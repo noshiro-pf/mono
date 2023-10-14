@@ -3,7 +3,7 @@ import { RootObservableClass } from '../class';
 import { type FromPromiseObservable } from '../types';
 
 export const fromPromise = <A, E = unknown>(
-  promise: Readonly<Promise<A>>
+  promise: Readonly<Promise<A>>,
 ): FromPromiseObservable<A, E> => new FromPromiseObservableClass(promise);
 
 class FromPromiseObservableClass<A, E = unknown>

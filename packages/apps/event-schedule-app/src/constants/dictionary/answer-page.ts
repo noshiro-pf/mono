@@ -3,7 +3,7 @@ import { ymd2str } from './datetime';
 import { detailedFilterDictionary } from './detailed-filter-dialog';
 
 const genTagName = (
-  icon: '△' | '✕' | '〇'
+  icon: '△' | '✕' | '〇',
 ): ((min: number, max: number) => string) => {
   const commonText = `${icon}の個数`;
 
@@ -122,12 +122,12 @@ export const answerPageDictionary = {
         pipe(
           Arr.zip(
             [Sun, Mon, Tue, Wed, Thr, Fri, Sat] as const,
-            commonDictionary.date.dayList
+            commonDictionary.date.dayList,
           )
             .filter(([checked, _displayName]) => checked)
-            .map(([_, displayName]) => displayName)
+            .map(([_, displayName]) => displayName),
         ).chain((list) =>
-          Arr.isEmpty(list) ? '曜日：なし' : `${list.join('・')}のみ`
+          Arr.isEmpty(list) ? '曜日：なし' : `${list.join('・')}のみ`,
         ).value,
 
       iconOfSpecifiedRespondent: '回答者の記号で絞り込み（詳細設定）',
@@ -164,7 +164,7 @@ export const answerPageDictionary = {
   requiredParticipantDescription:
     '（必須参加者が✕を付けている日のスコアは0点になります。）',
   noteForPointOfFair: (
-    defaultPoint: AnswerIconPoint
+    defaultPoint: AnswerIconPoint,
   ): readonly [string, string] => [
     '回答者が個別に△の点数を設定している場合があります。',
     `デフォルトの点数（＝${defaultPoint}点）から変更されている場合は、△の右隣に括弧付きでその点数が表示されています。`,

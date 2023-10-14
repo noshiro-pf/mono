@@ -18,6 +18,6 @@ export const TehaiTypeButtonGroup = memoNamed<Props>(
   (props) =>
     createElement(
       ButtonGroupTyped<TehaiType>,
-      Obj.merge(props, { buttons: tehaiTypeButtons })
-    )
+      Obj.merge(props, { buttons: tehaiTypeButtons }),
+    ),
 );

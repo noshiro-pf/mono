@@ -21,7 +21,7 @@ describe('hasKeyValue', () => {
       isLine({
         begin: { x: 1, y: 1 },
         end: { x: 2, y: 3 },
-      })
+      }),
     ).toBe(true);
   });
 });

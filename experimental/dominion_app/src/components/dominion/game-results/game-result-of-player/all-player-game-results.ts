@@ -3,14 +3,14 @@ import { TGameResult } from '~/types/game-result'
 import { IPlayerGameResult } from './player-game-result-type'
 
 export const allPlayerGameResults = (
-  gameResultsFiltered: I.List<TGameResult>
+  gameResultsFiltered: I.List<TGameResult>,
 ): I.List<IPlayerGameResult> => {
   // get all player names
   const userNames = new Set<string>()
   gameResultsFiltered.forEach((gr) =>
     gr.players.forEach((player) => {
       userNames.add(player.name)
-    })
+    }),
   )
 
   // initialize
@@ -30,7 +30,7 @@ export const allPlayerGameResults = (
     gr.players.forEach((player) => {
       rankScoreSumObj[player.name].numEachRank[player.rank]++
       rankScoreSumObj[player.name].scoreSum += player.score
-    })
+    }),
   )
 
   // calculate numEachRank and score average
@@ -45,7 +45,7 @@ export const allPlayerGameResults = (
         scoreSum: pl.scoreSum,
         scoreAverage: pl.scoreSum / count,
       }
-    }
+    },
   )
 
   return GRofEachPlayer.sort((a, b) => a.scoreAverage - b.scoreAverage)

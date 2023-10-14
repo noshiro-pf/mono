@@ -17,7 +17,7 @@ export const CheckboxView = ({
         onCheck?.(ev.target.checked);
         onChange?.(ev);
       },
-      [onCheck, onChange]
+      [onCheck, onChange],
     );
 
   const inputRef = useRef<Writable<HTMLInputElement>>(null);

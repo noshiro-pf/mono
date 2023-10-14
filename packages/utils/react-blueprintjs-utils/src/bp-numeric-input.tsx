@@ -13,7 +13,7 @@ export type BpNumericInputProps = Omit<NumericInputPropsOriginal, 'value'> &
     valueWhenNotParsedAsNumber?: number;
     convertValueOnBlurAndEmit?: (
       valueAsNumber: number,
-      valueAsString: string
+      valueAsString: string,
     ) => number;
   }>;
 
@@ -42,7 +42,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
         valueAsNumber: number,
         valueAsString: string,
         // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-        inputElement: HTMLInputElement | null
+        inputElement: HTMLInputElement | null,
       ) => {
         if (onValueChange !== undefined) {
           onValueChange(valueAsNumber, valueAsString, inputElement);
@@ -54,7 +54,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
           onValueChangeFiltered(parsed);
         }
       },
-      [onValueChange, onValueChangeFiltered, parseNumericString, setState]
+      [onValueChange, onValueChangeFiltered, parseNumericString, setState],
     );
 
     const onBlurInternal = useCallback<
@@ -71,7 +71,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
         if (parsed === undefined) {
           if (convertValueOnBlurAndEmit !== undefined) {
             onValueChangeFiltered(
-              convertValueOnBlurAndEmit(valueWhenNotParsedAsNumber, state)
+              convertValueOnBlurAndEmit(valueWhenNotParsedAsNumber, state),
             );
           } else {
             onValueChangeFiltered(valueWhenNotParsedAsNumber);
@@ -89,7 +89,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
         onValueChangeFiltered,
         onBlur,
         convertValueOnBlurAndEmit,
-      ]
+      ],
     );
 
     return (
@@ -104,7 +104,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
         {...props}
       />
     );
-  }
+  },
 );
 
 const style: React.CSSProperties = {

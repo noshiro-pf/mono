@@ -48,7 +48,7 @@ export type TimerObservable = Readonly<{
 
 export type WithInitialValueOperatorObservable<
   A,
-  I = A
+  I = A,
 > = InitializedSyncChildObservable<A | I, 'withInitialValue', readonly [A]>;
 export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
   B,
@@ -115,11 +115,11 @@ export type UnwrapResultErrOperatorObservable<R extends Result.Base> =
   >;
 export type MapMaybeOperatorObservable<
   M extends Maybe.Base,
-  B
+  B,
 > = SyncChildObservable<Maybe<B>, 'mapMaybe', readonly [M]>;
 export type MapResultOkOperatorObservable<
   R extends Result.Base,
-  S2
+  S2,
 > = SyncChildObservable<
   Result<S2, Result.UnwrapErr<R>>,
   'mapResultOk',
@@ -127,7 +127,7 @@ export type MapResultOkOperatorObservable<
 >;
 export type MapResultErrOperatorObservable<
   R extends Result.Base,
-  E2
+  E2,
 > = SyncChildObservable<
   Result<Result.UnwrapOk<R>, E2>,
   'mapResultErr',

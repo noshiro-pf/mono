@@ -6,7 +6,7 @@ import { AppView } from './App-view'
 
 const App: FC = () => {
   const snackbarIsOpen$ = useRN(
-    myName$.switchMap(() => timer(2000, true).mapTo(false).startWith(true))
+    myName$.switchMap(() => timer(2000, true).mapTo(false).startWith(true)),
   )
 
   const myName = useRNValue(myName$)

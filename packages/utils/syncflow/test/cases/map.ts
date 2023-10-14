@@ -3,7 +3,7 @@ import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import { type StreamTestCase } from '../typedef';
 
 const createStreams = (
-  tick: number
+  tick: number,
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<SafeUint>;
@@ -32,7 +32,7 @@ const createStreams = (
 export const mapTestCases: readonly [
   StreamTestCase<number>,
   StreamTestCase<number>,
-  StreamTestCase<number>
+  StreamTestCase<number>,
 ] = [
   {
     name: 'map case 1',

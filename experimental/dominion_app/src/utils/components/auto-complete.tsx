@@ -64,7 +64,7 @@ export const AutoComplete = memo(
       //   placeholder={placeholder}
       // />
     )
-  }
+  },
 )
 
 AutoComplete.displayName = 'AutoComplete'

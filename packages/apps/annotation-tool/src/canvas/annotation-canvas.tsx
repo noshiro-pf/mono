@@ -20,7 +20,7 @@ export const AnnotationCanvas = memoNamed<Props>(
         width: `${props.canvasSize.width}px`,
         height: `${props.canvasSize.height}px`,
       }),
-      [props.canvasSize]
+      [props.canvasSize],
     );
 
     const imgWrapperStyle = useMemo<React.CSSProperties>(
@@ -28,7 +28,7 @@ export const AnnotationCanvas = memoNamed<Props>(
         height: '100%',
         padding: `${props.canvasStyles.background.minPaddingPx}px`,
       }),
-      [props.canvasStyles.background.minPaddingPx]
+      [props.canvasStyles.background.minPaddingPx],
     );
 
     return (
@@ -70,7 +70,7 @@ export const AnnotationCanvas = memoNamed<Props>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 const absoluteWrapperStyle = css`

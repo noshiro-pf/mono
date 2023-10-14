@@ -30,18 +30,18 @@ export class AnswerPageComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private dialog: MatDialog,
-    private database: DatabaseService
+    private database: DatabaseService,
   ) {}
 
   ngOnInit() {
     this.eventId$ = this.route.paramMap.pipe(
-      switchMap((params: ParamMap) => params.getAll('eventId'))
+      switchMap((params: ParamMap) => params.getAll('eventId')),
     );
 
     this.event$ = combineLatest(
       this.database.schedulingEvents$,
       this.eventId$,
-      (list, id) => list.find((e) => e.databaseKey === id) || new Schedule()
+      (list, id) => list.find((e) => e.databaseKey === id) || new Schedule(),
     );
 
     this.answerDeadlineExpired$ = this.event$.pipe(
@@ -49,9 +49,9 @@ export class AnswerPageComponent implements OnInit {
         (e) =>
           utils.date.compare(
             Date.now(),
-            utils.date.getTomorrowTimestamp(e.answerDeadline)
-          ) > 0
-      )
+            utils.date.getTomorrowTimestamp(e.answerDeadline),
+          ) > 0,
+      ),
     );
   }
 

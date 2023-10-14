@@ -51,7 +51,7 @@ export const generateGlobalsForJest = (packageName, importsList) =>
 export const generateGlobalsDecl = (
   packageName,
   importsList,
-  typeImportsList
+  typeImportsList,
 ) =>
   [
     // imports
@@ -122,7 +122,7 @@ export const generateProvidePluginDef = (packageName, importsList) =>
 export const generateEslintNoRestrictedImportsDef = (
   packageName,
   importsList,
-  typeImportsList
+  typeImportsList,
 ) => {
   /**
    * @type {{

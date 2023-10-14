@@ -15,10 +15,10 @@ export const BpTextArea = memoNamed<BpTextAreaProps>(
       (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
         onValueChange(ev.target.value);
       },
-      [onValueChange]
+      [onValueChange],
     );
 
     // eslint-disable-next-line react/jsx-props-no-spreading
     return <TextArea value={value} onChange={onChangeHandler} {...props} />;
-  }
+  },
 );

@@ -109,5 +109,5 @@ export const ButtonWithConfirm = memoNamed<Props>(
         />
       </>
     );
-  }
+  },
 );

@@ -3,7 +3,7 @@ import { RootObservableClass } from '../class';
 import { type FromSubscribableObservable, type Subscribable } from '../types';
 
 export const fromSubscribable = <A, E = unknown>(
-  subscribable: Subscribable<A>
+  subscribable: Subscribable<A>,
 ): FromSubscribableObservable<A, E> =>
   new FromSubscribableObservableClass(subscribable);
 
@@ -24,7 +24,7 @@ class FromSubscribableObservableClass<A, E = unknown>
       },
       () => {
         this.complete();
-      }
+      },
     );
   }
 }

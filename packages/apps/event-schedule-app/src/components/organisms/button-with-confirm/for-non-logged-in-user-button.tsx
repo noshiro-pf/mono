@@ -47,7 +47,7 @@ export const ForNonLoggedInUserDialog = memoNamed<Props>(
         <Smaller>{dc.link.suffix}</Smaller>
       </Paragraph>
     </AlertWithMaxWidth>
-  )
+  ),
 );
 
 const Paragraph = styled.div`

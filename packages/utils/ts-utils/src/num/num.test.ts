@@ -4,7 +4,7 @@ import { Num } from './num';
 const testClamp = (
   [a, b]: readonly [number, number],
   target: number,
-  expected: number
+  expected: number,
 ): void => {
   test(`clamp ${target} to [${a}, ${b}]`, () => {
     expect(Num.clamp(a, b)(target)).toBe(expected);

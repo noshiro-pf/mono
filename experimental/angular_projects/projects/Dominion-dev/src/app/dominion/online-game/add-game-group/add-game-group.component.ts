@@ -44,7 +44,7 @@ export class AddGameGroupComponent implements OnInit {
     this.numberOfPlayers$.map((e) => !utils.number.isInRange(e, 2, 7)),
     this.isSelectedExpansions$.map((list) => list.every((e) => !e)),
     this.selectedCards$.map((e) => e.isEmpty()),
-    this.preparingDialog$
+    this.preparingDialog$,
   )
     .map((conditions) => conditions.some((e) => e))
     .withInitialValue(true)
@@ -58,7 +58,7 @@ export class AddGameGroupComponent implements OnInit {
     public dialog: MatDialog,
     private database: FireDatabaseService,
     private user: UserService,
-    private addGameGroupService: AddGameGroupService
+    private addGameGroupService: AddGameGroupService,
   ) {}
 
   ngOnInit() {}
@@ -98,7 +98,7 @@ export class AddGameGroupComponent implements OnInit {
 
   async makeNewGameRoomClicked(
     numberOfPlayers: number,
-    isSelectedExpansions: boolean[]
+    isSelectedExpansions: boolean[],
   ) {
     this.preparingDialog$.emit(true);
     await this.makeNewGameRoom(numberOfPlayers, isSelectedExpansions);
@@ -107,13 +107,13 @@ export class AddGameGroupComponent implements OnInit {
 
   private async makeNewGameRoom(
     numberOfPlayers: number,
-    isSelectedExpansions: boolean[]
+    isSelectedExpansions: boolean[],
   ) {
     const newRoom = await this.addGameGroupService.init(
       numberOfPlayers,
       isSelectedExpansions,
       this.memo$.value,
-      this.selectedCards$.value
+      this.selectedCards$.value,
     );
 
     // dialog
@@ -127,7 +127,7 @@ export class AddGameGroupComponent implements OnInit {
         await utils.asyncOperation.sleep(1);
         await this.database.onlineGameRoom.addMember(
           newRoom.databaseKey,
-          `testPlayer${i}`
+          `testPlayer${i}`,
         );
         console.log('added testPlayer');
       }
@@ -137,7 +137,7 @@ export class AddGameGroupComponent implements OnInit {
     if (result === 'Cancel Clicked') {
       this.database.onlineGameRoom.remove(newRoom.databaseKey);
       this.database.onlineGameCommunication.remove(
-        newRoom.gameRoomCommunicationId
+        newRoom.gameRoomCommunicationId,
       );
     } else {
       this.openSnackBar('Successfully signed in!');

@@ -4,7 +4,7 @@ import { useState } from './use-state';
 export const useDebounce = <ResultValue>(
   fn: () => ResultValue,
   deps: readonly unknown[],
-  bufferMilliSec: number = 300
+  bufferMilliSec: number = 300,
 ): ResultValue => {
   const timerId = useRef<TimerId | undefined>(undefined);
 
@@ -24,7 +24,7 @@ export const useDebounce = <ResultValue>(
       }, bufferMilliSec);
       return clearTimer;
     },
-    deps // eslint-disable-line react-hooks/exhaustive-deps
+    deps, // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return value;

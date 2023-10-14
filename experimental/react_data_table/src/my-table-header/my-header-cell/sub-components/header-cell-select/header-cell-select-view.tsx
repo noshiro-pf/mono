@@ -36,7 +36,7 @@ export const HeaderCellSelectView = memo(
         ev: React.ChangeEvent<{
           name?: string | undefined
           value: unknown
-        }>
+        }>,
       ) => {
         const value = Number(ev.target.value)
         if (value < 0) {
@@ -45,7 +45,7 @@ export const HeaderCellSelectView = memo(
           selectedIndexChange(value)
         }
       },
-      [selectedIndexChange, reset]
+      [selectedIndexChange, reset],
     )
 
     return (
@@ -98,7 +98,7 @@ export const HeaderCellSelectView = memo(
         )}
       </div>
     )
-  }
+  },
 )
 
 HeaderCellSelectView.displayName = 'HeaderCellSelectView'

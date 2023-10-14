@@ -107,7 +107,7 @@ const mapPlayers6CardsToDisplayValue = ({
                 onCardClick(c, direction);
               },
         } as const;
-      })
+      }),
     ).value;
 
 export const mapToDisplayValue = ({

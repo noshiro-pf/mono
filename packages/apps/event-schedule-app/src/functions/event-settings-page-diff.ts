@@ -96,8 +96,8 @@ const createDiffResult = <P extends EventSchedulePaths, R>(
   path: P,
   makeResult: (
     p: RecordValueAtPath<EventSchedule, P>,
-    c: RecordValueAtPath<EventSchedule, P>
-  ) => RelaxedExclude<R, undefined>
+    c: RecordValueAtPath<EventSchedule, P>,
+  ) => RelaxedExclude<R, undefined>,
 ): R | undefined => {
   const a = Obj.getIn(prev, path);
   const b = Obj.getIn(curr, path);
@@ -111,7 +111,7 @@ const notificationSettingsDiff = (
   a: EventSchedule['notificationSettings'],
   b: EventSchedule['notificationSettings'],
   emailPrev: string | undefined,
-  emailCurr: string | undefined
+  emailCurr: string | undefined,
 ): readonly string[] | undefined => {
   if (deepEqual(a, b) && emailPrev === emailCurr) return undefined;
 
@@ -131,11 +131,11 @@ const notificationSettingsDiff = (
               acc,
               `${notificationSettings[key]}${dict.common.colon} ${map(
                 a[key] ? ndc.on : ndc.off,
-                b[key] ? ndc.on : ndc.off
-              )}`
+                b[key] ? ndc.on : ndc.off,
+              )}`,
             ),
-      []
-    )
+      [],
+    ),
   );
 
   return collectedDiff;
@@ -145,38 +145,38 @@ const tilde = dict.common.tilde;
 
 const datetimeRange2str = (
   datetimeSpecification: EventSchedule['datetimeSpecification'],
-  datetimeRange: DatetimeRange
+  datetimeRange: DatetimeRange,
 ): string =>
   match(datetimeSpecification, {
     noStartEndSpecified: ymd2str(datetimeRange.ymd),
 
     startSpecified: `${ymd2str(datetimeRange.ymd)} ${hm2str(
-      datetimeRange.timeRange.start
+      datetimeRange.timeRange.start,
     )}${tilde}`,
 
     endSpecified: `${ymd2str(datetimeRange.ymd)} ${tilde}${hm2str(
-      datetimeRange.timeRange.end
+      datetimeRange.timeRange.end,
     )}`,
 
     startAndEndSpecified: `${ymd2str(datetimeRange.ymd)} ${hm2str(
-      datetimeRange.timeRange.start
+      datetimeRange.timeRange.start,
     )}${tilde}${hm2str(datetimeRange.timeRange.end)} `,
   });
 
 const datetimeRangeListDiff = (
   a: Pick<EventSchedule, 'datetimeRangeList' | 'datetimeSpecification'>,
-  b: Pick<EventSchedule, 'datetimeRangeList' | 'datetimeSpecification'>
+  b: Pick<EventSchedule, 'datetimeRangeList' | 'datetimeSpecification'>,
 ): Record<'added' | 'deleted', readonly string[]> | undefined => {
   const setA = ISetMapped.new(
     a.datetimeRangeList,
     datetimeRangeToMapKey,
-    datetimeRangeFromMapKey
+    datetimeRangeFromMapKey,
   );
 
   const setB = ISetMapped.new(
     b.datetimeRangeList,
     datetimeRangeToMapKey,
-    datetimeRangeFromMapKey
+    datetimeRangeFromMapKey,
   );
 
   const diff = ISetMapped.diff(setA, setB);
@@ -197,7 +197,7 @@ export const collectEventSettingsPageDiff = (
   prev: EventSchedule,
   curr: EventSchedule,
   emailPrev: string | undefined,
-  emailCurr: string | undefined
+  emailCurr: string | undefined,
 ): EventSettingsPageDiffResult => ({
   title: createDiffResult(prev, curr, ['title'], map),
   notes: createDiffResult(prev, curr, ['notes'], map),
@@ -207,7 +207,7 @@ export const collectEventSettingsPageDiff = (
     curr,
     ['datetimeSpecification'],
     (a, b) =>
-      map(datetimeSpecificationOptions[a], datetimeSpecificationOptions[b])
+      map(datetimeSpecificationOptions[a], datetimeSpecificationOptions[b]),
   ),
 
   datetimeRangeList: datetimeRangeListDiff(prev, curr),
@@ -215,15 +215,15 @@ export const collectEventSettingsPageDiff = (
   answerDeadline: createDiffResult(prev, curr, ['answerDeadline'], (a, b) =>
     map(
       a === 'none' ? dc.values.none : ymdhm2str(a),
-      b === 'none' ? dc.values.none : ymdhm2str(b)
-    )
+      b === 'none' ? dc.values.none : ymdhm2str(b),
+    ),
   ),
 
   notificationSettings: notificationSettingsDiff(
     prev.notificationSettings,
     curr.notificationSettings,
     emailPrev,
-    emailCurr
+    emailCurr,
   ),
 
   answerIcons: {
@@ -232,7 +232,7 @@ export const collectEventSettingsPageDiff = (
         prev,
         curr,
         ['answerIcons', 'good', 'description'],
-        map
+        map,
       ),
     },
 
@@ -241,13 +241,13 @@ export const collectEventSettingsPageDiff = (
         prev,
         curr,
         ['answerIcons', 'fair', 'description'],
-        map
+        map,
       ),
       point: createDiffResult(
         prev,
         curr,
         ['answerIcons', 'fair', 'point'],
-        (a, b) => map(a.toString(), b.toString())
+        (a, b) => map(a.toString(), b.toString()),
       ),
     },
 
@@ -256,19 +256,19 @@ export const collectEventSettingsPageDiff = (
         prev,
         curr,
         ['answerIcons', 'poor', 'description'],
-        map
+        map,
       ),
     },
   },
 
   author: createDiffResult(prev, curr, ['author'], (a, b) =>
-    map(a.name, b.name)
+    map(a.name, b.name),
   ),
 
   timezoneOffsetMinutes: createDiffResult(
     prev,
     curr,
     ['timezoneOffsetMinutes'],
-    (a, b) => map(a.toString(), b.toString())
+    (a, b) => map(a.toString(), b.toString()),
   ),
 });

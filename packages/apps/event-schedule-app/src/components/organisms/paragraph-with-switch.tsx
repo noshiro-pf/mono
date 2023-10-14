@@ -44,5 +44,5 @@ export const ParagraphWithSwitch = memoNamed<Props>(
           description.map((d, i) => <Description key={i} text={d} />)}
       {hideContentIfToggleIsFalse && !toggleState ? undefined : elementToToggle}
     </div>
-  )
+  ),
 );

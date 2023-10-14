@@ -27,19 +27,19 @@ export class EditEventComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     public dialog: MatDialog,
-    private database: DatabaseService
+    private database: DatabaseService,
   ) {}
 
   ngOnInit() {
     this.scEventId$ = this.route.paramMap.pipe(
-      switchMap((params: ParamMap) => params.getAll('eventId'))
+      switchMap((params: ParamMap) => params.getAll('eventId')),
     );
 
     const scEvent$: Observable<Schedule> = combineLatest(
       this.scEventId$,
       this.database.schedulingEvents$,
       (eventId, list) =>
-        list.find((e) => e.databaseKey === eventId) || new Schedule()
+        list.find((e) => e.databaseKey === eventId) || new Schedule(),
     );
 
     const scEventFirst$ = scEvent$.pipe(first());
@@ -102,7 +102,7 @@ export class EditEventComponent implements OnInit {
       /* remove selection for removed dates from answers */
       this.answers.forEach((ans) => {
         ans.selection = ans.selection.filter((sl) =>
-          this.selectedDatetimes.includes(sl.date)
+          this.selectedDatetimes.includes(sl.date),
         );
       });
 

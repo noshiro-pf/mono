@@ -37,14 +37,14 @@ export const GameMain = memoNamed<Props>('GameMain', ({ windowSize }) => {
 
   const displayValues: DisplayValues = useObservableValue(displayValues$);
   const turnPlayerHighlighterPosition = useObservableValue(
-    turnPlayerHighlighterPosition$
+    turnPlayerHighlighterPosition$,
   );
   const confirmTossBalloonProps = useObservableValue(confirmTossBalloonProps$);
   const selectAnswerBalloonProps = useObservableValue(
-    selectAnswerBalloonProps$
+    selectAnswerBalloonProps$,
   );
   const decidedAnswerBalloonProps = useObservableValue(
-    decidedAnswerBalloonProps$
+    decidedAnswerBalloonProps$,
   );
 
   return (

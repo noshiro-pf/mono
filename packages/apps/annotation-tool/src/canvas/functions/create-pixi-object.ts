@@ -37,7 +37,7 @@ export const getSpriteRect = (sprite: Sprite): Rect => ({
 
 export const createRectangleGraphics = (
   rect: Rect,
-  faceColor: Rgba
+  faceColor: Rgba,
 ): Graphics => {
   const gr = new Graphics();
   updateRectangleGraphics(gr, rect, faceColor);
@@ -47,7 +47,7 @@ export const createRectangleGraphics = (
 export const updateRectangleGraphics = (
   gr: Graphics,
   rect: Rect,
-  faceColor: Rgba
+  faceColor: Rgba,
 ): void => {
   gr.clear();
   const { left, top: top_, width, height } = rect;
@@ -61,7 +61,7 @@ export const createBorderedRectangleGraphics = (
   rect: Rect,
   faceColor: Rgba,
   borderWidthPx: number,
-  borderColor: Rgba
+  borderColor: Rgba,
 ): Graphics => {
   const gr = new Graphics();
   updateBorderedRectangleGraphics(
@@ -69,7 +69,7 @@ export const createBorderedRectangleGraphics = (
     rect,
     faceColor,
     borderWidthPx,
-    borderColor
+    borderColor,
   );
   return gr;
 };
@@ -79,7 +79,7 @@ export const updateBorderedRectangleGraphics = (
   rect: Rect,
   faceColor: Rgba,
   borderWidthPx: number,
-  borderColor: Rgba
+  borderColor: Rgba,
 ): void => {
   gr.clear();
   {

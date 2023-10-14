@@ -5,7 +5,7 @@ import { foreachBboxPoints } from './bbox-points';
 export const addBboxEventListener = (
   pixiBbox: PixiBbox,
   state: CanvasAppState,
-  stateHandler: CanvasAppStateHandler
+  stateHandler: CanvasAppStateHandler,
 ): void => {
   pixiBbox.pixi.face.removeAllListeners();
   pixiBbox.pixi.face.addListener('pointerover', () => {

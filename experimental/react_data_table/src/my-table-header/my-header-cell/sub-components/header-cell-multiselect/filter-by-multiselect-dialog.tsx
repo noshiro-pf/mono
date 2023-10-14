@@ -56,14 +56,14 @@ export const FilterByMultiselectDialog = memo(
     const selectedIndice$: RN<I.List<number>> = useRN(
       combine(
         selectedIndiceInput$,
-        selectorOptionsInput$.map((list) => list.map((_, i) => i))
+        selectorOptionsInput$.map((list) => list.map((_, i) => i)),
       ).switchMap(([init, selectorOps]) =>
         merge(
           flip$,
           selectAllClick$.mapTo<'selectAllClick'>('selectAllClick'),
           deselectAllClick$.mapTo<'deselectAllClick'>('deselectAllClick'),
           cancelClick$.mapTo<'cancelClick'>('cancelClick'),
-          okClick$.mapTo<'okClick'>('okClick')
+          okClick$.mapTo<'okClick'>('okClick'),
         )
           .scan(I.Set<number>(init), (acc: I.Set<number>, curr) => {
             switch (curr) {
@@ -79,8 +79,8 @@ export const FilterByMultiselectDialog = memo(
                 return acc.has(curr) ? acc.delete(curr) : acc.add(curr)
             }
           })
-          .map((s) => I.List(s).sort(num.cmp))
-      )
+          .map((s) => I.List(s).sort(num.cmp)),
+      ),
     )
 
     /* side effects */
@@ -88,7 +88,7 @@ export const FilterByMultiselectDialog = memo(
     useRNEffect(
       okClick$.withLatest(selectedIndice$),
       ([_, idc]) => okClickInput(idc),
-      false
+      false,
     )
 
     useRNEffect(cancelClick$, () => cancelClick(), false)
@@ -103,7 +103,7 @@ export const FilterByMultiselectDialog = memo(
           selectAllClickEmit()
         }
       },
-      [deselectAllClickEmit, selectAllClickEmit]
+      [deselectAllClickEmit, selectAllClickEmit],
     )
 
     /* extract values */
@@ -122,7 +122,7 @@ export const FilterByMultiselectDialog = memo(
         selectedIndice={selectedIndice}
       />
     )
-  }
+  },
 )
 
 FilterByMultiselectDialog.displayName = 'FilterByMultiselectDialog'

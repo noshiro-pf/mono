@@ -3,7 +3,7 @@ import { RN } from '../RN';
 export const fromPromise = <T>(
   initialValue: T,
   pr: Promise<T>,
-  name: string = ''
+  name: string = '',
 ): FromPromiseRN<T> => new FromPromiseRN<T>(initialValue, pr, name);
 
 class FromPromiseRN<T> extends RN<T> {

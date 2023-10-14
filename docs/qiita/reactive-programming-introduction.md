@@ -201,8 +201,8 @@ RxJS 版実装では、依存関係グラフを以下の図のように分解し
 ```js
 const tableFiltered$ = combineLatest(table$, headerValues$).pipe(
     map((table, headerValues) =>
-        table.filter((line) => filterFn(line, headerValues))
-    )
+        table.filter((line) => filterFn(line, headerValues)),
+    ),
 );
 ```
 
@@ -259,7 +259,7 @@ hello$.subscribe((_) => {
 
 ```js
 str$ = fromEvent(document.getElementById('str'), 'input').pipe(
-    (event) => event.target.value
+    (event) => event.target.value,
 );
 
 str$.subscribe((str) => {
@@ -283,7 +283,7 @@ Observable は`pipe`メソッドを持ち、様々なオペレータを渡すこ
 
 ```js
 alphabets$ = fromEvent(document.getElementById('alphabets'), 'input').pipe(
-    (event) => event.target.value
+    (event) => event.target.value,
 );
 ALPHABETS$ = alphabets$.pipe(map((str) => str.toUpperCase()));
 ALPHABETS$.subscribe((ALPHABETS) => {
@@ -328,10 +328,10 @@ buttons$.subscribe(() => {
 
 ```js
 str1$ = fromEvent(document.getElementById('str1'), 'input').pipe(
-    (event) => event.target.value
+    (event) => event.target.value,
 );
 str2$ = fromEvent(document.getElementById('str2'), 'input').pipe(
-    (event) => event.target.value
+    (event) => event.target.value,
 );
 str12$ = combineLatest(str1$, str2$).pipe(map((str1, str2) => str1 + str2));
 ```
@@ -353,8 +353,7 @@ npm install rxjs
 (2) 使用するソースコードでインポート（ES6 モジュールが使える場合）
 
 ```ts
-import { of } from 'rxjs';
-import { map } from 'rxjs/operators';
+
 ```
 
 あるいは以下のようにしてもよいです。
@@ -398,7 +397,7 @@ RxJS 版だと次のようになります。
 const fullName$ = fromEvent(document.getElementById('full-name'), 'input').pipe(
     map((event) => event.target.value ?? ''),
     debounceTime(100),
-    startWith('')
+    startWith(''),
 );
 ```
 
@@ -422,7 +421,7 @@ const headerValues$ = combineLatest(fullName$, emailAddress$, gender$).pipe(
         fullName: fullName,
         emailAddress: emailAddress,
         gender: gender,
-    }))
+    })),
 );
 ```
 
@@ -434,8 +433,8 @@ const headerValues$ = combineLatest(fullName$, emailAddress$, gender$).pipe(
 ```js
 const tableFiltered$ = combineLatest(table$, headerValues$).pipe(
     map((table, headerValues) =>
-        table.filter((line) => filterFn(line, headerValues))
-    )
+        table.filter((line) => filterFn(line, headerValues)),
+    ),
 );
 ```
 
@@ -450,13 +449,13 @@ const tableFiltered$ = combineLatest(table$, headerValues$).pipe(
 ```js
 const itemsPerPage$ = fromEvent(
     document.getElementById('items-per-page'),
-    'input'
+    'input',
 ).pipe(
     map(
         (event) => event.target.valueAsNumber ?? 50,
         debounceTime(100),
-        startWith(50)
-    )
+        startWith(50),
+    ),
 );
 ```
 
@@ -468,10 +467,10 @@ const itemsPerPage$ = fromEvent(
 const currentPage$ = merge(
     fromEvent(document.getElementById('current-page'), 'input').pipe(
         map((event) => event.target.valueAsNumber ?? 1),
-        debounceTime(100)
+        debounceTime(100),
     ),
     itemsPerPage$.pipe(map((_) => 1)),
-    tableFiltered$.pipe(map((_) => 1))
+    tableFiltered$.pipe(map((_) => 1)),
 ).pipe(startWith(1));
 ```
 
@@ -489,14 +488,14 @@ const currentPage$ = merge(
 const tableSliced$ = combineLatest(
     tableFiltered$,
     itemsPerPage$,
-    currentPage$
+    currentPage$,
 ).pipe(
     map((tableFiltered, itemsPerPage, currentPage) =>
         tableFiltered.slice(
             itemsPerPage * (currentPage - 1),
-            itemsPerPage * currentPage
-        )
-    )
+            itemsPerPage * currentPage,
+        ),
+    ),
 );
 ```
 

@@ -12,7 +12,7 @@ interface ISetMappedInterface<K, KM extends KeyType> {
   // Reducing a value
   every: ((predicate: (key: K) => boolean) => boolean) &
     (<L extends K>(
-      predicate: (key: K) => key is L
+      predicate: (key: K) => key is L,
     ) => this is ISetMapped<L, KM>);
   some: (predicate: (key: K) => boolean) => boolean;
 
@@ -22,7 +22,7 @@ interface ISetMappedInterface<K, KM extends KeyType> {
   withMutations: (
     actions: readonly Readonly<
       { type: 'add'; key: K } | { type: 'delete'; key: K }
-    >[]
+    >[],
   ) => ISetMapped<K, KM>;
 
   // Sequence algorithms
@@ -59,12 +59,12 @@ export const ISetMapped = {
   new: <K, KM extends KeyType>(
     iterable: Iterable<K>,
     toKey: (a: K) => KM,
-    fromKey: (k: KM) => K
+    fromKey: (k: KM) => K,
   ): ISetMapped<K, KM> => new ISetMappedClass<K, KM>(iterable, toKey, fromKey),
 
   equal: <K, KM extends KeyType>(
     a: ISetMapped<K, KM>,
-    b: ISetMapped<K, KM>
+    b: ISetMapped<K, KM>,
   ): boolean => {
     if (a.size !== b.size) return false;
 
@@ -73,7 +73,7 @@ export const ISetMapped = {
 
   diff: <K, KM extends KeyType>(
     oldSet: ISetMapped<K, KM>,
-    newSet: ISetMapped<K, KM>
+    newSet: ISetMapped<K, KM>,
   ): Record<'added' | 'deleted', ISetMapped<K, KM>> => ({
     deleted: oldSet.subtract(newSet),
     added: newSet.subtract(oldSet),
@@ -81,12 +81,12 @@ export const ISetMapped = {
 
   intersection: <K, KM extends KeyType>(
     a: ISetMapped<K, KM>,
-    b: ISetMapped<K, KM>
+    b: ISetMapped<K, KM>,
   ): ISetMapped<K, KM> => a.intersect(b),
 
   union: <K, KM extends KeyType>(
     a: ISetMapped<K, KM>,
-    b: ISetMapped<K, KM>
+    b: ISetMapped<K, KM>,
   ): ISetMapped<K, KM> => a.union(b),
 };
 
@@ -102,7 +102,7 @@ class ISetMappedClass<K, KM extends KeyType>
   constructor(
     iterable: Iterable<K>,
     toKey: (a: K) => KM,
-    fromKey: (k: KM) => K
+    fromKey: (k: KM) => K,
   ) {
     // eslint-disable-next-line no-restricted-globals
     this.#set = new Set(ArrayFrom(iterable, toKey));
@@ -123,7 +123,7 @@ class ISetMappedClass<K, KM extends KeyType>
   }
 
   every<L extends K>(
-    predicate: (key: K) => key is L
+    predicate: (key: K) => key is L,
   ): this is ISetMapped<L, KM>;
   every(predicate: (key: K) => boolean): boolean;
   every(predicate: (key: K) => boolean): boolean {
@@ -148,7 +148,7 @@ class ISetMappedClass<K, KM extends KeyType>
     return ISetMapped.new(
       [...this.#set, this.#toKey(key)].map(this.#fromKey),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
@@ -164,14 +164,14 @@ class ISetMappedClass<K, KM extends KeyType>
         .filter((k) => !Object.is(k, keyMapped))
         .map(this.#fromKey),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
   withMutations(
     actions: readonly Readonly<
       { type: 'add'; key: K } | { type: 'delete'; key: K }
-    >[]
+    >[],
   ): ISetMapped<K, KM> {
     // eslint-disable-next-line no-restricted-globals
     const mut_result = new Set<KM>(this.#set);
@@ -193,7 +193,7 @@ class ISetMappedClass<K, KM extends KeyType>
     return ISetMapped.new<K, KM>(
       ArrayFrom(mut_result, this.#fromKey),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
@@ -201,7 +201,7 @@ class ISetMappedClass<K, KM extends KeyType>
     return ISetMapped.new(
       this.toArray().map(mapFn),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
@@ -209,7 +209,7 @@ class ISetMappedClass<K, KM extends KeyType>
     return ISetMapped.new(
       this.toArray().filter(predicate),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
@@ -217,7 +217,7 @@ class ISetMappedClass<K, KM extends KeyType>
     return ISetMapped.new(
       this.toArray().filter((k) => !predicate(k)),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
@@ -239,7 +239,7 @@ class ISetMappedClass<K, KM extends KeyType>
     return ISetMapped.new(
       this.toArray().filter((k) => !set.has(k)),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
@@ -247,7 +247,7 @@ class ISetMappedClass<K, KM extends KeyType>
     return ISetMapped.new(
       this.toArray().filter((k) => set.has(k)),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
@@ -255,7 +255,7 @@ class ISetMappedClass<K, KM extends KeyType>
     return ISetMapped.new(
       [...this.values(), ...set.values()],
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 

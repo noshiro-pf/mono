@@ -17,11 +17,11 @@ export class UserService {
 
   constructor(
     private afAuth: AngularFireAuth,
-    private database: DatabaseService
+    private database: DatabaseService,
   ) {
     this.signedIn$ = this.afAuth.authState.pipe(map((user) => !!user));
     this.uid$ = this.afAuth.authState.pipe(
-      map((user) => (!user ? '' : user.uid))
+      map((user) => (!user ? '' : user.uid)),
     );
 
     this.myUserInfo$ = combineLatest(
@@ -30,16 +30,16 @@ export class UserService {
       (uid: string, users: User[]) =>
         !uid || users.length === 0
           ? new User()
-          : users.find((e) => e.databaseKey === uid) || new User()
+          : users.find((e) => e.databaseKey === uid) || new User(),
     );
 
     this.name$ = this.myUserInfo$.pipe(
       map((e) => e.name),
-      distinctUntilChanged()
+      distinctUntilChanged(),
     );
     this.name_yomi$ = this.myUserInfo$.pipe(
       map((e) => e.name_yomi),
-      distinctUntilChanged()
+      distinctUntilChanged(),
     );
 
     this.uid$.subscribe((val) => (this.uid = val));

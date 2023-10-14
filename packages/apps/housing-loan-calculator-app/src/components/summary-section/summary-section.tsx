@@ -44,7 +44,7 @@ export const SummarySection = memoNamed('SummarySection', () => {
         cyIdForDescription={'paymentsSumDescription'}
         cyIdForTitle={'paymentsSumTitle'}
         description={`${(propertyPriceManYen + interestSumManYen).toFixed(
-          2
+          2,
         )}万円`}
         title={dict.paymentsSum}
       />

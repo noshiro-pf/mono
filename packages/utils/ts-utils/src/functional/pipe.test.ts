@@ -6,15 +6,15 @@ describe('pipe', () => {
     expect(
       pipe(1)
         .chain((x) => x * 2)
-        .chain((x) => x.toString()).value
+        .chain((x) => x.toString()).value,
     ).toBe('2');
   });
 
   test('case 2', () => {
     expect(
       pipe({ x: 2, y: 3 } as const)
-        .chain((p) => ({ x: p.x, y: p.y * 4 } as const))
-        .chain((p) => ({ x: p.x * 5, y: p.y })).value
+        .chain((p) => ({ x: p.x, y: p.y * 4 }) as const)
+        .chain((p) => ({ x: p.x * 5, y: p.y })).value,
     ).toStrictEqual({ x: 10, y: 12 });
   });
 

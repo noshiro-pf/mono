@@ -50,7 +50,7 @@ export const calcBalloonPosition = ({
           anchorCardRect.width / 2 -
           balloonSize.width / 2,
       },
-    })
+    }),
   ).chain(({ top: t, left }: Readonly<{ top: number; left: number }>) => ({
     top: `${t}px` as const,
     left: `${left}px` as const,

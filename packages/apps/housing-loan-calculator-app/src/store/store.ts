@@ -78,8 +78,8 @@ const store$: InitializedObservable<Store> = combineLatestI([
       propertyPriceManYen,
       borrowingPeriodYear,
       interestRatePercentPerYear,
-    })
-  )
+    }),
+  ),
 );
 
 Router.state$.subscribe(({ searchParams: query }) => {
@@ -96,11 +96,11 @@ Router.state$.subscribe(({ searchParams: query }) => {
     propertyPrice: mapOptional(paramsAsStr.propertyPrice, Num.from),
     borrowingPeriodMonth: mapOptional(
       paramsAsStr.borrowingPeriodMonth,
-      Num.from
+      Num.from,
     ),
     interestRatePerMonth: mapOptional(
       paramsAsStr.interestRatePerMonth,
-      Num.from
+      Num.from,
     ),
   } as const;
 
@@ -121,7 +121,7 @@ Router.state$.subscribe(({ searchParams: query }) => {
   }
   if (paramsAsNumber.interestRatePerMonth !== undefined) {
     _setInterestRatePercentPerYear(
-      toPercentFloat(paramsAsNumber.interestRatePerMonth)
+      toPercentFloat(paramsAsNumber.interestRatePerMonth),
     );
   }
 });
@@ -134,7 +134,7 @@ userInput$.chain(withLatestFrom(store$)).subscribe(([_, store]) => {
       [queryParamKey.propertyPrice, store.propertyPriceManYen],
       [queryParamKey.borrowingPeriodMonth, store.borrowingPeriodYear],
       [queryParamKey.interestRatePerMonth, store.interestRatePercentPerYear],
-    ])
+    ]),
   );
 });
 

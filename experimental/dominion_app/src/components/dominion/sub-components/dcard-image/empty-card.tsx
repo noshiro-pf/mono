@@ -24,7 +24,7 @@ export const EmptyCard = memo(
       isButton={false}
       onClick={noop}
     />
-  )
+  ),
 )
 
 EmptyCard.displayName = 'EmptyCard'

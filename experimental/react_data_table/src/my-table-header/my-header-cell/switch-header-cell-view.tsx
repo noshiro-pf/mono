@@ -79,7 +79,7 @@ export const SwitchHeadereCellView = memo(
       default:
         return <span>{label}</span>
     }
-  }
+  },
 )
 
 SwitchHeadereCellView.displayName = 'SwitchHeadereCellView'

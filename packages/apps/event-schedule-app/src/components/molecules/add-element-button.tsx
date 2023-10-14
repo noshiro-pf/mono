@@ -8,5 +8,5 @@ export const AddElementButton = memoNamed<Props>(
   'AddElementButton',
   ({ onClick }) => (
     <Button data-cy={'add-button'} fill={true} icon='plus' onClick={onClick} />
-  )
+  ),
 );

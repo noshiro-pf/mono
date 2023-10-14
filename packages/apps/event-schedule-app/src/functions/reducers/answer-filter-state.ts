@@ -93,7 +93,7 @@ const initialState: AnswerFilterState = {
           : key.endsWith(`--poor`)
           ? 'poor'
           : 'none',
-      ]
+      ],
     ),
   },
 };
@@ -191,7 +191,7 @@ export type AnswerFilterStateAction = DeepReadonly<
 
 const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
   currentState,
-  action
+  action,
 ) =>
   pipe(currentState)
     .chain((state) => {
@@ -202,15 +202,15 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
               Obj.setIn(
                 draft,
                 ['dateRange', 'defaultValue'],
-                state.dateRange.defaultValue
-              )
+                state.dateRange.defaultValue,
+              ),
             )
             .chain((draft) =>
               Obj.setIn(
                 draft,
                 ['dateRange', 'value'],
-                state.dateRange.defaultValue ?? initialState.dateRange.value
-              )
+                state.dateRange.defaultValue ?? initialState.dateRange.value,
+              ),
             )
             .chain((draft) =>
               Obj.set(
@@ -218,15 +218,15 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
                 'iconState',
                 AnswerIconFilterState.reducer(state.iconState, {
                   type: 'reset',
-                })
-              )
+                }),
+              ),
             ).value;
 
         case 'icon':
           return Obj.set(
             state,
             'iconState',
-            AnswerIconFilterState.reducer(state.iconState, action.action)
+            AnswerIconFilterState.reducer(state.iconState, action.action),
           );
 
         case 'setFromUrlQueryParams': {
@@ -308,7 +308,7 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
                   defaultValue: action.range,
                   enabled: curr.enabled,
                   value: curr.value,
-                }
+                },
           );
         }
 
@@ -362,14 +362,14 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
             return Obj.updateIn(
               state,
               ['iconOfSpecifiedRespondent', 'falseKeys'] as const,
-              (st) => st.delete([username, iconId])
+              (st) => st.delete([username, iconId]),
             );
           } else {
             // check value is false
             return Obj.updateIn(
               state,
               ['iconOfSpecifiedRespondent', 'falseKeys'] as const,
-              (st) => st.add([username, iconId])
+              (st) => st.add([username, iconId]),
             );
           }
         }
@@ -385,7 +385,7 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
 
         case 'set-dayOfWeek':
           return Obj.updateIn(state, ['dayOfWeek', 'value'] as const, (draft) =>
-            Obj.set(draft, action.value.key, action.value.checked)
+            Obj.set(draft, action.value.key, action.value.checked),
           );
       }
     })
@@ -396,13 +396,13 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
         isNotUndefined(end) &&
         compareYmd(start, end) > 0
           ? { start, end: start }
-          : { start, end }
-      )
+          : { start, end },
+      ),
     )
     .chain((state) =>
       Obj.updateIn(state, ['scoreRange', 'value'] as const, ({ min, max }) =>
-        max < min ? { min, max: min } : { min, max }
-      )
+        max < min ? { min, max: min } : { min, max },
+      ),
     ).value;
 
 export const AnswerFilterState = {

@@ -27,11 +27,11 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
 });
 
 const resultsSortedByProbability = pipe(Array.from(results)).chain((list) =>
-  Arr.sorted(list, (a, b) => -(a.countSum - b.countSum))
+  Arr.sorted(list, (a, b) => -(a.countSum - b.countSum)),
 ).value;
 
 const { state$: sortBy$, setState: setSortBy } = createState<'dice' | 'prob'>(
-  'prob'
+  'prob',
 );
 
 const sortByDice = (): void => {
@@ -74,18 +74,18 @@ export const App = memoNamed('App', () => {
         .map(Num.from)
         .filter(isNotUndefined)
         .filter(isTwoDiceSumValue),
-    [filterByString]
+    [filterByString],
   );
 
   const sorted = useMemo(
     () => (sortBy === 'dice' ? results : resultsSortedByProbability),
-    [sortBy]
+    [sortBy],
   );
 
   const filtered = useMemo(
     () =>
       sorted.filter((row) => filterBy.every((v) => row.selected.includes(v))),
-    [sorted, filterBy]
+    [sorted, filterBy],
   );
 
   const columnsAliveWithHandler = useMemo<
@@ -101,22 +101,22 @@ export const App = memoNamed('App', () => {
         alive,
         toggle: () => {
           updateDeadColumns((prev) =>
-            prev.map((b, i) => (i === index ? !b : b))
+            prev.map((b, i) => (i === index ? !b : b)),
           );
         },
       })),
 
-    [columnsAlive]
+    [columnsAlive],
   );
 
   const hitSomeAliveColumnProbability = useMemo(
     () =>
       countSuccessForRemains(
         ISet.new(
-          columnsAliveWithHandler.filter((a) => a.alive).map((a) => a.columnId)
-        )
+          columnsAliveWithHandler.filter((a) => a.alive).map((a) => a.columnId),
+        ),
       ) / denom,
-    [columnsAliveWithHandler]
+    [columnsAliveWithHandler],
   );
 
   return (

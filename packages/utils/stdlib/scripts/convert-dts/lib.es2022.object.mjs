@@ -11,7 +11,7 @@ export const convertLibEs2022Object = (from) => {
     [
       '/// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />',
       '/// <reference path="./lib.es5.d.ts" />',
-    ].join('\n')
+    ].join('\n'),
   );
 
   ret = ret.replaceAll(
@@ -40,7 +40,7 @@ export const convertLibEs2022Object = (from) => {
       '  : never; // dummy case for union distribution',
       '',
       'interface ObjectConstructor {',
-    ].join('\n')
+    ].join('\n'),
   );
 
   ret = ret.replaceAll('@param o', '@param obj');
@@ -52,7 +52,7 @@ export const convertLibEs2022Object = (from) => {
       '  obj: R,',
       '  key: K',
       '): obj is _HasOwnReturnType<R, K>;',
-    ].join('\n')
+    ].join('\n'),
   );
 
   return ret;

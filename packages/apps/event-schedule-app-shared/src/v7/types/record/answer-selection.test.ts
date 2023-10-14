@@ -41,7 +41,7 @@ describe('AnswerSelection', () => {
   describe('fillAnswerSelection', () => {
     test('defaultValue should be true', () => {
       expect(fillAnswerSelection({})).toStrictEqual(
-        answerSelectionDefaultValue
+        answerSelectionDefaultValue,
       );
     });
   });

@@ -20,7 +20,7 @@ const databaseJsonType = t.record({
   dateToPollIdMap: t.keyValueRecord(dateOptionIdType, pollIdType),
   commandMessageIdToPollIdMap: t.keyValueRecord(
     commandMessageIdType,
-    pollIdType
+    pollIdType,
   ),
 });
 
@@ -39,22 +39,22 @@ export const databaseFromJson = (o?: unknown): Database =>
     .chain(databaseJsonType.fill)
     .chain((p) => ({
       polls: IMap.new<PollId, Poll>(
-        Object.entries(p.polls).map(([k, v]) => tp(k, pollFromJson(v)))
+        Object.entries(p.polls).map(([k, v]) => tp(k, pollFromJson(v))),
       ),
       dateToPollIdMap: IMap.new<DateOptionId, PollId>(
-        Object.entries(p.dateToPollIdMap)
+        Object.entries(p.dateToPollIdMap),
       ),
       commandMessageIdToPollIdMap: IMap.new<CommandMessageId, PollId>(
-        Object.entries(p.commandMessageIdToPollIdMap)
+        Object.entries(p.commandMessageIdToPollIdMap),
       ),
     })).value;
 
 export const databaseToJson = (database: Database): DatabaseJson => ({
   polls: Object.fromEntries(database.polls.map(pollToJson).toEntriesArray()),
   dateToPollIdMap: Object.fromEntries(
-    database.dateToPollIdMap.toEntriesArray()
+    database.dateToPollIdMap.toEntriesArray(),
   ),
   commandMessageIdToPollIdMap: Object.fromEntries(
-    database.commandMessageIdToPollIdMap.toEntriesArray()
+    database.commandMessageIdToPollIdMap.toEntriesArray(),
   ),
 });

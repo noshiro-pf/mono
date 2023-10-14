@@ -10,7 +10,7 @@ export const convertLibEs2017String = (from) => {
 
   ret = ret.replaceAll(
     'maxLength: number',
-    `maxLength: ${indexType.argNonNegative}`
+    `maxLength: ${indexType.argNonNegative}`,
   );
 
   return ret;

@@ -7,7 +7,7 @@ import { fbFunctions } from '../../initialize-firebase';
 
 const fbFetchEventListOfUser = httpsCallable(
   fbFunctions,
-  'fetchEventListOfUser'
+  'fetchEventListOfUser',
 );
 
 export const fetchEventListOfUser = ({
@@ -32,7 +32,7 @@ export const fetchEventListOfUser = ({
       filterOptionState,
       showAllPastDaysEvent,
       showOnlyEventSchedulesICreated,
-    })
+    }),
   ).then((result) => {
     if (Result.isErr(result)) {
       return Result.err({

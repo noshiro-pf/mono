@@ -48,5 +48,5 @@ export const SubmitEditingEventButton = memoNamed<Props>(
         text={dc.editEventButton.name}
         onClick={EditEventScheduleStore.onEditEventClick}
       />
-    )
+    ),
 );

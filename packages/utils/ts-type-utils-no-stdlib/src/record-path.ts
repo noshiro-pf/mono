@@ -9,7 +9,7 @@ export type Paths<R> = Prefixes<LeafPaths<R>>;
 
 export type Prefixes<L extends readonly unknown[]> = L extends readonly [
   infer Head,
-  ...infer Rest
+  ...infer Rest,
 ]
   ? readonly [] | readonly [Head, ...Prefixes<Rest>]
   : readonly [];
@@ -33,7 +33,7 @@ export type LeafPaths<R> = R extends readonly unknown[]
 /** @internal */
 type LeafPathsImplListCase<
   T extends readonly unknown[],
-  PathHead extends keyof T
+  PathHead extends keyof T,
 > = T extends readonly []
   ? readonly []
   : IsNotFixedLengthList<T> extends true
@@ -47,7 +47,7 @@ type LeafPathsImplListCase<
 /** @internal */
 type LeafPathsImplRecordCase<
   R extends RecordBase,
-  PathHead extends keyof R
+  PathHead extends keyof R,
 > = string extends PathHead
   ? readonly []
   : PathHead extends keyof R
@@ -63,7 +63,7 @@ export type LeafPathsWithIndex<R> = R extends readonly unknown[]
 /** @internal */
 type _LeafPathsWithIndexImplListCase<
   T extends readonly unknown[],
-  PathHead extends keyof T
+  PathHead extends keyof T,
 > = T extends readonly []
   ? readonly []
   : IsNotFixedLengthList<T> extends true
@@ -77,7 +77,7 @@ type _LeafPathsWithIndexImplListCase<
 /** @internal */
 type LeafPathsWithIndexImplRecordCase<
   R extends RecordBase,
-  PathHead extends keyof R
+  PathHead extends keyof R,
 > = PathHead extends keyof R
   ? readonly [PathHead, ...LeafPathsWithIndex<R[PathHead]>]
   : never;
@@ -85,7 +85,7 @@ type LeafPathsWithIndexImplRecordCase<
 export type RecordUpdated<
   R,
   Path extends Paths<R>,
-  ValueAfter
+  ValueAfter,
 > = Path extends readonly []
   ? ValueAfter
   : R extends readonly unknown[]
@@ -98,7 +98,7 @@ export type RecordUpdated<
 type RecordUpdatedImplRecordCase<
   R extends RecordBase,
   Path extends Paths<R>,
-  ValueAfter
+  ValueAfter,
 > = Path extends readonly [infer Head, ...infer Rest]
   ? Head extends keyof R
     ? Rest extends Paths<R[Head]>
@@ -115,7 +115,7 @@ type RecordUpdatedImplRecordCase<
 type RecordUpdatedImplTupleCase<
   T extends readonly unknown[],
   Path extends Paths<T>,
-  ValueAfter
+  ValueAfter,
 > = Path extends readonly [infer Head, ...infer Rest]
   ? Head extends IndexOfTuple<T>
     ? Rest extends Paths<T[Head]>
@@ -126,7 +126,7 @@ type RecordUpdatedImplTupleCase<
 
 export type RecordValueAtPath<
   R,
-  Path extends Paths<R>
+  Path extends Paths<R>,
 > = Path extends readonly [infer Head, ...infer Rest]
   ? Head extends keyof R
     ? Rest extends Paths<R[Head]>
@@ -137,14 +137,14 @@ export type RecordValueAtPath<
 
 export type RecordValueAtPathWithIndex<
   R,
-  Path extends PathsWithIndex<R>
+  Path extends PathsWithIndex<R>,
 > = RecordValueAtPathWithIndexImpl<R, Path, never>;
 
 /** @internal */
 type RecordValueAtPathWithIndexImpl<
   R,
   Path extends PathsWithIndex<R>,
-  LastPathElement
+  LastPathElement,
 > = Path extends readonly [infer Head, ...infer Rest]
   ? Head extends keyof R
     ? Rest extends PathsWithIndex<R[Head]>

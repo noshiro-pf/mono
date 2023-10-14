@@ -18,7 +18,7 @@ export class AppComponent {
 
   constructor(
     private snackBar: MatSnackBar,
-    private afAuth: AngularFireAuth // private myUserInfo: MyUserInfoService, // private autoBackup: AutoBackupOnFirebaseService,
+    private afAuth: AngularFireAuth, // private myUserInfo: MyUserInfoService, // private autoBackup: AutoBackupOnFirebaseService,
   ) {
     // this.myName$ = myUserInfo.name$;
     // this.signedIn$ = this.myUserInfo.signedIn$;

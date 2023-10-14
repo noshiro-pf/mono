@@ -54,7 +54,7 @@ for (let s of strings) {
     for (let name in validators) {
         let isMatch = validators[name].isAcceptable(s);
         console.log(
-            `'${s}' ${isMatch ? 'matches' : 'does not match'} '${name}'.`
+            `'${s}' ${isMatch ? 'matches' : 'does not match'} '${name}'.`,
         );
     }
 }
@@ -108,7 +108,7 @@ for (let s of strings) {
         console.log(
             `"${s}" - ${
                 validators[name].isAcceptable(s) ? 'matches' : 'does not match'
-            } ${name}`
+            } ${name}`,
         );
     }
 }
@@ -187,7 +187,7 @@ for (let s of strings) {
         console.log(
             `"${s}" - ${
                 validators[name].isAcceptable(s) ? 'matches' : 'does not match'
-            } ${name}`
+            } ${name}`,
         );
     }
 }

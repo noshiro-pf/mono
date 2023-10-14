@@ -38,12 +38,12 @@ const mul = (x: SafeUintWithSmallInt, y: SafeUintWithSmallInt): SafeUint =>
 
 const div = (
   x: SafeUintWithSmallInt,
-  y: PositiveSafeIntWithSmallInt
+  y: PositiveSafeIntWithSmallInt,
 ): SafeUint => clamp(Math.floor(x / y));
 
 const random = (
   min: SafeUintWithSmallInt,
-  max: SafeUintWithSmallInt
+  max: SafeUintWithSmallInt,
 ): SafeUint =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 

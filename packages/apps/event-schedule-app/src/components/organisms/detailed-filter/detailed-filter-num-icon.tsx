@@ -79,5 +79,5 @@ export const DetailedFilterNumIcon = memoNamed<Props>(
         />
       </IconCountNumericInputWrapper>
     </FilterItem>
-  )
+  ),
 );

@@ -20,7 +20,7 @@ const zi = zipI([
 ] as const);
 
 expectType<typeof z, SyncChildObservable<readonly [number, string], 'zip'>>(
-  '<='
+  '<=',
 );
 
 expectType<

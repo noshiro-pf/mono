@@ -76,5 +76,5 @@ export const DivCropped = memoNamed<Props>(
         <AbsoluteWrapper style={zoomedImgStyle}>{children}</AbsoluteWrapper>
       </RelativeWrapper>
     );
-  }
+  },
 );

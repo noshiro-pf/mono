@@ -17,7 +17,10 @@ export class FeedbackComponent implements OnInit {
 
   readonly feedbacks$: RN<Feedback[]> = this.database.feedbacks$;
 
-  constructor(private dialog: MatDialog, private database: DatabaseService) {}
+  constructor(
+    private dialog: MatDialog,
+    private database: DatabaseService,
+  ) {}
 
   ngOnInit() {}
 
@@ -43,7 +46,7 @@ export class FeedbackComponent implements OnInit {
             timeStamp: Date.now(),
             closed: false,
             category: this.category,
-          })
+          }),
         );
         this.name = '';
         this.feedbackText = '';

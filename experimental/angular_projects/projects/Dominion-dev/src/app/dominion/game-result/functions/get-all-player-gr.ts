@@ -7,7 +7,7 @@ export const getAllPlayerGR = (GRlistFiltered: GameResult[]): PlayerGR[] => {
   GRlistFiltered.forEach((gr) =>
     gr.players.forEach((player) => {
       userNames.add(player.name);
-    })
+    }),
   );
 
   // initialize
@@ -30,7 +30,7 @@ export const getAllPlayerGR = (GRlistFiltered: GameResult[]): PlayerGR[] => {
     gr.players.forEach((player) => {
       rankScoreSumObj[player.name].countRank[player.rank]++;
       rankScoreSumObj[player.name].scoreSum += player.score;
-    })
+    }),
   );
 
   // calculate countRank and score average

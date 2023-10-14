@@ -5,7 +5,7 @@ export function getTypeOfPropertyOfName(
   checker: ts.TypeChecker,
   type: ts.Type,
   name: string,
-  escapedName?: ts.__String
+  escapedName?: ts.__String,
 ): ts.Type | undefined {
   // Most names are directly usable in the checker and aren't different from escaped names
   if (!escapedName || !name.startsWith('__')) {
@@ -26,12 +26,12 @@ export function getTypeOfPropertyOfName(
 export function getTypeOfPropertyOfType(
   checker: ts.TypeChecker,
   type: ts.Type,
-  property: ts.Symbol
+  property: ts.Symbol,
 ): ts.Type | undefined {
   return getTypeOfPropertyOfName(
     checker,
     type,
     property.getName(),
-    property.getEscapedName()
+    property.getEscapedName(),
   );
 }

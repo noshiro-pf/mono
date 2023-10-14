@@ -19,6 +19,6 @@ if (isDev && useEmulators) {
   connectFirestoreEmulator(
     firestoreApp,
     'localhost',
-    firebaseJson.emulators.firestore.port
+    firebaseJson.emulators.firestore.port,
   );
 }

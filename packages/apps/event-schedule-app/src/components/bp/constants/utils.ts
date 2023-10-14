@@ -2,7 +2,7 @@ import { hexToRgb } from '@noshiro/ts-utils-additional';
 
 export const hexToRgba = (
   hex: string,
-  alpha: number
+  alpha: number,
 ): `rgba(${string}, ${number})` =>
   `rgba(${hexToRgb(hex).join(', ')}, ${alpha})`;
 

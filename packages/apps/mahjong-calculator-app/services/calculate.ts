@@ -44,7 +44,7 @@ export const calculate = (): void => {
 
   if (Maybe.isNone(maybeRevealedBlocks)) {
     setResult(
-      Result.err({ type: 'revealedBlocks-is-undefined', message: '' } as const)
+      Result.err({ type: 'revealedBlocks-is-undefined', message: '' } as const),
     );
   }
 
@@ -54,19 +54,19 @@ export const calculate = (): void => {
 
   if (Maybe.isNone(maybeBakaze)) {
     setResult(
-      Result.err({ type: 'bakaze-is-undefined', message: '' } as const)
+      Result.err({ type: 'bakaze-is-undefined', message: '' } as const),
     );
   }
 
   if (Maybe.isNone(maybeJikaze)) {
     setResult(
-      Result.err({ type: 'jikaze-is-undefined', message: '' } as const)
+      Result.err({ type: 'jikaze-is-undefined', message: '' } as const),
     );
   }
 
   if (Maybe.isNone(maybeDoraIndicators)) {
     setResult(
-      Result.err({ type: 'doraIndicators-is-undefined', message: '' } as const)
+      Result.err({ type: 'doraIndicators-is-undefined', message: '' } as const),
     );
   }
 
@@ -75,7 +75,7 @@ export const calculate = (): void => {
       Result.err({
         type: 'numRemainingTiles-is-undefined',
         message: '',
-      } as const)
+      } as const),
     );
   }
 
@@ -84,7 +84,7 @@ export const calculate = (): void => {
       Result.err({
         type: 'flagOptions-is-undefined',
         message: '',
-      } as const)
+      } as const),
     );
   }
 
@@ -93,7 +93,7 @@ export const calculate = (): void => {
       Result.err({
         type: 'maximizeTarget-is-undefined',
         message: '',
-      } as const)
+      } as const),
     );
   }
 
@@ -102,7 +102,7 @@ export const calculate = (): void => {
       Result.err({
         type: 'tehaiType-is-undefined',
         message: '',
-      } as const)
+      } as const),
     );
   }
 
@@ -171,7 +171,7 @@ export const calculate = (): void => {
           type: 'fetch-error',
           message:
             'サーバーとの通信に失敗しました。サービス停止中は利用できません。',
-        } as const)
+        } as const),
       );
     })
     .finally(() => {

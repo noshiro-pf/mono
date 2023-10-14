@@ -107,21 +107,21 @@ export const convertLibEs2023Array = (from) => {
   for (const elemType of typedArrayElemTypes) {
     const slice = ret.slice(
       ret.indexOf(markers[elemType].start),
-      ret.indexOf(markers[elemType].end)
+      ret.indexOf(markers[elemType].end),
     );
     ret = ret.replaceAll(
       slice,
       slice.replaceAll(
         'number',
-        elemType === 'Uint8Clamped' ? 'Uint8' : elemType
-      )
+        elemType === 'Uint8Clamped' ? 'Uint8' : elemType,
+      ),
     );
   }
 
   for (const elemType of bigIntElemTypes) {
     const slice = ret.slice(
       ret.indexOf(markers[elemType].start),
-      ret.indexOf(markers[elemType].end ?? '$$$$$$$$$$$')
+      ret.indexOf(markers[elemType].end ?? '$$$$$$$$$$$'),
     );
     ret = ret.replaceAll(slice, slice.replaceAll(`bigint`, elemType));
   }

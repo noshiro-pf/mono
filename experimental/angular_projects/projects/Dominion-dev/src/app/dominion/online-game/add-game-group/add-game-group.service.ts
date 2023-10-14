@@ -16,10 +16,10 @@ export class AddGameGroupService {
 
   constructor(
     private database: FireDatabaseService,
-    private user: UserService
+    private user: UserService,
   ) {
     this.database.cardPropertyList$.subscribe(
-      (val) => (this.cardPropertyList = val)
+      (val) => (this.cardPropertyList = val),
     );
 
     this.user.name$.subscribe((val) => (this.myName = val));
@@ -29,7 +29,7 @@ export class AddGameGroupService {
     numberOfPlayers: number,
     isSelectedExpansions: boolean[],
     memo: string,
-    selectedCards: SelectedCards
+    selectedCards: SelectedCards,
   ) {
     const newRoom = new GameRoom();
     {
@@ -42,7 +42,7 @@ export class AddGameGroupService {
       newRoom.initDecks();
       newRoom.initialState.setNumberOfPlayers(numberOfPlayers);
       newRoom.initialState.usePotion = selectedCards.usePotion(
-        this.cardPropertyList
+        this.cardPropertyList,
       );
       newRoom.initialState.turnInfo = new TurnInfo({
         action: 1,
@@ -79,8 +79,8 @@ export class AddGameGroupService {
               clickedCardId: 0,
             },
           },
-          undefined
-        )
+          undefined,
+        ),
       );
       const result = await this.database.onlineGameCommunication.add(newComm);
       newRoom.gameRoomCommunicationId = result.key;
@@ -95,7 +95,7 @@ export class AddGameGroupService {
     // add me to GameRoom object
     await this.database.onlineGameRoom.addMember(
       newRoom.databaseKey,
-      this.myName
+      this.myName,
     );
 
     return newRoom;

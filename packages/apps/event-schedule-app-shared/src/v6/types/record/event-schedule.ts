@@ -70,7 +70,7 @@ const isAnswerDeadline = (e: unknown): e is Ymdhm | 'none' =>
   e === 'none' || isYmdhm(e);
 
 const isNotificationSettingsWithNone = (
-  e: unknown
+  e: unknown,
 ): e is NotificationSettings | 'none' =>
   e === 'none' || isNotificationSettings(e);
 
@@ -87,7 +87,7 @@ export const isEventSchedule = (a: unknown): a is EventSchedule =>
   Obj.hasKeyValue(
     a,
     'datetimeSpecification',
-    isDatetimeSpecificationEnumType
+    isDatetimeSpecificationEnumType,
   ) &&
   Obj.hasKeyValue(a, 'datetimeRangeList', isDatetimeRangeList) &&
   Obj.hasKeyValue(a, 'answerDeadline', isAnswerDeadline) &&
@@ -109,7 +109,7 @@ export const fillEventSchedule = (a?: unknown): EventSchedule =>
         datetimeSpecification: Obj.hasKeyValue(
           a,
           'datetimeSpecification',
-          isDatetimeSpecificationEnumType
+          isDatetimeSpecificationEnumType,
         )
           ? a.datetimeSpecification
           : d.datetimeSpecification,
@@ -140,7 +140,7 @@ export const fillEventSchedule = (a?: unknown): EventSchedule =>
         timezoneOffsetMinutes: Obj.hasKeyValue(
           a,
           'timezoneOffsetMinutes',
-          isNumber
+          isNumber,
         )
           ? a.timezoneOffsetMinutes
           : d.timezoneOffsetMinutes,

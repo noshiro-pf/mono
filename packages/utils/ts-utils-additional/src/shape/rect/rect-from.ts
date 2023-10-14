@@ -3,7 +3,7 @@ import { type Point, type Rect } from '../../types';
 
 export const rectFromXYs = (
   xs: readonly [number, number],
-  ys: readonly [number, number]
+  ys: readonly [number, number],
 ): Rect => ({
   top: Math.min(ys[0], ys[1]),
   left: Math.min(xs[0], xs[1]),

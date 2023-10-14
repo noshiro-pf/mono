@@ -5,7 +5,7 @@ import { possibleTwoDiceSumPairs } from './possible-two-dice-sum-pair';
 export const countSuccess = (
   x: TwoDiceSumValue,
   y: TwoDiceSumValue,
-  z: TwoDiceSumValue
+  z: TwoDiceSumValue,
 ): Count => {
   const mut_count: Writable<Record<keyof Count, number>> = {
     oneLine: 0,

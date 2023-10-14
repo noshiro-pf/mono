@@ -90,7 +90,7 @@ export class ScheduleComponent implements OnInit {
 
   readonly password$: RN<string> = merge(
     this.passwordFromUI$,
-    this.passwordEnabledFromUI$.filter(true, (b) => b === false).mapTo('')
+    this.passwordEnabledFromUI$.filter(true, (b) => b === false).mapTo(''),
   );
 
   readonly createEventButtonDisabled$: RN<boolean> = combine(
@@ -98,7 +98,7 @@ export class ScheduleComponent implements OnInit {
     this.answerDeadline$,
     this.selectedDatetimes$,
     this.passwordEnabled$,
-    this.password$
+    this.password$,
   )
     .map(
       ([title, answerDeadline, selectedDatetimes, passwordEnabled, password]) =>
@@ -106,11 +106,14 @@ export class ScheduleComponent implements OnInit {
         !selectedDatetimes ||
         selectedDatetimes.length === 0 ||
         !answerDeadline ||
-        (passwordEnabled && password === '')
+        (passwordEnabled && password === ''),
     )
     .withInitialValue(false);
 
-  constructor(public dialog: MatDialog, private database: DatabaseService) {}
+  constructor(
+    public dialog: MatDialog,
+    private database: DatabaseService,
+  ) {}
 
   ngOnInit() {}
 

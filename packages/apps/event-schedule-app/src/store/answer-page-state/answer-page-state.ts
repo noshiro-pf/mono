@@ -49,7 +49,7 @@ const {
 } = createState(answerDefaultValue);
 
 const setAnswerBeingEditedSectionState = (
-  nextState: 'creating' | 'editing' | 'hidden'
+  nextState: 'creating' | 'editing' | 'hidden',
 ): void => {
   _setAnswerBeingEditedSectionState(nextState);
 
@@ -61,8 +61,8 @@ const setAnswerBeingEditedSectionState = (
       Obj.set(
         ans,
         'user',
-        Obj.set(ans.user, 'id', mapOptional(user?.uid, toUserId) ?? null)
-      )
+        Obj.set(ans.user, 'id', mapOptional(user?.uid, toUserId) ?? null),
+      ),
     );
   }
 };
@@ -79,8 +79,8 @@ const {
   ISetMapped.new<DatetimeRange, DatetimeRangeMapKey>(
     [],
     datetimeRangeToMapKey,
-    datetimeRangeFromMapKey
-  )
+    datetimeRangeFromMapKey,
+  ),
 );
 
 const { state$: batchInputFieldIsOpen$, toggle: _toggleBatchInputField } =
@@ -94,28 +94,28 @@ const toggleBatchInputField = (): void => {
 /* mapped values */
 
 const selectedAnswerUserName$ = selectedAnswerSaved$.chain(
-  mapI((selectedAnswerSaved) => selectedAnswerSaved?.user.name)
+  mapI((selectedAnswerSaved) => selectedAnswerSaved?.user.name),
 );
 
 const requiredParticipantsExist$: InitializedObservable<boolean> =
   answers$.chain(
-    mapI((answers) => answers?.some((a) => a.isRequiredParticipants) === true)
+    mapI((answers) => answers?.some((a) => a.isRequiredParticipants) === true),
   );
 
 const selectedDates$: InitializedObservable<readonly YearMonthDate[]> =
   eventSchedule$.chain(
     mapI(
       (eventSchedule) =>
-        eventSchedule?.datetimeRangeList.map((d) => d.ymd) ?? []
-    )
+        eventSchedule?.datetimeRangeList.map((d) => d.ymd) ?? [],
+    ),
   );
 
 const setYearMonth$: Observable<CalendarCurrentPageReducerState> =
   selectedDates$
     .chain(
       map((selectedDates) =>
-        Arr.isNonEmpty(selectedDates) ? selectedDates[0] : undefined
-      )
+        Arr.isNonEmpty(selectedDates) ? selectedDates[0] : undefined,
+      ),
     )
     .chain(filter(isNotUndefined));
 
@@ -133,10 +133,10 @@ const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
               iconId: 'none',
               point: 0,
               comment: '',
-            } as const)
-        )
-      )
-    )
+            }) as const,
+        ),
+      ),
+    ),
   )
   .chain(distinctUntilChanged(deepEqual))
   .chain(withInitialValue(answerDefaultValue));
@@ -150,9 +150,9 @@ const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combineLatestI([
     theNameIsAlreadyUsedFn(
       answerBeingEdited.user.name,
       answers ?? [],
-      selectedAnswerUserName
-    )
-  )
+      selectedAnswerUserName,
+    ),
+  ),
 );
 
 const submitButtonIsDisabled$: InitializedObservable<boolean> = combineLatestI([
@@ -164,8 +164,8 @@ const submitButtonIsDisabled$: InitializedObservable<boolean> = combineLatestI([
     ([answerBeingEdited, selectedAnswerSaved, theNameIsAlreadyUsed]) =>
       answerBeingEdited.user.name === '' ||
       deepEqual(selectedAnswerSaved, answerBeingEdited) ||
-      theNameIsAlreadyUsed
-  )
+      theNameIsAlreadyUsed,
+  ),
 );
 
 const answerSelectionMap$: InitializedObservable<
@@ -184,7 +184,7 @@ const answerSelectionMap$: InitializedObservable<
           d,
           { iconId: 'none', point: 0, comment: '' } as const,
         ]),
-        selection.map((s) => [s.datetimeRange, s])
+        selection.map((s) => [s.datetimeRange, s]),
       );
 
     return IMapMapped.new<
@@ -192,7 +192,7 @@ const answerSelectionMap$: InitializedObservable<
       AnswerSelectionValue,
       DatetimeRangeMapKey
     >(entries, datetimeRangeToMapKey, datetimeRangeFromMapKey);
-  })
+  }),
 );
 
 /* callbacks */
@@ -209,25 +209,25 @@ const onCancelEditingAnswer = (): void => {
 
 const onUserNameChange = (userName: UserName): void => {
   updateAnswerBeingEdited((answerBeingEdited) =>
-    Obj.setIn(answerBeingEdited, ['user', 'name'], userName)
+    Obj.setIn(answerBeingEdited, ['user', 'name'], userName),
   );
 };
 
 const onCommentChange = (comment: string): void => {
   updateAnswerBeingEdited((answerBeingEdited) =>
-    Obj.set(answerBeingEdited, 'comment', comment)
+    Obj.set(answerBeingEdited, 'comment', comment),
   );
 };
 
 const onWeightChange = (weight: Weight): void => {
   updateAnswerBeingEdited((answerBeingEdited) =>
-    Obj.set(answerBeingEdited, 'weight', weight)
+    Obj.set(answerBeingEdited, 'weight', weight),
   );
 };
 
 const toggleRequiredSection = (): void => {
   updateAnswerBeingEdited((answerBeingEdited) =>
-    Obj.update(answerBeingEdited, 'isRequiredParticipants', (b) => !b)
+    Obj.update(answerBeingEdited, 'isRequiredParticipants', (b) => !b),
   );
 };
 
@@ -236,7 +236,7 @@ const toggleRequiredSection = (): void => {
 /* @internal */
 const onAnswerClickImpl = (
   answer: Answer,
-  user: FireAuthUser | undefined
+  user: FireAuthUser | undefined,
 ): void => {
   // ログインユーザーの回答は本人のみ編集可能にする
   if (answer.user.id !== null && answer.user.id !== user?.uid) {
@@ -254,7 +254,7 @@ const onAddAnswerButtonClickImpl = (user: FireAuthUser | undefined): void => {
   setAnswerBeingEditedSectionState('creating');
   // automatically set username with user.displayName
   updateAnswerBeingEdited((prev) =>
-    Obj.setIn(prev, ['user', 'name'], toUserName(user?.displayName ?? ''))
+    Obj.setIn(prev, ['user', 'name'], toUserName(user?.displayName ?? '')),
   );
 };
 
@@ -262,7 +262,7 @@ const onAddAnswerButtonClickImpl = (user: FireAuthUser | undefined): void => {
 const onSubmitAnswerImpl = async (
   eventId: string | undefined,
   answerBeingEdited: Answer,
-  answerBeingEditedSectionState: 'creating' | 'editing' | 'hidden'
+  answerBeingEditedSectionState: 'creating' | 'editing' | 'hidden',
 ): Promise<void> => {
   if (eventId === undefined) return;
 
@@ -321,7 +321,7 @@ const onSubmitAnswerImpl = async (
 /* @internal */
 const onSubmitEmptyAnswerImpl = async (
   eventId: string | undefined,
-  fireAuthUser: FireAuthUser | undefined
+  fireAuthUser: FireAuthUser | undefined,
 ): Promise<void> => {
   if (eventId === undefined) return;
   if (fireAuthUser === undefined) return;
@@ -337,8 +337,8 @@ const onSubmitEmptyAnswerImpl = async (
           Obj.set(a, 'user', {
             id: toUserId(fireAuthUser.uid),
             name: toUserName(fireAuthUser.displayName ?? ''),
-          })
-        ).value
+          }),
+        ).value,
     )
     .then((res) => {
       if (Result.isErr(res)) {
@@ -361,7 +361,7 @@ const onSubmitEmptyAnswerImpl = async (
 /* @internal */
 const onDeleteAnswerImpl = async (
   eventId: string | undefined,
-  answerBeingEdited: Answer
+  answerBeingEdited: Answer,
 ): Promise<void> => {
   if (eventId === undefined) return;
 
@@ -388,7 +388,7 @@ const onEditButtonClickImpl = (eventId: string | undefined): void => {
 
 /* @internal */
 const answerBeingEditedDispatch = (
-  action: AnswerSelectionReducerAction
+  action: AnswerSelectionReducerAction,
 ): void => {
   updateAnswerBeingEdited((answerBeingEdited) =>
     Obj.set(
@@ -402,13 +402,13 @@ const answerBeingEditedDispatch = (
         >(
           answerBeingEdited.selection.map((s) => [s.datetimeRange, s]),
           datetimeRangeToMapKey,
-          datetimeRangeFromMapKey
+          datetimeRangeFromMapKey,
         ),
-        action
+        action,
       )
         .map((s, d) => ({ datetimeRange: d, ...s }))
-        .toValuesArray()
-    )
+        .toValuesArray(),
+    ),
   );
 };
 
@@ -418,9 +418,9 @@ const toggleProtectedSectionImpl = (user: FireAuthUser | undefined): void => {
       ans,
       'user',
       Obj.update(ans.user, 'id', (uid) =>
-        uid === null ? mapOptional(user?.uid, toUserId) ?? null : null
-      )
-    )
+        uid === null ? mapOptional(user?.uid, toUserId) ?? null : null,
+      ),
+    ),
   );
 };
 
@@ -448,27 +448,27 @@ const onSubmitAnswerClickPromise = (): Promise<void> =>
   onSubmitAnswerImpl(
     Router.eventId$.snapshot.value,
     answerBeingEdited$.snapshot.value,
-    answerBeingEditedSectionState$.snapshot.value
+    answerBeingEditedSectionState$.snapshot.value,
   );
 
 const onSubmitAnswerClick = (): void => {
   onSubmitAnswerImpl(
     Router.eventId$.snapshot.value,
     answerBeingEdited$.snapshot.value,
-    answerBeingEditedSectionState$.snapshot.value
+    answerBeingEditedSectionState$.snapshot.value,
   ).catch(noop);
 };
 
 const onSubmitEmptyAnswerClick = (): Promise<void> =>
   onSubmitEmptyAnswerImpl(
     Router.eventId$.snapshot.value,
-    Auth.fireAuthUser$.snapshot.value
+    Auth.fireAuthUser$.snapshot.value,
   );
 
 const onDeleteAnswerClick = (): Promise<void> =>
   onDeleteAnswerImpl(
     Router.eventId$.snapshot.value,
-    answerBeingEdited$.snapshot.value
+    answerBeingEdited$.snapshot.value,
   );
 
 const toggleProtectedSection = (): void => {
@@ -539,8 +539,8 @@ const iconHeader$: InitializedObservable<
           });
         },
       },
-    }))
-  )
+    })),
+  ),
 );
 
 const answerBeingEditedList$: InitializedObservable<
@@ -623,13 +623,13 @@ const answerBeingEditedList$: InitializedObservable<
               },
               onCheck: (checked: boolean) => {
                 updateCheckboxesState((set) =>
-                  checked ? set.add(d) : set.delete(d)
+                  checked ? set.add(d) : set.delete(d),
                 );
               },
-            } as const)
-        )
-      ) ?? []
-  )
+            }) as const,
+        ),
+      ) ?? [],
+  ),
 );
 
 const onCheckAll = (checked: boolean): void => {
@@ -640,8 +640,8 @@ const onCheckAll = (checked: boolean): void => {
       ISetMapped.new<DatetimeRange, DatetimeRangeMapKey>(
         dates,
         datetimeRangeToMapKey,
-        datetimeRangeFromMapKey
-      )
+        datetimeRangeFromMapKey,
+      ),
     );
   } else {
     resetCheckboxesState();
@@ -652,9 +652,9 @@ const hasUnanswered$: InitializedObservable<boolean> =
   answerBeingEditedList$.chain(
     mapI((answerBeingEditedList) =>
       answerBeingEditedList.some(
-        (a) => a.answerSelectionValue.iconId === 'none'
-      )
-    )
+        (a) => a.answerSelectionValue.iconId === 'none',
+      ),
+    ),
   );
 
 export const AnswerPageStore = {

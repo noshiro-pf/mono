@@ -18,7 +18,7 @@ import { type StreamTestCase } from '../typedef';
   throttleTime     1                       7           10          13          16          19
 */
 const createStreams = (
-  tick: number
+  tick: number,
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<SafeUint>;
@@ -49,7 +49,7 @@ const createStreams = (
 
 export const throttleTimeTestCases: readonly [
   StreamTestCase<number>,
-  StreamTestCase<number>
+  StreamTestCase<number>,
 ] = [
   {
     name: 'throttleTime case 1',

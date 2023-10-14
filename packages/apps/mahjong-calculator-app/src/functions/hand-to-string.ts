@@ -11,7 +11,7 @@ import { revealedBlockToTiles } from './revealed-block-to-tiles';
 
 export const hand2String = (
   handTiles: readonly TileName[],
-  revealedBlocks: readonly RevealedBlock[]
+  revealedBlocks: readonly RevealedBlock[],
 ): string => {
   let mut_str = '';
 
@@ -24,7 +24,7 @@ export const hand2String = (
 };
 
 const distributeTilesByType = (
-  tiles: readonly TileName[]
+  tiles: readonly TileName[],
 ): DeepReadonly<{
   manzu: TileName[];
   pinzu: TileName[];
@@ -147,7 +147,7 @@ export const problem2String = (
   turn: Turn,
   doraIndicators: readonly TileName[],
   handTiles: readonly TileName[],
-  revealedBlocks: readonly RevealedBlock[]
+  revealedBlocks: readonly RevealedBlock[],
 ): string => {
   let mut_str = '';
   mut_str += `${dict.bakaze[bakaze]}一局0本場 `;
@@ -156,7 +156,7 @@ export const problem2String = (
 
   if (doraIndicators.length > 0) {
     mut_str += `ドラ: ${tiles2string(
-      doraIndicators.map((a) => doraHyouji2Dora[a])
+      doraIndicators.map((a) => doraHyouji2Dora[a]),
     )}`;
   }
   mut_str += '\n';
@@ -166,7 +166,7 @@ export const problem2String = (
 };
 
 export const aka2Normal = (
-  tile: TileName
+  tile: TileName,
 ): Exclude<TileName, 'AkaManzu5' | 'AkaPinzu5' | 'AkaSozu5'> => {
   switch (tile) {
     case 'AkaManzu5':
@@ -181,6 +181,6 @@ export const aka2Normal = (
 };
 
 export const shanten2String = (
-  shanten: Shanten
+  shanten: Shanten,
 ): '和了' | '聴牌' | `${Shanten}向聴` =>
   shanten === -1 ? '和了' : shanten === 0 ? '聴牌' : `${shanten}向聴`;

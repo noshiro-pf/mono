@@ -62,7 +62,7 @@ export class RandomizerComponent implements OnInit {
   private randomizerButtonClicked$ = manual<void>(null);
   randomizerButtonLocked$: RN<boolean> = merge(
     this.randomizerButtonClicked$.mapTo(true),
-    this.randomizerButtonClicked$.delay(500).mapTo(false)
+    this.randomizerButtonClicked$.delay(500).mapTo(false),
   ).withInitialValue(false);
 
   // historyは時刻降順，0が最新
@@ -71,7 +71,7 @@ export class RandomizerComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private randomizer: RandomizerService
+    private randomizer: RandomizerService,
   ) {}
 
   ngOnInit() {
@@ -103,19 +103,19 @@ export class RandomizerComponent implements OnInit {
 
     this.undoable$ = combine(
       this.selectedIndexInHistory$,
-      this.selectedCardsHistory$
+      this.selectedCardsHistory$,
     ).map(
       ([index, history]) =>
         history.length > 0 &&
-        utils.number.isInRange(index, -1, history.length - 1)
+        utils.number.isInRange(index, -1, history.length - 1),
     );
 
     this.redoable$ = combine(
       this.selectedIndexInHistory$,
-      this.selectedCardsHistory$
+      this.selectedCardsHistory$,
     ).map(
       ([index, history]) =>
-        history.length > 0 && utils.number.isInRange(index, 1, history.length)
+        history.length > 0 && utils.number.isInRange(index, 1, history.length),
     );
   }
 
@@ -133,7 +133,7 @@ export class RandomizerComponent implements OnInit {
 
   randomizerButtonOnClick(
     isSelectedExpansions: boolean[],
-    history: SelectedCards[]
+    history: SelectedCards[],
   ) {
     this.randomizerButtonClicked$.emit();
     this.randomizerSelectCards(isSelectedExpansions, history);
@@ -164,11 +164,11 @@ export class RandomizerComponent implements OnInit {
 
   private randomizerSelectCards(
     isSelectedExpansions: boolean[],
-    history: SelectedCards[]
+    history: SelectedCards[],
   ) {
     const result = this.randomizer.selectCards(
       this.implementedOnly,
-      isSelectedExpansions
+      isSelectedExpansions,
     );
 
     if (!result.valid) {

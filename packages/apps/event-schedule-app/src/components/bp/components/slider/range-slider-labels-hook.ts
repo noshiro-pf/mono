@@ -37,13 +37,13 @@ export const useRangeSliderLabels = ({
           value: x,
           ratio: toRatio(x) ?? 0,
           cssStyle: { left: formatPercentage(toRatio(x) ?? 0) },
-        }))
+        })),
       ).value;
   }, [customLabelValues, min, max, toRatio]);
 
   const toFixed = useMemo(
     () => (n: number) => n.toFixed(labelFractionDigits),
-    [labelFractionDigits]
+    [labelFractionDigits],
   );
 
   const minLabel = useMemo(() => toFixed(min), [min, toFixed]);

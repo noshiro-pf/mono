@@ -29,7 +29,7 @@ const div = (x: FiniteNumber, y: NonZeroFiniteNumber): FiniteNumber =>
 const random = (min: FiniteNumber, max: FiniteNumber): FiniteNumber =>
   add(
     min,
-    Math.floor(toFiniteNumber((Math.max(max, min) - min + 1) * Math.random()))
+    Math.floor(toFiniteNumber((Math.max(max, min) - min + 1) * Math.random())),
   );
 
 const floor = (x: FiniteNumber): Int => Math.floor(x);

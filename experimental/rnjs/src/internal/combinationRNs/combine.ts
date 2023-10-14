@@ -19,7 +19,7 @@ class CombineRN<T extends RN<any>[]> extends RN<Unwrap<T>> {
     super(
       unwrapCurr(...srcs),
       srcs,
-      `combine(${srcs.map((e) => e.name).join(',')})`
+      `combine(${srcs.map((e) => e.name).join(',')})`,
     );
   }
 

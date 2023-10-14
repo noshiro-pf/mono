@@ -31,7 +31,7 @@ export const MyTableCell = memo(
         )}
       </TableCell>
     )
-  }
+  },
 )
 
 MyTableCell.displayName = 'MyTableCell'

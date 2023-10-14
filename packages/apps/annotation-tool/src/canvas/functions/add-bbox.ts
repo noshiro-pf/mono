@@ -17,13 +17,13 @@ export const addBboxToCanvas = (
   bboxColor: Readonly<{ border: Rgba; face: Rgba }>,
   canvasStyles: AnnotationCanvasStyle,
   app: Application,
-  stateHandler: CanvasAppStateHandler
+  stateHandler: CanvasAppStateHandler,
 ): void => {
   const [pixiBboxRect, pixiBboxPoints] = createBbox(
     bboxRect,
     canvasStyles.bbox.borderWidthPx.notSelected,
     canvasStyles.bbox.pointWidthPx,
-    bboxColor.border
+    bboxColor.border,
   );
 
   const pixiBbox: PixiBbox = {

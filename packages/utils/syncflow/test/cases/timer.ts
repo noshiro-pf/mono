@@ -17,7 +17,7 @@ import { type StreamTestCase } from '../typedef';
 */
 
 const createStreams = (
-  tick: number
+  tick: number,
 ): Readonly<{
   startSource: () => void;
   timer1$: Observable<number>;
@@ -46,7 +46,7 @@ const createStreams = (
 
 export const timerTestCases: readonly [
   StreamTestCase<number>,
-  StreamTestCase<[number, number, number]>
+  StreamTestCase<[number, number, number]>,
 ] = [
   {
     name: 'timer case 1',

@@ -24,7 +24,7 @@ export const defaultNotificationSettings = {
 
 const d = defaultNotificationSettings;
 export const fillNotificationSettings = (
-  a?: PartialNotificationSettings
+  a?: PartialNotificationSettings,
 ): NotificationSettings => ({
   email: a?.email ?? d.email,
   notifyOnAnswerChange: a?.notifyOnAnswerChange ?? d.notifyOnAnswerChange,

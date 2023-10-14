@@ -24,7 +24,7 @@ const firestore = initializeFirestore(fbApp, {
   experimentalForceLongPolling: Object.hasOwn(
     // eslint-disable-next-line no-restricted-syntax
     window as unknown as RecordBase,
-    'Cypress'
+    'Cypress',
   ),
 });
 // if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
@@ -47,13 +47,13 @@ if (isDevelopment && useEmulators) {
   connectFirestoreEmulator(
     firestore,
     'localhost',
-    firebaseJson.emulators.firestore.port
+    firebaseJson.emulators.firestore.port,
   );
 
   connectFunctionsEmulator(
     fbFunctions,
     'localhost',
-    firebaseJson.emulators.functions.port
+    firebaseJson.emulators.functions.port,
   );
 
   // connectAuthEmulator(

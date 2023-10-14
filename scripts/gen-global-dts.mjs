@@ -7,7 +7,7 @@ import { writeFileAsync } from './write-file-async.mjs';
 export const genGlobalDts = (rootDir, devDependencies) => {
   /** @type {string[]} */
   const globalUtils = Object.keys(devDependencies).filter((packageName) =>
-    packageName.startsWith('@noshiro/global-')
+    packageName.startsWith('@noshiro/global-'),
   );
 
   /** @type {string[]} */
@@ -15,8 +15,8 @@ export const genGlobalDts = (rootDir, devDependencies) => {
     (packageName) =>
       `/// <reference path="../../../utils/${packageName.replace(
         '@noshiro/',
-        ''
-      )}/esm/globals-decl.d.ts" />`
+        '',
+      )}/esm/globals-decl.d.ts" />`,
   );
 
   const result = [

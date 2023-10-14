@@ -19,7 +19,7 @@ type Props = Readonly<{
   firstHueOnChange: (v: Hue) => void;
   relativeLuminanceDistribution: readonly (readonly [
     Hsl,
-    NonNegativeFiniteNumber
+    NonNegativeFiniteNumber,
   ])[];
   result1_equallySpaced: ColorResult;
   result2_weighted: ColorResult;
@@ -134,7 +134,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
         </Variance>
       </PaperCustomized>
     </div>
-  )
+  ),
 );
 
 const PaperCustomized = styled(Paper)`

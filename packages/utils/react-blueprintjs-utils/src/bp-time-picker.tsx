@@ -22,17 +22,17 @@ export const BpTimePicker = memoNamed<BpTimePickerProps>(
           minutes: DateUtils.getLocaleMinutes(date),
         });
       },
-      [onTimeChange]
+      [onTimeChange],
     );
 
     const dateObj = useMemo<RawDateType>(
       () =>
         pipe(DateUtils.from(`1970/1/1 ${time.hours}:${time.minutes}:11`)).chain(
-          DateUtils.toDate
+          DateUtils.toDate,
         ).value,
-      [time]
+      [time],
     );
 
     return <TimePicker value={dateObj} onChange={onChangeHandler} />;
-  }
+  },
 );

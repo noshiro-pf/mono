@@ -34,14 +34,14 @@ export class ExpansionsToggleComponent implements OnInit {
   ngOnInit() {
     this.expansions$ = combine(
       this.isSelectedExpansions$,
-      this.database.expansionNameList$
+      this.database.expansionNameList$,
     )
       .map(([isSelectedList, nameList]) =>
         isSelectedList.map((e, i) => ({
           selected: e,
           name: nameList[i],
           index: i,
-        }))
+        })),
       )
       .withInitialValue([]);
   }

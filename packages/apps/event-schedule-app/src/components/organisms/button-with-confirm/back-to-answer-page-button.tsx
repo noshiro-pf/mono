@@ -39,5 +39,5 @@ export const BackToAnswerPageButton = memoNamed<Props>(
         toastConfig={toastConfig}
         onConfirmClick={onConfirmClick}
       />
-    )
+    ),
 );

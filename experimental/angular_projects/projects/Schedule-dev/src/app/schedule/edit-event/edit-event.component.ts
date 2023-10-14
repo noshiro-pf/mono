@@ -16,10 +16,10 @@ export class EditEventComponent implements OnInit {
 
   private readonly scEventCloud$: RN<Schedule> = combine(
     this.scEventId$,
-    this.database.schedulingEvents$
+    this.database.schedulingEvents$,
   ).map(
     ([eventId, list]) =>
-      list.find((e) => e.databaseKey === eventId) || new Schedule()
+      list.find((e) => e.databaseKey === eventId) || new Schedule(),
   );
 
   private readonly titleFromUI$ = manual<string>('');
@@ -33,43 +33,43 @@ export class EditEventComponent implements OnInit {
 
   readonly title$: RN<string> = merge(
     this.titleFromUI$,
-    this.scEventCloud$.pluck('title')
+    this.scEventCloud$.pluck('title'),
   );
 
   readonly notes$: RN<string> = merge(
     this.notesFromUI$,
-    this.scEventCloud$.pluck('notes')
+    this.scEventCloud$.pluck('notes'),
   );
 
   readonly selectedDatetimes$: RN<number[]> = merge(
     this.selectedDatetimesFromUI$,
-    this.scEventCloud$.pluck('selectedDatetimes')
+    this.scEventCloud$.pluck('selectedDatetimes'),
   );
 
   readonly answerDeadline$: RN<number> = merge(
     this.answerDeadlineFromUI$,
-    this.scEventCloud$.pluck('answerDeadline')
+    this.scEventCloud$.pluck('answerDeadline'),
   );
 
   readonly symbols$: RN<ScheduleSymbol[]> = merge(
     this.symbolsFromUI$,
-    this.scEventCloud$.pluck('symbols')
+    this.scEventCloud$.pluck('symbols'),
   );
 
   readonly password$: RN<string> = merge(
     this.passwordFromUI$.debounce(200),
     this.passwordEnabledFromUI$.filter(true, (b) => b === false).mapTo(''),
-    this.scEventCloud$.pluck('password')
+    this.scEventCloud$.pluck('password'),
   );
 
   readonly answers$: RN<Answer[]> = merge(
     this.answersFromUI$,
-    this.scEventCloud$.pluck('answers')
+    this.scEventCloud$.pluck('answers'),
   );
 
   readonly passwordEnabled$: RN<boolean> = merge(
     this.passwordEnabledFromUI$.debounce(100),
-    this.scEventCloud$.pluck('password').map((s) => s !== '')
+    this.scEventCloud$.pluck('password').map((s) => s !== ''),
   );
 
   readonly updateEventButtonDisabled$: RN<boolean> = combine(
@@ -77,7 +77,7 @@ export class EditEventComponent implements OnInit {
     this.answerDeadline$,
     this.selectedDatetimes$,
     this.passwordEnabled$,
-    this.password$
+    this.password$,
   )
     .map(
       ([title, answerDeadline, selectedDatetimes, passwordEnabled, password]) =>
@@ -85,7 +85,7 @@ export class EditEventComponent implements OnInit {
         !selectedDatetimes ||
         selectedDatetimes.length === 0 ||
         !answerDeadline ||
-        (passwordEnabled && password === '')
+        (passwordEnabled && password === ''),
     )
     .withInitialValue(false);
 
@@ -93,7 +93,7 @@ export class EditEventComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     public dialog: MatDialog,
-    private database: DatabaseService
+    private database: DatabaseService,
   ) {}
 
   ngOnInit() {
@@ -128,7 +128,7 @@ export class EditEventComponent implements OnInit {
 
   removePastDates() {
     this.selectedDatetimesFromUI$.emit(
-      this.selectedDatetimes$.value.filter((e) => e >= Date.now())
+      this.selectedDatetimes$.value.filter((e) => e >= Date.now()),
     );
   }
 
@@ -158,7 +158,7 @@ export class EditEventComponent implements OnInit {
 
       answers.forEach((ans) => {
         ans.selection = ans.selection.filter((sl) =>
-          selectedDatetimes.includes(sl.date)
+          selectedDatetimes.includes(sl.date),
         );
       });
 

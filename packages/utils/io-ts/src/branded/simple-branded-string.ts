@@ -4,7 +4,7 @@ import { brand } from './brand';
 
 export const simpleBrandedString = <S extends string>(
   typeName: S,
-  defaultValue: string = ''
+  defaultValue: string = '',
 ): Type<Brand<string, S>> =>
   brand({
     codec: string(defaultValue),

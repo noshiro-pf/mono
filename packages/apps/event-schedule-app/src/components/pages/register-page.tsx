@@ -12,7 +12,7 @@ const returnFalse = (): false => false;
 
 export const RegisterPage = memoNamed('RegisterPage', () => {
   const googleSignInButtonDisabled = useObservableValue(
-    GoogleSignInStore.googleSignInButtonDisabled$
+    GoogleSignInStore.googleSignInButtonDisabled$,
   );
 
   const {

@@ -4,7 +4,7 @@
  * @returns [Promise, interruptSleepFunction]
  */
 export const sleep = (
-  milliSec: number
+  milliSec: number,
 ): readonly [Promise<unknown>, () => void] => {
   let mut_timer: TimerId | undefined = undefined;
   let mut_resolver: ((value: unknown) => void) | undefined = undefined;

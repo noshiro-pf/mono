@@ -14,27 +14,27 @@ export class GameStateService {
   gameState$: Observable<GameState> = this.gameStateSource.asObservable();
 
   private turnInfo$: Observable<TurnInfo> = this.gameState$.pipe(
-    map((e) => e.turnInfo)
+    map((e) => e.turnInfo),
   );
   action$ = this.turnInfo$.pipe(
     map((e) => e.action),
-    distinctUntilChanged()
+    distinctUntilChanged(),
   );
   buy$ = this.turnInfo$.pipe(
     map((e) => e.buy),
-    distinctUntilChanged()
+    distinctUntilChanged(),
   );
   coin$ = this.turnInfo$.pipe(
     map((e) => e.coin),
-    distinctUntilChanged()
+    distinctUntilChanged(),
   );
   potion$ = this.turnInfo$.pipe(
     map((e) => e.potion),
-    distinctUntilChanged()
+    distinctUntilChanged(),
   );
   phase$ = this.turnInfo$.pipe(
     map((e) => e.phase),
-    distinctUntilChanged()
+    distinctUntilChanged(),
   );
   runningCards$ = this.turnInfo$.pipe(map((e) => e.runningCards));
 
@@ -47,53 +47,53 @@ export class GameStateService {
 
   turnPlayerIndex$: Observable<number> = this.gameState$.pipe(
     map((e) => e.turnPlayerIndex()),
-    distinctUntilChanged()
+    distinctUntilChanged(),
   );
   nextTurnPlayerIndex$: Observable<number> = this.gameState$.pipe(
     map((e) => e.nextTurnPlayerIndex()),
-    distinctUntilChanged()
+    distinctUntilChanged(),
   );
 
   turnPlayersName$: Observable<string> = combineLatest(
     this.turnPlayerIndex$,
     this.myGameRoomService.playersNameShuffled$,
-    (index, list) => list[index]
+    (index, list) => list[index],
   );
 
   turnPlayerCards$: Observable<PlayerCards> = combineLatest(
     this.allPlayersCards$,
     this.turnPlayerIndex$,
     (allPlayersCards, turnPlayerIndex) =>
-      allPlayersCards[turnPlayerIndex] || new PlayerCards()
+      allPlayersCards[turnPlayerIndex] || new PlayerCards(),
   );
 
   myData$: Observable<PlayerData> = combineLatest(
     this.allPlayersData$,
     this.myGameRoomService.myIndex$,
-    (allPlayersData, myIndex) => allPlayersData[myIndex] || new PlayerData()
+    (allPlayersData, myIndex) => allPlayersData[myIndex] || new PlayerData(),
   );
 
   myCards$: Observable<PlayerCards> = combineLatest(
     this.allPlayersCards$,
     this.myGameRoomService.myIndex$,
-    (allPlayersCards, myIndex) => allPlayersCards[myIndex] || new PlayerCards()
+    (allPlayersCards, myIndex) => allPlayersCards[myIndex] || new PlayerCards(),
   );
 
   isMyTurn$: Observable<boolean> = combineLatest(
     this.turnPlayerIndex$,
     this.myGameRoomService.myIndex$,
-    (turnPlayerIndex, myIndex) => turnPlayerIndex === myIndex
+    (turnPlayerIndex, myIndex) => turnPlayerIndex === myIndex,
   ).pipe(distinctUntilChanged(), startWith(false));
 
   gameIsOver$: Observable<boolean> = combineLatest(
     this.gameState$,
     this.gameRoomCommunication.isTerminated$,
-    (gameState, isTerminated) => gameState.gameIsOver() || isTerminated
+    (gameState, isTerminated) => gameState.gameIsOver() || isTerminated,
   ).pipe(distinctUntilChanged());
 
   constructor(
     private myGameRoomService: MyGameRoomService,
-    private gameRoomCommunication: GameRoomCommunicationService
+    private gameRoomCommunication: GameRoomCommunicationService,
   ) {}
 
   setGameState(gameState: GameState) {

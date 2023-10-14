@@ -186,12 +186,12 @@ if (
 ) {
     const objectOnlyTarget = extractTypesOfKind(
         target,
-        TypeFlags.Object | TypeFlags.Intersection | TypeFlags.Substitution
+        TypeFlags.Object | TypeFlags.Intersection | TypeFlags.Substitution,
     );
     if (objectOnlyTarget.flags & TypeFlags.Union) {
         const result = typeRelatedToDiscriminatedType(
             source,
-            objectOnlyTarget as UnionType
+            objectOnlyTarget as UnionType,
         );
         if (result) {
             return result;
@@ -232,7 +232,7 @@ for (const sourceProperty of sourcePropertiesFiltered) {
         tracing?.instant(
             tracing.Phase.CheckTypes,
             'typeRelatedToDiscriminatedType_DepthLimit',
-            { sourceId: source.id, targetId: target.id, numCombinations }
+            { sourceId: source.id, targetId: target.id, numCombinations },
         );
         return Ternary.False;
     }
@@ -340,21 +340,21 @@ if (
         target,
         reportStructuralErrors,
         /*excludedProperties*/ undefined,
-        intersectionState
+        intersectionState,
     );
     if (result) {
         result &= signaturesRelatedTo(
             source,
             target,
             SignatureKind.Call,
-            reportStructuralErrors
+            reportStructuralErrors,
         );
         if (result) {
             result &= signaturesRelatedTo(
                 source,
                 target,
                 SignatureKind.Construct,
-                reportStructuralErrors
+                reportStructuralErrors,
             );
             if (result) {
                 result &= indexSignaturesRelatedTo(
@@ -362,7 +362,7 @@ if (
                     target,
                     sourceIsPrimitive,
                     reportStructuralErrors,
-                    intersectionState
+                    intersectionState,
                 );
             }
         }

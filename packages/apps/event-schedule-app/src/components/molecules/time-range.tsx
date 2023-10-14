@@ -37,5 +37,5 @@ export const TimeRangeView = memoNamed<Props>(
         <BpTimePicker time={timeRange.end} onTimeChange={onRangeEndChange} />
       ) : undefined}
     </div>
-  )
+  ),
 );

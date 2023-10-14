@@ -6,7 +6,7 @@ import { brand } from '../brand';
 const is = Num.isNonZero;
 
 export const nonZeroNumber = (
-  defaultValue: number = 0
+  defaultValue: number = 0,
 ): Type<NonZeroNumber> => {
   if (!is(defaultValue)) {
     throw new Error('defaultValue must be a non-zero number');

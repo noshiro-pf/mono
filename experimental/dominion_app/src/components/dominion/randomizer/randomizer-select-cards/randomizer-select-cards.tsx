@@ -29,9 +29,9 @@ export const RandomizerSelectCards = memo(() => {
         .withLatest(selectedExpansions$)
         .withLatest(fb.dcardlist$)
         .map(([[_, selectedExpansions], dcardlist]) =>
-          selectCards(selectedExpansions, dcardlist)
-        )
-    ).startWith('')
+          selectCards(selectedExpansions, dcardlist),
+        ),
+    ).startWith(''),
   )
 
   /* extract values */

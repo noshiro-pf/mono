@@ -143,7 +143,7 @@ function hashJSObj(obj) {
     obj.propertyIsEnumerable = function () {
       return this.constructor.prototype.propertyIsEnumerable.apply(
         this,
-        arguments
+        arguments,
       );
     };
     obj.propertyIsEnumerable[UID_HASH_KEY] = hashed;

@@ -7,7 +7,7 @@ export const ymdToKey = ({ year, month, date }: YearMonthDate): YmdKey =>
 
 export const ymdFromKey = (ymdKey: YmdKey): YearMonthDate => {
   const [yearStr, monthStr, dateStr] = ymdKey.split(
-    '-'
+    '-',
   ) as MutableArrayOfLength<3, string>;
 
   return {

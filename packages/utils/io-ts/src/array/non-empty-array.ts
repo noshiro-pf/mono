@@ -12,7 +12,7 @@ export const nonEmptyArray = <A>(
   defaultValue: NonEmptyArray<A>,
   options?: Readonly<{
     typeName?: string;
-  }>
+  }>,
 ): Type<NonEmptyArray<A>> => {
   type T = NonEmptyArray<A>;
 
@@ -41,7 +41,7 @@ export const nonEmptyArray = <A>(
         const message = validationErrorMessage(
           el,
           `The array element is expected to be <${elementType.typeName}>`,
-          (str) => `but the actual value at index ${index} is '${str}'`
+          (str) => `but the actual value at index ${index} is '${str}'`,
         );
 
         return Result.err([message, ...res.value]);

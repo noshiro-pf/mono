@@ -10,7 +10,7 @@ type Props = Readonly<{
     state: Readonly<{
       timeRange: TimeRange;
       checkboxState: Record<DayOfWeekName, boolean>;
-    }>
+    }>,
   ) => void;
 }>;
 
@@ -28,12 +28,12 @@ export const SetTimesPopover = memoNamed<Props>(
         state: Readonly<{
           timeRange: TimeRange;
           checkboxState: Record<DayOfWeekName, boolean>;
-        }>
+        }>,
       ) => {
         onSetTimesSubmit(state);
         handleClose();
       },
-      [onSetTimesSubmit, handleClose]
+      [onSetTimesSubmit, handleClose],
     );
 
     return (
@@ -57,5 +57,5 @@ export const SetTimesPopover = memoNamed<Props>(
         />
       </Popover>
     );
-  }
+  },
 );

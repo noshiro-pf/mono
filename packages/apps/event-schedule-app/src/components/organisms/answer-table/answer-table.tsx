@@ -46,11 +46,11 @@ export const AnswerTable = memoNamed<Props>(
             AnswerPageStore.onAnswerClick(a);
           },
         })),
-      [answers]
+      [answers],
     );
 
     const tableBodyValuesFiltered = useObservableValue(
-      AnswerTableStore.tableBodyValuesFiltered$
+      AnswerTableStore.tableBodyValuesFiltered$,
     );
 
     const tableMinimized = useObservableValue(AnswerTableStore.tableMinimized$);
@@ -207,10 +207,10 @@ export const AnswerTable = memoNamed<Props>(
                         </AnswerIconCell>
                       )}
                     </td>
-                  )
+                  ),
                 )}
               </tr>
-            )
+            ),
           )}
 
           {/* コメント行 */}
@@ -243,7 +243,7 @@ export const AnswerTable = memoNamed<Props>(
         </tbody>
       </StickyHeaderTable>
     );
-  }
+  },
 );
 
 const userNameWrapperWidth = 80;

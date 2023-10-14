@@ -19,7 +19,7 @@ import { drawCards } from './shortcut';
 export const getCardEffect = async (
   dcard: DCard,
   pid: number,
-  data: DataForCardEffect
+  data: DataForCardEffect,
 ) => {
   const cardProp = dcard.cardProperty;
   data.gameState.turnInfo.action += cardProp.action;
@@ -36,7 +36,7 @@ export const getCardEffect = async (
 const getAdditionalEffect = async (
   dcard: DCard,
   pid: number,
-  data: DataForCardEffect
+  data: DataForCardEffect,
 ) => {
   cs.goToIndeterminatePhase(data);
 

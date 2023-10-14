@@ -47,15 +47,15 @@ export const GameResults = memo(() => {
   const firstDateInGRList$: RN<number> = useRN(
     fb.gameResults$
       .map((grlist) =>
-        date.toMidnightTimestamp(grlist.first(GameResult()).date)
+        date.toMidnightTimestamp(grlist.first(GameResult()).date),
       )
-      .skipUnchanged()
+      .skipUnchanged(),
   )
 
   const latestDateInGRList$: RN<number> = useRN(
     fb.gameResults$
       .map((grlist) => date.toMidnightTimestamp(grlist.last(GameResult()).date))
-      .skipUnchanged()
+      .skipUnchanged(),
   )
 
   const dateBegin$: RN<number> = useRN(
@@ -67,8 +67,8 @@ export const GameResults = memo(() => {
       latestClick$
         .withLatest(latestDateInGRList$)
         .map(([_, latestDate]) => latestDate),
-      dateBeginInput$
-    )
+      dateBeginInput$,
+    ),
   )
 
   const dateEnd$: RN<number> = useRN(
@@ -80,8 +80,8 @@ export const GameResults = memo(() => {
       latestClick$
         .withLatest(latestDateInGRList$)
         .map(([_, latestDate]) => latestDate),
-      dateEndInput$
-    )
+      dateEndInput$,
+    ),
   )
 
   const numPlayersCheckedValues$: RN<I.Set<number>> = useRN(
@@ -92,14 +92,14 @@ export const GameResults = memo(() => {
           ? I.Set(numPlayersList)
           : v.checked
           ? s.add(v.numPlayers)
-          : s.delete(v.numPlayers)
-    )
+          : s.delete(v.numPlayers),
+    ),
   )
 
   const numPlayersOptions$ = useRN(
     numPlayersCheckedValues$.map((s) =>
-      numPlayersList.map((e) => ({ numPlayers: e, checked: s.has(e) }))
-    )
+      numPlayersList.map((e) => ({ numPlayers: e, checked: s.has(e) })),
+    ),
   )
 
   const gameResultsFiltered$ = useRN(
@@ -107,7 +107,7 @@ export const GameResults = memo(() => {
       fb.gameResults$,
       dateBegin$,
       dateEnd$,
-      numPlayersCheckedValues$
+      numPlayersCheckedValues$,
     ).map(([GR, dBegin, dEnd, numPlayersChecked]) =>
       GR.filter((g) => {
         const mDate = date.toMidnightTimestamp(g.date)
@@ -116,8 +116,8 @@ export const GameResults = memo(() => {
           mDate <= dEnd &&
           numPlayersChecked.has(g.players.size)
         )
-      })
-    )
+      }),
+    ),
   )
 
   /* extract values */

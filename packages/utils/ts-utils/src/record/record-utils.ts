@@ -2,25 +2,25 @@ import { SafeUint } from '../num';
 
 const get = <R extends RecordBase, K extends keyof R>(
   record: R,
-  key: K
+  key: K,
 ): R[K] => record[key];
 
 const set = <R extends RecordBase, K extends keyof R>(
   record: R,
   key: K,
-  newValue: R[K]
+  newValue: R[K],
 ): R => ({ ...record, [key]: newValue });
 
 const update = <R extends RecordBase, K extends keyof R>(
   record: R,
   key: K,
-  updater: (prev: R[K]) => R[K]
+  updater: (prev: R[K]) => R[K],
 ): R => ({ ...record, [key]: updater(record[key]) });
 
 const UNSAFE_getIn_impl = (
   obj: RecordBase,
   keyPath: readonly (number | string)[],
-  index: SafeUintWithSmallInt
+  index: SafeUintWithSmallInt,
 ): unknown =>
   index >= keyPath.length
     ? obj
@@ -28,26 +28,26 @@ const UNSAFE_getIn_impl = (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-restricted-syntax
         obj[keyPath[index]!] as RecordBase,
         keyPath,
-        SafeUint.add(index, 1)
+        SafeUint.add(index, 1),
       );
 
 const getIn = <R extends RecordBase, Path extends Paths<R>>(
   record: R,
-  keyPath: Path
+  keyPath: Path,
 ): RecordValueAtPath<R, Path> =>
   // eslint-disable-next-line no-restricted-syntax
   UNSAFE_getIn_impl(
     record,
     // eslint-disable-next-line no-restricted-syntax
     keyPath as readonly string[],
-    0
+    0,
   ) as RecordValueAtPath<R, Path>;
 
 const UNSAFE_updateIn_impl = (
   obj: RecordBase,
   keyPath: readonly (number | string)[],
   index: SafeUintWithSmallInt,
-  updater: (prev: unknown) => unknown
+  updater: (prev: unknown) => unknown,
 ): unknown =>
   index >= keyPath.length
     ? updater(obj)
@@ -59,9 +59,9 @@ const UNSAFE_updateIn_impl = (
               obj[keyPath[index]!] as RecordBase,
               keyPath,
               SafeUint.add(index, 1),
-              updater
+              updater,
             )
-          : v
+          : v,
       )
     : {
         ...obj,
@@ -71,7 +71,7 @@ const UNSAFE_updateIn_impl = (
           obj[keyPath[index]!] as RecordBase,
           keyPath,
           SafeUint.add(index, 1),
-          updater
+          updater,
         ),
       };
 
@@ -85,7 +85,7 @@ const setIn = <R extends RecordBase>(
     // eslint-disable-next-line no-restricted-syntax
     keyPath as readonly string[],
     0,
-    () => newValue
+    () => newValue,
   ) as R;
 
 const updateIn = <R extends RecordBase, Path extends Paths<R>>(
@@ -93,7 +93,7 @@ const updateIn = <R extends RecordBase, Path extends Paths<R>>(
   keyPath: IsUnion<Path> extends true ? never : Path,
   updater: IsUnion<Path> extends true
     ? never
-    : (prev: RecordValueAtPath<R, Path>) => RecordValueAtPath<R, Path>
+    : (prev: RecordValueAtPath<R, Path>) => RecordValueAtPath<R, Path>,
 ): R =>
   // eslint-disable-next-line no-restricted-syntax
   UNSAFE_updateIn_impl(
@@ -102,13 +102,13 @@ const updateIn = <R extends RecordBase, Path extends Paths<R>>(
     keyPath as readonly string[],
     0,
     // eslint-disable-next-line no-restricted-syntax
-    updater as (prev: unknown) => unknown
+    updater as (prev: unknown) => unknown,
   ) as R;
 
 const removeProperties = <R extends RecordBase, K extends keyof R>(
   record: R,
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  keys: readonly K[]
+  keys: readonly K[],
 ): Readonly<{
   [Key in Exclude<keyof R, K>]: R[Key];
 }> => {
@@ -116,7 +116,7 @@ const removeProperties = <R extends RecordBase, K extends keyof R>(
   const keysSet = new Set<keyof R>(keys);
   // eslint-disable-next-line no-restricted-syntax
   return Object.fromEntries(
-    Object.entries(record).filter(([k, _v]) => !keysSet.has(k))
+    Object.entries(record).filter(([k, _v]) => !keysSet.has(k)),
   ) as never;
 };
 
@@ -128,7 +128,7 @@ const removeProperties = <R extends RecordBase, K extends keyof R>(
  */
 const merge = <R1 extends RecordBase, R2 extends RecordBase>(
   record1: R1,
-  record2: R2
+  record2: R2,
 ): Readonly<{
   [Key in keyof R1 | keyof R2]: Key extends keyof R2
     ? R2[Key]
@@ -136,24 +136,24 @@ const merge = <R1 extends RecordBase, R2 extends RecordBase>(
     ? R1[Key]
     : never;
   // eslint-disable-next-line no-restricted-syntax
-}> => ({ ...record1, ...record2 } as never);
+}> => ({ ...record1, ...record2 }) as never;
 
 function hasKeyValue<R extends RecordBase, K extends keyof R, V extends R[K]>(
   rec: R,
   key: K,
-  valueChecker: (v: R[K]) => v is V
+  valueChecker: (v: R[K]) => v is V,
 ): rec is R & Record<K, V>;
 
 function hasKeyValue<
   R extends RecordBase,
   K extends PropertyKey,
-  V extends R[K]
+  V extends R[K],
 >(rec: R, key: K, valueChecker: (v: R[K]) => v is V): rec is R & Record<K, V>;
 
 function hasKeyValue<
   R extends RecordBase,
   K extends PropertyKey,
-  V extends R[K]
+  V extends R[K],
 >(rec: R, key: K, valueChecker: (v: R[K]) => v is V): rec is R & Record<K, V> {
   return Object.hasOwn(rec, key) && valueChecker(rec[key]);
 }

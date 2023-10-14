@@ -16,17 +16,17 @@ const toast = createToaster();
 
 const [formState$, dispatch] = createReducer(
   updatePasswordPageStateReducer,
-  updatePasswordPageInitialState
+  updatePasswordPageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || updatePasswordPageHasError(state))
+  mapI((state) => state.isWaitingResponse || updatePasswordPageHasError(state)),
 );
 
 const oldPasswordFormIntent$: InitializedObservable<Intent> = formState$.chain(
   mapI((state) =>
-    state.oldPassword.error === undefined ? 'primary' : 'danger'
-  )
+    state.oldPassword.error === undefined ? 'primary' : 'danger',
+  ),
 );
 
 const newPasswordFormIntent$: InitializedObservable<Intent> = formState$.chain(
@@ -34,8 +34,8 @@ const newPasswordFormIntent$: InitializedObservable<Intent> = formState$.chain(
     state.newPassword.password.error === undefined &&
     state.newPassword.passwordConfirmation.error === undefined
       ? 'primary'
-      : 'danger'
-  )
+      : 'danger',
+  ),
 );
 
 const {
@@ -73,8 +73,8 @@ const state$ = combineLatestI([
       newPasswordFormIntent,
       oldPasswordIsOpen,
       newPasswordIsOpen,
-    })
-  )
+    }),
+  ),
 );
 
 const submit = async (user: FireAuthUser): Promise<void> => {
@@ -86,7 +86,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
 
   const credential: AuthCredential = EmailAuthProvider.credential(
     currentEmail,
-    s.oldPassword.inputValue
+    s.oldPassword.inputValue,
   );
 
   const res1 = await api.auth.reauthenticateWithCredential(user, credential);
@@ -104,7 +104,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
         console.error(
           'error occurred on reauthenticateWithCredential:',
           res1.value.code,
-          res1.value.message
+          res1.value.message,
         );
 
         dispatch({ type: 'done' });
@@ -123,14 +123,14 @@ const submit = async (user: FireAuthUser): Promise<void> => {
 
   const res2 = await api.auth.update.password(
     user,
-    s.newPassword.password.inputValue
+    s.newPassword.password.inputValue,
   );
 
   if (Result.isErr(res2)) {
     console.error(
       'error occurred on updatePassword:',
       res2.value.code,
-      res2.value.message
+      res2.value.message,
     );
 
     dispatch({ type: 'done' });

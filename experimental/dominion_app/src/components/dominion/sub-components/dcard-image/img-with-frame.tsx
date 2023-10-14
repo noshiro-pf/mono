@@ -44,7 +44,7 @@ export const ImgWithFrame = memo(
         />
       )}
     </div>
-  )
+  ),
 )
 
 ImgWithFrame.displayName = 'ImgWithFrame'

@@ -18,7 +18,7 @@ export const updateDisplayNamePageInitialState = {
 } as const satisfies UpdateDisplayNamePageState;
 
 export const updateDisplayNamePageHasError = (
-  state: UpdateDisplayNamePageState
+  state: UpdateDisplayNamePageState,
 ): boolean =>
   inputHasError(state.displayName) || state.otherErrors !== undefined;
 
@@ -43,7 +43,7 @@ export const updateDisplayNamePageStateReducer: Reducer<
         inputStateReducer(state.displayName, {
           type: 'input',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'setDisplayNameError':

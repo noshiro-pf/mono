@@ -31,7 +31,7 @@ import { UserAdminComponent } from './user-admin/user-admin.component';
         },
         { component: NotFoundPageComponent, path: '**' },
       ],
-      { useHash: true }
+      { useHash: true },
     ),
   ],
   exports: [RouterModule],

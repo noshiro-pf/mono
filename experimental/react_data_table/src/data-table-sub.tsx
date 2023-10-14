@@ -65,8 +65,8 @@ export const DataTableSub = memo(
         pageNumber$,
         headerValue$,
         sortState$,
-        resetAllClick$
-      )
+        resetAllClick$,
+      ),
     )
 
     // callbacks
@@ -108,7 +108,7 @@ export const DataTableSub = memo(
         )}
       </div>
     )
-  }
+  },
 )
 
 DataTableSub.displayName = 'DataTableSub'

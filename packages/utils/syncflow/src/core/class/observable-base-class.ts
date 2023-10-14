@@ -21,7 +21,7 @@ import {
 export class ObservableBaseClass<
   A,
   Kind extends ObservableBase<A>['kind'],
-  Depth extends ObservableBase<A>['depth']
+  Depth extends ObservableBase<A>['depth'],
 > implements ObservableBase<A>
 {
   readonly id;
@@ -60,7 +60,7 @@ export class ObservableBaseClass<
     this.#children = Arr.pushed(
       this.#children,
       // eslint-disable-next-line no-restricted-syntax
-      child as ChildObservable<unknown>
+      child as ChildObservable<unknown>,
     );
   }
 
@@ -154,7 +154,7 @@ export class ObservableBaseClass<
     }
 
     const id: SubscriberId = this.#addSubscriber(
-      toSubscriber(onNext, onComplete)
+      toSubscriber(onNext, onComplete),
     );
     return {
       unsubscribe: () => {

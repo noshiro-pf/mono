@@ -19,8 +19,10 @@ export const MuiCard = styled('div')`
   flex-direction: row;
 
   /* MuiPaper-elevation1 */
-  box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%),
-    0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
+  box-shadow:
+    0px 2px 1px -1px rgb(0 0 0 / 20%),
+    0px 1px 1px 0px rgb(0 0 0 / 14%),
+    0px 1px 3px 0px rgb(0 0 0 / 12%);
 
   /* MuiPaper-rounded */
   border-radius: 4px;

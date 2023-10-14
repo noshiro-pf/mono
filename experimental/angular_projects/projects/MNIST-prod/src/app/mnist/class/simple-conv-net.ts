@@ -51,7 +51,7 @@ export class SimpleConvNet {
     },
     hiddenSize: number = 100,
     outputSize: number = 10,
-    weightInitStd: number = 0.01
+    weightInitStd: number = 0.01,
   ) {
     this.filterNum = convParams.filterNum;
     this.filterSize = convParams.filterSize;
@@ -67,11 +67,11 @@ export class SimpleConvNet {
     this.convOutputSize = Math.round(
       (this.inputSize - this.filterSize + 2 * this.filterPadding) /
         this.fitlerStride +
-        1
+        1,
     );
 
     this.poolOutputSize = Math.round(
-      this.filterNum * (this.convOutputSize / 2) * (this.convOutputSize / 2)
+      this.filterNum * (this.convOutputSize / 2) * (this.convOutputSize / 2),
     );
 
     // 重みの初期化
@@ -83,17 +83,17 @@ export class SimpleConvNet {
           this.filterSize,
           this.filterSize,
         ]),
-        (e) => e * weightInitStd
+        (e) => e * weightInitStd,
       ),
       b1: np.zeros([this.filterNum]),
       W2: np.map(
         np.random.randn([this.poolOutputSize, hiddenSize]),
-        (e) => e * weightInitStd
+        (e) => e * weightInitStd,
       ),
       b2: np.zeros([this.hiddenSize]),
       W3: np.map(
         np.random.randn([hiddenSize, outputSize]),
-        (e) => e * weightInitStd
+        (e) => e * weightInitStd,
       ),
       b3: np.zeros([this.outputSize]),
     };
@@ -106,8 +106,8 @@ export class SimpleConvNet {
         this.params.W1,
         this.params.b1,
         convParams.stride,
-        convParams.padding
-      )
+        convParams.padding,
+      ),
     );
 
     this.layers.push(new Relu());

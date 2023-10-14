@@ -152,7 +152,7 @@ export class List extends IndexedCollection {
       const seq = IndexedCollection(
         typeof argument !== 'string' && hasIterator(argument)
           ? argument
-          : [argument]
+          : [argument],
       );
       if (seq.size !== 0) {
         seqs.push(seq);
@@ -191,7 +191,7 @@ export class List extends IndexedCollection {
     return setListBounds(
       this,
       resolveBegin(begin, size),
-      resolveEnd(end, size)
+      resolveEnd(end, size),
     );
   }
 
@@ -237,7 +237,7 @@ export class List extends IndexedCollection {
       this._root,
       this._tail,
       ownerID,
-      this.__hash
+      this.__hash,
     );
   }
 }
@@ -390,7 +390,7 @@ function iterateList(list, reverse) {
         values = iterateNodeOrLeaf(
           array && array[idx],
           level - SHIFT,
-          offset + (idx << level)
+          offset + (idx << level),
         );
       }
     };
@@ -445,7 +445,7 @@ function updateList(list, index, value) {
       list._level,
       index,
       value,
-      didAlter
+      didAlter,
     );
   }
 
@@ -480,7 +480,7 @@ function updateVNode(node, ownerID, level, index, value, didAlter) {
       level - SHIFT,
       index,
       value,
-      didAlter
+      didAlter,
     );
     if (newLowerNode === lowerNode) {
       return node;
@@ -565,7 +565,7 @@ function setListBounds(list, begin, end) {
   while (newOrigin + offsetShift < 0) {
     newRoot = new VNode(
       newRoot && newRoot.array.length ? [undefined, newRoot] : [],
-      owner
+      owner,
     );
     newLevel += SHIFT;
     offsetShift += 1 << newLevel;
@@ -584,7 +584,7 @@ function setListBounds(list, begin, end) {
   while (newTailOffset >= 1 << (newLevel + SHIFT)) {
     newRoot = new VNode(
       newRoot && newRoot.array.length ? [newRoot] : [],
-      owner
+      owner,
     );
     newLevel += SHIFT;
   }
@@ -652,7 +652,7 @@ function setListBounds(list, begin, end) {
       newRoot = newRoot.removeAfter(
         owner,
         newLevel,
-        newTailOffset - offsetShift
+        newTailOffset - offsetShift,
       );
     }
     if (offsetShift) {

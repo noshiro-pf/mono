@@ -19,7 +19,10 @@ export class FeedbackComponent implements OnInit, OnDestroy {
 
   feedbacks: Feedback[] = [];
 
-  constructor(private dialog: MatDialog, private database: DatabaseService) {
+  constructor(
+    private dialog: MatDialog,
+    private database: DatabaseService,
+  ) {
     this.database.feedbacks$
       .pipe(takeWhile(() => this.alive))
       .subscribe((val) => (this.feedbacks = val));
@@ -53,7 +56,7 @@ export class FeedbackComponent implements OnInit, OnDestroy {
             timeStamp: Date.now(),
             closed: false,
             category: this.category,
-          })
+          }),
         );
         this.name = '';
         this.feedbackText = '';

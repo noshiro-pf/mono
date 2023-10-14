@@ -2,7 +2,7 @@ import { compareDatetimeRange } from '@noshiro/event-schedule-app-shared';
 import { datetimeRange2str } from '../constants';
 
 export const normalizeEventSchedule = (
-  eventSchedule: EventSchedule
+  eventSchedule: EventSchedule,
 ): EventSchedule => ({
   title: eventSchedule.title.trim(),
   notes: `${eventSchedule.notes.trim()}\n`,

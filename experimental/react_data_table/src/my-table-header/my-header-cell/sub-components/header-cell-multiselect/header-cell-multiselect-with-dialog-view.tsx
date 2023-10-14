@@ -23,7 +23,7 @@ const Cell = styled.div`
 const generateLabel = (
   selectedIndice: I.List<number>,
   selectorOptions: I.List<ISelectorOptionWithViewValue>,
-  multiSelectType: 'and' | 'or'
+  multiSelectType: 'and' | 'or',
 ) => {
   if (!selectedIndice) return ''
   if (selectedIndice.isEmpty()) return 'None'
@@ -32,7 +32,7 @@ const generateLabel = (
     return selectorOptions.get(selectedIndice.get(0, 0), { viewValue: '' })
       .viewValue
   const values = selectedIndice.map(
-    (i) => selectorOptions.get(i, { viewValue: '' }).viewValue
+    (i) => selectorOptions.get(i, { viewValue: '' }).viewValue,
   )
   return `${values.join(', ')} (${multiSelectType})`
 }
@@ -59,7 +59,7 @@ export const HeaderCellMultiSelectByDialogView = memo(
   }>) => {
     const label: string = useMemo(
       () => generateLabel(selectedIndice, selectorOptions, multiSelectType),
-      [selectedIndice, selectorOptions, multiSelectType]
+      [selectedIndice, selectorOptions, multiSelectType],
     )
 
     return (
@@ -84,7 +84,7 @@ export const HeaderCellMultiSelectByDialogView = memo(
         )}
       </div>
     )
-  }
+  },
 )
 
 HeaderCellMultiSelectByDialogView.displayName =

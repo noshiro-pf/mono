@@ -18,7 +18,7 @@ const isInUint8Range = (a: number): a is Uint8 => Number.isInteger(a) && _r(a);
 export const toUint8 = (a: number): Uint8 => {
   if (!isInUint8Range(a)) {
     throw new TypeError(
-      `Expected non-negative integer less than ${MAX_VALUE}, got: ${a}`
+      `Expected non-negative integer less than ${MAX_VALUE}, got: ${a}`,
     );
   }
   return a;

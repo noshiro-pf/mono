@@ -10,7 +10,7 @@ if (container !== null) {
   root.render(
     <StrictMode>
       <App />
-    </StrictMode>
+    </StrictMode>,
   );
 } else {
   throw new Error('Could not find root element');

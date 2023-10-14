@@ -1,8 +1,8 @@
 ---
-title: "TypeScript 型ユーティリティ集"
-emoji: "🐈"
-type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["typescript"]
+title: 'TypeScript 型ユーティリティ集'
+emoji: '🐈'
+type: 'tech' # tech: 技術記事 / idea: アイデア
+topics: ['typescript']
 published: true
 ---
 
@@ -14,10 +14,10 @@ published: true
 ## `expectType` （型のユニットテスト用ユーティリティ）
 
 ```ts
-expectType<[1, 2, 3], [1, 2, 3]>("=");
-expectType<[any], [number]>("<=");
-expectType<number, string>("!=");
-expectType<any, 1>("!=");
+expectType<[1, 2, 3], [1, 2, 3]>('=');
+expectType<[any], [number]>('<=');
+expectType<number, string>('!=');
+expectType<any, 1>('!=');
 ```
 
 型が等価 or 部分型かどうか判定します。
@@ -32,10 +32,10 @@ expectType<any, 1>("!=");
 ```ts
 const expectType = <A, B>(
   _relation: TypeEq<A, B> extends true
-    ? "<=" | "="
+    ? '<=' | '='
     : TypeExtends<A, B> extends true
-    ? "!=" | "<="
-    : "!<=" | "!="
+    ? '!=' | '<='
+    : '!<=' | '!=',
 ): void => undefined;
 ```
 
@@ -61,8 +61,8 @@ type TypeEq<A, B>
 という実装だと `any` が含まれるときに上手く動作しません（例えば以下のテストが通ってしまいます）。
 
 ```ts
-expectType<any, number>("=");
-expectType<{ x: any }, { x: number }>("=");
+expectType<any, number>('=');
+expectType<{ x: any }, { x: number }>('=');
 ```
 
 参考： https://github.com/microsoft/TypeScript/issues/27024
@@ -75,13 +75,13 @@ https://github.com/noshiro-pf/mono/blob/63d5aa9197236c4ffb74bece4ee6025a28dd71b1
 ## `BoolAnd`, `BoolOr`, `BoolNot`, `BoolEq`, `BoolNeq`, `BoolNand`, `BoolNor`,
 
 ```ts
-expectType<BoolAnd<true, true>, true>("=");
-expectType<BoolOr<false, true>, true>("=");
-expectType<BoolNot<true>, false>("=");
-expectType<BoolEq<false, false>, true>("=");
-expectType<BoolNeq<false, true>, true>("=");
-expectType<BoolNand<false, true>, true>("=");
-expectType<BoolNor<false, false>, true>("=");
+expectType<BoolAnd<true, true>, true>('=');
+expectType<BoolOr<false, true>, true>('=');
+expectType<BoolNot<true>, false>('=');
+expectType<BoolEq<false, false>, true>('=');
+expectType<BoolNeq<false, true>, true>('=');
+expectType<BoolNand<false, true>, true>('=');
+expectType<BoolNor<false, false>, true>('=');
 ```
 
 論理演算を行う関数です。
@@ -119,8 +119,8 @@ https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-
 ## `IsNever`
 
 ```ts
-expectType<IsNever<never>, true>("=");
-expectType<IsNever<string>, false>("=");
+expectType<IsNever<never>, true>('=');
+expectType<IsNever<string>, false>('=');
 ```
 
 型が `never` と等しいかどうか判定します。
@@ -143,9 +143,9 @@ https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-
 ## `IsUnion`
 
 ```ts
-expectType<IsUnion<never>, false>("=");
-expectType<IsUnion<string>, false>("=");
-expectType<IsUnion<number | string>, true>("=");
+expectType<IsUnion<never>, false>('=');
+expectType<IsUnion<string>, false>('=');
+expectType<IsUnion<number | string>, true>('=');
 ```
 
 型が（2 個以上の型の） union 型かどうか判定します。
@@ -175,8 +175,8 @@ https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-
 ## `ToNumber`
 
 ```ts
-expectType<ToNumber<"1000">, 1000>("=");
-expectType<ToNumber<"8192">, 8192>("=");
+expectType<ToNumber<'1000'>, 1000>('=');
+expectType<ToNumber<'8192'>, 8192>('=');
 ```
 
 数値の文字列型を数値型にします。
@@ -206,9 +206,9 @@ https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-
 ## `IsFixedLengthList`
 
 ```ts
-expectType<IsFixedLengthList<readonly [1, 2, 3]>, true>("=");
-expectType<IsFixedLengthList<readonly number[]>, false>("=");
-expectType<IsFixedLengthList<[number, 1, 2, ...number[]]>, false>("=");
+expectType<IsFixedLengthList<readonly [1, 2, 3]>, true>('=');
+expectType<IsFixedLengthList<readonly number[]>, false>('=');
+expectType<IsFixedLengthList<[number, 1, 2, ...number[]]>, false>('=');
 ```
 
 配列型が固定長であるかどうかを返します。
@@ -217,7 +217,7 @@ expectType<IsFixedLengthList<[number, 1, 2, ...number[]]>, false>("=");
 
 ```ts
 type IsFixedLengthList<T extends readonly unknown[]> =
-  number extends T["length"] ? false : true;
+  number extends T['length'] ? false : true;
 ```
 
 可変長配列（ `readonly number[]` など）の`"length"` の型が `number` 型であるのに対して、固定長の配列型（タプル型、 `[1, 2, 3]` など）の `"length"` の型が `number` 型ではなく定数の型（`3`など）になることを利用しています。
@@ -233,9 +233,9 @@ https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-
 ## `IndexOfTuple`
 
 ```ts
-expectType<IndexOfTuple<readonly [1, 2, 3]>, 0 | 1 | 2>("=");
-expectType<IndexOfTuple<readonly [2, 4, 6, 8, 10]>, 0 | 1 | 2 | 3 | 4>("=");
-expectType<IndexOfTuple<readonly []>, never>("=");
+expectType<IndexOfTuple<readonly [1, 2, 3]>, 0 | 1 | 2>('=');
+expectType<IndexOfTuple<readonly [2, 4, 6, 8, 10]>, 0 | 1 | 2 | 3 | 4>('=');
+expectType<IndexOfTuple<readonly []>, never>('=');
 ```
 
 タプル型のインデックスを返します。
@@ -247,7 +247,7 @@ type IndexOfTuple<T extends readonly unknown[]> = _IndexOfTupleImpl<T, keyof T>;
 
 type _IndexOfTupleImpl<
   T extends readonly unknown[],
-  K
+  K,
 > = IsFixedLengthList<T> extends true
   ? K extends keyof T
     ? K extends `${number}`
@@ -271,7 +271,7 @@ https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-
 ## `MakeTuple`
 
 ```ts
-expectType<MakeTuple<unknown, 3>, readonly [unknown, unknown, unknown]>("=");
+expectType<MakeTuple<unknown, 3>, readonly [unknown, unknown, unknown]>('=');
 ```
 
 第 1 引数の型を第 2 引数の整数個分繰り返した配列を作ります。
@@ -296,7 +296,7 @@ namespace _MakeTupleInternals {
 
   type Tile<
     T extends readonly unknown[],
-    N extends Digit | DigitStr | "10" | 10
+    N extends Digit | DigitStr | '10' | 10,
   > = [
     readonly [],
     readonly [...T],
@@ -308,16 +308,16 @@ namespace _MakeTupleInternals {
     readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T],
     readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
     readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
-    readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T]
+    readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
   ][N];
 
   export type MakeTupleImpl<
     T,
     N extends string,
-    X extends readonly unknown[]
+    X extends readonly unknown[],
   > = string extends N
     ? never
-    : N extends ""
+    : N extends ''
     ? X
     : First<N> extends infer U
     ? U extends DigitStr
@@ -350,7 +350,7 @@ type _MakeTupleNaiveImpl<Num, Elm, T extends readonly unknown[]> =
 ```
 
 ```ts
-expectType<MakeTupleNaive<0, 1000>, MakeTuple<0, 1000>>("=");
+expectType<MakeTupleNaive<0, 1000>, MakeTuple<0, 1000>>('=');
 // Type instantiation is excessively deep and possibly infinite. ts(2589)
 ```
 
@@ -365,8 +365,8 @@ https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-
 ## `Index`
 
 ```ts
-expectType<Index<3>, 0 | 1 | 2>("=");
-expectType<Index<5>, 0 | 1 | 2 | 3 | 4>("=");
+expectType<Index<3>, 0 | 1 | 2>('=');
+expectType<Index<5>, 0 | 1 | 2 | 3 | 4>('=');
 ```
 
 与えられた整数未満の非負整数すべてからなる union 型を返します。
@@ -390,8 +390,8 @@ https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-
 ## `NegativeIndex`
 
 ```ts
-expectType<NegativeIndex<0>, never>("=");
-expectType<NegativeIndex<5>, -1 | -2 | -3 | -4 | -5>("=");
+expectType<NegativeIndex<0>, never>('=');
+expectType<NegativeIndex<5>, -1 | -2 | -3 | -4 | -5>('=');
 ```
 
 与えられた整数以上の負整数すべて（`0` は除く）からなる union 型を返します。
@@ -454,11 +454,11 @@ https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-
 ## `UintRange`
 
 ```ts
-expectType<UintRange<0, 3>, 0 | 1 | 2>("=");
-expectType<UintRange<0, 0>, never>("=");
-expectType<UintRange<0, 1>, 0>("=");
-expectType<UintRange<0, 5>, 0 | 1 | 2 | 3 | 4>("=");
-expectType<UintRange<2, 5>, 2 | 3 | 4>("=");
+expectType<UintRange<0, 3>, 0 | 1 | 2>('=');
+expectType<UintRange<0, 0>, never>('=');
+expectType<UintRange<0, 1>, 0>('=');
+expectType<UintRange<0, 5>, 0 | 1 | 2 | 3 | 4>('=');
+expectType<UintRange<2, 5>, 2 | 3 | 4>('=');
 ```
 
 --- 実装 ---
@@ -483,13 +483,13 @@ https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-
 ## `Max`, `Min`
 
 ```ts
-expectType<Max<0 | 1 | 2>, 2>("=");
-expectType<Max<0>, 0>("=");
-expectType<Max<0 | 1 | 3 | 5 | 6>, 6>("=");
+expectType<Max<0 | 1 | 2>, 2>('=');
+expectType<Max<0>, 0>('=');
+expectType<Max<0 | 1 | 3 | 5 | 6>, 6>('=');
 
-expectType<Min<0 | 1 | 2>, 0>("=");
-expectType<Min<0>, 0>("=");
-expectType<Min<0 | 1 | 3 | 5 | 6>, 0>("=");
+expectType<Min<0 | 1 | 2>, 0>('=');
+expectType<Min<0>, 0>('=');
+expectType<Min<0 | 1 | 3 | 5 | 6>, 0>('=');
 ```
 
 数値の union 型から最大値／最小値を取り出します。
@@ -511,9 +511,9 @@ https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-
 ## `Seq`
 
 ```ts
-expectType<Seq<3>, readonly [0, 1, 2]>("=");
-expectType<Seq<0>, readonly []>("=");
-expectType<Seq<5>, readonly [0, 1, 2, 3, 4]>("=");
+expectType<Seq<3>, readonly [0, 1, 2]>('=');
+expectType<Seq<0>, readonly []>('=');
+expectType<Seq<5>, readonly [0, 1, 2, 3, 4]>('=');
 ```
 
 与えられた数値までの連番配列の型を返します。

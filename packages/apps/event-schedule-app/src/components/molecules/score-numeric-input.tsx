@@ -28,7 +28,7 @@ export const ScoreNumericInput = memoNamed<Props>(
     const normalizeValue = useCallback(
       (value: number) =>
         clampAndRoundAnswersScore(Num.clamp<number>(min, max)(value)),
-      [min, max]
+      [min, max],
     );
 
     const {
@@ -48,7 +48,7 @@ export const ScoreNumericInput = memoNamed<Props>(
 
     const inputProps = useMemo(
       () => ({ min, max, step, onKeyDown }),
-      [min, max, onKeyDown]
+      [min, max, onKeyDown],
     );
 
     return (
@@ -64,5 +64,5 @@ export const ScoreNumericInput = memoNamed<Props>(
         onInputStringChange={setValueStr}
       />
     );
-  }
+  },
 );

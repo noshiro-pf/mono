@@ -6,7 +6,7 @@ import { brand } from '../brand';
 const is = Num.isNonNegative;
 
 export const nonNegativeNumber = (
-  defaultValue: number = 0
+  defaultValue: number = 0,
 ): Type<NonNegativeNumber> => {
   if (!is(defaultValue)) {
     throw new Error('defaultValue must be a non-negative number');

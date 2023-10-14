@@ -14,7 +14,7 @@ export const AnswerPageEventInfo = memoNamed<Props>(
   ({ eventSchedule }) => {
     const afterDeadline = useMemo(
       () => eventIsAfterDeadline(eventSchedule),
-      [eventSchedule]
+      [eventSchedule],
     );
 
     return (
@@ -88,7 +88,7 @@ export const AnswerPageEventInfo = memoNamed<Props>(
         </TableValue>
       </div>
     );
-  }
+  },
 );
 
 const TableCell = styled.div`

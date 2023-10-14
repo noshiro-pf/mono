@@ -39,11 +39,11 @@ const PlayerResultRankedRecordFactory = I.Record<IPlayerResultRanked>({
 })
 
 export const PlayerResultRanked = (
-  pr?: Partial<IPlayerResultRanked>
+  pr?: Partial<IPlayerResultRanked>,
 ): TPlayerResultRanked => PlayerResultRankedRecordFactory(pr)
 
 export const PlayerResultRankedFromJS = (
-  pr?: Partial<IPlayerResultRankedJS>
+  pr?: Partial<IPlayerResultRankedJS>,
 ): TPlayerResultRanked => {
   if (pr === undefined) return PlayerResultRanked()
   const wd = withDefaultMix(pr, PlayerResultRanked())
@@ -58,7 +58,7 @@ export const PlayerResultRankedFromJS = (
 }
 
 export const PlayerResultRankedToJS = (
-  pr: TPlayerResultRanked
+  pr: TPlayerResultRanked,
 ): IPlayerResultRankedJS => ({
   name: pr.name,
   turnOrder: pr.turnOrder,

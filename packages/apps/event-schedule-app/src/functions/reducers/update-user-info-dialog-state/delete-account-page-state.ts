@@ -24,7 +24,7 @@ export const deleteAccountPageInitialState = {
 } as const satisfies DeleteAccountPageState;
 
 export const deleteAccountPageHasError = (
-  state: DeleteAccountPageState
+  state: DeleteAccountPageState,
 ): boolean =>
   emailInputHasError(state.email) ||
   inputHasError(state.password) ||
@@ -53,7 +53,7 @@ export const deleteAccountPageStateReducer: Reducer<
         emailInputStateReducer(state.email, {
           type: 'input',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'setEmailError':
@@ -74,7 +74,7 @@ export const deleteAccountPageStateReducer: Reducer<
         inputStateReducer(state.password, {
           type: 'input',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'setPasswordError':

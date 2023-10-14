@@ -28,11 +28,11 @@ export const MyInput = memo(
       (
         ev: React.ChangeEvent<
           HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-        >
+        >,
       ) => {
         valueChange(ev.target.value)
       },
-      [valueChange]
+      [valueChange],
     )
 
     const required = useValueWithDefault(requiredInput, false)
@@ -53,7 +53,7 @@ export const MyInput = memo(
         disabled={disabled}
       />
     )
-  }
+  },
 )
 
 MyInput.displayName = 'MyInput'

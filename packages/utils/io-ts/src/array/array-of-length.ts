@@ -13,7 +13,7 @@ export const arrayOfLength = <A, N extends SmallUint>(
   options?: Readonly<{
     typeName?: string;
     defaultValue?: ArrayOfLength<N, A>;
-  }>
+  }>,
 ): Type<ArrayOfLength<N, A>> => {
   type T = ArrayOfLength<N, A>;
 
@@ -46,7 +46,7 @@ export const arrayOfLength = <A, N extends SmallUint>(
         const message = validationErrorMessage(
           el,
           `The array element is expected to be <${elementType.typeName}>`,
-          (str) => `but the actual value at index ${index} is '${str}'`
+          (str) => `but the actual value at index ${index} is '${str}'`,
         );
 
         return Result.err([message, ...res.value]);

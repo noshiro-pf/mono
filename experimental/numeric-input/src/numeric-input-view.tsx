@@ -17,7 +17,7 @@ export const NumericInputView = (props: Props): JSX.Element => {
     (ev: React.ChangeEvent<HTMLInputElement>) => {
       onChange(ev.target.value);
     },
-    [onChange]
+    [onChange],
   );
 
   return (

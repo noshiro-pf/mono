@@ -35,7 +35,7 @@ describe('match', () => {
       S: 4,
       W: 5,
     },
-    999
+    999,
   );
 
   expectType<typeof res, number>('=');

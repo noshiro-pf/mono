@@ -287,7 +287,7 @@ namespace ArrayElementNewline {
         | {
             readonly ArrayExpression?: BasicConfig;
             readonly ArrayPattern?: BasicConfig;
-          }
+          },
       ];
   export type BasicConfig =
     | ('always' | 'never' | 'consistent')
@@ -364,7 +364,7 @@ namespace ArrowBodyStyle {
         'as-needed',
         {
           readonly requireReturnForObjectLiteral?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -882,7 +882,7 @@ namespace CommaDangle {
             readonly imports?: ValueWithIgnore;
             readonly exports?: ValueWithIgnore;
             readonly functions?: ValueWithIgnore;
-          }
+          },
       ];
   export type Value =
     | 'always-multiline'
@@ -1471,7 +1471,7 @@ namespace Eqeqeq {
         'always',
         {
           readonly null?: 'always' | 'never' | 'ignore';
-        }
+        },
       ]
     | readonly ['smart' | 'allow-null'];
 
@@ -1555,7 +1555,7 @@ namespace FuncCallSpacing {
         'always',
         {
           readonly allowNewlines?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -1633,13 +1633,13 @@ namespace FuncNameMatching {
         {
           readonly considerPropertyDescriptor?: boolean;
           readonly includeCommonJSModuleExports?: boolean;
-        }
+        },
       ]
     | readonly [
         {
           readonly considerPropertyDescriptor?: boolean;
           readonly includeCommonJSModuleExports?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -1695,7 +1695,7 @@ namespace FuncNames {
         Value,
         {
           readonly generators?: Value;
-        }
+        },
       ];
   export type Value = 'always' | 'as-needed' | 'never';
 
@@ -2859,7 +2859,7 @@ namespace InitDeclarations {
         'never',
         {
           readonly ignoreForLoopInit?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -4665,7 +4665,7 @@ namespace LogicalAssignmentOperators {
         'always',
         {
           readonly enforceForIfStatements?: boolean;
-        }
+        },
       ]
     | readonly ['never'];
 
@@ -5361,7 +5361,7 @@ namespace MultilineCommentStyle {
         'separate-lines',
         {
           readonly checkJSDoc?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -6610,7 +6610,7 @@ namespace NoExtraParens {
           readonly enforceForNewInMemberExpressions?: boolean;
           readonly enforceForFunctionPrototypeMethods?: boolean;
           readonly allowParensAfterCommentPattern?: string;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -7429,7 +7429,7 @@ namespace NoMixedOperators {
         | 'instanceof'
         | '?:'
         | '??'
-      )[])
+      )[]),
     ])[];
     readonly allowSamePrecedence?: boolean;
   };
@@ -8445,7 +8445,7 @@ namespace NoRestrictedImports {
                  */
                 readonly importNames?: readonly [
                   string,
-                  ...(readonly string[])
+                  ...(readonly string[]),
                 ];
                 /**
                  * @minItems 1
@@ -8454,7 +8454,7 @@ namespace NoRestrictedImports {
                 readonly message?: string;
                 readonly caseSensitive?: boolean;
               }[];
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -10506,14 +10506,14 @@ namespace ObjectShorthand {
         | 'properties'
         | 'never'
         | 'consistent'
-        | 'consistent-as-needed'
+        | 'consistent-as-needed',
       ]
     | readonly ['always' | 'methods' | 'properties']
     | readonly [
         'always' | 'methods' | 'properties',
         {
           readonly avoidQuotes?: boolean;
-        }
+        },
       ]
     | readonly ['always' | 'methods']
     | readonly [
@@ -10523,7 +10523,7 @@ namespace ObjectShorthand {
           readonly methodsIgnorePattern?: string;
           readonly avoidQuotes?: boolean;
           readonly avoidExplicitReturnArrows?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -11094,7 +11094,7 @@ namespace PaddingLineBetweenStatements {
           | 'var'
           | 'while'
           | 'with'
-        )[])
+        )[]),
       ];
   export type Options = readonly {
     readonly blankLine: PaddingType;
@@ -11602,7 +11602,7 @@ namespace QuoteProps {
           readonly keywords?: boolean;
           readonly unnecessary?: boolean;
           readonly numbers?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -11948,7 +11948,7 @@ namespace Semi {
             | 'always'
             | 'any'
             | 'never';
-        }
+        },
       ]
     | readonly ['always']
     | readonly [
@@ -11956,7 +11956,7 @@ namespace Semi {
         {
           readonly omitLastInOneLineBlock?: boolean;
           readonly omitLastInOneLineClassBody?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -12104,7 +12104,7 @@ namespace SortImports {
       'none' | 'all' | 'multiple' | 'single',
       'none' | 'all' | 'multiple' | 'single',
       'none' | 'all' | 'multiple' | 'single',
-      'none' | 'all' | 'multiple' | 'single'
+      'none' | 'all' | 'multiple' | 'single',
     ];
     readonly ignoreDeclarationSort?: boolean;
     readonly ignoreMemberSort?: boolean;

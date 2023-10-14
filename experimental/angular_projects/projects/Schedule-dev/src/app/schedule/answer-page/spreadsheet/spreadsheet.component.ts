@@ -47,7 +47,7 @@ export class SpreadsheetComponent implements OnInit {
         if (!!spreadSheet[val.date]) {
           spreadSheet[val.date][val.symbolID]++;
         }
-      })
+      }),
     );
     return spreadSheet;
   });
@@ -71,7 +71,7 @@ export class SpreadsheetComponent implements OnInit {
       .filter((e) => e !== undefined)
       .map((e) => (e || { symbolID: '' }).symbolID);
     const scores = symbolIdsOfDate.map(
-      (id) => (event.symbols.find((e) => e.id === id) || { score: 0 }).score
+      (id) => (event.symbols.find((e) => e.id === id) || { score: 0 }).score,
     );
     return utils.number.roundAt(utils.array.average(scores), 1) || 0;
   }
@@ -80,7 +80,7 @@ export class SpreadsheetComponent implements OnInit {
   getIconNameOfAnswer(
     answer: Answer,
     date: number,
-    symbols: ScheduleSymbol[]
+    symbols: ScheduleSymbol[],
   ): string {
     const selection = answer.selection.find((e) => e.date === date);
     if (!selection) return '';
@@ -119,7 +119,7 @@ export class SpreadsheetComponent implements OnInit {
           (a, b) =>
             (isAsc ? 1 : -1) *
             (this.getAverageScore(scEvent, a) -
-              this.getAverageScore(scEvent, b))
+              this.getAverageScore(scEvent, b)),
         );
         break;
       case 'fav':
@@ -133,7 +133,7 @@ export class SpreadsheetComponent implements OnInit {
         this.selectedDatetimesAfterSort = selectedDatetimesRaw.sort(
           (a, b) =>
             (isAsc ? 1 : -1) *
-            (spreadSheet[a][sort.active] - spreadSheet[b][sort.active])
+            (spreadSheet[a][sort.active] - spreadSheet[b][sort.active]),
         );
         break;
       default:

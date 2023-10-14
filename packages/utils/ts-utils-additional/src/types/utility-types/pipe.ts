@@ -2,7 +2,7 @@ import { expectType } from '@noshiro/ts-utils';
 
 export type ShiftZip<T extends unknown[]> = ListType.Zip<T, ListType.Tail<T>>;
 expectType<ShiftZip<[1, 2, 3]>, readonly [readonly [1, 2], readonly [2, 3]]>(
-  '='
+  '=',
 );
 
 export type Tuple2Fn<T> = T extends [infer A, infer B] ? (x: A) => B : never;

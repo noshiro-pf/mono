@@ -46,16 +46,16 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
       '   * Returns a string representation of an array.',
       '   */',
       '  toString(): string;',
-    ].join('\n')
+    ].join('\n'),
   );
 
   ret = ret.replaceAll(
     'forEach(\n    callbackfn: (value: number, index: number, array: Uint32Array) => void,\n    thisArg?: unknown\n  ): void;',
-    'forEach(\n    callbackfn: (value: number, index: number, array: Uint32Array) => void,\n    thisArg?: unknown\n  ): void;\n'
+    'forEach(\n    callbackfn: (value: number, index: number, array: Uint32Array) => void,\n    thisArg?: unknown\n  ): void;\n',
   );
   ret = ret.replaceAll(
     'forEach(\n    callbackfn: (value: number, index: number, array: Int16Array) => void,\n    thisArg?: unknown\n  ): void;',
-    'forEach(\n    callbackfn: (value: number, index: number, array: Int16Array) => void,\n    thisArg?: unknown\n  ): void;\n'
+    'forEach(\n    callbackfn: (value: number, index: number, array: Int16Array) => void,\n    thisArg?: unknown\n  ): void;\n',
   );
 
   /////////////////////////////////////
@@ -90,7 +90,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
   {
     const slice = ret.slice(
       ret.indexOf(markers.JSON.start),
-      ret.indexOf(markers.JSON.end)
+      ret.indexOf(markers.JSON.end),
     );
     ret = ret.replaceAll(
       slice,
@@ -98,14 +98,14 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
         .replaceAll(`): unknown;`, `): MutableJSONValue;`)
         .replaceAll(
           'space?: string | number',
-          'space?: string | UintRange<1, 11>'
-        )
+          'space?: string | UintRange<1, 11>',
+        ),
     );
   }
   {
     const slice = ret.slice(
       ret.indexOf(markers.NumberConstructor.start),
-      ret.indexOf(markers.NumberConstructor.end)
+      ret.indexOf(markers.NumberConstructor.end),
     );
     ret = ret.replaceAll(
       slice,
@@ -116,7 +116,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
             `/** @deprecated Don't use Number constructor */\n`,
             commentOutDeprecated ? '// ' : '',
             `new (value?: unknown): Number;`,
-          ].join('')
+          ].join(''),
         )
         .replaceAll(
           `(value?: unknown): number;`,
@@ -124,14 +124,14 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
             `/** @deprecated Don't use Number constructor */\n`,
             commentOutDeprecated ? '// ' : '',
             `(value?: unknown): number;`,
-          ].join('')
-        )
+          ].join(''),
+        ),
     );
   }
   {
     const slice = ret.slice(
       ret.indexOf(markers.BooleanConstructor.start),
-      ret.indexOf(markers.BooleanConstructor.end)
+      ret.indexOf(markers.BooleanConstructor.end),
     );
     ret = ret.replaceAll(
       slice,
@@ -142,7 +142,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
             `/** @deprecated Don't use Boolean constructor */\n`,
             commentOutDeprecated ? '// ' : '',
             `new (value?: unknown): Boolean;`,
-          ].join('')
+          ].join(''),
         )
         .replaceAll(
           `<T>(value?: T): boolean;`,
@@ -150,8 +150,8 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
             `/** @deprecated Don't use Boolean constructor */\n`,
             commentOutDeprecated ? '// ' : '',
             `<T>(value?: T): boolean;`,
-          ].join('')
-        )
+          ].join(''),
+        ),
     );
   }
   {
@@ -166,7 +166,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
   {
     const slice = ret.slice(
       ret.indexOf(markers.FunctionConstructor.start),
-      ret.indexOf(markers.FunctionConstructor.end)
+      ret.indexOf(markers.FunctionConstructor.end),
     );
     ret = ret.replaceAll(
       slice,
@@ -182,7 +182,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
               "   * @deprecated Don't use Function constructor",
               '   */',
               '  new (...args: readonly string[]): Function;',
-            ].join('\n')
+            ].join('\n'),
           );
         }
         {
@@ -190,19 +190,19 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
           str = str.replaceAll(
             line,
             [`  /** @deprecated Don't use Function constructor */`, line].join(
-              '\n'
-            )
+              '\n',
+            ),
           );
         }
 
         return str;
-      }).value
+      }).value,
     );
   }
   {
     const slice = ret.slice(
       ret.indexOf(markers.ObjectConstructor.start),
-      ret.indexOf(markers.ObjectConstructor.end)
+      ret.indexOf(markers.ObjectConstructor.end),
     );
     ret = ret.replaceAll(
       slice,
@@ -215,83 +215,83 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
           str = str.replaceAll(
             line,
             [`  /** @deprecated Don't use Object constructor */`, line].join(
-              '\n'
-            )
+              '\n',
+            ),
           );
         }
         return str;
-      }).value
+      }).value,
     );
   }
   {
     const slice = ret.slice(
       ret.indexOf(markers.Number.start),
-      ret.indexOf(markers.Number.end)
+      ret.indexOf(markers.Number.end),
     );
     ret = ret.replaceAll(
       slice,
       slice
         .replaceAll(
           'toString(radix?: UintRange<2, 37>): string;',
-          'toString(radix?: UintRange<2, 37>): `${number}`;'
+          'toString(radix?: UintRange<2, 37>): `${number}`;',
         )
         .replaceAll(
           'toFixed(fractionDigits?: number): string;',
-          'toFixed(fractionDigits?: UintRange<0, 21>): `${number}`;'
+          'toFixed(fractionDigits?: UintRange<0, 21>): `${number}`;',
         )
         .replaceAll(
           'toExponential(fractionDigits?: number): string;',
-          'toExponential(fractionDigits?: UintRange<0, 21>): `${number}`;'
+          'toExponential(fractionDigits?: UintRange<0, 21>): `${number}`;',
         )
         .replaceAll(
           'toPrecision(precision?: number): string;',
-          'toPrecision(precision?: UintRange<1, 22>): `${number}`;'
+          'toPrecision(precision?: UintRange<1, 22>): `${number}`;',
         )
-        .replaceAll('valueOf(): number;', `valueOf(): ${indexType.ret};`)
+        .replaceAll('valueOf(): number;', `valueOf(): ${indexType.ret};`),
     );
   }
 
   ret = ret.replaceAll(
     'declare function parseInt(string: string, radix?: UintRange<2, 37>): number;',
-    'declare function parseInt(string: string, radix?: UintRange<2, 37>): Int | NaNType;'
+    'declare function parseInt(string: string, radix?: UintRange<2, 37>): Int | NaNType;',
   );
   ret = ret.replaceAll(
     'declare function parseFloat(string: string): number;',
-    'declare function parseFloat(string: string): number | NaNType;'
+    'declare function parseFloat(string: string): number | NaNType;',
   );
 
   ret = ret.replaceAll(
     'declare const NaN: number;',
-    'declare const NaN: NaNType;'
+    'declare const NaN: NaNType;',
   );
   ret = ret.replaceAll(
     'declare const Infinity: number;',
-    'declare const Infinity: POSITIVE_INFINITY;'
+    'declare const Infinity: POSITIVE_INFINITY;',
   );
   ret = ret.replaceAll('readonly NaN: number;', 'readonly NaN: NaNType;');
   ret = ret.replaceAll(
     'readonly NEGATIVE_INFINITY: number;',
-    'readonly NEGATIVE_INFINITY: NEGATIVE_INFINITY;'
+    'readonly NEGATIVE_INFINITY: NEGATIVE_INFINITY;',
   );
   ret = ret.replaceAll(
     'readonly POSITIVE_INFINITY: number;',
-    'readonly POSITIVE_INFINITY: POSITIVE_INFINITY;'
+    'readonly POSITIVE_INFINITY: POSITIVE_INFINITY;',
   );
 
   // Type utils
   ret = ret.replaceAll(
     'type Exclude<T, U> = T extends U ? never : T;',
-    'type Exclude<T, U extends T> = T extends U ? never : T;'
+    'type Exclude<T, U extends T> = T extends U ? never : T;',
   );
 
   ret = ret.replaceAll(
     'type Omit<T, K extends keyof never> = Pick<T, Exclude<keyof T, K>>;',
-    'type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;'
+    'type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;',
   );
 
   ret = ret.replaceAll(
     'type Partial<T> = {\n  readonly [P in keyof T]?: T[P];\n};',
-    'type Partial<T> = {\n  [P in keyof T]?: T[P];\n};'
+    'type Partial<T> = {\n  [P in keyof T]?: T[P];\n};',
   );
 
   // add @deprecated
@@ -308,7 +308,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
 
     ret = ret.replaceAll(
       [...commonPrefix, ...commonSuffix].join('\n'),
-      [...commonPrefix, lineToInsert, ...commonSuffix].join('\n')
+      [...commonPrefix, lineToInsert, ...commonSuffix].join('\n'),
     );
   }
   {
@@ -327,7 +327,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
 
     ret = ret.replaceAll(
       [...commonPrefix, ...commonSuffix].join('\n'),
-      [...commonPrefix, lineToInsert, ...commonSuffix].join('\n')
+      [...commonPrefix, lineToInsert, ...commonSuffix].join('\n'),
     );
   }
   {
@@ -346,7 +346,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
 
     ret = ret.replaceAll(
       [...commonPrefix, ...commonSuffix].join('\n'),
-      [...commonPrefix, lineToInsert, ...commonSuffix].join('\n')
+      [...commonPrefix, lineToInsert, ...commonSuffix].join('\n'),
     );
   }
 
@@ -358,12 +358,12 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
   // RegExp
   ret = ret.replaceAll(
     'readonly index?: number;',
-    'readonly index?: SafeUint;'
+    'readonly index?: SafeUint;',
   );
   ret = ret.replaceAll('readonly index: number;', 'readonly index: SafeUint;');
   ret = ret.replaceAll(
     'readonly lastIndex: number;',
-    'readonly lastIndex: SafeUint;'
+    'readonly lastIndex: SafeUint;',
   );
 
   ret = convertLibEs5_Array(ret, commentOutDeprecated);
@@ -384,7 +384,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
 
     ret = ret.replaceAll(
       [...commonPrefix, ...commonSuffix].join('\n'),
-      [...commonPrefix, lineToInsert, ...commonSuffix].join('\n')
+      [...commonPrefix, lineToInsert, ...commonSuffix].join('\n'),
     );
   }
   {
@@ -404,7 +404,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
 
     ret = ret.replaceAll(
       [...commonPrefix, ...commonSuffix].join('\n'),
-      [...commonPrefix, lineToInsert, ...commonSuffix].join('\n')
+      [...commonPrefix, lineToInsert, ...commonSuffix].join('\n'),
     );
   }
 
@@ -425,7 +425,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
     }
     ret = ret.replaceAll(
       `/** @deprecated A legacy feature for browser compatibility */\n  readonly`,
-      `/** @deprecated A legacy feature for browser compatibility */\n  // readonly`
+      `/** @deprecated A legacy feature for browser compatibility */\n  // readonly`,
     );
   }
 

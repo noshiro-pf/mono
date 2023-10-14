@@ -11,7 +11,7 @@ const onFileInputChange = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   ev: JSXInternal.TargetedEvent<HTMLInputElement, Event>,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  canvasRef: MutableRef<HTMLCanvasElement | null>
+  canvasRef: MutableRef<HTMLCanvasElement | null>,
 ): void => {
   const files = (ev.target as { files: FileList } | null)?.files;
 

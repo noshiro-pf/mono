@@ -4,7 +4,7 @@ import { Operator } from '../types/Operator';
 export const map =
   <T, U>(
     fn: (srcValue: T, srcIndex: number, index: number) => U,
-    name: string = ''
+    name: string = '',
   ): Operator<T, U> =>
   (src: RN<T>) =>
     new MapRN<T, U>(src, fn, name);
@@ -40,7 +40,7 @@ class MapRN<T, U> extends RN<U> {
   constructor(
     src: RN<T>,
     fn: (srcValue: T, srcIndex: number, index: number) => U,
-    name: string
+    name: string,
   ) {
     super(fn(src.value, src.index, -1), [src], name);
     this.fn = fn;

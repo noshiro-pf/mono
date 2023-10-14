@@ -45,7 +45,7 @@ export const utils = {
     submatch: (
       target: string,
       key: string,
-      ignoreCase: boolean = false
+      ignoreCase: boolean = false,
     ): boolean =>
       ignoreCase
         ? utils.string.submatch(target.toUpperCase(), key.toUpperCase())
@@ -65,12 +65,12 @@ export const utils = {
 
     forEach: (
       obj: { [key: string]: any },
-      f: (element: any, key: string, obj: object) => any
+      f: (element: any, key: string, obj: object) => any,
     ) => Object.keys(obj || {}).forEach((key) => f(obj[key], key, obj)),
 
     map: (
       obj: { [key: string]: any },
-      f: (element: any, key: string, object: object) => any
+      f: (element: any, key: string, object: object) => any,
     ) => Object.keys(obj || {}).map((key) => f(obj[key], key, obj)),
 
     values: (obj: { [key: string]: any }) =>
@@ -212,7 +212,7 @@ export const utils = {
 
       for (let i = 0; i < arr.length; i += QUANTUM) {
         const submin = Math.min(
-          ...arr.slice(i, Math.min(i + QUANTUM, arr.length))
+          ...arr.slice(i, Math.min(i + QUANTUM, arr.length)),
         );
         min = Math.min(submin, min);
       }
@@ -226,7 +226,7 @@ export const utils = {
       for (let i = 0; i < arr.length; i += QUANTUM) {
         const submax = Math.max.apply(
           null,
-          arr.slice(i, Math.max(i + QUANTUM, arr.length))
+          arr.slice(i, Math.max(i + QUANTUM, arr.length)),
         );
         max = Math.max(submax, max);
       }
@@ -253,7 +253,7 @@ export const utils = {
     numberSequence: (
       start: number,
       length: number,
-      step: number = 1
+      step: number = 1,
     ): number[] =>
       Array.from(new Array(length)).map((_, i) => i * step + start),
 

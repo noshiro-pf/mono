@@ -47,7 +47,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     setState: setDatetimeSpecification,
     resetState: resetDatetimeSpecification,
   } = createState<DatetimeSpecificationEnumType>(
-    eventScheduleInitialValue.datetimeSpecification
+    eventScheduleInitialValue.datetimeSpecification,
   );
 
   const {
@@ -55,7 +55,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     setState: setDatetimeRangeList,
     resetState: resetDatetimeRangeList,
   } = createState<readonly DatetimeRange[]>(
-    eventScheduleInitialValue.datetimeRangeList
+    eventScheduleInitialValue.datetimeRangeList,
   );
 
   const {
@@ -88,7 +88,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       email: user?.email ?? '',
       notifyAfterAnswerDeadline: answerDeadline !== undefined,
       notify00daysBeforeAnswerDeadline: answerDeadline !== undefined,
-    }))
+    })),
   );
 
   const {
@@ -104,7 +104,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     initialToggleState:
       eventScheduleInitialValue.notificationSettings !== 'none',
     initialState: pipe(
-      mapNoneToUndefined(eventScheduleInitialValue.notificationSettings)
+      mapNoneToUndefined(eventScheduleInitialValue.notificationSettings),
     ).chainOptional((a) => ({
       ...a,
       email: '',
@@ -131,7 +131,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
               notify07daysBeforeAnswerDeadline: false,
               notify14daysBeforeAnswerDeadline: false,
               notify28daysBeforeAnswerDeadline: false,
-            }
+            },
       );
     }
   };
@@ -152,7 +152,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
             notify07daysBeforeAnswerDeadline: false,
             notify14daysBeforeAnswerDeadline: false,
             notify28daysBeforeAnswerDeadline: false,
-          }
+          },
     );
   };
 
@@ -207,8 +207,8 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
               name: toUserName(fireAuthUser?.displayName ?? ''),
             },
             archivedBy: [],
-          })
-      )
+          }),
+      ),
     );
 
   const eventScheduleValidation$: InitializedObservable<EventScheduleValidation> =
@@ -231,12 +231,12 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
             answerIcons,
             notificationSettingsWithEmail:
               notificationSettingsWithEmail ?? 'none',
-          })
-      )
+          }),
+      ),
     );
 
   const eventScheduleValidationOk$ = eventScheduleValidation$.chain(
-    mapI(validateEventScheduleAll)
+    mapI(validateEventScheduleAll),
   );
 
   const commonState$: InitializedObservable<EventScheduleSettingCommonState> =
@@ -281,8 +281,8 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
           eventScheduleValidation,
           eventScheduleNormalized,
           eventScheduleValidationOk,
-        })
-      )
+        }),
+      ),
     );
 
   const commonStateHandlers: EventScheduleSettingCommonStateHandler = {

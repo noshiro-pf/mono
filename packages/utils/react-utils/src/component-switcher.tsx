@@ -20,8 +20,8 @@ export const ComponentSwitcher = memoNamed<Readonly<Props>>(
           <div key={i} style={displayNoneStyle}>
             {c}
           </div>
-        )
+        ),
       )}
     </>
-  )
+  ),
 );

@@ -53,7 +53,7 @@ export const SelectedCardsImageList = memo(
         />
       )}
     </div>
-  )
+  ),
 )
 
 SelectedCardsImageList.displayName = 'SelectedCardsImageList'

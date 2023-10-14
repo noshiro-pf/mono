@@ -32,7 +32,7 @@ export class GameResultDetailDialogComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     public snackBar: MatSnackBar,
-    private database: FireDatabaseService
+    private database: FireDatabaseService,
   ) {}
 
   ngOnInit() {
@@ -49,18 +49,18 @@ export class GameResultDetailDialogComponent implements OnInit {
       result.Prosperity = ids.Prosperity;
       result.DarkAges = ids.DarkAges;
       result.KingdomCards10 = (ids.KingdomCards10 || []).map((id) =>
-        toIndex(id, cardList)
+        toIndex(id, cardList),
       );
       result.BaneCard = (ids.BaneCard || []).map((id) => toIndex(id, cardList));
       result.EventCards = (ids.EventCards || []).map((id) =>
-        toIndex(id, cardList)
+        toIndex(id, cardList),
       );
       result.Obelisk = (ids.Obelisk || []).map((id) => toIndex(id, cardList));
       result.LandmarkCards = (ids.LandmarkCards || []).map((id) =>
-        toIndex(id, cardList)
+        toIndex(id, cardList),
       );
       result.BlackMarketPile = (ids.BlackMarketPile || []).map((id) =>
-        toIndex(id, cardList)
+        toIndex(id, cardList),
       );
       return result;
     });

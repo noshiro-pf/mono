@@ -3,10 +3,10 @@ import { type NumTiles, type TileName } from '../types';
 import { aka2Normal } from './hand-to-string';
 
 export const toTiles34 = (
-  tiles: Record<TileName, NumTiles> | readonly TileName[]
+  tiles: Record<TileName, NumTiles> | readonly TileName[],
 ): ArrayOfLength<34, NumTiles> => {
   const mut_tiles34: MutableArrayOfLength<34, NumTiles> = Arr.asMut(
-    Arr.zeros(34)
+    Arr.zeros(34),
   );
 
   if (Array.isArray(tiles)) {

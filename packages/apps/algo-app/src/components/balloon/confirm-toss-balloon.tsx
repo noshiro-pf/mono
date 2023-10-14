@@ -30,7 +30,7 @@ export const ConfirmTossBalloon = memoNamed<Props>(
           balloonSize,
           marginBetweenCardAndBalloon,
         }),
-      [anchorCardRect]
+      [anchorCardRect],
     );
 
     const cardWithStyle = useMemo(
@@ -44,8 +44,8 @@ export const ConfirmTossBalloon = memoNamed<Props>(
           float: 'never',
           showOutline: 'never',
           outlineColor: outlineColorDef.green,
-        } as const),
-      [card]
+        }) as const,
+      [card],
     );
 
     return (
@@ -80,7 +80,7 @@ export const ConfirmTossBalloon = memoNamed<Props>(
         </BalloonContent>
       </BalloonWithDownArrowTranslated>
     );
-  }
+  },
 );
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call

@@ -45,7 +45,7 @@ export type ObservableBase<A> = Readonly<{
   subscribe: (onNext: (v: A) => void, onComplete?: () => void) => Subscription;
 
   chain: (<B>(
-    operator: ToInitializedOperator<A, B>
+    operator: ToInitializedOperator<A, B>,
   ) => InitializedObservable<B>) &
     (<B>(operator: ToBaseOperator<A, B>) => Observable<B>);
 }>;
@@ -56,7 +56,7 @@ export type InitializedObservableBase<A> = ObservableBase<A> &
     chain: (<B>(
       operator:
         | InitializedToInitializedOperator<A, B>
-        | ToInitializedOperator<A, B>
+        | ToInitializedOperator<A, B>,
     ) => InitializedObservable<B>) &
       (<B>(operator: ToBaseOperator<A, B>) => Observable<B>);
   }>;
@@ -64,7 +64,7 @@ export type InitializedObservableBase<A> = ObservableBase<A> &
 export type SyncChildObservable<
   A,
   Type extends SyncChildObservableType,
-  P extends NonEmptyUnknownList = NonEmptyUnknownList
+  P extends NonEmptyUnknownList = NonEmptyUnknownList,
 > = ObservableBase<A> &
   Readonly<{
     kind: 'sync child';
@@ -75,13 +75,13 @@ export type SyncChildObservable<
 export type InitializedSyncChildObservable<
   A,
   Type extends SyncChildObservableType,
-  P extends NonEmptyUnknownList = NonEmptyUnknownList
+  P extends NonEmptyUnknownList = NonEmptyUnknownList,
 > = InitializedObservableBase<A> & SyncChildObservable<A, Type, P>;
 
 export type AsyncChildObservable<
   A,
   Type extends AsyncChildObservableType,
-  P extends NonEmptyUnknownList = NonEmptyUnknownList
+  P extends NonEmptyUnknownList = NonEmptyUnknownList,
 > = ObservableBase<A> &
   Readonly<{
     kind: 'async child';
@@ -93,19 +93,19 @@ export type AsyncChildObservable<
 export type InitializedAsyncChildObservable<
   A,
   Type extends AsyncChildObservableType,
-  P extends NonEmptyUnknownList = NonEmptyUnknownList
+  P extends NonEmptyUnknownList = NonEmptyUnknownList,
 > = AsyncChildObservable<A, Type, P> & InitializedObservableBase<A>;
 
 export type ChildObservable<
   A,
-  P extends NonEmptyUnknownList = NonEmptyUnknownList
+  P extends NonEmptyUnknownList = NonEmptyUnknownList,
 > =
   | AsyncChildObservable<A, AsyncChildObservableType, P>
   | SyncChildObservable<A, SyncChildObservableType, P>;
 
 export type RootObservable<
   A,
-  Type extends RootObservableType
+  Type extends RootObservableType,
 > = ObservableBase<A> &
   Readonly<{
     kind: 'root';
@@ -116,7 +116,7 @@ export type RootObservable<
 
 export type InitializedRootObservable<
   A,
-  Type extends RootObservableType
+  Type extends RootObservableType,
 > = InitializedObservableBase<A> & RootObservable<A, Type>;
 
 export type Observable<A> =
@@ -134,15 +134,15 @@ export type ManagerObservable<A> =
   | RootObservable<A, RootObservableType>;
 
 export type InitializedToInitializedOperator<A, B> = (
-  src: InitializedObservable<A>
+  src: InitializedObservable<A>,
 ) => InitializedObservable<B>;
 
 export type ToInitializedOperator<A, B> = (
-  src: InitializedObservable<A> | Observable<A>
+  src: InitializedObservable<A> | Observable<A>,
 ) => InitializedObservable<B>;
 
 export type RemoveInitializedOperator<A, B> = (
-  src: InitializedObservable<A> | Observable<A>
+  src: InitializedObservable<A> | Observable<A>,
 ) => Observable<B>;
 export type ToBaseOperator<A, B> = RemoveInitializedOperator<A, B>; // alias
 
@@ -155,15 +155,15 @@ export type Operator<A, B> =
   | ToInitializedOperator<A, B>;
 
 export const isManagerObservable = <A>(
-  obs: Observable<A>
+  obs: Observable<A>,
 ): obs is ManagerObservable<A> => obs.kind !== 'sync child';
 
 export const isRootObservable = <A>(
-  obs: Observable<A>
+  obs: Observable<A>,
 ): obs is RootObservable<A, RootObservableType> => obs.kind === 'root';
 
 export const isChildObservable = <A>(
-  obs: Observable<A>
+  obs: Observable<A>,
 ): obs is ChildObservable<A> =>
   obs.kind === 'sync child' || obs.kind === 'async child';
 

@@ -6,8 +6,8 @@ export function zipArrays<
   T extends readonly [
     readonly unknown[],
     readonly unknown[],
-    ...(readonly (readonly unknown[])[])
-  ]
+    ...(readonly (readonly unknown[])[]),
+  ],
 >(...arrays: T): readonly Unwrap<T>[] {
   const len = Arr.min(arrays.map(Arr.size));
 
@@ -15,6 +15,6 @@ export function zipArrays<
 
   // eslint-disable-next-line no-restricted-syntax
   return Arr.seq(len).map((i) =>
-    arrays.map((a) => a[i])
+    arrays.map((a) => a[i]),
   ) as readonly Unwrap<T>[];
 }

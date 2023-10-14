@@ -67,7 +67,7 @@ export class CardProperty implements ICardProperty {
       implemented: boolean;
       randomizerCandidate: boolean;
       linkId: number;
-    }
+    },
   ) {
     this.indexInList = indexInList || 0;
     if (!initObj) return;
@@ -94,7 +94,7 @@ export class CardProperty implements ICardProperty {
   from(cardProperty: CardProperty): CardProperty {
     utils.object.forEach(
       cardProperty,
-      (_, key) => (this[key] = cardProperty[key])
+      (_, key) => (this[key] = cardProperty[key]),
     );
     this.cost = new CardCost(cardProperty.cost);
     return this;

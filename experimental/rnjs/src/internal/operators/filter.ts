@@ -5,7 +5,7 @@ export const filter =
   <T>(
     initialValue: T,
     predicate: (srcValue: T, srcIndex: number, index: number) => boolean,
-    name: string = ''
+    name: string = '',
   ): Operator<T, T> =>
   (src: RN<T>) =>
     new FilterRN<T>(src, initialValue, predicate, name);
@@ -14,14 +14,14 @@ class FilterRN<T> extends RN<T> {
   private readonly predicate: (
     srcValue: T,
     srcIndex: number,
-    index: number
+    index: number,
   ) => boolean;
 
   constructor(
     src: RN<T>,
     initialValue: T,
     predicate: (srcValue: T, srcIndex: number, index: number) => boolean,
-    name: string
+    name: string,
   ) {
     super(initialValue, [src], name);
     this.predicate = predicate;

@@ -7,9 +7,9 @@ export const filterKeyIsDown =
     Readonly<KeyboardEvent>
   > =>
   (
-    keyEvents$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>
+    keyEvents$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>,
   ): Observable<Readonly<KeyboardEvent>> =>
     keyEvents$.pipe(
       filter(([du, _ev]) => du === 'down'),
-      map(([_, ev]) => ev)
+      map(([_, ev]) => ev),
     );

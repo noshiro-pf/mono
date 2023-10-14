@@ -13,17 +13,17 @@ export const useRangeSliderRatios = ({
 }> => {
   const toRatio = useCallback(
     (x: number) => (max === min ? undefined : (x - min) / (max - min)),
-    [min, max]
+    [min, max],
   );
 
   const leftRatio: number = useMemo(
     () => toRatio(range.min) ?? 0,
-    [range, toRatio]
+    [range, toRatio],
   );
 
   const rightRatio: number = useMemo(
     () => toRatio(range.max) ?? 1,
-    [range, toRatio]
+    [range, toRatio],
   );
 
   return {

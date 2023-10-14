@@ -29,7 +29,7 @@ const { state$: roomId$, setState: setRoomId } = createState<
 >(undefined);
 
 const { state$: room$, setState: setRoom } = createState<Room | undefined>(
-  undefined
+  undefined,
 );
 
 const [actionsFromDb$, _setActionsFromDb] =
@@ -51,18 +51,18 @@ const { state$: myName$, setState: setMyName } = createState<
 
 const addAction = (
   roomId: string,
-  localAction: GameStateAction
+  localAction: GameStateAction,
 ): Promise<Result<DocumentReference, unknown>> =>
   Result.fromPromise(
     addDoc(
       collection(firestore, paths.rooms, roomId, paths.actions),
-      localAction
-    )
+      localAction,
+    ),
   );
 
 const addPlayer = (
   roomId: string,
-  username: string
+  username: string,
 ): Promise<Result<void, unknown>> => {
   const ref: DocumentReference = doc(firestore, paths.rooms, roomId);
 
@@ -74,7 +74,7 @@ const addPlayer = (
   return Result.fromPromise(
     updateDoc(ref, {
       players: arrayUnion(player),
-    })
+    }),
   );
 };
 
@@ -88,7 +88,7 @@ const createRoom = async ({
   const room = newRoom(password, { name: username, online: true });
   const res = await addDoc(
     collection(firestore, paths.rooms),
-    convertRoomToRoomRemote(room)
+    convertRoomToRoomRemote(room),
   );
 
   const id = res.id;
@@ -132,7 +132,7 @@ roomId$.subscribe((roomId) => {
 
   const actionsColl = query(
     collection(db.firestore, db.paths.rooms, roomId, db.paths.actions),
-    orderBy('timestamp')
+    orderBy('timestamp'),
   );
 
   mut_unsubscribe.room = onSnapshot(roomDoc, (d) => {

@@ -37,7 +37,7 @@ export const ImgWithLoader = memo(
         />
       </>
     )
-  }
+  },
 )
 
 ImgWithLoader.displayName = 'ImgWithLoader'

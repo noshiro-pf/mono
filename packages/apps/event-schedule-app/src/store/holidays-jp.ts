@@ -14,8 +14,8 @@ export const holidaysJpDefinition$: InitializedObservable<
           value,
         ]),
         ymdToKey,
-        ymdFromKey
-      )
-    )
+        ymdFromKey,
+      ),
+    ),
   )
   .chain(withInitialValue(IMapMapped.new([], ymdToKey, ymdFromKey)));

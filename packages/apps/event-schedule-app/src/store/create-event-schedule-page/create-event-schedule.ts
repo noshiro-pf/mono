@@ -24,8 +24,8 @@ const { commonState$, commonStateHandlers } = createEventScheduleSettingStore();
 
 const hasNoChanges$: InitializedObservable<boolean> = commonState$.chain(
   mapI(({ eventScheduleNormalized }) =>
-    deepEqual(eventScheduleInitialValue, eventScheduleNormalized)
-  )
+    deepEqual(eventScheduleInitialValue, eventScheduleNormalized),
+  ),
 );
 
 const resetAllState = (): void => {
@@ -50,7 +50,7 @@ const restoreFromLocalStorage = (): void => {
     commonStateHandlers.setDatetimeSpecification(ev.datetimeSpecification);
     // 過去日（今日含む）は復元しない
     commonStateHandlers.setDatetimeRangeList(
-      ev.datetimeRangeList.filter((d) => compareYmd(d.ymd, now()) > 0)
+      ev.datetimeRangeList.filter((d) => compareYmd(d.ymd, now()) > 0),
     );
     commonStateHandlers.setAnswerIcons(ev.answerIcons);
 
@@ -74,7 +74,7 @@ const restoreFromLocalStorage = (): void => {
 };
 
 const saveToLocalStorage = (
-  commonState: EventScheduleSettingCommonState
+  commonState: EventScheduleSettingCommonState,
 ): void => {
   const saveResult = EventScheduleAppLocalStorage.saveCreateEventPageTemp({
     answerDeadline: commonState.answerDeadline ?? 'none',
@@ -84,7 +84,7 @@ const saveToLocalStorage = (
     notes: commonState.notes,
     notificationSettings:
       pipe(commonState.notificationSettingsWithEmail).chainOptional(
-        fillNotificationSettings
+        fillNotificationSettings,
       ).value ?? 'none',
     title: commonState.title,
   });
@@ -129,7 +129,7 @@ const createEvent = async (): Promise<Result<undefined, string>> => {
     Obj.set(eventScheduleNormalized, 'author', {
       id: mapOptional(fireAuthUser?.uid, toUserId) ?? null,
       name: toUserName(fireAuthUser?.displayName ?? ''),
-    })
+    }),
   );
 
   if (Result.isErr(res)) {

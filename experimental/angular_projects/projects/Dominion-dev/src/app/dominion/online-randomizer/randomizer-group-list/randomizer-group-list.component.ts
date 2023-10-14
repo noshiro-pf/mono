@@ -31,7 +31,7 @@ export class RandomizerGroupListComponent implements OnInit {
         users: users
           .filter((user) => user.randomizerGroupId === group.databaseKey)
           .map((user) => user.name),
-      }))
+      })),
   );
 
   newGroupName!: string;
@@ -44,7 +44,7 @@ export class RandomizerGroupListComponent implements OnInit {
     public snackBar: MatSnackBar,
     private user: UserService,
     private database: FireDatabaseService,
-    private myRandomizerGroup: MyRandomizerGroupService
+    private myRandomizerGroup: MyRandomizerGroupService,
   ) {}
 
   ngOnInit() {}
@@ -74,7 +74,7 @@ export class RandomizerGroupListComponent implements OnInit {
     uid: string,
     myName: string,
     myNameYomi: string,
-    groupListWithUsers: { group: RandomizerGroup; users: string[] }[]
+    groupListWithUsers: { group: RandomizerGroup; users: string[] }[],
   ) {
     const expansionNameList = await this.database.expansionNameList$.once();
     const isSelectedExpansionsInit = expansionNameList.map((_) => true);
@@ -99,9 +99,8 @@ export class RandomizerGroupListComponent implements OnInit {
       resetVPCalculator: 0,
     });
 
-    const ref = await this.database.randomizerGroup.addGroup(
-      newRandomizerGroup
-    );
+    const ref =
+      await this.database.randomizerGroup.addGroup(newRandomizerGroup);
     const groupId = ref.key;
     await this.user.setRandomizerGroupId(groupId);
     await this.myRandomizerGroup.addMember(groupId, uid, myName, myNameYomi);
@@ -132,7 +131,7 @@ export class RandomizerGroupListComponent implements OnInit {
     uid: string,
     myName: string,
     myNameYomi: string,
-    groupListWithUsers: { group: RandomizerGroup; users: string[] }[]
+    groupListWithUsers: { group: RandomizerGroup; users: string[] }[],
   ) {
     if (!this.signInPasswordIsValid(groupId, groupListWithUsers)) return;
 
@@ -150,7 +149,7 @@ export class RandomizerGroupListComponent implements OnInit {
   async signOut(
     groupId: string,
     uid: string,
-    groupListWithUsers: { group: RandomizerGroup; users: string[] }[]
+    groupListWithUsers: { group: RandomizerGroup; users: string[] }[],
   ) {
     if (!this.signInPasswordIsValid(groupId, groupListWithUsers)) return;
 
@@ -168,7 +167,7 @@ export class RandomizerGroupListComponent implements OnInit {
   /* private methods */
   private signInPasswordIsValid(
     groupId: string,
-    groupListWithUsers: { group: RandomizerGroup; users: string[] }[]
+    groupListWithUsers: { group: RandomizerGroup; users: string[] }[],
   ): boolean {
     const group = (
       groupListWithUsers.find((g) => g.group.databaseKey === groupId) || {

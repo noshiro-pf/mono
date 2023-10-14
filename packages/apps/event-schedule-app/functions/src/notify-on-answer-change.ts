@@ -22,7 +22,7 @@ export const notifyOnAnswerChangeBody = async (
     eventId: string;
     answerItemBefore: Answer | undefined;
     answerItemAfter: Answer | undefined;
-  }>
+  }>,
 ): Promise<void> => {
   const [eventItem, email] = await Promise.all([
     getEventItem(db, eventId),
@@ -39,7 +39,7 @@ export const notifyOnAnswerChangeBody = async (
   }
   if (!eventItem.notificationSettings.notifyOnAnswerChange) {
     logger.log(
-      'skipped because eventItem.notificationSettings.notifyOnAnswerChange is empty.'
+      'skipped because eventItem.notificationSettings.notifyOnAnswerChange is empty.',
     );
     return;
   }
@@ -53,7 +53,7 @@ export const notifyOnAnswerChangeBody = async (
     compareYmdhm(eventItem.answerDeadline, now()) <= 0
   ) {
     logger.log(
-      'skipped because eventItem.useAnswerDeadline is true and answerDeadline overed.'
+      'skipped because eventItem.useAnswerDeadline is true and answerDeadline overed.',
     );
     return; // skip if answerDeadline overed
   }
@@ -72,7 +72,7 @@ export const notifyOnAnswerChangeBody = async (
             eventId,
             answerItem: answerItemAfter,
           }),
-        })
+        }),
       );
       break;
     case 'delete':
@@ -88,13 +88,13 @@ export const notifyOnAnswerChangeBody = async (
             eventId,
             answerItem: answerItemBefore,
           }),
-        })
+        }),
       );
       break;
     case 'update':
       if (answerItemBefore === undefined || answerItemAfter === undefined) {
         logger.log(
-          'skipped because answerItemBefore or answerItemBefore is undefined'
+          'skipped because answerItemBefore or answerItemBefore is undefined',
         );
         return;
       }
@@ -108,7 +108,7 @@ export const notifyOnAnswerChangeBody = async (
             answerItemAfter,
             datetimeSpecification: eventItem.datetimeSpecification,
           }),
-        })
+        }),
       );
       break;
   }

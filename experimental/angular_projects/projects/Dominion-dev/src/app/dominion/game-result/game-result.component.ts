@@ -46,26 +46,26 @@ export class GameResultComponent implements OnInit {
     const firstDateInGRList$: RN<number> = this.gameResultList$
       .filter([], (GRList) => !!GRList && GRList.length > 0)
       .map((GRList) =>
-        utils.date.toMidnightTimestamp(utils.array.front(GRList).date)
+        utils.date.toMidnightTimestamp(utils.array.front(GRList).date),
       )
       .skipUnchanged();
 
     const latestDateInGRList$: RN<number> = this.gameResultList$
       .filter([], (GRList) => !!GRList && GRList.length > 0)
       .map((GRList) =>
-        utils.date.toMidnightTimestamp(utils.array.back(GRList).date)
+        utils.date.toMidnightTimestamp(utils.array.back(GRList).date),
       )
       .skipUnchanged();
 
     this.timestampBegin$ = merge(
       firstDateInGRList$, // initialize
       combine(firstDateInGRList$, this.resetAllClick$).map(
-        ([firstDate]) => firstDate
+        ([firstDate]) => firstDate,
       ),
       combine(latestDateInGRList$, this.latestResultClick$).map(
-        ([latestDate]) => latestDate
+        ([latestDate]) => latestDate,
       ),
-      this.dateBeginChange$
+      this.dateBeginChange$,
     );
 
     this.timestampEnd$ = merge(
@@ -73,9 +73,9 @@ export class GameResultComponent implements OnInit {
       combine(
         latestDateInGRList$,
         this.resetAllClick$,
-        this.latestResultClick$
+        this.latestResultClick$,
       ).map(([latestDate]) => latestDate),
-      this.dateEndChange$
+      this.dateEndChange$,
     );
 
     this.dateBegin$ = this.timestampBegin$.map((e) => new Date(e));
@@ -84,8 +84,8 @@ export class GameResultComponent implements OnInit {
     const nofPlayersAll$: RN<number[]> = this.gameResultList$
       .map((list) =>
         Array.from(
-          list.reduce((acc, v) => acc.add(v.players.length), new Set())
-        ).sort((a, b) => a - b)
+          list.reduce((acc, v) => acc.add(v.players.length), new Set()),
+        ).sort((a, b) => a - b),
       )
       .withInitialValue([2, 3, 4, 5, 6]);
 
@@ -95,14 +95,14 @@ export class GameResultComponent implements OnInit {
         nofPlayersAll$,
         this.nofPlayersCheck$,
         combine(nofPlayersAll$, this.resetAllClick$).map(
-          ([nofPlayersAll]) => nofPlayersAll
-        )
+          ([nofPlayersAll]) => nofPlayersAll,
+        ),
       )
         .scan(
           new Set<number>(),
           (
             acc: Set<number>,
-            v: number[] | { nofPlayers: number; checked: boolean }
+            v: number[] | { nofPlayers: number; checked: boolean },
           ): Set<number> => {
             if (Array.isArray(v)) {
               v.forEach((e) => acc.add(e));
@@ -111,22 +111,22 @@ export class GameResultComponent implements OnInit {
               else acc.delete(v.nofPlayers);
             }
             return acc;
-          }
+          },
         )
         .withInitialValue(new Set());
 
     this.nofPlayersOptions$ = combine(
       nofPlayersAll$,
-      nofPlayersCheckedValues$
+      nofPlayersCheckedValues$,
     ).map(([list, checkedValues]) =>
-      list.map((e) => ({ nofPlayers: e, checked: checkedValues.has(e) }))
+      list.map((e) => ({ nofPlayers: e, checked: checkedValues.has(e) })),
     );
 
     this.gameResultListFiltered$ = combine(
       this.gameResultList$,
       this.timestampBegin$,
       this.timestampEnd$,
-      nofPlayersCheckedValues$
+      nofPlayersCheckedValues$,
     ).map(([gameResultList, dateBegin, dateEnd, nofPlayersChecked]) =>
       gameResultList.filter((gr) => {
         const mDate = utils.date.toMidnightTimestamp(gr.date);
@@ -135,7 +135,7 @@ export class GameResultComponent implements OnInit {
           mDate <= dateEnd &&
           nofPlayersChecked.has(gr.players.length)
         );
-      })
+      }),
     );
   }
 

@@ -2,7 +2,7 @@ import { isValidRectSize } from './is-valid-rect-size';
 
 const testIsValidRectSize = (
   [width, height]: readonly [number, number],
-  expected: boolean
+  expected: boolean,
 ): void => {
   test(`isValidRect(RectSize({width: ${width}, height: ${height} }))`, () => {
     expect(isValidRectSize({ width, height })).toBe(expected);

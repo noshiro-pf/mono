@@ -54,7 +54,7 @@ export const PlayerName = memoNamed<Props>(
             height: `${playerNameRectSize.width - 2 * playerNameRectPadding}px`,
           },
         }),
-      [rotate]
+      [rotate],
     );
 
     const styleMerged = useMemo<preact.JSX.CSSProperties>(
@@ -62,7 +62,7 @@ export const PlayerName = memoNamed<Props>(
         ...rotateStyle,
         backgroundColor: isInTurn ? inTurnColor : undefined,
       }),
-      [isInTurn, rotateStyle]
+      [isInTurn, rotateStyle],
     );
 
     const ref = useRef<HTMLDivElement>(null);
@@ -80,11 +80,11 @@ export const PlayerName = memoNamed<Props>(
           null,
           <div ref={ref}>
             <Name style={styleMerged}>{playerName}</Name>
-          </div>
+          </div>,
         )}
       </Wrapper>
     );
-  }
+  },
 );
 
 const Wrapper = styled('div')`

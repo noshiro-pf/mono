@@ -6,7 +6,7 @@ export const selectBaneCard = (
   dcardlist: I.List<TDCardProperty>,
   shuffledDcardsGen: IterableIterator<
     { index: number; dcardprop: TDCardProperty } | undefined
-  >
+  >,
 ): I.List<number> | 'error' => {
   if (
     // prettier-ignore

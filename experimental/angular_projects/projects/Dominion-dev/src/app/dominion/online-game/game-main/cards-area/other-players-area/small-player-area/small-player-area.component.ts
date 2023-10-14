@@ -33,13 +33,13 @@ export class SmallPlayerAreaComponent implements OnInit {
   constructor(
     private gameStateService: GameStateService,
     private gameRoomService: MyGameRoomService,
-    private config: GameConfigService
+    private config: GameConfigService,
   ) {}
 
   ngOnInit() {
     const playerCards$ = this.gameStateService.allPlayersCards$.pipe(
       filter((e) => e.length > this.playerIndex),
-      map((e) => e[this.playerIndex])
+      map((e) => e[this.playerIndex]),
     );
 
     this.playerCards = {
@@ -49,13 +49,13 @@ export class SmallPlayerAreaComponent implements OnInit {
       Open$: playerCards$.pipe(map((e) => e.Open)),
       PlayArea$: playerCards$.pipe(map((e) => e.PlayArea)),
       DiscardPileReveresed$: playerCards$.pipe(
-        map((e) => utils.array.getReversed(e.DiscardPile))
+        map((e) => utils.array.getReversed(e.DiscardPile)),
       ),
     };
 
     const playerData$: Observable<PlayerData> =
       this.gameStateService.allPlayersData$.pipe(
-        map((e) => e[this.playerIndex])
+        map((e) => e[this.playerIndex]),
       );
 
     this.VPtoken$ = playerData$.pipe(map((e) => e.VPtoken));

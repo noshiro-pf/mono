@@ -45,7 +45,7 @@ export const MultipleDatePicker = memoNamed<Props>(
       selectedDates,
       onSelectedDatesChange,
       setYearMonth$,
-      holidaysJpDefinition
+      holidaysJpDefinition,
     );
 
     return (
@@ -94,5 +94,5 @@ export const MultipleDatePicker = memoNamed<Props>(
         </div>
       </div>
     );
-  }
+  },
 );

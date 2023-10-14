@@ -38,13 +38,13 @@ export class TransitStateService {
       startWith([]),
       pairwise(),
       map(([prev, curr]) => from(curr.slice(prev.length))),
-      concatAll()
+      concatAll(),
     );
 
   private isMyTurn$ = this.gameStateService.isMyTurn$;
 
   private transitStateResultSource = new BehaviorSubject<GameState>(
-    new GameState()
+    new GameState(),
   );
   private transitStateResult$ = this.transitStateResultSource
     .asObservable()
@@ -53,25 +53,25 @@ export class TransitStateService {
   gameData$ = zip(this.userInput$, this.transitStateResult$).pipe(
     withLatestFrom(
       this.myGameRoom.myIndex$,
-      this.myGameRoom.playersNameShuffled$
-    )
+      this.myGameRoom.playersNameShuffled$,
+    ),
   );
 
   loadingInitialUserInputList$: Observable<boolean> = combineLatest(
     zip(
       this.userInput$.pipe(
         map((e) => e.index),
-        startWith(-1)
+        startWith(-1),
       ),
       this.transitStateResult$,
-      (index, _) => index
+      (index, _) => index,
     ).pipe(startWith(-1)),
     this.gameCommunication.userInputList$.pipe(
       map((list) => list.length),
       filter((e) => e > 0),
-      first()
+      first(),
     ),
-    (doneIndex, initialListLength) => doneIndex < initialListLength - 1
+    (doneIndex, initialListLength) => doneIndex < initialListLength - 1,
   ).pipe(startWith(true), debounceTime(500));
 
   constructor(
@@ -81,7 +81,7 @@ export class TransitStateService {
     private messageService: GameMessageService,
     private database: FireDatabaseService,
     private gameCommunication: GameRoomCommunicationService,
-    private valuesForView: ValuesForViewService
+    private valuesForView: ValuesForViewService,
   ) {}
 
   setNextGameState(gameState: GameState) {
@@ -92,7 +92,7 @@ export class TransitStateService {
     userInput: UserInput,
     currState: GameState,
     myIndex: number,
-    playersNameList: string[]
+    playersNameList: string[],
   ): Promise<void> {
     // 現在のゲーム状態をコピー
     const nextState = new GameState(utils.object.copy(currState));
@@ -152,7 +152,7 @@ export class TransitStateService {
 
     // フェーズごとの処理
     await phaseAction(data, (state: boolean) =>
-      this.valuesForView.setGainCardState(state)
+      this.valuesForView.setGainCardState(state),
     );
 
     // 自動で手札をソート

@@ -13,7 +13,7 @@ type RecordResultType<A extends Record<string, Type<unknown>>> = Readonly<{
 
 export const record = <A extends Record<string, Type<unknown>>>(
   recordType: A,
-  typeName?: string
+  typeName?: string,
 ): Type<RecordResultType<A>> => {
   type T = RecordResultType<A>;
 
@@ -26,8 +26,8 @@ export const record = <A extends Record<string, Type<unknown>>>(
   // eslint-disable-next-line no-restricted-syntax
   const defaultValue = Object.fromEntries(
     Object.entries(recordType).map(([key, value]) =>
-      tp(key, value.defaultValue)
-    )
+      tp(key, value.defaultValue),
+    ),
   ) as T;
 
   const validate: Type<T>['validate'] = (a) => {
@@ -48,7 +48,7 @@ export const record = <A extends Record<string, Type<unknown>>>(
       if (Result.isErr(res)) {
         const message = validationErrorMessage(
           v,
-          `The value at record key "${k}" is expected to be <${valueType.typeName}>`
+          `The value at record key "${k}" is expected to be <${valueType.typeName}>`,
         );
 
         return Result.err([message, ...res.value]);
@@ -64,8 +64,8 @@ export const record = <A extends Record<string, Type<unknown>>>(
       ? // eslint-disable-next-line no-restricted-syntax
         (Object.fromEntries(
           Object.entries(recordType).map(([k, v]) =>
-            tp(k, Object.hasOwn(a, k) ? v.fill(a[k]) : v.defaultValue)
-          )
+            tp(k, Object.hasOwn(a, k) ? v.fill(a[k]) : v.defaultValue),
+          ),
         ) as T)
       : defaultValue;
 

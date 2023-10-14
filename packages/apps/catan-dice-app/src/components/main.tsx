@@ -5,7 +5,7 @@ import { MainView } from './main-view';
 
 const sumCountInitial = Tpl.map(
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] as const,
-  toSafeUint
+  toSafeUint,
 );
 
 const [rollDices$, rollDices] = createVoidEventEmitter();
@@ -30,7 +30,7 @@ const redoable$ = history$
 
 const diceValues$: InitializedObservable<readonly [number, number]> = history$
   .chain(
-    map((histState) => histState.history[histState.index] ?? ([0, 0] as const))
+    map((histState) => histState.history[histState.index] ?? ([0, 0] as const)),
   )
   .chain(withInitialValue([0, 0] as const));
 
@@ -44,8 +44,8 @@ const opacity$: InitializedObservable<number> = rollDices$
     switchMap(() =>
       interval(50)
         .chain(take(11))
-        .chain(map((i) => (10 - i) / 10))
-    )
+        .chain(map((i) => (10 - i) / 10)),
+    ),
   )
   .chain(withInitialValue(0));
 

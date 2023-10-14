@@ -8,7 +8,7 @@ import { fillEventScheduleWithCheck, isEmailData } from './types';
 
 export const getEventItem = async (
   db: firestore.Firestore,
-  eventId: string
+  eventId: string,
 ): Promise<EventSchedule | undefined> => {
   const res = await db.collection(firestorePaths.events).doc(eventId).get();
   const data = res.data();
@@ -17,7 +17,7 @@ export const getEventItem = async (
 
 export const getEmail = async (
   db: firestore.Firestore,
-  eventId: string
+  eventId: string,
 ): Promise<string> => {
   const res = await db
     .collection(firestorePaths.events)

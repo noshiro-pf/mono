@@ -301,9 +301,13 @@ a > .bp3-code {
   align-items: center;
   background: #ffffff;
   border-radius: 3px;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 0 0 rgba(16, 22, 26, 0),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.2);
   color: #5c7080;
   display: -webkit-inline-box;
@@ -332,9 +336,13 @@ a > .bp3-code {
 .bp3-running-text .bp3-dark kbd,
 .bp3-dark .bp3-key {
   background: #394b59;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 0 0 rgba(16, 22, 26, 0),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.4);
   color: #a7b6c2;
 }
@@ -633,27 +641,33 @@ a > .bp3-code {
     rgba(255, 255, 255, 0.8),
     rgba(255, 255, 255, 0)
   );
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
   color: #182026;
 }
 .bp3-button:not([class*='bp3-intent-']):hover {
   background-clip: padding-box;
   background-color: #ebf1f5;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
 }
 .bp3-button:not([class*='bp3-intent-']):active,
 .bp3-button:not([class*='bp3-intent-']).bp3-active {
   background-color: #d8e1e8;
   background-image: none;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-button:not([class*='bp3-intent-']):disabled,
@@ -686,9 +700,11 @@ a > .bp3-code {
     rgba(255, 255, 255, 0.1),
     rgba(255, 255, 255, 0)
   );
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
   color: #ffffff;
 }
@@ -699,18 +715,22 @@ a > .bp3-code {
 }
 .bp3-button.bp3-intent-primary:hover {
   background-color: #106ba3;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
 }
 .bp3-button.bp3-intent-primary:active,
 .bp3-button.bp3-intent-primary.bp3-active {
   background-color: #0e5a8a;
   background-image: none;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-button.bp3-intent-primary:disabled,
@@ -736,9 +756,11 @@ a > .bp3-code {
     rgba(255, 255, 255, 0.1),
     rgba(255, 255, 255, 0)
   );
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
   color: #ffffff;
 }
@@ -749,18 +771,22 @@ a > .bp3-code {
 }
 .bp3-button.bp3-intent-success:hover {
   background-color: #0d8050;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
 }
 .bp3-button.bp3-intent-success:active,
 .bp3-button.bp3-intent-success.bp3-active {
   background-color: #0a6640;
   background-image: none;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-button.bp3-intent-success:disabled,
@@ -786,9 +812,11 @@ a > .bp3-code {
     rgba(255, 255, 255, 0.1),
     rgba(255, 255, 255, 0)
   );
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
   color: #ffffff;
 }
@@ -799,18 +827,22 @@ a > .bp3-code {
 }
 .bp3-button.bp3-intent-warning:hover {
   background-color: #bf7326;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
 }
 .bp3-button.bp3-intent-warning:active,
 .bp3-button.bp3-intent-warning.bp3-active {
   background-color: #a66321;
   background-image: none;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-button.bp3-intent-warning:disabled,
@@ -836,9 +868,11 @@ a > .bp3-code {
     rgba(255, 255, 255, 0.1),
     rgba(255, 255, 255, 0)
   );
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
   color: #ffffff;
 }
@@ -849,18 +883,22 @@ a > .bp3-code {
 }
 .bp3-button.bp3-intent-danger:hover {
   background-color: #c23030;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
 }
 .bp3-button.bp3-intent-danger:active,
 .bp3-button.bp3-intent-danger.bp3-active {
   background-color: #a82a2a;
   background-image: none;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-button.bp3-intent-danger:disabled,
@@ -970,9 +1008,11 @@ a > .bp3-code {
 .bp3-dark .bp3-button:not([class*='bp3-intent-']).bp3-active {
   background-color: #202b33;
   background-image: none;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.6),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.6),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.6),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.6),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-dark .bp3-button:not([class*='bp3-intent-']):disabled,
@@ -1018,9 +1058,11 @@ a > .bp3-code {
 }
 .bp3-dark .bp3-button[class*='bp3-intent-']:active,
 .bp3-dark .bp3-button[class*='bp3-intent-'].bp3-active {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-dark .bp3-button[class*='bp3-intent-']:disabled,
@@ -2314,18 +2356,26 @@ a.bp3-button.bp3-disabled {
 .bp3-card {
   background-color: #ffffff;
   border-radius: 3px;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.15),
-    0 0 0 rgba(16, 22, 26, 0), 0 0 0 rgba(16, 22, 26, 0);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.15), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.15),
+    0 0 0 rgba(16, 22, 26, 0),
+    0 0 0 rgba(16, 22, 26, 0);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.15),
+    0 0 0 rgba(16, 22, 26, 0),
     0 0 0 rgba(16, 22, 26, 0);
   padding: 20px;
-  -webkit-transition: -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  -webkit-transition:
+    -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-box-shadow 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
-  transition: -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-box-shadow 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
-  transition: transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     box-shadow 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
-  transition: transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     box-shadow 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-box-shadow 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
@@ -2333,101 +2383,157 @@ a.bp3-button.bp3-disabled {
 .bp3-card.bp3-dark,
 .bp3-dark .bp3-card {
   background-color: #30404d;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.4), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.4),
+    0 0 0 rgba(16, 22, 26, 0),
     0 0 0 rgba(16, 22, 26, 0);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.4), 0 0 0 rgba(16, 22, 26, 0),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.4),
+    0 0 0 rgba(16, 22, 26, 0),
     0 0 0 rgba(16, 22, 26, 0);
 }
 
 .bp3-elevation-0 {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.15),
-    0 0 0 rgba(16, 22, 26, 0), 0 0 0 rgba(16, 22, 26, 0);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.15), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.15),
+    0 0 0 rgba(16, 22, 26, 0),
+    0 0 0 rgba(16, 22, 26, 0);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.15),
+    0 0 0 rgba(16, 22, 26, 0),
     0 0 0 rgba(16, 22, 26, 0);
 }
 .bp3-elevation-0.bp3-dark,
 .bp3-dark .bp3-elevation-0 {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.4), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.4),
+    0 0 0 rgba(16, 22, 26, 0),
     0 0 0 rgba(16, 22, 26, 0);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.4), 0 0 0 rgba(16, 22, 26, 0),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.4),
+    0 0 0 rgba(16, 22, 26, 0),
     0 0 0 rgba(16, 22, 26, 0);
 }
 
 .bp3-elevation-1 {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 0 0 rgba(16, 22, 26, 0),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-elevation-1.bp3-dark,
 .bp3-dark .bp3-elevation-1 {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 0 0 rgba(16, 22, 26, 0),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.4);
 }
 
 .bp3-elevation-2 {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1),
-    0 1px 1px rgba(16, 22, 26, 0.2), 0 2px 6px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 1px 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 1px 1px rgba(16, 22, 26, 0.2),
+    0 2px 6px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 1px 1px rgba(16, 22, 26, 0.2),
     0 2px 6px rgba(16, 22, 26, 0.2);
 }
 .bp3-elevation-2.bp3-dark,
 .bp3-dark .bp3-elevation-2 {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
-    0 1px 1px rgba(16, 22, 26, 0.4), 0 2px 6px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 1px 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 1px 1px rgba(16, 22, 26, 0.4),
+    0 2px 6px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 1px 1px rgba(16, 22, 26, 0.4),
     0 2px 6px rgba(16, 22, 26, 0.4);
 }
 
 .bp3-elevation-3 {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1),
-    0 2px 4px rgba(16, 22, 26, 0.2), 0 8px 24px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 2px 4px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
+    0 8px 24px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
     0 8px 24px rgba(16, 22, 26, 0.2);
 }
 .bp3-elevation-3.bp3-dark,
 .bp3-dark .bp3-elevation-3 {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
-    0 2px 4px rgba(16, 22, 26, 0.4), 0 8px 24px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 2px 4px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
+    0 8px 24px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
     0 8px 24px rgba(16, 22, 26, 0.4);
 }
 
 .bp3-elevation-4 {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1),
-    0 4px 8px rgba(16, 22, 26, 0.2), 0 18px 46px 6px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 4px 8px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 4px 8px rgba(16, 22, 26, 0.2),
+    0 18px 46px 6px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 4px 8px rgba(16, 22, 26, 0.2),
     0 18px 46px 6px rgba(16, 22, 26, 0.2);
 }
 .bp3-elevation-4.bp3-dark,
 .bp3-dark .bp3-elevation-4 {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
-    0 4px 8px rgba(16, 22, 26, 0.4), 0 18px 46px 6px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 4px 8px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 4px 8px rgba(16, 22, 26, 0.4),
+    0 18px 46px 6px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 4px 8px rgba(16, 22, 26, 0.4),
     0 18px 46px 6px rgba(16, 22, 26, 0.4);
 }
 
 .bp3-card.bp3-interactive:hover {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1),
-    0 2px 4px rgba(16, 22, 26, 0.2), 0 8px 24px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 2px 4px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
+    0 8px 24px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
     0 8px 24px rgba(16, 22, 26, 0.2);
   cursor: pointer;
 }
 .bp3-card.bp3-interactive:hover.bp3-dark,
 .bp3-dark .bp3-card.bp3-interactive:hover {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
-    0 2px 4px rgba(16, 22, 26, 0.4), 0 8px 24px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 2px 4px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
+    0 8px 24px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
     0 8px 24px rgba(16, 22, 26, 0.4);
 }
 
 .bp3-card.bp3-interactive:active {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 0 0 rgba(16, 22, 26, 0),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.2);
   opacity: 0.9;
   -webkit-transition-duration: 0;
@@ -2435,9 +2541,13 @@ a.bp3-button.bp3-disabled {
 }
 .bp3-card.bp3-interactive:active.bp3-dark,
 .bp3-dark .bp3-card.bp3-interactive:active {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 0 0 rgba(16, 22, 26, 0),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-collapse {
@@ -2450,7 +2560,8 @@ a.bp3-button.bp3-disabled {
   -webkit-transition: -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
   transition: -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
   transition: transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
-  transition: transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
 }
 .bp3-collapse .bp3-collapse-body[aria-hidden='true'] {
@@ -2508,10 +2619,17 @@ a.bp3-button.bp3-disabled {
   transition-delay: 0;
   -webkit-transition-duration: 300ms;
   transition-duration: 300ms;
-  -webkit-transition-property: opacity, -webkit-transform;
-  transition-property: opacity, -webkit-transform;
+  -webkit-transition-property:
+    opacity,
+    -webkit-transform;
+  transition-property:
+    opacity,
+    -webkit-transform;
   transition-property: opacity, transform;
-  transition-property: opacity, transform, -webkit-transform;
+  transition-property:
+    opacity,
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.54, 1.12, 0.38, 1.11);
   transition-timing-function: cubic-bezier(0.54, 1.12, 0.38, 1.11);
 }
@@ -2528,10 +2646,17 @@ a.bp3-button.bp3-disabled {
   transition-delay: 0;
   -webkit-transition-duration: 300ms;
   transition-duration: 300ms;
-  -webkit-transition-property: opacity, -webkit-transform;
-  transition-property: opacity, -webkit-transform;
+  -webkit-transition-property:
+    opacity,
+    -webkit-transform;
+  transition-property:
+    opacity,
+    -webkit-transform;
   transition-property: opacity, transform;
-  transition-property: opacity, transform, -webkit-transform;
+  transition-property:
+    opacity,
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.54, 1.12, 0.38, 1.11);
   transition-timing-function: cubic-bezier(0.54, 1.12, 0.38, 1.11);
 }
@@ -2539,9 +2664,13 @@ a.bp3-button.bp3-disabled {
 .bp3-dialog {
   background: #ebf1f5;
   border-radius: 6px;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1),
-    0 4px 8px rgba(16, 22, 26, 0.2), 0 18px 46px 6px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 4px 8px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 4px 8px rgba(16, 22, 26, 0.2),
+    0 18px 46px 6px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 4px 8px rgba(16, 22, 26, 0.2),
     0 18px 46px 6px rgba(16, 22, 26, 0.2);
   display: -webkit-box;
   display: -ms-flexbox;
@@ -2565,9 +2694,13 @@ a.bp3-button.bp3-disabled {
 .bp3-dialog.bp3-dark,
 .bp3-dark .bp3-dialog {
   background: #293742;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
-    0 4px 8px rgba(16, 22, 26, 0.4), 0 18px 46px 6px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 4px 8px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 4px 8px rgba(16, 22, 26, 0.4),
+    0 18px 46px 6px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 4px 8px rgba(16, 22, 26, 0.4),
     0 18px 46px 6px rgba(16, 22, 26, 0.4);
   color: #f5f8fa;
 }
@@ -2788,9 +2921,13 @@ a.bp3-button.bp3-disabled {
 }
 .bp3-drawer {
   background: #ffffff;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1),
-    0 4px 8px rgba(16, 22, 26, 0.2), 0 18px 46px 6px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 4px 8px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 4px 8px rgba(16, 22, 26, 0.2),
+    0 18px 46px 6px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 4px 8px rgba(16, 22, 26, 0.2),
     0 18px 46px 6px rgba(16, 22, 26, 0.2);
   display: -webkit-box;
   display: -ms-flexbox;
@@ -2827,7 +2964,9 @@ a.bp3-button.bp3-disabled {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -2845,7 +2984,9 @@ a.bp3-button.bp3-disabled {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -2871,7 +3012,9 @@ a.bp3-button.bp3-disabled {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -2889,7 +3032,9 @@ a.bp3-button.bp3-disabled {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -2915,7 +3060,9 @@ a.bp3-button.bp3-disabled {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -2933,7 +3080,9 @@ a.bp3-button.bp3-disabled {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -2959,7 +3108,9 @@ a.bp3-button.bp3-disabled {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -2977,7 +3128,9 @@ a.bp3-button.bp3-disabled {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -3013,7 +3166,9 @@ a.bp3-button.bp3-disabled {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -3035,7 +3190,9 @@ a.bp3-button.bp3-disabled {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -3071,7 +3228,9 @@ a.bp3-button.bp3-disabled {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -3093,16 +3252,22 @@ a.bp3-button.bp3-disabled {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
 .bp3-drawer.bp3-dark,
 .bp3-dark .bp3-drawer {
   background: #30404d;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
-    0 4px 8px rgba(16, 22, 26, 0.4), 0 18px 46px 6px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 4px 8px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 4px 8px rgba(16, 22, 26, 0.4),
+    0 18px 46px 6px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 4px 8px rgba(16, 22, 26, 0.4),
     0 18px 46px 6px rgba(16, 22, 26, 0.4);
   color: #f5f8fa;
 }
@@ -3193,27 +3358,39 @@ a.bp3-button.bp3-disabled {
   top: -3px;
   border-radius: 3px;
   content: '';
-  -webkit-transition: background-color 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  -webkit-transition:
+    background-color 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
-  transition: background-color 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    background-color 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
-  transition: background-color 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    background-color 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
     box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
-  transition: background-color 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    background-color 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
     box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
 }
 .bp3-editable-text:hover::before {
-  -webkit-box-shadow: 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.15);
-  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15);
+  box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
     inset 0 0 0 1px rgba(16, 22, 26, 0.15);
 }
 .bp3-editable-text.bp3-editable-text-editing::before {
   background-color: #ffffff;
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-editable-text.bp3-disabled::before {
@@ -3225,15 +3402,23 @@ a.bp3-button.bp3-disabled {
   color: #137cbd;
 }
 .bp3-editable-text.bp3-intent-primary:hover::before {
-  -webkit-box-shadow: 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(19, 124, 189, 0.4);
-  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px rgba(19, 124, 189, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
     inset 0 0 0 1px rgba(19, 124, 189, 0.4);
 }
 .bp3-editable-text.bp3-intent-primary.bp3-editable-text-editing::before {
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-editable-text.bp3-intent-success .bp3-editable-text-input,
@@ -3241,15 +3426,23 @@ a.bp3-button.bp3-disabled {
   color: #0f9960;
 }
 .bp3-editable-text.bp3-intent-success:hover::before {
-  -webkit-box-shadow: 0 0 0 0 rgba(15, 153, 96, 0), 0 0 0 0 rgba(15, 153, 96, 0),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(15, 153, 96, 0),
+    0 0 0 0 rgba(15, 153, 96, 0),
     inset 0 0 0 1px rgba(15, 153, 96, 0.4);
-  box-shadow: 0 0 0 0 rgba(15, 153, 96, 0), 0 0 0 0 rgba(15, 153, 96, 0),
+  box-shadow:
+    0 0 0 0 rgba(15, 153, 96, 0),
+    0 0 0 0 rgba(15, 153, 96, 0),
     inset 0 0 0 1px rgba(15, 153, 96, 0.4);
 }
 .bp3-editable-text.bp3-intent-success.bp3-editable-text-editing::before {
-  -webkit-box-shadow: 0 0 0 1px #0f9960, 0 0 0 3px rgba(15, 153, 96, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #0f9960,
+    0 0 0 3px rgba(15, 153, 96, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #0f9960, 0 0 0 3px rgba(15, 153, 96, 0.3),
+  box-shadow:
+    0 0 0 1px #0f9960,
+    0 0 0 3px rgba(15, 153, 96, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-editable-text.bp3-intent-warning .bp3-editable-text-input,
@@ -3257,15 +3450,23 @@ a.bp3-button.bp3-disabled {
   color: #d9822b;
 }
 .bp3-editable-text.bp3-intent-warning:hover::before {
-  -webkit-box-shadow: 0 0 0 0 rgba(217, 130, 43, 0),
-    0 0 0 0 rgba(217, 130, 43, 0), inset 0 0 0 1px rgba(217, 130, 43, 0.4);
-  box-shadow: 0 0 0 0 rgba(217, 130, 43, 0), 0 0 0 0 rgba(217, 130, 43, 0),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(217, 130, 43, 0),
+    0 0 0 0 rgba(217, 130, 43, 0),
+    inset 0 0 0 1px rgba(217, 130, 43, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(217, 130, 43, 0),
+    0 0 0 0 rgba(217, 130, 43, 0),
     inset 0 0 0 1px rgba(217, 130, 43, 0.4);
 }
 .bp3-editable-text.bp3-intent-warning.bp3-editable-text-editing::before {
-  -webkit-box-shadow: 0 0 0 1px #d9822b, 0 0 0 3px rgba(217, 130, 43, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #d9822b,
+    0 0 0 3px rgba(217, 130, 43, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #d9822b, 0 0 0 3px rgba(217, 130, 43, 0.3),
+  box-shadow:
+    0 0 0 1px #d9822b,
+    0 0 0 3px rgba(217, 130, 43, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-editable-text.bp3-intent-danger .bp3-editable-text-input,
@@ -3273,29 +3474,47 @@ a.bp3-button.bp3-disabled {
   color: #db3737;
 }
 .bp3-editable-text.bp3-intent-danger:hover::before {
-  -webkit-box-shadow: 0 0 0 0 rgba(219, 55, 55, 0), 0 0 0 0 rgba(219, 55, 55, 0),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(219, 55, 55, 0),
+    0 0 0 0 rgba(219, 55, 55, 0),
     inset 0 0 0 1px rgba(219, 55, 55, 0.4);
-  box-shadow: 0 0 0 0 rgba(219, 55, 55, 0), 0 0 0 0 rgba(219, 55, 55, 0),
+  box-shadow:
+    0 0 0 0 rgba(219, 55, 55, 0),
+    0 0 0 0 rgba(219, 55, 55, 0),
     inset 0 0 0 1px rgba(219, 55, 55, 0.4);
 }
 .bp3-editable-text.bp3-intent-danger.bp3-editable-text-editing::before {
-  -webkit-box-shadow: 0 0 0 1px #db3737, 0 0 0 3px rgba(219, 55, 55, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #db3737,
+    0 0 0 3px rgba(219, 55, 55, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #db3737, 0 0 0 3px rgba(219, 55, 55, 0.3),
+  box-shadow:
+    0 0 0 1px #db3737,
+    0 0 0 3px rgba(219, 55, 55, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-dark .bp3-editable-text:hover::before {
-  -webkit-box-shadow: 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
     inset 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 .bp3-dark .bp3-editable-text.bp3-editable-text-editing::before {
   background-color: rgba(16, 22, 26, 0.3);
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-editable-text.bp3-disabled::before {
   -webkit-box-shadow: none;
@@ -3305,65 +3524,105 @@ a.bp3-button.bp3-disabled {
   color: #48aff0;
 }
 .bp3-dark .bp3-editable-text.bp3-intent-primary:hover::before {
-  -webkit-box-shadow: 0 0 0 0 rgba(72, 175, 240, 0),
-    0 0 0 0 rgba(72, 175, 240, 0), inset 0 0 0 1px rgba(72, 175, 240, 0.4);
-  box-shadow: 0 0 0 0 rgba(72, 175, 240, 0), 0 0 0 0 rgba(72, 175, 240, 0),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(72, 175, 240, 0),
+    0 0 0 0 rgba(72, 175, 240, 0),
+    inset 0 0 0 1px rgba(72, 175, 240, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(72, 175, 240, 0),
+    0 0 0 0 rgba(72, 175, 240, 0),
     inset 0 0 0 1px rgba(72, 175, 240, 0.4);
 }
 .bp3-dark
   .bp3-editable-text.bp3-intent-primary.bp3-editable-text-editing::before {
-  -webkit-box-shadow: 0 0 0 1px #48aff0, 0 0 0 3px rgba(72, 175, 240, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #48aff0, 0 0 0 3px rgba(72, 175, 240, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  -webkit-box-shadow:
+    0 0 0 1px #48aff0,
+    0 0 0 3px rgba(72, 175, 240, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px #48aff0,
+    0 0 0 3px rgba(72, 175, 240, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-editable-text.bp3-intent-success .bp3-editable-text-content {
   color: #3dcc91;
 }
 .bp3-dark .bp3-editable-text.bp3-intent-success:hover::before {
-  -webkit-box-shadow: 0 0 0 0 rgba(61, 204, 145, 0),
-    0 0 0 0 rgba(61, 204, 145, 0), inset 0 0 0 1px rgba(61, 204, 145, 0.4);
-  box-shadow: 0 0 0 0 rgba(61, 204, 145, 0), 0 0 0 0 rgba(61, 204, 145, 0),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(61, 204, 145, 0),
+    0 0 0 0 rgba(61, 204, 145, 0),
+    inset 0 0 0 1px rgba(61, 204, 145, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(61, 204, 145, 0),
+    0 0 0 0 rgba(61, 204, 145, 0),
     inset 0 0 0 1px rgba(61, 204, 145, 0.4);
 }
 .bp3-dark
   .bp3-editable-text.bp3-intent-success.bp3-editable-text-editing::before {
-  -webkit-box-shadow: 0 0 0 1px #3dcc91, 0 0 0 3px rgba(61, 204, 145, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #3dcc91, 0 0 0 3px rgba(61, 204, 145, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  -webkit-box-shadow:
+    0 0 0 1px #3dcc91,
+    0 0 0 3px rgba(61, 204, 145, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px #3dcc91,
+    0 0 0 3px rgba(61, 204, 145, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-editable-text.bp3-intent-warning .bp3-editable-text-content {
   color: #ffb366;
 }
 .bp3-dark .bp3-editable-text.bp3-intent-warning:hover::before {
-  -webkit-box-shadow: 0 0 0 0 rgba(255, 179, 102, 0),
-    0 0 0 0 rgba(255, 179, 102, 0), inset 0 0 0 1px rgba(255, 179, 102, 0.4);
-  box-shadow: 0 0 0 0 rgba(255, 179, 102, 0), 0 0 0 0 rgba(255, 179, 102, 0),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(255, 179, 102, 0),
+    0 0 0 0 rgba(255, 179, 102, 0),
+    inset 0 0 0 1px rgba(255, 179, 102, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(255, 179, 102, 0),
+    0 0 0 0 rgba(255, 179, 102, 0),
     inset 0 0 0 1px rgba(255, 179, 102, 0.4);
 }
 .bp3-dark
   .bp3-editable-text.bp3-intent-warning.bp3-editable-text-editing::before {
-  -webkit-box-shadow: 0 0 0 1px #ffb366, 0 0 0 3px rgba(255, 179, 102, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #ffb366, 0 0 0 3px rgba(255, 179, 102, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  -webkit-box-shadow:
+    0 0 0 1px #ffb366,
+    0 0 0 3px rgba(255, 179, 102, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px #ffb366,
+    0 0 0 3px rgba(255, 179, 102, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-editable-text.bp3-intent-danger .bp3-editable-text-content {
   color: #ff7373;
 }
 .bp3-dark .bp3-editable-text.bp3-intent-danger:hover::before {
-  -webkit-box-shadow: 0 0 0 0 rgba(255, 115, 115, 0),
-    0 0 0 0 rgba(255, 115, 115, 0), inset 0 0 0 1px rgba(255, 115, 115, 0.4);
-  box-shadow: 0 0 0 0 rgba(255, 115, 115, 0), 0 0 0 0 rgba(255, 115, 115, 0),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(255, 115, 115, 0),
+    0 0 0 0 rgba(255, 115, 115, 0),
+    inset 0 0 0 1px rgba(255, 115, 115, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(255, 115, 115, 0),
+    0 0 0 0 rgba(255, 115, 115, 0),
     inset 0 0 0 1px rgba(255, 115, 115, 0.4);
 }
 .bp3-dark
   .bp3-editable-text.bp3-intent-danger.bp3-editable-text-editing::before {
-  -webkit-box-shadow: 0 0 0 1px #ff7373, 0 0 0 3px rgba(255, 115, 115, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #ff7373, 0 0 0 3px rgba(255, 115, 115, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  -webkit-box-shadow:
+    0 0 0 1px #ff7373,
+    0 0 0 3px rgba(255, 115, 115, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px #ff7373,
+    0 0 0 3px rgba(255, 115, 115, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 
 .bp3-editable-text-input,
@@ -3673,24 +3932,30 @@ a.bp3-button.bp3-disabled {
     rgba(255, 255, 255, 0.1),
     rgba(255, 255, 255, 0)
   );
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
   color: #ffffff;
 }
 .bp3-control:hover input:checked ~ .bp3-control-indicator {
   background-color: #106ba3;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
 }
 .bp3-control input:not(:disabled):active:checked ~ .bp3-control-indicator {
   background: #0e5a8a;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-control input:disabled:checked ~ .bp3-control-indicator {
@@ -3712,9 +3977,11 @@ a.bp3-button.bp3-disabled {
   input:not(:disabled):active:checked
   ~ .bp3-control-indicator {
   background-color: #0e5a8a;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-dark .bp3-control input:disabled:checked ~ .bp3-control-indicator {
@@ -3765,9 +4032,11 @@ a.bp3-button.bp3-disabled {
     rgba(255, 255, 255, 0)
   );
   border: none;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
   cursor: pointer;
   display: inline-block;
@@ -3794,9 +4063,11 @@ a.bp3-button.bp3-disabled {
 }
 .bp3-control input:not(:disabled):active ~ .bp3-control-indicator {
   background: #d8e1e8;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-control input:disabled ~ .bp3-control-indicator {
@@ -3850,26 +4121,32 @@ a.bp3-button.bp3-disabled {
     rgba(255, 255, 255, 0.1),
     rgba(255, 255, 255, 0)
   );
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
   color: #ffffff;
 }
 .bp3-control.bp3-checkbox:hover input:indeterminate ~ .bp3-control-indicator {
   background-color: #106ba3;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 -1px 0 rgba(16, 22, 26, 0.2);
 }
 .bp3-control.bp3-checkbox
   input:not(:disabled):active:indeterminate
   ~ .bp3-control-indicator {
   background: #0e5a8a;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-control.bp3-checkbox
@@ -3899,9 +4176,11 @@ a.bp3-button.bp3-disabled {
   input:not(:disabled):active:indeterminate
   ~ .bp3-control-indicator {
   background-color: #0e5a8a;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.4),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.4),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-dark
@@ -3992,9 +4271,12 @@ a.bp3-button.bp3-disabled {
 .bp3-control.bp3-switch .bp3-control-indicator::before {
   background: #ffffff;
   border-radius: 50%;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
     0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 1px 1px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 1px 1px rgba(16, 22, 26, 0.2);
   height: calc(1em - 4px);
   left: 0;
   margin: 2px;
@@ -4133,9 +4415,11 @@ a.bp3-button.bp3-disabled {
 }
 .bp3-dark .bp3-control input:not(:disabled):active ~ .bp3-control-indicator {
   background: #202b33;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.6),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.6),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.6),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.6),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-dark .bp3-control input:disabled ~ .bp3-control-indicator {
@@ -4241,10 +4525,14 @@ a.bp3-button.bp3-disabled {
   background: #ffffff;
   border: none;
   border-radius: 3px;
-  -webkit-box-shadow: 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
+  box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
     inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
   color: #182026;
@@ -4257,7 +4545,8 @@ a.bp3-button.bp3-disabled {
   -webkit-transition: -webkit-box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
   transition: -webkit-box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
   transition: box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
-  transition: box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
   vertical-align: middle;
   overflow: hidden;
@@ -4297,9 +4586,13 @@ a.bp3-button.bp3-disabled {
 }
 .bp3-file-upload-input:focus,
 .bp3-file-upload-input.bp3-active {
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-file-upload-input[type='search'],
@@ -4336,9 +4629,11 @@ a.bp3-button.bp3-disabled {
     rgba(255, 255, 255, 0.8),
     rgba(255, 255, 255, 0)
   );
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
   color: #182026;
   min-height: 24px;
@@ -4360,18 +4655,22 @@ a.bp3-button.bp3-disabled {
 .bp3-file-upload-input::after:hover {
   background-clip: padding-box;
   background-color: #ebf1f5;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
 }
 .bp3-file-upload-input::after:active,
 .bp3-file-upload-input::after.bp3-active {
   background-color: #d8e1e8;
   background-image: none;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-file-upload-input::after:disabled,
@@ -4393,17 +4692,21 @@ a.bp3-button.bp3-disabled {
 .bp3-file-upload-input:hover::after {
   background-clip: padding-box;
   background-color: #ebf1f5;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
 }
 .bp3-file-upload-input:active::after {
   background-color: #d8e1e8;
   background-image: none;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-large .bp3-file-upload-input {
@@ -4425,11 +4728,17 @@ a.bp3-button.bp3-disabled {
 }
 .bp3-dark .bp3-file-upload-input {
   background: rgba(16, 22, 26, 0.3);
-  -webkit-box-shadow: 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
   color: #f5f8fa;
   color: rgba(167, 182, 194, 0.6);
@@ -4450,11 +4759,17 @@ a.bp3-button.bp3-disabled {
   color: rgba(167, 182, 194, 0.6);
 }
 .bp3-dark .bp3-file-upload-input:focus {
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 1px #137cbd,
-    0 0 0 3px rgba(19, 124, 189, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 1px #137cbd,
-    0 0 0 3px rgba(19, 124, 189, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-file-upload-input[readonly] {
@@ -4500,9 +4815,11 @@ a.bp3-button.bp3-disabled {
 .bp3-dark .bp3-file-upload-input::after.bp3-active {
   background-color: #202b33;
   background-image: none;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.6),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.6),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.6),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.6),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-dark .bp3-file-upload-input::after:disabled,
@@ -4529,15 +4846,19 @@ a.bp3-button.bp3-disabled {
 .bp3-dark .bp3-file-upload-input:active::after {
   background-color: #202b33;
   background-image: none;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.6),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.6),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.6),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.6),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-file-upload-input::after {
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
 }
 .bp3-form-group {
@@ -4849,18 +5170,27 @@ a.bp3-button.bp3-disabled {
   color: rgba(167, 182, 194, 0.6);
 }
 .bp3-input-group.bp3-intent-primary .bp3-input {
-  -webkit-box-shadow: 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px #137cbd,
+  -webkit-box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px #137cbd,
     inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
-    inset 0 0 0 1px #137cbd, inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px #137cbd,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input-group.bp3-intent-primary .bp3-input:focus {
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input-group.bp3-intent-primary .bp3-input[readonly] {
@@ -4879,17 +5209,27 @@ a.bp3-button.bp3-disabled {
   color: #48aff0;
 }
 .bp3-input-group.bp3-intent-success .bp3-input {
-  -webkit-box-shadow: 0 0 0 0 rgba(15, 153, 96, 0), 0 0 0 0 rgba(15, 153, 96, 0),
-    inset 0 0 0 1px #0f9960, inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(15, 153, 96, 0),
+    0 0 0 0 rgba(15, 153, 96, 0),
+    inset 0 0 0 1px #0f9960,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 0 rgba(15, 153, 96, 0), 0 0 0 0 rgba(15, 153, 96, 0),
-    inset 0 0 0 1px #0f9960, inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  box-shadow:
+    0 0 0 0 rgba(15, 153, 96, 0),
+    0 0 0 0 rgba(15, 153, 96, 0),
+    inset 0 0 0 1px #0f9960,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input-group.bp3-intent-success .bp3-input:focus {
-  -webkit-box-shadow: 0 0 0 1px #0f9960, 0 0 0 3px rgba(15, 153, 96, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #0f9960,
+    0 0 0 3px rgba(15, 153, 96, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #0f9960, 0 0 0 3px rgba(15, 153, 96, 0.3),
+  box-shadow:
+    0 0 0 1px #0f9960,
+    0 0 0 3px rgba(15, 153, 96, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input-group.bp3-intent-success .bp3-input[readonly] {
@@ -4908,18 +5248,27 @@ a.bp3-button.bp3-disabled {
   color: #3dcc91;
 }
 .bp3-input-group.bp3-intent-warning .bp3-input {
-  -webkit-box-shadow: 0 0 0 0 rgba(217, 130, 43, 0),
-    0 0 0 0 rgba(217, 130, 43, 0), inset 0 0 0 1px #d9822b,
+  -webkit-box-shadow:
+    0 0 0 0 rgba(217, 130, 43, 0),
+    0 0 0 0 rgba(217, 130, 43, 0),
+    inset 0 0 0 1px #d9822b,
     inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 0 rgba(217, 130, 43, 0), 0 0 0 0 rgba(217, 130, 43, 0),
-    inset 0 0 0 1px #d9822b, inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  box-shadow:
+    0 0 0 0 rgba(217, 130, 43, 0),
+    0 0 0 0 rgba(217, 130, 43, 0),
+    inset 0 0 0 1px #d9822b,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input-group.bp3-intent-warning .bp3-input:focus {
-  -webkit-box-shadow: 0 0 0 1px #d9822b, 0 0 0 3px rgba(217, 130, 43, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #d9822b,
+    0 0 0 3px rgba(217, 130, 43, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #d9822b, 0 0 0 3px rgba(217, 130, 43, 0.3),
+  box-shadow:
+    0 0 0 1px #d9822b,
+    0 0 0 3px rgba(217, 130, 43, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input-group.bp3-intent-warning .bp3-input[readonly] {
@@ -4938,17 +5287,27 @@ a.bp3-button.bp3-disabled {
   color: #ffb366;
 }
 .bp3-input-group.bp3-intent-danger .bp3-input {
-  -webkit-box-shadow: 0 0 0 0 rgba(219, 55, 55, 0), 0 0 0 0 rgba(219, 55, 55, 0),
-    inset 0 0 0 1px #db3737, inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(219, 55, 55, 0),
+    0 0 0 0 rgba(219, 55, 55, 0),
+    inset 0 0 0 1px #db3737,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 0 rgba(219, 55, 55, 0), 0 0 0 0 rgba(219, 55, 55, 0),
-    inset 0 0 0 1px #db3737, inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  box-shadow:
+    0 0 0 0 rgba(219, 55, 55, 0),
+    0 0 0 0 rgba(219, 55, 55, 0),
+    inset 0 0 0 1px #db3737,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input-group.bp3-intent-danger .bp3-input:focus {
-  -webkit-box-shadow: 0 0 0 1px #db3737, 0 0 0 3px rgba(219, 55, 55, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #db3737,
+    0 0 0 3px rgba(219, 55, 55, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #db3737, 0 0 0 3px rgba(219, 55, 55, 0.3),
+  box-shadow:
+    0 0 0 1px #db3737,
+    0 0 0 3px rgba(219, 55, 55, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input-group.bp3-intent-danger .bp3-input[readonly] {
@@ -4973,10 +5332,14 @@ a.bp3-button.bp3-disabled {
   background: #ffffff;
   border: none;
   border-radius: 3px;
-  -webkit-box-shadow: 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
+  box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
     inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
   color: #182026;
@@ -4989,7 +5352,8 @@ a.bp3-button.bp3-disabled {
   -webkit-transition: -webkit-box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
   transition: -webkit-box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
   transition: box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
-  transition: box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
   vertical-align: middle;
 }
@@ -5015,9 +5379,13 @@ a.bp3-button.bp3-disabled {
 }
 .bp3-input:focus,
 .bp3-input.bp3-active {
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input[type='search'],
@@ -5068,11 +5436,17 @@ a.bp3-button.bp3-disabled {
 }
 .bp3-dark .bp3-input {
   background: rgba(16, 22, 26, 0.3);
-  -webkit-box-shadow: 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
   color: #f5f8fa;
 }
@@ -5092,11 +5466,17 @@ a.bp3-button.bp3-disabled {
   color: rgba(167, 182, 194, 0.6);
 }
 .bp3-dark .bp3-input:focus {
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 1px #137cbd,
-    0 0 0 3px rgba(19, 124, 189, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 1px #137cbd,
-    0 0 0 3px rgba(19, 124, 189, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-input[readonly] {
@@ -5111,18 +5491,27 @@ a.bp3-button.bp3-disabled {
   color: rgba(167, 182, 194, 0.6);
 }
 .bp3-input.bp3-intent-primary {
-  -webkit-box-shadow: 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px #137cbd,
+  -webkit-box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px #137cbd,
     inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
-    inset 0 0 0 1px #137cbd, inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px #137cbd,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input.bp3-intent-primary:focus {
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input.bp3-intent-primary[readonly] {
@@ -5135,20 +5524,33 @@ a.bp3-button.bp3-disabled {
   box-shadow: none;
 }
 .bp3-dark .bp3-input.bp3-intent-primary {
-  -webkit-box-shadow: 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
-    inset 0 0 0 1px #137cbd, inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px #137cbd,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px #137cbd,
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px #137cbd,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-input.bp3-intent-primary:focus {
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 1px #137cbd,
-    0 0 0 3px rgba(19, 124, 189, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 1px #137cbd,
-    0 0 0 3px rgba(19, 124, 189, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-input.bp3-intent-primary[readonly] {
@@ -5161,17 +5563,27 @@ a.bp3-button.bp3-disabled {
   box-shadow: none;
 }
 .bp3-input.bp3-intent-success {
-  -webkit-box-shadow: 0 0 0 0 rgba(15, 153, 96, 0), 0 0 0 0 rgba(15, 153, 96, 0),
-    inset 0 0 0 1px #0f9960, inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(15, 153, 96, 0),
+    0 0 0 0 rgba(15, 153, 96, 0),
+    inset 0 0 0 1px #0f9960,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 0 rgba(15, 153, 96, 0), 0 0 0 0 rgba(15, 153, 96, 0),
-    inset 0 0 0 1px #0f9960, inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  box-shadow:
+    0 0 0 0 rgba(15, 153, 96, 0),
+    0 0 0 0 rgba(15, 153, 96, 0),
+    inset 0 0 0 1px #0f9960,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input.bp3-intent-success:focus {
-  -webkit-box-shadow: 0 0 0 1px #0f9960, 0 0 0 3px rgba(15, 153, 96, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #0f9960,
+    0 0 0 3px rgba(15, 153, 96, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #0f9960, 0 0 0 3px rgba(15, 153, 96, 0.3),
+  box-shadow:
+    0 0 0 1px #0f9960,
+    0 0 0 3px rgba(15, 153, 96, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input.bp3-intent-success[readonly] {
@@ -5184,19 +5596,33 @@ a.bp3-button.bp3-disabled {
   box-shadow: none;
 }
 .bp3-dark .bp3-input.bp3-intent-success {
-  -webkit-box-shadow: 0 0 0 0 rgba(15, 153, 96, 0), 0 0 0 0 rgba(15, 153, 96, 0),
-    0 0 0 0 rgba(15, 153, 96, 0), inset 0 0 0 1px #0f9960,
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 0 rgba(15, 153, 96, 0), 0 0 0 0 rgba(15, 153, 96, 0),
-    0 0 0 0 rgba(15, 153, 96, 0), inset 0 0 0 1px #0f9960,
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  -webkit-box-shadow:
+    0 0 0 0 rgba(15, 153, 96, 0),
+    0 0 0 0 rgba(15, 153, 96, 0),
+    0 0 0 0 rgba(15, 153, 96, 0),
+    inset 0 0 0 1px #0f9960,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(15, 153, 96, 0),
+    0 0 0 0 rgba(15, 153, 96, 0),
+    0 0 0 0 rgba(15, 153, 96, 0),
+    inset 0 0 0 1px #0f9960,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-input.bp3-intent-success:focus {
-  -webkit-box-shadow: 0 0 0 1px #0f9960, 0 0 0 1px #0f9960,
-    0 0 0 3px rgba(15, 153, 96, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #0f9960,
+    0 0 0 1px #0f9960,
+    0 0 0 3px rgba(15, 153, 96, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #0f9960, 0 0 0 1px #0f9960,
-    0 0 0 3px rgba(15, 153, 96, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  box-shadow:
+    0 0 0 1px #0f9960,
+    0 0 0 1px #0f9960,
+    0 0 0 3px rgba(15, 153, 96, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-input.bp3-intent-success[readonly] {
@@ -5209,18 +5635,27 @@ a.bp3-button.bp3-disabled {
   box-shadow: none;
 }
 .bp3-input.bp3-intent-warning {
-  -webkit-box-shadow: 0 0 0 0 rgba(217, 130, 43, 0),
-    0 0 0 0 rgba(217, 130, 43, 0), inset 0 0 0 1px #d9822b,
+  -webkit-box-shadow:
+    0 0 0 0 rgba(217, 130, 43, 0),
+    0 0 0 0 rgba(217, 130, 43, 0),
+    inset 0 0 0 1px #d9822b,
     inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 0 rgba(217, 130, 43, 0), 0 0 0 0 rgba(217, 130, 43, 0),
-    inset 0 0 0 1px #d9822b, inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  box-shadow:
+    0 0 0 0 rgba(217, 130, 43, 0),
+    0 0 0 0 rgba(217, 130, 43, 0),
+    inset 0 0 0 1px #d9822b,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input.bp3-intent-warning:focus {
-  -webkit-box-shadow: 0 0 0 1px #d9822b, 0 0 0 3px rgba(217, 130, 43, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #d9822b,
+    0 0 0 3px rgba(217, 130, 43, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #d9822b, 0 0 0 3px rgba(217, 130, 43, 0.3),
+  box-shadow:
+    0 0 0 1px #d9822b,
+    0 0 0 3px rgba(217, 130, 43, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input.bp3-intent-warning[readonly] {
@@ -5233,20 +5668,33 @@ a.bp3-button.bp3-disabled {
   box-shadow: none;
 }
 .bp3-dark .bp3-input.bp3-intent-warning {
-  -webkit-box-shadow: 0 0 0 0 rgba(217, 130, 43, 0),
-    0 0 0 0 rgba(217, 130, 43, 0), 0 0 0 0 rgba(217, 130, 43, 0),
-    inset 0 0 0 1px #d9822b, inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(217, 130, 43, 0),
+    0 0 0 0 rgba(217, 130, 43, 0),
+    0 0 0 0 rgba(217, 130, 43, 0),
+    inset 0 0 0 1px #d9822b,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 0 rgba(217, 130, 43, 0), 0 0 0 0 rgba(217, 130, 43, 0),
-    0 0 0 0 rgba(217, 130, 43, 0), inset 0 0 0 1px #d9822b,
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(217, 130, 43, 0),
+    0 0 0 0 rgba(217, 130, 43, 0),
+    0 0 0 0 rgba(217, 130, 43, 0),
+    inset 0 0 0 1px #d9822b,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-input.bp3-intent-warning:focus {
-  -webkit-box-shadow: 0 0 0 1px #d9822b, 0 0 0 1px #d9822b,
-    0 0 0 3px rgba(217, 130, 43, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #d9822b,
+    0 0 0 1px #d9822b,
+    0 0 0 3px rgba(217, 130, 43, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #d9822b, 0 0 0 1px #d9822b,
-    0 0 0 3px rgba(217, 130, 43, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  box-shadow:
+    0 0 0 1px #d9822b,
+    0 0 0 1px #d9822b,
+    0 0 0 3px rgba(217, 130, 43, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-input.bp3-intent-warning[readonly] {
@@ -5259,17 +5707,27 @@ a.bp3-button.bp3-disabled {
   box-shadow: none;
 }
 .bp3-input.bp3-intent-danger {
-  -webkit-box-shadow: 0 0 0 0 rgba(219, 55, 55, 0), 0 0 0 0 rgba(219, 55, 55, 0),
-    inset 0 0 0 1px #db3737, inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(219, 55, 55, 0),
+    0 0 0 0 rgba(219, 55, 55, 0),
+    inset 0 0 0 1px #db3737,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 0 rgba(219, 55, 55, 0), 0 0 0 0 rgba(219, 55, 55, 0),
-    inset 0 0 0 1px #db3737, inset 0 0 0 1px rgba(16, 22, 26, 0.15),
+  box-shadow:
+    0 0 0 0 rgba(219, 55, 55, 0),
+    0 0 0 0 rgba(219, 55, 55, 0),
+    inset 0 0 0 1px #db3737,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.15),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input.bp3-intent-danger:focus {
-  -webkit-box-shadow: 0 0 0 1px #db3737, 0 0 0 3px rgba(219, 55, 55, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #db3737,
+    0 0 0 3px rgba(219, 55, 55, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #db3737, 0 0 0 3px rgba(219, 55, 55, 0.3),
+  box-shadow:
+    0 0 0 1px #db3737,
+    0 0 0 3px rgba(219, 55, 55, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-input.bp3-intent-danger[readonly] {
@@ -5282,19 +5740,33 @@ a.bp3-button.bp3-disabled {
   box-shadow: none;
 }
 .bp3-dark .bp3-input.bp3-intent-danger {
-  -webkit-box-shadow: 0 0 0 0 rgba(219, 55, 55, 0), 0 0 0 0 rgba(219, 55, 55, 0),
-    0 0 0 0 rgba(219, 55, 55, 0), inset 0 0 0 1px #db3737,
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 0 rgba(219, 55, 55, 0), 0 0 0 0 rgba(219, 55, 55, 0),
-    0 0 0 0 rgba(219, 55, 55, 0), inset 0 0 0 1px #db3737,
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  -webkit-box-shadow:
+    0 0 0 0 rgba(219, 55, 55, 0),
+    0 0 0 0 rgba(219, 55, 55, 0),
+    0 0 0 0 rgba(219, 55, 55, 0),
+    inset 0 0 0 1px #db3737,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(219, 55, 55, 0),
+    0 0 0 0 rgba(219, 55, 55, 0),
+    0 0 0 0 rgba(219, 55, 55, 0),
+    inset 0 0 0 1px #db3737,
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-input.bp3-intent-danger:focus {
-  -webkit-box-shadow: 0 0 0 1px #db3737, 0 0 0 1px #db3737,
-    0 0 0 3px rgba(219, 55, 55, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #db3737,
+    0 0 0 1px #db3737,
+    0 0 0 3px rgba(219, 55, 55, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #db3737, 0 0 0 1px #db3737,
-    0 0 0 3px rgba(219, 55, 55, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  box-shadow:
+    0 0 0 1px #db3737,
+    0 0 0 1px #db3737,
+    0 0 0 3px rgba(219, 55, 55, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-input.bp3-intent-danger[readonly] {
@@ -5324,11 +5796,17 @@ textarea.bp3-input.bp3-small {
 }
 .bp3-dark textarea.bp3-input {
   background: rgba(16, 22, 26, 0.3);
-  -webkit-box-shadow: 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
-    0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    0 0 0 0 rgba(19, 124, 189, 0),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
   color: #f5f8fa;
 }
@@ -5348,11 +5826,17 @@ textarea.bp3-input.bp3-small {
   color: rgba(167, 182, 194, 0.6);
 }
 .bp3-dark textarea.bp3-input:focus {
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 1px #137cbd,
-    0 0 0 3px rgba(19, 124, 189, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 1px #137cbd,
-    0 0 0 3px rgba(19, 124, 189, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark textarea.bp3-input[readonly] {
@@ -5493,9 +5977,11 @@ form {
     rgba(255, 255, 255, 0.8),
     rgba(255, 255, 255, 0)
   );
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
   color: #182026;
   -moz-appearance: none;
@@ -5537,9 +6023,11 @@ form {
 .bp3-select select:hover {
   background-clip: padding-box;
   background-color: #ebf1f5;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
 }
 .bp3-html-select select:active,
@@ -5548,9 +6036,11 @@ form {
 .bp3-select select.bp3-active {
   background-color: #d8e1e8;
   background-image: none;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-html-select select:disabled,
@@ -6176,9 +6666,11 @@ form {
 .bp3-dark .bp3-select select.bp3-active {
   background-color: #202b33;
   background-image: none;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.6),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.6),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.6),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.6),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-dark .bp3-html-select select:disabled,
@@ -8589,9 +9081,13 @@ span.bp3-icon:empty::before {
   padding: 0 5px;
 }
 .bp3-submenu.bp3-popover > .bp3-popover-content {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1),
-    0 2px 4px rgba(16, 22, 26, 0.2), 0 8px 24px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 2px 4px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
+    0 8px 24px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
     0 8px 24px rgba(16, 22, 26, 0.2);
 }
 .bp3-dark .bp3-submenu.bp3-popover,
@@ -8601,9 +9097,13 @@ span.bp3-icon:empty::before {
 }
 .bp3-dark .bp3-submenu.bp3-popover > .bp3-popover-content,
 .bp3-submenu.bp3-popover.bp3-dark > .bp3-popover-content {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
-    0 2px 4px rgba(16, 22, 26, 0.4), 0 8px 24px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 2px 4px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
+    0 8px 24px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
     0 8px 24px rgba(16, 22, 26, 0.4);
 }
 .bp3-menu {
@@ -9327,9 +9827,13 @@ button.bp3-menu-item {
 }
 .bp3-navbar {
   background-color: #ffffff;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 0 0 rgba(16, 22, 26, 0),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.2);
   height: 50px;
   padding: 0 15px;
@@ -9342,15 +9846,23 @@ button.bp3-menu-item {
   background-color: #394b59;
 }
 .bp3-navbar.bp3-dark {
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
-    0 0 0 rgba(16, 22, 26, 0), 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 0 0 rgba(16, 22, 26, 0),
+    0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-navbar {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 0 0 rgba(16, 22, 26, 0),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 0 0 rgba(16, 22, 26, 0),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 0 0 rgba(16, 22, 26, 0),
     0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-navbar.bp3-fixed-top {
@@ -9638,10 +10150,17 @@ body.bp3-overlay-open {
   transition-delay: 0;
   -webkit-transition-duration: 400ms;
   transition-duration: 400ms;
-  -webkit-transition-property: opacity, -webkit-transform;
-  transition-property: opacity, -webkit-transform;
+  -webkit-transition-property:
+    opacity,
+    -webkit-transform;
+  transition-property:
+    opacity,
+    -webkit-transform;
   transition-property: transform, opacity;
-  transition-property: transform, opacity, -webkit-transform;
+  transition-property:
+    transform,
+    opacity,
+    -webkit-transform;
   -webkit-transition-timing-function: ease;
   transition-timing-function: ease;
 }
@@ -9660,10 +10179,17 @@ body.bp3-overlay-open {
   transition-delay: 0;
   -webkit-transition-duration: 400ms;
   transition-duration: 400ms;
-  -webkit-transition-property: opacity, -webkit-transform;
-  transition-property: opacity, -webkit-transform;
+  -webkit-transition-property:
+    opacity,
+    -webkit-transform;
+  transition-property:
+    opacity,
+    -webkit-transform;
   transition-property: transform, opacity;
-  transition-property: transform, opacity, -webkit-transform;
+  transition-property:
+    transform,
+    opacity,
+    -webkit-transform;
   -webkit-transition-timing-function: ease;
   transition-timing-function: ease;
 }
@@ -9684,10 +10210,17 @@ body.bp3-overlay-open {
   transition-delay: 0;
   -webkit-transition-duration: 400ms;
   transition-duration: 400ms;
-  -webkit-transition-property: opacity, -webkit-transform;
-  transition-property: opacity, -webkit-transform;
+  -webkit-transition-property:
+    opacity,
+    -webkit-transform;
+  transition-property:
+    opacity,
+    -webkit-transform;
   transition-property: transform, opacity;
-  transition-property: transform, opacity, -webkit-transform;
+  transition-property:
+    transform,
+    opacity,
+    -webkit-transform;
   -webkit-transition-timing-function: ease;
   transition-timing-function: ease;
 }
@@ -9706,10 +10239,17 @@ body.bp3-overlay-open {
   transition-delay: 0;
   -webkit-transition-duration: 400ms;
   transition-duration: 400ms;
-  -webkit-transition-property: opacity, -webkit-transform;
-  transition-property: opacity, -webkit-transform;
+  -webkit-transition-property:
+    opacity,
+    -webkit-transform;
+  transition-property:
+    opacity,
+    -webkit-transform;
   transition-property: transform, opacity;
-  transition-property: transform, opacity, -webkit-transform;
+  transition-property:
+    transform,
+    opacity,
+    -webkit-transform;
   -webkit-transition-timing-function: ease;
   transition-timing-function: ease;
 }
@@ -9802,10 +10342,17 @@ body.bp3-overlay-open {
   transition-delay: 0;
   -webkit-transition-duration: 400ms;
   transition-duration: 400ms;
-  -webkit-transition-property: opacity, -webkit-transform;
-  transition-property: opacity, -webkit-transform;
+  -webkit-transition-property:
+    opacity,
+    -webkit-transform;
+  transition-property:
+    opacity,
+    -webkit-transform;
   transition-property: transform, opacity;
-  transition-property: transform, opacity, -webkit-transform;
+  transition-property:
+    transform,
+    opacity,
+    -webkit-transform;
   -webkit-transition-timing-function: ease;
   transition-timing-function: ease;
 }
@@ -9824,10 +10371,17 @@ body.bp3-overlay-open {
   transition-delay: 0;
   -webkit-transition-duration: 400ms;
   transition-duration: 400ms;
-  -webkit-transition-property: opacity, -webkit-transform;
-  transition-property: opacity, -webkit-transform;
+  -webkit-transition-property:
+    opacity,
+    -webkit-transform;
+  transition-property:
+    opacity,
+    -webkit-transform;
   transition-property: transform, opacity;
-  transition-property: transform, opacity, -webkit-transform;
+  transition-property:
+    transform,
+    opacity,
+    -webkit-transform;
   -webkit-transition-timing-function: ease;
   transition-timing-function: ease;
 }
@@ -9848,10 +10402,17 @@ body.bp3-overlay-open {
   transition-delay: 0;
   -webkit-transition-duration: 400ms;
   transition-duration: 400ms;
-  -webkit-transition-property: opacity, -webkit-transform;
-  transition-property: opacity, -webkit-transform;
+  -webkit-transition-property:
+    opacity,
+    -webkit-transform;
+  transition-property:
+    opacity,
+    -webkit-transform;
   transition-property: transform, opacity;
-  transition-property: transform, opacity, -webkit-transform;
+  transition-property:
+    transform,
+    opacity,
+    -webkit-transform;
   -webkit-transition-timing-function: ease;
   transition-timing-function: ease;
 }
@@ -9870,17 +10431,28 @@ body.bp3-overlay-open {
   transition-delay: 0;
   -webkit-transition-duration: 400ms;
   transition-duration: 400ms;
-  -webkit-transition-property: opacity, -webkit-transform;
-  transition-property: opacity, -webkit-transform;
+  -webkit-transition-property:
+    opacity,
+    -webkit-transform;
+  transition-property:
+    opacity,
+    -webkit-transform;
   transition-property: transform, opacity;
-  transition-property: transform, opacity, -webkit-transform;
+  transition-property:
+    transform,
+    opacity,
+    -webkit-transform;
   -webkit-transition-timing-function: ease;
   transition-timing-function: ease;
 }
 .bp3-popover {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1),
-    0 2px 4px rgba(16, 22, 26, 0.2), 0 8px 24px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 2px 4px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
+    0 8px 24px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
     0 8px 24px rgba(16, 22, 26, 0.2);
   -webkit-transform: scale(1);
   transform: scale(1);
@@ -10073,7 +10645,9 @@ body.bp3-overlay-open {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.54, 1.12, 0.38, 1.11);
   transition-timing-function: cubic-bezier(0.54, 1.12, 0.38, 1.11);
 }
@@ -10091,7 +10665,9 @@ body.bp3-overlay-open {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.54, 1.12, 0.38, 1.11);
   transition-timing-function: cubic-bezier(0.54, 1.12, 0.38, 1.11);
 }
@@ -10132,7 +10708,9 @@ body.bp3-overlay-open {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -10150,15 +10728,21 @@ body.bp3-overlay-open {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
 .bp3-popover.bp3-dark,
 .bp3-dark .bp3-popover {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
-    0 2px 4px rgba(16, 22, 26, 0.4), 0 8px 24px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 2px 4px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
+    0 8px 24px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
     0 8px 24px rgba(16, 22, 26, 0.4);
 }
 .bp3-popover.bp3-dark .bp3-popover-content,
@@ -10455,15 +11039,20 @@ span.bp3-popover-target {
     rgba(255, 255, 255, 0.8),
     rgba(255, 255, 255, 0)
   );
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
   color: #182026;
   border-radius: 3px;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
     0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 1px 1px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 1px 1px rgba(16, 22, 26, 0.2);
   cursor: pointer;
   height: 16px;
   left: 0;
@@ -10474,18 +11063,22 @@ span.bp3-popover-target {
 .bp3-slider-handle:hover {
   background-clip: padding-box;
   background-color: #ebf1f5;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
 }
 .bp3-slider-handle:active,
 .bp3-slider-handle.bp3-active {
   background-color: #d8e1e8;
   background-image: none;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-slider-handle:disabled,
@@ -10510,13 +11103,18 @@ span.bp3-popover-target {
 .bp3-slider-handle:hover {
   background-clip: padding-box;
   background-color: #ebf1f5;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 -1px 0 rgba(16, 22, 26, 0.1);
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
     0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 1px 1px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 1px 1px rgba(16, 22, 26, 0.2);
   cursor: -webkit-grab;
   cursor: grab;
   z-index: 2;
@@ -10524,13 +11122,17 @@ span.bp3-popover-target {
 .bp3-slider-handle.bp3-active {
   background-color: #d8e1e8;
   background-image: none;
-  -webkit-box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    inset 0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 1px rgba(16, 22, 26, 0.1);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
     inset 0 1px 1px rgba(16, 22, 26, 0.1);
   cursor: -webkit-grabbing;
   cursor: grabbing;
@@ -10573,9 +11175,11 @@ span.bp3-popover-target {
 .bp3-dark .bp3-slider-handle.bp3-active {
   background-color: #202b33;
   background-image: none;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.6),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.6),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.6),
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.6),
     inset 0 1px 2px rgba(16, 22, 26, 0.2);
 }
 .bp3-dark .bp3-slider-handle:disabled,
@@ -10610,18 +11214,26 @@ span.bp3-popover-target {
 .bp3-slider-handle .bp3-slider-label {
   background: #394b59;
   border-radius: 3px;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1),
-    0 2px 4px rgba(16, 22, 26, 0.2), 0 8px 24px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 2px 4px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
+    0 8px 24px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
     0 8px 24px rgba(16, 22, 26, 0.2);
   color: #f5f8fa;
   margin-left: 8px;
 }
 .bp3-dark .bp3-slider-handle .bp3-slider-label {
   background: #e1e8ed;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
-    0 2px 4px rgba(16, 22, 26, 0.4), 0 8px 24px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 2px 4px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
+    0 8px 24px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
     0 8px 24px rgba(16, 22, 26, 0.4);
   color: #394b59;
 }
@@ -10910,10 +11522,20 @@ span.bp3-popover-target {
   top: 0;
   -webkit-transform: translateX(0), translateY(0);
   transform: translateX(0), translateY(0);
-  -webkit-transition: height, width, -webkit-transform;
-  transition: height, width, -webkit-transform;
+  -webkit-transition:
+    height,
+    width,
+    -webkit-transform;
+  transition:
+    height,
+    width,
+    -webkit-transform;
   transition: height, transform, width;
-  transition: height, transform, width, -webkit-transform;
+  transition:
+    height,
+    transform,
+    width,
+    -webkit-transform;
   -webkit-transition-duration: 200ms;
   transition-duration: 200ms;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
@@ -11498,33 +12120,53 @@ span.bp3-popover-target {
 }
 .bp3-tag-input.bp3-active {
   background-color: #ffffff;
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgba(19, 124, 189, 0.3),
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-tag-input.bp3-active.bp3-intent-primary {
-  -webkit-box-shadow: 0 0 0 1px #106ba3, 0 0 0 3px rgba(16, 107, 163, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #106ba3,
+    0 0 0 3px rgba(16, 107, 163, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #106ba3, 0 0 0 3px rgba(16, 107, 163, 0.3),
+  box-shadow:
+    0 0 0 1px #106ba3,
+    0 0 0 3px rgba(16, 107, 163, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-tag-input.bp3-active.bp3-intent-success {
-  -webkit-box-shadow: 0 0 0 1px #0d8050, 0 0 0 3px rgba(13, 128, 80, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #0d8050,
+    0 0 0 3px rgba(13, 128, 80, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #0d8050, 0 0 0 3px rgba(13, 128, 80, 0.3),
+  box-shadow:
+    0 0 0 1px #0d8050,
+    0 0 0 3px rgba(13, 128, 80, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-tag-input.bp3-active.bp3-intent-warning {
-  -webkit-box-shadow: 0 0 0 1px #bf7326, 0 0 0 3px rgba(191, 115, 38, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #bf7326,
+    0 0 0 3px rgba(191, 115, 38, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #bf7326, 0 0 0 3px rgba(191, 115, 38, 0.3),
+  box-shadow:
+    0 0 0 1px #bf7326,
+    0 0 0 3px rgba(191, 115, 38, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-tag-input.bp3-active.bp3-intent-danger {
-  -webkit-box-shadow: 0 0 0 1px #c23030, 0 0 0 3px rgba(194, 48, 48, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #c23030,
+    0 0 0 3px rgba(194, 48, 48, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px #c23030, 0 0 0 3px rgba(194, 48, 48, 0.3),
+  box-shadow:
+    0 0 0 1px #c23030,
+    0 0 0 3px rgba(194, 48, 48, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.2);
 }
 .bp3-dark .bp3-tag-input .bp3-tag-input-icon,
@@ -11558,40 +12200,70 @@ span.bp3-popover-target {
 .bp3-dark .bp3-tag-input.bp3-active,
 .bp3-tag-input.bp3-dark.bp3-active {
   background-color: rgba(16, 22, 26, 0.3);
-  -webkit-box-shadow: 0 0 0 1px #137cbd, 0 0 0 1px #137cbd,
-    0 0 0 3px rgba(19, 124, 189, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  -webkit-box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #137cbd, 0 0 0 1px #137cbd,
-    0 0 0 3px rgba(19, 124, 189, 0.3), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+  box-shadow:
+    0 0 0 1px #137cbd,
+    0 0 0 1px #137cbd,
+    0 0 0 3px rgba(19, 124, 189, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
     inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-tag-input.bp3-active.bp3-intent-primary,
 .bp3-tag-input.bp3-dark.bp3-active.bp3-intent-primary {
-  -webkit-box-shadow: 0 0 0 1px #106ba3, 0 0 0 3px rgba(16, 107, 163, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #106ba3, 0 0 0 3px rgba(16, 107, 163, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  -webkit-box-shadow:
+    0 0 0 1px #106ba3,
+    0 0 0 3px rgba(16, 107, 163, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px #106ba3,
+    0 0 0 3px rgba(16, 107, 163, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-tag-input.bp3-active.bp3-intent-success,
 .bp3-tag-input.bp3-dark.bp3-active.bp3-intent-success {
-  -webkit-box-shadow: 0 0 0 1px #0d8050, 0 0 0 3px rgba(13, 128, 80, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #0d8050, 0 0 0 3px rgba(13, 128, 80, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  -webkit-box-shadow:
+    0 0 0 1px #0d8050,
+    0 0 0 3px rgba(13, 128, 80, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px #0d8050,
+    0 0 0 3px rgba(13, 128, 80, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-tag-input.bp3-active.bp3-intent-warning,
 .bp3-tag-input.bp3-dark.bp3-active.bp3-intent-warning {
-  -webkit-box-shadow: 0 0 0 1px #bf7326, 0 0 0 3px rgba(191, 115, 38, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #bf7326, 0 0 0 3px rgba(191, 115, 38, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  -webkit-box-shadow:
+    0 0 0 1px #bf7326,
+    0 0 0 3px rgba(191, 115, 38, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px #bf7326,
+    0 0 0 3px rgba(191, 115, 38, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 .bp3-dark .bp3-tag-input.bp3-active.bp3-intent-danger,
 .bp3-tag-input.bp3-dark.bp3-active.bp3-intent-danger {
-  -webkit-box-shadow: 0 0 0 1px #c23030, 0 0 0 3px rgba(194, 48, 48, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px #c23030, 0 0 0 3px rgba(194, 48, 48, 0.3),
-    inset 0 0 0 1px rgba(16, 22, 26, 0.3), inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  -webkit-box-shadow:
+    0 0 0 1px #c23030,
+    0 0 0 3px rgba(194, 48, 48, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px #c23030,
+    0 0 0 3px rgba(194, 48, 48, 0.3),
+    inset 0 0 0 1px rgba(16, 22, 26, 0.3),
+    inset 0 1px 1px rgba(16, 22, 26, 0.4);
 }
 
 .bp3-input-ghost {
@@ -11630,9 +12302,13 @@ span.bp3-popover-target {
   align-items: flex-start;
   background-color: #ffffff;
   border-radius: 3px;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1),
-    0 2px 4px rgba(16, 22, 26, 0.2), 0 8px 24px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 2px 4px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
+    0 8px 24px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
     0 8px 24px rgba(16, 22, 26, 0.2);
   display: -webkit-box;
   display: -ms-flexbox;
@@ -11659,7 +12335,9 @@ span.bp3-popover-target {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.54, 1.12, 0.38, 1.11);
   transition-timing-function: cubic-bezier(0.54, 1.12, 0.38, 1.11);
 }
@@ -11679,7 +12357,9 @@ span.bp3-popover-target {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.54, 1.12, 0.38, 1.11);
   transition-timing-function: cubic-bezier(0.54, 1.12, 0.38, 1.11);
 }
@@ -11696,10 +12376,17 @@ span.bp3-popover-target {
   transition-delay: 0;
   -webkit-transition-duration: 300ms;
   transition-duration: 300ms;
-  -webkit-transition-property: opacity, -webkit-filter;
-  transition-property: opacity, -webkit-filter;
+  -webkit-transition-property:
+    opacity,
+    -webkit-filter;
+  transition-property:
+    opacity,
+    -webkit-filter;
   transition-property: opacity, filter;
-  transition-property: opacity, filter, -webkit-filter;
+  transition-property:
+    opacity,
+    filter,
+    -webkit-filter;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -11717,7 +12404,9 @@ span.bp3-popover-target {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -11736,9 +12425,13 @@ span.bp3-popover-target {
 .bp3-toast.bp3-dark,
 .bp3-dark .bp3-toast {
   background-color: #394b59;
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
-    0 2px 4px rgba(16, 22, 26, 0.4), 0 8px 24px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 2px 4px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
+    0 8px 24px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
     0 8px 24px rgba(16, 22, 26, 0.4);
 }
 .bp3-toast.bp3-dark > .bp3-icon,
@@ -11861,9 +12554,13 @@ span.bp3-popover-target {
   transform: translateY(60px);
 }
 .bp3-tooltip {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1),
-    0 2px 4px rgba(16, 22, 26, 0.2), 0 8px 24px rgba(16, 22, 26, 0.2);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 2px 4px rgba(16, 22, 26, 0.2),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
+    0 8px 24px rgba(16, 22, 26, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.1),
+    0 2px 4px rgba(16, 22, 26, 0.2),
     0 8px 24px rgba(16, 22, 26, 0.2);
   -webkit-transform: scale(1);
   transform: scale(1);
@@ -12053,7 +12750,9 @@ span.bp3-popover-target {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -12071,7 +12770,9 @@ span.bp3-popover-target {
   -webkit-transition-property: -webkit-transform;
   transition-property: -webkit-transform;
   transition-property: transform;
-  transition-property: transform, -webkit-transform;
+  transition-property:
+    transform,
+    -webkit-transform;
   -webkit-transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
   transition-timing-function: cubic-bezier(0.4, 1, 0.75, 0.9);
 }
@@ -12080,9 +12781,13 @@ span.bp3-popover-target {
 }
 .bp3-tooltip.bp3-dark,
 .bp3-dark .bp3-tooltip {
-  -webkit-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2),
-    0 2px 4px rgba(16, 22, 26, 0.4), 0 8px 24px rgba(16, 22, 26, 0.4);
-  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.2), 0 2px 4px rgba(16, 22, 26, 0.4),
+  -webkit-box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
+    0 8px 24px rgba(16, 22, 26, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(16, 22, 26, 0.2),
+    0 2px 4px rgba(16, 22, 26, 0.4),
     0 8px 24px rgba(16, 22, 26, 0.4);
 }
 .bp3-tooltip.bp3-dark .bp3-popover-content,
@@ -12294,7 +12999,8 @@ span.bp3-popover-target {
   -webkit-transition: -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
   transition: -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
   transition: transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
-  transition: transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
 }
 .bp3-tree-node-caret:hover {

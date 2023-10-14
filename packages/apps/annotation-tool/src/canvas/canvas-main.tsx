@@ -76,7 +76,7 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
         ...props.canvasStyles.bbox.highlightedFaceColorSLA,
       ]),
     }),
-    [props.selectedHue, props.canvasStyles.bbox]
+    [props.selectedHue, props.canvasStyles.bbox],
   );
 
   const stateRef = useRef<CanvasAppState>(defaultCanvasAppState);
@@ -89,9 +89,9 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
             pixiApp,
             props.idMaker,
             props.canvasStyles,
-            newBboxColor
+            newBboxColor,
           ),
-    [pixiApp, props.idMaker, props.canvasStyles, newBboxColor]
+    [pixiApp, props.idMaker, props.canvasStyles, newBboxColor],
   );
 
   useEffect(() => {
@@ -101,7 +101,7 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
       pixiApp.app,
       pixiApp.background,
       stateRef.current,
-      canvasAppStateHandler
+      canvasAppStateHandler,
     );
 
     return () => {

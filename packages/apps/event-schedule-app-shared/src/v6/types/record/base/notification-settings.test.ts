@@ -13,7 +13,7 @@ describe('isNotificationSettings', () => {
 describe('fillUser', () => {
   test('defaultValue should be true', () => {
     expect(fillNotificationSettings({})).toStrictEqual(
-      notificationSettingsDefaultValue
+      notificationSettingsDefaultValue,
     );
   });
 });

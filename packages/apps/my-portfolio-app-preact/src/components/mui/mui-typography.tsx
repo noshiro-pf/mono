@@ -18,7 +18,7 @@ export const MuiTypography = memoNamed<Props>(
       case 'body2':
         return <MuiTypographyBody2>{children}</MuiTypographyBody2>;
     }
-  }
+  },
 );
 
 const MuiTypographyTitle = styled('h5')`

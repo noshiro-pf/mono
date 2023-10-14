@@ -39,7 +39,7 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
         min: clampAndRoundAnswersScore(sliderState.min),
         max: clampAndRoundAnswersScore(sliderState.max),
       }),
-      [sliderState]
+      [sliderState],
     );
 
     const onRelease = useCallback(() => {
@@ -53,7 +53,7 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
           max: rangeFromProps.max,
         });
       },
-      [rangeFromProps.max]
+      [rangeFromProps.max],
     );
 
     const onMaxChange = useCallback(
@@ -63,7 +63,7 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
           max: value,
         });
       },
-      [rangeFromProps.min]
+      [rangeFromProps.min],
     );
 
     useEffect(() => {
@@ -120,5 +120,5 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
         </FilterItemContent>
       </>
     );
-  }
+  },
 );

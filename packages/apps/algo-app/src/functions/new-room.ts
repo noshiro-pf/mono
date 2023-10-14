@@ -51,7 +51,7 @@ export const newShuffleDef = (): ShuffleDef =>
 
 export const newRoom = (
   password: Room['password'],
-  player: Room['players'][0]
+  player: Room['players'][0],
 ): Omit<Room, 'id'> => ({
   state: 'not-started',
   password,

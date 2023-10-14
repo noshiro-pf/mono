@@ -5,7 +5,7 @@ const fbVerifyEmail = httpsCallable(fbFunctions, 'verifyEmail');
 
 export const verifyEmail = async (
   eventId: string,
-  email: string
+  email: string,
 ): Promise<
   Result<
     'ng' | 'ok',
@@ -16,7 +16,7 @@ export const verifyEmail = async (
     fbVerifyEmail({
       eventId,
       email,
-    })
+    }),
   ).then((result) => {
     if (Result.isErr(result)) {
       const err = result.value;

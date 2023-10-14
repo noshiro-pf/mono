@@ -22,17 +22,17 @@ export class AnswerPageComponent implements OnInit, OnDestroy {
 
   readonly event$: RN<Schedule> = combine(
     this.database.schedulingEvents$,
-    this.eventId$
+    this.eventId$,
   ).map(
-    ([list, id]) => list.find((e) => e.databaseKey === id) || new Schedule()
+    ([list, id]) => list.find((e) => e.databaseKey === id) || new Schedule(),
   );
 
   readonly answerDeadlineExpired$: RN<boolean> = this.event$.map(
     (e) =>
       utils.date.compare(
         Date.now(),
-        utils.date.getTomorrowTimestamp(e.answerDeadline)
-      ) > 0
+        utils.date.getTomorrowTimestamp(e.answerDeadline),
+      ) > 0,
   );
 
   readonly answerId$ = manual<string>('');
@@ -43,7 +43,7 @@ export class AnswerPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private dialog: MatDialog,
-    private database: DatabaseService
+    private database: DatabaseService,
   ) {}
 
   ngOnInit() {

@@ -11,17 +11,17 @@ import {
 
 export const combineLatest = <A extends NonEmptyUnknownList>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  parents: Wrap<A>
+  parents: Wrap<A>,
 ): CombineLatestObservable<A> => new CombineLatestObservableClass(parents);
 
 export const combineLatestI = <A extends NonEmptyUnknownList>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  parents: WrapInitialized<A>
+  parents: WrapInitialized<A>,
 ): InitializedCombineLatestObservable<A> =>
   // eslint-disable-next-line no-restricted-syntax
   new CombineLatestObservableClass(
     // eslint-disable-next-line no-restricted-syntax
-    parents as Wrap<A>
+    parents as Wrap<A>,
   ) as InitializedCombineLatestObservable<A>;
 
 export const combine = combineLatest; // alias

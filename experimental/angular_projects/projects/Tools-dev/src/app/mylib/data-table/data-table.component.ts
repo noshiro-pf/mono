@@ -90,12 +90,12 @@ export class DataTableComponent implements OnInit, OnDestroy {
         data
           .map((e, i) => ({ val: e, idx: i }))
           .filter((e) => this.filterFn(e.val, columnSettings))
-          .map((e) => e.idx)
+          .map((e) => e.idx),
     );
 
     this.filteredData$ = this.filteredIndice$.pipe(
       withLatestFrom(this.data$),
-      map(([indice, data]) => indice.map((idx) => data[idx]))
+      map(([indice, data]) => indice.map((idx) => data[idx])),
     );
 
     this.filteredDataLength$ = this.filteredData$.pipe(map((e) => e.length));
@@ -105,7 +105,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.itemsPerPage$,
       this.selectedPageIndex$,
       (filteredData, itemsPerPage, selectedPageIndex) =>
-        getDataAtPage(filteredData, itemsPerPage, selectedPageIndex)
+        getDataAtPage(filteredData, itemsPerPage, selectedPageIndex),
     );
 
     this.transformedPagenatedData$ = this.pagenatedData$.pipe(
@@ -122,8 +122,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
             }
           });
           return transformed;
-        })
-      )
+        }),
+      ),
     );
 
     /* subscriptions */
@@ -139,14 +139,14 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.filteredData$
       .pipe(
         withLatestFrom(this.data$),
-        takeWhile(() => this.alive)
+        takeWhile(() => this.alive),
       )
       .subscribe(([filteredData, data]) => {
         const columnSettings = this.columnSettingsSource.getValue();
         columnSettings.forEach((column) => {
           const dataOfColumn = data.map((line) => line[column.name]);
           const dataOfColumnFiltered = filteredData.map(
-            (line) => line[column.name]
+            (line) => line[column.name],
           );
           switch (column.manip) {
             case 'select':
@@ -204,7 +204,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     rawData: any,
     rowIndexOnThisPage: number,
     columnName: string,
-    columnSettings: ColumnSetting[]
+    columnSettings: ColumnSetting[],
   ) {
     const rowIndexOnFilteredData =
       this.itemsPerPageSource.value * this.selectedPageIndexSource.value +
@@ -213,7 +213,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       rowIndex: this.indexOnRawData(
         rawData,
         rowIndexOnFilteredData,
-        columnSettings
+        columnSettings,
       ),
       rowIndexOnFiltered: rowIndexOnFilteredData,
       columnName: columnName,
@@ -240,7 +240,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   private filterFn(lineOfData: any, columnSettings: ColumnSetting[]): boolean {
     const validSettings = columnSettings.filter(
-      (column) => column.manipState !== undefined
+      (column) => column.manipState !== undefined,
     );
 
     for (const column of validSettings) {
@@ -251,7 +251,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
             !utils.string.submatch(
               lineOfData[column.name],
               column.manipState,
-              true
+              true,
             )
           )
             return false;
@@ -294,7 +294,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   private indexOnRawData(
     rawData: any,
     indexOnFilteredData: number,
-    columnSettings: ColumnSetting[]
+    columnSettings: ColumnSetting[],
   ): number {
     for (let i = 0, filteredDataNum = 0; i < rawData.length; ++i) {
       if (this.filterFn(rawData[i], columnSettings)) filteredDataNum++;

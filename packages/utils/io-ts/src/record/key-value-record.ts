@@ -15,7 +15,7 @@ type RecordResultType<K extends Type<string>, V extends Type<unknown>> = Record<
 export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
   keyType: K,
   valueType: V,
-  options?: Readonly<{ typeName?: string }>
+  options?: Readonly<{ typeName?: string }>,
 ): Type<RecordResultType<K, V>> => {
   type T = RecordResultType<K, V>;
 
@@ -38,7 +38,7 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
         if (Result.isErr(res)) {
           const message = validationErrorMessage(
             k,
-            `The key of the record is expected to be <${keyType.typeName}>`
+            `The key of the record is expected to be <${keyType.typeName}>`,
           );
 
           return Result.err([message, ...res.value]);
@@ -50,7 +50,7 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
         if (Result.isErr(res)) {
           const message = validationErrorMessage(
             v,
-            `The value of the record is expected to be <${valueType.typeName}>`
+            `The value of the record is expected to be <${valueType.typeName}>`,
           );
 
           return Result.err([message, ...res.value]);
@@ -66,7 +66,9 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
     isRecord(a)
       ? // eslint-disable-next-line no-restricted-syntax
         (Object.fromEntries(
-          Object.entries(a).filter(([k, v]) => keyType.is(k) && valueType.is(v))
+          Object.entries(a).filter(
+            ([k, v]) => keyType.is(k) && valueType.is(v),
+          ),
         ) as T)
       : defaultValue;
 

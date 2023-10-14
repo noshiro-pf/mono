@@ -18,7 +18,7 @@ type Props = Readonly<{
   onToggleUseNotification: () => void;
   notificationSettingsWithEmail: NotificationSettingsWithEmail | undefined;
   onNotificationSettingsWithEmailChange: (
-    value: NotificationSettingsWithEmail
+    value: NotificationSettingsWithEmail,
   ) => void;
 }>;
 
@@ -105,5 +105,5 @@ export const EventSettings = memoNamed<Props>(
         />
       </div>
     );
-  }
+  },
 );

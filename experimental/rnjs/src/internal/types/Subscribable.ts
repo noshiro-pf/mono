@@ -4,6 +4,6 @@ export type Subscribable<A> = {
   subscribe: (
     next: (v: A) => void,
     error?: (e?: any) => void,
-    complete?: () => void
+    complete?: () => void,
   ) => Subscription;
 };

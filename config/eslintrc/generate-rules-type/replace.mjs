@@ -15,16 +15,16 @@ export const replaceRulesType = (content, typeName) => {
     case eslintPlugins.EslintRules.typeName: {
       const slice = mut_ret.slice(
         mut_ret.indexOf('namespace LogicalAssignmentOperators {'),
-        mut_ret.indexOf('namespace MaxClassesPerFile {')
+        mut_ret.indexOf('namespace MaxClassesPerFile {'),
       );
       mut_ret = mut_ret.replaceAll(
         slice,
         slice
           .replaceAll(
             'export type Options = (',
-            ['/* modified */', '  export type Options = ('].join('\n')
+            ['/* modified */', '  export type Options = ('].join('\n'),
           )
-          .replaceAll([' &', '    readonly unknown[];'].join('\n'), '')
+          .replaceAll([' &', '    readonly unknown[];'].join('\n'), ''),
       );
       break;
     }
@@ -33,7 +33,7 @@ export const replaceRulesType = (content, typeName) => {
       {
         const slice = mut_ret.slice(
           mut_ret.indexOf('namespace ArrayType {'),
-          mut_ret.indexOf('namespace AwaitThenable {')
+          mut_ret.indexOf('namespace AwaitThenable {'),
         );
 
         mut_ret = mut_ret.replaceAll(
@@ -52,15 +52,15 @@ export const replaceRulesType = (content, typeName) => {
               '   */',
               "  readonly readonly?: 'array' | 'generic' | 'array-simple';",
               '};',
-            ].join('\n')
-          )
+            ].join('\n'),
+          ),
         );
       }
 
       {
         const slice = mut_ret.slice(
           mut_ret.indexOf('namespace BanTsComment {'),
-          mut_ret.indexOf('namespace BanTslintComment {')
+          mut_ret.indexOf('namespace BanTslintComment {'),
         );
         mut_ret = mut_ret.replaceAll(
           slice,
@@ -82,15 +82,15 @@ export const replaceRulesType = (content, typeName) => {
               '  | {',
               '      readonly descriptionFormat?: string;',
               '    };',
-            ].join('\n')
-          )
+            ].join('\n'),
+          ),
         );
       }
 
       {
         const slice = mut_ret.slice(
           mut_ret.indexOf('namespace NoRestrictedImports {'),
-          mut_ret.indexOf('namespace NoShadow {')
+          mut_ret.indexOf('namespace NoShadow {'),
         );
         mut_ret = mut_ret.replaceAll(
           slice,
@@ -152,15 +152,15 @@ export const replaceRulesType = (content, typeName) => {
               '      }[];',
               '    }',
               '  | { readonly paths: readonly string[] };',
-            ].join('\n')
-          )
+            ].join('\n'),
+          ),
         );
       }
 
       {
         const slice = mut_ret.slice(
           mut_ret.indexOf('namespace ParameterProperties {'),
-          mut_ret.indexOf('namespace PreferAsConst {')
+          mut_ret.indexOf('namespace PreferAsConst {'),
         );
         mut_ret = mut_ret.replaceAll(
           slice,
@@ -181,15 +181,15 @@ export const replaceRulesType = (content, typeName) => {
               "    | 'private readonly'",
               "    | 'protected readonly'",
               "    | 'public readonly';",
-            ].join('\n')
-          )
+            ].join('\n'),
+          ),
         );
       }
 
       {
         const slice = mut_ret.slice(
           mut_ret.indexOf('namespace ExplicitMemberAccessibility {'),
-          mut_ret.indexOf('namespace ExplicitModuleBoundaryTypes {')
+          mut_ret.indexOf('namespace ExplicitModuleBoundaryTypes {'),
         );
         mut_ret = mut_ret.replaceAll(
           slice,
@@ -210,8 +210,8 @@ export const replaceRulesType = (content, typeName) => {
               '  }>;',
               '',
               "  type AccessibilityLevel = 'explicit' | 'no-public' | 'off';",
-            ].join('\n')
-          )
+            ].join('\n'),
+          ),
         );
       }
 
@@ -221,7 +221,7 @@ export const replaceRulesType = (content, typeName) => {
     case eslintPlugins.EslintJestRules.typeName: {
       const slice = mut_ret.slice(
         mut_ret.indexOf('namespace ValidTitle {'),
-        mut_ret.indexOf('export type EslintJestRules = {')
+        mut_ret.indexOf('export type EslintJestRules = {'),
       );
       mut_ret = mut_ret.replaceAll(
         slice,
@@ -254,8 +254,8 @@ export const replaceRulesType = (content, typeName) => {
             '  type MustMatchType = Readonly<',
             "    Partial<Record<'describe' | 'test' | 'it', string>>",
             '  >;',
-          ].join('\n')
-        )
+          ].join('\n'),
+        ),
       );
       break;
     }
@@ -263,7 +263,7 @@ export const replaceRulesType = (content, typeName) => {
     case eslintPlugins.PreferArrowFunctionRules.typeName: {
       const slice = mut_ret.slice(
         mut_ret.indexOf('namespace PreferArrowFunctions {'),
-        mut_ret.indexOf('export type PreferArrowFunctionRules = {')
+        mut_ret.indexOf('export type PreferArrowFunctionRules = {'),
       );
       mut_ret = mut_ret.replaceAll(
         slice,
@@ -272,8 +272,8 @@ export const replaceRulesType = (content, typeName) => {
           [
             '/* modified */',
             "readonly returnStyle?: 'explicit' | 'implicit' | 'unchanged';",
-          ].join('\n')
-        )
+          ].join('\n'),
+        ),
       );
       break;
     }

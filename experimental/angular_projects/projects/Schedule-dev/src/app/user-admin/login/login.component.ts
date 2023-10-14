@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
   constructor(
     public snackBar: MatSnackBar,
     public afAuth: AngularFireAuth,
-    private location: Location
+    private location: Location,
   ) {}
 
   ngOnInit() {}

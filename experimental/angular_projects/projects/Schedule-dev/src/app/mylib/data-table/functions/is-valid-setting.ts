@@ -24,7 +24,7 @@ export const isValidSetting = (settings: TableSettings): boolean => {
 
 export const isValidSetting_withTable = (
   settings: TableSettings,
-  table: any[][]
+  table: any[][],
 ): boolean => {
   if (!isValidSetting(settings)) return false;
 
@@ -36,7 +36,7 @@ export const isValidSetting_withTable = (
 };
 
 export const isValidHeaderSetting = (
-  hsettings: IHeaderSettingFilled
+  hsettings: IHeaderSettingFilled,
 ): boolean => {
   if (hsettings.makeSubTable) {
     if (hsettings.sort) return false;

@@ -10,7 +10,7 @@ export const getSortedIndice = (
   table: I.List<I.List<any>>,
   filteredIndice: I.List<number>,
   sortState: TSortState,
-  settings: TTableSettings
+  settings: TTableSettings,
 ): I.List<number> =>
   sortState.activeCellState === 'desc'
     ? getSortedIndiceSub(table, filteredIndice, sortState, settings).reverse()
@@ -20,7 +20,7 @@ const getSortedIndiceSub = (
   table: I.List<I.List<any>>,
   filteredIndice: I.List<number>,
   sortState: TSortState,
-  settings: TTableSettings
+  settings: TTableSettings,
 ): I.List<number> => {
   switch (sortState.activeColumnId) {
     case '':
@@ -70,18 +70,21 @@ const sort = <T>(
   table: I.List<I.List<any>>,
   colIndex: number,
   filteredIndice: I.List<number>,
-  cmp: (a: T, b: T) => number
+  cmp: (a: T, b: T) => number,
 ): I.List<number> =>
   filteredIndice.sort((x, y) =>
-    cmp(table.getIn([x, colIndex]), table.getIn([y, colIndex]))
+    cmp(table.getIn([x, colIndex]), table.getIn([y, colIndex])),
   )
 
 const lexicalSort = <T>(
   table: I.List<I.List<any>>,
   colIndex: number,
   filteredIndice: I.List<number>,
-  cmp: (a: T, b: T) => number
+  cmp: (a: T, b: T) => number,
 ): I.List<number> =>
   filteredIndice.sort((x, y) =>
-    list.lexicalCmp(cmp)(table.getIn([x, colIndex]), table.getIn([y, colIndex]))
+    list.lexicalCmp(cmp)(
+      table.getIn([x, colIndex]),
+      table.getIn([y, colIndex]),
+    ),
   )

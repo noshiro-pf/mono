@@ -45,7 +45,7 @@ export const SelectAnswerBalloon = memoNamed<Props>(
           balloonSize,
           marginBetweenCardAndBalloon,
         }),
-      [anchorCardRect, arrowDirection]
+      [anchorCardRect, arrowDirection],
     );
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -62,7 +62,7 @@ export const SelectAnswerBalloon = memoNamed<Props>(
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           W: BalloonWithLeftArrow,
         }),
-      [arrowDirection]
+      [arrowDirection],
     );
 
     const cards = useMemo(
@@ -85,9 +85,9 @@ export const SelectAnswerBalloon = memoNamed<Props>(
               onClick: () => {
                 onSelectedNumberChange(n);
               },
-            } as const)
+            }) as const,
         ),
-      [cardColor, onSelectedNumberChange, selectedNumber]
+      [cardColor, onSelectedNumberChange, selectedNumber],
     );
 
     return (
@@ -121,7 +121,7 @@ export const SelectAnswerBalloon = memoNamed<Props>(
         </BalloonContent>
       </Balloon>
     );
-  }
+  },
 );
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call

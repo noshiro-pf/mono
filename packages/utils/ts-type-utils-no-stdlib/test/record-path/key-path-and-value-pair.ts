@@ -28,7 +28,7 @@ expectType<
         {
           d: { x: number }[];
           4: 5;
-        }
+        },
       ]
     | [
         ['y'],
@@ -40,7 +40,7 @@ expectType<
           g: [{ x: number }, ...{ y: string[] }[]];
           h: (a: number) => string;
           i: (a: string) => number;
-        }
+        },
       ]
     | [['x', 'a'], 1]
     | [['x', 'b'], { x: [number, ...string[]] }[]]

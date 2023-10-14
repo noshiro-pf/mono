@@ -7,11 +7,11 @@ import { tokensRepresentsLambdaTerm } from './token-list-is-lambda-term';
  * e ::= x | (lambda x.e) | (e e)
  * */
 export const getParseTree = (
-  tokens: readonly string[]
+  tokens: readonly string[],
 ): LambdaTerm | undefined => {
   if (tokens.length < 1) {
     console.error(
-      `invalid tokens passed: "${Result.unwrapThrow(Json.stringify(tokens))}"`
+      `invalid tokens passed: "${Result.unwrapThrow(Json.stringify(tokens))}"`,
     );
     return undefined;
   }

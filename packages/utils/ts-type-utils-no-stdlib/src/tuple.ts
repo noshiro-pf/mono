@@ -3,7 +3,7 @@ import { type NonEmptyArray } from './utils';
 export namespace Tuple {
   export type Head<
     T extends readonly unknown[],
-    D = never
+    D = never,
   > = T extends readonly [infer X, ...(readonly unknown[])] ? X : D;
 
   export type Last<T extends readonly unknown[]> = T extends readonly []
@@ -27,7 +27,7 @@ export namespace Tuple {
   /** @internal */
   type _ReverseImpl<
     L extends readonly unknown[],
-    X extends readonly unknown[]
+    X extends readonly unknown[],
   > = L extends readonly []
     ? X
     : _ReverseImpl<Tail<L>, readonly [Head<L>, ...X]>;
@@ -48,7 +48,7 @@ export namespace Tuple {
   type _TakeImpl<
     N extends number,
     T extends readonly unknown[],
-    R extends readonly unknown[]
+    R extends readonly unknown[],
   > = {
     0: Reverse<R>;
     1: _TakeImpl<N, Tail<T>, readonly [Head<T>, ...R]>;
@@ -64,7 +64,7 @@ export namespace Tuple {
   type _SkipImpl<
     N extends number,
     T extends readonly unknown[],
-    R extends readonly unknown[]
+    R extends readonly unknown[],
   > = T extends readonly []
     ? T
     : R['length'] extends N
@@ -81,7 +81,7 @@ export namespace Tuple {
   type _TakeLastImpl<
     N extends number,
     T extends readonly unknown[],
-    R extends readonly unknown[]
+    R extends readonly unknown[],
   > = T extends readonly []
     ? R
     : R['length'] extends N
@@ -90,14 +90,14 @@ export namespace Tuple {
 
   export type TakeLast<
     N extends number,
-    T extends readonly unknown[]
+    T extends readonly unknown[],
   > = _TakeLastImpl<N, T, readonly []>;
 
   /** @internal */
   type _SkipLastImpl<
     N extends number,
     T extends readonly unknown[],
-    R extends readonly unknown[]
+    R extends readonly unknown[],
   > = T extends readonly []
     ? T
     : R['length'] extends N
@@ -106,7 +106,7 @@ export namespace Tuple {
 
   export type SkipLast<
     N extends number,
-    T extends readonly unknown[]
+    T extends readonly unknown[],
   > = _SkipLastImpl<N, T, readonly []>;
 
   /** @internal */
@@ -114,7 +114,7 @@ export namespace Tuple {
     T extends readonly unknown[],
     I extends number,
     V,
-    ACC extends readonly unknown[]
+    ACC extends readonly unknown[],
   > = {
     end: Reverse<ACC>;
     next: _SetAtImpl<Tail<T>, I, V, readonly [Head<T>, ...ACC]>;
@@ -128,14 +128,14 @@ export namespace Tuple {
   export type SetAt<
     T extends readonly unknown[],
     I extends number,
-    V
+    V,
   > = _SetAtImpl<T, I, V, readonly []>;
 
   /** @internal */
   type _FlattenImpl<
     T extends readonly (readonly unknown[])[],
     R1 extends readonly unknown[],
-    R2 extends readonly unknown[]
+    R2 extends readonly unknown[],
   > = T extends readonly []
     ? R1 extends readonly []
       ? Reverse<R2>
@@ -154,7 +154,7 @@ export namespace Tuple {
   type _ConcatImpl<
     A extends readonly unknown[],
     B extends readonly unknown[],
-    R extends readonly unknown[]
+    R extends readonly unknown[],
   > = A extends readonly []
     ? B extends readonly []
       ? Reverse<R>
@@ -163,12 +163,12 @@ export namespace Tuple {
 
   export type Concat<
     A extends readonly unknown[],
-    B extends readonly unknown[]
+    B extends readonly unknown[],
   > = _ConcatImpl<A, B, readonly []>;
 
   export type Zip<
     A extends readonly unknown[],
-    B extends readonly unknown[]
+    B extends readonly unknown[],
   > = A extends NonEmptyArray<unknown>
     ? B extends NonEmptyArray<unknown>
       ? readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>] // both A and B has at least 1 element
@@ -180,7 +180,7 @@ export namespace Tuple {
     N extends number,
     T extends readonly unknown[],
     R1 extends readonly unknown[],
-    R2 extends readonly unknown[]
+    R2 extends readonly unknown[],
   > = T extends readonly []
     ? R1 extends readonly []
       ? Reverse<R2>
@@ -191,6 +191,6 @@ export namespace Tuple {
 
   export type Partition<
     N extends number,
-    T extends readonly unknown[]
+    T extends readonly unknown[],
   > = _PartitionImpl<N, T, readonly [], readonly []>;
 }

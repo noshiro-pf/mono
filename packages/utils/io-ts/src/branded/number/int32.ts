@@ -9,7 +9,7 @@ const is = isInt32 as (u: number) => u is Int32;
 export const int32 = (defaultValue: number = 0): Type<Int32> => {
   if (!is(defaultValue)) {
     throw new Error(
-      'defaultValue must be a integer in the range of 32-bit signed'
+      'defaultValue must be a integer in the range of 32-bit signed',
     );
   }
 

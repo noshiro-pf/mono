@@ -1,6 +1,6 @@
 export const asyncFilter = async <T>(
   array: readonly T[],
-  asyncFn: (a: T) => Promise<boolean>
+  asyncFn: (a: T) => Promise<boolean>,
 ): Promise<readonly T[]> => {
   const result = await Promise.all(array.map(asyncFn));
 

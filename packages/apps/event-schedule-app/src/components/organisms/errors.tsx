@@ -47,5 +47,5 @@ export const EventSchedulePropertiesErrors = memoNamed<Props>(
         />
       )}
     </div>
-  )
+  ),
 );

@@ -53,14 +53,14 @@ export const App = memoNamed('App', () => {
 
   const pathNameLast = useMemo(
     () => Arr.last(pathname.split('/').filter((s) => s !== '')) ?? '',
-    [pathname]
+    [pathname],
   );
 
   // pathnameと対応させるため、routerを使ってタブ切り替えを制御
   const tabIndex = useMemo(
     //
     () => pathNameLastToIndex(pathNameLast),
-    [pathNameLast]
+    [pathNameLast],
   );
 
   useEffect(() => {

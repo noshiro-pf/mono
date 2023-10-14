@@ -391,5 +391,5 @@ console.log(
   eventScheduleExampleV2,
   eventScheduleExampleV3,
   answersExampleV2,
-  answersExampleV3
+  answersExampleV3,
 );

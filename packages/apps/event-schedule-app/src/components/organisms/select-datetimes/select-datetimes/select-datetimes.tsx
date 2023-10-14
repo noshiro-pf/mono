@@ -89,7 +89,7 @@ export const SelectDatetimes = memoNamed<Props>(
                   onRangeStartChange={onRangeStartChange}
                   onYmdChange={onYmdChange}
                 />
-              )
+              ),
             )}
             <AddElementButton onClick={onAddDatetimeClick} />
           </div>
@@ -116,5 +116,5 @@ export const SelectDatetimes = memoNamed<Props>(
         />
       </div>
     );
-  }
+  },
 );

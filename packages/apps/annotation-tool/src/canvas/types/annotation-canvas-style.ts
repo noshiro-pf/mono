@@ -55,7 +55,7 @@ export const defaultAnnotationCanvasStyle = {
 const dfl = defaultAnnotationCanvasStyle;
 
 export const fillAnnotationCanvasStyle = (
-  cs?: AnnotationCanvasStylePartial
+  cs?: AnnotationCanvasStylePartial,
 ): AnnotationCanvasStyle => ({
   background: {
     style: cs?.background?.style ?? dfl.background.style,

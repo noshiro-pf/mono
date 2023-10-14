@@ -67,8 +67,8 @@ export const makeUppercase = firestore
             resolve(
               // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
               r?.members?.find(
-                (a: Readonly<{ name: string }>) => a.name === 'noshiro.pf'
-              )?.profile?.display_name_normalized
+                (a: Readonly<{ name: string }>) => a.name === 'noshiro.pf',
+              )?.profile?.display_name_normalized,
             );
           });
       });
@@ -79,6 +79,6 @@ export const makeUppercase = firestore
     // Setting an 'uppercase' field in Cloud Firestore document returns a Promise.
     return snap.ref.set(
       { uppercase, display_name_normalized: result },
-      { merge: true }
+      { merge: true },
     );
   });

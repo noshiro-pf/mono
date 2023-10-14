@@ -60,16 +60,16 @@ export const useNormalizedRangeSliderProps = ({
       min: clamp(_range.min),
       max: clamp(Math.max(_range.min, _range.max)),
     }),
-    [_range, clamp]
+    [_range, clamp],
   );
 
   const labelFractionDigits: UintRange<0, 21> = useMemo(
     () =>
       _labelFractionDigits ??
       pipe(-Math.floor(Math.log10(labelStepSize))).chain((x) =>
-        Num.isUintInRangeInclusive(0, 20)(x) ? x : 0
+        Num.isUintInRangeInclusive(0, 20)(x) ? x : 0,
       ).value,
-    [_labelFractionDigits, labelStepSize]
+    [_labelFractionDigits, labelStepSize],
   );
 
   return {

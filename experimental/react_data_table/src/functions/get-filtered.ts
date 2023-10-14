@@ -14,7 +14,7 @@ export const getFilteredIndice = (
   cache: {
     headerValuesAllPrev: I.List<HeaderValueType>
     filterResults: boolean[][]
-  }
+  },
 ): I.List<number> => {
   const indice = table.map((_, i) => i)
 
@@ -43,14 +43,14 @@ export const getFilteredIndice = (
     selectorOptionsAll,
     headerValuesAll,
     cache.headerValuesAllPrev,
-    cache.filterResults
+    cache.filterResults,
   )
 
   // update headerValuesAllPrev
   cache.headerValuesAllPrev = headerValuesAll.slice() // copy
 
   return indice.filter((rowIdx) =>
-    (cache.filterResults[rowIdx] || []).every((e) => e)
+    (cache.filterResults[rowIdx] || []).every((e) => e),
   )
 }
 
@@ -60,7 +60,7 @@ const updateFilterResultsCache = (
   selectorOptionsAll: I.List<I.List<any>>,
   headerValuesAll: I.List<HeaderValueType>,
   headerValuesAllPrev: I.List<HeaderValueType>,
-  filterResultsCache: boolean[][]
+  filterResultsCache: boolean[][],
 ) => {
   headerValuesAllPrev.zipAll(headerValuesAll).forEach(([prev, curr], ci) => {
     if (prev !== curr) {
@@ -70,7 +70,7 @@ const updateFilterResultsCache = (
         table,
         selectorOptionsAll.get(ci, I.List()),
         curr,
-        filterResultsCache
+        filterResultsCache,
       )
     }
   })
@@ -82,14 +82,14 @@ const updateFilterResultsOfColumn = (
   table: I.List<I.List<any>>,
   selectorOptions: I.List<any>,
   headerValue: HeaderValueType,
-  filterResultsCache: boolean[][]
+  filterResultsCache: boolean[][],
 ): void => {
   table.forEach((tableRow, rowIdx) => {
     filterResultsCache[rowIdx][colIdx] = filterResultOfCell(
       tableRow.get(colIdx, ''),
       columnSetting,
       selectorOptions,
-      headerValue
+      headerValue,
     )
   })
 }
@@ -98,7 +98,7 @@ const filterResultOfCell = (
   tableCell: any,
   columnSetting: TColumnSetting,
   selectorOptions: I.List<any>,
-  headerValue: HeaderValueType
+  headerValue: HeaderValueType,
 ): boolean => {
   const typeofTableCell = typeof tableCell
   const filterType = columnSetting.filterType
@@ -110,7 +110,7 @@ const filterResultOfCell = (
       if (headerValue === '') return true // not filtered
       if (typeofTableCell !== 'string') {
         throw new Error(
-          `ERROR: tableCell must be an array but the value is ${tableCell}(${typeofTableCell}).`
+          `ERROR: tableCell must be an array but the value is ${tableCell}(${typeofTableCell}).`,
         )
       }
       if (!str.submatch(transformed, headerValue, true)) return false
@@ -120,7 +120,7 @@ const filterResultOfCell = (
       if (headerValue === -1) return true // not filtered
       if (!['string', 'boolean', 'number'].includes(typeofTableCell)) {
         throw new Error(
-          `ERROR: tableCell must be primitive but the value is ${tableCell}(${typeofTableCell}).`
+          `ERROR: tableCell must be primitive but the value is ${tableCell}(${typeofTableCell}).`,
         )
       }
       if (tableCell !== selectorOptions.get(headerValue)) return false
@@ -136,7 +136,7 @@ const filterResultOfCell = (
         if (headerValue.isEmpty()) return true // not filtered
         if (!I.List.isList(tableCell)) {
           throw new Error(
-            `ERROR: tableCell must be an array but the value is ${tableCell}(${typeofTableCell}).`
+            `ERROR: tableCell must be an array but the value is ${tableCell}(${typeofTableCell}).`,
           )
         }
         if (!headerValueMapped.isSubset(tableCell)) return false

@@ -20,7 +20,7 @@ export const MySelect = memo(
       (ev: React.ChangeEvent<HTMLSelectElement>) => {
         valueChange(ev.target.value as string)
       },
-      [valueChange]
+      [valueChange],
     )
 
     return (
@@ -71,7 +71,7 @@ export const MySelect = memo(
       //   </Select>
       // </FormControl>
     )
-  }
+  },
 )
 
 MySelect.displayName = 'MySelect'

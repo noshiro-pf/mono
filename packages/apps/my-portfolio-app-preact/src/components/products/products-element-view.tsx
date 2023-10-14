@@ -39,7 +39,7 @@ export const ProductsElementView = memoNamed<
         )}
       </CardContentStyled>
     </CardStyled>
-  )
+  ),
 );
 
 const CardStyled = styled(MuiCard)`

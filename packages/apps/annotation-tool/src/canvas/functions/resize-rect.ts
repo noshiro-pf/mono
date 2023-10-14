@@ -8,7 +8,7 @@ import { type Direction } from './bbox-points';
 const resizeRectSub = (
   rectPrevious: Rect,
   pointDirectionToPinch: Direction,
-  dragVector: Point
+  dragVector: Point,
 ): Rect => {
   switch (pointDirectionToPinch) {
     case 'nw':
@@ -74,11 +74,11 @@ export const resizeRect = (
   rectPrevious: Rect,
   pointDirectionToPinch: Direction,
   movePointFrom: Point,
-  movePointTo: Point
+  movePointTo: Point,
 ): Rect =>
   normalizeRect(
     resizeRectSub(rectPrevious, pointDirectionToPinch, {
       x: movePointTo.x - movePointFrom.x,
       y: movePointTo.y - movePointFrom.y,
-    })
+    }),
   );

@@ -31,23 +31,23 @@ const answerDiffRowStr = ({
 }>): string =>
   `    ・ ${datetimeRange2str(
     datetimeRange,
-    datetimeSpecification
+    datetimeSpecification,
   )}：${iconId2str(iconBefore, pointBefore)}→${iconId2str(
     iconAfter,
-    pointAfter
+    pointAfter,
   )}`;
 
 export const answerDiffAsString = (
   before: Answer,
   after: Answer,
-  datetimeSpecification: DatetimeSpecificationEnumType
+  datetimeSpecification: DatetimeSpecificationEnumType,
 ): string[] => {
   const mut_result = [];
 
   if (before.user.name !== after.user.name) {
     mut_result.push(
       `・ 名前の変更（${before.user.name}→${after.user.name}）`,
-      ''
+      '',
     );
   }
 
@@ -60,28 +60,28 @@ export const answerDiffAsString = (
         ...after.selection.map((s) => s.datetimeRange),
       ],
       datetimeRangeToMapKey,
-      datetimeRangeFromMapKey
+      datetimeRangeFromMapKey,
     );
 
     const allDatetimeRangeSorted = Arr.sorted(
       allDatetimeRangeSet.toArray(),
-      compareDatetimeRange
+      compareDatetimeRange,
     );
 
     const datetimeRangeToBeforeIconIdMap = IMapMapped.new(
       before.selection.map((s) =>
-        tp(s.datetimeRange, { iconId: s.iconId, point: s.point })
+        tp(s.datetimeRange, { iconId: s.iconId, point: s.point }),
       ),
       datetimeRangeToMapKey,
-      datetimeRangeFromMapKey
+      datetimeRangeFromMapKey,
     );
 
     const datetimeRangeToAfterIconIdMap = IMapMapped.new(
       after.selection.map((s) =>
-        tp(s.datetimeRange, { iconId: s.iconId, point: s.point })
+        tp(s.datetimeRange, { iconId: s.iconId, point: s.point }),
       ),
       datetimeRangeToMapKey,
-      datetimeRangeFromMapKey
+      datetimeRangeFromMapKey,
     );
 
     // Note: assume before.selection and after.selection are the same length and the same order
@@ -109,7 +109,7 @@ export const answerDiffAsString = (
             iconBefore,
             pointAfter,
             pointBefore,
-          })
+          }),
         );
       }
     }
@@ -123,7 +123,7 @@ export const answerDiffAsString = (
     mut_result.push(
       '・ コメントの変更：',
       `    ・ （変更前）：${before.comment}`,
-      `    ・ （変更後）：${after.comment}`
+      `    ・ （変更後）：${after.comment}`,
     );
   }
 
@@ -131,7 +131,7 @@ export const answerDiffAsString = (
     mut_result.push(
       '・ 必須参加者チェックの変更：',
       `    ・ （変更前）：${before.isRequiredParticipants ? 'オン' : 'オフ'}`,
-      `    ・ （変更後）：${after.isRequiredParticipants ? 'オン' : 'オフ'}`
+      `    ・ （変更後）：${after.isRequiredParticipants ? 'オン' : 'オフ'}`,
     );
   }
 
@@ -139,7 +139,7 @@ export const answerDiffAsString = (
     mut_result.push(
       '・ 回答の重みの変更：',
       `    ・ （変更前）：${before.weight}人分としてカウント`,
-      `    ・ （変更後）：${after.weight}人分としてカウント`
+      `    ・ （変更後）：${after.weight}人分としてカウント`,
     );
   }
   return mut_result;

@@ -24,30 +24,30 @@ type SelectDatetimesHooks = DeepReadonly<{
     state: Readonly<{
       timeRange: TimeRange;
       checkboxState: Record<DayOfWeekName, boolean>;
-    }>
+    }>,
   ) => void;
   onSortClick: () => void;
 }>;
 
 export const useSelectDatetimesHooks = (
   datetimeList: readonly DatetimeRange[],
-  onDatetimeListChange: (list: readonly DatetimeRange[]) => void
+  onDatetimeListChange: (list: readonly DatetimeRange[]) => void,
 ): SelectDatetimesHooks => {
   const dispatch = useCallback(
     (action: DatetimeListReducerAction) => {
       onDatetimeListChange(datetimeListReducer(datetimeList, action));
     },
-    [datetimeList, onDatetimeListChange]
+    [datetimeList, onDatetimeListChange],
   );
 
   const selectedDates = useMemo<readonly YearMonthDate[]>(
     () => datetimeList.map((e) => e.ymd),
-    [datetimeList]
+    [datetimeList],
   );
 
   const mostFrequentTimeRange = useMemo<TimeRange>(
     () => getMostFrequentTimeRange(datetimeList),
-    [datetimeList]
+    [datetimeList],
   );
 
   /* handlers */
@@ -56,35 +56,35 @@ export const useSelectDatetimesHooks = (
     (index: SafeUint, ymd: YearMonthDate) => {
       dispatch({ type: 'ymd', index, ymd });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const onDatetimeRangeStartChange = useCallback(
     (index: SafeUint, hm: HoursMinutes) => {
       dispatch({ type: 'start', index, hm });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const onDatetimeRangeEndChange = useCallback(
     (index: SafeUint, hm: HoursMinutes) => {
       dispatch({ type: 'end', index, hm });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const onDeleteDatetimeClick = useCallback(
     (index: SafeUint) => {
       dispatch({ type: 'delete', index });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const onDuplicateDatetimeClick = useCallback(
     (index: SafeUint) => {
       dispatch({ type: 'duplicate', index });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const onAddDatetimeClick = useCallback(() => {
@@ -111,7 +111,7 @@ export const useSelectDatetimesHooks = (
     }>) => {
       dispatch({ type: 'setTimeAtOneTime', checkboxState, timeRange });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const onSortClick = useCallback(() => {
@@ -122,7 +122,7 @@ export const useSelectDatetimesHooks = (
     (list: readonly YearMonthDate[]) => {
       dispatch({ type: 'fromCalendar', list, mostFrequentTimeRange });
     },
-    [mostFrequentTimeRange, dispatch]
+    [mostFrequentTimeRange, dispatch],
   );
 
   /* view values */
@@ -155,7 +155,7 @@ export const useSelectDatetimesHooks = (
       onDatetimeRangeEndChange,
       onDuplicateDatetimeClick,
       onDeleteDatetimeClick,
-    ]
+    ],
   );
 
   return {

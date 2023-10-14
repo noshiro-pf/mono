@@ -59,7 +59,7 @@ const gameStateActionTypeDef = t.union({
 export type GameStateAction = t.TypeOf<typeof gameStateActionTypeDef>;
 
 export const assertIsGameStateAction: (
-  a: unknown
+  a: unknown,
 ) => asserts a is GameStateAction = gameStateActionTypeDef.assertIs;
 
 expectType<GameStateAction, Readonly<{ type: string }>>('<=');

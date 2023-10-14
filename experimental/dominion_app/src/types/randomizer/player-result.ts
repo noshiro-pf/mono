@@ -44,7 +44,7 @@ export const PlayerResult = (pr?: Partial<IPlayerResult>): TPlayerResult =>
   PlayerResultRecordFactory(pr)
 
 export const PlayerResultFromJS = (
-  pr?: Partial<IPlayerResultJS>
+  pr?: Partial<IPlayerResultJS>,
 ): TPlayerResult => {
   if (pr === undefined) return PlayerResult()
   const wd = withDefaultMix(pr, PlayerResult())

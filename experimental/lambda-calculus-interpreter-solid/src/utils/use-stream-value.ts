@@ -8,18 +8,18 @@ import { createSignal, onCleanup } from 'solid-js';
 
 export function useObservableValue<A, B = A>(
   observable$: Observable<A>,
-  initialValue: B
+  initialValue: B,
 ): A | B;
 export function useObservableValue<A>(observable$: InitializedObservable<A>): A;
 export function useObservableValue<A>(
-  observable$: Observable<A>
+  observable$: Observable<A>,
 ): A | undefined;
 export function useObservableValue<A, B = A>(
   observable$: Observable<A>,
-  initialValue?: B
+  initialValue?: B,
 ): () => A | B | undefined {
   const [getValue, setValue] = createSignal<A | B | undefined>(
-    Maybe.unwrap(observable$.currentValue) ?? initialValue
+    Maybe.unwrap(observable$.currentValue) ?? initialValue,
   );
 
   const subscription = observable$.subscribe(setValue);
@@ -31,7 +31,7 @@ export function useObservableValue<A, B = A>(
 }
 
 export const useObservableState = <A>(
-  initialValue: A
+  initialValue: A,
 ): [InitializedObservable<A>, (v: A) => void] => {
   const src$ = source<A>();
   const state$ = src$.chain(withInitialValue(initialValue));

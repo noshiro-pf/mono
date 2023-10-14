@@ -21,7 +21,7 @@ import { ObservableBaseClass } from './observable-base-class';
 
 const registerChild = <A>(
   child: ChildObservable<A>,
-  parents: ChildObservable<A>['parents']
+  parents: ChildObservable<A>['parents'],
 ): void => {
   for (const p of parents) {
     p.addChild(child);
@@ -72,7 +72,7 @@ const tryComplete = <A>({
 export class AsyncChildObservableClass<
     A,
     Type extends AsyncChildObservableType,
-    P extends NonEmptyUnknownList
+    P extends NonEmptyUnknownList,
   >
   extends ObservableBaseClass<A, 'async child', number>
   implements AsyncChildObservable<A, Type, P>
@@ -114,7 +114,7 @@ export class AsyncChildObservableClass<
 
     const insertPos = binarySearch(
       this.#procedure.map((a) => a.depth),
-      child.depth
+      child.depth,
     );
     this.#procedure = Arr.inserted(this.#procedure, insertPos, child);
   }
@@ -152,7 +152,7 @@ export class AsyncChildObservableClass<
 export class SyncChildObservableClass<
     A,
     Type extends SyncChildObservableType,
-    P extends NonEmptyUnknownList
+    P extends NonEmptyUnknownList,
   >
   extends ObservableBaseClass<A, 'sync child', number>
   implements SyncChildObservable<A, Type, P>
@@ -205,7 +205,7 @@ export class SyncChildObservableClass<
 export class InitializedSyncChildObservableClass<
     A,
     Type extends SyncChildObservableType,
-    P extends NonEmptyUnknownList
+    P extends NonEmptyUnknownList,
   >
   extends SyncChildObservableClass<A, Type, P>
   implements InitializedSyncChildObservable<A, Type, P>
@@ -233,7 +233,7 @@ export class InitializedSyncChildObservableClass<
   override chain<B>(
     operator:
       | InitializedToInitializedOperator<A, B>
-      | ToInitializedOperator<A, B>
+      | ToInitializedOperator<A, B>,
   ): InitializedObservable<B>;
 
   override chain<B>(operator: Operator<A, B>): Observable<B>;

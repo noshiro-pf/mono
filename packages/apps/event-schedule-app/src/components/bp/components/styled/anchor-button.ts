@@ -8,7 +8,8 @@ export const Anchor = styled.a`
     rgba(17, 20, 24, 0),
     rgba(17, 20, 24, 0.05)
   );
-  box-shadow: inset 0 0 0 1px rgb(17 20 24 / 20%),
+  box-shadow:
+    inset 0 0 0 1px rgb(17 20 24 / 20%),
     inset 0 -1px 0 rgb(17 20 24 / 10%);
   color: #1c2127;
   display: inline-flex;
@@ -29,7 +30,8 @@ export const Anchor = styled.a`
     text-decoration: none;
     background-clip: padding-box;
     background-color: #edeff2;
-    box-shadow: inset 0 0 0 1px rgb(17 20 24 / 20%),
+    box-shadow:
+      inset 0 0 0 1px rgb(17 20 24 / 20%),
       inset 0 -1px 0 rgb(17 20 24 / 10%);
   }
 

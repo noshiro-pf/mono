@@ -39,7 +39,7 @@ export const NavBar = memoNamed('NavBar', () => {
   });
 
   const openingDialog = useObservableValue(
-    UpdateUserInfoDialogStore.openingDialog$
+    UpdateUserInfoDialogStore.openingDialog$,
   );
 
   const passwordProviderIncluded = Auth.usePasswordProviderIncluded();

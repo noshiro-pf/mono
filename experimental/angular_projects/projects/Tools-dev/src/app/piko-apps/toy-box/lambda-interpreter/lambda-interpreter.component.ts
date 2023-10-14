@@ -24,31 +24,31 @@ export class LambdaInterpreterComponent implements OnInit {
     .pipe(debounceTime(200 /* ms */));
 
   private parseTree$: Observable<undefined | string | any[]> = this.input$.pipe(
-    map((input) => this.parser.parse(input))
+    map((input) => this.parser.parse(input)),
   );
   parseTreeToStr$: Observable<string> = this.parseTree$.pipe(
-    map((tree) => this.print.termToString(tree))
+    map((tree) => this.print.termToString(tree)),
   );
   private evalSequence$: Observable<any[]> = this.parseTree$.pipe(
-    map((t) => this.evaluator.evalSequence(t))
+    map((t) => this.evaluator.evalSequence(t)),
   );
 
   private evalSeqToStr$: Observable<string[]> = this.evalSequence$.pipe(
-    map((seq) => seq.map((tree) => this.print.termToString(tree)))
+    map((seq) => seq.map((tree) => this.print.termToString(tree))),
   );
   output$: Observable<string> = this.evalSeqToStr$.pipe(
-    map((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n'))
+    map((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n')),
   );
 
   isLambdaTerm$: Observable<boolean> = this.input$.pipe(
     map((input) => this.parser.splitToTokens(input)),
-    map((tokens) => this.parser.isLambdaTerm(tokens))
+    map((tokens) => this.parser.isLambdaTerm(tokens)),
   );
 
   constructor(
     private parser: LambdaParserService,
     private evaluator: LambdaEvaluatorService,
-    private print: LambdaPrintService
+    private print: LambdaPrintService,
   ) {}
 
   ngOnInit() {}

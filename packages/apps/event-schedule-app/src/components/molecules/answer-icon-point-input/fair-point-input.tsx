@@ -40,7 +40,7 @@ export const AnswerIconFairPointInput = memoNamed<Props>(
         step,
         onKeyDown,
       }),
-      [onKeyDown]
+      [onKeyDown],
     );
 
     return (
@@ -56,5 +56,5 @@ export const AnswerIconFairPointInput = memoNamed<Props>(
         onInputStringChange={setValueStr}
       />
     );
-  }
+  },
 );

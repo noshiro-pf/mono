@@ -1,7 +1,7 @@
 export const useFormError = <T>(
   value: T,
   valueIsInvalid: (v: T) => boolean,
-  onValueChange: (v: T) => void
+  onValueChange: (v: T) => void,
 ): [boolean, (v: T) => void, () => void] => {
   const {
     state: showError,
@@ -30,7 +30,7 @@ export const useFormError = <T>(
         hide();
       }
     },
-    [onValueChange, valueIsInvalid, hide, show]
+    [onValueChange, valueIsInvalid, hide, show],
   );
 
   return [showError, onChangeLocal, onBlur];

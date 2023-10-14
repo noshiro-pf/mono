@@ -14,7 +14,7 @@ const pageToBack$ = _router.state$.chain(pluckI('pathname')).chain(
       !Routes.isRoute.registerPage(pathSegments) &&
       !Routes.isRoute.signInPage(pathSegments)
     );
-  })
+  }),
 );
 
 export const Router = {

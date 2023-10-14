@@ -20,5 +20,5 @@ export const CloseIcon = memoNamed<Props>(
         fill={color}
       />
     </svg>
-  )
+  ),
 );

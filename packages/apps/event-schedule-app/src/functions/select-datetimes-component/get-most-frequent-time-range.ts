@@ -2,11 +2,11 @@ import { hoursMinutesDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { timeRangeToMapKey } from '../map-key';
 
 export const getMostFrequentTimeRange = (
-  datetimeList: readonly DatetimeRange[]
+  datetimeList: readonly DatetimeRange[],
 ): TimeRange => {
   const startMaxFreq = pipe(datetimeList)
     .chain((list) =>
-      Arr.groupBy(list, (e) => timeRangeToMapKey(e.timeRange.start))
+      Arr.groupBy(list, (e) => timeRangeToMapKey(e.timeRange.start)),
     )
     .chain((groups) => groups.toValuesArray())
     .chain((list) => Arr.maxBy(list, (g) => g.length))
@@ -14,7 +14,7 @@ export const getMostFrequentTimeRange = (
 
   const endMaxFreq = pipe(datetimeList)
     .chain((list) =>
-      Arr.groupBy(list, (e) => timeRangeToMapKey(e.timeRange.end))
+      Arr.groupBy(list, (e) => timeRangeToMapKey(e.timeRange.end)),
     )
     .chain((groups) => groups.toValuesArray())
     .chain((list) => Arr.maxBy(list, (g) => g.length))

@@ -17,6 +17,6 @@ export const BakazeButtonGroup = memoNamed<Props>(
   (props) =>
     createElement(
       ButtonGroupTyped<Bakaze>,
-      Obj.merge(props, { buttons: bakazeButtons })
-    )
+      Obj.merge(props, { buttons: bakazeButtons }),
+    ),
 );

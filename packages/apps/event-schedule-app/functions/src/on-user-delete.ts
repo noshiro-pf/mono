@@ -11,23 +11,23 @@ import { type auth } from 'firebase-functions';
 
 const removeAuthorIdFromEventSchedule = (
   eventSchedule: EventSchedule,
-  userIdToBeRemoved: string
+  userIdToBeRemoved: string,
 ): EventSchedule =>
   Obj.update(eventSchedule, 'author', (author) =>
-    Obj.update(author, 'id', (id) => (id === userIdToBeRemoved ? null : id))
+    Obj.update(author, 'id', (id) => (id === userIdToBeRemoved ? null : id)),
   );
 
 const removeUserIdFromAnswer = (
   answer: Answer,
-  userIdToBeRemoved: string
+  userIdToBeRemoved: string,
 ): Answer =>
   Obj.update(answer, 'user', (user) =>
-    Obj.update(user, 'id', (id) => (id === userIdToBeRemoved ? null : id))
+    Obj.update(user, 'id', (id) => (id === userIdToBeRemoved ? null : id)),
   );
 
 export const onUserDelete = async (
   db: firestore.Firestore,
-  user: DeepReadonly<auth.UserRecord>
+  user: DeepReadonly<auth.UserRecord>,
 ): Promise<void> => {
   const userIdToBeRemoved = user.uid;
 
@@ -43,8 +43,8 @@ export const onUserDelete = async (
       documentRef,
       removeAuthorIdFromEventSchedule(
         fillEventSchedule(doc.data()),
-        userIdToBeRemoved
-      )
+        userIdToBeRemoved,
+      ),
     );
 
     // eslint-disable-next-line no-await-in-loop
@@ -54,12 +54,12 @@ export const onUserDelete = async (
 
     for (const ans of answersSnapshotCurr.docs) {
       const documentRefForAnswers = db.doc(
-        `${firestorePaths.events}/${id}/${firestorePaths.answers}/${ans.id}`
+        `${firestorePaths.events}/${id}/${firestorePaths.answers}/${ans.id}`,
       );
 
       writeBatch.set(
         documentRefForAnswers,
-        removeUserIdFromAnswer(fillAnswer(ans.data()), userIdToBeRemoved)
+        removeUserIdFromAnswer(fillAnswer(ans.data()), userIdToBeRemoved),
       );
     }
   }

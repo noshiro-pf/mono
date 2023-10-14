@@ -16,15 +16,15 @@ const toast = createToaster();
 
 const [formState$, dispatch] = createReducer(
   confirmEmailDialogFormStateReducer,
-  confirmEmailDialogFormInitialState
+  confirmEmailDialogFormInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || confirmEmailDialogHasError(state))
+  mapI((state) => state.isWaitingResponse || confirmEmailDialogHasError(state)),
 );
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
+  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger')),
 );
 
 const emailIsVerified = createBooleanState(false);
@@ -32,8 +32,8 @@ const emailIsVerified = createBooleanState(false);
 const isOpen$ = combineLatestI([emailIsVerified.state$, eventSchedule$]).chain(
   mapI(
     ([verified, eventSchedule]) =>
-      eventSchedule?.notificationSettings !== 'none' && !verified
-  )
+      eventSchedule?.notificationSettings !== 'none' && !verified,
+  ),
 );
 
 const state$ = combineLatestI([
@@ -45,7 +45,7 @@ const state$ = combineLatestI([
     formState,
     enterButtonDisabled,
     emailFormIntent,
-  }))
+  })),
 );
 
 const submit = async (eventId: string, email: string): Promise<void> => {

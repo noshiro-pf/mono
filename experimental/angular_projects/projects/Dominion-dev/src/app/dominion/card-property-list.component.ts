@@ -29,10 +29,13 @@ const setNameIndex = [
   '冒険',
   '帝国',
   '夜想曲',
-].reduce((acc, v, i) => {
-  acc[v] = i;
-  return acc;
-}, {} as { [key: string]: number });
+].reduce(
+  (acc, v, i) => {
+    acc[v] = i;
+    return acc;
+  },
+  {} as { [key: string]: number },
+);
 
 @Component({
   selector: 'app-card-property-list',
@@ -158,14 +161,14 @@ export class CardPropertyListComponent implements OnInit {
       obj.VPtoken, // '+VPtoken'
       obj.implemented, // 'ゲーム実装状況'
       obj.randomizerCandidate, // 'ランダマイザー対象'
-    ])
+    ]),
   );
 
   filteredIndice: number[] = [];
 
   constructor(
     public dialog: MatDialog,
-    private database: FireDatabaseService
+    private database: FireDatabaseService,
   ) {}
 
   ngOnInit() {}

@@ -18,7 +18,7 @@ export let getSheet = (target) => {
     if (!sheet) {
       // Note to self: head.innerHTML +=, triggers a layout/reflow. Avoid it.
       sheet = (target || document.head).appendChild(
-        document.createElement('style')
+        document.createElement('style'),
       );
       sheet.innerHTML = ' ';
       sheet.id = GOOBER_ID;

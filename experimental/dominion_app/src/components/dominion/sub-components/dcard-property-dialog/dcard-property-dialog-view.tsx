@@ -86,7 +86,7 @@ export const DCardPropertyDialogView = memo(
         </DialogActions>
       </Dialog>
     )
-  }
+  },
 )
 
 DCardPropertyDialogView.displayName = 'DCardPropertyDialogView'

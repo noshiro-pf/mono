@@ -16,7 +16,7 @@ export const datetimeSpecificationOptions = {
 >;
 
 export const isDatetimeSpecificationEnumType = (
-  a: unknown
+  a: unknown,
 ): a is DatetimeSpecificationEnumType =>
   a === 'noStartEndSpecified' ||
   a === 'startSpecified' ||

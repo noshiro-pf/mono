@@ -31,11 +31,11 @@ type LabelLen = (typeof labelNames)['length'];
 const hues: ArrayOfLength<LabelLen, Hue> = pickupHighContrastHues(
   labelNames.length,
   saturationDarker,
-  lightnessDarker
+  lightnessDarker,
 );
 
 export const labels: NonEmptyArray<Label> = pipe(
-  Arr.zip(hues, labelNames)
+  Arr.zip(hues, labelNames),
 ).chain((list) =>
   Tpl.map(
     list,
@@ -43,8 +43,8 @@ export const labels: NonEmptyArray<Label> = pipe(
       id: index.toString(),
       hue,
       name: labelName,
-    })
-  )
+    }),
+  ),
 ).value;
 
 export const labelInit: Label = labels[0];

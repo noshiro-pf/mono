@@ -18,7 +18,7 @@ export const resetPasswordPageInitialState = {
 } as const satisfies ResetPasswordPageState;
 
 export const resetPasswordPageHasError = (
-  state: ResetPasswordPageState
+  state: ResetPasswordPageState,
 ): boolean =>
   emailInputHasError(state.email) || state.otherErrors !== undefined;
 
@@ -43,7 +43,7 @@ export const resetPasswordPageStateReducer: Reducer<
         emailInputStateReducer(state.email, {
           type: 'input',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'setEmailError':

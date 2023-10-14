@@ -51,7 +51,7 @@ export class Repeat extends IndexedSeq {
       ? this
       : new Repeat(
           this._value,
-          resolveEnd(end, size) - resolveBegin(begin, size)
+          resolveEnd(end, size) - resolveBegin(begin, size),
         );
   }
 
@@ -90,7 +90,7 @@ export class Repeat extends IndexedSeq {
     return new Iterator(() =>
       i === size
         ? iteratorDone()
-        : iteratorValue(type, reverse ? size - ++i : i++, this._value)
+        : iteratorValue(type, reverse ? size - ++i : i++, this._value),
     );
   }
 

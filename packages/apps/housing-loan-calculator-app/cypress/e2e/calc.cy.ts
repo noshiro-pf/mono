@@ -24,17 +24,17 @@ describe('main', { testIsolation: false }, () => {
 
     cy.get(e('borrowingTotalYenTitle')).should(
       'have.text',
-      '借入金額（＝物件の金額－頭金）'
+      '借入金額（＝物件の金額－頭金）',
     );
     cy.get(e('borrowingTotalYenDescription')).should('have.text', '2580万円');
 
     cy.get(e('fixedPrincipalYenPerMonthTitle')).should(
       'have.text',
-      '月々の元金の支払い額'
+      '月々の元金の支払い額',
     );
     cy.get(e('fixedPrincipalYenPerMonthDescription')).should(
       'have.text',
-      '61429円'
+      '61429円',
     );
 
     cy.get(e('interestSumTitle')).should('have.text', '利息合計額');
@@ -42,7 +42,7 @@ describe('main', { testIsolation: false }, () => {
 
     cy.get(e('paymentsSumTitle')).should(
       'have.text',
-      '合計支払い額（＝頭金＋借入金額＋利息）'
+      '合計支払い額（＝頭金＋借入金額＋利息）',
     );
     cy.get(e('paymentsSumDescription')).should('have.text', '5042.88万円');
   });
@@ -61,17 +61,17 @@ describe('main', { testIsolation: false }, () => {
 
     cy.get(e('borrowingTotalYenTitle')).should(
       'have.text',
-      '借入金額（＝物件の金額－頭金）'
+      '借入金額（＝物件の金額－頭金）',
     );
     cy.get(e('borrowingTotalYenDescription')).should('have.text', '2780万円');
 
     cy.get(e('fixedMonthlyPaymentsYenTitle')).should(
       'have.text',
-      '月々の支払い額'
+      '月々の支払い額',
     );
     cy.get(e('fixedMonthlyPaymentsYenDescription')).should(
       'have.text',
-      '140303円'
+      '140303円',
     );
 
     cy.get(e('interestSumTitle')).should('have.text', '利息合計額');
@@ -79,7 +79,7 @@ describe('main', { testIsolation: false }, () => {
 
     cy.get(e('paymentsSumTitle')).should(
       'have.text',
-      '合計支払い額（＝頭金＋借入金額＋利息）'
+      '合計支払い額（＝頭金＋借入金額＋利息）',
     );
     cy.get(e('paymentsSumDescription')).should('have.text', '5892.73万円');
   });

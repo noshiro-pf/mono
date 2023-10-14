@@ -25,7 +25,7 @@ const defaultAnswerSelection = {
 
 const d = defaultAnswerSelection;
 export const fillAnswerSelection = (
-  p?: PartialAnswerSelection
+  p?: PartialAnswerSelection,
 ): AnswerSelection => ({
   datetimeRange: fillDatetimeRange(p?.datetimeRange ?? d.datetimeRange),
   iconId: p?.iconId ?? d.iconId,

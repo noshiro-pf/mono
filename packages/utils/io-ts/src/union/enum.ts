@@ -28,8 +28,8 @@ export const enumType = <Values extends readonly Primitive[]>({
           validationErrorMessage(
             a,
             `The value is expected to be one of the elements contained in { ${values.join(
-              ', '
-            )} }`
+              ', ',
+            )} }`,
           ),
         ]);
 

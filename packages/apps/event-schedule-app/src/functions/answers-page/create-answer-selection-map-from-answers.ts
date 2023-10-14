@@ -2,13 +2,13 @@ import { type AnswerTableCellPosition } from '../../types';
 import { answerSelectionFromMapKey, answerSelectionToMapKey } from '../map-key';
 
 export const createAnswerSelectionMapFromAnswers = (
-  answers: readonly Answer[]
+  answers: readonly Answer[],
 ): IMapMapped<
   AnswerTableCellPosition,
   readonly [
     iconId: AnswerIconIdWithNone,
     point: AnswerIconPoint,
-    comment: string
+    comment: string,
   ],
   AnswerSelectionMapKey
 > =>
@@ -20,8 +20,8 @@ export const createAnswerSelectionMapFromAnswers = (
           answerId: id,
         },
         tp(s.iconId, s.point, s.comment),
-      ])
+      ]),
     ),
     answerSelectionToMapKey,
-    answerSelectionFromMapKey
+    answerSelectionFromMapKey,
   );

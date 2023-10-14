@@ -36,15 +36,18 @@ export const Button = styled('button')`
   );
   color: #182026;
 
-  box-shadow: inset 0 0 0 1px rgb(16 22 26 / 20%),
+  box-shadow:
+    inset 0 0 0 1px rgb(16 22 26 / 20%),
     inset 0 -1px 0 rgb(16 22 26 / 10%);
 
   &:active {
     background-color: #d8e1e8;
     background-image: none;
-    -webkit-box-shadow: inset 0 0 0 1px rgb(16 22 26 / 20%),
+    -webkit-box-shadow:
+      inset 0 0 0 1px rgb(16 22 26 / 20%),
       inset 0 1px 2px rgb(16 22 26 / 20%);
-    box-shadow: inset 0 0 0 1px rgb(16 22 26 / 20%),
+    box-shadow:
+      inset 0 0 0 1px rgb(16 22 26 / 20%),
       inset 0 1px 2px rgb(16 22 26 / 20%);
   }
 
@@ -78,26 +81,32 @@ export const ButtonSuccess = styled(Button)`
     hsla(0, 0%, 100%, 0.1),
     hsla(0, 0%, 100%, 0)
   );
-  -webkit-box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgb(16 22 26 / 40%),
     inset 0 -1px 0 rgb(16 22 26 / 20%);
-  box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%),
+  box-shadow:
+    inset 0 0 0 1px rgb(16 22 26 / 40%),
     inset 0 -1px 0 rgb(16 22 26 / 20%);
   color: #fff;
 
   &:active {
     background-color: #0a6640;
     background-image: none;
-    -webkit-box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%),
+    -webkit-box-shadow:
+      inset 0 0 0 1px rgb(16 22 26 / 40%),
       inset 0 1px 2px rgb(16 22 26 / 20%);
-    box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%),
+    box-shadow:
+      inset 0 0 0 1px rgb(16 22 26 / 40%),
       inset 0 1px 2px rgb(16 22 26 / 20%);
   }
 
   &:hover {
     background-color: #0d8050;
-    -webkit-box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%),
+    -webkit-box-shadow:
+      inset 0 0 0 1px rgb(16 22 26 / 40%),
       inset 0 -1px 0 rgb(16 22 26 / 20%);
-    box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%),
+    box-shadow:
+      inset 0 0 0 1px rgb(16 22 26 / 40%),
       inset 0 -1px 0 rgb(16 22 26 / 20%);
   }
 
@@ -125,26 +134,32 @@ export const ButtonPrimary = styled(Button)`
     hsla(0, 0%, 100%, 0.1),
     hsla(0, 0%, 100%, 0)
   );
-  -webkit-box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%),
+  -webkit-box-shadow:
+    inset 0 0 0 1px rgb(16 22 26 / 40%),
     inset 0 -1px 0 rgb(16 22 26 / 20%);
-  box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%),
+  box-shadow:
+    inset 0 0 0 1px rgb(16 22 26 / 40%),
     inset 0 -1px 0 rgb(16 22 26 / 20%);
   color: #fff;
 
   &:active {
     background-color: #0e5a8a;
     background-image: none;
-    -webkit-box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%),
+    -webkit-box-shadow:
+      inset 0 0 0 1px rgb(16 22 26 / 40%),
       inset 0 1px 2px rgb(16 22 26 / 20%);
-    box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%),
+    box-shadow:
+      inset 0 0 0 1px rgb(16 22 26 / 40%),
       inset 0 1px 2px rgb(16 22 26 / 20%);
   }
 
   &:hover {
     background-color: #106ba3;
-    -webkit-box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%),
+    -webkit-box-shadow:
+      inset 0 0 0 1px rgb(16 22 26 / 40%),
       inset 0 -1px 0 rgb(16 22 26 / 20%);
-    box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%),
+    box-shadow:
+      inset 0 0 0 1px rgb(16 22 26 / 40%),
       inset 0 -1px 0 rgb(16 22 26 / 20%);
   }
 

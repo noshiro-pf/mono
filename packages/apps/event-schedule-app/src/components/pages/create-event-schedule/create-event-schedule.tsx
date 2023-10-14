@@ -16,17 +16,17 @@ export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
   const { eventScheduleValidationOk } = commonState;
 
   const createButtonIsLoading = useObservableValue(
-    CreateEventScheduleStore.isLoading$
+    CreateEventScheduleStore.isLoading$,
   );
 
   const createResultDialogIsOpen = useObservableValue(
-    CreateEventScheduleStore.createResultDialogIsOpen$
+    CreateEventScheduleStore.createResultDialogIsOpen$,
   );
 
   const url = useObservableValue(CreateEventScheduleStore.url$);
 
   const hasNoChanges = useObservableValue(
-    CreateEventScheduleStore.hasNoChanges$
+    CreateEventScheduleStore.hasNoChanges$,
   );
 
   return (

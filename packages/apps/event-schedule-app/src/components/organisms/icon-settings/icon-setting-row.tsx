@@ -69,5 +69,5 @@ export const AnswerIconRow = memoNamed<Props>(
         })}
       </div>
     </div>
-  )
+  ),
 );

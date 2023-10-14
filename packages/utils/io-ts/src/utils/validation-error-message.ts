@@ -3,7 +3,7 @@ import { Json, Result } from '@noshiro/ts-utils';
 export const validationErrorMessage = (
   a: unknown,
   prefix: string,
-  suffix: (s: string) => string = (s) => `but it is actually '${s}'`
+  suffix: (s: string) => string = (s) => `but it is actually '${s}'`,
 ): string => {
   const stringifyResult = Json.stringify(a);
 

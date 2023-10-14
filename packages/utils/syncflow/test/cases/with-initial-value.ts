@@ -20,7 +20,7 @@ import { type StreamTestCase } from '../typedef';
 */
 
 const createStreams = (
-  tick: number
+  tick: number,
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<SafeUint>;
@@ -53,7 +53,7 @@ const createStreams = (
 
 export const withInitialValueTestCases: readonly [
   StreamTestCase<[number, number]>,
-  StreamTestCase<[number, number]>
+  StreamTestCase<[number, number]>,
 ] = [
   {
     name: 'withInitialValue case 1',

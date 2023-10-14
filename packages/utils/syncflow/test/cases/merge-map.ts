@@ -16,7 +16,7 @@ import { type StreamTestCase } from '../typedef';
 */
 
 const createStreams = (
-  tick: number
+  tick: number,
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<SafeUint>;
@@ -30,8 +30,8 @@ const createStreams = (
     mergeMap((i) =>
       interval(tick * 2)
         .chain(take(5))
-        .chain(map((x) => tp(i, x * i)))
-    )
+        .chain(map((x) => tp(i, x * i))),
+    ),
   );
 
   return {

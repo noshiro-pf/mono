@@ -44,7 +44,7 @@ export class User {
         messageSec: number;
         autoSort: boolean;
       };
-    }
+    },
   ) {
     this.databaseKey = databaseKey || '';
 

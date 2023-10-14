@@ -4,7 +4,7 @@ export const possibleTwoDiceSums = (
   a: DiceValue,
   b: DiceValue,
   c: DiceValue,
-  d: DiceValue
+  d: DiceValue,
 ): ISet<TwoDiceSumValue> =>
   ISet.new([
     addDiceValues(a, b),

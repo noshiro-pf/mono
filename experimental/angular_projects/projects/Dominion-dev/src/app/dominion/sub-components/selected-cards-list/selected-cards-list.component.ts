@@ -41,7 +41,7 @@ export class SelectedCardsListComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private database: FireDatabaseService
+    private database: FireDatabaseService,
   ) {}
 
   ngOnInit() {}
@@ -49,7 +49,7 @@ export class SelectedCardsListComponent implements OnInit {
   selectedCardsCheckboxOnChange(
     category: string,
     index: number,
-    check: boolean
+    check: boolean,
   ) {
     this.selectedCardsCheckboxPartEmitter.emit({
       category: category,

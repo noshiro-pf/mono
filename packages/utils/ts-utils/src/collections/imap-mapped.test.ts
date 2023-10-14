@@ -13,10 +13,10 @@ describe('IMapMapped[Symbol.iterator]', () => {
           [{ v: 3 }, '3'],
         ],
         toKey,
-        fromKey
+        fromKey,
       ),
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0).toStrictEqual(
@@ -27,8 +27,8 @@ describe('IMapMapped[Symbol.iterator]', () => {
           [{ v: 3 }, '3'],
         ],
         toKey,
-        fromKey
-      )
+        fromKey,
+      ),
     );
   });
 });
@@ -42,7 +42,7 @@ describe('IMapMapped.size', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0.size).toBe(3);
@@ -58,7 +58,7 @@ describe('IMapMapped.has', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0.has({ v: 3 })).toBe(true);
@@ -71,7 +71,7 @@ describe('IMapMapped.has', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0.has({ v: 4 })).toBe(false);
@@ -80,7 +80,7 @@ describe('IMapMapped.has', () => {
     const s0 = IMapMapped.new<Readonly<{ v: number }>, string, number>(
       [],
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0.has({ v: 3 })).toBe(false);
@@ -96,7 +96,7 @@ describe('IMapMapped.get', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0.get({ v: 3 })).toBe('3');
@@ -109,7 +109,7 @@ describe('IMapMapped.get', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0.get({ v: 4 })).toBeUndefined();
@@ -118,7 +118,7 @@ describe('IMapMapped.get', () => {
     const s0 = IMapMapped.new<Readonly<{ v: number }>, string, number>(
       [],
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0.get({ v: 3 })).toBeUndefined();
@@ -134,7 +134,7 @@ describe('IMapMapped.set', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0.set({ v: 5 }, '5')).toStrictEqual(
@@ -146,8 +146,8 @@ describe('IMapMapped.set', () => {
           [{ v: 5 }, '5'],
         ],
         toKey,
-        fromKey
-      )
+        fromKey,
+      ),
     );
     expect(s0).toStrictEqual(
       IMapMapped.new(
@@ -157,8 +157,8 @@ describe('IMapMapped.set', () => {
           [{ v: 3 }, '3'],
         ],
         toKey,
-        fromKey
-      )
+        fromKey,
+      ),
     );
   });
   test('case 2', () => {
@@ -169,7 +169,7 @@ describe('IMapMapped.set', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0.set({ v: 3 }, '3')).toStrictEqual(
@@ -180,8 +180,8 @@ describe('IMapMapped.set', () => {
           [{ v: 3 }, '3'],
         ],
         toKey,
-        fromKey
-      )
+        fromKey,
+      ),
     );
     expect(s0).toStrictEqual(
       IMapMapped.new(
@@ -191,15 +191,15 @@ describe('IMapMapped.set', () => {
           [{ v: 3 }, '3'],
         ],
         toKey,
-        fromKey
-      )
+        fromKey,
+      ),
     );
   });
   test('case 3', () => {
     const s0 = IMapMapped.new([], toKey, fromKey);
 
     expect(s0.set({ v: 1 }, '1')).toStrictEqual(
-      IMapMapped.new([[{ v: 1 }, '1']], toKey, fromKey)
+      IMapMapped.new([[{ v: 1 }, '1']], toKey, fromKey),
     );
     expect(s0).toStrictEqual(IMapMapped.new([], toKey, fromKey));
   });
@@ -214,7 +214,7 @@ describe('IMapMapped.delete', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0.delete({ v: 10 })).toStrictEqual(
@@ -225,8 +225,8 @@ describe('IMapMapped.delete', () => {
           [{ v: 3 }, '3'],
         ],
         toKey,
-        fromKey
-      )
+        fromKey,
+      ),
     );
     expect(s0).toStrictEqual(
       IMapMapped.new(
@@ -236,8 +236,8 @@ describe('IMapMapped.delete', () => {
           [{ v: 3 }, '3'],
         ],
         toKey,
-        fromKey
-      )
+        fromKey,
+      ),
     );
   });
   test('case 2', () => {
@@ -248,7 +248,7 @@ describe('IMapMapped.delete', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0.delete({ v: 3 })).toStrictEqual(
@@ -258,8 +258,8 @@ describe('IMapMapped.delete', () => {
           [{ v: 2 }, '2'],
         ],
         toKey,
-        fromKey
-      )
+        fromKey,
+      ),
     );
     expect(s0).toStrictEqual(
       IMapMapped.new(
@@ -269,15 +269,15 @@ describe('IMapMapped.delete', () => {
           [{ v: 3 }, '3'],
         ],
         toKey,
-        fromKey
-      )
+        fromKey,
+      ),
     );
   });
   test('case 3', () => {
     const s0 = IMapMapped.new([], toKey, fromKey);
 
     expect(s0.delete({ v: 1 })).toStrictEqual(
-      IMapMapped.new([], toKey, fromKey)
+      IMapMapped.new([], toKey, fromKey),
     );
     expect(s0).toStrictEqual(IMapMapped.new([], toKey, fromKey));
   });
@@ -292,7 +292,7 @@ describe('IMapMapped.forEach', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
     const keys = [{ v: 1 }, { v: 2 }, { v: 3 }];
     const values = ['1', '2', '3'];
@@ -313,7 +313,7 @@ describe('IMapMapped.keys', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
     const keys = [{ v: 1 }, { v: 2 }, { v: 3 }];
 
@@ -332,7 +332,7 @@ describe('IMapMapped.values', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
     const values = ['1', '2', '3'];
 
@@ -351,7 +351,7 @@ describe('IMapMapped.entries', () => {
         [{ v: 3 }, '3'],
       ],
       toKey,
-      fromKey
+      fromKey,
     );
     const keys = [{ v: 1 }, { v: 2 }, { v: 3 }];
     const values = ['1', '2', '3'];

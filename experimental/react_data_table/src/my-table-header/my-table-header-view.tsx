@@ -30,7 +30,7 @@ export const MyTableHeaderView = memo(
     sortState: TSortState
     cellSortStateChange: (
       columnId: number | 'NoColumn',
-      state: CellSortStateType
+      state: CellSortStateType,
     ) => void
     headerValueChange: (v: {
       columnIndex: number
@@ -72,7 +72,7 @@ export const MyTableHeaderView = memo(
         ))}
       </TableRow>
     </TableHead>
-  )
+  ),
 )
 
 MyTableHeaderView.displayName = 'MyTableHeaderView'

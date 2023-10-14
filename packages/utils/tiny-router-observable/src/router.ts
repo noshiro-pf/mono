@@ -53,7 +53,7 @@ export type Router = Readonly<{
 
   updateQueryParams: (
     recipe: (draft: URLSearchParams) => URLSearchParams,
-    options?: UpdateQueryParamsOptions
+    options?: UpdateQueryParamsOptions,
   ) => void;
 
   removeListener: () => void;
@@ -78,7 +78,7 @@ export const createRouter = (): Router => {
       pathname: a.pathname,
       searchParams: a.searchParams,
       pathSegments: splitToPathSegments(a.pathname),
-    }))
+    })),
   );
 
   const updateState = (): void => {
@@ -87,7 +87,7 @@ export const createRouter = (): Router => {
 
   const updateQueryParams = (
     recipe: (draft: URLSearchParams) => URLSearchParams,
-    options?: UpdateQueryParamsOptions
+    options?: UpdateQueryParamsOptions,
   ): void => {
     const mut_url = castWritable(getCurrentUrl());
 
@@ -103,7 +103,7 @@ export const createRouter = (): Router => {
               a.sort();
               return a;
             }
-          : (a) => a
+          : (a) => a,
       )
       .chain((a) => a.toString()).value;
 
@@ -126,7 +126,7 @@ export const createRouter = (): Router => {
     window.history.pushState(
       {},
       '',
-      appendSlash ? withSlash(nextUrl) : nextUrl
+      appendSlash ? withSlash(nextUrl) : nextUrl,
     );
     updateState();
   };
@@ -135,7 +135,7 @@ export const createRouter = (): Router => {
     window.history.replaceState(
       {},
       '',
-      appendSlash ? withSlash(nextUrl) : nextUrl
+      appendSlash ? withSlash(nextUrl) : nextUrl,
     );
     updateState();
   };

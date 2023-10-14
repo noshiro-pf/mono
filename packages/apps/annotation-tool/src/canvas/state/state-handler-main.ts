@@ -31,14 +31,14 @@ export type CanvasAppAction = Readonly<
 
 export type CanvasAppStateHandler = (
   state: CanvasAppState,
-  action: CanvasAppAction
+  action: CanvasAppAction,
 ) => void;
 
 export const canvasAppStateHandlerGenerator = (
   pixiApp: PixiApp,
   idMaker: () => IdType,
   canvasStyles: AnnotationCanvasStyle,
-  newBboxColor: Readonly<{ border: Rgba; face: Rgba }>
+  newBboxColor: Readonly<{ border: Rgba; face: Rgba }>,
 ): CanvasAppStateHandler =>
   function canvasAppStateHandler(mut_state, action) {
     switch (action.type) {
@@ -53,7 +53,7 @@ export const canvasAppStateHandlerGenerator = (
           newBboxColor,
           canvasStyles,
           pixiApp,
-          canvasAppStateHandler
+          canvasAppStateHandler,
         );
         break;
 

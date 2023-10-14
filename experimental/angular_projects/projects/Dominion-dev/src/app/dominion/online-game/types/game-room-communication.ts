@@ -22,7 +22,7 @@ export class GameCommunication {
       presenceState: boolean[];
       isTerminated: boolean;
       resultIsSubmitted: boolean;
-    }
+    },
   ) {
     this.databaseKey = databaseKey || '';
 

@@ -30,7 +30,7 @@ export class TurnPlayerAreaComponent implements OnInit {
     Open$: this.turnPlayerCards$.pipe(map((e) => e.Open)),
     PlayArea$: this.turnPlayerCards$.pipe(map((e) => e.PlayArea)),
     DiscardPileReveresed$: this.turnPlayerCards$.pipe(
-      map((e) => utils.array.getReversed(e.DiscardPile))
+      map((e) => utils.array.getReversed(e.DiscardPile)),
     ),
   };
 
@@ -39,7 +39,7 @@ export class TurnPlayerAreaComponent implements OnInit {
   constructor(
     private gameStateService: GameStateService,
     private gameRoomService: MyGameRoomService,
-    private config: GameConfigService
+    private config: GameConfigService,
   ) {}
 
   ngOnInit() {}

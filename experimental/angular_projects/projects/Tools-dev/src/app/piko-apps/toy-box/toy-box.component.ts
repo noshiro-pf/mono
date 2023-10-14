@@ -40,7 +40,7 @@ export class ToyBoxComponent implements OnInit {
           title: 'Lambda Calculus Interpreter',
           subtitle: 'λ計算インタプリタ',
         },
-      ])
+      ]),
     );
   }
 

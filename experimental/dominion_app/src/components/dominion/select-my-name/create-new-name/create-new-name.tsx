@@ -31,7 +31,7 @@ export const AddNewName = memo(
   }>) => {
     const helperText = useMemo(
       () => (newNameIsAlreadyUsed ? 'その名前は既に使われています。' : ''),
-      [newNameIsAlreadyUsed]
+      [newNameIsAlreadyUsed],
     )
 
     return (
@@ -57,7 +57,7 @@ export const AddNewName = memo(
         </ButtonWrapper>
       </Root>
     )
-  }
+  },
 )
 
 AddNewName.displayName = 'AddNewName'

@@ -168,7 +168,7 @@ export class Stack extends IndexedCollection {
     if (reverse) {
       return new ArraySeq(this.toArray()).__iterate(
         (v, k) => fn(v, k, this),
-        reverse
+        reverse,
       );
     }
     let iterations = 0;

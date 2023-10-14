@@ -10,5 +10,5 @@ export const providePluginDef = Object.fromEntries(
     'useObservableValue',
     'useValueAsObservable',
     'useVoidEventObservable',
-  ].map((key) => tp(key, tp('@noshiro/syncflow-react-hooks', key)))
+  ].map((key) => tp(key, tp('@noshiro/syncflow-react-hooks', key))),
 );

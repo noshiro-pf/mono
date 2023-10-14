@@ -57,18 +57,21 @@ export class AnswerFormComponent implements OnInit, OnDestroy {
   getDayStringEng = utils.date.getDayStringEng;
   toHM = utils.date.toHM;
 
-  constructor(private dialog: MatDialog, private database: DatabaseService) {}
+  constructor(
+    private dialog: MatDialog,
+    private database: DatabaseService,
+  ) {}
 
   ngOnInit() {
     this.allDatesSelected$ = this.dateToSymbolId$.pipe(
-      map((obj: any) => Object.keys(obj).every((date) => obj[date] !== ''))
+      map((obj: any) => Object.keys(obj).every((date) => obj[date] !== '')),
     );
 
     const selectedUsersAnswer$: Observable<Answer> = combineLatest(
       this.answerId$,
       this.scEvent$.pipe(map((e) => e.answers)),
       (answerId, answers) =>
-        answers.find((e) => e.databaseKey === answerId) || new Answer()
+        answers.find((e) => e.databaseKey === answerId) || new Answer(),
     );
 
     /* subscriptions */

@@ -4,7 +4,7 @@ import { assertIsCredentialError } from '../../types';
 
 export const signIn = (
   email: string,
-  password: string
+  password: string,
 ): Promise<
   Result<UserCredential, Readonly<{ code: string; message: string }>>
 > =>
@@ -13,5 +13,5 @@ export const signIn = (
       Result.mapErr(a, (error) => {
         assertIsCredentialError(error);
         return error;
-      })
+      }),
   );

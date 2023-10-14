@@ -42,7 +42,7 @@ import { firestoreEvents } from '../../initialize-firebase';
 //   });
 
 export const fetchEventSchedule = async (
-  id: string
+  id: string,
 ): Promise<
   Result<
     EventSchedule,

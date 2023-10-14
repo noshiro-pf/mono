@@ -9,7 +9,7 @@ test('isAbstraction 2', () => {
     isAbstraction([
       ['x', ['y', 'y']],
       ['x', ['y', 'y']],
-    ])
+    ]),
   ).toBe(false);
 });
 

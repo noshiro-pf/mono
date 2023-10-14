@@ -20,11 +20,11 @@ export class MyRandomizerGroupService {
    */
   private myGrp$: RN<RandomizerGroup> = combine(
     this.database.randomizerGroupList$,
-    this.myGrpId$
+    this.myGrpId$,
   )
     .map(
       ([list, id]) =>
-        list.find((e) => e.databaseKey === id) || new RandomizerGroup()
+        list.find((e) => e.databaseKey === id) || new RandomizerGroup(),
     )
     .skipUnchanged(this.objEq);
 
@@ -36,9 +36,9 @@ export class MyRandomizerGroupService {
    */
   isSelectedExpansions$: RN<boolean[]> = combine(
     this.database.expansionNameList$.map((list) => list.map((_) => false)),
-    this.myGrp$.map((e) => e.isSelectedExpansions).skipUnchanged(this.objEq)
+    this.myGrp$.map((e) => e.isSelectedExpansions).skipUnchanged(this.objEq),
   ).map(([initArray, isSelectedExpansions]) =>
-    initArray.map((_, i) => !!isSelectedExpansions[i])
+    initArray.map((_, i) => !!isSelectedExpansions[i]),
   );
 
   selectedCardsCheckbox$: RN<SelectedCardsCheckbox> = this.myGrp$
@@ -63,7 +63,7 @@ export class MyRandomizerGroupService {
 
   selectedCards$: RN<SelectedCards> = combine(
     this.selectedCardsHistory$,
-    this.selectedIndexInHistory$
+    this.selectedIndexInHistory$,
   ).map(([list, index]) => list[index] || new SelectedCards());
 
   newGameResult: {
@@ -92,7 +92,7 @@ export class MyRandomizerGroupService {
 
   constructor(
     private database: FireDatabaseService,
-    private user: UserService
+    private user: UserService,
   ) {}
 
   private objEq(x: any, y: any) {
@@ -104,7 +104,7 @@ export class MyRandomizerGroupService {
     await this.database.randomizerGroup.set.isSelectedExpansions(
       id,
       index,
-      value
+      value,
     );
   }
 
@@ -112,7 +112,7 @@ export class MyRandomizerGroupService {
     const id = await this.myGrpId$.once();
     await this.database.randomizerGroup.add.selectedCardsHistory(
       id,
-      newSelectedCards
+      newSelectedCards,
     );
   }
 
@@ -125,7 +125,7 @@ export class MyRandomizerGroupService {
     const id = await this.myGrpId$.once();
     await this.database.randomizerGroup.set.BlackMarketPileShuffled(
       id,
-      shuffled
+      shuffled,
     );
   }
 
@@ -137,14 +137,14 @@ export class MyRandomizerGroupService {
   async setSelectedCardsCheckbox(
     arrayName: string,
     index: number,
-    value: boolean
+    value: boolean,
   ) {
     const id = await this.myGrpId$.once();
     await this.database.randomizerGroup.set.selectedCardsCheckbox(
       id,
       arrayName,
       index,
-      value
+      value,
     );
   }
 
@@ -157,7 +157,7 @@ export class MyRandomizerGroupService {
     const id = await this.myGrpId$.once();
     await this.database.randomizerGroup.set.newGameResult.lastTurnPlayerName(
       id,
-      value
+      value,
     );
   }
 
@@ -166,7 +166,7 @@ export class MyRandomizerGroupService {
     await this.database.randomizerGroup.set.newGameResult.players.selected(
       id,
       uid,
-      value
+      value,
     );
   }
 
@@ -175,19 +175,19 @@ export class MyRandomizerGroupService {
     await this.database.randomizerGroup.set.newGameResult.players.VP(
       id,
       uid,
-      value
+      value,
     );
   }
 
   async setNGRPlayerNumberOfVictoryCards(
     uid: string,
-    value: NumberOfVictoryCards
+    value: NumberOfVictoryCards,
   ) {
     const id = await this.myGrpId$.once();
     await this.database.randomizerGroup.set.newGameResult.players.numberOfVictoryCards(
       id,
       uid,
-      value
+      value,
     );
   }
 
@@ -196,7 +196,7 @@ export class MyRandomizerGroupService {
     await this.database.randomizerGroup.set.newGameResult.players.turnOrder(
       id,
       uid,
-      value
+      value,
     );
   }
 
@@ -219,7 +219,7 @@ export class MyRandomizerGroupService {
     const id = await this.myGrpId$.once();
     await this.database.randomizerGroup.set.newGameResultDialogOpened(
       id,
-      value
+      value,
     );
   }
 
@@ -227,7 +227,7 @@ export class MyRandomizerGroupService {
     groupId: string,
     uid: string,
     name: string,
-    nameYomi: string
+    nameYomi: string,
   ) {
     // const id = await this.myGrpId$.once();
     const value = new PlayerResult(uid, {

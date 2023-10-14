@@ -12,7 +12,7 @@ export const createVoidEventEmitter = (): [Observable<void>, () => void] => {
 
 export const createEventEmitter = <A>(): [
   Observable<A>,
-  (value: A) => void
+  (value: A) => void,
 ] => {
   const src$ = source<A>();
 

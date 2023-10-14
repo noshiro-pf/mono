@@ -7,5 +7,5 @@ describe.each(Array.from(testColors.entries()))(
     test(`rgbToHex test No. ${index}`, () => {
       expect(testColor.HEX).toBe(rgbToHex(testColor.rgb));
     });
-  }
+  },
 );

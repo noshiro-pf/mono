@@ -8,7 +8,7 @@ import {
 
 export const rpCreateSummaryMessage = (
   poll: Poll,
-  userIdToDisplayName: IMap<UserId, string>
+  userIdToDisplayName: IMap<UserId, string>,
 ): EmbedBuilder =>
   new EmbedBuilder()
     .setColor(embedMessageColor)
@@ -19,14 +19,14 @@ export const rpCreateSummaryMessage = (
 
 const rpCreateSummaryFields = (
   poll: Poll,
-  userIdToDisplayName: IMap<UserId, string>
+  userIdToDisplayName: IMap<UserId, string>,
 ): readonly EmbedField[] =>
   poll.dateOptions.map((d) =>
-    rpCreateSummaryField(d, poll, userIdToDisplayName)
+    rpCreateSummaryField(d, poll, userIdToDisplayName),
   );
 
 export const gpCreateSummaryMessage = (
-  groups: readonly Group[]
+  groups: readonly Group[],
 ): EmbedBuilder =>
   new EmbedBuilder()
     .setColor(embedMessageColor)

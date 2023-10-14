@@ -24,7 +24,7 @@ export const SelectedExpansions = memo(
         />
       ))}
     </>
-  )
+  ),
 )
 
 SelectedExpansions.displayName = 'SelectedExpansions'

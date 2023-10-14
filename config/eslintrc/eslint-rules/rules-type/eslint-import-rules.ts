@@ -378,7 +378,7 @@ namespace Extensions {
           >;
           readonly ignorePackages?: boolean;
           readonly [k: string]: unknown;
-        }
+        },
       ]
     | readonly [
         {
@@ -388,12 +388,12 @@ namespace Extensions {
           >;
           readonly ignorePackages?: boolean;
           readonly [k: string]: unknown;
-        }
+        },
       ]
     | readonly [Record<string, 'always' | 'ignorePackages' | 'never'>]
     | readonly [
         'always' | 'ignorePackages' | 'never',
-        Record<string, 'always' | 'ignorePackages' | 'never'>
+        Record<string, 'always' | 'ignorePackages' | 'never'>,
       ];
 
   export type RuleEntry =
@@ -494,7 +494,7 @@ namespace NoRestrictedPaths {
         readonly from?: string | readonly string[];
         readonly except?: readonly string[];
         readonly message?: string;
-      }[])
+      }[]),
     ];
     readonly basePath?: string;
   };
@@ -1134,7 +1134,7 @@ namespace NoCommonjs {
           readonly allowPrimitiveModules?: boolean;
           readonly allowRequire?: boolean;
           readonly allowConditionalRequire?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =

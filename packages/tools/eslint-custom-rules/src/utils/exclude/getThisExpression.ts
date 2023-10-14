@@ -4,7 +4,7 @@ import {
 } from '@typescript-eslint/experimental-utils';
 
 export function getThisExpression(
-  node: TSESTree.Node
+  node: TSESTree.Node,
 ): TSESTree.ThisExpression | undefined {
   while (node) {
     if (node.type === AST_NODE_TYPES.CallExpression) {

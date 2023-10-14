@@ -15,15 +15,15 @@ const toast = createToaster();
 
 const [formState$, dispatch] = createReducer(
   resetPasswordPageStateReducer,
-  resetPasswordPageInitialState
+  resetPasswordPageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || resetPasswordPageHasError(state))
+  mapI((state) => state.isWaitingResponse || resetPasswordPageHasError(state)),
 );
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
+  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger')),
 );
 
 const state$ = combineLatestI([
@@ -35,7 +35,7 @@ const state$ = combineLatestI([
     formState,
     enterButtonDisabled,
     emailFormIntent,
-  }))
+  })),
 );
 
 const submit = async (pageToBack: string | undefined): Promise<void> => {
@@ -44,7 +44,7 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
   if (resetPasswordPageHasError(s)) return;
 
   const sendPasswordResetEmailResult = await api.auth.sendPasswordResetEmail(
-    s.email.inputValue
+    s.email.inputValue,
   );
 
   if (Result.isErr(sendPasswordResetEmailResult)) {

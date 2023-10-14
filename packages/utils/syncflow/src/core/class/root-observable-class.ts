@@ -40,7 +40,7 @@ export class RootObservableClass<A, Type extends RootObservableType>
 
     const insertPos = binarySearch(
       this.#procedure.map((a) => a.depth),
-      child.depth
+      child.depth,
     );
 
     this.#procedure = Arr.inserted(this.#procedure, insertPos, child);

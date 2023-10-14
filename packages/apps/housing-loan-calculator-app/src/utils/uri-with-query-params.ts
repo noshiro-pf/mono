@@ -4,10 +4,10 @@ export const uriWithQueryParams = (
   uri: string,
   queryParameters: DeepReadonly<
     [string, boolean | number | string | undefined][]
-  >
+  >,
 ): string => {
   const nonNullQueryParameters = queryParameters.filter(
-    ([_, value]) => value !== undefined
+    ([_, value]) => value !== undefined,
   );
 
   const normalizedUri = Router.utils.withSlash(uri);

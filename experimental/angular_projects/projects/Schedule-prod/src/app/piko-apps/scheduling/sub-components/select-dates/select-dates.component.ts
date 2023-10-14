@@ -49,7 +49,7 @@ export class SelectDatesComponent implements OnInit {
 
   private removeDates = (removed: number[]) => {
     this.selectedDatetimes = this.selectedDatetimes.filter(
-      (e) => !removed.includes(this.to0000(e))
+      (e) => !removed.includes(this.to0000(e)),
     );
   };
 
@@ -60,7 +60,7 @@ export class SelectDatesComponent implements OnInit {
         date.setHours(this.defaultHour);
         date.setMinutes(this.defaultMinutes);
         return date.getTime();
-      })
+      }),
     );
     this.selectedDatetimes.sort();
   };
@@ -139,7 +139,7 @@ export class SelectDatesComponent implements OnInit {
 
   remove(datetime: number) {
     this.selectedDatetimes = this.selectedDatetimes.filter(
-      (e) => e !== datetime
+      (e) => e !== datetime,
     );
     this.selectedDatetimesChange.emit(this.selectedDatetimes);
   }

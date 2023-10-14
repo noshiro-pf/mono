@@ -13,14 +13,14 @@ type MapTuple<T extends readonly Type<unknown>[]> = {
 
 export const tuple = <A extends readonly Type<unknown>[]>(
   types: A,
-  options?: Partial<Readonly<{ typeName?: string }>>
+  options?: Partial<Readonly<{ typeName?: string }>>,
 ): Type<MapTuple<A>> => {
   type T = MapTuple<A>;
 
   const { typeName = 'tuple' } = options ?? {};
   const defaultValue = TupleUtils.map(
     types,
-    (t) => t.defaultValue
+    (t) => t.defaultValue,
   ) satisfies MapTuple<A>;
 
   const validate: Type<T>['validate'] = (a) => {
@@ -42,7 +42,7 @@ export const tuple = <A extends readonly Type<unknown>[]>(
       if (Result.isErr(res)) {
         const message = validationErrorMessage(
           el,
-          `The tuple element at ${index} is expected to be <${typeDef.typeName}>`
+          `The tuple element at ${index} is expected to be <${typeDef.typeName}>`,
         );
 
         return Result.err([message, ...res.value]);

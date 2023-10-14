@@ -4,6 +4,6 @@ import type { OperatorFunction } from 'rxjs';
 import { mapToTargetKeyIsDown } from './map-to-target-key-is-down';
 
 export const mapToTargetAlphabetKeyIsDown = (
-  key: Alphabet
+  key: Alphabet,
 ): OperatorFunction<readonly ['down' | 'up', KeyboardEventType], boolean> =>
   mapToTargetKeyIsDown(key);

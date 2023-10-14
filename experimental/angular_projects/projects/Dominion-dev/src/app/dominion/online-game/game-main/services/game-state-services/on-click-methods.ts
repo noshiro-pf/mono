@@ -6,7 +6,7 @@ import { buyCard, playCard } from './shortcut';
 export const playAllTreasures = async (
   playerId: number,
   showMessage: boolean,
-  data: DataForCardEffect
+  data: DataForCardEffect,
 ) => {
   const basicTreasures = data.gameState.DCards.allPlayersCards[
     playerId
@@ -15,7 +15,7 @@ export const playAllTreasures = async (
   if (showMessage) {
     const name = basicTreasures.map((e) => e.cardProperty.nameJp).join('、');
     data.messager(
-      `${data.playersNameList[playerId]}が（${name}）をプレイしました。`
+      `${data.playersNameList[playerId]}が（${name}）をプレイしました。`,
     );
   }
 
@@ -28,13 +28,13 @@ export const playAllTreasures = async (
 export const onVcoinClick = (
   playerId: number,
   showMessage: boolean,
-  data: DataForCardEffect
+  data: DataForCardEffect,
 ) => {
   data.gameState.turnInfo.coin++;
   data.gameState.allPlayersData[playerId].vcoin--;
   if (showMessage) {
     data.messager(
-      `${data.playersNameList[playerId]}が仮想コインを使用しました。`
+      `${data.playersNameList[playerId]}が仮想コインを使用しました。`,
     );
   }
   data.gameStateSetter(data.gameState);
@@ -43,7 +43,7 @@ export const onVcoinClick = (
 export const onDebtClick = (
   playerId: number,
   showMessage: boolean,
-  data: DataForCardEffect
+  data: DataForCardEffect,
 ) => {
   // todo
 };
@@ -51,7 +51,7 @@ export const onDebtClick = (
 export const onCardClick = async (
   clickedCardId: number,
   playerId: number,
-  data: DataForCardEffect
+  data: DataForCardEffect,
 ) => {
   const clickedCard = data.gameState.getDCard(clickedCardId);
   const dir = data.gameState.getDirectory(clickedCardId);

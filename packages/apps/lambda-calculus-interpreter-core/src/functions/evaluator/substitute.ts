@@ -19,7 +19,7 @@ import { alphaConversion } from './alpha-conversion';
 export const substitute = (
   to: LambdaTerm,
   from: Variable,
-  term: LambdaTerm
+  term: LambdaTerm,
 ): LambdaTerm => {
   // console.log( 'substitute', to, from, term );
   if (isVariable(term)) {
@@ -44,8 +44,8 @@ export const substitute = (
   }
   console.error(
     `Syntax error: "${Result.unwrapThrow(
-      Json.stringify(term)
-    )}" is not lambda term.`
+      Json.stringify(term),
+    )}" is not lambda term.`,
   );
   return term;
 };

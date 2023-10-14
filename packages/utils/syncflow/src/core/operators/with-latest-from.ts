@@ -16,7 +16,7 @@ export const withLatestFrom =
     new WithLatestFromObservableClass(parentObservable, observable);
 
 export const withLatestFromI = <A, B>(
-  observable: InitializedObservable<B>
+  observable: InitializedObservable<B>,
 ): InitializedToInitializedOperator<A, readonly [A, B]> =>
   // eslint-disable-next-line no-restricted-syntax
   withLatestFrom(observable) as InitializedToInitializedOperator<

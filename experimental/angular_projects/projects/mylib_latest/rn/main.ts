@@ -26,17 +26,17 @@ switch (testid) {
     a.subscribe(
       console.log,
       () => {},
-      (e) => console.log('a complete', e)
+      (e) => console.log('a complete', e),
     );
     b.subscribe(
       console.log,
       () => {},
-      (e) => console.log('b complete', e)
+      (e) => console.log('b complete', e),
     );
     c.subscribe(
       console.log,
       () => {},
-      (e) => console.log('c complete', e)
+      (e) => console.log('c complete', e),
     );
     setTimeout(() => {
       _.stop();
@@ -54,17 +54,17 @@ switch (testid) {
     a.subscribe(
       console.log,
       () => {},
-      (e) => console.log('a complete', e)
+      (e) => console.log('a complete', e),
     );
     b.subscribe(
       console.log,
       () => {},
-      (e) => console.log('b complete', e)
+      (e) => console.log('b complete', e),
     );
     c.subscribe(
       console.log,
       () => {},
-      (e) => console.log('c complete', e)
+      (e) => console.log('c complete', e),
     );
     setTimeout(() => {
       b.stop();
@@ -102,7 +102,7 @@ switch (testid) {
     const b = a.flatMap((e) =>
       interval(700, true)
         .map((x) => [e, e * (x + 1)])
-        .take(4)
+        .take(4),
     );
     b.subscribe(console.log);
     break;
@@ -246,7 +246,7 @@ switch (testid) {
       scan([] as number[], (prev, curr) => {
         prev.push(curr);
         return prev;
-      })
+      }),
     );
     a.subscribe((e) => console.log('a', e));
     b.subscribe((e) => console.log('b', e));
@@ -301,7 +301,7 @@ switch (testid) {
     c1.subscribe(
       (e) => console.log('c1', e),
       undefined,
-      (e) => console.log('end', e)
+      (e) => console.log('end', e),
     );
     c2.subscribe((e) => console.log('c2', e));
     a.start();

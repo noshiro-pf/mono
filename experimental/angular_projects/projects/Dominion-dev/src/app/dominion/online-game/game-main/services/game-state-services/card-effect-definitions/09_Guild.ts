@@ -6,7 +6,7 @@ import { DataForCardEffect } from './data-for-card-effect';
 export const Baker = async (
   thisDcard: DCard,
   pid: number,
-  data: DataForCardEffect
+  data: DataForCardEffect,
 ) => {
   cs.incrementVcoin(pid, data);
   cs.goToDeterminatePhase(data);
@@ -16,7 +16,7 @@ export const Baker = async (
 export const Candlestick_Maker = async (
   thisDcard: DCard,
   pid: number,
-  data: DataForCardEffect
+  data: DataForCardEffect,
 ) => {
   cs.incrementVcoin(pid, data);
   cs.goToDeterminatePhase(data);

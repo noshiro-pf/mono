@@ -44,55 +44,55 @@ export const convertLibEs2015Iterable = (from) => {
     // Array
     const slice = ret.slice(
       ret.indexOf(markers.Array.start),
-      ret.indexOf(markers.Array.end)
+      ret.indexOf(markers.Array.end),
     );
     ret = ret.replaceAll(
       slice,
       slice
         .replaceAll(
           `IterableIterator<readonly [number, T]>`,
-          `IterableIterator<readonly [${indexType.ret}, T]>`
+          `IterableIterator<readonly [${indexType.ret}, T]>`,
         )
         .replaceAll(
           `IterableIterator<number>`,
-          `IterableIterator<${indexType.ret}>`
-        )
+          `IterableIterator<${indexType.ret}>`,
+        ),
     );
   }
   {
     // ArrayConstructor
     const slice = ret.slice(
       ret.indexOf(markers.ArrayConstructor.start),
-      ret.indexOf(markers.ArrayConstructor.end)
+      ret.indexOf(markers.ArrayConstructor.end),
     );
     ret = ret.replaceAll(
       slice,
       slice
         .replaceAll(
           'mapfn: (v: T, k: number) => U,',
-          `mapfn: (v: T, k: ${indexType.callbackArg}) => U,`
+          `mapfn: (v: T, k: ${indexType.callbackArg}) => U,`,
         )
         .replaceAll(`): readonly U[];`, `): U[];`)
-        .replaceAll(`): readonly T[];`, `): T[];`)
+        .replaceAll(`): readonly T[];`, `): T[];`),
     );
   }
   {
     // ReadonlyArray
     const slice = ret.slice(
       ret.indexOf(markers.ReadonlyArray.start),
-      ret.indexOf(markers.ReadonlyArray.end)
+      ret.indexOf(markers.ReadonlyArray.end),
     );
     ret = ret.replaceAll(
       slice,
       slice
         .replaceAll(
           `IterableIterator<readonly [number, T]>`,
-          `IterableIterator<readonly [${indexType.ret}, T]>`
+          `IterableIterator<readonly [${indexType.ret}, T]>`,
         )
         .replaceAll(
           `IterableIterator<number>`,
-          `IterableIterator<${indexType.ret}>`
-        )
+          `IterableIterator<${indexType.ret}>`,
+        ),
     );
   }
   {
@@ -101,8 +101,8 @@ export const convertLibEs2015Iterable = (from) => {
       slice,
       slice.replaceAll(
         'mapfn: (v: T, k: number) => U,',
-        `mapfn: (v: T, k: ${indexType.callbackArg}) => U,`
-      )
+        `mapfn: (v: T, k: ${indexType.callbackArg}) => U,`,
+      ),
     );
   }
 
@@ -111,15 +111,15 @@ export const convertLibEs2015Iterable = (from) => {
   ret = ret
     .replaceAll(
       `new (): ReadonlyMap<unknown, unknown>;`,
-      `new (): Map<unknown, unknown>;`
+      `new (): Map<unknown, unknown>;`,
     )
     .replaceAll(
       `new <K, V>(iterable?: Iterable<readonly [K, V]> | null): ReadonlyMap<K, V>`,
-      `new <K, V>(iterable?: Iterable<readonly [K, V]> | null): Map<K, V>`
+      `new <K, V>(iterable?: Iterable<readonly [K, V]> | null): Map<K, V>`,
     )
     .replaceAll(
       `new <T>(iterable?: Iterable<T> | null): ReadonlySet<T>;`,
-      `new <T>(iterable?: Iterable<T> | null): Set<T>;`
+      `new <T>(iterable?: Iterable<T> | null): Set<T>;`,
     );
 
   // normalize newlines
@@ -151,33 +151,33 @@ export const convertLibEs2015Iterable = (from) => {
     {
       const slice = ret.slice(
         ret.indexOf(markers.TypedArray(typeName ?? '').Array.start),
-        ret.indexOf(markers.TypedArray(typeName ?? '').Array.end)
+        ret.indexOf(markers.TypedArray(typeName ?? '').Array.end),
       );
       ret = ret.replaceAll(
         slice,
         slice
           .replaceAll(
             `[Symbol.iterator](): IterableIterator<number>;`,
-            `[Symbol.iterator](): IterableIterator<${elementType}>;`
+            `[Symbol.iterator](): IterableIterator<${elementType}>;`,
           )
           .replaceAll(
             `entries(): IterableIterator<readonly [number, number]>;`,
-            `entries(): IterableIterator<readonly [${indexType.ret}, ${elementType}]>;`
+            `entries(): IterableIterator<readonly [${indexType.ret}, ${elementType}]>;`,
           )
           .replaceAll(
             `keys(): IterableIterator<number>;`,
-            `keys(): IterableIterator<${indexType.ret}>;`
+            `keys(): IterableIterator<${indexType.ret}>;`,
           )
           .replaceAll(
             `values(): IterableIterator<number>`,
-            `values(): IterableIterator<${elementType}>`
-          )
+            `values(): IterableIterator<${elementType}>`,
+          ),
       );
     }
     {
       const slice = ret.slice(
         ret.indexOf(markers.TypedArray(typeName ?? '').ArrayConstructor.start),
-        ret.indexOf(markers.TypedArray(typeName ?? '').ArrayConstructor.end)
+        ret.indexOf(markers.TypedArray(typeName ?? '').ArrayConstructor.end),
       );
       ret = ret.replaceAll(
         slice,
@@ -186,8 +186,8 @@ export const convertLibEs2015Iterable = (from) => {
           .replaceAll(`arrayLike: Iterable<number>,`, `arrayLike: Iterable<T>,`)
           .replaceAll(
             `mapfn?: (v: number, k: number) => number,`,
-            `mapfn?: (v: T, k: SafeUint) => ${elementType},`
-          )
+            `mapfn?: (v: T, k: SafeUint) => ${elementType},`,
+          ),
       );
     }
   }

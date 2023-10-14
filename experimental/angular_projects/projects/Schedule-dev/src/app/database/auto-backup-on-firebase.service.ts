@@ -29,7 +29,7 @@ export class AutoBackupOnFirebaseService {
       .valueChanges()
       .pipe(
         first(),
-        map((e) => e || Date.now())
+        map((e) => e || Date.now()),
       )
       .toPromise();
     return new Date(timeStamp);

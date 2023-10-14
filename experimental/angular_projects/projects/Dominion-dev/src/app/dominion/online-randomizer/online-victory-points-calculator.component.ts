@@ -32,16 +32,16 @@ export class OnlineVictoryPointsCalculatorComponent implements OnInit {
   uid$: RN<string> = this.user.uid$;
   numberOfVictoryCards$ = combine(
     this.myRandomizerGroup.newGameResult.players$,
-    this.uid$.filter('', (uid) => !!uid)
+    this.uid$.filter('', (uid) => !!uid),
   ).map(
     ([players, uid]) =>
       (players.find((e) => e.uid === uid) || new PlayerResult())
-        .numberOfVictoryCards
+        .numberOfVictoryCards,
   );
 
   constructor(
     private user: UserService,
-    private myRandomizerGroup: MyRandomizerGroupService
+    private myRandomizerGroup: MyRandomizerGroupService,
   ) {}
 
   ngOnInit() {}
@@ -53,12 +53,12 @@ export class OnlineVictoryPointsCalculatorComponent implements OnInit {
 
   numberOfVictoryCardsOnChange(
     numberOfVictoryCards: NumberOfVictoryCards,
-    uid: string
+    uid: string,
   ) {
     if (!uid) return;
     this.myRandomizerGroup.setNGRPlayerNumberOfVictoryCards(
       uid,
-      numberOfVictoryCards
+      numberOfVictoryCards,
     );
   }
 }

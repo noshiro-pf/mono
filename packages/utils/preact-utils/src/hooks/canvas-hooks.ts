@@ -3,7 +3,7 @@ import { useState } from './use-state';
 
 export const useCanvasContext2d = (): [
   CanvasRenderingContext2D | undefined,
-  preact.Ref<HTMLCanvasElement | null>
+  preact.Ref<HTMLCanvasElement | null>,
 ] => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { state: ctx, setState: setCtx } = useState<

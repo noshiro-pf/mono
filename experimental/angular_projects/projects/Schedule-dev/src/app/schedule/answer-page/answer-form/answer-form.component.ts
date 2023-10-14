@@ -31,10 +31,10 @@ export class AnswerFormComponent implements OnInit {
 
   private readonly selectedUsersAnswer$: RN<Answer> = combine(
     this.answerId$,
-    this.scEvent$.pluck('answers')
+    this.scEvent$.pluck('answers'),
   ).map(
     ([answerId, answers]) =>
-      answers.find((e) => e.databaseKey === answerId) || new Answer()
+      answers.find((e) => e.databaseKey === answerId) || new Answer(),
   );
 
   private readonly userNameInput$ = manual<string>('');
@@ -42,12 +42,12 @@ export class AnswerFormComponent implements OnInit {
 
   readonly userName$: RN<string> = merge(
     this.userNameInput$.debounce(200),
-    this.selectedUsersAnswer$.pluck('userName')
+    this.selectedUsersAnswer$.pluck('userName'),
   );
 
   readonly comment$: RN<string> = merge(
     this.commentInput$.debounce(200),
-    this.selectedUsersAnswer$.pluck('comment')
+    this.selectedUsersAnswer$.pluck('comment'),
   );
 
   private readonly selectedDatetimes$: RN<number[]> =
@@ -80,7 +80,7 @@ export class AnswerFormComponent implements OnInit {
     this.dateToSymbolIdSymbolHeaderClick$.map((symbolId) => ({
       id: 'set-symbol-column',
       value: symbolId,
-    }))
+    })),
   )
     .withLatest(this.selectedDatetimes$)
     .scan({}, (state: { [key: number]: string }, [curr, datetimes]) => {
@@ -122,16 +122,19 @@ export class AnswerFormComponent implements OnInit {
 
   readonly allDatesSelected$: RN<boolean> = combine(
     this.selectedDatetimes$,
-    this.dateToSymbolId$
+    this.dateToSymbolId$,
   ).map(([selectedDatetimes, dateToSymbolId]) =>
-    selectedDatetimes.every((date) => dateToSymbolId[date] !== '')
+    selectedDatetimes.every((date) => dateToSymbolId[date] !== ''),
   );
 
   readonly toYMD = utils.date.toYMD;
   readonly getDayStringEng = utils.date.getDayStringEng;
   readonly toHM = utils.date.toHM;
 
-  constructor(private dialog: MatDialog, private database: DatabaseService) {}
+  constructor(
+    private dialog: MatDialog,
+    private database: DatabaseService,
+  ) {}
 
   ngOnInit() {}
 

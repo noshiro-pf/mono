@@ -15,7 +15,7 @@ export function delint(sourceFile: ts.SourceFile) {
         ) {
           report(
             node,
-            "A looping statement's contents should be wrapped in a block body."
+            "A looping statement's contents should be wrapped in a block body.",
           );
         }
         break;
@@ -25,7 +25,7 @@ export function delint(sourceFile: ts.SourceFile) {
         if (ifStatement.thenStatement.kind !== ts.SyntaxKind.Block) {
           report(
             ifStatement.thenStatement,
-            "An if statement's contents should be wrapped in a block body."
+            "An if statement's contents should be wrapped in a block body.",
           );
         }
         if (
@@ -35,7 +35,7 @@ export function delint(sourceFile: ts.SourceFile) {
         ) {
           report(
             ifStatement.elseStatement,
-            "An else statement's contents should be wrapped in a block body."
+            "An else statement's contents should be wrapped in a block body.",
           );
         }
         break;
@@ -56,10 +56,10 @@ export function delint(sourceFile: ts.SourceFile) {
 
   function report(node: ts.Node, message: string) {
     const { line, character } = sourceFile.getLineAndCharacterOfPosition(
-      node.getStart()
+      node.getStart(),
     );
     console.log(
-      `${sourceFile.fileName} (${line + 1},${character + 1}): ${message}`
+      `${sourceFile.fileName} (${line + 1},${character + 1}): ${message}`,
     );
   }
 }
@@ -71,7 +71,7 @@ fileNames.forEach((fileName) => {
     fileName,
     readFileSync(fileName).toString(),
     ts.ScriptTarget.ES2015,
-    /*setParentNodes */ true
+    /*setParentNodes */ true,
   );
 
   // delint it

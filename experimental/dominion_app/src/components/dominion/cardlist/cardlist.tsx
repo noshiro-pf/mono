@@ -34,20 +34,20 @@ export const CardList = memo(() => {
             dc.effects.villager, // '+villager'
             dc.implemented, // 'ゲーム実装状況'
             dc.randomizerCandidate, // 'ランダマイザー対象'
-          ])
-        )
+          ]),
+        ),
       ),
-    []
+    [],
   )
 
   const cardlistSettings$: RN<TTableSettings> = useMemo(
     () =>
       fb.expansions$.map((expansions) =>
         cardlistTableSettings(
-          expansions.reduce((m, v, i) => m.set(v, i), I.Map<string, number>())
-        )
+          expansions.reduce((m, v, i) => m.set(v, i), I.Map<string, number>()),
+        ),
       ),
-    []
+    [],
   )
 
   const table = useRNValue(table$)
@@ -62,7 +62,7 @@ export const CardList = memo(() => {
       setDialogOpen(true)
       setIndexInDialog(pos.rowIndexInFilteredIndice)
     },
-    [setDialogOpen, setIndexInDialog]
+    [setDialogOpen, setIndexInDialog],
   )
 
   const closeDialog = useCallback(() => {
@@ -75,7 +75,7 @@ export const CardList = memo(() => {
         setFilteredIndice(s.filteredIndice)
       }
     },
-    [filteredIndice, setFilteredIndice]
+    [filteredIndice, setFilteredIndice],
   )
 
   return (

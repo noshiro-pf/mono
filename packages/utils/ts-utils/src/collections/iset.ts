@@ -21,7 +21,7 @@ interface ISetInterface<K> {
   withMutations: (
     actions: readonly Readonly<
       { type: 'add'; key: K } | { type: 'delete'; key: K }
-    >[]
+    >[],
   ) => ISet<K>;
 
   // Sequence algorithms
@@ -68,7 +68,7 @@ export const ISet = {
 
   diff: <K>(
     oldSet: ISet<K>,
-    newSet: ISet<K>
+    newSet: ISet<K>,
   ): Record<'added' | 'deleted', ISet<K>> => ({
     deleted: oldSet.subtract(newSet),
     added: newSet.subtract(oldSet),
@@ -134,7 +134,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   withMutations(
     actions: readonly Readonly<
       { type: 'add'; key: K } | { type: 'delete'; key: K }
-    >[]
+    >[],
   ): ISet<K> {
     const mut_result = new MutableSet<K>(this.#set);
 

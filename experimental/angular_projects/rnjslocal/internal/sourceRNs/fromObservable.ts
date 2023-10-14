@@ -23,7 +23,7 @@ class FromObservableRN<T> extends RN<T> {
       },
       () => {
         this.terminate();
-      }
+      },
     );
   }
 }

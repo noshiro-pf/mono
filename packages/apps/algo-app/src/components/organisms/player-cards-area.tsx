@@ -16,7 +16,7 @@ type Props = Readonly<{
   paddingPx: number;
   windowSize: RectSize;
   cardPositionsDispatcher: (
-    action: readonly [CardColor, CardNumber, Rect]
+    action: readonly [CardColor, CardNumber, Rect],
   ) => void;
 }>;
 
@@ -75,9 +75,9 @@ export const PlayerCardsArea = memoNamed(
             onBoundingClientRectChange: (rect: Rect) => {
               cardPositionsDispatcher([c.color, c.number, rect]);
             },
-          }))
+          })),
         ).value,
-      [cards, cardPositionsDispatcher]
+      [cards, cardPositionsDispatcher],
     );
 
     return (
@@ -102,7 +102,7 @@ export const PlayerCardsArea = memoNamed(
         </RotateContainer>
       </Container>
     );
-  }
+  },
 );
 
 const Container = styled('div')`

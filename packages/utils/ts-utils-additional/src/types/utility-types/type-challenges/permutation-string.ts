@@ -2,7 +2,7 @@ import { expectType } from '@noshiro/ts-utils';
 import { type StringToUnion } from './string-to-union';
 
 type PermutationStringImpl<U extends string, V extends U = U> = [U] extends [
-  never
+  never,
 ]
   ? ''
   : V extends V

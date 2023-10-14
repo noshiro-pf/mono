@@ -17,5 +17,5 @@ export const ContrastRatioList = memoNamed<Props>(
       ))}
       {']'}
     </div>
-  )
+  ),
 );

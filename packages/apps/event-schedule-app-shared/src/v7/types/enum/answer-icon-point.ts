@@ -2,7 +2,7 @@ import * as t from '@noshiro/io-ts';
 import { isNumber } from '@noshiro/ts-utils';
 
 export const answerIconPointTypeDef = (
-  defaultValue: AnswerIconPoint
+  defaultValue: AnswerIconPoint,
 ): t.Type<AnswerIconPoint> =>
   t.createPrimitiveType({
     defaultValue,

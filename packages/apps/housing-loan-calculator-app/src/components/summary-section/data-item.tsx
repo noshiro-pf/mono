@@ -26,5 +26,5 @@ export const DataItem = memoNamed<Props>(
         {description}
       </dd>
     </>
-  )
+  ),
 );

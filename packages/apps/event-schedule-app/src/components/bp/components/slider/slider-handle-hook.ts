@@ -58,7 +58,7 @@ export const useSliderHandleStateManager = ({
 
   const tickSize = useMemo(
     () => trackSize * tickSizeRatio,
-    [trackSize, tickSizeRatio]
+    [trackSize, tickSizeRatio],
   );
 
   const tickSizeRef = useValueAsRef(tickSize);
@@ -73,7 +73,7 @@ export const useSliderHandleStateManager = ({
       return _newValue;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   /** Convert client pixel to value between min and max. */
@@ -85,7 +85,7 @@ export const useSliderHandleStateManager = ({
     // #1769: this logic doesn't work perfectly when the tick size is
     // smaller than the handle size; it may be off by a tick or two.
     const handleCenterPixel = getHandleElementCenterPixel(
-      handleElementRef.current
+      handleElementRef.current,
     );
     const pixelDelta = clientPixel - handleCenterPixel;
 
@@ -108,7 +108,7 @@ export const useSliderHandleStateManager = ({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const handleHandleMovement = useCallback(
@@ -117,7 +117,7 @@ export const useSliderHandleStateManager = ({
       handleMovedTo(mouseEventClientOffset(ev));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const handleHandleTouchMovement = useCallback(
@@ -126,7 +126,7 @@ export const useSliderHandleStateManager = ({
       handleMovedTo(touchEventClientOffset(ev));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const handleMoveEndedAt = useCallback(
@@ -138,7 +138,7 @@ export const useSliderHandleStateManager = ({
       onReleaseRef.current(finalValue);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const endHandleMovement = useCallback(
@@ -147,7 +147,7 @@ export const useSliderHandleStateManager = ({
       handleMoveEndedAt(mouseEventClientOffset(ev));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const endHandleTouchMovement = useCallback(
@@ -156,7 +156,7 @@ export const useSliderHandleStateManager = ({
       handleMoveEndedAt(touchEventClientOffset(ev));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const removeDocumentEventListeners = useCallback(() => {
@@ -177,7 +177,7 @@ export const useSliderHandleStateManager = ({
         changeValue(clientToValue(mouseEventClientOffset(ev)));
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
+      [],
     );
 
   const beginHandleTouchMovement: React.TouchEventHandler<HTMLSpanElement> =
@@ -190,7 +190,7 @@ export const useSliderHandleStateManager = ({
         changeValue(clientToValue(touchEventClientOffset(ev)));
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
+      [],
     );
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLSpanElement> =
@@ -206,7 +206,7 @@ export const useSliderHandleStateManager = ({
         }
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
+      [],
     );
 
   const handleKeyUp: React.KeyboardEventHandler<HTMLSpanElement> = useCallback(
@@ -221,12 +221,12 @@ export const useSliderHandleStateManager = ({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const tooltipValue = useMemo(
     () => value.toFixed(labelFractionDigits),
-    [value, labelFractionDigits]
+    [value, labelFractionDigits],
   );
 
   useEffect(() => {
@@ -256,7 +256,7 @@ const touchEventClientOffset =
 const getHandleMidpointAndOffset = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   handleElement: HTMLElement,
-  useOppositeDimension: boolean = false
+  useOppositeDimension: boolean = false,
 ): Readonly<{
   handleMidpoint: number;
   handleOffset: number;
@@ -275,7 +275,7 @@ const getHandleMidpointAndOffset = (
 
 const getHandleElementCenterPixel = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  handleElement: HTMLElement
+  handleElement: HTMLElement,
 ): number => {
   const { handleMidpoint, handleOffset } =
     getHandleMidpointAndOffset(handleElement);

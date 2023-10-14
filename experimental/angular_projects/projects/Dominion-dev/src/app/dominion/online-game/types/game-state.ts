@@ -54,19 +54,19 @@ export class GameState {
 
     this.turnInfo = new TurnInfo(dataObj.turnInfo);
     this.allPlayersData = (dataObj.allPlayersData || []).map(
-      (e) => new PlayerData(e)
+      (e) => new PlayerData(e),
     );
     if (!dataObj.DCards) return;
     this.DCards.allPlayersCards = (dataObj.DCards.allPlayersCards || []).map(
-      (e) => new PlayerCards(e)
+      (e) => new PlayerCards(e),
     );
     this.DCards.BasicCards = new BasicCards(dataObj.DCards.BasicCards);
     this.DCards.KingdomCards = new KingdomCards(dataObj.DCards.KingdomCards);
     this.DCards.trashPile = (dataObj.DCards.trashPile || []).map(
-      (e) => new DCard(e)
+      (e) => new DCard(e),
     );
     this.DCards.BlackMarketPile = (dataObj.DCards.BlackMarketPile || []).map(
-      (e) => new DCard(e)
+      (e) => new DCard(e),
     );
   }
 
@@ -111,7 +111,7 @@ export class GameState {
         if (pile.map((c) => c.id).includes(cardId)) {
           result = ['allPlayersCards', playerIndex, key] as DCardPath[];
         }
-      })
+      }),
     );
 
     utils.object.forEach(this.DCards.BasicCards, (pile: DCard[], key) => {
@@ -139,7 +139,7 @@ export class GameState {
 
   getAllPlayersCards() {
     return ([] as DCard[]).concat(
-      ...this.DCards.allPlayersCards.map((pl) => pl.getDCards())
+      ...this.DCards.allPlayersCards.map((pl) => pl.getDCards()),
     );
   }
 
@@ -149,7 +149,7 @@ export class GameState {
       this.DCards.BasicCards.getDCards(),
       this.DCards.KingdomCards.getDCards(),
       this.DCards.trashPile,
-      this.DCards.BlackMarketPile
+      this.DCards.BlackMarketPile,
     );
   }
 
@@ -170,17 +170,17 @@ export class GameState {
     this.DCards.BasicCards.removeDCards(cardIdArray);
     this.DCards.KingdomCards.removeDCards(cardIdArray);
     this.DCards.trashPile = this.DCards.trashPile.filter(
-      (c) => !cardIdArray.includes(c.id)
+      (c) => !cardIdArray.includes(c.id),
     );
     this.DCards.BlackMarketPile = this.DCards.BlackMarketPile.filter(
-      (c) => !cardIdArray.includes(c.id)
+      (c) => !cardIdArray.includes(c.id),
     );
   }
 
   emptyPiles(): number {
     const Supplies = ([] as DCard[][]).concat(
       utils.object.entries(this.DCards.BasicCards),
-      this.DCards.KingdomCards
+      this.DCards.KingdomCards,
     );
     return (
       Supplies.filter((e) => e.length <= 0).length -
@@ -206,7 +206,7 @@ export class GameState {
 
   disableAllButtons() {
     this.getAllDCards().forEach((d) =>
-      d.isButton.forEach((_, i, ar) => (ar[i] = false))
+      d.isButton.forEach((_, i, ar) => (ar[i] = false)),
     );
   }
 }

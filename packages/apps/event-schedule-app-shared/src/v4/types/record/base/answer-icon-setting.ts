@@ -14,7 +14,7 @@ export const defaultAnswerIconSetting = {
 
 const d = defaultAnswerIconSetting;
 export const fillAnswerIconSetting = (
-  a: PartialAnswerIconSetting
+  a: PartialAnswerIconSetting,
 ): AnswerIconSetting => ({
   description: a.description ?? d.description,
   point: a.point ?? d.point,

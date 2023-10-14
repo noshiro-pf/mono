@@ -67,45 +67,45 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   /* values */
 
   const alertOnAnswerClickIsOpen = useObservableValue(
-    AnswerPageStore.alertOnAnswerClickIsOpen$
+    AnswerPageStore.alertOnAnswerClickIsOpen$,
   );
   const answerBeingEdited = useObservableValue(
-    AnswerPageStore.answerBeingEdited$
+    AnswerPageStore.answerBeingEdited$,
   );
   const answerBeingEditedSectionState = useObservableValue(
-    AnswerPageStore.answerBeingEditedSectionState$
+    AnswerPageStore.answerBeingEditedSectionState$,
   );
   const answers = useObservableValue(answers$);
   const errorType = useObservableValue(errorType$);
   const eventId = useObservableValue(Router.eventId$);
   const eventSchedule = useObservableValue(eventSchedule$);
   const refreshButtonIsDisabled = useObservableValue(
-    AnswersStore.refreshButtonIsDisabled$
+    AnswersStore.refreshButtonIsDisabled$,
   );
   const refreshButtonIsLoading = useObservableValue(
-    AnswersStore.refreshButtonIsLoading$
+    AnswersStore.refreshButtonIsLoading$,
   );
   const requiredParticipantsExist = useObservableValue(
-    AnswerPageStore.requiredParticipantsExist$
+    AnswerPageStore.requiredParticipantsExist$,
   );
   const selectedAnswerUserName = useObservableValue(
-    AnswerPageStore.selectedAnswerUserName$
+    AnswerPageStore.selectedAnswerUserName$,
   );
   const selectedDates = useObservableValue(AnswerPageStore.selectedDates$);
   const submitButtonIsDisabled = useObservableValue(
-    AnswerPageStore.submitButtonIsDisabled$
+    AnswerPageStore.submitButtonIsDisabled$,
   );
   const submitButtonIsLoading = useObservableValue(
-    AnswerPageStore.submitButtonIsLoading$
+    AnswerPageStore.submitButtonIsLoading$,
   );
 
   const detailedFilterDialogIsDisplayed = useObservableValue(
-    AnswerTableStore.detailedFilterIsOpen$
+    AnswerTableStore.detailedFilterIsOpen$,
   );
 
   const afterDeadline = useMemo(
     () => eventIsAfterDeadline(eventSchedule),
-    [eventSchedule]
+    [eventSchedule],
   );
 
   /* effect */
@@ -147,7 +147,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
         answers !== undefined &&
         answers.some((ans) => ans.user.id === fireAuthUser.uid)
       ),
-    [fireAuthUser, answers]
+    [fireAuthUser, answers],
   );
 
   const screenShotAreaRef = useRef<HTMLDivElement>(null);
@@ -160,11 +160,11 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
       html2canvas(el, {
         width: Math.max(
           el.scrollWidth,
-          tableWrapperRef.current?.scrollWidth ?? 0
+          tableWrapperRef.current?.scrollWidth ?? 0,
         ),
         height: Math.max(
           el.scrollHeight,
-          tableWrapperRef.current?.scrollHeight ?? 0
+          tableWrapperRef.current?.scrollHeight ?? 0,
         ),
       })
         .then(saveAsImage)
@@ -254,7 +254,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                         // eslint-disable-next-line no-restricted-syntax
                         tagProps as (
                           value: DeepReadonly<React.ReactNode>,
-                          index: number
+                          index: number,
                         ) => TagProps
                       }
                       values={tagValues}

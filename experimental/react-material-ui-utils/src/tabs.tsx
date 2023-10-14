@@ -21,7 +21,7 @@ export const MuiTabs = memoNamed<Props>(
           tabIndexChange(idx);
         }
       },
-      [tabIndexChange]
+      [tabIndexChange],
     );
 
     return (
@@ -38,5 +38,5 @@ export const MuiTabs = memoNamed<Props>(
         ))}
       </Tabs>
     );
-  }
+  },
 );

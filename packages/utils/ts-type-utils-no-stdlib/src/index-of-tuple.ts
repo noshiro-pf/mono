@@ -10,7 +10,7 @@ export type IndexOfTuple<T extends readonly unknown[]> = _IndexOfTupleImpl<
 /** @internal */
 type _IndexOfTupleImpl<
   T extends readonly unknown[],
-  K
+  K,
 > = IsFixedLengthList<T> extends true
   ? K extends keyof T
     ? K extends `${number}`

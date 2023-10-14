@@ -1,8 +1,8 @@
 ---
-title: "立替精算の送金回数を最小化する効率の良いアルゴリズム"
-emoji: "🐈"
-type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["algorithm"]
+title: '立替精算の送金回数を最小化する効率の良いアルゴリズム'
+emoji: '🐈'
+type: 'tech' # tech: 技術記事 / idea: アイデア
+topics: ['algorithm']
 published: false
 ---
 

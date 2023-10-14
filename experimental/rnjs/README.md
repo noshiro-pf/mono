@@ -163,7 +163,7 @@ a.subscribe(console.log);
 -   interval, combine, map
 
 ```ts
-import { interval, combine, map } from 'rnjs';
+import { combine, interval, map } from 'rnjs';
 
 const a = interval(100, true);
 // ^
@@ -185,7 +185,7 @@ c.subscribe(console.log);
 ```
 
 ```ts
-import { interval, combine } from 'rnjs';
+import { combine, interval } from 'rnjs';
 
 const a = interval(100, false);
 // ^

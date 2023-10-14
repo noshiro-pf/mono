@@ -41,7 +41,7 @@ export namespace Maybe {
 
   export const map = <M extends Base, S2>(
     maybe: M,
-    mapFn: (value: Unwrap<M>) => S2
+    mapFn: (value: Unwrap<M>) => S2,
   ): Maybe<S2> =>
     isNone(maybe)
       ? none
@@ -62,7 +62,7 @@ export namespace Maybe {
 
   export const unwrapOr = <M extends Base, D>(
     maybe: M,
-    defaultValue: D
+    defaultValue: D,
   ): D | Unwrap<M> =>
     isNone(maybe)
       ? defaultValue

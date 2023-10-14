@@ -19,7 +19,7 @@ type FunctionNode = FunctionExpression | TSESTree.FunctionDeclaration;
  * ```
  */
 function isVariableDeclaratorWithTypeAnnotation(
-  node: TSESTree.Node
+  node: TSESTree.Node,
 ): node is TSESTree.VariableDeclarator {
   return (
     node.type === AST_NODE_TYPES.VariableDeclarator && !!node.id.typeAnnotation
@@ -33,7 +33,7 @@ function isVariableDeclaratorWithTypeAnnotation(
  * ```
  */
 function isClassPropertyWithTypeAnnotation(
-  node: TSESTree.Node
+  node: TSESTree.Node,
 ): node is TSESTree.ClassProperty {
   return node.type === AST_NODE_TYPES.ClassProperty && !!node.typeAnnotation;
 }
@@ -46,7 +46,7 @@ function isClassPropertyWithTypeAnnotation(
  * ```
  */
 function isConstructorArgument(
-  node: TSESTree.Node
+  node: TSESTree.Node,
 ): node is TSESTree.NewExpression {
   return node.type === AST_NODE_TYPES.NewExpression;
 }
@@ -61,7 +61,7 @@ function isConstructorArgument(
  * ```
  */
 function isPropertyOfObjectWithType(
-  property: TSESTree.Node | undefined
+  property: TSESTree.Node | undefined,
 ): boolean {
   if (!property || property.type !== AST_NODE_TYPES.Property) {
     return false;
@@ -136,7 +136,7 @@ function doesImmediatelyReturnFunctionExpression({
  */
 function isFunctionArgument(
   parent: TSESTree.Node,
-  callee?: FunctionExpression
+  callee?: FunctionExpression,
 ): parent is TSESTree.CallExpression {
   return (
     parent.type === AST_NODE_TYPES.CallExpression &&
@@ -152,7 +152,7 @@ function isFunctionArgument(
  * ```
  */
 function returnsConstAssertionDirectly(
-  node: TSESTree.ArrowFunctionExpression
+  node: TSESTree.ArrowFunctionExpression,
 ): boolean {
   const { body } = node;
   if (isTypeAssertion(body)) {
@@ -183,7 +183,7 @@ interface Options {
  */
 function isTypedFunctionExpression(
   node: FunctionExpression,
-  options: Options
+  options: Options,
 ): boolean {
   const parent = nullThrows(node.parent, NullThrowsReasons.MissingParent);
 
@@ -207,7 +207,7 @@ function isTypedFunctionExpression(
  */
 function isValidFunctionExpressionReturnType(
   node: FunctionExpression,
-  options: Options
+  options: Options,
 ): boolean {
   if (isTypedFunctionExpression(node, options)) {
     return true;
@@ -241,7 +241,7 @@ function isValidFunctionExpressionReturnType(
  */
 function isValidFunctionReturnType(
   node: FunctionNode,
-  options: Options
+  options: Options,
 ): boolean {
   if (
     options.allowHigherOrderFunctions &&
@@ -264,7 +264,7 @@ function checkFunctionReturnType(
   node: FunctionNode,
   options: Options,
   sourceCode: TSESLint.SourceCode,
-  report: (loc: TSESTree.SourceLocation) => void
+  report: (loc: TSESTree.SourceLocation) => void,
 ): void {
   if (isValidFunctionReturnType(node, options)) {
     return;
@@ -280,7 +280,7 @@ function checkFunctionExpressionReturnType(
   node: FunctionExpression,
   options: Options,
   sourceCode: TSESLint.SourceCode,
-  report: (loc: TSESTree.SourceLocation) => void
+  report: (loc: TSESTree.SourceLocation) => void,
 ): void {
   if (isValidFunctionExpressionReturnType(node, options)) {
     return;

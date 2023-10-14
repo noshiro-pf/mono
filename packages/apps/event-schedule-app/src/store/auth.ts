@@ -14,8 +14,8 @@ const passwordProviderIncluded$: InitializedObservable<boolean> =
   fireAuthUser$.chain(
     mapI(
       (user) =>
-        user?.providerData.some((p) => p.providerId === 'password') ?? false
-    )
+        user?.providerData.some((p) => p.providerId === 'password') ?? false,
+    ),
   );
 
 const usePasswordProviderIncluded = (): boolean =>

@@ -11,7 +11,7 @@ import {
 /** @deprecated use `createState` instead */
 export const switchMap =
   <A, B>(
-    mapToObservable: (curr: A) => Observable<B>
+    mapToObservable: (curr: A) => Observable<B>,
   ): RemoveInitializedOperator<A, B> =>
   (parentObservable: Observable<A>) =>
     new SwitchMapObservableClass(parentObservable, mapToObservable);
@@ -26,7 +26,7 @@ class SwitchMapObservableClass<A, B>
 
   constructor(
     parentObservable: Observable<A>,
-    mapToObservable: (curr: A) => Observable<B>
+    mapToObservable: (curr: A) => Observable<B>,
   ) {
     super({
       parents: [parentObservable],

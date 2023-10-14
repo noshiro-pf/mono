@@ -36,7 +36,7 @@ export const SelectFromDatabase = memo(
   }>) => {
     const selectedNameIsInNameList: boolean = useMemo(
       () => nameList.includes(selectedName),
-      [nameList, selectedName]
+      [nameList, selectedName],
     )
 
     return (
@@ -89,7 +89,7 @@ export const SelectFromDatabase = memo(
         </ButtonsWrapper>
       </Root>
     )
-  }
+  },
 )
 
 SelectFromDatabase.displayName = 'SelectFromDatabase'

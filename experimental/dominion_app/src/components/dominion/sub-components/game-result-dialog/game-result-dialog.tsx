@@ -50,7 +50,7 @@ export const GameResultDialog = memo(
 
     const playerResultsInit = useMemo(
       () => I.List(playerResultsPrev.map(PlayerResultRanked)),
-      [playerResultsPrev]
+      [playerResultsPrev],
     )
 
     const [date, setDate] = useState(datePrev)
@@ -100,7 +100,7 @@ export const GameResultDialog = memo(
               } else {
                 if (value !== -1 && value !== 1) {
                   throw new Error(
-                    'ERROR: turnOrder button should emits -1 or +1.'
+                    'ERROR: turnOrder button should emits -1 or +1.',
                   )
                 }
                 const curr = state.getIn([playerIndex, 'turnOrder'])
@@ -110,12 +110,12 @@ export const GameResultDialog = memo(
                   .updateIn([playerIndex, 'turnOrder'], (x) => x + value)
                   .updateIn([swapIndex, 'turnOrder'], (x) => x - value)
               }
-            })
-          )
+            }),
+          ),
         ).map(([scoreTbl, lastTurnPl, playerResult]) =>
-          getScored(scoreTbl, playerResult, lastTurnPl)
-        )
-      )
+          getScored(scoreTbl, playerResult, lastTurnPl),
+        ),
+      ),
     )
 
     /* extract values */
@@ -157,7 +157,7 @@ export const GameResultDialog = memo(
           selectedCardsId,
           place,
           selectedExpansions,
-        })
+        }),
       )
       // TODO snackbar
     }, [
@@ -208,7 +208,7 @@ export const GameResultDialog = memo(
         playerResultChange={playerResultChange}
       />
     )
-  }
+  },
 )
 
 GameResultDialog.displayName = 'GameResultDialog'

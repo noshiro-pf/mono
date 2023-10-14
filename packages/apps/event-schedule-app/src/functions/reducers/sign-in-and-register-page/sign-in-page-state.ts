@@ -51,7 +51,7 @@ export const signInPageStateReducer: Reducer<
         emailInputStateReducer(state.email, {
           type: 'input',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'setEmailError':
@@ -72,7 +72,7 @@ export const signInPageStateReducer: Reducer<
         inputStateReducer(state.password, {
           type: 'input',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'setPasswordError':

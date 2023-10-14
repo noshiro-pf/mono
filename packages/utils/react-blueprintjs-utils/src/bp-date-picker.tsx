@@ -16,7 +16,7 @@ const inputProps: HTMLInputProps & InputGroupProps2 = {
 
 const tenYearsLater = pipe(DateUtils.today())
   .chain(
-    DateUtils.updateLocaleYear((a) => toSafeUint(a + 99) satisfies YearEnum)
+    DateUtils.updateLocaleYear((a) => toSafeUint(a + 99) satisfies YearEnum),
   )
   .chain(DateUtils.setLocaleMonth(12))
   .chain(DateUtils.toDate).value;
@@ -60,7 +60,7 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
           date: DateUtils.getLocaleDate(dt),
         });
       },
-      [onYmdChange]
+      [onYmdChange],
     );
 
     const dateObj = useMemo<RawDateType | undefined>(
@@ -68,9 +68,9 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
         ymd === undefined
           ? undefined
           : pipe(
-              DateUtils.from(`${ymd.year}/${ymd.month}/${ymd.date} 12:34:56`)
+              DateUtils.from(`${ymd.year}/${ymd.month}/${ymd.date} 12:34:56`),
             ).chain(DateUtils.toDate).value,
-      [ymd]
+      [ymd],
     );
 
     return (
@@ -92,5 +92,5 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
         {...props}
       />
     );
-  }
+  },
 );

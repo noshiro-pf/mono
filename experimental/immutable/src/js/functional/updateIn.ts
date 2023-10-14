@@ -26,7 +26,7 @@ export function updateIn(collection, keyPath, notSetValue, updater) {
     coerceKeyPath(keyPath),
     0,
     notSetValue,
-    updater
+    updater,
   );
   return updatedValue === NOT_SET ? notSetValue : updatedValue;
 }
@@ -37,7 +37,7 @@ function updateInDeeply(
   keyPath,
   i,
   notSetValue,
-  updater
+  updater,
 ) {
   const wasNotSet = existing === NOT_SET;
   if (i === keyPath.length) {
@@ -50,7 +50,7 @@ function updateInDeeply(
       'Cannot update within non-data-structure value in path [' +
         keyPath.slice(0, i).map(quoteString) +
         ']: ' +
-        existing
+        existing,
     );
   }
   const key = keyPath[i];
@@ -61,7 +61,7 @@ function updateInDeeply(
     keyPath,
     i + 1,
     notSetValue,
-    updater
+    updater,
   );
   return nextUpdated === nextExisting
     ? existing
@@ -70,6 +70,6 @@ function updateInDeeply(
     : set(
         wasNotSet ? (inImmutable ? emptyMap() : {}) : existing,
         key,
-        nextUpdated
+        nextUpdated,
       );
 }

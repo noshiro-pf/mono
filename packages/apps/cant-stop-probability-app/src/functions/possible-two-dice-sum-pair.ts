@@ -4,7 +4,7 @@ export const possibleTwoDiceSumPairs = (
   a: DiceValue,
   b: DiceValue,
   c: DiceValue,
-  d: DiceValue
+  d: DiceValue,
 ): ArrayOfLength<3, readonly [TwoDiceSumValue, TwoDiceSumValue]> =>
   [
     [addDiceValues(a, b), addDiceValues(c, d)],

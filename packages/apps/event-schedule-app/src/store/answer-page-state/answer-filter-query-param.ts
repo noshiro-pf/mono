@@ -11,7 +11,7 @@ const keyDef = Routes.queryParamKey.answerTableState;
 
 const saveSortStateToQueryParams = ([sortKey, sortOrder]: readonly [
   'date' | 'score',
-  'asc' | 'desc'
+  'asc' | 'desc',
 ]): void => {
   Router.updateQueryParams(
     (urlSearchParams) => {
@@ -27,7 +27,7 @@ const saveSortStateToQueryParams = ([sortKey, sortOrder]: readonly [
       }
       return urlSearchParams;
     },
-    { method: 'replaceState' }
+    { method: 'replaceState' },
   );
 };
 
@@ -60,7 +60,7 @@ const dayOfWeekToStr = (
     Thr: boolean;
     Fri: boolean;
     Sat: boolean;
-  }>
+  }>,
 ): string =>
   (['Sun', 'Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat'] as const)
     .map((key) => tp(Routes.queryParamValue.dayAbbrDef[key], value[key]))
@@ -69,7 +69,7 @@ const dayOfWeekToStr = (
     .join(Routes.queryParamValue.dayElementDelim);
 
 const dayOfWeekFromStr = (
-  str: string
+  str: string,
 ): Readonly<{
   Sun: boolean;
   Mon: boolean;
@@ -96,7 +96,7 @@ const range2str = (a: string, b: string): string =>
   `${a}${Routes.queryParamValue.rangeDelim}${b}`;
 
 const rangeFromStr = (
-  rangeStr: string
+  rangeStr: string,
 ): Readonly<{ a: string; b: string }> | undefined => {
   const res = rangeStr.split(Routes.queryParamValue.rangeDelim);
   return Arr.isArrayOfLength2(res) ? { a: res[0], b: res[1] } : undefined;
@@ -126,8 +126,8 @@ const saveFilterStateToQueryParams = ({
           keyDef.date,
           range2str(
             ymd2str(dateRange.value.start),
-            ymd2str(dateRange.value.end)
-          )
+            ymd2str(dateRange.value.end),
+          ),
         );
       } else {
         urlSearchParams.delete(keyDef.date);
@@ -142,7 +142,7 @@ const saveFilterStateToQueryParams = ({
       if (filledDateOnly) {
         urlSearchParams.set(
           keyDef.filledDateOnly,
-          filledDateOnlyToStr(filledDateOnly)
+          filledDateOnlyToStr(filledDateOnly),
         );
       } else {
         urlSearchParams.delete(keyDef.filledDateOnly);
@@ -153,8 +153,8 @@ const saveFilterStateToQueryParams = ({
           keyDef.score,
           range2str(
             num2str(scoreRange.value.min),
-            num2str(scoreRange.value.max)
-          )
+            num2str(scoreRange.value.max),
+          ),
         );
       } else {
         urlSearchParams.delete(keyDef.score);
@@ -163,7 +163,7 @@ const saveFilterStateToQueryParams = ({
       if (iconState.good.enabled) {
         urlSearchParams.set(
           keyDef.good,
-          range2str(num2str(iconState.good.min), num2str(iconState.good.max))
+          range2str(num2str(iconState.good.min), num2str(iconState.good.max)),
         );
       } else {
         urlSearchParams.delete(keyDef.good);
@@ -172,7 +172,7 @@ const saveFilterStateToQueryParams = ({
       if (iconState.fair.enabled) {
         urlSearchParams.set(
           keyDef.fair,
-          range2str(num2str(iconState.fair.min), num2str(iconState.fair.max))
+          range2str(num2str(iconState.fair.min), num2str(iconState.fair.max)),
         );
       } else {
         urlSearchParams.delete(keyDef.fair);
@@ -181,7 +181,7 @@ const saveFilterStateToQueryParams = ({
       if (iconState.poor.enabled) {
         urlSearchParams.set(
           keyDef.poor,
-          range2str(num2str(iconState.poor.min), num2str(iconState.poor.max))
+          range2str(num2str(iconState.poor.min), num2str(iconState.poor.max)),
         );
       } else {
         urlSearchParams.delete(keyDef.poor);
@@ -192,8 +192,8 @@ const saveFilterStateToQueryParams = ({
           keyDef.goodPlusFair,
           range2str(
             num2str(iconState.goodPlusFair.min),
-            num2str(iconState.goodPlusFair.max)
-          )
+            num2str(iconState.goodPlusFair.max),
+          ),
         );
       } else {
         urlSearchParams.delete(keyDef.goodPlusFair);
@@ -204,8 +204,8 @@ const saveFilterStateToQueryParams = ({
           keyDef.fairPlusPoor,
           range2str(
             num2str(iconState.fairPlusPoor.min),
-            num2str(iconState.fairPlusPoor.max)
-          )
+            num2str(iconState.fairPlusPoor.max),
+          ),
         );
       } else {
         urlSearchParams.delete(keyDef.fairPlusPoor);
@@ -213,13 +213,13 @@ const saveFilterStateToQueryParams = ({
 
       return urlSearchParams;
     },
-    { method: 'replaceState' }
+    { method: 'replaceState' },
   );
 };
 
 const restoreFromQueryParams = (
   setSortOrderAndKey: (v: readonly ['date' | 'score', 'asc' | 'desc']) => void,
-  filterStateDispatch: (action: AnswerFilterStateAction) => void
+  filterStateDispatch: (action: AnswerFilterStateAction) => void,
 ): void => {
   const queryParams = Router.state$.snapshot.value.searchParams;
 
@@ -254,7 +254,7 @@ const restoreFromQueryParams = (
       },
 
       dayOfWeek: pipe(queryParams.get(keyDef.dayOfWeek)).chainOptional(
-        dayOfWeekFromStr
+        dayOfWeekFromStr,
       ).value,
 
       scoreRange: pipe(queryParams.get(keyDef.score))
@@ -268,7 +268,7 @@ const restoreFromQueryParams = (
       },
 
       filledDateOnly: pipe(
-        queryParams.get(keyDef.filledDateOnly)
+        queryParams.get(keyDef.filledDateOnly),
       ).chainOptional(filledDateOnlyFromStr).value,
 
       iconState: {

@@ -38,19 +38,19 @@ export class SideBarLeftComponent implements OnInit {
     private gameStateService: GameStateService,
     private gameRoomCommunication: GameRoomCommunicationService,
     private config: GameConfigService,
-    private gameMessageService: GameMessageService
+    private gameMessageService: GameMessageService,
   ) {}
 
   ngOnInit() {
     this.newChatMessageAlert$ = combineLatest(
       this.chatOpened$.pipe(
         filter((e) => e === true),
-        startWith(true)
+        startWith(true),
       ),
       this.gameRoomCommunication.chatList$.pipe(
-        filter((list) => list.length > 0)
+        filter((list) => list.length > 0),
       ),
-      (onOpen, receivedNewMessage) => 0
+      (onOpen, receivedNewMessage) => 0,
     ).pipe(withLatestFrom(this.chatOpened$, (_, chatOpened) => !chatOpened));
   }
 
@@ -86,7 +86,7 @@ export class SideBarLeftComponent implements OnInit {
         this.gameRoomCommunication.sendUserInput(
           'clicked goToNextPhase',
           0,
-          true
+          true,
         ),
       ]);
       // 最初のプレイヤーは自動でgoToNextPhaseを1回発動
@@ -98,7 +98,7 @@ export class SideBarLeftComponent implements OnInit {
     this.gameRoomCommunication.sendUserInput(
       'increment turnCounter',
       myIndex,
-      true
+      true,
     );
   }
 

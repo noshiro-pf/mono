@@ -68,7 +68,7 @@ export const PlayerResultTable = memo(
         </Table>
       </TableWrapper>
     </Paper>
-  )
+  ),
 )
 
 PlayerResultTable.displayName = 'PlayerResultTable'

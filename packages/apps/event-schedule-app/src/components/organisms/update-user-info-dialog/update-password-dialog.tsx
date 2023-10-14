@@ -133,5 +133,5 @@ export const UpdatePasswordDialog = memoNamed<Props>(
         title={dc.updatePassword.title}
       />
     );
-  }
+  },
 );

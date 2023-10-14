@@ -16,10 +16,10 @@ export const BpButton = memoNamed<BpButtonProps>(
         outline: 'none',
         whiteSpace: nowrap ?? false ? 'nowrap' : 'inherit',
       }),
-      [props.style, nowrap]
+      [props.style, nowrap],
     );
 
     // eslint-disable-next-line react/jsx-props-no-spreading
     return <Button {...props} style={style} />;
-  }
+  },
 );

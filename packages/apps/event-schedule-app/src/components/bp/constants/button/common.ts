@@ -57,19 +57,19 @@ CSS `border` property issues:
 */
 export const buttonBoxShadow = joinCssStr(
   `inset 0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.2)}`,
-  `inset 0 ${-buttonBorderWidthPx}px 0 ${hexToRgba(black, 0.1)}`
+  `inset 0 ${-buttonBorderWidthPx}px 0 ${hexToRgba(black, 0.1)}`,
 );
 export const buttonBoxShadowActive = joinCssStr(
   `inset 0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.2)}`,
-  `inset 0 1px 2px ${hexToRgba(black, 0.2)}`
+  `inset 0 1px 2px ${hexToRgba(black, 0.2)}`,
 );
 export const buttonIntentBoxShadow = joinCssStr(
   `inset 0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.4)}`,
-  `inset 0 ${-buttonBorderWidthPx}px 0 ${hexToRgba(black, 0.2)}`
+  `inset 0 ${-buttonBorderWidthPx}px 0 ${hexToRgba(black, 0.2)}`,
 );
 export const buttonIntentBoxShadowActive = joinCssStr(
   `inset 0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.4)}`,
-  `inset 0 1px 2px ${hexToRgba(black, 0.2)}`
+  `inset 0 1px 2px ${hexToRgba(black, 0.2)}`,
 );
 
 /*
@@ -80,40 +80,46 @@ Switches and slider handles both use these variables.
 */
 export const buttonBoxShadowOverlay = joinCssStr(
   `0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.2)}`,
-  `0 1px 1px ${hexToRgba(black, 0.2)}`
+  `0 1px 1px ${hexToRgba(black, 0.2)}`,
 );
 
 export const buttonBoxShadowOverlayActive = joinCssStr(
   `0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.2)}`,
-  `inset 0 1px 1px ${hexToRgba(black, 0.1)}`
+  `inset 0 1px 1px ${hexToRgba(black, 0.1)}`,
 );
 
 export const darkButtonBoxShadow = joinCssStr(
-  `0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.4)}`
+  `0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.4)}`,
 );
 export const darkButtonBoxShadowActive = joinCssStr(
   `0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.6)}`,
-  `inset 0 1px 2px ${hexToRgba(black, 0.2)}`
+  `inset 0 1px 2px ${hexToRgba(black, 0.2)}`,
 );
 export const darkButtonIntentBoxShadow = joinCssStr(
-  `0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.4)}`
+  `0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.4)}`,
 );
 export const darkButtonIntentBoxShadowActive = joinCssStr(
   `0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.4)}`,
-  `inset 0 1px 2px ${hexToRgba(black, 0.2)}`
+  `inset 0 1px 2px ${hexToRgba(black, 0.2)}`,
 );
 
 export const buttonGradient = joinCssStr(
-  `linear-gradient(to bottom, ${hexToRgba(white, 0.8)}, ${hexToRgba(white, 0)})`
+  `linear-gradient(to bottom, ${hexToRgba(white, 0.8)}, ${hexToRgba(
+    white,
+    0,
+  )})`,
 );
 export const buttonIntentGradient = joinCssStr(
-  `linear-gradient(to bottom, ${hexToRgba(white, 0.1)}, ${hexToRgba(white, 0)})`
+  `linear-gradient(to bottom, ${hexToRgba(white, 0.1)}, ${hexToRgba(
+    white,
+    0,
+  )})`,
 );
 export const darkButtonGradient = joinCssStr(
   `linear-gradient(to bottom, ${hexToRgba(white, 0.05)}, ${hexToRgba(
     white,
-    0
-  )})`
+    0,
+  )})`,
 );
 
 export const buttonColorDisabled = ptTextColorDisabled;
@@ -127,7 +133,7 @@ export const buttonIntentColorDisabled = hexToRgba(white, 0.6);
 export const darkButtonBackgroundColorDisabled = hexToRgba(darkGray5, 0.5);
 export const darkButtonBackgroundColorActiveDisabled = hexToRgba(
   darkGray5,
-  0.7
+  0.7,
 );
 export const darkButtonIntentColorDisabled = hexToRgba(white, 0.3);
 

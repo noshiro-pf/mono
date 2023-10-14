@@ -29,7 +29,7 @@ type FunctionNode =
  */
 export function getFunctionHeadLoc(
   node: FunctionNode,
-  sourceCode: TSESLint.SourceCode
+  sourceCode: TSESLint.SourceCode,
 ): TSESTree.SourceLocation {
   function getLocStart(): TSESTree.LineAndColumnData {
     if (node.parent && node.parent.type === AST_NODE_TYPES.MethodDefinition) {
@@ -38,7 +38,7 @@ export function getFunctionHeadLoc(
       if (node.parent.decorators && node.parent.decorators.length > 0) {
         // exclude decorators
         return sourceCode.getTokenAfter(
-          node.parent.decorators[node.parent.decorators.length - 1]
+          node.parent.decorators[node.parent.decorators.length - 1],
         )!.loc.start;
       }
 
@@ -64,7 +64,7 @@ export function getFunctionHeadLoc(
       return sourceCode.getTokenBefore(
         node.body,
         (token) =>
-          token.type === AST_TOKEN_TYPES.Punctuator && token.value === '=>'
+          token.type === AST_TOKEN_TYPES.Punctuator && token.value === '=>',
       )!.loc.end;
     }
 

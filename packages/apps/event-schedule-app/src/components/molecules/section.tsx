@@ -27,7 +27,7 @@ export const Section = memoNamed<React.PropsWithChildren<Props>>(
         {children}
       </Card>
     </div>
-  )
+  ),
 );
 
 const Header = styled.div`

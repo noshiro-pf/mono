@@ -95,5 +95,5 @@ export const UpdateEmailDialog = memoNamed<Props>(
         title={dc.updateEmail.title}
       />
     );
-  }
+  },
 );

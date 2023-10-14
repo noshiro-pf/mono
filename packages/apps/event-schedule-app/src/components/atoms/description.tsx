@@ -22,5 +22,5 @@ export const Description = memoNamed<Props>(
     >
       {text}
     </div>
-  )
+  ),
 );

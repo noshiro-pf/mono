@@ -31,12 +31,12 @@ export const LabelButtonItemView = memoNamed<Props>(
         backgroundColor: hslToStr(props.hsl),
         color: higherContrastTextColorHsl(props.hsl),
       }),
-      [props.hsl]
+      [props.hsl],
     );
 
     const buttonBgStyleConditional = useMemo<React.CSSProperties>(
       () => (disabled ? {} : buttonBgStyle),
-      [disabled, buttonBgStyle]
+      [disabled, buttonBgStyle],
     );
 
     const isSelectedIconStyle = useMemo<React.CSSProperties>(
@@ -45,7 +45,7 @@ export const LabelButtonItemView = memoNamed<Props>(
           ? higherContrastTextColorHsl(props.hsl)
           : hslToStr(props.hsl),
       }),
-      [props.isSelected, props.hsl]
+      [props.isSelected, props.hsl],
     );
 
     const LabelButtonItemBodyComponentConditional = useMemo(
@@ -53,7 +53,7 @@ export const LabelButtonItemView = memoNamed<Props>(
         disabled
           ? LabelButtonItemBodyDisabledStyled
           : LabelButtonItemBodyStyled,
-      [disabled]
+      [disabled],
     );
 
     const onLabelClickConditional = useCallback(() => {
@@ -66,7 +66,7 @@ export const LabelButtonItemView = memoNamed<Props>(
         if (disabled) return;
         props.onVisibilityIconClick(ev);
       },
-      [disabled, props]
+      [disabled, props],
     );
 
     return (
@@ -93,7 +93,7 @@ export const LabelButtonItemView = memoNamed<Props>(
         </LabelButtonItemBodyComponentConditional>
       </div>
     );
-  }
+  },
 );
 
 const iconWrapperStyle = css`

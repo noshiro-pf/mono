@@ -36,6 +36,6 @@ export const sendEmail = async (mailOptions: MailOptions): Promise<void> => {
   await mailTransport.sendMail(mailOptions).catch(logger.error);
 
   logger.log(
-    `email has successfully sent from ${firebaseConfig.gmail.email} to ${mailOptions.to}.`
+    `email has successfully sent from ${firebaseConfig.gmail.email} to ${mailOptions.to}.`,
   );
 };

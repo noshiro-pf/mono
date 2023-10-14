@@ -20,5 +20,5 @@ export const EditIcon = memoNamed<Props>(
         fill={color}
       />
     </svg>
-  )
+  ),
 );

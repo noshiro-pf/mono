@@ -27,7 +27,7 @@ const main = (typeName: string | undefined): void => {
   const program = getProgramFromFiles(
     [path.resolve('src.ts')],
     compilerOptions,
-    basePath
+    basePath,
   );
 
   const schema = generateSchema(program, typeName, settings);

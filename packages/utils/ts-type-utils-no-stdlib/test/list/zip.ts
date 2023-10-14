@@ -28,7 +28,7 @@ expectType<
   readonly [
     readonly [number, string],
     readonly [number, string | undefined],
-    readonly [number, string | undefined]
+    readonly [number, string | undefined],
   ]
 >('=');
 
@@ -40,7 +40,7 @@ expectType<
   readonly [
     readonly [string, number],
     readonly [string | undefined, number],
-    readonly [string | undefined, number]
+    readonly [string | undefined, number],
   ]
 >('=');
 
@@ -53,7 +53,7 @@ expectType<
     readonly [number, string],
     readonly [number, string | undefined],
     readonly [number, string | undefined],
-    ...(readonly [number, string])[]
+    ...(readonly [number, string])[],
   ]
 >('=');
 
@@ -66,6 +66,6 @@ expectType<
     readonly [string, number],
     readonly [string | undefined, number],
     readonly [string | undefined, number],
-    ...(readonly [string, number])[]
+    ...(readonly [string, number])[],
   ]
 >('=');

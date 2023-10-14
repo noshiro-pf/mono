@@ -13,11 +13,11 @@ export const EditEventScheduleOk = memoNamed<Props>(
   'EditEventScheduleOk',
   ({ eventScheduleFromDb }) => {
     const editPageIsHidden = useObservableValue(
-      ConfirmEmailDialogStore.isOpen$
+      ConfirmEmailDialogStore.isOpen$,
     );
 
     const emailVerified = useObservableValue(
-      EditEventScheduleStore.emailVerified$
+      EditEventScheduleStore.emailVerified$,
     );
 
     return (
@@ -31,5 +31,5 @@ export const EditEventScheduleOk = memoNamed<Props>(
         <ConfirmEmailDialog isOpen={editPageIsHidden} />
       </>
     );
-  }
+  },
 );

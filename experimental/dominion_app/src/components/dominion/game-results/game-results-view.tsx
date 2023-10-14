@@ -74,7 +74,7 @@ export const GameResultsView = memo(
         </Paper>
       </Root>
     )
-  }
+  },
 )
 
 GameResultsView.displayName = 'GameResultsView'

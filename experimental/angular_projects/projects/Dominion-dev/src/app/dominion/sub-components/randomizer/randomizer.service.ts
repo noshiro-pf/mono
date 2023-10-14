@@ -12,11 +12,11 @@ export class RandomizerService {
 
   constructor(private database: FireDatabaseService) {
     this.database.cardPropertyList$.subscribe(
-      (val) => (this.cardPropertyList = val)
+      (val) => (this.cardPropertyList = val),
     );
 
     this.database.expansionNameList$.subscribe(
-      (val) => (this.expansionNameList = val)
+      (val) => (this.expansionNameList = val),
     );
   }
 
@@ -42,8 +42,8 @@ export class RandomizerService {
           (e) =>
             this.expansionNameList // selected expansion
               .filter((_, index) => isSelectedExpansions[index])
-              .findIndex((name) => e.data.expansionName.includes(name)) >= 0
-        )
+              .findIndex((name) => e.data.expansionName.includes(name)) >= 0,
+        ),
     );
 
     // 10 Supply KingdomCards10 and Event, LandmarkCards
@@ -80,7 +80,7 @@ export class RandomizerService {
     // 災いカード（収穫祭：魔女娘）
     if (
       selectedCardsTemp.KingdomCards10.map(
-        (e) => this.cardPropertyList[e].nameJp
+        (e) => this.cardPropertyList[e].nameJp,
       ).includes('魔女娘')
     ) {
       if (CardsInSelectedSets_Shuffled.length <= 0) {
@@ -93,7 +93,7 @@ export class RandomizerService {
             e.data.cost.debt <= 0 &&
             e.data.cost.potion <= 0 &&
             e.data.cost.coin >= 2 &&
-            e.data.cost.coin <= 3
+            e.data.cost.coin <= 3,
         ) || { index: 0 }
       ).index;
       selectedCardsTemp.BaneCard = [cardIndex];
@@ -118,23 +118,23 @@ export class RandomizerService {
     // Obelisk (Choose 1 Action Supply Pile)
     if (
       selectedCardsTemp.LandmarkCards.map(
-        (e) => this.cardPropertyList[e].nameEng
+        (e) => this.cardPropertyList[e].nameEng,
       ).includes('Obelisk')
     ) {
       const cardIndex: number = (() => {
         const supplyUsed: number[] = ([] as number[]).concat(
           selectedCardsTemp.KingdomCards10,
-          selectedCardsTemp.BaneCard
+          selectedCardsTemp.BaneCard,
         );
         const ObeliskCandidatesActionCards: number[] =
           utils.array.copy(supplyUsed);
 
         const ct: CardType[] = utils.array.flatten(
-          supplyUsed.map((e) => this.cardPropertyList[e].cardTypes)
+          supplyUsed.map((e) => this.cardPropertyList[e].cardTypes),
         );
         if (ct.includes('Looter')) {
           const ruinsIndex: number = this.cardPropertyList.findIndex(
-            (e) => e.nameJp === '廃墟'
+            (e) => e.nameJp === '廃墟',
           );
           ObeliskCandidatesActionCards.unshift(ruinsIndex);
         }

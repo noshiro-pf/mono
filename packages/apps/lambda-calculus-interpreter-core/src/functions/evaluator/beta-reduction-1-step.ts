@@ -27,8 +27,8 @@ export const betaReduction1step = (term: LambdaTerm): LambdaTerm => {
   }
   console.error(
     `Syntax error: "${Result.unwrapThrow(
-      Json.stringify(term)
-    )}" is not lambda term.`
+      Json.stringify(term),
+    )}" is not lambda term.`,
   );
   return term;
 };

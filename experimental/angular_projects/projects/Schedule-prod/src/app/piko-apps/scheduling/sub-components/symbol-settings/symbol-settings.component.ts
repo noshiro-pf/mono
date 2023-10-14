@@ -14,10 +14,10 @@ export class SymbolSettingsComponent implements OnInit {
   @Input() set symbolsInit(value: ScheduleSymbol[]) {
     this.symbols = value.slice(); // copy
     this.defaultSymbols = this.symbols.filter((e) =>
-      e.id.match(/^(ok|maybe|ng)$/)
+      e.id.match(/^(ok|maybe|ng)$/),
     );
     this.optionalSymbols = this.symbols.filter(
-      (e) => !e.id.match(/^(ok|maybe|ng)$/)
+      (e) => !e.id.match(/^(ok|maybe|ng)$/),
     );
   }
   @Output() symbolsChange = new EventEmitter<ScheduleSymbol[]>();

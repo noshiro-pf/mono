@@ -16,21 +16,21 @@ export function pickupHighContrastHues<N extends SmallUint>(
   saturation: Percent,
   lightness: Percent,
   firstHue: Hue,
-  useLog: boolean
+  useLog: boolean,
 ): ArrayOfLength<N, Hue>;
 export function pickupHighContrastHues(
   n: PositiveSafeIntWithSmallInt,
   saturation: Percent,
   lightness: Percent,
   firstHue: Hue,
-  useLog: boolean
+  useLog: boolean,
 ): NonEmptyArray<Hue>;
 export function pickupHighContrastHues(
   n: SafeUintWithSmallInt,
   saturation: Percent,
   lightness: Percent,
   firstHue: Hue,
-  useLog: boolean
+  useLog: boolean,
 ): NonEmptyArray<Hue> | undefined {
   if (!Num.isPositive(n)) return undefined;
 
@@ -38,7 +38,7 @@ export function pickupHighContrastHues(
 
   const luminanceList: ArrayOfLength<360, NonNegativeFiniteNumber> = Tpl.map(
     hues,
-    (hue) => relativeLuminance(hslToRgb([hue, saturation, lightness]))
+    (hue) => relativeLuminance(hslToRgb([hue, saturation, lightness])),
   );
 
   const luminanceDiffAccumulated: NonEmptyArray<NonNegativeFiniteNumber> =

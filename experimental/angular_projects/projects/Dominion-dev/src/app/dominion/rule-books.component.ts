@@ -137,12 +137,12 @@ export class RuleBooksComponent implements OnInit {
   private toImgUrl = (filename: string) =>
     fromObservable(
       '',
-      this.storage.ref(`${this.COVER_IMAGE_DIR}/${filename}`).getDownloadURL()
+      this.storage.ref(`${this.COVER_IMAGE_DIR}/${filename}`).getDownloadURL(),
     );
 
   private toPdfUrl = (filename: string) =>
     fromObservable(
       '',
-      this.storage.ref(`${this.PDF_DIR}/${filename}`).getDownloadURL()
+      this.storage.ref(`${this.PDF_DIR}/${filename}`).getDownloadURL(),
     );
 }

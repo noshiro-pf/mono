@@ -14,7 +14,7 @@ export const distinctUntilChanged =
     new DistinctUntilChangedObservableClass(parentObservable, eq);
 
 export const distinctUntilChangedI = <A>(
-  eq: (x: A, y: A) => boolean = (x, y) => x === y
+  eq: (x: A, y: A) => boolean = (x, y) => x === y,
 ): InitializedToInitializedOperator<A, A> =>
   // eslint-disable-next-line no-restricted-syntax
   distinctUntilChanged(eq) as InitializedToInitializedOperator<A, A>;

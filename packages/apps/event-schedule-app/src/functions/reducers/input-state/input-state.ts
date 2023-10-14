@@ -19,7 +19,7 @@ export type InputStateAction = Readonly<
 
 export const inputStateReducer: Reducer<InputState, InputStateAction> = (
   state,
-  action
+  action,
 ) => {
   switch (action.type) {
     case 'input':

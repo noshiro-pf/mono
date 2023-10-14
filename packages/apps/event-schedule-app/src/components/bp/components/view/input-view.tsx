@@ -48,7 +48,7 @@ export const InputView = memoNamed<Props>(
           onInputStringChange?.(ev.currentTarget.value);
           onInputChange?.(ev);
         },
-        [onInputStringChange, onInputChange]
+        [onInputStringChange, onInputChange],
       );
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -61,7 +61,7 @@ export const InputView = memoNamed<Props>(
             inputRef.current?.select();
           }
         },
-        [selectOnFocus, onInputFocus]
+        [selectOnFocus, onInputFocus],
       );
 
     return (
@@ -82,7 +82,7 @@ export const InputView = memoNamed<Props>(
         </InputGroup>
       </InputControlGroup>
     );
-  }
+  },
 );
 
 const defaultFocusStyle = css`
@@ -163,8 +163,11 @@ const Input = styled.input`
   appearance: none;
   background: #ffffff;
   border: none;
-  box-shadow: 0 0 0 0 rgb(19 124 189 / 0%), 0 0 0 0 rgb(19 124 189 / 0%),
-    inset 0 0 0 1px rgb(16 22 26 / 15%), inset 0 1px 1px rgb(16 22 26 / 20%);
+  box-shadow:
+    0 0 0 0 rgb(19 124 189 / 0%),
+    0 0 0 0 rgb(19 124 189 / 0%),
+    inset 0 0 0 1px rgb(16 22 26 / 15%),
+    inset 0 1px 1px rgb(16 22 26 / 20%);
   color: #182026;
   font-size: 14px;
   font-weight: 400;
@@ -172,7 +175,8 @@ const Input = styled.input`
   line-height: 30px;
   outline: none;
   padding: 0 10px;
-  transition: box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
   vertical-align: middle;
 
@@ -184,7 +188,9 @@ const Input = styled.input`
 
   &:focus {
     outline-offset: 2px;
-    box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgb(19 124 189 / 30%),
+    box-shadow:
+      0 0 0 1px #137cbd,
+      0 0 0 3px rgb(19 124 189 / 30%),
       inset 0 1px 1px rgb(16 22 26 / 20%);
 
     border-radius: 3px;

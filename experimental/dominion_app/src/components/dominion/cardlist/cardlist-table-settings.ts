@@ -36,7 +36,7 @@ export const cardlistTableSettings = (setNameIndex: I.Map<string, number>) =>
         label: 'セット名',
         sort: list.lexicalCmp(
           (a: string, b: string): number =>
-            setNameIndex.get(a, -1) - setNameIndex.get(b, -1)
+            setNameIndex.get(a, -1) - setNameIndex.get(b, -1),
         ),
         cellToStr: (names: I.List<string>) => names.join('，'),
       }),

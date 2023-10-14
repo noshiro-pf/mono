@@ -40,42 +40,42 @@ export const fillNotificationSettings = (a?: unknown): NotificationSettings =>
         notifyOnAnswerChange: Obj.hasKeyValue(
           a,
           'notifyOnAnswerChange',
-          isBoolean
+          isBoolean,
         )
           ? a.notifyOnAnswerChange
           : d.notifyOnAnswerChange,
         notify01daysBeforeAnswerDeadline: Obj.hasKeyValue(
           a,
           'notify01daysBeforeAnswerDeadline',
-          isBoolean
+          isBoolean,
         )
           ? a.notify01daysBeforeAnswerDeadline
           : d.notify01daysBeforeAnswerDeadline,
         notify03daysBeforeAnswerDeadline: Obj.hasKeyValue(
           a,
           'notify03daysBeforeAnswerDeadline',
-          isBoolean
+          isBoolean,
         )
           ? a.notify03daysBeforeAnswerDeadline
           : d.notify03daysBeforeAnswerDeadline,
         notify07daysBeforeAnswerDeadline: Obj.hasKeyValue(
           a,
           'notify07daysBeforeAnswerDeadline',
-          isBoolean
+          isBoolean,
         )
           ? a.notify07daysBeforeAnswerDeadline
           : d.notify07daysBeforeAnswerDeadline,
         notify14daysBeforeAnswerDeadline: Obj.hasKeyValue(
           a,
           'notify14daysBeforeAnswerDeadline',
-          isBoolean
+          isBoolean,
         )
           ? a.notify14daysBeforeAnswerDeadline
           : d.notify14daysBeforeAnswerDeadline,
         notify28daysBeforeAnswerDeadline: Obj.hasKeyValue(
           a,
           'notify28daysBeforeAnswerDeadline',
-          isBoolean
+          isBoolean,
         )
           ? a.notify28daysBeforeAnswerDeadline
           : d.notify28daysBeforeAnswerDeadline,

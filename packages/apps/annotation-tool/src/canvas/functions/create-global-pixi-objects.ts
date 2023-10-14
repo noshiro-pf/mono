@@ -40,7 +40,7 @@ export const createGlobalPixiObjects = ({
       width: canvasStyles.crosshairLineWidthPx,
       height: canvasSize.height,
     },
-    canvasStyles.crosshairLineColor
+    canvasStyles.crosshairLineColor,
   );
 
   const horizontalLine = createRectangleSprite(
@@ -50,7 +50,7 @@ export const createGlobalPixiObjects = ({
       width: canvasSize.width,
       height: canvasStyles.crosshairLineWidthPx,
     },
-    canvasStyles.crosshairLineColor
+    canvasStyles.crosshairLineColor,
   );
 
   const mut_temporaryRect: PixiTempRect = {
@@ -64,7 +64,7 @@ export const createGlobalPixiObjects = ({
       { left: 0, top: 0, width: 1, height: 1 },
       canvasStyles.temporaryRectFaceColor,
       canvasStyles.temporaryRectBorderWidthPx,
-      canvasStyles.temporaryRectBorderColor
+      canvasStyles.temporaryRectBorderColor,
     ),
   };
 
@@ -74,7 +74,7 @@ export const createGlobalPixiObjects = ({
     background,
     verticalLine,
     horizontalLine,
-    mut_temporaryRect.pixi
+    mut_temporaryRect.pixi,
   );
 
   return {

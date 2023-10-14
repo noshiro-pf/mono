@@ -33,7 +33,7 @@ export const validateEventSchedule = ({
     answerIcons.poor.description === '' ||
     Num.isInRangeInclusive(
       answerIconPointConfig.fair.min,
-      answerIconPointConfig.fair.max
+      answerIconPointConfig.fair.max,
     )(answerIcons.fair.point),
   notificationEmail:
     notificationSettingsWithEmail === 'none' ||
@@ -51,7 +51,7 @@ export const validateEventSchedule = ({
 });
 
 export const validateEventScheduleAll = (
-  eventScheduleValidation: EventScheduleValidation
+  eventScheduleValidation: EventScheduleValidation,
 ): boolean =>
   eventScheduleValidation.title &&
   eventScheduleValidation.datetimeRangeList &&

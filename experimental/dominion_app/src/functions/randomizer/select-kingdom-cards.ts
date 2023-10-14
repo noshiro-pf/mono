@@ -4,7 +4,7 @@ import { TDCardProperty } from '~/types/dcard-property'
 export const selectKingdomCards = (
   shuffledDcardsGen: IterableIterator<
     { index: number; dcardprop: TDCardProperty } | undefined
-  >
+  >,
 ) => {
   const KingdomCards10temp: number[] = []
   const EventCardsTemp: number[] = []

@@ -12,5 +12,5 @@ export const expectType = <A, B>(
     ? '<=' | '='
     : TypeExtends<A, B> extends true
     ? '!=' | '<='
-    : '!<=' | '!='
+    : '!<=' | '!=',
 ): void => undefined;

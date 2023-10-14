@@ -60,7 +60,7 @@ export class SubmitGameResultService {
   constructor(
     private database: FireDatabaseService,
     private myGameRoomService: MyGameRoomService,
-    private gameStateService: GameStateService
+    private gameStateService: GameStateService,
   ) {}
 
   submitGameResult(gameResult: GameResult) {
@@ -69,7 +69,7 @@ export class SubmitGameResultService {
 
   private countNumberOfVictoryCards(
     playerIndex: number,
-    gameState: GameState
+    gameState: GameState,
   ): NumberOfVictoryCards {
     const nofVictoryCards = new NumberOfVictoryCards();
     nofVictoryCards.VPtoken = gameState.allPlayersData[playerIndex].VPtoken;
@@ -82,13 +82,13 @@ export class SubmitGameResultService {
       });
     nofVictoryCards.DeckSize = allCards.length;
     nofVictoryCards.numberOfActionCards = allCards.filter((e) =>
-      e.cardProperty.cardTypes.includes('Action')
+      e.cardProperty.cardTypes.includes('Action'),
     ).length;
     nofVictoryCards.numberOfDifferentlyNamedCards = utils.array.uniq(
-      allCards.map((e) => e.cardProperty.nameEng)
+      allCards.map((e) => e.cardProperty.nameEng),
     ).length;
     nofVictoryCards.numberOfSilvers = allCards.filter(
-      (e) => e.cardProperty.cardId === 'Silver'
+      (e) => e.cardProperty.cardId === 'Silver',
     ).length;
     // TavernMatを追加したら編集
     nofVictoryCards.Distant_Lands_on_TavernMat = 0;

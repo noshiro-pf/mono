@@ -8,7 +8,7 @@ const cmpR = (x: string, y: string): number => cmp(y, x);
 const subMatch = (
   target: string,
   key: string,
-  ignoreCase: boolean = false
+  ignoreCase: boolean = false,
 ): boolean =>
   ignoreCase
     ? subMatch(target.toUpperCase(), key.toUpperCase())

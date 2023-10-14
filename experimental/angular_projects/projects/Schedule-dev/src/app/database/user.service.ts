@@ -9,19 +9,19 @@ import { DatabaseService } from './database.service';
 export class UserService {
   uid$: RN<string> = fromObservable<fbUser>(
     {} as fbUser,
-    this.afAuth.authState
+    this.afAuth.authState,
   ).map((user) => (user || { uid: '' }).uid || '');
 
   signedIn$: RN<boolean> = fromObservable<fbUser>(
     {} as fbUser,
-    this.afAuth.authState
+    this.afAuth.authState,
   ).map((user) => !!user);
 
   private user$: RN<User> = combine(this.uid$, this.database.users$).map(
     ([uid, users]) =>
       !uid || users.length === 0
         ? new User()
-        : users.find((e) => e.databaseKey === uid) || new User()
+        : users.find((e) => e.databaseKey === uid) || new User(),
   );
 
   name$: RN<string> = this.user$.pluck('name').skipUnchanged();
@@ -30,7 +30,7 @@ export class UserService {
 
   constructor(
     private afAuth: AngularFireAuth,
-    private database: DatabaseService
+    private database: DatabaseService,
   ) {}
 
   async setMyName(value: string) {

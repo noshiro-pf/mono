@@ -12,7 +12,7 @@ const millisecOfADay: number = 24 * 3600 * 1000;
 
 export const todayIsNDaysBeforeDeadline = (
   n: 0 | 1 | 3 | 7 | 14 | 28,
-  answerDeadlineYmdhm: Ymdhm
+  answerDeadlineYmdhm: Ymdhm,
 ): boolean => {
   const answerDeadlineDate = ymd2DateObject(answerDeadlineYmdhm);
   const todayDate = ymd2DateObject(today());

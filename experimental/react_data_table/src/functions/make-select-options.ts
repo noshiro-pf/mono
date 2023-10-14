@@ -6,20 +6,20 @@ import { ISelectorOptionWithViewValue } from '../types/selector-option-with-view
 
 export const makeAllSelectOptions = (
   table: I.List<I.List<any>>,
-  columnSettings: I.List<TColumnSetting>
+  columnSettings: I.List<TColumnSetting>,
 ): I.List<I.List<ISelectorOptionWithViewValue>> =>
   !table || table.isEmpty()
     ? columnSettings.map(() => I.List())
     : columnSettings.map((cs, ci) =>
         makeSelectOptions(
           table.map((line) => line.get(ci)),
-          cs
-        )
+          cs,
+        ),
       )
 
 const makeSelectOptions = (
   column: I.List<any>,
-  cs: TColumnSetting
+  cs: TColumnSetting,
 ): I.List<any> => {
   if (
     cs.filterType !== 'select' &&

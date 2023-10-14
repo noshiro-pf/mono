@@ -26,7 +26,7 @@ export const ArchiveEventButton = memoNamed<Props>(
         ev.stopPropagation();
         handleOpen();
       },
-      [handleOpen]
+      [handleOpen],
     );
 
     const onCancel = useCallback(
@@ -36,7 +36,7 @@ export const ArchiveEventButton = memoNamed<Props>(
         ev.stopPropagation();
         handleClose();
       },
-      [handleClose]
+      [handleClose],
     );
 
     const onConfirmHandler = useCallback(
@@ -48,7 +48,7 @@ export const ArchiveEventButton = memoNamed<Props>(
         handleClose();
         onConfirm();
       },
-      [onConfirm, handleClose]
+      [onConfirm, handleClose],
     );
 
     return (
@@ -78,5 +78,5 @@ export const ArchiveEventButton = memoNamed<Props>(
         </AlertWithMaxWidth>
       </>
     );
-  }
+  },
 );

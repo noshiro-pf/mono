@@ -31,9 +31,9 @@ export const DCardPropertyDialog = memo(
     const card$: RN<TDCardProperty> = useRN(
       combine(dcardIndex$, fb.dcardlist$)
         .map(([dcardIndex, dcardlist]) =>
-          dcardlist.get(dcardIndex, DCardProperty())
+          dcardlist.get(dcardIndex, DCardProperty()),
         )
-        .skipUnchanged()
+        .skipUnchanged(),
     )
 
     const cardForView$ = useRN(card$.map(DCardPropertytoStr))
@@ -52,7 +52,7 @@ export const DCardPropertyDialog = memo(
         dcardIndex={dcardIndex}
       />
     )
-  }
+  },
 )
 
 DCardPropertyDialog.displayName = 'DCardPropertyDialog'

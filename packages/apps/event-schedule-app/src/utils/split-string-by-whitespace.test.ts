@@ -33,7 +33,7 @@ describe('splitStringByWhitespace', () => {
     expect(
       splitStringByWhitespace(`aaa
     bbb
-    ccc`)
+    ccc`),
     ).toStrictEqual(['aaa', '\n    ', 'bbb', '\n    ', 'ccc']);
   });
 });

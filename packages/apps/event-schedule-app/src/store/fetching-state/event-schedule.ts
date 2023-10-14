@@ -7,7 +7,7 @@ const [fetchEventSchedule$, _fetchEventSchedule] = createVoidEventEmitter();
 const fetchEventSchedule = _fetchEventSchedule;
 
 const fetchEventScheduleThrottled$ = fetchEventSchedule$.chain(
-  throttleTime(fetchThrottleTime)
+  throttleTime(fetchThrottleTime),
 );
 
 const { state$: eventScheduleResult$, setState: setEventScheduleResult } =

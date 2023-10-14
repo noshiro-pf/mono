@@ -32,7 +32,7 @@ import { SchedulingComponent } from './piko-apps/scheduling/scheduling.component
         },
         { component: NotFoundPageComponent, path: '**' },
       ],
-      { useHash: true }
+      { useHash: true },
     ),
   ],
   exports: [RouterModule],

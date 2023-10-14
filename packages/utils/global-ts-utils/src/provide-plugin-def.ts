@@ -101,5 +101,5 @@ export const providePluginDef = Object.fromEntries(
     'Uint16',
     'Uint32',
     'Uint8',
-  ].map((key) => tp(key, tp('@noshiro/ts-utils', key)))
+  ].map((key) => tp(key, tp('@noshiro/ts-utils', key))),
 );

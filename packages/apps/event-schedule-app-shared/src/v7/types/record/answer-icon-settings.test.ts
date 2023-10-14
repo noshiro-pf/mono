@@ -29,7 +29,7 @@ describe('AnswerIconSettings', () => {
   describe('fillAnswerIconSettings', () => {
     test('defaultValue should be true', () => {
       expect(fillAnswerIconSettings({})).toStrictEqual(
-        answerIconSettingsDefaultValue
+        answerIconSettingsDefaultValue,
       );
     });
   });

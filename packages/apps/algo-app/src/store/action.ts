@@ -17,10 +17,10 @@ export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
   // eslint-disable-next-line deprecation/deprecation
   merge([
     localGameStateActionSource$.chain(
-      map((a) => ({ type: 'local', value: a } as const))
+      map((a) => ({ type: 'local', value: a }) as const),
     ),
     db.actionsFromDb$.chain(
-      map((a) => ({ type: 'remote', value: a } as const))
+      map((a) => ({ type: 'remote', value: a }) as const),
     ),
   ] as const)
     .chain(
@@ -51,7 +51,7 @@ export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
                 : {
                     newCommits: Arr.skip(
                       action.value,
-                      Arr.length(commitsPlayed)
+                      Arr.length(commitsPlayed),
                     ),
                     commitsPlayed: action.value,
                   };
@@ -60,8 +60,8 @@ export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
         {
           newCommits: [],
           commitsPlayed: [],
-        }
-      )
+        },
+      ),
     )
     .chain(map((s) => s.newCommits));
 
@@ -163,12 +163,15 @@ export const onAnswerSubmit = (): void => {
     });
   }, autoPlaySpeedRate * time.showJudge);
 
-  setTimeout(() => {
-    gameStateDispatcher({
-      type: 'hideDecidedAnswerBalloon',
-      timestamp: serverTimestamp(),
-    });
-  }, autoPlaySpeedRate * (time.showJudge + time.hideJudge));
+  setTimeout(
+    () => {
+      gameStateDispatcher({
+        type: 'hideDecidedAnswerBalloon',
+        timestamp: serverTimestamp(),
+      });
+    },
+    autoPlaySpeedRate * (time.showJudge + time.hideJudge),
+  );
 };
 
 export const onTurnEndClick = (): void => {
@@ -307,7 +310,7 @@ const autoPlayMargin = toSafeUint(1 + (time.showJudge + time.hideJudge) / 1000);
 
 const actionsToAutoPlayStream = (
   actions: NonEmptyArray<GameStateAction>,
-  numSkip: SafeUintWithSmallInt
+  numSkip: SafeUintWithSmallInt,
 ): Observable<GameStateAction> =>
   zip([
     Num.isNonZero(numSkip)
@@ -323,7 +326,7 @@ const autoPlay = merge([
   actionsToAutoPlayStream(actionsToAutoPlay[0], 0),
   actionsToAutoPlayStream(
     actionsToAutoPlay[1],
-    SafeUint.add(autoPlayMargin, Arr.length(actionsToAutoPlay[0]))
+    SafeUint.add(autoPlayMargin, Arr.length(actionsToAutoPlay[0])),
   ),
   actionsToAutoPlayStream(
     actionsToAutoPlay[2],
@@ -331,8 +334,8 @@ const autoPlay = merge([
       autoPlayMargin +
         actionsToAutoPlay[0].length +
         autoPlayMargin +
-        actionsToAutoPlay[1].length
-    )
+        actionsToAutoPlay[1].length,
+    ),
   ),
   actionsToAutoPlayStream(
     actionsToAutoPlay[3],
@@ -342,8 +345,8 @@ const autoPlay = merge([
         autoPlayMargin +
         actionsToAutoPlay[1].length +
         autoPlayMargin +
-        actionsToAutoPlay[2].length
-    )
+        actionsToAutoPlay[2].length,
+    ),
   ),
 ] as const);
 

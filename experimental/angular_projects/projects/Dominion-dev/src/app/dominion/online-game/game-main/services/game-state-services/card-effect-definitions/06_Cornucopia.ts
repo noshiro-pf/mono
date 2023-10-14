@@ -8,13 +8,13 @@ import { DataForCardEffect } from './data-for-card-effect';
 export const Menagerie = async (
   thisDcard: DCard,
   pid: number,
-  data: DataForCardEffect
+  data: DataForCardEffect,
 ) => {
   await cs.revealHandCards(pid, 2, data);
   const handCards = data.gameState.DCards.allPlayersCards[pid].HandCards;
   const handCardsUniq = utils.array.uniq(
     handCards,
-    (d: DCard) => d.cardProperty.cardId
+    (d: DCard) => d.cardProperty.cardId,
   );
 
   if (handCards.length === handCardsUniq.length) {

@@ -18,7 +18,7 @@ export const GameResultMemo = memo(
         <MyInput value={memo} valueChange={memoChange} label='Memo' />
       )}
     </div>
-  )
+  ),
 )
 
 GameResultMemo.displayName = 'GameResultMemo'

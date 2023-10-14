@@ -2,7 +2,7 @@ import { Arr, Uint32 } from '@noshiro/ts-utils';
 import { type LowerAlphabet, type UpperAlphabet } from '../types';
 
 export const getAlphabets = <Case extends 'lower' | 'upper'>(
-  charCase: Case
+  charCase: Case,
 ): [Case] extends ['lower']
   ? LowerAlphabet[]
   : [Case] extends ['upper']
@@ -13,7 +13,7 @@ export const getAlphabets = <Case extends 'lower' | 'upper'>(
 
   // eslint-disable-next-line no-restricted-syntax
   return Arr.seq(26).map((i) => String.fromCodePoint(Uint32.add(code, i))) as [
-    Case
+    Case,
   ] extends ['lower']
     ? LowerAlphabet[]
     : [Case] extends ['upper']

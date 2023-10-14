@@ -62,17 +62,17 @@ export const AnswerBeingEdited = memoNamed<Props>(
         (v) =>
           v === '' ||
           theNameIsAlreadyUsedFn(v, answers, selectedAnswerUserName),
-        AnswerPageStore.onUserNameChange
+        AnswerPageStore.onUserNameChange,
       );
 
     const theNameIsAlreadyUsed = useObservableValue(
-      AnswerPageStore.theNameIsAlreadyUsed$
+      AnswerPageStore.theNameIsAlreadyUsed$,
     );
 
     const iconHeader = useObservableValue(AnswerPageStore.iconHeader$);
 
     const answerBeingEditedList = useObservableValue(
-      AnswerPageStore.answerBeingEditedList$
+      AnswerPageStore.answerBeingEditedList$,
     );
 
     const hasUnanswered = useObservableValue(AnswerPageStore.hasUnanswered$);
@@ -82,11 +82,11 @@ export const AnswerBeingEdited = memoNamed<Props>(
     const forNonLoggedInUserDialogState = useBoolState(false);
 
     const batchInputFieldIsOpen = useObservableValue(
-      AnswerPageStore.batchInputFieldIsOpen$
+      AnswerPageStore.batchInputFieldIsOpen$,
     );
 
     const checkboxesState = useObservableValue(
-      AnswerPageStore.checkboxesState$
+      AnswerPageStore.checkboxesState$,
     );
 
     return (
@@ -270,7 +270,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                       />
                     </td>
                   </tr>
-                )
+                ),
               )}
             </tbody>
           </HTMLTableBorderedStyled2>
@@ -372,7 +372,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
         </ButtonsWrapperAlignEnd>
       </>
     );
-  }
+  },
 );
 
 const Paragraph = styled.div`

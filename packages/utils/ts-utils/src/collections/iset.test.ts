@@ -158,7 +158,7 @@ describe('ISet.isSubsetOf', () => {
   });
   test('case 2', () => {
     expect(ISet.new([1, 2, 3]).isSubsetOf(ISet.new([1, 3, 5, 6, 7]))).toBe(
-      false
+      false,
     );
   });
 });
@@ -169,7 +169,7 @@ describe('ISet.isSupersetOf', () => {
   });
   test('case 2', () => {
     expect(ISet.new([1, 3, 5, 6, 7]).isSupersetOf(ISet.new([1, 2, 3]))).toBe(
-      false
+      false,
     );
   });
 });
@@ -177,12 +177,12 @@ describe('ISet.isSupersetOf', () => {
 describe('ISet.subtract', () => {
   test('case 1', () => {
     expect(ISet.new([1, 3, 5, 6, 7]).subtract(ISet.new([1, 3]))).toStrictEqual(
-      ISet.new([5, 6, 7])
+      ISet.new([5, 6, 7]),
     );
   });
   test('case 2', () => {
     expect(
-      ISet.new([1, 3, 5, 6, 7]).subtract(ISet.new([1, 2, 3]))
+      ISet.new([1, 3, 5, 6, 7]).subtract(ISet.new([1, 2, 3])),
     ).toStrictEqual(ISet.new([5, 6, 7]));
   });
 });
@@ -190,12 +190,12 @@ describe('ISet.subtract', () => {
 describe('ISet.intersection', () => {
   test('case 1', () => {
     expect(
-      ISet.intersection(ISet.new([1, 3, 5, 6, 7]), ISet.new<number>([]))
+      ISet.intersection(ISet.new([1, 3, 5, 6, 7]), ISet.new<number>([])),
     ).toStrictEqual(ISet.new([]));
   });
   test('case 2', () => {
     expect(
-      ISet.intersection(ISet.new([1, 3, 5, 6, 7]), ISet.new([1, 2, 3]))
+      ISet.intersection(ISet.new([1, 3, 5, 6, 7]), ISet.new([1, 2, 3])),
     ).toStrictEqual(ISet.new([1, 3]));
   });
 });
@@ -203,14 +203,14 @@ describe('ISet.intersection', () => {
 describe('ISet.union', () => {
   test('case 1', () => {
     expect(
-      ISet.union(ISet.new([1, 3, 5, 6, 7]), ISet.new<number>([]))
+      ISet.union(ISet.new([1, 3, 5, 6, 7]), ISet.new<number>([])),
     ).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
   });
   test('case 2', () => {
     expect(
       Array.from(
-        ISet.union(ISet.new([1, 3, 5, 6, 7]), ISet.new([2, 4, 8])).toArray()
-      ).sort((a, b) => a - b)
+        ISet.union(ISet.new([1, 3, 5, 6, 7]), ISet.new([2, 4, 8])).toArray(),
+      ).sort((a, b) => a - b),
     ).toStrictEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 });

@@ -7,14 +7,14 @@ export const toPromiseSnackbarState =
   <T>(
     timerMillisec: number,
     initialStateMapFn: (value: T) => PromiseSnackbarStateType,
-    delayedStateMapFn: (value: T) => PromiseSnackbarStateType
+    delayedStateMapFn: (value: T) => PromiseSnackbarStateType,
   ): OperatorFunction<T, PromiseSnackbarStateType> =>
   (source$: Observable<T>): Observable<PromiseSnackbarStateType> =>
     source$.pipe(
       switchMap((value) =>
         timer(timerMillisec).pipe(
           mapTo(delayedStateMapFn(value)),
-          startWith(initialStateMapFn(value))
-        )
-      )
+          startWith(initialStateMapFn(value)),
+        ),
+      ),
     );

@@ -1,5 +1,5 @@
 export const useState = <T>(
-  init: T
+  init: T,
 ): [T, (next: T) => void, (updater: (from: T) => T) => void] => {
   let value = init;
   const setValue = (next: T) => {

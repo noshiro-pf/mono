@@ -40,16 +40,16 @@ const updateStore = async (): Promise<boolean> => {
     const documentRef = db.doc(`${collectionNameNext}/${id}`);
     writeBatch.set(
       documentRef,
-      fillEventSchedule(doc.data() as EventScheduleCurr)
+      fillEventSchedule(doc.data() as EventScheduleCurr),
     );
 
     for (const ans of answersSnapshotCurr.docs) {
       const documentRefForAnswers = db.doc(
-        `${collectionNameNext}/${id}/${subCollectionName}/${ans.id}`
+        `${collectionNameNext}/${id}/${subCollectionName}/${ans.id}`,
       );
       writeBatch.set(
         documentRefForAnswers,
-        fillAnswer(ans.data() as AnswerCurr)
+        fillAnswer(ans.data() as AnswerCurr),
       );
     }
   }

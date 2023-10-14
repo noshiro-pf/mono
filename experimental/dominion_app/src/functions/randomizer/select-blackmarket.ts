@@ -7,7 +7,7 @@ export const selectBlackMarketPile = (
   dcardlist: I.List<TDCardProperty>,
   shuffledDcardsGen: IterableIterator<
     { index: number; dcardprop: TDCardProperty } | undefined
-  >
+  >,
 ): I.List<number> | 'error' => {
   if (
     KingdomCards10.concat(BaneCard)

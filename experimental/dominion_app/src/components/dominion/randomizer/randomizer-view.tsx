@@ -25,7 +25,7 @@ export const RandomizerView = memo(
         BlackMarketIsUsed
           ? ['Randomizer', '結果入力', '闇市場デッキ']
           : ['Randomizer', '結果入力'],
-      [BlackMarketIsUsed]
+      [BlackMarketIsUsed],
     )
 
     return (
@@ -53,7 +53,7 @@ export const RandomizerView = memo(
         )}
       </>
     )
-  }
+  },
 )
 
 RandomizerView.displayName = 'RandomizerView'

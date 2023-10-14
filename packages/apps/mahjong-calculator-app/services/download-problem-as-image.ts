@@ -23,6 +23,6 @@ export const downloadProblemAsImage = async (): Promise<void> => {
 
   downloadFile(
     src,
-    `${hand2String(handSorted.value, revealedBlocks.value)}.png`
+    `${hand2String(handSorted.value, revealedBlocks.value)}.png`,
   );
 };

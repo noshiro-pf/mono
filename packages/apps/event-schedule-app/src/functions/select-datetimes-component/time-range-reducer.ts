@@ -24,8 +24,8 @@ export const timeRangeReducer: Reducer<State, Action> = (state, action) => {
         .chain((r) => Obj.set(r, 'start', newStart))
         .chain((r) =>
           Obj.update(r, 'end', (e) =>
-            compareHm(newStart, e) <= 0 ? e : newStart
-          )
+            compareHm(newStart, e) <= 0 ? e : newStart,
+          ),
         ).value;
     }
 
@@ -35,8 +35,8 @@ export const timeRangeReducer: Reducer<State, Action> = (state, action) => {
         .chain((r) => Obj.set(r, 'end', newEnd))
         .chain((r) =>
           Obj.update(r, 'start', (s) =>
-            compareHm(s, newEnd) <= 0 ? s : newEnd
-          )
+            compareHm(s, newEnd) <= 0 ? s : newEnd,
+          ),
         ).value;
     }
   }

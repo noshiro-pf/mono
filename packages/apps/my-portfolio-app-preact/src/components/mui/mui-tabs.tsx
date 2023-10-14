@@ -25,12 +25,12 @@ export const MuiTabs = memoNamed<Props>(
 
     const tabWidthListWithDefault = useMemo(
       () => labels.map((_, index) => tabWidthList[index] ?? tabWidthPx),
-      [tabWidthList, tabWidthPx, labels]
+      [tabWidthList, tabWidthPx, labels],
     );
 
     const tabWidthAccumulated = useMemo(
       () => Arr.scan(tabWidthListWithDefault, (acc, curr) => acc + curr, 0),
-      [tabWidthListWithDefault]
+      [tabWidthListWithDefault],
     );
 
     const labelsWithHandler = useMemo<
@@ -54,7 +54,7 @@ export const MuiTabs = memoNamed<Props>(
             updateTabWidthList((prev) => Arr.set(prev, index, width));
           },
         })),
-      [labels, tabIndexChange, updateTabWidthList]
+      [labels, tabIndexChange, updateTabWidthList],
     );
 
     return (
@@ -82,7 +82,7 @@ export const MuiTabs = memoNamed<Props>(
         </TabsScroller>
       </Root>
     );
-  }
+  },
 );
 
 const Root = styled('div')`
@@ -102,7 +102,7 @@ const TabsScroller = memoNamed<
     <TabScrollerStyledScrollable>{children}</TabScrollerStyledScrollable>
   ) : (
     <TabsScrollerBaseStyled>{children}</TabsScrollerBaseStyled>
-  )
+  ),
 );
 
 const TabsScrollerBaseStyled = styled('div')`
@@ -135,7 +135,7 @@ const Tab = memoNamed<{
       maxWidth: `${tabWidthPx}px`,
       color: selected ? '#3f51b5' : undefined,
     }),
-    [selected, tabWidthPx]
+    [selected, tabWidthPx],
   );
 
   const [{ width }, ref] = useResizeObserver<HTMLDivElement>();
@@ -215,7 +215,7 @@ const TabIndicator = memoNamed<
         width: `${tabWidthList[tabIndex] ?? tabWidthPx}px`,
       }}
     />
-  )
+  ),
 );
 
 const TabIndicatorStyled = styled('span')`

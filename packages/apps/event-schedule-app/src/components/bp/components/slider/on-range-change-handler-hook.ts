@@ -3,7 +3,7 @@ import { useValueAsRef } from '@noshiro/react-utils';
 export const useOnRangeChangeHandlerHook = (
   range: Readonly<{ min: number; max: number }>,
   onChange?: (value: Readonly<{ min: number; max: number }>) => void,
-  onRelease?: (value: Readonly<{ min: number; max: number }>) => void
+  onRelease?: (value: Readonly<{ min: number; max: number }>) => void,
 ): Readonly<{
   onRangeMinChange: (x: number) => void;
   onRangeMaxChange: (x: number) => void;
@@ -19,7 +19,7 @@ export const useOnRangeChangeHandlerHook = (
         max: rangeRef.current.max,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onChange]
+    [onChange],
   );
 
   const onRangeMaxChange = useCallback(
@@ -29,7 +29,7 @@ export const useOnRangeChangeHandlerHook = (
         max: value,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onChange]
+    [onChange],
   );
 
   const onRangeMinRelease = useCallback(
@@ -39,7 +39,7 @@ export const useOnRangeChangeHandlerHook = (
         max: rangeRef.current.max,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onRelease]
+    [onRelease],
   );
 
   const onRangeMaxRelease = useCallback(
@@ -49,7 +49,7 @@ export const useOnRangeChangeHandlerHook = (
         max: value,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onRelease]
+    [onRelease],
   );
 
   return {

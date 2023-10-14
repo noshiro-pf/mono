@@ -69,5 +69,5 @@ export const CommentButton = memoNamed<Props>(
         )}
       </Popover>
     );
-  }
+  },
 );

@@ -19,7 +19,7 @@ export const unwrapMaybe =
     new UnwrapMaybeObservableClass(parentObservable);
 
 export const unwrapMaybeI = <
-  M extends Maybe.Base
+  M extends Maybe.Base,
 >(): InitializedToInitializedOperator<M, Maybe.Unwrap<M> | undefined> =>
   // eslint-disable-next-line no-restricted-syntax
   unwrapMaybe() as InitializedToInitializedOperator<
@@ -36,7 +36,7 @@ export const unwrapResultOk =
     new UnwrapResultOkObservableClass(parentObservable);
 
 export const unwrapResultOkI = <
-  R extends Result.Base
+  R extends Result.Base,
 >(): InitializedToInitializedOperator<R, Result.UnwrapOk<R> | undefined> =>
   // eslint-disable-next-line no-restricted-syntax
   unwrapResultOk() as InitializedToInitializedOperator<
@@ -53,7 +53,7 @@ export const unwrapResultErr =
     new UnwrapResultErrObservableClass(parentObservable);
 
 export const unwrapResultErrI = <
-  R extends Result.Base
+  R extends Result.Base,
 >(): InitializedToInitializedOperator<R, Result.UnwrapErr<R> | undefined> =>
   // eslint-disable-next-line no-restricted-syntax
   unwrapResultErr() as InitializedToInitializedOperator<
@@ -67,20 +67,20 @@ export const mapMaybe =
     new MapMaybeObservableClass(parentObservable, mapFn);
 
 export const mapMaybeI = <M extends Maybe.Base, B>(
-  mapFn: (x: Maybe.Unwrap<M>) => B
+  mapFn: (x: Maybe.Unwrap<M>) => B,
 ): InitializedToInitializedOperator<M, Maybe<B>> =>
   // eslint-disable-next-line no-restricted-syntax
   mapMaybe(mapFn) as InitializedToInitializedOperator<M, Maybe<B>>;
 
 export const mapResultOk =
   <R extends Result.Base, S2>(
-    mapFn: (x: Result.UnwrapOk<R>) => S2
+    mapFn: (x: Result.UnwrapOk<R>) => S2,
   ): ToBaseOperator<R, Result<S2, Result.UnwrapErr<R>>> =>
   (parentObservable: Observable<R>) =>
     new MapResultOkObservableClass(parentObservable, mapFn);
 
 export const mapResultOkI = <S, S2, E>(
-  mapFn: (x: S) => S2
+  mapFn: (x: S) => S2,
 ): InitializedToInitializedOperator<Result<S, E>, Result<S2, E>> =>
   // eslint-disable-next-line no-restricted-syntax
   mapResultOk(mapFn) as InitializedToInitializedOperator<
@@ -90,13 +90,13 @@ export const mapResultOkI = <S, S2, E>(
 
 export const mapResultErr =
   <S, E, E2>(
-    mapFn: (x: E) => E2
+    mapFn: (x: E) => E2,
   ): ToBaseOperator<Result<S, E>, Result<S, E2>> =>
   (parentObservable: Observable<Result<S, E>>) =>
     new MapResultErrObservableClass(parentObservable, mapFn);
 
 export const mapResultErrI = <S, E, E2>(
-  mapFn: (x: E) => E2
+  mapFn: (x: E) => E2,
 ): InitializedToInitializedOperator<Result<S, E>, Result<S, E2>> =>
   // eslint-disable-next-line no-restricted-syntax
   mapResultErr(mapFn) as InitializedToInitializedOperator<
@@ -190,13 +190,13 @@ class MapMaybeObservableClass<M extends Maybe.Base, B>
 
   constructor(
     parentObservable: Observable<M>,
-    mapFn: (x: Maybe.Unwrap<M>) => B
+    mapFn: (x: Maybe.Unwrap<M>) => B,
   ) {
     super({
       parents: [parentObservable],
       type: 'mapMaybe',
       initialValue: Maybe.map(parentObservable.snapshot, (a) =>
-        Maybe.map(a, mapFn)
+        Maybe.map(a, mapFn),
       ),
     });
     this.#mapFn = mapFn;
@@ -224,13 +224,13 @@ class MapResultOkObservableClass<R extends Result.Base, S2>
 
   constructor(
     parentObservable: Observable<R>,
-    mapFn: (x: Result.UnwrapOk<R>) => S2
+    mapFn: (x: Result.UnwrapOk<R>) => S2,
   ) {
     super({
       parents: [parentObservable],
       type: 'mapResultOk',
       initialValue: Maybe.map(parentObservable.snapshot, (a) =>
-        Result.map(a, mapFn)
+        Result.map(a, mapFn),
       ),
     });
     this.#mapFn = mapFn;
@@ -258,13 +258,13 @@ class MapResultErrObservableClass<R extends Result.Base, E2>
 
   constructor(
     parentObservable: Observable<R>,
-    mapFn: (x: Result.UnwrapErr<R>) => E2
+    mapFn: (x: Result.UnwrapErr<R>) => E2,
   ) {
     super({
       parents: [parentObservable],
       type: 'mapResultErr',
       initialValue: Maybe.map(parentObservable.snapshot, (a) =>
-        Result.mapErr(a, mapFn)
+        Result.mapErr(a, mapFn),
       ),
     });
     this.#mapFn = mapFn;

@@ -46,12 +46,12 @@ export const EventListItemComponent = memoNamed<Props>(
           : answers
               .find(({ user }) => user.id === fireAuthUser.uid)
               ?.selection.some((a) => a.iconId === 'none') ?? false,
-      [answers, fireAuthUser]
+      [answers, fireAuthUser],
     );
 
     const afterDeadline = useMemo(
       () => eventIsAfterDeadline(eventSchedule),
-      [eventSchedule]
+      [eventSchedule],
     );
 
     const authorName = useMemo<string>(
@@ -59,7 +59,7 @@ export const EventListItemComponent = memoNamed<Props>(
         eventSchedule.author.name === ''
           ? dc.listItem.anonymous
           : eventSchedule.author.name,
-      [eventSchedule.author.name]
+      [eventSchedule.author.name],
     );
 
     const datetimeOptionsSummary = useMemo<string>(
@@ -67,7 +67,7 @@ export const EventListItemComponent = memoNamed<Props>(
         `${ymd2str(Arr.first(eventSchedule.datetimeRangeList).ymd)} ${
           dict.common.tilde
         } ${ymd2str(Arr.last(eventSchedule.datetimeRangeList).ymd)}`,
-      [eventSchedule.datetimeRangeList]
+      [eventSchedule.datetimeRangeList],
     );
 
     const lastUpdateStr = useMemo<string>(() => {
@@ -86,7 +86,7 @@ export const EventListItemComponent = memoNamed<Props>(
           archive: onConfirmArchiving,
           unarchive: onConfirmUnArchiving,
         }),
-      [archiveOrUnArchive, onConfirmArchiving, onConfirmUnArchiving]
+      [archiveOrUnArchive, onConfirmArchiving, onConfirmUnArchiving],
     );
 
     return (
@@ -141,7 +141,7 @@ export const EventListItemComponent = memoNamed<Props>(
         </TableContainer>
       </ListItem>
     );
-  }
+  },
 );
 
 const ListItem = styled.div`
@@ -156,10 +156,13 @@ const ListItem = styled.div`
   padding: 18px;
 
   /* .bp4-elevation-1 */
-  box-shadow: 0 0 0 1px rgb(17 20 24 / 10%), 0 0 0 rgb(17 20 24 / 0%),
+  box-shadow:
+    0 0 0 1px rgb(17 20 24 / 10%),
+    0 0 0 rgb(17 20 24 / 0%),
     0 1px 1px rgb(17 20 24 / 20%);
 
-  transition: transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     box-shadow 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-box-shadow 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
@@ -170,7 +173,9 @@ const ListItem = styled.div`
     text-decoration: none;
     color: unset;
 
-    box-shadow: 0 0 0 1px rgb(17 20 24 / 10%), 0 2px 4px rgb(17 20 24 / 20%),
+    box-shadow:
+      0 0 0 1px rgb(17 20 24 / 10%),
+      0 2px 4px rgb(17 20 24 / 20%),
       0 8px 24px rgb(17 20 24 / 20%);
     cursor: pointer;
   }

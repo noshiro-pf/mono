@@ -32,5 +32,5 @@ export const TriangleIcon = memoNamed<Props>(
         </clipPath>
       </defs>
     </svg>
-  )
+  ),
 );

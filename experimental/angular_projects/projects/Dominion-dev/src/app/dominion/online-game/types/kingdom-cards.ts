@@ -31,7 +31,7 @@ export class KingdomCards extends Array<DCard[]> {
   removeDCards = (cardIdArray: number[]) => {
     this.forEach(
       (pile, key, obj) =>
-        (obj[key] = pile.filter((c) => !cardIdArray.includes(c.id)))
+        (obj[key] = pile.filter((c) => !cardIdArray.includes(c.id))),
     );
   };
 }

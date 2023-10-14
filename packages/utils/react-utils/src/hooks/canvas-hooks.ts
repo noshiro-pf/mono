@@ -3,7 +3,7 @@ import { useState } from './use-state';
 
 export const useCanvasContext2d = (): [
   CanvasRenderingContext2D | undefined,
-  React.RefObject<HTMLCanvasElement>
+  React.RefObject<HTMLCanvasElement>,
 ] => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { state: ctx, setState: setCtx } = useState<

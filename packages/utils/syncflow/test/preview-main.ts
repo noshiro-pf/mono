@@ -78,14 +78,14 @@ const printExamples = (exampleIdx: SafeUint): void => {
     console.log(
       `  ${isSelected ? '[' : ' '}${(i + 1)
         .toString()
-        .padStart(3)}. ${example.name.padEnd(20)}${isSelected ? ']' : ' '}`
+        .padStart(3)}. ${example.name.padEnd(20)}${isSelected ? ']' : ' '}`,
     );
   }
 };
 
 const printExampleCases = (
   exampleCases: readonly StreamTestCase<unknown>[],
-  testCaseIdx: SafeUint
+  testCaseIdx: SafeUint,
 ): void => {
   console.log('test cases:');
   for (const [i, c] of exampleCases.entries()) {
@@ -93,7 +93,7 @@ const printExampleCases = (
     console.log(
       `  ${isSelected ? '[' : ' '}${(i + 1)
         .toString()
-        .padStart(3)}. ${c.name.padEnd(30)}${isSelected ? ']' : ' '}`
+        .padStart(3)}. ${c.name.padEnd(30)}${isSelected ? ']' : ' '}`,
     );
   }
 };
@@ -111,7 +111,7 @@ const convertArgs = (
     example_no: string[];
     preview: string[] | null;
     case_no: string[];
-  }>
+  }>,
 ): Readonly<{
   exampleIdx: SafeUint;
   isPreviewMode: boolean;
@@ -157,7 +157,7 @@ const getArgs = (): {
       example_no: string[];
       preview: string[] | null;
       case_no: string[];
-    }>
+    }>,
   );
 };
 
@@ -172,7 +172,7 @@ const main = (): void => {
 
   if (!Arr.indexIsInRange(exampleList, exampleIdx)) {
     console.error(
-      `example-no must be a value from 1 to ${exampleList.length}.`
+      `example-no must be a value from 1 to ${exampleList.length}.`,
     );
     return;
   }
@@ -186,7 +186,7 @@ const main = (): void => {
 
   if (!Arr.indexIsInRange(example.cases, testCaseIdx)) {
     console.error(
-      `case-no must be a value from 1 to ${example.cases.length} for this example.`
+      `case-no must be a value from 1 to ${example.cases.length} for this example.`,
     );
     return;
   }

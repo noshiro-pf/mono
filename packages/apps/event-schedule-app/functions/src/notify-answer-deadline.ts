@@ -22,7 +22,7 @@ const keys = {
 } as const satisfies Record<string, keyof EventSchedule>;
 
 export const notifyAnswerDeadline = async (
-  db: firestore.Firestore
+  db: firestore.Firestore,
 ): Promise<void> => {
   const querySnapshot = await db
     .collection(firestorePaths.events)
@@ -34,7 +34,7 @@ export const notifyAnswerDeadline = async (
     .filter(([_id, ev]) => ev.answerDeadline !== 'none');
 
   const emails = await Promise.all(
-    events.map(([eventId]) => getEmail(db, eventId))
+    events.map(([eventId]) => getEmail(db, eventId)),
   );
 
   const eventsWithEmail = Arr.zip(events, emails);
@@ -60,7 +60,7 @@ export const notifyAnswerDeadline = async (
       )
         .filter(
           ([flag, diff]) =>
-            flag && todayIsNDaysBeforeDeadline(diff, answerDeadline)
+            flag && todayIsNDaysBeforeDeadline(diff, answerDeadline),
         )
         .map(([_, diff]) => {
           logger.log(`notify${pad2(diff)}daysBeforeAnswerDeadline`);
@@ -69,16 +69,16 @@ export const notifyAnswerDeadline = async (
               to: email,
               subject: `イベント「${ev.title}」の回答期限${diff}日前になりました。`,
               text: createMailBodyForAnswerDeadline({ eventId, diff }),
-            })
+            }),
           );
         });
-    })
+    }),
   );
 };
 
 export const notifyAfterAnswerDeadline = async (
   db: firestore.Firestore,
-  minutes: MinutesEnum
+  minutes: MinutesEnum,
 ): Promise<void> => {
   const querySnapshot = await db
     .collection(firestorePaths.events)
@@ -90,7 +90,7 @@ export const notifyAfterAnswerDeadline = async (
     .filter(([_id, ev]) => ev.answerDeadline !== 'none');
 
   const emails = await Promise.all(
-    events.map(([eventId]) => getEmail(db, eventId))
+    events.map(([eventId]) => getEmail(db, eventId)),
   );
 
   const eventsWithEmail = Arr.zip(events, emails);
@@ -112,11 +112,11 @@ export const notifyAfterAnswerDeadline = async (
             to: email,
             subject: `イベント「${ev.title}」の回答を締め切りました。`,
             text: createMailBodyForAnswerResult(eventId),
-          })
+          }),
         );
       }
 
       return Promise.resolve();
-    })
+    }),
   );
 };

@@ -44,7 +44,7 @@ export const DCardPropertyListDialog = memo(
       = useStateAsStream<number>(0);
     useEffectFromProps(
       indexInFilteredListInitInput,
-      setIndexInFilteredListInitInput
+      setIndexInFilteredListInitInput,
     )
 
     /* streams */
@@ -52,7 +52,7 @@ export const DCardPropertyListDialog = memo(
     // filtered
     const filteredIndice$ = useRN(filteredIndiceInput$.skipUnchanged())
     const indexInFilteredListInit$ = useRN(
-      indexInFilteredListInitInput$.skipUnchanged()
+      indexInFilteredListInitInput$.skipUnchanged(),
     )
 
     // combined
@@ -61,24 +61,24 @@ export const DCardPropertyListDialog = memo(
         .switchMap((v) =>
           merge(decrementIndex$.mapTo(-1), incrementIndex$.mapTo(1)).scan(
             v,
-            num.add
-          )
+            num.add,
+          ),
         )
-        .skipUnchanged()
+        .skipUnchanged(),
     )
 
     const indexInCardlist$: RN<number> = useRN(
       combine(filteredIndice$, indexInFilteredList$)
         .map(([indice, index]) => indice.get(index, 0))
-        .skipUnchanged()
+        .skipUnchanged(),
     )
 
     const dcard$: RN<TDCardProperty> = useRN(
       combine(indexInCardlist$, fb.dcardlist$)
         .map(([indexInCardlist, dcardlist]) =>
-          dcardlist.get(indexInCardlist, DCardProperty())
+          dcardlist.get(indexInCardlist, DCardProperty()),
         )
-        .skipUnchanged()
+        .skipUnchanged(),
     )
 
     const dcardForView$ = useRN(dcard$.map(DCardPropertytoStr))
@@ -101,7 +101,7 @@ export const DCardPropertyListDialog = memo(
         goToNextCard={incrementIndex}
       />
     )
-  }
+  },
 )
 
 DCardPropertyListDialog.displayName = 'DCardPropertyListDialog'

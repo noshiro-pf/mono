@@ -18,7 +18,7 @@ const isFirebaseConfig = firebaseConfigTypeDef.is;
 export const fillFirebaseConfig = (config: JSONValue): FirebaseConfig => {
   if (!isFirebaseConfig(config)) {
     logger.error(
-      `${Result.unwrapThrow(Json.stringify(config))} is not FirebaseConfig`
+      `${Result.unwrapThrow(Json.stringify(config))} is not FirebaseConfig`,
     );
     return {
       gmail: {

@@ -10,14 +10,14 @@ import { selectObelisk } from './select-obelisk'
 
 export const selectCards = (
   selectedExpansions: I.List<string>,
-  dcardlist: I.List<TDCardProperty>
+  dcardlist: I.List<TDCardProperty>,
 ): TSelectedCards | 'error' => {
   // selectedCardsTemp.date = new Date();
 
   // 選択されている拡張セットに含まれているカードすべてをindexとペアにしたリスト
   const dcardsInSelectedExpansions = getDcardsInSelectedExpansionsWithIndex(
     dcardlist,
-    selectedExpansions
+    selectedExpansions,
   )
 
   // シャッフルして先頭から出力するジェネレーター
@@ -45,7 +45,7 @@ export const selectCards = (
   const selectBaneCardResult = selectBaneCard(
     KingdomCards10,
     dcardlist,
-    shuffledDcardsGen
+    shuffledDcardsGen,
   )
   if (selectBaneCardResult === 'error') {
     return 'error'
@@ -57,7 +57,7 @@ export const selectCards = (
     KingdomCards10,
     BaneCard,
     dcardlist,
-    shuffledDcardsGen
+    shuffledDcardsGen,
   )
   if (selectBlackMarketPileResult === 'error') {
     return 'error'
@@ -69,7 +69,7 @@ export const selectCards = (
     KingdomCards10,
     BaneCard,
     LandmarkCards,
-    dcardlist
+    dcardlist,
   )
 
   return SelectedCards({

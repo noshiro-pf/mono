@@ -72,17 +72,17 @@ const rootComponent = () => {
   // states
 
   const [numRef, setNum, updateNum, numCallbacks] = createState(
-    initialValues.num
+    initialValues.num,
   );
 
   const [suffixRef, updateSuffix, suffixCallbacks] = createReactiveValue(() =>
-    new Array(numRef.value).fill('!').join('')
+    new Array(numRef.value).fill('!').join(''),
   );
   numCallbacks.push(updateSuffix);
   updateSuffix(); // initialize
 
   const [msgRef, updateMsg, msgCallbacks] = createReactiveValue(
-    () => `world${suffixRef.value}`
+    () => `world${suffixRef.value}`,
   );
   msgCallbacks.push(() => updateText_$t1(msgRef.value));
   suffixCallbacks.push(updateMsg);

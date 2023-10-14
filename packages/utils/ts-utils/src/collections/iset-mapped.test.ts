@@ -8,11 +8,11 @@ describe('ISetMapped[Symbol.iterator]', () => {
     const s0 = ISetMapped.new(
       ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
       toKey,
-      fromKey
+      fromKey,
     );
 
     expect(s0).toStrictEqual(
-      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey)
+      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
 });
@@ -48,27 +48,27 @@ describe('ISetMapped.add', () => {
     const s0 = ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey);
 
     expect(s0.add({ v: 5 })).toStrictEqual(
-      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }, { v: 5 }], toKey, fromKey)
+      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }, { v: 5 }], toKey, fromKey),
     );
     expect(s0).toStrictEqual(
-      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey)
+      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
   test('case 2', () => {
     const s0 = ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey);
 
     expect(s0.add({ v: 3 })).toStrictEqual(
-      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey)
+      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
     expect(s0).toStrictEqual(
-      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey)
+      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
   test('case 3', () => {
     const s0 = ISetMapped.new([], toKey, fromKey);
 
     expect(s0.add({ v: 1 })).toStrictEqual(
-      ISetMapped.new([{ v: 1 }], toKey, fromKey)
+      ISetMapped.new([{ v: 1 }], toKey, fromKey),
     );
     expect(s0).toStrictEqual(ISetMapped.new([], toKey, fromKey));
   });
@@ -79,27 +79,27 @@ describe('ISetMapped.delete', () => {
     const s0 = ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey);
 
     expect(s0.delete({ v: 10 })).toStrictEqual(
-      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey)
+      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
     expect(s0).toStrictEqual(
-      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey)
+      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
   test('case 2', () => {
     const s0 = ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey);
 
     expect(s0.delete({ v: 3 })).toStrictEqual(
-      ISetMapped.new([{ v: 1 }, { v: 2 }], toKey, fromKey)
+      ISetMapped.new([{ v: 1 }, { v: 2 }], toKey, fromKey),
     );
     expect(s0).toStrictEqual(
-      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey)
+      ISetMapped.new([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
   test('case 3', () => {
     const s0 = ISetMapped.new([], toKey, fromKey);
 
     expect(s0.delete({ v: 1 })).toStrictEqual(
-      ISetMapped.new([], toKey, fromKey)
+      ISetMapped.new([], toKey, fromKey),
     );
     expect(s0).toStrictEqual(ISetMapped.new([], toKey, fromKey));
   });

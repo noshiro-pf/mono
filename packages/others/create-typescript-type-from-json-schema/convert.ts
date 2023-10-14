@@ -20,7 +20,7 @@ const main = async (typeName: string | undefined): Promise<void> => {
   const typescriptCode = await compile(
     JSON.parse(schema) as JSONSchema4,
     typeName,
-    compilerConfig
+    compilerConfig,
   ).catch((error) => {
     throw new Error(String(error));
   });

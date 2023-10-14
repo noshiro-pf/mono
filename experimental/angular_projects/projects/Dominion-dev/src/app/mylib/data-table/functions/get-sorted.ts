@@ -5,7 +5,7 @@ import { TableSettings } from '../types/table-settings';
 export const getSorted = (
   tableFilteredIndexed: { val: any[]; idx: number }[],
   sortBy: Sort,
-  settings: TableSettings
+  settings: TableSettings,
 ): { val: any; idx: number }[] => {
   const tableFilteredWithIndiceCopy = tableFilteredIndexed.slice();
   if (sortBy.direction === '') return tableFilteredWithIndiceCopy;
@@ -15,7 +15,7 @@ export const getSorted = (
 
     if (!Array.isArray(tableFilteredWithIndiceCopy[0].val[0])) {
       tableFilteredWithIndiceCopy.sort((x, y) =>
-        cmp(x.val[colIndex], y.val[colIndex])
+        cmp(x.val[colIndex], y.val[colIndex]),
       );
     } else {
       // 要素の辞書順ソート
@@ -29,7 +29,7 @@ export const getSorted = (
 
 const lexicalSort = <T>(
   tableWithIndice: { val: any; idx: number }[],
-  cmp: (a: T, b: T) => number
+  cmp: (a: T, b: T) => number,
 ): { val: any; idx: number }[] => {
   // return indice.sort( (x, y) => lexicalCmp( data[x], data[y], cmp ) );
   return tableWithIndice.sort((x, y) => lexicalCmp(x.val, y.val, cmp));

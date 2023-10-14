@@ -57,7 +57,7 @@ export class GameMainComponent implements OnInit, OnDestroy {
   private autoScrollSource = new BehaviorSubject<boolean>(true);
   autoScroll$ = this.autoScrollSource.asObservable();
   isBuyPlayPhase$ = this.gameStateService.phase$.pipe(
-    map((e) => e === 'BuyPlay')
+    map((e) => e === 'BuyPlay'),
   );
   // myThinkingState$
   //   = combineLatest(
@@ -80,7 +80,7 @@ export class GameMainComponent implements OnInit, OnDestroy {
     private gameMessage: GameMessageService,
     private transitStateService: TransitStateService,
     private submitGameResultService: SubmitGameResultService,
-    private valuesForView: ValuesForViewService
+    private valuesForView: ValuesForViewService,
   ) {
     this.startProcessing();
 
@@ -100,7 +100,7 @@ export class GameMainComponent implements OnInit, OnDestroy {
     this.gameRoomCommunication.resetGameClicked$
       .pipe(
         skip(1),
-        takeWhile(() => this.alive)
+        takeWhile(() => this.alive),
       )
       .subscribe((_) => this.startProcessing()); // reset game
 
@@ -167,8 +167,8 @@ export class GameMainComponent implements OnInit, OnDestroy {
           userInput,
           currState,
           myIndex,
-          playersNameList
-        )
+          playersNameList,
+        ),
       );
 
     // const initialState = await this.myGameRoomService.initialState$.pipe( first() ).toPromise();
@@ -206,7 +206,7 @@ export class GameMainComponent implements OnInit, OnDestroy {
       'clicked card',
       myIndex,
       autoSort,
-      dcard.id
+      dcard.id,
     );
   }
 
@@ -214,7 +214,7 @@ export class GameMainComponent implements OnInit, OnDestroy {
     this.gameRoomCommunication.sendUserInput(
       'clicked vcoin',
       myIndex,
-      autoSort
+      autoSort,
     );
   }
 

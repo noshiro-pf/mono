@@ -76,14 +76,14 @@ export const fillEventSchedule = (p?: PartialEventSchedule): EventSchedule => ({
   notes: p?.notes ?? d.notes,
   datetimeSpecification: p?.datetimeSpecification ?? d.datetimeSpecification,
   datetimeRangeList: (p?.datetimeRangeList ?? d.datetimeRangeList).map(
-    fillDatetimeRange
+    fillDatetimeRange,
   ),
   useAnswerDeadline: p?.useAnswerDeadline ?? d.useAnswerDeadline,
   answerDeadline: fillYmdhm(p?.answerDeadline ?? d.answerDeadline),
   answerSymbols: fillSymbolSettings(p?.answerSymbols ?? d.answerSymbols),
   useNotification: p?.useNotification ?? d.useNotification,
   notificationSettings: fillNotificationSettings(
-    p?.notificationSettings ?? d.notificationSettings
+    p?.notificationSettings ?? d.notificationSettings,
   ),
   timezoneOffsetMinutes: p?.timezoneOffsetMinutes ?? d.timezoneOffsetMinutes,
 });

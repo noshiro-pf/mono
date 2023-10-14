@@ -36,5 +36,5 @@ export const AnswerDeadlineDatepicker = memoNamed<Props>(
         />
       </FormGroup>
     );
-  }
+  },
 );

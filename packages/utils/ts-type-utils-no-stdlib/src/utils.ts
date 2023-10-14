@@ -117,7 +117,7 @@ export type MutableArrayOfLength<N extends number, Elm> = Writable<
 
 export type MutableArrayAtLeastLen<
   N extends number,
-  Elm
+  Elm,
 > = MutableArrayAtLeastLenRec<N, Elm, Elm[], []>;
 
 export type ArrayAtLeastLen<N extends number, Elm> = Readonly<
@@ -129,7 +129,7 @@ type MutableArrayAtLeastLenRec<
   Num,
   Elm,
   T extends unknown[],
-  C extends unknown[]
+  C extends unknown[],
 > = {
   0: T;
   1: MutableArrayAtLeastLenRec<Num, Elm, [Elm, ...T], [unknown, ...C]>;

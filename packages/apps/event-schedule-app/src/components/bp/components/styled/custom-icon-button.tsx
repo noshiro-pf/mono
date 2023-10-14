@@ -24,5 +24,5 @@ export const CustomIconButton = memoNamed<Props>(
       title={props.title}
       onClick={props.onClick}
     />
-  )
+  ),
 );

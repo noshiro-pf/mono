@@ -6,5 +6,5 @@ export const toSnackbarIsOpen =
   <T>(milliSec: number): OperatorFunction<T, boolean> =>
   (source$: Observable<T>): Observable<boolean> =>
     source$.pipe(
-      switchMap(() => timer(milliSec).pipe(mapTo(false), startWith(true)))
+      switchMap(() => timer(milliSec).pipe(mapTo(false), startWith(true))),
     );

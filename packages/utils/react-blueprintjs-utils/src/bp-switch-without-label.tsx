@@ -21,7 +21,7 @@ export const BpSwitchWithoutLabel = memoNamed<BpSwitchWithoutLabelProps>(
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
     />
-  )
+  ),
 );
 
 const style: React.CSSProperties = {

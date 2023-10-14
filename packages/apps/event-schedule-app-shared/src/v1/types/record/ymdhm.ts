@@ -48,7 +48,7 @@ export const ymdhm2Date = (ymdhm: Ymdhm): DateType =>
     ymdhm.ymd.month,
     ymdhm.ymd.date,
     ymdhm.hm.hours,
-    ymdhm.hm.minutes
+    ymdhm.hm.minutes,
   );
 
 export const compareYmdhm = (a: Ymdhm, b: Ymdhm): -1 | 0 | 1 => {

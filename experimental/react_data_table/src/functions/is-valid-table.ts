@@ -2,7 +2,7 @@ import * as I from 'immutable'
 
 export const isValidTable = (
   table: I.List<I.List<any>>,
-  log = true
+  log = true,
 ): boolean => {
   if (!table) {
     if (log) console.error('"table" is undefined')

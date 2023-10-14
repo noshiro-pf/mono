@@ -28,7 +28,7 @@ export const Week = memoNamed<Props>(
                   onClick(d.ymd);
                 },
         })),
-      [week, onClick]
+      [week, onClick],
     );
 
     return (
@@ -47,5 +47,5 @@ export const Week = memoNamed<Props>(
         ))}
       </DatePickerWeekStyled>
     );
-  }
+  },
 );

@@ -23,7 +23,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
   constructor(
     private user: UserService,
-    private gameCommunication: GameRoomCommunicationService
+    private gameCommunication: GameRoomCommunicationService,
   ) {}
 
   ngOnInit() {}

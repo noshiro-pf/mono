@@ -29,7 +29,7 @@ export const union = <A extends NonEmptyArray<Type<unknown>>>({
             a,
             `The type of value is expected to be one of the elements contained in { ${types
               .map((t) => t.typeName)
-              .join(', ')} }`
+              .join(', ')} }`,
           ),
         ]);
 

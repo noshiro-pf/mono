@@ -9,7 +9,7 @@ const isInInt8Range = (a: number): a is Int8 => Number.isInteger(a) && _r(a);
 export const toInt8 = (a: number): Int8 => {
   if (!isInInt8Range(a)) {
     throw new TypeError(
-      `Expected integer in [${MIN_VALUE}, ${MAX_VALUE}], got: ${a}`
+      `Expected integer in [${MIN_VALUE}, ${MAX_VALUE}], got: ${a}`,
     );
   }
   return a;

@@ -3,8 +3,11 @@ export const Input = styled('input')`
   background: #fff;
   border: none;
   border-radius: 3px;
-  box-shadow: 0 0 0 0 rgb(19 124 189 / 0%), 0 0 0 0 rgb(19 124 189 / 0%),
-    inset 0 0 0 1px rgb(16 22 26 / 15%), inset 0 1px 1px rgb(16 22 26 / 20%);
+  box-shadow:
+    0 0 0 0 rgb(19 124 189 / 0%),
+    0 0 0 0 rgb(19 124 189 / 0%),
+    inset 0 0 0 1px rgb(16 22 26 / 15%),
+    inset 0 1px 1px rgb(16 22 26 / 20%);
   color: #182026;
   font-size: 14px;
   font-weight: 400;
@@ -16,7 +19,9 @@ export const Input = styled('input')`
   vertical-align: middle;
 
   &:focus {
-    box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgb(19 124 189 / 30%),
+    box-shadow:
+      0 0 0 1px #137cbd,
+      0 0 0 3px rgb(19 124 189 / 30%),
       inset 0 1px 1px rgb(16 22 26 / 20%);
   }
 

@@ -4,7 +4,7 @@ import { Operator } from '../types/Operator';
 export const scan =
   <T, U>(
     initialValue: U,
-    fn: (prev: U, curr: T, index?: number) => U
+    fn: (prev: U, curr: T, index?: number) => U,
   ): Operator<T, U> =>
   (src: RN<T>) =>
     new ScanRN<T, U>(initialValue, src, fn);
@@ -16,7 +16,7 @@ class ScanRN<T, U> extends RN<U> {
   constructor(
     initialValue: U,
     src: RN<T>,
-    fn: (prev: U, curr: T, index?: number) => U
+    fn: (prev: U, curr: T, index?: number) => U,
   ) {
     super(initialValue, [src]);
     this.scanState = initialValue;

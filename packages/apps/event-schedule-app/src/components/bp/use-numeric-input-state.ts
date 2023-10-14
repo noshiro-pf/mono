@@ -32,7 +32,7 @@ export const useNumericInputState = <NumericValue extends number>({
         defaultValue,
         step,
       }),
-    [defaultValue, step, normalizeValue]
+    [defaultValue, step, normalizeValue],
   );
 
   const [state$, dispatch] = useObservableReducer(reducer, initialState);
@@ -96,7 +96,7 @@ export const useNumericInputState = <NumericValue extends number>({
     delayTimerRef.current = setTimeout(() => {
       intervalTimerRef.current = setInterval(
         r.increment,
-        numericInputContinuousChangeInterval
+        numericInputContinuousChangeInterval,
       );
     }, numericInputContinuousChangeDelay);
   }, []);
@@ -109,7 +109,7 @@ export const useNumericInputState = <NumericValue extends number>({
     delayTimerRef.current = setTimeout(() => {
       intervalTimerRef.current = setInterval(
         r.decrement,
-        numericInputContinuousChangeInterval
+        numericInputContinuousChangeInterval,
       );
     }, numericInputContinuousChangeDelay);
   }, []);

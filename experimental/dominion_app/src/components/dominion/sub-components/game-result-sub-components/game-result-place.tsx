@@ -35,7 +35,7 @@ export const GameResultPlace = memo(
         />
       )}
     </div>
-  )
+  ),
 )
 
 GameResultPlace.displayName = 'GameResultPlace'

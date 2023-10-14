@@ -143,7 +143,7 @@ export const DetailedFilterIconOfSpecifiedRespondent = memoNamed<Props>(
         ))}
       </FilterItemContent>
     </>
-  )
+  ),
 );
 
 const CheckboxLabel = styled.div`

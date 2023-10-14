@@ -21,5 +21,5 @@ export const DetailedFilterNumFairIcon = memoNamed<Props>(
       onMaxChange={AnswerFilterAndSortStore.setMaxCountOfFairIcon}
       onMinChange={AnswerFilterAndSortStore.setMinCountOfFairIcon}
     />
-  )
+  ),
 );

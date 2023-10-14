@@ -42,8 +42,8 @@ export const answerDeadlineInitialValue: Ymdhm = pipe(DateUtils.today())
   .chain(
     DateUtils.updateLocaleDate(
       // eslint-disable-next-line no-restricted-syntax
-      (a) => (a + answerDeadlineRemainingDaysDefaultValue) as DateEnum
-    )
+      (a) => (a + answerDeadlineRemainingDaysDefaultValue) as DateEnum,
+    ),
   )
   .chain(DateUtils.setLocaleHours(23))
   .chain(DateUtils.setLocaleMinutes(59))
@@ -51,7 +51,7 @@ export const answerDeadlineInitialValue: Ymdhm = pipe(DateUtils.today())
   .chain(ymdhmFromDate).value;
 
 export const notificationSettingsInitialValue: NotificationSettings = pipe(
-  notificationSettingsDefaultValue
+  notificationSettingsDefaultValue,
 ).chain((o) => Obj.set(o, 'notifyOnAnswerChange', true)).value;
 
 export const datetimeSpecificationInitialValue: DatetimeSpecificationEnumType =

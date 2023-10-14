@@ -32,7 +32,7 @@ export const DataTable = memo(
           />
         )}
     </div>
-  )
+  ),
 )
 
 DataTable.displayName = 'DataTable'

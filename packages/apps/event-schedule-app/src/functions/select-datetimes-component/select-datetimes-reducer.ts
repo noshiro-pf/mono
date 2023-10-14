@@ -40,7 +40,7 @@ export const datetimeListReducer: Reducer<
       const datetimeSet: ISetMapped<YearMonthDate, YmdKey> = ISetMapped.new(
         state.map((e) => e.ymd),
         ymdToKey,
-        ymdFromKey
+        ymdFromKey,
       );
       const dateSetFromCalendar: ISetMapped<YearMonthDate, YmdKey> =
         ISetMapped.new(action.list, ymdToKey, ymdFromKey);
@@ -53,28 +53,28 @@ export const datetimeListReducer: Reducer<
             list,
             added
               .toArray()
-              .map((ymd) => ({ ymd, timeRange: timeRangeDefaultValue }))
-          )
+              .map((ymd) => ({ ymd, timeRange: timeRangeDefaultValue })),
+          ),
         )
         .chain((list) => Arr.sorted(list, compareDatetimeRange)).value;
     }
 
     case 'ymd':
       return Arr.update(state, action.index, (val) =>
-        Obj.set(val, action.type, action.ymd)
+        Obj.set(val, action.type, action.ymd),
       );
 
     case 'start':
     case 'end':
       return Arr.update(state, action.index, (val) =>
-        Obj.update(val, 'timeRange', (v) => timeRangeReducer(v, action))
+        Obj.update(val, 'timeRange', (v) => timeRangeReducer(v, action)),
       );
 
     case 'duplicate':
       return Arr.inserted(
         state,
         action.index,
-        state[action.index] ?? datetimeRangeInitialValue
+        state[action.index] ?? datetimeRangeInitialValue,
       );
 
     case 'delete':
@@ -90,7 +90,7 @@ export const datetimeListReducer: Reducer<
       return state.map((el) =>
         action.checkboxState[ymdToDayInWeek(el.ymd)]
           ? Obj.set(el, 'timeRange', action.timeRange)
-          : el
+          : el,
       );
 
     case 'sort':

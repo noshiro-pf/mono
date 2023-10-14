@@ -15,7 +15,7 @@ export const IconCountNumericInput = memoNamed<Props>(
   ({ count: valueFromProps, max, disabled = false, onCountChange }) => {
     const normalizeValue = useCallback(
       (value: number): number => clampAndRoundNumIcons(value, max),
-      [max]
+      [max],
     );
 
     const {
@@ -35,7 +35,7 @@ export const IconCountNumericInput = memoNamed<Props>(
 
     const inputProps = useMemo(
       () => ({ min: 0, max, onKeyDown }),
-      [max, onKeyDown]
+      [max, onKeyDown],
     );
 
     return (
@@ -51,5 +51,5 @@ export const IconCountNumericInput = memoNamed<Props>(
         onInputStringChange={setValueStr}
       />
     );
-  }
+  },
 );

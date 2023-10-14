@@ -14,7 +14,7 @@ export const throttleTime =
     new ThrottleTimeObservableClass(parentObservable, milliSeconds);
 
 export const throttleTimeI = <A>(
-  milliSeconds: number
+  milliSeconds: number,
 ): InitializedToInitializedOperator<A, A> =>
   // eslint-disable-next-line no-restricted-syntax
   throttleTime(milliSeconds) as InitializedToInitializedOperator<A, A>;

@@ -35,7 +35,7 @@ export const eventListItemDefaultValue = {
 } as const satisfies EventListItem;
 
 const isEventScheduleMetadata = (
-  a: unknown
+  a: unknown,
 ): a is EventListItem['eventScheduleMetadata'] =>
   isRecord(a) &&
   Obj.hasKeyValue(a, 'id', isString) &&
@@ -52,14 +52,14 @@ export const isEventListItem = (a: unknown): a is EventListItem =>
   Obj.hasKeyValue(
     a,
     'answers',
-    (e: unknown): e is Answer[] => Array.isArray(e) && e.every(isAnswer)
+    (e: unknown): e is Answer[] => Array.isArray(e) && e.every(isAnswer),
   ) &&
   Obj.hasKeyValue(a, 'answersMetadata', isAnswersMetadata);
 
 const d = eventListItemDefaultValue;
 
 const fillEventScheduleMetadata = (
-  a: unknown
+  a: unknown,
 ): EventListItem['eventScheduleMetadata'] =>
   !isRecord(a)
     ? d.eventScheduleMetadata

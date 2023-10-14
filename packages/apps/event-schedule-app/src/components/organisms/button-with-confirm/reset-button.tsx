@@ -34,5 +34,5 @@ export const ResetButton = memoNamed<Props>(
       toastConfig={toastConfig}
       onConfirmClick={onConfirmClick}
     />
-  )
+  ),
 );

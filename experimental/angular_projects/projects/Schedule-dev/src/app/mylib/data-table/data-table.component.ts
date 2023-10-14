@@ -55,14 +55,14 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   private readonly _tableSettingsPair$: RN<[any[][], TableSettings]> = combine(
     this.tableSource.debounce(DEBOUNCE_TIME),
-    this.settingsSource.debounce(DEBOUNCE_TIME)
+    this.settingsSource.debounce(DEBOUNCE_TIME),
   ).filter([[], new TableSettings()], ([table, settings]) =>
-    isValidSetting_withTable(settings, table)
+    isValidSetting_withTable(settings, table),
   );
 
   readonly table$: RN<any[][]> = this._tableSettingsPair$.map((e) => e[0]);
   readonly settings$: RN<TableSettings> = this._tableSettingsPair$.map(
-    (e) => e[1]
+    (e) => e[1],
   );
 
   @Output() clickedCellPosition = new EventEmitter<CellPosition>();
@@ -114,12 +114,12 @@ export class DataTableComponent implements OnInit, OnDestroy {
       columnIndex: colIndex,
       value: undefined,
     })),
-    this.headerValueChange$
+    this.headerValueChange$,
   ).scan(
     [],
     (
       acc: (any | undefined)[],
-      value: { columnIndex: number; value: any } | undefined[]
+      value: { columnIndex: number; value: any } | undefined[],
     ) => {
       if (Array.isArray(value)) {
         return value;
@@ -132,7 +132,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
           return acc;
         }
       }
-    }
+    },
   );
 
   readonly itemsPerPage$: RN<number> = merge(
@@ -140,7 +140,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.itemsPerPageChange$,
     this.resetAllClick$
       .withLatest(this.settings$)
-      .map(([_, settings]) => settings.itemsPerPageInit || 100)
+      .map(([_, settings]) => settings.itemsPerPageInit || 100),
   );
 
   private readonly tableFilteredIndexed$: RN<{ val: any[]; idx: number }[]> =
@@ -149,8 +149,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
         table
           .map((e, i) => ({ val: e, idx: i }))
           .filter((e) =>
-            filterFn(e.val, settings.headerSettings, headerValuesAll)
-          )
+            filterFn(e.val, settings.headerSettings, headerValuesAll),
+          ),
     );
 
   readonly filteredLength$: RN<number> =
@@ -158,13 +158,13 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   private readonly pageLength$: RN<number> = combine(
     this.filteredLength$,
-    this.itemsPerPage$
+    this.itemsPerPage$,
   ).map(([length, itemsPerPage]) => Math.ceil(length / itemsPerPage));
 
   readonly pageNumber$: RN<number> = merge(
     this.pageNumberChange$,
     this.pageLength$.mapTo(1),
-    this.resetAllClick$.mapTo(1)
+    this.resetAllClick$.mapTo(1),
   );
 
   readonly sortBy$: RN<Sort> = merge(
@@ -173,15 +173,15 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.resetAllClick$.mapTo({
       active: NoColumn,
       direction: '' as SortDirection,
-    })
+    }),
   ).skipUnchanged(
-    (a, b) => a.active === b.active && a.direction === b.direction
+    (a, b) => a.active === b.active && a.direction === b.direction,
   );
 
   private readonly tableFilteredSortedIndexed$: RN<
     { val: any[]; idx: number }[]
   > = combine(this.tableFilteredIndexed$, this.sortBy$, this.settings$).map(
-    ([tbl, sortBy, settings]) => getSorted(tbl, sortBy, settings)
+    ([tbl, sortBy, settings]) => getSorted(tbl, sortBy, settings),
   );
 
   private readonly tableSlicedIndexed$: RN<{ val: any[]; idx: number }[]> =
@@ -189,9 +189,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.itemsPerPage$,
       this.pageNumber$,
       this.settings$.map((e) => !!e.usepagination),
-      this.tableFilteredSortedIndexed$
+      this.tableFilteredSortedIndexed$,
     ).map(([itemsPerPage, pageNumber, usePagenation, tbl]) =>
-      usePagenation ? slice(tbl, itemsPerPage, pageNumber) : tbl
+      usePagenation ? slice(tbl, itemsPerPage, pageNumber) : tbl,
     );
 
   readonly tableSlicedTransformedIndexed$: RN<
@@ -203,15 +203,15 @@ export class DataTableComponent implements OnInit, OnDestroy {
         const tr = settings.headerSettings[i].transform;
         return tr === undefined ? e : tr(e);
       }),
-    }))
+    })),
   );
 
   readonly selectorOptionsAll$: RN<SelectorOption[][]> = combine(
     this.tableFilteredIndexed$.map((list) => list.map((e) => e.val)),
     this.table$,
-    this.settings$
+    this.settings$,
   ).map(([tableFiltered, table, settings]) =>
-    makeSelectOptions(table, tableFiltered, settings.headerSettings)
+    makeSelectOptions(table, tableFiltered, settings.headerSettings),
   );
 
   readonly NoColumn = NoColumn;
@@ -259,7 +259,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     columnIndex: number,
     itemsPerPage: number,
     pageNumber: number,
-    tableSlicedTransformedIndexed: { val: any; idx: number }[]
+    tableSlicedTransformedIndexed: { val: any; idx: number }[],
   ) {
     this.clickedCellPosition.emit({
       rowIndex: tableSlicedTransformedIndexed[rowIndexInThisPage].idx,

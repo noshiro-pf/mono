@@ -3,7 +3,7 @@ import { useState } from '../use-state';
 
 export const useInterval = (
   milliSec: number,
-  delayMilliSec: number = 0
+  delayMilliSec: number = 0,
 ): number => {
   const { state: counter, updateState: updateCounter } = useState<number>(0);
   useEffect(() => {

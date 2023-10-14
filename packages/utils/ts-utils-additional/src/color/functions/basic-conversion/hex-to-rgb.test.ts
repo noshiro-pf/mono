@@ -6,6 +6,6 @@ for (const [index, testColor] of testColors.entries()) {
   testRgbEquality(
     `hexToRgb test No. ${index}`,
     testColor.rgb,
-    hexToRgb(testColor.HEX)
+    hexToRgb(testColor.HEX),
   );
 }

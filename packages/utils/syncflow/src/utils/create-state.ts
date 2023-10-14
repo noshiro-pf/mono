@@ -15,7 +15,7 @@ const reducer = <S>(state: S, action: Action<S>): S => {
 };
 
 export const createState = <S>(
-  initialState: S
+  initialState: S,
 ): Readonly<{
   state$: InitializedObservable<S>;
   setState: (v: S) => S;
@@ -36,7 +36,7 @@ export const createState = <S>(
 };
 
 export const createBooleanState = (
-  initialState: boolean
+  initialState: boolean,
 ): {
   state$: InitializedObservable<boolean>;
   setTrue: () => void;

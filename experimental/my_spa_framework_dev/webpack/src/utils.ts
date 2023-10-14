@@ -4,7 +4,7 @@ export const append = <T extends Node>(target: Node, node: T): T =>
 export const insert = <T extends Node>(
   target: Node,
   node: T,
-  anchor?: Node | null
+  anchor?: Node | null,
 ): T => target.insertBefore(node, anchor ?? null);
 
 export const detach = <T extends Node>(node: T): void => {
@@ -17,7 +17,7 @@ export const listen = (
   node: HTMLElement,
   event: any,
   handler: (this: HTMLElement, ev: any) => any,
-  options?: boolean | AddEventListenerOptions
+  options?: boolean | AddEventListenerOptions,
 ): (() => void) => {
   node.addEventListener(event, handler, options);
   return () => node.removeEventListener(event, handler, options);
@@ -31,7 +31,7 @@ export const runCallbacks = (fns: CallbackFunction[]) =>
   });
 
 export const createReactiveValue = <T>(
-  setter: () => T
+  setter: () => T,
 ): [{ value: T }, () => void, CallbackFunction[]] => {
   const valueRef = { value: setter() };
   const onValueChangeFns: CallbackFunction[] = [];
@@ -43,12 +43,12 @@ export const createReactiveValue = <T>(
 };
 
 export const createState = <T>(
-  init: T
+  init: T,
 ): [
   { value: T },
   (next: T) => void,
   (fn: (value: T) => T) => void,
-  CallbackFunction[]
+  CallbackFunction[],
 ] => {
   const stateRef = {
     value: init,

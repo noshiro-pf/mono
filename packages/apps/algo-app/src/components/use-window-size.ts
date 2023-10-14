@@ -1,7 +1,7 @@
 import { type Rect, type RectSize } from '@noshiro/ts-utils-additional';
 
 export const useWindowSize = (
-  windowSize: Rect
+  windowSize: Rect,
 ): {
   tableSize: RectSize;
   headerHeight: number;
@@ -11,7 +11,7 @@ export const useWindowSize = (
 } => {
   const windowMinSideSize = useMemo(
     () => Math.min(windowSize.height, windowSize.width),
-    [windowSize]
+    [windowSize],
   );
 
   const tableSize = useMemo(
@@ -19,7 +19,7 @@ export const useWindowSize = (
       width: windowMinSideSize * 0.8,
       height: windowMinSideSize * 0.8,
     }),
-    [windowMinSideSize]
+    [windowMinSideSize],
   );
 
   const headerHeight = windowSize.height * 0.05;
@@ -27,11 +27,11 @@ export const useWindowSize = (
 
   const headerStyle = useMemo<preact.JSX.CSSProperties>(
     () => ({ flexBasis: `${headerHeight}px` }),
-    [headerHeight]
+    [headerHeight],
   );
   const footerStyle = useMemo<preact.JSX.CSSProperties>(
     () => ({ flexBasis: `${footerHeight}px` }),
-    [footerHeight]
+    [footerHeight],
   );
 
   return {

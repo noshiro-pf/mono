@@ -10,7 +10,7 @@ import { type StreamTestCase } from '../typedef';
 */
 
 const createStreams = (
-  tick: number
+  tick: number,
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<SafeUint>;

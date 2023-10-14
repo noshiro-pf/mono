@@ -7,7 +7,7 @@ export const im2col = (
   filter_h: number,
   filter_w: number,
   stride = 1,
-  padding = 0
+  padding = 0,
 ): number[][] => {
   const [N, C, H, W] = np.shapeOf(inputData);
 

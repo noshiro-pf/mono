@@ -6,7 +6,7 @@ import { isValidTable } from './is-valid-table'
 export const isValidInput = (
   settings: TTableSettings,
   table: I.List<I.List<any>>,
-  log = true
+  log = true,
 ): boolean => {
   if (!isValidSettings(settings)) {
     if (log) console.error('"settings" is not valid')

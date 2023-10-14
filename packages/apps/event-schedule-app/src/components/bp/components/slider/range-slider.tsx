@@ -86,5 +86,5 @@ export const BpRangeSlider = memoNamed<Props>(
         trackElementRef={trackElementRef}
       />
     );
-  }
+  },
 );

@@ -27,5 +27,5 @@ export const ImageElementRenderer = memoNamed<Props>(
     }, [imageElement]);
 
     return <Root ref={elementRef} />;
-  }
+  },
 );

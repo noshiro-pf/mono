@@ -11,7 +11,7 @@ export const isUint32 = (a: number): a is Uint32 =>
 export const toUint32 = (a: number): Uint32 => {
   if (!isUint32(a)) {
     throw new TypeError(
-      `Expected non-negative integer less than 2^32, got: ${a}`
+      `Expected non-negative integer less than 2^32, got: ${a}`,
     );
   }
   return a;
@@ -42,7 +42,7 @@ const mul = (x: Uint32WithSmallInt, y: Uint32WithSmallInt): Uint32 =>
 
 const div = (
   x: Uint32WithSmallInt,
-  y: WithSmallInt<IntersectBrand<Uint32, NonZeroNumber>>
+  y: WithSmallInt<IntersectBrand<Uint32, NonZeroNumber>>,
 ): Uint32 => clamp(Math.floor(x / y));
 
 const random = (min: Uint32WithSmallInt, max: Uint32WithSmallInt): Uint32 =>

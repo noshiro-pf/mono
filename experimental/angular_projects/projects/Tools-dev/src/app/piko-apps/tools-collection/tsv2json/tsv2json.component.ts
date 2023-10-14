@@ -31,7 +31,7 @@ export class Tsv2jsonComponent implements OnInit {
       this.tsvHeaderTextSource.asObservable(),
       this.separator$,
       (tsvHeaderText, separator) =>
-        tsvHeaderText.replace(/\n+$/g, '').split(separator)
+        tsvHeaderText.replace(/\n+$/g, '').split(separator),
     ); // 末尾の改行は削除
 
     this.table$ = combineLatest(
@@ -40,13 +40,13 @@ export class Tsv2jsonComponent implements OnInit {
       (tsvText, separator) => {
         const lines = tsvText.replace(/\n+$/g, '').split('\n');
         return lines.map((line) => line.split(separator).map(this.replacer));
-      }
+      },
     );
 
     this.jsonText$ = combineLatest(
       this.tableHeader$.pipe(debounceTime(300)),
       this.table$.pipe(debounceTime(300)),
-      (tableHeader, table) => this.tsv2json(tableHeader, table)
+      (tableHeader, table) => this.tsv2json(tableHeader, table),
     );
   }
 

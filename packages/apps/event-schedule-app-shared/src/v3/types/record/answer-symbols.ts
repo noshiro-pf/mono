@@ -13,7 +13,7 @@ const defaultSymbolSettings = {
 
 const d = defaultSymbolSettings;
 export const fillSymbolSettings = (
-  p?: PartialSymbolSettings
+  p?: PartialSymbolSettings,
 ): SymbolSettings => ({
   good: fillSymbolSetting(p?.good ?? d.good),
   fair: fillSymbolSetting(p?.fair ?? d.fair),

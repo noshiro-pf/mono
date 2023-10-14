@@ -63,7 +63,7 @@ export class FireDatabaseService {
         isSelectedExpansions: (
           uid: string,
           index: number,
-          value: boolean
+          value: boolean,
         ) => Promise<void>;
         numberOfPlayers: (uid: string, value: number) => Promise<void>;
         roomId: (uid: string, value: string) => Promise<void>;
@@ -85,24 +85,24 @@ export class FireDatabaseService {
 
   randomizerGroup: {
     addGroup: (
-      newGroup: RandomizerGroup
+      newGroup: RandomizerGroup,
     ) => firebase.database.ThenableReference;
     removeGroup: (groupId: string) => Promise<void>;
     set: {
       isSelectedExpansions: (
         groupId: string,
         index: number,
-        value: boolean
+        value: boolean,
       ) => Promise<void>;
       selectedCardsCheckbox: (
         groupId: string,
         arrayName: string,
         index: number,
-        value: boolean
+        value: boolean,
       ) => Promise<void>;
       BlackMarketPileShuffled: (
         groupId: string,
-        value: BlackMarketPileCard[]
+        value: BlackMarketPileCard[],
       ) => Promise<void>;
       BlackMarketPhase: (groupId: string, value: number) => Promise<void>;
       selectedIndexInHistory: (groupId: string, value: number) => Promise<void>;
@@ -111,18 +111,18 @@ export class FireDatabaseService {
           selected: (
             groupId: string,
             uid: string,
-            value: boolean
+            value: boolean,
           ) => Promise<void>;
           turnOrder: (
             groupId: string,
             uid: string,
-            value: number
+            value: number,
           ) => Promise<void>;
           VP: (groupId: string, uid: string, value: number) => Promise<void>;
           numberOfVictoryCards: (
             groupId: string,
             uid: string,
-            value: NumberOfVictoryCards
+            value: NumberOfVictoryCards,
           ) => Promise<void>;
         };
         lastTurnPlayerName: (groupId: string, value: string) => Promise<void>;
@@ -131,18 +131,18 @@ export class FireDatabaseService {
       };
       newGameResultDialogOpened: (
         groupId: string,
-        value: boolean
+        value: boolean,
       ) => Promise<void>;
     };
     add: {
       member: (
         groupId: string,
         uid: string,
-        value: PlayerResult
+        value: PlayerResult,
       ) => Promise<void>;
       selectedCardsHistory: (
         groupId: string,
-        value: SelectedCards
+        value: SelectedCards,
       ) => firebase.database.ThenableReference;
     };
     remove: {
@@ -159,34 +159,34 @@ export class FireDatabaseService {
     remove: (roomId: string) => Promise<void>;
     addMember: (
       roomId: string,
-      playerName: string
+      playerName: string,
     ) => firebase.database.ThenableReference;
     removeMember: (roomId: string, uid: string) => Promise<void>;
   };
 
   onlineGameCommunication: {
     add: (
-      newGameComm: GameCommunication
+      newGameComm: GameCommunication,
     ) => firebase.database.ThenableReference;
     remove: (roomId: string) => Promise<void>;
     sendMessage: (
       roomId: string,
-      message: ChatMessage
+      message: ChatMessage,
     ) => firebase.database.ThenableReference;
     sendUserInput: (
       roomId: string,
-      userInput: UserInput
+      userInput: UserInput,
     ) => firebase.database.ThenableReference;
     removeAllUserInput: (roomId: string) => Promise<void>;
     setThinkingState: (
       roomId: string,
       playerId: number,
-      state: boolean
+      state: boolean,
     ) => Promise<void>;
     setPresenceState: (
       roomId: string,
       playerId: number,
-      state: boolean
+      state: boolean,
     ) => Promise<void>;
     setTerminatedState: (roomId: string, state: boolean) => Promise<void>;
     setResultSubmittedState: (roomId: string, state: boolean) => Promise<void>;
@@ -194,46 +194,48 @@ export class FireDatabaseService {
 
   constructor(
     // private afs: AngularFirestore,
-    private afdb: AngularFireDatabase
+    private afdb: AngularFireDatabase,
   ) {
     this.expansionNameList$ = fromObservable(
       [],
-      afdb.list<string>(this.dbPath.expansionNameList).valueChanges()
+      afdb.list<string>(this.dbPath.expansionNameList).valueChanges(),
     ).map((list) => list.map((e) => e.toString()));
 
     this.cardPropertyList$ = fromObservable(
       [],
-      afdb.list<CardProperty>(this.dbPath.cardPropertyList).valueChanges()
+      afdb.list<CardProperty>(this.dbPath.cardPropertyList).valueChanges(),
     ).map((list) => list.map((e: any, i) => new CardProperty(i, e)));
 
     this.users$ = fromObservable(
       [],
       this.afdb
         .list(this.dbPath.users, (ref) =>
-          ref.orderByChild(fbPaths.db.usersSortBy)
+          ref.orderByChild(fbPaths.db.usersSortBy),
         )
-        .snapshotChanges()
+        .snapshotChanges(),
     ).map((actions) =>
       actions.map(
-        (action) => new User(action.key || '', action.payload.val() as any)
-      )
+        (action) => new User(action.key || '', action.payload.val() as any),
+      ),
     );
 
     this.scoringTable$ = fromObservable(
       [],
-      afdb.list<number[]>(this.dbPath.scoringTable).valueChanges()
+      afdb.list<number[]>(this.dbPath.scoringTable).valueChanges(),
     );
 
     this.gameResultList$ = combine(
       this.scoringTable$,
       fromObservable(
         [],
-        this.afdb.list<GameResult>(this.dbPath.gameResultList).snapshotChanges()
-      )
+        this.afdb
+          .list<GameResult>(this.dbPath.gameResultList)
+          .snapshotChanges(),
+      ),
     ).map(([scoringTable, actions]) => {
       const gameResultList = actions.map(
         (action) =>
-          new GameResult(action.key || '', action.payload.val() as any)
+          new GameResult(action.key || '', action.payload.val() as any),
       );
       gameResultList.forEach((gr) => {
         gr.setScores(scoringTable);
@@ -243,31 +245,31 @@ export class FireDatabaseService {
 
     this.randomizerGroupList$ = fromObservable(
       [],
-      this.afdb.list(this.dbPath.randomizerGroupList).snapshotChanges()
+      this.afdb.list(this.dbPath.randomizerGroupList).snapshotChanges(),
     ).map((actions) =>
       actions.map(
         (action) =>
-          new RandomizerGroup(action.key || '', action.payload.val() as any)
-      )
+          new RandomizerGroup(action.key || '', action.payload.val() as any),
+      ),
     );
 
     this.onlineGameRooms$ = fromObservable(
       [],
-      this.afdb.list(this.dbPath.onlineGameRoomsList).snapshotChanges()
+      this.afdb.list(this.dbPath.onlineGameRoomsList).snapshotChanges(),
     ).map((actions) =>
       actions.map(
-        (action) => new GameRoom(action.key || '', action.payload.val() as any)
-      )
+        (action) => new GameRoom(action.key || '', action.payload.val() as any),
+      ),
     );
 
     this.onlineGameCommunicationList$ = fromObservable(
       [],
-      this.afdb.list(this.dbPath.onlineGameCommunicationList).snapshotChanges()
+      this.afdb.list(this.dbPath.onlineGameCommunicationList).snapshotChanges(),
     ).map((actions) =>
       actions.map(
         (action) =>
-          new GameCommunication(action.key || '', action.payload.val() as any)
-      )
+          new GameCommunication(action.key || '', action.payload.val() as any),
+      ),
     );
 
     /*** methods ***/
@@ -300,7 +302,7 @@ export class FireDatabaseService {
             userSetProperty(
               uid,
               `onlineGame/isSelectedExpansions/${index}`,
-              value
+              value,
             ),
 
           numberOfPlayers: (uid: string, value: number) =>
@@ -355,7 +357,7 @@ export class FireDatabaseService {
     const randomizerGroupSetValue = (
       groupId: string,
       pathPrefix: string,
-      value: any
+      value: any,
     ) => {
       if (!groupId) {
         throw new Error(`groupId is empty.
@@ -368,7 +370,7 @@ export class FireDatabaseService {
     const randomizerGroupPushValue = (
       groupId: string,
       pathPrefix: string,
-      value: any
+      value: any,
     ) => {
       if (!groupId) {
         throw new Error(`groupId is empty.
@@ -403,19 +405,19 @@ export class FireDatabaseService {
         isSelectedExpansions: (
           groupId: string,
           index: number,
-          value: boolean
+          value: boolean,
         ) =>
           randomizerGroupSetValue(
             groupId,
             `isSelectedExpansions/${index}`,
-            value
+            value,
           ),
 
         selectedCardsCheckbox: (
           groupId: string,
           arrayName: string,
           index: number,
-          value: boolean
+          value: boolean,
         ) => {
           switch (arrayName) {
             case 'KingdomCards10':
@@ -427,7 +429,7 @@ export class FireDatabaseService {
               return randomizerGroupSetValue(
                 groupId,
                 `selectedCardsCheckbox/${arrayName}/${index}`,
-                value
+                value,
               );
 
             default:
@@ -439,7 +441,7 @@ export class FireDatabaseService {
 
         BlackMarketPileShuffled: (
           groupId: string,
-          value: BlackMarketPileCard[]
+          value: BlackMarketPileCard[],
         ) => randomizerGroupSetValue(groupId, 'BlackMarketPileShuffled', value),
 
         BlackMarketPhase: (groupId: string, value: number) =>
@@ -454,39 +456,39 @@ export class FireDatabaseService {
               randomizerGroupSetValue(
                 groupId,
                 `newGameResult/players/${uid}/selected`,
-                value
+                value,
               ),
 
             turnOrder: (groupId: string, uid: string, value: number) =>
               randomizerGroupSetValue(
                 groupId,
                 `newGameResult/players/${uid}/turnOrder`,
-                value
+                value,
               ),
 
             VP: (groupId: string, uid: string, value: number) =>
               randomizerGroupSetValue(
                 groupId,
                 `newGameResult/players/${uid}/VP`,
-                value
+                value,
               ),
 
             numberOfVictoryCards: (
               groupId: string,
               uid: string,
-              value: NumberOfVictoryCards
+              value: NumberOfVictoryCards,
             ) =>
               randomizerGroupSetValue(
                 groupId,
                 `newGameResult/players/${uid}/NofVictoryCards`,
-                value
+                value,
               ),
           },
           lastTurnPlayerName: (groupId: string, value: string) =>
             randomizerGroupSetValue(
               groupId,
               `newGameResult/lastTurnPlayerName`,
-              value
+              value,
             ),
 
           place: (groupId: string, value: string) =>
@@ -507,7 +509,7 @@ export class FireDatabaseService {
           return randomizerGroupSetValue(
             groupId,
             `newGameResult/players/${uid}`,
-            obj
+            obj,
           );
         },
 
@@ -522,7 +524,7 @@ export class FireDatabaseService {
         member: (groupId: string, uid: string) =>
           this.afdb
             .list(
-              `${this.dbPath.randomizerGroupList}/${groupId}/newGameResult/players`
+              `${this.dbPath.randomizerGroupList}/${groupId}/newGameResult/players`,
             )
             .remove(uid),
       },
@@ -531,7 +533,7 @@ export class FireDatabaseService {
           randomizerGroupSetValue(
             groupId,
             'selectedCardsCheckbox',
-            new SelectedCardsCheckbox()
+            new SelectedCardsCheckbox(),
           ),
 
         VPCalculator: (groupId: string) =>
@@ -581,49 +583,49 @@ export class FireDatabaseService {
       sendUserInput: (roomId: string, userInput: UserInput) =>
         this.afdb
           .list(
-            `${this.dbPath.onlineGameCommunicationList}/${roomId}/userInputList`
+            `${this.dbPath.onlineGameCommunicationList}/${roomId}/userInputList`,
           )
           .push(userInput),
 
       removeAllUserInput: (roomId: string) =>
         this.afdb
           .list(
-            `${this.dbPath.onlineGameCommunicationList}/${roomId}/userInputList`
+            `${this.dbPath.onlineGameCommunicationList}/${roomId}/userInputList`,
           )
           .remove()
           .then(() =>
             this.afdb
               .object(
-                `${this.dbPath.onlineGameCommunicationList}/${roomId}/resetGameClicked`
+                `${this.dbPath.onlineGameCommunicationList}/${roomId}/resetGameClicked`,
               )
-              .set(Date.now())
+              .set(Date.now()),
           ),
 
       setThinkingState: (roomId: string, playerId: number, state: boolean) =>
         this.afdb
           .object(
-            `${this.dbPath.onlineGameCommunicationList}/${roomId}/thinkingState/${playerId}`
+            `${this.dbPath.onlineGameCommunicationList}/${roomId}/thinkingState/${playerId}`,
           )
           .set(state),
 
       setPresenceState: (roomId: string, playerId: number, state: boolean) =>
         this.afdb
           .object(
-            `${this.dbPath.onlineGameCommunicationList}/${roomId}/presenceState/${playerId}`
+            `${this.dbPath.onlineGameCommunicationList}/${roomId}/presenceState/${playerId}`,
           )
           .set(state),
 
       setTerminatedState: (roomId: string, state: boolean) =>
         this.afdb
           .object(
-            `${this.dbPath.onlineGameCommunicationList}/${roomId}/isTerminated`
+            `${this.dbPath.onlineGameCommunicationList}/${roomId}/isTerminated`,
           )
           .set(state),
 
       setResultSubmittedState: (roomId: string, state: boolean) =>
         this.afdb
           .object(
-            `${this.dbPath.onlineGameCommunicationList}/${roomId}/resultIsSubmitted`
+            `${this.dbPath.onlineGameCommunicationList}/${roomId}/resultIsSubmitted`,
           )
           .set(state),
     };

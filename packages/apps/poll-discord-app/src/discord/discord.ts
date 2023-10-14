@@ -66,7 +66,7 @@ export const initDiscordClient = async (): Promise<
 
 export const startDiscordListener = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  discordClient: DiscordClient
+  discordClient: DiscordClient,
 ): void => {
   discordClient.on('messageReactionAdd', async (reaction, user) => {
     const reactionFilled: DiscordMessageReaction = reaction.partial

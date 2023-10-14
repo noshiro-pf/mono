@@ -7,7 +7,7 @@ import { DataForCardEffect } from './data-for-card-effect';
 export const Philosophers_Stone = async (
   thisDcard: DCard,
   pid: number,
-  data: DataForCardEffect
+  data: DataForCardEffect,
 ) => {
   const playersCard = data.gameState.DCards.allPlayersCards[pid];
   const DeckSize = playersCard.Deck.length;
@@ -17,7 +17,7 @@ export const Philosophers_Stone = async (
   data.messager(
     `${data.playersNameList[pid]}の` +
       `山札は${DeckSize}枚・捨て札置き場の枚数は${DiscardPileSize}枚` +
-      `だったので、${coin}コインを得ます。`
+      `だったので、${coin}コインを得ます。`,
   );
 
   data.gameState.turnInfo.coin += coin;

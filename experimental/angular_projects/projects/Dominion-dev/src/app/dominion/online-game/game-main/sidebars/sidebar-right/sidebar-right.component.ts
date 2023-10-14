@@ -27,7 +27,7 @@ export class SideBarRightComponent implements OnInit {
     private database: FireDatabaseService,
     private gameStateService: GameStateService,
     private myGameRoomService: MyGameRoomService,
-    private gameCommunication: GameRoomCommunicationService
+    private gameCommunication: GameRoomCommunicationService,
   ) {}
 
   ngOnInit() {}

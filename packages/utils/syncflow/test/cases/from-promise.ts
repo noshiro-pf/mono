@@ -15,7 +15,7 @@ const createStream = (tick: number): Observable<Result<number, unknown>> => {
 };
 
 export const fromPromiseTestCases: readonly [
-  StreamTestCase<Result<number, unknown>>
+  StreamTestCase<Result<number, unknown>>,
 ] = [
   {
     name: 'fromPromise case 1',

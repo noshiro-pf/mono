@@ -12,14 +12,14 @@ export const halfInt = (x: SafeInt): SafeInt =>
  */
 export const binarySearch = <N extends number>(
   sortedArray: readonly N[],
-  x: N
+  x: N,
 ): SafeInt => {
   if (sortedArray.length === 0) return toSafeInt(0);
   let mut_left: SafeInt = toSafeInt(0);
   let mut_right: SafeInt = SafeInt.sub(Arr.length(sortedArray), 1);
   let mut_mid: SafeInt = SafeInt.add(
     mut_left,
-    halfInt(SafeInt.sub(mut_right, mut_left))
+    halfInt(SafeInt.sub(mut_right, mut_left)),
   );
 
   // loop while x is in the range of [left, right)

@@ -12,7 +12,7 @@ const toImgUrl$ = (filename: string): RN<string> =>
     '',
     fb.storage
       .ref(`${fb.paths.storage.rulebookCoverImage}/${filename}`)
-      .getDownloadURL()
+      .getDownloadURL(),
   )
 
 const toPdfUrl$ = (filename: string): RN<string> =>
@@ -20,16 +20,16 @@ const toPdfUrl$ = (filename: string): RN<string> =>
     '',
     fb.storage
       .ref(`${fb.paths.storage.rulebookPdf}/${filename}`)
-      .getDownloadURL()
+      .getDownloadURL(),
   )
 
 export const Rulebooks = memo(() => {
   const imgUrls$: RN<string[]> = useRN(
-    combine(...rulebooksPath.map((e) => toImgUrl$(e.imgurl)).toArray())
+    combine(...rulebooksPath.map((e) => toImgUrl$(e.imgurl)).toArray()),
   )
 
   const pdfUrls$: RN<string[]> = useRN(
-    combine(...rulebooksPath.map((e) => toPdfUrl$(e.pdfurl)).toArray())
+    combine(...rulebooksPath.map((e) => toPdfUrl$(e.pdfurl)).toArray()),
   )
 
   const rulebooks$: RN<I.List<TRulebook>> = useRN(
@@ -39,9 +39,9 @@ export const Rulebooks = memo(() => {
           title: rb.title,
           imgurl: imgUrls[i],
           pdfurl: pdfUrls[i],
-        })
-      )
-    )
+        }),
+      ),
+    ),
   )
 
   const rulebooks = useRNValue(rulebooks$)

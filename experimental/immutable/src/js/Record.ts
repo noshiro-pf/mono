@@ -61,7 +61,7 @@ export class Record {
                   recordName(this) +
                   ' with property "' +
                   propName +
-                  '" since that property name is part of the Record API.'
+                  '" since that property name is part of the Record API.',
               );
             /* eslint-enable no-console */
           } else {
@@ -134,7 +134,7 @@ export class Record {
     if (this.has(k)) {
       const newValues = this._values.set(
         this._indices[k],
-        v === this._defaultValues[k] ? undefined : v
+        v === this._defaultValues[k] ? undefined : v,
       );
       if (newValues !== this._values && !this.__ownerID) {
         return makeRecord(this, newValues);

@@ -38,7 +38,7 @@ export const ColoredDistributionSelected = memoNamed<Props>(
         </div>
       ))}
     </div>
-  )
+  ),
 );
 
 const Bar = styled.div`

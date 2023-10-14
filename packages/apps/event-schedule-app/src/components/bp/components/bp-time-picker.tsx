@@ -18,18 +18,18 @@ export const BpTimePicker = memoNamed<BpTimePickerProps>(
           minutes: DateUtils.getLocaleMinutes(date),
         });
       },
-      [onTimeChange]
+      [onTimeChange],
     );
 
     const dateObj = useMemo<RawDateType>(
       () =>
         pipe(DateUtils.from(`1970/1/1 ${time.hours}:${time.minutes}:11`)).chain(
-          DateUtils.toDate
+          DateUtils.toDate,
         ).value,
-      [time]
+      [time],
     );
 
     // eslint-disable-next-line react/jsx-props-no-spreading
     return <TimePicker value={dateObj} onChange={onChangeHandler} {...props} />;
-  }
+  },
 );

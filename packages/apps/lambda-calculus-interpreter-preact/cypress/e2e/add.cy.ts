@@ -23,7 +23,7 @@ describe('add', { testIsolation: false }, () => {
         '4.	(λs.(λz.(s (s (s (s ((5 s) z)))))))',
         '5.	(λs.(λz.(s (s (s (s ((λz.(s (s (s (s (s z)))))) z)))))))',
         '6.	9',
-      ].join('\n')
+      ].join('\n'),
     );
   });
 
@@ -40,7 +40,7 @@ describe('add', { testIsolation: false }, () => {
         '4.	(λs.(λz.((0 s) z)))',
         '5.	(λs.(λz.((λz.z) z)))',
         '6.	0',
-      ].join('\n')
+      ].join('\n'),
     );
   });
 
@@ -57,7 +57,7 @@ describe('add', { testIsolation: false }, () => {
         '4.	(λs.(λz.((3 s) z)))',
         '5.	(λs.(λz.((λz.(s (s (s z)))) z)))',
         '6.	3',
-      ].join('\n')
+      ].join('\n'),
     );
   });
 
@@ -74,7 +74,7 @@ describe('add', { testIsolation: false }, () => {
         '4.	(λs.(λz.(s (s (s ((0 s) z))))))',
         '5.	(λs.(λz.(s (s (s ((λz.z) z))))))',
         '6.	3',
-      ].join('\n')
+      ].join('\n'),
     );
   });
 

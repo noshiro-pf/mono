@@ -13,7 +13,7 @@ import { nullThrows } from '../nullThrows';
 
 class UnusedVarsVisitor<
   TMessageIds extends string,
-  TOptions extends readonly unknown[]
+  TOptions extends readonly unknown[],
 > extends Visitor {
   private static readonly RESULTS_CACHE = new WeakMap<
     TSESTree.Program,
@@ -30,15 +30,15 @@ class UnusedVarsVisitor<
 
     this.scopeManager = nullThrows(
       context.getSourceCode().scopeManager,
-      'Missing required scope manager'
+      'Missing required scope manager',
     );
   }
 
   public static collectUnusedVariables<
     TMessageIds extends string,
-    TOptions extends readonly unknown[]
+    TOptions extends readonly unknown[],
   >(
-    context: TSESLint.RuleContext<TMessageIds, TOptions>
+    context: TSESLint.RuleContext<TMessageIds, TOptions>,
   ): ReadonlySet<TSESLint.Scope.Variable> {
     const program = context.getSourceCode().ast;
     const cached = this.RESULTS_CACHE.get(program);
@@ -50,7 +50,7 @@ class UnusedVarsVisitor<
     visitor.visit(program);
 
     const unusedVars = visitor.collectUnusedVariables(
-      visitor.getScope(program)
+      visitor.getScope(program),
     );
     this.RESULTS_CACHE.set(program, unusedVars);
     return unusedVars;
@@ -58,7 +58,7 @@ class UnusedVarsVisitor<
 
   private collectUnusedVariables(
     scope: TSESLint.Scope.Scope,
-    unusedVariables = new Set<TSESLint.Scope.Variable>()
+    unusedVariables = new Set<TSESLint.Scope.Variable>(),
   ): ReadonlySet<TSESLint.Scope.Variable> {
     for (const variable of scope.variables) {
       if (
@@ -91,7 +91,7 @@ class UnusedVarsVisitor<
   //#region HELPERS
 
   private getScope<T extends TSESLint.Scope.Scope = TSESLint.Scope.Scope>(
-    currentNode: TSESTree.Node
+    currentNode: TSESTree.Node,
   ): T {
     // On Program node, get the outermost scope to avoid return Node.js special function scope or ES modules scope.
     const inner = currentNode.type !== AST_NODE_TYPES.Program;
@@ -114,7 +114,7 @@ class UnusedVarsVisitor<
   }
 
   private markVariableAsUsed(
-    variableOrIdentifier: TSESLint.Scope.Variable | TSESTree.Identifier
+    variableOrIdentifier: TSESLint.Scope.Variable | TSESTree.Identifier,
   ): void;
   private markVariableAsUsed(name: string, parent: TSESTree.Node): void;
   private markVariableAsUsed(
@@ -122,7 +122,7 @@ class UnusedVarsVisitor<
       | TSESLint.Scope.Variable
       | TSESTree.Identifier
       | string,
-    parent?: TSESTree.Node
+    parent?: TSESTree.Node,
   ): void {
     if (
       typeof variableOrIdentifierOrName !== 'string' &&
@@ -145,7 +145,7 @@ class UnusedVarsVisitor<
     let currentScope: TSESLint.Scope.Scope | null = this.getScope(node);
     while (currentScope) {
       const variable = currentScope.variables.find(
-        (scopeVar) => scopeVar.name === name
+        (scopeVar) => scopeVar.name === name,
       );
 
       if (variable) {
@@ -158,7 +158,7 @@ class UnusedVarsVisitor<
   }
 
   private visitClass(
-    node: TSESTree.ClassDeclaration | TSESTree.ClassExpression
+    node: TSESTree.ClassDeclaration | TSESTree.ClassExpression,
   ): void {
     // skip a variable of class itself name in the class scope
     const scope = this.getScope<TSESLint.Scope.Scopes.ClassScope>(node);
@@ -171,7 +171,7 @@ class UnusedVarsVisitor<
   }
 
   private visitFunction(
-    node: TSESTree.FunctionDeclaration | TSESTree.FunctionExpression
+    node: TSESTree.FunctionDeclaration | TSESTree.FunctionExpression,
   ): void {
     const scope = this.getScope(node);
     // skip implicit "arguments" variable
@@ -189,7 +189,7 @@ class UnusedVarsVisitor<
       | TSESTree.TSDeclareFunction
       | TSESTree.TSEmptyBodyFunctionExpression
       | TSESTree.TSFunctionType
-      | TSESTree.TSMethodSignature
+      | TSESTree.TSMethodSignature,
   ): void {
     // function type signature params create variables because they can be referenced within the signature,
     // but they obviously aren't unused variables for the purposes of this rule.
@@ -201,7 +201,7 @@ class UnusedVarsVisitor<
   }
 
   private visitSetter(
-    node: TSESTree.MethodDefinition | TSESTree.Property
+    node: TSESTree.MethodDefinition | TSESTree.Property,
   ): void {
     if (node.kind === 'set') {
       // ignore setter parameters because they're syntactically required to exist
@@ -371,7 +371,7 @@ function isInside(inner: TSESTree.Node, outer: TSESTree.Node): boolean {
  */
 function isSelfReference(
   ref: TSESLint.Scope.Reference,
-  nodes: Set<TSESTree.Node>
+  nodes: Set<TSESTree.Node>,
 ): boolean {
   let scope: TSESLint.Scope.Scope | null = ref.from;
 
@@ -454,7 +454,7 @@ function isUsedVariable(variable: TSESLint.Scope.Variable): boolean {
    * @returns Function nodes.
    */
   function getFunctionDefinitions(
-    variable: TSESLint.Scope.Variable
+    variable: TSESLint.Scope.Variable,
   ): Set<TSESTree.Node> {
     const functionDefinitions = new Set<TSESTree.Node>();
 
@@ -477,7 +477,7 @@ function isUsedVariable(variable: TSESLint.Scope.Variable): boolean {
   }
 
   function getTypeDeclarations(
-    variable: TSESLint.Scope.Variable
+    variable: TSESLint.Scope.Variable,
   ): Set<TSESTree.Node> {
     const nodes = new Set<TSESTree.Node>();
 
@@ -494,7 +494,7 @@ function isUsedVariable(variable: TSESLint.Scope.Variable): boolean {
   }
 
   function getModuleDeclarations(
-    variable: TSESLint.Scope.Variable
+    variable: TSESLint.Scope.Variable,
   ): Set<TSESTree.Node> {
     const nodes = new Set<TSESTree.Node>();
 
@@ -512,7 +512,7 @@ function isUsedVariable(variable: TSESLint.Scope.Variable): boolean {
    */
   function isInsideOneOf(
     ref: TSESLint.Scope.Reference,
-    nodes: Set<TSESTree.Node>
+    nodes: Set<TSESTree.Node>,
   ): boolean {
     for (const node of nodes) {
       if (isInside(ref.identifier, node)) {
@@ -539,7 +539,7 @@ function isUsedVariable(variable: TSESLint.Scope.Variable): boolean {
    */
   function getRhsNode(
     ref: TSESLint.Scope.Reference,
-    prevRhsNode: TSESTree.Node | null
+    prevRhsNode: TSESTree.Node | null,
   ): TSESTree.Node | null {
     /**
      * Checks whether the given node is in a loop or not.
@@ -597,7 +597,7 @@ function isUsedVariable(variable: TSESLint.Scope.Variable): boolean {
    */
   function isReadForItself(
     ref: TSESLint.Scope.Reference,
-    rhsNode: TSESTree.Node | null
+    rhsNode: TSESTree.Node | null,
   ): boolean {
     /**
      * Checks whether a given Identifier node exists inside of a function node which can be used later.
@@ -614,7 +614,7 @@ function isUsedVariable(variable: TSESLint.Scope.Variable): boolean {
      */
     function isInsideOfStorableFunction(
       id: TSESTree.Node,
-      rhsNode: TSESTree.Node
+      rhsNode: TSESTree.Node,
     ): boolean {
       /**
        * Finds a function node from ancestors of a node.
@@ -645,7 +645,7 @@ function isUsedVariable(variable: TSESLint.Scope.Variable): boolean {
        */
       function isStorableFunction(
         funcNode: TSESTree.Node,
-        rhsNode: TSESTree.Node
+        rhsNode: TSESTree.Node,
       ): boolean {
         let node = funcNode;
         let parent = funcNode.parent;
@@ -751,9 +751,9 @@ function isUsedVariable(variable: TSESLint.Scope.Variable): boolean {
  */
 function collectUnusedVariables<
   TMessageIds extends string,
-  TOptions extends readonly unknown[]
+  TOptions extends readonly unknown[],
 >(
-  context: Readonly<TSESLint.RuleContext<TMessageIds, TOptions>>
+  context: Readonly<TSESLint.RuleContext<TMessageIds, TOptions>>,
 ): ReadonlySet<TSESLint.Scope.Variable> {
   return UnusedVarsVisitor.collectUnusedVariables(context);
 }

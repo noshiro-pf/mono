@@ -44,10 +44,10 @@ export const ScoreTable = memo(() => {
               e.score.get(4, -1) < 0 ? '' : e.score.get(4, 0).toString(),
               e.score.get(5, -1) < 0 ? '' : e.score.get(5, 0).toString(),
               e.score.get(6, -1) < 0 ? '' : e.score.get(6, 0).toString(),
-            ])
-          )
+            ]),
+          ),
       ),
-    []
+    [],
   )
 
   const scoreTableForView = useRNValue(scoreTableForView$)

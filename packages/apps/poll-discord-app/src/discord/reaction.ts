@@ -12,13 +12,13 @@ import { fixAnswerAndUpdateMessage } from './fix-answer';
 
 const onRefreshClick = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  reactionFilled: Discord.MessageReaction
+  reactionFilled: Discord.MessageReaction,
 ): Promise<Result<undefined, string>> => {
   const channel = reactionFilled.message.channel;
 
   if (channel.type !== ChannelType.GuildText) {
     return Result.err(
-      `This channel type (${channel.type}) is not supported. (GuildText only)`
+      `This channel type (${channel.type}) is not supported. (GuildText only)`,
     );
   }
 
@@ -27,7 +27,7 @@ const onRefreshClick = async (
   });
 
   const pollResult = await firestoreApi.getPollById(
-    toPollId(reactionFilled.message.id)
+    toPollId(reactionFilled.message.id),
   );
 
   if (Result.isErr(pollResult)) return pollResult;
@@ -38,7 +38,7 @@ const onRefreshClick = async (
 
   const fixAnswerAndUpdateMessageResult = await fixAnswerAndUpdateMessage(
     messages,
-    poll
+    poll,
   );
 
   if (Result.isErr(fixAnswerAndUpdateMessageResult)) {
@@ -56,7 +56,7 @@ const onMessageReactCommon = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   reaction: Discord.MessageReaction,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  user: Discord.PartialUser | Discord.User
+  user: Discord.PartialUser | Discord.User,
 ): Promise<Result<undefined, unknown>> => {
   if (user.bot) return Result.ok(undefined);
   if (action.value === undefined) return Result.ok(undefined);
@@ -73,7 +73,7 @@ const onMessageReactCommon = async (
   const channel = reaction.message.channel;
   if (channel.type !== ChannelType.GuildText) {
     return Result.err(
-      `This channel type "${channel.type}" is not supported. ("GuildText" only)`
+      `This channel type "${channel.type}" is not supported. ("GuildText" only)`,
     );
   }
 
@@ -85,21 +85,21 @@ const onMessageReactCommon = async (
 
   if (pollId === undefined) {
     return Result.err(
-      `pollId for dateOptionId "${dateOptionId}" doesn't exist in firestore`
+      `pollId for dateOptionId "${dateOptionId}" doesn't exist in firestore`,
     );
   }
 
   const [updateMessageReactionResult, updatePollUpdatedAtResult, messages]: [
     Result<void, string>,
     Result<void, string>,
-    Discord.Collection<string, Discord.Message>
+    Discord.Collection<string, Discord.Message>,
   ] = await Promise.all([
     firestoreApi.updateMessageReaction(
       pollId,
       dateOptionId,
       action.value,
       toUserId(user.id),
-      action.type
+      action.type,
     ),
     firestoreApi.updatePollUpdatedAt(pollId),
     channel.messages.fetch({
@@ -130,7 +130,7 @@ const onMessageReactCommon = async (
 
   const userIdToDisplayNameResult = await createUserIdToDisplayNameMap(
     reaction.message.guild,
-    getUserIdsFromAnswers(resultPoll.answers).toArray()
+    getUserIdsFromAnswers(resultPoll.answers).toArray(),
   );
 
   if (Result.isErr(userIdToDisplayNameResult)) {
@@ -140,7 +140,7 @@ const onMessageReactCommon = async (
   const userIdToDisplayName = userIdToDisplayNameResult.value;
 
   const message: Discord.Message | undefined = messages.find(
-    (m) => m.id === resultPoll.id
+    (m) => m.id === resultPoll.id,
   );
 
   if (message === undefined) {
@@ -152,14 +152,14 @@ const onMessageReactCommon = async (
       .edit({
         embeds: [rpCreateSummaryMessage(resultPoll, userIdToDisplayName)],
       })
-      .then(() => undefined)
+      .then(() => undefined),
   );
 
   return result;
 };
 
 const mapReactionEmojiNameToAnswerType = (
-  reactionEmojiName: string | null
+  reactionEmojiName: string | null,
 ): AnswerType | 'refresh' | undefined =>
   match(reactionEmojiName ?? '', {
     [emojis.good.unicode]: 'good',
@@ -172,7 +172,7 @@ export const onMessageReactionAdd = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   reaction: Discord.MessageReaction,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  user: Discord.PartialUser | Discord.User
+  user: Discord.PartialUser | Discord.User,
 ): Promise<Result<undefined, unknown>> =>
   onMessageReactCommon(
     {
@@ -180,14 +180,14 @@ export const onMessageReactionAdd = async (
       value: mapReactionEmojiNameToAnswerType(reaction.emoji.name),
     },
     reaction,
-    user
+    user,
   );
 
 export const onMessageReactionRemove = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   reaction: Discord.MessageReaction,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  user: Discord.PartialUser | Discord.User
+  user: Discord.PartialUser | Discord.User,
 ): Promise<Result<undefined, unknown>> =>
   onMessageReactCommon(
     {
@@ -195,5 +195,5 @@ export const onMessageReactionRemove = (
       value: mapReactionEmojiNameToAnswerType(reaction.emoji.name),
     },
     reaction,
-    user
+    user,
   );

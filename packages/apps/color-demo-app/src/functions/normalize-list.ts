@@ -1,5 +1,5 @@
 export const normalizeList = (
-  list: NonEmptyArray<NonNegativeFiniteNumber>
+  list: NonEmptyArray<NonNegativeFiniteNumber>,
 ): NonEmptyArray<NonNegativeFiniteNumber> => {
   const maxValueInList = Arr.max(list);
   if (Num.isNonZero(maxValueInList)) {

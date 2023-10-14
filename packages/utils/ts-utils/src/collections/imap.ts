@@ -14,7 +14,7 @@ interface IMapInterface<K, V> {
   // Reducing a value
   every: ((predicate: (value: V, key: K) => boolean) => boolean) &
     (<W extends V>(
-      predicate: (value: V, key: K) => value is W
+      predicate: (value: V, key: K) => value is W,
     ) => this is IMap<K, W>);
   some: (predicate: (value: V, key: K) => boolean) => boolean;
 
@@ -27,14 +27,14 @@ interface IMapInterface<K, V> {
       | { type: 'delete'; key: K }
       | { type: 'set'; key: K; value: V }
       | { type: 'update'; key: K; updater: (value: V) => V }
-    >[]
+    >[],
   ) => IMap<K, V>;
 
   // Sequence algorithms
   map: <V2>(mapFn: (value: V, key: K) => V2) => IMap<K, V2>;
   mapKeys: <K2>(mapFn: (key: K) => K2) => IMap<K2, V>;
   mapEntries: <K2, V2>(
-    mapFn: (entry: readonly [K, V]) => readonly [K2, V2]
+    mapFn: (entry: readonly [K, V]) => readonly [K2, V2],
   ) => IMap<K2, V2>;
 
   // Side effects
@@ -90,7 +90,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   }
 
   every<W extends V>(
-    predicate: (value: V, key: K) => value is W
+    predicate: (value: V, key: K) => value is W,
   ): this is IMap<K, W>;
   every(predicate: (value: V, key: K) => boolean): boolean;
   every(predicate: (value: V, key: K) => boolean): boolean {
@@ -124,7 +124,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
       return IMap.new([...this.#map, tp(key, value)]);
     } else {
       return IMap.new(
-        ArrayFrom(this.#map, ([k, v]) => tp(k, Object.is(k, key) ? value : v))
+        ArrayFrom(this.#map, ([k, v]) => tp(k, Object.is(k, key) ? value : v)),
       );
     }
   }
@@ -140,8 +140,8 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
     return IMap.new(
       ArrayFrom(this.#map, ([k, v]) =>
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        tp(k, Object.is(k, key) ? updater(curr!) : v)
-      )
+        tp(k, Object.is(k, key) ? updater(curr!) : v),
+      ),
     );
   }
 
@@ -150,7 +150,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
       | { type: 'delete'; key: K }
       | { type: 'set'; key: K; value: V }
       | { type: 'update'; key: K; updater: (value: V) => V }
-    >[]
+    >[],
   ): IMap<K, V> {
     const mut_result = new MutableMap<K, V>(this.#map);
 
@@ -169,11 +169,11 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
             mut_result.set(
               action.key,
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              action.updater(mut_result.get(action.key)!)
+              action.updater(mut_result.get(action.key)!),
             );
           } else {
             console.error(
-              `IMap.withMutations: key not found: ${Str.from(action.key)}`
+              `IMap.withMutations: key not found: ${Str.from(action.key)}`,
             );
           }
           break;
@@ -193,7 +193,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   }
 
   mapEntries<K2, V2>(
-    mapFn: (entry: readonly [K, V]) => readonly [K2, V2]
+    mapFn: (entry: readonly [K, V]) => readonly [K2, V2],
   ): IMap<K2, V2> {
     return IMap.new(this.toArray().map(mapFn));
   }

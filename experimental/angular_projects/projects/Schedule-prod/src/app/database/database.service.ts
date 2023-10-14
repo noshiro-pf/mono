@@ -34,12 +34,12 @@ export class DatabaseService {
     setEvent: (eventID: string, value: Schedule) => Promise<void>;
     addAnswer: (
       eventID: string,
-      value: Answer
+      value: Answer,
     ) => firebase.database.ThenableReference;
     setAnswer: (
       eventID: string,
       answerID: string,
-      value: Answer
+      value: Answer,
     ) => Promise<void>;
     removeAnswer: (eventID: string, answerID: string) => Promise<void>;
   };
@@ -56,9 +56,9 @@ export class DatabaseService {
       .pipe(
         map((actions) =>
           actions.map(
-            (action) => new User(<any>action.key, <any>action.payload.val())
-          )
-        )
+            (action) => new User(<any>action.key, <any>action.payload.val()),
+          ),
+        ),
       );
 
     this.schedulingEvents$ = this.afdb
@@ -67,9 +67,10 @@ export class DatabaseService {
       .pipe(
         map((actions) =>
           actions.map(
-            (action) => new Schedule(<any>action.key, <any>action.payload.val())
-          )
-        )
+            (action) =>
+              new Schedule(<any>action.key, <any>action.payload.val()),
+          ),
+        ),
       );
 
     this.feedbacks$ = this.afdb
@@ -78,9 +79,10 @@ export class DatabaseService {
       .pipe(
         map((actions) =>
           actions.map(
-            (action) => new Feedback(<any>action.key, <any>action.payload.val())
-          )
-        )
+            (action) =>
+              new Feedback(<any>action.key, <any>action.payload.val()),
+          ),
+        ),
       );
 
     /*** methods ***/
@@ -139,7 +141,7 @@ export class DatabaseService {
         delete copy.databaseKey;
         return this.afdb
           .object(
-            `${this.fdPath.schedulingEvents}/${eventID}/answers/${answerID}`
+            `${this.fdPath.schedulingEvents}/${eventID}/answers/${answerID}`,
           )
           .set(copy);
       },
@@ -147,7 +149,7 @@ export class DatabaseService {
       removeAnswer: (eventID: string, answerID: string) =>
         this.afdb
           .object(
-            `${this.fdPath.schedulingEvents}/${eventID}/answers/${answerID}`
+            `${this.fdPath.schedulingEvents}/${eventID}/answers/${answerID}`,
           )
           .remove(),
     };

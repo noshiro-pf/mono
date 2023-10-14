@@ -190,7 +190,7 @@ export const GameResultDialogView = memo(
         </ButtonsWrapper>
       </DialogActions>
     </Dialog>
-  )
+  ),
 )
 
 GameResultDialogView.displayName = 'GameResultDialogView'

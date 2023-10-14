@@ -1,6 +1,6 @@
 export type MakeTuple<
   Elm,
-  N extends number
+  N extends number,
 > = _MakeTupleInternals.MakeTupleImpl<Elm, `${N}`, []>;
 
 /**
@@ -23,7 +23,7 @@ export namespace _MakeTupleInternals {
   /** @internal */
   type Tile<
     T extends readonly unknown[],
-    N extends Digit | DigitStr | '10' | 10
+    N extends Digit | DigitStr | '10' | 10,
   > = [
     readonly [],
     readonly [...T],
@@ -35,14 +35,14 @@ export namespace _MakeTupleInternals {
     readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T],
     readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
     readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
-    readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T]
+    readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
   ][N];
 
   /** @internal */
   export type MakeTupleImpl<
     Elm,
     N extends string,
-    X extends readonly unknown[]
+    X extends readonly unknown[],
   > = string extends N
     ? never
     : N extends ''

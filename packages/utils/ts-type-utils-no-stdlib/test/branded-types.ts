@@ -810,7 +810,7 @@ import { expectType } from './expect-type';
 
   expectType<WithSmallInt<NonZeroInt>, NonZeroInt | SmallInt<'!=0'>>('=');
   expectType<WithSmallInt<NonZeroSafeInt>, NonZeroSafeInt | SmallInt<'!=0'>>(
-    '='
+    '=',
   );
 
   expectType<WithSmallInt<Uint>, SmallInt<'>=0'> | Uint>('=');

@@ -34,5 +34,5 @@ export const InputGroupView = memoNamed<Props>(
         onChange={onChange}
       />
     </div>
-  )
+  ),
 );

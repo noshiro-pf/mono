@@ -7,6 +7,6 @@ export const mapToKey =
     T
   > =>
   (
-    keyEvents$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>
+    keyEvents$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>,
   ): Observable<T> =>
     keyEvents$.pipe(map(([_du, ev]) => ev.key as T));

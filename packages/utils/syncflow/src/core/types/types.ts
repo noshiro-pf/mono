@@ -19,6 +19,6 @@ export type Subscribable<A> = Readonly<{
   subscribe: (
     onNext: (nextValue: A) => void,
     onError?: (error?: unknown) => void,
-    onComplete?: () => void
+    onComplete?: () => void,
   ) => Subscription;
 }>;

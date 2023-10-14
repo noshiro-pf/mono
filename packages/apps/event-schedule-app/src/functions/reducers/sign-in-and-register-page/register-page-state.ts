@@ -71,7 +71,7 @@ export const registerPageStateReducer: Reducer<
         emailInputStateReducer(state.email, {
           type: 'input',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'setEmailError':
@@ -93,7 +93,7 @@ export const registerPageStateReducer: Reducer<
         passwordWithConfirmationStateReducer(state.password, {
           type: 'inputPassword',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'setPasswordError':
@@ -115,7 +115,7 @@ export const registerPageStateReducer: Reducer<
         passwordWithConfirmationStateReducer(state.password, {
           type: 'inputPasswordConfirmation',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'setOtherError':
@@ -135,7 +135,7 @@ export const registerPageStateReducer: Reducer<
         state.password,
         {
           type: 'submit',
-        }
+        },
       );
 
       return {

@@ -4,7 +4,7 @@ import { commonDictionary } from './common';
 const { timeRangeTilde, dayList, dayWrapperBrace } = commonDictionary.date;
 
 const dayListWithBrace: readonly string[] = dayList.map(
-  (c) => `${dayWrapperBrace.start}${c}${dayWrapperBrace.end}`
+  (c) => `${dayWrapperBrace.start}${c}${dayWrapperBrace.end}`,
 );
 
 export const ymd2str = (ymd: YearMonthDate): string => {

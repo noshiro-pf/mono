@@ -22,34 +22,34 @@ export const convertLibEs2022Array = (from) => {
   {
     const slice = ret.slice(
       ret.indexOf(markers.Array.start),
-      ret.indexOf(markers.Array.end)
+      ret.indexOf(markers.Array.end),
     );
     ret = ret.replaceAll(
       slice,
       slice.replaceAll(
         'at(index: number): T | undefined;',
-        `at(index: ${indexType.arg}): T | undefined`
-      )
+        `at(index: ${indexType.arg}): T | undefined`,
+      ),
     );
   }
 
   {
     const slice = ret.slice(
       ret.indexOf(markers.ReadonlyArray.start),
-      ret.indexOf(markers.ReadonlyArray.end)
+      ret.indexOf(markers.ReadonlyArray.end),
     );
     ret = ret.replaceAll(
       slice,
       slice.replaceAll(
         'at(index: number): T | undefined;',
-        `at(index: ${indexType.arg}): T | undefined`
-      )
+        `at(index: ${indexType.arg}): T | undefined`,
+      ),
     );
   }
 
   ret = ret.replaceAll(
     'at(index: number): T | undefined;',
-    `at(index: ${indexType.arg}): T | undefined`
+    `at(index: ${indexType.arg}): T | undefined`,
   );
 
   for (const [typeName, returnTypeBefore, returnTypeAfter] of [
@@ -67,7 +67,7 @@ export const convertLibEs2022Array = (from) => {
   ]) {
     ret = ret.replaceAll(
       `interface ${typeName} {\n  /**\n   * Returns the item located at the specified index.\n   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.\n   */\n  at(index: number): ${returnTypeBefore} | undefined;\n}`,
-      `interface ${typeName} {\n  /**\n   * Returns the item located at the specified index.\n   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.\n   */\n  at(index: ${indexType.arg}): ${returnTypeAfter} | undefined;\n}`
+      `interface ${typeName} {\n  /**\n   * Returns the item located at the specified index.\n   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.\n   */\n  at(index: ${indexType.arg}): ${returnTypeAfter} | undefined;\n}`,
     );
   }
 

@@ -8,9 +8,9 @@ export const mapToCtrlKeyIsDown =
     boolean
   > =>
   (
-    keyEvents$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>
+    keyEvents$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>,
   ): Observable<boolean> =>
     keyEvents$.pipe(
       filter(([_du, ev]) => isCtrlKey(ev)),
-      map(([du]) => du === 'down')
+      map(([du]) => du === 'down'),
     );

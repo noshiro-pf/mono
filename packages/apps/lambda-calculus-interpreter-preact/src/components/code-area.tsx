@@ -19,7 +19,7 @@ export const CodeArea = memoNamed(
       (ev) => {
         valueChange(ev.target.value);
       },
-      [valueChange]
+      [valueChange],
     );
 
     const style = useMemo<preact.JSX.CSSProperties>(
@@ -27,7 +27,7 @@ export const CodeArea = memoNamed(
         minHeight: `${minHeightPx}px`,
         maxHeight: `${maxHeightPx}px`,
       }),
-      [minHeightPx, maxHeightPx]
+      [minHeightPx, maxHeightPx],
     );
 
     return (
@@ -38,7 +38,7 @@ export const CodeArea = memoNamed(
         onChange={onChange}
       />
     );
-  }
+  },
 );
 
 const TextArea = styled('textarea')`
@@ -50,7 +50,9 @@ const TextArea = styled('textarea')`
 
   /* border */
   border-radius: 8px;
-  box-shadow: inset 0 0 1px 2px #3c3d39, 0 0 15px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    inset 0 0 1px 2px #3c3d39,
+    0 0 15px rgba(0, 0, 0, 0.5);
   border: 1px solid #0b0c0a;
 
   /* color */

@@ -49,7 +49,7 @@ const restoreCreateEventPageTemp = (): Result<
 };
 
 const saveCreateEventPageTemp = (
-  eventSchedule: EventSchedulePicked
+  eventSchedule: EventSchedulePicked,
 ): Result<undefined, string> => {
   const str = Json.stringify(eventSchedule);
   if (Result.isErr(str)) {

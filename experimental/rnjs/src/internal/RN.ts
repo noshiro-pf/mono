@@ -193,7 +193,7 @@ export class RN<T> {
     runWithFirstValue: boolean = true,
     onFire: (v: T) => void,
     onError?: (e?: any) => void,
-    onComplete?: (v: T) => void
+    onComplete?: (v: T) => void,
   ): Subscription {
     return this.subscribe(onFire, onError, onComplete, runWithFirstValue);
   }
@@ -203,7 +203,7 @@ export class RN<T> {
     onFire: (v: T) => void,
     onError?: (e?: any) => void,
     onComplete?: (v: T) => void,
-    runWithFirstValue?: boolean
+    runWithFirstValue?: boolean,
   ): Subscription;
 
   // rxjs-like interface
@@ -212,7 +212,7 @@ export class RN<T> {
     next: (v: T) => void,
     error?: (e?: any) => void,
     complete?: (v: T) => void,
-    runWithFirstValue?: boolean
+    runWithFirstValue?: boolean,
   ): Subscription;
 
   // eslint-disable-next-line no-dupe-class-members
@@ -223,7 +223,7 @@ export class RN<T> {
     nextOrSubscriber: ((v: T) => void) | Subscriber<T>,
     error?: (e?: any) => void,
     complete?: (v: T) => void,
-    runWithFirstValue: boolean = true
+    runWithFirstValue: boolean = true,
   ): Subscription {
     // unify to subscriber
     let subscriber: Subscriber<T>;
@@ -293,13 +293,13 @@ export class RN<T> {
     onFire: (v: T) => void,
     onError?: (e?: any) => void,
     onComplete?: (v: T) => void,
-    name: string = ''
+    name: string = '',
   ): Subscription {
     return this.takeUntil(terminator, name).listen(
       runWithFirstValue,
       onFire,
       onError,
-      onComplete
+      onComplete,
     );
   }
 
@@ -328,14 +328,14 @@ export class RN<T> {
   pipe<A, B, C>(
     op1: Operator<T, A>,
     op2: Operator<A, B>,
-    op3: Operator<B, C>
+    op3: Operator<B, C>,
   ): RN<C>;
   // eslint-disable-next-line no-dupe-class-members
   pipe<A, B, C, D>(
     op1: Operator<T, A>,
     op2: Operator<A, B>,
     op3: Operator<B, C>,
-    op4: Operator<C, D>
+    op4: Operator<C, D>,
   ): RN<D>;
   // eslint-disable-next-line no-dupe-class-members
   pipe<A, B, C, D, E>(
@@ -343,7 +343,7 @@ export class RN<T> {
     op2: Operator<A, B>,
     op3: Operator<B, C>,
     op4: Operator<C, D>,
-    op5: Operator<D, E>
+    op5: Operator<D, E>,
   ): RN<E>;
   // eslint-disable-next-line no-dupe-class-members
   pipe<A, B, C, D, E, F>(
@@ -352,7 +352,7 @@ export class RN<T> {
     op3: Operator<B, C>,
     op4: Operator<C, D>,
     op5: Operator<D, E>,
-    op6: Operator<E, F>
+    op6: Operator<E, F>,
   ): RN<F>;
   // eslint-disable-next-line no-dupe-class-members
   pipe<A, B, C, D, E, F, G>(
@@ -362,7 +362,7 @@ export class RN<T> {
     op4: Operator<C, D>,
     op5: Operator<D, E>,
     op6: Operator<E, F>,
-    op7: Operator<F, G>
+    op7: Operator<F, G>,
   ): RN<G>;
   // eslint-disable-next-line no-dupe-class-members
   pipe<A, B, C, D, E, F, G, H>(
@@ -373,7 +373,7 @@ export class RN<T> {
     op5: Operator<D, E>,
     op6: Operator<E, F>,
     op7: Operator<F, G>,
-    op8: Operator<G, H>
+    op8: Operator<G, H>,
   ): RN<H>;
   // eslint-disable-next-line no-dupe-class-members
   pipe<A, B, C, D, E, F, G, H, I>(
@@ -411,7 +411,7 @@ export class RN<T> {
   filter(
     initialValue: T,
     predicate: (srcValue: T, srcIndex: number, index: number) => boolean,
-    name: string = ''
+    name: string = '',
   ): RN<T> {
     return filter<T>(initialValue, predicate, name)(this);
   }
@@ -424,14 +424,14 @@ export class RN<T> {
 
   flatMap<U>(
     fn: (srcValue: T, srcIndex: number, index: number) => RN<U>,
-    name: string = ''
+    name: string = '',
   ): RN<U> {
     return flatMap<T, U>(fn, name)(this);
   }
 
   map<U>(
     fn: (srcValue: T, srcIndex: number, index: number) => U,
-    name: string = ''
+    name: string = '',
   ): RN<U> {
     return map<T, U>(fn, name)(this);
   }
@@ -467,7 +467,7 @@ export class RN<T> {
   scan<U>(
     initialValue: U,
     fn: (state: U, srcValue: T, srcIndex?: number, index?: number) => U,
-    name: string = ''
+    name: string = '',
   ): RN<U> {
     return scan<T, U>(initialValue, fn, name)(this);
   }
@@ -479,7 +479,7 @@ export class RN<T> {
   skipWhile(
     initialValue: T,
     predicate: (srcValue: T, srcIndex: number, index: number) => boolean,
-    name: string = ''
+    name: string = '',
   ): RN<T> {
     return skipWhile<T>(initialValue, predicate, name)(this);
   }
@@ -498,7 +498,7 @@ export class RN<T> {
 
   switchMap<U>(
     fn: (srcValue: T, srcIndex: number, index: number) => RN<U>,
-    name: string = ''
+    name: string = '',
   ): RN<U> {
     return switchMap<T, U>(fn, name)(this);
   }
@@ -509,7 +509,7 @@ export class RN<T> {
 
   takeWhile(
     predicate: (srcValue: T, srcIndex: number, index: number) => boolean,
-    name: string = ''
+    name: string = '',
   ): RN<T> {
     return takeWhile<T>(predicate, name)(this);
   }

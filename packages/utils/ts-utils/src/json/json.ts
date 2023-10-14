@@ -11,7 +11,7 @@ import { Str } from '../str';
  */
 const parse = (
   text: string,
-  reviver?: (this: unknown, key: string, value: JSONValue) => unknown
+  reviver?: (this: unknown, key: string, value: JSONValue) => unknown,
 ): Result<JSONValue, string> => {
   try {
     return Result.ok(
@@ -19,8 +19,8 @@ const parse = (
       JSON.parse(
         text,
         // eslint-disable-next-line no-restricted-syntax
-        reviver as (this: unknown, key: string, value: unknown) => unknown
-      ) as JSONValue
+        reviver as (this: unknown, key: string, value: unknown) => unknown,
+      ) as JSONValue,
     );
   } catch (error: unknown) {
     return Result.err(Str.from(error));
@@ -36,12 +36,12 @@ const parse = (
 const stringify = (
   value: unknown,
   replacer?: (this: unknown, key: string, val: unknown) => unknown,
-  space?: UintRange<1, 11> | string
+  space?: UintRange<1, 11> | string,
 ): Result<string, string> => {
   try {
     return Result.ok(
       // eslint-disable-next-line no-restricted-globals
-      JSON.stringify(value, replacer, space)
+      JSON.stringify(value, replacer, space),
     );
   } catch (error) {
     return Result.err(Str.from(error));
@@ -57,12 +57,12 @@ const stringify = (
 const stringifySelected = (
   value: unknown,
   propertiesToBeSelected?: readonly (number | string)[] | null,
-  space?: UintRange<1, 11> | string
+  space?: UintRange<1, 11> | string,
 ): Result<string, string> => {
   try {
     return Result.ok(
       // eslint-disable-next-line no-restricted-globals
-      JSON.stringify(value, propertiesToBeSelected, space)
+      JSON.stringify(value, propertiesToBeSelected, space),
     );
   } catch (error) {
     return Result.err(Str.from(error));
@@ -71,7 +71,7 @@ const stringifySelected = (
 
 const stringifySortedKey = (
   value: RecordBase,
-  space?: UintRange<1, 11> | string
+  space?: UintRange<1, 11> | string,
 ): Result<string, string> => {
   const allKeys = pipe(keysDeep(value))
     .chain((keys) => Arr.uniq(keys))
@@ -83,7 +83,7 @@ const stringifySortedKey = (
 const keysDeepImpl = (
   obj: RecordBase,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  mut_keys: string[]
+  mut_keys: string[],
 ): void => {
   for (const k of Object.keys(obj)) {
     mut_keys.push(k);

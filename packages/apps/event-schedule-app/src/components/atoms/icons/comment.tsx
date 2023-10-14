@@ -32,5 +32,5 @@ export const CommentIcon = memoNamed<Props>(
         fill={color}
       />
     </svg>
-  )
+  ),
 );

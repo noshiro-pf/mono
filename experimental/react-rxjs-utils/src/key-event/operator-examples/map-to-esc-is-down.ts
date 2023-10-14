@@ -5,6 +5,6 @@ import { mapToTargetKeyIsDown } from '../custom-operators';
 export const mapToEscapeKeyIsDown =
   (): OperatorFunction<readonly ['down' | 'up', KeyboardEventType], boolean> =>
   (
-    keyEvents$: Observable<readonly ['down' | 'up', KeyboardEventType]>
+    keyEvents$: Observable<readonly ['down' | 'up', KeyboardEventType]>,
   ): Observable<boolean> =>
     keyEvents$.pipe(mapToTargetKeyIsDown('Escape'));

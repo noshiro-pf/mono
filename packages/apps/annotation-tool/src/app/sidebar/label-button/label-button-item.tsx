@@ -16,7 +16,7 @@ type Props = Readonly<{
 export const LabelButtonItem = memoNamed<Props>('LabelButtonItem', (props) => {
   const hsl = useMemo<Hsl>(
     () => [props.label.hue, props.labelsSaturation, props.labelsLightness],
-    [props.label.hue, props.labelsSaturation, props.labelsLightness]
+    [props.label.hue, props.labelsSaturation, props.labelsLightness],
   );
 
   const onLabelClick = useCallback(() => {
@@ -28,7 +28,7 @@ export const LabelButtonItem = memoNamed<Props>('LabelButtonItem', (props) => {
       props.handlers.flipLabelVisibility(props.label.id);
       ev.stopPropagation();
     },
-    [props.label.id, props.handlers]
+    [props.label.id, props.handlers],
   );
 
   return (

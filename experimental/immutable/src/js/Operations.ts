@@ -105,7 +105,7 @@ export class ToIndexedSequence extends IndexedSeq {
     reverse && ensureSize(this);
     return this._iter.__iterate(
       (v) => fn(v, reverse ? this.size - ++i : i++, this),
-      reverse
+      reverse,
     );
   }
 
@@ -121,7 +121,7 @@ export class ToIndexedSequence extends IndexedSeq {
             type,
             reverse ? this.size - ++i : i++,
             step.value,
-            step
+            step,
           );
     });
   }
@@ -172,7 +172,7 @@ export class FromEntriesSequence extends KeyedSeq {
         return fn(
           indexedCollection ? entry.get(1) : entry[1],
           indexedCollection ? entry.get(0) : entry[0],
-          this
+          this,
         );
       }
     }, reverse);
@@ -196,7 +196,7 @@ export class FromEntriesSequence extends KeyedSeq {
             type,
             indexedCollection ? entry.get(0) : entry[0],
             indexedCollection ? entry.get(1) : entry[1],
-            step
+            step,
           );
         }
       }
@@ -241,7 +241,7 @@ export function flipFactory(collection) {
     }
     return collection.__iterator(
       type === ITERATE_VALUES ? ITERATE_KEYS : ITERATE_VALUES,
-      reverse
+      reverse,
     );
   };
   return flipSequence;
@@ -260,7 +260,7 @@ export function mapFactory(collection, mapper, context) {
   mappedSequence.__iterateUncached = function (fn, reverse) {
     return collection.__iterate(
       (v, k, c) => fn(mapper.call(context, v, k, c), k, this) !== false,
-      reverse
+      reverse,
     );
   };
   mappedSequence.__iteratorUncached = function (type, reverse) {
@@ -276,7 +276,7 @@ export function mapFactory(collection, mapper, context) {
         type,
         key,
         mapper.call(context, entry[1], key, collection),
-        step
+        step,
       );
     });
   };
@@ -305,7 +305,7 @@ export function reverseFactory(collection, useKeys) {
     reverse && ensureSize(collection);
     return collection.__iterate(
       (v, k) => fn(v, useKeys ? k : reverse ? this.size - ++i : i++, this),
-      !reverse
+      !reverse,
     );
   };
   reversedSequence.__iterator = (type, reverse) => {
@@ -322,7 +322,7 @@ export function reverseFactory(collection, useKeys) {
         type,
         useKeys ? entry[0] : reverse ? this.size - ++i : i++,
         entry[1],
-        step
+        step,
       );
     });
   };
@@ -388,7 +388,7 @@ export function groupByFactory(collection, grouper, context) {
   collection.__iterate((v, k) => {
     groups.update(
       grouper.call(context, v, k, collection),
-      (a) => ((a = a || []), a.push(isKeyedIter ? [k, v] : v), a)
+      (a) => ((a = a || []), a.push(isKeyedIter ? [k, v] : v), a),
     );
   });
   const coerce = collectionClass(collection);
@@ -501,7 +501,7 @@ export function takeWhileFactory(collection, predicate, context) {
     let iterations = 0;
     collection.__iterate(
       (v, k, c) =>
-        predicate.call(context, v, k, c) && ++iterations && fn(v, k, this)
+        predicate.call(context, v, k, c) && ++iterations && fn(v, k, this),
     );
     return iterations;
   };
@@ -702,7 +702,7 @@ export function interposeFactory(collection, separator) {
       (v) =>
         (!iterations || fn(separator, iterations++, this) !== false) &&
         fn(v, iterations++, this) !== false,
-      reverse
+      reverse,
     );
     return iterations;
   };
@@ -745,7 +745,7 @@ export function sortFactory(collection, comparator, mapper) {
           }
         : (v, i) => {
             entries[i] = v[1];
-          }
+          },
     );
   return isKeyedCollection
     ? KeyedSeq(entries)
@@ -810,7 +810,7 @@ export function zipWithFactory(keyIter, zipper, iters, zipAll) {
   };
   zipSequence.__iteratorUncached = function (type, reverse) {
     const iterators = iters.map(
-      (i) => ((i = Collection(i)), getIterator(reverse ? i.reverse() : i))
+      (i) => ((i = Collection(i)), getIterator(reverse ? i.reverse() : i)),
     );
     let iterations = 0;
     let isDone = false;
@@ -830,8 +830,8 @@ export function zipWithFactory(keyIter, zipper, iters, zipAll) {
         iterations++,
         zipper.apply(
           null,
-          steps.map((s) => s.value)
-        )
+          steps.map((s) => s.value),
+        ),
       );
     });
   };
@@ -865,7 +865,7 @@ function makeSequence(collection) {
       : isIndexed(collection)
       ? IndexedSeq
       : SetSeq
-    ).prototype
+    ).prototype,
   );
 }
 

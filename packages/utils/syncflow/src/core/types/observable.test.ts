@@ -32,7 +32,7 @@ test('', () => {
       new RootObservableClass({
         initialValue: Maybe.some(0),
         type: 'Of',
-      })
-    )
+      }),
+    ),
   ).toBe(true);
 });

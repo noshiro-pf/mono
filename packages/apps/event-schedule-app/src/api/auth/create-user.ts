@@ -4,15 +4,15 @@ import { assertIsCredentialError } from '../../types';
 
 export const createUser = (
   email: string,
-  password: string
+  password: string,
 ): Promise<
   Result<UserCredential, Readonly<{ code: string; message: string }>>
 > =>
   Result.fromPromise(
-    createUserWithEmailAndPassword(fbAuth, email, password)
+    createUserWithEmailAndPassword(fbAuth, email, password),
   ).then((a) =>
     Result.mapErr(a, (error) => {
       assertIsCredentialError(error);
       return error;
-    })
+    }),
   );

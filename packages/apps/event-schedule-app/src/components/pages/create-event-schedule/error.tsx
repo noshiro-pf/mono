@@ -19,5 +19,5 @@ export const FetchEventScheduleError = memoNamed<Props>(
         <Description color={errorFontColor} text={dc.eventScheduleOtherError} />
       ) : undefined}
     </div>
-  )
+  ),
 );

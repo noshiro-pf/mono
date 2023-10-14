@@ -59,7 +59,7 @@ const clampAndRoundFn =
       max: T;
       digit: number;
       defaultValue: T;
-    }>
+    }>,
   ) =>
   (x: number): T =>
     !Number.isFinite(x)
@@ -78,7 +78,7 @@ export const clampAndRoundAnswerFairIconPoint =
   });
 
 export const clampAndRoundAnswerWeight = clampAndRoundFn<Weight>(
-  weightNumericInputConfig
+  weightNumericInputConfig,
 );
 
 export const clampAndRoundNumIcons = (x: number, upperLimit: number): number =>
@@ -90,5 +90,5 @@ export const clampAndRoundNumIcons = (x: number, upperLimit: number): number =>
   })(x);
 
 export const clampAndRoundAnswersScore = clampAndRoundFn<AnswersScore>(
-  answersScoreNumericInputConfig
+  answersScoreNumericInputConfig,
 );

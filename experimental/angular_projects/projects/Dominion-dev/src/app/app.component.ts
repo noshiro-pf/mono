@@ -20,7 +20,7 @@ export class AppComponent {
     private afAuth: AngularFireAuth,
     private user: UserService,
     private autoBackup: AutoBackupOnFirebaseService,
-    private router: Router
+    private router: Router,
   ) {
     this.autoBackup.checkAndExecuteBackup();
   }

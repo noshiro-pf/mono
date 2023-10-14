@@ -48,7 +48,7 @@ export const EventScheduleDiff = memoNamed<Props>(
                 {dc.items[li]}
                 {s}
               </li>
-            ))
+            )),
           )}
 
           {/* datetimeRangeList */}
@@ -90,7 +90,7 @@ export const EventScheduleDiff = memoNamed<Props>(
                 {dc.items[li]}
                 {s}
               </li>
-            ))
+            )),
           )}
 
           {/* answerIcons */}
@@ -151,5 +151,5 @@ export const EventScheduleDiff = memoNamed<Props>(
         </ul>
       </div>
     </div>
-  )
+  ),
 );

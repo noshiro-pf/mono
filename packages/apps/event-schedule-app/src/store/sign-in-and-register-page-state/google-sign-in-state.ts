@@ -14,7 +14,7 @@ const {
 } = createBooleanState(false);
 
 const googleSignInSubmit = async (
-  pageToBack: string | undefined
+  pageToBack: string | undefined,
 ): Promise<void> => {
   disableGoogleSignInButton();
 
@@ -48,7 +48,7 @@ const googleSignInClickHandler = (): void => {
 
   // TODO: use toast
   googleSignInSubmit(Maybe.unwrap(Router.pageToBack$.snapshot)).catch(
-    console.error
+    console.error,
   );
 };
 

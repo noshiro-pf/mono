@@ -9,7 +9,7 @@ expectType<
   readonly [1, 2, 3]
 >('=');
 expectType<ListType.Flatten<DeepReadonly<[[1, 2], [3]]>>, readonly [1, 2, 3]>(
-  '='
+  '=',
 );
 expectType<
   ListType.Flatten<DeepReadonly<[[1, 2], [3], []]>>,

@@ -67,14 +67,14 @@ export const DataTableView = memo(
       (_ev: any, page: number) => {
         pageNumberChange(page + 1)
       },
-      [pageNumberChange]
+      [pageNumberChange],
     )
 
     const itemsPerPageOnChange = useCallback(
       (ev: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         itemsPerPageChange(parseInt(ev.target.value, 10))
       },
-      [itemsPerPageChange]
+      [itemsPerPageChange],
     )
 
     const isValid: boolean = useMemo(() => {
@@ -90,7 +90,7 @@ export const DataTableView = memo(
       () =>
         settings.usepagination ||
         settings.columnSettings.some((e) => e.filterType !== 'none'),
-      [settings]
+      [settings],
     )
 
     return (
@@ -144,7 +144,7 @@ export const DataTableView = memo(
         )}
       </div>
     )
-  }
+  },
 )
 
 DataTableView.displayName = 'DataTableView'

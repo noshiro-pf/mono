@@ -1,8 +1,8 @@
 ---
-title: "TypeScript の型ユーティリティ Min, Max の実装"
-emoji: "🐈"
-type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["typescript"]
+title: 'TypeScript の型ユーティリティ Min, Max の実装'
+emoji: '🐈'
+type: 'tech' # tech: 技術記事 / idea: アイデア
+topics: ['typescript']
 published: true
 ---
 
@@ -26,8 +26,8 @@ type R2 = Min<1 | 2 | 3>; // 1
 ```ts
 type _MinImpl<
   N extends number,
-  T extends readonly unknown[]
-> = T["length"] extends N ? T["length"] : _MinImpl<N, [0, ...T]>;
+  T extends readonly unknown[],
+> = T['length'] extends N ? T['length'] : _MinImpl<N, [0, ...T]>;
 
 export type Min<N extends number> = _MinImpl<N, []>;
 ```
@@ -67,13 +67,13 @@ https://stackoverflow.com/questions/62968955/how-to-implement-a-type-level-max-f
 （簡単な解説）
 
 ```ts
-type Index = [0, 0, 0, 0]["length"];
+type Index = [0, 0, 0, 0]['length'];
 ```
 
 は `4` になりますが、この tuple 部分に `Partial` を適用し
 
 ```ts
-type Index = Partial<[0, 0, 0, 0]>["length"];
+type Index = Partial<[0, 0, 0, 0]>['length'];
 ```
 
 とすると `0 | 1 | 2 | 3 | 4` という型が得られます（このテクニックを私はこれを見て初めて知りました。）。
@@ -97,9 +97,9 @@ Max<1 | 2 | 3>
 
 ```ts
 type _MaxImpl<N extends number, T extends any[]> = {
-  b: T["length"];
+  b: T['length'];
   r: _MaxImpl<N, [0, ...T]>;
-}[[N] extends [Partial<T>["length"]] ? "b" : "r"];
+}[[N] extends [Partial<T>['length']] ? 'b' : 'r'];
 
 export type Max<N extends number> = _MaxImpl<N, []>;
 

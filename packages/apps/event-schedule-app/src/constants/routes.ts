@@ -96,7 +96,7 @@ const isRoute = {
 const redirectRules = IMap.new<string, string>([['/', routes.createPage]]);
 
 const getEventIdFromPathname = (
-  pathSegments: readonly string[]
+  pathSegments: readonly string[],
 ): string | undefined => pathSegments[1];
 
 export const Routes = {

@@ -33,10 +33,10 @@ export const MyTableHeader = memo(
           SortState({
             activeColumnId: cellSortState === '' ? '' : columnId,
             activeCellState: cellSortState,
-          })
+          }),
         )
       },
-      [sortStateChange]
+      [sortStateChange],
     )
 
     return (
@@ -50,7 +50,7 @@ export const MyTableHeader = memo(
         cellSortStateChange={cellSortStateChange}
       />
     )
-  }
+  },
 )
 
 MyTableHeader.displayName = 'MyTableHeader'

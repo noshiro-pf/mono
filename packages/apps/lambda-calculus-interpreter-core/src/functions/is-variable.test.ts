@@ -9,7 +9,7 @@ test('isVariable 2', () => {
     isVariable([
       ['x', ['y', 'y']],
       ['x', ['y', 'y']],
-    ])
+    ]),
   ).toBe(false);
 });
 

@@ -16,19 +16,19 @@ const toast = createToaster();
 
 const [formState$, dispatch] = createReducer(
   updateEmailPageStateReducer,
-  updateEmailPageInitialState
+  updateEmailPageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || updateEmailPageHasError(state))
+  mapI((state) => state.isWaitingResponse || updateEmailPageHasError(state)),
 );
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
+  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger')),
 );
 
 const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.password.error === undefined ? 'primary' : 'danger'))
+  mapI((state) => (state.password.error === undefined ? 'primary' : 'danger')),
 );
 
 const {
@@ -57,8 +57,8 @@ const state$ = combineLatestI([
       emailFormIntent,
       passwordFormIntent,
       passwordIsOpen,
-    })
-  )
+    }),
+  ),
 );
 
 const submit = async (user: FireAuthUser): Promise<void> => {
@@ -70,7 +70,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
 
   const credential: AuthCredential = EmailAuthProvider.credential(
     currentEmail,
-    s.password.inputValue
+    s.password.inputValue,
   );
 
   const res1 = await api.auth.reauthenticateWithCredential(user, credential);
@@ -88,7 +88,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
         console.error(
           'error occurred on reauthenticateWithCredential:',
           res1.value.code,
-          res1.value.message
+          res1.value.message,
         );
 
         dispatch({ type: 'done' });
@@ -111,7 +111,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
     console.error(
       'error occurred on updateEmail:',
       res2.value.code,
-      res2.value.message
+      res2.value.message,
     );
 
     dispatch({ type: 'done' });

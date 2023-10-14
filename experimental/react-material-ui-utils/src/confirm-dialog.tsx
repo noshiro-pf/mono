@@ -45,5 +45,5 @@ export const ConfirmDialog = memoNamed<Props>(
         </DialogActions>
       </Dialog>
     );
-  }
+  },
 );

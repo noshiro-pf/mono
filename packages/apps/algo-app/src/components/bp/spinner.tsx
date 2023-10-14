@@ -38,7 +38,7 @@ export const Spinner = memoNamed<Props>('Spinner', ({ size: _size, value }) => {
 
   const strokeWidth = useMemo(
     () => Math.min(MIN_STROKE_WIDTH, (STROKE_WIDTH * SpinnerSize.LARGE) / size),
-    [size]
+    [size],
   );
 
   const strokeOffset =
@@ -52,7 +52,7 @@ export const Spinner = memoNamed<Props>('Spinner', ({ size: _size, value }) => {
       width: `${size}px`,
       height: `${size}px`,
     }),
-    [size]
+    [size],
   );
 
   // multiple DOM elements around SVG are necessary to properly isolate animation:

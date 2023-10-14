@@ -9,6 +9,6 @@ expectType<ListType.Head<number[], 1>, 1>('=');
 expectType<ListType.Head<readonly []>, never>('=');
 expectType<ListType.Head<readonly number[]>, never>('=');
 expectType<ListType.Head<readonly [number, ...(readonly number[])], 0>, number>(
-  '='
+  '=',
 );
 expectType<ListType.Head<readonly number[], 1>, 1>('=');

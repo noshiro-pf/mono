@@ -2,7 +2,7 @@ import { expectType } from '@noshiro/ts-utils';
 
 export type LookUp<
   R extends { kind: string },
-  Kind extends R['kind']
+  Kind extends R['kind'],
 > = R extends R ? (R['kind'] extends Kind ? R : never) : never;
 
 type LookUp2<R extends { kind: string }, Kind extends R['kind']> = {

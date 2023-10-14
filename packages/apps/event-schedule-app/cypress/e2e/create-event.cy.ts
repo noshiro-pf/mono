@@ -32,18 +32,18 @@ describe('main', { testIsolation: false }, () => {
       timeout: 20_000,
     }).should('be.visible');
     cy.get(path(['create-event-result-dialog-footer', 'back-button'])).should(
-      'be.visible'
+      'be.visible',
     );
     cy.get(
-      path(['create-event-result-dialog-body', 'clipboard-button'])
+      path(['create-event-result-dialog-body', 'clipboard-button']),
     ).should('be.visible');
 
     cy.get(path(['create-event-result-dialog-footer', 'back-button'])).should(
-      'be.disabled'
+      'be.disabled',
     );
 
     cy.get(
-      path(['create-event-result-dialog-body', 'clipboard-button'])
+      path(['create-event-result-dialog-body', 'clipboard-button']),
     ).click();
 
     cy.get(e('create-event-result-dialog-footer')).within(() => {
@@ -81,7 +81,7 @@ describe('main', { testIsolation: false }, () => {
       cy.get('@edit-page-submit-button').should('be.disabled');
 
       cy.get(`${e('icon-settings')} ${e('fair-point-input')} input`).as(
-        'fair-point-input'
+        'fair-point-input',
       );
 
       cy.get('@fair-point-input').clear();
@@ -111,19 +111,19 @@ const createAnswer = (username: string): void => {
       cy.get(path(['buttons'])).should('be.visible');
 
       cy.get(path(['buttons', 'button-with-confirmation'])).should(
-        'be.visible'
+        'be.visible',
       );
 
       // submit button should be disabled if username is not filled
       cy.get(path(['buttons', 'button-with-confirmation'])).should(
-        'be.disabled'
+        'be.disabled',
       );
 
       cy.get(path(['username'])).type(username);
 
       // submit button should be enabled if username is filled
       cy.get(path(['buttons', 'button-with-confirmation'])).should(
-        'not.be.disabled'
+        'not.be.disabled',
       );
 
       // fill all datetime
@@ -132,7 +132,7 @@ const createAnswer = (username: string): void => {
       cy.get(path(['buttons', 'submit-answer-button'])).should('be.visible');
 
       cy.get(path(['buttons', 'submit-answer-button'])).should(
-        'not.be.disabled'
+        'not.be.disabled',
       );
 
       cy.get(path(['buttons', 'submit-answer-button'])).click();

@@ -7,6 +7,6 @@ export const mapToSpaceKeyIsDown =
     boolean
   > =>
   (
-    keyEvents$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>
+    keyEvents$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>,
   ): Observable<boolean> =>
     keyEvents$.pipe(mapToTargetKeyIsDown(' '));

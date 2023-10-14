@@ -20,7 +20,7 @@ export class Schedule {
       symbols: ScheduleSymbol[];
       answers: Answer[];
       password: string;
-    }
+    },
   ) {
     this.databaseKey = databaseKey || '';
 
@@ -58,7 +58,7 @@ export class Answer {
       userName: string;
       comment: string;
       selection: { date: number; symbolID: string }[];
-    }
+    },
   ) {
     this.databaseKey = databaseKey || '';
 

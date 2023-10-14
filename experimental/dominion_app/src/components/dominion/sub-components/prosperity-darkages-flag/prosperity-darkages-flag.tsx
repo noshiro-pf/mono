@@ -32,7 +32,7 @@ export const ProsperityDarkAgesFlag = memo(
         </ChipWrapper>
       )}
     </Root>
-  )
+  ),
 )
 
 ProsperityDarkAgesFlag.displayName = 'ProsperityDarkAgesFlag'

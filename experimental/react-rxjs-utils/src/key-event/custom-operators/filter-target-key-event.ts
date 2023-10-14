@@ -4,9 +4,9 @@ import { filter } from 'rxjs/operators';
 
 export const filterTargetKeyEvent =
   (
-    key: string
+    key: string,
   ): MonoTypeOperatorFunction<readonly ['down' | 'up', KeyboardEventType]> =>
   (
-    keyEvents$: Observable<readonly ['down' | 'up', KeyboardEventType]>
+    keyEvents$: Observable<readonly ['down' | 'up', KeyboardEventType]>,
   ): Observable<readonly ['down' | 'up', KeyboardEventType]> =>
     keyEvents$.pipe(filter(([_du, ev]) => ev.key === key));

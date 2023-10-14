@@ -23,7 +23,7 @@ export const HeaderCellInput = memo(
         resetClick={resetClick}
       />
     )
-  }
+  },
 )
 
 HeaderCellInput.displayName = 'HeaderCellInput'

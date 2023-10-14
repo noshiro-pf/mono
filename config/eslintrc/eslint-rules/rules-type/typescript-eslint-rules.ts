@@ -483,7 +483,7 @@ namespace CommaDangle {
             readonly enums?: ValueWithIgnore;
             readonly generics?: ValueWithIgnore;
             readonly tuples?: ValueWithIgnore;
-          }
+          },
       ];
   export type Value =
     | 'always-multiline'
@@ -1218,7 +1218,7 @@ namespace FuncCallSpacing {
         'always',
         {
           readonly allowNewlines?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -1605,7 +1605,7 @@ namespace InitDeclarations {
         'never',
         {
           readonly ignoreForLoopInit?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -3169,7 +3169,7 @@ namespace LinesAroundComment {
           readonly allowModuleEnd?: boolean;
           readonly ignorePattern?: string;
           readonly applyDefaultIgnorePatterns?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -12293,7 +12293,7 @@ namespace NoExtraParens {
           readonly enforceForNewInMemberExpressions?: boolean;
           readonly enforceForFunctionPrototypeMethods?: boolean;
           readonly allowParensAfterCommentPattern?: string;
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -14387,7 +14387,7 @@ namespace PaddingLineBetweenStatements {
           | 'with'
           | 'interface'
           | 'type'
-        )[])
+        )[]),
       ];
   export type Options = readonly {
     readonly blankLine: PaddingType;
@@ -15304,7 +15304,7 @@ namespace Semi {
             | 'always'
             | 'any'
             | 'never';
-        }
+        },
       ]
     | readonly ['always']
     | readonly [
@@ -15312,7 +15312,7 @@ namespace Semi {
         {
           readonly omitLastInOneLineBlock?: boolean;
           readonly omitLastInOneLineClassBody?: boolean;
-        }
+        },
       ];
 
   export type RuleEntry =

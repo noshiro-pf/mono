@@ -21,7 +21,7 @@ export const HeaderCellMultiSelectWithDialog = memo(
 
     const openDialog = useCallback(
       () => setDialogIsOpen(true),
-      [setDialogIsOpen]
+      [setDialogIsOpen],
     )
 
     const dialogOkClick = useCallback(
@@ -29,7 +29,7 @@ export const HeaderCellMultiSelectWithDialog = memo(
         selectedIndiceChange(v)
         setDialogIsOpen(false)
       },
-      [selectedIndiceChange, setDialogIsOpen]
+      [selectedIndiceChange, setDialogIsOpen],
     )
 
     const dialogCancelClick = useCallback(() => {
@@ -48,7 +48,7 @@ export const HeaderCellMultiSelectWithDialog = memo(
         dialogCancelClick={dialogCancelClick}
       />
     )
-  }
+  },
 )
 
 HeaderCellMultiSelectWithDialog.displayName = 'HeaderCellMultiSelectWithDialog'

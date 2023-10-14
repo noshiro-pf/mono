@@ -8,7 +8,7 @@ export class LambdaPrintService {
   constructor(
     private macro: LambdaMacroService,
     private parser: LambdaParserService,
-    private evaluator: LambdaEvaluatorService
+    private evaluator: LambdaEvaluatorService,
   ) {}
 
   termToString(term: any): string {

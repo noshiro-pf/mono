@@ -48,14 +48,14 @@ export const convertLibEs2015Core = (from, commentOutDeprecated) => {
     // Array
     const slice = ret.slice(
       ret.indexOf(markers.Array.start),
-      ret.indexOf(markers.Array.end)
+      ret.indexOf(markers.Array.end),
     );
     ret = ret.replaceAll(
       slice,
       slice
         .replaceAll(
           `predicate: (value: T, index: number, obj: readonly T[]) => unknown,`,
-          `predicate: (value: T, index: number, obj: readonly T[]) => boolean,`
+          `predicate: (value: T, index: number, obj: readonly T[]) => boolean,`,
         )
         .replaceAll(`index: number,`, `index: ${indexType.callbackArg},`)
         .replaceAll(`  ): number;`, `  ): ${indexType.searchResult};`)
@@ -63,122 +63,122 @@ export const convertLibEs2015Core = (from, commentOutDeprecated) => {
         .replaceAll(`end?: number`, `end?: ${indexType.arg}`)
         .replaceAll(`index: number`, `index: ${indexType.callbackArg}`)
         .replaceAll(`start: number`, `start: ${indexType.arg}`)
-        .replaceAll('target: number', `target: ${indexType.arg}`)
+        .replaceAll('target: number', `target: ${indexType.arg}`),
     );
   }
   {
     // ArrayConstructor
     const slice = ret.slice(
       ret.indexOf(markers.ArrayConstructor.start),
-      ret.indexOf(markers.ArrayConstructor.end)
+      ret.indexOf(markers.ArrayConstructor.end),
     );
     ret = ret.replaceAll(
       slice,
       slice
         .replaceAll(
           `from<T>(arrayLike: ArrayLike<T>): readonly T[];`,
-          `from<T>(arrayLike: ArrayLike<T>): T[];`
+          `from<T>(arrayLike: ArrayLike<T>): T[];`,
         )
         .replaceAll(`k: number`, `k: ${indexType.callbackArg}`)
         .replaceAll(`  ): readonly U[];`, `  ): U[];`)
-        .replaceAll(`): readonly T[];`, `): T[];`)
+        .replaceAll(`): readonly T[];`, `): T[];`),
     );
   }
   {
     // Math
     const slice = ret.slice(
       ret.indexOf(markers.Math.start),
-      ret.indexOf(markers.Math.end)
+      ret.indexOf(markers.Math.end),
     );
     ret = ret.replaceAll(
       slice,
       slice
         .replaceAll(
           `clz32(x: number): number;`,
-          `clz32(x: number): UintRange<0, 33>;`
+          `clz32(x: number): UintRange<0, 33>;`,
         )
         .replaceAll(
           `imul(x: number, y: number): number;`,
-          `imul(x: Int32, y: Int32): Int32;`
+          `imul(x: Int32, y: Int32): Int32;`,
         )
         .replaceAll(
           `sign(x: number): number;`,
-          `sign(x: number): -1 | 0 | -0 | 1 | NaNType;`
+          `sign(x: number): -1 | 0 | -0 | 1 | NaNType;`,
         )
         .replaceAll(
           `cosh(x: number): number;`,
-          `cosh(x: number): PositiveNumber | NaNType;`
+          `cosh(x: number): PositiveNumber | NaNType;`,
         )
         .replaceAll(
           `acosh(x: number): number;`,
-          `acosh(x: number): NonNegativeNumber | NaNType;`
+          `acosh(x: number): NonNegativeNumber | NaNType;`,
         )
         .replaceAll(
           `hypot(...values: readonly number[]): number;`,
-          `hypot(...values: readonly number[]): NonNegativeNumber | NaNType;`
+          `hypot(...values: readonly number[]): NonNegativeNumber | NaNType;`,
         )
         .replaceAll(
           `trunc(x: number): number;`,
-          `trunc(x: number): Int | InfiniteNumber | NaNType;`
+          `trunc(x: number): Int | InfiniteNumber | NaNType;`,
         )
         .replaceAll(
           `fround(x: number): number;`,
-          `fround(x: number): Float32 | NaNType;`
-        )
+          `fround(x: number): Float32 | NaNType;`,
+        ),
     );
   }
   {
     // NumberConstructor
     const slice = ret.slice(
       ret.indexOf(markers.NumberConstructor.start),
-      ret.indexOf(markers.NumberConstructor.end)
+      ret.indexOf(markers.NumberConstructor.end),
     );
     ret = ret.replaceAll(
       slice,
       slice
         .replaceAll(
           'readonly EPSILON: number;',
-          'readonly EPSILON: PositiveNumber;'
+          'readonly EPSILON: PositiveNumber;',
         )
         .replaceAll(
           'isFinite(number: unknown): boolean;',
-          'isFinite(number: number): number is FiniteNumber;'
+          'isFinite(number: number): number is FiniteNumber;',
         )
         .replaceAll(
           'isInteger(number: unknown): boolean;',
-          'isInteger(number: number): number is Int;'
+          'isInteger(number: number): number is Int;',
         )
         .replaceAll(
           'isNaN(number: unknown): boolean;',
-          'isNaN(number: number): number is NaNType;'
+          'isNaN(number: number): number is NaNType;',
         )
         .replaceAll(
           'isSafeInteger(number: unknown): boolean;',
-          'isSafeInteger(number: number): number is SafeInt;'
+          'isSafeInteger(number: number): number is SafeInt;',
         )
         .replaceAll(
           'readonly MAX_SAFE_INTEGER: number;',
-          'readonly MAX_SAFE_INTEGER: SafeUint;'
+          'readonly MAX_SAFE_INTEGER: SafeUint;',
         )
         .replaceAll(
           'readonly MIN_SAFE_INTEGER: number;',
-          'readonly MIN_SAFE_INTEGER: SafeInt;'
+          'readonly MIN_SAFE_INTEGER: SafeInt;',
         )
         .replaceAll(
           'parseFloat(string: string): number',
-          'parseFloat(string: string): number | NaNType'
+          'parseFloat(string: string): number | NaNType',
         )
         .replaceAll(
           'parseInt(string: string, radix?: UintRange<2, 37>): number;',
-          'parseInt(string: string, radix?: UintRange<2, 37>): Int | NaNType;'
-        )
+          'parseInt(string: string, radix?: UintRange<2, 37>): Int | NaNType;',
+        ),
     );
   }
   {
     // ObjectConstructor
     const slice = ret.slice(
       ret.indexOf(markers.ObjectConstructor.start),
-      ret.indexOf(markers.ObjectConstructor.end)
+      ret.indexOf(markers.ObjectConstructor.end),
     );
     ret = ret.replaceAll(
       slice,
@@ -195,8 +195,8 @@ export const convertLibEs2015Core = (from, commentOutDeprecated) => {
               '  : never;',
               '',
               'interface ObjectConstructor {',
-            ].join('\n')
-          )
+            ].join('\n'),
+          ),
         )
         .chain((str) => {
           const prefix = [
@@ -219,68 +219,68 @@ export const convertLibEs2015Core = (from, commentOutDeprecated) => {
 
           return str.replaceAll(
             [...prefix, ...before].join('\n'),
-            [...prefix, ...after].join('\n')
+            [...prefix, ...after].join('\n'),
           );
-        }).value
+        }).value,
     );
   }
   {
     // ReadonlyArray
     const slice = ret.slice(
       ret.indexOf(markers.ReadonlyArray.start),
-      ret.indexOf(markers.ReadonlyArray.end)
+      ret.indexOf(markers.ReadonlyArray.end),
     );
     ret = ret.replaceAll(
       slice,
       slice
         .replaceAll(`index: number`, `index: ${indexType.callbackArg}`)
         .replaceAll(`) => unknown,`, `) => boolean,`)
-        .replaceAll(`  ): number;`, `  ): ${indexType.searchResult};`)
+        .replaceAll(`  ): number;`, `  ): ${indexType.searchResult};`),
     );
   }
   {
     // String
     const slice = ret.slice(
       ret.indexOf(markers.String.start),
-      ret.indexOf(markers.String.end)
+      ret.indexOf(markers.String.end),
     );
     ret = ret.replaceAll(
       slice,
       slice
         .replaceAll(
           'codePointAt(pos: number): number | undefined',
-          `codePointAt(pos: ${indexType.argNonNegative}): Uint32 | undefined`
+          `codePointAt(pos: ${indexType.argNonNegative}): Uint32 | undefined`,
         )
         .replaceAll(
           `repeat(count: number): string`,
-          `repeat(count: Uint): string`
+          `repeat(count: Uint): string`,
         )
         .replaceAll(
           'includes(searchString: string, position?: number): boolean;',
-          `includes(searchString: string, position?: ${indexType.argNonNegative}): boolean;`
+          `includes(searchString: string, position?: ${indexType.argNonNegative}): boolean;`,
         )
         .replaceAll(
           'endsWith(searchString: string, endPosition?: number): boolean;',
-          `endsWith(searchString: string, endPosition?: ${indexType.argNonNegative}): boolean;`
+          `endsWith(searchString: string, endPosition?: ${indexType.argNonNegative}): boolean;`,
         )
         .replaceAll(
           'startsWith(searchString: string, position?: number): boolean;',
-          `startsWith(searchString: string, position?: ${indexType.argNonNegative}): boolean;`
-        )
+          `startsWith(searchString: string, position?: ${indexType.argNonNegative}): boolean;`,
+        ),
     );
   }
   {
     // StringConstructor
     const slice = ret.slice(
       ret.indexOf(markers.StringConstructor.start),
-      undefined
+      undefined,
     );
     ret = ret.replaceAll(
       slice,
       slice.replaceAll(
         `fromCodePoint(...codePoints: readonly number[]): string`,
-        `fromCodePoint(...codePoints: readonly Uint32[]): string`
-      )
+        `fromCodePoint(...codePoints: readonly Uint32[]): string`,
+      ),
     );
   }
 

@@ -18,7 +18,7 @@ export class MultipleDatePickerComponent implements OnInit {
 
   @Input() set initialDateList(value: number[]) {
     const initialDateValuesUniq = utils.array.uniq(
-      value.map((e) => utils.date.toMidnightTimestamp(e))
+      value.map((e) => utils.date.toMidnightTimestamp(e)),
     );
     this.selectedDateValuesSource.next(initialDateValuesUniq);
   }
@@ -29,10 +29,10 @@ export class MultipleDatePickerComponent implements OnInit {
   weeks$: Observable<{ date: Date; selected: boolean }[][]>;
 
   private currentYearSource = new BehaviorSubject<number>(
-    new Date().getFullYear()
+    new Date().getFullYear(),
   );
   private currentMonthSource = new BehaviorSubject<number>(
-    new Date().getMonth()
+    new Date().getMonth(),
   );
   currentYear$: Observable<number> = this.currentYearSource.asObservable();
   currentMonth$: Observable<number> = this.currentMonthSource.asObservable();
@@ -55,7 +55,7 @@ export class MultipleDatePickerComponent implements OnInit {
           };
         });
         return weeks;
-      }
+      },
     );
   }
 
@@ -127,11 +127,11 @@ export class MultipleDatePickerComponent implements OnInit {
       .filter((date: Date) => date.getDay() === dayIndex)
       .filter(this.filterFn);
     const datesInColumnAllSelected = datesOfDayColumn.every((e) =>
-      current.includes(e.getTime())
+      current.includes(e.getTime()),
     );
 
     datesOfDayColumn.forEach((date) =>
-      utils.array.remove(current, date.getTime())
+      utils.array.remove(current, date.getTime()),
     );
     if (!datesInColumnAllSelected) {
       datesOfDayColumn.forEach((date) => current.push(date.getTime()));

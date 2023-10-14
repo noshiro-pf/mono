@@ -23,7 +23,7 @@ const thisDir = dirname(fileURLToPath(import.meta.url));
 
 const packageName = packageJson.name.replace(
   /^@noshiro\/global-/u,
-  '@noshiro/'
+  '@noshiro/',
 );
 
 const importsList = [
@@ -89,27 +89,27 @@ const main = async () => {
     writeFileAsync(`${rootDir}/src/index.ts`, generateIndexTs),
     writeFileAsync(
       `${rootDir}/src/globals-decl.ts`,
-      generateGlobalsDecl(packageName, importsList, typeImportsList)
+      generateGlobalsDecl(packageName, importsList, typeImportsList),
     ),
     writeFileAsync(
       `${rootDir}/src/globals.ts`,
-      generateGlobalsForJest(packageName, importsList)
+      generateGlobalsForJest(packageName, importsList),
     ),
     writeFileAsync(
       `${rootDir}/src/provide-plugin-def.ts`,
-      generateProvidePluginDef(packageName, importsList)
+      generateProvidePluginDef(packageName, importsList),
     ),
     writeFileAsync(
       `${rootDir}/src/auto-import-def.ts`,
-      generateAutoImportDef(packageName, importsList)
+      generateAutoImportDef(packageName, importsList),
     ),
     writeFileAsync(
       `${rootDir}/src/eslint-no-restricted-imports-def.ts`,
       generateEslintNoRestrictedImportsDef(
         packageName,
         importsList,
-        typeImportsList
-      )
+        typeImportsList,
+      ),
     ),
   ]);
 };

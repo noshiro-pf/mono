@@ -103,7 +103,7 @@ describe('TupleUtils.sortedBy', () => {
     const sorted = Tpl.sortedBy(
       xs,
       (x) => x.v,
-      (a, b) => a - b
+      (a, b) => a - b,
     );
 
     expectType<

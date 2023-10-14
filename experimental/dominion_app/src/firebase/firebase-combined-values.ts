@@ -21,13 +21,13 @@ export const cardIdToDCardProperty$: RN<I.Map<string, TDCardProperty>> =
 export const me$: RN<TUser> = combine(users$, ls.myName$).map(
   ([users, myName]) =>
     users.find((u) => u.name === myName) || User({ name: myName }),
-  'me'
+  'me',
 )
 
 export const currentRandomizerGroup$: RN<TRandomizerGroup | undefined> =
   combine(
     randomizerGroups$,
-    me$.pluck('randomizerGroupId').skipUnchanged()
+    me$.pluck('randomizerGroupId').skipUnchanged(),
   ).map(([list, id]) => list.find((r) => r.key === id))
 
 export const nameListFromGameResults$: RN<I.List<string>> = gameResults$.map(
@@ -39,7 +39,7 @@ export const nameListFromGameResults$: RN<I.List<string>> = gameResults$.map(
       })
     })
     return I.List(names).sort()
-  }
+  },
 )
 
 export const placeListFromGameResults$: RN<I.List<string>> = gameResults$.map(
@@ -48,5 +48,5 @@ export const placeListFromGameResults$: RN<I.List<string>> = gameResults$.map(
     return I.List(places)
       .filter((e) => e !== '')
       .sort()
-  }
+  },
 )

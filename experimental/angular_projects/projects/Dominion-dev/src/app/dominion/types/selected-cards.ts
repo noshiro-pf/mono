@@ -42,7 +42,7 @@ export class SelectedCards {
       this.EventCards,
       this.LandmarkCards,
       this.Obelisk,
-      this.BlackMarketPile
+      this.BlackMarketPile,
     );
   }
 
@@ -52,7 +52,7 @@ export class SelectedCards {
 
   usePotion(cardPropertyList: CardProperty[]) {
     return this.concatAllCards().some(
-      (e) => cardPropertyList[e].cost.potion > 0
+      (e) => cardPropertyList[e].cost.potion > 0,
     );
   }
 }

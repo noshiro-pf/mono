@@ -28,7 +28,7 @@ export const convertEs2015SymbolWellknown = (from) => {
       '    readonly [K in keyof (any[])]?: boolean;',
       '  };',
       '}',
-    ].join('\n')
+    ].join('\n'),
   );
 
   ret = ret.replaceAll(
@@ -53,7 +53,7 @@ export const convertEs2015SymbolWellknown = (from) => {
       '    readonly [K in keyof (readonly any[])]?: boolean;',
       '  };',
       '}',
-    ].join('\n')
+    ].join('\n'),
   );
 
   return ret;

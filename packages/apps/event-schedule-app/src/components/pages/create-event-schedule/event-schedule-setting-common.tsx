@@ -82,5 +82,5 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
         eventScheduleValidation={eventScheduleValidation}
       />
     </>
-  )
+  ),
 );

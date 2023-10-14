@@ -5,6 +5,6 @@ for (const [index, testColor] of testColors.entries()) {
   testHslEquality(
     `rgbToHsl test No. ${index}`,
     testColor.hsl,
-    rgbToHsl(testColor.rgb)
+    rgbToHsl(testColor.rgb),
   );
 }

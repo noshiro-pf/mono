@@ -60,8 +60,8 @@ export class EachPlayerCardsComponent implements OnInit {
     this.playerCardsForView$ = this.allPlayersCards$.pipe(
       filter((e) => e.length > this.playerIndex),
       map((allPlayersCards) =>
-        allPlayersCards[this.playerIndex].getDCards(undefined, true)
-      )
+        allPlayersCards[this.playerIndex].getDCards(undefined, true),
+      ),
     );
   }
 }

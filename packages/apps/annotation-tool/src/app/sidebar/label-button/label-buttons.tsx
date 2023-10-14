@@ -17,9 +17,9 @@ export const LabelButtons = memoNamed<Props>('LabelButtons', (props) => {
   const labelsWithVisibleFlag = useMemo(
     () =>
       props.labels.map((label) =>
-        tp(label, props.visibleLabels.includes(label))
+        tp(label, props.visibleLabels.includes(label)),
       ),
-    [props.labels, props.visibleLabels]
+    [props.labels, props.visibleLabels],
   );
 
   return (

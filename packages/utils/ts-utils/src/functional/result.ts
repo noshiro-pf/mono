@@ -42,7 +42,7 @@ export namespace Result {
 
   export const map = <R extends Base, S2>(
     result: R,
-    mapFn: (value: UnwrapOk<R>) => S2
+    mapFn: (value: UnwrapOk<R>) => S2,
   ): Result<S2, UnwrapErr<R>> =>
     isErr(result)
       ? // eslint-disable-next-line no-restricted-syntax
@@ -52,7 +52,7 @@ export namespace Result {
 
   export const mapErr = <R extends Base, E2>(
     result: R,
-    mapFn: (error: UnwrapErr<R>) => E2
+    mapFn: (error: UnwrapErr<R>) => E2,
   ): Result<UnwrapOk<R>, E2> =>
     isOk(result)
       ? // eslint-disable-next-line no-restricted-syntax
@@ -63,7 +63,7 @@ export namespace Result {
   export const fold = <R extends Base, S2, E2>(
     result: R,
     mapFn: (value: UnwrapOk<R>) => S2,
-    mapErrFn: (error: UnwrapErr<R>) => E2
+    mapErrFn: (error: UnwrapErr<R>) => E2,
   ): Result<S2, E2> =>
     isOk(result)
       ? // eslint-disable-next-line no-restricted-syntax
@@ -73,7 +73,7 @@ export namespace Result {
 
   export const unwrapThrow = <R extends Base>(
     result: R,
-    toStr: (e: UnwrapErr<R>) => string = _toStr
+    toStr: (e: UnwrapErr<R>) => string = _toStr,
   ): UnwrapOk<R> => {
     if (isErr(result)) {
       // eslint-disable-next-line no-restricted-syntax
@@ -84,27 +84,27 @@ export namespace Result {
   };
 
   export const unwrapOk = <R extends Base>(
-    result: R
+    result: R,
   ): UnwrapOk<R> | undefined =>
     // eslint-disable-next-line no-restricted-syntax
     isErr(result) ? undefined : (result.value as UnwrapOk<R>);
 
   export const unwrapOkOr = <R extends Base, D>(
     result: R,
-    defaultValue: D
+    defaultValue: D,
   ): D | UnwrapOk<R> =>
     // eslint-disable-next-line no-restricted-syntax
     isErr(result) ? defaultValue : (result.value as UnwrapOk<R>);
 
   export const unwrapErr = <R extends Base>(
-    result: R
+    result: R,
   ): UnwrapErr<R> | undefined =>
     // eslint-disable-next-line no-restricted-syntax
     isErr(result) ? (result.value as UnwrapErr<R>) : undefined;
 
   export const unwrapErrOr = <R extends Base, D>(
     result: R,
-    defaultValue: D
+    defaultValue: D,
   ): D | UnwrapErr<R> =>
     // eslint-disable-next-line no-restricted-syntax
     isErr(result) ? (result.value as UnwrapErr<R>) : defaultValue;
@@ -124,7 +124,7 @@ export namespace Result {
     : never;
 
   export const fromPromise = <P extends Promise<unknown>>(
-    promise: P
+    promise: P,
   ): Promise<Result<UnwrapPromise<P>, unknown>> =>
     // eslint-disable-next-line no-restricted-syntax
     promise.then((v) => ok(v) as Ok<UnwrapPromise<P>>).catch(err);

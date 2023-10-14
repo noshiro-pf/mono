@@ -6,20 +6,20 @@ export const makeAllSelectOptionsWithViewValue = (
   table: I.List<I.List<any>>,
   filteredIndice: I.List<number>,
   selectorOptionsAll: I.List<I.List<any>>,
-  columnSettings: I.List<TColumnSetting>
+  columnSettings: I.List<TColumnSetting>,
 ): I.List<I.List<ISelectorOptionWithViewValue>> =>
   selectorOptionsAll.map((selectorOptions, colIdx) =>
     makeSelectOptionsViewValue(
       selectorOptions,
       filteredIndice.map((rowIdx) => table.getIn([rowIdx, colIdx])),
-      columnSettings.get(colIdx, ColumnSetting())
-    )
+      columnSettings.get(colIdx, ColumnSetting()),
+    ),
   )
 
 const makeSelectOptionsViewValue = (
   selectorOptions: I.List<any>,
   columnFiltered: I.List<any>,
-  cs: TColumnSetting
+  cs: TColumnSetting,
 ) => {
   if (cs.cellType === 'number[]' || cs.cellType === 'string[]') {
     const count = (e: number | string) =>

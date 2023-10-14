@@ -64,14 +64,14 @@ export const SelectedCardsListView = memo(
       (category: string, index: number) => (_ev: any, checked: boolean) => {
         selectedCardsCheckboxOnChange({ category, index, checked })
       },
-      [selectedCardsCheckboxOnChange]
+      [selectedCardsCheckboxOnChange],
     )
 
     const buttonOnClick = useCallback(
       (index: number) => () => {
         cardInfoButtonClicked(index)
       },
-      [cardInfoButtonClicked]
+      [cardInfoButtonClicked],
     )
 
     return (
@@ -145,7 +145,7 @@ export const SelectedCardsListView = memo(
         </Table>
       </TableWrapper>
     )
-  }
+  },
 )
 
 SelectedCardsListView.displayName = 'SelectedCardsListView'

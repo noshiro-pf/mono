@@ -20,7 +20,7 @@ class TakeWhileObservableClass<A>
 
   constructor(
     parentObservable: Observable<A>,
-    predicate: (value: A) => boolean
+    predicate: (value: A) => boolean,
   ) {
     super({
       parents: [parentObservable],

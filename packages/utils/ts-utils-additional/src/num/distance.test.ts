@@ -2,7 +2,7 @@ import { dist } from './distance';
 
 const testDist = (
   [a, b]: readonly [number, number],
-  expected: number
+  expected: number,
 ): void => {
   test(`testDist(dist(${a}, ${b}))`, () => {
     expect(dist(a, b)).toBe(expected);

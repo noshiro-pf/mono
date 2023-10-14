@@ -48,15 +48,15 @@ const clamp =
         (Math.max(lowerBound, Math.min(upperBound, target)) as N);
 
 const isNonZero = <N extends number>(
-  a: N
+  a: N,
 ): a is NonZeroNumber & RelaxedExclude<N, 0> => a !== 0;
 
 const isNonNegative = <N extends number>(
-  a: N
+  a: N,
 ): a is NonNegativeNumber & RelaxedExclude<N, NegativeIndex<1024>> => a >= 0;
 
 const isPositive = <N extends number>(
-  a: N
+  a: N,
 ): a is PositiveNumber & RelaxedExclude<N, NegativeIndex<1024> | 0> => a > 0;
 
 const roundAt = (val: number, precision: number): number => {
@@ -78,7 +78,7 @@ const round = (digit: number): ((x: number) => number) => {
 };
 
 const mapNaN2Undefined = <N extends number>(
-  value: N
+  value: N,
 ): RelaxedExclude<N, NaNType> | undefined =>
   // eslint-disable-next-line no-restricted-syntax
   Number.isNaN(value) ? undefined : (value as RelaxedExclude<N, NaNType>);

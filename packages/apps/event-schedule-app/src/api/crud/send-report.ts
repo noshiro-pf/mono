@@ -14,6 +14,6 @@ export const sendReport = ({
       () => undefined,
       (result) => ({
         message: Str.from(result),
-      })
-    )
+      }),
+    ),
   );

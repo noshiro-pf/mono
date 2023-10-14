@@ -52,7 +52,7 @@ export const SelectMyNameView = memo(
         !nameList ||
         nameList.isEmpty() ||
         (selectedName !== '' && nameList.isEmpty()),
-      [nameList, selectedName]
+      [nameList, selectedName],
     )
 
     return (
@@ -91,7 +91,7 @@ export const SelectMyNameView = memo(
         )}
       </FormWrapper>
     )
-  }
+  },
 )
 
 SelectMyNameView.displayName = 'SelectMyNameView'

@@ -21,5 +21,5 @@ export const ImgCropped = memoNamed<Props>(
     <DivCropped cropRectRelative={cropRectRelative}>
       <Img src={src} />
     </DivCropped>
-  )
+  ),
 );

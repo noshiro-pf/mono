@@ -39,9 +39,9 @@ export class DatabaseService {
       .pipe(
         map((actions) =>
           actions.map(
-            (action) => new User(<any>action.key, <any>action.payload.val())
-          )
-        )
+            (action) => new User(<any>action.key, <any>action.payload.val()),
+          ),
+        ),
       );
 
     this.feedbacks$ = this.afdb
@@ -50,9 +50,10 @@ export class DatabaseService {
       .pipe(
         map((actions) =>
           actions.map(
-            (action) => new Feedback(<any>action.key, <any>action.payload.val())
-          )
-        )
+            (action) =>
+              new Feedback(<any>action.key, <any>action.payload.val()),
+          ),
+        ),
       );
 
     /*** methods ***/
