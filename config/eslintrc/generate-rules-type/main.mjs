@@ -54,7 +54,13 @@ const main = async () => {
   console.log('formatting code ...');
 
   await execAsync(
-    `prettier --cache --cache-strategy content --write ${rulesTypeDir}`,
+    [
+      'prettier',
+      '--cache --cache-strategy content',
+      `--config "${thisDir}"/../../../.prettierrc`,
+      '--write',
+      rulesTypeDir,
+    ].join(' '),
   );
 };
 

@@ -18,7 +18,7 @@ ignore=""
 while [[ $# -gt 0 ]]
 do
     key="$1"
-    
+
     case $key in
         --clear)
             clear=true
@@ -61,29 +61,29 @@ index_ts_files=()
 # generate index.ts recursively
 for directory in $(find . -mindepth "${min_recursion_depth}" -maxdepth "${max_recursion_depth}" -type d); do
     echo "${directory}"
-    
+
     if [ -n "${ignore}" ]; then
         if [[ "${directory}" =~ ${ignore} ]]; then
             echo "skipped."
             continue
         fi
     fi
-    
+
     index_ts="${directory}/index.ts"
-    
+
     if "${clear}"; then
         rm "${index_ts}"
     else
-        
+
         result=""
-        
+
         # files in a current directory
         for file in $(find "${directory}" -mindepth 1 -maxdepth 1 -type f); do
             filename=$(basename "${file}")
-            
+
             # filename without extension
             filename_without_ext="${filename%.*}"
-            
+
             # only files that match a regular expression "[a-zA-Z0-9_]+.ts"
             if [ "${filename}" != "index.ts" ]; then
                 if [[ ${filename} =~ ${TS_FILENAME_REGEX} ]]; then
@@ -92,42 +92,42 @@ for directory in $(find . -mindepth "${min_recursion_depth}" -maxdepth "${max_re
                 fi
             fi
         done
-        
+
         if [ ${ADD_SUB_DIRECTORY_EXPORT_IN_INDEX_TS} = "true" ]; then
             # directories in a current directory
             for sub_directory in $(find "${directory}" -mindepth 1 -maxdepth 1 -type d); do
-                
+
                 if [ -n "${ignore}" ]; then
                     if [[ "${sub_directory}" =~ ${ignore} ]]; then
                         echo "skipped."
                         continue
                     fi
                 fi
-                
+
                 # add line "export * from 'directory_name'"
                 sub_directory_basename=$(basename "${sub_directory}")
                 result+="export * from './${sub_directory_basename}';"
             done
-            
+
         fi
-        
-        
+
+
         if [ -z "${result}" ]; then
             result+="export {};"
         fi
-        
+
         echo "${result}" > "${index_ts}"
         index_ts_files+=" ${index_ts}"
-        
+
     fi
-    
+
     echo "${directory}" "done"
-    
+
 done
 
 echo
 echo "--- prettier ---"
 
 if [ -n "${index_ts_files}" ]; then
-    node "${SCRIPT_DIR}"/../node_modules/.bin/prettier --cache --cache-strategy content --write ${index_ts_files}
+    node "${SCRIPT_DIR}"/../node_modules/.bin/prettier --config "${SCRIPT_DIR}"/../.prettierrc --ignore-unknown --no-error-on-unmatched-pattern --cache --cache-strategy content --write ${index_ts_files}
 fi
