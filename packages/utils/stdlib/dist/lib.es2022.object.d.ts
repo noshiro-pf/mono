@@ -26,7 +26,7 @@ and limitations under the License.
  */
 type _HasOwnReturnType<
   R extends RecordBase,
-  K extends PropertyKey
+  K extends PropertyKey,
 > = R extends R // union distribution
   ? K extends keyof R
     ? string extends keyof R
@@ -47,6 +47,6 @@ interface ObjectConstructor {
    */
   hasOwn<R extends RecordBase, K extends PropertyKey>(
     obj: R,
-    key: K
+    key: K,
   ): obj is _HasOwnReturnType<R, K>;
 }

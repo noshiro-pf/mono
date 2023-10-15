@@ -27,12 +27,12 @@ declare namespace Reflect {
   function apply<T, A extends readonly unknown[], R>(
     target: (this: T, ...args: A) => R,
     thisArgument: T,
-    argumentsList: Readonly<A>
+    argumentsList: Readonly<A>,
   ): R;
   function apply(
     target: Function,
     thisArgument: unknown,
-    argumentsList: ArrayLike<unknown>
+    argumentsList: ArrayLike<unknown>,
   ): unknown;
 
   /**
@@ -45,12 +45,12 @@ declare namespace Reflect {
   function construct<A extends readonly unknown[], R>(
     target: new (...args: A) => R,
     argumentsList: Readonly<A>,
-    newTarget?: new (...args: readonly never[]) => unknown
+    newTarget?: new (...args: readonly never[]) => unknown,
   ): R;
   function construct(
     target: Function,
     argumentsList: ArrayLike<unknown>,
-    newTarget?: Function
+    newTarget?: Function,
   ): unknown;
 
   /**
@@ -63,7 +63,7 @@ declare namespace Reflect {
   function defineProperty(
     target: object,
     propertyKey: PropertyKey,
-    attributes: PropertyDescriptor & ThisType<unknown>
+    attributes: PropertyDescriptor & ThisType<unknown>,
   ): boolean;
 
   /**
@@ -84,7 +84,7 @@ declare namespace Reflect {
   function get<T extends object, P extends PropertyKey>(
     target: T,
     propertyKey: P,
-    receiver?: unknown
+    receiver?: unknown,
   ): P extends keyof T ? T[P] : unknown;
 
   /**
@@ -95,7 +95,7 @@ declare namespace Reflect {
    */
   function getOwnPropertyDescriptor<T extends object, P extends PropertyKey>(
     target: T,
-    propertyKey: P
+    propertyKey: P,
   ): TypedPropertyDescriptor<P extends keyof T ? T[P] : unknown> | undefined;
 
   /**
@@ -142,13 +142,13 @@ declare namespace Reflect {
     target: T,
     propertyKey: P,
     value: P extends keyof T ? T[P] : unknown,
-    receiver?: unknown
+    receiver?: unknown,
   ): boolean;
   function set(
     target: object,
     propertyKey: PropertyKey,
     value: unknown,
-    receiver?: unknown
+    receiver?: unknown,
   ): boolean;
 
   /**

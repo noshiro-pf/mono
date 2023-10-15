@@ -36,11 +36,11 @@ declare namespace Intl {
   interface DateTimeFormat {
     formatRange(
       startDate: Date | number | bigint,
-      endDate: Date | number | bigint
+      endDate: Date | number | bigint,
     ): string;
     formatRangeToParts(
       startDate: Date | number | bigint,
-      endDate: Date | number | bigint
+      endDate: Date | number | bigint,
     ): readonly DateTimeRangeFormatPart[];
   }
 
@@ -154,7 +154,7 @@ declare namespace Intl {
      */
     new (
       locales?: BCP47LanguageTag | readonly BCP47LanguageTag[],
-      options?: ListFormatOptions
+      options?: ListFormatOptions,
     ): ListFormat;
 
     /**
@@ -175,7 +175,7 @@ declare namespace Intl {
      */
     supportedLocalesOf(
       locales: BCP47LanguageTag | readonly BCP47LanguageTag[],
-      options?: Pick<ListFormatOptions, 'localeMatcher'>
+      options?: Pick<ListFormatOptions, 'localeMatcher'>,
     ): readonly BCP47LanguageTag[];
   };
 }

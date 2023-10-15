@@ -192,7 +192,7 @@ declare namespace Intl {
      */
     formatToParts(
       value: number,
-      unit: RelativeTimeFormatUnit
+      unit: RelativeTimeFormatUnit,
     ): readonly RelativeTimeFormatPart[];
 
     /**
@@ -228,7 +228,7 @@ declare namespace Intl {
       locales?:
         | UnicodeBCP47LocaleIdentifier
         | readonly UnicodeBCP47LocaleIdentifier[],
-      options?: RelativeTimeFormatOptions
+      options?: RelativeTimeFormatOptions,
     ): RelativeTimeFormat;
 
     /**
@@ -253,7 +253,7 @@ declare namespace Intl {
       locales?:
         | UnicodeBCP47LocaleIdentifier
         | readonly UnicodeBCP47LocaleIdentifier[],
-      options?: RelativeTimeFormatOptions
+      options?: RelativeTimeFormatOptions,
     ): readonly UnicodeBCP47LocaleIdentifier[];
   };
 
@@ -443,7 +443,7 @@ declare namespace Intl {
      */
     supportedLocalesOf(
       locales?: LocalesArgument,
-      options?: { readonly localeMatcher?: RelativeTimeFormatLocaleMatcher }
+      options?: { readonly localeMatcher?: RelativeTimeFormatLocaleMatcher },
     ): readonly BCP47LanguageTag[];
   };
 }

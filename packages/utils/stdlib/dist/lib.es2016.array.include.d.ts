@@ -24,7 +24,7 @@ interface Array<T> {
    */
   includes(
     searchElement: T | (WidenLiteral<T> & {}),
-    fromIndex?: SafeInt | Int10
+    fromIndex?: SafeInt | Int10,
   ): searchElement is T;
 }
 
@@ -36,7 +36,7 @@ interface ReadonlyArray<T> {
    */
   includes(
     searchElement: T | (WidenLiteral<T> & {}),
-    fromIndex?: SafeInt | Int10
+    fromIndex?: SafeInt | Int10,
   ): searchElement is T;
 }
 

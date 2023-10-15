@@ -210,7 +210,7 @@ declare const WScript: {
   GetObject(
     strPathname: string,
     strProgID?: string,
-    strPrefix?: string
+    strPrefix?: string,
   ): unknown;
 
   /**

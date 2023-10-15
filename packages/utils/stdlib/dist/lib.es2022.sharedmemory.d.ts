@@ -29,7 +29,7 @@ interface Atomics {
     typedArray: Int32Array,
     index: SafeUint,
     value: Int32,
-    timeout?: number
+    timeout?: number,
   ):
     | { readonly async: false; readonly value: 'not-equal' | 'timed-out' }
     | { readonly async: true; readonly value: Promise<'ok' | 'timed-out'> };
@@ -46,7 +46,7 @@ interface Atomics {
     typedArray: BigInt64Array,
     index: SafeUint,
     value: BigInt64,
-    timeout?: number
+    timeout?: number,
   ):
     | { readonly async: false; readonly value: 'not-equal' | 'timed-out' }
     | { readonly async: true; readonly value: Promise<'ok' | 'timed-out'> };

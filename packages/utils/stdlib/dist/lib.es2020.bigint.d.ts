@@ -219,7 +219,7 @@ interface BigInt {
   /** Returns a string representation appropriate to the host environment's current locale. */
   toLocaleString(
     locales?: Intl.LocalesArgument,
-    options?: BigIntToLocaleStringOptions
+    options?: BigIntToLocaleStringOptions,
   ): string;
 
   /** Returns the primitive value of the specified object. */
@@ -279,7 +279,7 @@ interface BigInt64Array {
   copyWithin(
     target: SafeInt | Int10,
     start: SafeInt | Int10,
-    end?: SafeInt | Int10
+    end?: SafeInt | Int10,
   ): this;
 
   /** Yields index, value pairs for every entry in the array. */
@@ -297,9 +297,9 @@ interface BigInt64Array {
     predicate: (
       value: BigInt64,
       index: SafeUint,
-      array: BigInt64Array
+      array: BigInt64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -323,9 +323,9 @@ interface BigInt64Array {
     predicate: (
       value: BigInt64,
       index: SafeUint,
-      array: BigInt64Array
+      array: BigInt64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): BigInt64Array;
 
   /**
@@ -341,9 +341,9 @@ interface BigInt64Array {
     predicate: (
       value: BigInt64,
       index: SafeUint,
-      array: BigInt64Array
+      array: BigInt64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): BigInt64 | undefined;
 
   /**
@@ -359,9 +359,9 @@ interface BigInt64Array {
     predicate: (
       value: BigInt64,
       index: SafeUint,
-      array: BigInt64Array
+      array: BigInt64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 
   /**
@@ -375,9 +375,9 @@ interface BigInt64Array {
     callbackfn: (
       value: BigInt64,
       index: SafeUint,
-      array: BigInt64Array
+      array: BigInt64Array,
     ) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
 
   /**
@@ -413,7 +413,7 @@ interface BigInt64Array {
    */
   lastIndexOf(
     searchElement: BigInt64,
-    fromIndex?: SafeInt | Int10
+    fromIndex?: SafeInt | Int10,
   ): SafeUint | -1;
 
   /** The length of the array. */
@@ -431,9 +431,9 @@ interface BigInt64Array {
     callbackfn: (
       value: BigInt64,
       index: SafeUint,
-      array: BigInt64Array
+      array: BigInt64Array,
     ) => BigInt64,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): BigInt64Array;
 
   /**
@@ -451,8 +451,8 @@ interface BigInt64Array {
       previousValue: BigInt64,
       currentValue: BigInt64,
       currentIndex: SafeUint,
-      array: BigInt64Array
-    ) => BigInt64
+      array: BigInt64Array,
+    ) => BigInt64,
   ): BigInt64;
 
   /**
@@ -470,9 +470,9 @@ interface BigInt64Array {
       previousValue: U,
       currentValue: BigInt64,
       currentIndex: SafeUint,
-      array: BigInt64Array
+      array: BigInt64Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -490,8 +490,8 @@ interface BigInt64Array {
       previousValue: BigInt64,
       currentValue: BigInt64,
       currentIndex: SafeUint,
-      array: BigInt64Array
-    ) => BigInt64
+      array: BigInt64Array,
+    ) => BigInt64,
   ): BigInt64;
 
   /**
@@ -509,9 +509,9 @@ interface BigInt64Array {
       previousValue: U,
       currentValue: BigInt64,
       currentIndex: SafeUint,
-      array: BigInt64Array
+      array: BigInt64Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /** Reverses the elements in the array. */
@@ -543,9 +543,9 @@ interface BigInt64Array {
     predicate: (
       value: BigInt64,
       index: SafeUint,
-      array: BigInt64Array
+      array: BigInt64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -588,7 +588,7 @@ interface BigInt64ArrayConstructor {
   new (
     buffer: ArrayBufferLike,
     byteOffset?: SafeUint | Uint9,
-    length?: SafeUint
+    length?: SafeUint,
   ): BigInt64Array;
 
   /** The size in bytes of each element in the array. */
@@ -610,7 +610,7 @@ interface BigInt64ArrayConstructor {
   from<U>(
     arrayLike: ArrayLike<U>,
     mapfn: (v: U, k: SafeUint) => BigInt64,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): BigInt64Array;
 }
 
@@ -645,7 +645,7 @@ interface BigUint64Array {
   copyWithin(
     target: SafeInt | Int10,
     start: SafeInt | Int10,
-    end?: SafeInt | Int10
+    end?: SafeInt | Int10,
   ): this;
 
   /** Yields index, value pairs for every entry in the array. */
@@ -663,9 +663,9 @@ interface BigUint64Array {
     predicate: (
       value: BigUint64,
       index: SafeUint,
-      array: BigUint64Array
+      array: BigUint64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -689,9 +689,9 @@ interface BigUint64Array {
     predicate: (
       value: BigUint64,
       index: SafeUint,
-      array: BigUint64Array
+      array: BigUint64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): BigUint64Array;
 
   /**
@@ -707,9 +707,9 @@ interface BigUint64Array {
     predicate: (
       value: BigUint64,
       index: SafeUint,
-      array: BigUint64Array
+      array: BigUint64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): BigUint64 | undefined;
 
   /**
@@ -725,9 +725,9 @@ interface BigUint64Array {
     predicate: (
       value: BigUint64,
       index: SafeUint,
-      array: BigUint64Array
+      array: BigUint64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 
   /**
@@ -741,9 +741,9 @@ interface BigUint64Array {
     callbackfn: (
       value: BigUint64,
       index: SafeUint,
-      array: BigUint64Array
+      array: BigUint64Array,
     ) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
 
   /**
@@ -779,7 +779,7 @@ interface BigUint64Array {
    */
   lastIndexOf(
     searchElement: BigUint64,
-    fromIndex?: SafeInt | Int10
+    fromIndex?: SafeInt | Int10,
   ): SafeUint | -1;
 
   /** The length of the array. */
@@ -797,9 +797,9 @@ interface BigUint64Array {
     callbackfn: (
       value: BigUint64,
       index: SafeUint,
-      array: BigUint64Array
+      array: BigUint64Array,
     ) => BigUint64,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): BigUint64Array;
 
   /**
@@ -817,8 +817,8 @@ interface BigUint64Array {
       previousValue: BigUint64,
       currentValue: BigUint64,
       currentIndex: SafeUint,
-      array: BigUint64Array
-    ) => BigUint64
+      array: BigUint64Array,
+    ) => BigUint64,
   ): BigUint64;
 
   /**
@@ -836,9 +836,9 @@ interface BigUint64Array {
       previousValue: U,
       currentValue: BigUint64,
       currentIndex: SafeUint,
-      array: BigUint64Array
+      array: BigUint64Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -856,8 +856,8 @@ interface BigUint64Array {
       previousValue: BigUint64,
       currentValue: BigUint64,
       currentIndex: SafeUint,
-      array: BigUint64Array
-    ) => BigUint64
+      array: BigUint64Array,
+    ) => BigUint64,
   ): BigUint64;
 
   /**
@@ -875,9 +875,9 @@ interface BigUint64Array {
       previousValue: U,
       currentValue: BigUint64,
       currentIndex: SafeUint,
-      array: BigUint64Array
+      array: BigUint64Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /** Reverses the elements in the array. */
@@ -909,9 +909,9 @@ interface BigUint64Array {
     predicate: (
       value: BigUint64,
       index: SafeUint,
-      array: BigUint64Array
+      array: BigUint64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -954,7 +954,7 @@ interface BigUint64ArrayConstructor {
   new (
     buffer: ArrayBufferLike,
     byteOffset?: SafeUint | Uint9,
-    length?: SafeUint
+    length?: SafeUint,
   ): BigUint64Array;
 
   /** The size in bytes of each element in the array. */
@@ -976,7 +976,7 @@ interface BigUint64ArrayConstructor {
   from<U>(
     arrayLike: ArrayLike<U>,
     mapfn: (v: U, k: SafeUint) => BigUint64,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): BigUint64Array;
 }
 
@@ -1008,7 +1008,7 @@ interface DataView {
   setBigInt64(
     byteOffset: SafeUint,
     value: BigInt64,
-    littleEndian?: boolean
+    littleEndian?: boolean,
   ): void;
 
   /**
@@ -1020,7 +1020,7 @@ interface DataView {
   setBigUint64(
     byteOffset: SafeUint,
     value: BigUint64,
-    littleEndian?: boolean
+    littleEndian?: boolean,
   ): void;
 }
 

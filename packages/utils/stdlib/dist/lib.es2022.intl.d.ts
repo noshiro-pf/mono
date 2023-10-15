@@ -91,7 +91,7 @@ declare namespace Intl {
      */
     new (
       locales?: BCP47LanguageTag | readonly BCP47LanguageTag[],
-      options?: SegmenterOptions
+      options?: SegmenterOptions,
     ): Segmenter;
 
     /**
@@ -108,7 +108,7 @@ declare namespace Intl {
      */
     supportedLocalesOf(
       locales: BCP47LanguageTag | readonly BCP47LanguageTag[],
-      options?: Pick<SegmenterOptions, 'localeMatcher'>
+      options?: Pick<SegmenterOptions, 'localeMatcher'>,
     ): readonly BCP47LanguageTag[];
   };
 }

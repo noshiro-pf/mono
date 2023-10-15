@@ -38,6 +38,6 @@ interface PromiseConstructor {
    * @returns A new Promise.
    */
   any<T>(
-    values: readonly (T | PromiseLike<T>)[] | Iterable<T | PromiseLike<T>>
+    values: readonly (T | PromiseLike<T>)[] | Iterable<T | PromiseLike<T>>,
   ): Promise<T>;
 }

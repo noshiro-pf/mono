@@ -31,7 +31,7 @@ interface ProxyHandler<T extends object> {
   construct?(
     target: T,
     argArray: readonly unknown[],
-    newTarget: Function
+    newTarget: Function,
   ): object;
 
   /**
@@ -42,7 +42,7 @@ interface ProxyHandler<T extends object> {
   defineProperty?(
     target: T,
     property: string | symbol,
-    attributes: PropertyDescriptor
+    attributes: PropertyDescriptor,
   ): boolean;
 
   /**
@@ -68,7 +68,7 @@ interface ProxyHandler<T extends object> {
    */
   getOwnPropertyDescriptor?(
     target: T,
-    p: string | symbol
+    p: string | symbol,
   ): PropertyDescriptor | undefined;
 
   /**
@@ -113,7 +113,7 @@ interface ProxyHandler<T extends object> {
     target: T,
     p: string | symbol,
     newValue: unknown,
-    receiver: unknown
+    receiver: unknown,
   ): boolean;
 
   /**
@@ -132,7 +132,7 @@ interface ProxyConstructor {
    */
   revocable<T extends object>(
     target: T,
-    handler: ProxyHandler<T>
+    handler: ProxyHandler<T>,
   ): { readonly proxy: T; readonly revoke: () => void };
 
   /**

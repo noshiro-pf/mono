@@ -31,6 +31,6 @@ interface String {
    */
   replaceAll(
     searchValue: string | RegExp,
-    replacer: (substring: string, ...args: readonly never[]) => string
+    replacer: (substring: string, ...args: readonly never[]) => string,
   ): string;
 }

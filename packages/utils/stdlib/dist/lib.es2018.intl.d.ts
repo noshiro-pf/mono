@@ -50,16 +50,16 @@ declare namespace Intl {
   const PluralRules: {
     new (
       locales?: string | readonly string[],
-      options?: PluralRulesOptions
+      options?: PluralRulesOptions,
     ): PluralRules;
     (
       locales?: string | readonly string[],
-      options?: PluralRulesOptions
+      options?: PluralRulesOptions,
     ): PluralRules;
 
     supportedLocalesOf(
       locales: string | readonly string[],
-      options?: { readonly localeMatcher?: 'lookup' | 'best fit' }
+      options?: { readonly localeMatcher?: 'lookup' | 'best fit' },
     ): readonly string[];
   };
 

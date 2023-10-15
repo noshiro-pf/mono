@@ -33,7 +33,7 @@ interface Atomics {
   add<T extends TypedArrayElementTypes>(
     typedArray: MapToTypedArray<T>,
     index: SafeUint,
-    value: T
+    value: T,
   ): T;
 
   /**
@@ -44,7 +44,7 @@ interface Atomics {
   and<T extends TypedArrayElementTypes>(
     typedArray: MapToTypedArray<T>,
     index: SafeUint,
-    value: T
+    value: T,
   ): T;
 
   /**
@@ -56,7 +56,7 @@ interface Atomics {
     typedArray: MapToTypedArray<T>,
     index: SafeUint,
     expectedValue: T,
-    replacementValue: T
+    replacementValue: T,
   ): T;
 
   /**
@@ -67,7 +67,7 @@ interface Atomics {
   exchange<T extends TypedArrayElementTypes>(
     typedArray: MapToTypedArray<T>,
     index: SafeUint,
-    value: T
+    value: T,
   ): T;
 
   /**
@@ -84,7 +84,7 @@ interface Atomics {
   or<T extends TypedArrayElementTypes>(
     typedArray: MapToTypedArray<T>,
     index: SafeUint,
-    value: T
+    value: T,
   ): T;
 
   /**
@@ -94,7 +94,7 @@ interface Atomics {
   store<T extends TypedArrayElementTypes>(
     typedArray: MapToTypedArray<T>,
     index: SafeUint,
-    value: T
+    value: T,
   ): T;
 
   /**
@@ -105,7 +105,7 @@ interface Atomics {
   sub<T extends TypedArrayElementTypes>(
     typedArray: MapToTypedArray<T>,
     index: SafeUint,
-    value: T
+    value: T,
   ): T;
 
   /**
@@ -118,7 +118,7 @@ interface Atomics {
     typedArray: BigInt64Array,
     index: SafeUint,
     value: T,
-    timeout?: number
+    timeout?: number,
   ): 'ok' | 'not-equal' | 'timed-out';
 
   /**
@@ -138,6 +138,6 @@ interface Atomics {
   xor<T extends TypedArrayElementTypes>(
     typedArray: MapToTypedArray<T>,
     index: SafeUint,
-    value: T
+    value: T,
   ): T;
 }

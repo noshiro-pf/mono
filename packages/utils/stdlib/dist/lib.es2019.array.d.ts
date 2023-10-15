@@ -43,7 +43,7 @@ type FlatArray<Arr, Depth extends number> = {
           17,
           18,
           19,
-          20
+          20,
         ][Depth]
       >
     : Arr;
@@ -65,9 +65,9 @@ interface ReadonlyArray<T> {
       this: This,
       value: T,
       index: SafeUint,
-      array: readonly T[]
+      array: readonly T[],
     ) => U | ReadonlyArray<U>,
-    thisArg?: This
+    thisArg?: This,
   ): readonly U[];
 
   /**
@@ -78,7 +78,7 @@ interface ReadonlyArray<T> {
    */
   flat<A, D extends SafeUint | Uint9 = 1>(
     this: A,
-    depth?: D
+    depth?: D,
   ): readonly FlatArray<A, D>[];
 }
 
@@ -98,9 +98,9 @@ interface Array<T> {
       this: This,
       value: T,
       index: SafeUint,
-      array: readonly T[]
+      array: readonly T[],
     ) => U | ReadonlyArray<U>,
-    thisArg?: This
+    thisArg?: This,
   ): readonly U[];
 
   /**
@@ -111,6 +111,6 @@ interface Array<T> {
    */
   flat<A, D extends SafeUint | Uint9 = 1>(
     this: A,
-    depth?: D
+    depth?: D,
   ): readonly FlatArray<A, D>[];
 }

@@ -91,7 +91,7 @@ interface ArrayConstructor {
   from<T, U>(
     iterable: Iterable<T> | ArrayLike<T>,
     mapfn: (v: T, k: SafeUint) => U,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): U[];
 }
 
@@ -277,7 +277,7 @@ interface Int8ArrayConstructor {
   from<T extends number>(
     arrayLike: Iterable<T>,
     mapfn?: (v: T, k: SafeUint) => Int8,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int8Array;
 }
 
@@ -312,7 +312,7 @@ interface Uint8ArrayConstructor {
   from<T extends number>(
     arrayLike: Iterable<T>,
     mapfn?: (v: T, k: SafeUint) => Uint8,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint8Array;
 }
 
@@ -347,7 +347,7 @@ interface Uint8ClampedArrayConstructor {
   from<T extends number>(
     arrayLike: Iterable<T>,
     mapfn?: (v: T, k: SafeUint) => Uint8,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint8ClampedArray;
 }
 
@@ -382,7 +382,7 @@ interface Int16ArrayConstructor {
   from<T extends number>(
     arrayLike: Iterable<T>,
     mapfn?: (v: T, k: SafeUint) => Int16,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int16Array;
 }
 
@@ -417,7 +417,7 @@ interface Uint16ArrayConstructor {
   from<T extends number>(
     arrayLike: Iterable<T>,
     mapfn?: (v: T, k: SafeUint) => Uint16,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint16Array;
 }
 
@@ -452,7 +452,7 @@ interface Int32ArrayConstructor {
   from<T extends number>(
     arrayLike: Iterable<T>,
     mapfn?: (v: T, k: SafeUint) => Int32,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int32Array;
 }
 
@@ -487,7 +487,7 @@ interface Uint32ArrayConstructor {
   from<T extends number>(
     arrayLike: Iterable<T>,
     mapfn?: (v: T, k: SafeUint) => Uint32,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint32Array;
 }
 
@@ -522,7 +522,7 @@ interface Float32ArrayConstructor {
   from<T extends number>(
     arrayLike: Iterable<T>,
     mapfn?: (v: T, k: SafeUint) => Float32,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Float32Array;
 }
 
@@ -557,6 +557,6 @@ interface Float64ArrayConstructor {
   from<T extends number>(
     arrayLike: Iterable<T>,
     mapfn?: (v: T, k: SafeUint) => Float64,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Float64Array;
 }

@@ -25,7 +25,7 @@ interface AsyncGenerator<T = unknown, TReturn = any, TNext = unknown>
     ...args: readonly [] | readonly [TNext]
   ): Promise<IteratorResult<T, TReturn>>;
   return(
-    value: TReturn | PromiseLike<TReturn>
+    value: TReturn | PromiseLike<TReturn>,
   ): Promise<IteratorResult<T, TReturn>>;
   throw(e: unknown): Promise<IteratorResult<T, TReturn>>;
   [Symbol.asyncIterator](): AsyncGenerator<T, TReturn, TNext>;

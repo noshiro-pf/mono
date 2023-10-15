@@ -37,7 +37,7 @@ interface ObjectConstructor {
    * ```
    */
   fromEntries<K extends PropertyKey, V>(
-    entries: Iterable<readonly [K, V]>
+    entries: Iterable<readonly [K, V]>,
   ): Record<K, V>;
 
   /**

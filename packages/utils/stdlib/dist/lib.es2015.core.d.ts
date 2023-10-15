@@ -28,11 +28,11 @@ interface Array<T> {
    */
   find<S extends T>(
     predicate: (value: T, index: SafeUint, obj: readonly T[]) => value is S,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): S | undefined;
   find(
     predicate: (value: T, index: SafeUint, obj: readonly T[]) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): T | undefined;
 
   /**
@@ -46,7 +46,7 @@ interface Array<T> {
    */
   findIndex(
     predicate: (value: T, index: SafeUint, obj: readonly T[]) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 
   /**
@@ -71,7 +71,7 @@ interface Array<T> {
   copyWithin(
     target: SafeInt | Int10,
     start: SafeInt | Int10,
-    end?: SafeInt | Int10
+    end?: SafeInt | Int10,
   ): this;
 }
 
@@ -91,7 +91,7 @@ interface ArrayConstructor {
   from<T, U>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: SafeUint) => U,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): U[];
 
   /**
@@ -328,7 +328,7 @@ interface ObjectConstructor {
     target: T,
     source1: U,
     source2: V,
-    source3: W
+    source3: W,
   ): T & U & V & W;
 
   /**
@@ -383,11 +383,11 @@ interface ReadonlyArray<T> {
    */
   find<S extends T>(
     predicate: (value: T, index: SafeUint, obj: readonly T[]) => value is S,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): S | undefined;
   find(
     predicate: (value: T, index: SafeUint, obj: readonly T[]) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): T | undefined;
 
   /**
@@ -401,7 +401,7 @@ interface ReadonlyArray<T> {
    */
   findIndex(
     predicate: (value: T, index: SafeUint, obj: readonly T[]) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 }
 

@@ -42,7 +42,7 @@ declare function eval(x: string): unknown;
  */
 declare function parseInt(
   string: string,
-  radix?: UintRange<2, 37>
+  radix?: UintRange<2, 37>,
 ): Int | NaNType;
 
 /**
@@ -88,7 +88,7 @@ declare function encodeURI(uri: string): string;
  * @param uriComponent A value representing an unencoded URI component.
  */
 declare function encodeURIComponent(
-  uriComponent: string | number | boolean
+  uriComponent: string | number | boolean,
 ): string;
 
 /**
@@ -185,7 +185,7 @@ interface ObjectConstructor {
    */
   getOwnPropertyDescriptor(
     o: unknown,
-    p: PropertyKey
+    p: PropertyKey,
   ): PropertyDescriptor | undefined;
 
   /**
@@ -208,7 +208,7 @@ interface ObjectConstructor {
    */
   create(
     o: object | null,
-    properties: PropertyDescriptorMap & ThisType<unknown>
+    properties: PropertyDescriptorMap & ThisType<unknown>,
   ): unknown;
 
   /**
@@ -220,7 +220,7 @@ interface ObjectConstructor {
   defineProperty<T>(
     o: T,
     p: PropertyKey,
-    attributes: PropertyDescriptor & ThisType<unknown>
+    attributes: PropertyDescriptor & ThisType<unknown>,
   ): T;
 
   /**
@@ -230,7 +230,7 @@ interface ObjectConstructor {
    */
   defineProperties<T>(
     o: T,
-    properties: PropertyDescriptorMap & ThisType<unknown>
+    properties: PropertyDescriptorMap & ThisType<unknown>,
   ): T;
 
   /**
@@ -251,9 +251,9 @@ interface ObjectConstructor {
    */
   freeze<
     T extends { readonly [idx: string]: U | null | undefined | object },
-    U extends string | bigint | number | boolean | symbol
+    U extends string | bigint | number | boolean | symbol,
   >(
-    o: T
+    o: T,
   ): Readonly<T>;
 
   /**
@@ -383,7 +383,7 @@ interface CallableFunction extends Function {
   apply<T, A extends readonly unknown[], R>(
     this: (this: T, ...args: A) => R,
     thisArg: T,
-    args: A
+    args: A,
   ): R;
 
   /**
@@ -407,20 +407,20 @@ interface CallableFunction extends Function {
   bind<T, A0, A extends readonly unknown[], R>(
     this: (this: T, arg0: A0, ...args: A) => R,
     thisArg: T,
-    arg0: A0
+    arg0: A0,
   ): (...args: A) => R;
   bind<T, A0, A1, A extends readonly unknown[], R>(
     this: (this: T, arg0: A0, arg1: A1, ...args: A) => R,
     thisArg: T,
     arg0: A0,
-    arg1: A1
+    arg1: A1,
   ): (...args: A) => R;
   bind<T, A0, A1, A2, A extends readonly unknown[], R>(
     this: (this: T, arg0: A0, arg1: A1, arg2: A2, ...args: A) => R,
     thisArg: T,
     arg0: A0,
     arg1: A1,
-    arg2: A2
+    arg2: A2,
   ): (...args: A) => R;
   bind<T, A0, A1, A2, A3, A extends readonly unknown[], R>(
     this: (this: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R,
@@ -428,7 +428,7 @@ interface CallableFunction extends Function {
     arg0: A0,
     arg1: A1,
     arg2: A2,
-    arg3: A3
+    arg3: A3,
   ): (...args: A) => R;
   bind<T, AX, R>(
     this: (this: T, ...args: readonly AX[]) => R,
@@ -447,7 +447,7 @@ interface NewableFunction extends Function {
   apply<T, A extends readonly unknown[]>(
     this: new (...args: A) => T,
     thisArg: T,
-    args: A
+    args: A,
   ): void;
 
   /**
@@ -471,20 +471,20 @@ interface NewableFunction extends Function {
   bind<A0, A extends readonly unknown[], R>(
     this: new (arg0: A0, ...args: A) => R,
     thisArg: unknown,
-    arg0: A0
+    arg0: A0,
   ): new (...args: A) => R;
   bind<A0, A1, A extends readonly unknown[], R>(
     this: new (arg0: A0, arg1: A1, ...args: A) => R,
     thisArg: unknown,
     arg0: A0,
-    arg1: A1
+    arg1: A1,
   ): new (...args: A) => R;
   bind<A0, A1, A2, A extends readonly unknown[], R>(
     this: new (arg0: A0, arg1: A1, arg2: A2, ...args: A) => R,
     thisArg: unknown,
     arg0: A0,
     arg1: A1,
-    arg2: A2
+    arg2: A2,
   ): new (...args: A) => R;
   bind<A0, A1, A2, A3, A extends readonly unknown[], R>(
     this: new (arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R,
@@ -492,7 +492,7 @@ interface NewableFunction extends Function {
     arg0: A0,
     arg1: A1,
     arg2: A2,
-    arg3: A3
+    arg3: A3,
   ): new (...args: A) => R;
   bind<AX, R>(
     this: new (...args: readonly AX[]) => R,
@@ -571,7 +571,7 @@ interface String {
    */
   replace(
     searchValue: string | RegExp,
-    replacer: (substring: string, ...args: readonly never[]) => string
+    replacer: (substring: string, ...args: readonly never[]) => string,
   ): string;
 
   /**
@@ -595,7 +595,7 @@ interface String {
    */
   split(
     separator: string | RegExp,
-    limit?: SafeUint | Uint9
+    limit?: SafeUint | Uint9,
   ): readonly string[];
 
   /**
@@ -966,7 +966,7 @@ interface Date {
   setMinutes(
     min: MinutesEnum,
     sec?: SecondsEnum,
-    ms?: MillisecondsEnum
+    ms?: MillisecondsEnum,
   ): SafeUint;
   /**
    * Sets the minutes value in the Date object using Universal Coordinated Time (UTC).
@@ -977,7 +977,7 @@ interface Date {
   setUTCMinutes(
     min: MinutesEnum,
     sec?: SecondsEnum,
-    ms?: MillisecondsEnum
+    ms?: MillisecondsEnum,
   ): SafeUint;
   /**
    * Sets the hour value in the Date object using local time.
@@ -990,7 +990,7 @@ interface Date {
     hours: HoursEnum,
     min?: MinutesEnum,
     sec?: SecondsEnum,
-    ms?: MillisecondsEnum
+    ms?: MillisecondsEnum,
   ): SafeUint;
   /**
    * Sets the hours value in the Date object using Universal Coordinated Time (UTC).
@@ -1003,7 +1003,7 @@ interface Date {
     hours: HoursEnum,
     min?: MinutesEnum,
     sec?: SecondsEnum,
-    ms?: MillisecondsEnum
+    ms?: MillisecondsEnum,
   ): SafeUint;
   /**
    * Sets the numeric day-of-the-month value of the Date object using local time.
@@ -1036,7 +1036,7 @@ interface Date {
   setFullYear(
     year: YearEnum,
     month?: MonthIndexEnum,
-    date?: DateEnum
+    date?: DateEnum,
   ): SafeUint;
   /**
    * Sets the year value in the Date object using Universal Coordinated Time (UTC).
@@ -1047,7 +1047,7 @@ interface Date {
   setUTCFullYear(
     year: YearEnum,
     month?: MonthIndexEnum,
-    date?: DateEnum
+    date?: DateEnum,
   ): SafeUint;
   /** Returns a date converted to a string using Universal Coordinated Time (UTC). */
   toUTCString(): string;
@@ -1077,7 +1077,7 @@ interface DateConstructor {
     hours?: HoursEnum,
     minutes?: MinutesEnum,
     seconds?: SecondsEnum,
-    ms?: MillisecondsEnum
+    ms?: MillisecondsEnum,
   ): Date;
   (): string;
   readonly prototype: Date;
@@ -1103,7 +1103,7 @@ interface DateConstructor {
     hours?: HoursEnum,
     minutes?: MinutesEnum,
     seconds?: SecondsEnum,
-    ms?: MillisecondsEnum
+    ms?: MillisecondsEnum,
   ): SafeUint;
   /** Returns the number of milliseconds elapsed since midnight, January 1, 1970 Universal Coordinated Time (UTC). */
   now(): SafeUint;
@@ -1306,7 +1306,7 @@ interface JSON {
    */
   parse(
     text: string,
-    reviver?: (this: unknown, key: string, value: unknown) => unknown
+    reviver?: (this: unknown, key: string, value: unknown) => unknown,
   ): MutableJSONValue;
   /**
    * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
@@ -1317,7 +1317,7 @@ interface JSON {
   stringify(
     value: unknown,
     replacer?: (this: unknown, key: string, value: unknown) => unknown,
-    space?: string | UintRange<1, 11>
+    space?: string | UintRange<1, 11>,
   ): string;
   /**
    * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
@@ -1328,7 +1328,7 @@ interface JSON {
   stringify(
     value: unknown,
     replacer?: readonly (number | string)[] | null,
-    space?: string | UintRange<1, 11>
+    space?: string | UintRange<1, 11>,
   ): string;
 }
 
@@ -1397,7 +1397,7 @@ interface ReadonlyArray<T> {
    */
   every<S extends T>(
     predicate: (value: T, index: SafeUint, array: readonly T[]) => value is S,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): this is readonly S[];
   /**
    * Determines whether all the members of an array satisfy the specified test.
@@ -1409,7 +1409,7 @@ interface ReadonlyArray<T> {
    */
   every(
     predicate: (value: T, index: SafeUint, array: readonly T[]) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
   /**
    * Determines whether the specified callback function returns true for any element of an array.
@@ -1421,7 +1421,7 @@ interface ReadonlyArray<T> {
    */
   some(
     predicate: (value: T, index: SafeUint, array: readonly T[]) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
   /**
    * Performs the specified action for each element in an array.
@@ -1430,7 +1430,7 @@ interface ReadonlyArray<T> {
    */
   forEach(
     callbackfn: (value: T, index: SafeUint, array: readonly T[]) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
   /**
    * Calls a defined callback function on each element of an array, and returns an array that contains the results.
@@ -1439,7 +1439,7 @@ interface ReadonlyArray<T> {
    */
   map<U>(
     callbackfn: (value: T, index: SafeUint, array: readonly T[]) => U,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): readonly U[];
   /**
    * Returns the elements of an array that meet the condition specified in a callback function.
@@ -1448,7 +1448,7 @@ interface ReadonlyArray<T> {
    */
   filter<S extends T>(
     predicate: (value: T, index: SafeUint, array: readonly T[]) => value is S,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): readonly S[];
   /**
    * Returns the elements of an array that meet the condition specified in a callback function.
@@ -1457,7 +1457,7 @@ interface ReadonlyArray<T> {
    */
   filter(
     predicate: (value: T, index: SafeUint, array: readonly T[]) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): readonly T[];
   /**
    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1469,17 +1469,17 @@ interface ReadonlyArray<T> {
       previousValue: T,
       currentValue: T,
       currentIndex: SafeUint,
-      array: readonly T[]
-    ) => T
+      array: readonly T[],
+    ) => T,
   ): T;
   reduce(
     callbackfn: (
       previousValue: T,
       currentValue: T,
       currentIndex: SafeUint,
-      array: readonly T[]
+      array: readonly T[],
     ) => T,
-    initialValue: T
+    initialValue: T,
   ): T;
   /**
    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1491,9 +1491,9 @@ interface ReadonlyArray<T> {
       previousValue: U,
       currentValue: T,
       currentIndex: SafeUint,
-      array: readonly T[]
+      array: readonly T[],
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
   /**
    * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1505,17 +1505,17 @@ interface ReadonlyArray<T> {
       previousValue: T,
       currentValue: T,
       currentIndex: SafeUint,
-      array: readonly T[]
-    ) => T
+      array: readonly T[],
+    ) => T,
   ): T;
   reduceRight(
     callbackfn: (
       previousValue: T,
       currentValue: T,
       currentIndex: SafeUint,
-      array: readonly T[]
+      array: readonly T[],
     ) => T,
-    initialValue: T
+    initialValue: T,
   ): T;
   /**
    * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1527,9 +1527,9 @@ interface ReadonlyArray<T> {
       previousValue: U,
       currentValue: T,
       currentIndex: SafeUint,
-      array: readonly T[]
+      array: readonly T[],
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   readonly [n: number]: T;
@@ -1659,7 +1659,7 @@ interface Array<T> {
    */
   every<S extends T>(
     predicate: (value: T, index: SafeUint, array: readonly T[]) => value is S,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): this is readonly S[];
   /**
    * Determines whether all the members of an array satisfy the specified test.
@@ -1671,7 +1671,7 @@ interface Array<T> {
    */
   every(
     predicate: (value: T, index: SafeUint, array: readonly T[]) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
   /**
    * Determines whether the specified callback function returns true for any element of an array.
@@ -1683,7 +1683,7 @@ interface Array<T> {
    */
   some(
     predicate: (value: T, index: SafeUint, array: readonly T[]) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
   /**
    * Performs the specified action for each element in an array.
@@ -1692,7 +1692,7 @@ interface Array<T> {
    */
   forEach(
     callbackfn: (value: T, index: SafeUint, array: readonly T[]) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
   /**
    * Calls a defined callback function on each element of an array, and returns an array that contains the results.
@@ -1701,7 +1701,7 @@ interface Array<T> {
    */
   map<U>(
     callbackfn: (value: T, index: SafeUint, array: readonly T[]) => U,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): readonly U[];
   /**
    * Returns the elements of an array that meet the condition specified in a callback function.
@@ -1710,7 +1710,7 @@ interface Array<T> {
    */
   filter<S extends T>(
     predicate: (value: T, index: SafeUint, array: readonly T[]) => value is S,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): readonly S[];
   /**
    * Returns the elements of an array that meet the condition specified in a callback function.
@@ -1719,7 +1719,7 @@ interface Array<T> {
    */
   filter(
     predicate: (value: T, index: SafeUint, array: readonly T[]) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): readonly T[];
   /**
    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1731,17 +1731,17 @@ interface Array<T> {
       previousValue: T,
       currentValue: T,
       currentIndex: SafeUint,
-      array: readonly T[]
-    ) => T
+      array: readonly T[],
+    ) => T,
   ): T;
   reduce(
     callbackfn: (
       previousValue: T,
       currentValue: T,
       currentIndex: SafeUint,
-      array: readonly T[]
+      array: readonly T[],
     ) => T,
-    initialValue: T
+    initialValue: T,
   ): T;
   /**
    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1753,9 +1753,9 @@ interface Array<T> {
       previousValue: U,
       currentValue: T,
       currentIndex: SafeUint,
-      array: readonly T[]
+      array: readonly T[],
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
   /**
    * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1767,17 +1767,17 @@ interface Array<T> {
       previousValue: T,
       currentValue: T,
       currentIndex: SafeUint,
-      array: readonly T[]
-    ) => T
+      array: readonly T[],
+    ) => T,
   ): T;
   reduceRight(
     callbackfn: (
       previousValue: T,
       currentValue: T,
       currentIndex: SafeUint,
-      array: readonly T[]
+      array: readonly T[],
     ) => T,
-    initialValue: T
+    initialValue: T,
   ): T;
   /**
    * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1789,9 +1789,9 @@ interface Array<T> {
       previousValue: U,
       currentValue: T,
       currentIndex: SafeUint,
-      array: readonly T[]
+      array: readonly T[],
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   [n: number]: T;
@@ -1828,8 +1828,8 @@ interface TypedPropertyDescriptor<T> {
 declare type PromiseConstructorLike = new <T>(
   executor: (
     resolve: (value: T | PromiseLike<T>) => void,
-    reject: (reason?: unknown) => void
-  ) => void
+    reject: (reason?: unknown) => void,
+  ) => void,
 ) => PromiseLike<T>;
 
 interface PromiseLike<T> {
@@ -1847,7 +1847,7 @@ interface PromiseLike<T> {
     onrejected?:
       | ((reason: unknown) => TResult2 | PromiseLike<TResult2>)
       | undefined
-      | null
+      | null,
   ): PromiseLike<TResult1 | TResult2>;
 }
 
@@ -1869,7 +1869,7 @@ interface Promise<T> {
     onrejected?:
       | ((reason: unknown) => TResult2 | PromiseLike<TResult2>)
       | undefined
-      | null
+      | null,
   ): Promise<TResult1 | TResult2>;
 
   /**
@@ -1881,7 +1881,7 @@ interface Promise<T> {
     onrejected?:
       | ((reason: unknown) => TResult | PromiseLike<TResult>)
       | undefined
-      | null
+      | null,
   ): Promise<T | TResult>;
 }
 
@@ -1969,7 +1969,7 @@ type Parameters<T extends (...args: readonly never[]) => unknown> = T extends (
  * Obtain the parameters of a constructor function type in a tuple
  */
 type ConstructorParameters<
-  T extends abstract new (...args: readonly never[]) => unknown
+  T extends abstract new (...args: readonly never[]) => unknown,
 > = T extends abstract new (...args: infer P) => unknown ? P : never;
 
 /**
@@ -1985,7 +1985,7 @@ type ReturnType<T extends (...args: readonly never[]) => unknown> = T extends (
  * Obtain the return type of a constructor function type
  */
 type InstanceType<
-  T extends abstract new (...args: readonly never[]) => unknown
+  T extends abstract new (...args: readonly never[]) => unknown,
 > = T extends abstract new (...args: readonly never[]) => infer R ? R : unknown;
 
 /**
@@ -2137,7 +2137,7 @@ interface DataView {
   setFloat32(
     byteOffset: SafeUint,
     value: Float32,
-    littleEndian?: boolean
+    littleEndian?: boolean,
   ): void;
 
   /**
@@ -2149,7 +2149,7 @@ interface DataView {
   setFloat64(
     byteOffset: SafeUint,
     value: Float64,
-    littleEndian?: boolean
+    littleEndian?: boolean,
   ): void;
 
   /**
@@ -2204,7 +2204,7 @@ interface DataViewConstructor {
   new (
     buffer: ArrayBufferLike,
     byteOffset?: SafeUint,
-    byteLength?: SafeUint
+    byteLength?: SafeUint,
   ): DataView;
 }
 declare const DataView: DataViewConstructor;
@@ -2246,7 +2246,7 @@ interface Int8Array {
   copyWithin(
     target: SafeInt | Int10,
     start: SafeInt | Int10,
-    end?: SafeInt | Int10
+    end?: SafeInt | Int10,
   ): this;
 
   /**
@@ -2259,7 +2259,7 @@ interface Int8Array {
    */
   every(
     predicate: (value: Int8, index: SafeUint, array: Int8Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -2281,7 +2281,7 @@ interface Int8Array {
    */
   filter(
     predicate: (value: Int8, index: SafeUint, array: Int8Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int8Array;
 
   /**
@@ -2295,7 +2295,7 @@ interface Int8Array {
    */
   find(
     predicate: (value: Int8, index: SafeUint, obj: Int8Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int8 | undefined;
 
   /**
@@ -2309,7 +2309,7 @@ interface Int8Array {
    */
   findIndex(
     predicate: (value: Int8, index: SafeUint, obj: Int8Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 
   /**
@@ -2321,7 +2321,7 @@ interface Int8Array {
    */
   forEach(
     callbackfn: (value: Int8, index: SafeUint, array: Int8Array) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
 
   /**
@@ -2362,7 +2362,7 @@ interface Int8Array {
    */
   map(
     callbackfn: (value: Int8, index: SafeUint, array: Int8Array) => Int8,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int8Array;
 
   /**
@@ -2380,17 +2380,17 @@ interface Int8Array {
       previousValue: Int8,
       currentValue: Int8,
       currentIndex: SafeUint,
-      array: Int8Array
-    ) => Int8
+      array: Int8Array,
+    ) => Int8,
   ): Int8;
   reduce(
     callbackfn: (
       previousValue: Int8,
       currentValue: Int8,
       currentIndex: SafeUint,
-      array: Int8Array
+      array: Int8Array,
     ) => Int8,
-    initialValue: Int8
+    initialValue: Int8,
   ): Int8;
 
   /**
@@ -2408,9 +2408,9 @@ interface Int8Array {
       previousValue: U,
       currentValue: Int8,
       currentIndex: SafeUint,
-      array: Int8Array
+      array: Int8Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -2428,17 +2428,17 @@ interface Int8Array {
       previousValue: Int8,
       currentValue: Int8,
       currentIndex: SafeUint,
-      array: Int8Array
-    ) => Int8
+      array: Int8Array,
+    ) => Int8,
   ): Int8;
   reduceRight(
     callbackfn: (
       previousValue: Int8,
       currentValue: Int8,
       currentIndex: SafeUint,
-      array: Int8Array
+      array: Int8Array,
     ) => Int8,
-    initialValue: Int8
+    initialValue: Int8,
   ): Int8;
 
   /**
@@ -2456,9 +2456,9 @@ interface Int8Array {
       previousValue: U,
       currentValue: Int8,
       currentIndex: SafeUint,
-      array: Int8Array
+      array: Int8Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -2490,7 +2490,7 @@ interface Int8Array {
    */
   some(
     predicate: (value: Int8, index: SafeUint, array: Int8Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -2534,7 +2534,7 @@ interface Int8ArrayConstructor {
   new (
     buffer: ArrayBufferLike,
     byteOffset?: SafeUint,
-    length?: SafeUint
+    length?: SafeUint,
   ): Int8Array;
 
   /**
@@ -2563,7 +2563,7 @@ interface Int8ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: SafeUint) => Int8,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int8Array;
 }
 declare const Int8Array: Int8ArrayConstructor;
@@ -2605,7 +2605,7 @@ interface Uint8Array {
   copyWithin(
     target: SafeInt | Int10,
     start: SafeInt | Int10,
-    end?: SafeInt | Int10
+    end?: SafeInt | Int10,
   ): this;
 
   /**
@@ -2618,7 +2618,7 @@ interface Uint8Array {
    */
   every(
     predicate: (value: Uint8, index: SafeUint, array: Uint8Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -2640,7 +2640,7 @@ interface Uint8Array {
    */
   filter(
     predicate: (value: Uint8, index: SafeUint, array: Uint8Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint8Array;
 
   /**
@@ -2654,7 +2654,7 @@ interface Uint8Array {
    */
   find(
     predicate: (value: Uint8, index: SafeUint, obj: Uint8Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint8 | undefined;
 
   /**
@@ -2668,7 +2668,7 @@ interface Uint8Array {
    */
   findIndex(
     predicate: (value: Uint8, index: SafeUint, obj: Uint8Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 
   /**
@@ -2680,7 +2680,7 @@ interface Uint8Array {
    */
   forEach(
     callbackfn: (value: Uint8, index: SafeUint, array: Uint8Array) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
 
   /**
@@ -2721,7 +2721,7 @@ interface Uint8Array {
    */
   map(
     callbackfn: (value: Uint8, index: SafeUint, array: Uint8Array) => Uint8,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint8Array;
 
   /**
@@ -2739,17 +2739,17 @@ interface Uint8Array {
       previousValue: Uint8,
       currentValue: Uint8,
       currentIndex: SafeUint,
-      array: Uint8Array
-    ) => Uint8
+      array: Uint8Array,
+    ) => Uint8,
   ): Uint8;
   reduce(
     callbackfn: (
       previousValue: Uint8,
       currentValue: Uint8,
       currentIndex: SafeUint,
-      array: Uint8Array
+      array: Uint8Array,
     ) => Uint8,
-    initialValue: Uint8
+    initialValue: Uint8,
   ): Uint8;
 
   /**
@@ -2767,9 +2767,9 @@ interface Uint8Array {
       previousValue: U,
       currentValue: Uint8,
       currentIndex: SafeUint,
-      array: Uint8Array
+      array: Uint8Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -2787,17 +2787,17 @@ interface Uint8Array {
       previousValue: Uint8,
       currentValue: Uint8,
       currentIndex: SafeUint,
-      array: Uint8Array
-    ) => Uint8
+      array: Uint8Array,
+    ) => Uint8,
   ): Uint8;
   reduceRight(
     callbackfn: (
       previousValue: Uint8,
       currentValue: Uint8,
       currentIndex: SafeUint,
-      array: Uint8Array
+      array: Uint8Array,
     ) => Uint8,
-    initialValue: Uint8
+    initialValue: Uint8,
   ): Uint8;
 
   /**
@@ -2815,9 +2815,9 @@ interface Uint8Array {
       previousValue: U,
       currentValue: Uint8,
       currentIndex: SafeUint,
-      array: Uint8Array
+      array: Uint8Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -2849,7 +2849,7 @@ interface Uint8Array {
    */
   some(
     predicate: (value: Uint8, index: SafeUint, array: Uint8Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -2894,7 +2894,7 @@ interface Uint8ArrayConstructor {
   new (
     buffer: ArrayBufferLike,
     byteOffset?: SafeUint,
-    length?: SafeUint
+    length?: SafeUint,
   ): Uint8Array;
 
   /**
@@ -2923,7 +2923,7 @@ interface Uint8ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: SafeUint) => Uint8,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint8Array;
 }
 declare const Uint8Array: Uint8ArrayConstructor;
@@ -2965,7 +2965,7 @@ interface Uint8ClampedArray {
   copyWithin(
     target: SafeInt | Int10,
     start: SafeInt | Int10,
-    end?: SafeInt | Int10
+    end?: SafeInt | Int10,
   ): this;
 
   /**
@@ -2980,9 +2980,9 @@ interface Uint8ClampedArray {
     predicate: (
       value: Uint8,
       index: SafeUint,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -3006,9 +3006,9 @@ interface Uint8ClampedArray {
     predicate: (
       value: Uint8,
       index: SafeUint,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint8ClampedArray;
 
   /**
@@ -3024,9 +3024,9 @@ interface Uint8ClampedArray {
     predicate: (
       value: Uint8,
       index: SafeUint,
-      obj: Uint8ClampedArray
+      obj: Uint8ClampedArray,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint8 | undefined;
 
   /**
@@ -3042,9 +3042,9 @@ interface Uint8ClampedArray {
     predicate: (
       value: Uint8,
       index: SafeUint,
-      obj: Uint8ClampedArray
+      obj: Uint8ClampedArray,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 
   /**
@@ -3058,9 +3058,9 @@ interface Uint8ClampedArray {
     callbackfn: (
       value: Uint8,
       index: SafeUint,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
 
   /**
@@ -3103,9 +3103,9 @@ interface Uint8ClampedArray {
     callbackfn: (
       value: Uint8,
       index: SafeUint,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => Uint8,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint8ClampedArray;
 
   /**
@@ -3123,17 +3123,17 @@ interface Uint8ClampedArray {
       previousValue: Uint8,
       currentValue: Uint8,
       currentIndex: SafeUint,
-      array: Uint8ClampedArray
-    ) => Uint8
+      array: Uint8ClampedArray,
+    ) => Uint8,
   ): Uint8;
   reduce(
     callbackfn: (
       previousValue: Uint8,
       currentValue: Uint8,
       currentIndex: SafeUint,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => Uint8,
-    initialValue: Uint8
+    initialValue: Uint8,
   ): Uint8;
 
   /**
@@ -3151,9 +3151,9 @@ interface Uint8ClampedArray {
       previousValue: U,
       currentValue: Uint8,
       currentIndex: SafeUint,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -3171,17 +3171,17 @@ interface Uint8ClampedArray {
       previousValue: Uint8,
       currentValue: Uint8,
       currentIndex: SafeUint,
-      array: Uint8ClampedArray
-    ) => Uint8
+      array: Uint8ClampedArray,
+    ) => Uint8,
   ): Uint8;
   reduceRight(
     callbackfn: (
       previousValue: Uint8,
       currentValue: Uint8,
       currentIndex: SafeUint,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => Uint8,
-    initialValue: Uint8
+    initialValue: Uint8,
   ): Uint8;
 
   /**
@@ -3199,9 +3199,9 @@ interface Uint8ClampedArray {
       previousValue: U,
       currentValue: Uint8,
       currentIndex: SafeUint,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -3235,9 +3235,9 @@ interface Uint8ClampedArray {
     predicate: (
       value: Uint8,
       index: SafeUint,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -3282,7 +3282,7 @@ interface Uint8ClampedArrayConstructor {
   new (
     buffer: ArrayBufferLike,
     byteOffset?: SafeUint,
-    length?: SafeUint
+    length?: SafeUint,
   ): Uint8ClampedArray;
 
   /**
@@ -3311,7 +3311,7 @@ interface Uint8ClampedArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: SafeUint) => Uint8,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint8ClampedArray;
 }
 declare const Uint8ClampedArray: Uint8ClampedArrayConstructor;
@@ -3353,7 +3353,7 @@ interface Int16Array {
   copyWithin(
     target: SafeInt | Int10,
     start: SafeInt | Int10,
-    end?: SafeInt | Int10
+    end?: SafeInt | Int10,
   ): this;
 
   /**
@@ -3366,7 +3366,7 @@ interface Int16Array {
    */
   every(
     predicate: (value: Int16, index: SafeUint, array: Int16Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -3388,7 +3388,7 @@ interface Int16Array {
    */
   filter(
     predicate: (value: Int16, index: SafeUint, array: Int16Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int16Array;
 
   /**
@@ -3402,7 +3402,7 @@ interface Int16Array {
    */
   find(
     predicate: (value: Int16, index: SafeUint, obj: Int16Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int16 | undefined;
 
   /**
@@ -3416,7 +3416,7 @@ interface Int16Array {
    */
   findIndex(
     predicate: (value: Int16, index: SafeUint, obj: Int16Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 
   /**
@@ -3428,7 +3428,7 @@ interface Int16Array {
    */
   forEach(
     callbackfn: (value: Int16, index: SafeUint, array: Int16Array) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
 
   /**
@@ -3469,7 +3469,7 @@ interface Int16Array {
    */
   map(
     callbackfn: (value: Int16, index: SafeUint, array: Int16Array) => Int16,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int16Array;
 
   /**
@@ -3487,17 +3487,17 @@ interface Int16Array {
       previousValue: Int16,
       currentValue: Int16,
       currentIndex: SafeUint,
-      array: Int16Array
-    ) => Int16
+      array: Int16Array,
+    ) => Int16,
   ): Int16;
   reduce(
     callbackfn: (
       previousValue: Int16,
       currentValue: Int16,
       currentIndex: SafeUint,
-      array: Int16Array
+      array: Int16Array,
     ) => Int16,
-    initialValue: Int16
+    initialValue: Int16,
   ): Int16;
 
   /**
@@ -3515,9 +3515,9 @@ interface Int16Array {
       previousValue: U,
       currentValue: Int16,
       currentIndex: SafeUint,
-      array: Int16Array
+      array: Int16Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -3535,17 +3535,17 @@ interface Int16Array {
       previousValue: Int16,
       currentValue: Int16,
       currentIndex: SafeUint,
-      array: Int16Array
-    ) => Int16
+      array: Int16Array,
+    ) => Int16,
   ): Int16;
   reduceRight(
     callbackfn: (
       previousValue: Int16,
       currentValue: Int16,
       currentIndex: SafeUint,
-      array: Int16Array
+      array: Int16Array,
     ) => Int16,
-    initialValue: Int16
+    initialValue: Int16,
   ): Int16;
 
   /**
@@ -3563,9 +3563,9 @@ interface Int16Array {
       previousValue: U,
       currentValue: Int16,
       currentIndex: SafeUint,
-      array: Int16Array
+      array: Int16Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -3597,7 +3597,7 @@ interface Int16Array {
    */
   some(
     predicate: (value: Int16, index: SafeUint, array: Int16Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -3642,7 +3642,7 @@ interface Int16ArrayConstructor {
   new (
     buffer: ArrayBufferLike,
     byteOffset?: SafeUint,
-    length?: SafeUint
+    length?: SafeUint,
   ): Int16Array;
 
   /**
@@ -3671,7 +3671,7 @@ interface Int16ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: SafeUint) => Int16,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int16Array;
 }
 declare const Int16Array: Int16ArrayConstructor;
@@ -3713,7 +3713,7 @@ interface Uint16Array {
   copyWithin(
     target: SafeInt | Int10,
     start: SafeInt | Int10,
-    end?: SafeInt | Int10
+    end?: SafeInt | Int10,
   ): this;
 
   /**
@@ -3726,7 +3726,7 @@ interface Uint16Array {
    */
   every(
     predicate: (value: Uint16, index: SafeUint, array: Uint16Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -3748,7 +3748,7 @@ interface Uint16Array {
    */
   filter(
     predicate: (value: Uint16, index: SafeUint, array: Uint16Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint16Array;
 
   /**
@@ -3762,7 +3762,7 @@ interface Uint16Array {
    */
   find(
     predicate: (value: Uint16, index: SafeUint, obj: Uint16Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint16 | undefined;
 
   /**
@@ -3776,7 +3776,7 @@ interface Uint16Array {
    */
   findIndex(
     predicate: (value: Uint16, index: SafeUint, obj: Uint16Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 
   /**
@@ -3788,7 +3788,7 @@ interface Uint16Array {
    */
   forEach(
     callbackfn: (value: Uint16, index: SafeUint, array: Uint16Array) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
 
   /**
@@ -3814,7 +3814,7 @@ interface Uint16Array {
    */
   lastIndexOf(
     searchElement: Uint16,
-    fromIndex?: SafeInt | Int10
+    fromIndex?: SafeInt | Int10,
   ): SafeUint | -1;
 
   /**
@@ -3832,7 +3832,7 @@ interface Uint16Array {
    */
   map(
     callbackfn: (value: Uint16, index: SafeUint, array: Uint16Array) => Uint16,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint16Array;
 
   /**
@@ -3850,17 +3850,17 @@ interface Uint16Array {
       previousValue: Uint16,
       currentValue: Uint16,
       currentIndex: SafeUint,
-      array: Uint16Array
-    ) => Uint16
+      array: Uint16Array,
+    ) => Uint16,
   ): Uint16;
   reduce(
     callbackfn: (
       previousValue: Uint16,
       currentValue: Uint16,
       currentIndex: SafeUint,
-      array: Uint16Array
+      array: Uint16Array,
     ) => Uint16,
-    initialValue: Uint16
+    initialValue: Uint16,
   ): Uint16;
 
   /**
@@ -3878,9 +3878,9 @@ interface Uint16Array {
       previousValue: U,
       currentValue: Uint16,
       currentIndex: SafeUint,
-      array: Uint16Array
+      array: Uint16Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -3898,17 +3898,17 @@ interface Uint16Array {
       previousValue: Uint16,
       currentValue: Uint16,
       currentIndex: SafeUint,
-      array: Uint16Array
-    ) => Uint16
+      array: Uint16Array,
+    ) => Uint16,
   ): Uint16;
   reduceRight(
     callbackfn: (
       previousValue: Uint16,
       currentValue: Uint16,
       currentIndex: SafeUint,
-      array: Uint16Array
+      array: Uint16Array,
     ) => Uint16,
-    initialValue: Uint16
+    initialValue: Uint16,
   ): Uint16;
 
   /**
@@ -3926,9 +3926,9 @@ interface Uint16Array {
       previousValue: U,
       currentValue: Uint16,
       currentIndex: SafeUint,
-      array: Uint16Array
+      array: Uint16Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -3960,7 +3960,7 @@ interface Uint16Array {
    */
   some(
     predicate: (value: Uint16, index: SafeUint, array: Uint16Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -4005,7 +4005,7 @@ interface Uint16ArrayConstructor {
   new (
     buffer: ArrayBufferLike,
     byteOffset?: SafeUint,
-    length?: SafeUint
+    length?: SafeUint,
   ): Uint16Array;
 
   /**
@@ -4034,7 +4034,7 @@ interface Uint16ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: SafeUint) => Uint16,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint16Array;
 }
 declare const Uint16Array: Uint16ArrayConstructor;
@@ -4075,7 +4075,7 @@ interface Int32Array {
   copyWithin(
     target: SafeInt | Int10,
     start: SafeInt | Int10,
-    end?: SafeInt | Int10
+    end?: SafeInt | Int10,
   ): this;
 
   /**
@@ -4088,7 +4088,7 @@ interface Int32Array {
    */
   every(
     predicate: (value: Int32, index: SafeUint, array: Int32Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -4110,7 +4110,7 @@ interface Int32Array {
    */
   filter(
     predicate: (value: Int32, index: SafeUint, array: Int32Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int32Array;
 
   /**
@@ -4124,7 +4124,7 @@ interface Int32Array {
    */
   find(
     predicate: (value: Int32, index: SafeUint, obj: Int32Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int32 | undefined;
 
   /**
@@ -4138,7 +4138,7 @@ interface Int32Array {
    */
   findIndex(
     predicate: (value: Int32, index: SafeUint, obj: Int32Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 
   /**
@@ -4150,7 +4150,7 @@ interface Int32Array {
    */
   forEach(
     callbackfn: (value: Int32, index: SafeUint, array: Int32Array) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
 
   /**
@@ -4191,7 +4191,7 @@ interface Int32Array {
    */
   map(
     callbackfn: (value: Int32, index: SafeUint, array: Int32Array) => Int32,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int32Array;
 
   /**
@@ -4209,17 +4209,17 @@ interface Int32Array {
       previousValue: Int32,
       currentValue: Int32,
       currentIndex: SafeUint,
-      array: Int32Array
-    ) => Int32
+      array: Int32Array,
+    ) => Int32,
   ): Int32;
   reduce(
     callbackfn: (
       previousValue: Int32,
       currentValue: Int32,
       currentIndex: SafeUint,
-      array: Int32Array
+      array: Int32Array,
     ) => Int32,
-    initialValue: Int32
+    initialValue: Int32,
   ): Int32;
 
   /**
@@ -4237,9 +4237,9 @@ interface Int32Array {
       previousValue: U,
       currentValue: Int32,
       currentIndex: SafeUint,
-      array: Int32Array
+      array: Int32Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -4257,17 +4257,17 @@ interface Int32Array {
       previousValue: Int32,
       currentValue: Int32,
       currentIndex: SafeUint,
-      array: Int32Array
-    ) => Int32
+      array: Int32Array,
+    ) => Int32,
   ): Int32;
   reduceRight(
     callbackfn: (
       previousValue: Int32,
       currentValue: Int32,
       currentIndex: SafeUint,
-      array: Int32Array
+      array: Int32Array,
     ) => Int32,
-    initialValue: Int32
+    initialValue: Int32,
   ): Int32;
 
   /**
@@ -4285,9 +4285,9 @@ interface Int32Array {
       previousValue: U,
       currentValue: Int32,
       currentIndex: SafeUint,
-      array: Int32Array
+      array: Int32Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -4319,7 +4319,7 @@ interface Int32Array {
    */
   some(
     predicate: (value: Int32, index: SafeUint, array: Int32Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -4364,7 +4364,7 @@ interface Int32ArrayConstructor {
   new (
     buffer: ArrayBufferLike,
     byteOffset?: SafeUint,
-    length?: SafeUint
+    length?: SafeUint,
   ): Int32Array;
 
   /**
@@ -4393,7 +4393,7 @@ interface Int32ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: SafeUint) => Int32,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Int32Array;
 }
 declare const Int32Array: Int32ArrayConstructor;
@@ -4435,7 +4435,7 @@ interface Uint32Array {
   copyWithin(
     target: SafeInt | Int10,
     start: SafeInt | Int10,
-    end?: SafeInt | Int10
+    end?: SafeInt | Int10,
   ): this;
 
   /**
@@ -4448,7 +4448,7 @@ interface Uint32Array {
    */
   every(
     predicate: (value: Uint32, index: SafeUint, array: Uint32Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -4470,7 +4470,7 @@ interface Uint32Array {
    */
   filter(
     predicate: (value: Uint32, index: SafeUint, array: Uint32Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint32Array;
 
   /**
@@ -4484,7 +4484,7 @@ interface Uint32Array {
    */
   find(
     predicate: (value: Uint32, index: SafeUint, obj: Uint32Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint32 | undefined;
 
   /**
@@ -4498,7 +4498,7 @@ interface Uint32Array {
    */
   findIndex(
     predicate: (value: Uint32, index: SafeUint, obj: Uint32Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 
   /**
@@ -4510,7 +4510,7 @@ interface Uint32Array {
    */
   forEach(
     callbackfn: (value: Uint32, index: SafeUint, array: Uint32Array) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
 
   /**
@@ -4536,7 +4536,7 @@ interface Uint32Array {
    */
   lastIndexOf(
     searchElement: Uint32,
-    fromIndex?: SafeInt | Int10
+    fromIndex?: SafeInt | Int10,
   ): SafeUint | -1;
 
   /**
@@ -4554,7 +4554,7 @@ interface Uint32Array {
    */
   map(
     callbackfn: (value: Uint32, index: SafeUint, array: Uint32Array) => Uint32,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint32Array;
 
   /**
@@ -4572,17 +4572,17 @@ interface Uint32Array {
       previousValue: Uint32,
       currentValue: Uint32,
       currentIndex: SafeUint,
-      array: Uint32Array
-    ) => Uint32
+      array: Uint32Array,
+    ) => Uint32,
   ): Uint32;
   reduce(
     callbackfn: (
       previousValue: Uint32,
       currentValue: Uint32,
       currentIndex: SafeUint,
-      array: Uint32Array
+      array: Uint32Array,
     ) => Uint32,
-    initialValue: Uint32
+    initialValue: Uint32,
   ): Uint32;
 
   /**
@@ -4600,9 +4600,9 @@ interface Uint32Array {
       previousValue: U,
       currentValue: Uint32,
       currentIndex: SafeUint,
-      array: Uint32Array
+      array: Uint32Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -4620,17 +4620,17 @@ interface Uint32Array {
       previousValue: Uint32,
       currentValue: Uint32,
       currentIndex: SafeUint,
-      array: Uint32Array
-    ) => Uint32
+      array: Uint32Array,
+    ) => Uint32,
   ): Uint32;
   reduceRight(
     callbackfn: (
       previousValue: Uint32,
       currentValue: Uint32,
       currentIndex: SafeUint,
-      array: Uint32Array
+      array: Uint32Array,
     ) => Uint32,
-    initialValue: Uint32
+    initialValue: Uint32,
   ): Uint32;
 
   /**
@@ -4648,9 +4648,9 @@ interface Uint32Array {
       previousValue: U,
       currentValue: Uint32,
       currentIndex: SafeUint,
-      array: Uint32Array
+      array: Uint32Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -4682,7 +4682,7 @@ interface Uint32Array {
    */
   some(
     predicate: (value: Uint32, index: SafeUint, array: Uint32Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -4727,7 +4727,7 @@ interface Uint32ArrayConstructor {
   new (
     buffer: ArrayBufferLike,
     byteOffset?: SafeUint,
-    length?: SafeUint
+    length?: SafeUint,
   ): Uint32Array;
 
   /**
@@ -4756,7 +4756,7 @@ interface Uint32ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: SafeUint) => Uint32,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Uint32Array;
 }
 declare const Uint32Array: Uint32ArrayConstructor;
@@ -4798,7 +4798,7 @@ interface Float32Array {
   copyWithin(
     target: SafeInt | Int10,
     start: SafeInt | Int10,
-    end?: SafeInt | Int10
+    end?: SafeInt | Int10,
   ): this;
 
   /**
@@ -4813,9 +4813,9 @@ interface Float32Array {
     predicate: (
       value: Float32,
       index: SafeUint,
-      array: Float32Array
+      array: Float32Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -4839,9 +4839,9 @@ interface Float32Array {
     predicate: (
       value: Float32,
       index: SafeUint,
-      array: Float32Array
+      array: Float32Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Float32Array;
 
   /**
@@ -4855,7 +4855,7 @@ interface Float32Array {
    */
   find(
     predicate: (value: Float32, index: SafeUint, obj: Float32Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Float32 | undefined;
 
   /**
@@ -4869,7 +4869,7 @@ interface Float32Array {
    */
   findIndex(
     predicate: (value: Float32, index: SafeUint, obj: Float32Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 
   /**
@@ -4881,7 +4881,7 @@ interface Float32Array {
    */
   forEach(
     callbackfn: (value: Float32, index: SafeUint, array: Float32Array) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
 
   /**
@@ -4907,7 +4907,7 @@ interface Float32Array {
    */
   lastIndexOf(
     searchElement: Float32,
-    fromIndex?: SafeInt | Int10
+    fromIndex?: SafeInt | Int10,
   ): SafeUint | -1;
 
   /**
@@ -4927,9 +4927,9 @@ interface Float32Array {
     callbackfn: (
       value: Float32,
       index: SafeUint,
-      array: Float32Array
+      array: Float32Array,
     ) => Float32,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Float32Array;
 
   /**
@@ -4947,17 +4947,17 @@ interface Float32Array {
       previousValue: Float32,
       currentValue: Float32,
       currentIndex: SafeUint,
-      array: Float32Array
-    ) => Float32
+      array: Float32Array,
+    ) => Float32,
   ): Float32;
   reduce(
     callbackfn: (
       previousValue: Float32,
       currentValue: Float32,
       currentIndex: SafeUint,
-      array: Float32Array
+      array: Float32Array,
     ) => Float32,
-    initialValue: Float32
+    initialValue: Float32,
   ): Float32;
 
   /**
@@ -4975,9 +4975,9 @@ interface Float32Array {
       previousValue: U,
       currentValue: Float32,
       currentIndex: SafeUint,
-      array: Float32Array
+      array: Float32Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -4995,17 +4995,17 @@ interface Float32Array {
       previousValue: Float32,
       currentValue: Float32,
       currentIndex: SafeUint,
-      array: Float32Array
-    ) => Float32
+      array: Float32Array,
+    ) => Float32,
   ): Float32;
   reduceRight(
     callbackfn: (
       previousValue: Float32,
       currentValue: Float32,
       currentIndex: SafeUint,
-      array: Float32Array
+      array: Float32Array,
     ) => Float32,
-    initialValue: Float32
+    initialValue: Float32,
   ): Float32;
 
   /**
@@ -5023,9 +5023,9 @@ interface Float32Array {
       previousValue: U,
       currentValue: Float32,
       currentIndex: SafeUint,
-      array: Float32Array
+      array: Float32Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -5059,9 +5059,9 @@ interface Float32Array {
     predicate: (
       value: Float32,
       index: SafeUint,
-      array: Float32Array
+      array: Float32Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -5106,7 +5106,7 @@ interface Float32ArrayConstructor {
   new (
     buffer: ArrayBufferLike,
     byteOffset?: SafeUint,
-    length?: SafeUint
+    length?: SafeUint,
   ): Float32Array;
 
   /**
@@ -5135,7 +5135,7 @@ interface Float32ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: SafeUint) => Float32,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Float32Array;
 }
 declare const Float32Array: Float32ArrayConstructor;
@@ -5177,7 +5177,7 @@ interface Float64Array {
   copyWithin(
     target: SafeInt | Int10,
     start: SafeInt | Int10,
-    end?: SafeInt | Int10
+    end?: SafeInt | Int10,
   ): this;
 
   /**
@@ -5192,9 +5192,9 @@ interface Float64Array {
     predicate: (
       value: Float64,
       index: SafeUint,
-      array: Float64Array
+      array: Float64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -5218,9 +5218,9 @@ interface Float64Array {
     predicate: (
       value: Float64,
       index: SafeUint,
-      array: Float64Array
+      array: Float64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Float64Array;
 
   /**
@@ -5234,7 +5234,7 @@ interface Float64Array {
    */
   find(
     predicate: (value: Float64, index: SafeUint, obj: Float64Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Float64 | undefined;
 
   /**
@@ -5248,7 +5248,7 @@ interface Float64Array {
    */
   findIndex(
     predicate: (value: Float64, index: SafeUint, obj: Float64Array) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): SafeUint | -1;
 
   /**
@@ -5260,7 +5260,7 @@ interface Float64Array {
    */
   forEach(
     callbackfn: (value: Float64, index: SafeUint, array: Float64Array) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
 
   /**
@@ -5286,7 +5286,7 @@ interface Float64Array {
    */
   lastIndexOf(
     searchElement: Float64,
-    fromIndex?: SafeInt | Int10
+    fromIndex?: SafeInt | Int10,
   ): SafeUint | -1;
 
   /**
@@ -5306,9 +5306,9 @@ interface Float64Array {
     callbackfn: (
       value: Float64,
       index: SafeUint,
-      array: Float64Array
+      array: Float64Array,
     ) => Float64,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Float64Array;
 
   /**
@@ -5326,17 +5326,17 @@ interface Float64Array {
       previousValue: Float64,
       currentValue: Float64,
       currentIndex: SafeUint,
-      array: Float64Array
-    ) => Float64
+      array: Float64Array,
+    ) => Float64,
   ): Float64;
   reduce(
     callbackfn: (
       previousValue: Float64,
       currentValue: Float64,
       currentIndex: SafeUint,
-      array: Float64Array
+      array: Float64Array,
     ) => Float64,
-    initialValue: Float64
+    initialValue: Float64,
   ): Float64;
 
   /**
@@ -5354,9 +5354,9 @@ interface Float64Array {
       previousValue: U,
       currentValue: Float64,
       currentIndex: SafeUint,
-      array: Float64Array
+      array: Float64Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -5374,17 +5374,17 @@ interface Float64Array {
       previousValue: Float64,
       currentValue: Float64,
       currentIndex: SafeUint,
-      array: Float64Array
-    ) => Float64
+      array: Float64Array,
+    ) => Float64,
   ): Float64;
   reduceRight(
     callbackfn: (
       previousValue: Float64,
       currentValue: Float64,
       currentIndex: SafeUint,
-      array: Float64Array
+      array: Float64Array,
     ) => Float64,
-    initialValue: Float64
+    initialValue: Float64,
   ): Float64;
 
   /**
@@ -5402,9 +5402,9 @@ interface Float64Array {
       previousValue: U,
       currentValue: Float64,
       currentIndex: SafeUint,
-      array: Float64Array
+      array: Float64Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -5438,9 +5438,9 @@ interface Float64Array {
     predicate: (
       value: Float64,
       index: SafeUint,
-      array: Float64Array
+      array: Float64Array,
     ) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): boolean;
 
   /**
@@ -5485,7 +5485,7 @@ interface Float64ArrayConstructor {
   new (
     buffer: ArrayBufferLike,
     byteOffset?: SafeUint,
-    length?: SafeUint
+    length?: SafeUint,
   ): Float64Array;
 
   /**
@@ -5514,7 +5514,7 @@ interface Float64ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: SafeUint) => Float64,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): Float64Array;
 }
 declare const Float64Array: Float64ArrayConstructor;
@@ -5550,12 +5550,12 @@ declare namespace Intl {
   const Collator: {
     new (
       locales?: string | readonly string[],
-      options?: CollatorOptions
+      options?: CollatorOptions,
     ): Collator;
     (locales?: string | readonly string[], options?: CollatorOptions): Collator;
     supportedLocalesOf(
       locales: string | readonly string[],
-      options?: CollatorOptions
+      options?: CollatorOptions,
     ): readonly string[];
   };
 
@@ -5592,15 +5592,15 @@ declare namespace Intl {
   const NumberFormat: {
     new (
       locales?: string | readonly string[],
-      options?: NumberFormatOptions
+      options?: NumberFormatOptions,
     ): NumberFormat;
     (
       locales?: string | readonly string[],
-      options?: NumberFormatOptions
+      options?: NumberFormatOptions,
     ): NumberFormat;
     supportedLocalesOf(
       locales: string | readonly string[],
-      options?: NumberFormatOptions
+      options?: NumberFormatOptions,
     ): readonly string[];
     readonly prototype: NumberFormat;
   };
@@ -5658,15 +5658,15 @@ declare namespace Intl {
   const DateTimeFormat: {
     new (
       locales?: string | readonly string[],
-      options?: DateTimeFormatOptions
+      options?: DateTimeFormatOptions,
     ): DateTimeFormat;
     (
       locales?: string | readonly string[],
-      options?: DateTimeFormatOptions
+      options?: DateTimeFormatOptions,
     ): DateTimeFormat;
     supportedLocalesOf(
       locales: string | readonly string[],
-      options?: DateTimeFormatOptions
+      options?: DateTimeFormatOptions,
     ): readonly string[];
     readonly prototype: DateTimeFormat;
   };
@@ -5682,7 +5682,7 @@ interface String {
   localeCompare(
     that: string,
     locales?: string | readonly string[],
-    options?: Intl.CollatorOptions
+    options?: Intl.CollatorOptions,
   ): number;
 }
 
@@ -5694,7 +5694,7 @@ interface Number {
    */
   toLocaleString(
     locales?: string | readonly string[],
-    options?: Intl.NumberFormatOptions
+    options?: Intl.NumberFormatOptions,
   ): string;
 }
 
@@ -5706,7 +5706,7 @@ interface Date {
    */
   toLocaleString(
     locales?: string | readonly string[],
-    options?: Intl.DateTimeFormatOptions
+    options?: Intl.DateTimeFormatOptions,
   ): string;
   /**
    * Converts a date to a string by using the current or specified locale.
@@ -5715,7 +5715,7 @@ interface Date {
    */
   toLocaleDateString(
     locales?: string | readonly string[],
-    options?: Intl.DateTimeFormatOptions
+    options?: Intl.DateTimeFormatOptions,
   ): string;
 
   /**
@@ -5725,6 +5725,6 @@ interface Date {
    */
   toLocaleTimeString(
     locales?: string | readonly string[],
-    options?: Intl.DateTimeFormatOptions
+    options?: Intl.DateTimeFormatOptions,
   ): string;
 }

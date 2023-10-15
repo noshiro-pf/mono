@@ -38,7 +38,7 @@ type DecoratorContext = ClassDecoratorContext | ClassMemberDecoratorContext;
 interface ClassDecoratorContext<
   Class extends abstract new (
     ...args: readonly never[]
-  ) => unknown = abstract new (...args: readonly never[]) => unknown
+  ) => unknown = abstract new (...args: readonly never[]) => unknown,
 > {
   /** The kind of element that was decorated. */
   readonly kind: 'class';
@@ -77,7 +77,7 @@ interface ClassMethodDecoratorContext<
   Value extends (this: This, ...args: readonly never[]) => unknown = (
     this: This,
     ...args: readonly never[]
-  ) => unknown
+  ) => unknown,
 > {
   /** The kind of class element that was decorated. */
   readonly kind: 'method';

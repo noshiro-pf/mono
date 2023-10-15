@@ -27,7 +27,7 @@ interface Map<K, V> {
    */
   forEach(
     callbackfn: (value: V, key: K, map: ReadonlyMap<K, V>) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
   /**
    * Returns a specified element from the Map object. If the value that is associated to the provided key is an object, then you will get a reference to that object and any change made to that object will effectively modify it inside the Map.
@@ -58,7 +58,7 @@ declare const Map: MapConstructor;
 interface ReadonlyMap<K, V> {
   forEach(
     callbackfn: (value: V, key: K, map: ReadonlyMap<K, V>) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
   get(key: K): V | undefined;
   has(key: K | (WidenLiteral<K> & {})): key is K;
@@ -88,7 +88,7 @@ interface WeakMap<K extends object, V> {
 
 interface WeakMapConstructor {
   new <K extends object = object, V = unknown>(
-    entries?: readonly (readonly [K, V])[] | null
+    entries?: readonly (readonly [K, V])[] | null,
   ): WeakMap<K, V>;
   readonly prototype: WeakMap<object, unknown>;
 }
@@ -111,7 +111,7 @@ interface Set<T> {
    */
   forEach(
     callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
   /**
    * @returns a boolean indicating whether an element with the specified value exists in the Set or not.
@@ -132,7 +132,7 @@ declare const Set: SetConstructor;
 interface ReadonlySet<T> {
   forEach(
     callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
   has(value: T | (WidenLiteral<T> & {})): value is T;
   readonly size: SafeUint;

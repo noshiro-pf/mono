@@ -30,7 +30,7 @@ interface CanvasPath {
     y: number,
     w: number,
     h: number,
-    radii?: number | DOMPointInit | Iterable<number | DOMPointInit>
+    radii?: number | DOMPointInit | Iterable<number | DOMPointInit>,
   ): void;
 }
 
@@ -73,7 +73,7 @@ interface IDBDatabase {
   transaction(
     storeNames: string | Iterable<string>,
     mode?: IDBTransactionMode,
-    options?: IDBTransactionOptions
+    options?: IDBTransactionOptions,
   ): IDBTransaction;
 }
 
@@ -86,7 +86,7 @@ interface IDBObjectStore {
   createIndex(
     name: string,
     keyPath: string | Iterable<string>,
-    options?: IDBIndexParameters
+    options?: IDBIndexParameters,
   ): IDBIndex;
 }
 
@@ -100,7 +100,7 @@ interface MessageEvent<T = unknown> {
     origin?: string,
     lastEventId?: string,
     source?: MessageEventSource | null,
-    ports?: Iterable<MessagePort>
+    ports?: Iterable<MessagePort>,
   ): void;
 }
 
@@ -119,22 +119,22 @@ interface SubtleCrypto {
       | HkdfParams
       | Pbkdf2Params,
     extractable: boolean,
-    keyUsages: Iterable<KeyUsage>
+    keyUsages: Iterable<KeyUsage>,
   ): Promise<CryptoKey>;
   generateKey(
     algorithm: RsaHashedKeyGenParams | EcKeyGenParams,
     extractable: boolean,
-    keyUsages: ReadonlyArray<KeyUsage>
+    keyUsages: ReadonlyArray<KeyUsage>,
   ): Promise<CryptoKeyPair>;
   generateKey(
     algorithm: AesKeyGenParams | HmacKeyGenParams | Pbkdf2Params,
     extractable: boolean,
-    keyUsages: ReadonlyArray<KeyUsage>
+    keyUsages: ReadonlyArray<KeyUsage>,
   ): Promise<CryptoKey>;
   generateKey(
     algorithm: AlgorithmIdentifier,
     extractable: boolean,
-    keyUsages: Iterable<KeyUsage>
+    keyUsages: Iterable<KeyUsage>,
   ): Promise<CryptoKeyPair | CryptoKey>;
   importKey(
     format: 'jwk',
@@ -146,7 +146,7 @@ interface SubtleCrypto {
       | HmacImportParams
       | AesKeyAlgorithm,
     extractable: boolean,
-    keyUsages: ReadonlyArray<KeyUsage>
+    keyUsages: ReadonlyArray<KeyUsage>,
   ): Promise<CryptoKey>;
   importKey(
     format: Exclude<KeyFormat, 'jwk'>,
@@ -158,7 +158,7 @@ interface SubtleCrypto {
       | HmacImportParams
       | AesKeyAlgorithm,
     extractable: boolean,
-    keyUsages: Iterable<KeyUsage>
+    keyUsages: Iterable<KeyUsage>,
   ): Promise<CryptoKey>;
   unwrapKey(
     format: KeyFormat,
@@ -177,7 +177,7 @@ interface SubtleCrypto {
       | HmacImportParams
       | AesKeyAlgorithm,
     extractable: boolean,
-    keyUsages: Iterable<KeyUsage>
+    keyUsages: Iterable<KeyUsage>,
   ): Promise<CryptoKey>;
 }
 
@@ -204,7 +204,7 @@ interface WEBGL_multi_draw {
     countsOffset: GLuint,
     instanceCountsList: Int32Array | Iterable<GLsizei>,
     instanceCountsOffset: GLuint,
-    drawcount: GLsizei
+    drawcount: GLsizei,
   ): void;
   multiDrawArraysWEBGL(
     mode: GLenum,
@@ -212,7 +212,7 @@ interface WEBGL_multi_draw {
     firstsOffset: GLuint,
     countsList: Int32Array | Iterable<GLsizei>,
     countsOffset: GLuint,
-    drawcount: GLsizei
+    drawcount: GLsizei,
   ): void;
   multiDrawElementsInstancedWEBGL(
     mode: GLenum,
@@ -223,7 +223,7 @@ interface WEBGL_multi_draw {
     offsetsOffset: GLuint,
     instanceCountsList: Int32Array | Iterable<GLsizei>,
     instanceCountsOffset: GLuint,
-    drawcount: GLsizei
+    drawcount: GLsizei,
   ): void;
   multiDrawElementsWEBGL(
     mode: GLenum,
@@ -232,7 +232,7 @@ interface WEBGL_multi_draw {
     type: GLenum,
     offsetsList: Int32Array | Iterable<GLsizei>,
     offsetsOffset: GLuint,
-    drawcount: GLsizei
+    drawcount: GLsizei,
   ): void;
 }
 
@@ -241,29 +241,29 @@ interface WebGL2RenderingContextBase {
     buffer: GLenum,
     drawbuffer: GLint,
     values: Iterable<GLfloat>,
-    srcOffset?: GLuint
+    srcOffset?: GLuint,
   ): void;
   clearBufferiv(
     buffer: GLenum,
     drawbuffer: GLint,
     values: Iterable<GLint>,
-    srcOffset?: GLuint
+    srcOffset?: GLuint,
   ): void;
   clearBufferuiv(
     buffer: GLenum,
     drawbuffer: GLint,
     values: Iterable<GLuint>,
-    srcOffset?: GLuint
+    srcOffset?: GLuint,
   ): void;
   drawBuffers(buffers: Iterable<GLenum>): void;
   getActiveUniforms(
     program: WebGLProgram,
     uniformIndices: Iterable<GLuint>,
-    pname: GLenum
+    pname: GLenum,
   ): unknown;
   getUniformIndices(
     program: WebGLProgram,
-    uniformNames: Iterable<string>
+    uniformNames: Iterable<string>,
   ): Iterable<GLuint> | null;
   invalidateFramebuffer(target: GLenum, attachments: Iterable<GLenum>): void;
   invalidateSubFramebuffer(
@@ -272,78 +272,78 @@ interface WebGL2RenderingContextBase {
     x: GLint,
     y: GLint,
     width: GLsizei,
-    height: GLsizei
+    height: GLsizei,
   ): void;
   transformFeedbackVaryings(
     program: WebGLProgram,
     varyings: Iterable<string>,
-    bufferMode: GLenum
+    bufferMode: GLenum,
   ): void;
   uniform1uiv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLuint>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform2uiv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLuint>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform3uiv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLuint>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform4uiv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLuint>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix2x3fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix2x4fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix3x2fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix3x4fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix4x2fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix4x3fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   vertexAttribI4iv(index: GLuint, values: Iterable<GLint>): void;
   vertexAttribI4uiv(index: GLuint, values: Iterable<GLuint>): void;
@@ -354,70 +354,70 @@ interface WebGL2RenderingContextOverloads {
     location: WebGLUniformLocation | null,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform1iv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLint>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform2fv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform2iv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLint>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform3fv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform3iv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLint>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform4fv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform4iv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLint>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix2fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix3fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix4fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
 }
 
@@ -440,16 +440,16 @@ interface WebGLRenderingContextOverloads {
   uniformMatrix2fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
-    value: Iterable<GLfloat>
+    value: Iterable<GLfloat>,
   ): void;
   uniformMatrix3fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
-    value: Iterable<GLfloat>
+    value: Iterable<GLfloat>,
   ): void;
   uniformMatrix4fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
-    value: Iterable<GLfloat>
+    value: Iterable<GLfloat>,
   ): void;
 }

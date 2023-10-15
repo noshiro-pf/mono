@@ -205,7 +205,7 @@ interface RegExp {
    */
   [Symbol.replace](
     string: string,
-    replacer: (substring: string, ...args: readonly never[]) => string
+    replacer: (substring: string, ...args: readonly never[]) => string,
   ): string;
 
   /**
@@ -254,7 +254,7 @@ interface String {
     searchValue: {
       [Symbol.replace](string: string, replaceValue: string): string;
     },
-    replaceValue: string
+    replaceValue: string,
   ): string;
 
   /**
@@ -266,10 +266,10 @@ interface String {
     searchValue: {
       [Symbol.replace](
         string: string,
-        replacer: (substring: string, ...args: readonly never[]) => string
+        replacer: (substring: string, ...args: readonly never[]) => string,
       ): string;
     },
-    replacer: (substring: string, ...args: readonly never[]) => string
+    replacer: (substring: string, ...args: readonly never[]) => string,
   ): string;
 
   /**
@@ -287,7 +287,7 @@ interface String {
     splitter: {
       [Symbol.split](string: string, limit?: number): readonly string[];
     },
-    limit?: number
+    limit?: number,
   ): readonly string[];
 }
 

@@ -38,7 +38,7 @@ interface PromiseConstructor {
    * @returns A new Promise.
    */
   allSettled<T extends readonly unknown[] | readonly []>(
-    values: T
+    values: T,
   ): Promise<{ -readonly [P in keyof T]: PromiseSettledResult<Awaited<T[P]>> }>;
 
   /**
@@ -48,6 +48,6 @@ interface PromiseConstructor {
    * @returns A new Promise.
    */
   allSettled<T>(
-    values: Iterable<T | PromiseLike<T>>
+    values: Iterable<T | PromiseLike<T>>,
   ): Promise<readonly PromiseSettledResult<Awaited<T>>[]>;
 }

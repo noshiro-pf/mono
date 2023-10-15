@@ -33,7 +33,7 @@ interface AsyncIterator<T, TReturn = any, TNext = undefined> {
     ...args: readonly [] | readonly [TNext]
   ): Promise<IteratorResult<T, TReturn>>;
   return?(
-    value?: TReturn | PromiseLike<TReturn>
+    value?: TReturn | PromiseLike<TReturn>,
   ): Promise<IteratorResult<T, TReturn>>;
   throw?(e?: unknown): Promise<IteratorResult<T, TReturn>>;
 }

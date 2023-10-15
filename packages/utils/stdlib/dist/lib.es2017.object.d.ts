@@ -36,7 +36,7 @@ type _RecordUtilsEntries<R extends RecordBase> = R extends R
   ? readonly {
       readonly [K in keyof R]: readonly [
         ToObjectKeysValue<keyof PickByValue<R, R[K]>>,
-        R[K]
+        R[K],
       ];
       // eslint-disable-next-line @typescript-eslint/ban-types
     }[RelaxedExclude<keyof R, symbol>][]

@@ -38,7 +38,7 @@ interface PromiseConstructor {
    * @returns A new Promise.
    */
   any<T extends readonly unknown[] | readonly []>(
-    values: T
+    values: T,
   ): Promise<Awaited<T[number]>>;
 
   /**

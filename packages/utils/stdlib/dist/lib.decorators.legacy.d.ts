@@ -17,19 +17,19 @@ and limitations under the License.
 /// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />
 
 declare type ClassDecorator = <TFunction extends Function>(
-  target: TFunction
+  target: TFunction,
 ) => TFunction | void;
 declare type PropertyDecorator = (
   target: Object,
-  propertyKey: string | symbol
+  propertyKey: string | symbol,
 ) => void;
 declare type MethodDecorator = <T>(
   target: Object,
   propertyKey: string | symbol,
-  descriptor: TypedPropertyDescriptor<T>
+  descriptor: TypedPropertyDescriptor<T>,
 ) => TypedPropertyDescriptor<T> | void;
 declare type ParameterDecorator = (
   target: Object,
   propertyKey: string | symbol | undefined,
-  parameterIndex: number
+  parameterIndex: number,
 ) => void;
