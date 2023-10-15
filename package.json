@@ -130,7 +130,7 @@
     "ts-jest": "^29.1.0",
     "ts-morph": "^17.0.1",
     "tslib": "^2.4.0",
-    "typescript": "^5.0.4",
+    "typescript": "^5.2.2",
     "unplugin-auto-import": "^0.15.3",
     "vite": "^4.4.6",
     "vite-plugin-markdown": "^2.1.0",
