@@ -65,7 +65,7 @@ interface ReadonlyMap<K, V> {
   readonly size: SafeUint;
 }
 
-interface WeakMap<K extends object, V> {
+interface WeakMap<K extends WeakKey, V> {
   /**
    * Removes the specified element from the WeakMap.
    * @returns true if the element was successfully removed, or false if it was not present.
@@ -81,16 +81,16 @@ interface WeakMap<K extends object, V> {
   has(key: K | (WidenLiteral<K> & {})): key is K;
   /**
    * Adds a new element with a specified key and value.
-   * @param key Must be an object.
+   * @param key Must be an object or symbol.
    */
   set(key: K, value: V): this;
 }
 
 interface WeakMapConstructor {
-  new <K extends object = object, V = unknown>(
+  new <K extends WeakKey = WeakKey, V = unknown>(
     entries?: readonly (readonly [K, V])[] | null,
   ): WeakMap<K, V>;
-  readonly prototype: WeakMap<object, unknown>;
+  readonly prototype: WeakMap<WeakKey, unknown>;
 }
 declare const WeakMap: WeakMapConstructor;
 
@@ -138,9 +138,9 @@ interface ReadonlySet<T> {
   readonly size: SafeUint;
 }
 
-interface WeakSet<T extends object> {
+interface WeakSet<T extends WeakKey> {
   /**
-   * Appends a new object to the end of the WeakSet.
+   * Appends a new value to the end of the WeakSet.
    */
   add(value: T): this;
   /**
@@ -149,13 +149,13 @@ interface WeakSet<T extends object> {
    */
   delete(value: T): boolean;
   /**
-   * @returns a boolean indicating whether an object exists in the WeakSet or not.
+   * @returns a boolean indicating whether a value exists in the WeakSet or not.
    */
   has(value: T | (WidenLiteral<T> & {})): value is T;
 }
 
 interface WeakSetConstructor {
-  new <T extends object = object>(values?: readonly T[] | null): WeakSet<T>;
-  readonly prototype: WeakSet<object>;
+  new <T extends WeakKey = WeakKey>(values?: readonly T[] | null): WeakSet<T>;
+  readonly prototype: WeakSet<WeakKey>;
 }
 declare const WeakSet: WeakSetConstructor;

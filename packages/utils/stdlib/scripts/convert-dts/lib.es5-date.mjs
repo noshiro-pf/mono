@@ -92,12 +92,52 @@ export const convertLibEs5_Date = (from) => {
         );
       }
       str = str.replaceAll(
-        'new (\n    year: number,\n    monthIndex: number,\n    date?: number,\n    hours?: number,\n    minutes?: number,\n    seconds?: number,\n    ms?: number\n  ): Date;',
-        'new (\n    year: YearEnum,\n    monthIndex: MonthIndexEnum,\n    date?: DateEnum,\n    hours?: HoursEnum,\n    minutes?: MinutesEnum,\n    seconds?: SecondsEnum,\n    ms?: MillisecondsEnum\n  ): Date;',
+        [
+          '  new (',
+          '    year: number,',
+          '    monthIndex: number,',
+          '    date?: number,',
+          '    hours?: number,',
+          '    minutes?: number,',
+          '    seconds?: number,',
+          '    ms?: number,',
+          '  ): Date;',
+        ].join('\n'),
+        [
+          '  new (',
+          '    year: YearEnum,',
+          '    monthIndex: MonthIndexEnum,',
+          '    date?: DateEnum,',
+          '    hours?: HoursEnum,',
+          '    minutes?: MinutesEnum,',
+          '    seconds?: SecondsEnum,',
+          '    ms?: MillisecondsEnum,',
+          '  ): Date;',
+        ].join('\n'),
       );
       str = str.replaceAll(
-        'UTC(\n    year: number,\n    monthIndex: number,\n    date?: number,\n    hours?: number,\n    minutes?: number,\n    seconds?: number,\n    ms?: number\n  ): number;',
-        'UTC(\n    year: YearEnum,\n    monthIndex: MonthIndexEnum,\n    date?: DateEnum,\n    hours?: HoursEnum,\n    minutes?: MinutesEnum,\n    seconds?: SecondsEnum,\n    ms?: MillisecondsEnum\n  ): SafeUint;',
+        [
+          '  UTC(',
+          '    year: number,',
+          '    monthIndex: number,',
+          '    date?: number,',
+          '    hours?: number,',
+          '    minutes?: number,',
+          '    seconds?: number,',
+          '    ms?: number,',
+          '  ): number;',
+        ].join('\n'),
+        [
+          '  UTC(',
+          '    year: YearEnum,',
+          '    monthIndex: MonthIndexEnum,',
+          '    date?: DateEnum,',
+          '    hours?: HoursEnum,',
+          '    minutes?: MinutesEnum,',
+          '    seconds?: SecondsEnum,',
+          '    ms?: MillisecondsEnum,',
+          '  ): SafeUint;',
+        ].join('\n'),
       );
       str = str.replaceAll(
         'parse(s: string): number;',

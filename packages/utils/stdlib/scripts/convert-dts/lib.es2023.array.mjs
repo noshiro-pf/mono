@@ -94,6 +94,9 @@ const typedArrayElemTypes = [
 /** @type {BigintElemType[]} */
 const bigIntElemTypes = ['BigInt64', 'BigUint64'];
 
+/** @type {("Array" | "ReadonlyArray")[]} */
+const arrayTypes = ['Array', 'ReadonlyArray'];
+
 /**
  *
  * @param {string} from
@@ -104,6 +107,83 @@ export const convertLibEs2023Array = (from) => {
 
   ret = ret.replaceAll(`index: number`, `index: ${indexType.callbackArg}`);
 
+  {
+    for (const type of arrayTypes) {
+      const slice = ret.slice(
+        ret.indexOf(markers[type].start),
+        ret.indexOf(markers[type].end),
+      );
+      ret = ret.replaceAll(
+        slice,
+        slice
+          .replaceAll('compareFn?', 'compareFn')
+          .replaceAll(`start: number`, `start: ${indexType.arg}`)
+          .replaceAll(`deleteCount: number`, `deleteCount: ${indexType.arg}`)
+          .replaceAll(`deleteCount?: number`, `deleteCount?: ${indexType.arg}`),
+      );
+    }
+  }
+
+  {
+    const slice = ret.slice(
+      ret.indexOf(markers.Array.start),
+      ret.indexOf(markers.Array.end),
+    );
+    ret = ret.replaceAll(
+      slice,
+      slice
+        .replaceAll(
+          // TODO: remove if fixed
+          'Copies an array and removes elements and, if necessary, inserts new elements in their place. Returns the copied array.',
+          'Copies an array and removes elements while, if necessary, inserting new elements in their place, returning the remaining elements.',
+        )
+        .replaceAll(
+          // TODO: remove if fixed
+          '@returns The copied array.',
+          '@returns A copy of the original array with the remaining elements.',
+        ),
+    );
+  }
+
+  {
+    const slice = ret.slice(
+      ret.indexOf(markers.ReadonlyArray.start),
+      ret.indexOf(markers.ReadonlyArray.end),
+    );
+    ret = ret.replaceAll(
+      slice,
+      slice
+        .replaceAll(
+          // TODO: remove if fixed
+          'Copies the array and returns the copied array with all of its elements reversed.',
+          'Returns a copy of an array with its elements reversed.',
+        )
+        .replaceAll(
+          // TODO: remove if fixed
+          '@param value The value to insert into the copied array.',
+          '@param value The value to write into the copied array.',
+        )
+        .replaceAll(
+          // TODO: remove if fixed
+          '@returns A copy of the original array with the inserted value.',
+          '@returns The copied array with the updated value.',
+        )
+        .replaceAll(
+          // TODO: remove if fixed (missing ending ".")
+          [
+            '   * Copies an array, then overwrites the value at the provided index with the',
+            '   * given value. If the index is negative, then it replaces from the end',
+            '   * of the array',
+          ].join('\n'),
+          [
+            '   * Copies an array, then overwrites the value at the provided index with the',
+            '   * given value. If the index is negative, then it replaces from the end',
+            '   * of the array.',
+          ].join('\n'),
+        ),
+    );
+  }
+
   for (const elemType of typedArrayElemTypes) {
     const slice = ret.slice(
       ret.indexOf(markers[elemType].start),
@@ -111,10 +191,17 @@ export const convertLibEs2023Array = (from) => {
     );
     ret = ret.replaceAll(
       slice,
-      slice.replaceAll(
-        'number',
-        elemType === 'Uint8Clamped' ? 'Uint8' : elemType,
-      ),
+      slice
+        .replaceAll(
+          // TODO: remove if fixed
+          `   * Copies the array and inserts the given number at the provided index.`,
+          [
+            '   * Copies an array, then overwrites the value at the provided index with the',
+            '   * given value. If the index is negative, then it replaces from the end',
+            '   * of the array.',
+          ].join('\n'),
+        )
+        .replaceAll('number', elemType === 'Uint8Clamped' ? 'Uint8' : elemType),
     );
   }
 
@@ -123,10 +210,62 @@ export const convertLibEs2023Array = (from) => {
       ret.indexOf(markers[elemType].start),
       ret.indexOf(markers[elemType].end ?? '$$$$$$$$$$$'),
     );
-    ret = ret.replaceAll(slice, slice.replaceAll(`bigint`, elemType));
+    ret = ret.replaceAll(
+      slice,
+      slice
+        .replaceAll(
+          // TODO: remove if fixed
+          `   * Copies the array and inserts the given bigint at the provided index.`,
+          [
+            '   * Copies an array, then overwrites the value at the provided index with the',
+            '   * given value. If the index is negative, then it replaces from the end',
+            '   * of the array.',
+          ].join('\n'),
+        )
+        .replaceAll(`bigint`, elemType),
+    );
+  }
+
+  for (const list of [typedArrayElemTypes, bigIntElemTypes]) {
+    for (const elemType of list) {
+      const slice = ret.slice(
+        ret.indexOf(markers[elemType].start),
+        ret.indexOf(markers[elemType].end ?? '$$$$$$$$$$$'),
+      );
+      ret = ret.replaceAll(
+        slice,
+        slice
+          .replaceAll(
+            // TODO: remove if fixed
+            'Copies the array and returns the copy with the elements in reverse order.',
+            'Returns a copy of an array with its elements reversed.',
+          )
+          .replaceAll(
+            // TODO: remove if fixed
+            'If omitted, the elements are sorted in ascending, ASCII character order.',
+            'If omitted, the elements are sorted in ascending order.',
+          )
+          .replaceAll(
+            // TODO: remove if fixed
+            '@param value The value to insert into the copied array.',
+            '@param value The value to write into the copied array.',
+          )
+          .replaceAll(
+            // TODO: remove if fixed
+            '@returns A copy of the original array with the inserted value.',
+            '@returns The copied array with the updated value.',
+          ),
+      );
+    }
   }
 
   ret = ret.replaceAll(`): number;`, `): ${indexType.searchResult};`);
+
+  ret = ret.replaceAll(
+    // TODO: remove if fixed
+    'Copies and sorts the array.',
+    'Returns a copy of an array with its elements sorted.', // use the same description with Array
+  );
 
   return ret;
 };

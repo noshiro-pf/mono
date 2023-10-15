@@ -14,41 +14,6 @@ import { convertLibEs5_TypedArray } from './lib.es5-typed-array.mjs';
 export const convertLibEs5 = (from, commentOutDeprecated) => {
   let ret = from;
 
-  // fix stdlib
-  // https://github.com/microsoft/TypeScript/issues/53730
-
-  ret = ret.replaceAll(
-    [
-      '  /**',
-      '   * at begin, inclusive, up to end, exclusive.',
-      '   * @param begin The index of the beginning of the array.',
-      '   * @param end The index of the end of the array.',
-      '   */',
-      '  subarray(begin?: number, end?: number): Float64Array;',
-      '',
-      '  toString(): string;',
-    ].join('\n'),
-    [
-      '  /**',
-      '   * Gets a new Float64Array view of the ArrayBuffer store for this array, referencing the elements',
-      '   * at begin, inclusive, up to end, exclusive.',
-      '   * @param begin The index of the beginning of the array.',
-      '   * @param end The index of the end of the array.',
-      '   */',
-      '  subarray(begin?: number, end?: number): Float64Array;',
-      '',
-      '  /**',
-      '   * Converts a number to a string by using the current locale.',
-      '   */',
-      '  toLocaleString(): string;',
-      '',
-      '  /**',
-      '   * Returns a string representation of an array.',
-      '   */',
-      '  toString(): string;',
-    ].join('\n'),
-  );
-
   ret = ret.replaceAll(
     'forEach(\n    callbackfn: (value: number, index: number, array: Uint32Array) => void,\n    thisArg?: unknown\n  ): void;',
     'forEach(\n    callbackfn: (value: number, index: number, array: Uint32Array) => void,\n    thisArg?: unknown\n  ): void;\n',

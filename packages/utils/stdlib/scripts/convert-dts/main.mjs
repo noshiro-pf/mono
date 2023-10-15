@@ -8,6 +8,7 @@ import { convertLibEs2015Core } from './lib.es2015.core.mjs';
 import { convertLibEs2015Iterable } from './lib.es2015.iterable.mjs';
 import { convertEs2015SymbolWellknown } from './lib.es2015.symbol.wellknown.mjs';
 import { convertLibEs2016ArrayInclude } from './lib.es2016.array.include.mjs';
+import { convertLibEs2017Date } from './lib.es2017.date.mjs';
 import { convertLibEs2017Object } from './lib.es2017.object.mjs';
 import { convertLibEs2017Sharedmemory } from './lib.es2017.sharedmemory.mjs';
 import { convertLibEs2017String } from './lib.es2017.string.mjs';
@@ -165,6 +166,10 @@ const convert = (content, filename) => {
 
     case 'lib.es2017.string.d.ts':
       ret = convertLibEs2017String(ret);
+      break;
+
+    case 'lib.es2017.date.d.ts':
+      ret = convertLibEs2017Date(ret);
       break;
 
     case 'lib.es2019.array.d.ts':

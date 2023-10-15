@@ -63,6 +63,11 @@ export const convertLibEs5_TypedArray = (from) => {
     }
   }
 
+  ret = ret.replaceAll(
+    "a negative value if first argument is less than second argument, zero if they're equal and",
+    "a negative value if the first argument is less than the second argument, zero if they're equal, and",
+  );
+
   // DataView
   const markers = {
     ArrayBuffer: {
@@ -145,12 +150,12 @@ const convertInterfaceTypedArray = (from, elementType) => {
     `fill(value: ${elementType}, start?: ${indexType.arg}, end?: ${indexType.arg})`,
   );
   ret = ret.replaceAll(
-    `unknown,\n    thisArg?: unknown\n  ): boolean`,
-    `boolean,\n    thisArg?: unknown\n  ): boolean`,
+    `unknown,\n    thisArg?: unknown,\n  ): boolean`,
+    `boolean,\n    thisArg?: unknown,\n  ): boolean`,
   );
   ret = ret.replaceAll(
-    `) => unknown,\n    thisArg?: unknown\n  ): ${arrayType};`,
-    `) => boolean,\n    thisArg?: unknown\n  ): ${arrayType};`,
+    `) => unknown,\n    thisArg?: unknown,\n  ): ${arrayType};`,
+    `) => boolean,\n    thisArg?: unknown,\n  ): ${arrayType};`,
   );
   ret = ret.replaceAll(
     `searchElement: number`,
@@ -162,14 +167,42 @@ const convertInterfaceTypedArray = (from, elementType) => {
   );
 
   ret = ret.replaceAll(
-    `findIndex(\n    predicate: (value: number, index: ${indexType.callbackArg}, obj: ${arrayType}) => boolean,\n    thisArg?: unknown\n  ): number;`,
-    `findIndex(\n    predicate: (value: number, index: ${indexType.callbackArg}, obj: ${arrayType}) => boolean,\n    thisArg?: unknown\n  ): ${indexType.searchResult};`,
+    [
+      '  findIndex(',
+      `    predicate: (value: number, index: ${indexType.callbackArg}, obj: ${arrayType}) => boolean,`,
+      '    thisArg?: unknown,',
+      '  ): number;',
+    ].join('\n'),
+    [
+      '  findIndex(',
+      `    predicate: (value: number, index: ${indexType.callbackArg}, obj: ${arrayType}) => boolean,`,
+      '    thisArg?: unknown,',
+      `  ): ${indexType.searchResult};`,
+    ].join('\n'),
   );
 
   // Uint8ClampedArray
   ret = ret.replaceAll(
-    `findIndex(\n    predicate: (\n      value: number,\n      index: ${indexType.callbackArg},\n      obj: Uint8ClampedArray\n    ) => boolean,\n    thisArg?: unknown\n  ): number;`,
-    `findIndex(\n    predicate: (\n      value: number,\n      index: ${indexType.callbackArg},\n      obj: Uint8ClampedArray\n    ) => boolean,\n    thisArg?: unknown\n  ): ${indexType.searchResult};`,
+    [
+      '  findIndex(',
+      '    predicate: (',
+      '      value: number,',
+      `      index: ${indexType.callbackArg},`,
+      '      obj: Uint8ClampedArray,',
+      '    ) => boolean,',
+      '    thisArg?: unknown,',
+      '  ): number;',
+    ].join('\n'),
+    [
+      '  findIndex(',
+      '    predicate: (',
+      '      value: Uint8,',
+      `      index: ${indexType.callbackArg},`,
+      '      obj: Uint8ClampedArray,',
+      '    ) => boolean,',
+      '    thisArg?: unknown,',
+      `  ): ${indexType.searchResult};`,
+    ].join('\n'),
   );
 
   // convert rest
@@ -185,6 +218,8 @@ const convertInterfaceTypedArray = (from, elementType) => {
     `Converts a ${elementType} to a string`,
     `Converts a number to a string`,
   );
+
+  ret = ret.replaceAll('/**', '\n\n/**');
 
   return ret;
 };

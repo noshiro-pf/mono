@@ -377,9 +377,14 @@ interface CallableFunction extends Function {
   /**
    * Calls the function with the specified object as the this value and the elements of specified array as the arguments.
    * @param thisArg The object to be used as the this object.
-   * @param args An array of argument values to be passed to the function.
    */
   apply<T, R>(this: (this: T) => R, thisArg: T): R;
+
+  /**
+   * Calls the function with the specified object as the this value and the elements of specified array as the arguments.
+   * @param thisArg The object to be used as the this object.
+   * @param args An array of argument values to be passed to the function.
+   */
   apply<T, A extends readonly unknown[], R>(
     this: (this: T, ...args: A) => R,
     thisArg: T,
@@ -401,49 +406,33 @@ interface CallableFunction extends Function {
    * For a given function, creates a bound function that has the same body as the original function.
    * The this object of the bound function is associated with the specified object, and has the specified initial parameters.
    * @param thisArg The object to be used as the this object.
-   * @param args Arguments to bind to the parameters of the function.
    */
   bind<T>(this: T, thisArg: ThisParameterType<T>): OmitThisParameter<T>;
-  bind<T, A0, A extends readonly unknown[], R>(
-    this: (this: T, arg0: A0, ...args: A) => R,
+
+  /**
+   * For a given function, creates a bound function that has the same body as the original function.
+   * The this object of the bound function is associated with the specified object, and has the specified initial parameters.
+   * @param thisArg The object to be used as the this object.
+   * @param args Arguments to bind to the parameters of the function.
+   */
+  bind<T, A extends readonly unknown[], B extends readonly unknown[], R>(
+    this: (this: T, ...args: readonly [...A, ...B]) => R,
     thisArg: T,
-    arg0: A0,
-  ): (...args: A) => R;
-  bind<T, A0, A1, A extends readonly unknown[], R>(
-    this: (this: T, arg0: A0, arg1: A1, ...args: A) => R,
-    thisArg: T,
-    arg0: A0,
-    arg1: A1,
-  ): (...args: A) => R;
-  bind<T, A0, A1, A2, A extends readonly unknown[], R>(
-    this: (this: T, arg0: A0, arg1: A1, arg2: A2, ...args: A) => R,
-    thisArg: T,
-    arg0: A0,
-    arg1: A1,
-    arg2: A2,
-  ): (...args: A) => R;
-  bind<T, A0, A1, A2, A3, A extends readonly unknown[], R>(
-    this: (this: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R,
-    thisArg: T,
-    arg0: A0,
-    arg1: A1,
-    arg2: A2,
-    arg3: A3,
-  ): (...args: A) => R;
-  bind<T, AX, R>(
-    this: (this: T, ...args: readonly AX[]) => R,
-    thisArg: T,
-    ...args: readonly AX[]
-  ): (...args: readonly AX[]) => R;
+    ...args: A
+  ): (...args: B) => R;
 }
 
 interface NewableFunction extends Function {
   /**
    * Calls the function with the specified object as the this value and the elements of specified array as the arguments.
    * @param thisArg The object to be used as the this object.
-   * @param args An array of argument values to be passed to the function.
    */
   apply<T>(this: new () => T, thisArg: T): void;
+  /**
+   * Calls the function with the specified object as the this value and the elements of specified array as the arguments.
+   * @param thisArg The object to be used as the this object.
+   * @param args An array of argument values to be passed to the function.
+   */
   apply<T, A extends readonly unknown[]>(
     this: new (...args: A) => T,
     thisArg: T,
@@ -465,40 +454,20 @@ interface NewableFunction extends Function {
    * For a given function, creates a bound function that has the same body as the original function.
    * The this object of the bound function is associated with the specified object, and has the specified initial parameters.
    * @param thisArg The object to be used as the this object.
-   * @param args Arguments to bind to the parameters of the function.
    */
   bind<T>(this: T, thisArg: unknown): T;
-  bind<A0, A extends readonly unknown[], R>(
-    this: new (arg0: A0, ...args: A) => R,
+
+  /**
+   * For a given function, creates a bound function that has the same body as the original function.
+   * The this object of the bound function is associated with the specified object, and has the specified initial parameters.
+   * @param thisArg The object to be used as the this object.
+   * @param args Arguments to bind to the parameters of the function.
+   */
+  bind<A extends readonly unknown[], B extends readonly unknown[], R>(
+    this: new (...args: readonly [...A, ...B]) => R,
     thisArg: unknown,
-    arg0: A0,
-  ): new (...args: A) => R;
-  bind<A0, A1, A extends readonly unknown[], R>(
-    this: new (arg0: A0, arg1: A1, ...args: A) => R,
-    thisArg: unknown,
-    arg0: A0,
-    arg1: A1,
-  ): new (...args: A) => R;
-  bind<A0, A1, A2, A extends readonly unknown[], R>(
-    this: new (arg0: A0, arg1: A1, arg2: A2, ...args: A) => R,
-    thisArg: unknown,
-    arg0: A0,
-    arg1: A1,
-    arg2: A2,
-  ): new (...args: A) => R;
-  bind<A0, A1, A2, A3, A extends readonly unknown[], R>(
-    this: new (arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R,
-    thisArg: unknown,
-    arg0: A0,
-    arg1: A1,
-    arg2: A2,
-    arg3: A3,
-  ): new (...args: A) => R;
-  bind<AX, R>(
-    this: new (...args: readonly AX[]) => R,
-    thisArg: unknown,
-    ...args: readonly AX[]
-  ): new (...args: readonly AX[]) => R;
+    ...args: A
+  ): new (...args: B) => R;
 }
 
 interface IArguments {
@@ -2014,6 +1983,15 @@ type Uncapitalize<S extends string> = intrinsic;
 interface ThisType<T> {}
 
 /**
+ * Stores types to be used with WeakSet, WeakMap, WeakRef, and FinalizationRegistry
+ */
+interface WeakKeyTypes {
+  readonly object: object;
+}
+
+type WeakKey = WeakKeyTypes[keyof WeakKeyTypes];
+
+/**
  * Represents a raw buffer of binary data, which is used to store data for the
  * different typed arrays. ArrayBuffers cannot be read from or written to directly,
  * but can be passed to a typed array or DataView Object to interpret the raw
@@ -2202,7 +2180,7 @@ interface DataView {
 interface DataViewConstructor {
   readonly prototype: DataView;
   new (
-    buffer: ArrayBufferLike,
+    buffer: ArrayBufferLike & { readonly BYTES_PER_ELEMENT?: never },
     byteOffset?: SafeUint,
     byteLength?: SafeUint,
   ): DataView;
@@ -2496,7 +2474,7 @@ interface Int8Array {
   /**
    * Sorts an array.
    * @param compareFn Function used to determine the order of the elements. It is expected to return
-   * a negative value if first argument is less than second argument, zero if they're equal and a positive
+   * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
    * value otherwise. If omitted, the elements are sorted in ascending order.
    * ```ts
    * [11,2,22,1].sort((a, b) => a - b)
@@ -2855,7 +2833,7 @@ interface Uint8Array {
   /**
    * Sorts an array.
    * @param compareFn Function used to determine the order of the elements. It is expected to return
-   * a negative value if first argument is less than second argument, zero if they're equal and a positive
+   * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
    * value otherwise. If omitted, the elements are sorted in ascending order.
    * ```ts
    * [11,2,22,1].sort((a, b) => a - b)
@@ -3243,7 +3221,7 @@ interface Uint8ClampedArray {
   /**
    * Sorts an array.
    * @param compareFn Function used to determine the order of the elements. It is expected to return
-   * a negative value if first argument is less than second argument, zero if they're equal and a positive
+   * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
    * value otherwise. If omitted, the elements are sorted in ascending order.
    * ```ts
    * [11,2,22,1].sort((a, b) => a - b)
@@ -3603,7 +3581,7 @@ interface Int16Array {
   /**
    * Sorts an array.
    * @param compareFn Function used to determine the order of the elements. It is expected to return
-   * a negative value if first argument is less than second argument, zero if they're equal and a positive
+   * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
    * value otherwise. If omitted, the elements are sorted in ascending order.
    * ```ts
    * [11,2,22,1].sort((a, b) => a - b)
@@ -3966,7 +3944,7 @@ interface Uint16Array {
   /**
    * Sorts an array.
    * @param compareFn Function used to determine the order of the elements. It is expected to return
-   * a negative value if first argument is less than second argument, zero if they're equal and a positive
+   * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
    * value otherwise. If omitted, the elements are sorted in ascending order.
    * ```ts
    * [11,2,22,1].sort((a, b) => a - b)
@@ -4325,7 +4303,7 @@ interface Int32Array {
   /**
    * Sorts an array.
    * @param compareFn Function used to determine the order of the elements. It is expected to return
-   * a negative value if first argument is less than second argument, zero if they're equal and a positive
+   * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
    * value otherwise. If omitted, the elements are sorted in ascending order.
    * ```ts
    * [11,2,22,1].sort((a, b) => a - b)
@@ -4688,7 +4666,7 @@ interface Uint32Array {
   /**
    * Sorts an array.
    * @param compareFn Function used to determine the order of the elements. It is expected to return
-   * a negative value if first argument is less than second argument, zero if they're equal and a positive
+   * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
    * value otherwise. If omitted, the elements are sorted in ascending order.
    * ```ts
    * [11,2,22,1].sort((a, b) => a - b)
@@ -5067,7 +5045,7 @@ interface Float32Array {
   /**
    * Sorts an array.
    * @param compareFn Function used to determine the order of the elements. It is expected to return
-   * a negative value if first argument is less than second argument, zero if they're equal and a positive
+   * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
    * value otherwise. If omitted, the elements are sorted in ascending order.
    * ```ts
    * [11,2,22,1].sort((a, b) => a - b)
@@ -5446,7 +5424,7 @@ interface Float64Array {
   /**
    * Sorts an array.
    * @param compareFn Function used to determine the order of the elements. It is expected to return
-   * a negative value if first argument is less than second argument, zero if they're equal and a positive
+   * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
    * value otherwise. If omitted, the elements are sorted in ascending order.
    * ```ts
    * [11,2,22,1].sort((a, b) => a - b)
@@ -5525,11 +5503,30 @@ declare const Float64Array: Float64ArrayConstructor;
 
 declare namespace Intl {
   interface CollatorOptions {
-    readonly usage?: string | undefined;
-    readonly localeMatcher?: string | undefined;
+    readonly usage?: 'sort' | 'search' | undefined;
+    readonly localeMatcher?: 'lookup' | 'best fit' | undefined;
     readonly numeric?: boolean | undefined;
-    readonly caseFirst?: string | undefined;
-    readonly sensitivity?: string | undefined;
+    readonly caseFirst?: 'upper' | 'lower' | 'false' | undefined;
+    readonly sensitivity?: 'base' | 'accent' | 'case' | 'variant' | undefined;
+    readonly collation?:
+      | 'big5han'
+      | 'compat'
+      | 'dict'
+      | 'direct'
+      | 'ducet'
+      | 'emoji'
+      | 'eor'
+      | 'gb2312'
+      | 'phonebk'
+      | 'phonetic'
+      | 'pinyin'
+      | 'reformed'
+      | 'searchjl'
+      | 'stroke'
+      | 'trad'
+      | 'unihan'
+      | 'zhuyin'
+      | undefined;
     readonly ignorePunctuation?: boolean | undefined;
   }
 
