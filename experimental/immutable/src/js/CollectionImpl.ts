@@ -76,11 +76,11 @@ import quoteString from './utils/quoteString';
 
 export {
   Collection,
-  KeyedCollection,
-  IndexedCollection,
-  SetCollection,
   CollectionPrototype,
+  IndexedCollection,
   IndexedCollectionPrototype,
+  KeyedCollection,
+  SetCollection,
 };
 
 // Note: all of these methods are deprecated.

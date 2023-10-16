@@ -63,4 +63,4 @@ function styled(tag, forwardRef) {
   };
 }
 
-export { styled, setup };
+export { setup, styled };

@@ -44,13 +44,13 @@ const visibleLabels$ = visibleLabelIndices$.chain(
 );
 
 export {
-  sideBarIsHidden$,
+  handlers,
   hideSideBar,
+  selectLabel,
+  selectedLabel$,
   showSideBar,
+  sideBarIsHidden$,
   visibleLabelIndices$,
   visibleLabelIndicesDispatcher,
-  selectedLabel$,
-  selectLabel,
-  handlers,
   visibleLabels$,
 };

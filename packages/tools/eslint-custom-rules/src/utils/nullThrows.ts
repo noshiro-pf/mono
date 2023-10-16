@@ -25,4 +25,4 @@ function nullThrows<T>(value: T | null | undefined, message: string): T {
   return value;
 }
 
-export { nullThrows, NullThrowsReasons };
+export { NullThrowsReasons, nullThrows };
