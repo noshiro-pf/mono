@@ -100,3 +100,9 @@ workflow は .github ディレクトリに定義されている。
 -   `archive/*` ： 作業中のコード置き場
 -   `deploy-rich-poll` ： `packages/app/poll-discord-app` のデプロイトリガーにしているブランチ。
     -   `main` ブランチへの関係ない変更で Railway への無駄なデプロイが走らないようにするため。
+
+### dependencies memo
+
+-   `@babel/preset-react`
+    -   `vite-plugin-markdown` の依存だが別途 install が必要
+        -   https://github.com/hmsk/vite-plugin-markdown/issues/447
