@@ -7,13 +7,7 @@
 
 /// <reference types="vite/client" />
 
-declare module '*.md' {
-  // const content: string;
-  // export default content;
-  const attributes: Record<string, unknown>;
-
-  import React from 'react'
-  const ReactComponent: React.FC;
-
-  export { attributes, ReactComponent };
+declare module '*.mdx' {
+  const MDXComponent: (props) => JSX.Element;
+  export default MDXComponent;
 }
