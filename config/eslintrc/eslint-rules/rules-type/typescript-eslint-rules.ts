@@ -3194,9 +3194,57 @@ namespace LinesBetweenClassMembers {
    * ```json
    * {
    *   "0": {
-   *     "enum": [
-   *       "always",
-   *       "never"
+   *     "anyOf": [
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "enforce": {
+   *             "type": "array",
+   *             "items": {
+   *               "type": "object",
+   *               "properties": {
+   *                 "blankLine": {
+   *                   "enum": [
+   *                     "always",
+   *                     "never"
+   *                   ]
+   *                 },
+   *                 "prev": {
+   *                   "enum": [
+   *                     "method",
+   *                     "field",
+   *                     "*"
+   *                   ]
+   *                 },
+   *                 "next": {
+   *                   "enum": [
+   *                     "method",
+   *                     "field",
+   *                     "*"
+   *                   ]
+   *                 }
+   *               },
+   *               "additionalProperties": false,
+   *               "required": [
+   *                 "blankLine",
+   *                 "prev",
+   *                 "next"
+   *               ]
+   *             },
+   *             "minItems": 1
+   *           }
+   *         },
+   *         "additionalProperties": false,
+   *         "required": [
+   *           "enforce"
+   *         ]
+   *       },
+   *       {
+   *         "enum": [
+   *           "always",
+   *           "never"
+   *         ]
+   *       }
    *     ]
    *   },
    *   "1": {
@@ -12237,6 +12285,9 @@ namespace NoExtraParens {
    *             "conditionalAssign": {
    *               "type": "boolean"
    *             },
+   *             "ternaryOperandBinaryExpressions": {
+   *               "type": "boolean"
+   *             },
    *             "nestedBinaryExpressions": {
    *               "type": "boolean"
    *             },
@@ -12285,6 +12336,7 @@ namespace NoExtraParens {
         'all',
         {
           readonly conditionalAssign?: boolean;
+          readonly ternaryOperandBinaryExpressions?: boolean;
           readonly nestedBinaryExpressions?: boolean;
           readonly returnAssign?: boolean;
           readonly ignoreJSX?: 'none' | 'all' | 'single-line' | 'multi-line';

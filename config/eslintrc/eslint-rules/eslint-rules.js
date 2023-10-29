@@ -231,10 +231,11 @@ const eslintRules = {
   'no-nested-ternary': 'off', // unicorn/no-nested-ternary
   'no-new-func': 'error',
   'no-new-native-nonconstructor': 'error',
-  'no-new-object': 'error',
+  'no-new-object': 'off',
   'no-new-wrappers': 'error',
   'no-new': 'error',
   'no-nonoctal-decimal-escape': 'error',
+  'no-object-constructor': 'error',
   'no-octal-escape': 'error',
   'no-octal': 'error',
   'no-param-reassign': 'error',

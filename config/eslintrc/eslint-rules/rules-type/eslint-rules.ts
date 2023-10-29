@@ -171,10 +171,11 @@ namespace ArrayBracketSpacing {
  * @description Enforce `return` statements in callbacks of array methods
  * @link https://eslint.org/docs/latest/rules/array-callback-return
  *
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
  */
 namespace ArrayCallbackReturn {
   /**
@@ -192,6 +193,10 @@ namespace ArrayCallbackReturn {
    *       "checkForEach": {
    *         "type": "boolean",
    *         "default": false
+   *       },
+   *       "allowVoid": {
+   *         "type": "boolean",
+   *         "default": false
    *       }
    *     },
    *     "additionalProperties": false
@@ -202,6 +207,7 @@ namespace ArrayCallbackReturn {
   export type Options = {
     readonly allowImplicit?: boolean;
     readonly checkForEach?: boolean;
+    readonly allowVoid?: boolean;
   };
 
   export type RuleEntry =
@@ -4577,9 +4583,57 @@ namespace LinesBetweenClassMembers {
    * ```json
    * [
    *   {
-   *     "enum": [
-   *       "always",
-   *       "never"
+   *     "anyOf": [
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "enforce": {
+   *             "type": "array",
+   *             "items": {
+   *               "type": "object",
+   *               "properties": {
+   *                 "blankLine": {
+   *                   "enum": [
+   *                     "always",
+   *                     "never"
+   *                   ]
+   *                 },
+   *                 "prev": {
+   *                   "enum": [
+   *                     "method",
+   *                     "field",
+   *                     "*"
+   *                   ]
+   *                 },
+   *                 "next": {
+   *                   "enum": [
+   *                     "method",
+   *                     "field",
+   *                     "*"
+   *                   ]
+   *                 }
+   *               },
+   *               "additionalProperties": false,
+   *               "required": [
+   *                 "blankLine",
+   *                 "prev",
+   *                 "next"
+   *               ]
+   *             },
+   *             "minItems": 1
+   *           }
+   *         },
+   *         "additionalProperties": false,
+   *         "required": [
+   *           "enforce"
+   *         ]
+   *       },
+   *       {
+   *         "enum": [
+   *           "always",
+   *           "never"
+   *         ]
+   *       }
    *     ]
    *   },
    *   {
@@ -4595,7 +4649,25 @@ namespace LinesBetweenClassMembers {
    * ]
    * ```
    */
-  export type Options0 = 'always' | 'never';
+  export type Options0 =
+    | {
+        /**
+         * @minItems 1
+         */
+        readonly enforce: readonly [
+          {
+            readonly blankLine: 'always' | 'never';
+            readonly prev: 'method' | 'field' | '*';
+            readonly next: 'method' | 'field' | '*';
+          },
+          ...(readonly {
+            readonly blankLine: 'always' | 'never';
+            readonly prev: 'method' | 'field' | '*';
+            readonly next: 'method' | 'field' | '*';
+          }[]),
+        ];
+      }
+    | ('always' | 'never');
 
   export type Options1 = {
     readonly exceptAfterSingleLine?: boolean;
@@ -6326,7 +6398,31 @@ namespace NoEmptyFunction {
  *  | recommended | true    |
  */
 namespace NoEmptyPattern {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowObjectPatternsAsParameters": {
+   *         "type": "boolean",
+   *         "default": false
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly allowObjectPatternsAsParameters?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -6554,6 +6650,9 @@ namespace NoExtraParens {
    *             "conditionalAssign": {
    *               "type": "boolean"
    *             },
+   *             "ternaryOperandBinaryExpressions": {
+   *               "type": "boolean"
+   *             },
    *             "nestedBinaryExpressions": {
    *               "type": "boolean"
    *             },
@@ -6602,6 +6701,7 @@ namespace NoExtraParens {
         'all',
         {
           readonly conditionalAssign?: boolean;
+          readonly ternaryOperandBinaryExpressions?: boolean;
           readonly nestedBinaryExpressions?: boolean;
           readonly returnAssign?: boolean;
           readonly ignoreJSX?: 'none' | 'all' | 'single-line' | 'multi-line';
@@ -7046,6 +7146,10 @@ namespace NoIrregularWhitespace {
    *       "skipRegExps": {
    *         "type": "boolean",
    *         "default": false
+   *       },
+   *       "skipJSXText": {
+   *         "type": "boolean",
+   *         "default": false
    *       }
    *     },
    *     "additionalProperties": false
@@ -7058,6 +7162,7 @@ namespace NoIrregularWhitespace {
     readonly skipStrings?: boolean;
     readonly skipTemplates?: boolean;
     readonly skipRegExps?: boolean;
+    readonly skipJSXText?: boolean;
   };
 
   export type RuleEntry =
@@ -7782,10 +7887,11 @@ namespace NoNewNativeNonconstructor {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | true       |
  *  | recommended | false      |
  */
 namespace NoNewObject {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = 'off';
 }
 
 /**
@@ -7852,6 +7958,20 @@ namespace NoNonoctalDecimalEscape {
  *  | recommended | true    |
  */
 namespace NoObjCalls {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
+ * @description Disallow calls to the `Object` constructor without an argument
+ * @link https://eslint.org/docs/latest/rules/no-object-constructor
+ *
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
+ */
+namespace NoObjectConstructor {
   export type RuleEntry = Linter.RuleLevel;
 }
 
@@ -8037,13 +8157,38 @@ namespace NoProcessExit {
  * @description Disallow returning values from Promise executor functions
  * @link https://eslint.org/docs/latest/rules/no-promise-executor-return
  *
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
  */
 namespace NoPromiseExecutorReturn {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowVoid": {
+   *         "type": "boolean",
+   *         "default": false
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly allowVoid?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -8732,11 +8877,12 @@ namespace NoReturnAssign {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | true       |
  *  | hasSuggestions | true       |
  *  | recommended    | false      |
  */
 namespace NoReturnAwait {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = 'off';
 }
 
 /**
@@ -11810,7 +11956,7 @@ namespace RequireJsdoc {
 }
 
 /**
- * @description Enforce the use of `u` flag on RegExp
+ * @description Enforce the use of `u` or `v` flag on RegExp
  * @link https://eslint.org/docs/latest/rules/require-unicode-regexp
  *
  *  | key            | value      |
@@ -13259,11 +13405,11 @@ export type EslintRules = {
   readonly 'no-new': NoNew.RuleEntry;
   readonly 'no-new-func': NoNewFunc.RuleEntry;
   readonly 'no-new-native-nonconstructor': NoNewNativeNonconstructor.RuleEntry;
-  readonly 'no-new-object': NoNewObject.RuleEntry;
   readonly 'no-new-symbol': NoNewSymbol.RuleEntry;
   readonly 'no-new-wrappers': NoNewWrappers.RuleEntry;
   readonly 'no-nonoctal-decimal-escape': NoNonoctalDecimalEscape.RuleEntry;
   readonly 'no-obj-calls': NoObjCalls.RuleEntry;
+  readonly 'no-object-constructor': NoObjectConstructor.RuleEntry;
   readonly 'no-octal': NoOctal.RuleEntry;
   readonly 'no-octal-escape': NoOctalEscape.RuleEntry;
   readonly 'no-param-reassign': NoParamReassign.RuleEntry;
@@ -13279,7 +13425,6 @@ export type EslintRules = {
   readonly 'no-restricted-properties': NoRestrictedProperties.RuleEntry;
   readonly 'no-restricted-syntax': NoRestrictedSyntax.RuleEntry;
   readonly 'no-return-assign': NoReturnAssign.RuleEntry;
-  readonly 'no-return-await': NoReturnAwait.RuleEntry;
   readonly 'no-script-url': NoScriptUrl.RuleEntry;
   readonly 'no-self-assign': NoSelfAssign.RuleEntry;
   readonly 'no-self-compare': NoSelfCompare.RuleEntry;
@@ -13397,11 +13542,13 @@ export type EslintRules = {
   readonly 'no-mixed-requires': NoMixedRequires.RuleEntry;
   readonly 'no-native-reassign': NoNativeReassign.RuleEntry;
   readonly 'no-negated-in-lhs': NoNegatedInLhs.RuleEntry;
+  readonly 'no-new-object': NoNewObject.RuleEntry;
   readonly 'no-new-require': NoNewRequire.RuleEntry;
   readonly 'no-path-concat': NoPathConcat.RuleEntry;
   readonly 'no-process-env': NoProcessEnv.RuleEntry;
   readonly 'no-process-exit': NoProcessExit.RuleEntry;
   readonly 'no-restricted-modules': NoRestrictedModules.RuleEntry;
+  readonly 'no-return-await': NoReturnAwait.RuleEntry;
   readonly 'no-spaced-func': NoSpacedFunc.RuleEntry;
   readonly 'no-sync': NoSync.RuleEntry;
   readonly 'prefer-reflect': PreferReflect.RuleEntry;
