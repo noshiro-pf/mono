@@ -4,6 +4,7 @@
   "private": false,
   "license": "MIT",
   "author": "noshiro",
+  "type": "module",
   "browser": "src/main.tsx",
   "scripts": {
     "build": "yarn z:bundle:wireit",

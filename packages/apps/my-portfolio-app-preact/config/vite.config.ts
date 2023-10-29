@@ -3,6 +3,7 @@
 /* eslint-disable import/no-internal-modules */
 /* eslint-disable import/no-named-as-default */
 
+import mdx from '@mdx-js/rollup';
 import { castDeepWritable, tp } from '@noshiro/ts-utils';
 import preact from '@preact/preset-vite';
 import inject from '@rollup/plugin-inject';
@@ -10,7 +11,6 @@ import legacy from '@vitejs/plugin-legacy';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
-import mdPlugin, { Mode } from 'vite-plugin-markdown';
 import { genGlobalImportDefsFromDevDependencies } from '../../../../scripts/get-global-import-def-from-dev-dependencies.mjs';
 import packageJson from '../package.json' assert { type: 'json' };
 
@@ -24,14 +24,16 @@ const providePluginDefs = genGlobalImportDefsFromDevDependencies(
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    mdx({
+      jsxImportSource: 'preact',
+    }),
     preact(),
-    mdPlugin({ mode: [Mode.REACT] }),
     inject({
       modules: castDeepWritable({
         ...providePluginDefs,
         dict: tp('@/constants/dictionary/dictionary', 'dict'),
       }),
-      include: ['src/**/*.ts', 'src/**/*.tsx'] as const,
+      include: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.mdx'] as const,
     }),
     legacy(),
   ],
