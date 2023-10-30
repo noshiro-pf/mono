@@ -68,6 +68,7 @@
     "@solid/eslint-config-base": "^0.6.0",
     "@types/argparse": "^2.0.10",
     "@types/eslint": "^8.44.4",
+    "@types/jest": "^29.5.6",
     "@types/node": "^20.7.2",
     "@types/nodemailer": "^6.4.4",
     "@types/react": "^18.2.15",
