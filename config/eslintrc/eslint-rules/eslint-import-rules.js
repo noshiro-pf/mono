@@ -25,7 +25,7 @@ const eslintImportsRules = {
       allow: [
         'rxjs/operators',
         'solid-js/web',
-        '@testing-library/jest-dom/extend-expect',
+        '@testing-library/jest-dom/**',
         'react-dom/client',
         'preact/**',
         'immer/**',
@@ -107,11 +107,7 @@ const eslintImportsRules = {
   'import/no-unassigned-import': [
     'error',
     {
-      allow: [
-        '**/*.css',
-        '@testing-library/jest-dom/extend-expect',
-        'solid-js',
-      ],
+      allow: ['**/*.css', '@testing-library/jest-dom/**', 'solid-js'],
     },
   ],
   'import/no-named-default': 'off',
