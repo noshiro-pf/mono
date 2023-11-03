@@ -6,7 +6,7 @@ topics: ['typescript']
 published: true
 ---
 
-ほぼ私のライブラリ [ts-type-utils-no-stdlib](https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-type-utils-no-stdlib) と [ts-type-utils](https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-type-utils) からの抜粋です（都合により stdlib に依存するかどうかでパッケージを分けています）。
+ほぼ私のライブラリ [ts-type-utils-no-stdlib](https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-type-utils-no-stdlib) と [ts-type-utils](https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-type-utils) からの抜粋です（都合により TypeScript 標準ライブラリ（`lib.es5.d.ts` 等）に依存するかどうかでパッケージを分けています）。
 随時更新していきます。
 
 ---
@@ -154,15 +154,16 @@ Type Challenges^[[Type Challenges (IsUnion)](https://github.com/type-challenges/
 ```ts
 type IsUnion<U> = _IsUnionImpl<U, U>;
 
+/** @internal */
 type _IsUnionImpl<U, K extends U> = IsNever<U> extends true
   ? false
   : K extends K
-  ? BoolNot<IsNever<Exclude<U, K>>>
+  ? BoolNot<TypeEq<U, K>>
   : never;
 ```
 
 まず与えられた型 `U` が `never` であれば `false` を返します。
-次に union distribution[^1] を用いて `U` の各要素 `K` 取り出し、その `K` を `U` から除いた型 `Exclude<U, K>` が `never` と等しければ、`U` は 1 要素の union ということになるので `false` を返し、そうでない場合は `true` を返す、という仕組みです。
+次に union distribution[^1] を用いて `U` の各要素 `K` 取り出し、その `K` と `U` が等しければ、`U` は 1 要素の union ということになるので `false` を返し、そうでない場合は `true` を返す、という仕組みです。なお、最後の `never` に評価されることはありません（union distribution のイディオム）。
 
 :::details ソースコード
 https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/is-union.ts
@@ -190,7 +191,7 @@ type ToNumber<S extends `${number}`>
 ```
 
 :::message
-注意： TypeScript 4.8 で実装された機能 に依存しているため、それ以前のバージョンでは tuple 型を経由して "length" プロパティを取り出す大掛かりな実装が必要になる。
+注意： TypeScript 4.8 で実装された機能 に依存しているため、それ以前のバージョンでは tuple 型を経由して "length" プロパティを取り出す大掛かりな実装が必要になります。
 
 @[card](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-8.html#improved-inference-for-infer-types-in-template-string-types)
 :::
@@ -258,7 +259,7 @@ type _IndexOfTupleImpl<
 ```
 
 タプル型 `T` から `keyof T` を取り出してそれらを `ToNumber` で map した結果を得るという実装です。 `K extends keyof T` のところで union distribution[^1] を使っています。
-`K extends '${number}'`は `K` が `ToNumber` の制約を満たしていることを教えるために追加していますが `IndexOfTuple` からの入力では必ず真になる実質何もしていない条件部です。
+`K extends '${number}'`は `K` が `ToNumber` の制約を満たしているというヒントを型システムに与えるために追加していますが、 `IndexOfTuple` からの入力では必ず真になるので実質何もしていない条件部です。
 
 :::details ソースコード
 https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/index-of-tuple.ts
