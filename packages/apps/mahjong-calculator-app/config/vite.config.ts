@@ -27,7 +27,7 @@ export default defineConfig({
     inject({
       modules: castDeepWritable({
         ...providePluginDefs,
-        dict: tp('@/constants/dictionary', 'dict'),
+        dict: tp('~/constants/dictionary', 'dict'),
       }),
       include: ['src/**/*.ts', 'src/**/*.tsx'] as const,
     }),
@@ -37,6 +37,6 @@ export default defineConfig({
     outDir: 'build',
   },
   resolve: {
-    alias: [{ find: '@', replacement: resolve(thisDir, '../', 'src') }],
+    alias: [{ find: '~', replacement: resolve(thisDir, '../', 'src') }],
   },
 });

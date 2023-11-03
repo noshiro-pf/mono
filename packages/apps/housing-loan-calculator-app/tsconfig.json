@@ -8,7 +8,7 @@
     // customize
     "baseUrl": "./src/",
     "paths": {
-      "@/*": ["./*"]
+      "~/*": ["./*"]
     },
     "types": ["vitest/globals"]
   },
