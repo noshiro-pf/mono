@@ -7973,10 +7973,10 @@ eslint-module-utils@^2.7.4, eslint-module-utils@^2.8.0:
   dependencies:
     debug "^3.2.7"
 
-eslint-plugin-array-func@^3.1.8:
-  version "3.1.8"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-array-func/-/eslint-plugin-array-func-3.1.8.tgz#9dd635627f604e1ed6faf0c5525a8f84d48ed599"
-  integrity sha512-BjnbJvw+knaHgVddIL3q5xYcoqAZoK8wOdT7QF+mkvSAjXdZCdhL0z71Y7oRtgXA8BpN9QLJ2uHgD3I6ymlbOw==
+eslint-plugin-array-func@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-array-func/-/eslint-plugin-array-func-4.0.0.tgz#0c1ca0ac06d4974f2ebed372bb63bcc7252ac1c0"
+  integrity sha512-p3NY2idNIvgmQLF2/62ZskYt8gOuUgQ51smRc3Lh7FtSozpNc2sg+lniz9VaCagLZHEZTl8qGJKqE7xy8O/D/g==
 
 eslint-plugin-cypress@^2.12.1:
   version "2.12.1"

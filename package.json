@@ -94,7 +94,7 @@
     "eslint": "^8.51.0",
     "eslint-gitignore": "^0.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
-    "eslint-plugin-array-func": "^3.1.8",
+    "eslint-plugin-array-func": "^4.0.0",
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-deprecation": "^2.0.0",
     "eslint-plugin-functional": "^6.0.0",
