@@ -109,7 +109,7 @@
     "eslint-plugin-total-functions": "^7.0.7",
     "eslint-plugin-unicorn": "^48.0.1",
     "file-loader": "^6.2.0",
-    "firebase-admin": "^11.10.1",
+    "firebase-admin": "^11.11.1",
     "firebase-functions-test": "^3.1.0",
     "firebase-tools": "^12.9.1",
     "glob": "^10.2.6",
