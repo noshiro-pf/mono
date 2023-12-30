@@ -63,7 +63,7 @@
     "@noshiro/ts-type-utils": "*"
   },
   "engines": {
-    "node": "16"
+    "node": ">=16"
   },
   "wireit": {
     "z:build:wireit": {
