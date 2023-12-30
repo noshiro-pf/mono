@@ -61,10 +61,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         id: setup_node_id
         with:
-          node-version: 16
+          node-version: 20
           cache: 'yarn'
           cache-dependency-path: yarn.lock
 
@@ -111,10 +111,10 @@ jobs:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '17'
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         id: setup_node_id
         with:
-          node-version: 16
+          node-version: 20
           cache: 'yarn'
           cache-dependency-path: yarn.lock
 
