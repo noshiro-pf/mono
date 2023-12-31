@@ -85,7 +85,7 @@
     "argparse": "^2.0.1",
     "command-line-args": "^5.2.1",
     "cross-env": "^7.0.3",
-    "cspell": "^7.3.8",
+    "cspell": "^8.2.4",
     "css-loader": "^6.2.0",
     "cypress": "^12.17.3",
     "cypress-fail-on-console-error": "^4.0.2",
