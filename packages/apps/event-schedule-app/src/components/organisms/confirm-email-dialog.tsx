@@ -22,15 +22,11 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
       [state.formState.email.error],
     );
 
-    const onKeyDown = useCallback(
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      (ev: KeyboardEvent) => {
-        if (ev.key === 'Enter') {
-          ConfirmEmailDialogStore.enterClickHandler();
-        }
-      },
-      [],
-    );
+    const onKeyDown = useCallback((ev: KeyboardEvent) => {
+      if (ev.key === 'Enter') {
+        ConfirmEmailDialogStore.enterClickHandler();
+      }
+    }, []);
 
     useKeyEventListener(onKeyDown, noop);
 

@@ -39,7 +39,6 @@ import { AnswerPageError } from './error';
 
 const dc = dict.answerPage;
 
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const saveAsImage = (canvas: HTMLCanvasElement): void => {
   const targetImgUri: string = canvas.toDataURL('img/png');
 

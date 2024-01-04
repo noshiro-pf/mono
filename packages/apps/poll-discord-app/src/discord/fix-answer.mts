@@ -19,10 +19,10 @@ import {
  */
 export const fixAnswerAndUpdateMessage = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messages: Discord.Collection<string, Discord.Message>,
+  mut_messages: Discord.Collection<string, Discord.Message>,
   poll: Poll,
 ): Promise<Result<undefined, string>> => {
-  const pollMessage = messages.find((m) => m.id === poll.id);
+  const pollMessage = mut_messages.find((m) => m.id === poll.id);
 
   if (pollMessage === undefined) {
     return Result.err(`message with id ${poll.id} not found`);
@@ -38,7 +38,7 @@ export const fixAnswerAndUpdateMessage = async (
     .map((dateOption) =>
       tp(
         toDateOptionId(dateOption.id),
-        messages.find((m) => m.id === dateOption.id),
+        mut_messages.find((m) => m.id === dateOption.id),
       ),
     )
     .filter((a): a is readonly [DateOptionId, Discord.Message] =>

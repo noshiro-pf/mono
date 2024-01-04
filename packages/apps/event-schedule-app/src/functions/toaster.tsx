@@ -6,13 +6,9 @@ import { createRoot } from 'react-dom/client';
 
 const callback =
   (
-    resolve: (
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      value: OverlayToaster | PromiseLike<OverlayToaster>,
-    ) => void,
+    resolve: (value: OverlayToaster | PromiseLike<OverlayToaster>) => void,
     reject: (reason?: unknown) => void,
   ) =>
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   (instance: OverlayToaster | null) => {
     if (instance === null) {
       reject(new Error('[Blueprint] Unable to create toaster.'));

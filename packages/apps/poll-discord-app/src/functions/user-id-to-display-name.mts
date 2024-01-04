@@ -3,7 +3,6 @@ import { toUserId, type UserId } from '../types/index.mjs';
 import { quoteIfSpaceIncluded } from './quote-if-space-included.mjs';
 
 export const createUserIdToDisplayNameMap = async (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   guild: Discord.Guild | null,
   userIds: readonly UserId[] | undefined,
 ): Promise<Result<IMap<UserId, string>, string>> => {

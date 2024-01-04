@@ -26,7 +26,6 @@ export const fetchEventListOfUserImpl = async (
     showAllPastDaysEvent,
     showOnlyEventSchedulesICreated,
   }: FetchEventListOfUserPayload,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   context: CallableContext,
 ): Promise<readonly EventListItem[]> => {
   // Checking that the user is authenticated.

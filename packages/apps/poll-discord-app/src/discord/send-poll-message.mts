@@ -230,7 +230,6 @@ const gpSendRandMessageSub = async (
 };
 
 const gpSendGroupingMessage = async (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   messageFilled: Discord.Message,
 ): Promise<Result<undefined, unknown>> => {
   const parseResult = gpParseGroupingCommandArgument(
@@ -251,7 +250,6 @@ const gpSendGroupingMessage = async (
 };
 
 const gpSendRandMessage = async (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   messageFilled: Discord.Message,
 ): Promise<Result<undefined, unknown>> => {
   const parseResult = gpParseRandCommandArgument(
@@ -267,7 +265,6 @@ const gpSendRandMessage = async (
 };
 
 export const sendMessageMain = async (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   message: Discord.Message,
 ): Promise<Result<undefined, unknown>> => {
   if (message.author.bot) return Result.ok(undefined);
