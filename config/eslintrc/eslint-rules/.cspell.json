@@ -1,0 +1,25 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "backreference",
+    "blueprintjs",
+    "camelcase",
+    "chunkname",
+    "fontsource",
+    "iife",
+    "immer",
+    "linebreak",
+    "multilines",
+    "nonblock",
+    "nonconstructor",
+    "nonoctal",
+    "noshiro",
+    "plusplus",
+    "preact",
+    "setstate",
+    "textnodes",
+    "transpile",
+    "transpiles"
+  ]
+}
