@@ -151,12 +151,10 @@ type LEQ = {
   readonly [N in SmallUint]: Index<N>;
 };
 
-type RangeList<S extends SmallUint, E extends SmallUint> = BoolOr<
-  IsUnion<S>,
-  IsUnion<E>
-> extends true
-  ? readonly RelaxedExclude<LEQ[E], LEQ[Min<S>]>[] // union に対して Seq で型計算すると、結果が正しくないので、その回避のため
-  : ListType.Skip<S, Seq<E>>;
+type RangeList<S extends SmallUint, E extends SmallUint> =
+  BoolOr<IsUnion<S>, IsUnion<E>> extends true
+    ? readonly RelaxedExclude<LEQ[E], LEQ[Min<S>]>[] // union に対して Seq で型計算すると、結果が正しくないので、その回避のため
+    : ListType.Skip<S, Seq<E>>;
 
 function range<S extends SmallUint, E extends SmallUint>(
   start: S,

@@ -8,7 +8,7 @@ export const getCardDirection = (
   playerCards.W.some((c) => cardEq(c, target))
     ? 'W'
     : playerCards.E.some((c) => cardEq(c, target))
-    ? 'E'
-    : playerCards.N.some((c) => cardEq(c, target))
-    ? 'N'
-    : 'S';
+      ? 'E'
+      : playerCards.N.some((c) => cardEq(c, target))
+        ? 'N'
+        : 'S';

@@ -27,11 +27,11 @@ export const errorType$: InitializedObservable<
             type: esr.value,
           } as const)
         : ar !== undefined && Result.isErr(ar)
-        ? ({
-            data: 'answersResult' as const,
-            type: ar.value,
-          } as const)
-        : undefined,
+          ? ({
+              data: 'answersResult' as const,
+              type: ar.value,
+            } as const)
+          : undefined,
     ),
   )
   .chain(withInitialValue(undefined));

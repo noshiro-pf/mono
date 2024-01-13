@@ -157,8 +157,8 @@ const datetimeRangeListReordered$ = combineLatestI([
           ? datetimeRangeList
           : datetimeRangeListReversed
         : sortOrder === 'asc'
-        ? datetimeRangeListSortedByScores
-        : datetimeRangeListSortedByScoresReversed,
+          ? datetimeRangeListSortedByScores
+          : datetimeRangeListSortedByScoresReversed,
   ),
 );
 
@@ -240,8 +240,8 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
                     score === 1
                       ? answerTableColor.perfectColor
                       : score >= answerTableColor.goodThreshold
-                      ? answerTableColor.goodColor
-                      : undefined,
+                        ? answerTableColor.goodColor
+                        : undefined,
                 },
               } as const;
 

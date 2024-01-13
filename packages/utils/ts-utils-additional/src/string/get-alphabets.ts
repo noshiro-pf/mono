@@ -6,8 +6,8 @@ export const getAlphabets = <Case extends 'lower' | 'upper'>(
 ): [Case] extends ['lower']
   ? LowerAlphabet[]
   : [Case] extends ['upper']
-  ? UpperAlphabet[]
-  : never => {
+    ? UpperAlphabet[]
+    : never => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const code = charCase === 'lower' ? 'a'.codePointAt(0)! : 'A'.codePointAt(0)!;
 
@@ -17,6 +17,6 @@ export const getAlphabets = <Case extends 'lower' | 'upper'>(
   ] extends ['lower']
     ? LowerAlphabet[]
     : [Case] extends ['upper']
-    ? UpperAlphabet[]
-    : never;
+      ? UpperAlphabet[]
+      : never;
 };

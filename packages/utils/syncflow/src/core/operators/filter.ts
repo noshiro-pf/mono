@@ -33,8 +33,8 @@ class FilterObservableClass<A>
       initialValue: Maybe.isNone(parentObservable.snapshot)
         ? Maybe.none
         : predicate(parentObservable.snapshot.value)
-        ? parentObservable.snapshot
-        : Maybe.none,
+          ? parentObservable.snapshot
+          : Maybe.none,
     });
     this.#predicate = predicate;
   }

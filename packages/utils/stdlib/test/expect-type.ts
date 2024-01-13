@@ -9,6 +9,6 @@ export const expectType = <A, B>(
   _relation: TypeEq<A, B> extends true
     ? '<=' | '='
     : TypeExtends<A, B> extends true
-    ? '!=' | '<='
-    : '!<=' | '!=',
+      ? '!=' | '<='
+      : '!<=' | '!=',
 ): void => undefined;

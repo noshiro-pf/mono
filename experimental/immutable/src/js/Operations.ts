@@ -750,8 +750,8 @@ export function sortFactory(collection, comparator, mapper) {
   return isKeyedCollection
     ? KeyedSeq(entries)
     : isIndexed(collection)
-    ? IndexedSeq(entries)
-    : SetSeq(entries);
+      ? IndexedSeq(entries)
+      : SetSeq(entries);
 }
 
 export function maxFactory(collection, comparator, mapper) {
@@ -854,8 +854,8 @@ function collectionClass(collection) {
   return isKeyed(collection)
     ? KeyedCollection
     : isIndexed(collection)
-    ? IndexedCollection
-    : SetCollection;
+      ? IndexedCollection
+      : SetCollection;
 }
 
 function makeSequence(collection) {
@@ -863,8 +863,8 @@ function makeSequence(collection) {
     (isKeyed(collection)
       ? KeyedSeq
       : isIndexed(collection)
-      ? IndexedSeq
-      : SetSeq
+        ? IndexedSeq
+        : SetSeq
     ).prototype,
   );
 }

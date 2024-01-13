@@ -177,10 +177,10 @@ const withSlash = (path: string): string =>
   path.endsWith('/')
     ? path
     : path.includes('/?')
-    ? path
-    : path.includes('?')
-    ? path.split('?').join('/?')
-    : `${path}/`;
+      ? path
+      : path.includes('?')
+        ? path.split('?').join('/?')
+        : `${path}/`;
 
 const splitToPathSegments = (pathname: string): readonly string[] =>
   pathname.split('/').filter((s) => s !== '');

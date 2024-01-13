@@ -65,11 +65,11 @@ const clampAndRoundFn =
     !Number.isFinite(x)
       ? cfg.defaultValue
       : x < cfg.min
-      ? cfg.min
-      : cfg.max < x
-      ? cfg.max
-      : // eslint-disable-next-line no-restricted-syntax
-        ((Math.round(x * 10 ** cfg.digit) / 10 ** cfg.digit) as T);
+        ? cfg.min
+        : cfg.max < x
+          ? cfg.max
+          : // eslint-disable-next-line no-restricted-syntax
+            ((Math.round(x * 10 ** cfg.digit) / 10 ** cfg.digit) as T);
 
 export const clampAndRoundAnswerFairIconPoint =
   clampAndRoundFn<AnswerIconPoint>({

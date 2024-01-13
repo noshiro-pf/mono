@@ -242,19 +242,20 @@ type _SmallNegativeInt<MaxIndex extends number> = NegativeIndex<MaxIndex>;
 export type SmallInt<
   T extends '!=0' | '' | '<=0' | '<0' | '>=0' | '>0' = '',
   MaxIndex extends number = _SmallIntIndexMax,
-> = TypeEq<T, '<=0'> extends true
-  ? _SmallNegativeInt<MaxIndex> | 0
-  : TypeEq<T, '<0'> extends true
-  ? _SmallNegativeInt<MaxIndex>
-  : TypeEq<T, '>=0'> extends true
-  ? _SmallPositiveInt<MaxIndex> | 0
-  : TypeEq<T, '>0'> extends true
-  ? _SmallPositiveInt<MaxIndex>
-  : TypeEq<T, '!=0'> extends true
-  ? _SmallNegativeInt<MaxIndex> | _SmallPositiveInt<MaxIndex>
-  : TypeEq<T, ''> extends true
-  ? _SmallNegativeInt<MaxIndex> | _SmallPositiveInt<MaxIndex> | 0
-  : never;
+> =
+  TypeEq<T, '<=0'> extends true
+    ? _SmallNegativeInt<MaxIndex> | 0
+    : TypeEq<T, '<0'> extends true
+      ? _SmallNegativeInt<MaxIndex>
+      : TypeEq<T, '>=0'> extends true
+        ? _SmallPositiveInt<MaxIndex> | 0
+        : TypeEq<T, '>0'> extends true
+          ? _SmallPositiveInt<MaxIndex>
+          : TypeEq<T, '!=0'> extends true
+            ? _SmallNegativeInt<MaxIndex> | _SmallPositiveInt<MaxIndex>
+            : TypeEq<T, ''> extends true
+              ? _SmallNegativeInt<MaxIndex> | _SmallPositiveInt<MaxIndex> | 0
+              : never;
 
 export type SmallUint = SmallInt<'>=0'>;
 

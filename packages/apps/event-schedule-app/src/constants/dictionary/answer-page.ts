@@ -11,12 +11,12 @@ const genTagName = (
     min === max
       ? `${commonText} = ${min}`
       : min === 0
-      ? max === Number.POSITIVE_INFINITY
-        ? `${commonText} ≦ ∞` // dummy
-        : `${commonText} ≦ ${max}`
-      : max === Number.POSITIVE_INFINITY
-      ? `${min} ≦ ${commonText}`
-      : `${min} ≦ ${commonText} ≦ ${max}`;
+        ? max === Number.POSITIVE_INFINITY
+          ? `${commonText} ≦ ∞` // dummy
+          : `${commonText} ≦ ${max}`
+        : max === Number.POSITIVE_INFINITY
+          ? `${min} ≦ ${commonText}`
+          : `${min} ≦ ${commonText} ≦ ${max}`;
 };
 
 const genTagNameAdded = (
@@ -28,12 +28,12 @@ const genTagNameAdded = (
     min === max
       ? `${commonText} = ${min}`
       : min === 0
-      ? max === Number.POSITIVE_INFINITY
-        ? `${commonText} ≦ ∞` // dummy
-        : `${commonText} ≦ ${max}`
-      : max === Number.POSITIVE_INFINITY
-      ? `${min} ≦ ${commonText}`
-      : `${min} ≦ ${commonText} ≦ ${max}`;
+        ? max === Number.POSITIVE_INFINITY
+          ? `${commonText} ≦ ∞` // dummy
+          : `${commonText} ≦ ${max}`
+        : max === Number.POSITIVE_INFINITY
+          ? `${min} ≦ ${commonText}`
+          : `${min} ≦ ${commonText} ≦ ${max}`;
 };
 
 export const answerPageDictionary = {

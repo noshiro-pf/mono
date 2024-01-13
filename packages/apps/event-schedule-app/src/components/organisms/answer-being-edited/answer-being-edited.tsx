@@ -141,8 +141,8 @@ export const AnswerBeingEdited = memoNamed<Props>(
                           checkboxesState.size === answerBeingEditedList.length
                             ? 'checked'
                             : checkboxesState.size === 0
-                            ? 'none'
-                            : 'indeterminate'
+                              ? 'none'
+                              : 'indeterminate'
                         }
                         onCheck={AnswerPageStore.onCheckAll}
                       />

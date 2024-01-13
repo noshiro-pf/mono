@@ -474,10 +474,10 @@ type Props = Readonly<{
       !Number.isFinite(x)
         ? p.defaultValue
         : x < p.min
-        ? p.min
-        : p.max < x
-        ? p.max
-        : ((Math.round(x * 10 ** p.digit) / 10 ** p.digit) as T);
+          ? p.min
+          : p.max < x
+            ? p.max
+            : ((Math.round(x * 10 ** p.digit) / 10 ** p.digit) as T);
   ```
 
 動くコード

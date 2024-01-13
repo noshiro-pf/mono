@@ -8,16 +8,14 @@ export type IndexOfTuple<T extends readonly unknown[]> = _IndexOfTupleImpl<
 >;
 
 /** @internal */
-type _IndexOfTupleImpl<
-  T extends readonly unknown[],
-  K,
-> = IsFixedLengthList<T> extends true
-  ? K extends keyof T
-    ? K extends `${number}`
-      ? ToNumber<K>
+type _IndexOfTupleImpl<T extends readonly unknown[], K> =
+  IsFixedLengthList<T> extends true
+    ? K extends keyof T
+      ? K extends `${number}`
+        ? ToNumber<K>
+        : never
       : never
-    : never
-  : SafeUint;
+    : SafeUint;
 
 // export type IndexOfTuple<T extends readonly unknown[]> = TypeEq<
 //   T,

@@ -8,8 +8,8 @@ export namespace ListType {
   export type Last<T extends readonly unknown[]> = T extends readonly []
     ? never
     : T extends readonly [unknown]
-    ? Head<T>
-    : Last<Tail<T>>;
+      ? Head<T>
+      : Last<Tail<T>>;
 
   export type ButLast<A extends readonly unknown[]> = Tuple.ButLast<A>;
 
@@ -18,38 +18,27 @@ export namespace ListType {
   export type Reverse<L extends readonly unknown[]> = L extends readonly []
     ? readonly []
     : IsFixedLengthList<L> extends true
-    ? Tuple.Reverse<L>
-    : L extends readonly [unknown, ...(readonly unknown[])]
-    ? readonly [...Reverse<Tail<L>>, Head<L>]
-    : Readonly<L>;
+      ? Tuple.Reverse<L>
+      : L extends readonly [unknown, ...(readonly unknown[])]
+        ? readonly [...Reverse<Tail<L>>, Head<L>]
+        : Readonly<L>;
 
-  export type Take<
-    N extends number,
-    T extends readonly unknown[],
-  > = IsFixedLengthList<T> extends true ? Tuple.Take<N, T> : T;
+  export type Take<N extends number, T extends readonly unknown[]> =
+    IsFixedLengthList<T> extends true ? Tuple.Take<N, T> : T;
 
-  export type Skip<
-    N extends number,
-    T extends readonly unknown[],
-  > = IsFixedLengthList<T> extends true ? Tuple.Skip<N, T> : T;
+  export type Skip<N extends number, T extends readonly unknown[]> =
+    IsFixedLengthList<T> extends true ? Tuple.Skip<N, T> : T;
 
-  export type TakeLast<
-    N extends number,
-    T extends readonly unknown[],
-  > = IsFixedLengthList<T> extends true ? Tuple.TakeLast<N, T> : T;
+  export type TakeLast<N extends number, T extends readonly unknown[]> =
+    IsFixedLengthList<T> extends true ? Tuple.TakeLast<N, T> : T;
 
-  export type SkipLast<
-    N extends number,
-    T extends readonly unknown[],
-  > = IsFixedLengthList<T> extends true ? Tuple.SkipLast<N, T> : T;
+  export type SkipLast<N extends number, T extends readonly unknown[]> =
+    IsFixedLengthList<T> extends true ? Tuple.SkipLast<N, T> : T;
 
-  export type SetAt<
-    T extends readonly unknown[],
-    I extends number,
-    V,
-  > = IsFixedLengthList<T> extends true
-    ? Tuple.SetAt<T, I, V>
-    : readonly (T[number] | V)[];
+  export type SetAt<T extends readonly unknown[], I extends number, V> =
+    IsFixedLengthList<T> extends true
+      ? Tuple.SetAt<T, I, V>
+      : readonly (T[number] | V)[];
 
   export type Flatten<T extends readonly (readonly unknown[])[]> =
     Tuple.Flatten<T>;
@@ -65,20 +54,20 @@ export namespace ListType {
   > = A extends readonly []
     ? readonly []
     : B extends readonly []
-    ? readonly []
-    : A extends NonEmptyArray<unknown>
-    ? B extends NonEmptyArray<unknown>
-      ? readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>] // both A and B has at least 1 element
-      : readonly [
-          readonly [Head<A>, B[number] | undefined],
-          ...Zip<Tail<A>, Tail<B>>,
-        ] // A has at least 1 element but B doesn't
-    : B extends NonEmptyArray<unknown>
-    ? readonly [
-        readonly [A[number] | undefined, Head<B>],
-        ...Zip<Tail<A>, Tail<B>>,
-      ] // B has at least 1 element but A doesn't
-    : readonly (readonly [A[number], B[number]])[];
+      ? readonly []
+      : A extends NonEmptyArray<unknown>
+        ? B extends NonEmptyArray<unknown>
+          ? readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>] // both A and B has at least 1 element
+          : readonly [
+              readonly [Head<A>, B[number] | undefined],
+              ...Zip<Tail<A>, Tail<B>>,
+            ] // A has at least 1 element but B doesn't
+        : B extends NonEmptyArray<unknown>
+          ? readonly [
+              readonly [A[number] | undefined, Head<B>],
+              ...Zip<Tail<A>, Tail<B>>,
+            ] // B has at least 1 element but A doesn't
+          : readonly (readonly [A[number], B[number]])[];
 
   export type Partition<
     N extends number,

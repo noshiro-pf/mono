@@ -89,10 +89,10 @@ export class List extends IndexedCollection {
     return !this.has(index)
       ? this
       : index === 0
-      ? this.shift()
-      : index === this.size - 1
-      ? this.pop()
-      : this.splice(index, 1);
+        ? this.shift()
+        : index === this.size - 1
+          ? this.pop()
+          : this.splice(index, 1);
   }
 
   insert(index, value) {
@@ -546,8 +546,8 @@ function setListBounds(list, begin, end) {
     end === undefined
       ? oldCapacity
       : end < 0
-      ? oldCapacity + end
-      : oldOrigin + end;
+        ? oldCapacity + end
+        : oldOrigin + end;
   if (newOrigin === oldOrigin && newCapacity === oldCapacity) {
     return list;
   }
@@ -595,8 +595,8 @@ function setListBounds(list, begin, end) {
     newTailOffset < oldTailOffset
       ? listNodeFor(list, newCapacity - 1)
       : newTailOffset > oldTailOffset
-      ? new VNode([], owner)
-      : oldTail;
+        ? new VNode([], owner)
+        : oldTail;
 
   // Merge Tail into tree.
   if (

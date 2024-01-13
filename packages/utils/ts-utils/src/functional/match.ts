@@ -6,10 +6,10 @@ import { keyIsIn } from '../guard';
 export type _IsLiteralType<T extends RecordKeyType> = string extends T
   ? false
   : number extends T
-  ? false
-  : symbol extends T
-  ? false
-  : true;
+    ? false
+    : symbol extends T
+      ? false
+      : true;
 
 export function match<Case extends RecordKeyType, V>(
   switchCase: Case,

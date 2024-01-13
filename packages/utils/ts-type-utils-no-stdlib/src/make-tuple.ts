@@ -46,16 +46,16 @@ export namespace _MakeTupleInternals {
   > = string extends N
     ? never
     : N extends ''
-    ? X
-    : First<N> extends infer U
-    ? U extends DigitStr
-      ? MakeTupleImpl<
-          Elm,
-          Tail<N>,
-          readonly [...Tile<[Elm], U>, ...Tile<X, 10>]
-        >
-      : never
-    : never;
+      ? X
+      : First<N> extends infer U
+        ? U extends DigitStr
+          ? MakeTupleImpl<
+              Elm,
+              Tail<N>,
+              readonly [...Tile<[Elm], U>, ...Tile<X, 10>]
+            >
+          : never
+        : never;
 }
 
 // type MakeTuple<Elm, N extends number> = _MakeTupleImpl<N, Elm, readonly []>;

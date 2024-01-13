@@ -135,12 +135,13 @@ console.log(getAllDatesOfMonth(2024, 2));
 `RangeList<S, E>` の本体は以下のような実装になります。
 
 ```ts
-type RangeList<S extends Uint8, E extends Uint8> = BoolOr<
-  BoolOr<IsNever<S>, IsNever<E>>, // S, E のいずれかが 0 要素の union の場合
-  BoolOr<IsUnion<S>, IsUnion<E>> // S, E のいずれかが >=2 要素の union の場合
-> extends true
-  ? readonly Exclude<LEQ[E], LEQ[Min<S>]>[] // union に対して Seq で型計算すると、結果が正しくないので、その回避のため
-  : Skip<S, Seq<E>>;
+type RangeList<S extends Uint8, E extends Uint8> =
+  BoolOr<
+    BoolOr<IsNever<S>, IsNever<E>>, // S, E のいずれかが 0 要素の union の場合
+    BoolOr<IsUnion<S>, IsUnion<E>> // S, E のいずれかが >=2 要素の union の場合
+  > extends true
+    ? readonly Exclude<LEQ[E], LEQ[Min<S>]>[] // union に対して Seq で型計算すると、結果が正しくないので、その回避のため
+    : Skip<S, Seq<E>>;
 ```
 
 - `Skip<S, Seq<E>>` の部分は `S` と `E` がちょうど 1 要素の非負整数（0 以上 255 以下）の場合に対応しています

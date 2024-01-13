@@ -72,8 +72,8 @@ export const answerSelectionReducer: Reducer<
               action.point === 0
                 ? 'good'
                 : action.point === 10
-                ? 'poor'
-                : 'fair',
+                  ? 'poor'
+                  : 'fair',
             comment: '',
           });
 

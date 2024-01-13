@@ -52,28 +52,28 @@ const UNSAFE_updateIn_impl = (
   index >= keyPath.length
     ? updater(obj)
     : Array.isArray(obj)
-    ? obj.map((v, i): unknown =>
-        i === keyPath[index]
-          ? UNSAFE_updateIn_impl(
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-restricted-syntax
-              obj[keyPath[index]!] as RecordBase,
-              keyPath,
-              SafeUint.add(index, 1),
-              updater,
-            )
-          : v,
-      )
-    : {
-        ...obj,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        [keyPath[index]!]: UNSAFE_updateIn_impl(
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-restricted-syntax
-          obj[keyPath[index]!] as RecordBase,
-          keyPath,
-          SafeUint.add(index, 1),
-          updater,
-        ),
-      };
+      ? obj.map((v, i): unknown =>
+          i === keyPath[index]
+            ? UNSAFE_updateIn_impl(
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-restricted-syntax
+                obj[keyPath[index]!] as RecordBase,
+                keyPath,
+                SafeUint.add(index, 1),
+                updater,
+              )
+            : v,
+        )
+      : {
+          ...obj,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          [keyPath[index]!]: UNSAFE_updateIn_impl(
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-restricted-syntax
+            obj[keyPath[index]!] as RecordBase,
+            keyPath,
+            SafeUint.add(index, 1),
+            updater,
+          ),
+        };
 
 const setIn = <R extends RecordBase>(
   record: R,
@@ -133,8 +133,8 @@ const merge = <R1 extends RecordBase, R2 extends RecordBase>(
   [Key in keyof R1 | keyof R2]: Key extends keyof R2
     ? R2[Key]
     : Key extends keyof R1
-    ? R1[Key]
-    : never;
+      ? R1[Key]
+      : never;
   // eslint-disable-next-line no-restricted-syntax
 }> => ({ ...record1, ...record2 }) as never;
 

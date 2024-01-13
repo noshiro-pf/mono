@@ -210,16 +210,16 @@ const dayCheckboxReducer: Reducer<
         Sat: action.checked,
       }
     : action.key === 'flip'
-    ? {
-        Sun: !state.Sun,
-        Mon: !state.Mon,
-        Tue: !state.Tue,
-        Wed: !state.Wed,
-        Thr: !state.Thr,
-        Fri: !state.Fri,
-        Sat: !state.Sat,
-      }
-    : Obj.set(state, action.key, action.checked);
+      ? {
+          Sun: !state.Sun,
+          Mon: !state.Mon,
+          Tue: !state.Tue,
+          Wed: !state.Wed,
+          Thr: !state.Thr,
+          Fri: !state.Fri,
+          Sat: !state.Sat,
+        }
+      : Obj.set(state, action.key, action.checked);
 
 const [checkboxState$, checkboxStateDispatch] = createReducer(
   dayCheckboxReducer,
@@ -274,5 +274,5 @@ const checkAllCheckboxState = ({
   Sun && Mon && Tue && Wed && Thr && Fri && Sat
     ? 'checked'
     : Sun || Mon || Tue || Wed || Thr || Fri || Sat
-    ? 'indeterminate'
-    : 'none';
+      ? 'indeterminate'
+      : 'none';

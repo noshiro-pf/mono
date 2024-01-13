@@ -3,14 +3,12 @@ import { type IsNever } from './is-never';
 
 export type Max<N extends Uint10> = _MaxImpl<N, []>;
 
-type _MaxImpl<
-  N extends Uint10,
-  T extends readonly unknown[],
-> = IsNever<N> extends true
-  ? never
-  : [N] extends [Partial<T>['length']]
-  ? T['length']
-  : _MaxImpl<N, [0, ...T]>;
+type _MaxImpl<N extends Uint10, T extends readonly unknown[]> =
+  IsNever<N> extends true
+    ? never
+    : [N] extends [Partial<T>['length']]
+      ? T['length']
+      : _MaxImpl<N, [0, ...T]>;
 
 // /** @internal */
 // namespace _MaxImpl {

@@ -31,10 +31,10 @@ export const DatetimeRangeCell = memoNamed<Props>(
           holidaysJpDefinition.has(datetimeRange.ymd)
             ? 'holiday'
             : dayValue === 0
-            ? 'Sunday'
-            : dayValue === 6
-            ? 'Saturday'
-            : 'normal',
+              ? 'Sunday'
+              : dayValue === 6
+                ? 'Saturday'
+                : 'normal',
           {
             holiday: calendarDateColor.sunday,
             Sunday: calendarDateColor.sunday,

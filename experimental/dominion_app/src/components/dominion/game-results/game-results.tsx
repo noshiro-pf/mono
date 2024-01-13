@@ -91,8 +91,8 @@ export const GameResults = memo(() => {
         v === 'reset'
           ? I.Set(numPlayersList)
           : v.checked
-          ? s.add(v.numPlayers)
-          : s.delete(v.numPlayers),
+            ? s.add(v.numPlayers)
+            : s.delete(v.numPlayers),
     ),
   )
 

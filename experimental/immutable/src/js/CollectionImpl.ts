@@ -149,8 +149,8 @@ mixin(Collection, {
     return isIndexed(this)
       ? this.toIndexedSeq()
       : isKeyed(this)
-      ? this.toKeyedSeq()
-      : this.toSetSeq();
+        ? this.toKeyedSeq()
+        : this.toSetSeq();
   },
 
   toStack() {
@@ -764,12 +764,12 @@ function hashCollection(collection) {
             h = (h + hashMerge(hash(v), hash(k))) | 0;
           }
       : ordered
-      ? (v) => {
-          h = (31 * h + hash(v)) | 0;
-        }
-      : (v) => {
-          h = (h + hash(v)) | 0;
-        },
+        ? (v) => {
+            h = (31 * h + hash(v)) | 0;
+          }
+        : (v) => {
+            h = (h + hash(v)) | 0;
+          },
   );
   return murmurHashOfSize(size, h);
 }

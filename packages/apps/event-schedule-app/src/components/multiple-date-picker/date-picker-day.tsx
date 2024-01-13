@@ -53,13 +53,13 @@ export const DatePickerDate = memoNamed<Props>(
               })
             : DatePickerDaySelectedReadonlyStyled
           : outside
-          ? DatePickerDayOutside
-          : match(dayType, {
-              holiday: DatePickerDayReadonlyHolidayStyled,
-              Sunday: DatePickerDayReadonlyHolidayStyled,
-              Saturday: DatePickerDayReadonlySaturdayStyled,
-              normal: DatePickerDayReadonlyStyled,
-            });
+            ? DatePickerDayOutside
+            : match(dayType, {
+                holiday: DatePickerDayReadonlyHolidayStyled,
+                Sunday: DatePickerDayReadonlyHolidayStyled,
+                Saturday: DatePickerDayReadonlySaturdayStyled,
+                normal: DatePickerDayReadonlyStyled,
+              });
       } else {
         // button
         return selected
@@ -67,13 +67,13 @@ export const DatePickerDate = memoNamed<Props>(
             ? DatePickerDaySelectedReadonlyStyled
             : DatePickerDaySelectedStyled
           : outside
-          ? DatePickerDayOutside
-          : match(dayType, {
-              holiday: DatePickerDayHolidayStyled,
-              Sunday: DatePickerDayHolidayStyled,
-              Saturday: DatePickerDaySaturdayStyled,
-              normal: DatePickerDayStyled,
-            });
+            ? DatePickerDayOutside
+            : match(dayType, {
+                holiday: DatePickerDayHolidayStyled,
+                Sunday: DatePickerDayHolidayStyled,
+                Saturday: DatePickerDaySaturdayStyled,
+                normal: DatePickerDayStyled,
+              });
       }
     }, [dayType, onClick, selected, outside, useOutlinedSelectedStyle]);
 

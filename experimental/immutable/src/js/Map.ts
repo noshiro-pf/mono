@@ -45,12 +45,12 @@ export class Map extends KeyedCollection {
     return value === null || value === undefined
       ? emptyMap()
       : isMap(value) && !isOrdered(value)
-      ? value
-      : emptyMap().withMutations((map) => {
-          const iter = KeyedCollection(value);
-          assertNotInfinite(iter.size);
-          iter.forEach((v, k) => map.set(k, v));
-        });
+        ? value
+        : emptyMap().withMutations((map) => {
+            const iter = KeyedCollection(value);
+            assertNotInfinite(iter.size);
+            iter.forEach((v, k) => map.set(k, v));
+          });
   }
 
   static of(...keyValues) {
