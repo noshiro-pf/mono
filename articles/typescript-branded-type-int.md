@@ -477,13 +477,14 @@ type ExtractBooleanKeys<B, K extends keyof B> = K extends K
 
 type UnwrapBrandBooleanKey<B> = ExtractBooleanKeys<B, keyof B>;
 
-type GetBrandValuePart<B> = B extends Brand<
-  infer T,
-  UnwrapBrandTrueKey<B> & string,
-  UnwrapBrandFalseKey<B> & string
->
-  ? T
-  : never;
+type GetBrandValuePart<B> =
+  B extends Brand<
+    infer T,
+    UnwrapBrandTrueKey<B> & string,
+    UnwrapBrandFalseKey<B> & string
+  >
+    ? T
+    : never;
 
 /**
  * ある key が true | false になる場合、その key を削除する

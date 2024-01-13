@@ -6,8 +6,8 @@ type PermutationStringImpl<U extends string, V extends U = U> = [U] extends [
 ]
   ? ''
   : V extends V
-  ? `${V}${PermutationStringImpl<Exclude<U, V>>}`
-  : never;
+    ? `${V}${PermutationStringImpl<Exclude<U, V>>}`
+    : never;
 
 export type PermutationString<U extends string> = PermutationStringImpl<
   StringToUnion<U>

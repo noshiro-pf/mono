@@ -5,8 +5,8 @@ export type BoolNot<A extends boolean> =
   TypeEq<A, true> extends true
     ? false
     : TypeEq<A, false> extends true
-    ? true
-    : never;
+      ? true
+      : never;
 
 export type BoolAnd<A extends boolean, B extends boolean> =
   //
@@ -14,15 +14,15 @@ export type BoolAnd<A extends boolean, B extends boolean> =
     ? TypeEq<B, true> extends true
       ? true
       : TypeEq<B, false> extends true
-      ? false
-      : never
+        ? false
+        : never
     : TypeEq<A, false> extends true
-    ? TypeEq<B, true> extends true
-      ? false
-      : TypeEq<B, false> extends true
-      ? false
-      : never
-    : never;
+      ? TypeEq<B, true> extends true
+        ? false
+        : TypeEq<B, false> extends true
+          ? false
+          : never
+      : never;
 
 export type BoolOr<A extends boolean, B extends boolean> =
   //
@@ -30,15 +30,15 @@ export type BoolOr<A extends boolean, B extends boolean> =
     ? TypeEq<B, true> extends true
       ? true
       : TypeEq<B, false> extends true
-      ? true
-      : never
+        ? true
+        : never
     : TypeEq<A, false> extends true
-    ? TypeEq<B, true> extends true
-      ? true
-      : TypeEq<B, false> extends true
-      ? false
-      : never
-    : never;
+      ? TypeEq<B, true> extends true
+        ? true
+        : TypeEq<B, false> extends true
+          ? false
+          : never
+      : never;
 
 export type BoolEq<A extends boolean, B extends boolean> =
   //
@@ -46,15 +46,15 @@ export type BoolEq<A extends boolean, B extends boolean> =
     ? TypeEq<B, true> extends true
       ? true
       : TypeEq<B, false> extends true
-      ? false
-      : never
+        ? false
+        : never
     : TypeEq<A, false> extends true
-    ? TypeEq<B, true> extends true
-      ? false
-      : TypeEq<B, false> extends true
-      ? true
-      : never
-    : never;
+      ? TypeEq<B, true> extends true
+        ? false
+        : TypeEq<B, false> extends true
+          ? true
+          : never
+      : never;
 
 export type BoolNand<A extends boolean, B extends boolean> = BoolNot<
   BoolAnd<A, B>

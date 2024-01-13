@@ -51,25 +51,27 @@ export type UnwrapBrandBooleanKeys<B extends BrandBase> = _ExtractBooleanKeys<
 
 export type GetBrandKeysPart<B extends BrandBase> = Pick<B, UnwrapBrandKeys<B>>;
 
-export type GetBrandValuePart<B extends BrandBase> = B extends Brand<
-  infer T,
-  UnwrapBrandTrueKeys<B> & string,
-  UnwrapBrandFalseKeys<B> & string
->
-  ? T
-  : never;
+export type GetBrandValuePart<B extends BrandBase> =
+  B extends Brand<
+    infer T,
+    UnwrapBrandTrueKeys<B> & string,
+    UnwrapBrandFalseKeys<B> & string
+  >
+    ? T
+    : never;
 
 export type ExtendBrand<
   B extends BrandBase,
   T extends string,
   F extends string = never,
-> = IsNever<F & T> extends true // T and F shouldn't have intersection
-  ? Brand<
-      GetBrandValuePart<B>,
-      T | (UnwrapBrandTrueKeys<B> & string),
-      F | (UnwrapBrandFalseKeys<B> & string)
-    >
-  : never;
+> =
+  IsNever<F & T> extends true // T and F shouldn't have intersection
+    ? Brand<
+        GetBrandValuePart<B>,
+        T | (UnwrapBrandTrueKeys<B> & string),
+        F | (UnwrapBrandFalseKeys<B> & string)
+      >
+    : never;
 
 export type ChangeBaseBrand<B extends BrandBase, T> = Brand<
   T,

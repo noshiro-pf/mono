@@ -3,14 +3,12 @@ import { type IsNever } from './is-never';
 
 export type Min<N extends Uint10> = _MinImpl<N, []>;
 
-type _MinImpl<
-  N extends Uint10,
-  T extends readonly unknown[],
-> = IsNever<N> extends true
-  ? never
-  : T['length'] extends N
-  ? T['length']
-  : _MinImpl<N, [0, ...T]>;
+type _MinImpl<N extends Uint10, T extends readonly unknown[]> =
+  IsNever<N> extends true
+    ? never
+    : T['length'] extends N
+      ? T['length']
+      : _MinImpl<N, [0, ...T]>;
 
 // /** @internal */
 // type _MinImpl<

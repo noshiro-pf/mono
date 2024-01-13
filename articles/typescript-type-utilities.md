@@ -34,8 +34,8 @@ const expectType = <A, B>(
   _relation: TypeEq<A, B> extends true
     ? '<=' | '='
     : TypeExtends<A, B> extends true
-    ? '!=' | '<='
-    : '!<=' | '!=',
+      ? '!=' | '<='
+      : '!<=' | '!=',
 ): void => undefined;
 ```
 
@@ -95,15 +95,15 @@ type BoolAnd<A extends boolean, B extends boolean> =
     ? TypeEq<B, true> extends true
       ? true
       : TypeEq<B, false> extends true
-      ? false
-      : never
+        ? false
+        : never
     : TypeEq<A, false> extends true
-    ? TypeEq<B, true> extends true
-      ? false
-      : TypeEq<B, false> extends true
-      ? false
-      : never
-    : never;
+      ? TypeEq<B, true> extends true
+        ? false
+        : TypeEq<B, false> extends true
+          ? false
+          : never
+      : never;
 ```
 
 `A` や `B` に `true`, `false` の他に `boolean` や `never`, `any` などが入ってくる可能性もあるため、 `TypeEq` で厳密一致するかどうかをチェックする実装にしています。 `true` か `false` になっていなければすべて `never` を返します。
@@ -155,11 +155,8 @@ Type Challenges^[[Type Challenges (IsUnion)](https://github.com/type-challenges/
 type IsUnion<U> = _IsUnionImpl<U, U>;
 
 /** @internal */
-type _IsUnionImpl<U, K extends U> = IsNever<U> extends true
-  ? false
-  : K extends K
-  ? BoolNot<TypeEq<U, K>>
-  : never;
+type _IsUnionImpl<U, K extends U> =
+  IsNever<U> extends true ? false : K extends K ? BoolNot<TypeEq<U, K>> : never;
 ```
 
 まず与えられた型 `U` が `never` であれば `false` を返します。
@@ -246,16 +243,14 @@ expectType<IndexOfTuple<readonly []>, never>('=');
 ```ts
 type IndexOfTuple<T extends readonly unknown[]> = _IndexOfTupleImpl<T, keyof T>;
 
-type _IndexOfTupleImpl<
-  T extends readonly unknown[],
-  K,
-> = IsFixedLengthList<T> extends true
-  ? K extends keyof T
-    ? K extends `${number}`
-      ? ToNumber<K>
+type _IndexOfTupleImpl<T extends readonly unknown[], K> =
+  IsFixedLengthList<T> extends true
+    ? K extends keyof T
+      ? K extends `${number}`
+        ? ToNumber<K>
+        : never
       : never
-    : never
-  : number;
+    : number;
 ```
 
 タプル型 `T` から `keyof T` を取り出してそれらを `ToNumber` で map した結果を得るという実装です。 `K extends keyof T` のところで union distribution[^1] を使っています。
@@ -319,12 +314,16 @@ namespace _MakeTupleInternals {
   > = string extends N
     ? never
     : N extends ''
-    ? X
-    : First<N> extends infer U
-    ? U extends DigitStr
-      ? MakeTupleImpl<T, Tail<N>, readonly [...Tile<[T], U>, ...Tile<X, 10>]>
-      : never
-    : never;
+      ? X
+      : First<N> extends infer U
+        ? U extends DigitStr
+          ? MakeTupleImpl<
+              T,
+              Tail<N>,
+              readonly [...Tile<[T], U>, ...Tile<X, 10>]
+            >
+          : never
+        : never;
 }
 ```
 

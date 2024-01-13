@@ -57,9 +57,8 @@ export const GameResultList = memo(
 
     const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false)
 
-    const [selectedGameResult, setSelectedGameResult] = useState<TGameResult>(
-      GameResult(),
-    )
+    const [selectedGameResult, setSelectedGameResult] =
+      useState<TGameResult>(GameResult())
 
     const closeDialog = useCallback(() => {
       setDialogIsOpen(false)

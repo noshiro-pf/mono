@@ -69,11 +69,11 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
               {otherErrorMessages === undefined
                 ? undefined
                 : showOtherErrorMessages
-                ? otherErrorMessages.map((er, index) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <div key={index}>{er}</div>
-                  ))
-                : undefined}
+                  ? otherErrorMessages.map((er, index) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <div key={index}>{er}</div>
+                    ))
+                  : undefined}
             </div>
           )
         }

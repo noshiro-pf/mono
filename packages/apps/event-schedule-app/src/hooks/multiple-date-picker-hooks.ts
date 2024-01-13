@@ -94,10 +94,10 @@ export const useMultipleDatePickerState = (
               holidaysJpDefinition?.has(ymd) ?? false
                 ? 'holiday'
                 : dayValue === 0
-                ? 'Sunday'
-                : dayValue === 6
-                ? 'Saturday'
-                : 'normal',
+                  ? 'Sunday'
+                  : dayValue === 6
+                    ? 'Saturday'
+                    : 'normal',
             holidayJpName: holidaysJpDefinition?.get(ymd),
           };
         }),

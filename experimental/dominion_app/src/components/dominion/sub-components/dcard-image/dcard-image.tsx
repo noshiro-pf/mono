@@ -40,10 +40,10 @@ export const DCardImage = memo(
               : [widthInput * (15 / 23), widthInput]
             : [heightInput, heightInput * (23 / 15)]
           : heightInput === undefined
-          ? widthInput === undefined
-            ? [230, 150]
-            : [widthInput * (23 / 15), widthInput]
-          : [heightInput, heightInput * (15 / 23)],
+            ? widthInput === undefined
+              ? [230, 150]
+              : [widthInput * (23 / 15), widthInput]
+            : [heightInput, heightInput * (15 / 23)],
       [isWide, heightInput, widthInput],
     )
 

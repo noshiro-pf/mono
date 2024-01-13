@@ -266,8 +266,8 @@ const createRulePrefix = (
   pluginName === 'eslint'
     ? ''
     : rulePrefixOrNull !== undefined && rulePrefixOrNull !== ''
-    ? rulePrefixOrNull
-    : `${pluginName.replace(/^eslint-plugin-/u, '')}/`;
+      ? rulePrefixOrNull
+      : `${pluginName.replace(/^eslint-plugin-/u, '')}/`;
 
 export const generateRulesType = (
   typeName: string,

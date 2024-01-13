@@ -59,32 +59,32 @@ const mapPlayers6CardsToDisplayValue = ({
         const isClickable: boolean = gameState.readonly
           ? false
           : myPlayerIndex !== gameState.currentPlayerIndex
-          ? false
-          : match(direction, {
-              // me
-              S:
-                visibilityFromMe !== 'faceUp' &&
-                match(gameState.phase, {
-                  ph010_selectMyCardToToss: true,
-                  ph020_firstAnswer: true,
-                  ph030_continuousAnswer: false,
-                }),
-              W:
-                visibilityFromMe !== 'faceUp' &&
-                match(gameState.phase, {
-                  ph010_selectMyCardToToss: false,
-                  ph020_firstAnswer: true,
-                  ph030_continuousAnswer: true,
-                }),
-              N: false,
-              E:
-                visibilityFromMe !== 'faceUp' &&
-                match(gameState.phase, {
-                  ph010_selectMyCardToToss: false,
-                  ph020_firstAnswer: true,
-                  ph030_continuousAnswer: true,
-                }),
-            } as const);
+            ? false
+            : match(direction, {
+                // me
+                S:
+                  visibilityFromMe !== 'faceUp' &&
+                  match(gameState.phase, {
+                    ph010_selectMyCardToToss: true,
+                    ph020_firstAnswer: true,
+                    ph030_continuousAnswer: false,
+                  }),
+                W:
+                  visibilityFromMe !== 'faceUp' &&
+                  match(gameState.phase, {
+                    ph010_selectMyCardToToss: false,
+                    ph020_firstAnswer: true,
+                    ph030_continuousAnswer: true,
+                  }),
+                N: false,
+                E:
+                  visibilityFromMe !== 'faceUp' &&
+                  match(gameState.phase, {
+                    ph010_selectMyCardToToss: false,
+                    ph020_firstAnswer: true,
+                    ph030_continuousAnswer: true,
+                  }),
+              } as const);
 
         return {
           ...c,

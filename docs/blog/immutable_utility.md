@@ -287,11 +287,10 @@ export function setIn<R extends ReadonlyRecordBase>(
 少々複雑な型を実装するので、型のユニットテストをするためのユーティリティを用意します。
 
 ```ts
-export type TypeEq<X, Y> = (<T>() => T extends X ? 1 : 2) extends <
-    T,
->() => T extends Y ? 1 : 2
-    ? true
-    : false;
+export type TypeEq<X, Y> =
+    (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
+        ? true
+        : false;
 
 export const assertType = <_T extends true>(): void => undefined;
 export const assertNotType = <_T extends false>(): void => undefined;
@@ -320,8 +319,8 @@ assertNotType<TypeEq<{ x: any }, { x: number }>>();
 export type DeepReadonly<T> = T extends (...args: readonly unknown[]) => unknown
     ? T
     : T extends ReadonlyRecordBase | readonly unknown[]
-    ? { readonly [P in keyof T]: DeepReadonly<T[P]> }
-    : T;
+      ? { readonly [P in keyof T]: DeepReadonly<T[P]> }
+      : T;
 
 assertType<
     TypeEq<
@@ -504,12 +503,12 @@ type LeafPathsImplListCase<
 > = T extends readonly []
     ? readonly []
     : IsInfiniteList<T> extends true
-    ? readonly []
-    : PathHead extends keyof T
-    ? PathHead extends `${number}`
-        ? readonly [ToNumber<PathHead>, ...LeafPaths<T[PathHead]>]
-        : never
-    : never;
+      ? readonly []
+      : PathHead extends keyof T
+        ? PathHead extends `${number}`
+            ? readonly [ToNumber<PathHead>, ...LeafPaths<T[PathHead]>]
+            : never
+        : never;
 ```
 
 `IsInfiniteList<T> extends true` のところは不定長の配列型の場合は再帰をストップするための処理です。 `IsInfiniteList` は、固定長のタプル型の `length` がその具体的な長さの数値リテラルになる（たとえば `[1, 3, 6]['length']` = `3` ）ことを利用して `number` 以上に広い型になるかどうかで以下の判定できます。
@@ -747,28 +746,28 @@ const UNSAFE_setIn_impl = (
     index >= keyPath.length
         ? newValue
         : Array.isArray(record)
-        ? record.map((v, i): unknown =>
-              i === keyPath[index]
-                  ? UNSAFE_setIn_impl(
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        record[keyPath[index]!] as ReadonlyRecordBase,
-                        keyPath,
-                        index + 1,
-                        newValue,
-                    )
-                  : v,
-          )
-        : {
-              ...record,
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              [keyPath[index]!]: UNSAFE_setIn_impl(
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  record[keyPath[index]!] as ReadonlyRecordBase,
-                  keyPath,
-                  index + 1,
-                  newValue,
-              ),
-          };
+          ? record.map((v, i): unknown =>
+                i === keyPath[index]
+                    ? UNSAFE_setIn_impl(
+                          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                          record[keyPath[index]!] as ReadonlyRecordBase,
+                          keyPath,
+                          index + 1,
+                          newValue,
+                      )
+                    : v,
+            )
+          : {
+                ...record,
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                [keyPath[index]!]: UNSAFE_setIn_impl(
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    record[keyPath[index]!] as ReadonlyRecordBase,
+                    keyPath,
+                    index + 1,
+                    newValue,
+                ),
+            };
 
 export const setIn = <R extends ReadonlyRecordBase>(
     record: R,

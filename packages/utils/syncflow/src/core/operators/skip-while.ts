@@ -28,8 +28,8 @@ class SkipWhileObservableClass<A>
       initialValue: Maybe.isNone(parentObservable.snapshot)
         ? Maybe.none
         : predicate(parentObservable.snapshot.value)
-        ? Maybe.none
-        : parentObservable.snapshot,
+          ? Maybe.none
+          : parentObservable.snapshot,
     });
     this.#predicate = predicate;
   }

@@ -22,9 +22,8 @@ export namespace Maybe {
 
   export type NarrowToSome<M extends Base> = M extends None ? never : M;
 
-  export type NarrowToNone<M extends Base> = M extends Some<unknown>
-    ? never
-    : M;
+  export type NarrowToNone<M extends Base> =
+    M extends Some<unknown> ? never : M;
 
   export const some = <S>(value: S): Some<S> => ({
     type: SomeTypeSymbol,

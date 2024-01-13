@@ -89,10 +89,10 @@ const initialState: AnswerFilterState = {
         key.endsWith(`--good`)
           ? 'good'
           : key.endsWith(`--fair`)
-          ? 'fair'
-          : key.endsWith(`--poor`)
-          ? 'poor'
-          : 'none',
+            ? 'fair'
+            : key.endsWith(`--poor`)
+              ? 'poor'
+              : 'none',
       ],
     ),
   },
@@ -316,43 +316,48 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
           return state.scoreRange.enabled === action.value
             ? state // check変更無しならそのまま返す
             : !action.value // 無効化されたらリセット
-            ? Obj.set(state, 'scoreRange', {
-                enabled: false,
-                value: initialState.scoreRange.value,
-              })
-            : Obj.setIn(state, ['scoreRange', 'enabled'], true);
+              ? Obj.set(state, 'scoreRange', {
+                  enabled: false,
+                  value: initialState.scoreRange.value,
+                })
+              : Obj.setIn(state, ['scoreRange', 'enabled'], true);
 
         case 'set-enabled-filtering-by-dayOfWeek':
           return state.dayOfWeek.enabled === action.value
             ? state // check変更無しならそのまま返す
             : !action.value // 無効化されたらリセット
-            ? Obj.set(state, 'dayOfWeek', {
-                enabled: false,
-                value: initialState.dayOfWeek.value,
-              })
-            : Obj.setIn(state, ['dayOfWeek', 'enabled'], true);
+              ? Obj.set(state, 'dayOfWeek', {
+                  enabled: false,
+                  value: initialState.dayOfWeek.value,
+                })
+              : Obj.setIn(state, ['dayOfWeek', 'enabled'], true);
 
         case 'set-enabled-filtering-by-dateRange':
           return state.dateRange.enabled === action.value
             ? state // check変更無しならそのまま返す
             : !action.value // 無効化されたらリセット
-            ? Obj.set(state, 'dateRange', {
-                enabled: false,
-                defaultValue: state.dateRange.defaultValue,
-                value:
-                  state.dateRange.defaultValue ?? initialState.dateRange.value,
-              })
-            : Obj.setIn(state, ['dateRange', 'enabled'], true);
+              ? Obj.set(state, 'dateRange', {
+                  enabled: false,
+                  defaultValue: state.dateRange.defaultValue,
+                  value:
+                    state.dateRange.defaultValue ??
+                    initialState.dateRange.value,
+                })
+              : Obj.setIn(state, ['dateRange', 'enabled'], true);
 
         case 'set-enabled-filtering-by-iconOfSpecifiedRespondent':
           return state.iconOfSpecifiedRespondent.enabled === action.value
             ? state // check変更無しならそのまま返す
             : !action.value // 無効化されたらリセット
-            ? Obj.set(state, 'iconOfSpecifiedRespondent', {
-                enabled: false,
-                falseKeys: initialState.iconOfSpecifiedRespondent.falseKeys,
-              })
-            : Obj.setIn(state, ['iconOfSpecifiedRespondent', 'enabled'], true);
+              ? Obj.set(state, 'iconOfSpecifiedRespondent', {
+                  enabled: false,
+                  falseKeys: initialState.iconOfSpecifiedRespondent.falseKeys,
+                })
+              : Obj.setIn(
+                  state,
+                  ['iconOfSpecifiedRespondent', 'enabled'],
+                  true,
+                );
 
         case 'set-iconOfSpecifiedRespondent': {
           const { iconId, username, value } = action;

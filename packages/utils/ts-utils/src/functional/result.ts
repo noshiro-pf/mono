@@ -119,9 +119,8 @@ export namespace Result {
       return result.value as UnwrapOk<R>;
     };
 
-  type UnwrapPromise<P extends Promise<unknown>> = P extends Promise<infer V>
-    ? V
-    : never;
+  type UnwrapPromise<P extends Promise<unknown>> =
+    P extends Promise<infer V> ? V : never;
 
   export const fromPromise = <P extends Promise<unknown>>(
     promise: P,
