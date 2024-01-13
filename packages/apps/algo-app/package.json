@@ -93,7 +93,7 @@
     "@noshiro/ts-utils-additional": "*",
     "firebase": "^10.6.0",
     "immer": "^9.0.7",
-    "preact": "^10.13.2"
+    "preact": "^10.19.3"
   },
   "devDependencies": {
     "@noshiro/global-goober": "*",

@@ -88,7 +88,7 @@
     "@noshiro/tiny-router-preact-hooks": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
-    "preact": "^10.13.2"
+    "preact": "^10.19.3"
   },
   "devDependencies": {
     "@noshiro/global-goober": "*",
