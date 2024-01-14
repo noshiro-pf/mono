@@ -690,13 +690,21 @@ interface ImportMeta {}
  * augmented via interface merging.
  */
 interface ImportCallOptions {
-  readonly assert?: ImportAssertions;
+  /** @deprecated*/ readonly assert?: ImportAssertions;
+  readonly with?: ImportAttributes;
 }
 
 /**
  * The type for the `assert` property of the optional second argument to `import()`.
  */
 interface ImportAssertions {
+  readonly [key: string]: string;
+}
+
+/**
+ * The type for the `with` property of the optional second argument to `import()`.
+ */
+interface ImportAttributes {
   readonly [key: string]: string;
 }
 

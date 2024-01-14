@@ -156,7 +156,7 @@
     "ts-morph": "^17.0.1",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.0",
-    "typescript": "5.2.2",
+    "typescript": "5.3.3",
     "unplugin-auto-import": "^0.15.3",
     "vite": "^4.5.1",
     "vite-plugin-markdown": "^2.1.0",
