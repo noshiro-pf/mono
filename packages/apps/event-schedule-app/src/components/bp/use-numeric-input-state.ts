@@ -138,6 +138,9 @@ export const useNumericInputState = <NumericValue extends number>({
           r.decrement();
           ev.stopPropagation();
           break;
+
+        default:
+          break;
       }
     };
   }, []);

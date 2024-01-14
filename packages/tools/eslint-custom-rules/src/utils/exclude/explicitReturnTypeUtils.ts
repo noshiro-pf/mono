@@ -290,10 +290,10 @@ function checkFunctionExpressionReturnType(
 }
 
 export {
+  FunctionExpression,
+  FunctionNode,
   checkFunctionExpressionReturnType,
   checkFunctionReturnType,
   doesImmediatelyReturnFunctionExpression,
-  FunctionExpression,
-  FunctionNode,
   isTypedFunctionExpression,
 };

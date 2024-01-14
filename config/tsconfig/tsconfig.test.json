@@ -1,0 +1,11 @@
+{
+  // https://www.typescriptlang.org/ja/tsconfig
+  "extends": "./tsconfig.type-check.json",
+  "compilerOptions": {
+    // https://kulshekhar.github.io/ts-jest/docs/guides/esm-support
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "esModuleInterop": true
+  }
+}

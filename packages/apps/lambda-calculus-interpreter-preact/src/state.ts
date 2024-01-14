@@ -20,4 +20,4 @@ const outputAreaString$: InitializedObservable<string | undefined> =
     ),
   );
 
-export { inputAreaString$, setInputAreaString, outputAreaString$ };
+export { inputAreaString$, outputAreaString$, setInputAreaString };

@@ -1,0 +1,8 @@
+{
+  "extends": "../../../../config/tsconfig/tsconfig.lib.build.json",
+  "compilerOptions": {
+    "outDir": "../esm"
+  },
+  "include": ["../src"],
+  "exclude": ["../(src|test)/**/*.test.mts"]
+}

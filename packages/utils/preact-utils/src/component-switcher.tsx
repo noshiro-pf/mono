@@ -1,4 +1,4 @@
-import { memoNamed } from './memo-named';
+import { memoNamed } from './memo-named.mjs';
 
 type Props = Readonly<{
   children: readonly preact.VNode[];
@@ -11,20 +11,17 @@ export const ComponentSwitcher = memoNamed<Props>(
   'ComponentSwitcher',
   ({ children, index }) => (
     <>
-      {
-        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-        children.map((c, i) =>
-          i === index ? (
-            // eslint-disable-next-line react/no-array-index-key
-            <div key={i}>{c}</div>
-          ) : (
-            // eslint-disable-next-line react/no-array-index-key
-            <div key={i} style={displayNoneStyle}>
-              {c}
-            </div>
-          ),
-        )
-      }
+      {children.map((c, i) =>
+        i === index ? (
+          // eslint-disable-next-line react/no-array-index-key
+          <div key={i}>{c}</div>
+        ) : (
+          // eslint-disable-next-line react/no-array-index-key
+          <div key={i} style={displayNoneStyle}>
+            {c}
+          </div>
+        ),
+      )}
     </>
   ),
 );

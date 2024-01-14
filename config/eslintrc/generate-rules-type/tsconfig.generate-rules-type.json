@@ -1,7 +1,0 @@
-{
-  "extends": "../../tsconfig/tsconfig.cjs.nolib.json",
-  "compilerOptions": {
-    "module": "commonjs"
-  },
-  "include": ["./generate-rules-type.ts"]
-}

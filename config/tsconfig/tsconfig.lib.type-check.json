@@ -1,0 +1,3 @@
+{
+  "extends": ["./tsconfig.type-check.json", "./tsconfig.lib.json"]
+}

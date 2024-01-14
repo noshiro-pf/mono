@@ -6,168 +6,157 @@
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,
-  "main": "cjs/src/index.js",
-  "module": "esm/index.js",
-  "types": "esm/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./esm/index.d.mts",
+        "default": "./esm/index.mjs"
+      }
+    }
+  },
   "files": [
     "package.json",
-    "cjs",
     "esm"
   ],
   "scripts": {
-    "build": "yarn z:build:wireit",
+    "build": "wireit",
     "clean": "run-p clean:**",
-    "clean:build": "rimraf cjs esm",
+    "clean:build": "rimraf esm",
     "clean:eslintcache": "rimraf .eslintcache",
-    "clean:wireit": "rimraf .wireit/*/cache",
+    "clean:wireit": "rimraf .wireit/**",
     "fmt": "yarn zz:cmd:prettier .",
-    "gi": "run-p z:gi:src:wireit z:gi:test:wireit",
-    "lint": "yarn z:lint:src-and-test:wireit",
-    "lint:fix": "yarn z:lint:fix:src-and-test:wireit",
+    "gi": "run-p gi:src gi:test",
+    "gi:src": "wireit",
+    "gi:test": "wireit",
+    "lint": "wireit",
+    "lint:fix": "wireit",
     "pub": "yarn zz:cmd:publish",
-    "start": "node cjs/test/preview-main.js",
-    "test": "yarn z:test:wireit",
-    "test:stream": "yarn zz:cmd:jest:stream",
-    "testw": "yarn zz:cmd:jest --watch",
-    "tsc": "yarn z:type-check:wireit",
-    "tscw": "yarn z:type-check:impl --watch",
-    "z:build:impl": "run-p zz:cmd:build:**",
-    "z:build:wireit": "wireit",
-    "z:gi:src:impl": "yarn zz:cmd:gi ./src --min-depth 1",
-    "z:gi:src:wireit": "wireit",
-    "z:gi:test:impl": "yarn zz:cmd:gi ./test/cases --min-depth 1",
-    "z:gi:test:wireit": "wireit",
-    "z:lint:fix:src-and-test:impl": "yarn zz:cmd:eslint:src-and-test --fix",
-    "z:lint:fix:src-and-test:wireit": "wireit",
-    "z:lint:src-and-test:impl": "yarn zz:cmd:eslint:src-and-test",
-    "z:lint:src-and-test:wireit": "wireit",
-    "z:test:impl": "yarn zz:cmd:jest",
-    "z:test:wireit": "wireit",
-    "z:type-check:impl": "tsc --noEmit",
-    "z:type-check:wireit": "wireit",
-    "zz:cmd:build:cjs": "yarn zz:cmd:tsc-incremental --project config/tsconfig.cjs.json",
-    "zz:cmd:build:esm": "yarn zz:cmd:tsc-incremental --project config/tsconfig.esm.json",
-    "zz:cmd:eslint": "eslint --ext .ts,.tsx --color",
-    "zz:cmd:eslint:src-and-test": "yarn zz:cmd:eslint \"./{src,test}/**/*\" --cache --cache-location ./.eslintcache",
-    "zz:cmd:gi": "bash ../../../scripts/index_ts_generator.sh",
-    "zz:cmd:jest": "jest --config config/jest.config.json --passWithNoTests",
-    "zz:cmd:jest:stream": "jest --config config/jest.config.stream.json --passWithNoTests",
+    "start": "node esm/test/preview-main.js",
+    "test": "wireit",
+    "test:stream": "yarn zz:cmd:vitest:stream run",
+    "testw": "yarn zz:cmd:vitest watch",
+    "tsc": "yarn type-check",
+    "tscw": "tsc --noEmit --watch",
+    "type-check": "wireit",
+    "zz:cmd:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
+    "zz:cmd:eslint:print-config": "yarn zz:cmd:eslint --print-config src/index.mts",
+    "zz:cmd:eslint:src-and-test": "yarn zz:cmd:eslint --config eslint.config.js './{src,test}/**/*' --cache --cache-location ./src/.eslintcache",
     "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
     "zz:cmd:publish": "yarn publish --no-git-tag-version --access=public",
-    "zz:cmd:tsc-incremental": "tsc --incremental --pretty"
+    "zz:cmd:vitest": "vitest --config ./configs/vitest.config.ts",
+    "zz:cmd:vitest:stream": "vitest --config ./configs/vitest.config.stream.ts"
   },
   "dependencies": {
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^2.4.1",
-    "@noshiro/ts-type-utils": "*",
-    "@tsconfig/docusaurus": "^1.0.6"
+    "@noshiro/eslint-utils": "*",
+    "@noshiro/mono-scripts": "*",
+    "@noshiro/ts-type-utils": "*"
   },
   "peerDependencies": {
     "tslib": "^2.4.0",
     "typescript": "^4.9.3"
   },
   "wireit": {
-    "z:build:wireit": {
-      "command": "yarn z:build:impl",
-      "clean": "if-file-deleted",
+    "type-check": {
+      "command": "tsc --noEmit",
       "files": [
-        "src/**/*.ts",
-        "tsconfig.json",
+        "./**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
+        "./tsconfig.json",
+        "../../../package.json",
         "../../../config/tsconfig/**",
-        "../stdlib/stdlib.d.ts",
-        "../ts-type-utils/ts-type-utils.d.ts",
-        "../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts"
+        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
       ],
-      "output": [
-        "cjs/**",
-        "esm/**",
-        ".tsbuildinfo"
-      ]
+      "output": []
     },
-    "z:gi:src:wireit": {
-      "command": "yarn z:gi:src:impl",
-      "clean": false,
+    "gi:src": {
+      "command": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
       "files": [
         "../../../scripts/index_ts_generator.sh",
-        "src/**"
+        "./(src|test)/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
       ],
+      "clean": false,
       "output": [
-        "src/*/**/index.ts"
+        "src/**/index.mts"
       ],
       "packageLocks": []
     },
-    "z:gi:test:wireit": {
-      "command": "yarn z:gi:test:impl",
-      "clean": false,
+    "gi:test": {
+      "command": "bash ../../../scripts/index_ts_generator.sh ./test/cases --min-depth 0 --ext .mts",
       "files": [
         "../../../scripts/index_ts_generator.sh",
         "test/cases/**"
       ],
+      "clean": false,
       "output": [
-        "test/cases/**/index.ts"
+        "test/cases/**/index.mts"
       ],
       "packageLocks": []
     },
-    "z:lint:src-and-test:wireit": {
-      "command": "yarn z:lint:src-and-test:impl",
+    "build": {
+      "command": "tsc --project ./configs/tsconfig.build.json",
       "files": [
-        "src/**/*.ts",
-        "test/**/*.ts",
-        ".eslintignore",
-        ".eslintrc.cjs",
-        "package.json",
-        "tsconfig.json",
+        "./(src|test)/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
+        "./configs/tsconfig.build.json",
         "../../../package.json",
         "../../../config/tsconfig/**",
-        "../../../config/eslintrc/**",
-        "../stdlib/stdlib.d.ts",
-        "../ts-type-utils/ts-type-utils.d.ts",
-        "../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts"
+        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
+      ],
+      "clean": true,
+      "output": [
+        "esm/**",
+        ".tsbuildinfo"
+      ]
+    },
+    "test": {
+      "command": "yarn zz:cmd:vitest run",
+      "files": [
+        "./(src|test)/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
+        "./configs/vitest.config.ts",
+        "./configs/tsconfig.test.json",
+        "../../../package.json",
+        "../../../config/tsconfig/**",
+        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
       ],
       "output": []
     },
-    "z:lint:fix:src-and-test:wireit": {
-      "command": "yarn z:lint:fix:src-and-test:impl",
+    "lint": {
+      "dependencies": [
+        "../../../packages/utils/eslint-utils:build"
+      ],
+      "command": "yarn zz:cmd:eslint:src-and-test",
       "files": [
-        "src/**/*.ts",
-        "test/**/*.ts",
-        ".eslintignore",
-        ".eslintrc.cjs",
-        "package.json",
-        "tsconfig.json",
+        "./(src|test)/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
+        "./eslint.config.js",
+        "./package.json",
+        "./tsconfig.json",
         "../../../package.json",
         "../../../config/tsconfig/**",
-        "../../../config/eslintrc/**",
-        "../stdlib/stdlib.d.ts",
-        "../ts-type-utils/ts-type-utils.d.ts",
-        "../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts"
+        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
+      ],
+      "output": []
+    },
+    "lint:fix": {
+      "dependencies": [
+        "../../../packages/utils/eslint-utils:build"
+      ],
+      "command": "yarn zz:cmd:eslint:src-and-test --fix",
+      "files": [
+        "./(src|test)/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
+        "./eslint.config.js",
+        "./package.json",
+        "./tsconfig.json",
+        "../../../package.json",
+        "../../../config/tsconfig/**",
+        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
       ],
       "clean": false,
       "output": [
-        "src/**/*.ts"
+        "./(src|test)/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
       ]
-    },
-    "z:test:wireit": {
-      "command": "yarn z:test:impl",
-      "files": [
-        "config/jest.config.json",
-        "src/**"
-      ]
-    },
-    "z:type-check:wireit": {
-      "command": "yarn z:type-check:impl",
-      "files": [
-        "src/**/*.ts",
-        "tsconfig.json",
-        "../../../config/tsconfig/**",
-        "../stdlib/stdlib.d.ts",
-        "../ts-type-utils/ts-type-utils.d.ts",
-        "../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts"
-      ],
-      "output": []
     }
   }
 }

@@ -7,27 +7,29 @@
 
 ```sh
 $  yarn add --dev -W  \
-        @types/eslint@latest                     \
-        @typescript-eslint/eslint-plugin@latest  \
-        @typescript-eslint/parser@latest         \
-        @typescript-eslint/utils@latest          \
-        eslint@latest                            \
-        eslint-config-preact@latest              \
-        eslint-config-prettier@latest            \
-        eslint-gitignore@latest                  \
-        eslint-import-resolver-typescript@latest \
-        eslint-plugin-array-func@latest          \
-        eslint-plugin-cypress@latest             \
-        eslint-plugin-deprecation@latest         \
-        eslint-plugin-functional@latest          \
-        eslint-plugin-import@latest              \
-        eslint-plugin-jest@latest                \
-        eslint-plugin-promise@latest             \
-        eslint-plugin-react@latest               \
-        eslint-plugin-react-hooks@latest         \
-        eslint-plugin-security@latest            \
-        eslint-plugin-total-functions@latest     \
-        eslint-plugin-unicorn@latest
+        @types/eslint@latest                        \
+        @typescript-eslint/eslint-plugin@latest     \
+        @typescript-eslint/parser@latest            \
+        @typescript-eslint/utils@latest             \
+        eslint-config-preact@latest                 \
+        eslint-config-prettier@latest               \
+        eslint-gitignore@latest                     \
+        eslint-import-resolver-typescript@latest    \
+        eslint-plugin-array-func@latest             \
+        eslint-plugin-cypress@latest                \
+        eslint-plugin-deprecation@latest            \
+        eslint-plugin-functional@latest             \
+        eslint-plugin-import@latest                 \
+        eslint-plugin-jest@latest                   \
+        eslint-plugin-prefer-arrow-functions@latest \
+        eslint-plugin-promise@latest                \
+        eslint-plugin-react-hooks@latest            \
+        eslint-plugin-react-refresh@latest          \
+        eslint-plugin-react@latest                  \
+        eslint-plugin-security@latest               \
+        eslint-plugin-total-functions@latest        \
+        eslint-plugin-unicorn@latest                \
+        eslint@latest
 ```
 
 then

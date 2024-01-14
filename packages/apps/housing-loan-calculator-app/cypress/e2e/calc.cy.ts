@@ -11,10 +11,18 @@ describe('main', { testIsolation: false }, () => {
   });
 
   it('config 1', () => {
-    cy.get(e('numericInput-downPaymentManYen')).clear().type('200');
-    cy.get(e('numericInput-propertyPriceManYen')).clear().type('2780');
-    cy.get(e('numericInput-borrowingPeriodYear')).clear().type('35');
-    cy.get(e('numericInput-interestRatePerYear')).clear().type('0.5');
+    cy.get(e('numericInput-downPaymentManYen')).clear();
+    cy.get(e('numericInput-downPaymentManYen')).type('200');
+
+    cy.get(e('numericInput-propertyPriceManYen')).clear();
+    cy.get(e('numericInput-propertyPriceManYen')).type('2780');
+
+    cy.get(e('numericInput-borrowingPeriodYear')).clear();
+    cy.get(e('numericInput-borrowingPeriodYear')).type('35');
+
+    cy.get(e('numericInput-interestRatePerYear')).clear();
+    cy.get(e('numericInput-interestRatePerYear')).type('0.5');
+
     cy.get(e('repaymentTypeRadioGroup')).within(() => {
       // eslint-disable-next-line cypress/no-force
       cy.get(e('radio--principal-equal-payment')).check({
@@ -48,10 +56,18 @@ describe('main', { testIsolation: false }, () => {
   });
 
   it('config 2', () => {
-    cy.get(e('numericInput-downPaymentManYen')).clear().type('0');
-    cy.get(e('numericInput-propertyPriceManYen')).clear().type('2780');
-    cy.get(e('numericInput-borrowingPeriodYear')).clear().type('35');
-    cy.get(e('numericInput-interestRatePerYear')).clear().type('0.5');
+    cy.get(e('numericInput-downPaymentManYen')).clear();
+    cy.get(e('numericInput-downPaymentManYen')).type('0');
+
+    cy.get(e('numericInput-propertyPriceManYen')).clear();
+    cy.get(e('numericInput-propertyPriceManYen')).type('2780');
+
+    cy.get(e('numericInput-borrowingPeriodYear')).clear();
+    cy.get(e('numericInput-borrowingPeriodYear')).type('35');
+
+    cy.get(e('numericInput-interestRatePerYear')).clear();
+    cy.get(e('numericInput-interestRatePerYear')).type('0.5');
+
     cy.get(e('repaymentTypeRadioGroup')).within(() => {
       // eslint-disable-next-line cypress/no-force
       cy.get(e('radio--principal-and-interest-equal-repayment')).check({

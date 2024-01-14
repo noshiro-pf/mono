@@ -160,7 +160,7 @@ export const problem2String = (
     )}`;
   }
   mut_str += '\n';
-  mut_str += `${hand2String(handTiles, revealedBlocks)}`;
+  mut_str += hand2String(handTiles, revealedBlocks);
 
   return mut_str;
 };

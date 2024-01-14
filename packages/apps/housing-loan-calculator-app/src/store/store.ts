@@ -139,10 +139,10 @@ userInput$.chain(withLatestFrom(store$)).subscribe(([_, store]) => {
 });
 
 export {
-  setRepaymentType,
-  setDownPaymentManYen,
-  setPropertyPriceManYen,
   setBorrowingPeriodYear,
+  setDownPaymentManYen,
   setInterestRatePercentPerYear,
+  setPropertyPriceManYen,
+  setRepaymentType,
   store$,
 };

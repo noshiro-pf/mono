@@ -1,16 +1,16 @@
-/* eslint-disable import/no-internal-modules */
-
 import {
   firestorePaths as firestorePathsCurr,
   type Answer as AnswerCurr,
   type EventSchedule as EventScheduleCurr,
-} from '@noshiro/event-schedule-app-shared/cjs/v6';
+} from '@noshiro/event-schedule-app-shared/v6';
 import {
   fillAnswer,
   fillEventSchedule,
   firestorePaths as firestorePathsNext,
+  toUserId,
+  toUserName,
   type EventSchedule as EventScheduleNext,
-} from '@noshiro/event-schedule-app-shared/cjs/v7';
+} from '@noshiro/event-schedule-app-shared/v7';
 import admin from 'firebase-admin';
 import serviceAccount from '../../../service-account-key.json';
 
@@ -31,9 +31,19 @@ const path = {
 
 const convertEventSchedule = ({
   notificationSettings,
+  author,
+  archivedBy,
   ...rest
 }: EventScheduleCurr): EventScheduleNext => ({
   ...rest,
+  archivedBy: archivedBy.map((user) => ({
+    id: toUserId(user.id),
+    name: toUserName(user.name),
+  })),
+  author: {
+    id: toUserId(author.id),
+    name: toUserName(author.name),
+  },
   notificationSettings:
     notificationSettings === 'none'
       ? 'none'
@@ -49,6 +59,8 @@ const convertEventSchedule = ({
           notify28daysBeforeAnswerDeadline:
             notificationSettings.notify28daysBeforeAnswerDeadline,
           notifyOnAnswerChange: notificationSettings.notifyOnAnswerChange,
+          notify00daysBeforeAnswerDeadline: false,
+          notifyAfterAnswerDeadline: false,
         },
 });
 
@@ -60,7 +72,6 @@ const updateStore = async (): Promise<boolean> => {
     // read
     const id = doc.id;
 
-    // eslint-disable-next-line no-await-in-loop
     const answersSnapshotCurr = await db
       .collection(`${path.eventsCurr}/${id}/${path.answers}`)
       .get();

@@ -1,4 +1,4 @@
-import { type WritableDraft } from 'immer/dist/internal';
+import { type WritableDraft } from 'immer/dist/internal.js';
 import { cardEq } from '../../functions';
 import { type Card, type GameState } from '../../types';
 

@@ -2,7 +2,7 @@ import { TimePicker } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
 import { DateUtils, pipe } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
-import { type HoursMinutes } from './types';
+import { type HoursMinutes } from './types/index.mjs';
 
 type TimePickerPropsOriginal = React.ComponentProps<typeof TimePicker>;
 

@@ -1,4 +1,0 @@
-{
-  "extends": "../../../../config/tsconfig/tsconfig.cjs.json",
-  "include": ["../scripts/**/*.ts"]
-}

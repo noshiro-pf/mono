@@ -1,17 +1,9 @@
 {
-  "extends": "../../../config/tsconfig/tsconfig.react-emotion.nolib.json",
-  "compilerOptions": {
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "noEmit": true,
-
-    // customize
-    "baseUrl": "./src/",
-    "paths": {
-      "~/*": ["./*"]
-    },
-    "types": ["vitest/globals"]
-  },
-  "include": ["./src", "./scripts", "./config"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "extends": [
+    "../../../config/tsconfig/tsconfig.type-check.json",
+    "../../../config/tsconfig/tsconfig.react-emotion.json",
+    "../../../config/tsconfig/tsconfig.vite.json",
+    "../../../config/tsconfig/tsconfig.absolute-path.json"
+  ],
+  "include": ["./src", "./configs", "./scripts", "./functions/src"]
 }

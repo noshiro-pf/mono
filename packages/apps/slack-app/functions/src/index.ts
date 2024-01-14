@@ -53,7 +53,6 @@ export const makeUppercase = firestore
 
       get(searchUrl, (res) => {
         res
-          // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
           .on('data', (chunk: Buffer) => {
             mut_data.push(chunk);
           })
@@ -68,6 +67,7 @@ export const makeUppercase = firestore
               // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
               r?.members?.find(
                 (a: Readonly<{ name: string }>) => a.name === 'noshiro.pf',
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               )?.profile?.display_name_normalized,
             );
           });

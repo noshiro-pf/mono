@@ -18,6 +18,13 @@ export const writings: readonly WritingsInfo[] = [
     body: 'RxJSで発生するglitchという現象の発生原因とその対処法、他のglitch-freeリアクティブプログラミングライブラリがどう解決しているかを論文等を参照しつつ紹介。最後に拙作「SyncFlow」の実装概要を説明。',
   },
   {
+    id: 'take-full-advantage-of-typescript-eslint',
+    link: 'https://zenn.dev/noshiro_piko/articles/take-full-advantage-of-typescript-eslint',
+    title: '★ ESLint を使い倒す方法まとめ',
+    subtitle: '',
+    body: 'eslint:recommended などの config には含まれないが有用な ESLint ルールなどを紹介しています。',
+  },
+  {
     id: 'reactive-programming-introduction-with-rxjs',
     link: 'https://qiita.com/pikohideaki/items/292ab134397f4959e66b',
     title: '★ リアクティブプログラミングはどう有用なのか',

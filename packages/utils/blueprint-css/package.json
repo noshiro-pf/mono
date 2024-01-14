@@ -1,9 +1,11 @@
 {
   "name": "@noshiro/blueprint-css",
   "version": "1.0.0",
+  "private": false,
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,
+  "type": "module",
   "main": "blueprint-min.css",
   "style": "blueprint-min.css",
   "files": [
@@ -16,6 +18,7 @@
     "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write"
   },
   "devDependencies": {
+    "@noshiro/mono-scripts": "*",
     "normalize.css": "^8.0.1"
   },
   "peerDependencies": {

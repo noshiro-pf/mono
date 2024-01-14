@@ -486,11 +486,11 @@ declare module Immutable {
     updateIn(
       keyPath: Iterable<unknown>,
       notSetValue: unknown,
-      updater: (value: unknown) => unknown
+      updater: (value: unknown) => unknown,
     ): this;
     updateIn(
       keyPath: Iterable<unknown>,
-      updater: (value: unknown) => unknown
+      updater: (value: unknown) => unknown,
     ): this;
 
     /**
@@ -568,7 +568,7 @@ declare module Immutable {
      */
     map<M>(
       mapper: (value: T, key: number, iter: this) => M,
-      context?: unknown
+      context?: unknown,
     ): List<M>;
 
     /**
@@ -578,7 +578,7 @@ declare module Immutable {
      */
     flatMap<M>(
       mapper: (value: T, key: number, iter: this) => Iterable<M>,
-      context?: unknown
+      context?: unknown,
     ): List<M>;
 
     /**
@@ -590,11 +590,11 @@ declare module Immutable {
      */
     filter<F extends T>(
       predicate: (value: T, index: number, iter: this) => value is F,
-      context?: unknown
+      context?: unknown,
     ): List<F>;
     filter(
       predicate: (value: T, index: number, iter: this) => unknown,
-      context?: unknown
+      context?: unknown,
     ): this;
 
     /**
@@ -614,7 +614,7 @@ declare module Immutable {
     zip<U>(other: Collection<unknown, U>): List<[T, U]>;
     zip<U, V>(
       other: Collection<unknown, U>,
-      other2: Collection<unknown, V>
+      other2: Collection<unknown, V>,
     ): List<[T, U, V]>;
     zip(...collections: Array<Collection<unknown, unknown>>): List<unknown>;
 
@@ -640,7 +640,7 @@ declare module Immutable {
     zipAll<U>(other: Collection<unknown, U>): List<[T, U]>;
     zipAll<U, V>(
       other: Collection<unknown, U>,
-      other2: Collection<unknown, V>
+      other2: Collection<unknown, V>,
     ): List<[T, U, V]>;
     zipAll(...collections: Array<Collection<unknown, unknown>>): List<unknown>;
 
@@ -660,12 +660,12 @@ declare module Immutable {
      */
     zipWith<U, Z>(
       zipper: (value: T, otherValue: U) => Z,
-      otherCollection: Collection<unknown, U>
+      otherCollection: Collection<unknown, U>,
     ): List<Z>;
     zipWith<U, V, Z>(
       zipper: (value: T, otherValue: U, thirdValue: V) => Z,
       otherCollection: Collection<unknown, U>,
-      thirdCollection: Collection<unknown, V>
+      thirdCollection: Collection<unknown, V>,
     ): List<Z>;
     zipWith<Z>(
       zipper: (...any: Array<unknown>) => Z,
@@ -1235,11 +1235,11 @@ declare module Immutable {
     updateIn(
       keyPath: Iterable<unknown>,
       notSetValue: unknown,
-      updater: (value: unknown) => unknown
+      updater: (value: unknown) => unknown,
     ): this;
     updateIn(
       keyPath: Iterable<unknown>,
-      updater: (value: unknown) => unknown
+      updater: (value: unknown) => unknown,
     ): this;
 
     /**
@@ -1358,7 +1358,7 @@ declare module Immutable {
      */
     map<M>(
       mapper: (value: V, key: K, iter: this) => M,
-      context?: unknown
+      context?: unknown,
     ): Map<K, M>;
 
     /**
@@ -1366,7 +1366,7 @@ declare module Immutable {
      */
     mapKeys<M>(
       mapper: (key: K, value: V, iter: this) => M,
-      context?: unknown
+      context?: unknown,
     ): Map<M, V>;
 
     /**
@@ -1374,7 +1374,7 @@ declare module Immutable {
      */
     mapEntries<KM, VM>(
       mapper: (entry: [K, V], index: number, iter: this) => [KM, VM],
-      context?: unknown
+      context?: unknown,
     ): Map<KM, VM>;
 
     /**
@@ -1384,7 +1384,7 @@ declare module Immutable {
      */
     flatMap<KM, VM>(
       mapper: (value: V, key: K, iter: this) => Iterable<[KM, VM]>,
-      context?: unknown
+      context?: unknown,
     ): Map<KM, VM>;
 
     /**
@@ -1396,11 +1396,11 @@ declare module Immutable {
      */
     filter<F extends V>(
       predicate: (value: V, key: K, iter: this) => value is F,
-      context?: unknown
+      context?: unknown,
     ): Map<K, F>;
     filter(
       predicate: (value: V, key: K, iter: this) => unknown,
-      context?: unknown
+      context?: unknown,
     ): this;
 
     /**
@@ -1426,7 +1426,7 @@ declare module Immutable {
      * True if the provided value is an OrderedMap.
      */
     function isOrderedMap(
-      maybeOrderedMap: unknown
+      maybeOrderedMap: unknown,
     ): maybeOrderedMap is OrderedMap<unknown, unknown>;
   }
 
@@ -1446,7 +1446,7 @@ declare module Immutable {
    * the `new` keyword during construction.
    */
   export function OrderedMap<K, V>(
-    collection: Iterable<[K, V]>
+    collection: Iterable<[K, V]>,
   ): OrderedMap<K, V>;
   export function OrderedMap<V>(obj: {
     [key: string]: V;
@@ -1529,7 +1529,7 @@ declare module Immutable {
      */
     map<M>(
       mapper: (value: V, key: K, iter: this) => M,
-      context?: unknown
+      context?: unknown,
     ): OrderedMap<K, M>;
 
     /**
@@ -1537,7 +1537,7 @@ declare module Immutable {
      */
     mapKeys<M>(
       mapper: (key: K, value: V, iter: this) => M,
-      context?: unknown
+      context?: unknown,
     ): OrderedMap<M, V>;
 
     /**
@@ -1545,7 +1545,7 @@ declare module Immutable {
      */
     mapEntries<KM, VM>(
       mapper: (entry: [K, V], index: number, iter: this) => [KM, VM],
-      context?: unknown
+      context?: unknown,
     ): OrderedMap<KM, VM>;
 
     /**
@@ -1555,7 +1555,7 @@ declare module Immutable {
      */
     flatMap<KM, VM>(
       mapper: (value: V, key: K, iter: this) => Iterable<[KM, VM]>,
-      context?: unknown
+      context?: unknown,
     ): OrderedMap<KM, VM>;
 
     /**
@@ -1567,11 +1567,11 @@ declare module Immutable {
      */
     filter<F extends V>(
       predicate: (value: V, key: K, iter: this) => value is F,
-      context?: unknown
+      context?: unknown,
     ): OrderedMap<K, F>;
     filter(
       predicate: (value: V, key: K, iter: this) => unknown,
-      context?: unknown
+      context?: unknown,
     ): this;
 
     /**
@@ -1761,7 +1761,7 @@ declare module Immutable {
      */
     map<M>(
       mapper: (value: T, key: T, iter: this) => M,
-      context?: unknown
+      context?: unknown,
     ): Set<M>;
 
     /**
@@ -1771,7 +1771,7 @@ declare module Immutable {
      */
     flatMap<M>(
       mapper: (value: T, key: T, iter: this) => Iterable<M>,
-      context?: unknown
+      context?: unknown,
     ): Set<M>;
 
     /**
@@ -1783,11 +1783,11 @@ declare module Immutable {
      */
     filter<F extends T>(
       predicate: (value: T, key: T, iter: this) => value is F,
-      context?: unknown
+      context?: unknown,
     ): Set<F>;
     filter(
       predicate: (value: T, key: T, iter: this) => unknown,
-      context?: unknown
+      context?: unknown,
     ): this;
   }
 
@@ -1860,7 +1860,7 @@ declare module Immutable {
      */
     map<M>(
       mapper: (value: T, key: T, iter: this) => M,
-      context?: unknown
+      context?: unknown,
     ): OrderedSet<M>;
 
     /**
@@ -1870,7 +1870,7 @@ declare module Immutable {
      */
     flatMap<M>(
       mapper: (value: T, key: T, iter: this) => Iterable<M>,
-      context?: unknown
+      context?: unknown,
     ): OrderedSet<M>;
 
     /**
@@ -1882,11 +1882,11 @@ declare module Immutable {
      */
     filter<F extends T>(
       predicate: (value: T, key: T, iter: this) => value is F,
-      context?: unknown
+      context?: unknown,
     ): OrderedSet<F>;
     filter(
       predicate: (value: T, key: T, iter: this) => unknown,
-      context?: unknown
+      context?: unknown,
     ): this;
 
     /**
@@ -1905,7 +1905,7 @@ declare module Immutable {
     zip<U>(other: Collection<unknown, U>): OrderedSet<[T, U]>;
     zip<U, V>(
       other1: Collection<unknown, U>,
-      other2: Collection<unknown, V>
+      other2: Collection<unknown, V>,
     ): OrderedSet<[T, U, V]>;
     zip(
       ...collections: Array<Collection<unknown, unknown>>
@@ -1931,7 +1931,7 @@ declare module Immutable {
     zipAll<U>(other: Collection<unknown, U>): OrderedSet<[T, U]>;
     zipAll<U, V>(
       other1: Collection<unknown, U>,
-      other2: Collection<unknown, V>
+      other2: Collection<unknown, V>,
     ): OrderedSet<[T, U, V]>;
     zipAll(
       ...collections: Array<Collection<unknown, unknown>>
@@ -1945,12 +1945,12 @@ declare module Immutable {
      */
     zipWith<U, Z>(
       zipper: (value: T, otherValue: U) => Z,
-      otherCollection: Collection<unknown, U>
+      otherCollection: Collection<unknown, U>,
     ): OrderedSet<Z>;
     zipWith<U, V, Z>(
       zipper: (value: T, otherValue: U, thirdValue: V) => Z,
       otherCollection: Collection<unknown, U>,
-      thirdCollection: Collection<unknown, V>
+      thirdCollection: Collection<unknown, V>,
     ): OrderedSet<Z>;
     zipWith<Z>(
       zipper: (...any: Array<unknown>) => Z,
@@ -2112,7 +2112,7 @@ declare module Immutable {
      */
     map<M>(
       mapper: (value: T, key: number, iter: this) => M,
-      context?: unknown
+      context?: unknown,
     ): Stack<M>;
 
     /**
@@ -2122,7 +2122,7 @@ declare module Immutable {
      */
     flatMap<M>(
       mapper: (value: T, key: number, iter: this) => Iterable<M>,
-      context?: unknown
+      context?: unknown,
     ): Stack<M>;
 
     /**
@@ -2134,11 +2134,11 @@ declare module Immutable {
      */
     filter<F extends T>(
       predicate: (value: T, index: number, iter: this) => value is F,
-      context?: unknown
+      context?: unknown,
     ): Set<F>;
     filter(
       predicate: (value: T, index: number, iter: this) => unknown,
-      context?: unknown
+      context?: unknown,
     ): this;
 
     /**
@@ -2155,7 +2155,7 @@ declare module Immutable {
     zip<U>(other: Collection<unknown, U>): Stack<[T, U]>;
     zip<U, V>(
       other: Collection<unknown, U>,
-      other2: Collection<unknown, V>
+      other2: Collection<unknown, V>,
     ): Stack<[T, U, V]>;
     zip(...collections: Array<Collection<unknown, unknown>>): Stack<unknown>;
 
@@ -2178,7 +2178,7 @@ declare module Immutable {
     zipAll<U>(other: Collection<unknown, U>): Stack<[T, U]>;
     zipAll<U, V>(
       other: Collection<unknown, U>,
-      other2: Collection<unknown, V>
+      other2: Collection<unknown, V>,
     ): Stack<[T, U, V]>;
     zipAll(...collections: Array<Collection<unknown, unknown>>): Stack<unknown>;
 
@@ -2195,12 +2195,12 @@ declare module Immutable {
      */
     zipWith<U, Z>(
       zipper: (value: T, otherValue: U) => Z,
-      otherCollection: Collection<unknown, U>
+      otherCollection: Collection<unknown, U>,
     ): Stack<Z>;
     zipWith<U, V, Z>(
       zipper: (value: T, otherValue: U, thirdValue: V) => Z,
       otherCollection: Collection<unknown, U>,
-      thirdCollection: Collection<unknown, V>
+      thirdCollection: Collection<unknown, V>,
     ): Stack<Z>;
     zipWith<Z>(
       zipper: (...any: Array<unknown>) => Z,
@@ -2229,7 +2229,7 @@ declare module Immutable {
   export function Range(
     start?: number,
     end?: number,
-    step?: number
+    step?: number,
   ): Seq.Indexed<number>;
 
   /**
@@ -2484,10 +2484,11 @@ declare module Immutable {
     export module Factory {}
 
     export interface Factory<TProps extends Object> {
-      (values?: Partial<TProps> | Iterable<[string, unknown]>): Record<TProps> &
-        Readonly<TProps>;
+      (
+        values?: Partial<TProps> | Iterable<[string, unknown]>,
+      ): Record<TProps> & Readonly<TProps>;
       new (
-        values?: Partial<TProps> | Iterable<[string, unknown]>
+        values?: Partial<TProps> | Iterable<[string, unknown]>,
       ): Record<TProps> & Readonly<TProps>;
 
       /**
@@ -2498,7 +2499,7 @@ declare module Immutable {
     }
 
     export function Factory<TProps extends Object>(
-      values?: Partial<TProps> | Iterable<[string, unknown]>
+      values?: Partial<TProps> | Iterable<[string, unknown]>,
     ): Record<TProps> & Readonly<TProps>;
   }
 
@@ -2513,7 +2514,7 @@ declare module Immutable {
    */
   export function Record<TProps>(
     defaultValues: TProps,
-    name?: string
+    name?: string,
   ): Record.Factory<TProps>;
 
   export interface Record<TProps extends Object> {
@@ -2547,7 +2548,7 @@ declare module Immutable {
     set<K extends keyof TProps>(key: K, value: TProps[K]): this;
     update<K extends keyof TProps>(
       key: K,
-      updater: (value: TProps[K]) => TProps[K]
+      updater: (value: TProps[K]) => TProps[K],
     ): this;
     merge(
       ...collections: Array<Partial<TProps> | Iterable<[string, unknown]>>
@@ -2585,7 +2586,7 @@ declare module Immutable {
     setIn(keyPath: Iterable<unknown>, value: unknown): this;
     updateIn(
       keyPath: Iterable<unknown>,
-      updater: (value: unknown) => unknown
+      updater: (value: unknown) => unknown,
     ): this;
     mergeIn(keyPath: Iterable<unknown>, ...collections: Array<unknown>): this;
     mergeDeepIn(
@@ -2741,7 +2742,7 @@ declare module Immutable {
      * structure such as Map, List, or Set.
      */
     function isSeq(
-      maybeSeq: unknown
+      maybeSeq: unknown,
     ): maybeSeq is
       | Seq.Indexed<unknown>
       | Seq.Keyed<unknown, unknown>
@@ -2817,7 +2818,7 @@ declare module Immutable {
        */
       map<M>(
         mapper: (value: V, key: K, iter: this) => M,
-        context?: unknown
+        context?: unknown,
       ): Seq.Keyed<K, M>;
 
       /**
@@ -2825,7 +2826,7 @@ declare module Immutable {
        */
       mapKeys<M>(
         mapper: (key: K, value: V, iter: this) => M,
-        context?: unknown
+        context?: unknown,
       ): Seq.Keyed<M, V>;
 
       /**
@@ -2833,7 +2834,7 @@ declare module Immutable {
        */
       mapEntries<KM, VM>(
         mapper: (entry: [K, V], index: number, iter: this) => [KM, VM],
-        context?: unknown
+        context?: unknown,
       ): Seq.Keyed<KM, VM>;
 
       /**
@@ -2843,7 +2844,7 @@ declare module Immutable {
        */
       flatMap<KM, VM>(
         mapper: (value: V, key: K, iter: this) => Iterable<[KM, VM]>,
-        context?: unknown
+        context?: unknown,
       ): Seq.Keyed<KM, VM>;
 
       /**
@@ -2855,11 +2856,11 @@ declare module Immutable {
        */
       filter<F extends V>(
         predicate: (value: V, key: K, iter: this) => value is F,
-        context?: unknown
+        context?: unknown,
       ): Seq.Keyed<K, F>;
       filter(
         predicate: (value: V, key: K, iter: this) => unknown,
-        context?: unknown
+        context?: unknown,
       ): this;
 
       /**
@@ -2932,7 +2933,7 @@ declare module Immutable {
        */
       map<M>(
         mapper: (value: T, key: number, iter: this) => M,
-        context?: unknown
+        context?: unknown,
       ): Seq.Indexed<M>;
 
       /**
@@ -2942,7 +2943,7 @@ declare module Immutable {
        */
       flatMap<M>(
         mapper: (value: T, key: number, iter: this) => Iterable<M>,
-        context?: unknown
+        context?: unknown,
       ): Seq.Indexed<M>;
 
       /**
@@ -2954,11 +2955,11 @@ declare module Immutable {
        */
       filter<F extends T>(
         predicate: (value: T, index: number, iter: this) => value is F,
-        context?: unknown
+        context?: unknown,
       ): Seq.Indexed<F>;
       filter(
         predicate: (value: T, index: number, iter: this) => unknown,
-        context?: unknown
+        context?: unknown,
       ): this;
 
       /**
@@ -2975,7 +2976,7 @@ declare module Immutable {
       zip<U>(other: Collection<unknown, U>): Seq.Indexed<[T, U]>;
       zip<U, V>(
         other: Collection<unknown, U>,
-        other2: Collection<unknown, V>
+        other2: Collection<unknown, V>,
       ): Seq.Indexed<[T, U, V]>;
       zip(
         ...collections: Array<Collection<unknown, unknown>>
@@ -2996,7 +2997,7 @@ declare module Immutable {
       zipAll<U>(other: Collection<unknown, U>): Seq.Indexed<[T, U]>;
       zipAll<U, V>(
         other: Collection<unknown, U>,
-        other2: Collection<unknown, V>
+        other2: Collection<unknown, V>,
       ): Seq.Indexed<[T, U, V]>;
       zipAll(
         ...collections: Array<Collection<unknown, unknown>>
@@ -3015,12 +3016,12 @@ declare module Immutable {
        */
       zipWith<U, Z>(
         zipper: (value: T, otherValue: U) => Z,
-        otherCollection: Collection<unknown, U>
+        otherCollection: Collection<unknown, U>,
       ): Seq.Indexed<Z>;
       zipWith<U, V, Z>(
         zipper: (value: T, otherValue: U, thirdValue: V) => Z,
         otherCollection: Collection<unknown, U>,
-        thirdCollection: Collection<unknown, V>
+        thirdCollection: Collection<unknown, V>,
       ): Seq.Indexed<Z>;
       zipWith<Z>(
         zipper: (...any: Array<unknown>) => Z,
@@ -3094,7 +3095,7 @@ declare module Immutable {
        */
       map<M>(
         mapper: (value: T, key: T, iter: this) => M,
-        context?: unknown
+        context?: unknown,
       ): Seq.Set<M>;
 
       /**
@@ -3104,7 +3105,7 @@ declare module Immutable {
        */
       flatMap<M>(
         mapper: (value: T, key: T, iter: this) => Iterable<M>,
-        context?: unknown
+        context?: unknown,
       ): Seq.Set<M>;
 
       /**
@@ -3116,11 +3117,11 @@ declare module Immutable {
        */
       filter<F extends T>(
         predicate: (value: T, key: T, iter: this) => value is F,
-        context?: unknown
+        context?: unknown,
       ): Seq.Set<F>;
       filter(
         predicate: (value: T, key: T, iter: this) => unknown,
-        context?: unknown
+        context?: unknown,
       ): this;
     }
   }
@@ -3146,7 +3147,7 @@ declare module Immutable {
    */
   export function Seq<S extends Seq<unknown, unknown>>(seq: S): S;
   export function Seq<K, V>(
-    collection: Collection.Keyed<K, V>
+    collection: Collection.Keyed<K, V>,
   ): Seq.Keyed<K, V>;
   export function Seq<T>(collection: Collection.Indexed<T>): Seq.Indexed<T>;
   export function Seq<T>(collection: Collection.Set<T>): Seq.Set<T>;
@@ -3208,7 +3209,7 @@ declare module Immutable {
      */
     map<M>(
       mapper: (value: V, key: K, iter: this) => M,
-      context?: unknown
+      context?: unknown,
     ): Seq<K, M>;
 
     /**
@@ -3227,7 +3228,7 @@ declare module Immutable {
      */
     map<M>(
       mapper: (value: V, key: K, iter: this) => M,
-      context?: unknown
+      context?: unknown,
     ): Seq<M, M>;
 
     /**
@@ -3237,7 +3238,7 @@ declare module Immutable {
      */
     flatMap<M>(
       mapper: (value: V, key: K, iter: this) => Iterable<M>,
-      context?: unknown
+      context?: unknown,
     ): Seq<K, M>;
 
     /**
@@ -3248,7 +3249,7 @@ declare module Immutable {
      */
     flatMap<M>(
       mapper: (value: V, key: K, iter: this) => Iterable<M>,
-      context?: unknown
+      context?: unknown,
     ): Seq<M, M>;
 
     /**
@@ -3260,11 +3261,11 @@ declare module Immutable {
      */
     filter<F extends V>(
       predicate: (value: V, key: K, iter: this) => value is F,
-      context?: unknown
+      context?: unknown,
     ): Seq<K, F>;
     filter(
       predicate: (value: V, key: K, iter: this) => unknown,
-      context?: unknown
+      context?: unknown,
     ): this;
   }
 
@@ -3287,21 +3288,21 @@ declare module Immutable {
      * @deprecated use `const { isKeyed } = require('immutable')`
      */
     function isKeyed(
-      maybeKeyed: unknown
+      maybeKeyed: unknown,
     ): maybeKeyed is Collection.Keyed<unknown, unknown>;
 
     /**
      * @deprecated use `const { isIndexed } = require('immutable')`
      */
     function isIndexed(
-      maybeIndexed: unknown
+      maybeIndexed: unknown,
     ): maybeIndexed is Collection.Indexed<unknown>;
 
     /**
      * @deprecated use `const { isAssociative } = require('immutable')`
      */
     function isAssociative(
-      maybeAssociative: unknown
+      maybeAssociative: unknown,
     ): maybeAssociative is
       | Collection.Keyed<unknown, unknown>
       | Collection.Indexed<unknown>;
@@ -3330,7 +3331,7 @@ declare module Immutable {
      * does not use the `new` keyword during construction.
      */
     export function Keyed<K, V>(
-      collection: Iterable<[K, V]>
+      collection: Iterable<[K, V]>,
     ): Collection.Keyed<K, V>;
     export function Keyed<V>(obj: {
       [key: string]: V;
@@ -3402,7 +3403,7 @@ declare module Immutable {
        */
       map<M>(
         mapper: (value: V, key: K, iter: this) => M,
-        context?: unknown
+        context?: unknown,
       ): Collection.Keyed<K, M>;
 
       /**
@@ -3421,7 +3422,7 @@ declare module Immutable {
        */
       mapKeys<M>(
         mapper: (key: K, value: V, iter: this) => M,
-        context?: unknown
+        context?: unknown,
       ): Collection.Keyed<M, V>;
 
       /**
@@ -3441,7 +3442,7 @@ declare module Immutable {
        */
       mapEntries<KM, VM>(
         mapper: (entry: [K, V], index: number, iter: this) => [KM, VM],
-        context?: unknown
+        context?: unknown,
       ): Collection.Keyed<KM, VM>;
 
       /**
@@ -3451,7 +3452,7 @@ declare module Immutable {
        */
       flatMap<KM, VM>(
         mapper: (value: V, key: K, iter: this) => Iterable<[KM, VM]>,
-        context?: unknown
+        context?: unknown,
       ): Collection.Keyed<KM, VM>;
 
       /**
@@ -3463,11 +3464,11 @@ declare module Immutable {
        */
       filter<F extends V>(
         predicate: (value: V, key: K, iter: this) => value is F,
-        context?: unknown
+        context?: unknown,
       ): Collection.Keyed<K, F>;
       filter(
         predicate: (value: V, key: K, iter: this) => unknown,
-        context?: unknown
+        context?: unknown,
       ): this;
 
       [Symbol.iterator](): IterableIterator<[K, V]>;
@@ -3625,7 +3626,7 @@ declare module Immutable {
       zip<U>(other: Collection<unknown, U>): Collection.Indexed<[T, U]>;
       zip<U, V>(
         other: Collection<unknown, U>,
-        other2: Collection<unknown, V>
+        other2: Collection<unknown, V>,
       ): Collection.Indexed<[T, U, V]>;
       zip(
         ...collections: Array<Collection<unknown, unknown>>
@@ -3646,7 +3647,7 @@ declare module Immutable {
       zipAll<U>(other: Collection<unknown, U>): Collection.Indexed<[T, U]>;
       zipAll<U, V>(
         other: Collection<unknown, U>,
-        other2: Collection<unknown, V>
+        other2: Collection<unknown, V>,
       ): Collection.Indexed<[T, U, V]>;
       zipAll(
         ...collections: Array<Collection<unknown, unknown>>
@@ -3668,12 +3669,12 @@ declare module Immutable {
        */
       zipWith<U, Z>(
         zipper: (value: T, otherValue: U) => Z,
-        otherCollection: Collection<unknown, U>
+        otherCollection: Collection<unknown, U>,
       ): Collection.Indexed<Z>;
       zipWith<U, V, Z>(
         zipper: (value: T, otherValue: U, thirdValue: V) => Z,
         otherCollection: Collection<unknown, U>,
-        thirdCollection: Collection<unknown, V>
+        thirdCollection: Collection<unknown, V>,
       ): Collection.Indexed<Z>;
       zipWith<Z>(
         zipper: (...any: Array<unknown>) => Z,
@@ -3700,7 +3701,7 @@ declare module Immutable {
        */
       findIndex(
         predicate: (value: T, index: number, iter: this) => boolean,
-        context?: unknown
+        context?: unknown,
       ): number;
 
       /**
@@ -3709,7 +3710,7 @@ declare module Immutable {
        */
       findLastIndex(
         predicate: (value: T, index: number, iter: this) => boolean,
-        context?: unknown
+        context?: unknown,
       ): number;
 
       // Sequence algorithms
@@ -3736,7 +3737,7 @@ declare module Immutable {
        */
       map<M>(
         mapper: (value: T, key: number, iter: this) => M,
-        context?: unknown
+        context?: unknown,
       ): Collection.Indexed<M>;
 
       /**
@@ -3746,7 +3747,7 @@ declare module Immutable {
        */
       flatMap<M>(
         mapper: (value: T, key: number, iter: this) => Iterable<M>,
-        context?: unknown
+        context?: unknown,
       ): Collection.Indexed<M>;
 
       /**
@@ -3758,11 +3759,11 @@ declare module Immutable {
        */
       filter<F extends T>(
         predicate: (value: T, index: number, iter: this) => value is F,
-        context?: unknown
+        context?: unknown,
       ): Collection.Indexed<F>;
       filter(
         predicate: (value: T, index: number, iter: this) => unknown,
-        context?: unknown
+        context?: unknown,
       ): this;
 
       [Symbol.iterator](): IterableIterator<T>;
@@ -3838,7 +3839,7 @@ declare module Immutable {
        */
       map<M>(
         mapper: (value: T, key: T, iter: this) => M,
-        context?: unknown
+        context?: unknown,
       ): Collection.Set<M>;
 
       /**
@@ -3848,7 +3849,7 @@ declare module Immutable {
        */
       flatMap<M>(
         mapper: (value: T, key: T, iter: this) => Iterable<M>,
-        context?: unknown
+        context?: unknown,
       ): Collection.Set<M>;
 
       /**
@@ -3860,11 +3861,11 @@ declare module Immutable {
        */
       filter<F extends T>(
         predicate: (value: T, key: T, iter: this) => value is F,
-        context?: unknown
+        context?: unknown,
       ): Collection.Set<F>;
       filter(
         predicate: (value: T, key: T, iter: this) => unknown,
-        context?: unknown
+        context?: unknown,
       ): this;
 
       [Symbol.iterator](): IterableIterator<T>;
@@ -3894,7 +3895,7 @@ declare module Immutable {
    * use the `new` keyword during construction.
    */
   export function Collection<I extends Collection<unknown, unknown>>(
-    collection: I
+    collection: I,
   ): I;
   export function Collection<T>(collection: Iterable<T>): Collection.Indexed<T>;
   export function Collection<V>(obj: {
@@ -4241,7 +4242,7 @@ declare module Immutable {
      */
     map<M>(
       mapper: (value: V, key: K, iter: this) => M,
-      context?: unknown
+      context?: unknown,
     ): Collection<K, M>;
 
     /**
@@ -4268,11 +4269,11 @@ declare module Immutable {
      */
     filter<F extends V>(
       predicate: (value: V, key: K, iter: this) => value is F,
-      context?: unknown
+      context?: unknown,
     ): Collection<K, F>;
     filter(
       predicate: (value: V, key: K, iter: this) => unknown,
-      context?: unknown
+      context?: unknown,
     ): this;
 
     /**
@@ -4291,7 +4292,7 @@ declare module Immutable {
      */
     filterNot(
       predicate: (value: V, key: K, iter: this) => boolean,
-      context?: unknown
+      context?: unknown,
     ): this;
 
     /**
@@ -4347,7 +4348,7 @@ declare module Immutable {
      */
     sortBy<C>(
       comparatorValueMapper: (value: V, key: K, iter: this) => C,
-      comparator?: (valueA: C, valueB: C) => number
+      comparator?: (valueA: C, valueB: C) => number,
     ): this;
 
     /**
@@ -4376,7 +4377,7 @@ declare module Immutable {
      */
     groupBy<G>(
       grouper: (value: V, key: K, iter: this) => G,
-      context?: unknown
+      context?: unknown,
     ): /*Map*/ Seq.Keyed<G, /*this*/ Collection<K, V>>;
 
     // Side effects
@@ -4390,7 +4391,7 @@ declare module Immutable {
      */
     forEach(
       sideEffect: (value: V, key: K, iter: this) => unknown,
-      context?: unknown
+      context?: unknown,
     ): number;
 
     // Creating subsets
@@ -4451,7 +4452,7 @@ declare module Immutable {
      */
     skipWhile(
       predicate: (value: V, key: K, iter: this) => boolean,
-      context?: unknown
+      context?: unknown,
     ): this;
 
     /**
@@ -4468,7 +4469,7 @@ declare module Immutable {
      */
     skipUntil(
       predicate: (value: V, key: K, iter: this) => boolean,
-      context?: unknown
+      context?: unknown,
     ): this;
 
     /**
@@ -4497,7 +4498,7 @@ declare module Immutable {
      */
     takeWhile(
       predicate: (value: V, key: K, iter: this) => boolean,
-      context?: unknown
+      context?: unknown,
     ): this;
 
     /**
@@ -4514,7 +4515,7 @@ declare module Immutable {
      */
     takeUntil(
       predicate: (value: V, key: K, iter: this) => boolean,
-      context?: unknown
+      context?: unknown,
     ): this;
 
     // Combination
@@ -4553,7 +4554,7 @@ declare module Immutable {
      */
     flatMap<M>(
       mapper: (value: V, key: K, iter: this) => Iterable<M>,
-      context?: unknown
+      context?: unknown,
     ): Collection<K, M>;
 
     /**
@@ -4564,7 +4565,7 @@ declare module Immutable {
      */
     flatMap<KM, VM>(
       mapper: (value: V, key: K, iter: this) => Iterable<[KM, VM]>,
-      context?: unknown
+      context?: unknown,
     ): Collection<KM, VM>;
 
     // Reducing a value
@@ -4581,10 +4582,10 @@ declare module Immutable {
     reduce<R>(
       reducer: (reduction: R, value: V, key: K, iter: this) => R,
       initialReduction: R,
-      context?: unknown
+      context?: unknown,
     ): R;
     reduce<R>(
-      reducer: (reduction: V | R, value: V, key: K, iter: this) => R
+      reducer: (reduction: V | R, value: V, key: K, iter: this) => R,
     ): R;
 
     /**
@@ -4596,10 +4597,10 @@ declare module Immutable {
     reduceRight<R>(
       reducer: (reduction: R, value: V, key: K, iter: this) => R,
       initialReduction: R,
-      context?: unknown
+      context?: unknown,
     ): R;
     reduceRight<R>(
-      reducer: (reduction: V | R, value: V, key: K, iter: this) => R
+      reducer: (reduction: V | R, value: V, key: K, iter: this) => R,
     ): R;
 
     /**
@@ -4607,7 +4608,7 @@ declare module Immutable {
      */
     every(
       predicate: (value: V, key: K, iter: this) => boolean,
-      context?: unknown
+      context?: unknown,
     ): boolean;
 
     /**
@@ -4615,7 +4616,7 @@ declare module Immutable {
      */
     some(
       predicate: (value: V, key: K, iter: this) => boolean,
-      context?: unknown
+      context?: unknown,
     ): boolean;
 
     /**
@@ -4645,7 +4646,7 @@ declare module Immutable {
     count(): number;
     count(
       predicate: (value: V, key: K, iter: this) => boolean,
-      context?: unknown
+      context?: unknown,
     ): number;
 
     /**
@@ -4656,7 +4657,7 @@ declare module Immutable {
      */
     countBy<G>(
       grouper: (value: V, key: K, iter: this) => G,
-      context?: unknown
+      context?: unknown,
     ): Map<G, number>;
 
     // Search for value
@@ -4667,7 +4668,7 @@ declare module Immutable {
     find(
       predicate: (value: V, key: K, iter: this) => boolean,
       context?: unknown,
-      notSetValue?: V
+      notSetValue?: V,
     ): V | undefined;
 
     /**
@@ -4678,7 +4679,7 @@ declare module Immutable {
     findLast(
       predicate: (value: V, key: K, iter: this) => boolean,
       context?: unknown,
-      notSetValue?: V
+      notSetValue?: V,
     ): V | undefined;
 
     /**
@@ -4687,7 +4688,7 @@ declare module Immutable {
     findEntry(
       predicate: (value: V, key: K, iter: this) => boolean,
       context?: unknown,
-      notSetValue?: V
+      notSetValue?: V,
     ): [K, V] | undefined;
 
     /**
@@ -4699,7 +4700,7 @@ declare module Immutable {
     findLastEntry(
       predicate: (value: V, key: K, iter: this) => boolean,
       context?: unknown,
-      notSetValue?: V
+      notSetValue?: V,
     ): [K, V] | undefined;
 
     /**
@@ -4707,7 +4708,7 @@ declare module Immutable {
      */
     findKey(
       predicate: (value: V, key: K, iter: this) => boolean,
-      context?: unknown
+      context?: unknown,
     ): K | undefined;
 
     /**
@@ -4717,7 +4718,7 @@ declare module Immutable {
      */
     findLastKey(
       predicate: (value: V, key: K, iter: this) => boolean,
-      context?: unknown
+      context?: unknown,
     ): K | undefined;
 
     /**
@@ -4756,7 +4757,7 @@ declare module Immutable {
      */
     maxBy<C>(
       comparatorValueMapper: (value: V, key: K, iter: this) => C,
-      comparator?: (valueA: C, valueB: C) => number
+      comparator?: (valueA: C, valueB: C) => number,
     ): V | undefined;
 
     /**
@@ -4785,7 +4786,7 @@ declare module Immutable {
      */
     minBy<C>(
       comparatorValueMapper: (value: V, key: K, iter: this) => C,
-      comparator?: (valueA: C, valueB: C) => number
+      comparator?: (valueA: C, valueB: C) => number,
     ): V | undefined;
 
     // Comparison
@@ -4919,8 +4920,8 @@ declare module Immutable {
     reviver?: (
       key: string | number,
       sequence: Collection.Keyed<string, unknown> | Collection.Indexed<unknown>,
-      path?: Array<string | number>
-    ) => unknown
+      path?: Array<string | number>,
+    ) => unknown,
   ): unknown;
 
   /**
@@ -4991,7 +4992,7 @@ declare module Immutable {
    * ```
    */
   export function isImmutable(
-    maybeImmutable: unknown
+    maybeImmutable: unknown,
   ): maybeImmutable is Collection<unknown, unknown>;
 
   /**
@@ -5008,7 +5009,7 @@ declare module Immutable {
    * ```
    */
   export function isCollection(
-    maybeCollection: unknown
+    maybeCollection: unknown,
   ): maybeCollection is Collection<unknown, unknown>;
 
   /**
@@ -5025,7 +5026,7 @@ declare module Immutable {
    * ```
    */
   export function isKeyed(
-    maybeKeyed: unknown
+    maybeKeyed: unknown,
   ): maybeKeyed is Collection.Keyed<unknown, unknown>;
 
   /**
@@ -5043,7 +5044,7 @@ declare module Immutable {
    * ```
    */
   export function isIndexed(
-    maybeIndexed: unknown
+    maybeIndexed: unknown,
   ): maybeIndexed is Collection.Indexed<unknown>;
 
   /**
@@ -5061,7 +5062,7 @@ declare module Immutable {
    * ```
    */
   export function isAssociative(
-    maybeAssociative: unknown
+    maybeAssociative: unknown,
   ): maybeAssociative is
     | Collection.Keyed<unknown, unknown>
     | Collection.Indexed<unknown>;
@@ -5096,7 +5097,7 @@ declare module Immutable {
    * True if `maybeSeq` is a Seq.
    */
   export function isSeq(
-    maybeSeq: unknown
+    maybeSeq: unknown,
   ): maybeSeq is
     | Seq.Indexed<unknown>
     | Seq.Keyed<unknown, unknown>
@@ -5118,7 +5119,7 @@ declare module Immutable {
    * True if `maybeOrderedMap` is an OrderedMap.
    */
   export function isOrderedMap(
-    maybeOrderedMap: unknown
+    maybeOrderedMap: unknown,
   ): maybeOrderedMap is OrderedMap<unknown, unknown>;
 
   /**
@@ -5137,7 +5138,7 @@ declare module Immutable {
    * True if `maybeOrderedSet` is an OrderedSet.
    */
   export function isOrderedSet(
-    maybeOrderedSet: unknown
+    maybeOrderedSet: unknown,
   ): maybeOrderedSet is OrderedSet<unknown>;
 
   /**
@@ -5162,37 +5163,37 @@ declare module Immutable {
    */
   export function get<K, V>(
     collection: Collection<K, V>,
-    key: K
+    key: K,
   ): V | undefined;
   export function get<K, V, NSV>(
     collection: Collection<K, V>,
     key: K,
-    notSetValue: NSV
+    notSetValue: NSV,
   ): V | NSV;
   export function get<TProps, K extends keyof TProps>(
     record: Record<TProps>,
     key: K,
-    notSetValue: unknown
+    notSetValue: unknown,
   ): TProps[K];
   export function get<V>(collection: Array<V>, key: number): V | undefined;
   export function get<V, NSV>(
     collection: Array<V>,
     key: number,
-    notSetValue: NSV
+    notSetValue: NSV,
   ): V | NSV;
   export function get<C extends Object, K extends keyof C>(
     object: C,
     key: K,
-    notSetValue: unknown
+    notSetValue: unknown,
   ): C[K];
   export function get<V>(
     collection: { [key: string]: V },
-    key: string
+    key: string,
   ): V | undefined;
   export function get<V, NSV>(
     collection: { [key: string]: V },
     key: string,
-    notSetValue: NSV
+    notSetValue: NSV,
   ): V | NSV;
 
   /**
@@ -5233,21 +5234,21 @@ declare module Immutable {
    */
   export function remove<K, C extends Collection<K, unknown>>(
     collection: C,
-    key: K
+    key: K,
   ): C;
   export function remove<
     TProps,
     C extends Record<TProps>,
-    K extends keyof TProps
+    K extends keyof TProps,
   >(collection: C, key: K): C;
   export function remove<C extends Array<unknown>>(
     collection: C,
-    key: number
+    key: number,
   ): C;
   export function remove<C, K extends keyof C>(collection: C, key: K): C;
   export function remove<
     C extends { [key: string]: unknown },
-    K extends keyof C
+    K extends keyof C,
   >(collection: C, key: K): C;
 
   /**
@@ -5272,23 +5273,23 @@ declare module Immutable {
   export function set<K, V, C extends Collection<K, V>>(
     collection: C,
     key: K,
-    value: V
+    value: V,
   ): C;
   export function set<TProps, C extends Record<TProps>, K extends keyof TProps>(
     record: C,
     key: K,
-    value: TProps[K]
+    value: TProps[K],
   ): C;
   export function set<V, C extends Array<V>>(
     collection: C,
     key: number,
-    value: V
+    value: V,
   ): C;
   export function set<C, K extends keyof C>(object: C, key: K, value: C[K]): C;
   export function set<V, C extends { [key: string]: V }>(
     collection: C,
     key: string,
-    value: V
+    value: V,
   ): C;
 
   /**
@@ -5313,67 +5314,67 @@ declare module Immutable {
   export function update<K, V, C extends Collection<K, V>>(
     collection: C,
     key: K,
-    updater: (value: V) => V
+    updater: (value: V) => V,
   ): C;
   export function update<K, V, C extends Collection<K, V>, NSV>(
     collection: C,
     key: K,
     notSetValue: NSV,
-    updater: (value: V | NSV) => V
+    updater: (value: V | NSV) => V,
   ): C;
   export function update<
     TProps,
     C extends Record<TProps>,
-    K extends keyof TProps
+    K extends keyof TProps,
   >(record: C, key: K, updater: (value: TProps[K]) => TProps[K]): C;
   export function update<
     TProps,
     C extends Record<TProps>,
     K extends keyof TProps,
-    NSV
+    NSV,
   >(
     record: C,
     key: K,
     notSetValue: NSV,
-    updater: (value: TProps[K] | NSV) => TProps[K]
+    updater: (value: TProps[K] | NSV) => TProps[K],
   ): C;
   export function update<V>(
     collection: Array<V>,
     key: number,
-    updater: (value: V) => V
+    updater: (value: V) => V,
   ): Array<V>;
   export function update<V, NSV>(
     collection: Array<V>,
     key: number,
     notSetValue: NSV,
-    updater: (value: V | NSV) => V
+    updater: (value: V | NSV) => V,
   ): Array<V>;
   export function update<C, K extends keyof C>(
     object: C,
     key: K,
-    updater: (value: C[K]) => C[K]
+    updater: (value: C[K]) => C[K],
   ): C;
   export function update<C, K extends keyof C, NSV>(
     object: C,
     key: K,
     notSetValue: NSV,
-    updater: (value: C[K] | NSV) => C[K]
+    updater: (value: C[K] | NSV) => C[K],
   ): C;
   export function update<V, C extends { [key: string]: V }, K extends keyof C>(
     collection: C,
     key: K,
-    updater: (value: V) => V
+    updater: (value: V) => V,
   ): { [key: string]: V };
   export function update<
     V,
     C extends { [key: string]: V },
     K extends keyof C,
-    NSV
+    NSV,
   >(
     collection: C,
     key: K,
     notSetValue: NSV,
-    updater: (value: V | NSV) => V
+    updater: (value: V | NSV) => V,
   ): { [key: string]: V };
 
   /**
@@ -5393,7 +5394,7 @@ declare module Immutable {
   export function getIn(
     collection: unknown,
     keyPath: Iterable<unknown>,
-    notSetValue: unknown
+    notSetValue: unknown,
   ): unknown;
 
   /**
@@ -5411,7 +5412,7 @@ declare module Immutable {
    */
   export function hasIn(
     collection: unknown,
-    keyPath: Iterable<unknown>
+    keyPath: Iterable<unknown>,
   ): boolean;
 
   /**
@@ -5448,7 +5449,7 @@ declare module Immutable {
   export function setIn<C>(
     collection: C,
     keyPath: Iterable<unknown>,
-    value: unknown
+    value: unknown,
   ): C;
 
   /**
@@ -5469,13 +5470,13 @@ declare module Immutable {
   export function updateIn<C>(
     collection: C,
     keyPath: Iterable<unknown>,
-    updater: (value: unknown) => unknown
+    updater: (value: unknown) => unknown,
   ): C;
   export function updateIn<C>(
     collection: C,
     keyPath: Iterable<unknown>,
     notSetValue: unknown,
-    updater: (value: unknown) => unknown
+    updater: (value: unknown) => unknown,
   ): C;
 
   /**

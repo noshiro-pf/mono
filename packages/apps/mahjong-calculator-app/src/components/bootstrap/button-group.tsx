@@ -15,7 +15,11 @@ export const ButtonGroupTyped = <T,>(
   props: PropsTyped<T>,
 ): preact.VNode<PropsTyped<T>> | null =>
   // eslint-disable-next-line no-restricted-syntax
-  createElement(ButtonGroup, props as unknown as Props);
+  createElement(
+    ButtonGroup,
+    // eslint-disable-next-line no-restricted-syntax
+    props as unknown as Props,
+  ) as unknown as preact.VNode<PropsTyped<T>>;
 
 export const ButtonGroup = memoNamed<Props>(
   'ButtonGroup',

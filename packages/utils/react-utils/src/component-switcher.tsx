@@ -1,4 +1,4 @@
-import { memoNamed } from './memo-named';
+import { memoNamed } from './memo-named.mjs';
 
 type Props = Readonly<{
   children: readonly React.ReactNode[];

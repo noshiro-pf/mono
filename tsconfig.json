@@ -1,8 +1,12 @@
 {
-  "extends": "./config/tsconfig/tsconfig.base.json",
+  "extends": "./config/tsconfig/tsconfig.type-check.json",
   // for VSCode
   "compilerOptions": {
     "jsxFactory": "h",
     "typeRoots": ["node_modules/@types", "packages/**/node_modules/@types"]
-  }
+  },
+  "include": [
+    "./packages/**/eslint.config.js",
+    "./packages/**/eslint.config.*.mjs"
+  ]
 }

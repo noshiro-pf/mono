@@ -11,7 +11,8 @@ describe('main', { testIsolation: false }, () => {
   });
 
   it('filter 4,5', () => {
-    cy.get(e('filter-input')).clear().type('4,5');
+    cy.get(e('filter-input')).clear();
+    cy.get(e('filter-input')).type('4,5');
 
     cy.get(e('table-body')).within(() => {
       cy.get('tr')
@@ -41,7 +42,8 @@ describe('main', { testIsolation: false }, () => {
   });
 
   it('filter 12,2,3', () => {
-    cy.get(e('filter-input')).clear().type('12,2,3');
+    cy.get(e('filter-input')).clear();
+    cy.get(e('filter-input')).type('12,2,3');
 
     cy.get(e('table-body')).within(() => {
       cy.get('tr')

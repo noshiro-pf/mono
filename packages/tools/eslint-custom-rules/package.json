@@ -1,13 +1,16 @@
 {
   "name": "eslint-plugin-noshiro-custom",
   "version": "1.0.1",
+  "private": false,
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,
+  "type": "module",
   "main": "lib/index.js",
   "scripts": {
     "build_": "tsc --project tsconfig.json",
     "clean": "rimraf lib",
+    "lint_": "eslint src/**/*.ts",
     "prebuild": "yarn clean"
   },
   "dependencies": {

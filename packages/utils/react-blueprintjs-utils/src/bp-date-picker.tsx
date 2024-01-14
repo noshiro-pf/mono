@@ -3,7 +3,7 @@ import { DateInput, type DatePickerShortcut } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
 import { DateUtils, castWritable, pipe, toSafeUint } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
-import { type YearMonthDate } from './types';
+import { type YearMonthDate } from './types/index.mjs';
 
 const formatDate = (date: RawDateType): string => date.toLocaleDateString();
 

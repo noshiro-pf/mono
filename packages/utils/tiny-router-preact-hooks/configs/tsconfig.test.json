@@ -1,0 +1,7 @@
+{
+  "extends": [
+    "../../../../config/tsconfig/tsconfig.test.json",
+    "../../../../config/tsconfig/tsconfig.preact.json"
+  ],
+  "include": ["../src"]
+}

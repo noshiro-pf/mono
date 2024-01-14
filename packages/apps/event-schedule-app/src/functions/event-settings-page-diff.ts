@@ -47,7 +47,6 @@ const map = (a: string, b: string): string =>
 
 type EventSchedulePaths = Exclude<Paths<EventSchedule>, readonly []>;
 
-// eslint-disable-next-line no-lone-blocks
 {
   expectType<
     Readonly<

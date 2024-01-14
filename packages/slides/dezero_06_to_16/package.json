@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": false,
   "license": "MIT",
+  "author": "noshiro",
+  "sideEffects": true,
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "wireit",
     "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
     "fb:deploy": "yarn z:fb:deploy:wireit",
@@ -14,22 +16,24 @@
     "preview": "vite preview",
     "start": "vite",
     "z:build:impl": "vite build",
-    "z:build:wireit": "wireit",
     "z:fb:deploy:impl": "firebase deploy",
     "z:fb:deploy:wireit": "wireit"
   },
   "dependencies": {
     "reveal.js": "^4.0.2"
   },
+  "devDependencies": {
+    "@noshiro/eslint-utils": "*"
+  },
   "wireit": {
     "z:fb:deploy:wireit": {
       "command": "yarn z:fb:deploy:impl",
       "dependencies": [
-        "z:build:wireit"
+        "build"
       ]
     },
-    "z:build:wireit": {
-      "command": "yarn z:build:impl",
+    "build": {
+      "command": "vite build",
       "clean": "if-file-deleted",
       "files": [
         "src/**/*"

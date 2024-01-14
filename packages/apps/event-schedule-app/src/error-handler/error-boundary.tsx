@@ -1,6 +1,4 @@
 /* eslint-disable react/no-set-state */
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable react/destructuring-assignment */
 
 import {
@@ -20,7 +18,7 @@ import {
 } from '../components';
 import { createToaster, showToast } from '../functions';
 
-// eslint-disable-next-line functional/immutable-data, unicorn/prefer-add-event-listener, no-restricted-syntax
+// eslint-disable-next-line no-restricted-syntax
 (window.onerror as Writable<typeof window.onerror>) = (e: unknown) => {
   const errorString = Result.unwrapThrow(Json.stringify(e));
   console.error(errorString);
@@ -71,7 +69,6 @@ export class ErrorBoundary extends Component<Props, State> {
     };
   }
 
-  // eslint-disable-next-line class-methods-use-this
   override componentDidCatch(error: unknown, errorInfo: unknown): void {
     // You can also log error messages to an error reporting service here
 
@@ -136,7 +133,7 @@ export class ErrorBoundary extends Component<Props, State> {
     this.setState({ description: value });
   };
 
-  // eslint-disable-next-line react/no-unused-class-component-methods, class-methods-use-this
+  // eslint-disable-next-line react/no-unused-class-component-methods, @typescript-eslint/class-methods-use-this
   readonly onUnhandledRejection = (ev: PromiseRejectionEvent): void => {
     ev.promise.catch((error) => {
       showErrorToast(Str.from(error));

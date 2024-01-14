@@ -1,9 +1,4 @@
 {
-  "extends": "../../../config/tsconfig/tsconfig.cjs.nolib.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "noEmit": true
-  },
-  "include": ["./src", "./scripts"],
-  "exclude": ["node_modules", "dist"]
+  "extends": "../../../config/tsconfig/tsconfig.type-check.json",
+  "include": ["./src", "./scripts", "./eslint.config.js", "./config"]
 }

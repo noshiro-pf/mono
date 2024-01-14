@@ -1,7 +1,7 @@
-export { ReactComponent as BiographyMd } from './biography.md';
-export { ReactComponent as CareerMd } from './career.md';
+export { default as BiographyMdx } from './biography.mdx';
+export { default as CareerMdx } from './career.mdx';
 export * from './images';
 export * from './last-updated';
 export * from './products';
-export { ReactComponent as SkillsMd } from './skills.md';
+export { default as SkillsMdx } from './skills.mdx';
 export * from './writings';

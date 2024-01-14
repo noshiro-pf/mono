@@ -66,8 +66,8 @@ jobs:
           yarn ws:build
           yarn zz:cmd:check:no-diff
 
-      - name: type-check:root
-        run: yarn type-check:root
+      - name: type-check:scripts
+        run: yarn type-check:scripts
 
       - name: ws:type-check
         run: yarn ws:type-check

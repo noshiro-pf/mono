@@ -1,18 +1,4 @@
 {
-  "extends": "../config/tsconfig/tsconfig.base.json",
-  "compilerOptions": {
-    "moduleResolution": "NodeNext",
-    "module": "NodeNext",
-    "allowJs": true,
-    "checkJs": true,
-    "noEmit": true
-  },
-  "include": [
-    "./**/*.d.mts",
-    "./**/*.cjs",
-    "./**/*.mjs",
-    "./**/*.js",
-    "./**/*.mts",
-    "./**/*.ts"
-  ]
+  "extends": "../config/tsconfig/tsconfig.type-check.json",
+  "include": ["./**/*.mjs"]
 }

@@ -3,7 +3,7 @@ import { memoNamed, useBoolState } from '@noshiro/react-utils';
 import { type TinyObservable } from '@noshiro/ts-utils';
 import { isEmailString } from '@noshiro/ts-utils-additional';
 import { useCallback } from 'react';
-import { BpInput, type BpInputProps } from './bp-input';
+import { BpInput, type BpInputProps } from './bp-input.js';
 
 export type BpEmailInputProps = BpInputProps &
   Readonly<{

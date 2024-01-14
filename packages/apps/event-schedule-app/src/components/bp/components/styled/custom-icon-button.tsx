@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unused-modules */
 import { Button } from '@blueprintjs/core';
 import { CustomIcon } from '../../../atoms';
 

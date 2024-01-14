@@ -1,0 +1,2 @@
+*.mjs
+!eslint.config.gen.mjs

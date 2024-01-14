@@ -1,5 +1,4 @@
 {
-  "extends": "../../../config/tsconfig/tsconfig.base.nolib.json",
-  "include": ["./src", "./test"],
-  "exclude": ["node_modules", "cjs", "esm", "docs"]
+  "extends": "../../../config/tsconfig/tsconfig.lib.type-check.json",
+  "include": ["./src", "./configs", "./test"]
 }

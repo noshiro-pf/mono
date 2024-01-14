@@ -20,22 +20,35 @@ expectType<number, string>('!=');
 expectType<any, 1>('!=');
 ```
 
-型が等価 or 部分型かどうか判定します。
+型の等価性や部分型関係をチェックするユーティリティです。
 
 - `expectType<A, B>("=")` は型 `A` と型 `B` が等価であるときに型エラーにならず、そうでないときに型エラーになります。
-- `expectType<A, B>("<=")` は型 `A` が型 `B` の部分型であるときに型エラーにならず、そうでないときに型エラーになります。
-- `expectType<A, B>("!=")` は型 `A` と型 `B` が等価でないときに型エラーにならず、等価であるときに型エラーになります。
-- `expectType<A, B>("!<=")` は型 `A` が型 `B` の部分型でないときに型エラーにならず、部分型であるときに型エラーになります。
+- `expectType<A, B>("!=")` は `"="` の逆です。
+- `expectType<A, B>("<=")` は型 `A` が型 `B` の部分型であるとき型エラーにならず、部分型でないときに型エラーになります。
+- `expectType<A, B>("~=")` は `A` が `B` の部分型かつ `B` が `A` の部分型であるときに型エラーにならず、そうでないときに型エラーになります。 `"="` の内部実装の `TypeEq<A, B>` は例えば `{ x: 1 } & { y: 2 }` と `{ x: 1; y: 2 }` を区別してしまう程厳密なものなので、もう少し緩い等価判定を行いたい場合に用意しています。
 
 --- 実装 ---
 
 ```ts
-const expectType = <A, B>(
+/**
+ * @param _relation `"=" | "~=" | "<=" | ">=" | "!<=" | "!>=" | "!="`
+ * @description
+ * - `expectType<A, B>("=")` passes if `A` is equal to `B`.
+ * - `expectType<A, B>("~=")` passes if `A` extends `B` and `B` extends `A`.
+ * - `expectType<A, B>("<=")` passes if `A` extends `B`.
+ * - `expectType<A, B>(">=")` passes if `B` extends `A`.
+ * - `expectType<A, B>("!<=")` passes if `A` doesn't extend `B`.
+ * - `expectType<A, B>("!>=")` passes if `B` doesn't extend `A`.
+ * - `expectType<A, B>("!=")` passes if `A` is not equal to `B`.
+ */
+export const expectType = <A, B>(
   _relation: TypeEq<A, B> extends true
-    ? '<=' | '='
-    : TypeExtends<A, B> extends true
-      ? '!=' | '<='
-      : '!<=' | '!=',
+    ? '<=' | '=' | '>=' | '~='
+    :
+        | '!='
+        | (TypeExtends<A, B> extends true
+            ? '<=' | (TypeExtends<B, A> extends true ? '>=' | '~=' : '!>=')
+            : '!<=' | (TypeExtends<B, A> extends true ? '>=' : '!>=')),
 ): void => undefined;
 ```
 

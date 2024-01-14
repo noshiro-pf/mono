@@ -14,12 +14,6 @@ experimental/**/esm
 experimental/**/cjs
 experimental/**/config/**/*.js
 experimental/**/scripts/**/*.js
-config/**/*.js
-!config/eslintrc/**/*.js
-scripts/**/*.js
-**/*.d.ts
-**/*.d.mts
-**/*.d.cts
 !**/react-app-env.d.ts
 !**/vite-env.d.ts
 !**/globals.d.ts

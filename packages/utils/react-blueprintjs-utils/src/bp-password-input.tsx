@@ -1,6 +1,6 @@
 import { memoNamed, useBoolState } from '@noshiro/react-utils';
-import { BpButton } from './bp-button';
-import { BpInput, type BpInputProps } from './bp-input';
+import { BpButton } from './bp-button.js';
+import { BpInput, type BpInputProps } from './bp-input.js';
 
 export type BpPasswordInputProps = BpInputProps &
   Readonly<{
