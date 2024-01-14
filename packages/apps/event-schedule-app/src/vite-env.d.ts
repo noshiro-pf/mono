@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/triple-slash-reference */
-
 /// <reference path="./globals.d.ts" />
 
 /// <reference types="node" />
@@ -11,51 +9,51 @@
 /* eslint-disable @typescript-eslint/no-restricted-imports */
 /* eslint-disable import/no-internal-modules */
 
-import type {
-  HTMLInputProps as _HTMLInputProps,
-  HTMLSelectProps as _HTMLSelectProps,
-  IconName as _IconName,
-  InputGroupProps as _InputGroupProps,
-  Intent as _Intent,
-  Toaster as _Toaster,
-  OptionProps as _OptionProps,
-  PopperModifiers as _PopperModifiers,
+import {
+  type HTMLInputProps as _HTMLInputProps,
+  type HTMLSelectProps as _HTMLSelectProps,
+  type IconName as _IconName,
+  type InputGroupProps as _InputGroupProps,
+  type Intent as _Intent,
+  type OptionProps as _OptionProps,
+  type PopperModifiers as _PopperModifiers,
+  type Toaster as _Toaster,
 } from '@blueprintjs/core';
-import type { DateInputProps } from '@blueprintjs/datetime';
-import type {
-  Answer as _Answer,
-  AnswerIconId as _AnswerIconId,
-  AnswerIconIdWithNone as _AnswerIconIdWithNone,
-  AnswerIconPoint as _AnswerIconPoint,
-  AnswerIconSetting as _AnswerIconSetting,
-  AnswerIconSettings as _AnswerIconSettings,
-  AnswerId as _AnswerId,
-  AnswerSelection as _AnswerSelection,
-  DatetimeRange as _DatetimeRange,
-  DatetimeSpecificationEnumType as _DatetimeSpecificationEnumType,
-  DayType as _DayType,
-  EventSchedule as _EventSchedule,
-  HoursMinutes as _HoursMinutes,
-  NotificationSettings as _NotificationSettings,
-  TimeRange as _TimeRange,
-  User as _User,
-  UserId as _UserId,
-  UserName as _UserName,
-  Weight as _Weight,
-  YearMonthDate as _YearMonthDate,
-  Ymdhm as _Ymdhm,
+import { type DateInputProps } from '@blueprintjs/datetime';
+import {
+  type Answer as _Answer,
+  type AnswerIconId as _AnswerIconId,
+  type AnswerIconIdWithNone as _AnswerIconIdWithNone,
+  type AnswerIconPoint as _AnswerIconPoint,
+  type AnswerIconSetting as _AnswerIconSetting,
+  type AnswerIconSettings as _AnswerIconSettings,
+  type AnswerId as _AnswerId,
+  type AnswerSelection as _AnswerSelection,
+  type DatetimeRange as _DatetimeRange,
+  type DatetimeSpecificationEnumType as _DatetimeSpecificationEnumType,
+  type DayType as _DayType,
+  type EventSchedule as _EventSchedule,
+  type HoursMinutes as _HoursMinutes,
+  type NotificationSettings as _NotificationSettings,
+  type TimeRange as _TimeRange,
+  type User as _User,
+  type UserId as _UserId,
+  type UserName as _UserName,
+  type Weight as _Weight,
+  type YearMonthDate as _YearMonthDate,
+  type Ymdhm as _Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
-import type { dict as _dict } from './constants/dictionary/dictionary';
-import type {
-  AnswerSelectionMapKey as _AnswerSelectionMapKey,
-  DatetimeRangeMapKey as _DatetimeRangeMapKey,
-  YmdKey as _YmdKey,
+import { type dict as _dict } from './constants';
+import {
+  type AnswerSelectionMapKey as _AnswerSelectionMapKey,
+  type DatetimeRangeMapKey as _DatetimeRangeMapKey,
+  type YmdKey as _YmdKey,
 } from './functions';
-import type {
-  AuthCredential as _AuthCredential,
-  FireAuthUser as _FireAuthUser,
-  OAuthCredential as _OAuthCredential,
-  UserCredential as _UserCredential,
+import {
+  type AuthCredential as _AuthCredential,
+  type FireAuthUser as _FireAuthUser,
+  type OAuthCredential as _OAuthCredential,
+  type UserCredential as _UserCredential,
 } from './types/firebase-types-wrapper';
 
 declare global {
@@ -65,16 +63,14 @@ declare global {
   type IconName = _IconName;
   type InputGroupProps = _InputGroupProps;
   type Intent = _Intent;
-  // eslint-disable-next-line deprecation/deprecation
+
   type Toaster = _Toaster;
   type OptionProps = _OptionProps;
   type PopperModifiers = _PopperModifiers;
 
   /* @blueprintjs/datetime */
   type DatePickerShortcut = Readonly<
-    ArrayElement<
-      Exclude<DateInputProps['shortcuts'], boolean | undefined>
-    >
+    ArrayElement<Exclude<DateInputProps['shortcuts'], boolean | undefined>>
   >;
 
   /* @noshiro/event-schedule-app-shared */

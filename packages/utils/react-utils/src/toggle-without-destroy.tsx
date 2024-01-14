@@ -1,4 +1,4 @@
-import { memoNamed } from './memo-named';
+import { memoNamed } from './memo-named.mjs';
 
 type Props = DeepReadonly<{
   condition: boolean;

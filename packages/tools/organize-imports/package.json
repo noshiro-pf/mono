@@ -1,9 +1,11 @@
 {
   "name": "typescript-organize-imports",
   "version": "1.0.4",
+  "private": false,
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,
+  "type": "module",
   "main": "lib/index.js",
   "bin": {
     "organizeimports": "lib/index.js"

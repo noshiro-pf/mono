@@ -17,7 +17,6 @@ yarn.lock
 *.jpeg
 *.xml
 *.ico
-*.d.ts
 .firebaserc
 hosting.YnVpbGQ.cache
 LICENSE
@@ -37,6 +36,9 @@ packages/utils/syncflow/docs/**/*.js
 .wireit
 *.tsbuildinfo
 
+packages/strict-ts-lib/source/unchanged
+packages/strict-ts-lib/source/temp
+!packages/strict-ts-lib/source/dist
 
 # Optional eslint cache
 .eslintcache

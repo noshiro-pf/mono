@@ -1,4 +1,4 @@
-import { BiographyMd, CareerMd, CatIconImage, SkillsMd } from './assets';
+import { BiographyMdx, CareerMdx, CatIconImage, SkillsMdx } from './assets';
 import {
   GithubIconLink,
   LastUpdatedAt,
@@ -35,15 +35,15 @@ const LiSpacedBlock = styled('div')`
 const pages = {
   [routes.career]: (
     <LiSpacedBlock>
-      <CareerMd />
+      <CareerMdx />
     </LiSpacedBlock>
   ),
   [routes.biography]: (
     <LiSpacedBlock>
-      <BiographyMd />
+      <BiographyMdx />
     </LiSpacedBlock>
   ),
-  [routes.skills]: <SkillsMd />,
+  [routes.skills]: <SkillsMdx />,
   [routes.products]: <Products />,
   [routes.writings]: <Writings />,
 };

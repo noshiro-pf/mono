@@ -1,0 +1,10 @@
+{
+  "extends": [
+    "./tsconfig.lib.json",
+    "./tsconfig.type-check.json",
+    "./tsconfig.build.json"
+  ],
+  "compilerOptions": {
+    "declaration": true
+  }
+}

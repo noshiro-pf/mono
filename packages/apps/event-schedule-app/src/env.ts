@@ -1,5 +1,3 @@
-/* eslint-disable import/no-unused-modules */
-
 export const isProduction = import.meta.env.PROD;
 export const isDevelopment = import.meta.env.DEV;
 

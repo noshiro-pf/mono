@@ -2,7 +2,7 @@ import { DateInput, type DatePickerShortcut } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
 import { DateUtils, castWritable, pipe, toSafeUint } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
-import { type Ymdhm } from './types';
+import { type Ymdhm } from './types/index.mjs';
 
 const formatDate = (date: RawDateType): string =>
   `${DateUtils.toLocaleYMD(date, '-')}  ${DateUtils.toLocaleHM(date, ':')}`;
@@ -44,7 +44,6 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
     ...props
   }) => {
     const onChangeHandler = useCallback(
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       (dt: RawDateType | null | undefined, isUserChange: boolean) => {
         if (dt == null) {
           onYmdhmChange(undefined);

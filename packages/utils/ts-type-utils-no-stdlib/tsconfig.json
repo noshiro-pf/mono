@@ -1,9 +1,4 @@
 {
-  "extends": "../../../config/tsconfig/tsconfig.base.nolib.json",
-  "compilerOptions": {
-    "typeRoots": [],
-    "types": [],
-    "noLib": true
-  },
-  "include": ["./src", "test"]
+  "extends": "../../../config/tsconfig/tsconfig.lib.type-check.json",
+  "include": ["./src", "./configs", "./test"]
 }

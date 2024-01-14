@@ -196,13 +196,25 @@ export const useSliderHandleStateManager = ({
   const handleKeyDown: React.KeyboardEventHandler<HTMLSpanElement> =
     useCallback(
       (ev) => {
-        if (ev.key === 'ArrowDown' || ev.key === 'ArrowLeft') {
-          changeValue(valueRef.current - stepSizeRef.current);
-          // this key event has been handled! prevent browser scroll on up/down
-          ev.preventDefault();
-        } else if (ev.key === 'ArrowUp' || ev.key === 'ArrowRight') {
-          changeValue(valueRef.current + stepSizeRef.current);
-          ev.preventDefault();
+        switch (ev.key) {
+          case 'ArrowDown':
+          case 'ArrowLeft': {
+            changeValue(valueRef.current - stepSizeRef.current);
+            // this key event has been handled! prevent browser scroll on up/down
+            ev.preventDefault();
+
+            break;
+          }
+          case 'ArrowUp':
+          case 'ArrowRight': {
+            changeValue(valueRef.current + stepSizeRef.current);
+            ev.preventDefault();
+
+            break;
+          }
+
+          default:
+            break;
         }
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps

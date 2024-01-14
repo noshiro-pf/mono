@@ -25,7 +25,7 @@ export const createGlobalPixiObjects = ({
   canvasSize,
   canvasStyles,
 }: Args): ComponentReturnType => {
-  const halfWidth = Math.floor(canvasStyles.crosshairLineWidthPx / 2);
+  const halfWidth: number = Math.floor(canvasStyles.crosshairLineWidthPx / 2);
 
   const background = createDummySpriteRectangle({
     top: 0,

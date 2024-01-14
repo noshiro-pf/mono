@@ -3,12 +3,17 @@
   "version": "2.0.33",
   "private": false,
   "license": "MIT",
+  "author": "noshiro",
   "sideEffects": false,
-  "main": "dist/goober.js",
-  "module": "dist/goober.esm.js",
-  "source": "src/index.js",
-  "types": "goober.d.ts",
-  "typings": "./goober.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./index.d.mts",
+        "default": "./dist/goober.esm.js"
+      }
+    }
+  },
   "scripts": {
     "fmt": "yarn zz:cmd:prettier .",
     "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write"

@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": false,
   "license": "MIT",
+  "author": "noshiro",
+  "sideEffects": true,
+  "type": "module",
   "scripts": {
     "bundle": "tsc --outFile src/20201016_namespaces/sample.js src/20201016_namespaces/Test.ts --skipLibCheck",
     "bundle2": "tsc --outFile src/20201016_namespaces/sample2.js src/20201016_namespaces/Validation.ts src/20201016_namespaces/LettersOnlyValidator.ts src/20201016_namespaces/ZipCodeValidator.ts src/20201016_namespaces/Test.ts --skipLibCheck",

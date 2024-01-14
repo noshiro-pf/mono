@@ -1,5 +1,7 @@
 {
-  "extends": "../../../config/tsconfig/tsconfig.base.nolib.json",
-  "include": ["./src"],
-  "exclude": ["node_modules", "cjs", "esm"]
+  "extends": [
+    "../../../config/tsconfig/tsconfig.lib.type-check.json",
+    "../../../config/tsconfig/tsconfig.react.json"
+  ],
+  "include": ["./src", "./configs"]
 }

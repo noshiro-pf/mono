@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": false,
   "license": "MIT",
+  "author": "noshiro",
+  "sideEffects": true,
+  "type": "module",
   "scripts": {
     "convert": "node ./convert.js",
     "marked": "marked"

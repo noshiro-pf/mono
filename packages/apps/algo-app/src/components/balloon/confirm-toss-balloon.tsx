@@ -83,9 +83,7 @@ export const ConfirmTossBalloon = memoNamed<Props>(
   },
 );
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 const BalloonBody = createBalloonBody(balloonSize);
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 const BalloonWithDownArrow = createBalloonWithDownArrow(BalloonBody);
 const BalloonWithDownArrowTranslated = styled(BalloonWithDownArrow)`
   transform: translateY(-20px);

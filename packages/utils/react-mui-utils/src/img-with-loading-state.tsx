@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { ImgWithPreview } from '@noshiro/react-utils-styled';
-import { ImgWithLoadingCircle } from './img-with-loading-circle';
+import { ImgWithLoadingCircle } from './img-with-loading-circle.js';
 
 type Props = Readonly<{
   fullImgSrc: string;

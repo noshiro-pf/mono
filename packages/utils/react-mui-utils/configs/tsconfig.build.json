@@ -1,0 +1,11 @@
+{
+  "extends": [
+    "../../../../config/tsconfig/tsconfig.lib.build.json",
+    "../../../../config/tsconfig/tsconfig.react-emotion.json"
+  ],
+  "compilerOptions": {
+    "outDir": "../esm"
+  },
+  "include": ["../src"],
+  "exclude": ["../src/**/*.test.{mts,tsx}"]
+}

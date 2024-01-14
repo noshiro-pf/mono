@@ -1,0 +1,50 @@
+{
+  // https://www.typescriptlang.org/ja/tsconfig
+  "compilerOptions": {
+    // Type Checking
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": false, // TODO
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true,
+    // "alwaysStrict": true,                 // enabled by "strict"
+    // "strictBindCallApply": true,          // enabled by "strict"
+    // "strictFunctionTypes": true,          // enabled by "strict"
+    // "strictNullChecks": true,             // enabled by "strict"
+    // "strictPropertyInitialization": true, // enabled by "strict"
+    // "noImplicitAny": true,                // enabled by "strict"
+    // "noImplicitThis": true,               // enabled by "strict"
+    // "useUnknownInCatchVariables": true,   // enabled by "strict"
+
+    "noEmit": true,
+
+    // Modules
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+
+    // Language and Environment
+    "target": "ESNext",
+
+    // JavaScript Support
+    "allowJs": true,
+    "checkJs": true,
+
+    // Interop Constraints
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+
+    // Completeness
+    "skipLibCheck": true // TODO
+  }
+}

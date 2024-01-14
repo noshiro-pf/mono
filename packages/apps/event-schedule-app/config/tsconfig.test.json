@@ -1,5 +1,0 @@
-{
-  "extends": "../../../../config/tsconfig/tsconfig.react-emotion.nolib.json",
-  "include": ["../src", "./globals.ts"],
-  "exclude": ["../node_modules", "../build"]
-}

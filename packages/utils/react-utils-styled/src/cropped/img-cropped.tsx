@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { memoNamed } from '@noshiro/react-utils';
 import { type Rect } from '@noshiro/ts-utils-additional';
-import { DivCropped } from './div-cropped';
+import { DivCropped } from './div-cropped.js';
 
 const Img = styled.img`
   width: 100%;

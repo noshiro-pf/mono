@@ -17,7 +17,6 @@
 // eslint-disable-next-line import/no-unassigned-import
 import './commands';
 
-// eslint-disable-next-line import/no-unassigned-import
 // import 'cypress-real-events';
 
 // Alternatively you can use CommonJS syntax:

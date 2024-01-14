@@ -1,7 +1,4 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-// @ts-check
-
-import fs from 'node:fs';
+import * as fs from 'node:fs/promises';
 
 const funcTypeName = 'FunctionType';
 const functionName = 'pipeF';
@@ -14,7 +11,7 @@ import { FunctionType } from '../types';
  *
  * @param {number} start
  * @param {number} end
- * @returns {number[]}
+ * @returns {readonly number[]}
  */
 const range = (start, end) =>
   Array.from({ length: end - start }, (_, i) => start + i);
@@ -66,7 +63,7 @@ const createPipeTypeDef = (len) =>
 
 /**
  *
- * @returns {[number, string]}
+ * @returns {readonly [number, string]}
  */
 const input = () => {
   const args = process.argv.slice(2);
@@ -97,11 +94,11 @@ const input = () => {
   return [len, path];
 };
 
-const main = () => {
+const main = async () => {
   const [len, path] = input();
   const result = createPipeTypeDef(len);
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  fs.writeFile(path, result, { flag: 'w' }, () => undefined);
+  await fs.writeFile(path, result, { flag: 'w' });
 };
 
-main();
+main().catch(console.error);

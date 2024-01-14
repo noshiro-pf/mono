@@ -1,9 +1,0 @@
-{
-  "extends": "../../../config/tsconfig/tsconfig.base.nolib.json",
-  "include": ["./test"],
-  "compilerOptions": {
-    "noEmit": true,
-    "typeRoots": [],
-    "types": []
-  }
-}

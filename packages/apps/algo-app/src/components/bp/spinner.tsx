@@ -1,15 +1,10 @@
 import { keyframes } from '@noshiro/goober';
+import { spinnerSize } from './spinner-size';
 
 type Props = Readonly<{
   size: number;
   value?: number;
 }>;
-
-export enum SpinnerSize {
-  SMALL = 20,
-  STANDARD = 50,
-  LARGE = 100,
-}
 
 // see http://stackoverflow.com/a/18473154/3124288 for calculating arc path
 const R = 45;
@@ -37,7 +32,7 @@ export const Spinner = memoNamed<Props>('Spinner', ({ size: _size, value }) => {
   const size = Math.max(MIN_SIZE, _size);
 
   const strokeWidth = useMemo(
-    () => Math.min(MIN_STROKE_WIDTH, (STROKE_WIDTH * SpinnerSize.LARGE) / size),
+    () => Math.min(MIN_STROKE_WIDTH, (STROKE_WIDTH * spinnerSize.LARGE) / size),
     [size],
   );
 

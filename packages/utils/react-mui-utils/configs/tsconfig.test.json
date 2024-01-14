@@ -1,0 +1,7 @@
+{
+  "extends": [
+    "../../../../config/tsconfig/tsconfig.test.json",
+    "../../../../config/tsconfig/tsconfig.react-emotion.json"
+  ],
+  "include": ["../src"]
+}

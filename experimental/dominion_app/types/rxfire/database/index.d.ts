@@ -22,11 +22,11 @@ import {
 import { Observable } from 'rxjs'
 export declare function stateChanges(
   query: database.Query,
-  events?: ListenEvent[]
+  events?: ListenEvent[],
 ): Observable<QueryChange>
 export declare function list(
   query: database.Query,
-  events?: ListenEvent[]
+  events?: ListenEvent[],
 ): Observable<QueryChange[]>
 /**
  * Get an object mapped to its value, and optionally its key
@@ -35,5 +35,5 @@ export declare function list(
  */
 export declare function listVal<T>(
   query: database.Query,
-  keyField?: string
+  keyField?: string,
 ): Observable<T[]>

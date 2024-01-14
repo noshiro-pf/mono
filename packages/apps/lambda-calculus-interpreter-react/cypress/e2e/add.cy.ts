@@ -11,7 +11,8 @@ describe('add', { testIsolation: false }, () => {
   });
 
   it('4 + 5 = 9', () => {
-    cy.get(e('input-area')).clear().type('((+ 4) 5)');
+    cy.get(e('input-area')).clear();
+    cy.get(e('input-area')).type('((+ 4) 5)');
 
     cy.get(e('output-area')).should(
       'have.value',
@@ -28,7 +29,8 @@ describe('add', { testIsolation: false }, () => {
   });
 
   it('0 + 0 = 0', () => {
-    cy.get(e('input-area')).clear().type('((+ 0) 0)');
+    cy.get(e('input-area')).clear();
+    cy.get(e('input-area')).type('((+ 0) 0)');
 
     cy.get(e('output-area')).should(
       'have.value',
@@ -45,7 +47,8 @@ describe('add', { testIsolation: false }, () => {
   });
 
   it('0 + 3 = 3', () => {
-    cy.get(e('input-area')).clear().type('((+ 0) 3)');
+    cy.get(e('input-area')).clear();
+    cy.get(e('input-area')).type('((+ 0) 3)');
 
     cy.get(e('output-area')).should(
       'have.value',
@@ -62,7 +65,8 @@ describe('add', { testIsolation: false }, () => {
   });
 
   it('3 + 0 = 3', () => {
-    cy.get(e('input-area')).clear().type('((+ 3) 0)');
+    cy.get(e('input-area')).clear();
+    cy.get(e('input-area')).type('((+ 3) 0)');
 
     cy.get(e('output-area')).should(
       'have.value',
@@ -79,7 +83,8 @@ describe('add', { testIsolation: false }, () => {
   });
 
   it('parse error', () => {
-    cy.get(e('input-area')).clear().type('((+ 0) 0))');
+    cy.get(e('input-area')).clear();
+    cy.get(e('input-area')).type('((+ 0) 0))');
 
     cy.get(e('output-area')).should('have.value', 'Parse error.');
   });

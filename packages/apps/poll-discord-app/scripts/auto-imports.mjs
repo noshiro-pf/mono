@@ -1,66 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, import/no-internal-modules */
+/* eslint-disable import/extensions */
+/* eslint-disable @typescript-eslint/no-restricted-imports */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { autoImportDef } from '@noshiro/global-ts-utils/auto-imports';
+import { castDeepWritable } from '@noshiro/ts-utils';
 import autoImport from 'unplugin-auto-import/esbuild';
 
-// import { autoImportDef } from '@noshiro/global-ts-utils';
-
 export const autoImportsDef = autoImport({
-  include: [/\.[jt]sx?$/u],
+  include: [/\.m?[jt]sx?$/u],
   dts: false,
   /* options */
-  imports: [
-    {
-      '@noshiro/ts-utils': [
-        'Arr',
-        'ArrayUtils',
-        'assertNotUndefined',
-        'castWritable',
-        'createQueue',
-        'createTinyObservable',
-        'DateUtils',
-        'expectType',
-        'hasKey',
-        'hasKeyValue',
-        'idfn',
-        'ifThen',
-        'IMap',
-        'IMapMapped',
-        'isBoolean',
-        'ISet',
-        'ISetMapped',
-        'isNonNullObject',
-        'isNotBoolean',
-        'isNotNull',
-        'isNotNumber',
-        'isNotString',
-        'isNotSymbol',
-        'isNotUndefined',
-        'isNull',
-        'isNumber',
-        'isPrimitive',
-        'isRecord',
-        'isString',
-        'isSymbol',
-        'isUndefined',
-        'Json',
-        'mapOptional',
-        'mapOptionalC',
-        'match',
-        'Maybe',
-        'memoizeFunction',
-        // ['MutableMap', '_MutableMap'],
-        // ['MutableSet', '_MutableSet'],
-        'noop',
-        'Num',
-        'Obj',
-        'pipe',
-        // ['range', '_range'],
-        'RecordUtils',
-        'Result',
-        'Str',
-        'toBoolean',
-        'tp',
-      ],
-    },
-  ],
+  imports: [castDeepWritable(autoImportDef)],
 });

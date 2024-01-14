@@ -1,5 +1,0 @@
-!dist
-!dist/**/*.d.ts
-!unchanged
-!unchanged/*.d.ts
-!stdlib.d.ts

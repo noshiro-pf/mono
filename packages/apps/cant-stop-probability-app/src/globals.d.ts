@@ -1,12 +1,7 @@
-/* eslint-disable @typescript-eslint/triple-slash-reference */
-
-/// <reference path="../../../utils/stdlib/stdlib.d.ts" />
-/// <reference path="../../../utils/ts-type-utils/ts-type-utils.d.ts" />
-
-/// <reference path="../../../utils/global-emotion-react/esm/globals-decl.d.ts" />
-/// <reference path="../../../utils/global-emotion-styled/esm/globals-decl.d.ts" />
-/// <reference path="../../../utils/global-react/esm/globals-decl.d.ts" />
-/// <reference path="../../../utils/global-react-utils/esm/globals-decl.d.ts" />
-/// <reference path="../../../utils/global-syncflow/esm/globals-decl.d.ts" />
-/// <reference path="../../../utils/global-syncflow-react-hooks/esm/globals-decl.d.ts" />
-/// <reference path="../../../utils/global-ts-utils/esm/globals-decl.d.ts" />
+/// <reference types="@noshiro/global-emotion-react" />
+/// <reference types="@noshiro/global-emotion-styled" />
+/// <reference types="@noshiro/global-react" />
+/// <reference types="@noshiro/global-react-utils" />
+/// <reference types="@noshiro/global-syncflow" />
+/// <reference types="@noshiro/global-syncflow-react-hooks" />
+/// <reference types="@noshiro/global-ts-utils" />

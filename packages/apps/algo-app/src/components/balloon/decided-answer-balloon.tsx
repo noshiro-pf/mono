@@ -39,18 +39,12 @@ export const DecidedAnswerBalloon = memoNamed<Props>(
       [anchorCardRect, arrowDirection],
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const Balloon = useMemo(
       () =>
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         match(arrowDirection, {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           S: BalloonWithDownArrow,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           E: BalloonWithRightArrow,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           N: BalloonWithUpArrow,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           W: BalloonWithLeftArrow,
         }),
       [arrowDirection],
@@ -122,15 +116,10 @@ export const DecidedAnswerBalloon = memoNamed<Props>(
   },
 );
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 const BalloonBody = createBalloonBody(balloonSize);
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 const BalloonWithDownArrow = createBalloonWithDownArrow(BalloonBody);
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 const BalloonWithUpArrow = createBalloonWithUpArrow(BalloonBody);
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 const BalloonWithLeftArrow = createBalloonWithLeftArrow(BalloonBody);
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 const BalloonWithRightArrow = createBalloonWithRightArrow(BalloonBody);
 
 const BalloonContent = styled('div')`

@@ -1,15 +1,14 @@
-/* eslint-disable import/no-internal-modules */
 import {
   type Answer as AnswerV2,
   type EventSchedule as EventScheduleV2,
-} from '@noshiro/event-schedule-app-shared/cjs/v2';
+} from '@noshiro/event-schedule-app-shared/v2';
 import {
   type AnswerId,
   type Answer as AnswerV3,
   type EventSchedule as EventScheduleV3,
   type UserName,
   type Weight,
-} from '@noshiro/event-schedule-app-shared/cjs/v3';
+} from '@noshiro/event-schedule-app-shared/v3';
 
 const eventScheduleExampleV2: EventScheduleV2 = {
   answerSymbolList: [
@@ -29,7 +28,7 @@ const eventScheduleExampleV2: EventScheduleV2 = {
   useNotification: false,
   datetimeRangeList: [
     {
-      ymd: { month: 3, date: 9, year: 2021 },
+      ymd: { month: 3, date: 9, year: toSafeUint(2021) },
       timeRange: {
         start: { hours: 0, minutes: 0 },
         end: { hours: 0, minutes: 0 },
@@ -40,10 +39,10 @@ const eventScheduleExampleV2: EventScheduleV2 = {
         end: { hours: 0, minutes: 0 },
         start: { hours: 0, minutes: 0 },
       },
-      ymd: { month: 3, date: 12, year: 2021 },
+      ymd: { month: 3, date: 12, year: toSafeUint(2021) },
     },
     {
-      ymd: { year: 2021, date: 17, month: 3 },
+      ymd: { year: toSafeUint(2021), date: 17, month: 3 },
       timeRange: {
         start: { minutes: 0, hours: 0 },
         end: { minutes: 0, hours: 0 },
@@ -56,7 +55,7 @@ const eventScheduleExampleV2: EventScheduleV2 = {
   answerDeadline: {
     hours: 23,
     date: 28,
-    year: 2021,
+    year: toSafeUint(2021),
     minutes: 59,
     month: 11,
   },
@@ -83,7 +82,7 @@ const eventScheduleExampleV3: EventScheduleV3 = {
   useNotification: false,
   datetimeRangeList: [
     {
-      ymd: { month: 3, date: 9, year: 2021 },
+      ymd: { month: 3, date: 9, year: toSafeUint(2021) },
       timeRange: {
         start: { hours: 0, minutes: 0 },
         end: { hours: 0, minutes: 0 },
@@ -94,10 +93,10 @@ const eventScheduleExampleV3: EventScheduleV3 = {
         end: { hours: 0, minutes: 0 },
         start: { hours: 0, minutes: 0 },
       },
-      ymd: { month: 3, date: 12, year: 2021 },
+      ymd: { month: 3, date: 12, year: toSafeUint(2021) },
     },
     {
-      ymd: { year: 2021, date: 17, month: 3 },
+      ymd: { year: toSafeUint(2021), date: 17, month: 3 },
       timeRange: {
         start: { minutes: 0, hours: 0 },
         end: { minutes: 0, hours: 0 },
@@ -109,7 +108,7 @@ const eventScheduleExampleV3: EventScheduleV3 = {
   answerDeadline: {
     hours: 23,
     date: 28,
-    year: 2021,
+    year: toSafeUint(2021),
     minutes: 59,
     month: 11,
   },
@@ -139,7 +138,7 @@ const answersExampleV2: readonly AnswerV2[] = [
       {
         iconId: 'handmade-triangle',
         datetimeRange: {
-          ymd: { month: 3, date: 9, year: 2021 },
+          ymd: { month: 3, date: 9, year: toSafeUint(2021) },
           timeRange: {
             end: { minutes: 0, hours: 0 },
             start: { hours: 0, minutes: 0 },
@@ -149,7 +148,7 @@ const answersExampleV2: readonly AnswerV2[] = [
       {
         iconId: 'handmade-circle',
         datetimeRange: {
-          ymd: { date: 12, year: 2021, month: 3 },
+          ymd: { date: 12, year: toSafeUint(2021), month: 3 },
           timeRange: {
             start: { hours: 0, minutes: 0 },
             end: { minutes: 0, hours: 0 },
@@ -159,7 +158,7 @@ const answersExampleV2: readonly AnswerV2[] = [
       {
         iconId: 'handmade-cross',
         datetimeRange: {
-          ymd: { month: 3, year: 2021, date: 17 },
+          ymd: { month: 3, year: toSafeUint(2021), date: 17 },
           timeRange: {
             end: { minutes: 0, hours: 0 },
             start: { minutes: 0, hours: 0 },
@@ -180,7 +179,7 @@ const answersExampleV2: readonly AnswerV2[] = [
       {
         iconId: 'handmade-triangle',
         datetimeRange: {
-          ymd: { date: 9, year: 2021, month: 3 },
+          ymd: { date: 9, year: toSafeUint(2021), month: 3 },
           timeRange: {
             end: { hours: 0, minutes: 0 },
             start: { minutes: 0, hours: 0 },
@@ -190,7 +189,7 @@ const answersExampleV2: readonly AnswerV2[] = [
       {
         iconId: 'handmade-circle',
         datetimeRange: {
-          ymd: { month: 3, year: 2021, date: 12 },
+          ymd: { month: 3, year: toSafeUint(2021), date: 12 },
           timeRange: {
             start: { minutes: 0, hours: 0 },
             end: { minutes: 0, hours: 0 },
@@ -200,7 +199,7 @@ const answersExampleV2: readonly AnswerV2[] = [
       {
         iconId: 'handmade-circle',
         datetimeRange: {
-          ymd: { year: 2021, date: 17, month: 3 },
+          ymd: { year: toSafeUint(2021), date: 17, month: 3 },
           timeRange: {
             start: { minutes: 0, hours: 0 },
             end: { minutes: 0, hours: 0 },
@@ -221,7 +220,7 @@ const answersExampleV2: readonly AnswerV2[] = [
       {
         iconId: 'handmade-circle',
         datetimeRange: {
-          ymd: { year: 2021, date: 9, month: 3 },
+          ymd: { year: toSafeUint(2021), date: 9, month: 3 },
           timeRange: {
             start: { hours: 0, minutes: 0 },
             end: { hours: 0, minutes: 0 },
@@ -231,7 +230,7 @@ const answersExampleV2: readonly AnswerV2[] = [
       {
         iconId: 'handmade-circle',
         datetimeRange: {
-          ymd: { month: 3, date: 12, year: 2021 },
+          ymd: { month: 3, date: 12, year: toSafeUint(2021) },
           timeRange: {
             start: { minutes: 0, hours: 0 },
             end: { minutes: 0, hours: 0 },
@@ -241,7 +240,7 @@ const answersExampleV2: readonly AnswerV2[] = [
       {
         iconId: 'handmade-triangle',
         datetimeRange: {
-          ymd: { date: 17, month: 3, year: 2021 },
+          ymd: { date: 17, month: 3, year: toSafeUint(2021) },
           timeRange: {
             end: { hours: 0, minutes: 0 },
             start: { hours: 0, minutes: 0 },
@@ -266,7 +265,7 @@ const answersExampleV3: readonly AnswerV3[] = [
         iconId: 'fair',
         point: 6,
         datetimeRange: {
-          ymd: { month: 3, date: 9, year: 2021 },
+          ymd: { month: 3, date: 9, year: toSafeUint(2021) },
           timeRange: {
             end: { minutes: 0, hours: 0 },
             start: { hours: 0, minutes: 0 },
@@ -277,7 +276,7 @@ const answersExampleV3: readonly AnswerV3[] = [
         iconId: 'good',
         point: 10,
         datetimeRange: {
-          ymd: { date: 12, year: 2021, month: 3 },
+          ymd: { date: 12, year: toSafeUint(2021), month: 3 },
           timeRange: {
             start: { hours: 0, minutes: 0 },
             end: { minutes: 0, hours: 0 },
@@ -288,7 +287,7 @@ const answersExampleV3: readonly AnswerV3[] = [
         iconId: 'poor',
         point: 0,
         datetimeRange: {
-          ymd: { month: 3, year: 2021, date: 17 },
+          ymd: { month: 3, year: toSafeUint(2021), date: 17 },
           timeRange: {
             end: { minutes: 0, hours: 0 },
             start: { minutes: 0, hours: 0 },
@@ -310,7 +309,7 @@ const answersExampleV3: readonly AnswerV3[] = [
         iconId: 'fair',
         point: 6,
         datetimeRange: {
-          ymd: { date: 9, year: 2021, month: 3 },
+          ymd: { date: 9, year: toSafeUint(2021), month: 3 },
           timeRange: {
             end: { hours: 0, minutes: 0 },
             start: { minutes: 0, hours: 0 },
@@ -321,7 +320,7 @@ const answersExampleV3: readonly AnswerV3[] = [
         iconId: 'good',
         point: 10,
         datetimeRange: {
-          ymd: { month: 3, year: 2021, date: 12 },
+          ymd: { month: 3, year: toSafeUint(2021), date: 12 },
           timeRange: {
             start: { minutes: 0, hours: 0 },
             end: { minutes: 0, hours: 0 },
@@ -332,7 +331,7 @@ const answersExampleV3: readonly AnswerV3[] = [
         iconId: 'good',
         point: 10,
         datetimeRange: {
-          ymd: { year: 2021, date: 17, month: 3 },
+          ymd: { year: toSafeUint(2021), date: 17, month: 3 },
           timeRange: {
             start: { minutes: 0, hours: 0 },
             end: { minutes: 0, hours: 0 },
@@ -354,7 +353,7 @@ const answersExampleV3: readonly AnswerV3[] = [
         iconId: 'good',
         point: 10,
         datetimeRange: {
-          ymd: { year: 2021, date: 9, month: 3 },
+          ymd: { year: toSafeUint(2021), date: 9, month: 3 },
           timeRange: {
             start: { hours: 0, minutes: 0 },
             end: { hours: 0, minutes: 0 },
@@ -369,7 +368,7 @@ const answersExampleV3: readonly AnswerV3[] = [
             start: { minutes: 0, hours: 0 },
             end: { minutes: 0, hours: 0 },
           },
-          ymd: { month: 3, date: 12, year: 2021 },
+          ymd: { month: 3, date: 12, year: toSafeUint(2021) },
         },
       },
       {
@@ -380,7 +379,7 @@ const answersExampleV3: readonly AnswerV3[] = [
             end: { hours: 0, minutes: 0 },
             start: { hours: 0, minutes: 0 },
           },
-          ymd: { date: 17, month: 3, year: 2021 },
+          ymd: { date: 17, month: 3, year: toSafeUint(2021) },
         },
       },
     ],

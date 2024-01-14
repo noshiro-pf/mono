@@ -1,17 +1,15 @@
-/* eslint-disable import/no-internal-modules */
-
 import {
   firestorePaths as firestorePathsCurr,
   type Answer as AnswerCurr,
   type EventSchedule as EventScheduleCurr,
-} from '@noshiro/event-schedule-app-shared/cjs/v4';
+} from '@noshiro/event-schedule-app-shared/v4';
 import {
   fillAnswer,
   fillEventSchedule,
   firestorePaths as firestorePathsNext,
   type Answer as AnswerNext,
   type EventSchedule as EventScheduleNext,
-} from '@noshiro/event-schedule-app-shared/cjs/v5';
+} from '@noshiro/event-schedule-app-shared/v5';
 import * as admin from 'firebase-admin';
 import serviceAccount from '../../../service-account-key.json';
 
@@ -85,7 +83,6 @@ const updateStore = async (): Promise<boolean> => {
     // read
     const id = doc.id;
 
-    // eslint-disable-next-line no-await-in-loop
     const answersSnapshotCurr = await db
       .collection(`${collectionNameCurr}/${id}/${subCollectionName}`)
       .get();

@@ -1,5 +1,5 @@
 {
-  "extends": "../../../../config/tsconfig/tsconfig.cjs.nolib.json",
+  "extends": "../../../../config/tsconfig/tsconfig.build.json",
   "compilerOptions": {
     "target": "es2017",
     "outDir": "dist"

@@ -1,5 +1,4 @@
 {
-  "extends": "./tsconfig.esm.json",
   "compilerOptions": {
     "jsx": "react-jsx"
   }
