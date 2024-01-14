@@ -411,6 +411,9 @@ const ButtonsWrapperNowrapPadChanged = styled(ButtonsWrapperNowrap)`
 
 const TableTopWrapper = styled.div`
   margin: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 `;
 
 const TagInputWrapper = styled.div`
