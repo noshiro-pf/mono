@@ -38,7 +38,7 @@
     "zz:cmd:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
-    "@blueprintjs/core": "^4.20.1",
+    "@blueprintjs/core": "^5.8.2",
     "@blueprintjs/datetime": "^4.4.13",
     "@blueprintjs/icons": "^4.13.0",
     "@emotion/styled": "^11.11.0",
