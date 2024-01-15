@@ -53,7 +53,13 @@ export const AnswerTable = memoNamed<Props>(
       AnswerTableStore.tableBodyValuesFiltered$,
     );
 
-    const tableMinimized = useObservableValue(AnswerTableStore.tableMinimized$);
+    const dateStringIsMinimized = useObservableValue(
+      AnswerTableStore.dateStringIsMinimized$,
+    );
+
+    const tableMinimized = useObservableValue(
+      AnswerTableStore.tableIsMinimized$,
+    );
 
     return (
       <StickyHeaderTable
@@ -64,20 +70,8 @@ export const AnswerTable = memoNamed<Props>(
           <tr>
             <th className='sticky horizontal'>
               <TableTopLeftCell>
-                <MinimizeTableButton>
-                  <Button
-                    icon={tableMinimized ? 'maximize' : 'minimize'}
-                    minimal={true}
-                    outlined={true}
-                    onClick={
-                      tableMinimized
-                        ? AnswerTableStore.maximizeTable
-                        : AnswerTableStore.minimizeTable
-                    }
-                  />
-                </MinimizeTableButton>
                 <DatetimeHeaderCell>
-                  {tableMinimized ? undefined : (
+                  {tableMinimized || dateStringIsMinimized ? undefined : (
                     <PaddedSpan>{dc.datetime}</PaddedSpan>
                   )}
                   <SortButton
@@ -89,7 +83,9 @@ export const AnswerTable = memoNamed<Props>(
               </TableTopLeftCell>
             </th>
             <th>
-              {tableMinimized ? undefined : <PaddedSpan>{dc.score}</PaddedSpan>}
+              {tableMinimized || dateStringIsMinimized ? undefined : (
+                <PaddedSpan>{dc.score}</PaddedSpan>
+              )}
               <SortButton
                 onSortChange={AnswerFilterAndSortStore.onScoreSortOrderChange}
               />
@@ -154,7 +150,7 @@ export const AnswerTable = memoNamed<Props>(
                     datetimeRange={datetimeRange}
                     datetimeSpecification={datetimeSpecification}
                     holidaysJpDefinition={holidaysJpDefinition}
-                    tableMinimized={tableMinimized}
+                    minimized={tableMinimized || dateStringIsMinimized}
                   />
                 </td>
                 <td>
@@ -358,9 +354,7 @@ const TableTopLeftCell = styled.div`
   display: flex;
   align-items: center;
 `;
-const MinimizeTableButton = styled.div`
-  flex: 0;
-`;
+
 const DatetimeHeaderCell = styled(Centering)`
   flex: 1;
 `;

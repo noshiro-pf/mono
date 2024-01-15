@@ -22,7 +22,7 @@ import {
 } from '../../../store';
 import { toClassName } from '../../../utils';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
-import { AlertWithMaxWidth } from '../../bp';
+import { AlertWithMaxWidth, BpSwitch } from '../../bp';
 import { CustomScrollbarWrapper, Section } from '../../molecules';
 import { MultipleDatePicker } from '../../multiple-date-picker';
 import {
@@ -170,6 +170,14 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     }
   }, []);
 
+  const dateStringIsMinimized = useObservableValue(
+    AnswerTableStore.dateStringIsMinimized$,
+  );
+
+  const tableIsMinimized = useObservableValue(
+    AnswerTableStore.tableIsMinimized$,
+  );
+
   return errorType !== undefined && errorType.type.type === 'not-found' ? (
     <NotFoundPage />
   ) : (
@@ -273,10 +281,32 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                     </ToggleDetailedFilterSettingsButton>
                     <span>{dc.answers.detailedFilterSettingsButton}</span>
                   </ToggleDetailedFilterSettingsLabel>
+
                   <DetailedFilterCollapse
                     isOpen={detailedFilterDialogIsDisplayed}
                   />
                 </TableTopWrapper>
+
+                <TogglesWrapper>
+                  <div>
+                    <BpSwitch
+                      checked={dateStringIsMinimized}
+                      label={
+                        dict.answerPage.answers.toggleDateStringIsMinimized
+                      }
+                      noMargin={true}
+                      onToggle={AnswerTableStore.toggleDateStringIsMinimized}
+                    />
+                  </div>
+                  <div>
+                    <BpSwitch
+                      checked={tableIsMinimized}
+                      label={dict.answerPage.answers.toggleMinimizedTable}
+                      noMargin={true}
+                      onToggle={AnswerTableStore.toggleTableIsMinimized}
+                    />
+                  </div>
+                </TogglesWrapper>
 
                 <TableWrapper ref={tableWrapperRef}>
                   <AnswerTable
@@ -409,7 +439,7 @@ const ButtonsWrapperNowrapPadChanged = styled(ButtonsWrapperNowrap)`
   margin-left: 10px;
 `;
 
-const TableTopWrapper = styled.div`
+const TableTopWrapper = styled(CustomScrollbarWrapper)`
   margin: 5px;
   display: flex;
   flex-direction: column;
@@ -424,6 +454,18 @@ const TagInputWrapper = styled.div`
 
 const TableWrapper = styled(CustomScrollbarWrapper)`
   margin: 5px;
+`;
+
+const TogglesWrapper = styled.div`
+  margin: 5px;
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+
+  & > * {
+    margin-right: 20px;
+    white-space: nowrap;
+  }
 `;
 
 const IconDescriptionWrapper = styled.div`

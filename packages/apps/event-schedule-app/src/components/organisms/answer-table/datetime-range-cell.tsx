@@ -11,7 +11,7 @@ const dc = dict.common.date;
 type Props = Readonly<{
   datetimeRange: DatetimeRange;
   datetimeSpecification: DatetimeSpecificationEnumType;
-  tableMinimized: boolean;
+  minimized: boolean;
   holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
 
@@ -20,7 +20,7 @@ export const DatetimeRangeCell = memoNamed<Props>(
   ({
     datetimeRange,
     datetimeSpecification,
-    tableMinimized,
+    minimized,
     holidaysJpDefinition,
   }) => {
     const colored: React.CSSProperties = useMemo(() => {
@@ -45,7 +45,7 @@ export const DatetimeRangeCell = memoNamed<Props>(
       };
     }, [holidaysJpDefinition, datetimeRange.ymd]);
 
-    return tableMinimized ? (
+    return minimized ? (
       <span
         style={colored}
       >{`${datetimeRange.ymd.month}/${datetimeRange.ymd.date}`}</span>

@@ -209,7 +209,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                           eventSchedule.datetimeSpecification
                         }
                         holidaysJpDefinition={holidaysJpDefinition}
-                        tableMinimized={false}
+                        minimized={false}
                       />
                     </td>
                     <td>

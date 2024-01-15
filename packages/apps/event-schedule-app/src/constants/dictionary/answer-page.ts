@@ -160,6 +160,9 @@ export const answerPageDictionary = {
         title: '✕の個数でフィルタ',
       },
     },
+
+    toggleDateStringIsMinimized: '日付を短縮表示',
+    toggleMinimizedTable: 'テーブルを圧縮表示',
   },
   requiredParticipantDescription:
     '（必須参加者が✕を付けている日のスコアは0点になります。）',
