@@ -11,13 +11,15 @@ export function useObservable<A>(
 export function useObservable<A>(
   createObservable$: () => Observable<A>,
 ): Observable<A> {
-  const s = useMemo(createObservable$, [createObservable$]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const s = useMemo(createObservable$, []);
 
   useEffect(
     () => () => {
       s.complete();
     },
-    [s],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
   return s;
@@ -32,7 +34,8 @@ export const useObservableEffect = <A,>(
     return () => {
       s.unsubscribe();
     };
-  }, [observable$, subscriptionFn]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 };
 
 export function useObservableValue<A, B = A>(

@@ -8,9 +8,13 @@ import { useCallback, useMemo } from 'react';
 export const useVoidEventObservable = (): [Observable<void>, () => void] => {
   const src$ = useMemo<SourceObservable<undefined>>(source, []);
 
-  const emitter = useCallback(() => {
-    src$.next(undefined);
-  }, [src$]);
+  const emitter = useCallback(
+    () => {
+      src$.next(undefined);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   return [src$, emitter];
 };
@@ -25,7 +29,8 @@ export const useEventObservable = <A,>(): [
     (value: A) => {
       src$.next(value);
     },
-    [src$],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
   return [src$, emitter];
