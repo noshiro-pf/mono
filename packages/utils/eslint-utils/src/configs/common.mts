@@ -91,6 +91,7 @@ export const eslintFlatConfigCommon = ({
       '**/vite.config.ts',
       '**/vitest.config.ts',
       '**/jest.config*.mjs',
+      '**/cypress.config.ts',
     ],
     rules: {
       '@typescript-eslint/no-restricted-imports': 'off',
