@@ -265,6 +265,17 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                       }
                       values={tagValues}
                     />
+                    <FilterButtonsWrapper>
+                      <Button
+                        intent={'primary'}
+                        small={true}
+                        onClick={
+                          AnswerFilterAndSortStore.filterOnlyAnswersWithPoorIs0
+                        }
+                      >
+                        {dc.answers.filterOnlyAnswersWithPoorIs0}
+                      </Button>
+                    </FilterButtonsWrapper>
                   </TagInputWrapper>
 
                   <ToggleDetailedFilterSettingsLabel
@@ -450,6 +461,10 @@ const TagInputWrapper = styled.div`
   margin-bottom: 5px;
   display: flex;
   align-items: center;
+`;
+
+const FilterButtonsWrapper = styled.div`
+  margin: 5px;
 `;
 
 const TableWrapper = styled(CustomScrollbarWrapper)`

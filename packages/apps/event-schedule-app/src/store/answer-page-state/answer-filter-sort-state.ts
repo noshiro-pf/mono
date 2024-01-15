@@ -156,6 +156,11 @@ const setEnabledFilteringByFairPlusPoor = (value: boolean): void => {
   }
 };
 
+const filterOnlyAnswersWithPoorIs0 = (): void => {
+  setMaxCountOfPoorIcon(0);
+  setEnabledFilteringByPoorIcon(true);
+};
+
 const iconOfSpecifiedRespondentCheckState$: InitializedObservable<
   | DeepReadonly<
       {
@@ -645,4 +650,5 @@ export const AnswerFilterAndSortStore = {
   setEnabledFilteringByIconOfSpecifiedRespondent,
   restoreFromQueryParams,
   clearTags,
+  filterOnlyAnswersWithPoorIs0,
 } as const;
