@@ -21,6 +21,7 @@ export const generateCypressDirectory = async (
     JSON.stringify({
       name: `@noshiro/${packageName}-cypress`,
       version: '0.0.0',
+      license: 'MIT',
       type: 'module',
       scripts: {
         'cy:open': 'cypress open',
@@ -42,6 +43,13 @@ export const generateCypressDirectory = async (
       include: ['./cypress.config.ts', './cypress'],
     }),
   );
+
+  if (packageName !== 'event-schedule-app') {
+    await fs.writeFile(
+      `${workspaceLocation}/.gitignore`,
+      'cypress/cypress/videos\n',
+    );
+  }
 
   await fs.writeFile(
     `${workspaceLocation}/cypress/cypress/tsconfig.json`,

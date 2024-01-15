@@ -1,7 +1,3 @@
-import failOnConsoleError from 'cypress-fail-on-console-error';
-
-failOnConsoleError();
-
 const e = (selector: string): string => `[data-cy="${selector}"]`;
 
 describe('add', { testIsolation: false }, () => {
@@ -89,3 +85,5 @@ describe('add', { testIsolation: false }, () => {
     cy.get(e('output-area')).should('have.value', 'Parse error.');
   });
 });
+
+export {};

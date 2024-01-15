@@ -1,6 +1,7 @@
 {
   "name": "@noshiro/cant-stop-probability-app-cypress",
   "version": "0.0.0",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "cy:open": "cypress open",

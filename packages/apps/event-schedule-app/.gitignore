@@ -1,4 +1,4 @@
 scripts/*.json
 firestore_backup.json
-cypress/videos
+cypress/cypress/videos
 functions/.runtimeconfig.json

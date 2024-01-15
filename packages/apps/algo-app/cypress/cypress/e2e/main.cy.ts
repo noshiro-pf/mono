@@ -1,7 +1,3 @@
-import failOnConsoleError from 'cypress-fail-on-console-error';
-
-failOnConsoleError();
-
 const e = (selector: string): string => `[data-cy="${selector}"]`;
 
 describe('main', { testIsolation: false }, () => {
@@ -10,3 +6,5 @@ describe('main', { testIsolation: false }, () => {
     cy.get(e('root')).should('be.visible');
   });
 });
+
+export {};

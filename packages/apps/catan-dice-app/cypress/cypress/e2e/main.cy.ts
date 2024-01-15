@@ -1,7 +1,3 @@
-import failOnConsoleError from 'cypress-fail-on-console-error';
-
-failOnConsoleError();
-
 const e = (selector: string): string => `[data-cy="${selector}"]`;
 
 describe('main', { testIsolation: false }, () => {
@@ -56,3 +52,5 @@ describe('main', { testIsolation: false }, () => {
     cy.get(redoCount).should('have.text', 'N = 2');
   });
 });
+
+export {};

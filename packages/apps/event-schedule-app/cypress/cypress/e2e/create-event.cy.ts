@@ -1,8 +1,3 @@
-// import failOnConsoleError from 'cypress-fail-on-console-error';
-
-// TODO: enable this
-// failOnConsoleError();
-
 const e = (selector: string): string => `[data-cy="${selector}"]`;
 
 const path = (selectorList: readonly string[]): string =>
