@@ -30,7 +30,7 @@
     "fmt:all:print": "yarn zz:cmd:prettier:cache .",
     "fmt:diff": "yarn zz:cmd:prettier:cache $(git status --short --porcelain | awk -F ' ' '{print $2}')",
     "generate-configs": "node ./scripts/generate-configs-and-scripts/main.mjs",
-    "i": "yarn install --ignore-scripts",
+    "i": "yarn --ignore-scripts",
     "postinstall": "run-s generate-configs ws:build:utils",
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "pub:all": "scripts/commands/publish.sh",
