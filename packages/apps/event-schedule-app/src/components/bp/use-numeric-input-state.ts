@@ -1,3 +1,4 @@
+import { useValueAsRef } from '@noshiro/react-utils';
 import {
   numericInputContinuousChangeDelay,
   numericInputContinuousChangeInterval,
@@ -51,9 +52,13 @@ export const useNumericInputState = <NumericValue extends number>({
     r.dispatch({ type: 'set-string', value });
   }, []);
 
+  const valueAsStrRef = useValueAsRef(valueAsStr);
+
   useEffect(() => {
-    setValueStr(valueFromProps.toString());
-  }, [valueFromProps, setValueStr]);
+    if (valueFromProps.toString() !== valueAsStrRef.current) {
+      setValueStr(valueFromProps.toString());
+    }
+  }, [valueFromProps, setValueStr, valueAsStrRef]);
 
   const onInputBlur = useCallback(() => {
     const r = ref1.current;

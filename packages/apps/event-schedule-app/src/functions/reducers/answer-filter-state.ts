@@ -151,6 +151,14 @@ export type AnswerFilterStateAction = DeepReadonly<
       value: boolean;
     }
   | {
+      type: 'set-scoreRange-max';
+      max: AnswersScore;
+    }
+  | {
+      type: 'set-scoreRange-min';
+      min: AnswersScore;
+    }
+  | {
       type: 'set-scoreRange';
       range: { min: AnswersScore; max: AnswersScore };
     }
@@ -381,6 +389,12 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
 
         case 'set-filledDateOnly':
           return Obj.update(state, 'filledDateOnly', (b) => !b);
+
+        case 'set-scoreRange-min':
+          return Obj.setIn(state, ['scoreRange', 'value', 'min'], action.min);
+
+        case 'set-scoreRange-max':
+          return Obj.setIn(state, ['scoreRange', 'value', 'max'], action.max);
 
         case 'set-scoreRange':
           return Obj.setIn(state, ['scoreRange', 'value'], action.range);

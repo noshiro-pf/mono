@@ -259,6 +259,18 @@ const setScoreRange = (
   );
 };
 
+const setScoreRangeMin = (min: AnswersScore): void => {
+  AnswerFilterQueryParam.saveFilterStateToQueryParams(
+    filterStateDispatch({ type: 'set-scoreRange-min', min }),
+  );
+};
+
+const setScoreRangeMax = (max: AnswersScore): void => {
+  AnswerFilterQueryParam.saveFilterStateToQueryParams(
+    filterStateDispatch({ type: 'set-scoreRange-max', max }),
+  );
+};
+
 const setDateRangeDefaultValue = (
   range: Readonly<{ start: YearMonthDate; end: YearMonthDate }>,
 ): void => {
@@ -617,6 +629,8 @@ export const AnswerFilterAndSortStore = {
   setOnlyFilledDate,
   setEnabledFilteringByScoreRange,
   setScoreRange,
+  setScoreRangeMin,
+  setScoreRangeMax,
   setDateRangeDefaultValue,
   setEnabledFilteringByDayOfWeek,
   setSundayCheck,

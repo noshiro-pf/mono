@@ -14,6 +14,10 @@ type Props = DeepReadonly<{
   customLabelValues?: readonly number[];
   onChange?: (value: Readonly<{ min: number; max: number }>) => void;
   onRelease?: (value: Readonly<{ min: number; max: number }>) => void;
+  onRangeMinChange?: (value: number) => void;
+  onRangeMaxChange?: (value: number) => void;
+  onRangeMinRelease?: (value: number) => void;
+  onRangeMaxRelease?: (value: number) => void;
 }>;
 
 export const BpRangeSlider = memoNamed<Props>(
@@ -29,6 +33,10 @@ export const BpRangeSlider = memoNamed<Props>(
     customLabelValues,
     onChange,
     onRelease,
+    onRangeMinChange,
+    onRangeMaxChange,
+    onRangeMinRelease,
+    onRangeMaxRelease,
   }) => {
     const { max, min, range, stepSize, labelFractionDigits } =
       useNormalizedRangeSliderProps({
@@ -40,12 +48,7 @@ export const BpRangeSlider = memoNamed<Props>(
         labelFractionDigits: _labelFractionDigits,
       });
 
-    const {
-      onRangeMinChange,
-      onRangeMaxChange,
-      onRangeMinRelease,
-      onRangeMaxRelease,
-    } = useOnRangeChangeHandlerHook(range, onChange, onRelease);
+    const handlers = useOnRangeChangeHandlerHook(range, onChange, onRelease);
 
     const trackElementRef = useRef<HTMLDivElement>(null);
 
@@ -57,8 +60,8 @@ export const BpRangeSlider = memoNamed<Props>(
       stepSize,
       value: range.min,
       labelFractionDigits,
-      onChange: onRangeMinChange,
-      onRelease: onRangeMinRelease,
+      onChange: onRangeMinChange ?? handlers.onRangeMinChange,
+      onRelease: onRangeMinRelease ?? handlers.onRangeMinRelease,
     });
 
     const rightHandle = useSliderHandleStateManager({
@@ -69,8 +72,8 @@ export const BpRangeSlider = memoNamed<Props>(
       stepSize,
       value: range.max,
       labelFractionDigits,
-      onChange: onRangeMaxChange,
-      onRelease: onRangeMaxRelease,
+      onChange: onRangeMaxChange ?? handlers.onRangeMaxChange,
+      onRelease: onRangeMaxRelease ?? handlers.onRangeMaxRelease,
     });
 
     return (
