@@ -37,11 +37,13 @@ class PairwiseObservableClass<A>
     }
 
     const prev = this.#previousValue;
+    const cond = !Maybe.isNone(prev);
 
-    if (!Maybe.isNone(prev)) {
+    // NOTE: setNext より先に更新しないと tryUpdate が連続して呼ばれたときに Maybe.isNone(prev) が true になり続けてしまう
+    this.#previousValue = par.snapshot;
+
+    if (cond) {
       this.setNext([prev.value, par.snapshot.value], updaterSymbol);
     }
-
-    this.#previousValue = par.snapshot;
   }
 }
