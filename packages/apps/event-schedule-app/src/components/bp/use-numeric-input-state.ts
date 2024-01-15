@@ -3,7 +3,10 @@ import {
   numericInputContinuousChangeDelay,
   numericInputContinuousChangeInterval,
 } from './constants';
-import { createNumericInputStateReducer } from './numeric-input-state';
+import {
+  createNumericInputStateReducer,
+  parseValue,
+} from './numeric-input-state';
 
 export const useNumericInputState = <NumericValue extends number>({
   valueFromProps,
@@ -27,30 +30,33 @@ export const useNumericInputState = <NumericValue extends number>({
   onDecrementMouseDown: () => void;
   onKeyDown: React.KeyboardEventHandler<HTMLDivElement>;
 }> => {
-  const { reducer, toValueNormalized } = useMemo(
-    () =>
-      createNumericInputStateReducer(normalizeValue, {
-        defaultValue,
-        step,
-      }),
-    [defaultValue, step, normalizeValue],
+  const reducer = useRef(
+    createNumericInputStateReducer({
+      defaultValue,
+      step,
+    }),
   );
 
-  const [state$, dispatch] = useObservableReducer(reducer, initialState);
-
-  const valueAsStr = useObservableValue(state$);
-
-  const ref1 = useRef({
-    dispatch,
-    onValueStrChange: (value: string) => {
-      onValueChange(toValueNormalized(value));
-    },
+  const [state$, dispatch] = useObservableReducer(reducer.current, {
+    value: initialState,
+    normalizerFn: normalizeValue,
   });
 
-  const setValueStr = useCallback((value: string) => {
-    const r = ref1.current;
-    r.dispatch({ type: 'set-string', value });
-  }, []);
+  const { value: valueAsStr, normalizerFn } = useObservableValue(state$);
+
+  const onValueStrChange = useCallback(
+    (value: string) => {
+      onValueChange(normalizerFn(parseValue(value) ?? defaultValue));
+    },
+    [onValueChange, normalizerFn, defaultValue],
+  );
+
+  const setValueStr = useCallback(
+    (value: string) => {
+      dispatch({ type: 'set-string', value });
+    },
+    [dispatch],
+  );
 
   const valueAsStrRef = useValueAsRef(valueAsStr);
 
@@ -60,20 +66,25 @@ export const useNumericInputState = <NumericValue extends number>({
     }
   }, [valueFromProps, setValueStr, valueAsStrRef]);
 
+  const normalizerFnRef = useValueAsRef(normalizerFn);
+
+  useEffect(() => {
+    if (normalizeValue !== normalizerFnRef.current) {
+      dispatch({ type: 'set-normalizer-fn', normalizerFn: normalizeValue });
+    }
+  }, [dispatch, normalizeValue, normalizerFnRef]);
+
   const onInputBlur = useCallback(() => {
-    const r = ref1.current;
-    r.onValueStrChange(r.dispatch({ type: 'normalize' }));
-  }, []);
+    onValueStrChange(dispatch({ type: 'normalize' }).value);
+  }, [onValueStrChange, dispatch]);
 
   const increment = useCallback(() => {
-    const r = ref1.current;
-    r.onValueStrChange(r.dispatch({ type: 'increment' }));
-  }, []);
+    onValueStrChange(dispatch({ type: 'increment' }).value);
+  }, [onValueStrChange, dispatch]);
 
   const decrement = useCallback(() => {
-    const r = ref1.current;
-    r.onValueStrChange(r.dispatch({ type: 'decrement' }));
-  }, []);
+    onValueStrChange(dispatch({ type: 'decrement' }).value);
+  }, [onValueStrChange, dispatch]);
 
   const delayTimerRef = useRef<TimerId | undefined>(undefined);
   const intervalTimerRef = useRef<TimerId | undefined>(undefined);
@@ -87,68 +98,59 @@ export const useNumericInputState = <NumericValue extends number>({
     }
   }, []);
 
-  const ref2 = useRef({
-    increment,
-    decrement,
-    clearTimers,
-  });
-
   const onIncrementMouseDown = useCallback(() => {
-    const r = ref2.current;
-    r.increment(); // execute once
+    increment(); // execute once
 
-    r.clearTimers();
+    clearTimers();
     delayTimerRef.current = setTimeout(() => {
       intervalTimerRef.current = setInterval(
-        r.increment,
+        increment,
         numericInputContinuousChangeInterval,
       );
     }, numericInputContinuousChangeDelay);
-  }, []);
+  }, [clearTimers, increment]);
 
   const onDecrementMouseDown = useCallback(() => {
-    const r = ref2.current;
-    r.decrement(); // execute once
+    decrement(); // execute once
 
-    r.clearTimers();
+    clearTimers();
     delayTimerRef.current = setTimeout(() => {
       intervalTimerRef.current = setInterval(
-        r.decrement,
+        decrement,
         numericInputContinuousChangeInterval,
       );
     }, numericInputContinuousChangeDelay);
-  }, []);
+  }, [clearTimers, decrement]);
 
   useEffect(() => {
-    const r = ref2.current;
-    document.addEventListener('mouseup', r.clearTimers);
+    document.addEventListener('mouseup', clearTimers);
     return () => {
-      document.removeEventListener('mouseup', r.clearTimers);
-      r.clearTimers();
+      document.removeEventListener('mouseup', clearTimers);
+      clearTimers();
     };
-  }, []);
+  }, [clearTimers]);
 
-  const onKeyDown = useMemo(() => {
-    const r = ref2.current;
+  const onKeyDown = useMemo(
+    () =>
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      (ev: React.KeyboardEvent<HTMLDivElement>) => {
+        switch (ev.key) {
+          case 'ArrowUp':
+            increment();
+            ev.stopPropagation();
+            break;
 
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-    return (ev: React.KeyboardEvent<HTMLDivElement>) => {
-      switch (ev.key) {
-        case 'ArrowUp':
-          r.increment();
-          ev.stopPropagation();
-          break;
+          case 'ArrowDown':
+            decrement();
+            ev.stopPropagation();
+            break;
 
-        case 'ArrowDown':
-          r.decrement();
-          ev.stopPropagation();
-          break;
-
-        default:
-          break;
-      }
-    };
-  }, []);
+          default:
+            break;
+        }
+      },
+    [decrement, increment],
+  );
 
   return {
     valueAsStr,
