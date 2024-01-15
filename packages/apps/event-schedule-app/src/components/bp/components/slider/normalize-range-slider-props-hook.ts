@@ -43,15 +43,18 @@ export const useNormalizedRangeSliderProps = ({
       console.error('`stepSize` should be finite.');
       return defaultValues.stepSize;
     }
+
     return _stepSize;
   }, [_stepSize]);
 
   const labelStepSize = useMemo(() => {
     if (_labelStepSize === undefined) return stepSize;
+
     if (!Number.isFinite(_labelStepSize)) {
       console.error('`labelStepSize` should be finite.');
       return defaultValues.labelStepSize;
     }
+
     return _labelStepSize;
   }, [_labelStepSize, stepSize]);
 

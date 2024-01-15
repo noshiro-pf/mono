@@ -11,8 +11,11 @@ import {
   type AnswerTableCellPosition,
 } from '../../types';
 import { ymd2day } from '../../utils';
-import { answers$, eventSchedule$ } from '../fetching-state';
-import { AnswerFilterAndSortStore } from './answer-filter-sort-state';
+import { eventSchedule$ } from '../fetching-state';
+import {
+  AnswerFilterAndSortStore,
+  answersFiltered$,
+} from './answer-filter-sort-state';
 
 const answerSelectionMap$: InitializedObservable<
   | IMapMapped<
@@ -25,7 +28,7 @@ const answerSelectionMap$: InitializedObservable<
       AnswerSelectionMapKey
     >
   | undefined
-> = answers$.chain(
+> = answersFiltered$.chain(
   mapI((answers) => mapOptional(answers, createAnswerSelectionMapFromAnswers)),
 );
 
@@ -58,7 +61,11 @@ const answerTable$: InitializedObservable<
       DatetimeRangeMapKey
     >
   | undefined
-> = combineLatestI([eventSchedule$, answerSelectionMapFn$, answers$]).chain(
+> = combineLatestI([
+  eventSchedule$,
+  answerSelectionMapFn$,
+  answersFiltered$,
+]).chain(
   mapI(([eventSchedule, answerSelectionMapFn, answers]) =>
     eventSchedule === undefined || answers === undefined
       ? undefined
@@ -88,7 +95,7 @@ const scores$: InitializedObservable<
   eventSchedule$,
   answerSummary$,
   answerTable$,
-  answers$,
+  answersFiltered$,
 ]).chain(
   mapI(([eventSchedule, answerSummary, answerTable, answers]) =>
     eventSchedule === undefined ||
@@ -138,7 +145,6 @@ const datetimeRangeListSortedByScoresReversed$ =
 
 const datetimeRangeListReordered$ = combineLatestI([
   AnswerFilterAndSortStore.sortKeyAndOrder$,
-
   datetimeRangeList$,
   datetimeRangeListReversed$,
   datetimeRangeListSortedByScores$,
@@ -181,7 +187,7 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
   answerSummary$,
   answerTable$,
   eventSchedule$,
-  answers$,
+  answersFiltered$,
 ]).chain(
   mapI(
     ([
@@ -281,7 +287,7 @@ const tableBodyValues$: InitializedObservable<
 const tableBodyValuesFiltered$ = combineLatestI([
   tableBodyValues$,
   AnswerFilterAndSortStore.filterState$,
-  answers$,
+  answersFiltered$,
 ]).chain(
   mapI(([tableBodyValues, filterState, answers]) =>
     tableBodyValues.filter((row) => {

@@ -129,43 +129,40 @@ export const useMultipleDatePickerState = (
 
   const selectedDatesDispatch = useMemo(
     () =>
-      onSelectedDatesChange === undefined
-        ? undefined
-        : (action: SelectedDatesReducerAction) => {
-            onSelectedDatesChange(
-              Arr.sorted(
-                Array.from(
-                  selectedDatesReducer(selectedDatesSet, action).values(),
-                ),
-                compareYmd,
+      mapOptional(
+        onSelectedDatesChange,
+        (f) => (action: SelectedDatesReducerAction) => {
+          f(
+            Arr.sorted(
+              Array.from(
+                selectedDatesReducer(selectedDatesSet, action).values(),
               ),
-            );
-          },
+              compareYmd,
+            ),
+          );
+        },
+      ),
     [selectedDatesSet, onSelectedDatesChange],
   );
 
   const onDateClick = useMemo(
     () =>
-      selectedDatesDispatch === undefined
-        ? undefined
-        : (ymd: YearMonthDate) => {
-            selectedDatesDispatch({ type: 'flip', dateToFlip: ymd });
-          },
+      mapOptional(selectedDatesDispatch, (f) => (ymd: YearMonthDate) => {
+        f({ type: 'flip', dateToFlip: ymd });
+      }),
     [selectedDatesDispatch],
   );
 
   const onWeekdaysHeaderCellClick = useMemo(
     () =>
-      selectedDatesDispatch === undefined
-        ? undefined
-        : (w: DayOfWeekIndex) => {
-            selectedDatesDispatch({
-              type: 'fill-column',
-              dates: dates
-                .map((week) => week[w] ?? yearMonthDateInitialValue)
-                .filter((d) => d.month === calendarCurrentPage.month),
-            });
-          },
+      mapOptional(selectedDatesDispatch, (f) => (w: DayOfWeekIndex) => {
+        f({
+          type: 'fill-column',
+          dates: dates
+            .map((week) => week[w] ?? yearMonthDateInitialValue)
+            .filter((d) => d.month === calendarCurrentPage.month),
+        });
+      }),
     [selectedDatesDispatch, dates, calendarCurrentPage.month],
   );
 

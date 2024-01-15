@@ -48,6 +48,11 @@ export type AnswerFilterState = DeepReadonly<{
     enabled: boolean;
     falseKeys: ISetMapped<UserNameAndIconId, string>;
   };
+
+  respondent: {
+    enabled: boolean;
+    falseKeys: ISet<UserName>;
+  };
 }>;
 
 const initialState: AnswerFilterState = {
@@ -96,6 +101,11 @@ const initialState: AnswerFilterState = {
       ],
     ),
   },
+
+  respondent: {
+    enabled: false,
+    falseKeys: ISet.new<UserName>([]),
+  },
 };
 
 export type AnswerFilterStateAction = DeepReadonly<
@@ -137,6 +147,10 @@ export type AnswerFilterStateAction = DeepReadonly<
       value: boolean;
     }
   | {
+      type: 'set-enabled-filtering-by-respondent';
+      value: boolean;
+    }
+  | {
       type: 'set-enabled-filtering-by-scoreRange';
       value: boolean;
     }
@@ -148,6 +162,11 @@ export type AnswerFilterStateAction = DeepReadonly<
       type: 'set-iconOfSpecifiedRespondent';
       username: UserName;
       iconId: AnswerIconIdWithNone;
+      value: boolean;
+    }
+  | {
+      type: 'set-respondent';
+      username: UserName;
       value: boolean;
     }
   | {
@@ -289,6 +308,8 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
             }),
 
             iconOfSpecifiedRespondent: state.iconOfSpecifiedRespondent,
+
+            respondent: state.respondent,
           };
 
           return nextState;
@@ -367,6 +388,16 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
                   true,
                 );
 
+        case 'set-enabled-filtering-by-respondent':
+          return state.respondent.enabled === action.value
+            ? state // check変更無しならそのまま返す
+            : !action.value // 無効化されたらリセット
+              ? Obj.set(state, 'respondent', {
+                  enabled: false,
+                  falseKeys: initialState.respondent.falseKeys,
+                })
+              : Obj.setIn(state, ['respondent', 'enabled'], true);
+
         case 'set-iconOfSpecifiedRespondent': {
           const { iconId, username, value } = action;
 
@@ -383,6 +414,26 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
               state,
               ['iconOfSpecifiedRespondent', 'falseKeys'] as const,
               (st) => st.add([username, iconId]),
+            );
+          }
+        }
+
+        case 'set-respondent': {
+          const { username, value } = action;
+
+          if (value) {
+            // check value is true
+            return Obj.updateIn(
+              state,
+              ['respondent', 'falseKeys'] as const,
+              (st) => st.delete(username),
+            );
+          } else {
+            // check value is false
+            return Obj.updateIn(
+              state,
+              ['respondent', 'falseKeys'] as const,
+              (st) => st.add(username),
             );
           }
         }

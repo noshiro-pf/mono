@@ -16,12 +16,12 @@ const { state$: answersResult$, setState: setAnswersResult } = createState<
 const result$ = answersResult$;
 
 const { state$: refreshButtonIsLoading$, setState: setRefreshButtonIsLoading } =
-  createState<boolean>(false);
+  createBooleanState(false);
 
 const {
   state$: refreshButtonIsDisabled$,
   setState: setRefreshButtonIsDisabled,
-} = createState<boolean>(false);
+} = createBooleanState(false);
 
 const refreshAnswers = (): void => {
   fetchAnswers();
@@ -66,16 +66,16 @@ result$.subscribe((e) => {
   });
 }
 
-export const answers$: InitializedObservable<readonly Answer[] | undefined> =
-  result$
-    .chain(filter(isNotUndefined))
-    .chain(unwrapResultOk())
-    .chain(withInitialValue(undefined));
+const answers$: InitializedObservable<readonly Answer[] | undefined> = result$
+  .chain(filter(isNotUndefined))
+  .chain(unwrapResultOk())
+  .chain(withInitialValue(undefined));
 
 export const AnswersStore = {
+  answers$,
   result$,
   refreshButtonIsDisabled$,
   refreshButtonIsLoading$,
   fetchAnswers,
   refreshAnswers,
-};
+} as const;

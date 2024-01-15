@@ -21,12 +21,9 @@ export const Week = memoNamed<Props>(
         week.map((d, index) => ({
           value: d,
           index,
-          handler:
-            onClick === undefined
-              ? undefined
-              : () => {
-                  onClick(d.ymd);
-                },
+          handler: mapOptional(onClick, (f) => () => {
+            f(d.ymd);
+          }),
         })),
       [week, onClick],
     );

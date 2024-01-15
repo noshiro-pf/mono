@@ -19,5 +19,9 @@ export const detailedFilterDictionary = {
       title: '回答者の記号で絞り込み（URLには保存されません）',
       unanswered: '未回答',
     },
+    filterOutSomeAnswer: '［回答の一部を抜き出して集計］',
+    respondent: {
+      title: '回答者を選択して表示',
+    },
   },
 } as const;

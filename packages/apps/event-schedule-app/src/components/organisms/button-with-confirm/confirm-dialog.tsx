@@ -41,9 +41,9 @@ export const ConfirmDialog = memoNamed<Props>(
       onConfirm={onConfirm}
     >
       <p>{message}</p>
-      {description === undefined ? undefined : (
-        <Description text={description} />
-      )}
+      {mapOptional(description, (s) => (
+        <Description text={s} />
+      ))}
     </AlertWithMaxWidth>
   ),
 );

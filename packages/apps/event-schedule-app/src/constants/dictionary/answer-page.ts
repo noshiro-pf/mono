@@ -131,6 +131,7 @@ export const answerPageDictionary = {
         ).value,
 
       iconOfSpecifiedRespondent: '回答者の記号で絞り込み（詳細設定）',
+      respondent: '回答者を選択して表示',
     },
 
     datetime: '候補日程',

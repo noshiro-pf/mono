@@ -15,7 +15,7 @@ import {
   Auth,
   EventScheduleStore,
   Router,
-  answers$,
+  answersFiltered$,
   errorType$,
   eventSchedule$,
   holidaysJpDefinition$,
@@ -73,7 +73,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   const answerBeingEditedSectionState = useObservableValue(
     AnswerPageStore.answerBeingEditedSectionState$,
   );
-  const answers = useObservableValue(answers$);
+  const answers = useObservableValue(answersFiltered$);
   const errorType = useObservableValue(errorType$);
   const eventId = useObservableValue(Router.eventId$);
   const eventSchedule = useObservableValue(eventSchedule$);

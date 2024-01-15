@@ -52,37 +52,37 @@ export const EventScheduleDiff = memoNamed<Props>(
           )}
 
           {/* datetimeRangeList */}
-          {diff.datetimeRangeList === undefined ? undefined : (
+          {mapOptional(diff.datetimeRangeList, (list) => (
             <>
               <li>{dc.items.datetimeRangeList.title}</li>
               <ul>
                 <li>{dc.items.datetimeRangeList.added}</li>
                 <ul>
-                  {diff.datetimeRangeList.added.map((li) => (
+                  {list.added.map((li) => (
                     <li key={li}>{li}</li>
                   ))}
                 </ul>
                 <li>{dc.items.datetimeRangeList.deleted}</li>
                 <ul>
-                  {diff.datetimeRangeList.deleted.map((li) => (
+                  {list.deleted.map((li) => (
                     <li key={li}>{li}</li>
                   ))}
                 </ul>
               </ul>
             </>
-          )}
+          ))}
 
           {/* notificationSettings */}
-          {diff.notificationSettings === undefined ? undefined : (
+          {mapOptional(diff.notificationSettings, (list) => (
             <>
               <li>{dc.items.notificationSettings.title}</li>
               <ul>
-                {diff.notificationSettings.map((li) => (
+                {list.map((li) => (
                   <li key={li}>{li}</li>
                 ))}
               </ul>
             </>
-          )}
+          ))}
 
           {list2.map((li) =>
             mapOptional(diff[li], (s) => (

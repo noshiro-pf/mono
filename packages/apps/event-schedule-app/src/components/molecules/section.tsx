@@ -17,12 +17,12 @@ export const Section = memoNamed<React.PropsWithChildren<Props>>(
     >
       <Card elevation={1}>
         <Header>
-          {sectionTitle === undefined ? undefined : (
-            <SectionTitle>{sectionTitle}</SectionTitle>
-          )}
-          {onCloseClick === undefined ? undefined : (
-            <Button icon={'cross'} minimal={true} onClick={onCloseClick} />
-          )}
+          {mapOptional(sectionTitle, (s) => (
+            <SectionTitle>{s}</SectionTitle>
+          ))}
+          {mapOptional(onCloseClick, (f) => (
+            <Button icon={'cross'} minimal={true} onClick={f} />
+          ))}
         </Header>
         {children}
       </Card>
