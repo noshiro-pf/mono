@@ -67,7 +67,10 @@ const main = async () => {
             : generateEsLintConfig(workspace.location, packageName)
           : undefined,
       ]);
-    } else if (workspace.location.startsWith('packages/apps')) {
+    } else if (
+      workspace.location.startsWith('packages/apps') &&
+      !workspace.location.endsWith('/cypress')
+    ) {
       if (
         workspace.location === 'packages/apps/event-schedule-app/functions' ||
         workspace.location === 'packages/apps/slack-app/functions' ||

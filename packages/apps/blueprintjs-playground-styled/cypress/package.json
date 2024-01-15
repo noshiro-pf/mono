@@ -1,4 +1,14 @@
 {
-  "name": "blueprintjs-playground-styled-cypress",
-  "type": "module"
+  "name": "@noshiro/blueprintjs-playground-styled-cypress",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:record": "cypress run --record --key ${CYPRESS_RECORD_KEY}",
+    "cy:run:chrome": "cypress run --headed --browser chrome ",
+    "cy:run:firefox": "cypress run --headed --browser firefox ",
+    "start:dev-server": "yarn workspace @noshiro/blueprintjs-playground-styled start:dev-server",
+    "start:emulators": "yarn workspace @noshiro/blueprintjs-playground-styled start:emulators",
+    "start:emulators:e2e": "yarn workspace @noshiro/blueprintjs-playground-styled start:emulators:e2e"
+  }
 }

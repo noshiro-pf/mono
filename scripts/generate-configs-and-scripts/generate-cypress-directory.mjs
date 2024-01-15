@@ -18,7 +18,21 @@ export const generateCypressDirectory = async (
 
   await fs.writeFile(
     `${workspaceLocation}/cypress/package.json`,
-    JSON.stringify({ name: `${packageName}-cypress`, type: 'module' }),
+    JSON.stringify({
+      name: `@noshiro/${packageName}-cypress`,
+      version: '0.0.0',
+      type: 'module',
+      scripts: {
+        'cy:open': 'cypress open',
+        // eslint-disable-next-line no-template-curly-in-string
+        'cy:record': 'cypress run --record --key ${CYPRESS_RECORD_KEY}',
+        'cy:run:chrome': 'cypress run --headed --browser chrome ',
+        'cy:run:firefox': 'cypress run --headed --browser firefox ',
+        'start:dev-server': `yarn workspace @noshiro/${packageName} start:dev-server`,
+        'start:emulators': `yarn workspace @noshiro/${packageName} start:emulators`,
+        'start:emulators:e2e': `yarn workspace @noshiro/${packageName} start:emulators:e2e`,
+      },
+    }),
   );
 
   await fs.writeFile(

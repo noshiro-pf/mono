@@ -1,4 +1,14 @@
 {
-  "name": "my-portfolio-app-preact-cypress",
-  "type": "module"
+  "name": "@noshiro/my-portfolio-app-preact-cypress",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:record": "cypress run --record --key ${CYPRESS_RECORD_KEY}",
+    "cy:run:chrome": "cypress run --headed --browser chrome ",
+    "cy:run:firefox": "cypress run --headed --browser firefox ",
+    "start:dev-server": "yarn workspace @noshiro/my-portfolio-app-preact start:dev-server",
+    "start:emulators": "yarn workspace @noshiro/my-portfolio-app-preact start:emulators",
+    "start:emulators:e2e": "yarn workspace @noshiro/my-portfolio-app-preact start:emulators:e2e"
+  }
 }

@@ -85,7 +85,7 @@ jobs:
           install: false
           working-directory: packages/apps/${{ matrix.app_name }}/cypress
           spec: cypress/e2e/**/*.cy.ts
-          start: cd ../ && yarn start:dev-server
+          start: yarn start:dev-server
           wait-on: 'http://localhost:5180'
           wait-on-timeout: 120
           # headless: true
@@ -143,8 +143,8 @@ jobs:
           working-directory: packages/apps/event-schedule-app/cypress
           spec: cypress/e2e/**/*.cy.ts
           start: |
-            cd ../ && yarn start:emulators:e2e
-            cd ../ && yarn start:dev-server
+            yarn start:emulators:e2e
+            yarn start:dev-server
           # wait-on: 'http://localhost:8080, http://localhost:8081, http://localhost:5001'
           wait-on: 'http://localhost:5180'
           wait-on-timeout: 120

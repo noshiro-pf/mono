@@ -651,14 +651,14 @@ const updatePackageJsonImpl = (
           mut_scripts['build:no-minify'] = 'yarn build --minify false';
           mut_scripts['clean:firebase'] = 'rimraf .firebase';
 
-          mut_scripts['cy:open'] = 'cd ./cypress && cypress open';
+          mut_scripts['cy:open'] =
+            'yarn workspace @noshiro/event-schedule-app-cypress cy:open';
           mut_scripts['cy:record'] =
-            // eslint-disable-next-line no-template-curly-in-string
-            'cd ./cypress && cypress run --record --key ${CYPRESS_RECORD_KEY}';
+            'yarn workspace @noshiro/event-schedule-app-cypress cy:record';
           mut_scripts['cy:run:chrome'] =
-            'cd ./cypress && cypress run --headed --browser chrome ';
+            'yarn workspace @noshiro/event-schedule-app-cypress cy:run:chrome';
           mut_scripts['cy:run:firefox'] =
-            'cd ./cypress && cypress run --headed --browser firefox ';
+            'yarn workspace @noshiro/event-schedule-app-cypress cy:run:firefox';
 
           mut_scripts['fb'] = 'firebase';
           mut_scripts['fb:deploy'] = 'wireit';
