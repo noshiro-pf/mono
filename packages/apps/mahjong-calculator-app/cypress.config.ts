@@ -5,9 +5,9 @@ export default defineConfig({
   viewportWidth: 375,
   viewportHeight: 667,
   modifyObstructiveCode: false,
-  pageLoadTimeout: 120000,
+  pageLoadTimeout: 120_000,
   e2e: {
-    setupNodeEvents(on, config) {
+    setupNodeEvents(_on, _config) {
       // implement node event listeners here
     },
     baseUrl: 'http://localhost:5180',
