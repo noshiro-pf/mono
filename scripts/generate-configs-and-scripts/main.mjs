@@ -1,5 +1,6 @@
 import { execAsync } from '../node-utils/child-process-async.mjs';
 import { getWorkspaces } from '../others/get-workspaces.mjs';
+import { generateCypressDirectory } from './generate-cypress-directory.mjs';
 import { generateEsLintConfigForGlobalUtils } from './generate-eslint-config-for-global-utils.mjs';
 import { generateEsLintConfig } from './generate-eslint-config-for-utils.mjs';
 import { generateInjectDef } from './generate-inject-def.mjs';
@@ -19,6 +20,7 @@ const executeFlag = {
   eslintConfig: true,
   viteConfig: true,
   vitestConfig: true,
+  cypress: true,
 };
 
 const main = async () => {
@@ -97,6 +99,9 @@ const main = async () => {
           : undefined,
         executeFlag.eslintConfig && packageName !== 'event-schedule-app'
           ? generateEsLintConfig(workspace.location, packageName)
+          : undefined,
+        executeFlag.cypress
+          ? generateCypressDirectory(workspace.location, packageName)
           : undefined,
       ]);
     }
