@@ -13,7 +13,6 @@ import { toCommandMessageId, type UserId } from '../types/index.mjs';
 import { fixAnswerAndUpdateMessage } from './fix-answer.mjs';
 
 export const updatePollTitle = async (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   message: Discord.Message,
 ): Promise<Result<undefined, unknown>> => {
   if (message.author.bot) return Result.ok(undefined);

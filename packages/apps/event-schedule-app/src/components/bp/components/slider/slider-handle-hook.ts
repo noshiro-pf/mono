@@ -21,7 +21,6 @@ export type SliderHandleElementAdaptor = Readonly<{
   tooltipValue: string;
 }>;
 
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export const useSliderHandleStateManager = ({
   trackElementRef,
   disabled,
@@ -112,7 +111,6 @@ export const useSliderHandleStateManager = ({
   );
 
   const handleHandleMovement = useCallback(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (ev: MouseEvent) => {
       handleMovedTo(mouseEventClientOffset(ev));
     },
@@ -121,7 +119,6 @@ export const useSliderHandleStateManager = ({
   );
 
   const handleHandleTouchMovement = useCallback(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (ev: TouchEvent) => {
       handleMovedTo(touchEventClientOffset(ev));
     },
@@ -142,7 +139,6 @@ export const useSliderHandleStateManager = ({
   );
 
   const endHandleMovement = useCallback(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (ev: MouseEvent) => {
       handleMoveEndedAt(mouseEventClientOffset(ev));
     },
@@ -151,7 +147,6 @@ export const useSliderHandleStateManager = ({
   );
 
   const endHandleTouchMovement = useCallback(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (ev: TouchEvent) => {
       handleMoveEndedAt(touchEventClientOffset(ev));
     },
@@ -256,17 +251,17 @@ export const useSliderHandleStateManager = ({
   };
 };
 
-const mouseEventClientOffset =
+const mouseEventClientOffset = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  (ev: MouseEvent | React.MouseEvent<HTMLElement>): number => ev.clientX;
+  ev: MouseEvent | React.MouseEvent<HTMLElement>,
+): number => ev.clientX;
 
-const touchEventClientOffset =
+const touchEventClientOffset = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  (ev: React.TouchEvent<HTMLElement> | TouchEvent): number =>
-    ev.changedTouches[0]?.clientX ?? 0;
+  ev: React.TouchEvent<HTMLElement> | TouchEvent,
+): number => ev.changedTouches[0]?.clientX ?? 0;
 
 const getHandleMidpointAndOffset = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   handleElement: HTMLElement,
   useOppositeDimension: boolean = false,
 ): Readonly<{
@@ -285,10 +280,7 @@ const getHandleMidpointAndOffset = (
   return { handleMidpoint: handleRect[sizeKey] / 2, handleOffset };
 };
 
-const getHandleElementCenterPixel = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  handleElement: HTMLElement,
-): number => {
+const getHandleElementCenterPixel = (handleElement: HTMLElement): number => {
   const { handleMidpoint, handleOffset } =
     getHandleMidpointAndOffset(handleElement);
   return handleOffset + handleMidpoint;

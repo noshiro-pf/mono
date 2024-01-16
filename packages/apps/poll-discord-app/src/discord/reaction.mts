@@ -16,7 +16,6 @@ import {
 import { fixAnswerAndUpdateMessage } from './fix-answer.mjs';
 
 const onRefreshClick = async (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   reactionFilled: Discord.MessageReaction,
 ): Promise<Result<undefined, string>> => {
   const channel = reactionFilled.message.channel;
@@ -58,9 +57,7 @@ const onMessageReactCommon = async (
     type: 'add' | 'remove';
     value: AnswerType | 'refresh' | undefined;
   }>,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   reaction: Discord.MessageReaction,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   user: Discord.PartialUser | Discord.User,
 ): Promise<Result<undefined, unknown>> => {
   if (user.bot) return Result.ok(undefined);
@@ -174,9 +171,7 @@ const mapReactionEmojiNameToAnswerType = (
   });
 
 export const onMessageReactionAdd = async (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   reaction: Discord.MessageReaction,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   user: Discord.PartialUser | Discord.User,
 ): Promise<Result<undefined, unknown>> =>
   onMessageReactCommon(
@@ -189,9 +184,7 @@ export const onMessageReactionAdd = async (
   );
 
 export const onMessageReactionRemove = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   reaction: Discord.MessageReaction,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   user: Discord.PartialUser | Discord.User,
 ): Promise<Result<undefined, unknown>> =>
   onMessageReactCommon(
