@@ -295,13 +295,6 @@ export const convertLibEs2023Array = (from) => {
             .chain(
               replaceWithNoMatchCheck(
                 // TODO: remove if fixed
-                'If omitted, the elements are sorted in ascending, ASCII character order.',
-                'If omitted, the elements are sorted in ascending order.',
-              ),
-            )
-            .chain(
-              replaceWithNoMatchCheck(
-                // TODO: remove if fixed
                 '@param value The value to insert into the copied array.',
                 '@param value The value to write into the copied array.',
               ),
