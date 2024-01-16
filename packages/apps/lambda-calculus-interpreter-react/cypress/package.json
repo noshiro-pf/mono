@@ -1,0 +1,15 @@
+{
+  "name": "@noshiro/lambda-calculus-interpreter-react-cypress",
+  "version": "0.0.0",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:record": "cypress run --record --key ${CYPRESS_RECORD_KEY}",
+    "cy:run:chrome": "cypress run --headed --browser chrome ",
+    "cy:run:firefox": "cypress run --headed --browser firefox ",
+    "start:dev-server": "yarn workspace @noshiro/lambda-calculus-interpreter-react start:dev-server",
+    "start:emulators": "yarn workspace @noshiro/lambda-calculus-interpreter-react start:emulators",
+    "start:emulators:e2e": "yarn workspace @noshiro/lambda-calculus-interpreter-react start:emulators:e2e"
+  }
+}

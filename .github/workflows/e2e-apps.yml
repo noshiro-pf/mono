@@ -83,7 +83,7 @@ jobs:
         with:
           browser: chrome
           install: false
-          working-directory: packages/apps/${{ matrix.app_name }}
+          working-directory: packages/apps/${{ matrix.app_name }}/cypress
           spec: cypress/e2e/**/*.cy.ts
           start: yarn start:dev-server
           wait-on: 'http://localhost:5180'
@@ -140,7 +140,7 @@ jobs:
           # group: 'UI - Chrome'
           browser: chrome
           install: false
-          working-directory: packages/apps/event-schedule-app
+          working-directory: packages/apps/event-schedule-app/cypress
           spec: cypress/e2e/**/*.cy.ts
           start: |
             yarn start:emulators:e2e

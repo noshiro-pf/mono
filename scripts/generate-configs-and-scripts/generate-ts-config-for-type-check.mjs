@@ -36,7 +36,7 @@ export const generateTsConfigForTypeCheck = async (
       cfg.isViteApp,
     ),
     ',',
-    `  "include": [${cfg.typeCheckIncludes.map((s) => `"./${s}"`).join(', ')}]`,
+    `  "include": [${cfg.typeCheckIncludes.map((s) => (s.startsWith('./') ? s : `"./${s}"`)).join(', ')}]`,
     `}`,
     '',
   ].join('\n');
