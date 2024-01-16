@@ -109,7 +109,7 @@
     "cross-env": "^7.0.3",
     "cspell": "^8.2.4",
     "css-loader": "^6.2.0",
-    "cypress": "^12.17.3",
+    "cypress": "^13.6.2",
     "dotenv": "^16.0.3",
     "esbuild": "^0.17.12",
     "eslint": "^8.56.0",
