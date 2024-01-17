@@ -63,14 +63,8 @@ type LowerAlphabet = (
   | 'v' | 'w' | 'x' | 'y' | 'z'
 );
 
-// prettier-ignore
 /** `'A' | 'B' | 'C' | ... | 'Z'` */
-type UpperAlphabet = (
-  | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G'
-  | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N'
-  | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U'
-  | 'V' | 'W' | 'X' | 'Y' | 'Z'
-);
+type UpperAlphabet = Uppercase<LowerAlphabet>;
 
 /** ` 'A' | ... | 'Z' | 'a' | ... | 'z'` */
 type Alphabet = LowerAlphabet | UpperAlphabet;

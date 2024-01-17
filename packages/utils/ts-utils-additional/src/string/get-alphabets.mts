@@ -1,5 +1,4 @@
 import { Arr, Uint32 } from '@noshiro/ts-utils';
-import { type LowerAlphabet, type UpperAlphabet } from '../types/index.mjs';
 
 export const getAlphabets = <Case extends 'lower' | 'upper'>(
   charCase: Case,
