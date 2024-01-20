@@ -459,8 +459,7 @@ const TableTopWrapper = styled(CustomScrollbarWrapper)`
 
 const TagInputWrapper = styled.div`
   margin-bottom: 5px;
-  display: flex;
-  align-items: center;
+  max-width: 500px;
 `;
 
 const FilterButtonsWrapper = styled.div`
