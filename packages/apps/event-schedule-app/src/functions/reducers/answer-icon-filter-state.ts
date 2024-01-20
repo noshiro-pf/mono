@@ -148,6 +148,7 @@ const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
           const { upperLimit } = state;
           const { good, fair, poor, goodPlusFair, fairPlusPoor } =
             action.values;
+
           const nextState: AnswerIconFilterState = {
             good: {
               enabled: good.min !== undefined || good.max !== undefined,

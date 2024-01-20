@@ -26,13 +26,13 @@ type Props = DeepReadonly<{
 /* スコアで絞り込み */
 export const DetailedFilterScoreRange = memoNamed<Props>(
   'DetailedFilterScoreRange',
-  ({ enabled, range: rangeFromProps }) => {
+  ({ enabled, range }) => {
     const sliderStateNormalized = useMemo(
       () => ({
-        min: clampAndRoundAnswersScore(rangeFromProps.min),
-        max: clampAndRoundAnswersScore(rangeFromProps.max),
+        min: clampAndRoundAnswersScore(range.min),
+        max: clampAndRoundAnswersScore(range.max),
       }),
-      [rangeFromProps],
+      [range],
     );
 
     return (
@@ -60,14 +60,14 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
           >
             <ScoreNumericInput
               disabled={!enabled}
-              max={rangeFromProps.max}
-              value={rangeFromProps.min}
+              max={range.max}
+              value={range.min}
               onValueChange={AnswerFilterAndSortStore.setScoreRangeMin}
             />
             <ScoreNumericInput
               disabled={!enabled}
-              min={rangeFromProps.min}
-              value={rangeFromProps.max}
+              min={range.min}
+              value={range.max}
               onValueChange={AnswerFilterAndSortStore.setScoreRangeMax}
             />
           </div>

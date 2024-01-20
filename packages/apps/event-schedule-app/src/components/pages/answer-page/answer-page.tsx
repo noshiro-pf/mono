@@ -241,7 +241,11 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               </Button>
             </ButtonsWrapperNowrapPadChanged>
 
-            <ScreenShotAreaWrapper>
+            <div
+              css={css`
+                display: flex;
+              `}
+            >
               <ScreenShotArea ref={screenShotAreaRef}>
                 <TableTopWrapper>
                   <TagInputWrapper>
@@ -343,7 +347,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                   </AlertWithMaxWidth>
                 </TableWrapper>
               </ScreenShotArea>
-            </ScreenShotAreaWrapper>
+            </div>
 
             <IconDescriptionWrapper>
               {requiredParticipantsExist ? (
@@ -501,10 +505,6 @@ const NoteForPointOfFair = styled.div`
 
 const AnswerLaterWrapper = styled.div`
   margin: 20px;
-`;
-
-const ScreenShotAreaWrapper = styled.div`
-  display: flex;
 `;
 
 const ScreenShotArea = styled.div`
