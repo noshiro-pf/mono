@@ -289,8 +289,8 @@ const tableBodyValuesFiltered$ = combineLatestI([
   AnswerFilterAndSortStore.filterState$,
   answersFiltered$,
 ]).chain(
-  mapI(([tableBodyValues, filterState, answers]) =>
-    tableBodyValues.filter((row) => {
+  mapI(([tableBodyValues, filterState, answers]) => {
+    const tableBodyValuesFiltered = tableBodyValues.filter((row) => {
       const { answerTableRow, answerSummaryRow, score, datetimeRange } = row;
       if (answerSummaryRow === undefined || answerTableRow === undefined)
         return false;
@@ -316,7 +316,10 @@ const tableBodyValuesFiltered$ = combineLatestI([
         dateRange: {
           value: { start: dateStart, end: dateEnd },
         },
+        ...rest
       } = filterState;
+
+      expectType<keyof typeof rest, 'rank' | 'respondent'>('=');
 
       const day = ymd2day(datetimeRange.ymd);
 
@@ -363,8 +366,20 @@ const tableBodyValuesFiltered$ = combineLatestI([
           compareYmd(dateStart, datetimeRange.ymd) <= 0) &&
         (dateEnd === undefined || compareYmd(datetimeRange.ymd, dateEnd) <= 0)
       );
-    }),
-  ),
+    });
+
+    if (!filterState.rank.enabled) return tableBodyValuesFiltered;
+
+    const scoreThreshold = tableBodyValuesFiltered
+      .map((a) => a.score)
+      .toSorted((a, b) => b - a)[filterState.rank.value - 1];
+
+    return tableBodyValuesFiltered.filter(
+      (row) =>
+        // スコア上位のみ表示
+        scoreThreshold === undefined || row.score >= scoreThreshold,
+    );
+  }),
 );
 
 const { state$: tableIsMinimized$, toggle: toggleTableIsMinimized } =

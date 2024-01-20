@@ -1,6 +1,7 @@
 export * from './answer-selection-value';
 export * from './answer-table-cell';
 export * from './answer-table-cell-position';
+export * from './answers-rank';
 export * from './answers-score';
 export * from './assert-is-credential-error';
 export * from './detailed-filter-icon';

@@ -11,6 +11,7 @@ const queryParamKey = {
   answerTableState: {
     sortBy: 'sort-by',
     sortOrder: 'sort-order',
+    rank: 'rank',
     score: 'score',
     date: 'date',
     dayOfWeek: 'day',

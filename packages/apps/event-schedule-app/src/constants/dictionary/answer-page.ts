@@ -1,3 +1,4 @@
+import { type AnswerRank } from '../../types';
 import { commonDictionary } from './common';
 import { ymd2str } from './datetime';
 import { detailedFilterDictionary } from './detailed-filter-dialog';
@@ -95,6 +96,8 @@ export const answerPageDictionary = {
       poor: genTagName('✕'),
       goodPlusFair: genTagNameAdded('〇', '△'),
       fairPlusPoor: genTagNameAdded('△', '✕'),
+
+      rank: (value: AnswerRank) => `スコア上位${value}位まで`,
 
       scoreRange: ({ min, max }: Readonly<{ min: number; max: number }>) =>
         min === max

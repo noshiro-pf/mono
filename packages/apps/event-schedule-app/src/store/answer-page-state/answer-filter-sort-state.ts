@@ -1,7 +1,11 @@
 import { type TagProps } from '@blueprintjs/core';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { AnswerFilterState } from '../../functions';
-import { type AnswersScore, type DetailedFilterIcon } from '../../types';
+import {
+  type AnswerRank,
+  type AnswersScore,
+  type DetailedFilterIcon,
+} from '../../types';
 import { AnswersStore, eventSchedule$ } from '../fetching-state';
 import { AnswerFilterQueryParam } from './answer-filter-query-param';
 
@@ -272,6 +276,21 @@ const setOnlyFilledDate = (checked: boolean): void => {
   );
 };
 
+const setEnabledFilteringByRank = (value: boolean): void => {
+  AnswerFilterQueryParam.saveFilterStateToQueryParams(
+    filterStateDispatch({
+      type: 'set-enabled-filtering-by-rank',
+      value,
+    }),
+  );
+};
+
+const setRank = (rank: AnswerRank): void => {
+  AnswerFilterQueryParam.saveFilterStateToQueryParams(
+    filterStateDispatch({ type: 'set-rank', rank }),
+  );
+};
+
 const setEnabledFilteringByScoreRange = (value: boolean): void => {
   AnswerFilterQueryParam.saveFilterStateToQueryParams(
     filterStateDispatch({
@@ -451,14 +470,18 @@ const tags$: InitializedObservable<
       {
         iconState,
         filledDateOnly,
+        rank,
         scoreRange,
         dateRange,
         dayOfWeek,
         iconOfSpecifiedRespondent,
         respondent,
+        ...rest
       },
-    ]) =>
-      [
+    ]) => {
+      expectType<keyof typeof rest, never>('=');
+
+      return [
         {
           value: dc.sort(...sortKeyAndOrder),
           props: {
@@ -488,6 +511,18 @@ const tags$: InitializedObservable<
                 intent: 'primary' as const,
                 onRemove: () => {
                   setEnabledFilteringByDayOfWeek(false);
+                },
+              },
+            }
+          : undefined,
+
+        rank.enabled
+          ? {
+              value: dc.rank(rank.value),
+              props: {
+                intent: 'primary' as const,
+                onRemove: () => {
+                  setEnabledFilteringByRank(false);
                 },
               },
             }
@@ -602,7 +637,8 @@ const tags$: InitializedObservable<
               },
             }
           : undefined,
-      ].filter(isNotUndefined),
+      ].filter(isNotUndefined);
+    },
   ),
 );
 
@@ -697,6 +733,8 @@ export const AnswerFilterAndSortStore = {
   setEnabledFilteringByGoodPlusFair,
   setEnabledFilteringByFairPlusPoor,
   setOnlyFilledDate,
+  setEnabledFilteringByRank,
+  setRank,
   setEnabledFilteringByScoreRange,
   setScoreRange,
   setScoreRangeMin,

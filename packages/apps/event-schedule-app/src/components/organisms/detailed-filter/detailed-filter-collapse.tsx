@@ -10,6 +10,7 @@ import { DetailedFilterNumFairPlusPoorIcon } from './detailed-filter-num-fair-pl
 import { DetailedFilterNumGoodIcon } from './detailed-filter-num-good-icon';
 import { DetailedFilterNumGoodPlusFairIcon } from './detailed-filter-num-good-plus-fair-icon';
 import { DetailedFilterNumPoorIcon } from './detailed-filter-num-poor-icon';
+import { DetailedFilterRank } from './detailed-filter-rank';
 import { DetailedFilterScoreRange } from './detailed-filter-score-range';
 import { CheckboxWrapper, FilterItem, FilterItemContent } from './styled';
 
@@ -28,7 +29,11 @@ export const DetailedFilterCollapse = memoNamed<Props>(
       respondent,
       iconState,
       scoreRange,
+      rank,
+      ...rest
     } = useObservableValue(AnswerFilterAndSortStore.filterState$);
+
+    expectType<keyof typeof rest, never>('=');
 
     const iconOfSpecifiedRespondentCheckState = useObservableValue(
       AnswerFilterAndSortStore.iconOfSpecifiedRespondentCheckState$,
@@ -65,6 +70,8 @@ export const DetailedFilterCollapse = memoNamed<Props>(
               enabled={scoreRange.enabled}
               range={scoreRange.value}
             />
+
+            <DetailedFilterRank enabled={rank.enabled} rank={rank.value} />
 
             <hr />
 
