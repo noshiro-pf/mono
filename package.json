@@ -158,7 +158,7 @@
     "tslib": "^2.4.0",
     "typescript": "5.3.3",
     "unplugin-auto-import": "^0.15.3",
-    "vite": "^4.5.1",
+    "vite": "^4.5.2",
     "vite-plugin-markdown": "^2.1.0",
     "vitest": "^0.32.0",
     "wireit": "^0.14.1",
