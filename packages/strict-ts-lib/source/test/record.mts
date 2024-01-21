@@ -10,8 +10,8 @@ expectType<
 
 {
   /**
-   * value が異なる場合は extends は false になる。
-   * value が同じ場合には key の型が string, number, symbol のいずれかであれば extends はなぜか true になる。
+   * Value が異なる場合は extends は false になる。 value が同じ場合には key の型が string, number,
+   * symbol のいずれかであれば extends はなぜか true になる。
    */
 
   type Eq<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;

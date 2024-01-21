@@ -1,4 +1,4 @@
-/** @typedef { import('@noshiro/eslint-utils').FlatConfig } FlatConfig */
+/** @typedef {import('@noshiro/eslint-utils').FlatConfig} FlatConfig */
 
 import {
   eslintFlatConfigCommon,

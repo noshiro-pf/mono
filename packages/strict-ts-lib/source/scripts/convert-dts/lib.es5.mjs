@@ -8,7 +8,6 @@ import { convertLibEs5_String } from './lib.es5-string.mjs';
 import { convertLibEs5_TypedArray } from './lib.es5-typed-array.mjs';
 
 /**
- *
  * @param {string} from
  * @param {boolean} commentOutDeprecated
  * @returns {string}

@@ -17,7 +17,10 @@ const subMatch = (
 // eslint-disable-next-line no-restricted-syntax
 const from: (v: unknown) => string = String;
 
-/** Converts all alphabetic characters to lowercase, taking into account the host environment's current locale. */
+/**
+ * Converts all alphabetic characters to lowercase, taking into account the host
+ * environment's current locale.
+ */
 const toLocaleLowerCase =
   (locales?: string | readonly string[]) =>
   (str: string): Result<string, RangeError | TypeError> => {
@@ -29,7 +32,10 @@ const toLocaleLowerCase =
     }
   };
 
-/** Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale. */
+/**
+ * Returns a string where all alphabetic characters have been converted to
+ * uppercase, taking into account the host environment's current locale.
+ */
 const toLocaleUpperCase =
   (locales?: string | readonly string[]) =>
   (str: string): Result<string, RangeError | TypeError> => {
@@ -42,9 +48,10 @@ const toLocaleUpperCase =
   };
 
 /**
- * Returns a String value that is made from count copies appended together. If count is 0,
- * the empty string is returned.
- * @param count number of copies to append
+ * Returns a String value that is made from count copies appended together. If
+ * count is 0, the empty string is returned.
+ *
+ * @param count Number of copies to append
  */
 const repeat =
   (count: Uint) =>

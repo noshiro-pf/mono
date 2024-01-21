@@ -28,7 +28,8 @@ type Path = Readonly<{
 }>;
 
 /**
- * Creates a string URL path from the given pathname, search, and hash components.
+ * Creates a string URL path from the given pathname, search, and hash
+ * components.
  *
  * @see https://github.com/remix-run/history/tree/main/docs/api-reference.md#createpath
  */

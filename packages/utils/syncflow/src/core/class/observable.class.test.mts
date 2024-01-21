@@ -14,8 +14,9 @@ import {
 import { RootObservableClass } from './root-observable-class.mjs';
 
 /**
- * inheritance
+ * Inheritance
  *
+ * ```txt
  * ObservableBase
  *   |
  *   +- SyncChildObservable    \                       \
@@ -23,7 +24,7 @@ import { RootObservableClass } from './root-observable-class.mjs';
  *   +- AsyncChildObservable   X                         +-- Observable
  *   |                          +-- ManagerObservable   /
  *   +- RootObservableType     /                       /
- *
+ * ```
  */
 
 // type tests

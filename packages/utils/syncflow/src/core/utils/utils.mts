@@ -7,9 +7,7 @@ export const halfInt = (x: SafeInt): SafeInt =>
       ? SafeInt.div(SafeInt.sub(x, 1), 2) // (x-1) / 2. 例: 3 -> 1, 5 -> 2
       : SafeInt.div(SafeInt.add(x, 1), 2); // (x+1) / 2. 例: -3 -> -1, -5 -> -2
 
-/**
- * ソート済み配列に対して x が挿入される位置を返す。
- */
+/** ソート済み配列に対して x が挿入される位置を返す。 */
 export const binarySearch = <N extends number>(
   sortedArray: readonly N[],
   x: N,

@@ -613,8 +613,9 @@ const groupBy = <A, G extends Primitive>(
 };
 
 /**
- * @desc copy and return unique list
- * @param list target list
+ * Copy and return unique list
+ *
+ * @param list Target list
  */
 function uniq<A>(list: NonEmptyArray<A>): NonEmptyArray<A>;
 function uniq<A>(list: readonly A[]): readonly A[];
@@ -623,9 +624,10 @@ function uniq<A>(list: readonly A[]): readonly A[] {
 }
 
 /**
- * @desc copy and return unique list
- * @param list target list
- * @param mapFn perform identity check after mapping by the map function
+ * Copy and return unique list
+ *
+ * @param list Target list
+ * @param mapFn Perform identity check after mapping by the map function
  */
 function uniqBy<A, B>(
   list: NonEmptyArray<A>,
@@ -656,14 +658,14 @@ const indexIsInRange = <T,>(
 const eq = <T,>(list1: readonly T[], list2: readonly T[]): boolean =>
   list1.length === list2.length && list1.every((v, i) => v === list2[i]);
 
-/** @returns list1 ⊂ list2 */
+/** @returns `list1` ⊂ `list2` */
 const isSubset = <A extends Primitive, B extends Primitive = A>(
   list1: readonly A[],
   list2: readonly B[],
   // eslint-disable-next-line no-restricted-syntax
 ): boolean => list1.every((a) => list2.includes(a as A & B));
 
-/** @returns list1 ⊃ list2 */
+/** @returns `list1` ⊃ `list2` */
 const isSuperset = <A extends Primitive, B extends Primitive = A>(
   list1: readonly A[],
   list2: readonly B[],

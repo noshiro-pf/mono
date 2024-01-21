@@ -73,9 +73,9 @@ const defaultsForApp = {
 
 /**
  * @param {Readonly<{
- *   tsType?: WorkspaceConfig["tsType"];
- *   gi?: WorkspaceConfig["packageJson"]["scripts"]["gi"];
- *   passWithNoTests?: WorkspaceConfig["packageJson"]["scripts"]["passWithNoTests"];
+ *   tsType?: WorkspaceConfig['tsType'];
+ *   gi?: WorkspaceConfig['packageJson']['scripts']['gi'];
+ *   passWithNoTests?: WorkspaceConfig['packageJson']['scripts']['passWithNoTests'];
  *   hasScripts?: boolean;
  * }>} [options]
  * @returns {WorkspaceConfig}
@@ -100,10 +100,10 @@ const fillDefaultsForUtil = (options) => ({
 
 /**
  * @param {Readonly<{
- *   tsType?: WorkspaceConfig["tsType"];
- *   gi?: WorkspaceConfig["packageJson"]["scripts"]["gi"];
- *   giIgnore?: WorkspaceConfig["packageJson"]["scripts"]["giIgnore"];
- *   passWithNoTests?: WorkspaceConfig["packageJson"]["scripts"]["passWithNoTests"];
+ *   tsType?: WorkspaceConfig['tsType'];
+ *   gi?: WorkspaceConfig['packageJson']['scripts']['gi'];
+ *   giIgnore?: WorkspaceConfig['packageJson']['scripts']['giIgnore'];
+ *   passWithNoTests?: WorkspaceConfig['packageJson']['scripts']['passWithNoTests'];
  *   hasScripts?: boolean;
  * }>} [options]
  * @returns {WorkspaceConfig}

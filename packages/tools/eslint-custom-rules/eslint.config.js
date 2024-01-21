@@ -1,4 +1,4 @@
-/** @typedef { import('@noshiro/eslint-utils').FlatConfig } FlatConfig */
+/** @typedef {import('@noshiro/eslint-utils').FlatConfig} FlatConfig */
 
 import { toThisDir } from '@noshiro/mono-scripts/node-utils/path-utils.mjs';
 import * as nodePath from 'node:path';

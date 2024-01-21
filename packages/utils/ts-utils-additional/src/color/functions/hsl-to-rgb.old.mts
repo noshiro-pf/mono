@@ -2,9 +2,8 @@ import { type Hsl, type Hsla, type Rgb, type Rgba } from '../types/index.mjs';
 import { numberToRgbValue } from './from-number/index.mjs';
 
 /**
- * @description
- * convert hsl to rgb.
- * link: https://www.w3.org/TR/css-color-3/#hsl-color
+ * Convert hsl to rgb. link: https://www.w3.org/TR/css-color-3/#hsl-color
+ *
  * @deprecated
  */
 export const hslToRgb = ([h, s, l]: Hsl): Rgb => {
@@ -38,9 +37,7 @@ const hue2rgb = (m1: number, m2: number, normH: number): number => {
   }
 };
 
-/**
- * @deprecated
- */
+/** @deprecated */
 export const hslaToRgba = ([h, s, l, a]: Hsla): Rgba => {
   // eslint-disable-next-line deprecation/deprecation
   const [r, g, b] = hslToRgb([h, s, l]);

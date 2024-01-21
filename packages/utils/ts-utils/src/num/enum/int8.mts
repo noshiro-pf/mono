@@ -52,18 +52,18 @@ export const Int8 = {
   abs,
   random,
 
-  /** @returns a ** b, but clamped to [-128, 127] */
+  /** @returns `a ** b`, but clamped to `[-128, 127]` */
   pow,
 
-  /** @returns a + b, but clamped to [-128, 127] */
+  /** @returns `a + b`, but clamped to `[-128, 127]` */
   add,
 
-  /** @returns a - b, but clamped to [-128, 127] */
+  /** @returns `a - b`, but clamped to `[-128, 127]` */
   sub,
 
-  /** @returns a * b, but clamped to [-128, 127] */
+  /** @returns `a * b`, but clamped to `[-128, 127]` */
   mul,
 
-  /** @returns ⌊a / b⌋, but clamped to [-128, 127] */
+  /** @returns `⌊a / b⌋`, but clamped to `[-128, 127]` */
   div,
 } as const;

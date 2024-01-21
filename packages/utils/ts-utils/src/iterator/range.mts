@@ -1,10 +1,10 @@
 import { SafeInt, toSafeInt } from '../num/index.mjs';
 
 /**
- * @throws Will throw an error if the argument is not safe integer.
  * @param start
  * @param end
- * @param step default value is 1
+ * @param step Default value is 1
+ * @throws Will throw an error if the argument is not safe integer.
  */
 export function range(
   start: SafeUintWithSmallInt,

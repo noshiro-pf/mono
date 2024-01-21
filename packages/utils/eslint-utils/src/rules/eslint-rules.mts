@@ -41,12 +41,11 @@ export const restrictedSyntax = [
   },
 ];
 
-/**
- * @link https://github.com/eslint/eslint/blob/main/conf/eslint-all.js
- */
+/** @link https://github.com/eslint/eslint/blob/main/conf/eslint-all.js */
 export const eslintRules: EslintRules = {
   /**
-   * disable in favor of prettier
+   * Disable in favor of prettier
+   *
    * @link https://github.com/eslint/eslint/blob/main/conf/eslint-all.js
    * @link https://github.com/eslint/eslint/blob/main/conf/eslint-recommended.js
    */
@@ -126,7 +125,8 @@ export const eslintRules: EslintRules = {
   'new-parens': 'off',
 
   /**
-   * disable in favor of @typescript-eslint
+   * Disable in favor of @typescript-eslint
+   *
    * @link https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/eslint-plugin/src/configs/eslint-recommended.ts
    */
 
@@ -345,10 +345,10 @@ export const eslintRules: EslintRules = {
   'no-restricted-properties': 'error',
 
   /**
-   * 他ルールで実現しづらい禁止したい構文をここに書く。
-   * 以下のAST checker を用いて selector をどう書くべきか調べることができる。
+   * 他ルールで実現しづらい禁止したい構文をここに書く。 以下のAST checker を用いて selector をどう書くべきか調べることができる。
    *
-   * AST checker: https://typescript-eslint.io/play/#ts=4.7.2&sourceType=module&showAST=es
+   * AST checker:
+   * https://typescript-eslint.io/play/#ts=4.7.2&sourceType=module&showAST=es
    */
   'no-restricted-syntax': ['error', ...restrictedSyntax],
   'no-return-assign': 'error',
@@ -395,12 +395,12 @@ export const eslintRules: EslintRules = {
   'prefer-regex-literals': 'error',
 
   /**
-   * `+` の曖昧性回避のため使用。
-   * restrict-plus-operands で bigint, number, string 同士にしか使用できないように制限し、
-   * prefer-template で文字列の連結に `+` を使うことも禁止する。
-   * 修正方法： template literal を使うか、文字列の配列を `join("")` で結合する。
-   *  - a + b -> `${a}${b}`
-   *  - s_1 + s_2 + ... + s_n -> [s_1, ..., s_n].join("")
+   * `+` の曖昧性回避のため使用。 restrict-plus-operands で bigint, number, string
+   * 同士にしか使用できないように制限し、 prefer-template で文字列の連結に `+` を使うことも禁止する。 修正方法： template
+   * literal を使うか、文字列の配列を `join("")` で結合する。
+   *
+   *     - a + b -> `${a}${b}`
+   *     - s_1 + s_2 + ... + s_n -> [s_1, ..., s_n].join("")
    */
   'prefer-template': 'error',
   radix: 'error',

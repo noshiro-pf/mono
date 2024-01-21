@@ -101,9 +101,7 @@ export const eslintImportsRules: EslintImportsRules = {
   ],
   'import/no-named-default': 'off',
 
-  /**
-   * default export は定義側のリネームが import する側に反映されないので禁止
-   */
+  /** Default export は定義側のリネームが import する側に反映されないので禁止 */
   'import/no-default-export': 'error',
 
   'import/no-named-export': 'off',

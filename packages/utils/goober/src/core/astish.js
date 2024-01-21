@@ -3,6 +3,7 @@ let ruleClean = /\/\*[\s\S]*?\*\/|\s{2,}|\n/gm;
 
 /**
  * Convert a css style string into a object
+ *
  * @param {String} val
  * @returns {Object}
  */

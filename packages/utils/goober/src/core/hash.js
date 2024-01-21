@@ -3,13 +3,12 @@ import { parse } from './parse';
 import { toHash } from './to-hash';
 import { update } from './update';
 
-/**
- * In-memory cache.
- */
+/** In-memory cache. */
 let cache = {};
 
 /**
  * Stringifies a object structure
+ *
  * @param {Object} data
  * @returns {String}
  */
@@ -26,11 +25,13 @@ let stringify = (data) => {
 
 /**
  * Generates the needed className
- * @param {String|Object} compiled
+ *
+ * @param {String | Object} compiled
  * @param {Object} sheet StyleSheet target
  * @param {Object} global Global flag
  * @param {Boolean} append Append or not
- * @param {Boolean} keyframes Keyframes mode. The input is the keyframes body that needs to be wrapped.
+ * @param {Boolean} keyframes Keyframes mode. The input is the keyframes body
+ *   that needs to be wrapped.
  * @returns {String}
  */
 export let hash = (compiled, sheet, global, append, keyframes) => {

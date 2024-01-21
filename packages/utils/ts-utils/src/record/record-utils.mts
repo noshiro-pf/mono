@@ -122,8 +122,8 @@ const removeProperties = <R extends RecordBase, K extends keyof R>(
 /**
  * Merge `record1` and `record2` with `...`.
  *
- * If `record1` and `record2` share some properties,
- * `record2` value have priority.
+ * If `record1` and `record2` share some properties, `record2` value have
+ * priority.
  */
 const merge = <R1 extends RecordBase, R2 extends RecordBase>(
   record1: R1,

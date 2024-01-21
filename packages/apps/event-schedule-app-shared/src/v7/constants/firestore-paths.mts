@@ -1,4 +1,5 @@
 /**
+ * ```txt
  * events
  *   |
  *   +-- internal/values
@@ -7,9 +8,10 @@
  *   |
  *   +-- answers
  *         |
- *         +- answer1
- *         +- answer2
- *         +- ...
+ *         +-- answer1
+ *         +-- answer2
+ *         +-- ...
+ * ```
  */
 
 export const firestorePaths = {

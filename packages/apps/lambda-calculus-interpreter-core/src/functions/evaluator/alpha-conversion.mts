@@ -8,9 +8,10 @@ import { isAbstraction, isApplication } from '../is-lambda-term.mjs';
 import { isVariable } from '../is-variable.mjs';
 
 /**
- * @desc (λx.M[x]) → (λy.M[y])
- * @param to   "y" of "(λx.M[x]) → (λy.M[y])"
- * @param term "(λx.M[x])" of "(λx.M[x]) → (λy.M[y])"
+ * `(λx.M[x]) -> (λy.M[y])`
+ *
+ * @param to `y` of `(λx.M[x]) -> (λy.M[y])`
+ * @param term `(λx.M[x])` of `(λx.M[x]) -> (λy.M[y])`
  */
 export function alphaConversion(to: Variable, term: Variable): Variable;
 export function alphaConversion(

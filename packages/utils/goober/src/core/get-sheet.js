@@ -5,8 +5,9 @@ let ssr = {
 
 /**
  * Returns the _commit_ target
+ *
  * @param {Object} [target]
- * @returns {HTMLStyleElement|{data: ''}}
+ * @returns {HTMLStyleElement | { data: '' }}
  */
 export let getSheet = (target) => {
   if (typeof window !== 'undefined') {

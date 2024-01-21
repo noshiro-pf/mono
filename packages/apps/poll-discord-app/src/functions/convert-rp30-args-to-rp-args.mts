@@ -20,7 +20,7 @@ export const convertRp60ArgToRpArgsShared = (
   return Result.ok({ title, args: argsConverted });
 };
 
-/** @description ショートカットコマンド `/rp60` の引数を /rp コマンドの引数に変換する */
+/** ショートカットコマンド `/rp60` の引数を /rp コマンドの引数に変換する */
 export const convertRp60ArgToRpArgs = (
   commandArguments: string,
 ): Result<
@@ -39,7 +39,7 @@ export const convertRp60ArgToRpArgs = (
   return convertRp60ArgToRpArgsShared(title, arg1AsNumber, arg2AsNumber);
 };
 
-/** @description ショートカットコマンド `/rp30d` の引数を /rp コマンドの引数に変換する */
+/** ショートカットコマンド `/rp30d` の引数を /rp コマンドの引数に変換する */
 export const convertRp60dArgToRpArgs = (
   commandArguments: string,
 ): Result<
@@ -80,7 +80,7 @@ export const convertRp30ArgToRpArgsShared = (
   return Result.ok({ title, args: argsConverted });
 };
 
-/** @description ショートカットコマンド `/rp30` の引数を /rp コマンドの引数に変換する */
+/** ショートカットコマンド `/rp30` の引数を /rp コマンドの引数に変換する */
 export const convertRp30ArgToRpArgs = (
   commandArguments: string,
 ): Result<
@@ -96,7 +96,7 @@ export const convertRp30ArgToRpArgs = (
   return convertRp30ArgToRpArgsShared(title, arg1AsNumber, arg2AsNumber);
 };
 
-/** @description ショートカットコマンド `/rp30d` の引数を /rp コマンドの引数に変換する */
+/** ショートカットコマンド `/rp30d` の引数を /rp コマンドの引数に変換する */
 export const convertRp30dArgToRpArgs = (
   commandArguments: string,
 ): Result<

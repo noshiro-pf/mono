@@ -1,6 +1,7 @@
 import { getSheet } from './get-sheet';
 /**
  * Extracts and wipes the cache
+ *
  * @returns {String}
  */
 export let extractCss = (target) => {
@@ -12,6 +13,7 @@ export let extractCss = (target) => {
 
 /**
  * Updates the target and keeps a local cache
+ *
  * @param {String} css
  * @param {Object} sheet
  * @param {Boolean} append

@@ -14,9 +14,8 @@ import { type FetchEventListOfUserPayload } from './types/index.mjs';
 import { today } from './utils/index.mjs';
 
 /**
- * eventSchedule.author.id === uid であるか、
- * answers に uid が含まれているもの（＝自分が関わっているEventSchedule）
- * のみを返す。
+ * `EventSchedule.author.id === uid` であるか、 `answers` に `uid`
+ * が含まれているもの（＝自分が関わっている`EventSchedule`） のみを返す。
  */
 export const fetchEventListOfUserImpl = async (
   db: firestore.Firestore,

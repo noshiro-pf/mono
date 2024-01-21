@@ -65,16 +65,12 @@ const isRoute = {
     Arr.isArrayOfLength1(pathSegments) &&
     pathSegments[0] === pathSegment.createPage,
 
-  /**
-   * pathSegments[1] is `event-id`
-   */
+  /** PathSegments[1] is `event-id` */
   answerPage: (pathSegments: readonly string[]): boolean =>
     Arr.isArrayOfLength2(pathSegments) &&
     pathSegments[0] === pathSegment.answerPage,
 
-  /**
-   * pathSegments[1] is `event-id`
-   */
+  /** PathSegments[1] is `event-id` */
   editPage: (pathSegments: readonly string[]): boolean =>
     Arr.isArrayOfLength3(pathSegments) &&
     pathSegments[0] === pathSegment.answerPage &&

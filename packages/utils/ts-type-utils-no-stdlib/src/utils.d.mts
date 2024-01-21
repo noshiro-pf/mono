@@ -10,14 +10,10 @@ type ExpectTrue<T extends true> = T;
 
 type TypeExtends<A, B> = A extends B ? true : false;
 
-/**
- * Exclude from T those types that are assignable to U
- */
+/** Exclude from T those types that are assignable to U */
 type RelaxedExclude<T, U> = T extends U ? never : T;
 
-/**
- * Construct a type with the properties of T except for those in type K.
- */
+/** Construct a type with the properties of T except for those in type K. */
 type RelaxedOmit<T, K extends keyof never> = Pick<
   T,
   RelaxedExclude<keyof T, K>
@@ -130,9 +126,7 @@ type MergeIntersection<R extends Record<string, unknown>> = {
   [K in keyof R]: R[K];
 };
 
-/**
- * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
- */
+/** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods */
 type HTTPRequestMethod =
   | 'CONNECT'
   | 'DELETE'

@@ -3,9 +3,7 @@ import { replaceWithNoMatchCheck } from '@noshiro/mono-scripts/ts-utils/replace-
 import { indexType } from './common.mjs';
 import { convertTypedArrayCommon } from './lib.typed-array-common.mjs';
 
-/**
- * @typedef {'BigInt64' | 'BigUint64'} ElemType
- */
+/** @typedef {'BigInt64' | 'BigUint64'} ElemType */
 
 /** @param {ElemType} elemType */
 const marker = (elemType) => ({

@@ -7,9 +7,11 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/param-names.md
  *
+ *  ```md
  *  | key  | value      |
  *  | :--- | :--------- |
  *  | type | suggestion |
+ *  ```
  */
 namespace ParamNames {
   /**
@@ -45,9 +47,11 @@ namespace ParamNames {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-return-wrap.md
  *
+ *  ```md
  *  | key  | value      |
  *  | :--- | :--------- |
  *  | type | suggestion |
+ *  ```
  */
 namespace NoReturnWrap {
   /**
@@ -79,9 +83,11 @@ namespace NoReturnWrap {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/always-return.md
  *
+ *  ```md
  *  | key  | value   |
  *  | :--- | :------ |
  *  | type | problem |
+ *  ```
  */
 namespace AlwaysReturn {
   /**
@@ -113,9 +119,11 @@ namespace AlwaysReturn {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/catch-or-return.md
  *
+ *  ```md
  *  | key  | value   |
  *  | :--- | :------ |
  *  | type | problem |
+ *  ```
  */
 namespace CatchOrReturn {
   /**
@@ -165,9 +173,11 @@ namespace CatchOrReturn {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-await-to-callbacks.md
  *
+ *  ```md
  *  | key  | value      |
  *  | :--- | :--------- |
  *  | type | suggestion |
+ *  ```
  */
 namespace PreferAwaitToCallbacks {
   export type RuleEntry = Linter.RuleLevel;
@@ -176,9 +186,11 @@ namespace PreferAwaitToCallbacks {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-await-to-then.md
  *
+ *  ```md
  *  | key  | value      |
  *  | :--- | :--------- |
  *  | type | suggestion |
+ *  ```
  */
 namespace PreferAwaitToThen {
   export type RuleEntry = Linter.RuleLevel;
@@ -187,9 +199,11 @@ namespace PreferAwaitToThen {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-native.md
  *
+ *  ```md
  *  | key  | value      |
  *  | :--- | :--------- |
  *  | type | suggestion |
+ *  ```
  */
 namespace NoNative {
   export type RuleEntry = Linter.RuleLevel;
@@ -198,9 +212,11 @@ namespace NoNative {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-callback-in-promise.md
  *
+ *  ```md
  *  | key  | value      |
  *  | :--- | :--------- |
  *  | type | suggestion |
+ *  ```
  */
 namespace NoCallbackInPromise {
   /**
@@ -235,9 +251,11 @@ namespace NoCallbackInPromise {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-promise-in-callback.md
  *
+ *  ```md
  *  | key  | value      |
  *  | :--- | :--------- |
  *  | type | suggestion |
+ *  ```
  */
 namespace NoPromiseInCallback {
   export type RuleEntry = Linter.RuleLevel;
@@ -246,9 +264,11 @@ namespace NoPromiseInCallback {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-nesting.md
  *
+ *  ```md
  *  | key  | value      |
  *  | :--- | :--------- |
  *  | type | suggestion |
+ *  ```
  */
 namespace NoNesting {
   export type RuleEntry = Linter.RuleLevel;
@@ -257,9 +277,11 @@ namespace NoNesting {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/avoid-new.md
  *
+ *  ```md
  *  | key  | value      |
  *  | :--- | :--------- |
  *  | type | suggestion |
+ *  ```
  */
 namespace AvoidNew {
   export type RuleEntry = Linter.RuleLevel;
@@ -268,10 +290,12 @@ namespace AvoidNew {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-new-statics.md
  *
+ *  ```md
  *  | key     | value   |
  *  | :------ | :------ |
  *  | type    | problem |
  *  | fixable | code    |
+ *  ```
  */
 namespace NoNewStatics {
   export type RuleEntry = Linter.RuleLevel;
@@ -280,21 +304,26 @@ namespace NoNewStatics {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-return-in-finally.md
  *
+ *  ```md
  *  | key  | value   |
  *  | :--- | :------ |
  *  | type | problem |
+ *  ```
  */
 namespace NoReturnInFinally {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Ensures the proper number of arguments are passed to Promise functions
+ * Ensures the proper number of arguments are passed to Promise functions
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/valid-params.md
  *
+ *  ```md
  *  | key  | value   |
  *  | :--- | :------ |
  *  | type | problem |
+ *  ```
  */
 namespace ValidParams {
   export type RuleEntry = Linter.RuleLevel;
@@ -303,9 +332,11 @@ namespace ValidParams {
 /**
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-multiple-resolved.md
  *
+ *  ```md
  *  | key  | value   |
  *  | :--- | :------ |
  *  | type | problem |
+ *  ```
  */
 namespace NoMultipleResolved {
   export type RuleEntry = Linter.RuleLevel;

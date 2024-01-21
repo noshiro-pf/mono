@@ -3,7 +3,7 @@
 import { isNotUndefined } from '../ts-utils/guard.mjs';
 
 /**
- * @param {WorkspaceConfig["tsType"]} tsType
+ * @param {WorkspaceConfig['tsType']} tsType
  * @param {string} pathPrefixToRoot
  * @param {string} baseTsConfigName
  * @param {boolean} isViteApp

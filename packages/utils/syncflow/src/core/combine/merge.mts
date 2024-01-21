@@ -7,7 +7,11 @@ import {
   type Wrap,
 } from '../types/index.mjs';
 
-/** @deprecated use `createState` instead */
+/**
+ * @deprecated To improve the readability of your code, use `createState`
+ *   instead of `merge`, and subscribe to `parents` and call `setState` within
+ *   it.
+ */
 export const merge = <P extends NonEmptyUnknownList>(
   parents: Wrap<P>,
 ): MergeObservable<P> => new MergeObservableClass(parents);

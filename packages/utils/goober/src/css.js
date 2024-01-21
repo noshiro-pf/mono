@@ -3,8 +3,9 @@ import { getSheet } from './core/get-sheet';
 import { hash } from './core/hash';
 
 /**
- * css entry
- * @param {String|Object|Function} val
+ * Css entry
+ *
+ * @param {String | Object | Function} val
  */
 function css(val) {
   let ctx = this || {};
@@ -30,12 +31,14 @@ function css(val) {
 
 /**
  * CSS Global function to declare global styles
+ *
  * @type {Function}
  */
 let glob = css.bind({ g: 1 });
 
 /**
  * `keyframes` function for defining animations
+ *
  * @type {Function}
  */
 let keyframes = css.bind({ k: 1 });

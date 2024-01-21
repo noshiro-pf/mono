@@ -10,8 +10,9 @@ import {
 import { type NonEmptyUnknownList, type Subscription } from './types.mjs';
 
 /**
- * inheritance
+ * Inheritance
  *
+ * ```txt
  * ObservableBase
  *   |
  *   +- SyncChildObservable    \                       \
@@ -19,7 +20,7 @@ import { type NonEmptyUnknownList, type Subscription } from './types.mjs';
  *   +- AsyncChildObservable   X                         +-- Observable
  *   |                          +-- ManagerObservable   /
  *   +- RootObservableType     /                       /
- *
+ * ```
  */
 
 export type ObservableBase<A> = Readonly<{

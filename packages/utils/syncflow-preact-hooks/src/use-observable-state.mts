@@ -15,10 +15,7 @@ const reducer = <S,>(state: S, action: Action<S>): S => {
   }
 };
 
-/**
- * `initialState` は初期値でのみ評価される。
- * 動的に変更しても state には反映されないので注意。
- */
+/** `initialState` は初期値でのみ評価される。 動的に変更しても state には反映されないので注意。 */
 export const useObservableState = <S,>(
   initialState: S,
 ): Readonly<{

@@ -55,7 +55,8 @@ export const restrictedImportsOption: RestrictedImportsOption = {
 
 export const typescriptEslintRules: TypeScriptEslintRules = {
   /**
-   * disable in favor of prettier
+   * Disable in favor of prettier
+   *
    * @link https://github.com/prettier/eslint-config-prettier/blob/main/index.js
    */
   // The following rules can be used in some cases. See the README for more
@@ -64,7 +65,8 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/quotes': 'off',
 
   /**
-   * disable in favor of prettier
+   * Disable in favor of prettier
+   *
    * @link https://github.com/prettier/eslint-config-prettier/blob/main/index.js
    */
   '@typescript-eslint/brace-style': 'off',
@@ -353,10 +355,7 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/prefer-ts-expect-error': 'error',
   '@typescript-eslint/promise-function-async': 'off', // disabled
 
-  /**
-   * sortはデフォルトで文字列としての比較を行うため、数値のソートを行おうとしたときに
-   * 比較関数を忘れることを防ぐため使用。
-   */
+  /** `sort` はデフォルトで文字列としての比較を行うため、数値のソートを行おうとしたときに比較関数を忘れることを防ぐため使用。 */
   '@typescript-eslint/require-array-sort-compare': [
     'error',
     {
@@ -366,12 +365,12 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/require-await': 'error',
 
   /**
-   * `+` の曖昧性回避のため使用。
-   * restrict-plus-operands で bigint, number, string 同士にしか使用できないように制限し、
-   * prefer-template で文字列の連結に `+` を使うことも禁止する。
-   * 修正方法： template literal を使うか、文字列の配列を `join("")` で結合する。
-   *  - a + b -> `${a}${b}`
-   *  - s_1 + s_2 + ... + s_n -> [s_1, ..., s_n].join("")
+   * `+` の曖昧性回避のため使用。 restrict-plus-operands で bigint, number, string
+   * 同士にしか使用できないように制限し、 prefer-template で文字列の連結に `+` を使うことも禁止する。 修正方法： template
+   * literal を使うか、文字列の配列を `join("")` で結合する。
+   *
+   * - A + b -> `${a}${b}`
+   * - S_1 + s_2 + ... + s_n -> [s_1, ..., s_n].join("")
    */
   '@typescript-eslint/restrict-plus-operands': [
     'error',
@@ -399,18 +398,15 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/sort-type-constituents': 'error',
 
   /**
-   * boolean への暗黙のキャストを回避するために使用。
-   * 数値 `0`, `NaN` や 文字列 `""` が条件部に来たときに false として扱われるのを
-   * 見落とさないようにするため。
+   * Boolean への暗黙のキャストを回避するために使用。 数値 `0`, `NaN` や 文字列 `""` が条件部に来たときに false
+   * として扱われるのを 見落とさないようにするため。
    */
   '@typescript-eslint/strict-boolean-expressions': [
     'error',
     { allowString: false, allowNumber: false, allowNullableObject: false },
   ], // modified
 
-  /**
-   * switch の case 漏れを防ぐ（型情報を使用）
-   */
+  /** Switch の case 漏れを防ぐ（型情報を使用） */
   '@typescript-eslint/switch-exhaustiveness-check': [
     'error',
     {

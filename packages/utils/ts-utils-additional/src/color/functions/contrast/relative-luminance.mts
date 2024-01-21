@@ -6,7 +6,8 @@ import {
 import { type Rgb } from '../../types/index.mjs';
 
 /**
- * The relative brightness of any point in a colorspace, normalized to 0 for darkest black and 1 for lightest white.
+ * The relative brightness of any point in a colorspace, normalized to 0 for
+ * darkest black and 1 for lightest white.
  *
  * @link https://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef
  */

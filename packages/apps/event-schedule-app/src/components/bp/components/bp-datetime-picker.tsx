@@ -89,7 +89,8 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
         /**
          * FIXME: Blueprintjs v5 から showTimezoneSelect = true としていると
          * 以下のエラーが発生するようになったため一旦非表示にしている。
-         * "Internal React error: Expected static flag was missing."
+         *
+         *     'Internal React error: Expected static flag was missing.';
          */
         showTimezoneSelect={false}
         timePrecision={'minute'}

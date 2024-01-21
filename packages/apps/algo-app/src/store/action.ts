@@ -140,7 +140,7 @@ export const onAnswerCancel = (): void => {
 };
 
 /**
- * ```
+ * ```txt
  * time
  *  |   submitAnswer (hide buttons balloon, show answer balloon)
  *  |    --- 1s ---

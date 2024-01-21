@@ -3,16 +3,14 @@ import { isRecord, isString } from '../ts-utils/guard.mjs';
 
 /**
  * @typedef {Readonly<{
- *   name: string,
- *   location: string,
- *   workspaceDependencies: readonly string[],
- *   mismatchedWorkspaceDependencies: readonly string[],
+ *   name: string;
+ *   location: string;
+ *   workspaceDependencies: readonly string[];
+ *   mismatchedWorkspaceDependencies: readonly string[];
  * }>} Workspace
  */
 
-/**
- * @returns {Promise<readonly Workspace[]>}
- */
+/** @returns {Promise<readonly Workspace[]>} */
 export const getWorkspaces = async () => {
   const result = await execAsync('yarn workspaces info --json');
 

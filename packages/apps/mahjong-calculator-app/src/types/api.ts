@@ -23,6 +23,7 @@ export type ApiMeldedBlock = Readonly<{
 }>;
 
 /**
+ * ```json
  * {
  *   "version": "0.9.0",
  *   "zikaze": 27,
@@ -31,36 +32,44 @@ export type ApiMeldedBlock = Readonly<{
  *   "syanten_type": 1,
  *   "dora_indicators": [27],
  *   "flag": 63,
- *   "hand_tiles": [1,1,1,4,5,6,11,12,20,20,23,23,24,30],
+ *   "hand_tiles": [1, 1, 1, 4, 5, 6, 11, 12, 20, 20, 23, 23, 24, 30],
  *   "melded_blocks": [],
- *   "counts":[4,1,4,4,3,3,3,4,4,4,4,3,3,4,4,4,4,4,4,4,2,4,4,2,3,4,4,3,4,4,3,4,4,4,1,1,1]
+ *   "counts": [
+ *     4, 1, 4, 4, 3, 3, 3, 4, 4, 4, 4, 3, 3, 4, 4, 4, 4, 4, 4, 4, 2, 4, 4,
+ *     2, 3, 4, 4, 3, 4, 4, 3, 4, 4, 4, 1, 1, 1
+ *   ]
  * }
+ * ```
  */
 export type ApiPayload = Readonly<{
   version: string;
 
   /**
    * API 側では Tile 定義を流用している
-   * 27: 東
-   * 28: 南
-   * 29: 西
-   * 30: 北
+   *
+   *     27: 東
+   *     28: 南
+   *     29: 西
+   *     30: 北
    */
   zikaze: Extract<Tile['no'], 27 | 28 | 29 | 30>;
 
   /**
    * API 側では Tile 定義を流用している
-   * 27: 東
-   * 28: 南
+   *
+   *     27: 東
+   *     28: 南
    */
   bakaze: Extract<Tile['no'], 27 | 28>;
 
   turn: Turn;
 
   /**
-   * Normal: 1 一般手
-   * Tiitoi: 2 七対子手
-   * Kokusi: 4 国士無双手
+   * シャンテンタイプ
+   *
+   *     Normal: 1 一般手
+   *     Tiitoi: 2 七対子手
+   *     Kokusi: 4 国士無双手
    */
   syanten_type: 1 | 2 | 4;
 

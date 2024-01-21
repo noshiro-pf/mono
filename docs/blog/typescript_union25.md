@@ -90,14 +90,21 @@ checkBinaryLikeExpressionWorker
 ```ts
 /**
  * Checks if 'source' is related to 'target' (e.g.: is a assignable to).
+ *
  * @param source The left-hand-side of the relation.
  * @param target The right-hand-side of the relation.
- * @param relation The relation considered. One of 'identityRelation', 'subtypeRelation', 'assignableRelation', or 'comparableRelation'.
- * Used as both to determine which checks are performed and as a cache of previously computed results.
- * @param errorNode The suggested node upon which all errors will be reported, if defined. This may or may not be the actual node used.
- * @param headMessage If the error chain should be prepended by a head message, then headMessage will be used.
- * @param containingMessageChain A chain of errors to prepend any new errors found.
- * @param errorOutputContainer Return the diagnostic. Do not log if 'skipLogging' is truthy.
+ * @param relation The relation considered. One of 'identityRelation',
+ *   'subtypeRelation', 'assignableRelation', or 'comparableRelation'. Used as
+ *   both to determine which checks are performed and as a cache of previously
+ *   computed results.
+ * @param errorNode The suggested node upon which all errors will be reported,
+ *   if defined. This may or may not be the actual node used.
+ * @param headMessage If the error chain should be prepended by a head message,
+ *   then headMessage will be used.
+ * @param containingMessageChain A chain of errors to prepend any new errors
+ *   found.
+ * @param errorOutputContainer Return the diagnostic. Do not log if
+ *   'skipLogging' is truthy.
  */
 ```
 

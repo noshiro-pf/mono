@@ -92,9 +92,7 @@ describe('main', { testIsolation: false }, () => {
   });
 });
 
-/**
- * @param {string} username
- */
+/** @param {string} username */
 const createAnswer = (username: string): void => {
   cy.get(e('answer-page')).within(() => {
     // create answer

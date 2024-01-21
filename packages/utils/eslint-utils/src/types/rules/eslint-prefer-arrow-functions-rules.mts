@@ -5,13 +5,15 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
   T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
 
 /**
- * @description prefer arrow functions
+ * Prefer arrow functions
  *
- *  | key         | value       |
- *  | :---------- | :---------- |
- *  | fixable     | code        |
- *  | category    | emcascript6 |
- *  | recommended | false       |
+ * ```md
+ * | key         | value       |
+ * | :---------- | :---------- |
+ * | fixable     | code        |
+ * | category    | emcascript6 |
+ * | recommended | false       |
+ * ```
  */
 namespace PreferArrowFunctions {
   /**

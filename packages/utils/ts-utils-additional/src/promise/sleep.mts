@@ -1,7 +1,6 @@
 /**
- *
  * @param milliSec
- * @returns [Promise, interruptSleepFunction]
+ * @returns `[Promise, interruptSleepFunction]`
  */
 export const sleep = (
   milliSec: number,

@@ -13,9 +13,9 @@ const main = async () => {
    *   'lib.d.ts',
    *   'lib.dom.d.ts',
    *   'lib.dom.iterable.d.ts',
-   *   ```
+   *   ...
    * ]
-   * ...
+   * ```
    */
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const stdlibFiles = await fs.readdir(stdlibDir);

@@ -23,9 +23,7 @@ type Props = Readonly<{
   rightHandle: SliderHandleElementAdaptor;
 }>;
 
-/**
- * TODO: バーをクリック or touch したときに最も近いつまみをその位置に移動する
- */
+/** TODO: バーをクリック or touch したときに最も近いつまみをその位置に移動する */
 export const RangeSliderView = memoNamed<Props>(
   'RangeSliderView',
   ({
@@ -114,9 +112,7 @@ export const RangeSliderView = memoNamed<Props>(
   },
 );
 
-/**
- * bp4-dark と vertical は除外（必要になったら別コンポーネントとして作成）
- */
+/** Bp4-dark と vertical は除外（必要になったら別コンポーネントとして作成） */
 const Root = styled.div`
   height: 40px;
   min-width: 150px;

@@ -92,16 +92,28 @@ type NEGATIVE_INFINITY = _ExtendNumberBrand<
   '> -2^16' | '> -2^32' | '>= -2^15' | '>= -2^31'
 >;
 
-/** Numeric brand type for value after checking with `Number.isFinite(x)` and `x != 0` */
+/**
+ * Numeric brand type for value after checking with `Number.isFinite(x)` and `x
+ * != 0`
+ */
 type NonZeroFiniteNumber = IntersectBrand<NonZeroNumber, FiniteNumber>;
 
-/** Numeric brand type for value after checking with `Number.isFinite(x)` and `x >= 0` */
+/**
+ * Numeric brand type for value after checking with `Number.isFinite(x)` and `x>
+ * = 0`
+ */
 type NonNegativeFiniteNumber = IntersectBrand<NonNegativeNumber, FiniteNumber>;
 
-/** Numeric brand type for value after checking with `Number.isFinite(x)` and `x > 0` */
+/**
+ * Numeric brand type for value after checking with `Number.isFinite(x)` and `x>
+ * 0`
+ */
 type PositiveFiniteNumber = IntersectBrand<PositiveNumber, FiniteNumber>;
 
-/** Numeric brand type for value after checking with `Number.isFinite(x)` and `x < 0` */
+/**
+ * Numeric brand type for value after checking with `Number.isFinite(x)` and `x
+ * < 0`
+ */
 type NegativeFiniteNumber = IntersectBrand<NegativeNumber, FiniteNumber>;
 
 // integer types
@@ -109,37 +121,63 @@ type NegativeFiniteNumber = IntersectBrand<NegativeNumber, FiniteNumber>;
 /** Numeric brand type for value after checking with `Number.isInteger(x)` */
 type Int = _ExtendNumberBrand<FiniteNumber, 'Int'>;
 
-/** Numeric brand type for value after checking with `Number.isInteger(x)` and `x >= 0` */
+/**
+ * Numeric brand type for value after checking with `Number.isInteger(x)` and
+ * `x> = 0`
+ */
 type Uint = IntersectBrand<Int, NonNegativeNumber>;
 
-/** Numeric brand type for value after checking with `Number.isInteger(x)` and `x > 0` */
+/**
+ * Numeric brand type for value after checking with `Number.isInteger(x)` and
+ * `x> 0`
+ */
 type PositiveInt = IntersectBrand<Int, PositiveNumber>;
 
-/** Numeric brand type for value after checking with `Number.isInteger(x)` and `x < 0` */
+/**
+ * Numeric brand type for value after checking with `Number.isInteger(x)` and `x
+ * < 0`
+ */
 type NegativeInt = IntersectBrand<Int, NegativeNumber>;
 
-/** Numeric brand type for value after checking with `Number.isInteger(x)` and `x != 0` */
+/**
+ * Numeric brand type for value after checking with `Number.isInteger(x)` and `x
+ * != 0`
+ */
 type NonZeroInt = IntersectBrand<Int, NonZeroNumber>;
 
 /** Numeric brand type for value after checking with `Number.isSafeInteger(x)` */
 type SafeInt = _ExtendNumberBrand<Int, 'SafeInt'>;
 
-/** Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `x >= 0` */
+/**
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
+ * and `x >= 0`
+ */
 type SafeUint = IntersectBrand<SafeInt, NonNegativeNumber>;
 
-/** Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `x > 0` */
+/**
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
+ * and `x > 0`
+ */
 type PositiveSafeInt = IntersectBrand<SafeInt, PositiveNumber>;
 
-/** Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `x < 0` */
+/**
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
+ * and `x < 0`
+ */
 type NegativeSafeInt = IntersectBrand<SafeInt, NegativeNumber>;
 
-/** Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `x != 0` */
+/**
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
+ * and `x != 0`
+ */
 type NonZeroSafeInt = IntersectBrand<SafeInt, NonZeroNumber>;
 
 /**
  * `[-2^31, 2^31 - 1]`
  *
- * Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `-2^31 <= x <= 2^31 - 1` */
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
+ * and `-2^31 <= x <= 2^31 - 1`
+ */
 type Int32 = _ExtendNumberBrand<
   SafeInt,
   '< 2^31' | '< 2^32' | '> -2^32' | '>= -2^31'
@@ -148,7 +186,9 @@ type Int32 = _ExtendNumberBrand<
 /**
  * `[-2^15, 2^15 - 1]`
  *
- * Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `-2^15 <= x <= 2^15 - 1` */
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
+ * and `-2^15 <= x <= 2^15 - 1`
+ */
 type Int16 = _ExtendNumberBrand<
   Int32,
   '< 2^15' | '< 2^16' | '> -2^16' | '>= -2^15'
@@ -157,19 +197,25 @@ type Int16 = _ExtendNumberBrand<
 /**
  * `[0, 2^32 - 1]`
  *
- * Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `0 <= x <= 2^32 - 1` */
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
+ * and `0 <= x <= 2^32 - 1`
+ */
 type Uint32 = _ExtendNumberBrand<SafeUint, '< 2^32'>;
 
 /**
  * `[0, 2^16 - 1]`
  *
- * Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `0 <= x <= 2^16 - 1` */
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
+ * and `0 <= x <= 2^16 - 1`
+ */
 type Uint16 = _ExtendNumberBrand<Uint32, '< 2^16' | '< 2^31'>;
 
 /**
  * `[2^32 + 1, -1]`
  *
- * Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `-2^32 < x < 0` */
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
+ * and `-2^32 < x < 0`
+ */
 type NegativeInt32 = _ExtendNumberBrand<
   IntersectBrand<SafeInt, NegativeNumber>,
   '> -2^32'
@@ -178,7 +224,9 @@ type NegativeInt32 = _ExtendNumberBrand<
 /**
  * `[2^16 + 1, -1]`
  *
- * Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `-2^16 < x < 0` */
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
+ * and `-2^16 < x < 0`
+ */
 type NegativeInt16 = _ExtendNumberBrand<NegativeInt32, '> -2^16' | '>= -2^31'>;
 
 /** Numeric brand type for `Float32Array` element */
@@ -198,7 +246,8 @@ type _SmallIntIndexMax = 512;
 
 /**
  * @internal
- * integers in `[1, MaxIndex - 1]` */
+ * integers in `[1, MaxIndex - 1]`
+ */
 type _SmallPositiveInt<MaxIndex extends number> = RelaxedExclude<
   Index<MaxIndex>,
   0
@@ -206,18 +255,19 @@ type _SmallPositiveInt<MaxIndex extends number> = RelaxedExclude<
 
 /**
  * @internal
- * integers in `[-MaxIndex, -1]` */
+ * integers in `[-MaxIndex, -1]`
+ */
 type _SmallNegativeInt<MaxIndex extends number> = NegativeIndex<MaxIndex>;
 
 /**
- * small integers union
+ * Small integers union
  *
- * - `''`    : integers in `[-MaxIndex, MaxIndex - 1]`
- * - `'!=0'` : integers in `[-MaxIndex, MaxIndex - 1] \ { 0 }`
- * - `'<0'`  : integers in `[-MaxIndex, -1]`
- * - `'<=0'` : integers in `[-MaxIndex, 0]`
- * - `'>0'`  : integers in `[1, MaxIndex - 1]`
- * - `'>=0'` : integers in `[0, MaxIndex - 1]`
+ *     - `''`    : integers in `[-MaxIndex, MaxIndex - 1]`
+ *     - `'!=0'` : integers in `[-MaxIndex, MaxIndex - 1] \ { 0 }`
+ *     - `'<0'`  : integers in `[-MaxIndex, -1]`
+ *     - `'<=0'` : integers in `[-MaxIndex, 0]`
+ *     - `'>0'`  : integers in `[1, MaxIndex - 1]`
+ *     - `'>=0'` : integers in `[0, MaxIndex - 1]`
  *
  * @default MaxIndex = 512
  */
@@ -242,13 +292,13 @@ type SmallInt<
 type SmallUint = SmallInt<'>=0'>;
 
 /**
- * append optimal small integers union to number type
+ * Append optimal small integers union to number type
  *
- * - `SmallInt`         : integers in `[-512, 511]`
- * - `SmallUint`        : integers in `[0, 511]`
- * - `SmallPositiveInt` : integers in `[1, 511]`
- * - `NonZeroSmallInt`  : integers in `[-512, 511] \ { 0 }`
- * - `SmallNegativeInt` : integers in `[-512, -1]`
+ *     - `SmallInt`         : integers in `[-512, 511]`
+ *     - `SmallUint`        : integers in `[0, 511]`
+ *     - `SmallPositiveInt` : integers in `[1, 511]`
+ *     - `NonZeroSmallInt`  : integers in `[-512, 511] \ { 0 }`
+ *     - `SmallNegativeInt` : integers in `[-512, -1]`
  */
 type WithSmallInt<N extends Int, MaxIndex extends number = _SmallIntIndexMax> =
   | Exclude<

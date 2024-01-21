@@ -26,7 +26,6 @@ const markers = {
 };
 
 /**
- *
  * @param {string} from
  * @param {boolean} commentOutDeprecated
  * @returns {string}
@@ -35,7 +34,7 @@ export const convertLibEs5_Array = (from, commentOutDeprecated) => {
   let mut_ret = from;
 
   {
-    /** @type {('ReadonlyArray'| 'Array' )[]} */
+    /** @type {('ReadonlyArray' | 'Array')[]} */
     const keys = ['ReadonlyArray', 'Array'];
 
     for (const key of keys) {

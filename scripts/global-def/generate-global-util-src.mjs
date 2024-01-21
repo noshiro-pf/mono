@@ -1,8 +1,9 @@
 import * as fs from 'node:fs/promises';
 
 /**
- * @typedef {import("./generate-global-util-src.mjs").TypeImports} TypeImports
- * @typedef {import("./generate-global-util-src.mjs").Imports} Imports
+ * @typedef {import('./generate-global-util-src.mjs').TypeImports} TypeImports
+ *
+ * @typedef {import('./generate-global-util-src.mjs').Imports} Imports
  */
 
 /**
@@ -147,9 +148,9 @@ const generateEslintNoRestrictedImportsDef = (
 ) => {
   /**
    * @type {Readonly<{
-   *  name: string
-   *  importNames: readonly string[]
-   *  message: string
+   *   name: string;
+   *   importNames: readonly string[];
+   *   message: string;
    * }>}
    */
   const def = {

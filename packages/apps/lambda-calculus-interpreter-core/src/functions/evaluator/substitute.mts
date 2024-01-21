@@ -7,14 +7,16 @@ import { pickUpAvailableVariable } from '../pickup-available-variable.mjs';
 import { alphaConversion } from './alpha-conversion.mjs';
 
 /**
- * @desc substitute term2 for x in formula term1 in capture-avoiding manner.
- * formally:
- * x[x := N]       = N
- * y[x := N]       = y, if x ≠ y
- * (M1 M2)[x := N] = (M1[x := N]) (M2[x := N])
- * (λx.M)[x := N]  = λx.M
- * (λy.M)[x := N]  = λy.(M[x := N]), if x ≠ y, provided y ∉ FV(N)
- * if y ∈ FV(N) then proceed α-conversion
+ * Substitute term2 for x in formula term1 in capture-avoiding manner.
+ *
+ * Formally:
+ *
+ *     x[x := N]       = N
+ *     y[x := N]       = y, if x ≠ y
+ *     (M1 M2)[x := N] = (M1[x := N]) (M2[x := N])
+ *     (λx.M)[x := N]  = λx.M
+ *     (λy.M)[x := N]  = λy.(M[x := N]), if x ≠ y, provided y ∉ FV(N)
+ *     if y ∈ FV(N) then proceed α-conversion
  */
 export const substitute = (
   to: LambdaTerm,

@@ -1,5 +1,6 @@
 /**
  * Parses the object into css, scoped, blocks
+ *
  * @param {Object} obj
  * @param {String} selector
  * @param {String} wrapper

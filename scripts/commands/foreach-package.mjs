@@ -3,9 +3,9 @@ import { getWorkspaces } from '../others/get-workspaces.mjs';
 
 /**
  * @param {Readonly<{
- *   prefixes: readonly string[],
- *   command: string,
- *   wsrunOptions: string
+ *   prefixes: readonly string[];
+ *   command: string;
+ *   wsrunOptions: string;
  * }>} args
  * @returns {Promise<void>}
  */

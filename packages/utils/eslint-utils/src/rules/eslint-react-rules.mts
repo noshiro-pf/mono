@@ -2,7 +2,8 @@ import { type EslintReactRules } from '../types/rules/eslint-react-rules.mjs';
 
 export const eslintReactRules: EslintReactRules = {
   /**
-   * disable in favor of prettier
+   * Disable in favor of prettier
+   *
    * @link https://github.com/prettier/eslint-config-prettier/blob/main/index.js
    */
   'react/jsx-child-element-spacing': 'off',
@@ -25,9 +26,7 @@ export const eslintReactRules: EslintReactRules = {
   'react/button-has-type': 'error',
   'react/default-props-match-prop-types': 'error',
 
-  /**
-   * props を展開して使うかどうかを統一する。
-   */
+  /** Props を展開して使うかどうかを統一する。 */
   'react/destructuring-assignment': 'error',
 
   'react/display-name': 'error',
@@ -50,10 +49,7 @@ export const eslintReactRules: EslintReactRules = {
   'react/jsx-key': 'error',
   'react/jsx-max-depth': 'off', // disabled
 
-  /**
-   * JSXに直接コールバック関数を書くのを禁止する。
-   * 修正方法： React.useCallback を使うようにする。
-   */
+  /** JSXに直接コールバック関数を書くのを禁止する。 修正方法： React.useCallback を使うようにする。 */
   'react/jsx-no-bind': 'error',
 
   'react/jsx-no-comment-textnodes': 'error',
@@ -61,8 +57,8 @@ export const eslintReactRules: EslintReactRules = {
   'react/jsx-no-duplicate-props': 'error',
 
   /**
-   * JSXに文字列を直接書くのを避け `<div>{"aaa"}</div>` のように書くことを強制する。
-   * 変数に `{}` を付け忘れるミスに気づきやすくなったり syntax highlighting で読みやすくなるなどのメリットがある。
+   * JSXに文字列を直接書くのを避け `<div>{"aaa"}</div>` のように書くことを強制する。 変数に `{}`
+   * を付け忘れるミスに気づきやすくなったり syntax highlighting で読みやすくなるなどのメリットがある。
    */
   'react/jsx-no-literals': 'error',
 
@@ -72,9 +68,7 @@ export const eslintReactRules: EslintReactRules = {
   'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }],
   'react/jsx-pascal-case': 'error',
 
-  /**
-   * `{...props}` 形式でpropsを渡すと props の過不足のチェックが甘くなるため
-   */
+  /** `{...props}` 形式でpropsを渡すと props の過不足のチェックが甘くなるため */
   'react/jsx-props-no-spreading': 'error', // modified
 
   'react/jsx-sort-props': [
@@ -119,9 +113,7 @@ export const eslintReactRules: EslintReactRules = {
   'react/prefer-read-only-props': 'error',
   'react/prefer-stateless-function': 'error',
 
-  /**
-   * TypeScript では不要
-   */
+  /** TypeScript では不要 */
   'react/prop-types': 'off',
 
   'react/react-in-jsx-scope': 'off', // disabled

@@ -1,15 +1,14 @@
 import { type Result } from '@noshiro/ts-utils';
 
 /**
- * @description
  * - `typeName` : Name for this type
- * - `is`       : Type guard function
+ * - `is` : Type guard function
  * - `assertIs` : Type assertion function
- * - `cast`     : Cast function
- * - `fill`     : Default value filling function
- * - `validate` : A base function to be used in `is` and `assertIs`.
- *                `validate` returns Result.Ok if the value is of Type A,
- *                otherwise returns Result.Err with error message stack as the value.
+ * - `cast` : Cast function
+ * - `fill` : Default value filling function
+ * - `validate` : A base function to be used in `is` and `assertIs`. `validate`
+ *   returns Result.Ok if the value is of Type A, otherwise returns Result.Err
+ *   with error message stack as the value.
  */
 export type Type<A> = Readonly<{
   typeName: string;
