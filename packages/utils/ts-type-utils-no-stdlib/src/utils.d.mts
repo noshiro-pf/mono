@@ -129,3 +129,17 @@ type MutableArrayAtLeastLenRec<
 type MergeIntersection<R extends Record<string, unknown>> = {
   [K in keyof R]: R[K];
 };
+
+/**
+ * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
+ */
+type HTTPRequestMethod =
+  | 'CONNECT'
+  | 'DELETE'
+  | 'GET'
+  | 'HEAD'
+  | 'OPTIONS'
+  | 'PATCH'
+  | 'POST'
+  | 'PUT'
+  | 'TRACE';

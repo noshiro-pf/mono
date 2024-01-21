@@ -218,7 +218,7 @@ export const convert = (
       mut_ret = convertLibDom(mut_ret);
       break;
 
-    case 'lib.webworker.d':
+    case 'lib.webworker.d.ts':
       mut_ret = convertLibWebWorker(mut_ret);
       break;
 
