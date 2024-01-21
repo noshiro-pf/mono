@@ -259,7 +259,7 @@ export const AnswerTable = memoNamed<Props>(
 );
 
 const userNameWrapperWidth = 80;
-const userNameWrapperThinWidth = 45;
+const userNameWrapperThinWidth = 60;
 
 const answerCellStyle = {
   minWidth: `${userNameWrapperWidth}px`,
