@@ -22,12 +22,12 @@ const { state$: eventListResult$, setState: setEventListResult } = createState<
 const result$ = eventListResult$;
 
 const { state$: refreshButtonIsLoading$, setState: setRefreshButtonIsLoading } =
-  createState<boolean>(false);
+  createBooleanState(false);
 
 const {
   state$: refreshButtonIsDisabled$,
   setState: setRefreshButtonIsDisabled,
-} = createState<boolean>(false);
+} = createBooleanState(false);
 
 const refreshEventList = (): void => {
   fetchEventList();

@@ -29,7 +29,7 @@ const { state$: selectedAnswerSaved$, setState: setSelectedAnswerSaved } =
   createState<Answer | undefined>(undefined);
 
 const { state$: submitButtonIsLoading$, setState: setSubmitButtonIsLoading } =
-  createState<boolean>(false);
+  createBooleanState(false);
 
 const {
   state$: alertOnAnswerClickIsOpen$,
