@@ -22,7 +22,7 @@ import {
   WidthRestrictedInputWrapper,
 } from '../../styled';
 import { DatetimeRangeCell } from '../answer-table';
-import { BatchInputAnswerForm } from '../batch-input-field';
+import { BatchInputAnswerForm } from '../batch-input-form';
 import {
   DeleteAnswerButton,
   ForNonLoggedInUserDialog,

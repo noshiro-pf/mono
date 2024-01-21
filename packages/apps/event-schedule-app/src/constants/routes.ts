@@ -3,6 +3,7 @@ const pathSegment = {
   answerPage: 'event',
   editPageSuffix: 'edit',
   eventListPage: 'event-list',
+  batchUpdatePage: 'batch-update',
   registerUser: 'register',
   signIn: 'signIn',
 } as const;
@@ -56,6 +57,7 @@ const routes = {
     `/${pathSegment.answerPage}/${eventId}/${pathSegment.editPageSuffix}/`,
 
   eventListPage: `/${pathSegment.eventListPage}/`,
+  batchUpdatePage: `/${pathSegment.batchUpdatePage}/`,
 
   registerPage: `/${pathSegment.registerUser}/`,
   signInPage: `/${pathSegment.signIn}/`,
@@ -80,6 +82,10 @@ const isRoute = {
   eventListPage: (pathSegments: readonly string[]): boolean =>
     Arr.isArrayOfLength1(pathSegments) &&
     pathSegments[0] === pathSegment.eventListPage,
+
+  batchUpdatePage: (pathSegments: readonly string[]): boolean =>
+    Arr.isArrayOfLength1(pathSegments) &&
+    pathSegments[0] === pathSegment.batchUpdatePage,
 
   registerPage: (pathSegments: readonly string[]): boolean =>
     Arr.isArrayOfLength1(pathSegments) &&

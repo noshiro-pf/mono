@@ -1,6 +1,7 @@
 export const headerDictionary = {
   createNew: '日程調整を作成',
   list: '日程調整一覧',
+  batchUpdatePage: '回答を一覧＆一括編集',
   auth: {
     userName: {
       prefix: '',
