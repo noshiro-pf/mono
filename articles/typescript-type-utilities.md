@@ -82,7 +82,7 @@ expectType<{ x: any }, { x: number }>('=');
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/63d5aa9197236c4ffb74bece4ee6025a28dd71b1/packages/utils/ts-type-utils-no-stdlib/test/eq.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/eq.mts
 :::
 
 ## `BoolAnd`, `BoolOr`, `BoolNot`, `BoolEq`, `BoolNeq`, `BoolNand`, `BoolNor`,

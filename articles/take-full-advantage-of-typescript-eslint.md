@@ -93,7 +93,7 @@ eslint config （Flat Config 以前の形式）の記述には JavaScript, YAML,
 私のおすすめは `.eslintrc.js` または `.eslintrc.cjs` です。 JSON で書ける内容はすべて JavaScript でも書けるので敢えて `.eslintrc.json` を選ぶメリットはほぼ無く、 JavaScript ならコメントを書いたり、共通定義を関数・定数化したり、 `extends` に頼らずに JavaScript のモジュールシステムを活用してシンプルに設定ファイル分割ができたり、頑張れば（「[（余談）筆者の個人開発環境の場合](#（余談）筆者の個人開発環境の場合)」に書いたように）型チェックをより細かく行えるポテンシャルもあるので優れています。
 
 新しい config のフォーマットである [Flat Config](https://eslint.org/docs/latest/use/configure/configuration-files-new) では `eslint.config.js` というファイル名・形式が強制され、また旧 config 形式は v9.0.0 から deprecated になる[^old-eslintrc-is-deprecated] ようですので、その意味でも JavaScript による記述が公式に推奨されていると言えます。
-私も個人開発環境では Flat Config 対応を2023年11月現在まさに進めているところですが、一旦今回はまだ現在は使用している＆慣れている人が多いと思われる旧形式での設定例を紹介します。
+私も個人開発環境では Flat Config 対応を2023年11月現在まさに進めているところですが、一旦今回はまだ本記事執筆時点で使用している＆慣れている人が多いと思われる旧形式での設定例を紹介します。
 
 [^eslintrc-file-formats]: https://eslint.org/docs/latest/use/configure/configuration-files#configuration-file-formats
 [^old-eslintrc-is-deprecated]: https://eslint.org/docs/latest/use/configure/configuration-files
@@ -254,7 +254,7 @@ if (obj.value) {
 }
 ```
 
-私の経験上、このルールは後から有効化すると、 boolean が要求される文脈で boolean が使われていないコードに警告が山のように出る傾向があり、また、一度緩く書かれてしまったコードが `0`, `NaN`, `""` 等が falsy value として評価される動作を意図的に使っているのかどうかは後から判別しづらいため、リファクタが困難になりがちです。その意味で、**このルールはプロジェクトに初期から導入して厳密にコードを書くようにすることを強くお勧めします**。
+私の経験上、このルールは後から有効化すると、 boolean が要求される文脈で boolean が使われていないコードに警告が山のように出る傾向があり、また、一度緩く書かれてしまったコードで `0`, `NaN`, `""` 等が falsy value として評価される動作が意図的に使われているのかどうかは後から判別しづらいため、リファクタが困難になりがちです。その意味で、**このルールはプロジェクトに初期から導入して厳密にコードを書くようにすることを強くお勧めします**。
 
 残念ながら、このルールの `eslint --fix` による自動修正は同等の結果になるコードへ変換してくれないことが多くあり、既存の動作を変えてしまうリスクがあるので、手動修正がおすすめです。エラーをすべて潰せていないうちはこのルールを `warn` で設定した上で自動修正コマンドには `--quiet` を付けてスキップさせておく（`eslint --fix --quiet`）という対応が無難です。
 
@@ -329,13 +329,13 @@ const s = ss.join('');
 const s = ''.concat(...ss);
 ```
 
-こうすることで可読性が向上するだけでなく、 大きな `n` に対してパフォーマンスが低下することも避けられます（JavaScript の文字列連結のエンジン実装やパフォーマンス評価は結構複雑な話のようなのでここでは詳細は省きますが、 `+`,`+=` や template literal で2個の文字列連結を繰り返す一つ目・二つ目のようなやり方は、連続するメモリ領域の再確保が何度も走りパフォーマンスが低下する場合があります[^perf-string-concat1][^perf-string-concat2][^perf-string-concat3]。ただ、ウェブフロントエンド実装では `n` が巨大になることが稀であったり、 JavaScript エンジン実装の工夫のおかげであまり気にしなくて良い可能性もありそうです。）。
+こうすることで可読性が向上するだけでなく、 大きな `n` に対してパフォーマンスが低下することも避けられる可能性があります（JavaScript の文字列連結のエンジン実装やパフォーマンス評価は結構複雑な話のようなのでここでは詳細は省きますが、 `+`,`+=` や template literal で2個の文字列連結を繰り返す一つ目・二つ目のようなやり方は、連続するメモリ領域の再確保が何度も走りパフォーマンスが低下する場合があります[^perf-string-concat1][^perf-string-concat2][^perf-string-concat3]。ただ、ウェブフロントエンド実装では `n` が巨大になることが稀であったり、 JavaScript エンジン実装の工夫のおかげであまり気にしなくて良い可能性もありそうです。JSのパフォーマンスについては C/C++ などの経験で単純に類推すると間違えることが多々あるので、適度にパフォーマンスは気にしつつ可読性を重視しておくのが程良いバランスかなと思っています）。
 
 [^perf-string-concat1]: https://stackoverflow.com/questions/16696632/most-efficient-way-to-concatenate-strings-in-javascript
 [^perf-string-concat2]: https://medium.com/@zhongdongy/the-performance-of-javascript-string-concat-e52466ca2b3a
 [^perf-string-concat3]: https://docs.google.com/document/d/1o-MJPAddpfBfDZCkIHNKbMiM86iDFld7idGbNQLuKIQ/preview#heading=h.6kknmf22ixwc
 
-このパターンは長いメッセージを書くときも可読性を上げられて有用です。
+このパターンは長いメッセージを書くときも可読性向上に役に立ちます。
 
 ```ts
 // 🙁
@@ -502,7 +502,7 @@ TypeScript において、 メソッドは双変であるのに対し、関数�
 - https://github.com/Microsoft/TypeScript/wiki/FAQ#why-are-function-parameters-bivariant
 - https://zenn.dev/pixiv/articles/what-is-bivariance-hack
 
-ちなみに、詳しく比較していませんが [`functional/prefer-property-signatures`](https://github.com/eslint-functional/eslint-plugin-functional/blob/main/docs/rules/prefer-property-signatures.md) を使っても同様のチェックができそうです。
+ちなみに、詳しく比較していませんが [`functional/prefer-property-signatures`](https://github.com/eslint-functional/eslint-plugin-functional/blob/main/docs/rules/prefer-property-signatures.md) を使っても同じチェックができそうです。
 
 ## import 文周りのルール
 
