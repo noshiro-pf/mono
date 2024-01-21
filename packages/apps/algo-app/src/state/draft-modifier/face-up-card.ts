@@ -1,10 +1,9 @@
-import { type WritableDraft } from 'immer/dist/internal.js';
 import { cardEq } from '../../functions';
 import { type Card, type GameState } from '../../types';
 
 export const faceUpCard = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  draft: WritableDraft<GameState>,
+  draft: DeepWritable<GameState>,
   target: Card | undefined,
 ): void => {
   for (const mut_cards of draft.playerCards) {
