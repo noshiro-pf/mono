@@ -165,6 +165,11 @@ const displayOnlyCandidateDatesWithZeroPoorIcon = (): void => {
   setEnabledFilteringByPoorIcon(true);
 };
 
+const displayOnlyCandidateDatesOfRank1to3 = (): void => {
+  setRank(3);
+  setEnabledFilteringByRank(true);
+};
+
 const iconOfSpecifiedRespondentCheckState$: InitializedObservable<
   DeepReadonly<
     {
@@ -755,4 +760,5 @@ export const AnswerFilterAndSortStore = {
   restoreFromQueryParams,
   clearTags,
   displayOnlyCandidateDatesWithZeroPoorIcon,
+  displayOnlyCandidateDatesOfRank1to3,
 } as const;

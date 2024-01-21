@@ -273,6 +273,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                       }
                       values={tagValues}
                     />
+
                     <FilterButtonsWrapper>
                       <Button
                         intent={'primary'}
@@ -282,6 +283,15 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                         }
                       >
                         {dc.answers.displayOnlyCandidateDatesWithZeroPoorIcon}
+                      </Button>
+                      <Button
+                        intent={'primary'}
+                        small={true}
+                        onClick={
+                          AnswerFilterAndSortStore.displayOnlyCandidateDatesOfRank1to3
+                        }
+                      >
+                        {dc.answers.displayOnlyCandidateDatesOfRank1to3}
                       </Button>
                     </FilterButtonsWrapper>
                   </TagInputWrapper>
@@ -479,7 +489,13 @@ const TagInputWrapper = styled.div`
 `;
 
 const FilterButtonsWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
   margin: 5px;
+
+  & > * {
+    margin: 2px;
+  }
 `;
 
 const TableWrapper = styled(CustomScrollbarWrapper)`

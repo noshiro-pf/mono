@@ -164,6 +164,7 @@ export const answerPageDictionary = {
     refresh: '更新',
     saveScreenShot: '画像として保存',
     displayOnlyCandidateDatesWithZeroPoorIcon: '✕が0個の候補日程のみ表示',
+    displayOnlyCandidateDatesOfRank1to3: 'スコア上位3位まで表示',
     detailedFilterSettingsButton: '日程絞り込みの詳細設定',
     requiredParticipant: '必須参加者',
     iconHeaderFilter: {
