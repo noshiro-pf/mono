@@ -80,7 +80,7 @@
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
     "firebase": "^10.6.0",
-    "immer": "^9.0.7",
+    "immer": "^10.0.3",
     "preact": "^10.13.2"
   },
   "devDependencies": {
