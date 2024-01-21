@@ -1,5 +1,6 @@
 import {
   AnswerPage,
+  BatchUpdatePage,
   CreateEventSchedule,
   EditEventSchedule,
   EventListPage,
@@ -12,7 +13,18 @@ import { ErrorBoundary } from './error-handler';
 import { Router } from './store';
 
 export const App = memoNamed('App', () => {
-  const show = Router.useShowPage();
+  const {
+    createPage,
+    editPage,
+    answerPage,
+    eventListPage,
+    registerPage,
+    signInPage,
+    batchUpdatePage,
+    ...rest
+  } = Router.useShowPage();
+
+  expectType<keyof typeof rest, never>('=');
 
   return (
     <ErrorBoundary>
@@ -24,17 +36,19 @@ export const App = memoNamed('App', () => {
           justify-content: space-between;
         `}
       >
-        {show.createPage ? (
+        {createPage ? (
           <CreateEventSchedule />
-        ) : show.editPage ? (
+        ) : editPage ? (
           <EditEventSchedule />
-        ) : show.answerPage ? (
+        ) : answerPage ? (
           <AnswerPage />
-        ) : show.eventListPage ? (
+        ) : eventListPage ? (
           <EventListPage />
-        ) : show.registerPage ? (
+        ) : batchUpdatePage ? (
+          <BatchUpdatePage />
+        ) : registerPage ? (
           <RegisterPage />
-        ) : show.signInPage ? (
+        ) : signInPage ? (
           <SignInPage />
         ) : (
           <NotFoundPage />
