@@ -26,6 +26,12 @@ export const NavBar = memoNamed('NavBar', () => {
     redirectFn: Router.redirect,
   });
 
+  const handleBatchUpdatePageButtonClick = useRouterLinkClick({
+    replace: false,
+    pushFn: Router.push,
+    redirectFn: Router.redirect,
+  });
+
   const openingDialog = useObservableValue(
     UpdateUserInfoDialogStore.openingDialog$,
   );
@@ -70,6 +76,9 @@ export const NavBar = memoNamed('NavBar', () => {
               <ItemAnchor onClick={forNonLoggedInUserDialogState.setTrue}>
                 {dc.list}
               </ItemAnchor>
+              <ItemAnchor onClick={forNonLoggedInUserDialogState.setTrue}>
+                {dc.batchUpdatePage}
+              </ItemAnchor>
               <ForNonLoggedInUserDialog
                 cancel={forNonLoggedInUserDialogState.setFalse}
                 isOpen={forNonLoggedInUserDialogState.state}
@@ -95,6 +104,12 @@ export const NavBar = memoNamed('NavBar', () => {
                 onClick={routerLinkClickHandler}
               >
                 {dc.list}
+              </ItemAnchor>
+              <ItemAnchor
+                href={Routes.routes.batchUpdatePage}
+                onClick={handleBatchUpdatePageButtonClick}
+              >
+                {dc.batchUpdatePage}
               </ItemAnchor>
               <Item>
                 <span>{dc.auth.userName.prefix}</span>
