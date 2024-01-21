@@ -163,7 +163,7 @@ export const answerPageDictionary = {
     weight: '回答の優先度',
     refresh: '更新',
     saveScreenShot: '画像として保存',
-    filterOnlyAnswersWithPoorIs0: '✕が0個の候補日程のみ表示',
+    displayOnlyCandidateDatesWithZeroPoorIcon: '✕が0個の候補日程のみ表示',
     detailedFilterSettingsButton: '日程絞り込みの詳細設定',
     requiredParticipant: '必須参加者',
     iconHeaderFilter: {

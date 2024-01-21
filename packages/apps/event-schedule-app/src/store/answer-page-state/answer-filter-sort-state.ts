@@ -160,7 +160,7 @@ const setEnabledFilteringByFairPlusPoor = (value: boolean): void => {
   }
 };
 
-const filterOnlyAnswersWithPoorIs0 = (): void => {
+const displayOnlyCandidateDatesWithZeroPoorIcon = (): void => {
   setMaxCountOfPoorIcon(0);
   setEnabledFilteringByPoorIcon(true);
 };
@@ -754,5 +754,5 @@ export const AnswerFilterAndSortStore = {
   setEnabledFilteringByRespondent,
   restoreFromQueryParams,
   clearTags,
-  filterOnlyAnswersWithPoorIs0,
+  displayOnlyCandidateDatesWithZeroPoorIcon,
 } as const;
