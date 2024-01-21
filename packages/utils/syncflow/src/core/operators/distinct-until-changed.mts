@@ -50,9 +50,14 @@ class DistinctUntilChangedObservableClass<A>
 
     const prev = this.#previousValue;
 
-    if (Maybe.isNone(prev) || !this.#eq(prev.value, par.snapshot.value)) {
+    const cond =
+      Maybe.isNone(prev) || !this.#eq(prev.value, par.snapshot.value);
+
+    // NOTE: setNext より先に更新しないと tryUpdate が連続して呼ばれたときに Maybe.isNone(prev) が true になり続けてしまう
+    this.#previousValue = par.snapshot;
+
+    if (cond) {
       this.setNext(par.snapshot.value, updaterSymbol);
     }
-    this.#previousValue = par.snapshot;
   }
 }
