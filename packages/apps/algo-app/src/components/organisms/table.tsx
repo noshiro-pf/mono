@@ -24,7 +24,7 @@ const sidesWidth = playerNameRectSize.height;
 const containerPaddingPx = 7;
 
 /**
- *
+ * ```txt
  * +---------------------------------------------------------+
  * |                                                         |
  * |   +--------+-------------------------------+--------+   |
@@ -68,6 +68,7 @@ const containerPaddingPx = 7;
  *            = 2h + 6w + 11pad
  *            = 2(225/145 * w) + 6w + 11pad
  *            = (2 * 225/145 + 6)w + 11pad
+ * ```
  */
 export const Table = memoNamed(
   'Table',

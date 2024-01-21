@@ -14,9 +14,7 @@ import {
   type UserId,
 } from '../types/index.mjs';
 
-/**
- * @description reactions を取得して poll.answers を修復（データベースが壊れたときの保険）
- */
+/** Reactions を取得して poll.answers を修復（データベースが壊れたときの保険） */
 export const fixAnswerAndUpdateMessage = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_messages: Discord.Collection<string, Discord.Message>,

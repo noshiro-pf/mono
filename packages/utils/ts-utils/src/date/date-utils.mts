@@ -55,15 +55,17 @@ const getUTCYear = (date: DateType): YearEnum =>
   getValueHelper(date, (d) => d.getUTCFullYear()) satisfies YearEnum;
 
 /**
- * @description Gets the month, using local time.
- * @returns a number from 1 to 12
+ * Gets the month, using local time.
+ *
+ * @returns A number from 1 to 12
  */
 const getLocaleMonth = (date: DateType): MonthEnum =>
   getValueHelper(date, (d) => Num.increment(d.getMonth())) satisfies MonthEnum;
 
 /**
- * @description Gets the month of a Date object using Universal Coordinated Time (UTC).
- * @returns a number from 1 to 12
+ * Gets the month of a Date object using Universal Coordinated Time (UTC).
+ *
+ * @returns A number from 1 to 12
  */
 const getUTCMonth = (date: DateType): MonthEnum =>
   getValueHelper(date, (d) =>
@@ -71,85 +73,98 @@ const getUTCMonth = (date: DateType): MonthEnum =>
   ) satisfies MonthEnum;
 
 /**
- * @description Gets the day-of-the-month, using local time.
- * @returns a number from 1 to 31
+ * Gets the day-of-the-month, using local time.
+ *
+ * @returns A number from 1 to 31
  */
 const getLocaleDate = (date: DateType): DateEnum =>
   getValueHelper(date, (d) => d.getDate());
 
 /**
- * @description Gets the day-of-the-month, using Universal Coordinated Time (UTC).
- * @returns a number from 1 to 31
+ * Gets the day-of-the-month, using Universal Coordinated Time (UTC).
+ *
+ * @returns A number from 1 to 31
  */
 const getUTCDate = (date: DateType): DateEnum =>
   getValueHelper(date, (d) => d.getUTCDate());
 
 /**
- * @description Gets the day of the week, using local time.
- * @returns a number from 0 to 6
+ * Gets the day of the week, using local time.
+ *
+ * @returns A number from 0 to 6
  */
 const getLocaleDayOfWeek = (date: DateType): DayOfWeekIndex =>
   getValueHelper(date, (d) => d.getDay());
 
 /**
- * @description Gets the day of the week using Universal Coordinated Time (UTC).
- * @returns a number from 0 to 6
+ * Gets the day of the week using Universal Coordinated Time (UTC).
+ *
+ * @returns A number from 0 to 6
  */
 const getUTCDayOfWeek = (date: DateType): DayOfWeekIndex =>
   getValueHelper(date, (d) => d.getUTCDay());
 
 /**
- * @description Gets the hours in a date, using local time.
- * @returns a number from 0 to 23
+ * Gets the hours in a date, using local time.
+ *
+ * @returns A number from 0 to 23
  */
 const getLocaleHours = (date: DateType): HoursEnum =>
   getValueHelper(date, (d) => d.getHours());
 
 /**
- * @description Gets the hours value in a Date object using Universal Coordinated Time (UTC).
- * @returns a number from 0 to 23
+ * Gets the hours value in a Date object using Universal Coordinated Time (UTC).
+ *
+ * @returns A number from 0 to 23
  */
 const getUTCHours = (date: DateType): HoursEnum =>
   getValueHelper(date, (d) => d.getUTCHours());
 
 /**
- * @description Gets the minutes of a Date object, using local time.
- * @returns a number from 0 to 59
+ * Gets the minutes of a Date object, using local time.
+ *
+ * @returns A number from 0 to 59
  */
 const getLocaleMinutes = (date: DateType): MinutesEnum =>
   getValueHelper(date, (d) => d.getMinutes());
 
 /**
- * @description Gets the minutes of a Date object using Universal Coordinated Time (UTC).
- * @returns a number from 0 to 59
+ * Gets the minutes of a Date object using Universal Coordinated Time (UTC).
+ *
+ * @returns A number from 0 to 59
  */
 const getUTCMinutes = (date: DateType): MinutesEnum =>
   getValueHelper(date, (d) => d.getUTCMinutes());
 
 /**
- * @description Gets the seconds of a Date object, using local time.
- * @returns a number from 0 to 59
+ * Gets the seconds of a Date object, using local time.
+ *
+ * @returns A number from 0 to 59
  */
 const getLocaleSeconds = (date: DateType): SecondsEnum =>
   getValueHelper(date, (d) => d.getSeconds());
 
 /**
- * @description Gets the seconds of a Date object using Universal Coordinated Time (UTC).
- * @returns a number from 0 to 999
+ * Gets the seconds of a Date object using Universal Coordinated Time (UTC).
+ *
+ * @returns A number from 0 to 999
  */
 const getUTCSeconds = (date: DateType): SecondsEnum =>
   getValueHelper(date, (d) => d.getUTCSeconds());
 
 /**
- * @description Gets the milliseconds of a Date, using local time.
- * @returns a number from 0 to 999
+ * Gets the milliseconds of a Date, using local time.
+ *
+ * @returns A number from 0 to 999
  */
 const getLocaleMilliseconds = (date: DateType): MillisecondsEnum =>
   getValueHelper(date, (d) => d.getMilliseconds());
 
 /**
- * @description Gets the milliseconds of a Date object using Universal Coordinated Time (UTC).
- * @returns a number from 0 to 999
+ * Gets the milliseconds of a Date object using Universal Coordinated Time
+ * (UTC).
+ *
+ * @returns A number from 0 to 999
  */
 const getUTCMilliseconds = (date: DateType): MillisecondsEnum =>
   getValueHelper(date, (d) => d.getUTCMilliseconds());
@@ -170,7 +185,10 @@ const setLocaleYear = (year: YearEnum): ((curr: DateType) => DateType) =>
     mut_copy.setFullYear(year);
   });
 
-/** Sets the year value in the Date object using Universal Coordinated Time (UTC). */
+/**
+ * Sets the year value in the Date object using Universal Coordinated Time
+ * (UTC).
+ */
 const setUTCYear = (year: YearEnum): ((curr: DateType) => DateType) =>
   setValueHelper((mut_copy) => {
     mut_copy.setUTCFullYear(year);
@@ -182,7 +200,10 @@ const setLocaleMonth = (month: MonthEnum): ((curr: DateType) => DateType) =>
     mut_copy.setMonth(Num.decrement(month) satisfies MonthIndexEnum);
   });
 
-/** Sets the month value in the Date object using Universal Coordinated Time (UTC). */
+/**
+ * Sets the month value in the Date object using Universal Coordinated Time
+ * (UTC).
+ */
 const setUTCMonth = (month: MonthEnum): ((curr: DateType) => DateType) =>
   setValueHelper((mut_copy) => {
     mut_copy.setUTCMonth(Num.decrement(month) satisfies MonthIndexEnum);
@@ -194,7 +215,10 @@ const setLocaleDate = (date: DateEnum): ((curr: DateType) => DateType) =>
     mut_copy.setDate(date);
   });
 
-/** ets the numeric day of the month in the Date object using Universal Coordinated Time (UTC). */
+/**
+ * Ets the numeric day of the month in the Date object using Universal
+ * Coordinated Time (UTC).
+ */
 const setUTCDate = (date: DateEnum): ((curr: DateType) => DateType) =>
   setValueHelper((mut_copy) => {
     mut_copy.setUTCDate(date);
@@ -206,7 +230,10 @@ const setLocaleHours = (hours: HoursEnum): ((curr: DateType) => DateType) =>
     mut_copy.setHours(hours);
   });
 
-/** Sets the hours value in the Date object using Universal Coordinated Time (UTC). */
+/**
+ * Sets the hours value in the Date object using Universal Coordinated Time
+ * (UTC).
+ */
 const setUTCHours = (hours: HoursEnum): ((curr: DateType) => DateType) =>
   setValueHelper((mut_copy) => {
     mut_copy.setUTCHours(hours);
@@ -220,7 +247,10 @@ const setLocaleMinutes = (
     mut_copy.setMinutes(minutes);
   });
 
-/** Sets the minutes value in the Date object using Universal Coordinated Time (UTC). */
+/**
+ * Sets the minutes value in the Date object using Universal Coordinated Time
+ * (UTC).
+ */
 const setUTCMinutes = (minutes: MinutesEnum): ((curr: DateType) => DateType) =>
   setValueHelper((mut_copy) => {
     mut_copy.setUTCMinutes(minutes);
@@ -234,7 +264,10 @@ const setLocaleSeconds = (
     mut_copy.setSeconds(seconds);
   });
 
-/** Sets the seconds value in the Date object using Universal Coordinated Time (UTC). */
+/**
+ * Sets the seconds value in the Date object using Universal Coordinated Time
+ * (UTC).
+ */
 const setUTCSeconds = (seconds: SecondsEnum): ((curr: DateType) => DateType) =>
   setValueHelper((mut_copy) => {
     mut_copy.setUTCSeconds(seconds);
@@ -248,7 +281,10 @@ const setLocaleMilliseconds = (
     mut_copy.setMilliseconds(milliseconds);
   });
 
-/** Sets the milliseconds value in the Date object using Universal Coordinated Time (UTC). */
+/**
+ * Sets the milliseconds value in the Date object using Universal Coordinated
+ * Time (UTC).
+ */
 const setUTCMilliseconds = (
   milliseconds: MillisecondsEnum,
 ): ((curr: DateType) => DateType) =>
@@ -358,7 +394,10 @@ const from = (value: RawDateType | number | string): DateType =>
 
 /* timestamp */
 
-/** Parses a string containing a date, and returns the number of milliseconds between that date and midnight, January 1, 1970. */
+/**
+ * Parses a string containing a date, and returns the number of milliseconds
+ * between that date and midnight, January 1, 1970.
+ */
 const parse = (str: string): SafeUint | undefined => {
   const res = Date.parse(str);
   return Number.isNaN(res) ? undefined : res;
@@ -388,11 +427,9 @@ const toMidnight = (date: DateType): DateType => {
 const toDate = (date: DateType): RawDateType => date as RawDateType;
 
 /**
- * ```
- * date1  <  date2 --> -1
- * date1  >  date2 -->  1
- * date1 === date2 -->  0
- * ```
+ * - `date1 < date2` --> `-1`
+ * - `date1 > date2` --> `1`
+ * - `date1 === date2` --> `0`
  */
 const cmp = (x: DateType, y: DateType): -1 | 0 | 1 => {
   const date1value = toTimestamp(x);
@@ -406,7 +443,7 @@ const cmp = (x: DateType, y: DateType): -1 | 0 | 1 => {
 
 const isToday = (date: DateType): boolean => cmp(date, today()) === 0;
 
-/** @description 何週目か(0-origin)を返す */
+/** 何週目か（0-origin）を返す */
 const weekNumberLocale = (date: DateType): 0 | 1 | 2 | 3 | 4 | 5 => {
   const date0Saturday =
     getLocaleDate(date) - 1 + (6 - getLocaleDayOfWeek(date)); // 同じ週の土曜日
@@ -415,7 +452,7 @@ const weekNumberLocale = (date: DateType): 0 | 1 | 2 | 3 | 4 | 5 => {
   return Math.floor(date0Saturday / 7) as 0 | 1 | 2 | 3 | 4 | 5;
 };
 
-/** @description 何週目か(0-origin)を返す */
+/** 何週目か（0-origin）を返す */
 const weekNumberUTC = (date: DateType): 0 | 1 | 2 | 3 | 4 | 5 => {
   const date0Saturday = getUTCDate(date) - 1 + (6 - getLocaleDayOfWeek(date)); // 同じ週の土曜日
 
@@ -423,9 +460,7 @@ const weekNumberUTC = (date: DateType): 0 | 1 | 2 | 3 | 4 | 5 => {
   return Math.floor(date0Saturday / 7) as 0 | 1 | 2 | 3 | 4 | 5;
 };
 
-/**
- * @description 引数の日が含まれる月の最終日(28-31)の数値を返す
- */
+/** 引数の日が含まれる月の最終日(28-31)の数値を返す */
 const getLastDateNumberOfMonth = (year: YearEnum, month: MonthEnum): DateEnum =>
   // eslint-disable-next-line no-restricted-syntax
   getLocaleDate(create(year, (month + 1) as MonthEnum, 0 as DateEnum));

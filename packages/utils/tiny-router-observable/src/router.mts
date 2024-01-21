@@ -21,19 +21,16 @@ export type ReadonlyURLSearchParams = DeepReadonly<
 >;
 
 export type RouterState = Readonly<{
-  /**
-   * @description `(new URL(window.location.href)).searchParams`
-   */
+  /** `(new URL(window.location.href)).searchParams` */
   pathname: string;
 
-  /**
-   * @description `splitToPathSegments(pathname)`
-   */
+  /** `splitToPathSegments(pathname)` */
   pathSegments: readonly string[];
 
   /**
-   * @description Query parameters created from `(new URL(window.location.href)).searchParams`.
-   * Mutation methods (`append`, `delete`, `set`, `sort` of `URLSearchParams`) are omitted .
+   * Query parameters created from `(new
+   * URL(window.location.href)).searchParams`. Mutation methods (`append`,
+   * `delete`, `set`, `sort` of `URLSearchParams`) are omitted .
    */
   searchParams: ReadonlyURLSearchParams;
 }>;
@@ -65,8 +62,8 @@ export type Router = Readonly<{
 }>;
 
 /**
- * @description Creates pathname Observable and queryParams Observable,
- * and starts listening URL changes.
+ * Creates pathname Observable and queryParams Observable, and starts listening
+ * URL changes.
  */
 export const createRouter = (): Router => {
   const getCurrentUrl = (): URL => new URL(window.location.href);

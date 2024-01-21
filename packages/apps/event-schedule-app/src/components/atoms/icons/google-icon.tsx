@@ -1,6 +1,4 @@
-/**
- * @link https://developers.google.com/identity/branding-guidelines?hl=ja
- */
+/** @link https://developers.google.com/identity/branding-guidelines?hl=ja */
 
 export const GoogleIconButton = memoNamed('GoogleIconButton', () => (
   <svg

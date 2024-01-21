@@ -4,7 +4,15 @@ import { indexType } from './common.mjs';
 import { convertTypedArrayCommon } from './lib.typed-array-common.mjs';
 
 /**
- * @typedef {"Int8" | "Uint8" | "Uint8Clamped" | "Int16" | "Uint16" | "Int32" | "Uint32" | "Float32" | "Float64"} ElemType
+ * @typedef {'Int8'
+ *   | 'Uint8'
+ *   | 'Uint8Clamped'
+ *   | 'Int16'
+ *   | 'Uint16'
+ *   | 'Int32'
+ *   | 'Uint32'
+ *   | 'Float32'
+ *   | 'Float64'} ElemType
  */
 
 /** @param {ElemType} elemType */
@@ -448,8 +456,8 @@ const convertInterfaceTypedArrayConstructor = (from, elementTypeArg) => {
 };
 
 /**
- * @param {Exclude<ElemType, "Uint8Clamped">} elementType
- * @returns {1|2|4|8}
+ * @param {Exclude<ElemType, 'Uint8Clamped'>} elementType
+ * @returns {1 | 2 | 4 | 8}
  */
 const BYTES_PER_ELEMENT = (elementType) => {
   switch (elementType) {

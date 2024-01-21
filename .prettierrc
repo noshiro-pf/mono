@@ -1,10 +1,26 @@
 {
   "plugins": [
     "prettier-plugin-organize-imports",
-    "prettier-plugin-packagejson"
+    "prettier-plugin-packagejson",
+    "prettier-plugin-jsdoc"
   ],
   "semi": true,
   "endOfLine": "lf",
   "singleQuote": true,
-  "jsxSingleQuote": true
+  "jsxSingleQuote": true,
+  "overrides": [
+    {
+      "files": [
+        "experimental/**/*",
+        "packages/strict-ts-lib/packages/**/*",
+        "packages/tools/eslint-custom-rules/**/*"
+      ],
+      "options": {
+        "plugins": [
+          "prettier-plugin-organize-imports",
+          "prettier-plugin-packagejson"
+        ]
+      }
+    }
+  ]
 }

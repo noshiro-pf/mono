@@ -5,13 +5,16 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
   T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
 
 /**
- * @description Enforce functional parameters.
+ * Enforce functional parameters.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/functional-parameters.md
  *
+ *  ```md
  *  | key      | value      |
  *  | :------- | :--------- |
  *  | type     | suggestion |
  *  | category | Currying   |
+ *  ```
  */
 namespace FunctionalParameters {
   /**
@@ -114,13 +117,16 @@ namespace FunctionalParameters {
 }
 
 /**
- * @description Enforce treating data as immutable.
+ * Enforce treating data as immutable.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/immutable-data.md
  *
+ *  ```md
  *  | key      | value        |
  *  | :------- | :----------- |
  *  | type     | suggestion   |
  *  | category | No Mutations |
+ *  ```
  */
 namespace ImmutableData {
   /**
@@ -188,26 +194,32 @@ namespace ImmutableData {
 }
 
 /**
- * @description Disallow classes.
+ * Disallow classes.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/no-classes.md
  *
+ *  ```md
  *  | key      | value              |
  *  | :------- | :----------------- |
  *  | type     | suggestion         |
  *  | category | No Other Paradigms |
+ *  ```
  */
 namespace NoClasses {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Disallow conditional statements.
+ * Disallow conditional statements.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/no-conditional-statements.md
  *
+ *  ```md
  *  | key      | value         |
  *  | :------- | :------------ |
  *  | type     | suggestion    |
  *  | category | No Statements |
+ *  ```
  */
 namespace NoConditionalStatements {
   /**
@@ -247,13 +259,16 @@ namespace NoConditionalStatements {
 }
 
 /**
- * @description Disallow expression statements.
+ * Disallow expression statements.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/no-expression-statements.md
  *
+ *  ```md
  *  | key      | value         |
  *  | :------- | :------------ |
  *  | type     | suggestion    |
  *  | category | No Statements |
+ *  ```
  */
 namespace NoExpressionStatements {
   /**
@@ -297,13 +312,16 @@ namespace NoExpressionStatements {
 }
 
 /**
- * @description Disallow mutable variables.
+ * Disallow mutable variables.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/no-let.md
  *
+ *  ```md
  *  | key      | value        |
  *  | :------- | :----------- |
  *  | type     | suggestion   |
  *  | category | No Mutations |
+ *  ```
  */
 namespace NoLet {
   /**
@@ -347,26 +365,32 @@ namespace NoLet {
 }
 
 /**
- * @description Disallow imperative loops.
+ * Disallow imperative loops.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/no-loop-statements.md
  *
+ *  ```md
  *  | key      | value         |
  *  | :------- | :------------ |
  *  | type     | suggestion    |
  *  | category | No Statements |
+ *  ```
  */
 namespace NoLoopStatements {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Restrict types so that only members of the same kind are allowed in them.
+ * Restrict types so that only members of the same kind are allowed in them.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/no-mixed-types.md
  *
+ *  ```md
  *  | key      | value              |
  *  | :------- | :----------------- |
  *  | type     | suggestion         |
  *  | category | No Other Paradigms |
+ *  ```
  */
 namespace NoMixedTypes {
   /**
@@ -400,26 +424,32 @@ namespace NoMixedTypes {
 }
 
 /**
- * @description Disallow try-catch[-finally] and try-finally patterns.
+ * Disallow try-catch[-finally] and try-finally patterns.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/no-promise-reject.md
  *
+ *  ```md
  *  | key      | value         |
  *  | :------- | :------------ |
  *  | type     | suggestion    |
  *  | category | No Exceptions |
+ *  ```
  */
 namespace NoPromiseReject {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Disallow functions that don't return anything.
+ * Disallow functions that don't return anything.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/no-return-void.md
  *
+ *  ```md
  *  | key      | value         |
  *  | :------- | :------------ |
  *  | type     | suggestion    |
  *  | category | No Statements |
+ *  ```
  */
 namespace NoReturnVoid {
   /**
@@ -457,26 +487,32 @@ namespace NoReturnVoid {
 }
 
 /**
- * @description Disallow this access.
+ * Disallow this access.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/no-this-expressions.md
  *
+ *  ```md
  *  | key      | value              |
  *  | :------- | :----------------- |
  *  | type     | suggestion         |
  *  | category | No Other Paradigms |
+ *  ```
  */
 namespace NoThisExpressions {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Disallow throwing exceptions.
+ * Disallow throwing exceptions.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/no-throw-statements.md
  *
+ *  ```md
  *  | key      | value         |
  *  | :------- | :------------ |
  *  | type     | suggestion    |
  *  | category | No Exceptions |
+ *  ```
  */
 namespace NoThrowStatements {
   /**
@@ -506,13 +542,16 @@ namespace NoThrowStatements {
 }
 
 /**
- * @description Disallow try-catch[-finally] and try-finally patterns.
+ * Disallow try-catch[-finally] and try-finally patterns.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/no-try-statements.md
  *
+ *  ```md
  *  | key      | value         |
  *  | :------- | :------------ |
  *  | type     | suggestion    |
  *  | category | No Exceptions |
+ *  ```
  */
 namespace NoTryStatements {
   /**
@@ -546,15 +585,18 @@ namespace NoTryStatements {
 }
 
 /**
- * @description Require function parameters to be typed as certain immutability
+ * Require function parameters to be typed as certain immutability
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/prefer-immutable-types.md
  *
+ *  ```md
  *  | key            | value        |
  *  | :------------- | :----------- |
  *  | type           | suggestion   |
  *  | fixable        | code         |
  *  | hasSuggestions | true         |
  *  | category       | No Mutations |
+ *  ```
  */
 namespace PreferImmutableTypes {
   /**
@@ -1197,13 +1239,16 @@ namespace PreferImmutableTypes {
 }
 
 /**
- * @description Prefer property signatures over method signatures.
+ * Prefer property signatures over method signatures.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/prefer-property-signatures.md
  *
+ *  ```md
  *  | key      | value      |
  *  | :------- | :--------- |
  *  | type     | suggestion |
  *  | category | Stylistic  |
+ *  ```
  */
 namespace PreferPropertySignatures {
   /**
@@ -1234,15 +1279,18 @@ namespace PreferPropertySignatures {
 }
 
 /**
- * @description Prefer readonly types over mutable types.
+ * Prefer readonly types over mutable types.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/prefer-readonly-type.md
  *
+ *  ```md
  *  | key        | value        |
  *  | :--------- | :----------- |
  *  | type       | suggestion   |
  *  | deprecated | true         |
  *  | fixable    | code         |
  *  | category   | No Mutations |
+ *  ```
  */
 namespace PreferReadonlyType {
   /**
@@ -1300,28 +1348,34 @@ namespace PreferReadonlyType {
 }
 
 /**
- * @description Replaces `x => f(x)` with just `f`.
+ * Replaces `x => f(x)` with just `f`.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/prefer-tacit.md
  *
+ *  ```md
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
  *  | hasSuggestions | true       |
  *  | category       | Stylistic  |
+ *  ```
  */
 namespace PreferTacit {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Require consistently using either `readonly` keywords or `Readonly<T>`
+ * Require consistently using either `readonly` keywords or `Readonly<T>`
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/readonly-type.md
  *
+ *  ```md
  *  | key      | value      |
  *  | :------- | :--------- |
  *  | type     | suggestion |
  *  | fixable  | code       |
  *  | category | Stylistic  |
+ *  ```
  */
 namespace ReadonlyType {
   /**
@@ -1347,14 +1401,17 @@ namespace ReadonlyType {
 }
 
 /**
- * @description Enforce the immutability of types based on patterns.
+ * Enforce the immutability of types based on patterns.
+ *
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.0.0/docs/rules/type-declaration-immutability.md
  *
+ *  ```md
  *  | key      | value        |
  *  | :------- | :----------- |
  *  | type     | suggestion   |
  *  | fixable  | code         |
  *  | category | No Mutations |
+ *  ```
  */
 namespace TypeDeclarationImmutability {
   /**

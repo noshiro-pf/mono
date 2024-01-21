@@ -19,7 +19,6 @@ export const isNotUndefined = (a) => a !== undefined;
 export const isNumber = (a) => typeof a === 'number';
 
 /**
- *
  * @param {unknown} a
  * @returns {a is string}
  */

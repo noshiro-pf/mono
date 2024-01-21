@@ -3,9 +3,7 @@ import { type LambdaTerm } from '../../types/index.mjs';
 import { isVariable } from '../is-variable.mjs';
 import { tokensRepresentsLambdaTerm } from './token-list-is-lambda-term.mjs';
 
-/**
- * e ::= x | (lambda x.e) | (e e)
- * */
+/** `e ::= x | (lambda x.e) | (e e)` */
 export const getParseTree = (
   tokens: readonly string[],
 ): LambdaTerm | undefined => {

@@ -39,9 +39,7 @@ export const noLetOptions: NoLetOptions = {
 //   ],
 // };
 
-/**
- * @link {https://github.com/jonaskello/eslint-plugin-functional}
- */
+/** @link {https://github.com/jonaskello/eslint-plugin-functional} */
 export const eslintFunctionalRules: EslintFunctionalRules = {
   // No Mutations Rules
   'functional/immutable-data': ['error', immutableDataOptions],

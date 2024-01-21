@@ -84,6 +84,7 @@ const metaToString = (meta: Meta | undefined): string => {
       : ` * @description ${removeMultiLineCommentCharacter(description)}`,
     url == null ? undefined : ` * @link ${url}`,
     ' *',
+    ' *  ```md',
     ` *  | ${tableHeader[0].padEnd(
       longestKeyLength,
       ' ',
@@ -99,6 +100,7 @@ const metaToString = (meta: Meta | undefined): string => {
           ' ',
         )} |`,
     ),
+    ' *  ```',
     ' */',
   ];
   return result.filter((line) => line !== undefined).join('\n');

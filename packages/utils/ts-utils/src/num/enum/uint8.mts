@@ -1,12 +1,12 @@
 import { Num } from '../num.mjs';
 
-/** return type */
+/** Return type */
 type T = Uint8;
 
-/** arg type */
+/** Arg type */
 type A = T;
 
-/** denominator type */
+/** Denominator type */
 type D = Exclude<Uint8, 0>;
 
 const MIN_VALUE = 0;
@@ -56,18 +56,18 @@ export const Uint8 = {
 
   random,
 
-  /** @returns a ** b, but clamped to [0, 255] */
+  /** @returns `a ** b`, but clamped to `[0, 255]` */
   pow,
 
-  /** @returns a + b, but clamped to [0, 255] */
+  /** @returns `a + b`, but clamped to `[0, 255]` */
   add,
 
-  /** @returns a - b, but clamped to [0, 255] */
+  /** @returns `a - b`, but clamped to `[0, 255]` */
   sub,
 
-  /** @returns a * b, but clamped to [0, 255] */
+  /** @returns `a * b`, but clamped to `[0, 255]` */
   mul,
 
-  /** @returns ⌊a / b⌋, but clamped to [0, 255] */
+  /** @returns `⌊a / b⌋`, but clamped to `[0, 255]` */
   div,
 } as const;

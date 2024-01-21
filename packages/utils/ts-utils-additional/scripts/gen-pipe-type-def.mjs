@@ -8,7 +8,6 @@ import { FunctionType } from '../types';
 `;
 
 /**
- *
  * @param {number} start
  * @param {number} end
  * @returns {readonly number[]}
@@ -17,7 +16,6 @@ const range = (start, end) =>
   Array.from({ length: end - start }, (_, i) => start + i);
 
 /**
- *
  * @param {number} len
  * @returns {string}
  */
@@ -48,7 +46,6 @@ export function ${functionName}(x: unknown, ...fns: FunctionType<unknown, unknow
 `;
 
 /**
- *
  * @param {number} len
  * @returns {string}
  */
@@ -61,10 +58,7 @@ const createPipeTypeDef = (len) =>
     footer,
   ].join('\n');
 
-/**
- *
- * @returns {readonly [number, string]}
- */
+/** @returns {readonly [number, string]} */
 const input = () => {
   const args = process.argv.slice(2);
   if (args.length !== 2) {

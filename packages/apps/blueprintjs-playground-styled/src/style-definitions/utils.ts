@@ -6,8 +6,6 @@ export const hexToRgba = (
 ): `rgba(${string}, ${number})` =>
   `rgba(${hexToRgb(hex).join(', ')}, ${alpha})`;
 
-/**
- * @description join lines with `${lines.join(', \n')};`
- */
+/** Join lines with `${lines.join(', \n')};` */
 export const joinCssStr = (...lines: readonly string[]): string =>
   `${lines.join(', \n')};`;

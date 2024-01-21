@@ -3,21 +3,15 @@ import { memoNamed } from '@noshiro/react-utils';
 import { type Rect } from '@noshiro/ts-utils-additional';
 import { useMemo } from 'react';
 
-const RelativeWrapper = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-`;
-
-const AbsoluteWrapper = styled.div`
-  position: absolute;
-`;
+type Props = DeepReadonly<{
+  children: React.ReactNode;
+  cropRectRelative: Rect;
+}>;
 
 /**
- * @description
  * 画像の切り抜きを「拡大＆はみ出た部分を隠す」で実装している．
  *
+ * ```txt
  *     0
  *   0 +----------------------+
  *     |    l                 |
@@ -47,12 +41,8 @@ const AbsoluteWrapper = styled.div`
  * W = 1 / w
  * T + H * t = 0  =>  T = -H * t
  * L + W * l = 0  =>  L = -W * l
+ * ```
  */
-
-type Props = DeepReadonly<{
-  children: React.ReactNode;
-  cropRectRelative: Rect;
-}>;
 
 export const DivCropped = memoNamed<Props>(
   'DivCropped',
@@ -78,3 +68,14 @@ export const DivCropped = memoNamed<Props>(
     );
   },
 );
+
+const RelativeWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+`;
+
+const AbsoluteWrapper = styled.div`
+  position: absolute;
+`;

@@ -8,7 +8,11 @@ import {
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
-/** @deprecated use `createState` instead */
+/**
+ * @deprecated To improve the readability of your code, use `createState`
+ *   instead of `switchMap`, and subscribe to `parentObservable` and call
+ *   `setState` within it.
+ */
 export const switchMap =
   <A, B>(
     mapToObservable: (curr: A) => Observable<B>,

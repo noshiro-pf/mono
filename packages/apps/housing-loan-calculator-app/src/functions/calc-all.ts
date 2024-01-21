@@ -15,8 +15,8 @@ export const calcAll = ({
   interestRatePercentPerYear,
 }: Store): CalculatedValues => {
   /**
-   * 1 -> 元金均等返済
-   * 2 -> 元利均等返済
+   * - 1 -> 元金均等返済
+   * - 2 -> 元利均等返済
    */
   const downPaymentYen = toYen(downPaymentManYen * 10_000);
   const propertyPriceYen = toYen(propertyPriceManYen * 10_000);

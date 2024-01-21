@@ -7,10 +7,7 @@ import {
 import { useCallback, useMemo } from 'preact/hooks';
 import { useObservable } from './use-observable.mjs';
 
-/**
- * `reducer` 及び `initialState` は初期値でのみ評価される。
- * 動的に変更しても state には反映されないので注意。
- */
+/** `reducer` 及び `initialState` は初期値でのみ評価される。 動的に変更しても state には反映されないので注意。 */
 export const useObservableReducer = <S, A>(
   reducer: (state: S, action: A) => S,
   initialState: S,

@@ -55,7 +55,7 @@ type SecondsEnum = Sexagesimal;
 type MillisecondsEnum = Index<1000>;
 
 // prettier-ignore
-/** ` 'a' | 'b' | 'c'  | ... | 'z'` */
+/** ` 'a' | 'b' | 'c' | ... | 'z'` */
 type LowerAlphabet = (
   | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g'
   | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n'

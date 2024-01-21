@@ -2,7 +2,8 @@ import { type EslintUnicornRules } from '../types/rules/eslint-unicorn-rules.mjs
 
 export const eslintUnicornRules: EslintUnicornRules = {
   /**
-   * disable in favor of prettier
+   * Disable in favor of prettier
+   *
    * @link https://github.com/prettier/eslint-config-prettier/blob/main/index.js
    */
   'unicorn/empty-brace-spaces': 'off',

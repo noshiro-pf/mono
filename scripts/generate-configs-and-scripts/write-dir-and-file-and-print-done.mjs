@@ -2,7 +2,6 @@ import * as fs from 'fs/promises';
 import path from 'node:path';
 
 /**
- *
  * @param {string} dir
  * @param {string} file
  * @param {string} packageName

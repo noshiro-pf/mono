@@ -3,61 +3,43 @@
 
 type PropertyKey = number | string | symbol;
 
-/**
- * Make all properties in T optional
- */
+/** Make all properties in T optional */
 type Partial<T> = {
   [P in keyof T]?: T[P];
 };
 
-/**
- * Make all properties in T readonly
- */
+/** Make all properties in T readonly */
 type Readonly<T> = {
   readonly [P in keyof T]: T[P];
 };
 
-/**
- * From T, pick a set of properties whose keys are in the union K
- */
+/** From T, pick a set of properties whose keys are in the union K */
 type Pick<T, K extends keyof T> = {
   readonly [P in K]: T[P];
 };
 
-/**
- * Exclude from T those types that are assignable to U
- */
+/** Exclude from T those types that are assignable to U */
 type Exclude<T, U extends T> = T extends U ? never : T;
 
-/**
- * Construct a type with the properties of T except for those in type K.
- */
+/** Construct a type with the properties of T except for those in type K. */
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
-/**
- * Extract from T those types that are assignable to U
- */
+/** Extract from T those types that are assignable to U */
 type Extract<T, U> = T extends U ? T : never;
 
-/**
- * Construct a type with a set of properties K of type T
- */
+/** Construct a type with a set of properties K of type T */
 type Record<K extends keyof never, T> = {
   readonly [P in K]: T;
 };
 
-/**
- * Obtain the parameters of a function type in a tuple
- */
+/** Obtain the parameters of a function type in a tuple */
 type Parameters<T extends (...args: readonly never[]) => unknown> = T extends (
   ...args: infer P
 ) => unknown
   ? P
   : never;
 
-/**
- * Obtain the return type of a function type
- */
+/** Obtain the return type of a function type */
 type ReturnType<T extends (...args: readonly never[]) => unknown> = T extends (
   ...args: readonly never[]
 ) => infer R
@@ -70,7 +52,8 @@ type ReturnType<T extends (...args: readonly never[]) => unknown> = T extends (
 
 interface ReadonlyArray<T> {
   /**
-   * Gets the length of the array. This is a number one higher than the highest element defined in an array.
+   * Gets the length of the array. This is a number one higher than the highest
+   * element defined in an array.
    */
   readonly length: number;
 
@@ -79,7 +62,8 @@ interface ReadonlyArray<T> {
 
 interface Array<T> {
   /**
-   * Gets or sets the length of the array. This is a number one higher than the highest index in the array.
+   * Gets or sets the length of the array. This is a number one higher than the
+   * highest index in the array.
    */
   readonly length: number;
 

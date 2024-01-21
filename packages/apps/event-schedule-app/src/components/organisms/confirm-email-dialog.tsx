@@ -32,9 +32,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
 
     const fireAuthUser = Auth.useFireAuthUser();
 
-    /**
-     * ログイン済みならemailを自動入力してsubmit
-     */
+    /** ログイン済みならemailを自動入力してsubmit */
     useEffect(() => {
       const email = fireAuthUser?.email;
       if (isString(email)) {

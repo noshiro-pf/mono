@@ -74,13 +74,19 @@ const markers = {
 };
 
 /**
- * @typedef {"Int8" | "Uint8" | "Uint8Clamped" | "Int16" | "Uint16" | "Int32" | "Uint32" | "Float32" | "Float64"} ElemType
+ * @typedef {'Int8'
+ *   | 'Uint8'
+ *   | 'Uint8Clamped'
+ *   | 'Int16'
+ *   | 'Uint16'
+ *   | 'Int32'
+ *   | 'Uint32'
+ *   | 'Float32'
+ *   | 'Float64'} ElemType
  */
-/**
- * @typedef {"BigInt64" | "BigUint64"} BigintElemType
- */
+/** @typedef {'BigInt64' | 'BigUint64'} BigintElemType */
 
-/** @type {ElemType[]} */
+/** @type {readonly ElemType[]} */
 const typedArrayElemTypes = [
   'Int8',
   'Uint8',
@@ -93,10 +99,10 @@ const typedArrayElemTypes = [
   'Float64',
 ];
 
-/** @type {BigintElemType[]} */
+/** @type {readonly BigintElemType[]} */
 const bigIntElemTypes = ['BigInt64', 'BigUint64'];
 
-/** @type {("Array" | "ReadonlyArray")[]} */
+/** @type {readonly ('Array' | 'ReadonlyArray')[]} */
 const arrayTypes = ['Array', 'ReadonlyArray'];
 
 /**

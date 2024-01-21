@@ -2,6 +2,7 @@ import { parse } from './parse';
 
 /**
  * Can parse a compiled string, from a tagged template
+ *
  * @param {String} value
  * @param {Object} [props]
  */

@@ -5,28 +5,34 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
   T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
 
 /**
- * @description enforces the Rules of Hooks
+ * Enforces the Rules of Hooks
+ *
  * @link https://reactjs.org/docs/hooks-rules.html
  *
+ *  ```md
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | recommended | true    |
+ *  ```
  */
 namespace RulesOfHooks {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description verifies the list of dependencies for Hooks like useEffect and similar
+ * Verifies the list of dependencies for Hooks like useEffect and similar
+ *
  * @link https://github.com/facebook/react/issues/14920
  *
+ *  ```md
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
+ *  ```
  */
 namespace ExhaustiveDeps {
   /**

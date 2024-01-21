@@ -3,7 +3,8 @@ import { type TypeScriptEslintRulesOption } from './types/rules/typescript-eslin
 import { type RestrictedImportsOption } from './types/types.mjs';
 
 /**
- * Restrict prohibited imports defined in package '@noshiro/global-' in devDependencies.
+ * Restrict prohibited imports defined in package '@noshiro/global-' in
+ * devDependencies.
  */
 export const genEsLintRestrictedImportsDefFromDevDependencies = async (
   devDependencies: Record<string, string> | undefined,

@@ -1,8 +1,6 @@
 import { keyIsIn } from '../guard/index.mjs';
 
-/**
- * @internal
- */
+/** @internal */
 export type _IsLiteralType<T extends RecordKeyType> = string extends T
   ? false
   : number extends T

@@ -1,8 +1,8 @@
 import { type PercentFloat } from '../../types';
 
 /**
- * @description
  * 元利均等返済におけるi回支払い後の残高
+ *
  * PIER = PrincipalAndInterestEqualRepayments
  */
 export const ithBorrowingBalanceInPIER = ({

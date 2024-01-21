@@ -7,9 +7,8 @@ import { hslToRgb } from '../rgb-hsl-conversion/index.mjs';
 import { relativeLuminance } from './relative-luminance.mjs';
 
 /**
- * @description
- * Contrast ratios can range from 1 to 21.
- * link: https://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
+ * Contrast ratios can range from 1 to 21. link:
+ * https://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
  */
 export const contrastRatioRgb = (
   rgb1: Rgb,

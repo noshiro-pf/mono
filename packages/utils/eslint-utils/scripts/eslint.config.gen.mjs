@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/prefer-ts-expect-error */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-/** @typedef { import("../src/types/flat-config.mjs").FlatConfig } FlatConfig */
+/** @typedef {import('../src/types/flat-config.mjs').FlatConfig} FlatConfig */
 
 import { toThisDir } from '@noshiro/mono-scripts/node-utils/path-utils.mjs';
 import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin';

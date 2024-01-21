@@ -13,7 +13,8 @@ function setup(pragma, prefix, theme, forwardProps) {
 }
 
 /**
- * styled function
+ * Styled function
+ *
  * @param {string} tag
  * @param {function} forwardRef
  */

@@ -2,13 +2,16 @@
 import { type Linter } from 'eslint';
 
 /**
- * @description Do not use deprecated APIs.
+ * Do not use deprecated APIs.
+ *
  * @link https://github.com/gund/eslint-plugin-deprecation
  *
+ *  ```md
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
  *  | requiresTypeChecking | true    |
+ *  ```
  */
 namespace Deprecation {
   export type RuleEntry = Linter.RuleLevel;

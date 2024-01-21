@@ -1,5 +1,5 @@
-/** @typedef { import('@noshiro/eslint-utils').FlatConfig } FlatConfig */
-/** @typedef { import('@noshiro/eslint-utils').EslintImportsRules } EslintImportsRules */
+/** @typedef {import('@noshiro/eslint-utils').FlatConfig} FlatConfig */
+/** @typedef {import('@noshiro/eslint-utils').EslintImportsRules} EslintImportsRules */
 
 import {
   eslintFlatConfigCommon,

@@ -7,9 +7,7 @@ import { relativeLuminance } from './relative-luminance.mjs';
 
 const hues = Arr.seq(360) satisfies Seq<360>;
 
-/**
- * relativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（=hue）を返す
- */
+/** RelativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（=hue）を返す */
 export function pickupHighContrastHues<N extends SmallUint>(
   n: N,
   saturation: Percent,

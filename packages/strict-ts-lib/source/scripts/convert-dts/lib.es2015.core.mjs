@@ -37,7 +37,6 @@ const markers = {
 };
 
 /**
- *
  * @param {string} from
  * @param {boolean} commentOutDeprecated
  * @returns {string}

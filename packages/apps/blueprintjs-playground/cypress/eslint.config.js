@@ -1,4 +1,4 @@
-/** @typedef { import('@noshiro/eslint-utils').FlatConfig } FlatConfig */
+/** @typedef {import('@noshiro/eslint-utils').FlatConfig} FlatConfig */
 
 import { eslintFlatConfigForCypress } from '@noshiro/eslint-utils';
 import { toThisDir } from '@noshiro/mono-scripts/node-utils/path-utils.mjs';

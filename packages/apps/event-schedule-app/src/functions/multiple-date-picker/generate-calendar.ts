@@ -1,16 +1,18 @@
 /**
- * rowsize = 5
- * numPrevMonthDate = 3
- * lastDateNumberOfPrevMonth = 30
- * lastDateNumberOfThisMonth = 31
+ * ```js
+ * rowsize = 5;
+ * numPrevMonthDate = 3;
+ * lastDateNumberOfPrevMonth = 30;
+ * lastDateNumberOfThisMonth = 31;
+ * ```
  *
- * |Su|Mo|Tu|We|Th|Fr|Sa|
- * |--|--|--|--|--|--|--|
- * |28|29|30| 1| 2| 3| 4| --+
- * | 5| 6| 7| 8| 9|10|11|   |
- * |12|13|14|15|16|17|18|   | rowsize
- * |19|20|21|22|23|24|25|   |
- * |26|27|28|29|30|31| 1| --+
+ *     |Su|Mo|Tu|We|Th|Fr|Sa|
+ *     |--|--|--|--|--|--|--|
+ *     |28|29|30| 1| 2| 3| 4| --+
+ *     | 5| 6| 7| 8| 9|10|11|   |
+ *     |12|13|14|15|16|17|18|   | rowsize
+ *     |19|20|21|22|23|24|25|   |
+ *     |26|27|28|29|30|31| 1| --+
  */
 
 export const generateCalendar = (

@@ -1,5 +1,5 @@
 /**
- * @param {import("./workspace-config-type.mjs").WorkspaceConfig} cfg
+ * @param {import('./workspace-config-type.mjs').WorkspaceConfig} cfg
  * @returns {string}
  */
 export const toTestTargetGlob = (cfg) => {

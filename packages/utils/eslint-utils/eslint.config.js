@@ -1,4 +1,4 @@
-/** @typedef { import("./src/types/flat-config.mjs").FlatConfig } FlatConfig */
+/** @typedef {import('./src/types/flat-config.mjs').FlatConfig} FlatConfig */
 
 import { toThisDir } from '@noshiro/mono-scripts/node-utils/path-utils.mjs';
 import * as nodePath from 'node:path';

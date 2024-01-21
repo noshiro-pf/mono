@@ -1,8 +1,8 @@
 import { type PercentFloat } from '../../types';
 
 /**
- * @description
  * 元利均等返済における月々の支払い額を求める計算式．
+ *
  * PIER = PrincipalAndInterestEqualRepayments
  */
 export const monthlyPaymentsInPIER = ({
