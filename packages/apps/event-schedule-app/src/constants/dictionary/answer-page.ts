@@ -181,7 +181,8 @@ export const answerPageDictionary = {
       },
     },
 
-    toggleDateStringIsMinimized: '日付を短縮表示',
+    toggleAnswerIconIsHidden: '〇△✕列を隠す',
+    toggleDateStringIsMinimized: '日付を短縮表記にする',
     toggleMinimizedTable: 'テーブルを圧縮表示',
   },
   requiredParticipantDescription:

@@ -174,6 +174,10 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     AnswerTableStore.dateStringIsMinimized$,
   );
 
+  const answerIconIsHidden = useObservableValue(
+    AnswerTableStore.answerIconIsHidden$,
+  );
+
   const tableIsMinimized = useObservableValue(
     AnswerTableStore.tableIsMinimized$,
   );
@@ -311,6 +315,14 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                       }
                       noMargin={true}
                       onToggle={AnswerTableStore.toggleDateStringIsMinimized}
+                    />
+                  </div>
+                  <div>
+                    <BpSwitch
+                      checked={answerIconIsHidden}
+                      label={dict.answerPage.answers.toggleAnswerIconIsHidden}
+                      noMargin={true}
+                      onToggle={AnswerTableStore.toggleAnswerIconIsHidden}
                     />
                   </div>
                   <div>

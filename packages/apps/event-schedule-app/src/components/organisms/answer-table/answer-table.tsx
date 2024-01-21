@@ -57,6 +57,10 @@ export const AnswerTable = memoNamed<Props>(
       AnswerTableStore.dateStringIsMinimized$,
     );
 
+    const answerIconIsHidden = useObservableValue(
+      AnswerTableStore.answerIconIsHidden$,
+    );
+
     const tableMinimized = useObservableValue(
       AnswerTableStore.tableIsMinimized$,
     );
@@ -93,21 +97,25 @@ export const AnswerTable = memoNamed<Props>(
 
             {/* icons */}
 
-            <IconHeaderCell>
-              <Centering>
-                <FilterByIconPopover answerIconId={'good'} />
-              </Centering>
-            </IconHeaderCell>
-            <IconHeaderCell>
-              <Centering>
-                <FilterByIconPopover answerIconId={'fair'} />
-              </Centering>
-            </IconHeaderCell>
-            <IconHeaderCell>
-              <Centering>
-                <FilterByIconPopover answerIconId={'poor'} />
-              </Centering>
-            </IconHeaderCell>
+            {answerIconIsHidden ? undefined : (
+              <>
+                <IconHeaderCell>
+                  <Centering>
+                    <FilterByIconPopover answerIconId={'good'} />
+                  </Centering>
+                </IconHeaderCell>
+                <IconHeaderCell>
+                  <Centering>
+                    <FilterByIconPopover answerIconId={'fair'} />
+                  </Centering>
+                </IconHeaderCell>
+                <IconHeaderCell>
+                  <Centering>
+                    <FilterByIconPopover answerIconId={'poor'} />
+                  </Centering>
+                </IconHeaderCell>
+              </>
+            )}
 
             {answersWithHandler.map((answer) => (
               <th
@@ -156,15 +164,19 @@ export const AnswerTable = memoNamed<Props>(
                 <td>
                   <span>{Num.roundBy(2, score)}</span>
                 </td>
-                {answerSummaryRow?.map((s, i) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <td key={i}>
-                    <SummaryCellStyle>
-                      <span>{s}</span>
-                      <SummaryCellUnit>{dc.numAnswersUnit}</SummaryCellUnit>
-                    </SummaryCellStyle>
-                  </td>
-                ))}
+                {answerIconIsHidden ? undefined : (
+                  <>
+                    {answerSummaryRow?.map((s, i) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <td key={i}>
+                        <SummaryCellStyle>
+                          <span>{s}</span>
+                          <SummaryCellUnit>{dc.numAnswersUnit}</SummaryCellUnit>
+                        </SummaryCellStyle>
+                      </td>
+                    ))}
+                  </>
+                )}
                 {answerTableRow?.map(
                   ({ iconId, point, showPoint, weight, comment }, i) => (
                     <td
@@ -217,9 +229,13 @@ export const AnswerTable = memoNamed<Props>(
             <td />
 
             {/* spacer - icons */}
-            <td />
-            <td />
-            <td />
+            {answerIconIsHidden ? undefined : (
+              <>
+                <td />
+                <td />
+                <td />
+              </>
+            )}
 
             {answersWithHandler.map((answer) => (
               <td

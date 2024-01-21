@@ -385,6 +385,9 @@ const tableBodyValuesFiltered$ = combineLatestI([
 const { state$: tableIsMinimized$, toggle: toggleTableIsMinimized } =
   createBooleanState(false);
 
+const { state$: answerIconIsHidden$, toggle: toggleAnswerIconIsHidden } =
+  createBooleanState(false);
+
 const { state$: dateStringIsMinimized$, toggle: toggleDateStringIsMinimized } =
   createBooleanState(false);
 
@@ -395,8 +398,10 @@ export const AnswerTableStore = {
   tableBodyValuesFiltered$,
   detailedFilterIsOpen$,
   toggleDetailedFilter,
-  tableIsMinimized$,
-  toggleTableIsMinimized,
   dateStringIsMinimized$,
   toggleDateStringIsMinimized,
+  answerIconIsHidden$,
+  toggleAnswerIconIsHidden,
+  tableIsMinimized$,
+  toggleTableIsMinimized,
 } as const;
