@@ -5,7 +5,7 @@ import { setMyName } from './my-name';
 const [response$, setResponse] = createEventEmitter<Room>();
 
 const { state$: isWaitingResponse$, setState: setIsWaitingResponse } =
-  createState<boolean>(false);
+  createBooleanState(false);
 
 const dispatch = async (
   payload: Readonly<{
