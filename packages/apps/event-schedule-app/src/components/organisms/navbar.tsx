@@ -20,19 +20,7 @@ const popoverModifiers = {
 export const NavBar = memoNamed('NavBar', () => {
   const fireAuthUser = Auth.useFireAuthUser();
 
-  const handleSignInClick = useRouterLinkClick({
-    replace: false,
-    pushFn: Router.push,
-    redirectFn: Router.redirect,
-  });
-
-  const handleRegisterClick = useRouterLinkClick({
-    replace: false,
-    pushFn: Router.push,
-    redirectFn: Router.redirect,
-  });
-
-  const handleEventListButtonClick = useRouterLinkClick({
+  const routerLinkClickHandler = useRouterLinkClick({
     replace: false,
     pushFn: Router.push,
     redirectFn: Router.redirect,
@@ -89,13 +77,13 @@ export const NavBar = memoNamed('NavBar', () => {
 
               <ItemAnchor
                 href={Routes.routes.signInPage}
-                onClick={handleSignInClick}
+                onClick={routerLinkClickHandler}
               >
                 {dc.auth.signIn}
               </ItemAnchor>
               <ItemAnchor
                 href={Routes.routes.registerPage}
-                onClick={handleRegisterClick}
+                onClick={routerLinkClickHandler}
               >
                 {dc.auth.register}
               </ItemAnchor>
@@ -104,7 +92,7 @@ export const NavBar = memoNamed('NavBar', () => {
             <>
               <ItemAnchor
                 href={Routes.routes.eventListPage}
-                onClick={handleEventListButtonClick}
+                onClick={routerLinkClickHandler}
               >
                 {dc.list}
               </ItemAnchor>
