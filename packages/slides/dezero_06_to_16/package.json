@@ -20,7 +20,7 @@
     "z:fb:deploy:wireit": "wireit"
   },
   "dependencies": {
-    "reveal.js": "^4.0.2"
+    "reveal.js": "^5.0.4"
   },
   "devDependencies": {
     "@noshiro/eslint-utils": "*"
