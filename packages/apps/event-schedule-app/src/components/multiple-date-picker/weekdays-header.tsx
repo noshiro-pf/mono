@@ -17,13 +17,10 @@ export const WeekdaysHeader = memoNamed<Props>(
       () =>
         daysOfWeekList.en.map((w, idx) => ({
           ...w,
-          onClickHandler:
-            onClick === undefined
-              ? undefined
-              : () => {
-                  // eslint-disable-next-line no-restricted-syntax
-                  onClick(idx as DayOfWeekIndex);
-                },
+          onClickHandler: mapOptional(onClick, (f) => () => {
+            // eslint-disable-next-line no-restricted-syntax
+            f(idx as DayOfWeekIndex);
+          }),
         })),
       [onClick],
     );

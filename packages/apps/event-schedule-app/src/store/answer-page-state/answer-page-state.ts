@@ -18,7 +18,7 @@ import {
 } from '../../functions';
 import { type AnswerSelectionValue } from '../../types';
 import { Auth } from '../auth';
-import { AnswersStore, answers$, eventSchedule$ } from '../fetching-state';
+import { AnswersStore, eventSchedule$ } from '../fetching-state';
 import { Router } from '../router';
 
 const toast = createToaster();
@@ -29,7 +29,7 @@ const { state$: selectedAnswerSaved$, setState: setSelectedAnswerSaved } =
   createState<Answer | undefined>(undefined);
 
 const { state$: submitButtonIsLoading$, setState: setSubmitButtonIsLoading } =
-  createState<boolean>(false);
+  createBooleanState(false);
 
 const {
   state$: alertOnAnswerClickIsOpen$,
@@ -98,7 +98,7 @@ const selectedAnswerUserName$ = selectedAnswerSaved$.chain(
 );
 
 const requiredParticipantsExist$: InitializedObservable<boolean> =
-  answers$.chain(
+  AnswersStore.answers$.chain(
     mapI((answers) => answers?.some((a) => a.isRequiredParticipants) === true),
   );
 
@@ -142,7 +142,7 @@ const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
   .chain(withInitialValue(answerDefaultValue));
 
 const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combineLatestI([
-  answers$,
+  AnswersStore.answers$,
   answerBeingEdited$,
   selectedAnswerUserName$,
 ]).chain(

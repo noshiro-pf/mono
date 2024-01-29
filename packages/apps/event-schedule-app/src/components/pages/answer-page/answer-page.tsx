@@ -15,14 +15,14 @@ import {
   Auth,
   EventScheduleStore,
   Router,
-  answers$,
+  answersFiltered$,
   errorType$,
   eventSchedule$,
   holidaysJpDefinition$,
 } from '../../../store';
 import { toClassName } from '../../../utils';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
-import { AlertWithMaxWidth } from '../../bp';
+import { AlertWithMaxWidth, BpSwitch } from '../../bp';
 import { CustomScrollbarWrapper, Section } from '../../molecules';
 import { MultipleDatePicker } from '../../multiple-date-picker';
 import {
@@ -73,7 +73,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   const answerBeingEditedSectionState = useObservableValue(
     AnswerPageStore.answerBeingEditedSectionState$,
   );
-  const answers = useObservableValue(answers$);
+  const answers = useObservableValue(answersFiltered$);
   const errorType = useObservableValue(errorType$);
   const eventId = useObservableValue(Router.eventId$);
   const eventSchedule = useObservableValue(eventSchedule$);
@@ -170,6 +170,18 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     }
   }, []);
 
+  const dateStringIsMinimized = useObservableValue(
+    AnswerTableStore.dateStringIsMinimized$,
+  );
+
+  const answerIconIsHidden = useObservableValue(
+    AnswerTableStore.answerIconIsHidden$,
+  );
+
+  const tableIsMinimized = useObservableValue(
+    AnswerTableStore.tableIsMinimized$,
+  );
+
   return errorType !== undefined && errorType.type.type === 'not-found' ? (
     <NotFoundPage />
   ) : (
@@ -233,7 +245,11 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               </Button>
             </ButtonsWrapperNowrapPadChanged>
 
-            <ScreenShotAreaWrapper>
+            <div
+              css={css`
+                display: flex;
+              `}
+            >
               <ScreenShotArea ref={screenShotAreaRef}>
                 <TableTopWrapper>
                   <TagInputWrapper>
@@ -257,6 +273,27 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                       }
                       values={tagValues}
                     />
+
+                    <FilterButtonsWrapper>
+                      <Button
+                        intent={'primary'}
+                        small={true}
+                        onClick={
+                          AnswerFilterAndSortStore.displayOnlyCandidateDatesWithZeroPoorIcon
+                        }
+                      >
+                        {dc.answers.displayOnlyCandidateDatesWithZeroPoorIcon}
+                      </Button>
+                      <Button
+                        intent={'primary'}
+                        small={true}
+                        onClick={
+                          AnswerFilterAndSortStore.displayOnlyCandidateDatesOfRank1to3
+                        }
+                      >
+                        {dc.answers.displayOnlyCandidateDatesOfRank1to3}
+                      </Button>
+                    </FilterButtonsWrapper>
                   </TagInputWrapper>
 
                   <ToggleDetailedFilterSettingsLabel
@@ -273,10 +310,40 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                     </ToggleDetailedFilterSettingsButton>
                     <span>{dc.answers.detailedFilterSettingsButton}</span>
                   </ToggleDetailedFilterSettingsLabel>
+
                   <DetailedFilterCollapse
                     isOpen={detailedFilterDialogIsDisplayed}
                   />
                 </TableTopWrapper>
+
+                <TogglesWrapper>
+                  <div>
+                    <BpSwitch
+                      checked={dateStringIsMinimized}
+                      label={
+                        dict.answerPage.answers.toggleDateStringIsMinimized
+                      }
+                      noMargin={true}
+                      onToggle={AnswerTableStore.toggleDateStringIsMinimized}
+                    />
+                  </div>
+                  <div>
+                    <BpSwitch
+                      checked={answerIconIsHidden}
+                      label={dict.answerPage.answers.toggleAnswerIconIsHidden}
+                      noMargin={true}
+                      onToggle={AnswerTableStore.toggleAnswerIconIsHidden}
+                    />
+                  </div>
+                  <div>
+                    <BpSwitch
+                      checked={tableIsMinimized}
+                      label={dict.answerPage.answers.toggleMinimizedTable}
+                      noMargin={true}
+                      onToggle={AnswerTableStore.toggleTableIsMinimized}
+                    />
+                  </div>
+                </TogglesWrapper>
 
                 <TableWrapper ref={tableWrapperRef}>
                   <AnswerTable
@@ -302,7 +369,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                   </AlertWithMaxWidth>
                 </TableWrapper>
               </ScreenShotArea>
-            </ScreenShotAreaWrapper>
+            </div>
 
             <IconDescriptionWrapper>
               {requiredParticipantsExist ? (
@@ -409,18 +476,42 @@ const ButtonsWrapperNowrapPadChanged = styled(ButtonsWrapperNowrap)`
   margin-left: 10px;
 `;
 
-const TableTopWrapper = styled.div`
+const TableTopWrapper = styled(CustomScrollbarWrapper)`
   margin: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 `;
 
 const TagInputWrapper = styled.div`
   margin-bottom: 5px;
+  max-width: 500px;
+`;
+
+const FilterButtonsWrapper = styled.div`
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  margin: 5px;
+
+  & > * {
+    margin: 2px;
+  }
 `;
 
 const TableWrapper = styled(CustomScrollbarWrapper)`
   margin: 5px;
+`;
+
+const TogglesWrapper = styled.div`
+  margin: 5px;
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+
+  & > * {
+    margin-right: 20px;
+    white-space: nowrap;
+  }
 `;
 
 const IconDescriptionWrapper = styled.div`
@@ -442,10 +533,6 @@ const NoteForPointOfFair = styled.div`
 
 const AnswerLaterWrapper = styled.div`
   margin: 20px;
-`;
-
-const ScreenShotAreaWrapper = styled.div`
-  display: flex;
 `;
 
 const ScreenShotArea = styled.div`

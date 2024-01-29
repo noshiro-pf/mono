@@ -1,8 +1,12 @@
 import { type TagProps } from '@blueprintjs/core';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { AnswerFilterState } from '../../functions';
-import { type AnswersScore, type DetailedFilterIcon } from '../../types';
-import { answers$, eventSchedule$ } from '../fetching-state';
+import {
+  type AnswerRank,
+  type AnswersScore,
+  type DetailedFilterIcon,
+} from '../../types';
+import { AnswersStore, eventSchedule$ } from '../fetching-state';
 import { AnswerFilterQueryParam } from './answer-filter-query-param';
 
 const {
@@ -156,89 +160,139 @@ const setEnabledFilteringByFairPlusPoor = (value: boolean): void => {
   }
 };
 
+const displayOnlyCandidateDatesWithZeroPoorIcon = (): void => {
+  setMaxCountOfPoorIcon(0);
+  setEnabledFilteringByPoorIcon(true);
+};
+
+const displayOnlyCandidateDatesOfRank1to3 = (): void => {
+  setRank(3);
+  setEnabledFilteringByRank(true);
+};
+
 const iconOfSpecifiedRespondentCheckState$: InitializedObservable<
-  | DeepReadonly<
-      {
-        key: string;
-        username: string;
-        checkState: Record<
-          AnswerIconIdWithNone,
-          {
-            checked: boolean;
-            onCheck: (value: boolean) => void;
-          }
-        >;
-      }[]
-    >
-  | undefined
-> = combineLatestI([answers$, filterState$]).chain(
-  mapI(([answers, filterState]) =>
-    answers === undefined
-      ? undefined
-      : answers.map((ans) => ({
-          key: ans.id,
-          username: ans.user.name,
-          checkState: {
-            good: {
-              checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
+  DeepReadonly<
+    {
+      key: string;
+      username: string;
+      checkState: Record<
+        AnswerIconIdWithNone,
+        {
+          checked: boolean;
+          onCheck: (value: boolean) => void;
+        }
+      >;
+    }[]
+  >
+> = combineLatestI([AnswersStore.answers$, filterState$]).chain(
+  mapI(
+    ([answers, filterState]) =>
+      answers?.map((ans) => ({
+        key: ans.id,
+        username: ans.user.name,
+        checkState: {
+          good: {
+            checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
+              ans.user.name,
+              'good',
+            ]),
+            onCheck: (value: boolean) => {
+              setIconOfSpecifiedRespondentCheckState(
                 ans.user.name,
                 'good',
-              ]),
-              onCheck: (value: boolean) => {
-                setIconOfSpecifiedRespondentCheckState(
-                  ans.user.name,
-                  'good',
-                  value,
-                );
-              },
-            },
-            fair: {
-              checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
-                ans.user.name,
-                'fair',
-              ]),
-              onCheck: (value: boolean) => {
-                setIconOfSpecifiedRespondentCheckState(
-                  ans.user.name,
-                  'fair',
-                  value,
-                );
-              },
-            },
-            poor: {
-              checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
-                ans.user.name,
-                'poor',
-              ]),
-              onCheck: (value: boolean) => {
-                setIconOfSpecifiedRespondentCheckState(
-                  ans.user.name,
-                  'poor',
-                  value,
-                );
-              },
-            },
-            none: {
-              checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
-                ans.user.name,
-                'none',
-              ]),
-              onCheck: (value: boolean) => {
-                setIconOfSpecifiedRespondentCheckState(
-                  ans.user.name,
-                  'none',
-                  value,
-                );
-              },
+                value,
+              );
             },
           },
-        })),
+          fair: {
+            checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
+              ans.user.name,
+              'fair',
+            ]),
+            onCheck: (value: boolean) => {
+              setIconOfSpecifiedRespondentCheckState(
+                ans.user.name,
+                'fair',
+                value,
+              );
+            },
+          },
+          poor: {
+            checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
+              ans.user.name,
+              'poor',
+            ]),
+            onCheck: (value: boolean) => {
+              setIconOfSpecifiedRespondentCheckState(
+                ans.user.name,
+                'poor',
+                value,
+              );
+            },
+          },
+          none: {
+            checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
+              ans.user.name,
+              'none',
+            ]),
+            onCheck: (value: boolean) => {
+              setIconOfSpecifiedRespondentCheckState(
+                ans.user.name,
+                'none',
+                value,
+              );
+            },
+          },
+        },
+      })) ?? [],
+  ),
+);
+
+const respondentCheckState$: InitializedObservable<
+  DeepReadonly<
+    {
+      key: string;
+      username: string;
+      checkState: {
+        checked: boolean;
+        onCheck: (value: boolean) => void;
+      };
+    }[]
+  >
+> = combineLatestI([AnswersStore.answers$, filterState$]).chain(
+  mapI(
+    ([answers, filterState]) =>
+      answers?.map((ans) => ({
+        key: ans.id,
+        username: ans.user.name,
+        checkState: {
+          checked: !filterState.respondent.falseKeys.has(ans.user.name),
+          onCheck: (value: boolean) => {
+            setRespondentCheckState(ans.user.name, value);
+          },
+        },
+      })) ?? [],
   ),
 );
 
 const setOnlyFilledDate = (checked: boolean): void => {
   AnswerFilterQueryParam.saveFilterStateToQueryParams(
     filterStateDispatch({ type: 'set-filledDateOnly', checked }),
+  );
+};
+
+const setEnabledFilteringByRank = (value: boolean): void => {
+  AnswerFilterQueryParam.saveFilterStateToQueryParams(
+    filterStateDispatch({
+      type: 'set-enabled-filtering-by-rank',
+      value,
+    }),
+  );
+};
+
+const setRank = (rank: AnswerRank): void => {
+  AnswerFilterQueryParam.saveFilterStateToQueryParams(
+    filterStateDispatch({ type: 'set-rank', rank }),
   );
 };
 
@@ -256,6 +310,18 @@ const setScoreRange = (
 ): void => {
   AnswerFilterQueryParam.saveFilterStateToQueryParams(
     filterStateDispatch({ type: 'set-scoreRange', range }),
+  );
+};
+
+const setScoreRangeMin = (min: AnswersScore): void => {
+  AnswerFilterQueryParam.saveFilterStateToQueryParams(
+    filterStateDispatch({ type: 'set-scoreRange-min', min }),
+  );
+};
+
+const setScoreRangeMax = (max: AnswersScore): void => {
+  AnswerFilterQueryParam.saveFilterStateToQueryParams(
+    filterStateDispatch({ type: 'set-scoreRange-max', max }),
   );
 };
 
@@ -357,19 +423,36 @@ const setEnabledFilteringByIconOfSpecifiedRespondent = (
   );
 };
 
+const setEnabledFilteringByRespondent = (value: boolean): void => {
+  AnswerFilterQueryParam.saveFilterStateToQueryParams(
+    filterStateDispatch({
+      type: 'set-enabled-filtering-by-respondent',
+      value,
+    }),
+  );
+};
+
 const setIconOfSpecifiedRespondentCheckState = (
   username: UserName,
   iconId: AnswerIconIdWithNone,
   value: boolean,
 ): void => {
-  AnswerFilterQueryParam.saveFilterStateToQueryParams(
-    filterStateDispatch({
-      type: 'set-iconOfSpecifiedRespondent',
-      value,
-      username,
-      iconId,
-    }),
-  );
+  // don't call AnswerFilterQueryParam.saveFilterStateToQueryParams
+  filterStateDispatch({
+    type: 'set-iconOfSpecifiedRespondent',
+    value,
+    username,
+    iconId,
+  });
+};
+
+const setRespondentCheckState = (username: UserName, value: boolean): void => {
+  // don't call AnswerFilterQueryParam.saveFilterStateToQueryParams
+  filterStateDispatch({
+    type: 'set-respondent',
+    value,
+    username,
+  });
 };
 
 const restoreFromQueryParams = (): void => {
@@ -392,13 +475,18 @@ const tags$: InitializedObservable<
       {
         iconState,
         filledDateOnly,
+        rank,
         scoreRange,
         dateRange,
         dayOfWeek,
         iconOfSpecifiedRespondent,
+        respondent,
+        ...rest
       },
-    ]) =>
-      [
+    ]) => {
+      expectType<keyof typeof rest, never>('=');
+
+      return [
         {
           value: dc.sort(...sortKeyAndOrder),
           props: {
@@ -428,6 +516,18 @@ const tags$: InitializedObservable<
                 intent: 'primary' as const,
                 onRemove: () => {
                   setEnabledFilteringByDayOfWeek(false);
+                },
+              },
+            }
+          : undefined,
+
+        rank.enabled
+          ? {
+              value: dc.rank(rank.value),
+              props: {
+                intent: 'primary' as const,
+                onRemove: () => {
+                  setEnabledFilteringByRank(false);
                 },
               },
             }
@@ -530,7 +630,20 @@ const tags$: InitializedObservable<
               },
             }
           : undefined,
-      ].filter(isNotUndefined),
+
+        respondent.enabled
+          ? {
+              value: dc.respondent,
+              props: {
+                intent: 'none' as const,
+                onRemove: () => {
+                  setEnabledFilteringByRespondent(false);
+                },
+              },
+            }
+          : undefined,
+      ].filter(isNotUndefined);
+    },
   ),
 );
 
@@ -560,7 +673,16 @@ const clearTags = (): void => {
 
 /* subscriptions */
 
-answers$
+export const answersFiltered$ = combineLatestI([
+  AnswersStore.answers$,
+  filterState$,
+]).chain(
+  mapI(([answers, filterState]) =>
+    answers?.filter((a) => !filterState.respondent.falseKeys.has(a.user.name)),
+  ),
+);
+
+answersFiltered$
   .chain(filter(isNotUndefined))
   .chain(map((answers) => answers.length))
   .chain(distinctUntilChanged())
@@ -591,6 +713,7 @@ export const AnswerFilterAndSortStore = {
   sortKeyAndOrder$,
   filterState$,
   iconOfSpecifiedRespondentCheckState$,
+  respondentCheckState$,
   tagValues$,
   tagProps$,
   onDatetimeSortOrderChange,
@@ -615,8 +738,12 @@ export const AnswerFilterAndSortStore = {
   setEnabledFilteringByGoodPlusFair,
   setEnabledFilteringByFairPlusPoor,
   setOnlyFilledDate,
+  setEnabledFilteringByRank,
+  setRank,
   setEnabledFilteringByScoreRange,
   setScoreRange,
+  setScoreRangeMin,
+  setScoreRangeMax,
   setDateRangeDefaultValue,
   setEnabledFilteringByDayOfWeek,
   setSundayCheck,
@@ -629,6 +756,9 @@ export const AnswerFilterAndSortStore = {
   setEnabledFilteringByDateRange,
   setDateRange,
   setEnabledFilteringByIconOfSpecifiedRespondent,
+  setEnabledFilteringByRespondent,
   restoreFromQueryParams,
   clearTags,
+  displayOnlyCandidateDatesWithZeroPoorIcon,
+  displayOnlyCandidateDatesOfRank1to3,
 } as const;

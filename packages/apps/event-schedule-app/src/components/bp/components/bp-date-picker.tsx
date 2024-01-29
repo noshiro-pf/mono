@@ -61,11 +61,11 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
 
     const date = useMemo<string | undefined>(
       () =>
-        ymd === undefined
-          ? undefined
-          : DateUtils.from(
-              `${ymd.year}/${ymd.month}/${ymd.date} 12:34:56`,
-            ).toLocaleString(),
+        mapOptional(ymd, (a) =>
+          DateUtils.from(
+            `${a.year}/${a.month}/${a.date} 12:34:56`,
+          ).toISOString(),
+        ),
       [ymd],
     );
 

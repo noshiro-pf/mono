@@ -1,5 +1,5 @@
 import { toWeight } from '@noshiro/event-schedule-app-shared';
-import { type AnswersScore } from '../types';
+import { type AnswerRank, type AnswersScore } from '../types';
 import { defaultIconPoint } from './default-icon-point';
 
 type NumericInputConfigBase = Readonly<{
@@ -52,6 +52,15 @@ export const answersScoreNumericInputConfig = {
   defaultValue: 0 satisfies AnswersScore,
 } as const satisfies NumericInputConfigBase;
 
+export const answerRankNumericInputConfig = {
+  step: 1 satisfies AnswerRank,
+  majorStep: 1 satisfies AnswerRank,
+  min: 1 satisfies AnswerRank,
+  max: 10 satisfies AnswerRank,
+  digit: toSafeUint(0),
+  defaultValue: 3 satisfies AnswerRank,
+} as const satisfies NumericInputConfigBase;
+
 const clampAndRoundFn =
   <T extends number>(
     cfg: Readonly<{
@@ -91,4 +100,8 @@ export const clampAndRoundNumIcons = (x: number, upperLimit: number): number =>
 
 export const clampAndRoundAnswersScore = clampAndRoundFn<AnswersScore>(
   answersScoreNumericInputConfig,
+);
+
+export const clampAndRoundAnswerRank = clampAndRoundFn<AnswerRank>(
+  answerRankNumericInputConfig,
 );

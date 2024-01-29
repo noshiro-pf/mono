@@ -1,5 +1,5 @@
 import { compareYmd, toUserName } from '@noshiro/event-schedule-app-shared';
-import { type AnswersScore } from '../../types';
+import { type AnswerRank, type AnswersScore } from '../../types';
 import {
   AnswerIconFilterState,
   type AnswerIconFilterStateAction,
@@ -11,6 +11,11 @@ export type AnswerFilterState = DeepReadonly<{
   iconState: AnswerIconFilterState;
 
   filledDateOnly: boolean;
+
+  rank: {
+    enabled: boolean;
+    value: AnswerRank;
+  };
 
   scoreRange: {
     enabled: boolean;
@@ -48,12 +53,23 @@ export type AnswerFilterState = DeepReadonly<{
     enabled: boolean;
     falseKeys: ISetMapped<UserNameAndIconId, string>;
   };
+
+  respondent: {
+    enabled: boolean;
+    falseKeys: ISet<UserName>;
+  };
 }>;
 
 const initialState: AnswerFilterState = {
   iconState: AnswerIconFilterState.initialState,
 
   filledDateOnly: false,
+
+  rank: {
+    enabled: false,
+    value: 3,
+  },
+
   scoreRange: {
     enabled: false,
     value: { min: 0, max: 1 },
@@ -96,6 +112,11 @@ const initialState: AnswerFilterState = {
       ],
     ),
   },
+
+  respondent: {
+    enabled: false,
+    falseKeys: ISet.new<UserName>([]),
+  },
 };
 
 export type AnswerFilterStateAction = DeepReadonly<
@@ -137,6 +158,14 @@ export type AnswerFilterStateAction = DeepReadonly<
       value: boolean;
     }
   | {
+      type: 'set-enabled-filtering-by-rank';
+      value: boolean;
+    }
+  | {
+      type: 'set-enabled-filtering-by-respondent';
+      value: boolean;
+    }
+  | {
       type: 'set-enabled-filtering-by-scoreRange';
       value: boolean;
     }
@@ -149,6 +178,23 @@ export type AnswerFilterStateAction = DeepReadonly<
       username: UserName;
       iconId: AnswerIconIdWithNone;
       value: boolean;
+    }
+  | {
+      type: 'set-rank';
+      rank: AnswerRank;
+    }
+  | {
+      type: 'set-respondent';
+      username: UserName;
+      value: boolean;
+    }
+  | {
+      type: 'set-scoreRange-max';
+      max: AnswersScore;
+    }
+  | {
+      type: 'set-scoreRange-min';
+      min: AnswersScore;
     }
   | {
       type: 'set-scoreRange';
@@ -165,6 +211,7 @@ export type AnswerFilterStateAction = DeepReadonly<
           fairPlusPoor: { min: number | undefined; max: number | undefined };
         };
         filledDateOnly: boolean | undefined;
+        rank: AnswerRank | undefined;
         scoreRange: {
           min: AnswersScore | undefined;
           max: AnswersScore | undefined;
@@ -236,6 +283,7 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
             filledDateOnly,
             iconState,
             scoreRange,
+            rank,
           } = action.values;
 
           const init = initialState;
@@ -263,6 +311,10 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
                 Sat: dayOfWeek?.Sat ?? init.dayOfWeek.value.Sat,
               },
             },
+            rank: {
+              enabled: isNotUndefined(rank),
+              value: rank ?? init.rank.value,
+            },
             scoreRange: {
               enabled:
                 isNotUndefined(scoreRange.min) ||
@@ -281,6 +333,8 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
             }),
 
             iconOfSpecifiedRespondent: state.iconOfSpecifiedRespondent,
+
+            respondent: state.respondent,
           };
 
           return nextState;
@@ -311,6 +365,16 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
                 },
           );
         }
+
+        case 'set-enabled-filtering-by-rank':
+          return state.rank.enabled === action.value
+            ? state // check変更無しならそのまま返す
+            : !action.value // 無効化されたらリセット
+              ? Obj.set(state, 'rank', {
+                  enabled: false,
+                  value: initialState.rank.value,
+                })
+              : Obj.setIn(state, ['rank', 'enabled'], true);
 
         case 'set-enabled-filtering-by-scoreRange':
           return state.scoreRange.enabled === action.value
@@ -359,6 +423,16 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
                   true,
                 );
 
+        case 'set-enabled-filtering-by-respondent':
+          return state.respondent.enabled === action.value
+            ? state // check変更無しならそのまま返す
+            : !action.value // 無効化されたらリセット
+              ? Obj.set(state, 'respondent', {
+                  enabled: false,
+                  falseKeys: initialState.respondent.falseKeys,
+                })
+              : Obj.setIn(state, ['respondent', 'enabled'], true);
+
         case 'set-iconOfSpecifiedRespondent': {
           const { iconId, username, value } = action;
 
@@ -379,8 +453,37 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
           }
         }
 
+        case 'set-respondent': {
+          const { username, value } = action;
+
+          if (value) {
+            // check value is true
+            return Obj.updateIn(
+              state,
+              ['respondent', 'falseKeys'] as const,
+              (st) => st.delete(username),
+            );
+          } else {
+            // check value is false
+            return Obj.updateIn(
+              state,
+              ['respondent', 'falseKeys'] as const,
+              (st) => st.add(username),
+            );
+          }
+        }
+
         case 'set-filledDateOnly':
           return Obj.update(state, 'filledDateOnly', (b) => !b);
+
+        case 'set-rank':
+          return Obj.setIn(state, ['rank', 'value'], action.rank);
+
+        case 'set-scoreRange-min':
+          return Obj.setIn(state, ['scoreRange', 'value', 'min'], action.min);
+
+        case 'set-scoreRange-max':
+          return Obj.setIn(state, ['scoreRange', 'value', 'max'], action.max);
 
         case 'set-scoreRange':
           return Obj.setIn(state, ['scoreRange', 'value'], action.range);

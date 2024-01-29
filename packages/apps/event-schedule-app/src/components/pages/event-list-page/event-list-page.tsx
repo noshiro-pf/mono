@@ -14,47 +14,6 @@ import { EventListItemComponent } from './event-list-item';
 
 const dc = dict.eventListPage;
 
-const filterOptionStateChangeHandler: React.ChangeEventHandler<
-  HTMLSelectElement
-> = (ev) => {
-  const v = ev.target.value;
-  if (v === 'archive' || v === 'inProgress') {
-    EventListPageFilterStore.setFilterOptionState(v);
-  }
-};
-
-const toast = createToaster();
-
-const archiveOrUnarchiveHandler =
-  (archiveOrUnarchive: 'archive' | 'unarchive') =>
-  async (eventId: string, user: User): Promise<void> => {
-    const result = await api.event[archiveOrUnarchive](eventId, user);
-
-    if (Result.isErr(result)) {
-      console.error(result.value);
-      showToast({
-        toast,
-        message: dc.errorOccurred,
-        intent: 'danger',
-      });
-    } else {
-      showToast({
-        toast,
-        message: match(archiveOrUnarchive, {
-          archive: dc.archivingDone,
-          unarchive: dc.unArchivingDone,
-        }),
-        intent: 'success',
-      });
-
-      EventListStore.fetchEventList();
-    }
-  };
-
-const archiveEventScheduleHandler = archiveOrUnarchiveHandler('archive');
-
-const unarchiveEventScheduleHandler = archiveOrUnarchiveHandler('unarchive');
-
 export const EventListPage = memoNamed('EventListPage', () => {
   useEffect(() => {
     EventListStore.fetchEventList();
@@ -211,6 +170,47 @@ export const EventListPage = memoNamed('EventListPage', () => {
     </div>
   );
 });
+
+const filterOptionStateChangeHandler: React.ChangeEventHandler<
+  HTMLSelectElement
+> = (ev) => {
+  const v = ev.target.value;
+  if (v === 'archive' || v === 'inProgress') {
+    EventListPageFilterStore.setFilterOptionState(v);
+  }
+};
+
+const toast = createToaster();
+
+const archiveOrUnarchiveHandler =
+  (archiveOrUnarchive: 'archive' | 'unarchive') =>
+  async (eventId: string, user: User): Promise<void> => {
+    const result = await api.event[archiveOrUnarchive](eventId, user);
+
+    if (Result.isErr(result)) {
+      console.error(result.value);
+      showToast({
+        toast,
+        message: dc.errorOccurred,
+        intent: 'danger',
+      });
+    } else {
+      showToast({
+        toast,
+        message: match(archiveOrUnarchive, {
+          archive: dc.archivingDone,
+          unarchive: dc.unArchivingDone,
+        }),
+        intent: 'success',
+      });
+
+      EventListStore.fetchEventList();
+    }
+  };
+
+const archiveEventScheduleHandler = archiveOrUnarchiveHandler('archive');
+
+const unarchiveEventScheduleHandler = archiveOrUnarchiveHandler('unarchive');
 
 const FilterByArea = styled.div`
   margin: 10px 0;

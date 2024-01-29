@@ -3,6 +3,7 @@ export * from './answer-icon-point-input';
 export * from './custom-scrollbar-wrapper';
 export * from './icon-count-numeric-input';
 export * from './lock-button';
+export * from './rank-numeric-input';
 export * from './score-numeric-input';
 export * from './section';
 export * from './time-range';

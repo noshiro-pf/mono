@@ -25,11 +25,14 @@ export const useRangeSliderLabels = ({
 }> => {
   const customLabelValuesWithRatio = useMemo(() => {
     if (customLabelValues === undefined) return [];
+
     const isInRangeInclusive = Num.isInRangeInclusive(min, max);
+
     if (!customLabelValues.every(isInRangeInclusive)) {
       console.error('all values should be in [min, max].');
       return [];
     }
+
     return pipe(customLabelValues)
       .chain((list) => Arr.uniq(list))
       .chain((list) =>

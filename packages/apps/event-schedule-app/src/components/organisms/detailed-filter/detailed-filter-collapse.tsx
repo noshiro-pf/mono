@@ -1,5 +1,6 @@
 import { Collapse } from '@blueprintjs/core';
 import { AnswerFilterAndSortStore } from '../../../store';
+import { CheckboxView } from '../../bp';
 import { DetailedFilterDateRange } from './detailed-filter-date-range';
 import { DetailedFilterDayOfWeek } from './detailed-filter-day-of-week';
 import { DetailedFilterFilledDateOnly } from './detailed-filter-filled-date-only';
@@ -9,7 +10,9 @@ import { DetailedFilterNumFairPlusPoorIcon } from './detailed-filter-num-fair-pl
 import { DetailedFilterNumGoodIcon } from './detailed-filter-num-good-icon';
 import { DetailedFilterNumGoodPlusFairIcon } from './detailed-filter-num-good-plus-fair-icon';
 import { DetailedFilterNumPoorIcon } from './detailed-filter-num-poor-icon';
+import { DetailedFilterRank } from './detailed-filter-rank';
 import { DetailedFilterScoreRange } from './detailed-filter-score-range';
+import { CheckboxWrapper, FilterItem, FilterItemContent } from './styled';
 
 type Props = DeepReadonly<{
   isOpen: boolean;
@@ -23,12 +26,21 @@ export const DetailedFilterCollapse = memoNamed<Props>(
       dayOfWeek,
       filledDateOnly,
       iconOfSpecifiedRespondent,
+      respondent,
       iconState,
       scoreRange,
+      rank,
+      ...rest
     } = useObservableValue(AnswerFilterAndSortStore.filterState$);
+
+    expectType<keyof typeof rest, never>('=');
 
     const iconOfSpecifiedRespondentCheckState = useObservableValue(
       AnswerFilterAndSortStore.iconOfSpecifiedRespondentCheckState$,
+    );
+
+    const filteredRespondentCheckState = useObservableValue(
+      AnswerFilterAndSortStore.respondentCheckState$,
     );
 
     return (
@@ -58,6 +70,8 @@ export const DetailedFilterCollapse = memoNamed<Props>(
               enabled={scoreRange.enabled}
               range={scoreRange.value}
             />
+
+            <DetailedFilterRank enabled={rank.enabled} rank={rank.value} />
 
             <hr />
 
@@ -104,24 +118,70 @@ export const DetailedFilterCollapse = memoNamed<Props>(
 
             <DetailedFilterFilledDateOnly filledDateOnly={filledDateOnly} />
 
-            {iconOfSpecifiedRespondentCheckState === undefined ? undefined : (
-              <DetailedFilterIconOfSpecifiedRespondent
-                checkState={iconOfSpecifiedRespondentCheckState}
-                enabled={iconOfSpecifiedRespondent.enabled}
-                fairDisabled={
-                  iconState.fair.max === 0 ||
-                  iconState.goodPlusFair.max === 0 ||
-                  iconState.fairPlusPoor.max === 0
-                }
-                goodDisabled={
-                  iconState.good.max === 0 || iconState.goodPlusFair.max === 0
-                }
-                noneDisabled={filledDateOnly}
-                poorDisabled={
-                  iconState.poor.max === 0 || iconState.fairPlusPoor.max === 0
-                }
-              />
-            )}
+            <DetailedFilterIconOfSpecifiedRespondent
+              checkState={iconOfSpecifiedRespondentCheckState}
+              enabled={iconOfSpecifiedRespondent.enabled}
+              fairDisabled={
+                iconState.fair.max === 0 ||
+                iconState.goodPlusFair.max === 0 ||
+                iconState.fairPlusPoor.max === 0
+              }
+              goodDisabled={
+                iconState.good.max === 0 || iconState.goodPlusFair.max === 0
+              }
+              noneDisabled={filledDateOnly}
+              poorDisabled={
+                iconState.poor.max === 0 || iconState.fairPlusPoor.max === 0
+              }
+            />
+
+            <hr />
+
+            <div
+              css={css`
+                margin-top: 20px;
+                margin-bottom: 15px;
+              `}
+            >
+              {dict.answerPage.detailedFilter.filterItems.filterOutSomeAnswer}
+            </div>
+
+            <FilterItem>
+              <CheckboxWrapper>
+                <CheckboxView
+                  state={respondent.enabled ? 'checked' : 'none'}
+                  onCheck={
+                    AnswerFilterAndSortStore.setEnabledFilteringByRespondent
+                  }
+                />
+                <span>
+                  {dict.answerPage.detailedFilter.filterItems.respondent.title}
+                </span>
+              </CheckboxWrapper>
+            </FilterItem>
+            <FilterItemContent>
+              {filteredRespondentCheckState.map(
+                ({ username, checkState }, index) => (
+                  <div
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    css={css`
+                      display: flex;
+                      align-items: center;
+                    `}
+                  >
+                    <CheckboxWrapper>
+                      <CheckboxView
+                        disabled={!respondent.enabled}
+                        state={checkState.checked ? 'checked' : 'none'}
+                        onCheck={checkState.onCheck}
+                      />
+                      <span>{username}</span>
+                    </CheckboxWrapper>
+                  </div>
+                ),
+              )}
+            </FilterItemContent>
           </div>
         </div>
       </Collapse>

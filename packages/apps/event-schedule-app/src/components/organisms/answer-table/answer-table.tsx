@@ -53,7 +53,17 @@ export const AnswerTable = memoNamed<Props>(
       AnswerTableStore.tableBodyValuesFiltered$,
     );
 
-    const tableMinimized = useObservableValue(AnswerTableStore.tableMinimized$);
+    const dateStringIsMinimized = useObservableValue(
+      AnswerTableStore.dateStringIsMinimized$,
+    );
+
+    const answerIconIsHidden = useObservableValue(
+      AnswerTableStore.answerIconIsHidden$,
+    );
+
+    const tableMinimized = useObservableValue(
+      AnswerTableStore.tableIsMinimized$,
+    );
 
     return (
       <StickyHeaderTable
@@ -64,20 +74,8 @@ export const AnswerTable = memoNamed<Props>(
           <tr>
             <th className='sticky horizontal'>
               <TableTopLeftCell>
-                <MinimizeTableButton>
-                  <Button
-                    icon={tableMinimized ? 'maximize' : 'minimize'}
-                    minimal={true}
-                    outlined={true}
-                    onClick={
-                      tableMinimized
-                        ? AnswerTableStore.maximizeTable
-                        : AnswerTableStore.minimizeTable
-                    }
-                  />
-                </MinimizeTableButton>
                 <DatetimeHeaderCell>
-                  {tableMinimized ? undefined : (
+                  {tableMinimized || dateStringIsMinimized ? undefined : (
                     <PaddedSpan>{dc.datetime}</PaddedSpan>
                   )}
                   <SortButton
@@ -89,7 +87,9 @@ export const AnswerTable = memoNamed<Props>(
               </TableTopLeftCell>
             </th>
             <th>
-              {tableMinimized ? undefined : <PaddedSpan>{dc.score}</PaddedSpan>}
+              {tableMinimized || dateStringIsMinimized ? undefined : (
+                <PaddedSpan>{dc.score}</PaddedSpan>
+              )}
               <SortButton
                 onSortChange={AnswerFilterAndSortStore.onScoreSortOrderChange}
               />
@@ -97,21 +97,25 @@ export const AnswerTable = memoNamed<Props>(
 
             {/* icons */}
 
-            <IconHeaderCell>
-              <Centering>
-                <FilterByIconPopover answerIconId={'good'} />
-              </Centering>
-            </IconHeaderCell>
-            <IconHeaderCell>
-              <Centering>
-                <FilterByIconPopover answerIconId={'fair'} />
-              </Centering>
-            </IconHeaderCell>
-            <IconHeaderCell>
-              <Centering>
-                <FilterByIconPopover answerIconId={'poor'} />
-              </Centering>
-            </IconHeaderCell>
+            {answerIconIsHidden ? undefined : (
+              <>
+                <IconHeaderCell>
+                  <Centering>
+                    <FilterByIconPopover answerIconId={'good'} />
+                  </Centering>
+                </IconHeaderCell>
+                <IconHeaderCell>
+                  <Centering>
+                    <FilterByIconPopover answerIconId={'fair'} />
+                  </Centering>
+                </IconHeaderCell>
+                <IconHeaderCell>
+                  <Centering>
+                    <FilterByIconPopover answerIconId={'poor'} />
+                  </Centering>
+                </IconHeaderCell>
+              </>
+            )}
 
             {answersWithHandler.map((answer) => (
               <th
@@ -154,21 +158,25 @@ export const AnswerTable = memoNamed<Props>(
                     datetimeRange={datetimeRange}
                     datetimeSpecification={datetimeSpecification}
                     holidaysJpDefinition={holidaysJpDefinition}
-                    tableMinimized={tableMinimized}
+                    minimized={tableMinimized || dateStringIsMinimized}
                   />
                 </td>
                 <td>
                   <span>{Num.roundBy(2, score)}</span>
                 </td>
-                {answerSummaryRow?.map((s, i) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <td key={i}>
-                    <SummaryCellStyle>
-                      <span>{s}</span>
-                      <SummaryCellUnit>{dc.numAnswersUnit}</SummaryCellUnit>
-                    </SummaryCellStyle>
-                  </td>
-                ))}
+                {answerIconIsHidden ? undefined : (
+                  <>
+                    {answerSummaryRow?.map((s, i) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <td key={i}>
+                        <SummaryCellStyle>
+                          <span>{s}</span>
+                          <SummaryCellUnit>{dc.numAnswersUnit}</SummaryCellUnit>
+                        </SummaryCellStyle>
+                      </td>
+                    ))}
+                  </>
+                )}
                 {answerTableRow?.map(
                   ({ iconId, point, showPoint, weight, comment }, i) => (
                     <td
@@ -221,9 +229,13 @@ export const AnswerTable = memoNamed<Props>(
             <td />
 
             {/* spacer - icons */}
-            <td />
-            <td />
-            <td />
+            {answerIconIsHidden ? undefined : (
+              <>
+                <td />
+                <td />
+                <td />
+              </>
+            )}
 
             {answersWithHandler.map((answer) => (
               <td
@@ -247,7 +259,7 @@ export const AnswerTable = memoNamed<Props>(
 );
 
 const userNameWrapperWidth = 80;
-const userNameWrapperThinWidth = 45;
+const userNameWrapperThinWidth = 60;
 
 const answerCellStyle = {
   minWidth: `${userNameWrapperWidth}px`,
@@ -358,9 +370,7 @@ const TableTopLeftCell = styled.div`
   display: flex;
   align-items: center;
 `;
-const MinimizeTableButton = styled.div`
-  flex: 0;
-`;
+
 const DatetimeHeaderCell = styled(Centering)`
   flex: 1;
 `;

@@ -4,7 +4,12 @@ import {
   type AnswerFilterState,
   type AnswerFilterStateAction,
 } from '../../functions';
-import { isAnswersScore, type AnswersScore } from '../../types';
+import {
+  isAnswerRank,
+  isAnswersScore,
+  type AnswerRank,
+  type AnswersScore,
+} from '../../types';
 import { Router } from '../router';
 
 const keyDef = Routes.queryParamKey.answerTableState;
@@ -114,7 +119,13 @@ const saveFilterStateToQueryParams = ({
   dateRange,
   filledDateOnly,
   dayOfWeek,
+  rank,
+  ...rest
 }: AnswerFilterState): void => {
+  expectType<keyof typeof rest, 'iconOfSpecifiedRespondent' | 'respondent'>(
+    '=',
+  );
+
   Router.updateQueryParams(
     (urlSearchParams) => {
       if (
@@ -146,6 +157,12 @@ const saveFilterStateToQueryParams = ({
         );
       } else {
         urlSearchParams.delete(keyDef.filledDateOnly);
+      }
+
+      if (rank.enabled) {
+        urlSearchParams.set(keyDef.rank, num2str(rank.value));
+      } else {
+        urlSearchParams.delete(keyDef.rank);
       }
 
       if (scoreRange.enabled) {
@@ -235,6 +252,11 @@ const restoreFromQueryParams = (
 
   setSortOrderAndKey([sortKey, sortOrder]);
 
+  const parseRank = (s: string): AnswerRank | undefined =>
+    pipe(s)
+      .chain(Num.from)
+      .chain((a) => (isAnswerRank(a) ? a : undefined)).value;
+
   const parseScore = (s: string): AnswersScore | undefined =>
     pipe(s)
       .chain(Num.from)
@@ -256,6 +278,8 @@ const restoreFromQueryParams = (
       dayOfWeek: pipe(queryParams.get(keyDef.dayOfWeek)).chainOptional(
         dayOfWeekFromStr,
       ).value,
+
+      rank: pipe(queryParams.get(keyDef.rank)).chainOptional(parseRank).value,
 
       scoreRange: pipe(queryParams.get(keyDef.score))
         .chainOptional(rangeFromStr)

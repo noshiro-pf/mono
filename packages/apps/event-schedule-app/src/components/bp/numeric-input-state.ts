@@ -1,57 +1,72 @@
-export type NumericInputStateBaseAction = DeepReadonly<
-  | { type: 'decrement' }
-  | { type: 'increment' }
-  | { type: 'normalize' }
-  | { type: 'set-string'; value: string }
->;
+export type NumericInputStateBaseAction<NumericValue extends number> =
+  DeepReadonly<
+    | {
+        type: 'set-normalizer-fn';
+        normalizerFn: (value: number) => NumericValue;
+      }
+    | { type: 'decrement' }
+    | { type: 'increment' }
+    | { type: 'normalize' }
+    | { type: 'set-string'; value: string }
+  >;
 
-const parseValue = (valueStr: string): number | undefined =>
+export const parseValue = (valueStr: string): number | undefined =>
   pipe(Number.parseFloat(valueStr)).chain((a) =>
     Number.isNaN(a) ? undefined : a,
   ).value;
 
-export const createNumericInputStateReducer = <
-  NumericValue extends number,
-  Action extends NumericInputStateBaseAction = NumericInputStateBaseAction,
->(
-  normalizeValue: (value: number) => NumericValue,
-  config: Readonly<{
-    step: number;
-    defaultValue: NumericValue;
-  }>,
-): Readonly<{
-  reducer: Reducer<string, Action>;
-  toValueNormalized: (valueStr: string) => NumericValue;
-}> => {
-  const toValueNormalized = (valueStr: string): NumericValue =>
-    pipe(valueStr).chain(parseValue).chainOptional(normalizeValue).value ??
-    config.defaultValue;
+type State<NumericValue extends number> = Readonly<{
+  value: string;
+  normalizerFn: (value: number) => NumericValue;
+}>;
 
-  const reducer: Reducer<string, Action> = (state, action) => {
+export const createNumericInputStateReducer =
+  <NumericValue extends number>(
+    config: Readonly<{
+      step: number;
+      defaultValue: NumericValue;
+    }>,
+  ): Reducer<State<NumericValue>, NumericInputStateBaseAction<NumericValue>> =>
+  (state, action) => {
     switch (action.type) {
+      case 'set-normalizer-fn':
+        return {
+          value: state.value,
+          normalizerFn: action.normalizerFn,
+        };
+
       case 'set-string':
-        return action.value;
+        return Obj.set(state, 'value', action.value);
 
       case 'normalize':
-        return toValueNormalized(state).toString();
+        return Obj.set(
+          state,
+          'value',
+
+          pipe(state.value)
+            .chain(parseValue)
+            .chainOptional(state.normalizerFn)
+            .chain((n) => n ?? config.defaultValue)
+            .chain((n) => n.toString()).value,
+        );
 
       case 'increment':
       case 'decrement': {
-        const valueParsed = parseValue(state);
-        const nextValue =
-          pipe(valueParsed)
+        return Obj.set(
+          state,
+          'value',
+          pipe(state.value)
+            .chain(parseValue)
             .chainOptional((v) =>
               match(action.type, {
                 decrement: v - config.step,
                 increment: v + config.step,
               }),
             )
-            .chainOptional(normalizeValue).value ?? config.defaultValue;
-
-        return nextValue.toString();
+            .chainOptional(state.normalizerFn)
+            .chain((n) => n ?? config.defaultValue)
+            .chain((n) => n.toString()).value,
+        );
       }
     }
   };
-
-  return { reducer, toValueNormalized };
-};

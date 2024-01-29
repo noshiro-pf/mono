@@ -11,8 +11,11 @@ import {
   type AnswerTableCellPosition,
 } from '../../types';
 import { ymd2day } from '../../utils';
-import { answers$, eventSchedule$ } from '../fetching-state';
-import { AnswerFilterAndSortStore } from './answer-filter-sort-state';
+import { eventSchedule$ } from '../fetching-state';
+import {
+  AnswerFilterAndSortStore,
+  answersFiltered$,
+} from './answer-filter-sort-state';
 
 const answerSelectionMap$: InitializedObservable<
   | IMapMapped<
@@ -25,7 +28,7 @@ const answerSelectionMap$: InitializedObservable<
       AnswerSelectionMapKey
     >
   | undefined
-> = answers$.chain(
+> = answersFiltered$.chain(
   mapI((answers) => mapOptional(answers, createAnswerSelectionMapFromAnswers)),
 );
 
@@ -58,7 +61,11 @@ const answerTable$: InitializedObservable<
       DatetimeRangeMapKey
     >
   | undefined
-> = combineLatestI([eventSchedule$, answerSelectionMapFn$, answers$]).chain(
+> = combineLatestI([
+  eventSchedule$,
+  answerSelectionMapFn$,
+  answersFiltered$,
+]).chain(
   mapI(([eventSchedule, answerSelectionMapFn, answers]) =>
     eventSchedule === undefined || answers === undefined
       ? undefined
@@ -88,7 +95,7 @@ const scores$: InitializedObservable<
   eventSchedule$,
   answerSummary$,
   answerTable$,
-  answers$,
+  answersFiltered$,
 ]).chain(
   mapI(([eventSchedule, answerSummary, answerTable, answers]) =>
     eventSchedule === undefined ||
@@ -138,7 +145,6 @@ const datetimeRangeListSortedByScoresReversed$ =
 
 const datetimeRangeListReordered$ = combineLatestI([
   AnswerFilterAndSortStore.sortKeyAndOrder$,
-
   datetimeRangeList$,
   datetimeRangeListReversed$,
   datetimeRangeListSortedByScores$,
@@ -181,7 +187,7 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
   answerSummary$,
   answerTable$,
   eventSchedule$,
-  answers$,
+  answersFiltered$,
 ]).chain(
   mapI(
     ([
@@ -281,10 +287,10 @@ const tableBodyValues$: InitializedObservable<
 const tableBodyValuesFiltered$ = combineLatestI([
   tableBodyValues$,
   AnswerFilterAndSortStore.filterState$,
-  answers$,
+  answersFiltered$,
 ]).chain(
-  mapI(([tableBodyValues, filterState, answers]) =>
-    tableBodyValues.filter((row) => {
+  mapI(([tableBodyValues, filterState, answers]) => {
+    const tableBodyValuesFiltered = tableBodyValues.filter((row) => {
       const { answerTableRow, answerSummaryRow, score, datetimeRange } = row;
       if (answerSummaryRow === undefined || answerTableRow === undefined)
         return false;
@@ -310,7 +316,10 @@ const tableBodyValuesFiltered$ = combineLatestI([
         dateRange: {
           value: { start: dateStart, end: dateEnd },
         },
+        ...rest
       } = filterState;
+
+      expectType<keyof typeof rest, 'rank' | 'respondent'>('=');
 
       const day = ymd2day(datetimeRange.ymd);
 
@@ -357,24 +366,42 @@ const tableBodyValuesFiltered$ = combineLatestI([
           compareYmd(dateStart, datetimeRange.ymd) <= 0) &&
         (dateEnd === undefined || compareYmd(datetimeRange.ymd, dateEnd) <= 0)
       );
-    }),
-  ),
+    });
+
+    if (!filterState.rank.enabled) return tableBodyValuesFiltered;
+
+    const scoreThreshold = tableBodyValuesFiltered
+      .map((a) => a.score)
+      .toSorted((a, b) => b - a)[filterState.rank.value - 1];
+
+    return tableBodyValuesFiltered.filter(
+      (row) =>
+        // スコア上位のみ表示
+        scoreThreshold === undefined || row.score >= scoreThreshold,
+    );
+  }),
 );
 
-const {
-  state$: tableMinimized$,
-  setTrue: minimizeTable,
-  setFalse: maximizeTable,
-} = createBooleanState(false);
+const { state$: tableIsMinimized$, toggle: toggleTableIsMinimized } =
+  createBooleanState(false);
+
+const { state$: answerIconIsHidden$, toggle: toggleAnswerIconIsHidden } =
+  createBooleanState(false);
+
+const { state$: dateStringIsMinimized$, toggle: toggleDateStringIsMinimized } =
+  createBooleanState(false);
 
 const { state$: detailedFilterIsOpen$, toggle: toggleDetailedFilter } =
   createBooleanState(false);
 
 export const AnswerTableStore = {
   tableBodyValuesFiltered$,
-  tableMinimized$,
-  maximizeTable,
-  minimizeTable,
   detailedFilterIsOpen$,
   toggleDetailedFilter,
+  dateStringIsMinimized$,
+  toggleDateStringIsMinimized,
+  answerIconIsHidden$,
+  toggleAnswerIconIsHidden,
+  tableIsMinimized$,
+  toggleTableIsMinimized,
 } as const;

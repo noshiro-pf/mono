@@ -9,5 +9,6 @@ export * from './detailed-filter-num-good-icon';
 export * from './detailed-filter-num-good-plus-fair-icon';
 export * from './detailed-filter-num-icon';
 export * from './detailed-filter-num-poor-icon';
+export * from './detailed-filter-rank';
 export * from './detailed-filter-score-range';
 export * from './styled';

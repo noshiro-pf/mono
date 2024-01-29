@@ -16,15 +16,18 @@ import {
   ButtonsWrapperAlignEnd,
   DialogWithMaxWidth,
 } from '../components';
+import { isProduction } from '../env';
 import { createToaster, showToast } from '../functions';
 
-// eslint-disable-next-line no-restricted-syntax
-(window.onerror as Writable<typeof window.onerror>) = (e: unknown) => {
-  const errorString = Result.unwrapThrow(Json.stringify(e));
-  console.error(errorString);
+if (isProduction) {
+  // eslint-disable-next-line no-restricted-syntax
+  (window.onerror as Writable<typeof window.onerror>) = (e: unknown) => {
+    const errorString = Result.unwrapThrow(Json.stringify(e));
+    console.error(errorString);
 
-  api.sendReport({ error: errorString }).catch(console.error);
-};
+    api.sendReport({ error: errorString }).catch(console.error);
+  };
+}
 
 type State = Readonly<{
   error: unknown;

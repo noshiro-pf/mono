@@ -26,49 +26,14 @@ type Props = DeepReadonly<{
 /* スコアで絞り込み */
 export const DetailedFilterScoreRange = memoNamed<Props>(
   'DetailedFilterScoreRange',
-  ({ enabled, range: rangeFromProps }) => {
-    const { state: sliderState, setState: setSliderState } = useState<
-      Readonly<{ min: number; max: number }>
-    >({
-      min: answersScoreNumericInputConfig.min,
-      max: answersScoreNumericInputConfig.max,
-    });
-
+  ({ enabled, range }) => {
     const sliderStateNormalized = useMemo(
       () => ({
-        min: clampAndRoundAnswersScore(sliderState.min),
-        max: clampAndRoundAnswersScore(sliderState.max),
+        min: clampAndRoundAnswersScore(range.min),
+        max: clampAndRoundAnswersScore(range.max),
       }),
-      [sliderState],
+      [range],
     );
-
-    const onRelease = useCallback(() => {
-      AnswerFilterAndSortStore.setScoreRange(sliderStateNormalized);
-    }, [sliderStateNormalized]);
-
-    const onMinChange = useCallback(
-      (value: AnswersScore) => {
-        AnswerFilterAndSortStore.setScoreRange({
-          min: value,
-          max: rangeFromProps.max,
-        });
-      },
-      [rangeFromProps.max],
-    );
-
-    const onMaxChange = useCallback(
-      (value: AnswersScore) => {
-        AnswerFilterAndSortStore.setScoreRange({
-          min: rangeFromProps.min,
-          max: value,
-        });
-      },
-      [rangeFromProps.min],
-    );
-
-    useEffect(() => {
-      setSliderState(rangeFromProps);
-    }, [rangeFromProps, setSliderState]);
 
     return (
       <>
@@ -95,15 +60,15 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
           >
             <ScoreNumericInput
               disabled={!enabled}
-              max={rangeFromProps.max}
-              value={rangeFromProps.min}
-              onValueChange={onMinChange}
+              max={range.max}
+              value={range.min}
+              onValueChange={AnswerFilterAndSortStore.setScoreRangeMin}
             />
             <ScoreNumericInput
               disabled={!enabled}
-              min={rangeFromProps.min}
-              value={rangeFromProps.max}
-              onValueChange={onMaxChange}
+              min={range.min}
+              value={range.max}
+              onValueChange={AnswerFilterAndSortStore.setScoreRangeMax}
             />
           </div>
           <RangeSliderWrapper>
@@ -113,8 +78,10 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
               min={answersScoreNumericInputConfig.min}
               range={sliderStateNormalized}
               stepSize={answersScoreNumericInputConfig.step}
-              onChange={setSliderState}
-              onRelease={onRelease}
+              onRangeMaxChange={onRangeMaxChange}
+              onRangeMaxRelease={onRangeMaxRelease}
+              onRangeMinChange={onRangeMinChange}
+              onRangeMinRelease={onRangeMinRelease}
             />
           </RangeSliderWrapper>
         </FilterItemContent>
@@ -122,3 +89,19 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
     );
   },
 );
+
+const onRangeMinChange = (a: number): void => {
+  AnswerFilterAndSortStore.setScoreRangeMin(clampAndRoundAnswersScore(a));
+};
+
+const onRangeMaxChange = (a: number): void => {
+  AnswerFilterAndSortStore.setScoreRangeMax(clampAndRoundAnswersScore(a));
+};
+
+const onRangeMinRelease = (a: number): void => {
+  AnswerFilterAndSortStore.setScoreRangeMin(clampAndRoundAnswersScore(a));
+};
+
+const onRangeMaxRelease = (a: number): void => {
+  AnswerFilterAndSortStore.setScoreRangeMax(clampAndRoundAnswersScore(a));
+};

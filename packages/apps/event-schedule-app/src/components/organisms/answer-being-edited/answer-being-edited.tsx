@@ -132,7 +132,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
             `}
           >
             <thead>
-              {iconHeader === undefined ? undefined : (
+              {mapOptional(iconHeader, (a) => (
                 <tr>
                   {batchInputFieldIsOpen ? (
                     <th>
@@ -153,30 +153,30 @@ export const AnswerBeingEdited = memoNamed<Props>(
                     <CustomIconButton
                       data-cy={'col-good-button'}
                       iconName={'good'}
-                      title={iconHeader.good.iconDescription}
-                      onClick={iconHeader.good.onClick}
+                      title={a.good.iconDescription}
+                      onClick={a.good.onClick}
                     />
                   </th>
                   <th>
                     <CustomIconButton
                       data-cy={'col-fair-button'}
                       iconName={'fair'}
-                      title={iconHeader.fair.iconDescription}
-                      onClick={iconHeader.fair.onClick}
+                      title={a.fair.iconDescription}
+                      onClick={a.fair.onClick}
                     />
                   </th>
                   <th>
                     <CustomIconButton
                       data-cy={'col-poor-button'}
                       iconName={'poor'}
-                      title={iconHeader.poor.iconDescription}
-                      onClick={iconHeader.poor.onClick}
+                      title={a.poor.iconDescription}
+                      onClick={a.poor.onClick}
                     />
                   </th>
                   <th>{dc.table.header.score}</th>
                   <th>{dc.table.header.comment}</th>
                 </tr>
-              )}
+              ))}
             </thead>
             <tbody>
               {answerBeingEditedList.map(
@@ -209,7 +209,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                           eventSchedule.datetimeSpecification
                         }
                         holidaysJpDefinition={holidaysJpDefinition}
-                        tableMinimized={false}
+                        minimized={false}
                       />
                     </td>
                     <td>

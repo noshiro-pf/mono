@@ -1,3 +1,4 @@
+import { type AnswerRank } from '../../types';
 import { commonDictionary } from './common';
 import { ymd2str } from './datetime';
 import { detailedFilterDictionary } from './detailed-filter-dialog';
@@ -96,8 +97,12 @@ export const answerPageDictionary = {
       goodPlusFair: genTagNameAdded('〇', '△'),
       fairPlusPoor: genTagNameAdded('△', '✕'),
 
+      rank: (value: AnswerRank) => `スコア上位${value}位まで`,
+
       scoreRange: ({ min, max }: Readonly<{ min: number; max: number }>) =>
-        `${min.toFixed(2)} ≦ スコア ≦ ${max.toFixed(2)}`,
+        min === max
+          ? `スコア = ${min.toFixed(2)}`
+          : `${min.toFixed(2)} ≦ スコア ≦ ${max.toFixed(2)}`,
 
       dateRange: (start: YearMonthDate, end: YearMonthDate) =>
         `日程：${ymd2str(start)} ～ ${ymd2str(end)}`,
@@ -118,19 +123,33 @@ export const answerPageDictionary = {
         Thr: boolean;
         Fri: boolean;
         Sat: boolean;
-      }>) =>
-        pipe(
-          Arr.zip(
-            [Sun, Mon, Tue, Wed, Thr, Fri, Sat] as const,
-            commonDictionary.date.dayList,
-          )
-            .filter(([checked, _displayName]) => checked)
-            .map(([_, displayName]) => displayName),
-        ).chain((list) =>
-          Arr.isEmpty(list) ? '曜日：なし' : `${list.join('・')}のみ`,
-        ).value,
+      }>) => {
+        const zipped = Arr.zip(
+          [Sun, Mon, Tue, Wed, Thr, Fri, Sat] as const,
+          commonDictionary.date.dayList,
+        );
+
+        const numChecked = Arr.count(
+          [Sun, Mon, Tue, Wed, Thr, Fri, Sat],
+          (b) => b,
+        );
+
+        if (numChecked === 0) return '曜日：なし';
+        if (numChecked === 7) return '曜日：すべて';
+
+        return numChecked <= 3
+          ? `${zipped
+              .filter(([b]) => b)
+              .map(([, s]) => s)
+              .join('・')}のみ`
+          : `${zipped
+              .filter(([b]) => !b)
+              .map(([, s]) => s)
+              .join('・')}以外`;
+      },
 
       iconOfSpecifiedRespondent: '回答者の記号で絞り込み（詳細設定）',
+      respondent: '回答者を選択して表示',
     },
 
     datetime: '候補日程',
@@ -144,6 +163,8 @@ export const answerPageDictionary = {
     weight: '回答の優先度',
     refresh: '更新',
     saveScreenShot: '画像として保存',
+    displayOnlyCandidateDatesWithZeroPoorIcon: '✕が0個の候補日程のみ表示',
+    displayOnlyCandidateDatesOfRank1to3: 'スコア上位3位まで表示',
     detailedFilterSettingsButton: '日程絞り込みの詳細設定',
     requiredParticipant: '必須参加者',
     iconHeaderFilter: {
@@ -160,6 +181,10 @@ export const answerPageDictionary = {
         title: '✕の個数でフィルタ',
       },
     },
+
+    toggleAnswerIconIsHidden: '〇△✕列を隠す',
+    toggleDateStringIsMinimized: '日付を短縮表記にする',
+    toggleMinimizedTable: 'テーブルを圧縮表示',
   },
   requiredParticipantDescription:
     '（必須参加者が✕を付けている日のスコアは0点になります。）',
