@@ -25,7 +25,6 @@
     "fmt": "yarn zz:cmd:prettier .",
     "gen-rules-type": "wireit",
     "gi": "wireit",
-    "postinstall": "wireit",
     "lint": "run-p lint:scripts lint:src",
     "lint:fix": "run-p lint:fix:scripts lint:fix:src",
     "lint:fix:scripts": "wireit",
@@ -185,9 +184,6 @@
       "output": [
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
       ]
-    },
-    "postinstall": {
-      "command": "yarn build"
     }
   }
 }
