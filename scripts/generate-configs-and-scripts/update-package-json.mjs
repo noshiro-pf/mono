@@ -889,11 +889,6 @@ const updatePackageJsonImpl = (
               mut_wireit[key] = property;
             }
           }
-
-          mut_scripts['postinstall'] = 'wireit';
-          mut_wireit['postinstall'] = {
-            command: 'yarn build',
-          };
         }
       }
     }
