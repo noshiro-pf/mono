@@ -67,7 +67,10 @@ export const notifyAnswerDeadline = async (
           return sendEmail(
             createMailOptions({
               to: email,
-              subject: `イベント「${ev.title}」の回答期限${diff}日前になりました。`,
+              subject:
+                diff === 0
+                  ? `イベント「${ev.title}」の回答期限当日になりました。`
+                  : `イベント「${ev.title}」の回答期限${diff}日前になりました。`,
               text: createMailBodyForAnswerDeadline({ eventId, diff }),
             }),
           );
