@@ -8,7 +8,6 @@ import { generateTsConfigForBuild } from './generate-ts-config-for-build.mjs';
 import { generateTsConfigForTest } from './generate-ts-config-for-test.mjs';
 import { generateTsConfigForTypeCheck } from './generate-ts-config-for-type-check.mjs';
 import { generateViteConfig } from './generate-vite-config.mjs';
-import { generateVitestConfigForApps } from './generate-vitest-config-for-apps.mjs';
 import { generateVitestConfigForUtils } from './generate-vitest-config-for-utils.mjs';
 import { updatePackageJson } from './update-package-json.mjs';
 
@@ -90,9 +89,6 @@ const main = async () => {
           : undefined,
         executeFlag.viteConfig
           ? generateViteConfig(workspace.location, packageName)
-          : undefined,
-        executeFlag.vitestConfig
-          ? generateVitestConfigForApps(workspace.location, packageName)
           : undefined,
         executeFlag.viteConfig || executeFlag.vitestConfig
           ? generateInjectDef(workspace.location, packageName)

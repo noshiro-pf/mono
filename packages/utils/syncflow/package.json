@@ -54,7 +54,7 @@
   "devDependencies": {
     "@noshiro/eslint-utils": "*",
     "@noshiro/mono-scripts": "*",
-    "@noshiro/ts-type-utils": "*"
+    "@noshiro/ts-type-utils-no-stdlib": "*"
   },
   "peerDependencies": {
     "tslib": "^2.4.0",

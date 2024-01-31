@@ -62,6 +62,13 @@ export const generateViteConfig = async (workspaceLocation, packageName) => {
     `        { find: '~', replacement: nodePath.resolve(thisDir, '../', 'src') },`,
     `      ],`,
     `    },`,
+    `    test: {`,
+    `      globals: true,`,
+    `      environment: 'happy-dom',`,
+    `      typecheck: {`,
+    `        tsconfig: nodePath.resolve(thisDir, 'tsconfig.test.json'),`,
+    `      },`,
+    `    },`,
     `  };`,
     `});`,
   ].join('\n');
