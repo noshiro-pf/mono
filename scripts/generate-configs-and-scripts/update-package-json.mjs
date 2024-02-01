@@ -490,7 +490,9 @@ const updatePackageJsonImpl = (
         }
 
         if (generateFlag.test) {
-          const vitestConfigPath = `./${workspaceConfigsDirName}/${vitestConfigName}`;
+          const vitestConfigPath = cfg.isViteApp
+            ? `./${workspaceConfigsDirName}/${viteConfigName}`
+            : `./${workspaceConfigsDirName}/${vitestConfigName}`;
 
           mut_scripts['test'] = 'wireit';
           mut_scripts['testw'] = 'yarn zz:cmd:vitest watch';
@@ -909,14 +911,12 @@ const updatePackageJsonImpl = (
     }
 
     if (
-      packageName === 'goober' ||
-      packageName === 'eslint-utils' ||
-      packageName === 'ts-type-utils-no-stdlib' ||
-      packageName === 'strict-ts-lib'
+      packageName !== 'goober' &&
+      packageName !== 'eslint-utils' &&
+      packageName !== 'ts-type-utils-no-stdlib' &&
+      packageName !== 'strict-ts-lib'
     ) {
-      delete mut_ref['@noshiro/ts-type-utils'];
-    } else {
-      mut_ref['@noshiro/ts-type-utils'] = '*';
+      mut_ref['@noshiro/ts-type-utils-no-stdlib'] = '*';
     }
   }
 

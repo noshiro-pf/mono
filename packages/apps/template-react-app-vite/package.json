@@ -53,7 +53,7 @@
     "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
     "zz:cmd:vite": "vite --config configs/vite.config.ts",
     "zz:cmd:vite:preview": "yarn zz:cmd:vite preview",
-    "zz:cmd:vitest": "vitest --config ./configs/vitest.config.ts"
+    "zz:cmd:vitest": "vitest --config ./configs/vite.config.ts"
   },
   "browserslist": {
     "production": [
@@ -93,7 +93,7 @@
     "@noshiro/global-tiny-router-react-hooks": "*",
     "@noshiro/global-ts-utils": "*",
     "@noshiro/mono-scripts": "*",
-    "@noshiro/ts-type-utils": "*",
+    "@noshiro/ts-type-utils-no-stdlib": "*",
     "@noshiro/ts-utils": "*"
   },
   "wireit": {
@@ -155,7 +155,7 @@
       "command": "yarn zz:cmd:vitest run",
       "files": [
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./configs/vitest.config.ts",
+        "./configs/vite.config.ts",
         "./configs/tsconfig.test.json",
         "../../../package.json",
         "../../../config/tsconfig/**",
