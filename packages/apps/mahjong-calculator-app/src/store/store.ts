@@ -43,7 +43,7 @@ export const {
 } = createState<readonly RevealedBlock[]>([]);
 
 export const { state$: isCalculating$, setState: setIsCalculating } =
-  createState<boolean>(false);
+  createBooleanState(false);
 
 export const {
   state$: result$,
