@@ -71,7 +71,7 @@
     "@emotion/react": "^11.11.1",
     "@fontsource/roboto": "^5.0.8",
     "@mui/icons-material": "^5.15.7",
-    "@mui/material": "^5.15.5",
+    "@mui/material": "^5.15.7",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/syncflow-react-hooks": "*",
