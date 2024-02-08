@@ -1,5 +1,5 @@
 ---
-title: 'ESLint を使い倒す方法まとめ'
+title: 'ESLint を使い倒す（おすすめルール紹介）'
 emoji: '🐈'
 type: 'tech'
 topics: ['typescript', 'eslint']
