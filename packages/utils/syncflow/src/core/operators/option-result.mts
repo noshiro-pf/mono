@@ -6,7 +6,7 @@ import {
   type MapResultErrOperatorObservable,
   type MapResultOkOperatorObservable,
   type Observable,
-  type ToBaseOperator,
+  type ToUninitializedOperator,
   type UnwrapMaybeOperatorObservable,
   type UnwrapResultErrOperatorObservable,
   type UnwrapResultOkOperatorObservable,
@@ -14,7 +14,7 @@ import {
 } from '../types/index.mjs';
 
 export const unwrapMaybe =
-  <A,>(): ToBaseOperator<Maybe<A>, A | undefined> =>
+  <A,>(): ToUninitializedOperator<Maybe<A>, A | undefined> =>
   (parentObservable: Observable<Maybe<A>>) =>
     new UnwrapMaybeObservableClass(parentObservable);
 
@@ -28,7 +28,7 @@ export const unwrapMaybeI = <
   >;
 
 export const unwrapResultOk =
-  <R extends Result.Base>(): ToBaseOperator<
+  <R extends Result.Base>(): ToUninitializedOperator<
     R,
     Result.UnwrapOk<R> | undefined
   > =>
@@ -45,7 +45,7 @@ export const unwrapResultOkI = <
   >;
 
 export const unwrapResultErr =
-  <R extends Result.Base>(): ToBaseOperator<
+  <R extends Result.Base>(): ToUninitializedOperator<
     R,
     Result.UnwrapErr<R> | undefined
   > =>
@@ -62,7 +62,7 @@ export const unwrapResultErrI = <
   >;
 
 export const mapMaybe =
-  <A, B>(mapFn: (x: A) => B): ToBaseOperator<Maybe<A>, Maybe<B>> =>
+  <A, B>(mapFn: (x: A) => B): ToUninitializedOperator<Maybe<A>, Maybe<B>> =>
   (parentObservable: Observable<Maybe<A>>) =>
     new MapMaybeObservableClass(parentObservable, mapFn);
 
@@ -75,7 +75,7 @@ export const mapMaybeI = <M extends Maybe.Base, B>(
 export const mapResultOk =
   <R extends Result.Base, S2>(
     mapFn: (x: Result.UnwrapOk<R>) => S2,
-  ): ToBaseOperator<R, Result<S2, Result.UnwrapErr<R>>> =>
+  ): ToUninitializedOperator<R, Result<S2, Result.UnwrapErr<R>>> =>
   (parentObservable: Observable<R>) =>
     new MapResultOkObservableClass(parentObservable, mapFn);
 
@@ -91,7 +91,7 @@ export const mapResultOkI = <S, S2, E>(
 export const mapResultErr =
   <S, E, E2>(
     mapFn: (x: E) => E2,
-  ): ToBaseOperator<Result<S, E>, Result<S, E2>> =>
+  ): ToUninitializedOperator<Result<S, E>, Result<S, E2>> =>
   (parentObservable: Observable<Result<S, E>>) =>
     new MapResultErrObservableClass(parentObservable, mapFn);
 

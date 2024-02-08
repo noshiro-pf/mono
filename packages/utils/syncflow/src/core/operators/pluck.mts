@@ -4,12 +4,12 @@ import {
   type InitializedToInitializedOperator,
   type Observable,
   type PluckOperatorObservable,
-  type ToBaseOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
 export const pluck =
-  <A, K extends keyof A>(key: K): ToBaseOperator<A, A[K]> =>
+  <A, K extends keyof A>(key: K): ToUninitializedOperator<A, A[K]> =>
   (parentObservable: Observable<A>) =>
     new PluckObservableClass(parentObservable, key);
 

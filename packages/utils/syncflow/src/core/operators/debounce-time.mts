@@ -4,12 +4,12 @@ import {
   type DebounceTimeOperatorObservable,
   type InitializedToInitializedOperator,
   type Observable,
-  type ToBaseOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
 export const debounceTime =
-  <A,>(milliSeconds: number): ToBaseOperator<A, A> =>
+  <A,>(milliSeconds: number): ToUninitializedOperator<A, A> =>
   (parentObservable: Observable<A>) =>
     new DebounceTimeObservableClass(parentObservable, milliSeconds);
 

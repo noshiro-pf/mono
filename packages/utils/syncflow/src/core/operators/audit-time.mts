@@ -4,12 +4,12 @@ import {
   type AuditTimeOperatorObservable,
   type InitializedToInitializedOperator,
   type Observable,
-  type ToBaseOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
 export const auditTime =
-  <A,>(milliSeconds: number): ToBaseOperator<A, A> =>
+  <A,>(milliSeconds: number): ToUninitializedOperator<A, A> =>
   (parentObservable: Observable<A>) =>
     new AuditTimeObservableClass(parentObservable, milliSeconds);
 

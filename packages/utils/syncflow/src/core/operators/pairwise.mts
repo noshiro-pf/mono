@@ -3,12 +3,12 @@ import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type Observable,
   type PairwiseOperatorObservable,
-  type RemoveInitializedOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
 export const pairwise =
-  <A,>(): RemoveInitializedOperator<A, readonly [A, A]> =>
+  <A,>(): ToUninitializedOperator<A, readonly [A, A]> =>
   (parentObservable: Observable<A>) =>
     new PairwiseObservableClass(parentObservable);
 

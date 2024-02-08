@@ -48,7 +48,7 @@ export type ObservableBase<A> = Readonly<{
   chain: (<B>(
     operator: ToInitializedOperator<A, B>,
   ) => InitializedObservable<B>) &
-    (<B>(operator: ToBaseOperator<A, B>) => Observable<B>);
+    (<B>(operator: ToUninitializedOperator<A, B>) => Observable<B>);
 }>;
 
 export type InitializedObservableBase<A> = ObservableBase<A> &
@@ -59,7 +59,7 @@ export type InitializedObservableBase<A> = ObservableBase<A> &
         | InitializedToInitializedOperator<A, B>
         | ToInitializedOperator<A, B>,
     ) => InitializedObservable<B>) &
-      (<B>(operator: ToBaseOperator<A, B>) => Observable<B>);
+      (<B>(operator: ToUninitializedOperator<A, B>) => Observable<B>);
   }>;
 
 export type SyncChildObservable<
@@ -142,18 +142,19 @@ export type ToInitializedOperator<A, B> = (
   src: InitializedObservable<A> | Observable<A>,
 ) => InitializedObservable<B>;
 
-export type RemoveInitializedOperator<A, B> = (
+export type ToUninitializedOperator<A, B> = (
   src: InitializedObservable<A> | Observable<A>,
 ) => Observable<B>;
-export type ToBaseOperator<A, B> = RemoveInitializedOperator<A, B>; // alias
 
-type BaseToBaseOperator<A, B> = (src: Observable<A>) => Observable<B>;
+type UninitializedToUninitializedOperator<A, B> = (
+  src: Observable<A>,
+) => Observable<B>;
 
 export type Operator<A, B> =
-  | BaseToBaseOperator<A, B>
   | InitializedToInitializedOperator<A, B>
-  | RemoveInitializedOperator<A, B>
-  | ToInitializedOperator<A, B>;
+  | ToInitializedOperator<A, B>
+  | ToUninitializedOperator<A, B>
+  | UninitializedToUninitializedOperator<A, B>;
 
 export const isManagerObservable = <A,>(
   obs: Observable<A>,

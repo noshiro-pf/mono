@@ -4,12 +4,14 @@ import {
   type InitializedToInitializedOperator,
   type MapWithIndexOperatorObservable,
   type Observable,
-  type ToBaseOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
 export const mapWithIndex =
-  <A, B>(mapFn: (x: A, index: SafeUint | -1) => B): ToBaseOperator<A, B> =>
+  <A, B>(
+    mapFn: (x: A, index: SafeUint | -1) => B,
+  ): ToUninitializedOperator<A, B> =>
   (parentObservable: Observable<A>) =>
     new MapWithIndexObservableClass(parentObservable, mapFn);
 

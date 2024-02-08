@@ -3,13 +3,13 @@ import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type InitializedToInitializedOperator,
   type Observable,
-  type ToBaseOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
   type WithIndexOperatorObservable,
 } from '../types/index.mjs';
 
 export const withIndex =
-  <A,>(): ToBaseOperator<A, readonly [SafeUint | -1, A]> =>
+  <A,>(): ToUninitializedOperator<A, readonly [SafeUint | -1, A]> =>
   (parentObservable: Observable<A>) =>
     new WithIndexObservableClass(parentObservable);
 

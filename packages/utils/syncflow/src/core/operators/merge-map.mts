@@ -3,8 +3,8 @@ import { AsyncChildObservableClass } from '../class/index.mjs';
 import {
   type MergeMapOperatorObservable,
   type Observable,
-  type RemoveInitializedOperator,
   type Subscription,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
@@ -16,7 +16,7 @@ import {
 export const mergeMap =
   <A, B>(
     mapToObservable: (curr: A) => Observable<B>,
-  ): RemoveInitializedOperator<A, B> =>
+  ): ToUninitializedOperator<A, B> =>
   (parentObservable: Observable<A>) =>
     new MergeMapObservableClass(parentObservable, mapToObservable);
 

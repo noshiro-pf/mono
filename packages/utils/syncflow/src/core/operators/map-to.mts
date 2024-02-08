@@ -4,12 +4,12 @@ import {
   type InitializedToInitializedOperator,
   type MapToOperatorObservable,
   type Observable,
-  type ToBaseOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
 export const mapTo =
-  <A, B>(value: B): ToBaseOperator<A, B> =>
+  <A, B>(value: B): ToUninitializedOperator<A, B> =>
   (parentObservable: Observable<A>) =>
     new MapToObservableClass(parentObservable, value);
 

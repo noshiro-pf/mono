@@ -2,13 +2,13 @@ import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type Observable,
-  type RemoveInitializedOperator,
   type TakeWhileOperatorObservable,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
 export const takeWhile =
-  <A,>(predicate: (value: A) => boolean): RemoveInitializedOperator<A, A> =>
+  <A,>(predicate: (value: A) => boolean): ToUninitializedOperator<A, A> =>
   (parentObservable: Observable<A>) =>
     new TakeWhileObservableClass(parentObservable, predicate);
 

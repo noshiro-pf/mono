@@ -4,12 +4,12 @@ import {
   type InitializedToInitializedOperator,
   type Observable,
   type TakeUntilOperatorObservable,
-  type ToBaseOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
 export const takeUntil =
-  <A,>(notifier: Observable<unknown>): ToBaseOperator<A, A> =>
+  <A,>(notifier: Observable<unknown>): ToUninitializedOperator<A, A> =>
   (parentObservable: Observable<A>) =>
     new TakeUntilObservableClass(parentObservable, notifier);
 

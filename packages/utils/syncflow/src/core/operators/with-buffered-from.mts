@@ -4,7 +4,7 @@ import {
   type InitializedObservable,
   type InitializedToInitializedOperator,
   type Observable,
-  type ToBaseOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
   type WithBufferedFromOperatorObservable,
 } from '../types/index.mjs';
@@ -13,7 +13,7 @@ import { maxDepth } from '../utils/index.mjs';
 export const withBufferedFrom =
   <A, B>(
     observable: Observable<B>,
-  ): ToBaseOperator<A, readonly [A, readonly B[]]> =>
+  ): ToUninitializedOperator<A, readonly [A, readonly B[]]> =>
   (parentObservable: Observable<A>) =>
     new WithBufferedFromObservableClass(parentObservable, observable);
 
