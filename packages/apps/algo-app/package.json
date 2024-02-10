@@ -81,7 +81,7 @@
     "@noshiro/ts-utils-additional": "*",
     "firebase": "^10.6.0",
     "immer": "^10.0.3",
-    "preact": "^10.13.2"
+    "preact": "^10.19.4"
   },
   "devDependencies": {
     "@noshiro/eslint-utils": "*",
