@@ -39,7 +39,7 @@
   "dependencies": {
     "@noshiro/preact-utils": "*",
     "@noshiro/ts-utils": "*",
-    "preact": "^10.13.2",
+    "preact": "^10.19.4",
     "resize-observer": "^1.0.0"
   },
   "devDependencies": {
