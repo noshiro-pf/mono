@@ -58,12 +58,3 @@ namespace _MakeTupleInternals {
           : never
         : never;
 }
-
-// type MakeTuple<Elm, N extends number> = _MakeTupleImpl<N, Elm, readonly []>;
-
-// /** @internal */
-// type _MakeTupleImpl<Num, Elm, T extends readonly unknown[]> =
-//   //
-//   T extends { length: Num }
-//     ? T
-//     : _MakeTupleImpl<Num, Elm, readonly [Elm, ...T]>;
