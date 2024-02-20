@@ -279,19 +279,19 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                         intent={'primary'}
                         small={true}
                         onClick={
-                          AnswerFilterAndSortStore.displayOnlyCandidateDatesWithZeroPoorIcon
+                          AnswerFilterAndSortStore.displayOnlyCandidateDatesOfRank1to3
                         }
                       >
-                        {dc.answers.displayOnlyCandidateDatesWithZeroPoorIcon}
+                        {dc.answers.displayOnlyCandidateDatesOfRank1to3}
                       </Button>
                       <Button
                         intent={'primary'}
                         small={true}
                         onClick={
-                          AnswerFilterAndSortStore.displayOnlyCandidateDatesOfRank1to3
+                          AnswerFilterAndSortStore.displayOnlyCandidateDatesWithZeroPoorIcon
                         }
                       >
-                        {dc.answers.displayOnlyCandidateDatesOfRank1to3}
+                        {dc.answers.displayOnlyCandidateDatesWithZeroPoorIcon}
                       </Button>
                     </FilterButtonsWrapper>
                   </TagInputWrapper>
