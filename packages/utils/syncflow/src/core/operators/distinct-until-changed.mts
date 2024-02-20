@@ -4,12 +4,14 @@ import {
   type DistinctUntilChangedOperatorObservable,
   type InitializedToInitializedOperator,
   type Observable,
-  type ToBaseOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
 export const distinctUntilChanged =
-  <A,>(eq: (x: A, y: A) => boolean = (x, y) => x === y): ToBaseOperator<A, A> =>
+  <A,>(
+    eq: (x: A, y: A) => boolean = (x, y) => x === y,
+  ): ToUninitializedOperator<A, A> =>
   (parentObservable: Observable<A>) =>
     new DistinctUntilChangedObservableClass(parentObservable, eq);
 

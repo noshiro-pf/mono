@@ -2,13 +2,13 @@ import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type Observable,
-  type RemoveInitializedOperator,
   type SkipUntilOperatorObservable,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
 export const skipUntil =
-  <A,>(notifier: Observable<unknown>): RemoveInitializedOperator<A, A> =>
+  <A,>(notifier: Observable<unknown>): ToUninitializedOperator<A, A> =>
   (parentObservable: Observable<A>) =>
     new SkipUntilObservableClass(parentObservable, notifier);
 

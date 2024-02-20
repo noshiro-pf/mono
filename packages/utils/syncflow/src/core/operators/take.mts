@@ -7,14 +7,14 @@ import {
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type Observable,
-  type RemoveInitializedOperator,
   type TakeOperatorObservable,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 import { isPositiveSafeInteger } from '../utils/index.mjs';
 
 export const take =
-  <A,>(n: PositiveSafeIntWithSmallInt): RemoveInitializedOperator<A, A> =>
+  <A,>(n: PositiveSafeIntWithSmallInt): ToUninitializedOperator<A, A> =>
   (parentObservable: Observable<A>) =>
     new TakeObservableClass(parentObservable, n);
 

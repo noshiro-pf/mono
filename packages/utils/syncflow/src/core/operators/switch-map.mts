@@ -2,9 +2,9 @@ import { Maybe } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class/index.mjs';
 import {
   type Observable,
-  type RemoveInitializedOperator,
   type Subscription,
   type SwitchMapOperatorObservable,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
@@ -16,7 +16,7 @@ import {
 export const switchMap =
   <A, B>(
     mapToObservable: (curr: A) => Observable<B>,
-  ): RemoveInitializedOperator<A, B> =>
+  ): ToUninitializedOperator<A, B> =>
   (parentObservable: Observable<A>) =>
     new SwitchMapObservableClass(parentObservable, mapToObservable);
 

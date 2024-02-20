@@ -3,19 +3,19 @@ import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type FilterOperatorObservable,
   type Observable,
-  type RemoveInitializedOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
 export function filter<A, B extends A>(
   predicate: (value: A) => value is B,
-): RemoveInitializedOperator<A, B>;
+): ToUninitializedOperator<A, B>;
 export function filter<A>(
   predicate: (value: A) => boolean,
-): RemoveInitializedOperator<A, A>;
+): ToUninitializedOperator<A, A>;
 export function filter<A>(
   predicate: (value: A) => boolean,
-): RemoveInitializedOperator<A, A> {
+): ToUninitializedOperator<A, A> {
   return (parentObservable: Observable<A>) =>
     new FilterObservableClass(parentObservable, predicate);
 }

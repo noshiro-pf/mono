@@ -4,12 +4,12 @@ import {
   type InitializedToInitializedOperator,
   type Observable,
   type ThrottleTimeOperatorObservable,
-  type ToBaseOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
 export const throttleTime =
-  <A,>(milliSeconds: number): ToBaseOperator<A, A> =>
+  <A,>(milliSeconds: number): ToUninitializedOperator<A, A> =>
   (parentObservable: Observable<A>) =>
     new ThrottleTimeObservableClass(parentObservable, milliSeconds);
 

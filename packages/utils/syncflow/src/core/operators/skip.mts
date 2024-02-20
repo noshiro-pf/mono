@@ -7,14 +7,14 @@ import {
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type Observable,
-  type RemoveInitializedOperator,
   type SkipOperatorObservable,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 import { isPositiveSafeInteger } from '../utils/index.mjs';
 
 export const skip =
-  <A,>(n: PositiveSafeIntWithSmallInt): RemoveInitializedOperator<A, A> =>
+  <A,>(n: PositiveSafeIntWithSmallInt): ToUninitializedOperator<A, A> =>
   (parentObservable: Observable<A>) =>
     !isPositiveSafeInteger(n)
       ? parentObservable

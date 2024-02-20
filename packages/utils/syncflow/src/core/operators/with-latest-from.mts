@@ -4,14 +4,16 @@ import {
   type InitializedObservable,
   type InitializedToInitializedOperator,
   type Observable,
-  type ToBaseOperator,
+  type ToUninitializedOperator,
   type UpdaterSymbol,
   type WithLatestFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
 
 export const withLatestFrom =
-  <A, B>(observable: Observable<B>): ToBaseOperator<A, readonly [A, B]> =>
+  <A, B>(
+    observable: Observable<B>,
+  ): ToUninitializedOperator<A, readonly [A, B]> =>
   (parentObservable: Observable<A>) =>
     new WithLatestFromObservableClass(parentObservable, observable);
 
