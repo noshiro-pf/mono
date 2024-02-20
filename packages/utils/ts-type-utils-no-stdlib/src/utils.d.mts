@@ -100,27 +100,41 @@ type MutableArrayOfLength<N extends number, Elm> = Writable<
 
 // https://qiita.com/uhyo/items/80ce7c00f413c1d1be56
 
-type MutableArrayAtLeastLen<N extends number, Elm> = MutableArrayAtLeastLenRec<
+type MutableArrayOfLengthOrMore<N extends number, Elm> = MutableArrayAtLeastLen<
   N,
-  Elm,
-  Elm[],
-  []
+  Elm
+>;
+type MutableArrayAtLeastLen<N extends number, Elm> = Writable<
+  ArrayAtLeastLen<N, Elm>
 >;
 
-type ArrayAtLeastLen<N extends number, Elm> = Readonly<
-  MutableArrayAtLeastLen<N, Elm>
->;
+type ArrayOfLengthOrMore<N extends number, Elm> = ArrayAtLeastLen<N, Elm>;
+type ArrayAtLeastLen<N extends number, Elm> = readonly [
+  ...MakeTuple<Elm, N>,
+  ...Elm[],
+];
 
-/** @internal */
-type MutableArrayAtLeastLenRec<
-  Num,
-  Elm,
-  T extends unknown[],
-  C extends unknown[],
-> = {
-  0: T;
-  1: MutableArrayAtLeastLenRec<Num, Elm, [Elm, ...T], [unknown, ...C]>;
-}[C extends { length: Num } ? 0 : 1];
+// type ArrayAtLeastLen<N extends number, Elm> = ArrayAtLeastLenRec<
+//   N,
+//   Elm,
+//   Elm[],
+//   []
+// >;
+
+// /** @internal */
+// type ArrayAtLeastLenRec<
+//   Num,
+//   Elm,
+//   T extends readonly unknown[],
+//   C extends readonly unknown[],
+// > = C extends { length: Num }
+//   ? T
+//   : ArrayAtLeastLenRec<
+//       Num,
+//       Elm,
+//       readonly [Elm, ...T],
+//       readonly [unknown, ...C]
+//     >;
 
 type MergeIntersection<R extends Record<string, unknown>> = {
   [K in keyof R]: R[K];
