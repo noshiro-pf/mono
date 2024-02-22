@@ -140,12 +140,13 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   // ログイン済み & 回答済みの場合のみ非表示、それ以外の場合は表示。
   const showAnswerLaterButton = useMemo<boolean>(
     () =>
+      !afterDeadline &&
       !(
         fireAuthUser?.uid !== undefined &&
         answers !== undefined &&
         answers.some((ans) => ans.user.id === fireAuthUser.uid)
       ),
-    [fireAuthUser, answers],
+    [afterDeadline, fireAuthUser, answers],
   );
 
   const screenShotAreaRef = useRef<HTMLDivElement>(null);
