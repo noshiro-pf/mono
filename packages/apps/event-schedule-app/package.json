@@ -114,7 +114,7 @@
     "@noshiro/mono-scripts": "*",
     "@noshiro/ts-type-utils-no-stdlib": "*",
     "@noshiro/ts-utils": "*",
-    "@types/react": "^18.2.34",
+    "@types/react": "^18.2.58",
     "@types/react-dom": "^18.2.7"
   },
   "wireit": {
