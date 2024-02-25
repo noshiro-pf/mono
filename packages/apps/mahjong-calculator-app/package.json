@@ -76,7 +76,7 @@
     "@noshiro/tiny-router-preact-hooks": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
-    "preact": "^10.19.4"
+    "preact": "^10.19.6"
   },
   "devDependencies": {
     "@noshiro/eslint-utils": "*",
