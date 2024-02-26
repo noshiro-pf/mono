@@ -1,5 +1,4 @@
 type BoolNot<A extends boolean> =
-  //
   TypeEq<A, true> extends true
     ? false
     : TypeEq<A, false> extends true
@@ -7,7 +6,6 @@ type BoolNot<A extends boolean> =
       : never;
 
 type BoolAnd<A extends boolean, B extends boolean> =
-  //
   TypeEq<A, true> extends true
     ? TypeEq<B, true> extends true
       ? true
@@ -23,7 +21,6 @@ type BoolAnd<A extends boolean, B extends boolean> =
       : never;
 
 type BoolOr<A extends boolean, B extends boolean> =
-  //
   TypeEq<A, true> extends true
     ? TypeEq<B, true> extends true
       ? true
@@ -39,7 +36,6 @@ type BoolOr<A extends boolean, B extends boolean> =
       : never;
 
 type BoolEq<A extends boolean, B extends boolean> =
-  //
   TypeEq<A, true> extends true
     ? TypeEq<B, true> extends true
       ? true
