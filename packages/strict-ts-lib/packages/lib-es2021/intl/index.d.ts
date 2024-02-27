@@ -75,12 +75,17 @@ declare namespace Intl {
   type ListFormatStyle = 'long' | 'short' | 'narrow';
 
   /**
-   * An object with some or all properties of the `Intl.ListFormat` constructor `options` parameter.
+   * An object with some or all properties of the `Intl.ListFormat`
+   * constructor `options` parameter.
    *
    * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/ListFormat#parameters).
    */
   interface ListFormatOptions {
-    /** The locale matching algorithm to use. For information about this option, see [Intl page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
+    /**
+     * The locale matching algorithm to use. For information about this
+     * option, see [Intl
+     * page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation).
+     */
     readonly localeMatcher?: ListFormatLocaleMatcher | undefined;
     /** The format of output message. */
     readonly type?: ListFormatType | undefined;
@@ -98,26 +103,31 @@ declare namespace Intl {
     /**
      * Returns a string with a language-specific representation of the list.
      *
-     * @param list - An iterable object, such as an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array).
+     * @param list - An iterable object, such as an
+     *   [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array).
+     * @returns {string} A language-specific formatted string representing
+     *   the elements of the list.
      *
-     * @throws `TypeError` if `list` includes something other than the possible values.
-     *
-     * @returns {string} A language-specific formatted string representing the elements of the list.
-     *
-     * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/format).
+     *   [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/format).
+     * @throws `TypeError` if `list` includes something other than the
+     *   possible values.
      */
     format(list: Iterable<string>): string;
 
     /**
-     * Returns an Array of objects representing the different components that can be used to format a list of values in a locale-aware fashion.
+     * Returns an Array of objects representing the different components
+     * that can be used to format a list of values in a locale-aware
+     * fashion.
      *
-     * @param list - An iterable object, such as an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array), to be formatted according to a locale.
+     * @param list - An iterable object, such as an
+     *   [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array),
+     *   to be formatted according to a locale.
+     * @returns {{ type: 'element' | 'literal'; value: string }[]} An Array
+     *   of components which contains the formatted parts from the list.
      *
-     * @throws `TypeError` if `list` includes something other than the possible values.
-     *
-     * @returns {{ type: "element" | "literal", value: string; }[]} An Array of components which contains the formatted parts from the list.
-     *
-     * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/formatToParts).
+     *   [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/formatToParts).
+     * @throws `TypeError` if `list` includes something other than the
+     *   possible values.
      */
     formatToParts(list: Iterable<string>): readonly {
       readonly type: 'element' | 'literal';
@@ -138,19 +148,23 @@ declare namespace Intl {
     readonly prototype: ListFormat;
 
     /**
-     * Creates [Intl.ListFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat) objects that
-     * enable language-sensitive list formatting.
+     * Creates
+     * [Intl.ListFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat)
+     * objects that enable language-sensitive list formatting.
      *
-     * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
-     *  For the general form and interpretation of the `locales` argument,
-     *  see the [`Intl` page](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
+     * @param locales - A string with a [BCP 47 language
+     *   tag](http://tools.ietf.org/html/rfc5646), or an array of such
+     *   strings. For the general form and interpretation of the `locales`
+     *   argument, see the [`Intl`
+     *   page](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
+     * @param options - An
+     *   [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/ListFormat#parameters)
+     *   with some or all options of `ListFormatOptions`.
+     * @returns
+     *   [Intl.ListFormatOptions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat)
+     *   object.
      *
-     * @param options - An [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/ListFormat#parameters)
-     *  with some or all options of `ListFormatOptions`.
-     *
-     * @returns [Intl.ListFormatOptions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat) object.
-     *
-     * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat).
+     *   [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat).
      */
     new (
       locales?: BCP47LanguageTag | readonly BCP47LanguageTag[],
@@ -159,19 +173,22 @@ declare namespace Intl {
 
     /**
      * Returns an array containing those of the provided locales that are
-     * supported in list formatting without having to fall back to the runtime's default locale.
+     * supported in list formatting without having to fall back to the
+     * runtime's default locale.
      *
-     * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
-     *  For the general form and interpretation of the `locales` argument,
-     *  see the [`Intl` page](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
+     * @param locales - A string with a [BCP 47 language
+     *   tag](http://tools.ietf.org/html/rfc5646), or an array of such
+     *   strings. For the general form and interpretation of the `locales`
+     *   argument, see the [`Intl`
+     *   page](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
+     * @param options - An
+     *   [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/supportedLocalesOf#parameters).
+     *   with some or all possible options.
+     * @returns An array of strings representing a subset of the given
+     *   locale tags that are supported in list formatting without having to
+     *   fall back to the runtime's default locale.
      *
-     * @param options - An [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/supportedLocalesOf#parameters).
-     *  with some or all possible options.
-     *
-     * @returns An array of strings representing a subset of the given locale tags that are supported in list
-     *  formatting without having to fall back to the runtime's default locale.
-     *
-     * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/supportedLocalesOf).
+     *   [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/supportedLocalesOf).
      */
     supportedLocalesOf(
       locales: BCP47LanguageTag | readonly BCP47LanguageTag[],

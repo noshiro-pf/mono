@@ -48,14 +48,20 @@ export const convertLibEs2017Object = (from) => {
     const prefix = [
       '  /**',
       '   * Returns an array of key/values of the enumerable properties of an object',
-      '   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.',
+      '   *',
+    ];
+    const suffix = [
+      '   * @param o Object that contains the properties and methods. This can be an',
+      '   *   object that you created or an existing Document Object Model (DOM)',
+      '   *   object.',
+      '   */',
     ];
 
     mut_ret = pipe(mut_ret).chain(
       replaceWithNoMatchCheck(
         [
           ...prefix,
-          '   */',
+          ...suffix,
           '  entries<T>(',
           '    o: { readonly [s: string]: T } | ArrayLike<T>,',
           '  ): readonly (readonly [string, T])[];',
@@ -63,7 +69,6 @@ export const convertLibEs2017Object = (from) => {
         [
           ...prefix,
           '   *',
-          '   * @example',
           '   * ```ts',
           '   * const obj = {',
           '   *   x: 1,',
@@ -74,7 +79,8 @@ export const convertLibEs2017Object = (from) => {
           '   *',
           "   * const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]",
           '   * ```',
-          '   */',
+          '   *',
+          ...suffix,
           'entries<R extends RecordBase>(object: R): _RecordUtilsEntries<R>;',
         ].join('\n'),
       ),

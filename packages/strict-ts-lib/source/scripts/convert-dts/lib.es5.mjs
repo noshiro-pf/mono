@@ -341,6 +341,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
     const commonPrefix = [
       '/**',
       ' * Evaluates JavaScript code and executes it.',
+      ' *',
       ' * @param x A String value that contains valid JavaScript code.',
     ];
 
@@ -358,7 +359,9 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
   {
     const commonPrefix = [
       '/**',
-      ' * Returns a Boolean value that indicates whether a value is the reserved value NaN (not a number).',
+      ' * Returns a Boolean value that indicates whether a value is the reserved value',
+      ' * NaN (not a number).',
+      ' *',
       ' * @param number A numeric value.',
     ];
 
@@ -380,6 +383,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
     const commonPrefix = [
       '/**',
       ' * Determines whether a supplied number is finite.',
+      ' *',
       ' * @param number Any numeric value.',
     ];
 
@@ -439,6 +443,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
     const commonPrefix = [
       '  /**',
       '   * Returns the character at the specified index.',
+      '   *',
       '   * @param pos The zero-based index of the desired character.',
     ];
 
@@ -458,6 +463,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
     const commonPrefix = [
       '  /**',
       '   * Returns a string that contains the concatenation of two or more strings.',
+      '   *',
       '   * @param strings The strings to append to the end of the string.',
     ];
 

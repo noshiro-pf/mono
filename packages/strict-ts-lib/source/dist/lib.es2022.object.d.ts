@@ -42,6 +42,7 @@ type _HasOwnReturnType<
 interface ObjectConstructor {
   /**
    * Determines whether an object has a property with the specified name.
+   *
    * @param obj An object.
    * @param key A property name.
    */

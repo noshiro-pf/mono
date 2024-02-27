@@ -22,19 +22,21 @@ and limitations under the License.
 interface ObjectConstructor {
   /**
    * Returns an object created by key-value entries for properties and methods
-   * @param entries An iterable object that contains key-value entries for properties and methods.
    *
-   * @example
    * ```ts
-   * const entries: readonly (readonly ['x' | 'y' | 'z' | 4, 1 | 2 | 3])[] = [
-   *   ['x', 1],
-   *   ['y', 2],
-   *   ['z', 3],
-   *   [4, 3],
-   * ] as const;
+   * const entries: readonly (readonly ['x' | 'y' | 'z' | 4, 1 | 2 | 3])[] =
+   *   [
+   *     ['x', 1],
+   *     ['y', 2],
+   *     ['z', 3],
+   *     [4, 3],
+   *   ] as const;
    *
    * const obj = Object.fromEntries(entries); // Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>
    * ```
+   *
+   * @param entries An iterable object that contains key-value entries for
+   *   properties and methods.
    */
   fromEntries<K extends PropertyKey, V>(
     entries: Iterable<readonly [K, V]>,
@@ -42,7 +44,9 @@ interface ObjectConstructor {
 
   /**
    * Returns an object created by key-value entries for properties and methods
-   * @param entries An iterable object that contains key-value entries for properties and methods.
+   *
+   * @param entries An iterable object that contains key-value entries for
+   *   properties and methods.
    */
   fromEntries(entries: Iterable<readonly unknown[]>): unknown;
 }

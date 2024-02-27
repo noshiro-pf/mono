@@ -17,8 +17,6 @@ and limitations under the License.
 /// <reference types="@noshiro/ts-type-utils-no-stdlib" />
 
 interface Symbol {
-  /**
-   * Expose the [[Description]] internal slot of a symbol directly.
-   */
+  /** Expose the [[Description]] internal slot of a symbol directly. */
   readonly description: string | undefined;
 }

@@ -12,8 +12,8 @@ export const convertEs2015SymbolWellknown = (from) =>
         [
           'interface Array<T> {',
           '  /**',
-          "   * Is an object whose properties have the value 'true'",
-          "   * when they will be absent when used in a 'with' statement.",
+          "   * Is an object whose properties have the value 'true' when they will be",
+          "   * absent when used in a 'with' statement.",
           '   */',
           '  readonly [Symbol.unscopables]: {',
           '    readonly [K in keyof (readonly unknown[])]?: boolean;',
@@ -23,8 +23,8 @@ export const convertEs2015SymbolWellknown = (from) =>
         [
           'interface Array<T> {',
           '  /**',
-          "   * Is an object whose properties have the value 'true'",
-          "   * when they will be absent when used in a 'with' statement.",
+          "   * Is an object whose properties have the value 'true' when they will be",
+          "   * absent when used in a 'with' statement.",
           '   */',
           '  readonly [Symbol.unscopables]: {',
           '    readonly [K in keyof (any[])]?: boolean;',
@@ -38,8 +38,8 @@ export const convertEs2015SymbolWellknown = (from) =>
         [
           'interface ReadonlyArray<T> {',
           '  /**',
-          "   * Is an object whose properties have the value 'true'",
-          "   * when they will be absent when used in a 'with' statement.",
+          "   * Is an object whose properties have the value 'true' when they will be",
+          "   * absent when used in a 'with' statement.",
           '   */',
           '  readonly [Symbol.unscopables]: {',
           '    readonly [K in keyof (readonly unknown[])]?: boolean;',
@@ -49,8 +49,8 @@ export const convertEs2015SymbolWellknown = (from) =>
         [
           'interface ReadonlyArray<T> {',
           '  /**',
-          "   * Is an object whose properties have the value 'true'",
-          "   * when they will be absent when used in a 'with' statement.",
+          "   * Is an object whose properties have the value 'true' when they will be",
+          "   * absent when used in a 'with' statement.",
           '   */',
           '  readonly [Symbol.unscopables]: {',
           '    readonly [K in keyof (readonly any[])]?: boolean;',

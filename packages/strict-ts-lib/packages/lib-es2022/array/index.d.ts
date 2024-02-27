@@ -19,7 +19,9 @@ and limitations under the License.
 interface Array<T> {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): T | undefined;
 }
@@ -27,7 +29,9 @@ interface Array<T> {
 interface ReadonlyArray<T> {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): T | undefined;
 }
@@ -35,7 +39,9 @@ interface ReadonlyArray<T> {
 interface Int8Array {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): Int8 | undefined;
 }
@@ -43,7 +49,9 @@ interface Int8Array {
 interface Uint8Array {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): Uint8 | undefined;
 }
@@ -51,7 +59,9 @@ interface Uint8Array {
 interface Uint8ClampedArray {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): Uint8 | undefined;
 }
@@ -59,7 +69,9 @@ interface Uint8ClampedArray {
 interface Int16Array {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): Int16 | undefined;
 }
@@ -67,7 +79,9 @@ interface Int16Array {
 interface Uint16Array {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): Uint16 | undefined;
 }
@@ -75,7 +89,9 @@ interface Uint16Array {
 interface Int32Array {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): Int32 | undefined;
 }
@@ -83,7 +99,9 @@ interface Int32Array {
 interface Uint32Array {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): Uint32 | undefined;
 }
@@ -91,7 +109,9 @@ interface Uint32Array {
 interface Float32Array {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): Float32 | undefined;
 }
@@ -99,7 +119,9 @@ interface Float32Array {
 interface Float64Array {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): Float64 | undefined;
 }
@@ -107,7 +129,9 @@ interface Float64Array {
 interface BigInt64Array {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): BigInt64 | undefined;
 }
@@ -115,7 +139,9 @@ interface BigInt64Array {
 interface BigUint64Array {
   /**
    * Returns the item located at the specified index.
-   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   *
+   * @param index The zero-based index of the desired code unit. A negative
+   *   index will count back from the last item.
    */
   at(index: SafeInt | Int10): BigUint64 | undefined;
 }
