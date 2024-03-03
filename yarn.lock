@@ -1197,7 +1197,7 @@
     react-day-picker "7.4.9"
     tslib "~2.6.2"
 
-"@blueprintjs/icons@^4.13.0", "@blueprintjs/icons@^4.16.0":
+"@blueprintjs/icons@^4.16.0":
   version "4.16.0"
   resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-4.16.0.tgz#47f9e8abe64d84fc18721080b8f191d8aac075d8"
   integrity sha512-cyfgjUZcZCtQrXWUV8FwqYTFEzduV4a0N7yhOU38jY+cBRCLu/sDrD0Osvfk4DGRvNe4YjY7pohVLFSxpg68Uw==
@@ -1206,10 +1206,10 @@
     classnames "^2.3.1"
     tslib "~2.5.0"
 
-"@blueprintjs/icons@^5.0.0", "@blueprintjs/icons@^5.5.0":
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-5.5.0.tgz#3694614066a91515f2e993ad574f61e5f0ead323"
-  integrity sha512-XnGWYZwtYh3+Cf9e2zYweZdwhZTevgufo287hu38Jfdhb7rcbWUwU7ktAmmf21QvGFqw6Ohyu8VVkoZZlE4eMg==
+"@blueprintjs/icons@^5.5.0", "@blueprintjs/icons@^5.8.0":
+  version "5.8.0"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-5.8.0.tgz#5c6b8ab32ba238a7bbc1fc4a0aec7fcd6cb0d6a2"
+  integrity sha512-QAl0eh1lzYR7CDkT6Uerci5x7jy0vtOj6+B+5cg0noEdjguHoRmhx7b3dDcj+Nmlz6rAvRZoU3cgzfk0NiD1zg==
   dependencies:
     change-case "^4.1.2"
     classnames "^2.3.1"
