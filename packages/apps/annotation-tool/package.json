@@ -79,7 +79,7 @@
     "@noshiro/tiny-router-react-hooks": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
-    "pixi.js": "^5.3.3",
+    "pixi.js": "^8.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "uuid": "^9.0.1"
