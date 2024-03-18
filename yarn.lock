@@ -16973,10 +16973,10 @@ yocto-queue@^1.0.0:
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-1.0.0.tgz#7f816433fb2cbc511ec8bf7d263c3b58a1a3c251"
   integrity sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==
 
-zenn-cli@^0.1.151:
-  version "0.1.151"
-  resolved "https://registry.yarnpkg.com/zenn-cli/-/zenn-cli-0.1.151.tgz#0fa7c224ce7f7af8a0ae76bbcea861b765450068"
-  integrity sha512-Xp3hJ7Lo+Li7MbRMPheQCbiWu5nWnExXfyH0cgG8Mwk37tze2Kb1C4UOq/dvg3kukIfI0wxlIGTjoLKL7x8c5g==
+zenn-cli@^0.1.153:
+  version "0.1.153"
+  resolved "https://registry.yarnpkg.com/zenn-cli/-/zenn-cli-0.1.153.tgz#38db92cba432d2bc9d4c9c1068502ed7688be437"
+  integrity sha512-MLIdtRW2arQBuVCKlWrMF4eFZGkvmswrcc0OvgxmQs9w9/9rODfoyFK9nQQwrgyUwlxDzhUa/oAO6nks4GY5DA==
 
 zip-stream@^4.1.0:
   version "4.1.1"
