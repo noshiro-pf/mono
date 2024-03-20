@@ -881,6 +881,8 @@ interface ImportCallOptions {
 /**
  * The type for the `assert` property of the optional second argument to
  * `import()`.
+ *
+ * @deprecated
  */
 interface ImportAssertions {
   readonly [key: string]: string;
@@ -2407,6 +2409,9 @@ type Capitalize<S extends string> = intrinsic;
 
 /** Convert first character of string literal type to lowercase */
 type Uncapitalize<S extends string> = intrinsic;
+
+/** Marker for non-inference type position */
+type NoInfer<T> = intrinsic;
 
 /** Marker for contextual 'this' type */
 interface ThisType<T> {}
@@ -6284,7 +6289,8 @@ declare namespace Intl {
     compare(x: string, y: string): number;
     resolvedOptions(): ResolvedCollatorOptions;
   }
-  const Collator: {
+
+  interface CollatorConstructor {
     new (
       locales?: string | readonly string[],
       options?: CollatorOptions,
@@ -6294,7 +6300,9 @@ declare namespace Intl {
       locales: string | readonly string[],
       options?: CollatorOptions,
     ): readonly string[];
-  };
+  }
+
+  const Collator: CollatorConstructor;
 
   interface NumberFormatOptions {
     readonly localeMatcher?: string | undefined;
@@ -6326,7 +6334,8 @@ declare namespace Intl {
     format(value: number): string;
     resolvedOptions(): ResolvedNumberFormatOptions;
   }
-  const NumberFormat: {
+
+  interface NumberFormatConstructor {
     new (
       locales?: string | readonly string[],
       options?: NumberFormatOptions,
@@ -6340,7 +6349,9 @@ declare namespace Intl {
       options?: NumberFormatOptions,
     ): readonly string[];
     readonly prototype: NumberFormat;
-  };
+  }
+
+  const NumberFormat: NumberFormatConstructor;
 
   interface DateTimeFormatOptions {
     readonly localeMatcher?: 'best fit' | 'lookup' | undefined;
@@ -6392,7 +6403,8 @@ declare namespace Intl {
     format(date?: Date | number): string;
     resolvedOptions(): ResolvedDateTimeFormatOptions;
   }
-  const DateTimeFormat: {
+
+  interface DateTimeFormatConstructor {
     new (
       locales?: string | readonly string[],
       options?: DateTimeFormatOptions,
@@ -6406,7 +6418,9 @@ declare namespace Intl {
       options?: DateTimeFormatOptions,
     ): readonly string[];
     readonly prototype: DateTimeFormat;
-  };
+  }
+
+  const DateTimeFormat: DateTimeFormatConstructor;
 }
 
 interface String {

@@ -106,10 +106,7 @@ declare namespace Intl {
      *
      *   [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter).
      */
-    new (
-      locales?: BCP47LanguageTag | readonly BCP47LanguageTag[],
-      options?: SegmenterOptions,
-    ): Segmenter;
+    new (locales?: LocalesArgument, options?: SegmenterOptions): Segmenter;
 
     /**
      * Returns an array containing those of the provided locales that are
@@ -127,9 +124,9 @@ declare namespace Intl {
      *   [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter/supportedLocalesOf)
      */
     supportedLocalesOf(
-      locales: BCP47LanguageTag | readonly BCP47LanguageTag[],
+      locales: LocalesArgument,
       options?: Pick<SegmenterOptions, 'localeMatcher'>,
-    ): readonly BCP47LanguageTag[];
+    ): readonly UnicodeBCP47LocaleIdentifier[];
   };
 
   /**

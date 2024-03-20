@@ -20,3 +20,6 @@ and limitations under the License.
 /// <reference path="./lib.esnext.intl.d.ts" />
 /// <reference path="./lib.esnext.decorators.d.ts" />
 /// <reference path="./lib.esnext.disposable.d.ts" />
+/// <reference path="./lib.esnext.promise.d.ts" />
+/// <reference path="./lib.esnext.object.d.ts" />
+/// <reference path="./lib.esnext.collection.d.ts" />

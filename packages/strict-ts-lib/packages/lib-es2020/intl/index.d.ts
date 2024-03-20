@@ -19,11 +19,13 @@ and limitations under the License.
 /// <reference lib="es2018.intl" />
 declare namespace Intl {
   /**
-   * [Unicode BCP 47 Locale
-   * Identifiers](https://unicode.org/reports/tr35/#Unicode_Language_and_Locale_Identifiers)
-   * definition.
+   * A string that is a valid [Unicode BCP 47 Locale
+   * Identifier](https://unicode.org/reports/tr35/#Unicode_locale_identifier).
    *
-   * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locales_argument).
+   * For example: "fa", "es-MX", "zh-Hant-TW".
+   *
+   * See [MDN - Intl - locales
+   * argument](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locales_argument).
    */
   type UnicodeBCP47LocaleIdentifier = string;
 
@@ -91,16 +93,10 @@ declare namespace Intl {
   type RelativeTimeFormatStyle = 'long' | 'short' | 'narrow';
 
   /**
-   * [BCP 47 language tag](http://tools.ietf.org/html/rfc5646) definition.
+   * The locale or locales to use
    *
-   * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locales_argument).
-   */
-  type BCP47LanguageTag = string;
-
-  /**
-   * The locale(s) to use
-   *
-   * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locales_argument).
+   * See [MDN - Intl - locales
+   * argument](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locales_argument).
    */
   type LocalesArgument =
     | UnicodeBCP47LocaleIdentifier
@@ -242,9 +238,7 @@ declare namespace Intl {
      *   [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/RelativeTimeFormat).
      */
     new (
-      locales?:
-        | UnicodeBCP47LocaleIdentifier
-        | readonly UnicodeBCP47LocaleIdentifier[],
+      locales?: LocalesArgument,
       options?: RelativeTimeFormatOptions,
     ): RelativeTimeFormat;
 
@@ -268,9 +262,7 @@ declare namespace Intl {
      *   [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/supportedLocalesOf).
      */
     supportedLocalesOf(
-      locales?:
-        | UnicodeBCP47LocaleIdentifier
-        | readonly UnicodeBCP47LocaleIdentifier[],
+      locales?: LocalesArgument,
       options?: RelativeTimeFormatOptions,
     ): readonly UnicodeBCP47LocaleIdentifier[];
   };
@@ -375,7 +367,7 @@ declare namespace Intl {
      */
     minimize(): Locale;
     /** Returns the locale's full locale identifier string. */
-    toString(): BCP47LanguageTag;
+    toString(): UnicodeBCP47LocaleIdentifier;
   }
 
   /**
@@ -397,7 +389,10 @@ declare namespace Intl {
    *   [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale).
    */
   const Locale: {
-    new (tag: BCP47LanguageTag | Locale, options?: LocaleOptions): Locale;
+    new (
+      tag: UnicodeBCP47LocaleIdentifier | Locale,
+      options?: LocaleOptions,
+    ): Locale;
   };
 
   type DisplayNamesFallback = 'code' | 'none';
@@ -513,6 +508,52 @@ declare namespace Intl {
     supportedLocalesOf(
       locales?: LocalesArgument,
       options?: { readonly localeMatcher?: RelativeTimeFormatLocaleMatcher },
-    ): readonly BCP47LanguageTag[];
+    ): readonly UnicodeBCP47LocaleIdentifier[];
   };
+
+  interface CollatorConstructor {
+    new (locales?: LocalesArgument, options?: CollatorOptions): Collator;
+    (locales?: LocalesArgument, options?: CollatorOptions): Collator;
+    supportedLocalesOf(
+      locales: LocalesArgument,
+      options?: CollatorOptions,
+    ): readonly string[];
+  }
+
+  interface DateTimeFormatConstructor {
+    new (
+      locales?: LocalesArgument,
+      options?: DateTimeFormatOptions,
+    ): DateTimeFormat;
+    (
+      locales?: LocalesArgument,
+      options?: DateTimeFormatOptions,
+    ): DateTimeFormat;
+    supportedLocalesOf(
+      locales: LocalesArgument,
+      options?: DateTimeFormatOptions,
+    ): readonly string[];
+  }
+
+  interface NumberFormatConstructor {
+    new (
+      locales?: LocalesArgument,
+      options?: NumberFormatOptions,
+    ): NumberFormat;
+    (locales?: LocalesArgument, options?: NumberFormatOptions): NumberFormat;
+    supportedLocalesOf(
+      locales: LocalesArgument,
+      options?: NumberFormatOptions,
+    ): readonly string[];
+  }
+
+  interface PluralRulesConstructor {
+    new (locales?: LocalesArgument, options?: PluralRulesOptions): PluralRules;
+    (locales?: LocalesArgument, options?: PluralRulesOptions): PluralRules;
+
+    supportedLocalesOf(
+      locales: LocalesArgument,
+      options?: { readonly localeMatcher?: 'lookup' | 'best fit' },
+    ): readonly string[];
+  }
 }
