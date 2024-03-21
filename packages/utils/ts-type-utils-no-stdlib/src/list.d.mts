@@ -55,15 +55,9 @@ namespace ListType {
       : A extends NonEmptyArray<unknown>
         ? B extends NonEmptyArray<unknown>
           ? readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>] // both A and B has at least 1 element
-          : readonly [
-              readonly [Head<A>, B[number] | undefined],
-              ...Zip<Tail<A>, Tail<B>>,
-            ] // A has at least 1 element but B doesn't
+          : readonly [readonly [Head<A>, B[number]], ...Zip<Tail<A>, Tail<B>>] // A has at least 1 element but B has at least 0 element
         : B extends NonEmptyArray<unknown>
-          ? readonly [
-              readonly [A[number] | undefined, Head<B>],
-              ...Zip<Tail<A>, Tail<B>>,
-            ] // B has at least 1 element but A doesn't
+          ? readonly [readonly [A[number], Head<B>], ...Zip<Tail<A>, Tail<B>>] // B has at least 1 element but A has at least 0 element
           : readonly (readonly [A[number], B[number]])[];
 
   export type Partition<
