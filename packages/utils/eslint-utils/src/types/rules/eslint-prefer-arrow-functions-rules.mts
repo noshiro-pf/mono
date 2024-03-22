@@ -11,7 +11,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
  * | key         | value       |
  * | :---------- | :---------- |
  * | fixable     | code        |
- * | category    | emcascript6 |
+ * | category    | ecmascript6 |
  * | recommended | false       |
  * ```
  */

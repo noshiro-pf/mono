@@ -35,6 +35,9 @@ export const Router = {
     eventListPage$: pathSegments$
       .chain(mapI(Routes.isRoute.eventListPage))
       .chain(distinctUntilChangedI()),
+    batchUpdatePage$: pathSegments$
+      .chain(mapI(Routes.isRoute.batchUpdatePage))
+      .chain(distinctUntilChangedI()),
     registerPage$: pathSegments$
       .chain(mapI(Routes.isRoute.registerPage))
       .chain(distinctUntilChangedI()),
@@ -51,6 +54,7 @@ export const Router = {
     answerPage: boolean;
     editPage: boolean;
     eventListPage: boolean;
+    batchUpdatePage: boolean;
     registerPage: boolean;
     signInPage: boolean;
   }> => {
@@ -58,6 +62,7 @@ export const Router = {
     const answerPage = useObservableValue(Router.isRoute.answerPage$);
     const editPage = useObservableValue(Router.isRoute.editPage$);
     const eventListPage = useObservableValue(Router.isRoute.eventListPage$);
+    const batchUpdatePage = useObservableValue(Router.isRoute.batchUpdatePage$);
     const registerPage = useObservableValue(Router.isRoute.registerPage$);
     const signInPage = useObservableValue(Router.isRoute.signInPage$);
 
@@ -66,6 +71,7 @@ export const Router = {
       answerPage,
       editPage,
       eventListPage,
+      batchUpdatePage,
       registerPage,
       signInPage,
     };

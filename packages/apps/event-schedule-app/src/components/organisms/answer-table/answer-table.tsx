@@ -1,10 +1,13 @@
-import { Button } from '@blueprintjs/core';
 import {
   AnswerFilterAndSortStore,
   AnswerPageStore,
   AnswerTableStore,
 } from '../../../store';
-import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
+import {
+  BpButtonOverflowHidden,
+  CustomIcon,
+  RequiredParticipantIcon,
+} from '../../atoms';
 import { HTMLTableBorderedStyled2 } from '../../bp';
 import { CommentButton } from './comment-button';
 import { DatetimeRangeCell } from './datetime-range-cell';
@@ -281,16 +284,6 @@ const RequiredParticipantIconStyled = styled.div`
   position: absolute;
   top: -5px;
   left: 5px;
-`;
-
-const BpButtonOverflowHidden = styled(Button)`
-  max-width: 100%;
-  overflow-x: hidden;
-
-  & > span {
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-  }
 `;
 
 const SummaryCellStyle = styled.div`

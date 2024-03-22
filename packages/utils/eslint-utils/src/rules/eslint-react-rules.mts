@@ -134,6 +134,7 @@ export const eslintReactRules: EslintReactRules = {
       validStrategies: ['ternary'],
     },
   ],
+  'react/checked-requires-onchange-or-readonly': 'error',
 
   // deprecated
   'react/jsx-sort-default-props': 'off',

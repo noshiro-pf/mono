@@ -1,4 +1,5 @@
 export * from './answer-page';
+export * from './batch-update-page';
 export * from './create-event-schedule';
 export * from './event-list-page';
 export * from './not-found-page';
