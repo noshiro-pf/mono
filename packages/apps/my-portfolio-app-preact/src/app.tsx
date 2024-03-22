@@ -58,7 +58,6 @@ export const App = memoNamed('App', () => {
 
   // pathnameと対応させるため、routerを使ってタブ切り替えを制御
   const tabIndex = useMemo(
-    //
     () => pathNameLastToIndex(pathNameLast),
     [pathNameLast],
   );

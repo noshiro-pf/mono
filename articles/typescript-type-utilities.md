@@ -103,7 +103,6 @@ expectType<BoolNor<false, false>, true>('=');
 
 ```ts
 type BoolAnd<A extends boolean, B extends boolean> =
-  //
   TypeEq<A, true> extends true
     ? TypeEq<B, true> extends true
       ? true
