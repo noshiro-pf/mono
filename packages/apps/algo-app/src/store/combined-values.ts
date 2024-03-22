@@ -15,6 +15,7 @@ import {
   onTossCancel,
   onTossSubmit,
 } from './action';
+import { DB } from './database';
 import { gameState$ } from './game-state';
 import { myPlayerIndex$ } from './my-player-index';
 import { cardPositions$, playerNamePositions$ } from './position';
@@ -30,10 +31,18 @@ const isMyTurn$: InitializedObservable<boolean> = combineLatestI([
 );
 
 export const displayValues$: InitializedObservable<DisplayValues> =
-  combineLatestI([gameState$, myPlayerIndex$] as const).chain(
-    mapI(([gameState, myPlayerIndex]) =>
+  combineLatestI([
+    gameState$,
+    DB.room$,
+    DB.players$,
+    myPlayerIndex$,
+  ] as const).chain(
+    mapI(([gameState, room, players, myPlayerIndex]) =>
       mapToDisplayValue({
+        roomState: room?.state ?? 'not-started',
         gameState,
+        shuffleDef: room?.shuffleDef ?? '0123',
+        players,
         myPlayerIndex: myPlayerIndex ?? 0,
         onCardClick,
       }),
@@ -99,7 +108,10 @@ export const selectAnswerBalloonProps$: InitializedObservable<
       submitAnswer: onAnswerSubmit,
       selectedNumber: gameState.answerSelected?.number,
       onSelectedNumberChange: (selectedNumber: CardNumber) => {
-        onSelectAnswer({ color: cardColor, number: selectedNumber });
+        onSelectAnswer({
+          color: cardColor,
+          number: selectedNumber,
+        });
       },
       submitButtonIsDisabled:
         gameState.cardChosenToAttack === undefined ||
