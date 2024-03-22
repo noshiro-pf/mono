@@ -20,15 +20,18 @@ expectType<
 >('=');
 
 expectType<
-  ListType.Zip<
-    readonly [number, number, number],
-    readonly [string, ...string[]]
-  >,
-  readonly [
-    readonly [number, string],
-    readonly [number, string | undefined],
-    readonly [number, string | undefined],
-  ]
+  ListType.Zip<readonly [number, number, number], readonly [string]>,
+  readonly [readonly [number, string]]
+>('=');
+
+expectType<
+  ListType.Zip<readonly [number], readonly [string, ...string[]]>,
+  readonly [readonly [number, string]]
+>('=');
+
+expectType<
+  ListType.Zip<readonly [number], readonly [...string[]]>,
+  readonly [readonly [number, string]]
 >('=');
 
 expectType<
@@ -38,33 +41,45 @@ expectType<
   >,
   readonly [
     readonly [string, number],
-    readonly [string | undefined, number],
-    readonly [string | undefined, number],
+    readonly [string, number],
+    readonly [string, number],
+  ]
+>('~='); // "=" にできない原因は不明
+
+expectType<
+  ListType.Zip<
+    readonly [boolean, ...string[]],
+    readonly [number, number, number]
+  >,
+  readonly [
+    readonly [boolean, number],
+    readonly [string, number],
+    readonly [string, number],
   ]
 >('=');
 
 expectType<
   ListType.Zip<
     readonly [number, number, number, ...number[]],
-    readonly [string, ...string[]]
+    readonly [boolean, ...string[]]
   >,
   readonly [
+    readonly [number, boolean],
     readonly [number, string],
-    readonly [number, string | undefined],
-    readonly [number, string | undefined],
+    readonly [number, string],
     ...(readonly [number, string])[],
   ]
 >('=');
 
 expectType<
   ListType.Zip<
-    readonly [string, ...string[]],
+    readonly [boolean, ...string[]],
     readonly [number, number, number, ...number[]]
   >,
   readonly [
+    readonly [boolean, number],
     readonly [string, number],
-    readonly [string | undefined, number],
-    readonly [string | undefined, number],
+    readonly [string, number],
     ...(readonly [string, number])[],
   ]
 >('=');
