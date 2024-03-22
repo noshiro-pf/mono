@@ -45,7 +45,7 @@ $  yarn ws:build
 -   configs
     -   tsconfig
         -   各 workspace で継承する共通 tsconfig 定義を置いている。
-        -   `nolib` の付いた tsconfig は標準ライブラリをデフォルトで読み込まない設定になっている。代わりに各 workspace のルート index.ts などで `/// <reference types="@noshiro/stdlib" />` のように reference 文を入れてカスタム lib 型定義を読み込むようにしている。ほとんどの TypeScript project の workspace で nolib の tsconfig を使用している。
+        -   `nolib` の付いた tsconfig は標準ライブラリをデフォルトで読み込まない設定になっている。代わりに各 workspace のルート index.ts などで `/// <reference types="@noshiro/strict-ts-lib" />` のように reference 文を入れてカスタム lib 型定義を読み込むようにしている。ほとんどの TypeScript project の workspace で nolib の tsconfig を使用している。
         -   `packages/utils/stdlib/stdlib.d.ts` の型定義は、TypeScript の標準 lib 型定義を元に半自動生成しており、一部の型を厳格化する目的で作成している（詳細は `packages/utils/stdlib` の script 等を参照）。
 -   特殊 utility の説明
     -   `packages/utils/eslint-utils`
