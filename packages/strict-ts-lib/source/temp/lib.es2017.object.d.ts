@@ -18,19 +18,28 @@ and limitations under the License.
 interface ObjectConstructor {
   /**
    * Returns an array of values of the enumerable properties of an object
-   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+   *
+   * @param o Object that contains the properties and methods. This can be an
+   *   object that you created or an existing Document Object Model (DOM)
+   *   object.
    */
   values<T>(o: { readonly [s: string]: T } | ArrayLike<T>): readonly T[];
 
   /**
    * Returns an array of values of the enumerable properties of an object
-   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+   *
+   * @param o Object that contains the properties and methods. This can be an
+   *   object that you created or an existing Document Object Model (DOM)
+   *   object.
    */
   values(o: {}): readonly unknown[];
 
   /**
    * Returns an array of key/values of the enumerable properties of an object
-   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+   *
+   * @param o Object that contains the properties and methods. This can be an
+   *   object that you created or an existing Document Object Model (DOM)
+   *   object.
    */
   entries<T>(
     o: { readonly [s: string]: T } | ArrayLike<T>,
@@ -38,13 +47,19 @@ interface ObjectConstructor {
 
   /**
    * Returns an array of key/values of the enumerable properties of an object
-   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+   *
+   * @param o Object that contains the properties and methods. This can be an
+   *   object that you created or an existing Document Object Model (DOM)
+   *   object.
    */
   entries(o: {}): readonly (readonly [string, unknown])[];
 
   /**
    * Returns an object containing all own property descriptors of an object
-   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+   *
+   * @param o Object that contains the properties and methods. This can be an
+   *   object that you created or an existing Document Object Model (DOM)
+   *   object.
    */
   getOwnPropertyDescriptors<T>(
     o: T,

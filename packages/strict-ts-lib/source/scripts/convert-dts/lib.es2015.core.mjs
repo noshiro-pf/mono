@@ -274,8 +274,12 @@ export const convertLibEs2015Core = (from, commentOutDeprecated) => {
           .chain((str) => {
             const prefix = [
               '  /**',
-              '   * Returns the names of the enumerable string properties and methods of an object.',
-              '   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.',
+              '   * Returns the names of the enumerable string properties and methods of an',
+              '   * object.',
+              '   *',
+              '   * @param o Object that contains the properties and methods. This can be an',
+              '   *   object that you created or an existing Document Object Model (DOM)',
+              '   *   object.',
             ];
 
             const before = ['   */', '  keys(o: {}): readonly string[];'];

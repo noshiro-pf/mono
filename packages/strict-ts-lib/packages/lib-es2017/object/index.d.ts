@@ -45,21 +45,26 @@ type _RecordUtilsEntries<R extends RecordBase> = R extends R
 interface ObjectConstructor {
   /**
    * Returns an array of values of the enumerable properties of an object
-   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+   *
+   * @param o Object that contains the properties and methods. This can be an
+   *   object that you created or an existing Document Object Model (DOM)
+   *   object.
    */
   values<T>(o: { readonly [s: string]: T } | ArrayLike<T>): readonly T[];
 
   /**
    * Returns an array of values of the enumerable properties of an object
-   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+   *
+   * @param o Object that contains the properties and methods. This can be an
+   *   object that you created or an existing Document Object Model (DOM)
+   *   object.
    */
   values(o: {}): readonly unknown[];
 
   /**
    * Returns an array of key/values of the enumerable properties of an object
-   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    *
-   * @example
+   *
    * ```ts
    * const obj = {
    *   x: 1,
@@ -70,18 +75,28 @@ interface ObjectConstructor {
    *
    * const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]
    * ```
+   *
+   * @param o Object that contains the properties and methods. This can be an
+   *   object that you created or an existing Document Object Model (DOM)
+   *   object.
    */
   entries<R extends RecordBase>(object: R): _RecordUtilsEntries<R>;
 
   /**
    * Returns an array of key/values of the enumerable properties of an object
-   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+   *
+   * @param o Object that contains the properties and methods. This can be an
+   *   object that you created or an existing Document Object Model (DOM)
+   *   object.
    */
   entries(o: {}): readonly (readonly [string, unknown])[];
 
   /**
    * Returns an object containing all own property descriptors of an object
-   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+   *
+   * @param o Object that contains the properties and methods. This can be an
+   *   object that you created or an existing Document Object Model (DOM)
+   *   object.
    */
   getOwnPropertyDescriptors<T>(o: T): {
     readonly [P in keyof T]: TypedPropertyDescriptor<T[P]>;

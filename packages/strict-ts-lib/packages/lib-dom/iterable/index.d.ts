@@ -21,7 +21,10 @@ and limitations under the License.
 /////////////////////////////
 
 interface AudioParam {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioParam/setValueCurveAtTime) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/AudioParam/setValueCurveAtTime)
+   */
   setValueCurveAtTime(
     values: Iterable<number>,
     startTime: number,
@@ -32,12 +35,18 @@ interface AudioParam {
 interface AudioParamMap extends ReadonlyMap<string, AudioParam> {}
 
 interface BaseAudioContext {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/BaseAudioContext/createIIRFilter) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/BaseAudioContext/createIIRFilter)
+   */
   createIIRFilter(
     feedforward: Iterable<number>,
     feedback: Iterable<number>,
   ): IIRFilterNode;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/BaseAudioContext/createPeriodicWave) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/BaseAudioContext/createPeriodicWave)
+   */
   createPeriodicWave(
     real: Iterable<number>,
     imag: Iterable<number>,
@@ -84,7 +93,10 @@ interface Cache {
 }
 
 interface CanvasPath {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/roundRect) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/roundRect)
+   */
   roundRect(
     x: number,
     y: number,
@@ -95,7 +107,10 @@ interface CanvasPath {
 }
 
 interface CanvasPathDrawingStyles {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/setLineDash) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/setLineDash)
+   */
   setLineDash(segments: Iterable<number>): void;
 }
 
@@ -158,19 +173,30 @@ interface HTMLSelectElement {
 
 interface Headers {
   [Symbol.iterator](): IterableIterator<readonly [string, string]>;
-  /** Returns an iterator allowing to go through all key/value pairs contained in this object. */
+  /**
+   * Returns an iterator allowing to go through all key/value pairs contained
+   * in this object.
+   */
   entries(): IterableIterator<readonly [string, string]>;
-  /** Returns an iterator allowing to go through all keys of the key/value pairs contained in this object. */
+  /**
+   * Returns an iterator allowing to go through all keys of the key/value
+   * pairs contained in this object.
+   */
   keys(): IterableIterator<string>;
-  /** Returns an iterator allowing to go through all values of the key/value pairs contained in this object. */
+  /**
+   * Returns an iterator allowing to go through all values of the key/value
+   * pairs contained in this object.
+   */
   values(): IterableIterator<string>;
 }
 
 interface IDBDatabase {
   /**
-   * Returns a new transaction with the given mode ("readonly" or "readwrite") and scope which can be a single object store name or an array of names.
+   * Returns a new transaction with the given mode ("readonly" or "readwrite")
+   * and scope which can be a single object store name or an array of names.
    *
-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBDatabase/transaction)
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/IDBDatabase/transaction)
    */
   transaction(
     storeNames: string | Iterable<string>,
@@ -181,11 +207,16 @@ interface IDBDatabase {
 
 interface IDBObjectStore {
   /**
-   * Creates a new index in store with the given name, keyPath and options and returns a new IDBIndex. If the keyPath and options define constraints that cannot be satisfied with the data already in store the upgrade transaction will abort with a "ConstraintError" DOMException.
+   * Creates a new index in store with the given name, keyPath and options and
+   * returns a new IDBIndex. If the keyPath and options define constraints
+   * that cannot be satisfied with the data already in store the upgrade
+   * transaction will abort with a "ConstraintError" DOMException.
    *
-   * Throws an "InvalidStateError" DOMException if not called within an upgrade transaction.
+   * Throws an "InvalidStateError" DOMException if not called within an
+   * upgrade transaction.
    *
-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBObjectStore/createIndex)
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/IDBObjectStore/createIndex)
    */
   createIndex(
     name: string,
@@ -197,7 +228,10 @@ interface IDBObjectStore {
 interface MIDIInputMap extends ReadonlyMap<string, MIDIInput> {}
 
 interface MIDIOutput {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/MIDIOutput/send) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/MIDIOutput/send)
+   */
   send(data: Iterable<number>, timestamp?: DOMHighResTimeStamp): void;
 }
 
@@ -220,7 +254,8 @@ interface MessageEvent<T = unknown> {
   /**
    * @deprecated
    *
-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/initMessageEvent)
+   *   [MDN
+   *   Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/initMessageEvent)
    */
   initMessageEvent(
     type: string,
@@ -246,13 +281,17 @@ interface Navigator {
   /**
    * Available only in secure contexts.
    *
-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Navigator/requestMediaKeySystemAccess)
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/Navigator/requestMediaKeySystemAccess)
    */
   requestMediaKeySystemAccess(
     keySystem: string,
     supportedConfigurations: Iterable<MediaKeySystemConfiguration>,
   ): Promise<MediaKeySystemAccess>;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Navigator/vibrate) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/Navigator/vibrate)
+   */
   vibrate(pattern: Iterable<number>): boolean;
 }
 
@@ -285,7 +324,10 @@ interface PluginArray {
 }
 
 interface RTCRtpTransceiver {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCRtpTransceiver/setCodecPreferences) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/RTCRtpTransceiver/setCodecPreferences)
+   */
   setCodecPreferences(codecs: Iterable<RTCRtpCodecCapability>): void;
 }
 
@@ -337,7 +379,10 @@ interface StyleSheetList {
 }
 
 interface SubtleCrypto {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)
+   */
   deriveKey(
     algorithm:
       | AlgorithmIdentifier
@@ -354,7 +399,10 @@ interface SubtleCrypto {
     extractable: boolean,
     keyUsages: Iterable<KeyUsage>,
   ): Promise<CryptoKey>;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)
+   */
   generateKey(
     algorithm: RsaHashedKeyGenParams | EcKeyGenParams,
     extractable: boolean,
@@ -370,7 +418,10 @@ interface SubtleCrypto {
     extractable: boolean,
     keyUsages: Iterable<KeyUsage>,
   ): Promise<CryptoKeyPair | CryptoKey>;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)
+   */
   importKey(
     format: 'jwk',
     keyData: JsonWebKey,
@@ -395,7 +446,10 @@ interface SubtleCrypto {
     extractable: boolean,
     keyUsages: Iterable<KeyUsage>,
   ): Promise<CryptoKey>;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)
+   */
   unwrapKey(
     format: KeyFormat,
     wrappedKey: BufferSource,
@@ -431,7 +485,10 @@ interface TouchList {
 
 interface URLSearchParams {
   [Symbol.iterator](): IterableIterator<readonly [string, string]>;
-  /** Returns an array of key, value pairs for every entry in the search params. */
+  /**
+   * Returns an array of key, value pairs for every entry in the search
+   * params.
+   */
   entries(): IterableIterator<readonly [string, string]>;
   /** Returns a list of keys in the search params. */
   keys(): IterableIterator<string>;
@@ -440,12 +497,18 @@ interface URLSearchParams {
 }
 
 interface WEBGL_draw_buffers {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_draw_buffers/drawBuffersWEBGL) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_draw_buffers/drawBuffersWEBGL)
+   */
   drawBuffersWEBGL(buffers: Iterable<GLenum>): void;
 }
 
 interface WEBGL_multi_draw {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_multi_draw/multiDrawArraysInstancedWEBGL) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_multi_draw/multiDrawArraysInstancedWEBGL)
+   */
   multiDrawArraysInstancedWEBGL(
     mode: GLenum,
     firstsList: Int32Array | Iterable<GLint>,
@@ -456,7 +519,10 @@ interface WEBGL_multi_draw {
     instanceCountsOffset: GLuint,
     drawcount: GLsizei,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_multi_draw/multiDrawArraysWEBGL) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_multi_draw/multiDrawArraysWEBGL)
+   */
   multiDrawArraysWEBGL(
     mode: GLenum,
     firstsList: Int32Array | Iterable<GLint>,
@@ -465,7 +531,10 @@ interface WEBGL_multi_draw {
     countsOffset: GLuint,
     drawcount: GLsizei,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_multi_draw/multiDrawElementsInstancedWEBGL) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_multi_draw/multiDrawElementsInstancedWEBGL)
+   */
   multiDrawElementsInstancedWEBGL(
     mode: GLenum,
     countsList: Int32Array | Iterable<GLsizei>,
@@ -477,7 +546,10 @@ interface WEBGL_multi_draw {
     instanceCountsOffset: GLuint,
     drawcount: GLsizei,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_multi_draw/multiDrawElementsWEBGL) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_multi_draw/multiDrawElementsWEBGL)
+   */
   multiDrawElementsWEBGL(
     mode: GLenum,
     countsList: Int32Array | Iterable<GLsizei>,
@@ -490,43 +562,67 @@ interface WEBGL_multi_draw {
 }
 
 interface WebGL2RenderingContextBase {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/clearBuffer) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/clearBuffer)
+   */
   clearBufferfv(
     buffer: GLenum,
     drawbuffer: GLint,
     values: Iterable<GLfloat>,
     srcOffset?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/clearBuffer) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/clearBuffer)
+   */
   clearBufferiv(
     buffer: GLenum,
     drawbuffer: GLint,
     values: Iterable<GLint>,
     srcOffset?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/clearBuffer) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/clearBuffer)
+   */
   clearBufferuiv(
     buffer: GLenum,
     drawbuffer: GLint,
     values: Iterable<GLuint>,
     srcOffset?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/drawBuffers) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/drawBuffers)
+   */
   drawBuffers(buffers: Iterable<GLenum>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getActiveUniforms) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getActiveUniforms)
+   */
   getActiveUniforms(
     program: WebGLProgram,
     uniformIndices: Iterable<GLuint>,
     pname: GLenum,
   ): unknown;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getUniformIndices) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getUniformIndices)
+   */
   getUniformIndices(
     program: WebGLProgram,
     uniformNames: Iterable<string>,
   ): Iterable<GLuint> | null;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/invalidateFramebuffer) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/invalidateFramebuffer)
+   */
   invalidateFramebuffer(target: GLenum, attachments: Iterable<GLenum>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/invalidateSubFramebuffer) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/invalidateSubFramebuffer)
+   */
   invalidateSubFramebuffer(
     target: GLenum,
     attachments: Iterable<GLenum>,
@@ -535,41 +631,59 @@ interface WebGL2RenderingContextBase {
     width: GLsizei,
     height: GLsizei,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/transformFeedbackVaryings) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/transformFeedbackVaryings)
+   */
   transformFeedbackVaryings(
     program: WebGLProgram,
     varyings: Iterable<string>,
     bufferMode: GLenum,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniform)
+   */
   uniform1uiv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLuint>,
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniform)
+   */
   uniform2uiv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLuint>,
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniform)
+   */
   uniform3uiv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLuint>,
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniform)
+   */
   uniform4uiv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLuint>,
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix)
+   */
   uniformMatrix2x3fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
@@ -577,7 +691,10 @@ interface WebGL2RenderingContextBase {
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix)
+   */
   uniformMatrix2x4fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
@@ -585,7 +702,10 @@ interface WebGL2RenderingContextBase {
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix)
+   */
   uniformMatrix3x2fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
@@ -593,7 +713,10 @@ interface WebGL2RenderingContextBase {
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix)
+   */
   uniformMatrix3x4fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
@@ -601,7 +724,10 @@ interface WebGL2RenderingContextBase {
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix)
+   */
   uniformMatrix4x2fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
@@ -609,7 +735,10 @@ interface WebGL2RenderingContextBase {
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix)
+   */
   uniformMatrix4x3fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
@@ -617,70 +746,103 @@ interface WebGL2RenderingContextBase {
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/vertexAttribI) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/vertexAttribI)
+   */
   vertexAttribI4iv(index: GLuint, values: Iterable<GLint>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/vertexAttribI) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/vertexAttribI)
+   */
   vertexAttribI4uiv(index: GLuint, values: Iterable<GLuint>): void;
 }
 
 interface WebGL2RenderingContextOverloads {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform1fv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform1iv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLint>,
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform2fv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform2iv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLint>,
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform3fv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform3iv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLint>,
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform4fv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLfloat>,
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform4iv(
     location: WebGLUniformLocation | null,
     data: Iterable<GLint>,
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix)
+   */
   uniformMatrix2fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
@@ -688,7 +850,10 @@ interface WebGL2RenderingContextOverloads {
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix)
+   */
   uniformMatrix3fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
@@ -696,7 +861,10 @@ interface WebGL2RenderingContextOverloads {
     srcOffset?: GLuint,
     srcLength?: GLuint,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix)
+   */
   uniformMatrix4fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
@@ -707,46 +875,91 @@ interface WebGL2RenderingContextOverloads {
 }
 
 interface WebGLRenderingContextBase {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/vertexAttrib) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/vertexAttrib)
+   */
   vertexAttrib1fv(index: GLuint, values: Iterable<GLfloat>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/vertexAttrib) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/vertexAttrib)
+   */
   vertexAttrib2fv(index: GLuint, values: Iterable<GLfloat>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/vertexAttrib) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/vertexAttrib)
+   */
   vertexAttrib3fv(index: GLuint, values: Iterable<GLfloat>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/vertexAttrib) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/vertexAttrib)
+   */
   vertexAttrib4fv(index: GLuint, values: Iterable<GLfloat>): void;
 }
 
 interface WebGLRenderingContextOverloads {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform1fv(location: WebGLUniformLocation | null, v: Iterable<GLfloat>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform1iv(location: WebGLUniformLocation | null, v: Iterable<GLint>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform2fv(location: WebGLUniformLocation | null, v: Iterable<GLfloat>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform2iv(location: WebGLUniformLocation | null, v: Iterable<GLint>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform3fv(location: WebGLUniformLocation | null, v: Iterable<GLfloat>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform3iv(location: WebGLUniformLocation | null, v: Iterable<GLint>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform4fv(location: WebGLUniformLocation | null, v: Iterable<GLfloat>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniform)
+   */
   uniform4iv(location: WebGLUniformLocation | null, v: Iterable<GLint>): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix)
+   */
   uniformMatrix2fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     value: Iterable<GLfloat>,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix)
+   */
   uniformMatrix3fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     value: Iterable<GLfloat>,
   ): void;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix)
+   */
   uniformMatrix4fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,

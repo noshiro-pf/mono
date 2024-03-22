@@ -162,8 +162,16 @@ export const convertLibEs2023Array = (from) => {
           .chain(
             replaceWithNoMatchCheck(
               // TODO: remove if fixed
-              'Copies an array and removes elements and, if necessary, inserts new elements in their place. Returns the copied array.',
-              'Copies an array and removes elements while, if necessary, inserting new elements in their place, returning the remaining elements.',
+              [
+                '  /**',
+                '   * Copies an array and removes elements and, if necessary, inserts new',
+                '   * elements in their place. Returns the copied array.',
+              ].join('\n'),
+              [
+                '  /**',
+                '   * Copies an array and removes elements while, if necessary, inserting new',
+                '   * elements in their place, returning the remaining elements.',
+              ].join('\n'),
             ),
           )
           .chain(
@@ -189,8 +197,18 @@ export const convertLibEs2023Array = (from) => {
           .chain(
             replaceWithNoMatchCheck(
               // TODO: remove if fixed
-              'Copies the array and returns the copied array with all of its elements reversed.',
-              'Returns a copy of an array with its elements reversed.',
+
+              [
+                '  /**',
+                '   * Copies the array and returns the copied array with all of its elements',
+                '   * reversed.',
+                '   */',
+              ].join('\n'),
+              [
+                '  /**',
+                '   * Returns a copy of an array with its elements reversed.',
+                '   */',
+              ].join('\n'),
             ),
           )
           .chain(
@@ -212,13 +230,13 @@ export const convertLibEs2023Array = (from) => {
               // TODO: remove if fixed (missing ending ".")
               [
                 '   * Copies an array, then overwrites the value at the provided index with the',
-                '   * given value. If the index is negative, then it replaces from the end',
-                '   * of the array',
+                '   * given value. If the index is negative, then it replaces from the end of',
+                '   * the array',
               ].join('\n'),
               [
                 '   * Copies an array, then overwrites the value at the provided index with the',
-                '   * given value. If the index is negative, then it replaces from the end',
-                '   * of the array.',
+                '   * given value. If the index is negative, then it replaces from the end of',
+                '   * the array.',
               ].join('\n'),
             ),
           ).value,
