@@ -360,7 +360,9 @@ describe('RecordUtils', () => {
 
     const obj0 = Object.fromEntries(entries);
 
-    expectType<typeof obj0, Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>>('=');
+    expectType<typeof obj0, Partial<Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>>>(
+      '=',
+    );
 
     test('case 1', () => {
       expect(obj0).toStrictEqual({

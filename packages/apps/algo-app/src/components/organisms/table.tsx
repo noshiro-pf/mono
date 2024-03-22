@@ -110,12 +110,16 @@ export const Table = memoNamed(
     const onBoundingClientRectChange = useMemo(
       () =>
         Object.fromEntries(
-          (['N', 'W', 'E', 'S'] as const).map((d) => [
-            d,
-            (rect: Readonly<DOMRect>) => {
-              playerNamePositionsDispatcher([d, rect]);
-            },
-          ]),
+          Tpl.map(
+            ['N', 'W', 'E', 'S'] as const,
+            (d) =>
+              [
+                d,
+                (rect: Readonly<DOMRect>) => {
+                  playerNamePositionsDispatcher([d, rect]);
+                },
+              ] as const,
+          ),
         ),
       [playerNamePositionsDispatcher],
     );
