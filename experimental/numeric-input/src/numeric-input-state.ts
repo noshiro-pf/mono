@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import * as React from 'react';
 
 export const useNumericInputState = <T extends number>({
   decode,
@@ -15,13 +15,13 @@ export const useNumericInputState = <T extends number>({
   onValueAsStrChange: (value: string) => void;
   submit: () => void;
 }> => {
-  const [valueAsStr, setValueAsStr] = useState(encode(valueFromProps));
+  const [valueAsStr, setValueAsStr] = React.useState(encode(valueFromProps));
 
-  useEffect(() => {
+  React.useEffect(() => {
     setValueAsStr(encode(valueFromProps));
   }, [valueFromProps, setValueAsStr, encode]);
 
-  const submit = useCallback(() => {
+  const submit = React.useCallback(() => {
     onValueChange(decode(valueAsStr));
   }, [decode, onValueChange, valueAsStr]);
 
