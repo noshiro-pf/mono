@@ -176,6 +176,8 @@ export const eslintRules: EslintRules = {
   'require-await': 'off',
   'no-return-await': 'off',
   'class-methods-use-this': 'off',
+  'prefer-promise-reject-errors': 'off',
+  'consistent-return': 'off',
 
   // customized
   'accessor-pairs': 'error',
@@ -185,7 +187,6 @@ export const eslintRules: EslintRules = {
   camelcase: 'off', // disabled
   'capitalized-comments': 'off', // disabled
   complexity: 'off', // disabled
-  'consistent-return': 'off', // disabled
   'consistent-this': 'error',
   'default-case-last': 'error',
   'default-case': 'off', // disabled
@@ -351,6 +352,7 @@ export const eslintRules: EslintRules = {
    * https://typescript-eslint.io/play/#ts=4.7.2&sourceType=module&showAST=es
    */
   'no-restricted-syntax': ['error', ...restrictedSyntax],
+
   'no-return-assign': 'error',
   'no-script-url': 'error',
   'no-self-assign': 'error',
@@ -391,7 +393,6 @@ export const eslintRules: EslintRules = {
   'prefer-numeric-literals': 'error',
   'prefer-object-has-own': 'error',
   'prefer-object-spread': 'error',
-  'prefer-promise-reject-errors': 'error',
   'prefer-regex-literals': 'error',
 
   /**

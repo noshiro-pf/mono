@@ -446,6 +446,16 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-unsafe-unary-minus': 'error',
   '@typescript-eslint/no-useless-template-literals': 'error',
 
+  '@typescript-eslint/consistent-return': 'off',
+  '@typescript-eslint/no-array-delete': 'error',
+  '@typescript-eslint/prefer-find': 'error',
+
+  '@typescript-eslint/prefer-promise-reject-errors': 'off',
+  // It is not necessary now as we will change the type definition of strict-ts-lib if necessary.
+  // [ 'error', { allowEmptyReject: false }, ],
+
+  '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off', // unnecessary in TypeScript with strict-ts-lib
+
   // deprecated
   '@typescript-eslint/block-spacing': 'off',
   '@typescript-eslint/padding-line-between-statements': 'off',

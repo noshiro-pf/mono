@@ -116,6 +116,48 @@ namespace ButtonHasType {
 }
 
 /**
+ * Enforce using `onChange` or `readonly` attribute when `checked` is used
+ *
+ * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/checked-requires-onchange-or-readonly.md
+ *
+ *  ```md
+ *  | key         | value          |
+ *  | :---------- | :------------- |
+ *  | category    | Best Practices |
+ *  | recommended | false          |
+ *  ```
+ */
+namespace CheckedRequiresOnchangeOrReadonly {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "ignoreMissingProperties": {
+   *         "type": "boolean"
+   *       },
+   *       "ignoreExclusiveCheckedAttribute": {
+   *         "type": "boolean"
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly ignoreMissingProperties?: boolean;
+    readonly ignoreExclusiveCheckedAttribute?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
  * Enforce all defaultProps have a corresponding non-required PropType
  *
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/default-props-match-prop-types.md
@@ -784,6 +826,9 @@ namespace JsxBooleanValue {
    *                 "minLength": 1
    *               },
    *               "uniqueItems": true
+   *             },
+   *             "assumeUndefinedIsFalse": {
+   *               "type": "boolean"
    *             }
    *           }
    *         }
@@ -807,6 +852,9 @@ namespace JsxBooleanValue {
    *                 "minLength": 1
    *               },
    *               "uniqueItems": true
+   *             },
+   *             "assumeUndefinedIsFalse": {
+   *               "type": "boolean"
    *             }
    *           }
    *         }
@@ -822,12 +870,14 @@ namespace JsxBooleanValue {
         'always',
         {
           readonly never?: readonly string[];
+          readonly assumeUndefinedIsFalse?: boolean;
         },
       ]
     | readonly [
         'never',
         {
           readonly always?: readonly string[];
+          readonly assumeUndefinedIsFalse?: boolean;
         },
       ]
     | readonly ['always' | 'never']
@@ -1255,6 +1305,9 @@ namespace JsxFilenameExtension {
    *         "items": {
    *           "type": "string"
    *         }
+   *       },
+   *       "ignoreFilesWithoutCode": {
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -1265,6 +1318,7 @@ namespace JsxFilenameExtension {
   export type Options = {
     readonly allow?: 'always' | 'as-needed';
     readonly extensions?: readonly string[];
+    readonly ignoreFilesWithoutCode?: boolean;
   };
 
   export type RuleEntry =
@@ -2078,38 +2132,87 @@ namespace JsxNoScriptUrl {
    * ### schema
    *
    * ```json
-   * [
-   *   {
-   *     "type": "array",
-   *     "uniqueItems": true,
-   *     "items": {
-   *       "type": "object",
-   *       "properties": {
-   *         "name": {
-   *           "type": "string"
-   *         },
-   *         "props": {
+   * {
+   *   "anyOf": [
+   *     {
+   *       "type": "array",
+   *       "items": [
+   *         {
    *           "type": "array",
+   *           "uniqueItems": true,
    *           "items": {
-   *             "type": "string",
-   *             "uniqueItems": true
+   *             "type": "object",
+   *             "properties": {
+   *               "name": {
+   *                 "type": "string"
+   *               },
+   *               "props": {
+   *                 "type": "array",
+   *                 "items": {
+   *                   "type": "string",
+   *                   "uniqueItems": true
+   *                 }
+   *               }
+   *             },
+   *             "required": ["name", "props"],
+   *             "additionalProperties": false
    *           }
+   *         },
+   *         {
+   *           "type": "object",
+   *           "properties": {
+   *             "includeFromSettings": {
+   *               "type": "boolean"
+   *             }
+   *           },
+   *           "additionalItems": false
    *         }
-   *       },
-   *       "required": [
-   *         "name",
-   *         "props"
    *       ],
-   *       "additionalProperties": false
+   *       "additionalItems": false
+   *     },
+   *     {
+   *       "type": "array",
+   *       "items": [
+   *         {
+   *           "type": "object",
+   *           "properties": {
+   *             "includeFromSettings": {
+   *               "type": "boolean"
+   *             }
+   *           },
+   *           "additionalItems": false
+   *         }
+   *       ],
+   *       "additionalItems": false
    *     }
-   *   }
-   * ]
+   *   ]
+   * }
    * ```
    */
-  export type Options = readonly {
-    readonly name: string;
-    readonly props: readonly string[];
-  }[];
+  export type Options =
+    | readonly [
+        {
+          readonly includeFromSettings?: boolean;
+          readonly [k: string]: unknown;
+        },
+      ]
+    | readonly [
+        readonly {
+          readonly name: string;
+          readonly props: readonly string[];
+        }[],
+        {
+          readonly includeFromSettings?: boolean;
+          readonly [k: string]: unknown;
+        },
+      ]
+    | readonly [
+        readonly {
+          readonly name: string;
+          readonly props: readonly string[];
+        }[],
+      ]
+    | readonly [];
 
   export type RuleEntry =
     | Linter.RuleLevel
@@ -2244,7 +2347,8 @@ namespace JsxOneExpressionPerLine {
    *         "enum": [
    *           "none",
    *           "literal",
-   *           "single-child"
+   *           "single-child",
+   *           "non-jsx"
    *         ]
    *       }
    *     },
@@ -2257,7 +2361,7 @@ namespace JsxOneExpressionPerLine {
    * ```
    */
   export type Options = {
-    readonly allow?: 'literal' | 'none' | 'single-child';
+    readonly allow?: 'literal' | 'non-jsx' | 'none' | 'single-child';
   };
 
   export type RuleEntry =
@@ -2864,7 +2968,8 @@ namespace JsxWrapMultilines {
    *           false,
    *           "ignore",
    *           "parens",
-   *           "parens-new-line"
+   *           "parens-new-line",
+   *           "never"
    *         ]
    *       },
    *       "assignment": {
@@ -2873,7 +2978,8 @@ namespace JsxWrapMultilines {
    *           false,
    *           "ignore",
    *           "parens",
-   *           "parens-new-line"
+   *           "parens-new-line",
+   *           "never"
    *         ]
    *       },
    *       "return": {
@@ -2882,7 +2988,8 @@ namespace JsxWrapMultilines {
    *           false,
    *           "ignore",
    *           "parens",
-   *           "parens-new-line"
+   *           "parens-new-line",
+   *           "never"
    *         ]
    *       },
    *       "arrow": {
@@ -2891,7 +2998,8 @@ namespace JsxWrapMultilines {
    *           false,
    *           "ignore",
    *           "parens",
-   *           "parens-new-line"
+   *           "parens-new-line",
+   *           "never"
    *         ]
    *       },
    *       "condition": {
@@ -2900,7 +3008,8 @@ namespace JsxWrapMultilines {
    *           false,
    *           "ignore",
    *           "parens",
-   *           "parens-new-line"
+   *           "parens-new-line",
+   *           "never"
    *         ]
    *       },
    *       "logical": {
@@ -2909,7 +3018,8 @@ namespace JsxWrapMultilines {
    *           false,
    *           "ignore",
    *           "parens",
-   *           "parens-new-line"
+   *           "parens-new-line",
+   *           "never"
    *         ]
    *       },
    *       "prop": {
@@ -2918,7 +3028,8 @@ namespace JsxWrapMultilines {
    *           false,
    *           "ignore",
    *           "parens",
-   *           "parens-new-line"
+   *           "parens-new-line",
+   *           "never"
    *         ]
    *       }
    *     },
@@ -2930,21 +3041,53 @@ namespace JsxWrapMultilines {
   export type Options = {
     readonly declaration?:
       | 'ignore'
+      | 'never'
       | 'parens-new-line'
       | 'parens'
       | false
       | true;
     readonly assignment?:
       | 'ignore'
+      | 'never'
       | 'parens-new-line'
       | 'parens'
       | false
       | true;
-    readonly return?: 'ignore' | 'parens-new-line' | 'parens' | false | true;
-    readonly arrow?: 'ignore' | 'parens-new-line' | 'parens' | false | true;
-    readonly condition?: 'ignore' | 'parens-new-line' | 'parens' | false | true;
-    readonly logical?: 'ignore' | 'parens-new-line' | 'parens' | false | true;
-    readonly prop?: 'ignore' | 'parens-new-line' | 'parens' | false | true;
+    readonly return?:
+      | 'ignore'
+      | 'never'
+      | 'parens-new-line'
+      | 'parens'
+      | false
+      | true;
+    readonly arrow?:
+      | 'ignore'
+      | 'never'
+      | 'parens-new-line'
+      | 'parens'
+      | false
+      | true;
+    readonly condition?:
+      | 'ignore'
+      | 'never'
+      | 'parens-new-line'
+      | 'parens'
+      | false
+      | true;
+    readonly logical?:
+      | 'ignore'
+      | 'never'
+      | 'parens-new-line'
+      | 'parens'
+      | false
+      | true;
+    readonly prop?:
+      | 'ignore'
+      | 'never'
+      | 'parens-new-line'
+      | 'parens'
+      | false
+      | true;
   };
 
   export type RuleEntry =
@@ -3528,6 +3671,10 @@ namespace NoUnknownProperty {
    *         "items": {
    *           "type": "string"
    *         }
+   *       },
+   *       "requireDataLowercase": {
+   *         "type": "boolean",
+   *         "default": false
    *       }
    *     },
    *     "additionalProperties": false
@@ -3537,6 +3684,7 @@ namespace NoUnknownProperty {
    */
   export type Options = {
     readonly ignore?: readonly string[];
+    readonly requireDataLowercase?: boolean;
   };
 
   export type RuleEntry =
@@ -4232,6 +4380,9 @@ namespace SortPropTypes {
    *       },
    *       "sortShapeProp": {
    *         "type": "boolean"
+   *       },
+   *       "checkTypes": {
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -4245,6 +4396,7 @@ namespace SortPropTypes {
     readonly ignoreCase?: boolean;
     readonly noSortAlphabetically?: boolean;
     readonly sortShapeProp?: boolean;
+    readonly checkTypes?: boolean;
   };
 
   export type RuleEntry =
@@ -4463,6 +4615,7 @@ namespace VoidDomElementsNoChildren {
 export type EslintReactRules = {
   readonly 'react/boolean-prop-naming': BooleanPropNaming.RuleEntry;
   readonly 'react/button-has-type': ButtonHasType.RuleEntry;
+  readonly 'react/checked-requires-onchange-or-readonly': CheckedRequiresOnchangeOrReadonly.RuleEntry;
   readonly 'react/default-props-match-prop-types': DefaultPropsMatchPropTypes.RuleEntry;
   readonly 'react/destructuring-assignment': DestructuringAssignment.RuleEntry;
   readonly 'react/display-name': DisplayName.RuleEntry;
@@ -4568,6 +4721,7 @@ export type EslintReactRules = {
 export type EslintReactRulesOption = {
   readonly 'react/boolean-prop-naming': BooleanPropNaming.Options;
   readonly 'react/button-has-type': ButtonHasType.Options;
+  readonly 'react/checked-requires-onchange-or-readonly': CheckedRequiresOnchangeOrReadonly.Options;
   readonly 'react/default-props-match-prop-types': DefaultPropsMatchPropTypes.Options;
   readonly 'react/destructuring-assignment': readonly [
     DestructuringAssignment.Options0,

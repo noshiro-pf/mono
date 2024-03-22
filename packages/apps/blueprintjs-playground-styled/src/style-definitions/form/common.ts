@@ -25,8 +25,7 @@ import { hexToRgba } from '../utils';
 export const inputPaddingHorizontalPx = ptGridSizePx;
 export const inputSmallPaddingPx = ptInputHeightSmallPx - ptIconSizeStandardPx;
 export const inputFontWeight = 400;
-export const inputTransition =
-  `box-shadow ${ptTransitionDuration} ${ptTransitionEase}` as const;
+export const inputTransition = `box-shadow ${ptTransitionDuration} ${ptTransitionEase}`;
 
 export const inputColor = ptTextColor;
 export const inputColorDisabled = buttonColorDisabled;
