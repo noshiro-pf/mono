@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useNumericInputState } from './numeric-input-state';
 import { NumericInputView } from './numeric-input-view';
 import { ScoreType } from './score';
@@ -10,11 +11,9 @@ type Props = Readonly<{
 
 const { step, min, max } = ScoreType;
 
-export const ScoreNumericInput = ({
-  score,
-  disabled = false,
-  onScoreChange,
-}: Props): JSX.Element => {
+export const ScoreNumericInput = React.memo<Props>((props) => {
+  const { score, disabled = false, onScoreChange } = props;
+
   const { valueAsStr, onValueAsStrChange, submit } = useNumericInputState({
     valueFromProps: score,
     onValueChange: onScoreChange,
@@ -33,4 +32,4 @@ export const ScoreNumericInput = ({
       onChange={onValueAsStrChange}
     />
   );
-};
+});

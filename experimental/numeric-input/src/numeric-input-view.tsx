@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import * as React from 'react';
 
 type Props = Readonly<{
   value: string;
@@ -10,10 +10,10 @@ type Props = Readonly<{
   onBlur: () => void;
 }>;
 
-export const NumericInputView = (props: Props): JSX.Element => {
+export const NumericInputView = React.memo<Props>((props) => {
   const { value, disabled, max, min, step, onChange, onBlur } = props;
 
-  const handleChange = useCallback(
+  const handleChange = React.useCallback(
     (ev: React.ChangeEvent<HTMLInputElement>) => {
       onChange(ev.target.value);
     },
@@ -32,4 +32,4 @@ export const NumericInputView = (props: Props): JSX.Element => {
       onChange={handleChange}
     />
   );
-};
+});
