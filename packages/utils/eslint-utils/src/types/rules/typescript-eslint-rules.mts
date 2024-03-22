@@ -105,11 +105,11 @@ namespace AwaitThenable {
  * @link https://typescript-eslint.io/rules/ban-ts-comment
  *
  *  ```md
- *  | key            | value       |
- *  | :------------- | :---------- |
- *  | type           | problem     |
- *  | hasSuggestions | true        |
- *  | recommended    | recommended |
+ *  | key            | value           |
+ *  | :------------- | :-------------- |
+ *  | type           | problem         |
+ *  | hasSuggestions | true            |
+ *  | recommended    | [object Object] |
  *  ```
  */
 namespace BanTsComment {
@@ -440,8 +440,6 @@ namespace ClassLiteralPropertyStyle {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
- *  | fixable              | code       |
- *  | hasSuggestions       | false      |
  *  | requiresTypeChecking | false      |
  *  ```
  */
@@ -468,7 +466,7 @@ namespace ClassMethodsUseThis {
    *       },
    *       "ignoreOverrideMethods": {
    *         "type": "boolean",
-   *         "description": "Ingore members marked with the `override` modifier"
+   *         "description": "Ignore members marked with the `override` modifier"
    *       },
    *       "ignoreClassesThatImplementAnInterface": {
    *         "oneOf": [
@@ -500,7 +498,7 @@ namespace ClassMethodsUseThis {
      * `this`
      */
     readonly enforceForClassFields?: boolean;
-    /** Ingore members marked with the `override` modifier */
+    /** Ignore members marked with the `override` modifier */
     readonly ignoreOverrideMethods?: boolean;
     /** Ignore classes that specifically implement some interface */
     readonly ignoreClassesThatImplementAnInterface?: boolean | 'public-fields';
@@ -706,6 +704,46 @@ namespace ConsistentIndexedObjectStyle {
 }
 
 /**
+ * Require `return` statements to either always or never specify values
+ *
+ * @link https://typescript-eslint.io/rules/consistent-return
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | requiresTypeChecking | true       |
+ *  ```
+ */
+namespace ConsistentReturn {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "treatUndefinedAsUnspecified": {
+   *         "type": "boolean",
+   *         "default": false
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly treatUndefinedAsUnspecified?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
  * Enforce consistent usage of type assertions
  *
  * @link https://typescript-eslint.io/rules/consistent-type-assertions
@@ -885,13 +923,6 @@ namespace ConsistentTypeImports {
    *   {
    *     "type": "object",
    *     "properties": {
-   *       "prefer": {
-   *         "type": "string",
-   *         "enum": [
-   *           "type-imports",
-   *           "no-type-imports"
-   *         ]
-   *       },
    *       "disallowTypeAnnotations": {
    *         "type": "boolean"
    *       },
@@ -901,6 +932,13 @@ namespace ConsistentTypeImports {
    *           "separate-type-imports",
    *           "inline-type-imports"
    *         ]
+   *       },
+   *       "prefer": {
+   *         "type": "string",
+   *         "enum": [
+   *           "type-imports",
+   *           "no-type-imports"
+   *         ]
    *       }
    *     },
    *     "additionalProperties": false
@@ -909,9 +947,9 @@ namespace ConsistentTypeImports {
    * ```
    */
   export type Options = {
-    readonly prefer?: 'no-type-imports' | 'type-imports';
     readonly disallowTypeAnnotations?: boolean;
     readonly fixStyle?: 'inline-type-imports' | 'separate-type-imports';
+    readonly prefer?: 'no-type-imports' | 'type-imports';
   };
 
   export type RuleEntry =
@@ -1241,7 +1279,7 @@ namespace ExplicitModuleBoundaryTypes {
    *         "type": "boolean"
    *       },
    *       "allowTypedFunctionExpressions": {
-   *         "description": "Whether to ignore type annotations on the variable of a function expresion.",
+   *         "description": "Whether to ignore type annotations on the variable of a function expression.",
    *         "type": "boolean"
    *       }
    *     },
@@ -1272,7 +1310,7 @@ namespace ExplicitModuleBoundaryTypes {
     readonly allowHigherOrderFunctions?: boolean;
     /**
      * Whether to ignore type annotations on the variable of a function
-     * expresion.
+     * expression.
      */
     readonly allowTypedFunctionExpressions?: boolean;
   };
@@ -3877,11 +3915,12 @@ namespace NamingConvention {
    *                 "typeLike",
    *                 "method",
    *                 "property",
+   *                 "accessor",
    *                 "variable",
    *                 "function",
    *                 "parameter",
    *                 "parameterProperty",
-   *                 "accessor",
+   *                 "classicAccessor",
    *                 "enumMember",
    *                 "classMethod",
    *                 "objectLiteralMethod",
@@ -3889,6 +3928,7 @@ namespace NamingConvention {
    *                 "classProperty",
    *                 "objectLiteralProperty",
    *                 "typeProperty",
+   *                 "autoAccessor",
    *                 "class",
    *                 "interface",
    *                 "typeAlias",
@@ -4844,6 +4884,140 @@ namespace NamingConvention {
    *       },
    *       {
    *         "type": "object",
+   *         "description": "Selector 'classicAccessor'",
+   *         "properties": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "custom": {
+   *             "$ref": "#/$defs/matchRegexConfig"
+   *           },
+   *           "leadingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
+   *           },
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
+   *           },
+   *           "prefix": {
+   *             "$ref": "#/$defs/prefixSuffixConfig"
+   *           },
+   *           "suffix": {
+   *             "$ref": "#/$defs/prefixSuffixConfig"
+   *           },
+   *           "failureMessage": {
+   *             "type": "string"
+   *           },
+   *           "filter": {
+   *             "oneOf": [
+   *               {
+   *                 "type": "string",
+   *                 "minLength": 1
+   *               },
+   *               {
+   *                 "$ref": "#/$defs/matchRegexConfig"
+   *               }
+   *             ]
+   *           },
+   *           "selector": {
+   *             "type": "string",
+   *             "enum": ["classicAccessor"]
+   *           },
+   *           "modifiers": {
+   *             "type": "array",
+   *             "items": {
+   *               "type": "string",
+   *               "enum": [
+   *                 "abstract",
+   *                 "private",
+   *                 "protected",
+   *                 "public",
+   *                 "requiresQuotes",
+   *                 "static",
+   *                 "override"
+   *               ]
+   *             },
+   *             "additionalItems": false
+   *           },
+   *           "types": {
+   *             "type": "array",
+   *             "items": {
+   *               "$ref": "#/$defs/typeModifiers"
+   *             },
+   *             "additionalItems": false
+   *           }
+   *         },
+   *         "required": ["selector", "format"],
+   *         "additionalProperties": false
+   *       },
+   *       {
+   *         "type": "object",
+   *         "description": "Selector 'autoAccessor'",
+   *         "properties": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "custom": {
+   *             "$ref": "#/$defs/matchRegexConfig"
+   *           },
+   *           "leadingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
+   *           },
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
+   *           },
+   *           "prefix": {
+   *             "$ref": "#/$defs/prefixSuffixConfig"
+   *           },
+   *           "suffix": {
+   *             "$ref": "#/$defs/prefixSuffixConfig"
+   *           },
+   *           "failureMessage": {
+   *             "type": "string"
+   *           },
+   *           "filter": {
+   *             "oneOf": [
+   *               {
+   *                 "type": "string",
+   *                 "minLength": 1
+   *               },
+   *               {
+   *                 "$ref": "#/$defs/matchRegexConfig"
+   *               }
+   *             ]
+   *           },
+   *           "selector": {
+   *             "type": "string",
+   *             "enum": ["autoAccessor"]
+   *           },
+   *           "modifiers": {
+   *             "type": "array",
+   *             "items": {
+   *               "type": "string",
+   *               "enum": [
+   *                 "abstract",
+   *                 "private",
+   *                 "protected",
+   *                 "public",
+   *                 "requiresQuotes",
+   *                 "static",
+   *                 "override"
+   *               ]
+   *             },
+   *             "additionalItems": false
+   *           },
+   *           "types": {
+   *             "type": "array",
+   *             "items": {
+   *               "$ref": "#/$defs/typeModifiers"
+   *             },
+   *             "additionalItems": false
+   *           }
+   *         },
+   *         "required": ["selector", "format"],
+   *         "additionalProperties": false
+   *       },
+   *       {
+   *         "type": "object",
    *         "description": "Selector 'accessor'",
    *         "properties": {
    *           "format": {
@@ -5384,8 +5558,50 @@ namespace NamingConvention {
         readonly suffix?: PrefixSuffixConfig;
         readonly failureMessage?: string;
         readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'autoAccessor';
+        readonly modifiers?: readonly (
+          | 'abstract'
+          | 'override'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'requiresQuotes'
+          | 'static'
+        )[];
+        readonly types?: readonly TypeModifiers[];
+      }
+    | {
+        readonly format: FormatOptionsConfig;
+        readonly custom?: MatchRegexConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly failureMessage?: string;
+        readonly filter?: MatchRegexConfig | string;
         readonly selector: 'class';
         readonly modifiers?: readonly ('abstract' | 'exported' | 'unused')[];
+      }
+    | {
+        readonly format: FormatOptionsConfig;
+        readonly custom?: MatchRegexConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly failureMessage?: string;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'classicAccessor';
+        readonly modifiers?: readonly (
+          | 'abstract'
+          | 'override'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'requiresQuotes'
+          | 'static'
+        )[];
+        readonly types?: readonly TypeModifiers[];
       }
     | {
         readonly format: FormatOptionsConfig;
@@ -5760,7 +5976,9 @@ namespace NamingConvention {
         readonly filter?: MatchRegexConfig | string;
         readonly selector: readonly (
           | 'accessor'
+          | 'autoAccessor'
           | 'class'
+          | 'classicAccessor'
           | 'classMethod'
           | 'classProperty'
           | 'default'
@@ -5835,6 +6053,24 @@ namespace NoArrayConstructor {
 }
 
 /**
+ * Disallow using the `delete` operator on array values
+ *
+ * @link https://typescript-eslint.io/rules/no-array-delete
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | hasSuggestions       | true    |
+ *  | recommended          | strict  |
+ *  | requiresTypeChecking | true    |
+ *  ```
+ */
+namespace NoArrayDelete {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
  * Require `.toString()` to only be called on objects which provide useful
  * information when stringified
  *
@@ -5887,7 +6123,6 @@ namespace NoBaseToString {
  *  | key            | value     |
  *  | :------------- | :-------- |
  *  | type           | problem   |
- *  | fixable        | code      |
  *  | hasSuggestions | true      |
  *  | recommended    | stylistic |
  *  ```
@@ -7073,7 +7308,35 @@ namespace NoRedundantTypeConstituents {
  *  ```
  */
 namespace NoRequireImports {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allow": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "description": "Patterns of import paths to allow requiring from."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    /** Patterns of import paths to allow requiring from. */
+    readonly allow?: readonly string[];
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -8127,11 +8390,12 @@ namespace NoUselessEmptyExport {
  * @link https://typescript-eslint.io/rules/no-useless-template-literals
  *
  *  ```md
- *  | key                  | value   |
- *  | :------------------- | :------ |
- *  | type                 | problem |
- *  | recommended          | strict  |
- *  | requiresTypeChecking | true    |
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | fixable              | code       |
+ *  | recommended          | strict     |
+ *  | requiresTypeChecking | true       |
  *  ```
  */
 namespace NoUselessTemplateLiterals {
@@ -8151,7 +8415,35 @@ namespace NoUselessTemplateLiterals {
  *  ```
  */
 namespace NoVarRequires {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allow": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "description": "Patterns of import paths to allow requiring from."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    /** Patterns of import paths to allow requiring from. */
+    readonly allow?: readonly string[];
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -8579,6 +8871,24 @@ namespace PreferEnumInitializers {
 }
 
 /**
+ * Enforce the use of Array.prototype.find() over Array.prototype.filter()
+ * followed by [0] when looking for a single result
+ *
+ * @link https://typescript-eslint.io/rules/prefer-find
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | hasSuggestions       | true       |
+ *  | requiresTypeChecking | true       |
+ *  ```
+ */
+namespace PreferFind {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
  * Enforce the use of `for-of` loop over the standard `for` loop where possible
  *
  * @link https://typescript-eslint.io/rules/prefer-for-of
@@ -8889,6 +9199,46 @@ namespace PreferOptionalChain {
 }
 
 /**
+ * Require using Error objects as Promise rejection reasons
+ *
+ * @link https://typescript-eslint.io/rules/prefer-promise-reject-errors
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | recommended          | strict     |
+ *  | requiresTypeChecking | true       |
+ *  ```
+ */
+namespace PreferPromiseRejectErrors {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowEmptyReject": {
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly allowEmptyReject?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
  * Require private members to be marked as `readonly` if they're never modified
  * outside of the constructor
  *
@@ -9173,7 +9523,39 @@ namespace PreferReturnThisType {
  *  ```
  */
 namespace PreferStringStartsEndsWith {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "allowSingleElementEquality": {
+   *         "description": "Whether to allow equality checks against the first or last element of a string.",
+   *         "enum": [
+   *           "always",
+   *           "never"
+   *         ],
+   *         "type": "string"
+   *       }
+   *     },
+   *     "type": "object"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    /**
+     * Whether to allow equality checks against the first or last element of a
+     * string.
+     */
+    readonly allowSingleElementEquality?: 'always' | 'never';
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -9379,11 +9761,11 @@ namespace RequireAwait {
  * @link https://typescript-eslint.io/rules/restrict-plus-operands
  *
  *  ```md
- *  | key                  | value       |
- *  | :------------------- | :---------- |
- *  | type                 | problem     |
- *  | recommended          | recommended |
- *  | requiresTypeChecking | true        |
+ *  | key                  | value           |
+ *  | :------------------- | :-------------- |
+ *  | type                 | problem         |
+ *  | recommended          | [object Object] |
+ *  | requiresTypeChecking | true            |
  *  ```
  */
 namespace RestrictPlusOperands {
@@ -9454,11 +9836,11 @@ namespace RestrictPlusOperands {
  * @link https://typescript-eslint.io/rules/restrict-template-expressions
  *
  *  ```md
- *  | key                  | value       |
- *  | :------------------- | :---------- |
- *  | type                 | problem     |
- *  | recommended          | recommended |
- *  | requiresTypeChecking | true        |
+ *  | key                  | value           |
+ *  | :------------------- | :-------------- |
+ *  | type                 | problem         |
+ *  | recommended          | [object Object] |
+ *  | requiresTypeChecking | true            |
  *  ```
  */
 namespace RestrictTemplateExpressions {
@@ -9473,6 +9855,10 @@ namespace RestrictTemplateExpressions {
    *     "properties": {
    *       "allowAny": {
    *         "description": "Whether to allow `any` typed values in template expressions.",
+   *         "type": "boolean"
+   *       },
+   *       "allowArray": {
+   *         "description": "Whether to allow `array` typed values in template expressions.",
    *         "type": "boolean"
    *       },
    *       "allowBoolean": {
@@ -9503,6 +9889,8 @@ namespace RestrictTemplateExpressions {
   export type Options = {
     /** Whether to allow `any` typed values in template expressions. */
     readonly allowAny?: boolean;
+    /** Whether to allow `array` typed values in template expressions. */
+    readonly allowArray?: boolean;
     /** Whether to allow `boolean` typed values in template expressions. */
     readonly allowBoolean?: boolean;
     /** Whether to allow `nullish` typed values in template expressions. */
@@ -10286,6 +10674,25 @@ namespace UnifiedSignatures {
     | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
+/**
+ * Enforce typing arguments in `.catch()` callbacks as `unknown`
+ *
+ * @link https://typescript-eslint.io/rules/use-unknown-in-catch-callback-variable
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | fixable              | code       |
+ *  | hasSuggestions       | true       |
+ *  | recommended          | strict     |
+ *  | requiresTypeChecking | true       |
+ *  ```
+ */
+namespace UseUnknownInCatchCallbackVariable {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
 export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/adjacent-overload-signatures': AdjacentOverloadSignatures.RuleEntry;
   readonly '@typescript-eslint/array-type': ArrayType.RuleEntry;
@@ -10297,6 +10704,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/class-methods-use-this': ClassMethodsUseThis.RuleEntry;
   readonly '@typescript-eslint/consistent-generic-constructors': ConsistentGenericConstructors.RuleEntry;
   readonly '@typescript-eslint/consistent-indexed-object-style': ConsistentIndexedObjectStyle.RuleEntry;
+  readonly '@typescript-eslint/consistent-return': ConsistentReturn.RuleEntry;
   readonly '@typescript-eslint/consistent-type-assertions': ConsistentTypeAssertions.RuleEntry;
   readonly '@typescript-eslint/consistent-type-definitions': ConsistentTypeDefinitions.RuleEntry;
   readonly '@typescript-eslint/consistent-type-exports': ConsistentTypeExports.RuleEntry;
@@ -10312,6 +10720,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/method-signature-style': MethodSignatureStyle.RuleEntry;
   readonly '@typescript-eslint/naming-convention': NamingConvention.RuleEntry;
   readonly '@typescript-eslint/no-array-constructor': NoArrayConstructor.RuleEntry;
+  readonly '@typescript-eslint/no-array-delete': NoArrayDelete.RuleEntry;
   readonly '@typescript-eslint/no-base-to-string': NoBaseToString.RuleEntry;
   readonly '@typescript-eslint/no-confusing-non-null-assertion': NoConfusingNonNullAssertion.RuleEntry;
   readonly '@typescript-eslint/no-confusing-void-expression': NoConfusingVoidExpression.RuleEntry;
@@ -10375,6 +10784,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/prefer-as-const': PreferAsConst.RuleEntry;
   readonly '@typescript-eslint/prefer-destructuring': PreferDestructuring.RuleEntry;
   readonly '@typescript-eslint/prefer-enum-initializers': PreferEnumInitializers.RuleEntry;
+  readonly '@typescript-eslint/prefer-find': PreferFind.RuleEntry;
   readonly '@typescript-eslint/prefer-for-of': PreferForOf.RuleEntry;
   readonly '@typescript-eslint/prefer-function-type': PreferFunctionType.RuleEntry;
   readonly '@typescript-eslint/prefer-includes': PreferIncludes.RuleEntry;
@@ -10382,6 +10792,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/prefer-namespace-keyword': PreferNamespaceKeyword.RuleEntry;
   readonly '@typescript-eslint/prefer-nullish-coalescing': PreferNullishCoalescing.RuleEntry;
   readonly '@typescript-eslint/prefer-optional-chain': PreferOptionalChain.RuleEntry;
+  readonly '@typescript-eslint/prefer-promise-reject-errors': PreferPromiseRejectErrors.RuleEntry;
   readonly '@typescript-eslint/prefer-readonly': PreferReadonly.RuleEntry;
   readonly '@typescript-eslint/prefer-readonly-parameter-types': PreferReadonlyParameterTypes.RuleEntry;
   readonly '@typescript-eslint/prefer-reduce-type-parameter': PreferReduceTypeParameter.RuleEntry;
@@ -10402,6 +10813,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/typedef': Typedef.RuleEntry;
   readonly '@typescript-eslint/unbound-method': UnboundMethod.RuleEntry;
   readonly '@typescript-eslint/unified-signatures': UnifiedSignatures.RuleEntry;
+  readonly '@typescript-eslint/use-unknown-in-catch-callback-variable': UseUnknownInCatchCallbackVariable.RuleEntry;
 
   // deprecated
   readonly '@typescript-eslint/block-spacing': BlockSpacing.RuleEntry;
@@ -10436,6 +10848,7 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/class-methods-use-this': ClassMethodsUseThis.Options;
   readonly '@typescript-eslint/consistent-generic-constructors': ConsistentGenericConstructors.Options;
   readonly '@typescript-eslint/consistent-indexed-object-style': ConsistentIndexedObjectStyle.Options;
+  readonly '@typescript-eslint/consistent-return': ConsistentReturn.Options;
   readonly '@typescript-eslint/consistent-type-assertions': ConsistentTypeAssertions.Options;
   readonly '@typescript-eslint/consistent-type-definitions': ConsistentTypeDefinitions.Options;
   readonly '@typescript-eslint/consistent-type-exports': ConsistentTypeExports.Options;
@@ -10465,6 +10878,7 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/no-misused-promises': NoMisusedPromises.Options;
   readonly '@typescript-eslint/no-namespace': NoNamespace.Options;
   readonly '@typescript-eslint/no-redeclare': NoRedeclare.Options;
+  readonly '@typescript-eslint/no-require-imports': NoRequireImports.Options;
   readonly '@typescript-eslint/no-restricted-imports': NoRestrictedImports.Options;
   readonly '@typescript-eslint/no-shadow': NoShadow.Options;
   readonly '@typescript-eslint/no-this-alias': NoThisAlias.Options;
@@ -10475,6 +10889,7 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/no-unused-expressions': NoUnusedExpressions.Options;
   readonly '@typescript-eslint/no-unused-vars': NoUnusedVars.Options;
   readonly '@typescript-eslint/no-use-before-define': NoUseBeforeDefine.Options;
+  readonly '@typescript-eslint/no-var-requires': NoVarRequires.Options;
   readonly '@typescript-eslint/parameter-properties': ParameterProperties.Options;
   readonly '@typescript-eslint/prefer-destructuring': readonly [
     PreferDestructuring.Options0,
@@ -10483,8 +10898,10 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/prefer-literal-enum-member': PreferLiteralEnumMember.Options;
   readonly '@typescript-eslint/prefer-nullish-coalescing': PreferNullishCoalescing.Options;
   readonly '@typescript-eslint/prefer-optional-chain': PreferOptionalChain.Options;
+  readonly '@typescript-eslint/prefer-promise-reject-errors': PreferPromiseRejectErrors.Options;
   readonly '@typescript-eslint/prefer-readonly': PreferReadonly.Options;
   readonly '@typescript-eslint/prefer-readonly-parameter-types': PreferReadonlyParameterTypes.Options;
+  readonly '@typescript-eslint/prefer-string-starts-ends-with': PreferStringStartsEndsWith.Options;
   readonly '@typescript-eslint/promise-function-async': PromiseFunctionAsync.Options;
   readonly '@typescript-eslint/require-array-sort-compare': RequireArraySortCompare.Options;
   readonly '@typescript-eslint/restrict-plus-operands': RestrictPlusOperands.Options;
