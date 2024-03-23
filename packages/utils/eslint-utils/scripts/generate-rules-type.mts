@@ -39,7 +39,6 @@ const metaToString = (meta: Meta | undefined): string => {
 
   if (docs === undefined) return '';
 
-  // eslint-disable-next-line deprecation/deprecation
   const { description, recommended, category, url } = docs;
 
   const keyValue: DeepReadonly<[string, boolean | string | undefined][]> = [
