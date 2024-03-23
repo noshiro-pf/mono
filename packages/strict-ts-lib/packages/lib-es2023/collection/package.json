@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/lib-es2023-collection",
-  "version": "5.3.3",
+  "version": "5.4.3",
   "private": false,
   "description": "Strict TypeScript lib",
   "license": "MIT",

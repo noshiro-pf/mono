@@ -44,7 +44,7 @@ interface SuppressedError extends Error {
   readonly suppressed: unknown;
 }
 
-interface SuppressedErrorConstructor extends ErrorConstructor {
+interface SuppressedErrorConstructor {
   new (error: unknown, suppressed: unknown, message?: string): SuppressedError;
   (error: unknown, suppressed: unknown, message?: string): SuppressedError;
   readonly prototype: SuppressedError;
