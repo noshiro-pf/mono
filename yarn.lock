@@ -4834,52 +4834,52 @@
     eslint-visitor-keys "^3.4.1"
 
 "@typescript/lib-decorators@file:./packages/strict-ts-lib/packages/lib-decorators":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-dom@file:./packages/strict-ts-lib/packages/lib-dom":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-es2015@file:./packages/strict-ts-lib/packages/lib-es2015":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-es2016@file:./packages/strict-ts-lib/packages/lib-es2016":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-es2017@file:./packages/strict-ts-lib/packages/lib-es2017":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-es2018@file:./packages/strict-ts-lib/packages/lib-es2018":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-es2019@file:./packages/strict-ts-lib/packages/lib-es2019":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-es2020@file:./packages/strict-ts-lib/packages/lib-es2020":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-es2021@file:./packages/strict-ts-lib/packages/lib-es2021":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-es2022@file:./packages/strict-ts-lib/packages/lib-es2022":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-es2023@file:./packages/strict-ts-lib/packages/lib-es2023":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-es5@file:./packages/strict-ts-lib/packages/lib-es5":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-es6@file:./packages/strict-ts-lib/packages/lib-es6":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-esnext@file:./packages/strict-ts-lib/packages/lib-esnext":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-scripthost@file:./packages/strict-ts-lib/packages/lib-scripthost":
-  version "5.4.2"
+  version "5.4.3"
 
 "@typescript/lib-webworker@file:./packages/strict-ts-lib/packages/lib-webworker":
-  version "5.4.2"
+  version "5.4.3"
 
 "@ungap/structured-clone@^1.0.0", "@ungap/structured-clone@^1.2.0":
   version "1.2.0"
@@ -14358,10 +14358,10 @@ re2@^1.17.7:
     nan "^2.18.0"
     node-gyp "^10.0.1"
 
-react-codemod@^5.4.3:
-  version "5.4.3"
-  resolved "https://registry.yarnpkg.com/react-codemod/-/react-codemod-5.4.3.tgz#7f7c8d8d52d889bf26887c73c3cedf91fd37f106"
-  integrity sha512-n1Ec/uJWv7ibdmXij/cSzzfl6n5MqCYrIbepD+q72k3CSxDOvNjiJyBdsXjnFFJemfmf24PymNeZ9ROxyoyYvA==
+react-codemod@^5.4.4:
+  version "5.4.4"
+  resolved "https://registry.yarnpkg.com/react-codemod/-/react-codemod-5.4.4.tgz#3331cfda823f3840b8f994c07b497f26cd8b9520"
+  integrity sha512-PtaaDiCE4TYcMHv/nhUJV1g0OAjt4tPRrpQa+LOCR4NJTkNis/pcPJlUWPFs14iPQ4vxt9dcD7ZW0E0NOCNiOw==
   dependencies:
     chalk "^2.4.2"
     eslint "^6.6.0"
