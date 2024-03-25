@@ -10,20 +10,18 @@ export type _IsLiteralType<T extends RecordKeyType> = string extends T
       : true;
 
 export function match<Case extends RecordKeyType, V>(
-  switchCase: Case,
+  target: Case,
   cases: Record<Case, V>,
 ): _IsLiteralType<Case> extends true ? V : V | undefined;
 
 export function match<Case extends RecordKeyType, V, CaseSub extends Case>(
-  switchCase: Case,
+  target: Case,
   cases: Record<CaseSub, V>,
-  defaultCase: V,
 ): V;
 
 export function match<Case extends RecordKeyType, V, CaseSub extends Case>(
-  switchCase: Case,
+  target: Case,
   cases: Record<CaseSub, V>,
-  defaultCase?: V,
 ): V | undefined {
-  return keyIsIn(switchCase, cases) ? cases[switchCase] : defaultCase;
+  return keyIsIn(target, cases) ? cases[target] : undefined;
 }
