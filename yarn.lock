@@ -14390,10 +14390,10 @@ re2@^1.17.7:
     nan "^2.18.0"
     node-gyp "^10.0.1"
 
-react-codemod@^5.4.3:
-  version "5.4.3"
-  resolved "https://registry.yarnpkg.com/react-codemod/-/react-codemod-5.4.3.tgz#7f7c8d8d52d889bf26887c73c3cedf91fd37f106"
-  integrity sha512-n1Ec/uJWv7ibdmXij/cSzzfl6n5MqCYrIbepD+q72k3CSxDOvNjiJyBdsXjnFFJemfmf24PymNeZ9ROxyoyYvA==
+react-codemod@^5.4.4:
+  version "5.4.4"
+  resolved "https://registry.yarnpkg.com/react-codemod/-/react-codemod-5.4.4.tgz#3331cfda823f3840b8f994c07b497f26cd8b9520"
+  integrity sha512-PtaaDiCE4TYcMHv/nhUJV1g0OAjt4tPRrpQa+LOCR4NJTkNis/pcPJlUWPFs14iPQ4vxt9dcD7ZW0E0NOCNiOw==
   dependencies:
     chalk "^2.4.2"
     eslint "^6.6.0"
