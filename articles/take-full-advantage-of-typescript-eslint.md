@@ -14,10 +14,10 @@ ESLint を活用することで、コーディング規約やベストプラク�
 
 eslint を使う際、 `eslint:recommended`, `plugin:@typescript-eslint/eslint-recommended` などの各 eslint plugin の推奨 config のみを使って済ませたり、 [eslint-config-airbnb](https://www.npmjs.com/package/eslint-config-airbnb) などの config のみに頼ることも多い印象ですが、 recommended config に含まれないルールやオプションにも非常に有用なものが数多く存在するので、それらを一つでも多く活用した方が良いと私は考えています。
 
-推奨設定を使っているだけだと、 ESLint はコードのフォーマットや `eval` などのグローバル変数の使用を禁止する程度の素朴なチェックしかできないように思ってしまうかもしれませんが、ESLint は JavaScript コードをパースしてできた AST（抽象構文木）を検証するツールであるため、非常に強力な静的検証ができます。
-パーサー等を適切に指定することで TypeScript の型情報も使ったチェックや、循環依存の検出[^no-cycle]、どこからも参照されていない export の検出[^no-unused-modules]なども行うことができます。
+推奨設定を使っているだけだと、もしかしたら ESLint はコードのフォーマットや `eval` などのグローバル変数の使用を禁止する程度の素朴なチェックしかできないように思ってしまうかもしれませんが、ESLint は JavaScript コードをパースしてできた AST（抽象構文木）を検証するツールであるため、強力な静的検証を行うポテンシャルがあります。
+例えば、パーサー等を適切に指定することで TypeScript の型情報を使ったチェックや、循環依存の検出[^no-cycle]、どこからも参照されていない export の検出[^no-unused-modules]なども行うことができます。
 
-今回は、私が特に有用だと思っているルールをいくつか紹介します。サンプルコードは各ルールのリンク先を見た方が分かりやすいので、記事の長さの都合上省きました。
+今回は、私が特に有用だと思っているルールをいくつか紹介します。サンプルコードは各ルールのリンク先を見た方が分かりやすいので、記事の長さの都合上一部省きました。
 
 [^no-cycle]: https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-cycle.md
 [^no-unused-modules]: https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-unused-modules.md
@@ -222,6 +222,13 @@ const config = {
 
 ## 型安全性に関わるルール
 
+### 危険な `as` の使用を禁止する（2024/5/4追記）
+
+- [total-functions/no-unsafe-type-assertion](https://www.npmjs.com/package/eslint-plugin-total-functions#total-functionsno-unsafe-type-assertion)
+
+危険な `as` の使用を禁止します。
+何を合法とするかのルールは https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-type-assertion.test.ts に書かれています。 `as const` や `'foo' as string` 、 `42 as number` といったキャストは安全であるため許容されますが、 `{} as { readonly foo: string }` はエラーになります。
+
 ### boolean への型強制を禁止する
 
 - [`@typescript-eslint/strict-boolean-expressions`](https://typescript-eslint.io/rules/strict-boolean-expressions/)（★★★★★）
@@ -402,7 +409,6 @@ if 文の羅列は switch 文と比べて余計な条件式の評価の繰り返
 - [`no-restricted-globals`](https://eslint.org/docs/latest/rules/no-restricted-globals)（★★★★）
 
 以下の設定例のようにすれば、安全性が低い `isFinite`, `isNaN` （引数を数値に強制的に変換してしまう）の使用を禁止し、暗黙の型強制を行わないより堅牢な `Number.isFinite`, `Number.isNaN` を使うよう促すことができます。
-ランタイム動作の違いがあるにもかかわらず、 TypeScript の標準ライブラリでは `isFinite`, `isNaN` の引数の型は `any` や `unknown` ではなく `number` になっています（関連： https://github.com/microsoft/TypeScript/issues/34609 ）。このため、この二つの関数のみに関しては TypeScript 環境ではそれほど重要ではなくなっています。
 
 ```json
 {
@@ -411,11 +417,15 @@ if 文の羅列は switch 文と比べて余計な条件式の評価の繰り返
     "Boolean",
     "Function",
     "globalThis",
-    { "name": "isFinite", "message": "use Number.isFinite instead." },
-    { "name": "isNaN", "message": "use Number.isNaN instead." }
+    { "name": "isFinite", "message": "Use Number.isFinite instead." },
+    { "name": "isNaN", "message": "Use Number.isNaN instead." }
   ]
 }
 ```
+
+:::message
+ランタイム動作は異なりますが、 TypeScript の標準ライブラリでは `isFinite`, `isNaN` の引数の型は `any` や `unknown` ではなく `number` になっています（この issue にその理由が説明されています： https://github.com/microsoft/TypeScript/issues/34609 ）。このため、この二つの関数に限っては禁止ルールを追加する必要性が TypeScript 環境では低くなっています。
+:::
 
 ### Mutationを禁止するルール
 
@@ -510,7 +520,7 @@ TypeScript において、 メソッドは双変であるのに対し、関数�
 
 - [`import/no-cycle`](https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-cycle.md)（★★★★★）
 
-JavaScript では循環 import を行っているファイルがあると、定義したはずのオブジェクトが未定義であるというランタイムエラーが出ることがあります。このルールを入れ循環 import を検出することでそのようなエラーが起きる可能性を未然に防ぐことができます（bundler を使って 1 ファイルに固めている場合は問題にならない可能性もありますが…）。
+JavaScript では循環 import を行っているファイルがあると、定義したはずのオブジェクトが未定義であるというランタイムエラーが出ることがあります。このルールを入れ循環 import を検出することでそのようなエラーが起きる可能性を未然に防ぐことができます（bundler を使って 1 ファイルに固めている場合は問題にならないのかもしれませんが…）。
 
 ### import パターンを制限
 
@@ -533,7 +543,7 @@ JavaScript では循環 import を行っているファイルがあると、定�
       "patterns": [
         {
           "group": ["constants/**", "**/../constants/**"],
-          "message": "import from '~/constants' instead."
+          "message": "Import from '~/constants' instead."
         }
       ]
     }
@@ -577,14 +587,14 @@ JavaScript では循環 import を行っているファイルがあると、定�
   `prettier-plugin-organize-imports`は prettier の plugin で、 npm install するだけで prettier の挙動が拡張されます。 TypeScript の言語サービスの `organizeImport` API を呼び import 文のソートや使われていない import の削除を自動でしてくれます。 VSCode の "Organize Imports" アクションを実行したときと同じ結果になります。
   `eslint-plugin-import` にも似たルールがありますが、 prettier でフォーマットしてしまえる方が動作も速く config も無いのでおすすめです。
 
-  不要な import 文を削除することでバンドルサイズ削減に有効である可能性もあるため ★★★★ の評価にしました。
+  不要な import 文を削除することでバンドルサイズ削減に有効である可能性もあると考えたため ★★★★ の評価にしました。
 
 - [`import/newline-after-import`](https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/newline-after-import.md) (auto fixable)（★）
   import ブロックの直後の空白行を強制するルールです。2 行以上あるときは prettier が 1 行にまとめてくれますが、 0 行のときに 1 行空白を作ってくれるわけではないので、空白が欲しい場合はこのルールが使えます。
   可読性向上のためでしかないので使いたいかどうかは単に気持ちの問題ですが、使うデメリットもほぼ無いので関連するルールとして挙げました。
 
 - [`import/no-useless-path-segments`](https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-useless-path-segments.md)（★★）
-  `..` で祖先ディレクトリへ遡るパスを書いたときに、余計に遡りすぎていたらこのルールで検出し正規化することができます。
+  例えば `..` で祖先ディレクトリへ遡るパスを書いたときに、余計に遡りすぎていたらこのルールで検出し正規化することができます。
 
 ### TypeScript の Type only import/export スタイル指定
 
@@ -643,7 +653,7 @@ foo('aaa');
 禁止したい構文にマッチする selector を調べるには [AST checker](https://typescript-eslint.io/play/#ts=4.7.2&sourceType=module&showAST=es) が便利です。
 
 - `as` の禁止設定例
-  例えば TypeScript の（`as const` や import rename 以外の） `as` を禁止するルールは以下のように書くことができます（※これまでこの設定で経験上問題無さそうであることは確認していますが、完璧な設定である保証はありません）。
+  例えば TypeScript の（`as const` や import alias 以外の） `as` を禁止するルールは以下のように書くことができます（※これまでこの設定で経験上問題無さそうであることは確認していますが、完璧な設定である保証はありません）。
 
   ```json
   {
@@ -657,6 +667,11 @@ foo('aaa');
     ]
   }
   ```
+
+:::message
+（2024/5/4追記）
+この設定は [total-functions/no-unsafe-type-assertion](https://www.npmjs.com/package/eslint-plugin-total-functions#total-functionsno-unsafe-type-assertion) という上位互換のルールがあったため不要になりました。 `no-restricted-syntax` に複数のルールを設定している場合に disable コメントでそのオンオフが一気に切り替わる点も不満なのでこのルールを使う方が良いと思われます。
+:::
 
 - `immer.js` の `produce` 関数外での `draft` の使用禁止設定例
   以下は [`immer.js`](https://immerjs.github.io/immer/) の `produce` 関数外で `draft` という変数名を使用してしまわないようにする設定例です。
@@ -687,7 +702,7 @@ foo('aaa');
       {
         // ban t.array of "io-ts"
         "selector": "MemberExpression[object.name='t'][property.name='array']",
-        "message": "use 't.readonlyArray' instead."
+        "message": "Use 't.readonlyArray' instead."
       }
     ]
   }
