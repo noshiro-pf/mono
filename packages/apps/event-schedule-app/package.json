@@ -115,7 +115,7 @@
     "@noshiro/ts-type-utils-no-stdlib": "*",
     "@noshiro/ts-utils": "*",
     "@types/react": "^18.2.61",
-    "@types/react-dom": "^18.2.7"
+    "@types/react-dom": "^18.2.23"
   },
   "wireit": {
     "type-check:src": {
