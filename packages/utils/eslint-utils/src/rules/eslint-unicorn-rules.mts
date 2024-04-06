@@ -139,6 +139,9 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/prefer-logical-operator-over-ternary': 'error',
   'unicorn/prefer-blob-reading-methods': 'error',
   'unicorn/no-unnecessary-polyfills': 'error',
+  'unicorn/no-anonymous-default-export': 'error',
+  'unicorn/no-await-in-promise-methods': 'error',
+  'unicorn/no-single-promise-in-promise-methods': 'error',
 
   // deprecated rules
   'unicorn/import-index': 'off',
