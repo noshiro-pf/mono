@@ -28,7 +28,29 @@ export const eslintUnicornRules: EslintUnicornRules = {
       ignore: ['serviceWorker.ts', 'setupTests.ts'],
     },
   ],
-  'unicorn/import-style': 'error',
+  'unicorn/import-style': [
+    'error',
+    {
+      styles: {
+        util: {
+          namespace: true,
+          named: false,
+        },
+        'node:util': {
+          namespace: true,
+          named: false,
+        },
+        path: {
+          namespace: true,
+          named: false,
+        },
+        'node:path': {
+          namespace: true,
+          named: false,
+        },
+      },
+    },
+  ],
   'unicorn/new-for-builtins': 'error',
   'unicorn/no-abusive-eslint-disable': 'error',
   'unicorn/no-array-callback-reference': 'off',
@@ -139,6 +161,9 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/prefer-logical-operator-over-ternary': 'error',
   'unicorn/prefer-blob-reading-methods': 'error',
   'unicorn/no-unnecessary-polyfills': 'error',
+  'unicorn/no-anonymous-default-export': 'error',
+  'unicorn/no-await-in-promise-methods': 'error',
+  'unicorn/no-single-promise-in-promise-methods': 'error',
 
   // deprecated rules
   'unicorn/import-index': 'off',
