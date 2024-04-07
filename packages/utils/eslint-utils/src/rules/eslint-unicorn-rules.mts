@@ -28,7 +28,29 @@ export const eslintUnicornRules: EslintUnicornRules = {
       ignore: ['serviceWorker.ts', 'setupTests.ts'],
     },
   ],
-  'unicorn/import-style': 'error',
+  'unicorn/import-style': [
+    'error',
+    {
+      styles: {
+        util: {
+          namespace: true,
+          named: false,
+        },
+        'node:util': {
+          namespace: true,
+          named: false,
+        },
+        path: {
+          namespace: true,
+          named: false,
+        },
+        'node:path': {
+          namespace: true,
+          named: false,
+        },
+      },
+    },
+  ],
   'unicorn/new-for-builtins': 'error',
   'unicorn/no-abusive-eslint-disable': 'error',
   'unicorn/no-array-callback-reference': 'off',

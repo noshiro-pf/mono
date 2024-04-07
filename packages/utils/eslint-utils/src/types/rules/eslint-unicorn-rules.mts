@@ -494,7 +494,9 @@ namespace ImportStyle {
   export type Styles = BooleanObject | false;
 
   export type ModuleStyles = Readonly<Record<string, Styles>>;
-  export type BooleanObject = Readonly<Record<string, boolean>>;
+  export type BooleanObject = Readonly<
+    Partial<Record<'default' | 'named' | 'namespace' | 'unassigned', boolean>>
+  >;
 
   export type RuleEntry =
     | Linter.RuleLevel

@@ -1,5 +1,6 @@
 import { pipe } from '@noshiro/mono-scripts/ts-utils/pipe.mjs';
 import { replaceWithNoMatchCheck } from '@noshiro/mono-scripts/ts-utils/replace-with-no-match-check.mjs';
+import { sliceByMatch } from '@noshiro/mono-scripts/ts-utils/slice-by-match.mjs';
 import { eslintPlugins } from './eslint-plugins.mjs';
 
 export const replaceRulesType = (content: string, typeName: string): string => {
@@ -7,10 +8,8 @@ export const replaceRulesType = (content: string, typeName: string): string => {
 
   switch (typeName) {
     case eslintPlugins.EslintRules.typeName: {
-      const slice = mut_ret.slice(
-        mut_ret.indexOf('namespace LogicalAssignmentOperators {'),
-        mut_ret.indexOf('namespace MaxClassesPerFile {'),
-      );
+      const slice = sliceFn(mut_ret, 'LogicalAssignmentOperators');
+
       mut_ret = mut_ret.replaceAll(
         slice,
         pipe(slice)
@@ -26,10 +25,8 @@ export const replaceRulesType = (content: string, typeName: string): string => {
     }
 
     case eslintPlugins.EslintJestRules.typeName: {
-      const slice = mut_ret.slice(
-        mut_ret.indexOf('namespace ValidTitle {'),
-        mut_ret.indexOf('export type EslintJestRules = {'),
-      );
+      const slice = sliceFn(mut_ret, 'ValidTitle');
+
       mut_ret = mut_ret.replaceAll(
         slice,
         pipe(slice).chain(
@@ -72,10 +69,8 @@ export const replaceRulesType = (content: string, typeName: string): string => {
     }
 
     case eslintPlugins.PreferArrowFunctionRules.typeName: {
-      const slice = mut_ret.slice(
-        mut_ret.indexOf('namespace PreferArrowFunctions {'),
-        mut_ret.indexOf('export type PreferArrowFunctionRules = {'),
-      );
+      const slice = sliceFn(mut_ret, 'PreferArrowFunctions');
+
       mut_ret = mut_ret.replaceAll(
         slice,
         pipe(slice).chain(
@@ -89,10 +84,8 @@ export const replaceRulesType = (content: string, typeName: string): string => {
     }
 
     case eslintPlugins.EslintCypressRules.typeName: {
-      const slice = mut_ret.slice(
-        mut_ret.indexOf('namespace UnsafeToChainCommand {'),
-        mut_ret.indexOf('namespace NoUnnecessaryWaiting {'),
-      );
+      const slice = sliceFn(mut_ret, 'UnsafeToChainCommand');
+
       mut_ret = mut_ret.replaceAll(
         slice,
         pipe(slice).chain(
@@ -105,9 +98,35 @@ export const replaceRulesType = (content: string, typeName: string): string => {
       break;
     }
 
+    case eslintPlugins.EslintUnicornRules.typeName: {
+      const slice = sliceFn(mut_ret, 'ImportStyle');
+
+      mut_ret = mut_ret.replaceAll(
+        slice,
+        pipe(slice).chain(
+          replaceWithNoMatchCheck(
+            '  export type BooleanObject = Readonly<Record<string, boolean>>;',
+            [
+              '  export type BooleanObject = Readonly<',
+              "    Partial<Record<'default' | 'named' | 'namespace' | 'unassigned', boolean>>",
+              '  >;',
+            ].join('\n'),
+          ),
+        ).value,
+      );
+      break;
+    }
+
     default:
       break;
   }
 
   return mut_ret;
 };
+
+const sliceFn = (target: string, ruleName: string): string =>
+  sliceByMatch({
+    target,
+    startRegexp: `namespace ${ruleName} {`,
+    endRegexp: /\n\}\n/u,
+  });
