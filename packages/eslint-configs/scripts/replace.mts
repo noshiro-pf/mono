@@ -6,13 +6,11 @@ import {
 import { eslintPlugins } from './eslint-plugins.mjs';
 
 export const replaceRulesType = (content: string, typeName: string): string => {
-  let mut_ret = content;
-
   switch (typeName) {
     case eslintPlugins.EslintRules.typeName: {
-      const slice = sliceFn(mut_ret, 'LogicalAssignmentOperators');
+      const slice = sliceFn(content, 'LogicalAssignmentOperators');
 
-      mut_ret = mut_ret.replaceAll(
+      return content.replaceAll(
         slice,
         pipe(slice)
           .chain(
@@ -23,13 +21,12 @@ export const replaceRulesType = (content: string, typeName: string): string => {
           )
           .chain(replaceWithNoMatchCheck('readonly unknown[] &', '')).value,
       );
-      break;
     }
 
     case eslintPlugins.EslintJestRules.typeName: {
-      const slice = sliceFn(mut_ret, 'ValidTitle');
+      const slice = sliceFn(content, 'ValidTitle');
 
-      mut_ret = mut_ret.replaceAll(
+      return content.replaceAll(
         slice,
         pipe(slice).chain(
           replaceWithNoMatchCheck(
@@ -67,13 +64,12 @@ export const replaceRulesType = (content: string, typeName: string): string => {
           ),
         ).value,
       );
-      break;
     }
 
     case eslintPlugins.PreferArrowFunctionRules.typeName: {
-      const slice = sliceFn(mut_ret, 'PreferArrowFunctions');
+      const slice = sliceFn(content, 'PreferArrowFunctions');
 
-      mut_ret = mut_ret.replaceAll(
+      return content.replaceAll(
         slice,
         pipe(slice).chain(
           replaceWithNoMatchCheck(
@@ -82,13 +78,12 @@ export const replaceRulesType = (content: string, typeName: string): string => {
           ),
         ).value,
       );
-      break;
     }
 
     case eslintPlugins.EslintCypressRules.typeName: {
-      const slice = sliceFn(mut_ret, 'UnsafeToChainCommand');
+      const slice = sliceFn(content, 'UnsafeToChainCommand');
 
-      mut_ret = mut_ret.replaceAll(
+      return content.replaceAll(
         slice,
         pipe(slice).chain(
           replaceWithNoMatchCheck(
@@ -97,13 +92,12 @@ export const replaceRulesType = (content: string, typeName: string): string => {
           ),
         ).value,
       );
-      break;
     }
 
     case eslintPlugins.EslintUnicornRules.typeName: {
-      const slice = sliceFn(mut_ret, 'ImportStyle');
+      const slice = sliceFn(content, 'ImportStyle');
 
-      mut_ret = mut_ret.replaceAll(
+      return content.replaceAll(
         slice,
         pipe(slice).chain(
           replaceWithNoMatchCheck(
@@ -116,14 +110,11 @@ export const replaceRulesType = (content: string, typeName: string): string => {
           ),
         ).value,
       );
-      break;
     }
 
     default:
-      break;
+      return content;
   }
-
-  return mut_ret;
 };
 
 const sliceFn = (target: string, ruleName: string): string =>
