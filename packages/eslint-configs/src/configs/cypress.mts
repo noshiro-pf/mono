@@ -1,7 +1,7 @@
 import { eslintCypressRules } from '../rules/eslint-cypress-rules.mjs';
 import { type FlatConfig } from '../types/flat-config.mjs';
 import { type TypeScriptEslintRulesOption } from '../types/rules/typescript-eslint-rules.mjs';
-import { eslintFlatConfigCommon } from './common.mjs';
+import { eslintConfigForTypeScript } from './typescript.mjs';
 
 export const eslintFlatConfigForCypress = ({
   tsconfigFileName,
@@ -15,7 +15,7 @@ export const eslintFlatConfigForCypress = ({
   restrictedImports?: TypeScriptEslintRulesOption['@typescript-eslint/no-restricted-imports'];
 }>): readonly FlatConfig[] =>
   [
-    ...eslintFlatConfigCommon({
+    ...eslintConfigForTypeScript({
       tsconfigFileName,
       tsconfigRootDir,
       packageDirs,

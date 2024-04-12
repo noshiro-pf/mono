@@ -2,7 +2,7 @@
 /** @typedef {import('@noshiro/eslint-configs').EslintImportsRules} EslintImportsRules */
 
 import {
-  eslintFlatConfigCommon,
+  eslintConfigForTypeScript,
   genEsLintRestrictedImportsDefFromDevDependencies,
 } from '@noshiro/eslint-configs';
 import { toThisDir } from '@noshiro/mono-scripts';
@@ -23,7 +23,7 @@ const defineConfig = async () => {
     {
       ignores: ['src/globals.d.ts'],
     },
-    ...eslintFlatConfigCommon({
+    ...eslintConfigForTypeScript({
       tsconfigRootDir: thisDir,
       tsconfigFileName: './tsconfig.json',
       packageDirs: [nodePath.resolve(thisDir, '../../../..'), thisDir],
