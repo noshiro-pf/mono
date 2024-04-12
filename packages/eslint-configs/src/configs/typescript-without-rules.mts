@@ -2,7 +2,7 @@ import typescriptEslintParser from '@typescript-eslint/parser';
 import { type FlatConfig } from '../types/flat-config.mjs';
 import { plugins } from './plugins.mjs';
 
-export const eslintFlatConfigCommonWithoutRules = ({
+export const eslintConfigForTypeScriptWithoutRules = ({
   tsconfigFileName,
   tsconfigRootDir,
 }: Readonly<{
