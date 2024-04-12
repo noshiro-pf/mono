@@ -17,9 +17,9 @@ import {
   type TypeScriptEslintRules,
   type TypeScriptEslintRulesOption,
 } from '../types/rules/typescript-eslint-rules.mjs';
-import { eslintFlatConfigCommonWithoutRules } from './common-without-rules.mjs';
+import { eslintConfigForTypeScriptWithoutRules } from './typescript-without-rules.mjs';
 
-export const eslintFlatConfigCommon = ({
+export const eslintConfigForTypeScript = ({
   tsconfigFileName,
   tsconfigRootDir,
   packageDirs,
@@ -30,7 +30,7 @@ export const eslintFlatConfigCommon = ({
   packageDirs: readonly string[];
   restrictedImports?: TypeScriptEslintRulesOption['@typescript-eslint/no-restricted-imports'];
 }>): readonly FlatConfig[] => [
-  ...eslintFlatConfigCommonWithoutRules({
+  ...eslintConfigForTypeScriptWithoutRules({
     tsconfigFileName,
     tsconfigRootDir,
   }),
