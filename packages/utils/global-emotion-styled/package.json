@@ -44,7 +44,7 @@
     "zz:cmd:setup": "run-s clean:src zz:cmd:gen zz:cmd:fmt-src"
   },
   "dependencies": {
-    "@emotion/styled": "^11.11.0",
+    "@emotion/styled": "^11.11.5",
     "@noshiro/ts-utils": "*"
   },
   "devDependencies": {
