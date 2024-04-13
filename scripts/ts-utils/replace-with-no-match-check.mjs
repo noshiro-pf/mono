@@ -23,6 +23,10 @@
  */
 export const replaceWithNoMatchCheck =
   (searchValue, replaceValue, notFoundChecker) => (target) => {
+    if (searchValue === replaceValue) {
+      throw new Error('searchValue is equal to replaceValue');
+    }
+
     const result = target.replaceAll(searchValue, replaceValue);
 
     if (
