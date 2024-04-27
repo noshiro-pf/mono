@@ -85,7 +85,7 @@
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.3.1",
     "@typescript-eslint/parser": "^7.3.1",
-    "@typescript-eslint/utils": "^7.3.1",
+    "@typescript-eslint/utils": "^7.7.1",
     "@typescript/lib-decorators": "file:./packages/strict-ts-lib/packages/lib-decorators",
     "@typescript/lib-dom": "file:./packages/strict-ts-lib/packages/lib-dom",
     "@typescript/lib-es2015": "file:./packages/strict-ts-lib/packages/lib-es2015",
