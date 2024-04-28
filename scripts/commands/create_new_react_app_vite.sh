@@ -26,11 +26,3 @@ sed -i "s/template-react-app-vite/${new_app_name_kebab}/" "${APPS_DIR}/${new_app
 echo "created ${APPS_DIR}/${new_app_name}"
 
 echo "don't forget to add \"${new_app_name}\" to yarn workspaces!"
-
-new_app_name_kebab=$(echo "${new_app_name}" | sed "s/_/-/g")
-echo "${new_app_name_kebab}"
-sed -i "s/template-react-app-vite/${new_app_name_kebab}/" "${APPS_DIR}/${new_app_name}/package.json"
-
-echo "created ${APPS_DIR}/${new_app_name}"
-
-echo "don't forget to add \"${new_app_name}\" to yarn workspaces!"
