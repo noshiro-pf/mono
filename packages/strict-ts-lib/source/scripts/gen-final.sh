@@ -3,8 +3,8 @@
 
 ###### convert ######
 
-mkdir -p ./dist
-rm -f ./dist/lib.*
+mkdir -p ./final
+rm -f ./final/lib.*
 node ./scripts/convert-dts/main.mjs
 
 
@@ -12,5 +12,5 @@ node ./scripts/convert-dts/main.mjs
 
 node ./scripts/gen-stdlib-dts.mjs
 
-yarn zz:cmd:prettier ./dist > /dev/null
+yarn zz:cmd:prettier ./final > /dev/null
 yarn zz:cmd:prettier ./stdlib.d.ts > /dev/null

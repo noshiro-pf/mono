@@ -236,9 +236,9 @@ const updatePackageJsonImpl = (
           autofix: 'wireit',
           fmt: 'yarn zz:cmd:prettier .',
           gen: 'run-s gen:d gen:packages',
-          'gen:d': 'run-s gen:d:temp gen:d:dist',
-          'gen:d:dist': `./${workspaceScriptsDirName}/gen-dist.sh`,
-          'gen:d:temp': `./${workspaceScriptsDirName}/gen-temp.sh`,
+          'gen:d': 'run-s gen:d:eslint-fixed gen:d:final',
+          'gen:d:eslint-fixed': `./${workspaceScriptsDirName}/gen-eslint-fixed.sh`,
+          'gen:d:final': `./${workspaceScriptsDirName}/gen-final.sh`,
           'gen:packages': `./${workspaceScriptsDirName}/gen-packages.sh`,
           lint: 'wireit',
           tsc: 'yarn type-check',
@@ -283,9 +283,9 @@ const updatePackageJsonImpl = (
           const configPath = `./${workspaceConfigsDirName}/eslint.config.gen.mjs`;
 
           mut_wireit['autofix'] = {
-            command: `yarn zz:cmd:eslint temp/ --config ${configPath} --fix --cache --cache-location ./.eslintcache`,
+            command: `yarn zz:cmd:eslint eslint-fixed/ --config ${configPath} --fix --cache --cache-location ./.eslintcache`,
             files: [
-              './temp/**/*.d.ts',
+              './eslint-fixed/**/*.d.ts',
               configPath,
               './package.json',
               './tsconfig.json',

@@ -279,7 +279,7 @@ export const workspaceConfig = {
     };
 
     draft.typeCheckIncludes = [
-      'dist',
+      'final',
       'test',
       'stdlib.d.ts',
       workspaceScriptsDirName,

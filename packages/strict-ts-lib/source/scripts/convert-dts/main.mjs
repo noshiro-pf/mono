@@ -2,8 +2,8 @@ import * as fs from 'node:fs/promises';
 import { getSrcFileList } from './common.mjs';
 import { convert } from './convert-main.mjs';
 
-const srcDir = './temp';
-const distDir = './dist';
+const srcDir = './eslint-fixed';
+const distDir = './final';
 
 /** @type {boolean} */
 const commentOutDeprecated = false;

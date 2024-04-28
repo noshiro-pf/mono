@@ -4,7 +4,7 @@ import * as nodePath from 'node:path';
 
 const thisDir = toThisDir(import.meta.url);
 
-const stdlibDir = nodePath.resolve(thisDir, '../dist');
+const stdlibDir = nodePath.resolve(thisDir, '../final');
 
 const main = async () => {
   /**
@@ -23,7 +23,7 @@ const main = async () => {
   /** @type {readonly string[]} */
   const stdlibs = stdlibFiles
     .filter((f) => f !== 'utils.d.ts')
-    .map((filename) => `/// <reference path="./dist/${filename}" />`);
+    .map((filename) => `/// <reference path="./final/${filename}" />`);
 
   const result = [
     '/// <reference no-default-lib="true"/>',

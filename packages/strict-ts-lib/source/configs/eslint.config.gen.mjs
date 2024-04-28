@@ -12,7 +12,7 @@ const defineConfig = () => [
     tsconfigRootDir: thisDir,
   }),
   {
-    files: ['temp/**/*.d.ts', 'dist/**/*.d.ts'],
+    files: ['eslint-fixed/**/*.d.ts', 'final/**/*.d.ts'],
 
     rules: {
       'no-var': 'error',

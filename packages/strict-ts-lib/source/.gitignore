@@ -1,7 +1,6 @@
-!dist
-!dist/**/*.d.ts
-!unchanged
-!unchanged/*.d.ts
-!temp
-!temp/*.d.ts
-!stdlib.d.ts
+!copied
+!copied/*.d.ts
+!eslint-fixed
+!eslint-fixed/*.d.ts
+!final
+!final/**/*.d.ts

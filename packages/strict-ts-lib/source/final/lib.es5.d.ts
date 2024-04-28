@@ -2690,8 +2690,8 @@ interface Int8Array {
    *   length is the length of the array.
    * @param start If start is negative, it is treated as length+start. If end is
    *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its default
-   *   value.
+   * @param end If not specified, length of the this object is used as its
+   *   default value.
    */
   copyWithin(
     target: SafeInt | Int10,
@@ -2703,11 +2703,12 @@ interface Int8Array {
    * Determines whether all the members of an array satisfy the specified test.
    *
    * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value false, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   every(
     predicate: (value: Int8, index: SafeUint, array: Int8Array) => boolean,
@@ -2719,8 +2720,8 @@ interface Int8Array {
    * and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it is
-   *   treated as length+start where length is the length of the array.
+   * @param start Index to start filling the array at. If start is negative, it
+   *   is treated as length+start where length is the length of the array.
    * @param end Index to stop filling the array at. If end is negative, it is
    *   treated as length+end.
    */
@@ -2733,8 +2734,9 @@ interface Int8Array {
    * @param predicate A function that accepts up to three arguments. The filter
    *   method calls the predicate function one time for each element in the
    *   array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   filter(
     predicate: (value: Int8, index: SafeUint, array: Int8Array) => boolean,
@@ -2742,15 +2744,16 @@ interface Int8Array {
   ): Int8Array;
 
   /**
-   * Returns the value of the first element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is
+   * true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, find immediately returns that element value.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, find immediately returns that element value.
    *   Otherwise, find returns undefined.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   find(
     predicate: (value: Int8, index: SafeUint, obj: Int8Array) => boolean,
@@ -2758,15 +2761,16 @@ interface Int8Array {
   ): Int8 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is
+   * true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, findIndex immediately returns that element index.
-   *   Otherwise, findIndex returns -1.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, findIndex immediately returns that element
+   *   index. Otherwise, findIndex returns -1.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   findIndex(
     predicate: (value: Int8, index: SafeUint, obj: Int8Array) => boolean,
@@ -2801,8 +2805,8 @@ interface Int8Array {
    * string.
    *
    * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are separated
-   *   with a comma.
+   *   next in the resulting String. If omitted, the array elements are
+   *   separated with a comma.
    */
   join(separator?: string): string;
 
@@ -2819,8 +2823,8 @@ interface Int8Array {
   readonly length: SafeUint;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns an
-   * array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns
+   * an array that contains the results.
    *
    * @param callbackfn A function that accepts up to three arguments. The map
    *   method calls the callbackfn function one time for each element in the
@@ -2843,8 +2847,8 @@ interface Int8Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -2873,8 +2877,8 @@ interface Int8Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -2893,11 +2897,11 @@ interface Int8Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -2924,11 +2928,11 @@ interface Int8Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -2966,11 +2970,12 @@ interface Int8Array {
    * element of an array.
    *
    * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value true, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   some(
     predicate: (value: Int8, index: SafeUint, array: Int8Array) => boolean,
@@ -2980,10 +2985,10 @@ interface Int8Array {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It is
-   *   expected to return a negative value if the first argument is less than the
-   *   second argument, zero if they're equal, and a positive value otherwise. If
-   *   omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It
+   *   is expected to return a negative value if the first argument is less than
+   *   the second argument, zero if they're equal, and a positive value
+   *   otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -3079,8 +3084,8 @@ interface Uint8Array {
    *   length is the length of the array.
    * @param start If start is negative, it is treated as length+start. If end is
    *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its default
-   *   value.
+   * @param end If not specified, length of the this object is used as its
+   *   default value.
    */
   copyWithin(
     target: SafeInt | Int10,
@@ -3092,11 +3097,12 @@ interface Uint8Array {
    * Determines whether all the members of an array satisfy the specified test.
    *
    * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value false, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   every(
     predicate: (value: Uint8, index: SafeUint, array: Uint8Array) => boolean,
@@ -3108,8 +3114,8 @@ interface Uint8Array {
    * and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it is
-   *   treated as length+start where length is the length of the array.
+   * @param start Index to start filling the array at. If start is negative, it
+   *   is treated as length+start where length is the length of the array.
    * @param end Index to stop filling the array at. If end is negative, it is
    *   treated as length+end.
    */
@@ -3122,8 +3128,9 @@ interface Uint8Array {
    * @param predicate A function that accepts up to three arguments. The filter
    *   method calls the predicate function one time for each element in the
    *   array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   filter(
     predicate: (value: Uint8, index: SafeUint, array: Uint8Array) => boolean,
@@ -3131,15 +3138,16 @@ interface Uint8Array {
   ): Uint8Array;
 
   /**
-   * Returns the value of the first element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is
+   * true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, find immediately returns that element value.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, find immediately returns that element value.
    *   Otherwise, find returns undefined.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   find(
     predicate: (value: Uint8, index: SafeUint, obj: Uint8Array) => boolean,
@@ -3147,15 +3155,16 @@ interface Uint8Array {
   ): Uint8 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is
+   * true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, findIndex immediately returns that element index.
-   *   Otherwise, findIndex returns -1.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, findIndex immediately returns that element
+   *   index. Otherwise, findIndex returns -1.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   findIndex(
     predicate: (value: Uint8, index: SafeUint, obj: Uint8Array) => boolean,
@@ -3190,8 +3199,8 @@ interface Uint8Array {
    * string.
    *
    * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are separated
-   *   with a comma.
+   *   next in the resulting String. If omitted, the array elements are
+   *   separated with a comma.
    */
   join(separator?: string): string;
 
@@ -3208,8 +3217,8 @@ interface Uint8Array {
   readonly length: SafeUint;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns an
-   * array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns
+   * an array that contains the results.
    *
    * @param callbackfn A function that accepts up to three arguments. The map
    *   method calls the callbackfn function one time for each element in the
@@ -3232,8 +3241,8 @@ interface Uint8Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -3262,8 +3271,8 @@ interface Uint8Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -3282,11 +3291,11 @@ interface Uint8Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -3313,11 +3322,11 @@ interface Uint8Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -3355,11 +3364,12 @@ interface Uint8Array {
    * element of an array.
    *
    * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value true, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   some(
     predicate: (value: Uint8, index: SafeUint, array: Uint8Array) => boolean,
@@ -3369,10 +3379,10 @@ interface Uint8Array {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It is
-   *   expected to return a negative value if the first argument is less than the
-   *   second argument, zero if they're equal, and a positive value otherwise. If
-   *   omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It
+   *   is expected to return a negative value if the first argument is less than
+   *   the second argument, zero if they're equal, and a positive value
+   *   otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -3469,8 +3479,8 @@ interface Uint8ClampedArray {
    *   length is the length of the array.
    * @param start If start is negative, it is treated as length+start. If end is
    *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its default
-   *   value.
+   * @param end If not specified, length of the this object is used as its
+   *   default value.
    */
   copyWithin(
     target: SafeInt | Int10,
@@ -3482,11 +3492,12 @@ interface Uint8ClampedArray {
    * Determines whether all the members of an array satisfy the specified test.
    *
    * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value false, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   every(
     predicate: (
@@ -3502,8 +3513,8 @@ interface Uint8ClampedArray {
    * and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it is
-   *   treated as length+start where length is the length of the array.
+   * @param start Index to start filling the array at. If start is negative, it
+   *   is treated as length+start where length is the length of the array.
    * @param end Index to stop filling the array at. If end is negative, it is
    *   treated as length+end.
    */
@@ -3516,8 +3527,9 @@ interface Uint8ClampedArray {
    * @param predicate A function that accepts up to three arguments. The filter
    *   method calls the predicate function one time for each element in the
    *   array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   filter(
     predicate: (
@@ -3529,15 +3541,16 @@ interface Uint8ClampedArray {
   ): Uint8ClampedArray;
 
   /**
-   * Returns the value of the first element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is
+   * true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, find immediately returns that element value.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, find immediately returns that element value.
    *   Otherwise, find returns undefined.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   find(
     predicate: (
@@ -3549,15 +3562,16 @@ interface Uint8ClampedArray {
   ): Uint8 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is
+   * true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, findIndex immediately returns that element index.
-   *   Otherwise, findIndex returns -1.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, findIndex immediately returns that element
+   *   index. Otherwise, findIndex returns -1.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   findIndex(
     predicate: (
@@ -3600,8 +3614,8 @@ interface Uint8ClampedArray {
    * string.
    *
    * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are separated
-   *   with a comma.
+   *   next in the resulting String. If omitted, the array elements are
+   *   separated with a comma.
    */
   join(separator?: string): string;
 
@@ -3618,8 +3632,8 @@ interface Uint8ClampedArray {
   readonly length: SafeUint;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns an
-   * array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns
+   * an array that contains the results.
    *
    * @param callbackfn A function that accepts up to three arguments. The map
    *   method calls the callbackfn function one time for each element in the
@@ -3646,8 +3660,8 @@ interface Uint8ClampedArray {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -3676,8 +3690,8 @@ interface Uint8ClampedArray {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -3696,11 +3710,11 @@ interface Uint8ClampedArray {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -3727,11 +3741,11 @@ interface Uint8ClampedArray {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -3769,11 +3783,12 @@ interface Uint8ClampedArray {
    * element of an array.
    *
    * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value true, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   some(
     predicate: (
@@ -3787,10 +3802,10 @@ interface Uint8ClampedArray {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It is
-   *   expected to return a negative value if the first argument is less than the
-   *   second argument, zero if they're equal, and a positive value otherwise. If
-   *   omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It
+   *   is expected to return a negative value if the first argument is less than
+   *   the second argument, zero if they're equal, and a positive value
+   *   otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -3887,8 +3902,8 @@ interface Int16Array {
    *   length is the length of the array.
    * @param start If start is negative, it is treated as length+start. If end is
    *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its default
-   *   value.
+   * @param end If not specified, length of the this object is used as its
+   *   default value.
    */
   copyWithin(
     target: SafeInt | Int10,
@@ -3900,11 +3915,12 @@ interface Int16Array {
    * Determines whether all the members of an array satisfy the specified test.
    *
    * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value false, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   every(
     predicate: (value: Int16, index: SafeUint, array: Int16Array) => boolean,
@@ -3916,8 +3932,8 @@ interface Int16Array {
    * and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it is
-   *   treated as length+start where length is the length of the array.
+   * @param start Index to start filling the array at. If start is negative, it
+   *   is treated as length+start where length is the length of the array.
    * @param end Index to stop filling the array at. If end is negative, it is
    *   treated as length+end.
    */
@@ -3930,8 +3946,9 @@ interface Int16Array {
    * @param predicate A function that accepts up to three arguments. The filter
    *   method calls the predicate function one time for each element in the
    *   array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   filter(
     predicate: (value: Int16, index: SafeUint, array: Int16Array) => boolean,
@@ -3939,15 +3956,16 @@ interface Int16Array {
   ): Int16Array;
 
   /**
-   * Returns the value of the first element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is
+   * true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, find immediately returns that element value.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, find immediately returns that element value.
    *   Otherwise, find returns undefined.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   find(
     predicate: (value: Int16, index: SafeUint, obj: Int16Array) => boolean,
@@ -3955,15 +3973,16 @@ interface Int16Array {
   ): Int16 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is
+   * true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, findIndex immediately returns that element index.
-   *   Otherwise, findIndex returns -1.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, findIndex immediately returns that element
+   *   index. Otherwise, findIndex returns -1.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   findIndex(
     predicate: (value: Int16, index: SafeUint, obj: Int16Array) => boolean,
@@ -3998,8 +4017,8 @@ interface Int16Array {
    * string.
    *
    * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are separated
-   *   with a comma.
+   *   next in the resulting String. If omitted, the array elements are
+   *   separated with a comma.
    */
   join(separator?: string): string;
 
@@ -4016,8 +4035,8 @@ interface Int16Array {
   readonly length: SafeUint;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns an
-   * array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns
+   * an array that contains the results.
    *
    * @param callbackfn A function that accepts up to three arguments. The map
    *   method calls the callbackfn function one time for each element in the
@@ -4040,8 +4059,8 @@ interface Int16Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -4070,8 +4089,8 @@ interface Int16Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -4090,11 +4109,11 @@ interface Int16Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -4121,11 +4140,11 @@ interface Int16Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -4163,11 +4182,12 @@ interface Int16Array {
    * element of an array.
    *
    * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value true, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   some(
     predicate: (value: Int16, index: SafeUint, array: Int16Array) => boolean,
@@ -4177,10 +4197,10 @@ interface Int16Array {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It is
-   *   expected to return a negative value if the first argument is less than the
-   *   second argument, zero if they're equal, and a positive value otherwise. If
-   *   omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It
+   *   is expected to return a negative value if the first argument is less than
+   *   the second argument, zero if they're equal, and a positive value
+   *   otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -4277,8 +4297,8 @@ interface Uint16Array {
    *   length is the length of the array.
    * @param start If start is negative, it is treated as length+start. If end is
    *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its default
-   *   value.
+   * @param end If not specified, length of the this object is used as its
+   *   default value.
    */
   copyWithin(
     target: SafeInt | Int10,
@@ -4290,11 +4310,12 @@ interface Uint16Array {
    * Determines whether all the members of an array satisfy the specified test.
    *
    * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value false, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   every(
     predicate: (value: Uint16, index: SafeUint, array: Uint16Array) => boolean,
@@ -4306,8 +4327,8 @@ interface Uint16Array {
    * and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it is
-   *   treated as length+start where length is the length of the array.
+   * @param start Index to start filling the array at. If start is negative, it
+   *   is treated as length+start where length is the length of the array.
    * @param end Index to stop filling the array at. If end is negative, it is
    *   treated as length+end.
    */
@@ -4320,8 +4341,9 @@ interface Uint16Array {
    * @param predicate A function that accepts up to three arguments. The filter
    *   method calls the predicate function one time for each element in the
    *   array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   filter(
     predicate: (value: Uint16, index: SafeUint, array: Uint16Array) => boolean,
@@ -4329,15 +4351,16 @@ interface Uint16Array {
   ): Uint16Array;
 
   /**
-   * Returns the value of the first element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is
+   * true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, find immediately returns that element value.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, find immediately returns that element value.
    *   Otherwise, find returns undefined.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   find(
     predicate: (value: Uint16, index: SafeUint, obj: Uint16Array) => boolean,
@@ -4345,15 +4368,16 @@ interface Uint16Array {
   ): Uint16 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is
+   * true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, findIndex immediately returns that element index.
-   *   Otherwise, findIndex returns -1.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, findIndex immediately returns that element
+   *   index. Otherwise, findIndex returns -1.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   findIndex(
     predicate: (value: Uint16, index: SafeUint, obj: Uint16Array) => boolean,
@@ -4388,8 +4412,8 @@ interface Uint16Array {
    * string.
    *
    * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are separated
-   *   with a comma.
+   *   next in the resulting String. If omitted, the array elements are
+   *   separated with a comma.
    */
   join(separator?: string): string;
 
@@ -4409,8 +4433,8 @@ interface Uint16Array {
   readonly length: SafeUint;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns an
-   * array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns
+   * an array that contains the results.
    *
    * @param callbackfn A function that accepts up to three arguments. The map
    *   method calls the callbackfn function one time for each element in the
@@ -4433,8 +4457,8 @@ interface Uint16Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -4463,8 +4487,8 @@ interface Uint16Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -4483,11 +4507,11 @@ interface Uint16Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -4514,11 +4538,11 @@ interface Uint16Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -4556,11 +4580,12 @@ interface Uint16Array {
    * element of an array.
    *
    * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value true, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   some(
     predicate: (value: Uint16, index: SafeUint, array: Uint16Array) => boolean,
@@ -4570,10 +4595,10 @@ interface Uint16Array {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It is
-   *   expected to return a negative value if the first argument is less than the
-   *   second argument, zero if they're equal, and a positive value otherwise. If
-   *   omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It
+   *   is expected to return a negative value if the first argument is less than
+   *   the second argument, zero if they're equal, and a positive value
+   *   otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -4669,8 +4694,8 @@ interface Int32Array {
    *   length is the length of the array.
    * @param start If start is negative, it is treated as length+start. If end is
    *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its default
-   *   value.
+   * @param end If not specified, length of the this object is used as its
+   *   default value.
    */
   copyWithin(
     target: SafeInt | Int10,
@@ -4682,11 +4707,12 @@ interface Int32Array {
    * Determines whether all the members of an array satisfy the specified test.
    *
    * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value false, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   every(
     predicate: (value: Int32, index: SafeUint, array: Int32Array) => boolean,
@@ -4698,8 +4724,8 @@ interface Int32Array {
    * and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it is
-   *   treated as length+start where length is the length of the array.
+   * @param start Index to start filling the array at. If start is negative, it
+   *   is treated as length+start where length is the length of the array.
    * @param end Index to stop filling the array at. If end is negative, it is
    *   treated as length+end.
    */
@@ -4712,8 +4738,9 @@ interface Int32Array {
    * @param predicate A function that accepts up to three arguments. The filter
    *   method calls the predicate function one time for each element in the
    *   array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   filter(
     predicate: (value: Int32, index: SafeUint, array: Int32Array) => boolean,
@@ -4721,15 +4748,16 @@ interface Int32Array {
   ): Int32Array;
 
   /**
-   * Returns the value of the first element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is
+   * true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, find immediately returns that element value.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, find immediately returns that element value.
    *   Otherwise, find returns undefined.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   find(
     predicate: (value: Int32, index: SafeUint, obj: Int32Array) => boolean,
@@ -4737,15 +4765,16 @@ interface Int32Array {
   ): Int32 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is
+   * true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, findIndex immediately returns that element index.
-   *   Otherwise, findIndex returns -1.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, findIndex immediately returns that element
+   *   index. Otherwise, findIndex returns -1.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   findIndex(
     predicate: (value: Int32, index: SafeUint, obj: Int32Array) => boolean,
@@ -4780,8 +4809,8 @@ interface Int32Array {
    * string.
    *
    * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are separated
-   *   with a comma.
+   *   next in the resulting String. If omitted, the array elements are
+   *   separated with a comma.
    */
   join(separator?: string): string;
 
@@ -4798,8 +4827,8 @@ interface Int32Array {
   readonly length: SafeUint;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns an
-   * array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns
+   * an array that contains the results.
    *
    * @param callbackfn A function that accepts up to three arguments. The map
    *   method calls the callbackfn function one time for each element in the
@@ -4822,8 +4851,8 @@ interface Int32Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -4852,8 +4881,8 @@ interface Int32Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -4872,11 +4901,11 @@ interface Int32Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -4903,11 +4932,11 @@ interface Int32Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -4945,11 +4974,12 @@ interface Int32Array {
    * element of an array.
    *
    * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value true, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   some(
     predicate: (value: Int32, index: SafeUint, array: Int32Array) => boolean,
@@ -4959,10 +4989,10 @@ interface Int32Array {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It is
-   *   expected to return a negative value if the first argument is less than the
-   *   second argument, zero if they're equal, and a positive value otherwise. If
-   *   omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It
+   *   is expected to return a negative value if the first argument is less than
+   *   the second argument, zero if they're equal, and a positive value
+   *   otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -5059,8 +5089,8 @@ interface Uint32Array {
    *   length is the length of the array.
    * @param start If start is negative, it is treated as length+start. If end is
    *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its default
-   *   value.
+   * @param end If not specified, length of the this object is used as its
+   *   default value.
    */
   copyWithin(
     target: SafeInt | Int10,
@@ -5072,11 +5102,12 @@ interface Uint32Array {
    * Determines whether all the members of an array satisfy the specified test.
    *
    * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value false, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   every(
     predicate: (value: Uint32, index: SafeUint, array: Uint32Array) => boolean,
@@ -5088,8 +5119,8 @@ interface Uint32Array {
    * and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it is
-   *   treated as length+start where length is the length of the array.
+   * @param start Index to start filling the array at. If start is negative, it
+   *   is treated as length+start where length is the length of the array.
    * @param end Index to stop filling the array at. If end is negative, it is
    *   treated as length+end.
    */
@@ -5102,8 +5133,9 @@ interface Uint32Array {
    * @param predicate A function that accepts up to three arguments. The filter
    *   method calls the predicate function one time for each element in the
    *   array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   filter(
     predicate: (value: Uint32, index: SafeUint, array: Uint32Array) => boolean,
@@ -5111,15 +5143,16 @@ interface Uint32Array {
   ): Uint32Array;
 
   /**
-   * Returns the value of the first element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is
+   * true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, find immediately returns that element value.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, find immediately returns that element value.
    *   Otherwise, find returns undefined.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   find(
     predicate: (value: Uint32, index: SafeUint, obj: Uint32Array) => boolean,
@@ -5127,15 +5160,16 @@ interface Uint32Array {
   ): Uint32 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is
+   * true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, findIndex immediately returns that element index.
-   *   Otherwise, findIndex returns -1.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, findIndex immediately returns that element
+   *   index. Otherwise, findIndex returns -1.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   findIndex(
     predicate: (value: Uint32, index: SafeUint, obj: Uint32Array) => boolean,
@@ -5170,8 +5204,8 @@ interface Uint32Array {
    * string.
    *
    * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are separated
-   *   with a comma.
+   *   next in the resulting String. If omitted, the array elements are
+   *   separated with a comma.
    */
   join(separator?: string): string;
 
@@ -5191,8 +5225,8 @@ interface Uint32Array {
   readonly length: SafeUint;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns an
-   * array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns
+   * an array that contains the results.
    *
    * @param callbackfn A function that accepts up to three arguments. The map
    *   method calls the callbackfn function one time for each element in the
@@ -5215,8 +5249,8 @@ interface Uint32Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -5245,8 +5279,8 @@ interface Uint32Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -5265,11 +5299,11 @@ interface Uint32Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -5296,11 +5330,11 @@ interface Uint32Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -5338,11 +5372,12 @@ interface Uint32Array {
    * element of an array.
    *
    * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value true, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   some(
     predicate: (value: Uint32, index: SafeUint, array: Uint32Array) => boolean,
@@ -5352,10 +5387,10 @@ interface Uint32Array {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It is
-   *   expected to return a negative value if the first argument is less than the
-   *   second argument, zero if they're equal, and a positive value otherwise. If
-   *   omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It
+   *   is expected to return a negative value if the first argument is less than
+   *   the second argument, zero if they're equal, and a positive value
+   *   otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -5451,8 +5486,8 @@ interface Float32Array {
    *   length is the length of the array.
    * @param start If start is negative, it is treated as length+start. If end is
    *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its default
-   *   value.
+   * @param end If not specified, length of the this object is used as its
+   *   default value.
    */
   copyWithin(
     target: SafeInt | Int10,
@@ -5464,11 +5499,12 @@ interface Float32Array {
    * Determines whether all the members of an array satisfy the specified test.
    *
    * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value false, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   every(
     predicate: (
@@ -5484,8 +5520,8 @@ interface Float32Array {
    * and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it is
-   *   treated as length+start where length is the length of the array.
+   * @param start Index to start filling the array at. If start is negative, it
+   *   is treated as length+start where length is the length of the array.
    * @param end Index to stop filling the array at. If end is negative, it is
    *   treated as length+end.
    */
@@ -5498,8 +5534,9 @@ interface Float32Array {
    * @param predicate A function that accepts up to three arguments. The filter
    *   method calls the predicate function one time for each element in the
    *   array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   filter(
     predicate: (
@@ -5511,15 +5548,16 @@ interface Float32Array {
   ): Float32Array;
 
   /**
-   * Returns the value of the first element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is
+   * true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, find immediately returns that element value.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, find immediately returns that element value.
    *   Otherwise, find returns undefined.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   find(
     predicate: (value: Float32, index: SafeUint, obj: Float32Array) => boolean,
@@ -5527,15 +5565,16 @@ interface Float32Array {
   ): Float32 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is
+   * true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, findIndex immediately returns that element index.
-   *   Otherwise, findIndex returns -1.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, findIndex immediately returns that element
+   *   index. Otherwise, findIndex returns -1.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   findIndex(
     predicate: (value: Float32, index: SafeUint, obj: Float32Array) => boolean,
@@ -5570,8 +5609,8 @@ interface Float32Array {
    * string.
    *
    * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are separated
-   *   with a comma.
+   *   next in the resulting String. If omitted, the array elements are
+   *   separated with a comma.
    */
   join(separator?: string): string;
 
@@ -5591,8 +5630,8 @@ interface Float32Array {
   readonly length: SafeUint;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns an
-   * array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns
+   * an array that contains the results.
    *
    * @param callbackfn A function that accepts up to three arguments. The map
    *   method calls the callbackfn function one time for each element in the
@@ -5619,8 +5658,8 @@ interface Float32Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -5649,8 +5688,8 @@ interface Float32Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -5669,11 +5708,11 @@ interface Float32Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -5700,11 +5739,11 @@ interface Float32Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -5742,11 +5781,12 @@ interface Float32Array {
    * element of an array.
    *
    * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value true, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   some(
     predicate: (
@@ -5760,10 +5800,10 @@ interface Float32Array {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It is
-   *   expected to return a negative value if the first argument is less than the
-   *   second argument, zero if they're equal, and a positive value otherwise. If
-   *   omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It
+   *   is expected to return a negative value if the first argument is less than
+   *   the second argument, zero if they're equal, and a positive value
+   *   otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -5859,8 +5899,8 @@ interface Float64Array {
    *   length is the length of the array.
    * @param start If start is negative, it is treated as length+start. If end is
    *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its default
-   *   value.
+   * @param end If not specified, length of the this object is used as its
+   *   default value.
    */
   copyWithin(
     target: SafeInt | Int10,
@@ -5872,11 +5912,12 @@ interface Float64Array {
    * Determines whether all the members of an array satisfy the specified test.
    *
    * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value false, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   every(
     predicate: (
@@ -5892,8 +5933,8 @@ interface Float64Array {
    * and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it is
-   *   treated as length+start where length is the length of the array.
+   * @param start Index to start filling the array at. If start is negative, it
+   *   is treated as length+start where length is the length of the array.
    * @param end Index to stop filling the array at. If end is negative, it is
    *   treated as length+end.
    */
@@ -5906,8 +5947,9 @@ interface Float64Array {
    * @param predicate A function that accepts up to three arguments. The filter
    *   method calls the predicate function one time for each element in the
    *   array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   filter(
     predicate: (
@@ -5919,15 +5961,16 @@ interface Float64Array {
   ): Float64Array;
 
   /**
-   * Returns the value of the first element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is
+   * true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, find immediately returns that element value.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, find immediately returns that element value.
    *   Otherwise, find returns undefined.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   find(
     predicate: (value: Float64, index: SafeUint, obj: Float64Array) => boolean,
@@ -5935,15 +5978,16 @@ interface Float64Array {
   ): Float64 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is
+   * true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array, in
-   *   ascending order, until it finds one where predicate returns true. If such
-   *   an element is found, findIndex immediately returns that element index.
-   *   Otherwise, findIndex returns -1.
+   * @param predicate Find calls predicate once for each element of the array,
+   *   in ascending order, until it finds one where predicate returns true. If
+   *   such an element is found, findIndex immediately returns that element
+   *   index. Otherwise, findIndex returns -1.
    * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used instead.
+   *   invocation of predicate. If it is not provided, undefined is used
+   *   instead.
    */
   findIndex(
     predicate: (value: Float64, index: SafeUint, obj: Float64Array) => boolean,
@@ -5978,8 +6022,8 @@ interface Float64Array {
    * string.
    *
    * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are separated
-   *   with a comma.
+   *   next in the resulting String. If omitted, the array elements are
+   *   separated with a comma.
    */
   join(separator?: string): string;
 
@@ -5999,8 +6043,8 @@ interface Float64Array {
   readonly length: SafeUint;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns an
-   * array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns
+   * an array that contains the results.
    *
    * @param callbackfn A function that accepts up to three arguments. The map
    *   method calls the callbackfn function one time for each element in the
@@ -6027,8 +6071,8 @@ interface Float64Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -6057,8 +6101,8 @@ interface Float64Array {
    *   method calls the callbackfn function one time for each element in the
    *   array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -6077,11 +6121,11 @@ interface Float64Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -6108,11 +6152,11 @@ interface Float64Array {
    * callback function.
    *
    * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each element
-   *   in the array.
+   *   reduceRight method calls the callbackfn function one time for each
+   *   element in the array.
    * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn function
-   *   provides this value as an argument instead of an array value.
+   *   value to start the accumulation. The first call to the callbackfn
+   *   function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -6150,11 +6194,12 @@ interface Float64Array {
    * element of an array.
    *
    * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until the
-   *   predicate returns a value which is coercible to the Boolean value true, or
-   *   until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the predicate
-   *   function. If thisArg is omitted, undefined is used as the this value.
+   *   method calls the predicate function for each element in the array until
+   *   the predicate returns a value which is coercible to the Boolean value
+   *   true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the
+   *   predicate function. If thisArg is omitted, undefined is used as the this
+   *   value.
    */
   some(
     predicate: (
@@ -6168,10 +6213,10 @@ interface Float64Array {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It is
-   *   expected to return a negative value if the first argument is less than the
-   *   second argument, zero if they're equal, and a positive value otherwise. If
-   *   omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It
+   *   is expected to return a negative value if the first argument is less than
+   *   the second argument, zero if they're equal, and a positive value
+   *   otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
