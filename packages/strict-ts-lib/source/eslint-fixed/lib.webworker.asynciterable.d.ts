@@ -13,6 +13,7 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
+
 /// <reference no-default-lib="true"/>
 
 /////////////////////////////
@@ -20,10 +21,8 @@ and limitations under the License.
 /////////////////////////////
 
 interface FileSystemDirectoryHandle {
-  [Symbol.asyncIterator](): AsyncIterableIterator<
-    readonly [string, FileSystemHandle]
-  >;
-  entries(): AsyncIterableIterator<readonly [string, FileSystemHandle]>;
-  keys(): AsyncIterableIterator<string>;
-  values(): AsyncIterableIterator<FileSystemHandle>;
+    [Symbol.asyncIterator](): AsyncIterableIterator<readonly [string, FileSystemHandle]>;
+    entries(): AsyncIterableIterator<readonly [string, FileSystemHandle]>;
+    keys(): AsyncIterableIterator<string>;
+    values(): AsyncIterableIterator<FileSystemHandle>;
 }

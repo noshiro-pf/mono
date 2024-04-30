@@ -24,16 +24,20 @@ interface RegExpExecArray {
   readonly indices?: RegExpIndicesArray;
 }
 
-interface RegExpIndicesArray extends Array<readonly [SafeUint, SafeUint]> {
+interface RegExpIndicesArray
+  extends Array<readonly [NumberType.ArraySize, NumberType.ArraySize]> {
   readonly groups?: {
-    readonly [key: string]: readonly [SafeUint, SafeUint];
+    readonly [key: string]: readonly [
+      NumberType.ArraySize,
+      NumberType.ArraySize,
+    ];
   };
 }
 
 interface RegExp {
   /**
-   * Returns a Boolean value indicating the state of the hasIndices flag (d)
-   * used with with a regular expression. Default is false. Read-only.
+   * Returns a Boolean value indicating the state of the hasIndices flag (d) used with with a regular expression.
+   * Default is false. Read-only.
    */
   readonly hasIndices: boolean;
 }

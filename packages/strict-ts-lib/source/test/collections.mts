@@ -2,6 +2,7 @@ import { expectType } from './expect-type.mjs';
 
 // ReadonlyMap
 {
+  // eslint-disable-next-line no-restricted-globals
   const mp: ReadonlyMap<'a' | 'b', number> = new Map([
     ['a', 0],
     ['b', 1],
@@ -34,6 +35,7 @@ import { expectType } from './expect-type.mjs';
 
 // ReadonlySet
 {
+  // eslint-disable-next-line no-restricted-globals
   const mp: ReadonlySet<'a' | 'b'> = new Set(['a', 'b'] as const);
 
   {

@@ -1,13 +1,13 @@
 #!/bin/bash
 
 
+THIS_SCRIPT_DIR=$(cd "$(dirname $0)" || exit; pwd)
+FINAL_DIR="${THIS_SCRIPT_DIR}/../final"
+# MONO_DIR="${THIS_SCRIPT_DIR}/../../.."
+
 ###### convert ######
 
-mkdir -p ./final
-rm -f ./final/lib.*
-node ./scripts/convert-dts/main.mjs
+mkdir -p "${FINAL_DIR}"
+node "${THIS_SCRIPT_DIR}/dist/convert-dts/main.mjs" || exit
 
-
-###### last step ######
-
-yarn zz:cmd:prettier ./final > /dev/null
+# cd "${MONO_DIR}" || exit

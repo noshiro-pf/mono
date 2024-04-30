@@ -15,11 +15,11 @@ and limitations under the License.
 
 /// <reference no-default-lib="true"/>
 /// <reference types="@noshiro/ts-type-utils-no-stdlib" />
-/// <reference path="./lib.es5.d.ts" />
+/// <reference lib="es5" />
 
 /**
  * @internal
- * O が union 型（要素数1の場合も含む）のとき、 union の要素の中に K をキーとして含むものが一つでもあれば、
+ * R が union 型（要素数1の場合も含む）のとき、 union の要素の中に K をキーとして含むものが一つでもあれば、
  * union 型を K をキーとして含むもののみに絞った型を返す。
  * union の要素の中に K をキーとして含むものが一つも無ければ、`Record<K, unknown>` を返す。
  * 結果には Readonly を付ける。
@@ -42,7 +42,6 @@ type _HasOwnReturnType<
 interface ObjectConstructor {
   /**
    * Determines whether an object has a property with the specified name.
-   *
    * @param obj An object.
    * @param key A property name.
    */

@@ -272,7 +272,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
     draft.typeCheckIncludes = [
       'final',
       'test',
-      workspaceScriptsDirName,
+      `${workspaceScriptsDirName}/src`,
       workspaceConfigsDirName,
     ];
   }),

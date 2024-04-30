@@ -5,7 +5,7 @@ import { expectType } from './expect-type.mjs';
   const entries = [
     ['x', 1],
     ['y', 2],
-  ] as const satisfies [['x', 1], ['y', 2]];
+  ] as const satisfies DeepReadonly<[['x', 1], ['y', 2]]>;
 
   const obj = Object.fromEntries(entries);
 

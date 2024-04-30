@@ -1,1 +1,7 @@
 !packages/**
+!source/copied
+!source/copied/*.d.ts
+!source/eslint-fixed
+!source/eslint-fixed/*.d.ts
+!source/final
+!source/final/*.d.ts

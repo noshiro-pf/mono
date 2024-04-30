@@ -13,57 +13,65 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
+
 /// <reference no-default-lib="true"/>
 
 /// <reference lib="es2015.iterable" />
 
-interface Generator<T = unknown, TReturn = unknown, TNext = unknown>
-  extends Iterator<T, TReturn, TNext> {
-  // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
-  next(...args: readonly [] | readonly [TNext]): IteratorResult<T, TReturn>;
-  return(value: TReturn): IteratorResult<T, TReturn>;
-  throw(e: unknown): IteratorResult<T, TReturn>;
-  [Symbol.iterator](): Generator<T, TReturn, TNext>;
+interface Generator<T = unknown, TReturn = unknown, TNext = unknown> extends Iterator<T, TReturn, TNext> {
+    // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
+    next(...args: readonly [] | readonly [TNext]): IteratorResult<T, TReturn>;
+    return(value: TReturn): IteratorResult<T, TReturn>;
+    throw(e: unknown): IteratorResult<T, TReturn>;
+    [Symbol.iterator](): Generator<T, TReturn, TNext>;
 }
 
 interface GeneratorFunction {
-  /**
-   * Creates a new Generator object.
-   *
-   * @param args A list of arguments the function accepts.
-   */
-  new (...args: readonly any[]): Generator;
-  /**
-   * Creates a new Generator object.
-   *
-   * @param args A list of arguments the function accepts.
-   */
-  (...args: readonly any[]): Generator;
-  /** The length of the arguments. */
-  readonly length: number;
-  /** Returns the name of the function. */
-  readonly name: string;
-  /** A reference to the prototype. */
-  readonly prototype: Generator;
+    /**
+     * Creates a new Generator object.
+     * @param args A list of arguments the function accepts.
+     */
+    new (...args: readonly any[]): Generator;
+    /**
+     * Creates a new Generator object.
+     * @param args A list of arguments the function accepts.
+     */
+    (...args: readonly any[]): Generator;
+    /**
+     * The length of the arguments.
+     */
+    readonly length: number;
+    /**
+     * Returns the name of the function.
+     */
+    readonly name: string;
+    /**
+     * A reference to the prototype.
+     */
+    readonly prototype: Generator;
 }
 
 interface GeneratorFunctionConstructor {
-  /**
-   * Creates a new Generator function.
-   *
-   * @param args A list of arguments the function accepts.
-   */
-  new (...args: readonly string[]): GeneratorFunction;
-  /**
-   * Creates a new Generator function.
-   *
-   * @param args A list of arguments the function accepts.
-   */
-  (...args: readonly string[]): GeneratorFunction;
-  /** The length of the arguments. */
-  readonly length: number;
-  /** Returns the name of the function. */
-  readonly name: string;
-  /** A reference to the prototype. */
-  readonly prototype: GeneratorFunction;
+    /**
+     * Creates a new Generator function.
+     * @param args A list of arguments the function accepts.
+     */
+    new (...args: readonly string[]): GeneratorFunction;
+    /**
+     * Creates a new Generator function.
+     * @param args A list of arguments the function accepts.
+     */
+    (...args: readonly string[]): GeneratorFunction;
+    /**
+     * The length of the arguments.
+     */
+    readonly length: number;
+    /**
+     * Returns the name of the function.
+     */
+    readonly name: string;
+    /**
+     * A reference to the prototype.
+     */
+    readonly prototype: GeneratorFunction;
 }

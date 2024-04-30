@@ -39,7 +39,8 @@ packages/utils/syncflow/docs/**/*.js
 
 packages/strict-ts-lib/source/copied
 packages/strict-ts-lib/source/eslint-fixed
-!packages/strict-ts-lib/source/final
+packages/strict-ts-lib/source/final
+packages/strict-ts-lib/packages
 
 # Optional eslint cache
 .eslintcache

@@ -233,67 +233,37 @@ const updatePackageJsonImpl = (
       case 'strict-ts-lib': {
         // reset
         mut_packageJson['scripts'] = {
-          autofix: 'wireit',
-          fmt: 'yarn zz:cmd:prettier .',
-          gen: 'run-s gen:d gen:packages',
+          build: 'tsc --project ./configs/tsconfig.build.json',
+          clean: 'run-p clean:**',
+          'clean:build': 'rimraf esm',
+          'clean:wireit': 'rimraf .wireit/**',
+          fmt: 'yarn zz:prettier ..',
+          gen: 'run-s gen:d gen:packages fmt fmt',
           'gen:d': 'run-s gen:d:eslint-fixed gen:d:final',
           'gen:d:eslint-fixed': `./${workspaceScriptsDirName}/gen-eslint-fixed.sh`,
-          'gen:d:final': `./${workspaceScriptsDirName}/gen-final.sh`,
-          'gen:packages': `./${workspaceScriptsDirName}/gen-packages.sh`,
-          lint: 'wireit',
+          'gen:d:final': 'wireit',
+          'gen:packages': 'wireit',
+          test: 'tsc -p ./configs/tsconfig.type-check.json',
+          testw: 'yarn test --watch',
           tsc: 'yarn type-check',
           tscw: 'tsc --noEmit --watch',
-          'type-check': 'wireit',
-          'zz:cmd:eslint': 'ESLINT_USE_FLAT_CONFIG=true eslint',
-          'zz:cmd:eslint:scripts': `yarn zz:cmd:eslint --config ${eslintConfigName} ${workspaceScriptsDirName} --cache --cache-location ./${workspaceScriptsDirName}/.eslintcache`,
-          'zz:cmd:prettier': `prettier --cache --cache-strategy content --ignore-path ${pathPrefixToRoot}/.prettierignore --write`,
-        };
-        mut_packageJson['wireit'] = {};
-
-        // aliases
-        const mut_wireit = mut_packageJson['wireit'];
-
-        {
-          const tsConfigPath = `./${workspaceConfigsDirName}/tsconfig.type-check.json`;
-          mut_wireit['type-check'] = {
-            command: `tsc -p ${tsConfigPath}`,
-            files: ['./test/**/*.mts', tsConfigPath, wireitDeps.tsConfigs],
-            output: [],
-          };
-        }
-
-        mut_wireit['lint'] = {
-          dependencies: [
-            `${pathPrefixToRoot}/packages/utils/eslint-utils:build`,
-          ],
-          command: 'yarn zz:cmd:eslint:scripts',
-          files: [
-            `./${workspaceScriptsDirName}/**/*.{mjs,mts,js,ts,jsx,tsx,d.ts}`,
-            `./${eslintConfigName}`,
-            './package.json',
-            './tsconfig.json',
-            wireitDeps.rootPackageJson,
-            wireitDeps.tsConfigs,
-          ],
-          output: [],
+          'type-check': 'tsc --noEmit',
+          'zz:eslint': 'ESLINT_USE_FLAT_CONFIG=true eslint',
+          'zz:eslint:scripts':
+            'yarn zz:eslint --config eslint.config.js scripts --cache --cache-location ./scripts/.eslintcache',
+          'zz:prettier': 'prettier --ignore-path ../.prettierignore --write',
         };
 
-        {
-          const configPath = `./${workspaceConfigsDirName}/eslint.config.gen.mjs`;
-
-          mut_wireit['autofix'] = {
-            command: `yarn zz:cmd:eslint eslint-fixed/ --config ${configPath} --fix --cache --cache-location ./.eslintcache`,
-            files: [
-              './eslint-fixed/**/*.d.ts',
-              configPath,
-              './package.json',
-              './tsconfig.json',
-              wireitDeps.rootPackageJson,
-              wireitDeps.tsConfigs,
-            ],
-            output: [],
-          };
-        }
+        mut_packageJson['wireit'] = {
+          'gen:d:final': {
+            dependencies: ['build'],
+            command: `./${workspaceScriptsDirName}/gen-final.sh`,
+          },
+          'gen:packages': {
+            dependencies: ['build'],
+            command: `./${workspaceScriptsDirName}/gen-packages.sh`,
+          },
+        };
 
         break;
       }
@@ -897,7 +867,11 @@ const updatePackageJsonImpl = (
 
     const mut_ref = mut_packageJson['devDependencies'];
 
-    if (packageName === 'eslint-utils' || packageName === 'goober') {
+    if (
+      packageName === 'eslint-utils' ||
+      packageName === 'goober' ||
+      packageName === 'strict-ts-lib'
+    ) {
       delete mut_ref['@noshiro/eslint-utils'];
     } else {
       mut_ref['@noshiro/eslint-utils'] = '*';

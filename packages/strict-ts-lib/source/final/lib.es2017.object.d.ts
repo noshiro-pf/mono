@@ -16,53 +16,50 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 /// <reference types="@noshiro/ts-type-utils-no-stdlib" />
 
-/** @internal */
-type ToObjectKeysValue<A> = A extends string
-  ? A
-  : A extends number
-    ? `${A}`
+declare namespace LibEs2017Object {
+  /** @internal */
+  type ToObjectKeysValue<A> = A extends string
+    ? A
+    : A extends number
+      ? `${A}`
+      : never;
+
+  /** @internal */
+  type PickByValue<R, V> = Pick<
+    R,
+    {
+      [K in keyof R]: R[K] extends V ? K : never;
+    }[keyof R]
+  >;
+
+  /** @internal */
+  export type _RecordUtilsEntries<R extends RecordBase> = R extends R
+    ? readonly {
+        readonly [K in keyof R]: readonly [
+          ToObjectKeysValue<keyof PickByValue<R, R[K]>>,
+          R[K],
+        ];
+        // eslint-disable-next-line @typescript-eslint/ban-types
+      }[RelaxedExclude<keyof R, symbol>][]
     : never;
-
-/** @internal */
-type PickByValue<R, V> = Pick<
-  R,
-  {
-    [K in keyof R]: R[K] extends V ? K : never;
-  }[keyof R]
->;
-
-/** @internal */
-type _RecordUtilsEntries<R extends RecordBase> = R extends R
-  ? readonly {
-      readonly [K in keyof R]: readonly [
-        ToObjectKeysValue<keyof PickByValue<R, R[K]>>,
-        R[K],
-      ];
-      // eslint-disable-next-line @typescript-eslint/ban-types
-    }[RelaxedExclude<keyof R, symbol>][]
-  : never;
+}
 
 interface ObjectConstructor {
   /**
    * Returns an array of values of the enumerable properties of an object
-   *
-   * @param o Object that contains the properties and methods. This can be an
-   *   object that you created or an existing Document Object Model (DOM)
-   *   object.
+   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
   values<T>(o: { readonly [s: string]: T } | ArrayLike<T>): readonly T[];
 
   /**
    * Returns an array of values of the enumerable properties of an object
-   *
-   * @param o Object that contains the properties and methods. This can be an
-   *   object that you created or an existing Document Object Model (DOM)
-   *   object.
+   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
   values(o: {}): readonly unknown[];
 
   /**
    * Returns an array of key/values of the enumerable properties of an object
+   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    *
    * ```ts
    * const obj = {
@@ -75,27 +72,20 @@ interface ObjectConstructor {
    * const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]
    * ```
    *
-   * @param o Object that contains the properties and methods. This can be an
-   *   object that you created or an existing Document Object Model (DOM)
-   *   object.
    */
-  entries<R extends RecordBase>(object: R): _RecordUtilsEntries<R>;
+  entries<R extends RecordBase>(
+    object: R,
+  ): LibEs2017Object._RecordUtilsEntries<R>;
 
   /**
    * Returns an array of key/values of the enumerable properties of an object
-   *
-   * @param o Object that contains the properties and methods. This can be an
-   *   object that you created or an existing Document Object Model (DOM)
-   *   object.
+   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
   entries(o: {}): readonly (readonly [string, unknown])[];
 
   /**
    * Returns an object containing all own property descriptors of an object
-   *
-   * @param o Object that contains the properties and methods. This can be an
-   *   object that you created or an existing Document Object Model (DOM)
-   *   object.
+   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
   getOwnPropertyDescriptors<T>(o: T): {
     readonly [P in keyof T]: TypedPropertyDescriptor<T[P]>;

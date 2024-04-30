@@ -4,7 +4,7 @@ import {
   eslintFlatConfigCommon,
   restrictedSyntax,
 } from '@noshiro/eslint-utils';
-import { toThisDir } from '@noshiro/mono-scripts/node-utils/path-utils.mjs';
+import { toThisDir } from '@noshiro/mono-scripts';
 import * as nodePath from 'node:path';
 
 const thisDir = toThisDir(import.meta.url);
@@ -31,6 +31,7 @@ const defineConfig = () => [
           message: 'Use `replaceWithNoMatchCheck` instead.',
         },
       ],
+      'import/no-internal-modules': 'off',
     },
   },
 ];

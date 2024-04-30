@@ -13,8 +13,9 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
+
 /// <reference no-default-lib="true"/>
 
 interface WeakKeyTypes {
-  readonly symbol: symbol;
+    readonly symbol: symbol;
 }

@@ -4871,51 +4871,83 @@
 
 "@typescript/lib-decorators@file:./packages/strict-ts-lib/packages/lib-decorators":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-dom@file:./packages/strict-ts-lib/packages/lib-dom":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-es2015@file:./packages/strict-ts-lib/packages/lib-es2015":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-es2016@file:./packages/strict-ts-lib/packages/lib-es2016":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-es2017@file:./packages/strict-ts-lib/packages/lib-es2017":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-es2018@file:./packages/strict-ts-lib/packages/lib-es2018":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-es2019@file:./packages/strict-ts-lib/packages/lib-es2019":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-es2020@file:./packages/strict-ts-lib/packages/lib-es2020":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-es2021@file:./packages/strict-ts-lib/packages/lib-es2021":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-es2022@file:./packages/strict-ts-lib/packages/lib-es2022":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-es2023@file:./packages/strict-ts-lib/packages/lib-es2023":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-es5@file:./packages/strict-ts-lib/packages/lib-es5":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-es6@file:./packages/strict-ts-lib/packages/lib-es6":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-esnext@file:./packages/strict-ts-lib/packages/lib-esnext":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-scripthost@file:./packages/strict-ts-lib/packages/lib-scripthost":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@typescript/lib-webworker@file:./packages/strict-ts-lib/packages/lib-webworker":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@ungap/structured-clone@^1.0.0", "@ungap/structured-clone@^1.2.0":
   version "1.2.0"
@@ -15639,6 +15671,7 @@ string-length@^4.0.1:
     strip-ansi "^6.0.0"
 
 "string-width-cjs@npm:string-width@^4.2.0", string-width@^4.0.0, string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.2, string-width@^4.2.3:
+  name string-width-cjs
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -15776,6 +15809,7 @@ stringify-entities@^4.0.0:
     character-entities-legacy "^3.0.0"
 
 "strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+  name strip-ansi-cjs
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -17349,6 +17383,7 @@ wordwrapjs@^5.1.0:
   integrity sha512-JNjcULU2e4KJwUNv6CHgI46UvDGitb6dGryHajXTDiLgg1/RiGoPSDw4kZfYnwGtEXf2ZMeIewDQgFGzkCB2Sg==
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+  name wrap-ansi-cjs
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==

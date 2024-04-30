@@ -20,8 +20,8 @@ and limitations under the License.
 
 interface SymbolConstructor {
   /**
-   * A method that returns the default iterator for an object. Called by the
-   * semantics of the for-of statement.
+   * A method that returns the default iterator for an object. Called by the semantics of the
+   * for-of statement.
    */
   readonly iterator: unique symbol;
 }
@@ -59,34 +59,38 @@ interface Array<T> {
   /** Iterator */
   [Symbol.iterator](): IterableIterator<T>;
 
-  /** Returns an iterable of key, value pairs for every entry in the array */
-  entries(): IterableIterator<readonly [SafeUint, T]>;
+  /**
+   * Returns an iterable of key, value pairs for every entry in the array
+   */
+  entries(): IterableIterator<readonly [NumberType.ArraySize, T]>;
 
-  /** Returns an iterable of keys in the array */
-  keys(): IterableIterator<SafeUint>;
+  /**
+   * Returns an iterable of keys in the array
+   */
+  keys(): IterableIterator<NumberType.ArraySize>;
 
-  /** Returns an iterable of values in the array */
+  /**
+   * Returns an iterable of values in the array
+   */
   values(): IterableIterator<T>;
 }
 
 interface ArrayConstructor {
   /**
    * Creates an array from an iterable object.
-   *
    * @param iterable An iterable object to convert to an array.
    */
   from<T>(iterable: Iterable<T> | ArrayLike<T>): T[];
 
   /**
    * Creates an array from an iterable object.
-   *
    * @param iterable An iterable object to convert to an array.
    * @param mapfn A mapping function to call on every element of the array.
    * @param thisArg Value of 'this' used to invoke the mapfn.
    */
   from<T, U>(
     iterable: Iterable<T> | ArrayLike<T>,
-    mapfn: (v: T, k: SafeUint) => U,
+    mapfn: (v: T, k: NumberType.ArraySize) => U,
     thisArg?: unknown,
   ): U[];
 }
@@ -95,13 +99,19 @@ interface ReadonlyArray<T> {
   /** Iterator of values in the array. */
   [Symbol.iterator](): IterableIterator<T>;
 
-  /** Returns an iterable of key, value pairs for every entry in the array */
-  entries(): IterableIterator<readonly [SafeUint, T]>;
+  /**
+   * Returns an iterable of key, value pairs for every entry in the array
+   */
+  entries(): IterableIterator<readonly [NumberType.ArraySize, T]>;
 
-  /** Returns an iterable of keys in the array */
-  keys(): IterableIterator<SafeUint>;
+  /**
+   * Returns an iterable of keys in the array
+   */
+  keys(): IterableIterator<NumberType.ArraySize>;
 
-  /** Returns an iterable of values in the array */
+  /**
+   * Returns an iterable of values in the array
+   */
   values(): IterableIterator<T>;
 }
 
@@ -114,13 +124,19 @@ interface Map<K, V> {
   /** Returns an iterable of entries in the map. */
   [Symbol.iterator](): IterableIterator<readonly [K, V]>;
 
-  /** Returns an iterable of key, value pairs for every entry in the map. */
+  /**
+   * Returns an iterable of key, value pairs for every entry in the map.
+   */
   entries(): IterableIterator<readonly [K, V]>;
 
-  /** Returns an iterable of keys in the map */
+  /**
+   * Returns an iterable of keys in the map
+   */
   keys(): IterableIterator<K>;
 
-  /** Returns an iterable of values in the map */
+  /**
+   * Returns an iterable of values in the map
+   */
   values(): IterableIterator<V>;
 }
 
@@ -128,18 +144,24 @@ interface ReadonlyMap<K, V> {
   /** Returns an iterable of entries in the map. */
   [Symbol.iterator](): IterableIterator<readonly [K, V]>;
 
-  /** Returns an iterable of key, value pairs for every entry in the map. */
+  /**
+   * Returns an iterable of key, value pairs for every entry in the map.
+   */
   entries(): IterableIterator<readonly [K, V]>;
 
-  /** Returns an iterable of keys in the map */
+  /**
+   * Returns an iterable of keys in the map
+   */
   keys(): IterableIterator<K>;
 
-  /** Returns an iterable of values in the map */
+  /**
+   * Returns an iterable of values in the map
+   */
   values(): IterableIterator<V>;
 }
 
 interface MapConstructor {
-  new (): Map<unknown, unknown>;
+  new (): Map<never, never>;
   new <K, V>(iterable?: Iterable<readonly [K, V]> | null): Map<K, V>;
 }
 
@@ -155,13 +177,19 @@ interface Set<T> {
   /** Iterates over values in the set. */
   [Symbol.iterator](): IterableIterator<T>;
 
-  /** Returns an iterable of [v,v] pairs for every value `v` in the set. */
+  /**
+   * Returns an iterable of [v,v] pairs for every value `v` in the set.
+   */
   entries(): IterableIterator<readonly [T, T]>;
 
-  /** Despite its name, returns an iterable of the values in the set. */
+  /**
+   * Despite its name, returns an iterable of the values in the set.
+   */
   keys(): IterableIterator<T>;
 
-  /** Returns an iterable of values in the set. */
+  /**
+   * Returns an iterable of values in the set.
+   */
   values(): IterableIterator<T>;
 }
 
@@ -169,17 +197,24 @@ interface ReadonlySet<T> {
   /** Iterates over values in the set. */
   [Symbol.iterator](): IterableIterator<T>;
 
-  /** Returns an iterable of [v,v] pairs for every value `v` in the set. */
+  /**
+   * Returns an iterable of [v,v] pairs for every value `v` in the set.
+   */
   entries(): IterableIterator<readonly [T, T]>;
 
-  /** Despite its name, returns an iterable of the values in the set. */
+  /**
+   * Despite its name, returns an iterable of the values in the set.
+   */
   keys(): IterableIterator<T>;
 
-  /** Returns an iterable of values in the set. */
+  /**
+   * Returns an iterable of values in the set.
+   */
   values(): IterableIterator<T>;
 }
 
 interface SetConstructor {
+  new (): Set<never>;
   new <T>(iterable?: Iterable<T> | null): Set<T>;
 }
 
@@ -193,18 +228,16 @@ interface Promise<T> {}
 
 interface PromiseConstructor {
   /**
-   * Creates a Promise that is resolved with an array of results when all of
-   * the provided Promises resolve, or rejected when any Promise is rejected.
-   *
+   * Creates a Promise that is resolved with an array of results when all of the provided Promises
+   * resolve, or rejected when any Promise is rejected.
    * @param values An iterable of Promises.
    * @returns A new Promise.
    */
   all<T>(values: Iterable<T | PromiseLike<T>>): Promise<readonly Awaited<T>[]>;
 
   /**
-   * Creates a Promise that is resolved or rejected when any of the provided
-   * Promises are resolved or rejected.
-   *
+   * Creates a Promise that is resolved or rejected when any of the provided Promises are resolved
+   * or rejected.
    * @param values An iterable of Promises.
    * @returns A new Promise.
    */
@@ -219,13 +252,19 @@ interface String {
 interface Int8Array {
   [Symbol.iterator](): IterableIterator<Int8>;
 
-  /** Returns an array of key, value pairs for every entry in the array */
-  entries(): IterableIterator<readonly [SafeUint, Int8]>;
+  /**
+   * Returns an array of key, value pairs for every entry in the array
+   */
+  entries(): IterableIterator<readonly [NumberType.TypedArraySize, Int8]>;
 
-  /** Returns an list of keys in the array */
-  keys(): IterableIterator<SafeUint>;
+  /**
+   * Returns an list of keys in the array
+   */
+  keys(): IterableIterator<NumberType.TypedArraySize>;
 
-  /** Returns an list of values in the array */
+  /**
+   * Returns an list of values in the array
+   */
   values(): IterableIterator<Int8>;
 }
 
@@ -234,7 +273,6 @@ interface Int8ArrayConstructor {
 
   /**
    * Creates an array from an array-like or iterable object.
-   *
    * @param arrayLike An array-like or iterable object to convert to an array.
    * @param mapfn A mapping function to call on every element of the array.
    * @param thisArg Value of 'this' used to invoke the mapfn.
@@ -249,13 +287,19 @@ interface Int8ArrayConstructor {
 interface Uint8Array {
   [Symbol.iterator](): IterableIterator<Uint8>;
 
-  /** Returns an array of key, value pairs for every entry in the array */
-  entries(): IterableIterator<readonly [SafeUint, Uint8]>;
+  /**
+   * Returns an array of key, value pairs for every entry in the array
+   */
+  entries(): IterableIterator<readonly [NumberType.TypedArraySize, Uint8]>;
 
-  /** Returns an list of keys in the array */
-  keys(): IterableIterator<SafeUint>;
+  /**
+   * Returns an list of keys in the array
+   */
+  keys(): IterableIterator<NumberType.TypedArraySize>;
 
-  /** Returns an list of values in the array */
+  /**
+   * Returns an list of values in the array
+   */
   values(): IterableIterator<Uint8>;
 }
 
@@ -264,7 +308,6 @@ interface Uint8ArrayConstructor {
 
   /**
    * Creates an array from an array-like or iterable object.
-   *
    * @param arrayLike An array-like or iterable object to convert to an array.
    * @param mapfn A mapping function to call on every element of the array.
    * @param thisArg Value of 'this' used to invoke the mapfn.
@@ -279,13 +322,19 @@ interface Uint8ArrayConstructor {
 interface Uint8ClampedArray {
   [Symbol.iterator](): IterableIterator<Uint8>;
 
-  /** Returns an array of key, value pairs for every entry in the array */
-  entries(): IterableIterator<readonly [SafeUint, Uint8]>;
+  /**
+   * Returns an array of key, value pairs for every entry in the array
+   */
+  entries(): IterableIterator<readonly [NumberType.TypedArraySize, Uint8]>;
 
-  /** Returns an list of keys in the array */
-  keys(): IterableIterator<SafeUint>;
+  /**
+   * Returns an list of keys in the array
+   */
+  keys(): IterableIterator<NumberType.TypedArraySize>;
 
-  /** Returns an list of values in the array */
+  /**
+   * Returns an list of values in the array
+   */
   values(): IterableIterator<Uint8>;
 }
 
@@ -294,7 +343,6 @@ interface Uint8ClampedArrayConstructor {
 
   /**
    * Creates an array from an array-like or iterable object.
-   *
    * @param arrayLike An array-like or iterable object to convert to an array.
    * @param mapfn A mapping function to call on every element of the array.
    * @param thisArg Value of 'this' used to invoke the mapfn.
@@ -309,13 +357,19 @@ interface Uint8ClampedArrayConstructor {
 interface Int16Array {
   [Symbol.iterator](): IterableIterator<Int16>;
 
-  /** Returns an array of key, value pairs for every entry in the array */
-  entries(): IterableIterator<readonly [SafeUint, Int16]>;
+  /**
+   * Returns an array of key, value pairs for every entry in the array
+   */
+  entries(): IterableIterator<readonly [NumberType.TypedArraySize, Int16]>;
 
-  /** Returns an list of keys in the array */
-  keys(): IterableIterator<SafeUint>;
+  /**
+   * Returns an list of keys in the array
+   */
+  keys(): IterableIterator<NumberType.TypedArraySize>;
 
-  /** Returns an list of values in the array */
+  /**
+   * Returns an list of values in the array
+   */
   values(): IterableIterator<Int16>;
 }
 
@@ -324,7 +378,6 @@ interface Int16ArrayConstructor {
 
   /**
    * Creates an array from an array-like or iterable object.
-   *
    * @param arrayLike An array-like or iterable object to convert to an array.
    * @param mapfn A mapping function to call on every element of the array.
    * @param thisArg Value of 'this' used to invoke the mapfn.
@@ -339,13 +392,19 @@ interface Int16ArrayConstructor {
 interface Uint16Array {
   [Symbol.iterator](): IterableIterator<Uint16>;
 
-  /** Returns an array of key, value pairs for every entry in the array */
-  entries(): IterableIterator<readonly [SafeUint, Uint16]>;
+  /**
+   * Returns an array of key, value pairs for every entry in the array
+   */
+  entries(): IterableIterator<readonly [NumberType.TypedArraySize, Uint16]>;
 
-  /** Returns an list of keys in the array */
-  keys(): IterableIterator<SafeUint>;
+  /**
+   * Returns an list of keys in the array
+   */
+  keys(): IterableIterator<NumberType.TypedArraySize>;
 
-  /** Returns an list of values in the array */
+  /**
+   * Returns an list of values in the array
+   */
   values(): IterableIterator<Uint16>;
 }
 
@@ -354,7 +413,6 @@ interface Uint16ArrayConstructor {
 
   /**
    * Creates an array from an array-like or iterable object.
-   *
    * @param arrayLike An array-like or iterable object to convert to an array.
    * @param mapfn A mapping function to call on every element of the array.
    * @param thisArg Value of 'this' used to invoke the mapfn.
@@ -369,13 +427,19 @@ interface Uint16ArrayConstructor {
 interface Int32Array {
   [Symbol.iterator](): IterableIterator<Int32>;
 
-  /** Returns an array of key, value pairs for every entry in the array */
-  entries(): IterableIterator<readonly [SafeUint, Int32]>;
+  /**
+   * Returns an array of key, value pairs for every entry in the array
+   */
+  entries(): IterableIterator<readonly [NumberType.TypedArraySize, Int32]>;
 
-  /** Returns an list of keys in the array */
-  keys(): IterableIterator<SafeUint>;
+  /**
+   * Returns an list of keys in the array
+   */
+  keys(): IterableIterator<NumberType.TypedArraySize>;
 
-  /** Returns an list of values in the array */
+  /**
+   * Returns an list of values in the array
+   */
   values(): IterableIterator<Int32>;
 }
 
@@ -384,7 +448,6 @@ interface Int32ArrayConstructor {
 
   /**
    * Creates an array from an array-like or iterable object.
-   *
    * @param arrayLike An array-like or iterable object to convert to an array.
    * @param mapfn A mapping function to call on every element of the array.
    * @param thisArg Value of 'this' used to invoke the mapfn.
@@ -399,13 +462,19 @@ interface Int32ArrayConstructor {
 interface Uint32Array {
   [Symbol.iterator](): IterableIterator<Uint32>;
 
-  /** Returns an array of key, value pairs for every entry in the array */
-  entries(): IterableIterator<readonly [SafeUint, Uint32]>;
+  /**
+   * Returns an array of key, value pairs for every entry in the array
+   */
+  entries(): IterableIterator<readonly [NumberType.TypedArraySize, Uint32]>;
 
-  /** Returns an list of keys in the array */
-  keys(): IterableIterator<SafeUint>;
+  /**
+   * Returns an list of keys in the array
+   */
+  keys(): IterableIterator<NumberType.TypedArraySize>;
 
-  /** Returns an list of values in the array */
+  /**
+   * Returns an list of values in the array
+   */
   values(): IterableIterator<Uint32>;
 }
 
@@ -414,7 +483,6 @@ interface Uint32ArrayConstructor {
 
   /**
    * Creates an array from an array-like or iterable object.
-   *
    * @param arrayLike An array-like or iterable object to convert to an array.
    * @param mapfn A mapping function to call on every element of the array.
    * @param thisArg Value of 'this' used to invoke the mapfn.
@@ -429,13 +497,19 @@ interface Uint32ArrayConstructor {
 interface Float32Array {
   [Symbol.iterator](): IterableIterator<Float32>;
 
-  /** Returns an array of key, value pairs for every entry in the array */
-  entries(): IterableIterator<readonly [SafeUint, Float32]>;
+  /**
+   * Returns an array of key, value pairs for every entry in the array
+   */
+  entries(): IterableIterator<readonly [NumberType.TypedArraySize, Float32]>;
 
-  /** Returns an list of keys in the array */
-  keys(): IterableIterator<SafeUint>;
+  /**
+   * Returns an list of keys in the array
+   */
+  keys(): IterableIterator<NumberType.TypedArraySize>;
 
-  /** Returns an list of values in the array */
+  /**
+   * Returns an list of values in the array
+   */
   values(): IterableIterator<Float32>;
 }
 
@@ -444,7 +518,6 @@ interface Float32ArrayConstructor {
 
   /**
    * Creates an array from an array-like or iterable object.
-   *
    * @param arrayLike An array-like or iterable object to convert to an array.
    * @param mapfn A mapping function to call on every element of the array.
    * @param thisArg Value of 'this' used to invoke the mapfn.
@@ -459,13 +532,19 @@ interface Float32ArrayConstructor {
 interface Float64Array {
   [Symbol.iterator](): IterableIterator<Float64>;
 
-  /** Returns an array of key, value pairs for every entry in the array */
-  entries(): IterableIterator<readonly [SafeUint, Float64]>;
+  /**
+   * Returns an array of key, value pairs for every entry in the array
+   */
+  entries(): IterableIterator<readonly [NumberType.TypedArraySize, Float64]>;
 
-  /** Returns an list of keys in the array */
-  keys(): IterableIterator<SafeUint>;
+  /**
+   * Returns an list of keys in the array
+   */
+  keys(): IterableIterator<NumberType.TypedArraySize>;
 
-  /** Returns an list of values in the array */
+  /**
+   * Returns an list of values in the array
+   */
   values(): IterableIterator<Float64>;
 }
 
@@ -474,7 +553,6 @@ interface Float64ArrayConstructor {
 
   /**
    * Creates an array from an array-like or iterable object.
-   *
    * @param arrayLike An array-like or iterable object to convert to an array.
    * @param mapfn A mapping function to call on every element of the array.
    * @param thisArg Value of 'this' used to invoke the mapfn.

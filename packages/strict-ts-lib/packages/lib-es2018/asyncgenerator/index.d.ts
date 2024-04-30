@@ -34,41 +34,49 @@ interface AsyncGenerator<T = unknown, TReturn = any, TNext = unknown>
 interface AsyncGeneratorFunction {
   /**
    * Creates a new AsyncGenerator object.
-   *
    * @param args A list of arguments the function accepts.
    */
   new (...args: readonly never[]): AsyncGenerator;
   /**
    * Creates a new AsyncGenerator object.
-   *
    * @param args A list of arguments the function accepts.
    */
   (...args: readonly never[]): AsyncGenerator;
-  /** The length of the arguments. */
-  readonly length: SafeUint;
-  /** Returns the name of the function. */
+  /**
+   * The length of the arguments.
+   */
+  readonly length: number;
+  /**
+   * Returns the name of the function.
+   */
   readonly name: string;
-  /** A reference to the prototype. */
+  /**
+   * A reference to the prototype.
+   */
   readonly prototype: AsyncGenerator;
 }
 
 interface AsyncGeneratorFunctionConstructor {
   /**
    * Creates a new AsyncGenerator function.
-   *
    * @param args A list of arguments the function accepts.
    */
   new (...args: readonly string[]): AsyncGeneratorFunction;
   /**
    * Creates a new AsyncGenerator function.
-   *
    * @param args A list of arguments the function accepts.
    */
   (...args: readonly string[]): AsyncGeneratorFunction;
-  /** The length of the arguments. */
-  readonly length: SafeUint;
-  /** Returns the name of the function. */
+  /**
+   * The length of the arguments.
+   */
+  readonly length: number;
+  /**
+   * Returns the name of the function.
+   */
   readonly name: string;
-  /** A reference to the prototype. */
+  /**
+   * A reference to the prototype.
+   */
   readonly prototype: AsyncGeneratorFunction;
 }

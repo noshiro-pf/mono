@@ -13,31 +13,32 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
+
 /// <reference no-default-lib="true"/>
 
 declare namespace Intl {
-  interface DateTimeFormatPartTypesRegistry {
-    readonly day: unknown;
-    readonly dayPeriod: unknown;
-    readonly era: unknown;
-    readonly hour: unknown;
-    readonly literal: unknown;
-    readonly minute: unknown;
-    readonly month: unknown;
-    readonly second: unknown;
-    readonly timeZoneName: unknown;
-    readonly weekday: unknown;
-    readonly year: unknown;
-  }
+    interface DateTimeFormatPartTypesRegistry {
+        readonly day: unknown;
+        readonly dayPeriod: unknown;
+        readonly era: unknown;
+        readonly hour: unknown;
+        readonly literal: unknown;
+        readonly minute: unknown;
+        readonly month: unknown;
+        readonly second: unknown;
+        readonly timeZoneName: unknown;
+        readonly weekday: unknown;
+        readonly year: unknown;
+    }
 
-  type DateTimeFormatPartTypes = keyof DateTimeFormatPartTypesRegistry;
+    type DateTimeFormatPartTypes = keyof DateTimeFormatPartTypesRegistry;
 
-  interface DateTimeFormatPart {
-    readonly type: DateTimeFormatPartTypes;
-    readonly value: string;
-  }
+    interface DateTimeFormatPart {
+        readonly type: DateTimeFormatPartTypes;
+        readonly value: string;
+    }
 
-  interface DateTimeFormat {
-    formatToParts(date?: Date | number): readonly DateTimeFormatPart[];
-  }
+    interface DateTimeFormat {
+        formatToParts(date?: Date | number): readonly DateTimeFormatPart[];
+    }
 }

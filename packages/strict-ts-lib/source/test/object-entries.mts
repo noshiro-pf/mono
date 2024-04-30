@@ -8,7 +8,7 @@ type RecordType1 = DeepReadonly<{
 }>;
 
 expectType<
-  _RecordUtilsEntries<RecordType1>,
+  LibEs2017Object._RecordUtilsEntries<RecordType1>,
   readonly (readonly ['3', 4] | readonly ['x', 1] | readonly ['y' | 'z', 2])[]
 >('=');
 
@@ -28,7 +28,7 @@ type RecordType2 = DeepReadonly<
 >;
 
 expectType<
-  _RecordUtilsEntries<RecordType2>,
+  LibEs2017Object._RecordUtilsEntries<RecordType2>,
   | readonly (
       | readonly ['9', 40]
       | readonly ['a', 10]
@@ -38,7 +38,7 @@ expectType<
 >('=');
 
 expectType<
-  _RecordUtilsEntries<MutableRecord<string, number>>,
+  LibEs2017Object._RecordUtilsEntries<MutableRecord<string, number>>,
   readonly (readonly [string, number])[]
 >('=');
 
