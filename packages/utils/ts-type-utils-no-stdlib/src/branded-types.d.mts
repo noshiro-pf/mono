@@ -248,7 +248,7 @@ type _SmallIntIndexMax = 512;
  * @internal
  * integers in `[1, MaxIndex - 1]`
  */
-type _SmallPositiveInt<MaxIndex extends number> = RelaxedExclude<
+type _SmallPositiveInt<MaxIndex extends number = _SmallIntIndexMax> = Exclude<
   Index<MaxIndex>,
   0
 >;
@@ -257,7 +257,8 @@ type _SmallPositiveInt<MaxIndex extends number> = RelaxedExclude<
  * @internal
  * integers in `[-MaxIndex, -1]`
  */
-type _SmallNegativeInt<MaxIndex extends number> = NegativeIndex<MaxIndex>;
+type _SmallNegativeInt<MaxIndex extends number = _SmallIntIndexMax> =
+  NegativeIndex<MaxIndex>;
 
 /**
  * Small integers union
@@ -300,12 +301,17 @@ type SmallUint = SmallInt<'>=0'>;
  *     - `NonZeroSmallInt`  : integers in `[-512, 511] \ { 0 }`
  *     - `SmallNegativeInt` : integers in `[-512, -1]`
  */
-type WithSmallInt<N extends Int, MaxIndex extends number = _SmallIntIndexMax> =
+type WithSmallInt<
+  N extends Int,
+  MaxIndex extends number = _SmallIntIndexMax,
+> = WithSmallIntImpl<NormalizeBrandUnion<N>, MaxIndex>;
+
+type WithSmallIntImpl<N extends Int, MaxIndex extends number> =
   | Exclude<
       SmallInt<'', MaxIndex>,
       | (N extends NegativeNumber ? SmallInt<'>=0', MaxIndex> : never)
       | (N extends NonNegativeNumber ? SmallInt<'<0', MaxIndex> : never)
-      | (N extends NonZeroInt ? 0 : never)
+      | (N extends NonZeroNumber ? 0 : never)
     >
   | N;
 

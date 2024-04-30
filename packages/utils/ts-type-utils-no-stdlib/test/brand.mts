@@ -32,6 +32,60 @@ import { expectType } from './expect-type.mjs';
       number
   >('=');
 
+  expectType<
+    IntersectBrand<PositiveNumber, Uint32>,
+    Readonly<{
+      NaNValue: false;
+      '!=0': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      '>= -2^15': true;
+      '>= -2^31': true;
+      '>=0': true;
+      '< 2^32': true;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    IntersectBrand<PositiveInt, Uint32>,
+    Readonly<{
+      NaNValue: false;
+      '!=0': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      '>= -2^15': true;
+      '>= -2^31': true;
+      '>=0': true;
+      '< 2^32': true;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    PositiveInt & Uint32,
+    Readonly<{
+      NaNValue: false;
+      '!=0': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      '>= -2^15': true;
+      '>= -2^31': true;
+      '>=0': true;
+      '< 2^32': true;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+    }> &
+      number
+  >('!=');
+
   expectType<UnwrapBrandKeys<A>, 'B' | 'F' | 'T'>('=');
   expectType<UnwrapBrandKeys<B>, 'B' | 'F' | 'T'>('=');
   expectType<UnwrapBrandTrueKeys<AB>, 'T'>('=');

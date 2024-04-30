@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-namespace Tuple {
+declare namespace Tuple {
   export type Head<
     T extends readonly unknown[],
     D = never,
