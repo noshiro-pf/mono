@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable no-restricted-globals */
 // https://github.com/microsoft/TypeScript/issues/27024
 // prettier-ignore
 type TypeEq<A, B> =
@@ -5,8 +7,6 @@ type TypeEq<A, B> =
   (<T>() => T extends B ? 1 : 2)
     ? true
     : false;
-
-type ExpectTrue<T extends true> = T;
 
 type TypeExtends<A, B> = A extends B ? true : false;
 
@@ -64,6 +64,60 @@ type UnionToIntersection<T> = (
   : never;
 
 type Writable<T> = { -readonly [P in keyof T]: T[P] };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ToMutableMap<T extends ReadonlyMap<any, any>> =
+  T extends ReadonlyMap<infer K, infer V> ? Map<K, V> : never;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ToMutableSet<T extends ReadonlySet<any>> =
+  T extends ReadonlySet<infer V> ? Set<V> : never;
+
+type DeepReadonly<T> = T extends Primitive
+  ? T
+  : T extends Function
+    ? T
+    : T extends MutableMap<infer K, infer V>
+      ? ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>
+      : T extends MutableSet<infer V>
+        ? ReadonlySet<DeepReadonly<V>>
+        : T extends object | readonly unknown[]
+          ? {
+              readonly [K in keyof T]: DeepReadonly<T[K]>;
+            }
+          : T;
+
+type MutableSet<K> = Set<K>;
+
+type MutableMap<K, V> = Map<K, V>;
+
+type DeepWritable<T> = T extends Primitive
+  ? T
+  : T extends Function
+    ? T
+    : T extends ReadonlyMap<infer K, infer V>
+      ? MutableMap<DeepWritable<K>, DeepWritable<V>>
+      : T extends ReadonlySet<infer V>
+        ? MutableSet<DeepWritable<V>>
+        : T extends object | readonly unknown[]
+          ? {
+              -readonly [K in keyof T]: DeepWritable<T[K]>;
+            }
+          : T;
+
+type DeepPartial<T> = T extends Primitive
+  ? T
+  : T extends Function
+    ? T
+    : T extends MutableMap<infer K, infer V>
+      ? ReadonlyMap<DeepPartial<K>, DeepPartial<V>>
+      : T extends MutableSet<infer V>
+        ? ReadonlySet<DeepPartial<V>>
+        : T extends object | readonly unknown[]
+          ? {
+              [K in keyof T]?: DeepPartial<T[K]>;
+            }
+          : T;
 
 type RecordKeyType = keyof never;
 
@@ -140,14 +194,56 @@ type MergeIntersection<R extends Record<string, unknown>> = {
   [K in keyof R]: R[K];
 };
 
-/** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods */
-type HTTPRequestMethod =
-  | 'CONNECT'
-  | 'DELETE'
-  | 'GET'
-  | 'HEAD'
-  | 'OPTIONS'
-  | 'PATCH'
-  | 'POST'
-  | 'PUT'
-  | 'TRACE';
+type PartiallyPartial<T, K extends keyof T> = MergeIntersection<
+  Omit<T, K> & Partial<Pick<T, K>>
+>;
+
+type PartiallyNullable<T, K extends keyof T> = MergeIntersection<
+  Omit<T, K> & { [P in K]: T[P] | undefined }
+>;
+
+// eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+type FalsyValue = -0 | '' | 0 | 0n | false | null | undefined;
+
+/** 注：NaN は型で除外できていない。 */
+type ExcludeFalsyValue<A> = RelaxedExclude<A, FalsyValue>;
+
+type PickUndefined<Obj> = {
+  [K in keyof Obj]-?: undefined extends Obj[K] ? K : never;
+}[keyof Obj];
+
+type MapToNever<Obj> = {
+  [K in keyof Obj]: never;
+};
+
+/**
+ * `Obj` のうち optional なキーを union として返す。
+ *
+ * ```ts
+ * type K = OptionalKeys<{
+ *   a?: 0;
+ *   b?: 0 | undefined;
+ *   c?: undefined;
+ *   d: 0;
+ *   e: undefined;
+ *   f: 0 | undefined;
+ * }>; // 'a' | 'b' | 'c'
+ * ```
+ */
+type OptionalKeys<Obj> = PickUndefined<MapToNever<Obj>>;
+
+/**
+ * `Obj` のうち optional でないキーを union として返す。
+ *
+ * ```ts
+ * type K = RequiredKeys<{
+ *   a?: 0;
+ *   b?: 0 | undefined;
+ *   c?: undefined;
+ *   d: 0;
+ *   e: undefined;
+ *   f: 0 | undefined;
+ * }>; // 'd' | 'e' | 'f'
+ * ```
+ */
+type RequiredKeys<Obj> = StrictExclude<keyof Obj, OptionalKeys<Obj>>;

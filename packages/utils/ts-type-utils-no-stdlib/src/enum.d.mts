@@ -68,3 +68,15 @@ type UpperAlphabet = Uppercase<LowerAlphabet>;
 
 /** ` 'A' | ... | 'Z' | 'a' | ... | 'z'` */
 type Alphabet = LowerAlphabet | UpperAlphabet;
+
+/** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods */
+type HTTPRequestMethod =
+  | 'CONNECT'
+  | 'DELETE'
+  | 'GET'
+  | 'HEAD'
+  | 'OPTIONS'
+  | 'PATCH'
+  | 'POST'
+  | 'PUT'
+  | 'TRACE';

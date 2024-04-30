@@ -8,7 +8,7 @@ type MakeTuple<Elm, N extends number> = _MakeTupleInternals.MakeTupleImpl<
  * @link https://techracho.bpsinc.jp/yoshi/2020_09_04/97108
  * @internal
  */
-namespace _MakeTupleInternals {
+declare namespace _MakeTupleInternals {
   /** @internal */
   type Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 

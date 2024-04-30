@@ -5,4 +5,4 @@ expectType<IndexOfTuple<readonly [2, 4, 6, 8, 10]>, 0 | 1 | 2 | 3 | 4>('=');
 expectType<IndexOfTuple<readonly []>, never>('=');
 // expectType<IndexOfTuple<{ length: 0 }>, 0>('=');
 // expectType<IndexOfTuple<{ length: 1 }>, 1>('=');
-expectType<IndexOfTuple<readonly unknown[]>, SafeUint>('=');
+expectType<IndexOfTuple<readonly unknown[]>, NumberType.ArraySize>('=');

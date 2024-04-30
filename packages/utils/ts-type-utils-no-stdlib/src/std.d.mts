@@ -15,7 +15,7 @@ type Readonly<T> = {
 
 /** From T, pick a set of properties whose keys are in the union K */
 type Pick<T, K extends keyof T> = {
-  readonly [P in K]: T[P];
+  [P in K]: T[P];
 };
 
 /** Exclude from T those types that are assignable to U */
@@ -72,6 +72,10 @@ interface Array<T> {
 
 // global definitions for compiler
 
+/** Convert string literal type to uppercase */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type Uppercase<S extends string> = intrinsic;
+
 interface IArguments {}
 interface Function {}
 interface CallableFunction extends Function {}
@@ -82,3 +86,12 @@ interface String {}
 interface Boolean {}
 interface Object {}
 interface RegExp {}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface ReadonlySet<K> {}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface Set<K> {}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface ReadonlyMap<K, V> {}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface Map<K, V> {}
