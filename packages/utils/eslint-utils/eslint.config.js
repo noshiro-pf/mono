@@ -1,6 +1,6 @@
 /** @typedef {import('./src/types/flat-config.mjs').FlatConfig} FlatConfig */
 
-import { toThisDir } from '@noshiro/mono-scripts/node-utils/path-utils.mjs';
+import { toThisDir } from '@noshiro/mono-scripts';
 import * as nodePath from 'node:path';
 import { eslintFlatConfigCommon } from './esm/configs/common.mjs';
 

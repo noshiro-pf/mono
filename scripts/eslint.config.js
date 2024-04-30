@@ -12,7 +12,7 @@ const thisDir = toThisDir(import.meta.url);
 /** @type {readonly FlatConfig[]} */
 const configs = [
   {
-    ignores: ['**/*.d.mts'],
+    ignores: ['**/*.d.mts', 'esm'],
   },
   ...eslintFlatConfigCommon({
     tsconfigRootDir: thisDir,

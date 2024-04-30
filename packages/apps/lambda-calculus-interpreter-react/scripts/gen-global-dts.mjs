@@ -1,5 +1,4 @@
-import { genGlobalDts } from '@noshiro/mono-scripts/global-def/gen-global-dts.mjs';
-import { toThisDir } from '@noshiro/mono-scripts/node-utils/path-utils.mjs';
+import { genGlobalDts, toThisDir } from '@noshiro/mono-scripts';
 import * as nodePath from 'node:path';
 import packageJson from '../package.json' assert { type: 'json' };
 
