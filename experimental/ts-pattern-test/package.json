@@ -1,0 +1,9 @@
+{
+  "name": "ts-pattern-test",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "ts-pattern": "^5.1.1"
+  }
+}
