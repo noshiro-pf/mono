@@ -192,7 +192,13 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     },
   ], // modified
   '@typescript-eslint/no-this-alias': 'error',
-  '@typescript-eslint/no-throw-literal': 'error',
+  '@typescript-eslint/only-throw-error': [
+    'error',
+    {
+      allowThrowingAny: false,
+      allowThrowingUnknown: false,
+    },
+  ],
   '@typescript-eslint/no-type-alias': 'off', // disabled
   '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
   '@typescript-eslint/no-unnecessary-condition': [
@@ -459,4 +465,5 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   // deprecated
   '@typescript-eslint/block-spacing': 'off',
   '@typescript-eslint/padding-line-between-statements': 'off',
+  '@typescript-eslint/no-throw-literal': 'off',
 };

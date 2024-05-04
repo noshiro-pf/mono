@@ -143,8 +143,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
       !afterDeadline &&
       !(
         fireAuthUser?.uid !== undefined &&
-        answers !== undefined &&
-        answers.some((ans) => ans.user.id === fireAuthUser.uid)
+        answers?.some((ans) => ans.user.id === fireAuthUser.uid) === true
       ),
     [afterDeadline, fireAuthUser, answers],
   );

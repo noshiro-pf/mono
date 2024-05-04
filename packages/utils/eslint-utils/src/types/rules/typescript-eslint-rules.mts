@@ -7672,7 +7672,7 @@ namespace NoThisAlias {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
- *  | recommended          | strict  |
+ *  | deprecated           | true    |
  *  | requiresTypeChecking | true    |
  *  ```
  */
@@ -7697,14 +7697,7 @@ namespace NoThrowLiteral {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowThrowingAny?: boolean;
-    readonly allowThrowingUnknown?: boolean;
-  };
-
-  export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+  export type RuleEntry = 'off';
 }
 
 /**
@@ -8505,6 +8498,50 @@ namespace ObjectCurlySpacing {
    * ```
    */
   export type RuleEntry = 'off';
+}
+
+/**
+ * Disallow throwing non-`Error` values as exceptions
+ *
+ * @link https://typescript-eslint.io/rules/only-throw-error
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | recommended          | strict  |
+ *  | requiresTypeChecking | true    |
+ *  ```
+ */
+namespace OnlyThrowError {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowThrowingAny": {
+   *         "type": "boolean"
+   *       },
+   *       "allowThrowingUnknown": {
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly allowThrowingAny?: boolean;
+    readonly allowThrowingUnknown?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -10757,7 +10794,6 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-restricted-imports': NoRestrictedImports.RuleEntry;
   readonly '@typescript-eslint/no-shadow': NoShadow.RuleEntry;
   readonly '@typescript-eslint/no-this-alias': NoThisAlias.RuleEntry;
-  readonly '@typescript-eslint/no-throw-literal': NoThrowLiteral.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-boolean-literal-compare': NoUnnecessaryBooleanLiteralCompare.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-condition': NoUnnecessaryCondition.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-qualifier': NoUnnecessaryQualifier.RuleEntry;
@@ -10780,6 +10816,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-useless-template-literals': NoUselessTemplateLiterals.RuleEntry;
   readonly '@typescript-eslint/no-var-requires': NoVarRequires.RuleEntry;
   readonly '@typescript-eslint/non-nullable-type-assertion-style': NonNullableTypeAssertionStyle.RuleEntry;
+  readonly '@typescript-eslint/only-throw-error': OnlyThrowError.RuleEntry;
   readonly '@typescript-eslint/parameter-properties': ParameterProperties.RuleEntry;
   readonly '@typescript-eslint/prefer-as-const': PreferAsConst.RuleEntry;
   readonly '@typescript-eslint/prefer-destructuring': PreferDestructuring.RuleEntry;
@@ -10829,6 +10866,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/member-delimiter-style': MemberDelimiterStyle.RuleEntry;
   readonly '@typescript-eslint/no-extra-parens': NoExtraParens.RuleEntry;
   readonly '@typescript-eslint/no-extra-semi': NoExtraSemi.RuleEntry;
+  readonly '@typescript-eslint/no-throw-literal': NoThrowLiteral.RuleEntry;
   readonly '@typescript-eslint/no-type-alias': NoTypeAlias.RuleEntry;
   readonly '@typescript-eslint/object-curly-spacing': ObjectCurlySpacing.RuleEntry;
   readonly '@typescript-eslint/padding-line-between-statements': PaddingLineBetweenStatements.RuleEntry;
@@ -10882,7 +10920,6 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/no-restricted-imports': NoRestrictedImports.Options;
   readonly '@typescript-eslint/no-shadow': NoShadow.Options;
   readonly '@typescript-eslint/no-this-alias': NoThisAlias.Options;
-  readonly '@typescript-eslint/no-throw-literal': NoThrowLiteral.Options;
   readonly '@typescript-eslint/no-unnecessary-boolean-literal-compare': NoUnnecessaryBooleanLiteralCompare.Options;
   readonly '@typescript-eslint/no-unnecessary-condition': NoUnnecessaryCondition.Options;
   readonly '@typescript-eslint/no-unnecessary-type-assertion': NoUnnecessaryTypeAssertion.Options;
@@ -10890,6 +10927,7 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/no-unused-vars': NoUnusedVars.Options;
   readonly '@typescript-eslint/no-use-before-define': NoUseBeforeDefine.Options;
   readonly '@typescript-eslint/no-var-requires': NoVarRequires.Options;
+  readonly '@typescript-eslint/only-throw-error': OnlyThrowError.Options;
   readonly '@typescript-eslint/parameter-properties': ParameterProperties.Options;
   readonly '@typescript-eslint/prefer-destructuring': readonly [
     PreferDestructuring.Options0,
