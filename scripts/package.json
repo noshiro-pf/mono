@@ -29,6 +29,9 @@
       "output": []
     },
     "lint": {
+      "dependencies": [
+        "../packages/utils/eslint-utils:build"
+      ],
       "command": "yarn zz:cmd:eslint --config eslint.config.js \"./**/*.mjs\"",
       "files": [
         "./**/*.{mjs,d.mts}",

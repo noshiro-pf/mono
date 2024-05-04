@@ -77,9 +77,10 @@
         "../../../config/tsconfig/**",
         "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
       ],
-      "clean": false,
+      "clean": true,
       "output": [
-        "scripts/**/*.mjs"
+        "scripts/**/*.mjs",
+        "!scripts/eslint.config.gen.mjs"
       ]
     },
     "gen-rules-type": {
@@ -122,6 +123,9 @@
       ]
     },
     "lint:scripts": {
+      "dependencies": [
+        "build"
+      ],
       "command": "yarn zz:cmd:eslint:scripts",
       "files": [
         "scripts/**/*.mts",
@@ -135,6 +139,9 @@
       "output": []
     },
     "lint:fix:scripts": {
+      "dependencies": [
+        "build"
+      ],
       "command": "yarn zz:cmd:eslint:scripts --fix",
       "files": [
         "scripts/**/*.mts",

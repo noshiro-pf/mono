@@ -214,6 +214,9 @@ const updatePackageJsonImpl = (
           ];
 
           mut_wireit['lint'] = {
+            dependencies: [
+              `${pathPrefixToRoot}/packages/utils/eslint-utils:build`,
+            ],
             command: 'yarn zz:cmd:eslint:src-and-test',
             files,
             output: [],
@@ -818,8 +821,11 @@ const updatePackageJsonImpl = (
                 wireitDeps.tsConfigs,
                 wireitDeps.tsTypeUtilsNoStdLib,
               ],
-              clean: false, // eslint.config.gen.mjs を削除しないため
-              output: [`${workspaceScriptsDirName}/**/*.mjs`],
+              clean: true,
+              output: [
+                `${workspaceScriptsDirName}/**/*.mjs`,
+                `!${workspaceScriptsDirName}/eslint.config.gen.mjs`,
+              ],
             };
           }
 
@@ -843,12 +849,14 @@ const updatePackageJsonImpl = (
             ];
 
             mut_wireit['lint:scripts'] = {
+              dependencies: ['build'],
               command: 'yarn zz:cmd:eslint:scripts',
               files,
               output: [],
             };
 
             mut_wireit['lint:fix:scripts'] = {
+              dependencies: ['build'],
               command: 'yarn zz:cmd:eslint:scripts --fix',
               files,
               clean: false,
