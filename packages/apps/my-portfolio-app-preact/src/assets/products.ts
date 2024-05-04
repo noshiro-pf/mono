@@ -70,7 +70,8 @@ export const products: DeepReadonly<{
       id: 'rnjs',
       link: 'https://github.com/noshiro-pf/mono/tree/main/experimental/rnjs',
       title: 'rnjs',
-      subtitle: 'リアクティブプログラミング用のTypeScriptのライブラリ',
+      subtitle:
+        'リアクティブプログラミング用のTypeScriptのライブラリ（"SyncFlow" の過去作）',
       description:
         'RxJS風の構文のリアクティブプログラミングライブラリ。RxJSで発生しうる「グリッチ」という現象が起きないようにしたもの（Observableの発火をpriority queueで管理している）。',
       implementation:
@@ -107,7 +108,7 @@ export const products: DeepReadonly<{
       title: '住宅ローン返済シミュレータ',
       subtitle: '住宅ローンの月々の返済額などを計算',
       description:
-        '表計算ソフトで作りかけてなんとなくBlueprint.jsを試したくなったので作った。クエリパラメータでスナップショットを保存可能。',
+        '表計算ソフトで済む内容ではあるが Blueprint.js を試したくなったのもあって React で作成。クエリパラメータで設定を保存可能。',
       implementation:
         'React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2019年11月17日、最終更新：2021年9月22日）',
       imageUrl: HousingLoanCalculatorAppImage,
@@ -117,8 +118,7 @@ export const products: DeepReadonly<{
       link: 'https://cant-stop-probability.web.app/',
       title: "ボードゲーム「Can't Stop」の確率表",
       subtitle: '',
-      description:
-        '表計算ソフトで式を書くのは骨が折れると思ったので作成。完全に自分用。',
+      description: '期待値等を調べるために作成。',
       implementation:
         'React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2021年1月22日）',
       imageUrl: CantStopProbabilityAppImage,
@@ -146,7 +146,7 @@ export const products: DeepReadonly<{
         'React・RxJS・TypeScriptで実装。RxJSはリングの透明度変化を扱うために使用した（連打時に前のアニメーションをキャンセルする処理）。',
         '（制作時期：2019年7月）',
         '→ 2021-03-12にRxJSを自作ライブラリ SyncFlow に差し替えた。',
-      ].join(''),
+      ].join(' '),
       imageUrl: CatanDiceAppImage,
     },
     {
@@ -162,7 +162,7 @@ export const products: DeepReadonly<{
         'タブ切り替えをreact-routerで行うように変更（2020/08/04）。（最終更新：右上に記載）',
         ' → 2021-09-22 に Preact 化した。ルーティングも自作ライブラリに置き換えた。',
         'Github Actions で main branch 更新時に自動でデプロイするよう設定。',
-      ].join(''),
+      ].join(' '),
       imageUrl: MyPortfolioAppImage,
     },
     {
