@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
-// @ts-ignore
 import typescriptEslintParser from '@typescript-eslint/parser';
 import { type FlatConfig } from '../types/flat-config.mjs';
 import { plugins } from './plugins.mjs';
@@ -30,9 +28,6 @@ export const eslintFlatConfigCommonWithoutRules = ({
   {
     languageOptions: {
       ecmaVersion: 'latest',
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
-      // @ts-ignore
       parser: typescriptEslintParser,
       parserOptions: {
         project: tsconfigFileName,
