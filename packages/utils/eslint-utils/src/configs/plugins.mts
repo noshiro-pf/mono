@@ -1,54 +1,53 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable import/order */
-/* eslint-disable @typescript-eslint/prefer-ts-expect-error */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 
-// @ts-ignore
+// @ts-expect-error
 import arrayFunc from 'eslint-plugin-array-func';
 
-// @ts-ignore
+// @ts-expect-error
 import cypress from 'eslint-plugin-cypress';
 import deprecation from 'eslint-plugin-deprecation';
 
-// @ts-ignore
+// @ts-expect-error
 import functional from 'eslint-plugin-functional';
 
-// @ts-ignore
+// @ts-expect-error
 import pluginImport from 'eslint-plugin-import';
 
-// @ts-ignore
+// @ts-expect-error
 import jest from 'eslint-plugin-jest';
 
-// @ts-ignore
+// @ts-expect-error
 import promise from 'eslint-plugin-promise';
 
-// @ts-ignore
+// @ts-expect-error
 import react from 'eslint-plugin-react';
 
-// @ts-ignore
+// @ts-expect-error
 import reactHooks from 'eslint-plugin-react-hooks';
 
-// @ts-ignore
+// @ts-expect-error
 import reactRefresh from 'eslint-plugin-react-refresh';
 
-// @ts-ignore
+// @ts-expect-error
 import security from 'eslint-plugin-security';
 
-// @ts-ignore
+// @ts-expect-error
 import totalFunctions from 'eslint-plugin-total-functions';
 
-// @ts-ignore
+// @ts-expect-error
 import unicorn from 'eslint-plugin-unicorn';
 import { type FlatConfig } from '../types/flat-config.mjs';
 
 export const plugins: FlatConfig['plugins'] = {
-  // @ts-ignore
+  // @ts-expect-error
   '@typescript-eslint': typescriptEslint,
   'array-func': arrayFunc,
   cypress,
-  // @ts-ignore
+  // @ts-expect-error
   deprecation,
   functional,
   import: pluginImport,
@@ -58,7 +57,6 @@ export const plugins: FlatConfig['plugins'] = {
   'react-hooks': reactHooks,
   'react-refresh': reactRefresh,
   security,
-  // @ts-ignore
   'total-functions': totalFunctions,
   unicorn,
 } as const;

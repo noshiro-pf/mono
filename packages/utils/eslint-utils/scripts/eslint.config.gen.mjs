@@ -8,7 +8,7 @@ import { toThisDir } from '@noshiro/mono-scripts/node-utils/path-utils.mjs';
 import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin';
 import typescriptEslintParser from '@typescript-eslint/parser';
 
-// @ts-ignore
+// @ts-expect-error
 import functional from 'eslint-plugin-functional';
 
 const thisDir = toThisDir(import.meta.url);
@@ -20,7 +20,6 @@ const config = [
   },
   {
     languageOptions: {
-      // @ts-ignore
       parser: typescriptEslintParser,
       parserOptions: {
         project: 'tsconfig.gen.json',
@@ -32,9 +31,8 @@ const config = [
       reportUnusedDisableDirectives: true,
     },
     plugins: {
-      // @ts-ignore
+      // @ts-expect-error
       '@typescript-eslint': typescriptEslintPlugin,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       functional,
     },
   },
