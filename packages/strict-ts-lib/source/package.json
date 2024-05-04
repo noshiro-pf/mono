@@ -17,9 +17,9 @@
     "autofix": "wireit",
     "fmt": "yarn zz:cmd:prettier .",
     "gen": "run-s gen:d gen:packages",
-    "gen:d": "run-s gen:d:temp gen:d:dist",
-    "gen:d:dist": "./scripts/gen-dist.sh",
-    "gen:d:temp": "./scripts/gen-temp.sh",
+    "gen:d": "run-s gen:d:eslint-fixed gen:d:final",
+    "gen:d:eslint-fixed": "./scripts/gen-eslint-fixed.sh",
+    "gen:d:final": "./scripts/gen-final.sh",
     "gen:packages": "./scripts/gen-packages.sh",
     "lint": "wireit",
     "tsc": "yarn type-check",
@@ -61,9 +61,9 @@
       "output": []
     },
     "autofix": {
-      "command": "yarn zz:cmd:eslint temp/ --config ./configs/eslint.config.gen.mjs --fix --cache --cache-location ./.eslintcache",
+      "command": "yarn zz:cmd:eslint eslint-fixed/ --config ./configs/eslint.config.gen.mjs --fix --cache --cache-location ./.eslintcache",
       "files": [
-        "./temp/**/*.d.ts",
+        "./eslint-fixed/**/*.d.ts",
         "./configs/eslint.config.gen.mjs",
         "./package.json",
         "./tsconfig.json",

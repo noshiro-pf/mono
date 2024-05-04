@@ -37,9 +37,9 @@ packages/utils/syncflow/docs/**/*.js
 .wireit
 *.tsbuildinfo
 
-packages/strict-ts-lib/source/unchanged
-packages/strict-ts-lib/source/temp
-!packages/strict-ts-lib/source/dist
+packages/strict-ts-lib/source/copied
+packages/strict-ts-lib/source/eslint-fixed
+!packages/strict-ts-lib/source/final
 
 # Optional eslint cache
 .eslintcache

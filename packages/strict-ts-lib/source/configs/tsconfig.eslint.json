@@ -1,10 +1,10 @@
 {
   "extends": "../../../../config/tsconfig/tsconfig.lib.type-check.json",
   "include": [
-    "../dist",
-    "../temp",
+    "../copied",
+    "../eslint-fixed",
+    "../final",
     "../test",
-    "../unchanged",
     "../scripts",
     "../stdlib.d.ts",
     "../eslint.config.js"
