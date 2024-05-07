@@ -138,7 +138,7 @@ export class UserManager {
 }
 ```
 
-メソッドの戻り値を使うユーザーとしては、この関数の戻り値が `User | void` という値を返すのか返さないのかどっちつかずな型であることは好ましくないと思われるため、 `User | undefined` にしてもらえるよう、以下の PR を送っています。
+メソッドの戻り値を使うユーザーとしては、この関数の戻り値が `User | void` という値を返すのか返さないのかどっちつかずな型であることは好ましくないと思われるため、 `User | undefined` にしてもらえるよう、以下の PR を送っています（2024/5/7 追記： merge されました）。
 
 https://github.com/authts/oidc-client-ts/issues/1492
 
@@ -159,7 +159,7 @@ https://typescript-eslint.io/rules/no-invalid-void-type
 
 https://typescript-eslint.io/rules/no-confusing-void-expression/
 
-`void` を他の方と混ぜて使うことを禁止するルール
+`void` を他の型と混ぜて使うことを禁止するルール
 
 https://typescript-eslint.io/rules/no-invalid-void-type
 
