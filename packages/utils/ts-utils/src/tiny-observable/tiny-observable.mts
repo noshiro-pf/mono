@@ -1,5 +1,3 @@
-import { MutableMap } from '../others/index.mjs';
-
 export type Subscription = Readonly<{
   unsubscribe: () => void;
 }>;
@@ -16,7 +14,8 @@ export const createTinyObservable = <T,>(): TinyObservableSource<T> =>
   new TinyObservableClass<T>();
 
 class TinyObservableClass<T> implements TinyObservableSource<T> {
-  readonly #mut_subscriptions = new MutableMap<symbol, (value: T) => void>();
+  // eslint-disable-next-line no-restricted-globals
+  readonly #mut_subscriptions = new Map<symbol, (value: T) => void>();
 
   next(value: T): void {
     for (const fn of this.#mut_subscriptions.values()) {

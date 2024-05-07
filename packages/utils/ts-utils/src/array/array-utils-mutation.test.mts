@@ -1,5 +1,5 @@
 import { expectType } from '../expect-type.mjs';
-import { toSafeUint } from '../index.mjs';
+import { toUint32 } from '../index.mjs';
 import { Arr } from './array-utils.mjs';
 
 describe('ArrayUtils', () => {
@@ -56,7 +56,7 @@ describe('ArrayUtils', () => {
       });
     }
     {
-      const result = Arr.inserted(xs, toSafeUint(999), 5);
+      const result = Arr.inserted(xs, toUint32(999), 5);
 
       expectType<typeof result, readonly (1 | 2 | 3 | 5)[]>('=');
 

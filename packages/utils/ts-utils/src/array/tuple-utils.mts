@@ -6,16 +6,16 @@ function length<T extends readonly unknown[]>(list: T): Length<T> {
 
 const reversed = <T extends readonly unknown[]>(tpl: T): Tuple.Reverse<T> =>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, no-restricted-syntax
-  Array.from<T[number]>(tpl).reverse() as unknown as Tuple.Reverse<T>;
+  tpl.toReversed() as unknown as Tuple.Reverse<T>;
 
 const findIndex = <T extends readonly unknown[]>(
   tpl: T,
-  predicate: (value: T[number], index: SafeUint) => boolean,
+  predicate: (value: T[number], index: NumberType.ArraySize) => boolean,
 ): IndexOfTuple<T> | -1 =>
   // eslint-disable-next-line no-restricted-syntax
   tpl.findIndex(
     // eslint-disable-next-line no-restricted-syntax
-    predicate as (value: T[number], index: SafeUint) => boolean,
+    predicate as (value: T[number], index: NumberType.ArraySize) => boolean,
   ) as IndexOfTuple<T>;
 
 const indexOf = <T extends readonly unknown[]>(
@@ -36,10 +36,10 @@ const lastIndexOf = <T extends readonly unknown[]>(
 
 const map = <T extends readonly unknown[], B>(
   tpl: T,
-  mapFn: (a: T[number], index: SafeUint) => B,
+  mapFn: (a: T[number], index: NumberType.ArraySize) => B,
 ): { readonly [K in keyof T]: B } =>
   // eslint-disable-next-line no-restricted-syntax
-  tpl.map(mapFn as (a: unknown, index: SafeUint) => B) as {
+  tpl.map(mapFn as (a: unknown, index: NumberType.ArraySize) => B) as {
     readonly [K in keyof T]: B;
   };
 
@@ -57,7 +57,7 @@ const set = <T extends readonly unknown[], N>(
 const update = <T extends readonly unknown[], N>(
   tpl: T,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  index: SafeUint | (Index<Length<T>> & SmallUint),
+  index: NumberType.ArraySize | (Index<Length<T>> & SmallUint),
   updater: (prev: T[number]) => N,
 ): { readonly [K in keyof T]: N | T[K] } =>
   // eslint-disable-next-line no-restricted-syntax
@@ -80,7 +80,9 @@ function sorted<T extends readonly unknown[]>(
   const cmp = comparator ?? ((x, y) => Num.from(x) - Num.from(y));
 
   // eslint-disable-next-line no-restricted-syntax
-  return Array.from(tpl).sort(cmp) as { readonly [K in keyof T]: T[number] };
+  return Array.from(tpl).sort(cmp) as {
+    readonly [K in keyof T]: T[number];
+  };
 }
 
 function sortedBy<T extends readonly unknown[]>(

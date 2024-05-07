@@ -1,4 +1,4 @@
-import { Arr, MutableSet } from '@noshiro/ts-utils';
+import { Arr } from '@noshiro/ts-utils';
 import {
   type ChildObservable,
   type ObservableId,
@@ -31,7 +31,8 @@ export class RootObservableClass<A, Type extends RootObservableType>
     });
     this.type = type;
     this.#procedure = [];
-    this._descendantsIdSet = new MutableSet<ObservableId>();
+    // eslint-disable-next-line no-restricted-globals
+    this._descendantsIdSet = new Set<ObservableId>();
   }
 
   addDescendant<B>(child: ChildObservable<B>): void {

@@ -1,15 +1,9 @@
+import { toSafeUint, toUint32 } from '@noshiro/mono-scripts';
 import { type Rule } from 'eslint';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { type JSONSchema4 } from 'json-schema';
 import { compile } from 'json-schema-to-typescript';
-import {
-  deepCopy,
-  deepReplace,
-  isArray,
-  toCapitalCase,
-  toSafeUint,
-  toStr,
-} from './utils.mjs';
+import { deepCopy, deepReplace, toCapitalCase, toStr } from './utils.mjs';
 
 type Meta = DeepReadonly<
   DeepPartial<{
@@ -27,7 +21,7 @@ const compilerConfig = {
 const normalizeToSchemaArray = (
   schema: DeepReadonly<JSONSchema4 | JSONSchema4[]> | undefined,
 ): DeepReadonly<JSONSchema4[]> =>
-  schema === undefined ? [] : isArray(schema) ? schema : [schema];
+  schema === undefined ? [] : Array.isArray(schema) ? schema : [schema];
 
 const removeMultiLineCommentCharacter = (str: string): string =>
   str.replace('/*', ' ').replace('*/', ' ');
@@ -216,7 +210,7 @@ const createResult = async (
               (_, i) =>
                 `   | readonly [Linter.RuleLevel, ${OptionsStrs.slice(
                   0,
-                  toSafeUint(i + 1),
+                  toUint32(i + 1),
                 ).join(', ')}]`,
             ),
           );

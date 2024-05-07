@@ -8,7 +8,7 @@ interface IMapMappedInterface<K, V, KM extends MapKeyType> {
   new (iterable: Iterable<K>, toKey: (a: K) => KM, fromKey: (k: KM) => K): void;
 
   // Getting information
-  size: SafeUint;
+  size: NumberType.ArraySize;
   has: (key: K) => boolean;
   get: (key: K) => V | undefined;
 
@@ -96,7 +96,7 @@ class IMapMappedClass<K, V, KM extends MapKeyType>
     this.#fromKey = fromKey;
   }
 
-  get size(): SafeUint {
+  get size(): NumberType.ArraySize {
     return this.#map.size;
   }
 

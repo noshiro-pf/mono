@@ -1,4 +1,4 @@
-import { MutableMap, tp } from '../others/index.mjs';
+import { tp } from '../others/index.mjs';
 import { Str } from '../str/index.mjs';
 import { ISet } from './iset.mjs';
 
@@ -7,7 +7,7 @@ interface IMapInterface<K, V> {
   new (iterable: Iterable<K>): void;
 
   // Getting information
-  size: SafeUint;
+  size: NumberType.ArraySize;
   has: (key: K) => boolean;
   get: (key: K) => V | undefined;
 
@@ -72,10 +72,11 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   readonly #map: ReadonlyMap<K, V>;
 
   constructor(iterable: Iterable<readonly [K, V]>) {
-    this.#map = new MutableMap(iterable);
+    // eslint-disable-next-line no-restricted-globals
+    this.#map = new Map(iterable);
   }
 
-  get size(): SafeUint {
+  get size(): NumberType.ArraySize {
     return this.#map.size;
   }
 
@@ -149,7 +150,8 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
       | { type: 'update'; key: K; updater: (value: V) => V }
     >[],
   ): IMap<K, V> {
-    const mut_result = new MutableMap<K, V>(this.#map);
+    // eslint-disable-next-line no-restricted-globals
+    const mut_result = new Map<K, V>(this.#map);
 
     for (const action of actions) {
       switch (action.type) {

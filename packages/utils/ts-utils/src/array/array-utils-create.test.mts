@@ -1,5 +1,5 @@
 import { expectType } from '../expect-type.mjs';
-import { toSafeUint } from '../index.mjs';
+import { toUint32 } from '../index.mjs';
 import { Arr } from './array-utils.mjs';
 
 describe('ArrayUtils', () => {
@@ -21,7 +21,7 @@ describe('ArrayUtils', () => {
     });
 
     test('unknown length', () => {
-      const n: SafeUint = toSafeUint(3);
+      const n: NumberType.ArraySize = toUint32(3);
       const result = Arr.zeros(n);
 
       expectType<typeof result, readonly 0[]>('=');
@@ -48,10 +48,10 @@ describe('ArrayUtils', () => {
     });
 
     test('unknown length', () => {
-      const n: SafeUint = toSafeUint(3);
+      const n: NumberType.ArraySize = toUint32(3);
       const result = Arr.seq(n);
 
-      expectType<typeof result, readonly SafeUint[]>('=');
+      expectType<typeof result, readonly NumberType.ArraySize[]>('=');
 
       expect(result).toStrictEqual([0, 1, 2]);
     });

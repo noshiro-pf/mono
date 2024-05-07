@@ -1,4 +1,4 @@
-import { Arr, Num, toSafeUint } from '@noshiro/ts-utils';
+import { Arr, Num, toUint32 } from '@noshiro/ts-utils';
 import { ArgumentParser } from 'argparse';
 import {
   auditTimeTestCases,
@@ -113,19 +113,19 @@ const convertArgs = (
     case_no: string[];
   }>,
 ): Readonly<{
-  exampleIdx: SafeUint;
+  exampleIdx: NumberType.ArraySize;
   isPreviewMode: boolean;
-  testCaseIdx: SafeUint;
+  testCaseIdx: NumberType.ArraySize;
 }> => ({
-  exampleIdx: toSafeUint(Num.from(args.example_no[0] ?? '0') - 1),
+  exampleIdx: toUint32(Num.from(args.example_no[0] ?? '0') - 1),
   isPreviewMode: args.preview != null,
-  testCaseIdx: toSafeUint(Num.from(args.case_no[0] ?? '0') - 1),
+  testCaseIdx: toUint32(Num.from(args.case_no[0] ?? '0') - 1),
 });
 
 const getArgs = (): {
-  exampleIdx: SafeUint;
+  exampleIdx: NumberType.ArraySize;
   isPreviewMode: boolean;
-  testCaseIdx: SafeUint;
+  testCaseIdx: NumberType.ArraySize;
 } => {
   const parser = new ArgumentParser({
     add_help: true,

@@ -136,7 +136,7 @@ export class ErrorBoundary extends Component<Props, State> {
     this.setState({ description: value });
   };
 
-  // eslint-disable-next-line react/no-unused-class-component-methods, @typescript-eslint/class-methods-use-this
+  // eslint-disable-next-line react/no-unused-class-component-methods, @typescript-eslint/class-methods-use-this, @typescript-eslint/prefer-readonly-parameter-types
   readonly onUnhandledRejection = (ev: PromiseRejectionEvent): void => {
     ev.promise.catch((error) => {
       showErrorToast(Str.from(error));

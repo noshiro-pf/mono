@@ -1,6 +1,3 @@
-export const isArray = (a: unknown): a is readonly unknown[] =>
-  Array.isArray(a);
-
 export const toCapitalCase = (str: string): string =>
   str
     .replaceAll(/-./gu, (x) => x[1]?.toUpperCase() ?? str)
@@ -21,7 +18,3 @@ export const deepReplace = <T,>(obj: T, from: string, to: string): T => {
 export const toStr: (v: unknown) => string =
   // eslint-disable-next-line no-restricted-syntax
   String;
-
-export const toSafeUint = (v: number): SafeUint =>
-  // eslint-disable-next-line no-restricted-syntax
-  v as SafeUint;

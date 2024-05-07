@@ -117,9 +117,7 @@ const datetimeRangeList$ = eventSchedule$.chain(
 );
 
 const datetimeRangeListReversed$ = eventSchedule$.chain(
-  mapI((eventSchedule) =>
-    mapOptional(eventSchedule?.datetimeRangeList, Arr.reversed),
-  ),
+  mapI((eventSchedule) => eventSchedule?.datetimeRangeList.toReversed()),
 );
 
 const datetimeRangeListSortedByScores$ = combineLatestI([
@@ -139,7 +137,7 @@ const datetimeRangeListSortedByScores$ = combineLatestI([
 const datetimeRangeListSortedByScoresReversed$ =
   datetimeRangeListSortedByScores$.chain(
     mapI((datetimeRangeListSortedByScores) =>
-      mapOptional(datetimeRangeListSortedByScores, Arr.reversed),
+      datetimeRangeListSortedByScores?.toReversed(),
     ),
   );
 
@@ -370,9 +368,11 @@ const tableBodyValuesFiltered$ = combineLatestI([
 
     if (!filterState.rank.enabled) return tableBodyValuesFiltered;
 
-    const scoreThreshold = tableBodyValuesFiltered
-      .map((a) => a.score)
-      .toSorted((a, b) => b - a)[filterState.rank.value - 1];
+    const scoreThreshold = pipe(tableBodyValuesFiltered)
+      .chain((ar) => ar.map((a) => a.score))
+      .chain(
+        (ar) => Arr.sorted(ar, (a, b) => b - a)[filterState.rank.value - 1],
+      ).value;
 
     return tableBodyValuesFiltered.filter(
       (row) =>

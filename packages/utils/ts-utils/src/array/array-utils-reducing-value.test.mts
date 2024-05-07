@@ -127,7 +127,7 @@ describe('ArrayUtils', () => {
 
     const result = Arr.count(xs, (a) => a.x === 2);
 
-    expectType<typeof result, SafeUint>('=');
+    expectType<typeof result, NumberType.ArraySize>('=');
 
     test('case 1', () => {
       expect(result).toBe(2);
@@ -146,7 +146,7 @@ describe('ArrayUtils', () => {
 
     const result = Arr.countBy(xs, (a) => a.x);
 
-    expectType<typeof result, IMap<1 | 2 | 3, SafeUint>>('=');
+    expectType<typeof result, IMap<1 | 2 | 3, NumberType.ArraySize>>('=');
 
     test('case 1', () => {
       expect(result).toStrictEqual(

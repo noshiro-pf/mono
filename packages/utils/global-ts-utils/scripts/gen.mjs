@@ -65,8 +65,6 @@ await generateAllGlobalDefs({
     'match',
     'Maybe',
     'memoizeFunction',
-    'MutableMap',
-    'MutableSet',
     'NonNegativeFiniteNumber',
     'noop',
     'Num',
