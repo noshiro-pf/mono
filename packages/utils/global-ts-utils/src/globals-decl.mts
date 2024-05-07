@@ -24,8 +24,6 @@ import {
   type Int8 as VAR_Int8,
   type Json as VAR_Json,
   type Maybe as VAR_Maybe,
-  type MutableMap as VAR_MutableMap,
-  type MutableSet as VAR_MutableSet,
   type NonNegativeFiniteNumber as VAR_NonNegativeFiniteNumber,
   type Num as VAR_Num,
   type Obj as VAR_Obj,
@@ -184,8 +182,6 @@ declare global {
   const match: typeof VAR_match;
   const Maybe: typeof VAR_Maybe;
   const memoizeFunction: typeof VAR_memoizeFunction;
-  const MutableMap: typeof VAR_MutableMap;
-  const MutableSet: typeof VAR_MutableSet;
   const NonNegativeFiniteNumber: typeof VAR_NonNegativeFiniteNumber;
   const noop: typeof VAR_noop;
   const Num: typeof VAR_Num;

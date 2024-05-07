@@ -11,7 +11,7 @@ export const historyReducer: Reducer<
   return {
     index: match(action, {
       undo: sub1(currIdx),
-      redo: SafeUint.min(SafeUint.sub(size, 1), add1(currIdx)),
+      redo: Uint32.min(Uint32.sub(size, 1), add1(currIdx)),
       'roll-dices': add1(currIdx),
     }),
 

@@ -5,7 +5,11 @@ export const expandShortcuts = (tokens: readonly string[]): string[] => {
   const mut_expanded: string[] = [];
   for (const token of tokens) {
     const parsedAsNumber = Number.parseInt(token, 10);
-    if (!Number.isNaN(parsedAsNumber) && Num.isNonNegative(parsedAsNumber)) {
+    if (
+      !Number.isNaN(parsedAsNumber) &&
+      Num.isNonNegative(parsedAsNumber) &&
+      Number.isSafeInteger(parsedAsNumber)
+    ) {
       /* 3 => (lambda s. (lambda z. (s(s(s z))))) */
       mut_expanded.push(...numberLambdaTerm(parsedAsNumber));
       continue;

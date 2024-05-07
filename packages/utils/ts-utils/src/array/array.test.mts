@@ -102,7 +102,7 @@ describe('Array.findIndex', () => {
     const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
     const result = xs.findIndex((x) => x.v === 1);
 
-    expectType<typeof result, SafeUint | -1>('=');
+    expectType<typeof result, NumberType.ArraySearchResult>('=');
 
     test('case 1', () => {
       expect(result).toBe(1);
@@ -116,7 +116,7 @@ describe('Array.findIndex', () => {
     ] as const;
     const result = xs.findIndex((x) => x.v === 1);
 
-    expectType<typeof result, SafeUint | -1>('=');
+    expectType<typeof result, NumberType.ArraySearchResult>('=');
 
     test('case 2', () => {
       expect(result).toBe(1);

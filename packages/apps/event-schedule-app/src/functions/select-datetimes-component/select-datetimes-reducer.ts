@@ -19,11 +19,11 @@ export type DatetimeListReducerAction = Readonly<
       checkboxState: Record<DayOfWeekName, boolean>;
     }
   | { type: 'addClick'; datetimeRange: DatetimeRange }
-  | { type: 'delete'; index: SafeUint }
+  | { type: 'delete'; index: NumberType.ArraySize }
   | { type: 'deleteAll' | 'sort' }
-  | { type: 'duplicate'; index: SafeUint }
-  | { type: 'end' | 'start'; index: SafeUint; hm: HoursMinutes }
-  | { type: 'ymd'; index: SafeUint; ymd: YearMonthDate }
+  | { type: 'duplicate'; index: NumberType.ArraySize }
+  | { type: 'end' | 'start'; index: NumberType.ArraySize; hm: HoursMinutes }
+  | { type: 'ymd'; index: NumberType.ArraySize; ymd: YearMonthDate }
 >;
 
 export type DatetimeListReducerState = readonly DatetimeRange[];

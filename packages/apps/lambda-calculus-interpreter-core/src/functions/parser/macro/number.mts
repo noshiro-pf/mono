@@ -1,7 +1,7 @@
 import { splitToTokens } from '../split-to-tokens.mjs';
 
-const numberStr = (n: Uint): string =>
+const numberStr = (n: SafeUint): string =>
   `(lambda s.(lambda z. ${'(s'.repeat(n)} z${')'.repeat(n)}))`;
 
-export const numberLambdaTerm = (n: Uint): readonly string[] =>
+export const numberLambdaTerm = (n: SafeUint): readonly string[] =>
   splitToTokens(numberStr(n));

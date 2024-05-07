@@ -1,4 +1,4 @@
-import { SafeUint } from '../num/index.mjs';
+import { Uint32 } from '../num/index.mjs';
 
 const get = <R extends RecordBase, K extends keyof R>(
   record: R,
@@ -20,7 +20,7 @@ const update = <R extends RecordBase, K extends keyof R>(
 const UNSAFE_getIn_impl = (
   obj: RecordBase,
   keyPath: readonly (number | string)[],
-  index: SafeUintWithSmallInt,
+  index: NumberType.ArraySizeArgNonNegative,
 ): unknown =>
   index >= keyPath.length
     ? obj
@@ -28,7 +28,7 @@ const UNSAFE_getIn_impl = (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-restricted-syntax
         obj[keyPath[index]!] as RecordBase,
         keyPath,
-        SafeUint.add(index, 1),
+        Uint32.add(index, 1),
       );
 
 const getIn = <R extends RecordBase, Path extends Paths<R>>(
@@ -46,7 +46,7 @@ const getIn = <R extends RecordBase, Path extends Paths<R>>(
 const UNSAFE_updateIn_impl = (
   obj: RecordBase,
   keyPath: readonly (number | string)[],
-  index: SafeUintWithSmallInt,
+  index: NumberType.ArraySizeArgNonNegative,
   updater: (prev: unknown) => unknown,
 ): unknown =>
   index >= keyPath.length
@@ -58,7 +58,7 @@ const UNSAFE_updateIn_impl = (
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-restricted-syntax
                 obj[keyPath[index]!] as RecordBase,
                 keyPath,
-                SafeUint.add(index, 1),
+                Uint32.add(index, 1),
                 updater,
               )
             : v,
@@ -70,7 +70,7 @@ const UNSAFE_updateIn_impl = (
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-restricted-syntax
             obj[keyPath[index]!] as RecordBase,
             keyPath,
-            SafeUint.add(index, 1),
+            Uint32.add(index, 1),
             updater,
           ),
         };

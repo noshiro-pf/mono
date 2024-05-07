@@ -5,7 +5,7 @@ interface ISetMappedInterface<K, KM extends SetKeyType> {
   new (iterable: Iterable<K>, toKey: (a: K) => KM, fromKey: (k: KM) => K): void;
 
   // Getting information
-  size: SafeUint;
+  size: NumberType.ArraySize;
   isEmpty: boolean;
   has: (key: K) => boolean;
 
@@ -108,7 +108,7 @@ class ISetMappedClass<K, KM extends SetKeyType>
     this.#fromKey = fromKey;
   }
 
-  get size(): SafeUint {
+  get size(): NumberType.ArraySize {
     return this.#set.size;
   }
 

@@ -1,4 +1,4 @@
-import { Arr, Json, range, Result, SafeInt } from '@noshiro/ts-utils';
+import { Arr, Json, range, Result, toUint32, Uint32 } from '@noshiro/ts-utils';
 import { type LambdaTerm } from '../../types/index.mjs';
 import { isVariable } from '../is-variable.mjs';
 import { tokensRepresentsLambdaTerm } from './token-list-is-lambda-term.mjs';
@@ -38,9 +38,9 @@ export const getParseTree = (
     tokens[0] === '(' &&
     Arr.last(tokens) === ')'
   ) {
-    for (const sep of range(1, SafeInt.sub(Arr.length(tokens), 1))) {
-      const leftTokens = tokens.slice(1, sep);
-      const rightTokens = tokens.slice(sep, -1);
+    for (const sep of range(1, Uint32.sub(Arr.length(tokens), 1))) {
+      const leftTokens = tokens.slice(1, toUint32(sep));
+      const rightTokens = tokens.slice(toUint32(sep), -1);
       if (
         tokensRepresentsLambdaTerm(leftTokens) &&
         tokensRepresentsLambdaTerm(rightTokens)

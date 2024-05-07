@@ -1,10 +1,9 @@
-import { MutableMap } from './aliases.mjs';
-
 export const memoizeFunction = <A extends readonly unknown[], R, K>(
   fn: (...args: A) => R,
   argsToCacheKey: (...args: A) => K,
 ): ((...args: A) => R) => {
-  const mut_cache = new MutableMap<K, R>();
+  // eslint-disable-next-line no-restricted-globals
+  const mut_cache = new Map<K, R>();
 
   return (...args: A): R => {
     const key = argsToCacheKey(...args);

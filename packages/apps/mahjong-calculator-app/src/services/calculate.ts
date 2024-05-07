@@ -21,7 +21,7 @@ import {
   tehaiType$,
   turn$,
 } from '../store';
-import { type API } from '../types';
+import { type ApiPayload } from '../types';
 
 export const calculate = (): void => {
   setIsCalculating(true);
@@ -118,7 +118,7 @@ export const calculate = (): void => {
   const hand = maybeHand.value;
 
   // cspell:disable
-  const payload: API.Payload = {
+  const payload: ApiPayload = {
     version: packageJson.version,
     zikaze: tileDef[jikaze].no,
     bakaze: tileDef[bakaze].no,
@@ -163,7 +163,12 @@ export const calculate = (): void => {
   })
     .then((response) => response.json())
     .then((data) => {
-      setResult(Result.ok(data as JsonValue));
+      setResult(
+        Result.ok(
+          // eslint-disable-next-line no-restricted-syntax
+          data as JsonValue,
+        ),
+      );
     })
     .catch(() => {
       setResult(

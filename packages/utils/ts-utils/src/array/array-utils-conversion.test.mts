@@ -51,7 +51,7 @@ describe('ArrayUtils', () => {
   describe('reversed', () => {
     {
       const xs = [1, 2, 3] as const;
-      const result = Arr.reversed(xs);
+      const result = xs.toReversed();
 
       expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 

@@ -36,7 +36,7 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
 
   const numRows = useMemo(
     () =>
-      SafeUint.max(
+      Uint32.max(
         Arr.length(borrowingBalanceYen),
         Arr.length(interestYen),
         Arr.length(monthlyPaymentTotalYen),

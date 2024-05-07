@@ -1,4 +1,4 @@
-import { Arr, Result, Tpl, toSafeUint } from '@noshiro/ts-utils';
+import { Arr, Result, Tpl } from '@noshiro/ts-utils';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -23,8 +23,7 @@ export const arrayOfLength = <A, N extends SmallUint>(
   } = options ?? {};
 
   const typeNameFilled: string =
-    typeName ??
-    `[${Arr.newArray(toSafeUint(size), elementType.typeName).join(', ')}]`;
+    typeName ?? `[${Arr.newArray(size, elementType.typeName).join(', ')}]`;
 
   const validate: Type<T>['validate'] = (a) => {
     if (!Array.isArray(a)) {

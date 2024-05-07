@@ -17,14 +17,14 @@ export function pickupHighContrastHues<N extends SmallUint>(
   useLog: boolean,
 ): ArrayOfLength<N, Hue>;
 export function pickupHighContrastHues(
-  n: PositiveSafeIntWithSmallInt,
+  n: NumberType.ArraySizeArgPositive,
   saturation: Percent,
   lightness: Percent,
   firstHue: Hue,
   useLog: boolean,
 ): NonEmptyArray<Hue>;
 export function pickupHighContrastHues(
-  n: SafeUintWithSmallInt,
+  n: NumberType.ArraySizeArgNonNegative,
   saturation: Percent,
   lightness: Percent,
   firstHue: Hue,

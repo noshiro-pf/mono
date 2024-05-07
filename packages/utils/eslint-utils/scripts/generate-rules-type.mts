@@ -1,15 +1,9 @@
+import { toSafeUint, toUint32 } from '@noshiro/mono-scripts';
 import { type Rule } from 'eslint';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { type JSONSchema4 } from 'json-schema';
 import { compile } from 'json-schema-to-typescript';
-import {
-  deepCopy,
-  deepReplace,
-  isArray,
-  toCapitalCase,
-  toSafeUint,
-  toStr,
-} from './utils.mjs';
+import { deepCopy, deepReplace, toCapitalCase, toStr } from './utils.mjs';
 
 type Meta = DeepReadonly<
   DeepPartial<{
@@ -23,6 +17,11 @@ const compilerConfig = {
   bannerComment: '',
   format: false,
 } as const;
+
+type FilterArray<T> = T extends readonly unknown[] ? T : never;
+
+const isArray = <T,>(maybeArray: T): maybeArray is FilterArray<T> =>
+  Array.isArray(maybeArray);
 
 const normalizeToSchemaArray = (
   schema: DeepReadonly<JSONSchema4 | JSONSchema4[]> | undefined,
@@ -73,7 +72,7 @@ const metaToString = (meta: Meta | undefined): string => {
       toSafeUint(Math.max(keyMax, key.length)),
       toSafeUint(Math.max(valueMax, value.length)),
     ],
-    [tableHeader[0].length, tableHeader[1].length],
+    [toSafeUint(tableHeader[0].length), toSafeUint(tableHeader[1].length)],
   );
 
   const result = [
@@ -216,7 +215,7 @@ const createResult = async (
               (_, i) =>
                 `   | readonly [Linter.RuleLevel, ${OptionsStrs.slice(
                   0,
-                  toSafeUint(i + 1),
+                  toUint32(i + 1),
                 ).join(', ')}]`,
             ),
           );

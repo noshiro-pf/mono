@@ -1,4 +1,4 @@
-import { Arr, range, SafeInt } from '@noshiro/ts-utils';
+import { Arr, range, toUint32, Uint32 } from '@noshiro/ts-utils';
 import { isVariable } from '../is-variable.mjs';
 
 export const tokensRepresentsLambdaTerm = (
@@ -23,10 +23,10 @@ export const tokensRepresentsLambdaTerm = (
 
   /* (e e)? */
   if (tokens[0] === '(' && Arr.last(tokens) === ')') {
-    for (const sep of range(1, SafeInt.sub(Arr.length(tokens), 1))) {
+    for (const sep of range(1, Uint32.sub(Arr.length(tokens), 1))) {
       if (
-        tokensRepresentsLambdaTerm(tokens.slice(1, sep)) &&
-        tokensRepresentsLambdaTerm(tokens.slice(sep, -1))
+        tokensRepresentsLambdaTerm(tokens.slice(1, toUint32(sep))) &&
+        tokensRepresentsLambdaTerm(tokens.slice(toUint32(sep), -1))
       )
         return true;
     }

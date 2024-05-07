@@ -61,8 +61,6 @@ export const injectModulesDef = Object.fromEntries(
     'match',
     'Maybe',
     'memoizeFunction',
-    'MutableMap',
-    'MutableSet',
     'NonNegativeFiniteNumber',
     'noop',
     'Num',

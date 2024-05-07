@@ -9,7 +9,7 @@ export type Store = Readonly<{
   /** 物件の金額（円） */
   propertyPriceManYen: Yen;
   /** 借入期間（年） */
-  borrowingPeriodYear: SafeUint;
+  borrowingPeriodYear: Uint32;
   /** 年当たりの金利 */
   interestRatePercentPerYear: PercentFloat;
 }>;
