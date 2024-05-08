@@ -48,8 +48,7 @@
         "./package.json",
         "./tsconfig.json",
         "../../../package.json",
-        "../../../config/tsconfig/**",
-        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
+        "../../../config/tsconfig/**"
       ],
       "output": []
     },
@@ -61,8 +60,7 @@
         "./package.json",
         "./tsconfig.json",
         "../../../package.json",
-        "../../../config/tsconfig/**",
-        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
+        "../../../config/tsconfig/**"
       ],
       "output": []
     }
