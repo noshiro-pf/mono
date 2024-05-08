@@ -58,8 +58,7 @@
         "src/**/*.ts",
         "src/**/*.mts",
         "tsconfig.json",
-        "../../../../config/tsconfig/**",
-        "../../../utils/ts-type-utils/ts-type-utils.d.mts"
+        "../../../../config/tsconfig/**"
       ],
       "output": [
         "esm/**",
@@ -94,8 +93,7 @@
         "tsconfig.json",
         "../../../../package.json",
         "../../../../config/tsconfig/**",
-        "../../../../config/eslint/**",
-        "../../../utils/ts-type-utils/ts-type-utils.d.mts"
+        "../../../../config/eslint/**"
       ],
       "output": []
     },
@@ -109,8 +107,7 @@
         "tsconfig.json",
         "../../../../package.json",
         "../../../../config/tsconfig/**",
-        "../../../../config/eslint/**",
-        "../../../utils/ts-type-utils/ts-type-utils.d.mts"
+        "../../../../config/eslint/**"
       ],
       "clean": false,
       "output": [
@@ -123,8 +120,7 @@
         "src/**/*.ts",
         "src/**/*.mts",
         "tsconfig.json",
-        "../../../../config/tsconfig/**",
-        "../../../utils/ts-type-utils/ts-type-utils.d.mts"
+        "../../../../config/tsconfig/**"
       ],
       "output": []
     }
