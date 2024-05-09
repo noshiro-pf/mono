@@ -62,7 +62,7 @@ const main = async (): Promise<void> => {
           ? generateVitestConfigForUtils(workspace.location, packageName)
           : undefined,
         executeFlag.packageJson
-          ? updatePackageJson(workspace.location, packageName)
+          ? updatePackageJson(workspace, packageName)
           : undefined,
         executeFlag.eslintConfig
           ? packageName.startsWith('global-')
@@ -101,7 +101,7 @@ const main = async (): Promise<void> => {
           ? generateInjectDef(workspace.location, packageName)
           : undefined,
         executeFlag.packageJson
-          ? updatePackageJson(workspace.location, packageName)
+          ? updatePackageJson(workspace, packageName)
           : undefined,
         executeFlag.eslintConfig && packageName !== 'event-schedule-app'
           ? generateEsLintConfig(workspace.location, packageName)

@@ -1,7 +1,7 @@
 import { execAsync } from '../node-utils/index.mjs';
 import { isRecord, isString } from '../ts-utils/index.mjs';
 
-type Workspace = Readonly<{
+export type Workspace = Readonly<{
   name: string;
   location: string;
   workspaceDependencies: readonly string[];

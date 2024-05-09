@@ -2,6 +2,7 @@
 
 import * as fs from 'fs/promises';
 import path from 'node:path';
+import { type Workspace } from '../index.mjs';
 import { isNotUndefined, isRecord } from '../ts-utils/index.mjs';
 import {
   eslintConfigName,
@@ -17,7 +18,7 @@ import { type WorkspaceConfig } from './workspace-config-type.mjs';
 import { workspaceConfig } from './workspace-config.mjs';
 
 export const updatePackageJson = async (
-  workspaceLocation: string,
+  workspace: Workspace,
   packageName: string,
 ): Promise<void> => {
   const cfg = workspaceConfig[packageName];
@@ -26,11 +27,11 @@ export const updatePackageJson = async (
     throw new Error(`workspaceConfig for package "${packageName}" not found.`);
   }
 
-  const depth = workspaceLocation.split('/').length;
+  const depth = workspace.location.split('/').length;
 
   const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
 
-  const packageJsonPath = path.resolve(workspaceLocation, './package.json');
+  const packageJsonPath = path.resolve(workspace.location, './package.json');
 
   const mut_packageJson = JSON.parse(
     await fs.readFile(packageJsonPath, { encoding: 'utf8' }),
@@ -38,7 +39,13 @@ export const updatePackageJson = async (
 
   if (!isRecord(mut_packageJson)) return;
 
-  updatePackageJsonImpl(mut_packageJson, packageName, pathPrefixToRoot, cfg);
+  updatePackageJsonImpl(
+    workspace,
+    mut_packageJson,
+    packageName,
+    pathPrefixToRoot,
+    cfg,
+  );
 
   await fs.writeFile(
     packageJsonPath,
@@ -52,6 +59,7 @@ export const updatePackageJson = async (
 };
 
 const updatePackageJsonImpl = (
+  workspace: Workspace,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_packageJson: MutableRecord<string, MutableJSONValue | undefined>,
   packageName: string,
@@ -635,14 +643,15 @@ const updatePackageJsonImpl = (
           mut_scripts['build:no-minify'] = 'yarn build --minify false';
           mut_scripts['clean:firebase'] = 'rimraf .firebase';
 
+          // workspace.name
           mut_scripts['cy:open'] =
-            'yarn workspace @noshiro/event-schedule-app-cypress cy:open';
+            `yarn workspace ${workspace.name}-cypress cy:open`;
           mut_scripts['cy:record'] =
-            'yarn workspace @noshiro/event-schedule-app-cypress cy:record';
+            `yarn workspace ${workspace.name}-cypress cy:record`;
           mut_scripts['cy:run:chrome'] =
-            'yarn workspace @noshiro/event-schedule-app-cypress cy:run:chrome';
+            `yarn workspace ${workspace.name}-cypress cy:run:chrome`;
           mut_scripts['cy:run:firefox'] =
-            'yarn workspace @noshiro/event-schedule-app-cypress cy:run:firefox';
+            `yarn workspace ${workspace.name}-cypress cy:run:firefox`;
 
           mut_scripts['fb'] = 'firebase';
           mut_scripts['fb:deploy'] = 'wireit';
