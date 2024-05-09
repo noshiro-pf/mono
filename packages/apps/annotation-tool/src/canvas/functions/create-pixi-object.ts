@@ -3,7 +3,7 @@ import {
   type Rect,
   type Rgba,
 } from '@noshiro/ts-utils-additional';
-import { Graphics, Sprite, Texture } from 'pixi.js';
+import { Graphics, Sprite, Texture } from 'pixi.js-legacy';
 
 export const createDummySpriteRectangle = (rect: Rect): Sprite => {
   const mut_rectObj = new Sprite(Texture.EMPTY);
