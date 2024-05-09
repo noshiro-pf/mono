@@ -8,7 +8,7 @@ import {
   Application,
   InteractionManager,
   settings as mut_settings,
-} from 'pixi.js';
+} from 'pixi.js-legacy';
 import {
   addGlobalPointerEventListener,
   createGlobalPixiObjects,

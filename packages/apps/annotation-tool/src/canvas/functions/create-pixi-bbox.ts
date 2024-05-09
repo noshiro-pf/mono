@@ -1,5 +1,5 @@
 import { type Rect, type Rgba } from '@noshiro/ts-utils-additional';
-import { Graphics } from 'pixi.js';
+import { Graphics } from 'pixi.js-legacy';
 import { zIndex } from '../z-index';
 import {
   bboxPointsFromRect,
