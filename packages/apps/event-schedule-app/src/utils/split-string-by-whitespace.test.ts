@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { splitStringByWhitespace } from './split-string-by-whitespace';
 
 describe('splitStringByWhitespace', () => {

@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { swap } from './swap.mjs';
 
 test('swap', () => {

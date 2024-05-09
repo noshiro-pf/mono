@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { dist } from './distance.mjs';
 
 const testDist = (

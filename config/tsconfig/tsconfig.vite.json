@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "useDefineForClassFields": true,
-    "types": ["vitest/globals"]
+    "useDefineForClassFields": true
+    // "types": ["vitest/globals"]
   }
 }

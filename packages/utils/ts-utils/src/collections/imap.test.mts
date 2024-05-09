@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { IMap } from './imap.mjs';
 
 describe('IMap[Symbol.iterator]', () => {

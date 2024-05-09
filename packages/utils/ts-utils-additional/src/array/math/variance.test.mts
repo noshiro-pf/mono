@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { variance } from './variance.mjs';
 
 test('variance', () => {

@@ -1,4 +1,5 @@
 import { expectType, type Queue } from '@noshiro/ts-utils';
+import { expect, test } from 'vitest';
 import { type Subscriber, type TupleToQueueTuple } from './types.mjs';
 
 test('type test', () => {

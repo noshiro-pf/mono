@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { removeAt } from './remove-at.mjs';
 
 test('removeAt middle', () => {

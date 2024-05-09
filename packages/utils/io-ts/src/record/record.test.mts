@@ -1,4 +1,5 @@
 import { expectType } from '@noshiro/ts-utils';
+import { describe, expect, test } from 'vitest';
 import { number } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
 import { record } from './record.mjs';

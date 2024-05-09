@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { fillYmdhm, isYmdhm, ymdhmDefaultValue } from './ymdhm.mjs';
 
 describe('isYmdhm', () => {

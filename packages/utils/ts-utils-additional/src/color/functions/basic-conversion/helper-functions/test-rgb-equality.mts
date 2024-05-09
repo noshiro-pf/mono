@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { dist } from '../../../../num/index.mjs';
 import { type Rgb } from '../../../types/index.mjs';
 import { epsilon } from '../color-test-values.mjs';

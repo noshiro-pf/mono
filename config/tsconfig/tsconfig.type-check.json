@@ -44,6 +44,11 @@
 
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
 
+    // @types/* をデフォルトで include しないようにする
+    // 主にjest/vitest/cypress あたりのコンフリクト回避のため
+    "types": [],
+    // "typeRoots": [],
+
     // Completeness
     "skipLibCheck": true
   }

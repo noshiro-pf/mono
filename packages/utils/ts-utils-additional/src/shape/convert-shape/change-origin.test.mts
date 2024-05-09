@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { changeOriginOfPos, changeOriginOfRect } from './change-origin.mjs';
 
 describe('changeOriginOfPos', () => {

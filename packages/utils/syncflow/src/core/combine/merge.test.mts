@@ -1,4 +1,5 @@
 import { expectType } from '@noshiro/ts-utils';
+import { expect, test } from 'vitest';
 import { fromArray } from '../create/index.mjs';
 import { type SyncChildObservable } from '../types/index.mjs';
 import { merge } from './merge.mjs';

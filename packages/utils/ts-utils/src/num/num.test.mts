@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { expectType } from '../expect-type.mjs';
 import { Num } from './num.mjs';
 

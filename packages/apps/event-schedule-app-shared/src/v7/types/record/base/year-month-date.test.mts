@@ -1,4 +1,5 @@
 import { expectType } from '@noshiro/ts-utils';
+import { describe, expect, test } from 'vitest';
 import { toYears } from '../../enum/index.mjs';
 import {
   fillYearMonthDate,

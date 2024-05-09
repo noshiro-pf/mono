@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { hexStrToNumber } from './hex-str-to-number.mjs';
 
 test('hexStrToNumber', () => {

@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { isValidRectSize } from './is-valid-rect-size.mjs';
 
 const testIsValidRectSize = (

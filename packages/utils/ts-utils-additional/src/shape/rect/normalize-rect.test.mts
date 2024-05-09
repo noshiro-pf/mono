@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { normalizeRect } from './normalize-rect.mjs';
 
 const testNormalizeRect = (

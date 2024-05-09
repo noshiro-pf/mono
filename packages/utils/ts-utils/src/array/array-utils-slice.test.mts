@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { Arr } from './array-utils.mjs';
 
 describe('ArrayUtils', () => {

@@ -1,4 +1,5 @@
 import { toSafeInt } from '@noshiro/ts-utils';
+import { describe, expect, test } from 'vitest';
 import { binarySearch, halfInt } from './utils.mjs';
 
 describe('halfInt', () => {

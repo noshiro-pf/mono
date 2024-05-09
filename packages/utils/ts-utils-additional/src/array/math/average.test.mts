@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { average } from './average.mjs';
 
 describe('average', () => {

@@ -1,4 +1,5 @@
 import { expectType } from '@noshiro/ts-utils';
+import { describe, expect, test } from 'vitest';
 import { hoursMinutesDefaultValue, type HoursMinutes } from './base/index.mjs';
 import {
   fillTimeRange,

@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { IMapMapped } from './imap-mapped.mjs';
 
 const toKey = (a: Readonly<{ v: number }>): number => a.v;

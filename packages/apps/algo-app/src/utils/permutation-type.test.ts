@@ -1,4 +1,5 @@
 import type * as t from '@noshiro/io-ts';
+import { describe, expect, test } from 'vitest';
 import { permutationType } from './permutation-type';
 
 describe('permutationType', () => {

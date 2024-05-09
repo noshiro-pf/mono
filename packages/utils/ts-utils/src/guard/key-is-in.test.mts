@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { keyIsIn } from './key-is-in.mjs';
 
 const f = <Key extends string, V, KeySub extends Key>(

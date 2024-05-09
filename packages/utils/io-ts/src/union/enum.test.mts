@@ -1,4 +1,5 @@
 import { expectType } from '@noshiro/ts-utils';
+import { describe, expect, test } from 'vitest';
 import { type TypeOf } from '../type.mjs';
 import { enumType } from './enum.mjs';
 

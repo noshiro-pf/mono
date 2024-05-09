@@ -1,4 +1,5 @@
 import { expectType, Maybe } from '@noshiro/ts-utils';
+import { expect, test } from 'vitest';
 import { RootObservableClass } from '../class/index.mjs';
 import {
   isRootObservable,

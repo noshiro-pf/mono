@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { expectType } from '../expect-type.mjs';
 import { isNumber, isRecord } from '../index.mjs';
 import { RecordUtils } from './record-utils.mjs';

@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { combineLatest, map, of, withLatestFrom } from '../src/index.mjs';
 
 describe('graph-structure', () => {

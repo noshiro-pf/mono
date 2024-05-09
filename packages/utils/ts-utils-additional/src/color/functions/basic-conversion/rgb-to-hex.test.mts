@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { testColors } from './color-test-values.mjs';
 import { rgbToHex } from './rgb-to-hex.mjs';
 

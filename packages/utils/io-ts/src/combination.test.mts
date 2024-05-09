@@ -1,4 +1,5 @@
 import { expectType, Result } from '@noshiro/ts-utils';
+import { describe, expect, test } from 'vitest';
 import { array } from './array/index.mjs';
 import { int } from './branded/index.mjs';
 import { number } from './primitives/index.mjs';

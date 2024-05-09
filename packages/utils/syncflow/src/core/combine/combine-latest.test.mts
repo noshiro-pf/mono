@@ -1,4 +1,5 @@
 import { expectType } from '@noshiro/ts-utils';
+import { expect, test } from 'vitest';
 import { fromArray } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
 import {

@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { TICK } from './constants.mjs';
 import { type StreamTestCase } from './typedef.mjs';
 

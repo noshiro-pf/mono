@@ -22,7 +22,7 @@ export default defineConfig(async () => {
       ],
     },
     test: {
-      globals: true,
+      globals: false,
       environment: 'happy-dom',
       typecheck: {
         tsconfig: nodePath.resolve(thisDir, 'tsconfig.test.json'),

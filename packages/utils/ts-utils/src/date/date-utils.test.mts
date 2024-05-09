@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { expectType } from '../expect-type.mjs';
 import { toSafeUint } from '../num/index.mjs';
 import { DateUtils, type DateType } from './date-utils.mjs';
