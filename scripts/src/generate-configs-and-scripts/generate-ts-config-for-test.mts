@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { toPositiveSafeInt, zeros } from '../ts-utils/index.mjs';
 import { tsconfigTestJsonName, workspaceConfigsDirName } from './constants.mjs';
 import { tsConfigExtendString } from './ts-config-extend-string.mjs';
 import { workspaceConfig } from './workspace-config.mjs';
@@ -17,11 +16,9 @@ export const generateTsConfigForTest = async (
 
   if (!cfg.gen.test) return;
 
-  const depth = toPositiveSafeInt(workspaceLocation.split('/').length + 1);
+  const depth = workspaceLocation.split('/').length + 1;
 
-  const pathPrefixToRoot = zeros(depth)
-    .map(() => '..')
-    .join('/');
+  const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
 
   const content = [
     `{`,

@@ -1,16 +1,13 @@
 import * as fs from 'fs/promises';
 import { execAsync } from '../node-utils/index.mjs';
-import { toPositiveSafeInt, zeros } from '../ts-utils/index.mjs';
 
 export const generateCypressDirectory = async (
   workspaceLocation: string,
   packageName: string,
 ): Promise<void> => {
-  const depth = toPositiveSafeInt(workspaceLocation.split('/').length + 1);
+  const depth = workspaceLocation.split('/').length + 1;
 
-  const pathPrefixToRoot = zeros(depth)
-    .map(() => '..')
-    .join('/');
+  const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
 
   await fs.writeFile(
     `${workspaceLocation}/cypress/package.json`,
