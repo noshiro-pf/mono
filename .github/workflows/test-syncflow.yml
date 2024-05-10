@@ -46,7 +46,7 @@ jobs:
       - uses: google/wireit@setup-github-actions-caching/v1
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --frozen-lockfile --ignore-scripts
 
       - name: build dependencies
         run: yarn zz:cmd:wsrun-stages --recursive -p @noshiro/syncflow -c build
