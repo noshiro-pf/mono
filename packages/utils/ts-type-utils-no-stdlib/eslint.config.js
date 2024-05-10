@@ -1,7 +1,7 @@
 /** @typedef {import('@noshiro/eslint-utils').FlatConfig} FlatConfig */
 
 import { eslintFlatConfigCommon } from '@noshiro/eslint-utils';
-import { toThisDir } from '@noshiro/mono-scripts/node-utils/path-utils.mjs';
+import { toThisDir } from '@noshiro/mono-scripts';
 import * as nodePath from 'node:path';
 
 const thisDir = toThisDir(import.meta.url);

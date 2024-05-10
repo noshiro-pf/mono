@@ -125,9 +125,9 @@
       "output": []
     },
     "gi": {
-      "command": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1 --ignore assets",
+      "command": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 1 --ignore assets",
       "files": [
-        "../../../scripts/index_ts_generator.sh",
+        "../../../scripts/bash/index_ts_generator.sh",
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
       ],
       "clean": false,

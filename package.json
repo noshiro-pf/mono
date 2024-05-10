@@ -10,6 +10,7 @@
     "scripts"
   ],
   "scripts": {
+    "build:mono-scripts": "yarn workspace @noshiro/mono-scripts build",
     "ci": "run-s fmt:all zz:cmd:check:no-diff type-check:scripts ws:build ws:gi zz:cmd:check:no-diff ci:lint-and-test zz:cmd:check:no-diff",
     "ci:clean-build-and-cache": "run-s clean:build-and-cache ci",
     "ci:clean-gitignored": "run-s clean:gitignored ci:install ci",
@@ -21,38 +22,38 @@
     "clean:caches": "run-p ws:clean:eslintcache ws:clean:wireit",
     "clean:gitignored": "git clean -xfd",
     "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
-    "create:preact-app:vite": "scripts/commands/create_new_preact_app_vite.sh",
-    "create:react-app:vite": "scripts/commands/create_new_react_app_vite.sh",
-    "create:slides": "scripts/commands/create_new_slides.sh",
-    "create:util": "scripts/commands/create_new_util.sh",
+    "create:preact-app:vite": "scripts/bash/create_new_preact_app_vite.sh",
+    "create:react-app:vite": "scripts/bash/create_new_react_app_vite.sh",
+    "create:slides": "scripts/bash/create_new_slides.sh",
+    "create:util": "scripts/bash/create_new_util.sh",
     "fmt:all": "yarn zz:cmd:prettier:cache . > /dev/null",
     "fmt:all:no-cache": "yarn zz:cmd:prettier . > /dev/null",
     "fmt:all:print": "yarn zz:cmd:prettier:cache .",
     "fmt:diff": "yarn zz:cmd:prettier:cache $(git status --short --porcelain | awk -F ' ' '{print $2}')",
-    "generate-configs": "node ./scripts/generate-configs-and-scripts/main.mjs",
+    "generate-configs": "wireit",
     "i": "yarn --ignore-scripts",
-    "postinstall": "run-s generate-configs ws:build:utils",
+    "postinstall": "run-s build:mono-scripts generate-configs ws:build:utils",
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
-    "pub:all": "scripts/commands/publish.sh",
+    "pub:all": "scripts/bash/publish.sh",
     "type-check:scripts": "tsc --project scripts/tsconfig.json",
     "ws:build": "yarn zz:cmd:wsrun-stages build",
-    "ws:build:apps": "node scripts/commands/build-apps.mjs",
+    "ws:build:apps": "wireit",
     "ws:build:globals": "yarn zz:cmd:wsrun-stages -p '@noshiro/global-*' -c build",
-    "ws:build:utils": "node scripts/commands/build-utils.mjs",
+    "ws:build:utils": "wireit",
     "ws:clean": "yarn zz:cmd:wsrun-parallel clean",
     "ws:clean:build": "yarn zz:cmd:wsrun-parallel clean:build",
     "ws:clean:eslintcache": "yarn zz:cmd:wsrun-parallel clean:eslintcache",
     "ws:clean:wireit": "yarn zz:cmd:wsrun-parallel clean:wireit",
     "ws:gi": "yarn zz:cmd:wsrun-parallel gi",
     "ws:lint": "yarn zz:cmd:wsrun-parallel lint",
-    "ws:lint:apps": "node scripts/commands/lint-apps.mjs",
+    "ws:lint:apps": "wireit",
     "ws:lint:fix": "yarn zz:cmd:wsrun-parallel lint:fix",
-    "ws:lint:utils": "node scripts/commands/lint-utils.mjs",
+    "ws:lint:utils": "wireit",
     "ws:setup": "yarn zz:cmd:wsrun-parallel z:setup",
     "ws:test": "yarn zz:cmd:wsrun-parallel test",
-    "ws:test:utils": "node scripts/commands/test-utils.mjs",
+    "ws:test:utils": "wireit",
     "ws:type-check": "yarn zz:cmd:wsrun-parallel type-check",
-    "zz:cmd:check:no-diff": "scripts/commands/git_no_changes.sh",
+    "zz:cmd:check:no-diff": "scripts/bash/git_no_changes.sh",
     "zz:cmd:prettier": "prettier --ignore-unknown --no-error-on-unmatched-pattern --write",
     "zz:cmd:prettier:cache": "yarn zz:cmd:prettier --cache --cache-strategy content",
     "zz:cmd:wsrun": "wsrun --exclude-missing --fast-exit --prefix --ifDependency",
@@ -169,5 +170,43 @@
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
+  },
+  "wireit": {
+    "generate-configs": {
+      "dependencies": [
+        "build:mono-scripts"
+      ],
+      "command": "node scripts/esm/commands/generate-configs-and-scripts-main.mjs"
+    },
+    "ws:build:apps": {
+      "dependencies": [
+        "build:mono-scripts"
+      ],
+      "command": "node scripts/esm/commands/build-apps.mjs"
+    },
+    "ws:build:utils": {
+      "dependencies": [
+        "build:mono-scripts"
+      ],
+      "command": "node scripts/esm/commands/build-utils.mjs"
+    },
+    "ws:lint:apps": {
+      "dependencies": [
+        "build:mono-scripts"
+      ],
+      "command": "node scripts/esm/commands/lint-apps.mjs"
+    },
+    "ws:lint:utils": {
+      "dependencies": [
+        "build:mono-scripts"
+      ],
+      "command": "node scripts/esm/commands/lint-utils.mjs"
+    },
+    "ws:test:utils": {
+      "dependencies": [
+        "build:mono-scripts"
+      ],
+      "command": "node scripts/esm/commands/test-utils.mjs"
+    }
   }
 }

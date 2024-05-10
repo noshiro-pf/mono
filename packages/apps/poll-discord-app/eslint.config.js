@@ -4,7 +4,7 @@ import {
   eslintFlatConfigCommon,
   genEsLintRestrictedImportsDefFromDevDependencies,
 } from '@noshiro/eslint-utils';
-import { toThisDir } from '@noshiro/mono-scripts/node-utils/path-utils.mjs';
+import { toThisDir } from '@noshiro/mono-scripts';
 import * as nodePath from 'node:path';
 import packageJson from './package.json' assert { type: 'json' };
 

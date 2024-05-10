@@ -1,6 +1,8 @@
-import { pipe } from '@noshiro/mono-scripts/ts-utils/pipe.mjs';
-import { replaceWithNoMatchCheck } from '@noshiro/mono-scripts/ts-utils/replace-with-no-match-check.mjs';
-import { sliceByMatch } from '@noshiro/mono-scripts/ts-utils/slice-by-match.mjs';
+import {
+  pipe,
+  replaceWithNoMatchCheck,
+  sliceByMatch,
+} from '@noshiro/mono-scripts';
 import { eslintPlugins } from './eslint-plugins.mjs';
 
 export const replaceRulesType = (content: string, typeName: string): string => {

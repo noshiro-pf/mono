@@ -60,9 +60,9 @@
       "output": []
     },
     "gi": {
-      "command": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
+      "command": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
       "files": [
-        "../../../scripts/index_ts_generator.sh",
+        "../../../scripts/bash/index_ts_generator.sh",
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
       ],
       "clean": false,
