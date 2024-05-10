@@ -7,8 +7,6 @@
 import { toThisDir } from '@noshiro/mono-scripts';
 import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin';
 import typescriptEslintParser from '@typescript-eslint/parser';
-
-// @ts-expect-error
 import functional from 'eslint-plugin-functional';
 
 const thisDir = toThisDir(import.meta.url);
@@ -33,6 +31,8 @@ const config = [
     plugins: {
       // @ts-expect-error
       '@typescript-eslint': typescriptEslintPlugin,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      // @ts-expect-error
       functional,
     },
   },

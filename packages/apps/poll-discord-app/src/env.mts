@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 
-// eslint-disable-next-line functional/readonly-type, @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/ban-types
 const NODE_ENV: 'development' | 'production' | (string & {}) | undefined =
   process.env['NODE_ENV'];
 

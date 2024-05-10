@@ -11,7 +11,6 @@ import arrayFunc from 'eslint-plugin-array-func';
 import cypress from 'eslint-plugin-cypress';
 import deprecation from 'eslint-plugin-deprecation';
 
-// @ts-expect-error
 import functional from 'eslint-plugin-functional';
 
 // @ts-expect-error
@@ -49,6 +48,7 @@ export const plugins: FlatConfig['plugins'] = {
   cypress,
   // @ts-expect-error
   deprecation,
+  // @ts-expect-error
   functional,
   import: pluginImport,
   jest,
