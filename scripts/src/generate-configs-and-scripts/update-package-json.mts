@@ -2,12 +2,7 @@
 
 import * as fs from 'fs/promises';
 import path from 'node:path';
-import {
-  isNotUndefined,
-  isRecord,
-  toPositiveSafeInt,
-  zeros,
-} from '../ts-utils/index.mjs';
+import { isNotUndefined, isRecord } from '../ts-utils/index.mjs';
 import {
   eslintConfigName,
   jsOrTsExt,
@@ -31,11 +26,9 @@ export const updatePackageJson = async (
     throw new Error(`workspaceConfig for package "${packageName}" not found.`);
   }
 
-  const depth = toPositiveSafeInt(workspaceLocation.split('/').length);
+  const depth = workspaceLocation.split('/').length;
 
-  const pathPrefixToRoot = zeros(depth)
-    .map(() => '..')
-    .join('/');
+  const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
 
   const packageJsonPath = path.resolve(workspaceLocation, './package.json');
 

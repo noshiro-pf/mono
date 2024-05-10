@@ -1,4 +1,3 @@
-import { toPositiveSafeInt, zeros } from '../ts-utils/index.mjs';
 import { eslintConfigName } from './constants.mjs';
 import { workspaceConfig } from './workspace-config.mjs';
 import { writeDirAndFileAndPrintDone } from './write-dir-and-file-and-print-done.mjs';
@@ -15,11 +14,9 @@ export const generateEsLintConfigForGlobalUtils = async (
 
   if (!cfg.gen.lint) return;
 
-  const depth = toPositiveSafeInt(workspaceLocation.split('/').length);
+  const depth = workspaceLocation.split('/').length;
 
-  const pathPrefixToRoot = zeros(depth)
-    .map(() => '..')
-    .join('/');
+  const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
 
   const content = [
     "/** @typedef { import('@noshiro/eslint-utils').FlatConfig } FlatConfig */",
