@@ -2,13 +2,12 @@
   // https://www.typescriptlang.org/ja/tsconfig
   "extends": "./tsconfig.type-check.json",
   "compilerOptions": {
-    "noEmit": false,
-
     // Emit
     "downlevelIteration": true,
     "importHelpers": true,
     "importsNotUsedAsValues": "remove",
     "newLine": "lf",
+    "noEmit": false,
     "noEmitOnError": true,
 
     // Projects

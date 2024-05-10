@@ -4,7 +4,7 @@
     // Type Checking
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "exactOptionalPropertyTypes": false, // TODO
+    "exactOptionalPropertyTypes": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
@@ -45,6 +45,6 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
 
     // Completeness
-    "skipLibCheck": true // TODO
+    "skipLibCheck": true
   }
 }
