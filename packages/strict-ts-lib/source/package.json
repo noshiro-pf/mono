@@ -6,13 +6,6 @@
   "author": "noshiro",
   "sideEffects": false,
   "type": "module",
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./stdlib.d.ts"
-      }
-    }
-  },
   "scripts": {
     "autofix": "wireit",
     "fmt": "yarn zz:cmd:prettier .",

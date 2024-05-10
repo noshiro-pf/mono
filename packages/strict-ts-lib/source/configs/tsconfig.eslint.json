@@ -6,7 +6,6 @@
     "../final",
     "../test",
     "../scripts",
-    "../stdlib.d.ts",
     "../eslint.config.js"
   ]
 }

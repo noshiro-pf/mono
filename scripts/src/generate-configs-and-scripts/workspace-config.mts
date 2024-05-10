@@ -272,7 +272,6 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
     draft.typeCheckIncludes = [
       'final',
       'test',
-      'stdlib.d.ts',
       workspaceScriptsDirName,
       workspaceConfigsDirName,
     ];

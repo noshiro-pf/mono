@@ -53,7 +53,6 @@
         "./tsconfig.json",
         "../../../package.json",
         "../../../config/tsconfig/**",
-        "../../../packages/utils/stdlib/stdlib.d.ts",
         "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
       ],
       "output": []
@@ -78,7 +77,6 @@
         "./scripts/**",
         "../../../package.json",
         "../../../config/tsconfig/**",
-        "../../../packages/utils/stdlib/stdlib.d.ts",
         "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
       ],
       "clean": true,
@@ -95,7 +93,6 @@
         "./tsconfig.json",
         "../../../package.json",
         "../../../config/tsconfig/**",
-        "../../../packages/utils/stdlib/stdlib.d.ts",
         "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
       ],
       "output": []
@@ -109,7 +106,6 @@
         "./tsconfig.json",
         "../../../package.json",
         "../../../config/tsconfig/**",
-        "../../../packages/utils/stdlib/stdlib.d.ts",
         "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
       ],
       "clean": false,
