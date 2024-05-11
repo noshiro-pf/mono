@@ -51,8 +51,7 @@
         "./**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
         "./tsconfig.json",
         "../../../package.json",
-        "../../../config/tsconfig/**",
-        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
+        "../../../config/tsconfig/**"
       ],
       "output": []
     },
@@ -74,8 +73,7 @@
         "./scripts/**/*.{mts,ts,d.ts}",
         "./configs/tsconfig.scripts.json",
         "../../../package.json",
-        "../../../config/tsconfig/**",
-        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
+        "../../../config/tsconfig/**"
       ],
       "clean": true,
       "output": [
@@ -95,8 +93,7 @@
         "./scripts/eslint.config.gen.mjs",
         "../../../package.json",
         "../../../.prettierrc",
-        "../../../config/tsconfig/**",
-        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
+        "../../../config/tsconfig/**"
       ],
       "clean": false,
       "output": [
@@ -113,8 +110,7 @@
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
         "./configs/tsconfig.build.json",
         "../../../package.json",
-        "../../../config/tsconfig/**",
-        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
+        "../../../config/tsconfig/**"
       ],
       "clean": "if-file-deleted",
       "output": [
@@ -133,8 +129,7 @@
         "package.json",
         "tsconfig.json",
         "../../../package.json",
-        "../../../config/tsconfig/**",
-        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
+        "../../../config/tsconfig/**"
       ],
       "output": []
     },
@@ -149,8 +144,7 @@
         "package.json",
         "tsconfig.json",
         "../../../package.json",
-        "../../../config/tsconfig/**",
-        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
+        "../../../config/tsconfig/**"
       ],
       "clean": false,
       "output": [
@@ -168,8 +162,7 @@
         "./package.json",
         "./tsconfig.json",
         "../../../package.json",
-        "../../../config/tsconfig/**",
-        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
+        "../../../config/tsconfig/**"
       ],
       "output": []
     },
@@ -184,8 +177,7 @@
         "./package.json",
         "./tsconfig.json",
         "../../../package.json",
-        "../../../config/tsconfig/**",
-        "../../../packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts"
+        "../../../config/tsconfig/**"
       ],
       "clean": false,
       "output": [

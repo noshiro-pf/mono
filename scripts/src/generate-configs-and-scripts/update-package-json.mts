@@ -147,7 +147,6 @@ const updatePackageJsonImpl = (
       }/**/*.{${jsOrTsExt}}`,
       typeCheckTarget: `./**/*.{${jsOrTsExt}}`,
       tsConfigs: `${pathPrefixToRoot}/config/tsconfig/**`,
-      tsTypeUtilsNoStdLib: `${pathPrefixToRoot}/packages/utils/ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.mts`,
       rootPackageJson: `${pathPrefixToRoot}/package.json`,
       rootPrettierrc: `${pathPrefixToRoot}/.prettierrc`,
     };
@@ -275,7 +274,6 @@ const updatePackageJsonImpl = (
             './tsconfig.json',
             wireitDeps.rootPackageJson,
             wireitDeps.tsConfigs,
-            wireitDeps.tsTypeUtilsNoStdLib,
           ],
           output: [],
         };
@@ -292,7 +290,6 @@ const updatePackageJsonImpl = (
               './tsconfig.json',
               wireitDeps.rootPackageJson,
               wireitDeps.tsConfigs,
-              wireitDeps.tsTypeUtilsNoStdLib,
             ],
             output: [],
           };
@@ -349,7 +346,6 @@ const updatePackageJsonImpl = (
                 './tsconfig.json',
                 wireitDeps.rootPackageJson,
                 wireitDeps.tsConfigs,
-                wireitDeps.tsTypeUtilsNoStdLib,
               ],
               output: [],
             };
@@ -361,7 +357,6 @@ const updatePackageJsonImpl = (
                 './cypress/tsconfig.json',
                 wireitDeps.rootPackageJson,
                 wireitDeps.tsConfigs,
-                wireitDeps.tsTypeUtilsNoStdLib,
               ],
               output: [],
             };
@@ -375,7 +370,6 @@ const updatePackageJsonImpl = (
                 './tsconfig.json',
                 wireitDeps.rootPackageJson,
                 wireitDeps.tsConfigs,
-                wireitDeps.tsTypeUtilsNoStdLib,
               ],
               output: [],
             };
@@ -457,7 +451,6 @@ const updatePackageJsonImpl = (
                 viteConfigPath,
                 wireitDeps.rootPackageJson,
                 wireitDeps.tsConfigs,
-                wireitDeps.tsTypeUtilsNoStdLib,
               ],
               output: ['build/**'],
             };
@@ -481,7 +474,6 @@ const updatePackageJsonImpl = (
                   tsConfigPath,
                   wireitDeps.rootPackageJson,
                   wireitDeps.tsConfigs,
-                  wireitDeps.tsTypeUtilsNoStdLib,
                 ],
                 clean:
                   packageName === 'eslint-utils' ? 'if-file-deleted' : true,
@@ -508,7 +500,6 @@ const updatePackageJsonImpl = (
               `./${workspaceConfigsDirName}/${tsconfigTestJsonName}`,
               wireitDeps.rootPackageJson,
               wireitDeps.tsConfigs,
-              wireitDeps.tsTypeUtilsNoStdLib,
             ],
             output: [],
           };
@@ -573,7 +564,6 @@ const updatePackageJsonImpl = (
               './tsconfig.json',
               wireitDeps.rootPackageJson,
               wireitDeps.tsConfigs,
-              wireitDeps.tsTypeUtilsNoStdLib,
             ];
 
             mut_wireit[
@@ -620,7 +610,6 @@ const updatePackageJsonImpl = (
               './package.json',
               wireitDeps.rootPackageJson,
               wireitDeps.tsConfigs,
-              wireitDeps.tsTypeUtilsNoStdLib,
             ];
 
             mut_wireit['lint:cy'] = {
@@ -818,7 +807,6 @@ const updatePackageJsonImpl = (
                 tsConfigPath,
                 wireitDeps.rootPackageJson,
                 wireitDeps.tsConfigs,
-                wireitDeps.tsTypeUtilsNoStdLib,
               ],
               clean: true,
               output: [
@@ -844,7 +832,6 @@ const updatePackageJsonImpl = (
               'tsconfig.json',
               wireitDeps.rootPackageJson,
               wireitDeps.tsConfigs,
-              wireitDeps.tsTypeUtilsNoStdLib,
             ];
 
             mut_wireit['lint:scripts'] = {
@@ -875,7 +862,6 @@ const updatePackageJsonImpl = (
               wireitDeps.rootPackageJson,
               wireitDeps.rootPrettierrc,
               wireitDeps.tsConfigs,
-              wireitDeps.tsTypeUtilsNoStdLib,
             ],
             clean: false, // index.mts を削除しないため
             output: ['./src/types/rules/**/*.mts'],
