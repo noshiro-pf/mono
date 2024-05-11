@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-namespace ListType {
+declare namespace ListType {
   export type Head<T extends readonly unknown[], D = never> = Tuple.Head<T, D>;
 
   export type Last<T extends readonly unknown[]> = T extends readonly []

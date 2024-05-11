@@ -5,7 +5,7 @@ type NegativeIndex<N extends number> = _NegativeIndexImpl.MapIdx<
 >;
 
 /** @internal */
-namespace _NegativeIndexImpl {
+declare namespace _NegativeIndexImpl {
   /** @internal */
   type ToNumber<S extends `-${number}`> = S extends `${infer N extends number}`
     ? N
