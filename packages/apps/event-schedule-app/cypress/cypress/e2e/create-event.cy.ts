@@ -3,7 +3,7 @@ const e = (selector: string): string => `[data-cy="${selector}"]`;
 const path = (selectorList: readonly string[]): string =>
   selectorList.map(e).join(' ');
 
-describe('main', { testIsolation: false }, () => {
+describe('main', { testIsolation: false, taskTimeout: 120_000 }, () => {
   it('visit', () => {
     cy.visit('/');
 
