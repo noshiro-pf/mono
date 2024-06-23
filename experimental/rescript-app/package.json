@@ -9,7 +9,7 @@
     "re:start": "rescript build -w"
   },
   "devDependencies": {
-    "@rescript/react": "^0.10.3",
-    "rescript": "^9.1.4"
+    "@rescript/react": "^0.12.2",
+    "rescript": "^11.1.1"
   }
 }
