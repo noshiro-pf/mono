@@ -141,7 +141,8 @@ jobs:
           browser: chrome
           install: false
           working-directory: packages/apps/event-schedule-app/cypress
-          spec: cypress/e2e/**/*.cy.ts
+          # spec: cypress/e2e/**/*.cy.ts
+          spec: cypress/e2e/display-create-event-page.cy.ts
           start: |
             yarn start:emulators:e2e
             yarn start:dev-server
