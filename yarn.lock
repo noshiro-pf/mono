@@ -1130,14 +1130,14 @@
   dependencies:
     tslib "~2.5.0"
 
-"@blueprintjs/colors@^5.0.8":
-  version "5.0.8"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/colors/-/colors-5.0.8.tgz#c4658d1c314bb69086c8f54179fac84e668f5018"
-  integrity sha512-Y/gpCMc/NAiScuH6vJGDI6vW2RqgR9ayEwtesVirQz3KnQSAHvbZWlgHzEO4Teyhc6FuXL3Tbj5kfq5JCeEyoQ==
+"@blueprintjs/colors@^5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/colors/-/colors-5.1.1.tgz#b227d1ce8b95d9266d976441f34cd71d436735db"
+  integrity sha512-Mni/GgCYLaMf5U5zsCN42skOG49w3U0QmUFuJgFZ/1pv+3cHF/9xR4L4dXcj5DtgJoHkmUbK36PR5mdFB65WEA==
   dependencies:
     tslib "~2.6.2"
 
-"@blueprintjs/core@^4.20.1", "@blueprintjs/core@^4.20.2":
+"@blueprintjs/core@^4.20.1":
   version "4.20.2"
   resolved "https://registry.yarnpkg.com/@blueprintjs/core/-/core-4.20.2.tgz#ae1bbaf13bd1bf887b506760c478cc940f6d6e20"
   integrity sha512-5v4Nr0jozfAjiOkjY4zvt1XSpt4ldnrSaxtwo506S2cxJYfwFeMTmDshXNPFcc8L1fjZMxi0IWI2WABXzZXS6w==
@@ -1154,42 +1154,33 @@
     react-transition-group "^4.4.5"
     tslib "~2.5.0"
 
-"@blueprintjs/core@^5.0.1", "@blueprintjs/core@^5.7.2":
-  version "5.7.2"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/core/-/core-5.7.2.tgz#494beb68c00e913c71a486a968d39007279f43b1"
-  integrity sha512-wzYSog3RGsNq95F0stYZ+C6/PBjPidFRzVRnQPeUO/M0tZCL4QEbKC4qNz1flGlXaQH5sD6rjaoRoFaJfouXVg==
+"@blueprintjs/core@^5.0.1", "@blueprintjs/core@^5.10.4":
+  version "5.10.4"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/core/-/core-5.10.4.tgz#f15fbafb00e3c501d73d1c8a7d7bd84eab771c1d"
+  integrity sha512-OThG6kfTXQbpoXrdEE8uTIvEIw12fz8WKt4x18jeWCrEumxH+ecTUINvJsoMhUsO0QNg0rQEeQbIpuxIrw5l/g==
   dependencies:
-    "@blueprintjs/colors" "^5.0.8"
-    "@blueprintjs/icons" "^5.5.0"
-    "@popperjs/core" "^2.11.7"
+    "@blueprintjs/colors" "^5.1.1"
+    "@blueprintjs/icons" "^5.10.0"
+    "@popperjs/core" "^2.11.8"
     classnames "^2.3.1"
     normalize.css "^8.0.1"
     react-popper "^2.3.0"
     react-transition-group "^4.4.5"
+    react-uid "^2.3.3"
     tslib "~2.6.2"
+    use-sync-external-store "^1.2.0"
 
-"@blueprintjs/datetime@^4.4.13":
-  version "4.4.37"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/datetime/-/datetime-4.4.37.tgz#c3c92cf3b0aa39c26a5727ffd0a5262ca9a1f29c"
-  integrity sha512-YJiWzUH1eefCMvvvdsLimrLZNk5XW1yTMK4OmX6BP+gAt/u7cNKyv+42XO4tlymeWRqT0K7HbQOPP4ybt/xzEw==
+"@blueprintjs/datetime@^5.3.6":
+  version "5.3.6"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/datetime/-/datetime-5.3.6.tgz#487613e51f4b87d57dee0cdf8b8470834d33d212"
+  integrity sha512-UttGdHfv91TosBzkr4PSsgqLq1sjKEgYQ2GmbQ4wghO+wFN4UhITRtH84Kvvln04QWUJSavurusVnjj4Sabj5w==
   dependencies:
-    "@blueprintjs/core" "^4.20.2"
-    classnames "^2.3.1"
-    react-day-picker "7.4.9"
-    tslib "~2.5.0"
-
-"@blueprintjs/datetime@^5.0.1":
-  version "5.2.8"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/datetime/-/datetime-5.2.8.tgz#21f125d64fc3d872565d2b4c58c593136d9152e8"
-  integrity sha512-HcuCeKJRC7XyLyuDWRdS4OdK7wBqxBnZBoPRjHl6I3C13ZHGXnx159UtOuckNob280BIgX+mKbR1lCBKW1Kn/A==
-  dependencies:
-    "@blueprintjs/core" "^5.7.2"
-    "@blueprintjs/icons" "^5.5.0"
-    "@blueprintjs/select" "^5.0.20"
+    "@blueprintjs/core" "^5.10.4"
+    "@blueprintjs/icons" "^5.10.0"
+    "@blueprintjs/select" "^5.2.0"
     classnames "^2.3.1"
     date-fns "^2.28.0"
     date-fns-tz "^2.0.0"
-    lodash "^4.17.21"
     react-day-picker "7.4.9"
     tslib "~2.6.2"
 
@@ -1202,7 +1193,16 @@
     classnames "^2.3.1"
     tslib "~2.5.0"
 
-"@blueprintjs/icons@^5.11.0", "@blueprintjs/icons@^5.5.0":
+"@blueprintjs/icons@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-5.10.0.tgz#fc49e2bbaf8843fb517f36b30dcff8d0ef415a9f"
+  integrity sha512-Qp9H2U2/m6+p0Lh9ACuF2O6o0uVINMFimo+EgasgGaLx8SkJsl7ApB3hYQ+iRSYlQWotnoqd4Vtzj4c7sKukHQ==
+  dependencies:
+    change-case "^4.1.2"
+    classnames "^2.3.1"
+    tslib "~2.6.2"
+
+"@blueprintjs/icons@^5.11.0":
   version "5.11.0"
   resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-5.11.0.tgz#dafb5905a6d940be6a2bf712a9a1d7191e363f9e"
   integrity sha512-2SyJgeol61hSaxdGrwPdzCx0cA5TEboc18oJYWQ31TZkidN3NWuH0Z4aEvugtM1+NR3W0Vcd/+1xIe5Y32pwTQ==
@@ -1211,13 +1211,13 @@
     classnames "^2.3.1"
     tslib "~2.6.2"
 
-"@blueprintjs/select@^5.0.20":
-  version "5.0.20"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/select/-/select-5.0.20.tgz#200dbf11149fcfffab52be0f507e0ae3f607c997"
-  integrity sha512-t9T8mAXP5enMrieVOVv86J8OOv/+JiGIapiswgmt1MYpSO3mmF+yo3SGw/tOEqHla0Nk/tVxLbxdkwGGY2NYvA==
+"@blueprintjs/select@^5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/select/-/select-5.2.0.tgz#83af4a63226fd6dee09636321d6289e19a4fd3a4"
+  integrity sha512-MVD2kuJYZmZPPRMYVXLxPQN2zJr5r272/yRXhVUw+Lc/C+4tYkltPnUyy/Jn1k4GAfVEnzv1jtDF6dFEOunTWw==
   dependencies:
-    "@blueprintjs/core" "^5.7.2"
-    "@blueprintjs/icons" "^5.5.0"
+    "@blueprintjs/core" "^5.10.4"
+    "@blueprintjs/icons" "^5.10.0"
     classnames "^2.3.1"
     tslib "~2.6.2"
 
@@ -3780,7 +3780,7 @@
     "@pnpm/network.ca-file" "^1.0.1"
     config-chain "^1.1.11"
 
-"@popperjs/core@^2.11.7", "@popperjs/core@^2.11.8":
+"@popperjs/core@^2.11.8":
   version "2.11.8"
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
@@ -15305,6 +15305,13 @@ react-transition-group@^4.4.5:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
+react-uid@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/react-uid/-/react-uid-2.3.3.tgz#6a485ccc868555997f3506c6db97a3e735d97adf"
+  integrity sha512-iNpDovcb9qBpBTo8iUgqRSQOS8GV3bWoNaTaUptHkXtAooXSo0OWe7vN6TqqB8x3x0bNBbQx96kkmSltQ5h9kQ==
+  dependencies:
+    tslib "^2.0.0"
+
 react@^18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
@@ -17259,7 +17266,7 @@ tsconfig-paths@^3.15.0:
     minimist "^1.2.6"
     strip-bom "^3.0.0"
 
-tslib@2.6.2, tslib@~2.6.2:
+tslib@2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.2.tgz#703ac29425e7b37cd6fd456e92404d46d1f3e4ae"
   integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
@@ -17269,10 +17276,10 @@ tslib@^1.8.1, tslib@^1.9.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.4.0, tslib@^2.6.2:
-  version "2.8.1"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.8.1.tgz#612efe4ed235d567e8aba5f2a5fab70280ade83f"
-  integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==
+tslib@^2.0.0, tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.4.0, tslib@^2.6.2, tslib@~2.6.2:
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.3.tgz#0438f810ad7a9edcde7a241c3d80db693c8cbfe0"
+  integrity sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==
 
 tslib@~2.5.0:
   version "2.5.3"
@@ -17873,6 +17880,11 @@ url@^0.11.0:
   dependencies:
     punycode "^1.4.1"
     qs "^6.12.3"
+
+use-sync-external-store@^1.2.0:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.2.tgz#c3b6390f3a30eba13200d2302dcdf1e7b57b2ef9"
+  integrity sha512-PElTlVMwpblvbNqQ82d2n6RjStvdSoNe9FG28kNfz3WiXilJm4DdNkEzRhCZuIDwY8U08WVihhGR5iRqAwfDiw==
 
 use@^3.1.0:
   version "3.1.1"
