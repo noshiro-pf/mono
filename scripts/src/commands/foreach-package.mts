@@ -5,16 +5,20 @@ export const forEachPackages = async ({
   prefixes,
   command,
   wsrunOptions,
+  treatPrefixesAsExcludeList = false,
 }: Readonly<{
   prefixes: readonly string[];
   command: string;
   wsrunOptions: string;
+  treatPrefixesAsExcludeList?: boolean;
 }>): Promise<void> => {
   const workspaces = await getWorkspaces();
 
   const packageNameList = prefixes.flatMap((prefix) =>
     workspaces
-      .filter((ws) => ws.location.startsWith(prefix))
+      .filter(
+        (ws) => ws.location.startsWith(prefix) === !treatPrefixesAsExcludeList,
+      )
       .map((ws) => ws.name),
   );
 

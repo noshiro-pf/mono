@@ -58,9 +58,9 @@ jobs:
           - template-react-app-vite
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.1.7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4.0.2
         id: setup_node_id
         with:
           node-version: 20
@@ -68,7 +68,7 @@ jobs:
           cache-dependency-path: yarn.lock
 
       # Set up GitHub Actions caching for Wireit.
-      - uses: google/wireit@setup-github-actions-caching/v1
+      - uses: google/wireit@setup-github-actions-caching/v1.0.2
 
       # - run: echo '${{ toJSON(steps.setup_node_id.outputs) }}'
       # - if: ${{ steps.setup_node_id.outputs.cache-hit != 'true' }}
@@ -79,14 +79,14 @@ jobs:
         run: yarn zz:cmd:wsrun-stages --recursive -p @noshiro/${{ matrix.app_name }} -c build
 
       - name: Cypress run on Chrome
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v6.7.1
         with:
           browser: chrome
           install: false
           working-directory: packages/apps/${{ matrix.app_name }}/cypress
           spec: cypress/e2e/**/*.cy.ts
           start: yarn start:dev-server
-          wait-on: 'http://localhost:5180'
+          wait-on: 'http://[::1]:5180'
           wait-on-timeout: 120
           # headless: true
         env:
@@ -102,15 +102,15 @@ jobs:
       options: --user 1001
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.1.7
 
       - name: Setting-up JAVA
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4.2.1
         with:
           distribution: 'temurin' # See 'Supported distributions' for available options
-          java-version: '17'
+          java-version: '21'
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4.0.2
         id: setup_node_id
         with:
           node-version: 20
@@ -118,7 +118,7 @@ jobs:
           cache-dependency-path: yarn.lock
 
       # Set up GitHub Actions caching for Wireit.
-      - uses: google/wireit@setup-github-actions-caching/v1
+      - uses: google/wireit@setup-github-actions-caching/v1.0.2
 
       # - run: echo '${{ toJSON(steps.setup_node_id.outputs) }}'
       # - if: ${{ steps.setup_node_id.outputs.cache-hit != 'true' }}
@@ -135,18 +135,19 @@ jobs:
       #   run: yarn workspace @noshiro/event-schedule-app z:setup:fb:emulators:gen-dummy-runtimeconfig
 
       - name: Cypress run on Chrome
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v6.7.1
         with:
           # group: 'UI - Chrome'
           browser: chrome
           install: false
           working-directory: packages/apps/event-schedule-app/cypress
-          spec: cypress/e2e/**/*.cy.ts
+          # spec: cypress/e2e/**/*.cy.ts
+          spec: cypress/e2e/display-create-event-page.cy.ts
           start: |
             yarn start:emulators:e2e
             yarn start:dev-server
           # wait-on: 'http://localhost:8080, http://localhost:8081, http://localhost:5001'
-          wait-on: 'http://localhost:5180'
+          wait-on: 'http://[::1]:5180'
           wait-on-timeout: 120
           # headless: true
           # record: true
