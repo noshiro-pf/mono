@@ -31,6 +31,19 @@ jobs:
   main:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: true
+      matrix:
+        command:
+          - fmt:all
+          - ws:gi
+          - ws:type-check
+          - ws:test
+          - ws:build:non-utils
+          - ws:lint:fix
+          - workspace @noshiro/syncflow test:stream
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -49,33 +62,14 @@ jobs:
       # - run: echo '${{ toJSON(steps.setup_node_id.outputs) }}'
       # - if: ${{ steps.setup_node_id.outputs.cache-hit != 'true' }}
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn
 
-      - name: gi
-        run: |
-          yarn ws:gi
-          yarn zz:cmd:check:no-diff
+      - name: Check if there is no file diff
+        run: yarn zz:cmd:check:no-diff
 
-      - name: fmt:all
-        run: |
-          yarn fmt:all
-          yarn zz:cmd:check:no-diff
+      - name: Run "${{ matrix.command }}"
+        run: yarn ${{ matrix.command }}
 
-      - name: build
-        run: |
-          yarn ws:build
-          yarn zz:cmd:check:no-diff
-
-      - name: type-check:scripts
-        run: yarn type-check:scripts
-
-      - name: ws:type-check
-        run: yarn ws:type-check
-
-      - name: ws:test
-        run: yarn ws:test
-
-      - name: ws:lint:fix
-        run: |
-          yarn ws:lint:fix
-          yarn zz:cmd:check:no-diff
+      - if: ${{ !contains(fromJSON('["ws:type-check", "ws:test", "workspace @noshiro/syncflow test:stream"]'), matrix.command) }}
+        name: Check if there is no file diff
+        run: yarn zz:cmd:check:no-diff

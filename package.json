@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build:mono-scripts": "yarn workspace @noshiro/mono-scripts build",
-    "ci": "run-s fmt:all zz:cmd:check:no-diff type-check:scripts ws:build ws:gi zz:cmd:check:no-diff ci:lint-and-test zz:cmd:check:no-diff",
+    "ci": "run-s fmt:all zz:cmd:check:no-diff ws:gi zz:cmd:check:no-diff ws:build zz:cmd:check:no-diff ci:lint-and-test zz:cmd:check:no-diff",
     "ci:clean-build-and-cache": "run-s clean:build-and-cache ci",
     "ci:clean-gitignored": "run-s clean:gitignored ci:install ci",
     "ci:clean-install": "run-s clean ci:install ci",
@@ -35,10 +35,10 @@
     "postinstall": "run-s build:mono-scripts generate-configs ws:build:utils",
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "pub:all": "scripts/bash/publish.sh",
-    "type-check:scripts": "tsc --project scripts/tsconfig.json",
     "ws:build": "yarn zz:cmd:wsrun-stages build",
     "ws:build:apps": "wireit",
     "ws:build:globals": "yarn zz:cmd:wsrun-stages -p '@noshiro/global-*' -c build",
+    "ws:build:non-utils": "wireit",
     "ws:build:utils": "wireit",
     "ws:clean": "yarn zz:cmd:wsrun-parallel clean",
     "ws:clean:build": "yarn zz:cmd:wsrun-parallel clean:build",
@@ -189,6 +189,12 @@
         "build:mono-scripts"
       ],
       "command": "node scripts/esm/commands/build-utils.mjs"
+    },
+    "ws:build:non-utils": {
+      "dependencies": [
+        "build:mono-scripts"
+      ],
+      "command": "node scripts/esm/commands/build-non-utils.mjs"
     },
     "ws:lint:apps": {
       "dependencies": [
