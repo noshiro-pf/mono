@@ -34,9 +34,9 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.1.7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4.0.2
         id: setup_node_id
         with:
           node-version: 20
@@ -44,7 +44,7 @@ jobs:
           cache-dependency-path: yarn.lock
 
       # Set up GitHub Actions caching for Wireit.
-      - uses: google/wireit@setup-github-actions-caching/v1
+      - uses: google/wireit@setup-github-actions-caching/v1.0.2
 
       # - run: echo '${{ toJSON(steps.setup_node_id.outputs) }}'
       # - if: ${{ steps.setup_node_id.outputs.cache-hit != 'true' }}

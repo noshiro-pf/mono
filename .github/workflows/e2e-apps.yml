@@ -58,9 +58,9 @@ jobs:
           - template-react-app-vite
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.1.7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4.0.2
         id: setup_node_id
         with:
           node-version: 20
@@ -68,7 +68,7 @@ jobs:
           cache-dependency-path: yarn.lock
 
       # Set up GitHub Actions caching for Wireit.
-      - uses: google/wireit@setup-github-actions-caching/v1
+      - uses: google/wireit@setup-github-actions-caching/v1.0.2
 
       # - run: echo '${{ toJSON(steps.setup_node_id.outputs) }}'
       # - if: ${{ steps.setup_node_id.outputs.cache-hit != 'true' }}
@@ -79,7 +79,7 @@ jobs:
         run: yarn zz:cmd:wsrun-stages --recursive -p @noshiro/${{ matrix.app_name }} -c build
 
       - name: Cypress run on Chrome
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v6.7.1
         with:
           browser: chrome
           install: false
@@ -102,15 +102,15 @@ jobs:
       options: --user 1001
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.1.7
 
       - name: Setting-up JAVA
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4.2.1
         with:
           distribution: 'temurin' # See 'Supported distributions' for available options
-          java-version: '17'
+          java-version: '21'
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4.0.2
         id: setup_node_id
         with:
           node-version: 20
@@ -118,7 +118,7 @@ jobs:
           cache-dependency-path: yarn.lock
 
       # Set up GitHub Actions caching for Wireit.
-      - uses: google/wireit@setup-github-actions-caching/v1
+      - uses: google/wireit@setup-github-actions-caching/v1.0.2
 
       # - run: echo '${{ toJSON(steps.setup_node_id.outputs) }}'
       # - if: ${{ steps.setup_node_id.outputs.cache-hit != 'true' }}
@@ -135,7 +135,7 @@ jobs:
       #   run: yarn workspace @noshiro/event-schedule-app z:setup:fb:emulators:gen-dummy-runtimeconfig
 
       - name: Cypress run on Chrome
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v6.7.1
         with:
           # group: 'UI - Chrome'
           browser: chrome
