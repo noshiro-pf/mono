@@ -1,6 +1,7 @@
 {
   "extends": "../../config/tsconfig/tsconfig.lib.build.json",
   "compilerOptions": {
+    "types": ["node", "vitest/globals"],
     "outDir": "../esm"
   },
   "include": ["../src"],

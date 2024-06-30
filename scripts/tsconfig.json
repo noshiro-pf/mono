@@ -1,4 +1,7 @@
 {
   "extends": "../config/tsconfig/tsconfig.type-check.json",
+  "compilerOptions": {
+    "types": ["node", "vitest/globals"]
+  },
   "include": ["./**/*.mjs", "./**/*.mts", "./configs"]
 }
