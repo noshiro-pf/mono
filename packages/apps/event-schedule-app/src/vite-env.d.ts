@@ -1,6 +1,5 @@
 /// <reference path="./globals.d.ts" />
 
-/// <reference types="node" />
 /// <reference types="react" />
 /// <reference types="react-dom" />
 
