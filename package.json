@@ -177,43 +177,43 @@
       "dependencies": [
         "build:mono-scripts"
       ],
-      "command": "node scripts/esm/commands/generate-configs-and-scripts-main.mjs"
+      "command": "node scripts/commands/generate-configs-and-scripts-main.mjs"
     },
     "ws:build:apps": {
       "dependencies": [
         "build:mono-scripts"
       ],
-      "command": "node scripts/esm/commands/build-apps.mjs"
+      "command": "node scripts/commands/build-apps.mjs"
     },
     "ws:build:utils": {
       "dependencies": [
         "build:mono-scripts"
       ],
-      "command": "node scripts/esm/commands/build-utils.mjs"
+      "command": "node scripts/commands/build-utils.mjs"
     },
     "ws:build:non-utils": {
       "dependencies": [
         "build:mono-scripts"
       ],
-      "command": "node scripts/esm/commands/build-non-utils.mjs"
+      "command": "node scripts/commands/build-non-utils.mjs"
     },
     "ws:lint:apps": {
       "dependencies": [
         "build:mono-scripts"
       ],
-      "command": "node scripts/esm/commands/lint-apps.mjs"
+      "command": "node scripts/commands/lint-apps.mjs"
     },
     "ws:lint:utils": {
       "dependencies": [
         "build:mono-scripts"
       ],
-      "command": "node scripts/esm/commands/lint-utils.mjs"
+      "command": "node scripts/commands/lint-utils.mjs"
     },
     "ws:test:utils": {
       "dependencies": [
         "build:mono-scripts"
       ],
-      "command": "node scripts/esm/commands/test-utils.mjs"
+      "command": "node scripts/commands/test-utils.mjs"
     }
   }
 }

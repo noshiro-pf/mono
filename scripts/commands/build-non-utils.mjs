@@ -1,4 +1,4 @@
-import { forEachPackages } from './foreach-package.mjs';
+import { forEachPackages } from '../esm/index.mjs';
 
 forEachPackages({
   prefixes: [
