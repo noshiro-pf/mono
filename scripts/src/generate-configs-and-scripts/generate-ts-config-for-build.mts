@@ -30,7 +30,7 @@ export const generateTsConfigForBuild = async (
         cfg.tsType,
         pathPrefixToRoot,
         'tsconfig.lib.build.json',
-        cfg.isViteApp,
+        cfg.useVite,
       ),
       compilerOptions: cfg.tsconfig?.compilerOptions ?? {
         outDir: '../esm',

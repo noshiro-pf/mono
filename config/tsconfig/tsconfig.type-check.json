@@ -42,6 +42,8 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
 
+    "types": [],
+
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
 
     // Completeness

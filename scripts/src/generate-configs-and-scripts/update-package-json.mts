@@ -71,14 +71,14 @@ const updatePackageJsonImpl = (
   mut_packageJson['license'] = 'MIT';
   mut_packageJson['author'] = 'noshiro';
   mut_packageJson['sideEffects'] =
-    cfg.isViteApp || packageName.startsWith('global-');
+    cfg.useVite === true || packageName.startsWith('global-');
   mut_packageJson['type'] = 'module';
 
   delete mut_packageJson['module'];
   delete mut_packageJson['main'];
   delete mut_packageJson['types'];
 
-  if (!cfg.isViteApp && packageName !== 'strict-ts-lib') {
+  if (cfg.useVite === false && packageName !== 'strict-ts-lib') {
     mut_packageJson['exports'] = {
       '.': {
         import:
@@ -323,7 +323,7 @@ const updatePackageJsonImpl = (
           mut_scripts['tsc'] = 'yarn type-check';
           mut_scripts['tscw'] = 'tsc --noEmit --watch';
 
-          if (cfg.isViteApp) {
+          if (cfg.useVite === true) {
             mut_scripts['type-check'] = 'run-p type-check:src type-check:cy';
             mut_scripts['type-check:cy'] = 'wireit';
             mut_scripts['type-check:src'] = 'wireit';
@@ -375,7 +375,7 @@ const updatePackageJsonImpl = (
           const minDepth = generateFlag.gi;
           const giIgnore = cfg.packageJson.scripts.giIgnore;
 
-          const mts = !cfg.isViteApp;
+          const mts = cfg.useVite !== true;
 
           const content = {
             command: [
@@ -428,11 +428,10 @@ const updatePackageJsonImpl = (
         if (generateFlag.build) {
           mut_scripts[packageName === 'eslint-utils' ? 'build:src' : 'build'] =
             'wireit';
-          mut_scripts['clean:build'] = cfg.isViteApp
-            ? 'rimraf build'
-            : 'rimraf esm';
+          mut_scripts['clean:build'] =
+            cfg.useVite === true ? 'rimraf build' : 'rimraf esm';
 
-          if (cfg.isViteApp) {
+          if (cfg.useVite === true) {
             const viteConfigPath = `./${workspaceConfigsDirName}/${viteConfigName}`;
 
             mut_wireit['build'] = {
@@ -476,9 +475,10 @@ const updatePackageJsonImpl = (
         }
 
         if (generateFlag.test) {
-          const vitestConfigPath = cfg.isViteApp
-            ? `./${workspaceConfigsDirName}/${viteConfigName}`
-            : `./${workspaceConfigsDirName}/${vitestConfigName}`;
+          const vitestConfigPath =
+            cfg.useVite === true
+              ? `./${workspaceConfigsDirName}/${viteConfigName}`
+              : `./${workspaceConfigsDirName}/${vitestConfigName}`;
 
           mut_scripts['test'] = 'wireit';
           mut_scripts['testw'] = 'yarn zz:cmd:vitest watch';
@@ -501,7 +501,7 @@ const updatePackageJsonImpl = (
         if (generateFlag.lint) {
           mut_scripts['clean:eslintcache'] = 'rimraf .eslintcache';
 
-          if (cfg.isViteApp) {
+          if (cfg.useVite === true) {
             mut_scripts['lint'] = 'run-p lint:src lint:cy';
             mut_scripts['lint:src'] = 'wireit';
             mut_scripts['lint:cy'] = 'wireit';
@@ -523,7 +523,7 @@ const updatePackageJsonImpl = (
 
           mut_scripts['zz:cmd:eslint:print-config'] = [
             'yarn zz:cmd:eslint --print-config',
-            cfg.isViteApp ? 'src/main.tsx' : 'src/index.mts',
+            cfg.useVite === true ? 'src/main.tsx' : 'src/index.mts',
           ].join(' ');
 
           const srcDirStr =
@@ -560,7 +560,7 @@ const updatePackageJsonImpl = (
             ];
 
             mut_wireit[
-              cfg.isViteApp || packageName === 'eslint-utils'
+              cfg.useVite === true || packageName === 'eslint-utils'
                 ? 'lint:src'
                 : 'lint'
             ] = {
@@ -574,7 +574,7 @@ const updatePackageJsonImpl = (
             };
 
             mut_wireit[
-              cfg.isViteApp || packageName === 'eslint-utils'
+              cfg.useVite === true || packageName === 'eslint-utils'
                 ? 'lint:fix:src'
                 : 'lint:fix'
             ] = {
@@ -589,7 +589,7 @@ const updatePackageJsonImpl = (
             };
           }
 
-          if (cfg.isViteApp) {
+          if (cfg.useVite === true) {
             mut_scripts['zz:cmd:eslint:cy'] = [
               `yarn zz:cmd:eslint --config ./cypress/${eslintConfigName}`,
               "'./cypress/**/*.ts'",
@@ -632,7 +632,7 @@ const updatePackageJsonImpl = (
             'yarn publish --no-git-tag-version --access=public';
         }
 
-        if (cfg.isViteApp) {
+        if (cfg.useVite === true) {
           mut_scripts['build:no-minify'] = 'yarn build --minify false';
           mut_scripts['clean:firebase'] = 'rimraf .firebase';
 
@@ -907,7 +907,7 @@ const updatePackageJsonImpl = (
   }
 
   {
-    if (cfg.isViteApp) {
+    if (cfg.useVite === true) {
       mut_packageJson['browserslist'] = {
         production: ['>0.2%', 'not dead', 'not op_mini all'],
         development: [

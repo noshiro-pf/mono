@@ -14,7 +14,7 @@ const workspaceConfigGlobalUtil: WorkspaceConfig = {
     test: false,
   },
   tsType: 'mts',
-  isViteApp: false,
+  useVite: false,
   srcDirs: ['src'],
   typeCheckIncludes: ['src', workspaceConfigsDirName, workspaceScriptsDirName],
   packageJson: {
@@ -33,7 +33,7 @@ const defaultsForUtil: WorkspaceConfig = {
     test: true,
   },
   tsType: 'mts',
-  isViteApp: false,
+  useVite: 'vitest-only',
   srcDirs: ['src'],
   typeCheckIncludes: ['src', workspaceConfigsDirName],
   packageJson: {
@@ -52,7 +52,7 @@ const defaultsForApp: WorkspaceConfig = {
     test: true,
   },
   // eslint-disable-next-line unicorn/no-unused-properties
-  isViteApp: true,
+  useVite: true,
   // eslint-disable-next-line unicorn/no-unused-properties
   tsType: 'mts',
   // eslint-disable-next-line unicorn/no-unused-properties
@@ -76,17 +76,17 @@ const fillDefaultsForUtil = (
   }>,
 ): WorkspaceConfig => ({
   gen: defaultsForUtil.gen,
-  tsType: options?.tsType ?? 'mts',
-  isViteApp: false,
-  srcDirs: ['src'],
+  tsType: options?.tsType ?? defaultsForUtil.tsType,
+  useVite: defaultsForUtil.useVite,
+  srcDirs: defaultsForUtil.srcDirs,
   typeCheckIncludes: [
     ...defaultsForUtil.typeCheckIncludes,
     options?.hasScripts === true ? workspaceScriptsDirName : undefined,
   ].filter(isNotUndefined),
   packageJson: {
     scripts: {
-      gi: options?.gi ?? 0,
-      publish: true,
+      gi: options?.gi ?? defaultsForUtil.packageJson.scripts.gi,
+      publish: defaultsForUtil.packageJson.scripts.publish,
       passWithNoTests: options?.passWithNoTests,
     },
   },
@@ -103,7 +103,7 @@ const fillDefaultsForApp = (
 ): WorkspaceConfig => ({
   gen: defaultsForApp.gen,
   tsType: options.tsType ?? 'mts',
-  isViteApp: true,
+  useVite: true,
   srcDirs: ['src'],
   typeCheckIncludes: [
     ...defaultsForApp.typeCheckIncludes,
@@ -251,6 +251,8 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
   }),
 
   'ts-type-utils-no-stdlib': produce(defaultsForUtil, (draft) => {
+    draft.useVite = false;
+
     draft.gen = {
       typeCheck: true,
       build: false,
@@ -272,6 +274,8 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
   }),
 
   'strict-ts-lib': produce(defaultsForUtil, (draft) => {
+    draft.useVite = false;
+
     draft.gen = {
       typeCheck: true,
       build: false,
