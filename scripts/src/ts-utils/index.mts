@@ -1,4 +1,7 @@
+export * from './compose-mono-type-fns.mjs';
 export * from './compose.mjs';
+export * from './expect-type.mjs';
+export * from './generate-key-value-record-from-keys.mjs';
 export * from './guard.mjs';
 export * from './pipe.mjs';
 export * from './replace-with-no-match-check-between-regexp.mjs';

@@ -54,7 +54,7 @@ const toLocaleUpperCase =
  * @param count Number of copies to append
  */
 const repeat =
-  (count: Uint) =>
+  (count: SafeUint) =>
   (str: string): Result<string, string> => {
     try {
       return Result.ok(str.repeat(count));

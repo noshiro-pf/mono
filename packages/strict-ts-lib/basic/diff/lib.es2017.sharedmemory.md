@@ -1,0 +1,205 @@
+```diff
+@@ -14,9 +14,10 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+-/// <reference lib="es2015.symbol" />
+-/// <reference lib="es2015.symbol.wellknown" />
++/// <reference path="./lib.es2015.symbol.d.ts" />
++/// <reference path="./lib.es2015.symbol.wellknown.d.ts" />
+ 
+ interface SharedArrayBuffer {
+   /** Read-only. The length of the ArrayBuffer (in bytes). */
+@@ -32,10 +33,10 @@ interface SharedArrayBufferConstructor {
+   readonly prototype: SharedArrayBuffer;
+   new (byteLength: number): SharedArrayBuffer;
+ }
+-declare var SharedArrayBuffer: SharedArrayBufferConstructor;
++declare const SharedArrayBuffer: SharedArrayBufferConstructor;
+ 
+ interface ArrayBufferTypes {
+-  SharedArrayBuffer: SharedArrayBuffer;
++  readonly SharedArrayBuffer: SharedArrayBuffer;
+ }
+ 
+ interface Atomics {
+@@ -44,14 +45,10 @@ interface Atomics {
+    * original value. Until this atomic operation completes, any other read or
+    * write operation against the array will block.
+    */
++  add(typedArray: Int8Array, index: number, value: Int8): Int8;
++  add(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
+   add(
+-    typedArray:
+-      | Int8Array
+-      | Uint8Array
+-      | Int16Array
+-      | Uint16Array
+-      | Int32Array
+-      | Uint32Array,
++    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
+     index: number,
+     value: number,
+   ): number;
+@@ -61,14 +58,10 @@ interface Atomics {
+    * the array, returning the original value. Until this atomic operation
+    * completes, any other read or write operation against the array will block.
+    */
++  and(typedArray: Int8Array, index: number, value: Int8): Int8;
++  and(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
+   and(
+-    typedArray:
+-      | Int8Array
+-      | Uint8Array
+-      | Int16Array
+-      | Uint16Array
+-      | Int32Array
+-      | Uint32Array,
++    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
+     index: number,
+     value: number,
+   ): number;
+@@ -80,13 +73,19 @@ interface Atomics {
+    * array will block.
+    */
+   compareExchange(
+-    typedArray:
+-      | Int8Array
+-      | Uint8Array
+-      | Int16Array
+-      | Uint16Array
+-      | Int32Array
+-      | Uint32Array,
++    typedArray: Int8Array,
++    index: number,
++    expectedValue: Int8,
++    replacementValue: Int8,
++  ): Int8;
++  compareExchange(
++    typedArray: Uint8Array,
++    index: number,
++    expectedValue: Uint8,
++    replacementValue: Uint8,
++  ): Uint8;
++  compareExchange(
++    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
+     index: number,
+     expectedValue: number,
+     replacementValue: number,
+@@ -97,14 +96,10 @@ interface Atomics {
+    * original value. Until this atomic operation completes, any other read or
+    * write operation against the array will block.
+    */
++  exchange(typedArray: Int8Array, index: number, value: Int8): Int8;
++  exchange(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
+   exchange(
+-    typedArray:
+-      | Int8Array
+-      | Uint8Array
+-      | Int16Array
+-      | Uint16Array
+-      | Int32Array
+-      | Uint32Array,
++    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
+     index: number,
+     value: number,
+   ): number;
+@@ -121,14 +116,10 @@ interface Atomics {
+    * operation completes, any other read or write operation against the array
+    * will block.
+    */
++  load(typedArray: Int8Array, index: number): Int8;
++  load(typedArray: Uint8Array, index: number): Uint8;
+   load(
+-    typedArray:
+-      | Int8Array
+-      | Uint8Array
+-      | Int16Array
+-      | Uint16Array
+-      | Int32Array
+-      | Uint32Array,
++    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
+     index: number,
+   ): number;
+ 
+@@ -137,14 +128,10 @@ interface Atomics {
+    * the array, returning the original value. Until this atomic operation
+    * completes, any other read or write operation against the array will block.
+    */
++  or(typedArray: Int8Array, index: number, value: Int8): Int8;
++  or(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
+   or(
+-    typedArray:
+-      | Int8Array
+-      | Uint8Array
+-      | Int16Array
+-      | Uint16Array
+-      | Int32Array
+-      | Uint32Array,
++    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
+     index: number,
+     value: number,
+   ): number;
+@@ -154,14 +141,10 @@ interface Atomics {
+    * Until this atomic operation completes, any other read or write operation
+    * against the array will block.
+    */
++  store(typedArray: Int8Array, index: number, value: Int8): Int8;
++  store(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
+   store(
+-    typedArray:
+-      | Int8Array
+-      | Uint8Array
+-      | Int16Array
+-      | Uint16Array
+-      | Int32Array
+-      | Uint32Array,
++    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
+     index: number,
+     value: number,
+   ): number;
+@@ -171,14 +154,10 @@ interface Atomics {
+    * returning the original value. Until this atomic operation completes, any
+    * other read or write operation against the array will block.
+    */
++  sub(typedArray: Int8Array, index: number, value: Int8): Int8;
++  sub(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
+   sub(
+-    typedArray:
+-      | Int8Array
+-      | Uint8Array
+-      | Int16Array
+-      | Uint16Array
+-      | Int32Array
+-      | Uint32Array,
++    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
+     index: number,
+     value: number,
+   ): number;
+@@ -212,14 +191,10 @@ interface Atomics {
+    * the array, returning the original value. Until this atomic operation
+    * completes, any other read or write operation against the array will block.
+    */
++  xor(typedArray: Int8Array, index: number, value: Int8): Int8;
++  xor(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
+   xor(
+-    typedArray:
+-      | Int8Array
+-      | Uint8Array
+-      | Int16Array
+-      | Uint16Array
+-      | Int32Array
+-      | Uint32Array,
++    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
+     index: number,
+     value: number,
+   ): number;
+@@ -227,4 +202,4 @@ interface Atomics {
+   readonly [Symbol.toStringTag]: 'Atomics';
+ }
+ 
+-declare var Atomics: Atomics;
++declare const Atomics: Atomics;
+```

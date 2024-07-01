@@ -6,11 +6,11 @@ function length<T extends readonly unknown[]>(list: T): Length<T> {
 
 const reversed = <T extends readonly unknown[]>(tpl: T): Tuple.Reverse<T> =>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, no-restricted-syntax
-  Array.from<T[number]>(tpl).reverse() as unknown as Tuple.Reverse<T>;
+  tpl.toReversed() as unknown as Tuple.Reverse<T>;
 
 type MapNumberToArraySearchResult<T> = T extends number
   ? TypeEq<T, number> extends true
-    ? SafeUint
+    ? NumberType.ArraySearchResult
     : T
   : T;
 
@@ -19,12 +19,12 @@ type IndexOfTupleRefined<T extends readonly unknown[]> =
 
 const findIndex = <T extends readonly unknown[]>(
   tpl: T,
-  predicate: (value: T[number], index: SafeUint) => boolean,
+  predicate: (value: T[number], index: NumberType.ArraySize) => boolean,
 ): IndexOfTupleRefined<T> | -1 =>
   // eslint-disable-next-line no-restricted-syntax
   tpl.findIndex(
     // eslint-disable-next-line no-restricted-syntax
-    predicate as (value: T[number], index: SafeUint) => boolean,
+    predicate as (value: T[number], index: NumberType.ArraySize) => boolean,
   ) as IndexOfTupleRefined<T> | -1;
 
 const indexOf = <T extends readonly unknown[]>(
@@ -33,7 +33,9 @@ const indexOf = <T extends readonly unknown[]>(
   fromIndex?: IndexOfTupleRefined<T> | undefined,
 ): IndexOfTupleRefined<T> | -1 =>
   // eslint-disable-next-line no-restricted-syntax
-  tpl.indexOf(searchElement, fromIndex) as IndexOfTupleRefined<T> | -1;
+  tpl.indexOf(searchElement, fromIndex) as
+    | MapNumberToArraySearchResult<IndexOfTuple<T>>
+    | -1;
 
 const lastIndexOf = <T extends readonly unknown[]>(
   tpl: T,
@@ -45,10 +47,10 @@ const lastIndexOf = <T extends readonly unknown[]>(
 
 const map = <T extends readonly unknown[], B>(
   tpl: T,
-  mapFn: (a: T[number], index: SafeUint) => B,
+  mapFn: (a: T[number], index: NumberType.ArraySize) => B,
 ): { readonly [K in keyof T]: B } =>
   // eslint-disable-next-line no-restricted-syntax
-  tpl.map(mapFn as (a: unknown, index: SafeUint) => B) as {
+  tpl.map(mapFn as (a: unknown, index: NumberType.ArraySize) => B) as {
     readonly [K in keyof T]: B;
   };
 
@@ -65,7 +67,8 @@ const set = <T extends readonly unknown[], N>(
 // TODO: improve type
 const update = <T extends readonly unknown[], N>(
   tpl: T,
-  index: SafeUint | (Index<Length<T>> & SmallUint),
+
+  index: NumberType.ArraySize | (Index<Length<T>> & SmallUint),
   updater: (prev: T[number]) => N,
 ): { readonly [K in keyof T]: N | T[K] } =>
   // eslint-disable-next-line no-restricted-syntax
@@ -88,7 +91,9 @@ function sorted<T extends readonly unknown[]>(
   const cmp = comparator ?? ((x, y) => Num.from(x) - Num.from(y));
 
   // eslint-disable-next-line no-restricted-syntax
-  return Array.from(tpl).sort(cmp) as { readonly [K in keyof T]: T[number] };
+  return tpl.toSorted(cmp) as {
+    readonly [K in keyof T]: T[number];
+  };
 }
 
 function sortedBy<T extends readonly unknown[]>(

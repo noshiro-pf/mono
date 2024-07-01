@@ -40,9 +40,9 @@ const setPropertyPriceManYen = (value: Yen): void => {
 
 // 借入期間（年）
 const { state$: borrowingPeriodYear$, setState: _setBorrowingPeriodYear } =
-  createState<YearEnum>(toSafeUint(defaultValues.borrowingPeriodYear));
+  createState<Uint32>(toUint32(defaultValues.borrowingPeriodYear));
 
-const setBorrowingPeriodYear = (value: YearEnum): void => {
+const setBorrowingPeriodYear = (value: Uint32): void => {
   _setBorrowingPeriodYear(value);
   nextUserInput();
 };
@@ -117,7 +117,7 @@ Router.state$.subscribe(({ searchParams: query }) => {
     _setPropertyPriceManYen(toYen(paramsAsNumber.propertyPrice));
   }
   if (paramsAsNumber.borrowingPeriodMonth !== undefined) {
-    _setBorrowingPeriodYear(toSafeUint(paramsAsNumber.borrowingPeriodMonth));
+    _setBorrowingPeriodYear(toUint32(paramsAsNumber.borrowingPeriodMonth));
   }
   if (paramsAsNumber.interestRatePerMonth !== undefined) {
     _setInterestRatePercentPerYear(

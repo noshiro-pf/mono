@@ -1,0 +1,21 @@
+{
+  "plugins": [
+    "prettier-plugin-organize-imports",
+    "prettier-plugin-packagejson",
+    "prettier-plugin-jsdoc"
+  ],
+  "semi": true,
+  "endOfLine": "lf",
+  "printWidth": 80,
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "overrides": [
+    {
+      "files": ["source/temp/copied", "source/temp/copied/*.d.ts"],
+      "options": {
+        "plugins": ["prettier-plugin-jsdoc"],
+        "printWidth": 320
+      }
+    }
+  ]
+}

@@ -1,1 +1,14 @@
-!packages/**
+!source/temp/copied
+!source/temp/copied/*.d.ts
+!source/temp/eslint-fixed
+!source/temp/eslint-fixed/*.d.ts
+
+!basic/final
+!basic/final/*.d.ts
+!basic/packages/**
+!basic/lib
+
+!branded/final
+!branded/final/*.d.ts
+!branded/packages/**
+!branded/lib

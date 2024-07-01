@@ -2,6 +2,12 @@
 
 A monorepo for nodejs projects.
 
+## Clone
+
+```sh
+git clone --recursive
+```
+
 ## Setup
 
 ```sh

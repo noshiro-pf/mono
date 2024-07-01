@@ -1,0 +1,39 @@
+```diff
+@@ -14,15 +14,16 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+ interface PromiseFulfilledResult<T> {
+-  status: 'fulfilled';
+-  value: T;
++  readonly status: 'fulfilled';
++  readonly value: T;
+ }
+ 
+ interface PromiseRejectedResult {
+-  status: 'rejected';
+-  reason: any;
++  readonly status: 'rejected';
++  readonly reason: unknown;
+ }
+ 
+ type PromiseSettledResult<T> =
+@@ -37,7 +38,7 @@ interface PromiseConstructor {
+    * @param values An array of Promises.
+    * @returns A new Promise.
+    */
+-  allSettled<T extends readonly unknown[] | []>(
++  allSettled<T extends readonly unknown[] | readonly []>(
+     values: T,
+   ): Promise<{ -readonly [P in keyof T]: PromiseSettledResult<Awaited<T[P]>> }>;
+ 
+@@ -50,5 +51,5 @@ interface PromiseConstructor {
+    */
+   allSettled<T>(
+     values: Iterable<T | PromiseLike<T>>,
+-  ): Promise<PromiseSettledResult<Awaited<T>>[]>;
++  ): Promise<readonly PromiseSettledResult<Awaited<T>>[]>;
+ }
+```

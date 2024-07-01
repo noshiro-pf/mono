@@ -1,0 +1,57 @@
+```diff
+@@ -14,10 +14,11 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+ interface PromiseConstructor {
+   /** A reference to the prototype. */
+-  readonly prototype: Promise<any>;
++  readonly prototype: Promise<unknown>;
+ 
+   /**
+    * Creates a new Promise.
+@@ -30,7 +31,7 @@ interface PromiseConstructor {
+   new <T>(
+     executor: (
+       resolve: (value: T | PromiseLike<T>) => void,
+-      reject: (reason?: any) => void,
++      reject: (reason?: unknown) => void,
+     ) => void,
+   ): Promise<T>;
+ 
+@@ -41,7 +42,7 @@ interface PromiseConstructor {
+    * @param values An array of Promises.
+    * @returns A new Promise.
+    */
+-  all<T extends readonly unknown[] | []>(
++  all<T extends readonly unknown[] | readonly []>(
+     values: T,
+   ): Promise<{ -readonly [P in keyof T]: Awaited<T[P]> }>;
+ 
+@@ -55,7 +56,7 @@ interface PromiseConstructor {
+    * @param values An array of Promises.
+    * @returns A new Promise.
+    */
+-  race<T extends readonly unknown[] | []>(
++  race<T extends readonly unknown[] | readonly []>(
+     values: T,
+   ): Promise<Awaited<T[number]>>;
+ 
+@@ -68,7 +69,7 @@ interface PromiseConstructor {
+    * @param reason The reason the promise was rejected.
+    * @returns A new rejected Promise.
+    */
+-  reject<T = never>(reason?: any): Promise<T>;
++  reject<T = never>(reason?: unknown): Promise<T>;
+ 
+   /**
+    * Creates a new resolved promise.
+@@ -92,4 +93,4 @@ interface PromiseConstructor {
+   resolve<T>(value: T | PromiseLike<T>): Promise<Awaited<T>>;
+ }
+ 
+-declare var Promise: PromiseConstructor;
++declare const Promise: PromiseConstructor;
+```

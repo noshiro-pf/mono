@@ -76,6 +76,7 @@
     "@noshiro/tiny-router-preact-hooks": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
+    "html2canvas": "^1.4.1",
     "preact": "^10.19.6"
   },
   "devDependencies": {

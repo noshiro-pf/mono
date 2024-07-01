@@ -1,4 +1,4 @@
-import { Arr, SafeInt, toSafeInt } from '@noshiro/ts-utils';
+import { Arr, SafeInt, toSafeInt, toUint32 } from '@noshiro/ts-utils';
 
 export const halfInt = (x: SafeInt): SafeInt =>
   x % 2 === 0
@@ -11,8 +11,8 @@ export const halfInt = (x: SafeInt): SafeInt =>
 export const binarySearch = <N extends number>(
   sortedArray: readonly N[],
   x: N,
-): SafeInt => {
-  if (sortedArray.length === 0) return toSafeInt(0);
+): NegativeInt32 | Uint32 => {
+  if (sortedArray.length === 0) return toUint32(0);
   let mut_left: SafeInt = toSafeInt(0);
   let mut_right: SafeInt = SafeInt.sub(Arr.length(sortedArray), 1);
   let mut_mid: SafeInt = SafeInt.add(
@@ -32,5 +32,6 @@ export const binarySearch = <N extends number>(
     }
     mut_mid = SafeInt.add(mut_left, halfInt(SafeInt.sub(mut_right, mut_left)));
   }
-  return mut_mid;
+  // eslint-disable-next-line no-restricted-syntax
+  return mut_mid as NegativeInt32 | Uint32;
 };

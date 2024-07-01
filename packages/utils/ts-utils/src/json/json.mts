@@ -17,12 +17,12 @@ const parse = (
 ): Result<JsonValue, string> => {
   try {
     return Result.ok(
-      // eslint-disable-next-line no-restricted-globals, no-restricted-syntax
+      // eslint-disable-next-line no-restricted-globals
       JSON.parse(
         text,
         // eslint-disable-next-line no-restricted-syntax
         reviver as (this: unknown, key: string, value: unknown) => unknown,
-      ) as JsonValue,
+      ),
     );
   } catch (error: unknown) {
     return Result.err(Str.from(error));

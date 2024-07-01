@@ -1,13 +1,17 @@
 import { Num, range } from '@noshiro/ts-utils';
 
 export type ReadonlyBitArrayType = Readonly<{
-  size: SafeUint;
+  size: NumberType.TypedArraySize;
   get: (at: SafeIntWithSmallInt) => 0 | 1 | undefined;
 
   values: () => IterableIterator<0 | 1>;
-  entries: () => IterableIterator<readonly [SafeUint, 0 | 1]>;
-  map: (fn: (value: 0 | 1, index: SafeUint) => 0 | 1) => ReadonlyBitArrayType;
-  forEach: (fn: (value: 0 | 1, index: SafeUint) => void) => void;
+  entries: () => IterableIterator<readonly [NumberType.TypedArraySize, 0 | 1]>;
+  map: (
+    fn: (value: 0 | 1, index: NumberType.TypedArraySize) => 0 | 1,
+  ) => ReadonlyBitArrayType;
+  forEach: (
+    fn: (value: 0 | 1, index: NumberType.TypedArraySize) => void,
+  ) => void;
   toString: () => string;
 }>;
 
@@ -20,8 +24,9 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
     this.#isInRange = Num.isInRange(0, input.length);
   }
 
-  get size(): SafeUint {
-    return this.#data.length;
+  get size(): NumberType.TypedArraySize {
+    // eslint-disable-next-line no-restricted-syntax
+    return this.#data.length as NumberType.TypedArraySize;
   }
 
   get(at: SafeIntWithSmallInt): 0 | 1 | undefined {
@@ -38,17 +43,19 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
     }
   }
 
-  *entries(): IterableIterator<readonly [SafeUint, 0 | 1]> {
+  *entries(): IterableIterator<readonly [NumberType.TypedArraySize, 0 | 1]> {
     for (const idx of range(0, this.size)) {
       yield [idx, this.#data[idx] === 0 ? 0 : 1];
     }
   }
 
-  map(fn: (value: 0 | 1, index: SafeUint) => 0 | 1): ReadonlyBitArrayType {
+  map(
+    fn: (value: 0 | 1, index: NumberType.TypedArraySize) => 0 | 1,
+  ): ReadonlyBitArrayType {
     return ReadonlyBitArray(this.#data.map((v, i) => fn(v === 0 ? 0 : 1, i)));
   }
 
-  forEach(fn: (value: 0 | 1, index: SafeUint) => void): void {
+  forEach(fn: (value: 0 | 1, index: NumberType.TypedArraySize) => void): void {
     for (const [i, v] of this.#data.entries()) {
       fn(v === 0 ? 0 : 1, i);
     }
@@ -66,5 +73,6 @@ export const ReadonlyBitArray = (
 export const ReadonlyBitArrayFromStr = (bitStr: string): ReadonlyBitArrayType =>
   ReadonlyBitArray(Array.from(bitStr, (c) => (c === '0' ? 0 : 1)));
 
-export const ReadonlyBitArrayOfLength = (len: SafeUint): ReadonlyBitArrayType =>
-  ReadonlyBitArray(new Uint8Array(len).fill(0));
+export const ReadonlyBitArrayOfLength = (
+  len: NumberType.TypedArraySize,
+): ReadonlyBitArrayType => ReadonlyBitArray(new Uint8Array(len).fill(0));

@@ -1,0 +1,32 @@
+```diff
+@@ -14,6 +14,7 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+ interface String {
+   /**
+@@ -28,7 +29,10 @@ interface String {
+    *   is too long, it will be truncated and the left-most part will be applied.
+    *   The default value for this parameter is " " (U+0020).
+    */
+-  padStart(maxLength: number, fillString?: string): string;
++  padStart(
++    maxLength: NumberType.StringSizeArgNonNegative,
++    fillString?: string,
++  ): string;
+ 
+   /**
+    * Pads the current string with a given string (possibly repeated) so that the
+@@ -42,5 +46,8 @@ interface String {
+    *   is too long, it will be truncated and the left-most part will be applied.
+    *   The default value for this parameter is " " (U+0020).
+    */
+-  padEnd(maxLength: number, fillString?: string): string;
++  padEnd(
++    maxLength: NumberType.StringSizeArgNonNegative,
++    fillString?: string,
++  ): string;
+ }
+```

@@ -1,4 +1,3 @@
-import { MutableSet } from '../others/index.mjs';
 import { Str } from '../str/index.mjs';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -6,7 +5,7 @@ interface ISetInterface<K> {
   new (iterable: Iterable<K>): void;
 
   // Getting information
-  size: SafeUint;
+  size: NumberType.ArraySize;
   isEmpty: boolean;
   has: (key: K) => boolean;
 
@@ -81,10 +80,11 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   readonly #set: ReadonlySet<K>;
 
   constructor(iterable: Iterable<K>) {
-    this.#set = new MutableSet(iterable);
+    // eslint-disable-next-line no-restricted-globals
+    this.#set = new Set(iterable);
   }
 
-  get size(): SafeUint {
+  get size(): NumberType.ArraySize {
     return this.#set.size;
   }
 
@@ -134,7 +134,8 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
       { type: 'add'; key: K } | { type: 'delete'; key: K }
     >[],
   ): ISet<K> {
-    const mut_result = new MutableSet<K>(this.#set);
+    // eslint-disable-next-line no-restricted-globals
+    const mut_result = new Set<K>(this.#set);
 
     for (const action of actions) {
       switch (action.type) {

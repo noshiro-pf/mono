@@ -1,4 +1,4 @@
-import { Arr, MutableSet, type Maybe } from '@noshiro/ts-utils';
+import { Arr, type Maybe } from '@noshiro/ts-utils';
 import {
   isManagerObservable,
   type AsyncChildObservable,
@@ -27,7 +27,7 @@ const registerChild = <A,>(
     p.addChild(child);
   }
   // register child to all reachable ManagerObservables
-  const mut_rest = Array.from(parents);
+  const mut_rest = Arr.asMut(Array.from(parents));
 
   while (mut_rest.length >= 1) {
     const p = mut_rest.pop();
@@ -102,7 +102,8 @@ export class AsyncChildObservableClass<
     this.type = type;
     this.parents = parents;
     this.#procedure = [];
-    this._descendantsIdSet = new MutableSet<ObservableId>();
+    // eslint-disable-next-line no-restricted-globals
+    this._descendantsIdSet = new Set<ObservableId>();
     registerChild(this, parents);
   }
 

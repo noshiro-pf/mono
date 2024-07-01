@@ -3,11 +3,11 @@ import { type Rgb } from '../../../types/index.mjs';
 import { epsilon } from '../color-test-values.mjs';
 
 export const testRgbEquality = (
-  testname: string,
+  testName: string,
   rgb1: Rgb,
   rgb2: Rgb,
 ): void => {
-  test(testname, () => {
+  test(testName, () => {
     const [r1, g1, b1] = rgb1;
     const [r2, g2, b2] = rgb2;
 

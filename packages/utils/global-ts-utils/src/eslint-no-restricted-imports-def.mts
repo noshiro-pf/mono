@@ -60,8 +60,6 @@ export const eslintNoRestrictedImportsDef = {
     'match',
     'Maybe',
     'memoizeFunction',
-    'MutableMap',
-    'MutableSet',
     'NonNegativeFiniteNumber',
     'noop',
     'Num',

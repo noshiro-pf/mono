@@ -1,0 +1,21 @@
+```diff
+@@ -14,14 +14,15 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+-/// <reference lib="es2015.symbol" />
+-/// <reference lib="decorators" />
++/// <reference path="./lib.es2015.symbol.d.ts" />
++/// <reference path="./lib.decorators.d.ts" />
+ 
+ interface SymbolConstructor {
+   readonly metadata: unique symbol;
+ }
+ 
+ interface Function {
+-  [Symbol.metadata]: DecoratorMetadata | null;
++  readonly [Symbol.metadata]: DecoratorMetadata | null;
+ }
+```

@@ -20,7 +20,7 @@ export const calcAll = ({
    */
   const downPaymentYen = toYen(downPaymentManYen * 10_000);
   const propertyPriceYen = toYen(propertyPriceManYen * 10_000);
-  const borrowingPeriodMonth = SafeUint.mul(borrowingPeriodYear, 12);
+  const borrowingPeriodMonth = Uint32.mul(borrowingPeriodYear, 12);
   const interestRatePerMonth = toPercentFloat(
     interestRatePercentPerYear / (100 * 12),
   );

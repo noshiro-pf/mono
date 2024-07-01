@@ -1,0 +1,43 @@
+```diff
+@@ -14,6 +14,7 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+ interface WeakRef<T extends WeakKey> {
+   readonly [Symbol.toStringTag]: 'WeakRef';
+@@ -27,7 +28,7 @@ interface WeakRef<T extends WeakKey> {
+ }
+ 
+ interface WeakRefConstructor {
+-  readonly prototype: WeakRef<any>;
++  readonly prototype: WeakRef<object>;
+ 
+   /**
+    * Creates a WeakRef instance for the given target value. In es2023 the value
+@@ -39,7 +40,7 @@ interface WeakRefConstructor {
+   new <T extends WeakKey>(target: T): WeakRef<T>;
+ }
+ 
+-declare var WeakRef: WeakRefConstructor;
++declare const WeakRef: WeakRefConstructor;
+ 
+ interface FinalizationRegistry<T> {
+   readonly [Symbol.toStringTag]: 'FinalizationRegistry';
+@@ -68,7 +69,7 @@ interface FinalizationRegistry<T> {
+ }
+ 
+ interface FinalizationRegistryConstructor {
+-  readonly prototype: FinalizationRegistry<any>;
++  readonly prototype: FinalizationRegistry<unknown>;
+ 
+   /**
+    * Creates a finalization registry with an associated cleanup callback
+@@ -79,4 +80,4 @@ interface FinalizationRegistryConstructor {
+   new <T>(cleanupCallback: (heldValue: T) => void): FinalizationRegistry<T>;
+ }
+ 
+-declare var FinalizationRegistry: FinalizationRegistryConstructor;
++declare const FinalizationRegistry: FinalizationRegistryConstructor;
+```

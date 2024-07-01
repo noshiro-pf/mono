@@ -3331,6 +3331,102 @@
     "@pixi/core" "5.3.12"
     "@pixi/display" "5.3.12"
 
+"@pixi/canvas-display@5.3.12":
+  version "5.3.12"
+  resolved "https://registry.yarnpkg.com/@pixi/canvas-display/-/canvas-display-5.3.12.tgz#4c57e4aaa082fbfe4af8e9648f8ee9e169ec12aa"
+  integrity sha512-IMqXmAF0X7xcmYTZ2fYn/pToXgUTpRoraI+zarBGv2HfklbF7woQBicNmAVacR+5lXK3+MEl1zrPt64yuPEdDA==
+  dependencies:
+    "@pixi/display" "5.3.12"
+
+"@pixi/canvas-extract@5.3.12":
+  version "5.3.12"
+  resolved "https://registry.yarnpkg.com/@pixi/canvas-extract/-/canvas-extract-5.3.12.tgz#51574ddc2a3cc6861043e34fa1140e179533db41"
+  integrity sha512-iHEp5XZcHbhIQUKdDZzB3eHBkkmDxXONCBBWJp8Gf8+LqwdnsUneB3eAdazCoG6DSEPuYWniu/7pUf9fHtfsKQ==
+  dependencies:
+    "@pixi/canvas-renderer" "5.3.12"
+    "@pixi/core" "5.3.12"
+    "@pixi/display" "5.3.12"
+    "@pixi/math" "5.3.12"
+    "@pixi/utils" "5.3.12"
+
+"@pixi/canvas-graphics@5.3.12":
+  version "5.3.12"
+  resolved "https://registry.yarnpkg.com/@pixi/canvas-graphics/-/canvas-graphics-5.3.12.tgz#59484c27e5f52a3cc6c324a121c479c53a13e251"
+  integrity sha512-dRrh30xcVuCDcFhZ+EpWL3l6P59gpT1gTKs9SyYG51p3AJcij4njteBAdUtEloN4+pIqNVFs20HrntcwDTgvPg==
+  dependencies:
+    "@pixi/canvas-renderer" "5.3.12"
+    "@pixi/constants" "5.3.12"
+    "@pixi/core" "5.3.12"
+    "@pixi/graphics" "5.3.12"
+    "@pixi/math" "5.3.12"
+
+"@pixi/canvas-mesh@5.3.12":
+  version "5.3.12"
+  resolved "https://registry.yarnpkg.com/@pixi/canvas-mesh/-/canvas-mesh-5.3.12.tgz#afe58d062343e25719fd8ef0ccf0d6a9abf12320"
+  integrity sha512-FoDuRkxrqXWvq6cosG5xax/Nv+YJHeOh2QP2qY9QQKkjGBWPQLgCoHZ+PUxbjY4fzSjs8NFlJIdbXAEox6PmiA==
+  dependencies:
+    "@pixi/canvas-renderer" "5.3.12"
+    "@pixi/constants" "5.3.12"
+    "@pixi/mesh" "5.3.12"
+    "@pixi/mesh-extras" "5.3.12"
+    "@pixi/settings" "5.3.12"
+
+"@pixi/canvas-particles@5.3.12":
+  version "5.3.12"
+  resolved "https://registry.yarnpkg.com/@pixi/canvas-particles/-/canvas-particles-5.3.12.tgz#3a8de6bd19e6a6306b4cd7cd518f3d1ded56f229"
+  integrity sha512-mDIfh3hOZSOLiajL72HnSWWRh/vMHRa1zjosyNe9MOwh0gpdsa33PqgSI+c88XYj054vU/xw4Uu9CoiQO59IWg==
+  dependencies:
+    "@pixi/particles" "5.3.12"
+
+"@pixi/canvas-prepare@5.3.12":
+  version "5.3.12"
+  resolved "https://registry.yarnpkg.com/@pixi/canvas-prepare/-/canvas-prepare-5.3.12.tgz#0596398a0cdbc35fa68264c15229d0cd9b4724e1"
+  integrity sha512-LOj/yTi6th0iFQUSGoaKM0sPCVDEmyn4wxefPwS3baAlWaMewHYwYaef9s6Pyo475aVOuz9bKt2+B1pnV7c0HA==
+  dependencies:
+    "@pixi/canvas-renderer" "5.3.12"
+    "@pixi/core" "5.3.12"
+    "@pixi/prepare" "5.3.12"
+
+"@pixi/canvas-renderer@5.3.12":
+  version "5.3.12"
+  resolved "https://registry.yarnpkg.com/@pixi/canvas-renderer/-/canvas-renderer-5.3.12.tgz#c0a92f3b9728aeee8c093f990108f218b56d67bb"
+  integrity sha512-BuUgEeapZH4Twhv3TGlUXkKhGDFCuHDClQWJEJX/R6JzxmXJ9wi6CeSK+fk6/We8899/3y2R+jvEUD51wAMx9g==
+  dependencies:
+    "@pixi/constants" "5.3.12"
+    "@pixi/core" "5.3.12"
+    "@pixi/math" "5.3.12"
+    "@pixi/settings" "5.3.12"
+    "@pixi/utils" "5.3.12"
+
+"@pixi/canvas-sprite-tiling@5.3.12":
+  version "5.3.12"
+  resolved "https://registry.yarnpkg.com/@pixi/canvas-sprite-tiling/-/canvas-sprite-tiling-5.3.12.tgz#4d2691e6af1329a2572171f0eddd8156689e5e74"
+  integrity sha512-5Y5JSA6AQhfq1gBqF8KKNcdJlztF3uqK4Eg1h64GadkbLYrwgFCcU/TYn7jNq8/1rjZ5uxgB+HtzC3fOFO+nLw==
+  dependencies:
+    "@pixi/canvas-renderer" "5.3.12"
+    "@pixi/canvas-sprite" "5.3.12"
+    "@pixi/sprite-tiling" "5.3.12"
+    "@pixi/utils" "5.3.12"
+
+"@pixi/canvas-sprite@5.3.12":
+  version "5.3.12"
+  resolved "https://registry.yarnpkg.com/@pixi/canvas-sprite/-/canvas-sprite-5.3.12.tgz#f3d242fac8c3cfd7be41cf5a7e8b12494bf4cc9e"
+  integrity sha512-oq3IDaidhQMlzgkHSjir3h9CGFteIFrytukzpV845AqPE02wOkFKwdZJ/FKOSgnlx64XEHXORXKgjqdn5ZHqKQ==
+  dependencies:
+    "@pixi/canvas-renderer" "5.3.12"
+    "@pixi/constants" "5.3.12"
+    "@pixi/math" "5.3.12"
+    "@pixi/sprite" "5.3.12"
+    "@pixi/utils" "5.3.12"
+
+"@pixi/canvas-text@5.3.12":
+  version "5.3.12"
+  resolved "https://registry.yarnpkg.com/@pixi/canvas-text/-/canvas-text-5.3.12.tgz#c2a2988da381aa7e7f21cc389cf12c0ba54b1b93"
+  integrity sha512-5sWkBUSfMp3ufs4SNu8uNGsauQvnQ0qlNJiAVrqFE+V+tYtmweRVK9bopzJ8xydDGD4UzHSyLWd8g42+9WqSmA==
+  dependencies:
+    "@pixi/sprite" "5.3.12"
+    "@pixi/text" "5.3.12"
+
 "@pixi/constants@5.3.12":
   version "5.3.12"
   resolved "https://registry.yarnpkg.com/@pixi/constants/-/constants-5.3.12.tgz#f02b4366669a30983f044a1d2870fd6dbdeea03d"
@@ -4869,53 +4965,85 @@
     "@typescript-eslint/types" "7.8.0"
     eslint-visitor-keys "^3.4.3"
 
-"@typescript/lib-decorators@file:./packages/strict-ts-lib/packages/lib-decorators":
+"@typescript/lib-decorators@file:packages/strict-ts-lib/branded/packages/lib-decorators":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-dom@file:./packages/strict-ts-lib/packages/lib-dom":
+"@typescript/lib-dom@file:packages/strict-ts-lib/branded/packages/lib-dom":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-es2015@file:./packages/strict-ts-lib/packages/lib-es2015":
+"@typescript/lib-es2015@file:packages/strict-ts-lib/branded/packages/lib-es2015":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-es2016@file:./packages/strict-ts-lib/packages/lib-es2016":
+"@typescript/lib-es2016@file:packages/strict-ts-lib/branded/packages/lib-es2016":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-es2017@file:./packages/strict-ts-lib/packages/lib-es2017":
+"@typescript/lib-es2017@file:packages/strict-ts-lib/branded/packages/lib-es2017":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-es2018@file:./packages/strict-ts-lib/packages/lib-es2018":
+"@typescript/lib-es2018@file:packages/strict-ts-lib/branded/packages/lib-es2018":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-es2019@file:./packages/strict-ts-lib/packages/lib-es2019":
+"@typescript/lib-es2019@file:packages/strict-ts-lib/branded/packages/lib-es2019":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-es2020@file:./packages/strict-ts-lib/packages/lib-es2020":
+"@typescript/lib-es2020@file:packages/strict-ts-lib/branded/packages/lib-es2020":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-es2021@file:./packages/strict-ts-lib/packages/lib-es2021":
+"@typescript/lib-es2021@file:packages/strict-ts-lib/branded/packages/lib-es2021":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-es2022@file:./packages/strict-ts-lib/packages/lib-es2022":
+"@typescript/lib-es2022@file:packages/strict-ts-lib/branded/packages/lib-es2022":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-es2023@file:./packages/strict-ts-lib/packages/lib-es2023":
+"@typescript/lib-es2023@file:packages/strict-ts-lib/branded/packages/lib-es2023":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-es5@file:./packages/strict-ts-lib/packages/lib-es5":
+"@typescript/lib-es5@file:packages/strict-ts-lib/branded/packages/lib-es5":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-es6@file:./packages/strict-ts-lib/packages/lib-es6":
+"@typescript/lib-es6@file:packages/strict-ts-lib/branded/packages/lib-es6":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-esnext@file:./packages/strict-ts-lib/packages/lib-esnext":
+"@typescript/lib-esnext@file:packages/strict-ts-lib/branded/packages/lib-esnext":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-scripthost@file:./packages/strict-ts-lib/packages/lib-scripthost":
+"@typescript/lib-scripthost@file:packages/strict-ts-lib/branded/packages/lib-scripthost":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
-"@typescript/lib-webworker@file:./packages/strict-ts-lib/packages/lib-webworker":
+"@typescript/lib-webworker@file:packages/strict-ts-lib/branded/packages/lib-webworker":
   version "5.4.3"
+  dependencies:
+    "@noshiro/ts-type-utils-no-stdlib" "*"
 
 "@ungap/structured-clone@^1.0.0", "@ungap/structured-clone@^1.2.0":
   version "1.2.0"
@@ -6033,10 +6161,10 @@ camelcase@^6.2.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.3.0.tgz#5685b95eb209ac9c0c177467778c9c84df58ba9a"
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
-caniuse-lite@^1.0.30001524, caniuse-lite@^1.0.30001565:
-  version "1.0.30001572"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001572.tgz#1ccf7dc92d2ee2f92ed3a54e11b7b4a3041acfa0"
-  integrity sha512-1Pbh5FLmn5y4+QhNyJE9j3/7dK44dGB83/ZMjv/qJk86TvDbjk0LosiZo0i0WB0Vx607qMX9jYrn1VLHCkN4rw==
+caniuse-lite@^1.0.30001524, caniuse-lite@^1.0.30001565, caniuse-lite@^1.0.30001639:
+  version "1.0.30001639"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001639.tgz#972b3a6adeacdd8f46af5fc7f771e9639f6c1521"
+  integrity sha512-eFHflNTBIlFwP2AIKaYuBQN/apnUoKNhBdza8ZnW/h2di4LCZ4xFqYlxUxo+LQ76KFI1PGcC1QDxMbxTZpSCAg==
 
 capital-case@^1.0.4:
   version "1.0.4"
@@ -13862,7 +13990,24 @@ pirates@^4.0.4, pirates@^4.0.6:
   resolved "https://registry.yarnpkg.com/pirates/-/pirates-4.0.6.tgz#3018ae32ecfcff6c29ba2267cbf21166ac1f36b9"
   integrity sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==
 
-pixi.js@^5.3.3:
+pixi.js-legacy@^5.3.12:
+  version "5.3.12"
+  resolved "https://registry.yarnpkg.com/pixi.js-legacy/-/pixi.js-legacy-5.3.12.tgz#c8bce52ffd1bfe2c4d01e5060b9afcb8231630f6"
+  integrity sha512-GHq2ZfQZ+9hOXObipbqbRSqPQ/xRSq5lw/1ACsDWVQex88Owq/BRZUUzyoKcym4FtztLdJwXW/zSDoqucj0JnQ==
+  dependencies:
+    "@pixi/canvas-display" "5.3.12"
+    "@pixi/canvas-extract" "5.3.12"
+    "@pixi/canvas-graphics" "5.3.12"
+    "@pixi/canvas-mesh" "5.3.12"
+    "@pixi/canvas-particles" "5.3.12"
+    "@pixi/canvas-prepare" "5.3.12"
+    "@pixi/canvas-renderer" "5.3.12"
+    "@pixi/canvas-sprite" "5.3.12"
+    "@pixi/canvas-sprite-tiling" "5.3.12"
+    "@pixi/canvas-text" "5.3.12"
+    pixi.js "5.3.12"
+
+pixi.js@5.3.12:
   version "5.3.12"
   resolved "https://registry.yarnpkg.com/pixi.js/-/pixi.js-5.3.12.tgz#1ae667dc066665b536269b0695406811a63b92fe"
   integrity sha512-XZzUhrq/m6fx3E0ESv/zXKEVR/GW82dPmbwdapIqsgAldKT2QqBYMfz1WuPf+Q9moPapywVNjjyxPvh+DNPmIg==
@@ -15585,7 +15730,8 @@ string-length@^4.0.1:
     char-regex "^1.0.2"
     strip-ansi "^6.0.0"
 
-"string-width-cjs@npm:string-width@^4.2.0":
+"string-width-cjs@npm:string-width@^4.2.0", string-width@^4.0.0, string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.2, string-width@^4.2.3:
+  name string-width-cjs
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -15602,15 +15748,6 @@ string-width@^3.0.0, string-width@^3.1.0:
     emoji-regex "^7.0.1"
     is-fullwidth-code-point "^2.0.0"
     strip-ansi "^5.1.0"
-
-string-width@^4.0.0, string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.2, string-width@^4.2.3:
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
-  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
-  dependencies:
-    emoji-regex "^8.0.0"
-    is-fullwidth-code-point "^3.0.0"
-    strip-ansi "^6.0.1"
 
 string-width@^5.0.1, string-width@^5.1.2:
   version "5.1.2"
@@ -15731,7 +15868,8 @@ stringify-entities@^4.0.0:
     character-entities-html4 "^2.0.0"
     character-entities-legacy "^3.0.0"
 
-"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+  name strip-ansi-cjs
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -15744,13 +15882,6 @@ strip-ansi@^5.0.0, strip-ansi@^5.1.0, strip-ansi@^5.2.0:
   integrity sha512-DuRs1gKbBqsMKIZlrffwlug8MHkcnpjs5VPmL1PAh+mA30U0DTotfDZ0d2UUsXpPmPmMMJ6W773MaA3J+lbiWA==
   dependencies:
     ansi-regex "^4.1.0"
-
-strip-ansi@^6.0.0, strip-ansi@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
-  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
-  dependencies:
-    ansi-regex "^5.0.1"
 
 strip-ansi@^7.0.1, strip-ansi@^7.1.0:
   version "7.1.0"
@@ -16516,7 +16647,7 @@ typescript-json-schema@^0.63.0:
     typescript "~5.1.0"
     yargs "^17.1.1"
 
-typescript@^5.4.3:
+typescript@5.4.3:
   version "5.4.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.3.tgz#5c6fedd4c87bee01cd7a528a30145521f8e0feff"
   integrity sha512-KrPd3PKaCLr78MalgiwJnA25Nm8HAmdwN3mYUYZgG/wizIo9EainNVQI9/yDavtVFRN2h3k8uf3GLHuhDMgEHg==
@@ -17311,7 +17442,8 @@ wordwrapjs@^5.1.0:
   resolved "https://registry.yarnpkg.com/wordwrapjs/-/wordwrapjs-5.1.0.tgz#4c4d20446dcc670b14fa115ef4f8fd9947af2b3a"
   integrity sha512-JNjcULU2e4KJwUNv6CHgI46UvDGitb6dGryHajXTDiLgg1/RiGoPSDw4kZfYnwGtEXf2ZMeIewDQgFGzkCB2Sg==
 
-"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
+"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+  name wrap-ansi-cjs
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
@@ -17333,15 +17465,6 @@ wrap-ansi@^6.0.1, wrap-ansi@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-6.2.0.tgz#e9393ba07102e6c91a3b221478f0257cd2856e53"
   integrity sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==
-  dependencies:
-    ansi-styles "^4.0.0"
-    string-width "^4.1.0"
-    strip-ansi "^6.0.0"
-
-wrap-ansi@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
-  integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
   dependencies:
     ansi-styles "^4.0.0"
     string-width "^4.1.0"

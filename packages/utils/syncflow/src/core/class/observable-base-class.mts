@@ -1,4 +1,4 @@
-import { Arr, Maybe, MutableMap, noop } from '@noshiro/ts-utils';
+import { Arr, Maybe, noop } from '@noshiro/ts-utils';
 import {
   type ChildObservable,
   type InitializedObservable,
@@ -51,7 +51,8 @@ export class ObservableBaseClass<
     this.id = issueObservableId();
     this.#currentValue = initialValue;
     this.#children = [];
-    this.#subscribers = new MutableMap<SubscriberId, Subscriber<A>>();
+    // eslint-disable-next-line no-restricted-globals
+    this.#subscribers = new Map<SubscriberId, Subscriber<A>>();
     this.#isCompleted = false;
     this.#updaterSymbol = issueUpdaterSymbol();
   }

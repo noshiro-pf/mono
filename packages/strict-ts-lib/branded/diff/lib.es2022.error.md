@@ -1,0 +1,34 @@
+```diff
+@@ -14,13 +14,14 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+ interface ErrorOptions {
+-  cause?: unknown;
++  readonly cause?: unknown;
+ }
+ 
+ interface Error {
+-  cause?: unknown;
++  readonly cause?: unknown;
+ }
+ 
+ interface ErrorConstructor {
+@@ -60,12 +61,12 @@ interface URIErrorConstructor {
+ 
+ interface AggregateErrorConstructor {
+   new (
+-    errors: Iterable<any>,
++    errors: Iterable<unknown>,
+     message?: string,
+     options?: ErrorOptions,
+   ): AggregateError;
+   (
+-    errors: Iterable<any>,
++    errors: Iterable<unknown>,
+     message?: string,
+     options?: ErrorOptions,
+   ): AggregateError;
+```
