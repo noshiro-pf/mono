@@ -15,7 +15,7 @@ type FirebaseConfig = t.TypeOf<typeof firebaseConfigTypeDef>;
 
 const isFirebaseConfig = firebaseConfigTypeDef.is;
 
-export const fillFirebaseConfig = (config: JSONValue): FirebaseConfig => {
+export const fillFirebaseConfig = (config: JsonValue): FirebaseConfig => {
   if (!isFirebaseConfig(config)) {
     logger.error(
       `${Result.unwrapThrow(Json.stringify(config))} is not FirebaseConfig`,

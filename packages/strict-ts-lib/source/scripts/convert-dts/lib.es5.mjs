@@ -56,7 +56,7 @@ export const convertLibEs5 = (from, commentOutDeprecated) => {
       replaceWithNoMatchCheck(
         slice,
         pipe(slice)
-          .chain(replaceWithNoMatchCheck(`): unknown;`, `): MutableJSONValue;`))
+          .chain(replaceWithNoMatchCheck(`): unknown;`, `): MutableJsonValue;`))
           .chain(
             replaceWithNoMatchCheck(
               'space?: string | number',

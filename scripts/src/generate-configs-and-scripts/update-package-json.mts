@@ -62,7 +62,7 @@ export const updatePackageJson = async (
 const updatePackageJsonImpl = (
   workspace: Workspace,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  mut_packageJson: MutableRecord<string, MutableJSONValue | undefined>,
+  mut_packageJson: MutableRecord<string, MutableJsonValue | undefined>,
   packageName: string,
   pathPrefixToRoot: string,
   cfg: WorkspaceConfig,

@@ -13,8 +13,8 @@ import { Str } from '../str/index.mjs';
  */
 const parse = (
   text: string,
-  reviver?: (this: unknown, key: string, value: JSONValue) => unknown,
-): Result<JSONValue, string> => {
+  reviver?: (this: unknown, key: string, value: JsonValue) => unknown,
+): Result<JsonValue, string> => {
   try {
     return Result.ok(
       // eslint-disable-next-line no-restricted-globals, no-restricted-syntax
@@ -22,7 +22,7 @@ const parse = (
         text,
         // eslint-disable-next-line no-restricted-syntax
         reviver as (this: unknown, key: string, value: unknown) => unknown,
-      ) as JSONValue,
+      ) as JsonValue,
     );
   } catch (error: unknown) {
     return Result.err(Str.from(error));

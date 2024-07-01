@@ -163,7 +163,7 @@ export const calculate = (): void => {
   })
     .then((response) => response.json())
     .then((data) => {
-      setResult(Result.ok(data as JSONValue));
+      setResult(Result.ok(data as JsonValue));
     })
     .catch(() => {
       setResult(

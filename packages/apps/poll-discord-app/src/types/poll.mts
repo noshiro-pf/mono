@@ -37,7 +37,7 @@ export const pollJsonType = t.record({
 
 export type PollJson = t.TypeOf<typeof pollJsonType>;
 
-expectType<PollJson, JSONType>('<=');
+expectType<PollJson, JsonType>('<=');
 
 export const pollFromJson = (p?: unknown): Poll =>
   pipe(p)

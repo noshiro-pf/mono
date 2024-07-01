@@ -9,7 +9,7 @@ export const convertLibDom = (from) =>
     .chain(
       replaceWithNoMatchCheck(
         'json(): Promise<unknown>;',
-        'json(): Promise<JSONType>;',
+        'json(): Promise<JsonType>;',
       ),
     )
     .chain((s) => {
