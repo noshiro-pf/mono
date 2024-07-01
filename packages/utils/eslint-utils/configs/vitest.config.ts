@@ -1,4 +1,4 @@
-import { toThisDir } from '@noshiro/mono-scripts';
+import { toThisDir } from '@noshiro/mono-scripts/node-utils/path-utils.mjs';
 import * as nodePath from 'node:path';
 import { defineConfig } from 'vitest/config';
 
