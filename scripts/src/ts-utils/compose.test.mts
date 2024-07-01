@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'vitest';
 import { compose } from './compose.mjs';
 
 const fn1 = (x: number): readonly [number, number] => [x, x];

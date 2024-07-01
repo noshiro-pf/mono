@@ -5,13 +5,13 @@ export const tsConfigExtend = (
   tsType: WorkspaceConfig['tsType'],
   pathPrefixToRoot: string,
   baseTsConfigName: string,
-  isViteApp: boolean,
+  useVite: boolean | 'vitest-only',
 ): string | readonly string[] => {
   const pathToSharedTsConfig = `${pathPrefixToRoot}/config/tsconfig`;
 
   switch (tsType) {
     case 'mts':
-      return isViteApp
+      return useVite !== false
         ? [
             `${pathToSharedTsConfig}/${baseTsConfigName}`,
             `${pathToSharedTsConfig}/tsconfig.vite.json`,
@@ -22,12 +22,14 @@ export const tsConfigExtend = (
       return [
         `${pathToSharedTsConfig}/${baseTsConfigName}`,
         `${pathToSharedTsConfig}/tsconfig.react.json`,
-        isViteApp
+        useVite === true
           ? [
               `${pathToSharedTsConfig}/tsconfig.vite.json`,
               `${pathToSharedTsConfig}/tsconfig.absolute-path.json`,
             ]
-          : undefined,
+          : useVite === 'vitest-only'
+            ? [`${pathToSharedTsConfig}/tsconfig.vite.json`]
+            : undefined,
       ]
         .flat()
         .filter(isNotUndefined);
@@ -36,12 +38,14 @@ export const tsConfigExtend = (
       return [
         `${pathToSharedTsConfig}/${baseTsConfigName}`,
         `${pathToSharedTsConfig}/tsconfig.react-emotion.json`,
-        isViteApp
+        useVite === true
           ? [
               `${pathToSharedTsConfig}/tsconfig.vite.json`,
               `${pathToSharedTsConfig}/tsconfig.absolute-path.json`,
             ]
-          : undefined,
+          : useVite === 'vitest-only'
+            ? [`${pathToSharedTsConfig}/tsconfig.vite.json`]
+            : undefined,
       ]
         .flat()
         .filter(isNotUndefined);
@@ -50,12 +54,14 @@ export const tsConfigExtend = (
       return [
         `${pathToSharedTsConfig}/${baseTsConfigName}`,
         `${pathToSharedTsConfig}/tsconfig.preact.json`,
-        isViteApp
+        useVite === true
           ? [
               `${pathToSharedTsConfig}/tsconfig.vite.json`,
               `${pathToSharedTsConfig}/tsconfig.absolute-path.json`,
             ]
-          : undefined,
+          : useVite === 'vitest-only'
+            ? [`${pathToSharedTsConfig}/tsconfig.vite.json`]
+            : undefined,
       ]
         .flat()
         .filter(isNotUndefined);

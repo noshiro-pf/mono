@@ -51,7 +51,7 @@ export const generateEsLintConfig = async (
     "    tsconfigFileName: './tsconfig.json',",
     `    packageDirs: [nodePath.resolve(thisDir, '${pathPrefixToRoot}'), thisDir],`,
     '    restrictedImports,',
-    cfg.isViteApp ? '    isViteProject: true,' : '',
+    cfg.useVite === true ? '    isViteProject: true,' : '',
     '  });',
     '',
     packageName === 'annotation-tool'

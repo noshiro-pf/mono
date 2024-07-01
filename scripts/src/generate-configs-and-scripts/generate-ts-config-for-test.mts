@@ -26,7 +26,7 @@ export const generateTsConfigForTest = async (
         cfg.tsType,
         pathPrefixToRoot,
         tsconfigTestJsonName,
-        cfg.isViteApp,
+        cfg.useVite,
       ),
       compilerOptions: cfg.tsconfig?.compilerOptions,
       include: cfg.srcDirs.map((d) => `../${d}`),

@@ -23,10 +23,10 @@ export const generateTsConfigForTypeCheck = async (
       extends: tsConfigExtend(
         cfg.tsType,
         pathPrefixToRoot,
-        cfg.isViteApp
+        cfg.useVite === true
           ? 'tsconfig.type-check.json'
           : 'tsconfig.lib.type-check.json',
-        cfg.isViteApp,
+        cfg.useVite,
       ),
       compilerOptions: cfg.tsconfig?.compilerOptions,
       include: cfg.typeCheckIncludes.map((s) =>
