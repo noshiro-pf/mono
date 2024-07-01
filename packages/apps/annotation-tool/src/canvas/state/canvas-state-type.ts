@@ -1,5 +1,5 @@
 import { type Point, type Rect } from '@noshiro/ts-utils-additional';
-import { type Sprite } from 'pixi.js';
+import { type Sprite } from 'pixi.js-legacy';
 import { type Direction } from '../functions';
 import { type PixiBbox, type PixiTempRect } from '../types';
 

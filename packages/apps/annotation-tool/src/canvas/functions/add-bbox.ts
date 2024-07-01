@@ -1,5 +1,5 @@
 import { type Rect, type Rgba } from '@noshiro/ts-utils-additional';
-import { type Application } from 'pixi.js';
+import { type Application } from 'pixi.js-legacy';
 import { type CanvasAppState, type CanvasAppStateHandler } from '../state';
 import {
   type AnnotationCanvasStyle,

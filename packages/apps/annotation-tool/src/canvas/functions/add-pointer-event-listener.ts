@@ -1,4 +1,4 @@
-import { type Application, type Sprite } from 'pixi.js';
+import { type Application, type Sprite } from 'pixi.js-legacy';
 import { type CanvasAppState, type CanvasAppStateHandler } from '../state';
 
 export const addGlobalPointerEventListener = (

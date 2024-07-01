@@ -3,7 +3,7 @@ import {
   type Rect,
   type Rgba,
 } from '@noshiro/ts-utils-additional';
-import { Rectangle, type Graphics } from 'pixi.js';
+import { Rectangle, type Graphics } from 'pixi.js-legacy';
 import { type PixiBbox } from '../types';
 
 export const updateBboxRect = (
