@@ -33,9 +33,10 @@ export const updatePackageJson = async (
 
   const packageJsonPath = path.resolve(workspace.location, './package.json');
 
+  // eslint-disable-next-line no-restricted-syntax
   const mut_packageJson = JSON.parse(
     await fs.readFile(packageJsonPath, { encoding: 'utf8' }),
-  );
+  ) as MutableJsonValue;
 
   if (!isRecord(mut_packageJson)) return;
 
@@ -226,67 +227,53 @@ const updatePackageJsonImpl = (
       case 'strict-ts-lib': {
         // reset
         mut_packageJson['scripts'] = {
-          autofix: 'wireit',
-          fmt: 'yarn zz:cmd:prettier .',
-          gen: 'run-s gen:d gen:packages',
-          'gen:d': 'run-s gen:d:eslint-fixed gen:d:final',
-          'gen:d:eslint-fixed': `./${workspaceScriptsDirName}/gen-eslint-fixed.sh`,
-          'gen:d:final': `./${workspaceScriptsDirName}/gen-final.sh`,
-          'gen:packages': `./${workspaceScriptsDirName}/gen-packages.sh`,
-          lint: 'wireit',
+          build: 'wireit',
+          clean: 'run-p clean:**',
+          'clean:build': `rimraf ${workspaceScriptsDirName}/dist`,
+          'clean:wireit': 'rimraf .wireit/**',
+          fmt: 'yarn zz:prettier ..',
+          gen: 'run-s z:gen:final z:gen:packages fmt fmt gen:diff',
+          'gen:diff': 'run-s z:get:lib-files z:gen:diff',
+          'gen:final': 'run-s z:gen:final z:fmt:final z:fmt:final',
+          'gen:full':
+            'run-s z:get:lib-files z:gen:eslint-fixed z:gen:final z:gen:packages fmt fmt z:gen:diff',
+          'gen:packages': 'run-s z:gen:packages z:fmt:packages z:fmt:packages',
+          test: 'run-p test:basic test:branded',
+          'test:basic': 'tsc -p ../basic/tsconfig.json',
+          'test:branded': 'tsc -p ../branded/tsconfig.json',
+          'testw:basic': 'yarn test --watch',
+          'testw:branded': 'yarn test-branded --watch',
           tsc: 'yarn type-check',
           tscw: 'tsc --noEmit --watch',
-          'type-check': 'wireit',
-          'zz:cmd:eslint': 'ESLINT_USE_FLAT_CONFIG=true eslint',
-          'zz:cmd:eslint:scripts': `yarn zz:cmd:eslint --config ${eslintConfigName} ${workspaceScriptsDirName} --cache --cache-location ./${workspaceScriptsDirName}/.eslintcache`,
-          'zz:cmd:prettier': `prettier --cache --cache-strategy content --ignore-path ${pathPrefixToRoot}/.prettierignore --write`,
-        };
-        mut_packageJson['wireit'] = {};
-
-        // aliases
-        const mut_wireit = mut_packageJson['wireit'];
-
-        {
-          const tsConfigPath = `./${workspaceConfigsDirName}/tsconfig.type-check.json`;
-          mut_wireit['type-check'] = {
-            command: `tsc -p ${tsConfigPath}`,
-            files: ['./test/**/*.mts', tsConfigPath, wireitDeps.tsConfigs],
-            output: [],
-          };
-        }
-
-        mut_wireit['lint'] = {
-          dependencies: [
-            `${pathPrefixToRoot}/packages/utils/eslint-utils:build`,
-          ],
-          command: 'yarn zz:cmd:eslint:scripts',
-          files: [
-            `./${workspaceScriptsDirName}/**/*.{mjs,mts,js,ts,jsx,tsx,d.ts}`,
-            `./${eslintConfigName}`,
-            './package.json',
-            './tsconfig.json',
-            wireitDeps.rootPackageJson,
-            wireitDeps.tsConfigs,
-          ],
-          output: [],
+          'type-check': 'tsc --noEmit',
+          'z:fmt:final': 'yarn zz:prettier ../basic/final ../branded/final',
+          'z:fmt:packages':
+            'yarn zz:prettier ../basic/packages ../branded/packages',
+          'z:gen:diff': `./${workspaceScriptsDirName}/gen-diff.sh`,
+          'z:gen:eslint-fixed': `./${workspaceScriptsDirName}/gen-eslint-fixed.sh`,
+          'z:gen:final': 'wireit',
+          'z:gen:packages': 'wireit',
+          'z:get:lib-files': `./${workspaceScriptsDirName}/get-lib-files.sh`,
+          'zz:eslint': 'ESLINT_USE_FLAT_CONFIG=true eslint',
+          'zz:eslint:scripts': `yarn zz:eslint --config eslint.config.js ${workspaceScriptsDirName} --cache --cache-location ./${workspaceScriptsDirName}/.eslintcache`,
+          'zz:prettier': 'prettier --ignore-path ../.prettierignore --write',
         };
 
-        {
-          const configPath = `./${workspaceConfigsDirName}/eslint.config.gen.mjs`;
-
-          mut_wireit['autofix'] = {
-            command: `yarn zz:cmd:eslint eslint-fixed/ --config ${configPath} --fix --cache --cache-location ./.eslintcache`,
-            files: [
-              './eslint-fixed/**/*.d.ts',
-              configPath,
-              './package.json',
-              './tsconfig.json',
-              wireitDeps.rootPackageJson,
-              wireitDeps.tsConfigs,
-            ],
-            output: [],
-          };
-        }
+        mut_packageJson['wireit'] = {
+          'z:gen:final': {
+            dependencies: ['build'],
+            command: `./${workspaceScriptsDirName}/gen-final.sh`,
+          },
+          'z:gen:packages': {
+            dependencies: ['build'],
+            command: `./${workspaceScriptsDirName}/gen-packages.sh`,
+          },
+          build: {
+            command: `tsc --project ./${workspaceConfigsDirName}/tsconfig.build.json`,
+            clean: true,
+            output: [`./${workspaceScriptsDirName}/dist/**/*`],
+          },
+        };
 
         break;
       }
@@ -890,7 +877,11 @@ const updatePackageJsonImpl = (
 
     const mut_ref = mut_packageJson['devDependencies'];
 
-    if (packageName === 'eslint-utils' || packageName === 'goober') {
+    if (
+      packageName === 'eslint-utils' ||
+      packageName === 'goober' ||
+      packageName === 'strict-ts-lib'
+    ) {
       delete mut_ref['@noshiro/eslint-utils'];
     } else {
       mut_ref['@noshiro/eslint-utils'] = '*';

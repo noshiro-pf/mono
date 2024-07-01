@@ -13,10 +13,25 @@ export const replaceWithNoMatchCheckBetweenRegexp =
     startRegexp,
     endRegexp,
     mapFn,
+    options,
   }: Readonly<{
     startRegexp: RegExp | string;
     endRegexp: RegExp | string | undefined;
     mapFn: (slice: string) => string;
+    options?: Readonly<
+      | {
+          onNotFound: 'off';
+          onNoChange: 'off';
+        }
+      | {
+          onNotFound: 'throw';
+          onNoChange: 'off' | 'throw' | 'warn';
+        }
+      | {
+          onNotFound: 'warn';
+          onNoChange: 'off' | 'warn';
+        }
+    >;
   }>) =>
   (target: string): string => {
     const slice = sliceByMatch({
@@ -25,5 +40,5 @@ export const replaceWithNoMatchCheckBetweenRegexp =
       endRegexp,
     });
 
-    return replaceWithNoMatchCheck(slice, mapFn(slice))(target);
+    return replaceWithNoMatchCheck(slice, mapFn(slice), options)(target);
   };
