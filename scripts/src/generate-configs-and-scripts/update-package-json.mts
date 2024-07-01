@@ -861,7 +861,9 @@ const updatePackageJsonImpl = (
             for (const key of keys) {
               const property = mut_wireit[key];
               delete mut_wireit[key];
-              mut_wireit[key] = property;
+              if (property !== undefined) {
+                mut_wireit[key] = property;
+              }
             }
           }
         }

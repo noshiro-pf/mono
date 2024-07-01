@@ -21,7 +21,7 @@ export const answerOfDateJsonType = t.record({
 
 export type AnswerOfDateJson = t.TypeOf<typeof answerOfDateJsonType>;
 
-expectType<AnswerOfDateJson, JsonType>('<=');
+expectType<AnswerOfDateJson, JsonObject>('<=');
 
 export const answerOfDateFromJson = (p?: unknown): AnswerOfDate =>
   pipe(answerOfDateJsonType.fill(p)).chain((a) => ({
