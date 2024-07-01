@@ -1,0 +1,99 @@
+```diff
+@@ -14,6 +14,35 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
++
++declare namespace StrictLibInternals {
++  /** @internal */
++  type ToObjectKeysValue<A> = A extends string
++    ? A
++    : A extends number
++      ? `${A}`
++      : never;
++
++  /** @internal */
++  type PickByValue<R, V> = Pick<
++    R,
++    {
++      [K in keyof R]: R[K] extends V ? K : never;
++    }[keyof R]
++  >;
++
++  /** @internal */
++  export type RecordUtilsEntries<R extends RecordBase> = R extends R
++    ? readonly {
++        readonly [K in keyof R]: readonly [
++          ToObjectKeysValue<keyof PickByValue<R, R[K]>>,
++          R[K],
++        ];
++        // eslint-disable-next-line @typescript-eslint/ban-types
++      }[RelaxedExclude<keyof R, symbol>][]
++    : never;
++}
+ 
+ interface ObjectConstructor {
+   /**
+@@ -23,7 +52,7 @@ interface ObjectConstructor {
+    *   object that you created or an existing Document Object Model (DOM)
+    *   object.
+    */
+-  values<T>(o: { [s: string]: T } | ArrayLike<T>): T[];
++  values<T>(o: { readonly [s: string]: T } | ArrayLike<T>): readonly T[];
+ 
+   /**
+    * Returns an array of values of the enumerable properties of an object
+@@ -32,7 +61,7 @@ interface ObjectConstructor {
+    *   object that you created or an existing Document Object Model (DOM)
+    *   object.
+    */
+-  values(o: {}): any[];
++  values(o: {}): readonly unknown[];
+ 
+   /**
+    * Returns an array of key/values of the enumerable properties of an object
+@@ -40,8 +69,21 @@ interface ObjectConstructor {
+    * @param o Object that contains the properties and methods. This can be an
+    *   object that you created or an existing Document Object Model (DOM)
+    *   object.
++   *
++   *   ```ts
++   *   const obj = {
++   *     x: 1,
++   *     y: 2,
++   *     z: 2,
++   *     3: 4,
++   *   } as const;
++   *
++   *   const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]
++   *   ```
+    */
+-  entries<T>(o: { [s: string]: T } | ArrayLike<T>): [string, T][];
++  entries<R extends RecordBase>(
++    object: R,
++  ): StrictLibInternals.RecordUtilsEntries<R>;
+ 
+   /**
+    * Returns an array of key/values of the enumerable properties of an object
+@@ -50,7 +92,7 @@ interface ObjectConstructor {
+    *   object that you created or an existing Document Object Model (DOM)
+    *   object.
+    */
+-  entries(o: {}): [string, any][];
++  entries(o: {}): readonly (readonly [string, unknown])[];
+ 
+   /**
+    * Returns an object containing all own property descriptors of an object
+@@ -60,8 +102,8 @@ interface ObjectConstructor {
+    *   object.
+    */
+   getOwnPropertyDescriptors<T>(o: T): {
+-    [P in keyof T]: TypedPropertyDescriptor<T[P]>;
++    readonly [P in keyof T]: TypedPropertyDescriptor<T[P]>;
+   } & {
+-    [x: string]: PropertyDescriptor;
++    readonly [x: string]: PropertyDescriptor;
+   };
+ }
+```

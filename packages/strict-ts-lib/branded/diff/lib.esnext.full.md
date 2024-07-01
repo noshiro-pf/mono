@@ -1,0 +1,20 @@
+```diff
+@@ -14,10 +14,11 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+-/// <reference lib="esnext" />
+-/// <reference lib="dom" />
+-/// <reference lib="webworker.importscripts" />
+-/// <reference lib="scripthost" />
+-/// <reference lib="dom.iterable" />
+-/// <reference lib="dom.asynciterable" />
++/// <reference path="./lib.esnext.d.ts" />
++/// <reference path="./lib.dom.d.ts" />
++/// <reference path="./lib.webworker.importscripts.d.ts" />
++/// <reference path="./lib.scripthost.d.ts" />
++/// <reference path="./lib.dom.iterable.d.ts" />
++/// <reference path="./lib.dom.asynciterable.d.ts" />
+```

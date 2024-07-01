@@ -1,0 +1,50 @@
+```diff
+@@ -14,8 +14,9 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+-/// <reference lib="es2015.symbol" />
++/// <reference path="./lib.es2015.symbol.d.ts" />
+ 
+ interface SymbolConstructor {
+   /**
+@@ -40,16 +41,16 @@ interface AsyncDisposable {
+ }
+ 
+ interface SuppressedError extends Error {
+-  error: any;
+-  suppressed: any;
++  readonly error: unknown;
++  readonly suppressed: unknown;
+ }
+ 
+ interface SuppressedErrorConstructor {
+-  new (error: any, suppressed: any, message?: string): SuppressedError;
+-  (error: any, suppressed: any, message?: string): SuppressedError;
++  new (error: unknown, suppressed: unknown, message?: string): SuppressedError;
++  (error: unknown, suppressed: unknown, message?: string): SuppressedError;
+   readonly prototype: SuppressedError;
+ }
+-declare var SuppressedError: SuppressedErrorConstructor;
++declare const SuppressedError: SuppressedErrorConstructor;
+ 
+ interface DisposableStack {
+   /** Returns a value indicating whether this stack has been disposed. */
+@@ -118,7 +119,7 @@ interface DisposableStackConstructor {
+   new (): DisposableStack;
+   readonly prototype: DisposableStack;
+ }
+-declare var DisposableStack: DisposableStackConstructor;
++declare const DisposableStack: DisposableStackConstructor;
+ 
+ interface AsyncDisposableStack {
+   /** Returns a value indicating whether this stack has been disposed. */
+@@ -188,4 +189,4 @@ interface AsyncDisposableStackConstructor {
+   new (): AsyncDisposableStack;
+   readonly prototype: AsyncDisposableStack;
+ }
+-declare var AsyncDisposableStack: AsyncDisposableStackConstructor;
++declare const AsyncDisposableStack: AsyncDisposableStackConstructor;
+```

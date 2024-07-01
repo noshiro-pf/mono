@@ -1,0 +1,23 @@
+```diff
+@@ -14,10 +14,11 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+ declare namespace Intl {
+   interface NumberRangeFormatPart extends NumberFormatPart {
+-    source: 'startRange' | 'endRange' | 'shared';
++    readonly source: 'startRange' | 'endRange' | 'shared';
+   }
+ 
+   interface NumberFormat {
+@@ -25,6 +26,6 @@ declare namespace Intl {
+     formatRangeToParts(
+       start: number | bigint,
+       end: number | bigint,
+-    ): NumberRangeFormatPart[];
++    ): readonly NumberRangeFormatPart[];
+   }
+ }
+```

@@ -10,11 +10,7 @@
   "jsxSingleQuote": true,
   "overrides": [
     {
-      "files": [
-        "experimental/**/*",
-        "packages/strict-ts-lib/packages/**/*",
-        "packages/tools/eslint-custom-rules/**/*"
-      ],
+      "files": ["experimental/**/*", "packages/tools/eslint-custom-rules/**/*"],
       "options": {
         "plugins": [
           "prettier-plugin-organize-imports",

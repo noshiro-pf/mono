@@ -1,16 +1,12 @@
 #!/bin/bash
 
-###### copy original definitions ######
 
-rm -rf ./copied
-mkdir -p ./copied
-./get-lib-files.sh
+THIS_SCRIPT_DIR=$(cd "$(dirname $0)" || exit; pwd)
+COPIED_DIR="${THIS_SCRIPT_DIR}/../temp/copied"
+ESLINT_FIXED_DIR="${THIS_SCRIPT_DIR}/../temp/eslint-fixed"
 
-# ###### eslint fix & prettier ######
 
-mkdir -p ./eslint-fixed
-cp -r ./copied/* ./eslint-fixed
+mkdir -p "${ESLINT_FIXED_DIR}"
+cp -r "${COPIED_DIR}"/lib*.d.ts "${ESLINT_FIXED_DIR}"
 
-yarn autofix > /dev/null 2>&1 || true
-
-yarn prettier --write ./eslint-fixed > /dev/null 2>&1  || true
+yarn zz:eslint "${ESLINT_FIXED_DIR}" --config ./configs/eslint.config.gen.mjs --fix || true

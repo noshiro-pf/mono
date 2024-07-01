@@ -1,0 +1,206 @@
+```diff
+@@ -14,6 +14,7 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+ interface Array<T> {
+   /**
+@@ -29,12 +30,12 @@ interface Array<T> {
+    *   instead.
+    */
+   find<S extends T>(
+-    predicate: (value: T, index: number, obj: T[]) => value is S,
+-    thisArg?: any,
++    predicate: (value: T, index: number, obj: readonly T[]) => value is S,
++    thisArg?: unknown,
+   ): S | undefined;
+   find(
+-    predicate: (value: T, index: number, obj: T[]) => unknown,
+-    thisArg?: any,
++    predicate: (value: T, index: number, obj: readonly T[]) => boolean,
++    thisArg?: unknown,
+   ): T | undefined;
+ 
+   /**
+@@ -50,8 +51,8 @@ interface Array<T> {
+    *   instead.
+    */
+   findIndex(
+-    predicate: (value: T, index: number, obj: T[]) => unknown,
+-    thisArg?: any,
++    predicate: (value: T, index: number, obj: readonly T[]) => boolean,
++    thisArg?: unknown,
+   ): number;
+ 
+   /**
+@@ -98,7 +99,7 @@ interface ArrayConstructor {
+   from<T, U>(
+     arrayLike: ArrayLike<T>,
+     mapfn: (v: T, k: number) => U,
+-    thisArg?: any,
++    thisArg?: unknown,
+   ): U[];
+ 
+   /**
+@@ -106,7 +107,7 @@ interface ArrayConstructor {
+    *
+    * @param items A set of elements to include in the new array object.
+    */
+-  of<T>(...items: T[]): T[];
++  of<T>(...items: readonly T[]): T[];
+ }
+ 
+ interface DateConstructor {
+@@ -128,7 +129,7 @@ interface Math {
+    *
+    * @param x A numeric expression.
+    */
+-  clz32(x: number): number;
++  clz32(x: number): UintRange<0, 33>;
+ 
+   /**
+    * Returns the result of 32-bit multiplication of two numbers.
+@@ -227,7 +228,7 @@ interface Math {
+    *   is +Infinity. If any argument is NaN, the result is NaN. If all arguments
+    *   are either +0 or −0, the result is +0.
+    */
+-  hypot(...values: number[]): number;
++  hypot(...values: readonly number[]): number;
+ 
+   /**
+    * Returns the integral part of the a numeric expression, x, removing any
+@@ -268,14 +269,14 @@ interface NumberConstructor {
+    *
+    * @param number A numeric value.
+    */
+-  isFinite(number: unknown): boolean;
++  isFinite(number: number): boolean;
+ 
+   /**
+    * Returns true if the value passed is an integer, false otherwise.
+    *
+    * @param number A numeric value.
+    */
+-  isInteger(number: unknown): boolean;
++  isInteger(number: number): boolean;
+ 
+   /**
+    * Returns a Boolean value that indicates whether a value is the reserved
+@@ -285,14 +286,14 @@ interface NumberConstructor {
+    *
+    * @param number A numeric value.
+    */
+-  isNaN(number: unknown): boolean;
++  isNaN(number: number): boolean;
+ 
+   /**
+    * Returns true if the value passed is a safe integer.
+    *
+    * @param number A numeric value.
+    */
+-  isSafeInteger(number: unknown): boolean;
++  isSafeInteger(number: number): boolean;
+ 
+   /**
+    * The value of the largest integer n such that n and n + 1 are both exactly
+@@ -324,7 +325,7 @@ interface NumberConstructor {
+    *   '0x' are considered hexadecimal. All other strings are considered
+    *   decimal.
+    */
+-  parseInt(string: string, radix?: number): number;
++  parseInt(string: string, radix?: UintRange<2, 37>): number;
+ }
+ 
+ interface ObjectConstructor {
+@@ -370,14 +371,14 @@ interface ObjectConstructor {
+    * @param target The target object to copy to.
+    * @param sources One or more source objects from which to copy properties
+    */
+-  assign(target: object, ...sources: any[]): any;
++  assign(target: object, ...sources: readonly unknown[]): unknown;
+ 
+   /**
+    * Returns an array of all symbol properties found directly on object o.
+    *
+    * @param o Object to retrieve the symbols from.
+    */
+-  getOwnPropertySymbols(o: any): symbol[];
++  getOwnPropertySymbols(o: unknown): symbol[];
+ 
+   /**
+    * Returns the names of the enumerable string properties and methods of an
+@@ -387,7 +388,7 @@ interface ObjectConstructor {
+    *   object that you created or an existing Document Object Model (DOM)
+    *   object.
+    */
+-  keys(o: {}): string[];
++  // keys(o: {}): string[];
+ 
+   /**
+    * Returns true if the values are the same value, false otherwise.
+@@ -395,7 +396,7 @@ interface ObjectConstructor {
+    * @param value1 The first value.
+    * @param value2 The second value.
+    */
+-  is(value1: any, value2: any): boolean;
++  is(value1: unknown, value2: unknown): boolean;
+ 
+   /**
+    * Sets the prototype of a specified object o to object proto or null. Returns
+@@ -404,7 +405,7 @@ interface ObjectConstructor {
+    * @param o The object to change its prototype.
+    * @param proto The value of the new prototype or null.
+    */
+-  setPrototypeOf(o: any, proto: object | null): any;
++  setPrototypeOf(o: unknown, proto: object | null): unknown;
+ }
+ 
+ interface ReadonlyArray<T> {
+@@ -422,11 +423,11 @@ interface ReadonlyArray<T> {
+    */
+   find<S extends T>(
+     predicate: (value: T, index: number, obj: readonly T[]) => value is S,
+-    thisArg?: any,
++    thisArg?: unknown,
+   ): S | undefined;
+   find(
+-    predicate: (value: T, index: number, obj: readonly T[]) => unknown,
+-    thisArg?: any,
++    predicate: (value: T, index: number, obj: readonly T[]) => boolean,
++    thisArg?: unknown,
+   ): T | undefined;
+ 
+   /**
+@@ -442,8 +443,8 @@ interface ReadonlyArray<T> {
+    *   instead.
+    */
+   findIndex(
+-    predicate: (value: T, index: number, obj: readonly T[]) => unknown,
+-    thisArg?: any,
++    predicate: (value: T, index: number, obj: readonly T[]) => boolean,
++    thisArg?: unknown,
+   ): number;
+ }
+ 
+@@ -652,7 +653,7 @@ interface StringConstructor {
+    * Return the String value whose elements are, in order, the elements in the
+    * List elements. If length is 0, the empty string is returned.
+    */
+-  fromCodePoint(...codePoints: number[]): string;
++  fromCodePoint(...codePoints: readonly number[]): string;
+ 
+   /**
+    * String.raw is usually used as a tag function of a Tagged Template String.
+@@ -666,7 +667,7 @@ interface StringConstructor {
+    * @param substitutions A set of substitution values.
+    */
+   raw(
+-    template: { raw: readonly string[] | ArrayLike<string> },
+-    ...substitutions: any[]
++    template: { readonly raw: readonly string[] | ArrayLike<string> },
++    ...substitutions: readonly unknown[]
+   ): string;
+ }
+```

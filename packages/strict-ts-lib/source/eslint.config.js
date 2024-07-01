@@ -31,6 +31,8 @@ const defineConfig = () => [
           message: 'Use `replaceWithNoMatchCheck` instead.',
         },
       ],
+      'import/no-internal-modules': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
     },
   },
 ];

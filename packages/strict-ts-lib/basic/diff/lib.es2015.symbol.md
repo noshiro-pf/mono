@@ -1,0 +1,16 @@
+```diff
+@@ -14,6 +14,7 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+ interface SymbolConstructor {
+   /** A reference to the prototype. */
+@@ -43,4 +44,4 @@ interface SymbolConstructor {
+   keyFor(sym: symbol): string | undefined;
+ }
+ 
+-declare var Symbol: SymbolConstructor;
++declare const Symbol: SymbolConstructor;
+```

@@ -1,0 +1,12 @@
+```diff
+@@ -14,7 +14,8 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+ interface WeakKeyTypes {
+-  symbol: symbol;
++  readonly symbol: symbol;
+ }
+```

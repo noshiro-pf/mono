@@ -1,0 +1,15 @@
+```diff
+@@ -14,9 +14,10 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+-/// <reference lib="es2015.iterable" />
+-/// <reference lib="es2015.symbol" />
++/// <reference path="./lib.es2015.iterable.d.ts" />
++/// <reference path="./lib.es2015.symbol.d.ts" />
+ 
+ interface SymbolConstructor {
+   /**
+```

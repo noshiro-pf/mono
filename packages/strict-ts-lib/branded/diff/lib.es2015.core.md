@@ -1,0 +1,413 @@
+```diff
+@@ -14,6 +14,7 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+ interface Array<T> {
+   /**
+@@ -29,12 +30,20 @@ interface Array<T> {
+    *   instead.
+    */
+   find<S extends T>(
+-    predicate: (value: T, index: number, obj: T[]) => value is S,
+-    thisArg?: any,
++    predicate: (
++      value: T,
++      index: NumberType.ArraySize,
++      obj: readonly T[],
++    ) => value is S,
++    thisArg?: unknown,
+   ): S | undefined;
+   find(
+-    predicate: (value: T, index: number, obj: T[]) => unknown,
+-    thisArg?: any,
++    predicate: (
++      value: T,
++      index: NumberType.ArraySize,
++      obj: readonly T[],
++    ) => boolean,
++    thisArg?: unknown,
+   ): T | undefined;
+ 
+   /**
+@@ -50,9 +59,13 @@ interface Array<T> {
+    *   instead.
+    */
+   findIndex(
+-    predicate: (value: T, index: number, obj: T[]) => unknown,
+-    thisArg?: any,
+-  ): number;
++    predicate: (
++      value: T,
++      index: NumberType.ArraySize,
++      obj: readonly T[],
++    ) => boolean,
++    thisArg?: unknown,
++  ): NumberType.ArraySearchResult;
+ 
+   /**
+    * Changes all array elements from `start` to `end` index to a static `value`
+@@ -64,7 +77,11 @@ interface Array<T> {
+    * @param end Index to stop filling the array at. If end is negative, it is
+    *   treated as length+end.
+    */
+-  fill(value: T, start?: number, end?: number): this;
++  fill(
++    value: T,
++    start?: NumberType.ArraySizeArg,
++    end?: NumberType.ArraySizeArg,
++  ): this;
+ 
+   /**
+    * Returns the this object after copying a section of the array identified by
+@@ -77,7 +94,11 @@ interface Array<T> {
+    * @param end If not specified, length of the this object is used as its
+    *   default value.
+    */
+-  copyWithin(target: number, start: number, end?: number): this;
++  copyWithin(
++    target: NumberType.ArraySizeArg,
++    start: NumberType.ArraySizeArg,
++    end?: NumberType.ArraySizeArg,
++  ): this;
+ }
+ 
+ interface ArrayConstructor {
+@@ -86,7 +107,7 @@ interface ArrayConstructor {
+    *
+    * @param arrayLike An array-like object to convert to an array.
+    */
+-  from<T>(arrayLike: ArrayLike<T>): T[];
++  from<T>(arrayLike: ArrayLike<T>): readonly T[];
+ 
+   /**
+    * Creates an array from an iterable object.
+@@ -97,16 +118,16 @@ interface ArrayConstructor {
+    */
+   from<T, U>(
+     arrayLike: ArrayLike<T>,
+-    mapfn: (v: T, k: number) => U,
+-    thisArg?: any,
+-  ): U[];
++    mapfn: (v: T, k: NumberType.ArraySize) => U,
++    thisArg?: unknown,
++  ): readonly U[];
+ 
+   /**
+    * Returns a new array from a set of elements.
+    *
+    * @param items A set of elements to include in the new array object.
+    */
+-  of<T>(...items: T[]): T[];
++  of<T>(...items: readonly T[]): readonly T[];
+ }
+ 
+ interface DateConstructor {
+@@ -128,7 +149,7 @@ interface Math {
+    *
+    * @param x A numeric expression.
+    */
+-  clz32(x: number): number;
++  clz32(x: number): UintRange<0, 33>;
+ 
+   /**
+    * Returns the result of 32-bit multiplication of two numbers.
+@@ -136,7 +157,7 @@ interface Math {
+    * @param x First number
+    * @param y Second number
+    */
+-  imul(x: number, y: number): number;
++  imul(x: Int32, y: Int32): Int32;
+ 
+   /**
+    * Returns the sign of the x, indicating whether x is positive, negative or
+@@ -144,7 +165,7 @@ interface Math {
+    *
+    * @param x The numeric expression to test
+    */
+-  sign(x: number): number;
++  sign(x: number): -1 | 0 | -0 | 1 | NaNType;
+ 
+   /**
+    * Returns the base 10 logarithm of a number.
+@@ -181,7 +202,7 @@ interface Math {
+    *
+    * @param x A numeric expression that contains an angle measured in radians.
+    */
+-  cosh(x: number): number;
++  cosh(x: number): PositiveNumber | NaNType;
+ 
+   /**
+    * Returns the hyperbolic sine of a number.
+@@ -202,7 +223,7 @@ interface Math {
+    *
+    * @param x A numeric expression that contains an angle measured in radians.
+    */
+-  acosh(x: number): number;
++  acosh(x: number): NonNegativeNumber | NaNType;
+ 
+   /**
+    * Returns the inverse hyperbolic sine of a number.
+@@ -227,7 +248,7 @@ interface Math {
+    *   is +Infinity. If any argument is NaN, the result is NaN. If all arguments
+    *   are either +0 or −0, the result is +0.
+    */
+-  hypot(...values: number[]): number;
++  hypot(...values: readonly number[]): NonNegativeNumber | NaNType;
+ 
+   /**
+    * Returns the integral part of the a numeric expression, x, removing any
+@@ -235,14 +256,14 @@ interface Math {
+    *
+    * @param x A numeric expression.
+    */
+-  trunc(x: number): number;
++  trunc(x: number): Int | InfiniteNumber | NaNType;
+ 
+   /**
+    * Returns the nearest single precision float representation of a number.
+    *
+    * @param x A numeric expression.
+    */
+-  fround(x: number): number;
++  fround(x: number): Float32 | NaNType;
+ 
+   /**
+    * Returns an implementation-dependent approximation to the cube root of
+@@ -259,7 +280,7 @@ interface NumberConstructor {
+    * value greater than 1 that is representable as a Number value, which is
+    * approximately: 2.2204460492503130808472633361816 x 10‍−‍16.
+    */
+-  readonly EPSILON: number;
++  readonly EPSILON: PositiveNumber;
+ 
+   /**
+    * Returns true if passed value is finite. Unlike the global isFinite,
+@@ -268,14 +289,14 @@ interface NumberConstructor {
+    *
+    * @param number A numeric value.
+    */
+-  isFinite(number: unknown): boolean;
++  isFinite(number: number): number is FiniteNumber;
+ 
+   /**
+    * Returns true if the value passed is an integer, false otherwise.
+    *
+    * @param number A numeric value.
+    */
+-  isInteger(number: unknown): boolean;
++  isInteger(number: number): number is Int;
+ 
+   /**
+    * Returns a Boolean value that indicates whether a value is the reserved
+@@ -285,35 +306,35 @@ interface NumberConstructor {
+    *
+    * @param number A numeric value.
+    */
+-  isNaN(number: unknown): boolean;
++  isNaN(number: number): number is NaNType;
+ 
+   /**
+    * Returns true if the value passed is a safe integer.
+    *
+    * @param number A numeric value.
+    */
+-  isSafeInteger(number: unknown): boolean;
++  isSafeInteger(number: number): number is SafeInt;
+ 
+   /**
+    * The value of the largest integer n such that n and n + 1 are both exactly
+    * representable as a Number value. The value of Number.MAX_SAFE_INTEGER is
+    * 9007199254740991 2^53 − 1.
+    */
+-  readonly MAX_SAFE_INTEGER: number;
++  readonly MAX_SAFE_INTEGER: SafeUint;
+ 
+   /**
+    * The value of the smallest integer n such that n and n − 1 are both exactly
+    * representable as a Number value. The value of Number.MIN_SAFE_INTEGER is
+    * −9007199254740991 (−(2^53 − 1)).
+    */
+-  readonly MIN_SAFE_INTEGER: number;
++  readonly MIN_SAFE_INTEGER: SafeInt;
+ 
+   /**
+    * Converts a string to a floating-point number.
+    *
+    * @param string A string that contains a floating-point number.
+    */
+-  parseFloat(string: string): number;
++  parseFloat(string: string): number | NaNType;
+ 
+   /**
+    * Converts A string to an integer.
+@@ -324,7 +345,7 @@ interface NumberConstructor {
+    *   '0x' are considered hexadecimal. All other strings are considered
+    *   decimal.
+    */
+-  parseInt(string: string, radix?: number): number;
++  parseInt(string: string, radix?: UintRange<2, 37>): Int | NaNType;
+ }
+ 
+ interface ObjectConstructor {
+@@ -370,14 +391,14 @@ interface ObjectConstructor {
+    * @param target The target object to copy to.
+    * @param sources One or more source objects from which to copy properties
+    */
+-  assign(target: object, ...sources: any[]): any;
++  assign(target: object, ...sources: readonly unknown[]): unknown;
+ 
+   /**
+    * Returns an array of all symbol properties found directly on object o.
+    *
+    * @param o Object to retrieve the symbols from.
+    */
+-  getOwnPropertySymbols(o: any): symbol[];
++  getOwnPropertySymbols(o: unknown): readonly symbol[];
+ 
+   /**
+    * Returns the names of the enumerable string properties and methods of an
+@@ -387,7 +408,7 @@ interface ObjectConstructor {
+    *   object that you created or an existing Document Object Model (DOM)
+    *   object.
+    */
+-  keys(o: {}): string[];
++  // keys(o: {}): readonly string[];
+ 
+   /**
+    * Returns true if the values are the same value, false otherwise.
+@@ -395,7 +416,7 @@ interface ObjectConstructor {
+    * @param value1 The first value.
+    * @param value2 The second value.
+    */
+-  is(value1: any, value2: any): boolean;
++  is(value1: unknown, value2: unknown): boolean;
+ 
+   /**
+    * Sets the prototype of a specified object o to object proto or null. Returns
+@@ -404,7 +425,7 @@ interface ObjectConstructor {
+    * @param o The object to change its prototype.
+    * @param proto The value of the new prototype or null.
+    */
+-  setPrototypeOf(o: any, proto: object | null): any;
++  setPrototypeOf(o: unknown, proto: object | null): unknown;
+ }
+ 
+ interface ReadonlyArray<T> {
+@@ -421,12 +442,20 @@ interface ReadonlyArray<T> {
+    *   instead.
+    */
+   find<S extends T>(
+-    predicate: (value: T, index: number, obj: readonly T[]) => value is S,
+-    thisArg?: any,
++    predicate: (
++      value: T,
++      index: NumberType.ArraySize,
++      obj: readonly T[],
++    ) => value is S,
++    thisArg?: unknown,
+   ): S | undefined;
+   find(
+-    predicate: (value: T, index: number, obj: readonly T[]) => unknown,
+-    thisArg?: any,
++    predicate: (
++      value: T,
++      index: NumberType.ArraySize,
++      obj: readonly T[],
++    ) => boolean,
++    thisArg?: unknown,
+   ): T | undefined;
+ 
+   /**
+@@ -442,9 +471,13 @@ interface ReadonlyArray<T> {
+    *   instead.
+    */
+   findIndex(
+-    predicate: (value: T, index: number, obj: readonly T[]) => unknown,
+-    thisArg?: any,
+-  ): number;
++    predicate: (
++      value: T,
++      index: NumberType.ArraySize,
++      obj: readonly T[],
++    ) => boolean,
++    thisArg?: unknown,
++  ): NumberType.ArraySearchResult;
+ }
+ 
+ interface RegExp {
+@@ -490,7 +523,7 @@ interface String {
+    * undefined. If a valid UTF-16 surrogate pair does not begin at pos, the
+    * result is the code unit at pos.
+    */
+-  codePointAt(pos: number): number | undefined;
++  codePointAt(pos: NumberType.StringSizeArgNonNegative): Uint32 | undefined;
+ 
+   /**
+    * Returns true if searchString appears as a substring of the result of
+@@ -501,7 +534,10 @@ interface String {
+    * @param position If position is undefined, 0 is assumed, so as to search all
+    *   of the String.
+    */
+-  includes(searchString: string, position?: number): boolean;
++  includes(
++    searchString: string,
++    position?: NumberType.StringSizeArgNonNegative,
++  ): boolean;
+ 
+   /**
+    * Returns true if the sequence of elements of searchString converted to a
+@@ -509,7 +545,10 @@ interface String {
+    * to a String) starting at endPosition – length(this). Otherwise returns
+    * false.
+    */
+-  endsWith(searchString: string, endPosition?: number): boolean;
++  endsWith(
++    searchString: string,
++    endPosition?: NumberType.StringSizeArgNonNegative,
++  ): boolean;
+ 
+   /**
+    * Returns the String value result of normalizing the string into the
+@@ -537,14 +576,17 @@ interface String {
+    *
+    * @param count Number of copies to append
+    */
+-  repeat(count: number): string;
++  repeat(count: SafeUint): string;
+ 
+   /**
+    * Returns true if the sequence of elements of searchString converted to a
+    * String is the same as the corresponding elements of this object (converted
+    * to a String) starting at position. Otherwise returns false.
+    */
+-  startsWith(searchString: string, position?: number): boolean;
++  startsWith(
++    searchString: string,
++    position?: NumberType.StringSizeArgNonNegative,
++  ): boolean;
+ 
+   /**
+    * Returns an `<a>` HTML anchor element and sets the name attribute to the
+@@ -652,7 +694,7 @@ interface StringConstructor {
+    * Return the String value whose elements are, in order, the elements in the
+    * List elements. If length is 0, the empty string is returned.
+    */
+-  fromCodePoint(...codePoints: number[]): string;
++  fromCodePoint(...codePoints: readonly Uint32[]): string;
+ 
+   /**
+    * String.raw is usually used as a tag function of a Tagged Template String.
+@@ -666,7 +708,7 @@ interface StringConstructor {
+    * @param substitutions A set of substitution values.
+    */
+   raw(
+-    template: { raw: readonly string[] | ArrayLike<string> },
+-    ...substitutions: any[]
++    template: { readonly raw: readonly string[] | ArrayLike<string> },
++    ...substitutions: readonly unknown[]
+   ): string;
+ }
+```

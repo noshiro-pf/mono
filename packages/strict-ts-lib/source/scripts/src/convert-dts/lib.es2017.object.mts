@@ -1,0 +1,68 @@
+import {
+  composeMonoTypeFns,
+  replaceWithNoMatchCheck,
+} from '@noshiro/mono-scripts';
+import { type ConverterOptions } from './common.mjs';
+
+export const convertLibEs2017Object = ({
+  readonlyModifier,
+}: ConverterOptions): MonoTypeFunction<string> =>
+  composeMonoTypeFns(
+    replaceWithNoMatchCheck(
+      'interface ObjectConstructor {',
+      [
+        'declare namespace StrictLibInternals {',
+        '  /** @internal */',
+        '  type ToObjectKeysValue<A> = A extends string',
+        '    ? A',
+        '    : A extends number',
+        // eslint-disable-next-line no-template-curly-in-string
+        '    ? `${A}`',
+        '    : never;',
+        '',
+        '  /** @internal */',
+        '  type PickByValue<R, V> = Pick<',
+        '    R,',
+        '    {',
+        '      [K in keyof R]: R[K] extends V ? K : never;',
+        '    }[keyof R]',
+        '  >;',
+        '',
+        '  /** @internal */',
+        '  export type RecordUtilsEntries<R extends RecordBase> = R extends R',
+        `    ? ${readonlyModifier}{`,
+        `        ${readonlyModifier}[K in keyof R]: readonly [`,
+        '          ToObjectKeysValue<keyof PickByValue<R, R[K]>>,',
+        '          R[K]',
+        '        ];',
+        '        // eslint-disable-next-line @typescript-eslint/ban-types',
+        '      }[RelaxedExclude<keyof R, symbol>][]',
+        '    : never;',
+        '  }',
+        '',
+        'interface ObjectConstructor {',
+      ].join('\n'),
+    ),
+    replaceWithNoMatchCheck(
+      [
+        '   */',
+        '  entries<T>(o: { readonly [s: string]: T } | ArrayLike<T>): readonly (readonly [string, T])[];',
+      ].join('\n'),
+      [
+        '   *',
+        '   * ```ts',
+        '   * const obj = {',
+        '   *   x: 1,',
+        '   *   y: 2,',
+        '   *   z: 2,',
+        '   *   3: 4,',
+        '   * } as const;',
+        '   *',
+        "   * const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]",
+        '   * ```',
+        '   *',
+        '   */',
+        'entries<R extends RecordBase>(object: R): StrictLibInternals.RecordUtilsEntries<R>;',
+      ].join('\n'),
+    ),
+  );

@@ -1,0 +1,39 @@
+{
+  "name": "@noshiro/strict-ts-lib-branded",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Strict TypeScript lib",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/noshiro-pf/mono.git"
+  },
+  "license": "ISC",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "dependencies": {
+    "@typescript/lib-decorators": "file:../packages/lib-decorators",
+    "@typescript/lib-dom": "file:../packages/lib-dom",
+    "@typescript/lib-es2015": "file:../packages/lib-es2015",
+    "@typescript/lib-es2016": "file:../packages/lib-es2016",
+    "@typescript/lib-es2017": "file:../packages/lib-es2017",
+    "@typescript/lib-es2018": "file:../packages/lib-es2018",
+    "@typescript/lib-es2019": "file:../packages/lib-es2019",
+    "@typescript/lib-es2020": "file:../packages/lib-es2020",
+    "@typescript/lib-es2021": "file:../packages/lib-es2021",
+    "@typescript/lib-es2022": "file:../packages/lib-es2022",
+    "@typescript/lib-es2023": "file:../packages/lib-es2023",
+    "@typescript/lib-es5": "file:../packages/lib-es5",
+    "@typescript/lib-es6": "file:../packages/lib-es6",
+    "@typescript/lib-esnext": "file:../packages/lib-esnext",
+    "@typescript/lib-scripthost": "file:../packages/lib-scripthost",
+    "@typescript/lib-webworker": "file:../packages/lib-webworker"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.5.2"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com/"
+  }
+}

@@ -1,0 +1,28 @@
+```diff
+@@ -14,6 +14,7 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+ interface DateConstructor {
+   /**
+@@ -36,11 +37,11 @@ interface DateConstructor {
+    */
+   UTC(
+     year: number,
+-    monthIndex?: number,
+-    date?: number,
+-    hours?: number,
+-    minutes?: number,
+-    seconds?: number,
+-    ms?: number,
++    monthIndex?: MonthIndexEnum,
++    date?: DateEnum,
++    hours?: HoursEnum,
++    minutes?: MinutesEnum,
++    seconds?: SecondsEnum,
++    ms?: MillisecondsEnum,
+   ): number;
+ }
+```

@@ -1,0 +1,62 @@
+```diff
+@@ -14,8 +14,9 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+-/// <reference lib="es2015.symbol" />
++/// <reference path="./lib.es2015.symbol.d.ts" />
+ 
+ interface SymbolConstructor {
+   /**
+@@ -95,7 +96,7 @@ interface Array<T> {
+    * absent when used in a 'with' statement.
+    */
+   readonly [Symbol.unscopables]: {
+-    [K in keyof any[]]?: boolean;
++    readonly [K in keyof (readonly any[])]?: boolean;
+   };
+ }
+ 
+@@ -105,7 +106,7 @@ interface ReadonlyArray<T> {
+    * absent when used in a 'with' statement.
+    */
+   readonly [Symbol.unscopables]: {
+-    [K in keyof (readonly any[])]?: boolean;
++    readonly [K in keyof (readonly any[])]?: boolean;
+   };
+ }
+ 
+@@ -157,7 +158,7 @@ interface Function {
+    * A constructor function can control which objects are recognized as its
+    * instances by 'instanceof' by overriding this method.
+    */
+-  [Symbol.hasInstance](value: any): boolean;
++  [Symbol.hasInstance](value: unknown): boolean;
+ }
+ 
+ interface GeneratorFunction {
+@@ -204,7 +205,7 @@ interface RegExp {
+    */
+   [Symbol.replace](
+     string: string,
+-    replacer: (substring: string, ...args: any[]) => string,
++    replacer: (substring: string, ...args: readonly unknown[]) => string,
+   ): string;
+ 
+   /**
+@@ -274,10 +275,10 @@ interface String {
+     searchValue: {
+       [Symbol.replace](
+         string: string,
+-        replacer: (substring: string, ...args: any[]) => string,
++        replacer: (substring: string, ...args: readonly unknown[]) => string,
+       ): string;
+     },
+-    replacer: (substring: string, ...args: any[]) => string,
++    replacer: (substring: string, ...args: readonly unknown[]) => string,
+   ): string;
+ 
+   /**
+```

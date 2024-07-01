@@ -1,0 +1,26 @@
+```diff
+@@ -14,13 +14,14 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+-/// <reference lib="es2019" />
+-/// <reference lib="es2020.bigint" />
+-/// <reference lib="es2020.date" />
+-/// <reference lib="es2020.number" />
+-/// <reference lib="es2020.promise" />
+-/// <reference lib="es2020.sharedmemory" />
+-/// <reference lib="es2020.string" />
+-/// <reference lib="es2020.symbol.wellknown" />
+-/// <reference lib="es2020.intl" />
++/// <reference path="./lib.es2019.d.ts" />
++/// <reference path="./lib.es2020.bigint.d.ts" />
++/// <reference path="./lib.es2020.date.d.ts" />
++/// <reference path="./lib.es2020.number.d.ts" />
++/// <reference path="./lib.es2020.promise.d.ts" />
++/// <reference path="./lib.es2020.sharedmemory.d.ts" />
++/// <reference path="./lib.es2020.string.d.ts" />
++/// <reference path="./lib.es2020.symbol.wellknown.d.ts" />
++/// <reference path="./lib.es2020.intl.d.ts" />
+```
