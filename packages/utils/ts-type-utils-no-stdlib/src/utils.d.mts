@@ -23,31 +23,31 @@ type RelaxedOmit<T, K extends keyof never> = Pick<
 
 type Primitive = bigint | boolean | number | string | symbol | null | undefined;
 
-/* JSONValue */
+/* JSON */
 
-type MutableJSONValue =
-  | MutableJSONValue[]
+type MutableJsonValue =
+  | MutableJsonValue[]
   | boolean
   | number
   | string
   | {
-      [K in string]?: MutableJSONValue;
+      [K in string]?: MutableJsonValue;
     }
   | null;
 
-type JSONValue =
+type JsonValue =
   | boolean
   | number
   | string
-  | readonly JSONValue[]
+  | readonly JsonValue[]
   | {
-      readonly [K in string]?: JSONValue;
+      readonly [K in string]?: JsonValue;
     }
   | null;
 
-type JSONType = Record<string, JSONValue>;
+type JsonType = Record<string, JsonValue>;
 
-type MutableJSONType = MutableRecord<string, MutableJSONValue>;
+type MutableJsonType = MutableRecord<string, MutableJsonValue>;
 
 /* Other Utilities */
 
@@ -246,4 +246,4 @@ type OptionalKeys<Obj> = PickUndefined<MapToNever<Obj>>;
  * }>; // 'd' | 'e' | 'f'
  * ```
  */
-type RequiredKeys<Obj> = StrictExclude<keyof Obj, OptionalKeys<Obj>>;
+type RequiredKeys<Obj> = Exclude<keyof Obj, OptionalKeys<Obj>>;

@@ -8,7 +8,7 @@ type _IndexOfTupleImpl<T extends readonly unknown[], K> =
         ? ToNumber<K>
         : never
       : never
-    : SafeUint;
+    : number;
 
 // export type IndexOfTuple<T extends readonly unknown[]> = TypeEq<
 //   T,
