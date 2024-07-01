@@ -1,5 +1,4 @@
-import { pipe } from '@noshiro/mono-scripts/ts-utils/pipe.mjs';
-import { replaceWithNoMatchCheck } from '@noshiro/mono-scripts/ts-utils/replace-with-no-match-check.mjs';
+import { pipe, replaceWithNoMatchCheck } from '@noshiro/mono-scripts';
 import { indexType } from './common.mjs';
 
 const marker = {

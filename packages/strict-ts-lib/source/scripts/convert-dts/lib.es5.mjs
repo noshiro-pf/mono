@@ -1,5 +1,4 @@
-import { pipe } from '@noshiro/mono-scripts/ts-utils/pipe.mjs';
-import { replaceWithNoMatchCheck } from '@noshiro/mono-scripts/ts-utils/replace-with-no-match-check.mjs';
+import { pipe, replaceWithNoMatchCheck } from '@noshiro/mono-scripts';
 import { indexType } from './common.mjs';
 import { convertLibEs5_Array } from './lib.es5-array.mjs';
 import { convertLibEs5_Date } from './lib.es5-date.mjs';
