@@ -25,29 +25,25 @@ type Primitive = bigint | boolean | number | string | symbol | null | undefined;
 
 /* JSON */
 
+type JsonPrimitive = boolean | number | string | null;
+
 type MutableJsonValue =
+  | JsonPrimitive
   | MutableJsonValue[]
-  | boolean
-  | number
-  | string
   | {
-      [K in string]?: MutableJsonValue;
-    }
-  | null;
+      [k: string]: MutableJsonValue;
+    };
 
 type JsonValue =
-  | boolean
-  | number
-  | string
-  | readonly JsonValue[]
-  | {
-      readonly [K in string]?: JsonValue;
-    }
-  | null;
+  | JsonPrimitive
+  | Readonly<{
+      [k: string]: JsonValue;
+    }>
+  | readonly JsonValue[];
 
-type JsonType = Record<string, JsonValue>;
+type JsonObject = Record<string, JsonValue>;
 
-type MutableJsonType = MutableRecord<string, MutableJsonValue>;
+type MutableJsonObject = MutableRecord<string, MutableJsonValue>;
 
 /* Other Utilities */
 

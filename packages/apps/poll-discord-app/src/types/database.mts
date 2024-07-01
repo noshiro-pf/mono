@@ -26,7 +26,7 @@ const databaseJsonType = t.record({
 
 export type DatabaseJson = t.TypeOf<typeof databaseJsonType>;
 
-expectType<DatabaseJson, JsonType>('<=');
+expectType<DatabaseJson, JsonObject>('<=');
 
 export const databaseDefaultValue = {
   polls: IMap.new<PollId, Poll>([]),
