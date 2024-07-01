@@ -1,4 +1,5 @@
 import {
+  execAsync,
   generateCypressDirectory,
   generateEsLintConfig,
   generateEsLintConfigForGlobalUtils,
@@ -8,10 +9,9 @@ import {
   generateTsConfigForTypeCheck,
   generateViteConfig,
   generateVitestConfigForUtils,
+  getWorkspaces,
   updatePackageJson,
-} from '../generate-configs-and-scripts/index.mjs';
-import { execAsync } from '../node-utils/index.mjs';
-import { getWorkspaces } from '../others/index.mjs';
+} from '../esm/index.mjs';
 
 /** For test */
 const executeFlag = {
@@ -28,8 +28,10 @@ const executeFlag = {
 /**
  * Generate configuration files such as "eslint.config.js", "tsconfig.json",
  * "vitest.config.ts", and "package.json".
+ *
+ * @returns {Promise<void>}
  */
-const main = async (): Promise<void> => {
+const main = async () => {
   const workspaces = await getWorkspaces();
 
   // utils

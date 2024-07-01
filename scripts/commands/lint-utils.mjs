@@ -1,4 +1,4 @@
-import { forEachPackages } from './foreach-package.mjs';
+import { forEachPackages } from '../esm/index.mjs';
 
 forEachPackages({
   prefixes: [
@@ -6,7 +6,7 @@ forEachPackages({
     'packages/apps/lambda-calculus-interpreter-core',
     'packages/apps/event-schedule-app-shared',
   ],
-  command: 'build',
+  command: 'lint',
   wsrunOptions: [
     '--exclude-missing',
     '--fast-exit',

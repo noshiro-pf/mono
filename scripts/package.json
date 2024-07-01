@@ -4,7 +4,7 @@
   "private": false,
   "license": "MIT",
   "author": "noshiro",
-  "sideEffects": true,
+  "sideEffects": false,
   "type": "module",
   "exports": {
     ".": {
@@ -14,6 +14,10 @@
       }
     }
   },
+  "files": [
+    "esm",
+    "src"
+  ],
   "scripts": {
     "build": "wireit",
     "clean": "run-p clean:**",
@@ -45,7 +49,7 @@
       "output": []
     },
     "gi": {
-      "command": "bash ./bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts --ignore commands",
+      "command": "bash ./bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
       "files": [
         "./bash/index_ts_generator.sh",
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"

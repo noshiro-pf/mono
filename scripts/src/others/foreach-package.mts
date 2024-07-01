@@ -1,5 +1,5 @@
 import { exec } from 'child_process';
-import { getWorkspaces } from '../others/index.mjs';
+import { getWorkspaces } from './get-workspaces.mjs';
 
 export const forEachPackages = async ({
   prefixes,
