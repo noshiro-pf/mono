@@ -1,4 +1,11 @@
 {
   "extends": "../../../config/tsconfig/tsconfig.lib.type-check.json",
-  "include": ["./src", "./configs", "./test"]
+  "compilerOptions": {
+    "types": [],
+    "lib": null,
+    "noLib": true,
+    "skipLibCheck": false,
+    "noEmit": true
+  },
+  "include": ["./src", "./test"]
 }

@@ -1,10 +1,7 @@
 import { type WorkspaceConfig } from './workspace-config-type.mjs';
 
-export const toTestTargetGlob = (cfg: WorkspaceConfig): string => {
-  const srcDirStr =
-    cfg.srcDirs.length >= 2 ? `(${cfg.srcDirs.join('|')})` : cfg.srcDirs[0];
-
+export const toTestTargetGlob = (cfg: WorkspaceConfig): readonly string[] => {
   const ext = cfg.tsType?.includes('react') === true ? '{mts,tsx}' : 'mts';
 
-  return `${srcDirStr}/**/*.test.${ext}`;
+  return cfg.srcDirs.map((d) => `${d}/**/*.test.${ext}`);
 };

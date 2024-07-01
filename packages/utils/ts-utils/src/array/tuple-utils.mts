@@ -8,31 +8,40 @@ const reversed = <T extends readonly unknown[]>(tpl: T): Tuple.Reverse<T> =>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, no-restricted-syntax
   Array.from<T[number]>(tpl).reverse() as unknown as Tuple.Reverse<T>;
 
+type MapNumberToArraySearchResult<T> = T extends number
+  ? TypeEq<T, number> extends true
+    ? SafeUint
+    : T
+  : T;
+
+type IndexOfTupleRefined<T extends readonly unknown[]> =
+  MapNumberToArraySearchResult<IndexOfTuple<T>>;
+
 const findIndex = <T extends readonly unknown[]>(
   tpl: T,
   predicate: (value: T[number], index: SafeUint) => boolean,
-): IndexOfTuple<T> | -1 =>
+): IndexOfTupleRefined<T> | -1 =>
   // eslint-disable-next-line no-restricted-syntax
   tpl.findIndex(
     // eslint-disable-next-line no-restricted-syntax
     predicate as (value: T[number], index: SafeUint) => boolean,
-  ) as IndexOfTuple<T>;
+  ) as IndexOfTupleRefined<T> | -1;
 
 const indexOf = <T extends readonly unknown[]>(
   tpl: T,
   searchElement: T[number],
-  fromIndex?: IndexOfTuple<T> | undefined,
-): IndexOfTuple<T> | -1 =>
+  fromIndex?: IndexOfTupleRefined<T> | undefined,
+): IndexOfTupleRefined<T> | -1 =>
   // eslint-disable-next-line no-restricted-syntax
-  tpl.indexOf(searchElement, fromIndex) as IndexOfTuple<T>;
+  tpl.indexOf(searchElement, fromIndex) as IndexOfTupleRefined<T> | -1;
 
 const lastIndexOf = <T extends readonly unknown[]>(
   tpl: T,
   searchElement: T[number],
-  fromIndex?: IndexOfTuple<T> | undefined,
-): IndexOfTuple<T> | -1 =>
+  fromIndex?: IndexOfTupleRefined<T> | undefined,
+): IndexOfTupleRefined<T> | -1 =>
   // eslint-disable-next-line no-restricted-syntax
-  tpl.lastIndexOf(searchElement, fromIndex) as IndexOfTuple<T>;
+  tpl.lastIndexOf(searchElement, fromIndex) as IndexOfTupleRefined<T>;
 
 const map = <T extends readonly unknown[], B>(
   tpl: T,
@@ -56,7 +65,6 @@ const set = <T extends readonly unknown[], N>(
 // TODO: improve type
 const update = <T extends readonly unknown[], N>(
   tpl: T,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   index: SafeUint | (Index<Length<T>> & SmallUint),
   updater: (prev: T[number]) => N,
 ): { readonly [K in keyof T]: N | T[K] } =>

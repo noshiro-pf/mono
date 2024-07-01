@@ -88,9 +88,9 @@ interface Object {}
 interface RegExp {}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface ReadonlySet<K> {}
+interface ReadonlySet<T> {}
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface Set<K> {}
+interface Set<T> {}
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ReadonlyMap<K, V> {}
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

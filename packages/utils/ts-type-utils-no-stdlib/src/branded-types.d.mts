@@ -248,10 +248,8 @@ type _SmallIntIndexMax = 512;
  * @internal
  * integers in `[1, MaxIndex - 1]`
  */
-type _SmallPositiveInt<MaxIndex extends number = _SmallIntIndexMax> = Exclude<
-  Index<MaxIndex>,
-  0
->;
+type _SmallPositiveInt<MaxIndex extends number = _SmallIntIndexMax> =
+  RelaxedExclude<Index<MaxIndex>, 0>;
 
 /**
  * @internal
@@ -292,6 +290,8 @@ type SmallInt<
 
 type SmallUint = SmallInt<'>=0'>;
 
+type CastToInt<T> = T extends Int ? T : never;
+
 /**
  * Append optimal small integers union to number type
  *
@@ -304,7 +304,7 @@ type SmallUint = SmallInt<'>=0'>;
 type WithSmallInt<
   N extends Int,
   MaxIndex extends number = _SmallIntIndexMax,
-> = WithSmallIntImpl<NormalizeBrandUnion<N>, MaxIndex>;
+> = WithSmallIntImpl<CastToInt<NormalizeBrandUnion<N>>, MaxIndex>;
 
 type WithSmallIntImpl<N extends Int, MaxIndex extends number> =
   | Exclude<

@@ -1574,7 +1574,7 @@ interface JSON {
   parse(
     text: string,
     reviver?: (this: unknown, key: string, value: unknown) => unknown,
-  ): MutableJSONValue;
+  ): MutableJsonValue;
   /**
    * Converts a JavaScript value to a JavaScript Object Notation (JSON)
    * string.

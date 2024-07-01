@@ -51,7 +51,7 @@ export const {
   resetState: resetResult,
 } = createState<
   | Result<
-      JSONValue,
+      JsonValue,
       Readonly<{
         type:
           | 'bakaze-is-undefined'

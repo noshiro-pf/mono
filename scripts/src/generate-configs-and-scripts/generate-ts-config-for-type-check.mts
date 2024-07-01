@@ -1,4 +1,4 @@
-import { tsConfigExtendString } from './ts-config-extend-string.mjs';
+import { tsConfigExtend } from './ts-config-extend-string.mjs';
 import { workspaceConfig } from './workspace-config.mjs';
 import { writeDirAndFileAndPrintDone } from './write-dir-and-file-and-print-done.mjs';
 
@@ -18,21 +18,24 @@ export const generateTsConfigForTypeCheck = async (
 
   const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
 
-  const content = [
-    `{`,
-    ...tsConfigExtendString(
-      cfg.tsType,
-      pathPrefixToRoot,
-      cfg.isViteApp
-        ? 'tsconfig.type-check.json'
-        : 'tsconfig.lib.type-check.json',
-      cfg.isViteApp,
-    ),
-    ',',
-    `  "include": [${cfg.typeCheckIncludes.map((s) => (s.startsWith('./') ? s : `"./${s}"`)).join(', ')}]`,
-    `}`,
-    '',
-  ].join('\n');
+  const content = JSON.stringify(
+    {
+      extends: tsConfigExtend(
+        cfg.tsType,
+        pathPrefixToRoot,
+        cfg.isViteApp
+          ? 'tsconfig.type-check.json'
+          : 'tsconfig.lib.type-check.json',
+        cfg.isViteApp,
+      ),
+      compilerOptions: cfg.tsconfig?.compilerOptions,
+      include: cfg.typeCheckIncludes.map((s) =>
+        s.startsWith('./') ? s : `./${s}`,
+      ),
+    },
+    undefined,
+    2,
+  );
 
   await writeDirAndFileAndPrintDone(
     workspaceLocation,
