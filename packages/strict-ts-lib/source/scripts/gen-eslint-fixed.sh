@@ -4,8 +4,7 @@
 
 rm -rf ./copied
 mkdir -p ./copied
-cp -r ../../../node_modules/typescript/lib/lib*.d.ts ./copied
-
+./get-lib-files.sh
 
 # ###### eslint fix & prettier ######
 

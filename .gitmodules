@@ -1,3 +1,0 @@
-[submodule "packages/strict-ts-lib/source/TypeScript"]
-	path = packages/strict-ts-lib/source/TypeScript
-	url = https://github.com/Microsoft/TypeScript
