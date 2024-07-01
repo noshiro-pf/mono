@@ -41,7 +41,8 @@ export const updatePackageJson = async (
 
   updatePackageJsonImpl(
     workspace,
-    mut_packageJson,
+    // eslint-disable-next-line no-restricted-syntax
+    mut_packageJson as MutableRecord<string, MutableJsonValue | undefined>,
     packageName,
     pathPrefixToRoot,
     cfg,
@@ -95,6 +96,10 @@ const updatePackageJsonImpl = (
                 },
       },
     };
+
+    if (packageName === 'ts-type-utils-no-stdlib') {
+      mut_packageJson['types'] = './ts-type-utils-no-stdlib.d.mts';
+    }
 
     if (packageName === 'event-schedule-app-shared') {
       for (let mut_n = 1; mut_n <= 7; mut_n += 1) {
@@ -172,12 +177,11 @@ const updatePackageJsonImpl = (
             'lint:fix': 'wireit',
             pub: 'yarn zz:cmd:publish',
             tsc: 'yarn type-check',
-            tscw: 'tsc --noEmit --watch',
-            'type-check': 'wireit',
-
+            tscw: 'yarn type-check --watch',
+            'type-check': 'tsc --noEmit',
             'zz:cmd:build:seq': 'run-s zz:cmd:build:step1',
 
-            'zz:cmd:build:step1': `ls src/*.d.mts | grep std.d.mts --invert | sed -E 's@(^.*$)@/// <reference path="./\\1" />@g' > ${filename}`,
+            'zz:cmd:build:step1': `ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path="./\\1" />@g' > ${filename}`,
             'zz:cmd:build:step2': `date | sed 's/^/\\/\\/ /g' >> ${filename}`,
 
             'zz:cmd:eslint': 'ESLINT_USE_FLAT_CONFIG=true eslint',
@@ -188,17 +192,6 @@ const updatePackageJsonImpl = (
               'yarn publish --no-git-tag-version --access=public',
           };
         }
-
-        mut_wireit['type-check'] = {
-          command: 'tsc --noEmit',
-          files: [
-            wireitDeps.typeCheckTarget,
-            'tsconfig.json',
-            wireitDeps.rootPackageJson,
-            wireitDeps.tsConfigs,
-          ],
-          output: [],
-        };
 
         {
           const files = [

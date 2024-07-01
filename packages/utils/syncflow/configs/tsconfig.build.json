@@ -4,5 +4,5 @@
     "outDir": "../esm"
   },
   "include": ["../src"],
-  "exclude": ["../(src|test)/**/*.test.mts"]
+  "exclude": ["../src/**/*.test.mts", "../test/**/*.test.mts"]
 }

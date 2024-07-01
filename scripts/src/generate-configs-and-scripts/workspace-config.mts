@@ -258,7 +258,17 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
       test: false,
     };
 
-    draft.typeCheckIncludes = ['src', workspaceConfigsDirName, 'test'];
+    draft.tsconfig = {
+      compilerOptions: {
+        types: [],
+        lib: null,
+        noLib: true,
+        skipLibCheck: false,
+        noEmit: true,
+      },
+    };
+
+    draft.typeCheckIncludes = ['src', 'test'];
   }),
 
   'strict-ts-lib': produce(defaultsForUtil, (draft) => {

@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { tsconfigTestJsonName, workspaceConfigsDirName } from './constants.mjs';
-import { tsConfigExtendString } from './ts-config-extend-string.mjs';
+import { tsConfigExtend } from './ts-config-extend-string.mjs';
 import { workspaceConfig } from './workspace-config.mjs';
 import { writeDirAndFileAndPrintDone } from './write-dir-and-file-and-print-done.mjs';
 
@@ -20,19 +20,20 @@ export const generateTsConfigForTest = async (
 
   const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
 
-  const content = [
-    `{`,
-    ...tsConfigExtendString(
-      cfg.tsType,
-      pathPrefixToRoot,
-      tsconfigTestJsonName,
-      cfg.isViteApp,
-    ),
-    ',',
-    `  "include": [${cfg.srcDirs.map((d) => `"../${d}"`).join(', ')}],`,
-    `}`,
-    '',
-  ].join('\n');
+  const content = JSON.stringify(
+    {
+      extends: tsConfigExtend(
+        cfg.tsType,
+        pathPrefixToRoot,
+        tsconfigTestJsonName,
+        cfg.isViteApp,
+      ),
+      compilerOptions: cfg.tsconfig?.compilerOptions,
+      include: cfg.srcDirs.map((d) => `../${d}`),
+    },
+    undefined,
+    2,
+  );
 
   await writeDirAndFileAndPrintDone(
     path.resolve(workspaceLocation, workspaceConfigsDirName),

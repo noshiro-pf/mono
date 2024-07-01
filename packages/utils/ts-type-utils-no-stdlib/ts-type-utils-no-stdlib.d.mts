@@ -16,6 +16,7 @@
 /// <reference path="./src/min.d.mts" />
 /// <reference path="./src/record-path.d.mts" />
 /// <reference path="./src/seq.d.mts" />
+/// <reference path="./src/std.d.mts" />
 /// <reference path="./src/to-number.d.mts" />
 /// <reference path="./src/tuple.d.mts" />
 /// <reference path="./src/uint-range.d.mts" />

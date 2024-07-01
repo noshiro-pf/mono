@@ -9,6 +9,9 @@ export type WorkspaceConfig = DeepReadonly<{
     test: boolean;
     lint: boolean;
   };
+  tsconfig?: {
+    compilerOptions: RecordBase;
+  };
   packageJson: {
     scripts: {
       gi: 0 | 1 | 2 | 3 | false;
