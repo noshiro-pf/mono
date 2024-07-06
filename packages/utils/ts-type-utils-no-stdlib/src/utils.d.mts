@@ -243,3 +243,11 @@ type OptionalKeys<Obj> = PickUndefined<MapToNever<Obj>>;
  * ```
  */
 type RequiredKeys<Obj> = Exclude<keyof Obj, OptionalKeys<Obj>>;
+
+type PartiallyOptional<T, K extends keyof T> = MergeIntersection<
+  Omit<T, K> & Partial<Pick<T, K>>
+>;
+
+type PartiallyRequired<T, K extends keyof T> = MergeIntersection<
+  Omit<T, K> & Required<Pick<T, K>>
+>;

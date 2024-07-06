@@ -28,7 +28,6 @@
     "type-check": "tsc --noEmit",
     "zz:cmd:build:seq": "run-s zz:cmd:build:step1",
     "zz:cmd:build:step1": "ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path=\"./\\1\" />@g' > ./ts-type-utils-no-stdlib.d.mts",
-    "zz:cmd:build:step2": "date | sed 's/^/\\/\\/ /g' >> ./ts-type-utils-no-stdlib.d.mts",
     "zz:cmd:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
     "zz:cmd:eslint:src-and-test": "yarn zz:cmd:eslint \"./{src,test}/**\" --cache --cache-location ./.eslintcache",
     "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",

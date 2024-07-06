@@ -2425,9 +2425,10 @@ interface ArrayLike<T> {
 // };
 
 /** Make all properties in T required */
-type Required<T> = {
-  [P in keyof T]-?: T[P];
-};
+// This is already defined in ts-type-utils.
+// type Required<T> = {
+//   [P in keyof T]-?: T[P];
+// };
 
 /** Make all properties in T readonly */
 // This is already defined in ts-type-utils.

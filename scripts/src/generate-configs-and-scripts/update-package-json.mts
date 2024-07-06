@@ -183,7 +183,6 @@ const updatePackageJsonImpl = (
             'zz:cmd:build:seq': 'run-s zz:cmd:build:step1',
 
             'zz:cmd:build:step1': `ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path="./\\1" />@g' > ${filename}`,
-            'zz:cmd:build:step2': `date | sed 's/^/\\/\\/ /g' >> ${filename}`,
 
             'zz:cmd:eslint': 'ESLINT_USE_FLAT_CONFIG=true eslint',
             'zz:cmd:eslint:src-and-test':
