@@ -42,9 +42,10 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
 
+    // @types/* をデフォルトで include しないようにする
     "types": [],
 
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "lib": ["ESNext"],
 
     // Completeness
     "skipLibCheck": true
