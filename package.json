@@ -6,12 +6,7 @@
   "sideEffects": true,
   "type": "module",
   "workspaces": [
-    "packages/!(strict-ts-lib)/**",
-    "packages/strict-ts-lib/basic/packages/**",
-    "packages/strict-ts-lib/basic/lib",
-    "packages/strict-ts-lib/branded/packages/**",
-    "packages/strict-ts-lib/branded/lib",
-    "packages/strict-ts-lib/source",
+    "packages/**",
     "scripts"
   ],
   "scripts": {
