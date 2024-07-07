@@ -147,6 +147,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
 
   'ts-utils-additional': fillDefaultsForUtil({
     hasScripts: true,
+    tsType: 'dom',
   }),
 
   'event-schedule-app-shared': fillDefaultsForUtil({
