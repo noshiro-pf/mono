@@ -141,6 +141,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
   'ts-utils': fillDefaultsForUtil(),
   'tiny-router-observable': fillDefaultsForUtil({
     passWithNoTests: true,
+    tsType: 'dom',
   }),
   'io-ts': fillDefaultsForUtil(),
   'lambda-calculus-interpreter-core': fillDefaultsForUtil(),
