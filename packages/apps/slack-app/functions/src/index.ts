@@ -53,6 +53,7 @@ export const makeUppercase = firestore
 
       get(searchUrl, (res) => {
         res
+          // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
           .on('data', (chunk: Buffer) => {
             mut_data.push(chunk);
           })

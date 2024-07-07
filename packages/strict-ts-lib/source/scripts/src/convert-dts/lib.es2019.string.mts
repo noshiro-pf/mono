@@ -2,21 +2,26 @@ import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
 } from '@noshiro/mono-scripts';
+import { type ConverterOptions } from './common.mjs';
 
-export const convertLibEs2019String = (): MonoTypeFunction<string> =>
+export const convertLibEs2019String = ({
+  config: { commentOutDeprecated },
+}: ConverterOptions): MonoTypeFunction<string> =>
   composeMonoTypeFns(
-    ...(
-      [
-        //
-        'trimLeft(): string;',
-        'trimRight(): string;',
-      ] as const
-    ).map((line) =>
-      // comment out deprecated functions
-      replaceWithNoMatchCheck(
-        //
-        line,
-        `// ${line}`,
-      ),
-    ),
+    ...(commentOutDeprecated
+      ? (
+          [
+            //
+            'trimLeft(): string;',
+            'trimRight(): string;',
+          ] as const
+        ).map((line) =>
+          // comment out deprecated functions
+          replaceWithNoMatchCheck(
+            //
+            line,
+            `// ${line}`,
+          ),
+        )
+      : []),
   );

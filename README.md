@@ -51,7 +51,6 @@ $  yarn ws:build
 -   configs
     -   tsconfig
         -   各 workspace で継承する共通 tsconfig 定義を置いている。
-        -   `nolib` の付いた tsconfig は標準ライブラリをデフォルトで読み込まない設定になっている。代わりに各 workspace のルート index.ts などで `/// <reference types="@noshiro/strict-ts-lib" />` のように reference 文を入れてカスタム lib 型定義を読み込むようにしている。ほとんどの TypeScript project の workspace で nolib の tsconfig を使用している。
 -   特殊 utility の説明
     -   `packages/utils/eslint-utils`
         -   eslint 共通設定を定義している。
@@ -67,10 +66,9 @@ $  yarn ws:build
         -   この仕組みにより、 plugin アップデート時には上のコマンドを実行し git 差分を確認することで、追加・削除されたルールを発見できるようになっている。
             -   schema に deprecated フラグが設定されているルールの severity は `"off"` しか選べないような型を生成しているため、 deprecated になったルールが有効のままにはならないことを保証している。
         -   一部のルールは false positive が多いなどの理由で workspace ごとに個別に無効化していることがある。
-    -   `packages/strict-ts-lib`
+    -   `packages/strict-typescript-lib`
         -   TypeScript の標準ライブラリの型を一部厳格化した型を提供するパッケージ。
         -   TypeScript 型ユーティリティ集。workspace 内で `DeepReadonly` などの型を使用できるようにする。
-        -   strict-ts-lib
     -   `packages/utils/global-*`
         -   `packages/apps` 内の各パッケージで使用。
         -   `global-X` は、 (P)React プロジェクトで頻繁に使うユーティリティを import 無しで使用できるようにするためのツール。 workspace に適切に設定すると `React.useMemo`　などのユーティリティを import 無しで使えるようになる。

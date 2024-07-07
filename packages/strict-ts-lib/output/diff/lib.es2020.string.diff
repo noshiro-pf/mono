@@ -1,0 +1,11 @@
+@@ -14,8 +14,9 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+-/// <reference lib="es2015.iterable" />
++/// <reference path="./lib.es2015.iterable.d.ts" />
+ 
+ interface String {
+   /**

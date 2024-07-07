@@ -11,7 +11,7 @@ import {
 import {
   BYTES_PER_ELEMENT,
   convertTypedArrayCommon,
-  typedArrayElemTypes,
+  typedArrayNumberElemTypes,
   typedArrayTypeToElemType,
   type TypedArrayElemType,
 } from './lib.typed-array-common.mjs';
@@ -103,7 +103,7 @@ export const convertLibEs5_TypedArray = (
   options: ConverterOptions,
 ): MonoTypeFunction<string> =>
   composeMonoTypeFns(
-    ...typedArrayElemTypes.flatMap((elemType) => [
+    ...typedArrayNumberElemTypes.flatMap((elemType) => [
       replaceWithNoMatchCheckBetweenRegexp({
         startRegexp: `interface ${elemType}Array {`,
         endRegexp: closeBraceRegexp,
@@ -134,6 +134,10 @@ export const convertLibEs5_TypedArray = (
           replaceWithNoMatchCheck(
             'byteOffset: number',
             `byteOffset: ${options.brandedNumber.TypedArraySize}`,
+          ),
+          replaceWithNoMatchCheck(
+            'readonly [index: number]: ',
+            '[index: number]: ',
           ),
         ),
       }),

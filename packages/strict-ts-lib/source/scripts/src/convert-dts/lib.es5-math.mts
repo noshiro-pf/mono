@@ -26,7 +26,7 @@ export const convertLibEs5_Math = ({
       replaceWithNoMatchCheck(
         'abs(x: number): number;',
         [
-          'abs<N extends SmallInt>(x: N): AbsoluteValue<N>;',
+          `abs<N extends ${useBrandedNumber ? 'SmallInt' : 'number'}>(x: N): AbsoluteValue<N>;`,
           ...(!useBrandedNumber
             ? ['abs(x: number): number;']
             : [

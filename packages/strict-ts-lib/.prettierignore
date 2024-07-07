@@ -1,21 +1,20 @@
-
 !source/temp/copied
 !source/temp/copied/*.d.ts
 source/temp/eslint-fixed
 source/temp/eslint-fixed/*.d.ts
 
-!basic/final
-!basic/final/*.d.ts
-!basic/packages
-!basic/packages/**/*.d.ts
-!basic/packages/**/package.json
-basic/diff
-basic/diff/**/*.md
+!output/lib-files
+!output/lib-files/*.d.ts
+!output/packages
+!output/packages/**/*.d.ts
+!output/packages/**/package.json
+output/diff
+output/diff/**/*.md
 
-!branded/final
-!branded/final/*.d.ts
-!branded/packages
-!branded/packages/**/*.d.ts
-!branded/packages/**/package.json
-branded/diff
-branded/diff/**/*.md
+!output-branded/lib-files
+!output-branded/lib-files/*.d.ts
+!output-branded/packages
+!output-branded/packages/**/*.d.ts
+!output-branded/packages/**/package.json
+output-branded/diff
+output-branded/diff/**/*.md

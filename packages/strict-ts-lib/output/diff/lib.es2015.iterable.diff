@@ -1,0 +1,391 @@
+@@ -14,8 +14,9 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+-/// <reference lib="es2015.symbol" />
++/// <reference path="./lib.es2015.symbol.d.ts" />
+ 
+ interface SymbolConstructor {
+   /**
+@@ -26,13 +27,13 @@ interface SymbolConstructor {
+ }
+ 
+ interface IteratorYieldResult<TYield> {
+-  done?: false;
+-  value: TYield;
++  readonly done?: false;
++  readonly value: TYield;
+ }
+ 
+ interface IteratorReturnResult<TReturn> {
+-  done: true;
+-  value: TReturn;
++  readonly done: true;
++  readonly value: TReturn;
+ }
+ 
+ type IteratorResult<T, TReturn = any> =
+@@ -41,9 +42,9 @@ type IteratorResult<T, TReturn = any> =
+ 
+ interface Iterator<T, TReturn = any, TNext = undefined> {
+   // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
+-  next(...args: [] | [TNext]): IteratorResult<T, TReturn>;
++  next(...args: readonly [] | readonly [TNext]): IteratorResult<T, TReturn>;
+   return?(value?: TReturn): IteratorResult<T, TReturn>;
+-  throw?(e?: any): IteratorResult<T, TReturn>;
++  throw?(e?: unknown): IteratorResult<T, TReturn>;
+ }
+ 
+ interface Iterable<T> {
+@@ -59,7 +60,7 @@ interface Array<T> {
+   [Symbol.iterator](): IterableIterator<T>;
+ 
+   /** Returns an iterable of key, value pairs for every entry in the array */
+-  entries(): IterableIterator<[number, T]>;
++  entries(): IterableIterator<readonly [number, T]>;
+ 
+   /** Returns an iterable of keys in the array */
+   keys(): IterableIterator<number>;
+@@ -86,7 +87,7 @@ interface ArrayConstructor {
+   from<T, U>(
+     iterable: Iterable<T> | ArrayLike<T>,
+     mapfn: (v: T, k: number) => U,
+-    thisArg?: any,
++    thisArg?: unknown,
+   ): U[];
+ }
+ 
+@@ -95,7 +96,7 @@ interface ReadonlyArray<T> {
+   [Symbol.iterator](): IterableIterator<T>;
+ 
+   /** Returns an iterable of key, value pairs for every entry in the array */
+-  entries(): IterableIterator<[number, T]>;
++  entries(): IterableIterator<readonly [number, T]>;
+ 
+   /** Returns an iterable of keys in the array */
+   keys(): IterableIterator<number>;
+@@ -106,15 +107,15 @@ interface ReadonlyArray<T> {
+ 
+ interface IArguments {
+   /** Iterator */
+-  [Symbol.iterator](): IterableIterator<any>;
++  [Symbol.iterator](): IterableIterator<unknown>;
+ }
+ 
+ interface Map<K, V> {
+   /** Returns an iterable of entries in the map. */
+-  [Symbol.iterator](): IterableIterator<[K, V]>;
++  [Symbol.iterator](): IterableIterator<readonly [K, V]>;
+ 
+   /** Returns an iterable of key, value pairs for every entry in the map. */
+-  entries(): IterableIterator<[K, V]>;
++  entries(): IterableIterator<readonly [K, V]>;
+ 
+   /** Returns an iterable of keys in the map */
+   keys(): IterableIterator<K>;
+@@ -125,10 +126,10 @@ interface Map<K, V> {
+ 
+ interface ReadonlyMap<K, V> {
+   /** Returns an iterable of entries in the map. */
+-  [Symbol.iterator](): IterableIterator<[K, V]>;
++  [Symbol.iterator](): IterableIterator<readonly [K, V]>;
+ 
+   /** Returns an iterable of key, value pairs for every entry in the map. */
+-  entries(): IterableIterator<[K, V]>;
++  entries(): IterableIterator<readonly [K, V]>;
+ 
+   /** Returns an iterable of keys in the map */
+   keys(): IterableIterator<K>;
+@@ -138,7 +139,7 @@ interface ReadonlyMap<K, V> {
+ }
+ 
+ interface MapConstructor {
+-  new (): Map<any, any>;
++  new (): Map<never, never>;
+   new <K, V>(iterable?: Iterable<readonly [K, V]> | null): Map<K, V>;
+ }
+ 
+@@ -153,8 +154,10 @@ interface WeakMapConstructor {
+ interface Set<T> {
+   /** Iterates over values in the set. */
+   [Symbol.iterator](): IterableIterator<T>;
++
+   /** Returns an iterable of [v,v] pairs for every value `v` in the set. */
+-  entries(): IterableIterator<[T, T]>;
++  entries(): IterableIterator<readonly [T, T]>;
++
+   /** Despite its name, returns an iterable of the values in the set. */
+   keys(): IterableIterator<T>;
+ 
+@@ -167,7 +170,7 @@ interface ReadonlySet<T> {
+   [Symbol.iterator](): IterableIterator<T>;
+ 
+   /** Returns an iterable of [v,v] pairs for every value `v` in the set. */
+-  entries(): IterableIterator<[T, T]>;
++  entries(): IterableIterator<readonly [T, T]>;
+ 
+   /** Despite its name, returns an iterable of the values in the set. */
+   keys(): IterableIterator<T>;
+@@ -177,6 +180,7 @@ interface ReadonlySet<T> {
+ }
+ 
+ interface SetConstructor {
++  new (): Set<never>;
+   new <T>(iterable?: Iterable<T> | null): Set<T>;
+ }
+ 
+@@ -214,13 +218,15 @@ interface String {
+ }
+ 
+ interface Int8Array {
+-  [Symbol.iterator](): IterableIterator<number>;
++  [Symbol.iterator](): IterableIterator<Int8>;
+   /** Returns an array of key, value pairs for every entry in the array */
+-  entries(): IterableIterator<[number, number]>;
++  entries(): IterableIterator<readonly [number, Int8]>;
++
+   /** Returns an list of keys in the array */
+   keys(): IterableIterator<number>;
++
+   /** Returns an list of values in the array */
+-  values(): IterableIterator<number>;
++  values(): IterableIterator<Int8>;
+ }
+ 
+ interface Int8ArrayConstructor {
+@@ -233,21 +239,23 @@ interface Int8ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(
+-    arrayLike: Iterable<number>,
+-    mapfn?: (v: number, k: number) => number,
+-    thisArg?: any,
++  from<T extends number>(
++    arrayLike: Iterable<T>,
++    mapfn?: (v: T, k: number) => Int8,
++    thisArg?: unknown,
+   ): Int8Array;
+ }
+ 
+ interface Uint8Array {
+-  [Symbol.iterator](): IterableIterator<number>;
++  [Symbol.iterator](): IterableIterator<Uint8>;
+   /** Returns an array of key, value pairs for every entry in the array */
+-  entries(): IterableIterator<[number, number]>;
++  entries(): IterableIterator<readonly [number, Uint8]>;
++
+   /** Returns an list of keys in the array */
+   keys(): IterableIterator<number>;
++
+   /** Returns an list of values in the array */
+-  values(): IterableIterator<number>;
++  values(): IterableIterator<Uint8>;
+ }
+ 
+ interface Uint8ArrayConstructor {
+@@ -260,23 +268,23 @@ interface Uint8ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(
+-    arrayLike: Iterable<number>,
+-    mapfn?: (v: number, k: number) => number,
+-    thisArg?: any,
++  from<T extends number>(
++    arrayLike: Iterable<T>,
++    mapfn?: (v: T, k: number) => Uint8,
++    thisArg?: unknown,
+   ): Uint8Array;
+ }
+ 
+ interface Uint8ClampedArray {
+-  [Symbol.iterator](): IterableIterator<number>;
++  [Symbol.iterator](): IterableIterator<Uint8>;
+   /** Returns an array of key, value pairs for every entry in the array */
+-  entries(): IterableIterator<[number, number]>;
++  entries(): IterableIterator<readonly [number, Uint8]>;
+ 
+   /** Returns an list of keys in the array */
+   keys(): IterableIterator<number>;
+ 
+   /** Returns an list of values in the array */
+-  values(): IterableIterator<number>;
++  values(): IterableIterator<Uint8>;
+ }
+ 
+ interface Uint8ClampedArrayConstructor {
+@@ -289,17 +297,17 @@ interface Uint8ClampedArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(
+-    arrayLike: Iterable<number>,
+-    mapfn?: (v: number, k: number) => number,
+-    thisArg?: any,
++  from<T extends number>(
++    arrayLike: Iterable<T>,
++    mapfn?: (v: T, k: number) => Uint8,
++    thisArg?: unknown,
+   ): Uint8ClampedArray;
+ }
+ 
+ interface Int16Array {
+   [Symbol.iterator](): IterableIterator<number>;
+   /** Returns an array of key, value pairs for every entry in the array */
+-  entries(): IterableIterator<[number, number]>;
++  entries(): IterableIterator<readonly [number, number]>;
+ 
+   /** Returns an list of keys in the array */
+   keys(): IterableIterator<number>;
+@@ -318,19 +326,21 @@ interface Int16ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(
+-    arrayLike: Iterable<number>,
+-    mapfn?: (v: number, k: number) => number,
+-    thisArg?: any,
++  from<T extends number>(
++    arrayLike: Iterable<T>,
++    mapfn?: (v: T, k: number) => number,
++    thisArg?: unknown,
+   ): Int16Array;
+ }
+ 
+ interface Uint16Array {
+   [Symbol.iterator](): IterableIterator<number>;
+   /** Returns an array of key, value pairs for every entry in the array */
+-  entries(): IterableIterator<[number, number]>;
++  entries(): IterableIterator<readonly [number, number]>;
++
+   /** Returns an list of keys in the array */
+   keys(): IterableIterator<number>;
++
+   /** Returns an list of values in the array */
+   values(): IterableIterator<number>;
+ }
+@@ -345,19 +355,21 @@ interface Uint16ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(
+-    arrayLike: Iterable<number>,
+-    mapfn?: (v: number, k: number) => number,
+-    thisArg?: any,
++  from<T extends number>(
++    arrayLike: Iterable<T>,
++    mapfn?: (v: T, k: number) => number,
++    thisArg?: unknown,
+   ): Uint16Array;
+ }
+ 
+ interface Int32Array {
+   [Symbol.iterator](): IterableIterator<number>;
+   /** Returns an array of key, value pairs for every entry in the array */
+-  entries(): IterableIterator<[number, number]>;
++  entries(): IterableIterator<readonly [number, number]>;
++
+   /** Returns an list of keys in the array */
+   keys(): IterableIterator<number>;
++
+   /** Returns an list of values in the array */
+   values(): IterableIterator<number>;
+ }
+@@ -372,19 +384,21 @@ interface Int32ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(
+-    arrayLike: Iterable<number>,
+-    mapfn?: (v: number, k: number) => number,
+-    thisArg?: any,
++  from<T extends number>(
++    arrayLike: Iterable<T>,
++    mapfn?: (v: T, k: number) => number,
++    thisArg?: unknown,
+   ): Int32Array;
+ }
+ 
+ interface Uint32Array {
+   [Symbol.iterator](): IterableIterator<number>;
+   /** Returns an array of key, value pairs for every entry in the array */
+-  entries(): IterableIterator<[number, number]>;
++  entries(): IterableIterator<readonly [number, number]>;
++
+   /** Returns an list of keys in the array */
+   keys(): IterableIterator<number>;
++
+   /** Returns an list of values in the array */
+   values(): IterableIterator<number>;
+ }
+@@ -399,19 +413,21 @@ interface Uint32ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(
+-    arrayLike: Iterable<number>,
+-    mapfn?: (v: number, k: number) => number,
+-    thisArg?: any,
++  from<T extends number>(
++    arrayLike: Iterable<T>,
++    mapfn?: (v: T, k: number) => number,
++    thisArg?: unknown,
+   ): Uint32Array;
+ }
+ 
+ interface Float32Array {
+   [Symbol.iterator](): IterableIterator<number>;
+   /** Returns an array of key, value pairs for every entry in the array */
+-  entries(): IterableIterator<[number, number]>;
++  entries(): IterableIterator<readonly [number, number]>;
++
+   /** Returns an list of keys in the array */
+   keys(): IterableIterator<number>;
++
+   /** Returns an list of values in the array */
+   values(): IterableIterator<number>;
+ }
+@@ -426,19 +442,21 @@ interface Float32ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(
+-    arrayLike: Iterable<number>,
+-    mapfn?: (v: number, k: number) => number,
+-    thisArg?: any,
++  from<T extends number>(
++    arrayLike: Iterable<T>,
++    mapfn?: (v: T, k: number) => number,
++    thisArg?: unknown,
+   ): Float32Array;
+ }
+ 
+ interface Float64Array {
+   [Symbol.iterator](): IterableIterator<number>;
+   /** Returns an array of key, value pairs for every entry in the array */
+-  entries(): IterableIterator<[number, number]>;
++  entries(): IterableIterator<readonly [number, number]>;
++
+   /** Returns an list of keys in the array */
+   keys(): IterableIterator<number>;
++
+   /** Returns an list of values in the array */
+   values(): IterableIterator<number>;
+ }
+@@ -453,9 +471,9 @@ interface Float64ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(
+-    arrayLike: Iterable<number>,
+-    mapfn?: (v: number, k: number) => number,
+-    thisArg?: any,
++  from<T extends number>(
++    arrayLike: Iterable<T>,
++    mapfn?: (v: T, k: number) => number,
++    thisArg?: unknown,
+   ): Float64Array;
+ }

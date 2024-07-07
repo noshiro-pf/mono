@@ -1,5 +1,5 @@
 {
-  "name": "@noshiro/strict-ts-lib-source",
+  "name": "@noshiro/strict-typescript-lib-source",
   "version": "1.0.0",
   "private": false,
   "repository": {
@@ -15,41 +15,48 @@
     "clean": "run-p clean:**",
     "clean:build": "rimraf scripts/dist",
     "clean:wireit": "rimraf .wireit/**",
+    "code-diffs:branded": "./scripts/open-diff-in-code.sh branded",
+    "code-diffs:normal": "./scripts/open-diff-in-code.sh normal",
     "fmt": "yarn zz:prettier ..",
-    "gen": "run-s z:gen:final z:gen:packages fmt fmt gen:diff",
-    "gen:diff": "run-s z:get:lib-files z:gen:diff",
-    "gen:final": "run-s z:gen:final z:fmt:final z:fmt:final",
-    "gen:full": "run-s z:get:lib-files z:gen:eslint-fixed z:gen:final z:gen:packages fmt fmt z:gen:diff",
-    "gen:packages": "run-s z:gen:packages z:fmt:packages z:fmt:packages",
-    "test": "run-p test:basic test:branded",
-    "test:basic": "tsc -p ../basic/tsconfig.json",
-    "test:branded": "tsc -p ../branded/tsconfig.json",
-    "testw:basic": "yarn test --watch",
+    "gen": "run-s z:gen:lib-files z:gen:packages z:gen:diff:cp fmt z:fmt:finishing z:gen:diff:script z:rename-lib",
+    "gen:diff": "run-s z:gen:diff:script",
+    "gen:diff:full": "run-s z:gen:diff:cp z:fmt:copied-for-diff z:fmt:finishing z:gen:diff:script",
+    "gen:full": "run-s z:get:lib-files z:gen:eslint-fixed gen",
+    "gen:lib-files": "run-s z:gen:lib-files z:fmt:lib-files z:fmt:finishing",
+    "gen:packages": "run-s z:gen:packages z:fmt:packages z:fmt:finishing z:rename-lib",
+    "test": "run-p test:normal test:branded",
+    "test:branded": "tsc -p ../output-branded/tsconfig.json",
+    "test:normal": "tsc -p ../output/tsconfig.json",
     "testw:branded": "yarn test-branded --watch",
+    "testw:normal": "yarn test --watch",
     "tsc": "yarn type-check",
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit",
-    "z:fmt:final": "yarn zz:prettier ../basic/final ../branded/final",
-    "z:fmt:packages": "yarn zz:prettier ../basic/packages ../branded/packages",
-    "z:gen:diff": "./scripts/gen-diff.sh",
+    "z:fmt:copied-for-diff": "yarn zz:prettier ./temp/copied-for-diff",
+    "z:fmt:finishing": "yarn zz:prettier ../**/lib.es2017.object.d.ts ../**/es2017/object/index.d.ts ../**/lib.dom.d.ts ../**/dom/index.d.ts ../**/lib.es2021.intl.d.ts ../**/es2021/intl/index.d.ts ../**/lib.es5.d.ts ../**/es5/index.d.ts",
+    "z:fmt:lib-files": "yarn zz:prettier ../output/lib-files ../output-branded/lib-files",
+    "z:fmt:packages": "yarn zz:prettier ../output/packages ../output-branded/packages ../output/lib ../output-branded/lib",
+    "z:gen:diff:cp": "cpx './temp/copied/*' './temp/copied-for-diff/'",
+    "z:gen:diff:script": "./scripts/gen-diff.sh",
     "z:gen:eslint-fixed": "./scripts/gen-eslint-fixed.sh",
-    "z:gen:final": "wireit",
+    "z:gen:lib-files": "wireit",
     "z:gen:packages": "wireit",
     "z:get:lib-files": "./scripts/get-lib-files.sh",
+    "z:rename-lib": "mv ../output/lib/package.json ../output/lib/package.json_bk",
     "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
     "zz:eslint:scripts": "yarn zz:eslint --config eslint.config.js scripts --cache --cache-location ./scripts/.eslintcache",
-    "zz:prettier": "prettier --ignore-path ../.prettierignore --write"
+    "zz:prettier": "prettier --ignore-path ../.prettierignore --write --log-level warn"
   },
   "devDependencies": {
     "@noshiro/mono-scripts": "*",
     "@noshiro/ts-type-utils-no-stdlib": "*"
   },
   "wireit": {
-    "z:gen:final": {
+    "z:gen:lib-files": {
       "dependencies": [
         "build"
       ],
-      "command": "./scripts/gen-final.sh"
+      "command": "./scripts/gen-lib-files.sh"
     },
     "z:gen:packages": {
       "dependencies": [

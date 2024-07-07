@@ -1,0 +1,59 @@
+@@ -14,6 +14,7 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+ interface Array<T> {
+   /**
+@@ -24,7 +25,10 @@ interface Array<T> {
+    * @param fromIndex The position in this array at which to begin searching for
+    *   searchElement.
+    */
+-  includes(searchElement: T, fromIndex?: number): boolean;
++  includes(
++    searchElement: T | (WidenLiteral<T> & {}),
++    fromIndex?: number,
++  ): searchElement is T;
+ }
+ 
+ interface ReadonlyArray<T> {
+@@ -36,7 +40,10 @@ interface ReadonlyArray<T> {
+    * @param fromIndex The position in this array at which to begin searching for
+    *   searchElement.
+    */
+-  includes(searchElement: T, fromIndex?: number): boolean;
++  includes(
++    searchElement: T | (WidenLiteral<T> & {}),
++    fromIndex?: number,
++  ): searchElement is T;
+ }
+ 
+ interface Int8Array {
+@@ -48,7 +55,7 @@ interface Int8Array {
+    * @param fromIndex The position in this array at which to begin searching for
+    *   searchElement.
+    */
+-  includes(searchElement: number, fromIndex?: number): boolean;
++  includes(searchElement: Int8, fromIndex?: number): boolean;
+ }
+ 
+ interface Uint8Array {
+@@ -60,7 +67,7 @@ interface Uint8Array {
+    * @param fromIndex The position in this array at which to begin searching for
+    *   searchElement.
+    */
+-  includes(searchElement: number, fromIndex?: number): boolean;
++  includes(searchElement: Uint8, fromIndex?: number): boolean;
+ }
+ 
+ interface Uint8ClampedArray {
+@@ -72,7 +79,7 @@ interface Uint8ClampedArray {
+    * @param fromIndex The position in this array at which to begin searching for
+    *   searchElement.
+    */
+-  includes(searchElement: number, fromIndex?: number): boolean;
++  includes(searchElement: Uint8, fromIndex?: number): boolean;
+ }
+ 
+ interface Int16Array {
