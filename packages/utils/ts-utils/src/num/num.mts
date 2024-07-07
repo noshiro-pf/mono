@@ -95,7 +95,6 @@ const decrement = <N extends PositiveSmallInt>(n: N): Decrement<N> =>
 
 export const Num = {
   from,
-  toString,
   isInRange,
   isInRangeInclusive,
   isUintInRange,
