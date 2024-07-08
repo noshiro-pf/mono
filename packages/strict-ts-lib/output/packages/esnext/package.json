@@ -13,7 +13,7 @@
   "type": "module",
   "types": "./index.d.ts",
   "dependencies": {
-    "@noshiro/ts-type-utils-no-stdlib": "1.1.0"
+    "@noshiro/ts-type-utils": "1.1.0"
   },
   "peerDependencies": {
     "typescript": ">=4.5.2"

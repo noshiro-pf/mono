@@ -6,7 +6,7 @@ topics: ['typescript']
 published: true
 ---
 
-ほぼ私のライブラリ [ts-type-utils-no-stdlib](https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-type-utils-no-stdlib) と [ts-type-utils](https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-type-utils) からの抜粋です（都合により TypeScript 標準ライブラリ（`lib.es5.d.ts` 等）に依存するかどうかでパッケージを分けています）。
+ほぼ私のライブラリ [ts-type-utils](https://github.com/noshiro-pf/mono/tree/main/packages/ts-type-utils) からの抜粋です（都合により TypeScript 標準ライブラリ（`lib.es5.d.ts` 等）に依存するかどうかでパッケージを分けています）。
 随時更新していきます。
 
 ---
@@ -82,7 +82,7 @@ expectType<{ x: any }, { x: number }>('=');
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/eq.mts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/eq.mts
 :::
 
 ## `BoolAnd`, `BoolOr`, `BoolNot`, `BoolEq`, `BoolNeq`, `BoolNand`, `BoolNor`,
@@ -121,11 +121,11 @@ type BoolAnd<A extends boolean, B extends boolean> =
 `A` や `B` に `true`, `false` の他に `boolean` や `never`, `any` などが入ってくる可能性もあるため、 `TypeEq` で厳密一致するかどうかをチェックする実装にしています。 `true` か `false` になっていなければすべて `never` を返します。
 
 :::details ソースコード（残りの実装）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/boolean.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/boolean.ts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/boolean.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/boolean.ts
 :::
 
 ## `IsNever`
@@ -149,7 +149,7 @@ type IsNever<T> = [T] extends [never] ? true : false;
 :::
 
 :::details テスト
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/is-never.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/is-never.ts
 :::
 
 ## `IsUnion`
@@ -175,11 +175,11 @@ type _IsUnionImpl<U, K extends U> =
 次に union distribution[^1] を用いて `U` の各要素 `K` 取り出し、その `K` と `U` が等しければ、`U` は 1 要素の union ということになるので `false` を返し、そうでない場合は `true` を返す、という仕組みです。なお、最後の `never` に評価されることはありません（union distribution のイディオム）。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/is-union.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/is-union.ts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/is-union.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/is-union.ts
 :::
 
 ## `ToNumber`
@@ -206,11 +206,11 @@ type ToNumber<S extends `${number}`>
 :::
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/to-number.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/to-number.ts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/to-number.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/to-number.ts
 :::
 
 ## `IsFixedLengthList`
@@ -233,11 +233,11 @@ type IsFixedLengthList<T extends readonly unknown[]> =
 可変長配列（ `readonly number[]` など）の`"length"` の型が `number` 型であるのに対して、固定長の配列型（タプル型、 `[1, 2, 3]` など）の `"length"` の型が `number` 型ではなく定数の型（`3`など）になることを利用しています。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/is-fixed-length-list.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/is-fixed-length-list.ts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/is-fixed-length-list.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/is-fixed-length-list.ts
 :::
 
 ## `IndexOfTuple`
@@ -269,11 +269,11 @@ type _IndexOfTupleImpl<T extends readonly unknown[], K> =
 `K extends '${number}'`は `K` が `ToNumber` の制約を満たしているというヒントを型システムに与えるために追加していますが、 `IndexOfTuple` からの入力では必ず真になるので実質何もしていない条件部です。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/index-of-tuple.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/index-of-tuple.ts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/index-of-tuple.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/index-of-tuple.ts
 :::
 
 ## `MakeTuple`
@@ -367,11 +367,11 @@ expectType<MakeTupleNaive<0, 1000>, MakeTuple<0, 1000>>('=');
 ```
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/make-tuple.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/make-tuple.ts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/make-tuple.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/make-tuple.ts
 :::
 
 ## `Index`
@@ -392,11 +392,11 @@ type Index<N extends number> = IndexOfTuple<MakeTuple<0, N>>;
 `MakeTuple` を利用して tuple を作った後 `IndexOfTuple` でその index を取り出す、という実装をしています。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/index-type.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/index-type.ts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/index-type.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/index-type.ts
 :::
 
 ## `NegativeIndex`
@@ -428,11 +428,11 @@ namespace _NegativeIndexImpl {
 `Index` と同様 tuple 型の index を取り出す実装を使っていますが、負数にするためにその index `I` を `-${I}` で文字列化して数値として取り出すという実装をしています。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/index-type.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/index-type.ts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/index-type.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/index-type.ts
 :::
 
 ## Enum types
@@ -460,7 +460,7 @@ type Int10 = Readonly<Index<512> | NegativeIndex<513>>;
 ```
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/enum.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/enum.ts
 :::
 
 ## `UintRange`
@@ -485,11 +485,11 @@ type UintRange<Start extends number, End extends number> = Exclude<
 `Index` と `Exclude` を組み合わせるだけで実装できます。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/uint-range.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/uint-range.ts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/uint-range.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/uint-range.ts
 :::
 
 ## `Max`, `Min`
@@ -509,15 +509,15 @@ expectType<Min<0 | 1 | 3 | 5 | 6>, 0>('=');
 実装は[この記事](https://zenn.dev/noshiro_piko/articles/typescript-type-level-min)で解説しています。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/max.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/max.ts
 
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/min.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/min.ts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/max.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/max.ts
 
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/min.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/min.ts
 :::
 
 ## `Seq`
@@ -543,11 +543,11 @@ type _SeqImpl<T extends readonly unknown[]> = {
 `MakeTuple` で長さ `N` の配列を作った後、その中身を Mapped Type で差し替えています。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/src/seq.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/seq.ts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-type-utils-no-stdlib/test/seq.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/seq.ts
 :::
 
 ---

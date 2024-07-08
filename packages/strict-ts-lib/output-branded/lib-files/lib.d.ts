@@ -14,7 +14,7 @@ and limitations under the License.
 ***************************************************************************** */
 
 /// <reference no-default-lib="true"/>
-/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+/// <reference types="@noshiro/ts-type-utils" />
 
 /// <reference path="./lib.es5.d.ts" />
 /// <reference path="./lib.dom.d.ts" />

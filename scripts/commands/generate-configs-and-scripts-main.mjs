@@ -34,15 +34,18 @@ const executeFlag = {
 const main = async () => {
   const workspaces = await getWorkspaces();
 
-  // utils
   for (const workspace of workspaces) {
     if (
       workspace.location === 'packages/strict-ts-lib/source' ||
       workspace.location.startsWith('packages/utils') ||
+      workspace.location === 'packages/ts-type-utils' ||
       workspace.location === 'packages/apps/lambda-calculus-interpreter-core' ||
       workspace.location === 'packages/apps/event-schedule-app-shared'
     ) {
+      // utils
+
       const packageName = workspace.location
+        .replace('packages/ts-type-utils', 'ts-type-utils')
         .replace('packages/utils/', '')
         .replace('packages/apps/', '')
         .replace('packages/strict-ts-lib/source', 'strict-ts-lib');
@@ -79,6 +82,8 @@ const main = async () => {
       workspace.location.startsWith('packages/apps') &&
       !workspace.location.endsWith('/cypress')
     ) {
+      // apps
+
       if (
         workspace.location === 'packages/apps/event-schedule-app/functions' ||
         workspace.location === 'packages/apps/slack-app/functions' ||

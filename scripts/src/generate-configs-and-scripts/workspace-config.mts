@@ -252,7 +252,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
     draft.typeCheckIncludes.push(workspaceScriptsDirName);
   }),
 
-  'ts-type-utils-no-stdlib': produce(defaultsForUtil, (draft) => {
+  'ts-type-utils': produce(defaultsForUtil, (draft) => {
     draft.useVite = false;
 
     draft.gen = {

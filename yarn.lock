@@ -4968,7 +4968,7 @@
 "@typescript/lib-decorators@file:packages/strict-ts-lib/output-branded/packages/decorators":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-decorators@file:packages/strict-ts-lib/output/packages/decorators":
   version "5.4.3"
@@ -4978,7 +4978,7 @@
 "@typescript/lib-dom@file:packages/strict-ts-lib/output-branded/packages/dom":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-dom@file:packages/strict-ts-lib/output/packages/dom":
   version "5.4.3"
@@ -4988,7 +4988,7 @@
 "@typescript/lib-es2015@file:packages/strict-ts-lib/output-branded/packages/es2015":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2015@file:packages/strict-ts-lib/output/packages/es2015":
   version "5.4.3"
@@ -4998,7 +4998,7 @@
 "@typescript/lib-es2016@file:packages/strict-ts-lib/output-branded/packages/es2016":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2016@file:packages/strict-ts-lib/output/packages/es2016":
   version "5.4.3"
@@ -5008,7 +5008,7 @@
 "@typescript/lib-es2017@file:packages/strict-ts-lib/output-branded/packages/es2017":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2017@file:packages/strict-ts-lib/output/packages/es2017":
   version "5.4.3"
@@ -5018,7 +5018,7 @@
 "@typescript/lib-es2018@file:packages/strict-ts-lib/output-branded/packages/es2018":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2018@file:packages/strict-ts-lib/output/packages/es2018":
   version "5.4.3"
@@ -5028,7 +5028,7 @@
 "@typescript/lib-es2019@file:packages/strict-ts-lib/output-branded/packages/es2019":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2019@file:packages/strict-ts-lib/output/packages/es2019":
   version "5.4.3"
@@ -5038,7 +5038,7 @@
 "@typescript/lib-es2020@file:packages/strict-ts-lib/output-branded/packages/es2020":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2020@file:packages/strict-ts-lib/output/packages/es2020":
   version "5.4.3"
@@ -5048,7 +5048,7 @@
 "@typescript/lib-es2021@file:packages/strict-ts-lib/output-branded/packages/es2021":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2021@file:packages/strict-ts-lib/output/packages/es2021":
   version "5.4.3"
@@ -5058,7 +5058,7 @@
 "@typescript/lib-es2022@file:packages/strict-ts-lib/output-branded/packages/es2022":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2022@file:packages/strict-ts-lib/output/packages/es2022":
   version "5.4.3"
@@ -5068,7 +5068,7 @@
 "@typescript/lib-es2023@file:packages/strict-ts-lib/output-branded/packages/es2023":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2023@file:packages/strict-ts-lib/output/packages/es2023":
   version "5.4.3"
@@ -5078,7 +5078,7 @@
 "@typescript/lib-es5@file:packages/strict-ts-lib/output-branded/packages/es5":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es5@file:packages/strict-ts-lib/output/packages/es5":
   version "5.4.3"
@@ -5088,7 +5088,7 @@
 "@typescript/lib-es6@file:packages/strict-ts-lib/output-branded/packages/es6":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es6@file:packages/strict-ts-lib/output/packages/es6":
   version "5.4.3"
@@ -5098,7 +5098,7 @@
 "@typescript/lib-esnext@file:packages/strict-ts-lib/output-branded/packages/esnext":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-esnext@file:packages/strict-ts-lib/output/packages/esnext":
   version "5.4.3"
@@ -5108,7 +5108,7 @@
 "@typescript/lib-scripthost@file:packages/strict-ts-lib/output-branded/packages/scripthost":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-scripthost@file:packages/strict-ts-lib/output/packages/scripthost":
   version "5.4.3"
@@ -5118,7 +5118,7 @@
 "@typescript/lib-webworker@file:packages/strict-ts-lib/output-branded/packages/webworker":
   version "5.4.3"
   dependencies:
-    "@noshiro/ts-type-utils-no-stdlib" "1.1.0"
+    "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-webworker@file:packages/strict-ts-lib/output/packages/webworker":
   version "5.4.3"

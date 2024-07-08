@@ -9,12 +9,12 @@ const thisDir = toThisDir(import.meta.url);
 /** @returns {readonly FlatConfig[]} */
 const defineConfig = () => [
   {
-    ignores: ['std.d.mts', './src/**/*', 'ts-type-utils-no-stdlib.d.mts'],
+    ignores: ['std.d.mts', './src/**/*', 'ts-type-utils.d.mts'],
   },
   ...eslintFlatConfigCommon({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
-    packageDirs: [nodePath.resolve(thisDir, '../../..'), thisDir],
+    packageDirs: [nodePath.resolve(thisDir, '../..'), thisDir],
   }),
   {
     rules: {

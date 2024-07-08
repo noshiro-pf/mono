@@ -2,7 +2,7 @@
  ***************************************************************************** */
  
  /// <reference no-default-lib="true"/>
-+/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
++/// <reference types="@noshiro/ts-type-utils" />
  
 -/// <reference lib="es2018.asynciterable" />
 +/// <reference path="./lib.es2018.asynciterable.d.ts" />

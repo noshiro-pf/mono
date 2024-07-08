@@ -94,7 +94,7 @@
     "@noshiro/global-tiny-router-react-hooks": "*",
     "@noshiro/global-ts-utils": "*",
     "@noshiro/mono-scripts": "*",
-    "@noshiro/ts-type-utils-no-stdlib": "*",
+    "@noshiro/ts-type-utils": "*",
     "@noshiro/ts-utils": "*"
   },
   "wireit": {
