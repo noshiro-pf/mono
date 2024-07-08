@@ -221,6 +221,20 @@ export const convertLibEs5 = (
       replaceWithNoMatchCheck(
         [
           //
+          'type Required<T> = {',
+          '  [P in keyof T]-?: T[P];',
+          '};',
+        ].join('\n'),
+        [
+          '// This is already defined in ts-type-utils.',
+          '// type Required<T> = {',
+          '//   [P in keyof T]-?: T[P];',
+          '// };',
+        ].join('\n'),
+      ),
+      replaceWithNoMatchCheck(
+        [
+          //
           'type Readonly<T> = {',
           '  readonly [P in keyof T]: T[P];',
           '};',

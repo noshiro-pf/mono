@@ -1819,7 +1819,7 @@
        ? Awaited<V> // recursively unwrap the value
        : never // the argument to `then` was not callable
      : T; // non-object or non-thenable
-@@ -2264,9 +2419,10 @@ interface ArrayLike<T> {
+@@ -2264,66 +2419,71 @@ interface ArrayLike<T> {
  }
  
  /** Make all properties in T optional */
@@ -1832,9 +1832,13 @@
 +// };
  
  /** Make all properties in T required */
- type Required<T> = {
-@@ -2274,56 +2430,59 @@ type Required<T> = {
- };
+-type Required<T> = {
+-  [P in keyof T]-?: T[P];
+-};
++// This is already defined in ts-type-utils.
++// type Required<T> = {
++//   [P in keyof T]-?: T[P];
++// };
  
  /** Make all properties in T readonly */
 -type Readonly<T> = {
@@ -1920,7 +1924,7 @@
  
  /** Convert string literal type to lowercase */
  type Lowercase<S extends string> = intrinsic;
-@@ -2345,7 +2504,7 @@ interface ThisType<T> {}
+@@ -2345,7 +2505,7 @@ interface ThisType<T> {}
   * FinalizationRegistry
   */
  interface WeakKeyTypes {
@@ -1929,7 +1933,7 @@
  }
  
  type WeakKey = WeakKeyTypes[keyof WeakKeyTypes];
-@@ -2358,10 +2517,13 @@ type WeakKey = WeakKeyTypes[keyof WeakKeyTypes];
+@@ -2358,10 +2518,13 @@ type WeakKey = WeakKeyTypes[keyof WeakKeyTypes];
   */
  interface ArrayBuffer {
    /** Read-only. The length of the ArrayBuffer (in bytes). */
@@ -1945,7 +1949,7 @@
  }
  
  /**
-@@ -2369,32 +2531,32 @@ interface ArrayBuffer {
+@@ -2369,32 +2532,32 @@ interface ArrayBuffer {
   * Typed Arrays.
   */
  interface ArrayBufferTypes {
@@ -1987,7 +1991,7 @@
    /**
     * Gets the Float32 value at the specified byte offset from the start of the
     * view. There is no alignment constraint; multi-byte values may be fetched
-@@ -2405,7 +2567,10 @@ interface DataView {
+@@ -2405,7 +2568,10 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   read.
     */
@@ -1999,7 +2003,7 @@
  
    /**
     * Gets the Float64 value at the specified byte offset from the start of the
-@@ -2417,7 +2582,10 @@ interface DataView {
+@@ -2417,7 +2583,10 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   read.
     */
@@ -2011,7 +2015,7 @@
  
    /**
     * Gets the Int8 value at the specified byte offset from the start of the
-@@ -2427,7 +2595,7 @@ interface DataView {
+@@ -2427,7 +2596,7 @@ interface DataView {
     * @param byteOffset The place in the buffer at which the value should be
     *   retrieved.
     */
@@ -2020,7 +2024,7 @@
  
    /**
     * Gets the Int16 value at the specified byte offset from the start of the
-@@ -2439,7 +2607,10 @@ interface DataView {
+@@ -2439,7 +2608,10 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   read.
     */
@@ -2032,7 +2036,7 @@
    /**
     * Gets the Int32 value at the specified byte offset from the start of the
     * view. There is no alignment constraint; multi-byte values may be fetched
-@@ -2450,7 +2621,10 @@ interface DataView {
+@@ -2450,7 +2622,10 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   read.
     */
@@ -2044,7 +2048,7 @@
  
    /**
     * Gets the Uint8 value at the specified byte offset from the start of the
-@@ -2460,7 +2634,7 @@ interface DataView {
+@@ -2460,7 +2635,7 @@ interface DataView {
     * @param byteOffset The place in the buffer at which the value should be
     *   retrieved.
     */
@@ -2053,7 +2057,7 @@
  
    /**
     * Gets the Uint16 value at the specified byte offset from the start of the
-@@ -2472,7 +2646,10 @@ interface DataView {
+@@ -2472,7 +2647,10 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   read.
     */
@@ -2065,7 +2069,7 @@
  
    /**
     * Gets the Uint32 value at the specified byte offset from the start of the
-@@ -2484,7 +2661,10 @@ interface DataView {
+@@ -2484,7 +2662,10 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   read.
     */
@@ -2077,7 +2081,7 @@
  
    /**
     * Stores an Float32 value at the specified byte offset from the start of the
-@@ -2495,7 +2675,11 @@ interface DataView {
+@@ -2495,7 +2676,11 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   written.
     */
@@ -2090,7 +2094,7 @@
  
    /**
     * Stores an Float64 value at the specified byte offset from the start of the
-@@ -2506,7 +2690,11 @@ interface DataView {
+@@ -2506,7 +2691,11 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   written.
     */
@@ -2103,7 +2107,7 @@
  
    /**
     * Stores an Int8 value at the specified byte offset from the start of the
-@@ -2515,7 +2703,7 @@ interface DataView {
+@@ -2515,7 +2704,7 @@ interface DataView {
     * @param byteOffset The place in the buffer at which the value should be set.
     * @param value The value to set.
     */
@@ -2112,7 +2116,7 @@
  
    /**
     * Stores an Int16 value at the specified byte offset from the start of the
-@@ -2526,7 +2714,11 @@ interface DataView {
+@@ -2526,7 +2715,11 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   written.
     */
@@ -2125,7 +2129,7 @@
  
    /**
     * Stores an Int32 value at the specified byte offset from the start of the
-@@ -2537,7 +2729,11 @@ interface DataView {
+@@ -2537,7 +2730,11 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   written.
     */
@@ -2138,7 +2142,7 @@
  
    /**
     * Stores an Uint8 value at the specified byte offset from the start of the
-@@ -2546,7 +2742,7 @@ interface DataView {
+@@ -2546,7 +2743,7 @@ interface DataView {
     * @param byteOffset The place in the buffer at which the value should be set.
     * @param value The value to set.
     */
@@ -2147,7 +2151,7 @@
  
    /**
     * Stores an Uint16 value at the specified byte offset from the start of the
-@@ -2557,7 +2753,11 @@ interface DataView {
+@@ -2557,7 +2754,11 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   written.
     */
@@ -2160,7 +2164,7 @@
  
    /**
     * Stores an Uint32 value at the specified byte offset from the start of the
-@@ -2568,18 +2768,22 @@ interface DataView {
+@@ -2568,18 +2769,22 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   written.
     */
@@ -2188,7 +2192,7 @@
  
  /**
   * A typed array of 8-bit integer values. The contents are initialized to 0. If
-@@ -2587,16 +2791,16 @@ declare var DataView: DataViewConstructor;
+@@ -2587,16 +2792,16 @@ declare var DataView: DataViewConstructor;
   */
  interface Int8Array {
    /** The size in bytes of each element in the array. */
@@ -2208,7 +2212,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -2609,7 +2813,11 @@ interface Int8Array {
+@@ -2609,7 +2814,11 @@ interface Int8Array {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -2221,7 +2225,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -2623,8 +2831,12 @@ interface Int8Array {
+@@ -2623,8 +2832,12 @@ interface Int8Array {
     *   value.
     */
    every(
@@ -2236,7 +2240,7 @@
    ): boolean;
  
    /**
-@@ -2637,7 +2849,11 @@ interface Int8Array {
+@@ -2637,7 +2850,11 @@ interface Int8Array {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -2249,7 +2253,7 @@
  
    /**
     * Returns the elements of an array that meet the condition specified in a
-@@ -2651,8 +2867,12 @@ interface Int8Array {
+@@ -2651,8 +2868,12 @@ interface Int8Array {
     *   value.
     */
    filter(
@@ -2264,7 +2268,7 @@
    ): Int8Array;
  
    /**
-@@ -2668,9 +2888,13 @@ interface Int8Array {
+@@ -2668,9 +2889,13 @@ interface Int8Array {
     *   instead.
     */
    find(
@@ -2281,7 +2285,7 @@
  
    /**
     * Returns the index of the first element in the array where predicate is
-@@ -2685,9 +2909,13 @@ interface Int8Array {
+@@ -2685,9 +2910,13 @@ interface Int8Array {
     *   instead.
     */
    findIndex(
@@ -2298,7 +2302,7 @@
  
    /**
     * Performs the specified action for each element in an array.
-@@ -2699,8 +2927,12 @@ interface Int8Array {
+@@ -2699,8 +2928,12 @@ interface Int8Array {
     *   value.
     */
    forEach(
@@ -2313,7 +2317,7 @@
    ): void;
  
    /**
-@@ -2710,7 +2942,10 @@ interface Int8Array {
+@@ -2710,7 +2943,10 @@ interface Int8Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -2325,7 +2329,7 @@
  
    /**
     * Adds all the elements of an array separated by the specified separator
-@@ -2729,7 +2964,10 @@ interface Int8Array {
+@@ -2729,7 +2965,10 @@ interface Int8Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -2337,7 +2341,7 @@
  
    /** The length of the array. */
    readonly length: number;
-@@ -2746,8 +2984,12 @@ interface Int8Array {
+@@ -2746,8 +2985,12 @@ interface Int8Array {
     *   value.
     */
    map(
@@ -2352,7 +2356,7 @@
    ): Int8Array;
  
    /**
-@@ -2764,21 +3006,21 @@ interface Int8Array {
+@@ -2764,21 +3007,21 @@ interface Int8Array {
     */
    reduce(
      callbackfn: (
@@ -2385,7 +2389,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array. The
-@@ -2795,8 +3037,8 @@ interface Int8Array {
+@@ -2795,8 +3038,8 @@ interface Int8Array {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -2396,7 +2400,7 @@
        array: Int8Array,
      ) => U,
      initialValue: U,
-@@ -2817,21 +3059,21 @@ interface Int8Array {
+@@ -2817,21 +3060,21 @@ interface Int8Array {
     */
    reduceRight(
      callbackfn: (
@@ -2429,7 +2433,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array, in
-@@ -2849,8 +3091,8 @@ interface Int8Array {
+@@ -2849,8 +3092,8 @@ interface Int8Array {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -2440,7 +2444,7 @@
        array: Int8Array,
      ) => U,
      initialValue: U,
-@@ -2866,7 +3108,10 @@ interface Int8Array {
+@@ -2866,7 +3109,10 @@ interface Int8Array {
     * @param offset The index in the current array at which the values are to be
     *   written.
     */
@@ -2452,7 +2456,7 @@
  
    /**
     * Returns a section of an array.
-@@ -2875,7 +3120,10 @@ interface Int8Array {
+@@ -2875,7 +3121,10 @@ interface Int8Array {
     * @param end The end of the specified portion of the array. This is exclusive
     *   of the element at the index 'end'.
     */
@@ -2464,7 +2468,7 @@
  
    /**
     * Determines whether the specified callback function returns true for any
-@@ -2890,23 +3138,27 @@ interface Int8Array {
+@@ -2890,23 +3139,27 @@ interface Int8Array {
     *   value.
     */
    some(
@@ -2498,7 +2502,7 @@
  
    /**
     * Gets a new Int8Array view of the ArrayBuffer store for this array,
-@@ -2915,7 +3167,10 @@ interface Int8Array {
+@@ -2915,7 +3168,10 @@ interface Int8Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -2510,7 +2514,7 @@
  
    /** Converts a number to a string by using the current locale. */
    toLocaleString(): string;
-@@ -2926,34 +3181,34 @@ interface Int8Array {
+@@ -2926,34 +3182,34 @@ interface Int8Array {
    /** Returns the primitive value of the specified object. */
    valueOf(): Int8Array;
  
@@ -2553,7 +2557,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -2964,11 +3219,11 @@ interface Int8ArrayConstructor {
+@@ -2964,11 +3220,11 @@ interface Int8ArrayConstructor {
     */
    from<T>(
      arrayLike: ArrayLike<T>,
@@ -2568,7 +2572,7 @@
  
  /**
   * A typed array of 8-bit unsigned integer values. The contents are initialized
-@@ -2977,16 +3232,16 @@ declare var Int8Array: Int8ArrayConstructor;
+@@ -2977,16 +3233,16 @@ declare var Int8Array: Int8ArrayConstructor;
   */
  interface Uint8Array {
    /** The size in bytes of each element in the array. */
@@ -2588,7 +2592,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -2999,7 +3254,11 @@ interface Uint8Array {
+@@ -2999,7 +3255,11 @@ interface Uint8Array {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -2601,7 +2605,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -3013,8 +3272,12 @@ interface Uint8Array {
+@@ -3013,8 +3273,12 @@ interface Uint8Array {
     *   value.
     */
    every(
@@ -2616,7 +2620,7 @@
    ): boolean;
  
    /**
-@@ -3027,7 +3290,11 @@ interface Uint8Array {
+@@ -3027,7 +3291,11 @@ interface Uint8Array {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -2629,7 +2633,7 @@
  
    /**
     * Returns the elements of an array that meet the condition specified in a
-@@ -3041,8 +3308,12 @@ interface Uint8Array {
+@@ -3041,8 +3309,12 @@ interface Uint8Array {
     *   value.
     */
    filter(
@@ -2644,7 +2648,7 @@
    ): Uint8Array;
  
    /**
-@@ -3058,9 +3329,13 @@ interface Uint8Array {
+@@ -3058,9 +3330,13 @@ interface Uint8Array {
     *   instead.
     */
    find(
@@ -2661,7 +2665,7 @@
  
    /**
     * Returns the index of the first element in the array where predicate is
-@@ -3075,9 +3350,13 @@ interface Uint8Array {
+@@ -3075,9 +3351,13 @@ interface Uint8Array {
     *   instead.
     */
    findIndex(
@@ -2678,7 +2682,7 @@
  
    /**
     * Performs the specified action for each element in an array.
-@@ -3089,8 +3368,12 @@ interface Uint8Array {
+@@ -3089,8 +3369,12 @@ interface Uint8Array {
     *   value.
     */
    forEach(
@@ -2693,7 +2697,7 @@
    ): void;
  
    /**
-@@ -3100,7 +3383,10 @@ interface Uint8Array {
+@@ -3100,7 +3384,10 @@ interface Uint8Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -2705,7 +2709,7 @@
  
    /**
     * Adds all the elements of an array separated by the specified separator
-@@ -3119,7 +3405,10 @@ interface Uint8Array {
+@@ -3119,7 +3406,10 @@ interface Uint8Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -2717,7 +2721,7 @@
  
    /** The length of the array. */
    readonly length: number;
-@@ -3136,8 +3425,12 @@ interface Uint8Array {
+@@ -3136,8 +3426,12 @@ interface Uint8Array {
     *   value.
     */
    map(
@@ -2732,7 +2736,7 @@
    ): Uint8Array;
  
    /**
-@@ -3154,21 +3447,21 @@ interface Uint8Array {
+@@ -3154,21 +3448,21 @@ interface Uint8Array {
     */
    reduce(
      callbackfn: (
@@ -2765,7 +2769,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array. The
-@@ -3185,8 +3478,8 @@ interface Uint8Array {
+@@ -3185,8 +3479,8 @@ interface Uint8Array {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -2776,7 +2780,7 @@
        array: Uint8Array,
      ) => U,
      initialValue: U,
-@@ -3207,21 +3500,21 @@ interface Uint8Array {
+@@ -3207,21 +3501,21 @@ interface Uint8Array {
     */
    reduceRight(
      callbackfn: (
@@ -2809,7 +2813,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array, in
-@@ -3239,8 +3532,8 @@ interface Uint8Array {
+@@ -3239,8 +3533,8 @@ interface Uint8Array {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -2820,7 +2824,7 @@
        array: Uint8Array,
      ) => U,
      initialValue: U,
-@@ -3256,7 +3549,10 @@ interface Uint8Array {
+@@ -3256,7 +3550,10 @@ interface Uint8Array {
     * @param offset The index in the current array at which the values are to be
     *   written.
     */
@@ -2832,7 +2836,7 @@
  
    /**
     * Returns a section of an array.
-@@ -3265,7 +3561,10 @@ interface Uint8Array {
+@@ -3265,7 +3562,10 @@ interface Uint8Array {
     * @param end The end of the specified portion of the array. This is exclusive
     *   of the element at the index 'end'.
     */
@@ -2844,7 +2848,7 @@
  
    /**
     * Determines whether the specified callback function returns true for any
-@@ -3280,23 +3579,27 @@ interface Uint8Array {
+@@ -3280,23 +3580,27 @@ interface Uint8Array {
     *   value.
     */
    some(
@@ -2878,7 +2882,7 @@
  
    /**
     * Gets a new Uint8Array view of the ArrayBuffer store for this array,
-@@ -3305,7 +3608,10 @@ interface Uint8Array {
+@@ -3305,7 +3609,10 @@ interface Uint8Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -2890,7 +2894,7 @@
  
    /** Converts a number to a string by using the current locale. */
    toLocaleString(): string;
-@@ -3316,35 +3622,35 @@ interface Uint8Array {
+@@ -3316,35 +3623,35 @@ interface Uint8Array {
    /** Returns the primitive value of the specified object. */
    valueOf(): Uint8Array;
  
@@ -2934,7 +2938,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -3355,11 +3661,11 @@ interface Uint8ArrayConstructor {
+@@ -3355,11 +3662,11 @@ interface Uint8ArrayConstructor {
     */
    from<T>(
      arrayLike: ArrayLike<T>,
@@ -2949,7 +2953,7 @@
  
  /**
   * A typed array of 8-bit unsigned integer (clamped) values. The contents are
-@@ -3368,16 +3674,16 @@ declare var Uint8Array: Uint8ArrayConstructor;
+@@ -3368,16 +3675,16 @@ declare var Uint8Array: Uint8ArrayConstructor;
   */
  interface Uint8ClampedArray {
    /** The size in bytes of each element in the array. */
@@ -2969,7 +2973,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -3390,7 +3696,11 @@ interface Uint8ClampedArray {
+@@ -3390,7 +3697,11 @@ interface Uint8ClampedArray {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -2982,7 +2986,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -3405,11 +3715,11 @@ interface Uint8ClampedArray {
+@@ -3405,11 +3716,11 @@ interface Uint8ClampedArray {
     */
    every(
      predicate: (
@@ -2998,7 +3002,7 @@
    ): boolean;
  
    /**
-@@ -3422,7 +3732,11 @@ interface Uint8ClampedArray {
+@@ -3422,7 +3733,11 @@ interface Uint8ClampedArray {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -3011,7 +3015,7 @@
  
    /**
     * Returns the elements of an array that meet the condition specified in a
-@@ -3436,8 +3750,12 @@ interface Uint8ClampedArray {
+@@ -3436,8 +3751,12 @@ interface Uint8ClampedArray {
     *   value.
     */
    filter(
@@ -3026,7 +3030,7 @@
    ): Uint8ClampedArray;
  
    /**
-@@ -3454,12 +3772,12 @@ interface Uint8ClampedArray {
+@@ -3454,12 +3773,12 @@ interface Uint8ClampedArray {
     */
    find(
      predicate: (
@@ -3043,7 +3047,7 @@
  
    /**
     * Returns the index of the first element in the array where predicate is
-@@ -3475,12 +3793,12 @@ interface Uint8ClampedArray {
+@@ -3475,12 +3794,12 @@ interface Uint8ClampedArray {
     */
    findIndex(
      predicate: (
@@ -3060,7 +3064,7 @@
  
    /**
     * Performs the specified action for each element in an array.
-@@ -3493,11 +3811,11 @@ interface Uint8ClampedArray {
+@@ -3493,11 +3812,11 @@ interface Uint8ClampedArray {
     */
    forEach(
      callbackfn: (
@@ -3075,7 +3079,7 @@
    ): void;
  
    /**
-@@ -3507,7 +3825,10 @@ interface Uint8ClampedArray {
+@@ -3507,7 +3826,10 @@ interface Uint8ClampedArray {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -3087,7 +3091,7 @@
  
    /**
     * Adds all the elements of an array separated by the specified separator
-@@ -3526,7 +3847,10 @@ interface Uint8ClampedArray {
+@@ -3526,7 +3848,10 @@ interface Uint8ClampedArray {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -3099,7 +3103,7 @@
  
    /** The length of the array. */
    readonly length: number;
-@@ -3544,11 +3868,11 @@ interface Uint8ClampedArray {
+@@ -3544,11 +3869,11 @@ interface Uint8ClampedArray {
     */
    map(
      callbackfn: (
@@ -3115,7 +3119,7 @@
    ): Uint8ClampedArray;
  
    /**
-@@ -3565,21 +3889,21 @@ interface Uint8ClampedArray {
+@@ -3565,21 +3890,21 @@ interface Uint8ClampedArray {
     */
    reduce(
      callbackfn: (
@@ -3148,7 +3152,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array. The
-@@ -3596,8 +3920,8 @@ interface Uint8ClampedArray {
+@@ -3596,8 +3921,8 @@ interface Uint8ClampedArray {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -3159,7 +3163,7 @@
        array: Uint8ClampedArray,
      ) => U,
      initialValue: U,
-@@ -3618,21 +3942,21 @@ interface Uint8ClampedArray {
+@@ -3618,21 +3943,21 @@ interface Uint8ClampedArray {
     */
    reduceRight(
      callbackfn: (
@@ -3192,7 +3196,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array, in
-@@ -3650,8 +3974,8 @@ interface Uint8ClampedArray {
+@@ -3650,8 +3975,8 @@ interface Uint8ClampedArray {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -3203,7 +3207,7 @@
        array: Uint8ClampedArray,
      ) => U,
      initialValue: U,
-@@ -3667,7 +3991,10 @@ interface Uint8ClampedArray {
+@@ -3667,7 +3992,10 @@ interface Uint8ClampedArray {
     * @param offset The index in the current array at which the values are to be
     *   written.
     */
@@ -3215,7 +3219,7 @@
  
    /**
     * Returns a section of an array.
-@@ -3676,7 +4003,10 @@ interface Uint8ClampedArray {
+@@ -3676,7 +4004,10 @@ interface Uint8ClampedArray {
     * @param end The end of the specified portion of the array. This is exclusive
     *   of the element at the index 'end'.
     */
@@ -3227,7 +3231,7 @@
  
    /**
     * Determines whether the specified callback function returns true for any
-@@ -3692,26 +4022,26 @@ interface Uint8ClampedArray {
+@@ -3692,26 +4023,26 @@ interface Uint8ClampedArray {
     */
    some(
      predicate: (
@@ -3262,7 +3266,7 @@
  
    /**
     * Gets a new Uint8ClampedArray view of the ArrayBuffer store for this array,
-@@ -3720,7 +4050,10 @@ interface Uint8ClampedArray {
+@@ -3720,7 +4051,10 @@ interface Uint8ClampedArray {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -3274,7 +3278,7 @@
  
    /** Converts a number to a string by using the current locale. */
    toLocaleString(): string;
-@@ -3731,35 +4064,35 @@ interface Uint8ClampedArray {
+@@ -3731,35 +4065,35 @@ interface Uint8ClampedArray {
    /** Returns the primitive value of the specified object. */
    valueOf(): Uint8ClampedArray;
  
@@ -3318,7 +3322,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -3770,11 +4103,11 @@ interface Uint8ClampedArrayConstructor {
+@@ -3770,11 +4104,11 @@ interface Uint8ClampedArrayConstructor {
     */
    from<T>(
      arrayLike: ArrayLike<T>,
@@ -3333,7 +3337,7 @@
  
  /**
   * A typed array of 16-bit signed integer values. The contents are initialized
-@@ -3783,16 +4116,16 @@ declare var Uint8ClampedArray: Uint8ClampedArrayConstructor;
+@@ -3783,16 +4117,16 @@ declare var Uint8ClampedArray: Uint8ClampedArrayConstructor;
   */
  interface Int16Array {
    /** The size in bytes of each element in the array. */
@@ -3353,7 +3357,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -3805,7 +4138,11 @@ interface Int16Array {
+@@ -3805,7 +4139,11 @@ interface Int16Array {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -3366,7 +3370,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -3819,8 +4156,12 @@ interface Int16Array {
+@@ -3819,8 +4157,12 @@ interface Int16Array {
     *   value.
     */
    every(
@@ -3381,7 +3385,7 @@
    ): boolean;
  
    /**
-@@ -3833,7 +4174,11 @@ interface Int16Array {
+@@ -3833,7 +4175,11 @@ interface Int16Array {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -3394,7 +3398,7 @@
  
    /**
     * Returns the elements of an array that meet the condition specified in a
-@@ -3847,8 +4192,12 @@ interface Int16Array {
+@@ -3847,8 +4193,12 @@ interface Int16Array {
     *   value.
     */
    filter(
@@ -3409,7 +3413,7 @@
    ): Int16Array;
  
    /**
-@@ -3864,9 +4213,13 @@ interface Int16Array {
+@@ -3864,9 +4214,13 @@ interface Int16Array {
     *   instead.
     */
    find(
@@ -3426,7 +3430,7 @@
  
    /**
     * Returns the index of the first element in the array where predicate is
-@@ -3881,9 +4234,13 @@ interface Int16Array {
+@@ -3881,9 +4235,13 @@ interface Int16Array {
     *   instead.
     */
    findIndex(
@@ -3443,7 +3447,7 @@
  
    /**
     * Performs the specified action for each element in an array.
-@@ -3895,9 +4252,14 @@ interface Int16Array {
+@@ -3895,9 +4253,14 @@ interface Int16Array {
     *   value.
     */
    forEach(
@@ -3460,7 +3464,7 @@
    /**
     * Returns the index of the first occurrence of a value in an array.
     *
-@@ -3905,7 +4267,10 @@ interface Int16Array {
+@@ -3905,7 +4268,10 @@ interface Int16Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -3472,7 +3476,7 @@
  
    /**
     * Adds all the elements of an array separated by the specified separator
-@@ -3924,7 +4289,10 @@ interface Int16Array {
+@@ -3924,7 +4290,10 @@ interface Int16Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -3484,7 +3488,7 @@
  
    /** The length of the array. */
    readonly length: number;
-@@ -3941,8 +4309,12 @@ interface Int16Array {
+@@ -3941,8 +4310,12 @@ interface Int16Array {
     *   value.
     */
    map(
@@ -3499,7 +3503,7 @@
    ): Int16Array;
  
    /**
-@@ -3959,21 +4331,21 @@ interface Int16Array {
+@@ -3959,21 +4332,21 @@ interface Int16Array {
     */
    reduce(
      callbackfn: (
@@ -3532,7 +3536,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array. The
-@@ -3990,8 +4362,8 @@ interface Int16Array {
+@@ -3990,8 +4363,8 @@ interface Int16Array {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -3543,7 +3547,7 @@
        array: Int16Array,
      ) => U,
      initialValue: U,
-@@ -4012,21 +4384,21 @@ interface Int16Array {
+@@ -4012,21 +4385,21 @@ interface Int16Array {
     */
    reduceRight(
      callbackfn: (
@@ -3576,7 +3580,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array, in
-@@ -4044,8 +4416,8 @@ interface Int16Array {
+@@ -4044,8 +4417,8 @@ interface Int16Array {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -3587,7 +3591,7 @@
        array: Int16Array,
      ) => U,
      initialValue: U,
-@@ -4061,7 +4433,10 @@ interface Int16Array {
+@@ -4061,7 +4434,10 @@ interface Int16Array {
     * @param offset The index in the current array at which the values are to be
     *   written.
     */
@@ -3599,7 +3603,7 @@
  
    /**
     * Returns a section of an array.
-@@ -4070,7 +4445,10 @@ interface Int16Array {
+@@ -4070,7 +4446,10 @@ interface Int16Array {
     * @param end The end of the specified portion of the array. This is exclusive
     *   of the element at the index 'end'.
     */
@@ -3611,7 +3615,7 @@
  
    /**
     * Determines whether the specified callback function returns true for any
-@@ -4085,23 +4463,27 @@ interface Int16Array {
+@@ -4085,23 +4464,27 @@ interface Int16Array {
     *   value.
     */
    some(
@@ -3645,7 +3649,7 @@
  
    /**
     * Gets a new Int16Array view of the ArrayBuffer store for this array,
-@@ -4110,7 +4492,10 @@ interface Int16Array {
+@@ -4110,7 +4493,10 @@ interface Int16Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -3657,7 +3661,7 @@
  
    /** Converts a number to a string by using the current locale. */
    toLocaleString(): string;
-@@ -4121,35 +4506,35 @@ interface Int16Array {
+@@ -4121,35 +4507,35 @@ interface Int16Array {
    /** Returns the primitive value of the specified object. */
    valueOf(): Int16Array;
  
@@ -3701,7 +3705,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -4160,11 +4545,11 @@ interface Int16ArrayConstructor {
+@@ -4160,11 +4546,11 @@ interface Int16ArrayConstructor {
     */
    from<T>(
      arrayLike: ArrayLike<T>,
@@ -3716,7 +3720,7 @@
  
  /**
   * A typed array of 16-bit unsigned integer values. The contents are initialized
-@@ -4173,16 +4558,16 @@ declare var Int16Array: Int16ArrayConstructor;
+@@ -4173,16 +4559,16 @@ declare var Int16Array: Int16ArrayConstructor;
   */
  interface Uint16Array {
    /** The size in bytes of each element in the array. */
@@ -3736,7 +3740,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -4195,7 +4580,11 @@ interface Uint16Array {
+@@ -4195,7 +4581,11 @@ interface Uint16Array {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -3749,7 +3753,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -4209,8 +4598,12 @@ interface Uint16Array {
+@@ -4209,8 +4599,12 @@ interface Uint16Array {
     *   value.
     */
    every(
@@ -3764,7 +3768,7 @@
    ): boolean;
  
    /**
-@@ -4223,7 +4616,11 @@ interface Uint16Array {
+@@ -4223,7 +4617,11 @@ interface Uint16Array {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -3777,7 +3781,7 @@
  
    /**
     * Returns the elements of an array that meet the condition specified in a
-@@ -4237,8 +4634,12 @@ interface Uint16Array {
+@@ -4237,8 +4635,12 @@ interface Uint16Array {
     *   value.
     */
    filter(
@@ -3792,7 +3796,7 @@
    ): Uint16Array;
  
    /**
-@@ -4254,9 +4655,13 @@ interface Uint16Array {
+@@ -4254,9 +4656,13 @@ interface Uint16Array {
     *   instead.
     */
    find(
@@ -3809,7 +3813,7 @@
  
    /**
     * Returns the index of the first element in the array where predicate is
-@@ -4271,9 +4676,13 @@ interface Uint16Array {
+@@ -4271,9 +4677,13 @@ interface Uint16Array {
     *   instead.
     */
    findIndex(
@@ -3826,7 +3830,7 @@
  
    /**
     * Performs the specified action for each element in an array.
-@@ -4285,8 +4694,12 @@ interface Uint16Array {
+@@ -4285,8 +4695,12 @@ interface Uint16Array {
     *   value.
     */
    forEach(
@@ -3841,7 +3845,7 @@
    ): void;
  
    /**
-@@ -4296,7 +4709,10 @@ interface Uint16Array {
+@@ -4296,7 +4710,10 @@ interface Uint16Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -3853,7 +3857,7 @@
  
    /**
     * Adds all the elements of an array separated by the specified separator
-@@ -4315,7 +4731,10 @@ interface Uint16Array {
+@@ -4315,7 +4732,10 @@ interface Uint16Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -3865,7 +3869,7 @@
  
    /** The length of the array. */
    readonly length: number;
-@@ -4332,8 +4751,12 @@ interface Uint16Array {
+@@ -4332,8 +4752,12 @@ interface Uint16Array {
     *   value.
     */
    map(
@@ -3880,7 +3884,7 @@
    ): Uint16Array;
  
    /**
-@@ -4350,21 +4773,21 @@ interface Uint16Array {
+@@ -4350,21 +4774,21 @@ interface Uint16Array {
     */
    reduce(
      callbackfn: (
@@ -3913,7 +3917,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array. The
-@@ -4381,8 +4804,8 @@ interface Uint16Array {
+@@ -4381,8 +4805,8 @@ interface Uint16Array {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -3924,7 +3928,7 @@
        array: Uint16Array,
      ) => U,
      initialValue: U,
-@@ -4403,21 +4826,21 @@ interface Uint16Array {
+@@ -4403,21 +4827,21 @@ interface Uint16Array {
     */
    reduceRight(
      callbackfn: (
@@ -3957,7 +3961,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array, in
-@@ -4435,8 +4858,8 @@ interface Uint16Array {
+@@ -4435,8 +4859,8 @@ interface Uint16Array {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -3968,7 +3972,7 @@
        array: Uint16Array,
      ) => U,
      initialValue: U,
-@@ -4452,7 +4875,10 @@ interface Uint16Array {
+@@ -4452,7 +4876,10 @@ interface Uint16Array {
     * @param offset The index in the current array at which the values are to be
     *   written.
     */
@@ -3980,7 +3984,7 @@
  
    /**
     * Returns a section of an array.
-@@ -4461,7 +4887,10 @@ interface Uint16Array {
+@@ -4461,7 +4888,10 @@ interface Uint16Array {
     * @param end The end of the specified portion of the array. This is exclusive
     *   of the element at the index 'end'.
     */
@@ -3992,7 +3996,7 @@
  
    /**
     * Determines whether the specified callback function returns true for any
-@@ -4476,23 +4905,27 @@ interface Uint16Array {
+@@ -4476,23 +4906,27 @@ interface Uint16Array {
     *   value.
     */
    some(
@@ -4026,7 +4030,7 @@
  
    /**
     * Gets a new Uint16Array view of the ArrayBuffer store for this array,
-@@ -4501,7 +4934,10 @@ interface Uint16Array {
+@@ -4501,7 +4935,10 @@ interface Uint16Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -4038,7 +4042,7 @@
  
    /** Converts a number to a string by using the current locale. */
    toLocaleString(): string;
-@@ -4512,35 +4948,35 @@ interface Uint16Array {
+@@ -4512,35 +4949,35 @@ interface Uint16Array {
    /** Returns the primitive value of the specified object. */
    valueOf(): Uint16Array;
  
@@ -4082,7 +4086,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -4551,11 +4987,11 @@ interface Uint16ArrayConstructor {
+@@ -4551,11 +4988,11 @@ interface Uint16ArrayConstructor {
     */
    from<T>(
      arrayLike: ArrayLike<T>,
@@ -4097,7 +4101,7 @@
  /**
   * A typed array of 32-bit signed integer values. The contents are initialized
   * to 0. If the requested number of bytes could not be allocated an exception is
-@@ -4563,16 +4999,16 @@ declare var Uint16Array: Uint16ArrayConstructor;
+@@ -4563,16 +5000,16 @@ declare var Uint16Array: Uint16ArrayConstructor;
   */
  interface Int32Array {
    /** The size in bytes of each element in the array. */
@@ -4117,7 +4121,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -4585,7 +5021,11 @@ interface Int32Array {
+@@ -4585,7 +5022,11 @@ interface Int32Array {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -4130,7 +4134,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -4599,8 +5039,12 @@ interface Int32Array {
+@@ -4599,8 +5040,12 @@ interface Int32Array {
     *   value.
     */
    every(
@@ -4145,7 +4149,7 @@
    ): boolean;
  
    /**
-@@ -4613,7 +5057,11 @@ interface Int32Array {
+@@ -4613,7 +5058,11 @@ interface Int32Array {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -4158,7 +4162,7 @@
  
    /**
     * Returns the elements of an array that meet the condition specified in a
-@@ -4627,8 +5075,12 @@ interface Int32Array {
+@@ -4627,8 +5076,12 @@ interface Int32Array {
     *   value.
     */
    filter(
@@ -4173,7 +4177,7 @@
    ): Int32Array;
  
    /**
-@@ -4644,9 +5096,13 @@ interface Int32Array {
+@@ -4644,9 +5097,13 @@ interface Int32Array {
     *   instead.
     */
    find(
@@ -4190,7 +4194,7 @@
  
    /**
     * Returns the index of the first element in the array where predicate is
-@@ -4661,9 +5117,13 @@ interface Int32Array {
+@@ -4661,9 +5118,13 @@ interface Int32Array {
     *   instead.
     */
    findIndex(
@@ -4207,7 +4211,7 @@
  
    /**
     * Performs the specified action for each element in an array.
-@@ -4675,8 +5135,12 @@ interface Int32Array {
+@@ -4675,8 +5136,12 @@ interface Int32Array {
     *   value.
     */
    forEach(
@@ -4222,7 +4226,7 @@
    ): void;
  
    /**
-@@ -4686,7 +5150,10 @@ interface Int32Array {
+@@ -4686,7 +5151,10 @@ interface Int32Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -4234,7 +4238,7 @@
  
    /**
     * Adds all the elements of an array separated by the specified separator
-@@ -4705,7 +5172,10 @@ interface Int32Array {
+@@ -4705,7 +5173,10 @@ interface Int32Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -4246,7 +4250,7 @@
  
    /** The length of the array. */
    readonly length: number;
-@@ -4722,8 +5192,12 @@ interface Int32Array {
+@@ -4722,8 +5193,12 @@ interface Int32Array {
     *   value.
     */
    map(
@@ -4261,7 +4265,7 @@
    ): Int32Array;
  
    /**
-@@ -4740,21 +5214,21 @@ interface Int32Array {
+@@ -4740,21 +5215,21 @@ interface Int32Array {
     */
    reduce(
      callbackfn: (
@@ -4294,7 +4298,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array. The
-@@ -4771,8 +5245,8 @@ interface Int32Array {
+@@ -4771,8 +5246,8 @@ interface Int32Array {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -4305,7 +4309,7 @@
        array: Int32Array,
      ) => U,
      initialValue: U,
-@@ -4793,21 +5267,21 @@ interface Int32Array {
+@@ -4793,21 +5268,21 @@ interface Int32Array {
     */
    reduceRight(
      callbackfn: (
@@ -4338,7 +4342,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array, in
-@@ -4825,8 +5299,8 @@ interface Int32Array {
+@@ -4825,8 +5300,8 @@ interface Int32Array {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -4349,7 +4353,7 @@
        array: Int32Array,
      ) => U,
      initialValue: U,
-@@ -4842,7 +5316,10 @@ interface Int32Array {
+@@ -4842,7 +5317,10 @@ interface Int32Array {
     * @param offset The index in the current array at which the values are to be
     *   written.
     */
@@ -4361,7 +4365,7 @@
  
    /**
     * Returns a section of an array.
-@@ -4851,7 +5328,10 @@ interface Int32Array {
+@@ -4851,7 +5329,10 @@ interface Int32Array {
     * @param end The end of the specified portion of the array. This is exclusive
     *   of the element at the index 'end'.
     */
@@ -4373,7 +4377,7 @@
  
    /**
     * Determines whether the specified callback function returns true for any
-@@ -4866,23 +5346,27 @@ interface Int32Array {
+@@ -4866,23 +5347,27 @@ interface Int32Array {
     *   value.
     */
    some(
@@ -4407,7 +4411,7 @@
  
    /**
     * Gets a new Int32Array view of the ArrayBuffer store for this array,
-@@ -4891,7 +5375,10 @@ interface Int32Array {
+@@ -4891,7 +5376,10 @@ interface Int32Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -4419,7 +4423,7 @@
  
    /** Converts a number to a string by using the current locale. */
    toLocaleString(): string;
-@@ -4902,35 +5389,35 @@ interface Int32Array {
+@@ -4902,35 +5390,35 @@ interface Int32Array {
    /** Returns the primitive value of the specified object. */
    valueOf(): Int32Array;
  
@@ -4463,7 +4467,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -4941,11 +5428,11 @@ interface Int32ArrayConstructor {
+@@ -4941,11 +5429,11 @@ interface Int32ArrayConstructor {
     */
    from<T>(
      arrayLike: ArrayLike<T>,
@@ -4478,7 +4482,7 @@
  
  /**
   * A typed array of 32-bit unsigned integer values. The contents are initialized
-@@ -4954,16 +5441,16 @@ declare var Int32Array: Int32ArrayConstructor;
+@@ -4954,16 +5442,16 @@ declare var Int32Array: Int32ArrayConstructor;
   */
  interface Uint32Array {
    /** The size in bytes of each element in the array. */
@@ -4498,7 +4502,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -4976,7 +5463,11 @@ interface Uint32Array {
+@@ -4976,7 +5464,11 @@ interface Uint32Array {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -4511,7 +4515,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -4990,8 +5481,12 @@ interface Uint32Array {
+@@ -4990,8 +5482,12 @@ interface Uint32Array {
     *   value.
     */
    every(
@@ -4526,7 +4530,7 @@
    ): boolean;
  
    /**
-@@ -5004,7 +5499,11 @@ interface Uint32Array {
+@@ -5004,7 +5500,11 @@ interface Uint32Array {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -4539,7 +4543,7 @@
  
    /**
     * Returns the elements of an array that meet the condition specified in a
-@@ -5018,8 +5517,12 @@ interface Uint32Array {
+@@ -5018,8 +5518,12 @@ interface Uint32Array {
     *   value.
     */
    filter(
@@ -4554,7 +4558,7 @@
    ): Uint32Array;
  
    /**
-@@ -5035,9 +5538,13 @@ interface Uint32Array {
+@@ -5035,9 +5539,13 @@ interface Uint32Array {
     *   instead.
     */
    find(
@@ -4571,7 +4575,7 @@
  
    /**
     * Returns the index of the first element in the array where predicate is
-@@ -5052,9 +5559,13 @@ interface Uint32Array {
+@@ -5052,9 +5560,13 @@ interface Uint32Array {
     *   instead.
     */
    findIndex(
@@ -4588,7 +4592,7 @@
  
    /**
     * Performs the specified action for each element in an array.
-@@ -5066,9 +5577,14 @@ interface Uint32Array {
+@@ -5066,9 +5578,14 @@ interface Uint32Array {
     *   value.
     */
    forEach(
@@ -4605,7 +4609,7 @@
    /**
     * Returns the index of the first occurrence of a value in an array.
     *
-@@ -5076,7 +5592,10 @@ interface Uint32Array {
+@@ -5076,7 +5593,10 @@ interface Uint32Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -4617,7 +4621,7 @@
  
    /**
     * Adds all the elements of an array separated by the specified separator
-@@ -5095,7 +5614,10 @@ interface Uint32Array {
+@@ -5095,7 +5615,10 @@ interface Uint32Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -4629,7 +4633,7 @@
  
    /** The length of the array. */
    readonly length: number;
-@@ -5112,8 +5634,12 @@ interface Uint32Array {
+@@ -5112,8 +5635,12 @@ interface Uint32Array {
     *   value.
     */
    map(
@@ -4644,7 +4648,7 @@
    ): Uint32Array;
  
    /**
-@@ -5130,21 +5656,21 @@ interface Uint32Array {
+@@ -5130,21 +5657,21 @@ interface Uint32Array {
     */
    reduce(
      callbackfn: (
@@ -4677,7 +4681,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array. The
-@@ -5161,8 +5687,8 @@ interface Uint32Array {
+@@ -5161,8 +5688,8 @@ interface Uint32Array {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -4688,7 +4692,7 @@
        array: Uint32Array,
      ) => U,
      initialValue: U,
-@@ -5183,21 +5709,21 @@ interface Uint32Array {
+@@ -5183,21 +5710,21 @@ interface Uint32Array {
     */
    reduceRight(
      callbackfn: (
@@ -4721,7 +4725,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array, in
-@@ -5215,8 +5741,8 @@ interface Uint32Array {
+@@ -5215,8 +5742,8 @@ interface Uint32Array {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -4732,7 +4736,7 @@
        array: Uint32Array,
      ) => U,
      initialValue: U,
-@@ -5232,7 +5758,10 @@ interface Uint32Array {
+@@ -5232,7 +5759,10 @@ interface Uint32Array {
     * @param offset The index in the current array at which the values are to be
     *   written.
     */
@@ -4744,7 +4748,7 @@
  
    /**
     * Returns a section of an array.
-@@ -5241,7 +5770,10 @@ interface Uint32Array {
+@@ -5241,7 +5771,10 @@ interface Uint32Array {
     * @param end The end of the specified portion of the array. This is exclusive
     *   of the element at the index 'end'.
     */
@@ -4756,7 +4760,7 @@
  
    /**
     * Determines whether the specified callback function returns true for any
-@@ -5256,23 +5788,27 @@ interface Uint32Array {
+@@ -5256,23 +5789,27 @@ interface Uint32Array {
     *   value.
     */
    some(
@@ -4790,7 +4794,7 @@
  
    /**
     * Gets a new Uint32Array view of the ArrayBuffer store for this array,
-@@ -5281,7 +5817,10 @@ interface Uint32Array {
+@@ -5281,7 +5818,10 @@ interface Uint32Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -4802,7 +4806,7 @@
  
    /** Converts a number to a string by using the current locale. */
    toLocaleString(): string;
-@@ -5292,35 +5831,35 @@ interface Uint32Array {
+@@ -5292,35 +5832,35 @@ interface Uint32Array {
    /** Returns the primitive value of the specified object. */
    valueOf(): Uint32Array;
  
@@ -4846,7 +4850,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -5331,11 +5870,11 @@ interface Uint32ArrayConstructor {
+@@ -5331,11 +5871,11 @@ interface Uint32ArrayConstructor {
     */
    from<T>(
      arrayLike: ArrayLike<T>,
@@ -4861,7 +4865,7 @@
  
  /**
   * A typed array of 32-bit float values. The contents are initialized to 0. If
-@@ -5343,16 +5882,16 @@ declare var Uint32Array: Uint32ArrayConstructor;
+@@ -5343,16 +5883,16 @@ declare var Uint32Array: Uint32ArrayConstructor;
   */
  interface Float32Array {
    /** The size in bytes of each element in the array. */
@@ -4881,7 +4885,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -5365,7 +5904,11 @@ interface Float32Array {
+@@ -5365,7 +5905,11 @@ interface Float32Array {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -4894,7 +4898,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -5379,8 +5922,12 @@ interface Float32Array {
+@@ -5379,8 +5923,12 @@ interface Float32Array {
     *   value.
     */
    every(
@@ -4909,7 +4913,7 @@
    ): boolean;
  
    /**
-@@ -5393,7 +5940,11 @@ interface Float32Array {
+@@ -5393,7 +5941,11 @@ interface Float32Array {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -4922,7 +4926,7 @@
  
    /**
     * Returns the elements of an array that meet the condition specified in a
-@@ -5407,8 +5958,12 @@ interface Float32Array {
+@@ -5407,8 +5959,12 @@ interface Float32Array {
     *   value.
     */
    filter(
@@ -4937,7 +4941,7 @@
    ): Float32Array;
  
    /**
-@@ -5424,9 +5979,13 @@ interface Float32Array {
+@@ -5424,9 +5980,13 @@ interface Float32Array {
     *   instead.
     */
    find(
@@ -4954,7 +4958,7 @@
  
    /**
     * Returns the index of the first element in the array where predicate is
-@@ -5441,9 +6000,13 @@ interface Float32Array {
+@@ -5441,9 +6001,13 @@ interface Float32Array {
     *   instead.
     */
    findIndex(
@@ -4971,7 +4975,7 @@
  
    /**
     * Performs the specified action for each element in an array.
-@@ -5455,8 +6018,12 @@ interface Float32Array {
+@@ -5455,8 +6019,12 @@ interface Float32Array {
     *   value.
     */
    forEach(
@@ -4986,7 +4990,7 @@
    ): void;
  
    /**
-@@ -5466,7 +6033,10 @@ interface Float32Array {
+@@ -5466,7 +6034,10 @@ interface Float32Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -4998,7 +5002,7 @@
  
    /**
     * Adds all the elements of an array separated by the specified separator
-@@ -5485,7 +6055,10 @@ interface Float32Array {
+@@ -5485,7 +6056,10 @@ interface Float32Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -5010,7 +5014,7 @@
  
    /** The length of the array. */
    readonly length: number;
-@@ -5502,8 +6075,12 @@ interface Float32Array {
+@@ -5502,8 +6076,12 @@ interface Float32Array {
     *   value.
     */
    map(
@@ -5025,7 +5029,7 @@
    ): Float32Array;
  
    /**
-@@ -5520,21 +6097,21 @@ interface Float32Array {
+@@ -5520,21 +6098,21 @@ interface Float32Array {
     */
    reduce(
      callbackfn: (
@@ -5058,7 +5062,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array. The
-@@ -5551,8 +6128,8 @@ interface Float32Array {
+@@ -5551,8 +6129,8 @@ interface Float32Array {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -5069,7 +5073,7 @@
        array: Float32Array,
      ) => U,
      initialValue: U,
-@@ -5573,21 +6150,21 @@ interface Float32Array {
+@@ -5573,21 +6151,21 @@ interface Float32Array {
     */
    reduceRight(
      callbackfn: (
@@ -5102,7 +5106,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array, in
-@@ -5605,8 +6182,8 @@ interface Float32Array {
+@@ -5605,8 +6183,8 @@ interface Float32Array {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -5113,7 +5117,7 @@
        array: Float32Array,
      ) => U,
      initialValue: U,
-@@ -5622,7 +6199,10 @@ interface Float32Array {
+@@ -5622,7 +6200,10 @@ interface Float32Array {
     * @param offset The index in the current array at which the values are to be
     *   written.
     */
@@ -5125,7 +5129,7 @@
  
    /**
     * Returns a section of an array.
-@@ -5631,7 +6211,10 @@ interface Float32Array {
+@@ -5631,7 +6212,10 @@ interface Float32Array {
     * @param end The end of the specified portion of the array. This is exclusive
     *   of the element at the index 'end'.
     */
@@ -5137,7 +5141,7 @@
  
    /**
     * Determines whether the specified callback function returns true for any
-@@ -5646,23 +6229,27 @@ interface Float32Array {
+@@ -5646,23 +6230,27 @@ interface Float32Array {
     *   value.
     */
    some(
@@ -5171,7 +5175,7 @@
  
    /**
     * Gets a new Float32Array view of the ArrayBuffer store for this array,
-@@ -5671,7 +6258,10 @@ interface Float32Array {
+@@ -5671,7 +6259,10 @@ interface Float32Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -5183,7 +5187,7 @@
  
    /** Converts a number to a string by using the current locale. */
    toLocaleString(): string;
-@@ -5682,35 +6272,35 @@ interface Float32Array {
+@@ -5682,35 +6273,35 @@ interface Float32Array {
    /** Returns the primitive value of the specified object. */
    valueOf(): Float32Array;
  
@@ -5227,7 +5231,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -5721,11 +6311,11 @@ interface Float32ArrayConstructor {
+@@ -5721,11 +6312,11 @@ interface Float32ArrayConstructor {
     */
    from<T>(
      arrayLike: ArrayLike<T>,
@@ -5242,7 +5246,7 @@
  
  /**
   * A typed array of 64-bit float values. The contents are initialized to 0. If
-@@ -5733,16 +6323,16 @@ declare var Float32Array: Float32ArrayConstructor;
+@@ -5733,16 +6324,16 @@ declare var Float32Array: Float32ArrayConstructor;
   */
  interface Float64Array {
    /** The size in bytes of each element in the array. */
@@ -5262,7 +5266,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -5755,7 +6345,11 @@ interface Float64Array {
+@@ -5755,7 +6346,11 @@ interface Float64Array {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -5275,7 +5279,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -5769,8 +6363,12 @@ interface Float64Array {
+@@ -5769,8 +6364,12 @@ interface Float64Array {
     *   value.
     */
    every(
@@ -5290,7 +5294,7 @@
    ): boolean;
  
    /**
-@@ -5783,7 +6381,11 @@ interface Float64Array {
+@@ -5783,7 +6382,11 @@ interface Float64Array {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -5303,7 +5307,7 @@
  
    /**
     * Returns the elements of an array that meet the condition specified in a
-@@ -5797,8 +6399,12 @@ interface Float64Array {
+@@ -5797,8 +6400,12 @@ interface Float64Array {
     *   value.
     */
    filter(
@@ -5318,7 +5322,7 @@
    ): Float64Array;
  
    /**
-@@ -5814,9 +6420,13 @@ interface Float64Array {
+@@ -5814,9 +6421,13 @@ interface Float64Array {
     *   instead.
     */
    find(
@@ -5335,7 +5339,7 @@
  
    /**
     * Returns the index of the first element in the array where predicate is
-@@ -5831,9 +6441,13 @@ interface Float64Array {
+@@ -5831,9 +6442,13 @@ interface Float64Array {
     *   instead.
     */
    findIndex(
@@ -5352,7 +5356,7 @@
  
    /**
     * Performs the specified action for each element in an array.
-@@ -5845,8 +6459,12 @@ interface Float64Array {
+@@ -5845,8 +6460,12 @@ interface Float64Array {
     *   value.
     */
    forEach(
@@ -5367,7 +5371,7 @@
    ): void;
  
    /**
-@@ -5856,7 +6474,10 @@ interface Float64Array {
+@@ -5856,7 +6475,10 @@ interface Float64Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -5379,7 +5383,7 @@
  
    /**
     * Adds all the elements of an array separated by the specified separator
-@@ -5875,7 +6496,10 @@ interface Float64Array {
+@@ -5875,7 +6497,10 @@ interface Float64Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -5391,7 +5395,7 @@
  
    /** The length of the array. */
    readonly length: number;
-@@ -5892,8 +6516,12 @@ interface Float64Array {
+@@ -5892,8 +6517,12 @@ interface Float64Array {
     *   value.
     */
    map(
@@ -5406,7 +5410,7 @@
    ): Float64Array;
  
    /**
-@@ -5910,21 +6538,21 @@ interface Float64Array {
+@@ -5910,21 +6539,21 @@ interface Float64Array {
     */
    reduce(
      callbackfn: (
@@ -5439,7 +5443,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array. The
-@@ -5941,8 +6569,8 @@ interface Float64Array {
+@@ -5941,8 +6570,8 @@ interface Float64Array {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -5450,7 +5454,7 @@
        array: Float64Array,
      ) => U,
      initialValue: U,
-@@ -5963,21 +6591,21 @@ interface Float64Array {
+@@ -5963,21 +6592,21 @@ interface Float64Array {
     */
    reduceRight(
      callbackfn: (
@@ -5483,7 +5487,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array, in
-@@ -5995,8 +6623,8 @@ interface Float64Array {
+@@ -5995,8 +6624,8 @@ interface Float64Array {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -5494,7 +5498,7 @@
        array: Float64Array,
      ) => U,
      initialValue: U,
-@@ -6012,7 +6640,10 @@ interface Float64Array {
+@@ -6012,7 +6641,10 @@ interface Float64Array {
     * @param offset The index in the current array at which the values are to be
     *   written.
     */
@@ -5506,7 +5510,7 @@
  
    /**
     * Returns a section of an array.
-@@ -6021,7 +6652,10 @@ interface Float64Array {
+@@ -6021,7 +6653,10 @@ interface Float64Array {
     * @param end The end of the specified portion of the array. This is exclusive
     *   of the element at the index 'end'.
     */
@@ -5518,7 +5522,7 @@
  
    /**
     * Determines whether the specified callback function returns true for any
-@@ -6036,23 +6670,27 @@ interface Float64Array {
+@@ -6036,23 +6671,27 @@ interface Float64Array {
     *   value.
     */
    some(
@@ -5552,7 +5556,7 @@
  
    /**
     * Gets a new Float64Array view of the ArrayBuffer store for this array,
-@@ -6061,7 +6699,10 @@ interface Float64Array {
+@@ -6061,7 +6700,10 @@ interface Float64Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -5564,7 +5568,7 @@
  
    /** Converts a number to a string by using the current locale. */
    toLocaleString(): string;
-@@ -6072,35 +6713,35 @@ interface Float64Array {
+@@ -6072,35 +6714,35 @@ interface Float64Array {
    /** Returns the primitive value of the specified object. */
    valueOf(): Float64Array;
  
@@ -5608,7 +5612,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -6111,11 +6752,11 @@ interface Float64ArrayConstructor {
+@@ -6111,11 +6753,11 @@ interface Float64ArrayConstructor {
     */
    from<T>(
      arrayLike: ArrayLike<T>,
@@ -5623,7 +5627,7 @@
  
  /////////////////////////////
  /// ECMAScript Internationalization API
-@@ -6123,12 +6764,12 @@ declare var Float64Array: Float64ArrayConstructor;
+@@ -6123,12 +6765,12 @@ declare var Float64Array: Float64ArrayConstructor;
  
  declare namespace Intl {
    interface CollatorOptions {
@@ -5642,7 +5646,7 @@
        | 'big5han'
        | 'compat'
        | 'dict'
-@@ -6147,17 +6788,17 @@ declare namespace Intl {
+@@ -6147,17 +6789,17 @@ declare namespace Intl {
        | 'unihan'
        | 'zhuyin'
        | undefined;
@@ -5668,7 +5672,7 @@
    }
  
    interface Collator {
-@@ -6166,40 +6807,43 @@ declare namespace Intl {
+@@ -6166,40 +6808,43 @@ declare namespace Intl {
    }
  
    interface CollatorConstructor {
@@ -5737,7 +5741,7 @@
    }
  
    interface NumberFormat {
-@@ -6209,30 +6853,39 @@ declare namespace Intl {
+@@ -6209,30 +6854,39 @@ declare namespace Intl {
  
    interface NumberFormatConstructor {
      new (
@@ -5792,7 +5796,7 @@
        | 'short'
        | 'long'
        | 'shortOffset'
-@@ -6240,26 +6893,26 @@ declare namespace Intl {
+@@ -6240,26 +6894,26 @@ declare namespace Intl {
        | 'shortGeneric'
        | 'longGeneric'
        | undefined;
@@ -5836,7 +5840,7 @@
    }
  
    interface DateTimeFormat {
-@@ -6269,21 +6922,21 @@ declare namespace Intl {
+@@ -6269,21 +6923,21 @@ declare namespace Intl {
  
    interface DateTimeFormatConstructor {
      new (
@@ -5863,7 +5867,7 @@
  }
  
  interface String {
-@@ -6303,7 +6956,7 @@ interface String {
+@@ -6303,7 +6957,7 @@ interface String {
     */
    localeCompare(
      that: string,
@@ -5872,7 +5876,7 @@
      options?: Intl.CollatorOptions,
    ): number;
  }
-@@ -6321,7 +6974,7 @@ interface Number {
+@@ -6321,7 +6975,7 @@ interface Number {
     *   comparison options.
     */
    toLocaleString(
@@ -5881,7 +5885,7 @@
      options?: Intl.NumberFormatOptions,
    ): string;
  }
-@@ -6340,7 +6993,7 @@ interface Date {
+@@ -6340,7 +6994,7 @@ interface Date {
     *   comparison options.
     */
    toLocaleString(
@@ -5890,7 +5894,7 @@
      options?: Intl.DateTimeFormatOptions,
    ): string;
    /**
-@@ -6355,7 +7008,7 @@ interface Date {
+@@ -6355,7 +7009,7 @@ interface Date {
     *   comparison options.
     */
    toLocaleDateString(
@@ -5899,7 +5903,7 @@
      options?: Intl.DateTimeFormatOptions,
    ): string;
  
-@@ -6371,7 +7024,50 @@ interface Date {
+@@ -6371,7 +7025,50 @@ interface Date {
     *   comparison options.
     */
    toLocaleTimeString(
