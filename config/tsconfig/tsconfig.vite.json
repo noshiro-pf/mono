@@ -2,6 +2,6 @@
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "vitest/importMeta"]
   }
 }

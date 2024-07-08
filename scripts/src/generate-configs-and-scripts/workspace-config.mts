@@ -141,12 +141,14 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
   'ts-utils': fillDefaultsForUtil(),
   'tiny-router-observable': fillDefaultsForUtil({
     passWithNoTests: true,
+    tsType: 'dom',
   }),
   'io-ts': fillDefaultsForUtil(),
   'lambda-calculus-interpreter-core': fillDefaultsForUtil(),
 
   'ts-utils-additional': fillDefaultsForUtil({
     hasScripts: true,
+    tsType: 'dom',
   }),
 
   'event-schedule-app-shared': fillDefaultsForUtil({

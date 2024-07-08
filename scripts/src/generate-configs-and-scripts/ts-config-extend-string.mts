@@ -18,6 +18,18 @@ export const tsConfigExtend = (
           ]
         : `${pathToSharedTsConfig}/${baseTsConfigName}`;
 
+    case 'dom':
+      return useVite !== false
+        ? [
+            `${pathToSharedTsConfig}/${baseTsConfigName}`,
+            `${pathToSharedTsConfig}/tsconfig.dom.json`,
+            `${pathToSharedTsConfig}/tsconfig.vite.json`,
+          ]
+        : [
+            `${pathToSharedTsConfig}/${baseTsConfigName}`,
+            `${pathToSharedTsConfig}/tsconfig.dom.json`,
+          ];
+
     case 'react':
       return [
         `${pathToSharedTsConfig}/${baseTsConfigName}`,
@@ -66,7 +78,7 @@ export const tsConfigExtend = (
         .flat()
         .filter(isNotUndefined);
 
-    default:
+    case undefined:
       return [];
   }
 };

@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { pipe } from '../ts-utils/index.mjs';
 import {
   tsconfigBuildJsonName,
   workspaceConfigsDirName,
@@ -32,9 +33,18 @@ export const generateTsConfigForBuild = async (
         'tsconfig.lib.build.json',
         cfg.useVite,
       ),
-      compilerOptions: cfg.tsconfig?.compilerOptions ?? {
-        outDir: '../esm',
-      },
+
+      compilerOptions: pipe(cfg.tsconfig?.compilerOptions).chain((op) =>
+        op === undefined
+          ? {
+              outDir: '../esm',
+            }
+          : {
+              ...op,
+              outDir: '../esm',
+            },
+      ).value,
+
       include: ['../src'],
       exclude: toTestTargetGlob(cfg).map((s) => `../${s}`),
     },

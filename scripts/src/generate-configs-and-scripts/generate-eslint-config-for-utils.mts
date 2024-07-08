@@ -23,6 +23,7 @@ export const generateEsLintConfig = async (
     react: 'eslintFlatConfigForReact',
     'react-emotion': 'eslintFlatConfigForReact',
     mts: 'eslintFlatConfigCommon',
+    dom: 'eslintFlatConfigCommon',
   }[cfg.tsType];
 
   const content = [

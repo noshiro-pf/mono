@@ -1,6 +1,7 @@
 {
   "extends": [
     "../../../../config/tsconfig/tsconfig.test.json",
+    "../../../../config/tsconfig/tsconfig.dom.json",
     "../../../../config/tsconfig/tsconfig.vite.json"
   ],
   "include": ["../src"]
