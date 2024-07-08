@@ -121,7 +121,7 @@ type MutableRecord<K extends RecordKeyType, V> = {
   [P in K]: V;
 };
 
-type RecordBase = Record<string, unknown>;
+type UnknownRecord = Record<string, unknown>;
 
 type FunctionType<A, B> = (value: A) => B;
 type Fn<A, B> = (value: A) => B;

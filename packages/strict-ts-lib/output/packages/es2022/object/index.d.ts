@@ -26,7 +26,7 @@ and limitations under the License.
  */
 declare namespace StrictLibInternals {
   export type HasOwnReturnType<
-    R extends RecordBase,
+    R extends UnknownRecord,
     K extends PropertyKey,
   > = R extends R // union distribution
     ? K extends keyof R
@@ -48,7 +48,7 @@ interface ObjectConstructor {
    * @param obj An object.
    * @param key A property name.
    */
-  hasOwn<R extends RecordBase, K extends PropertyKey>(
+  hasOwn<R extends UnknownRecord, K extends PropertyKey>(
     obj: R,
     key: K,
   ): obj is StrictLibInternals.HasOwnReturnType<R, K>;

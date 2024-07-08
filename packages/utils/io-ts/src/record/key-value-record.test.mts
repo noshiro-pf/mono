@@ -14,7 +14,7 @@ describe('keyValueRecord', () => {
 
   describe('is', () => {
     test('truthy case', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         year: 2000,
         month: 12,
         date: 12,
@@ -23,14 +23,14 @@ describe('keyValueRecord', () => {
       if (strNumRecord.is(x)) {
         expectType<typeof x, StrNumRecord>('=');
       } else {
-        expectType<typeof x, RecordBase>('=');
+        expectType<typeof x, UnknownRecord>('=');
       }
 
       expect(strNumRecord.is(x)).toBe(true);
     });
 
     test('falsy case', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         year: 2000,
         month: 'ab',
         date: 'cd',
@@ -39,7 +39,7 @@ describe('keyValueRecord', () => {
       if (strNumRecord.is(x)) {
         expectType<typeof x, StrNumRecord>('=');
       } else {
-        expectType<typeof x, RecordBase>('=');
+        expectType<typeof x, UnknownRecord>('=');
       }
 
       expect(strNumRecord.is(x)).toBe(false);
@@ -48,7 +48,7 @@ describe('keyValueRecord', () => {
 
   describe('validate', () => {
     test('falsy case', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         year: 2000,
         month: 'ab',
         date: 'cd',
@@ -63,13 +63,13 @@ describe('keyValueRecord', () => {
 
   describe('fill', () => {
     test('from an empty record', () => {
-      const x: RecordBase = {};
+      const x: UnknownRecord = {};
 
       expect(strNumRecord.fill(x)).toStrictEqual({});
     });
 
     test('from a filled record', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         year: 2000,
         month: 999,
         date: 999,
@@ -83,7 +83,7 @@ describe('keyValueRecord', () => {
     });
 
     test('from a record with wrong value', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         year: 2000,
         month: '12',
       };

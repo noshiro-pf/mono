@@ -30,7 +30,7 @@ export const convertLibEs2017Object = ({
         '  >;',
         '',
         '  /** @internal */',
-        '  export type ToObjectEntries<R extends RecordBase> = R extends R',
+        '  export type ToObjectEntries<R extends UnknownRecord> = R extends R',
         `    ? ${readonlyModifier}{`,
         `        ${readonlyModifier}[K in keyof R]: readonly [`,
         '          ToObjectKeysValue<keyof PickByValue<R, R[K]>>,',
@@ -63,7 +63,7 @@ export const convertLibEs2017Object = ({
         '   * ```',
         '   *',
         '   */',
-        'entries<R extends RecordBase>(object: R): StrictLibInternals.ToObjectEntries<R>;',
+        'entries<R extends UnknownRecord>(object: R): StrictLibInternals.ToObjectEntries<R>;',
       ].join('\n'),
     ),
     returnType === 'readonly'

@@ -77,7 +77,7 @@ const stringifySelected = (
 };
 
 const stringifySortedKey = (
-  value: RecordBase,
+  value: UnknownRecord,
   space?: UintRange<1, 11> | string,
 ): Result<string, string> => {
   const allKeys = pipe(keysDeep(value))
@@ -88,7 +88,7 @@ const stringifySortedKey = (
 };
 
 const keysDeepImpl = (
-  obj: RecordBase,
+  obj: UnknownRecord,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_keys: string[],
 ): void => {
@@ -108,7 +108,7 @@ const keysDeepImpl = (
   }
 };
 
-const keysDeep = (obj: RecordBase): readonly string[] => {
+const keysDeep = (obj: UnknownRecord): readonly string[] => {
   const mut_keys: string[] = [];
   keysDeepImpl(obj, mut_keys);
   return mut_keys;

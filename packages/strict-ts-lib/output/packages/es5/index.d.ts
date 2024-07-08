@@ -355,7 +355,7 @@ interface ObjectConstructor {
    *   object that you created or an existing Document Object Model (DOM)
    *   object.
    */
-  keys<R extends RecordBase>(
+  keys<R extends UnknownRecord>(
     object: R,
   ): StrictLibInternals.ToObjectKeysValue<keyof R>[];
 }

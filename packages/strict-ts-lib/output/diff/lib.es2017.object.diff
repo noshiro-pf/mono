@@ -21,7 +21,7 @@
 +  >;
 +
 +  /** @internal */
-+  export type ToObjectEntries<R extends RecordBase> = R extends R
++  export type ToObjectEntries<R extends UnknownRecord> = R extends R
 +    ? {
 +        [K in keyof R]: readonly [
 +          ToObjectKeysValue<keyof PickByValue<R, R[K]>>,
@@ -69,7 +69,7 @@
 +   *   ```
     */
 -  entries<T>(o: { [s: string]: T } | ArrayLike<T>): [string, T][];
-+  entries<R extends RecordBase>(
++  entries<R extends UnknownRecord>(
 +    object: R,
 +  ): StrictLibInternals.ToObjectEntries<R>;
  

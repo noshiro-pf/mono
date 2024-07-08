@@ -23,7 +23,7 @@ const firestore = initializeFirestore(fbApp, {
   // https://zenn.dev/cauchye/articles/20210816_yutaro-elk
   experimentalForceLongPolling: Object.hasOwn(
     // eslint-disable-next-line no-restricted-syntax
-    window as unknown as RecordBase,
+    window as unknown as UnknownRecord,
     'Cypress',
   ),
 });

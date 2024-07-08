@@ -18,7 +18,7 @@ describe('record', () => {
 
   describe('is', () => {
     test('truthy case', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         year: 2000,
         month: 12,
         date: 12,
@@ -27,14 +27,14 @@ describe('record', () => {
       if (ymd.is(x)) {
         expectType<typeof x, Ymd>('=');
       } else {
-        expectType<typeof x, RecordBase>('=');
+        expectType<typeof x, UnknownRecord>('=');
       }
 
       expect(ymd.is(x)).toBe(true);
     });
 
     test('falsy case', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         year: 2000,
         month: 'ab',
         date: 'cd',
@@ -43,7 +43,7 @@ describe('record', () => {
       if (ymd.is(x)) {
         expectType<typeof x, Ymd>('=');
       } else {
-        expectType<typeof x, RecordBase>('=');
+        expectType<typeof x, UnknownRecord>('=');
       }
 
       expect(ymd.is(x)).toBe(false);
@@ -52,7 +52,7 @@ describe('record', () => {
 
   describe('validate', () => {
     test('falsy case', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         year: 2000,
         month: 'ab',
         date: 'cd',
@@ -67,7 +67,7 @@ describe('record', () => {
 
   describe('fill', () => {
     test('from an empty record', () => {
-      const x: RecordBase = {};
+      const x: UnknownRecord = {};
 
       expect(ymd.fill(x)).toStrictEqual({
         year: 1900,
@@ -77,7 +77,7 @@ describe('record', () => {
     });
 
     test('from a filled record', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         year: 2000,
         month: 999,
         date: 999,
@@ -91,7 +91,7 @@ describe('record', () => {
     });
 
     test('from a partial record', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         year: 2000,
       };
 
@@ -103,7 +103,7 @@ describe('record', () => {
     });
 
     test('from a partial record with excess property', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         year: 2000,
         aaaaa: 9999,
       };
