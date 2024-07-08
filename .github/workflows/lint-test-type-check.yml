@@ -64,6 +64,9 @@ jobs:
       - name: Install dependencies
         run: yarn
 
+      - name: Setup
+        run: yarn setup
+
       - name: Check if there is no file diff
         run: yarn zz:cmd:check:no-diff
 
