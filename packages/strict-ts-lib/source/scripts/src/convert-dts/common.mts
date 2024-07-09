@@ -81,7 +81,7 @@ const BrandedNumberName = generateKeyValueRecordFromKeys(
 
 export type BrandedNumberTypes = Record<
   (typeof brandedNumbers)[number],
-  string
+  (typeof brandedNumbers)[number] | 'bigint' | 'number' | `NumberType.${string}`
 >;
 
 const tupleMap = <T extends readonly unknown[], B>(
@@ -106,7 +106,9 @@ export const createBrandedNumber = (
         [
           key,
           !useBrandedNumber
-            ? 'number'
+            ? key === 'BigInt64' || key === 'BigUint64'
+              ? 'bigint'
+              : 'number'
             : set.has(key)
               ? key
               : prependNamespacePrefix(BrandedNumberName[key]),

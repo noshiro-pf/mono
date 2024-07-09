@@ -72,7 +72,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.0.0",
     "@mdx-js/rollup": "^3.0.1",
-    "@noshiro/strict-ts-lib-branded": "*",
+    "@noshiro/strict-typescript-lib-branded": "*",
     "@preact/preset-vite": "^2.4.0",
     "@rollup/plugin-inject": "^5.0.5",
     "@solid/eslint-config-base": "^0.6.0",
@@ -94,6 +94,7 @@
     "@vitejs/plugin-react-swc": "^3.4.0",
     "argparse": "^2.0.1",
     "command-line-args": "^5.2.1",
+    "cpx": "^1.5.0",
     "cross-env": "^7.0.3",
     "cspell": "^8.2.4",
     "css-loader": "^6.2.0",

@@ -171,7 +171,7 @@ export const convertLibEs2015Core = ({
       startRegexp: 'interface ObjectConstructor {',
       endRegexp: closeBraceRegexp,
       mapFn: composeMonoTypeFns(
-        // use the refined type definition in final/lib.es5.d.ts
+        // use the refined type definition in lib-files/lib.es5.d.ts
         replaceWithNoMatchCheck(
           'keys(o: {}): readonly string[]',
           '// keys(o: {}): readonly string[]',

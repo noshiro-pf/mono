@@ -1,9 +1,9 @@
 #!/bin/bash
 
 THIS_SCRIPT_DIR=$(cd "$(dirname $0)" || exit; pwd)
-COPIED_DIR="${THIS_SCRIPT_DIR}/../temp/copied"
+STRICT_TS_LIB_DIR="${THIS_SCRIPT_DIR}/../.."
 
-
+COPIED_DIR="${STRICT_TS_LIB_DIR}/source/temp/copied"
 TS_VERSION=$(less "${THIS_SCRIPT_DIR}/typescript-version.txt")
 
 
@@ -18,5 +18,6 @@ for filename in $(gh api --method GET --jq '.[].name' /repos/microsoft/TypeScrip
     wget "https://raw.githubusercontent.com/microsoft/TypeScript/v${TS_VERSION}/lib/${filename}"  -P "${COPIED_DIR}"
 done
 
+echo "formatting..."
 yarn zz:prettier "${COPIED_DIR}"
 yarn zz:prettier "${COPIED_DIR}"

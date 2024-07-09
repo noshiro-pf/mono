@@ -2,8 +2,10 @@
 
 
 THIS_SCRIPT_DIR=$(cd "$(dirname $0)" || exit; pwd)
-COPIED_DIR="${THIS_SCRIPT_DIR}/../temp/copied"
-ESLINT_FIXED_DIR="${THIS_SCRIPT_DIR}/../temp/eslint-fixed"
+STRICT_TS_LIB_DIR="${THIS_SCRIPT_DIR}/../.."
+
+COPIED_DIR="${STRICT_TS_LIB_DIR}/source/temp/copied"
+ESLINT_FIXED_DIR="${STRICT_TS_LIB_DIR}/source/temp/eslint-fixed"
 
 
 mkdir -p "${ESLINT_FIXED_DIR}"

@@ -1,0 +1,20 @@
+@@ -14,11 +14,12 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+-/// <reference lib="es2023" />
+-/// <reference lib="esnext.intl" />
+-/// <reference lib="esnext.decorators" />
+-/// <reference lib="esnext.disposable" />
+-/// <reference lib="esnext.promise" />
+-/// <reference lib="esnext.object" />
+-/// <reference lib="esnext.collection" />
++/// <reference path="./lib.es2023.d.ts" />
++/// <reference path="./lib.esnext.intl.d.ts" />
++/// <reference path="./lib.esnext.decorators.d.ts" />
++/// <reference path="./lib.esnext.disposable.d.ts" />
++/// <reference path="./lib.esnext.promise.d.ts" />
++/// <reference path="./lib.esnext.object.d.ts" />
++/// <reference path="./lib.esnext.collection.d.ts" />

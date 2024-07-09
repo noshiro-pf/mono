@@ -3,12 +3,14 @@
 !source/temp/eslint-fixed
 !source/temp/eslint-fixed/*.d.ts
 
-!basic/final
-!basic/final/*.d.ts
-!basic/packages/**
-!basic/lib
+!output
+!output/lib-files
+!output/lib-files/*.d.ts
+!output/packages/**
+!output/lib
 
-!branded/final
-!branded/final/*.d.ts
-!branded/packages/**
-!branded/lib
+!output-branded
+!output-branded/lib-files
+!output-branded/lib-files/*.d.ts
+!output-branded/packages/**
+!output-branded/lib

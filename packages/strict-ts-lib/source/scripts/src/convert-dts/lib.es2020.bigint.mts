@@ -3,7 +3,7 @@ import {
   replaceWithNoMatchCheck,
   replaceWithNoMatchCheckBetweenRegexp,
 } from '@noshiro/mono-scripts';
-import { closeBraceRegexp, type ConverterOptions } from './common.mjs';
+import { closeBraceRegexp, idFn, type ConverterOptions } from './common.mjs';
 import { convertTypedArrayCommon } from './lib.typed-array-common.mjs';
 
 type ElemType = 'BigInt64' | 'BigUint64';
@@ -99,11 +99,11 @@ export const convertLibEs2020Bigint = (
     replaceWithNoMatchCheck(
       // DataView
       'getBigInt64(byteOffset: number, littleEndian?: boolean): bigint;',
-      `getBigInt64(byteOffset: ${config.brandedNumber.TypedArraySizeArgNonNegative}, littleEndian?: boolean): BigInt64;`,
+      `getBigInt64(byteOffset: ${config.brandedNumber.TypedArraySizeArgNonNegative}, littleEndian?: boolean): ${config.brandedNumber.BigInt64};`,
     ),
     replaceWithNoMatchCheck(
       'getBigUint64(byteOffset: number, littleEndian?: boolean): bigint;',
-      `getBigUint64(byteOffset: ${config.brandedNumber.TypedArraySizeArgNonNegative}, littleEndian?: boolean): BigUint64;`,
+      `getBigUint64(byteOffset: ${config.brandedNumber.TypedArraySizeArgNonNegative}, littleEndian?: boolean): ${config.brandedNumber.BigUint64};`,
     ),
     replaceWithNoMatchCheck(
       'setBigInt64(byteOffset: number, value: bigint, littleEndian?: boolean): void;',
@@ -121,23 +121,39 @@ export const convertLibEs2020Bigint = (
         startRegexp: `interface ${elemType}Array {`,
         endRegexp: closeBraceRegexp,
         mapFn: composeMonoTypeFns(
-          replaceWithNoMatchCheck(`bigint`, elemType),
           replaceWithNoMatchCheck(
-            `index: number`,
-            `index: ${config.brandedNumber.TypedArraySize}`,
+            'readonly [index: number]: bigint;',
+            '[index: number]: bigint;',
           ),
+          config.config.useBrandedNumber
+            ? replaceWithNoMatchCheck(
+                `[number, bigint]`,
+                `[${config.brandedNumber.TypedArraySize}, bigint]`,
+              )
+            : idFn,
+          config.config.useBrandedNumber
+            ? replaceWithNoMatchCheck('bigint', elemType)
+            : idFn,
           replaceWithNoMatchCheck(
-            `[number, ${elemType}]`,
-            `[${config.brandedNumber.TypedArraySize}, ${elemType}]`,
+            `index: number,`,
+            `index: ${config.brandedNumber.TypedArraySize},`,
           ),
-          replaceWithNoMatchCheck(`number | ${elemType}`, `number | bigint`),
+          config.config.useBrandedNumber
+            ? replaceWithNoMatchCheck(
+                //
+                `number | ${elemType}`,
+                `number | bigint`,
+              )
+            : idFn,
         ),
       }),
       replaceWithNoMatchCheckBetweenRegexp({
         startRegexp: `interface ${elemType}ArrayConstructor {`,
         endRegexp: closeBraceRegexp,
         mapFn: composeMonoTypeFns(
-          replaceWithNoMatchCheck(`bigint`, elemType),
+          config.config.useBrandedNumber
+            ? replaceWithNoMatchCheck(`bigint`, elemType)
+            : idFn,
           replaceWithNoMatchCheck(
             `number`,
             config.brandedNumber.TypedArraySize,

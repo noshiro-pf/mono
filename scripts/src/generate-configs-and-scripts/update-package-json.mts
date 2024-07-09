@@ -224,56 +224,7 @@ const updatePackageJsonImpl = (
       }
 
       case 'strict-ts-lib': {
-        // reset
-        mut_packageJson['scripts'] = {
-          build: 'wireit',
-          clean: 'run-p clean:**',
-          'clean:build': `rimraf ${workspaceScriptsDirName}/dist`,
-          'clean:wireit': 'rimraf .wireit/**',
-          fmt: 'yarn zz:prettier ..',
-          gen: 'run-s z:gen:final z:gen:packages fmt fmt gen:diff',
-          'gen:diff': 'run-s z:get:lib-files z:gen:diff',
-          'gen:final': 'run-s z:gen:final z:fmt:final z:fmt:final',
-          'gen:full':
-            'run-s z:get:lib-files z:gen:eslint-fixed z:gen:final z:gen:packages fmt fmt z:gen:diff',
-          'gen:packages': 'run-s z:gen:packages z:fmt:packages z:fmt:packages',
-          test: 'run-p test:basic test:branded',
-          'test:basic': 'tsc -p ../basic/tsconfig.json',
-          'test:branded': 'tsc -p ../branded/tsconfig.json',
-          'testw:basic': 'yarn test --watch',
-          'testw:branded': 'yarn test-branded --watch',
-          tsc: 'yarn type-check',
-          tscw: 'tsc --noEmit --watch',
-          'type-check': 'tsc --noEmit',
-          'z:fmt:final': 'yarn zz:prettier ../basic/final ../branded/final',
-          'z:fmt:packages':
-            'yarn zz:prettier ../basic/packages ../branded/packages',
-          'z:gen:diff': `./${workspaceScriptsDirName}/gen-diff.sh`,
-          'z:gen:eslint-fixed': `./${workspaceScriptsDirName}/gen-eslint-fixed.sh`,
-          'z:gen:final': 'wireit',
-          'z:gen:packages': 'wireit',
-          'z:get:lib-files': `./${workspaceScriptsDirName}/get-lib-files.sh`,
-          'zz:eslint': 'ESLINT_USE_FLAT_CONFIG=true eslint',
-          'zz:eslint:scripts': `yarn zz:eslint --config eslint.config.js ${workspaceScriptsDirName} --cache --cache-location ./${workspaceScriptsDirName}/.eslintcache`,
-          'zz:prettier': 'prettier --ignore-path ../.prettierignore --write',
-        };
-
-        mut_packageJson['wireit'] = {
-          'z:gen:final': {
-            dependencies: ['build'],
-            command: `./${workspaceScriptsDirName}/gen-final.sh`,
-          },
-          'z:gen:packages': {
-            dependencies: ['build'],
-            command: `./${workspaceScriptsDirName}/gen-packages.sh`,
-          },
-          build: {
-            command: `tsc --project ./${workspaceConfigsDirName}/tsconfig.build.json`,
-            clean: true,
-            output: [`./${workspaceScriptsDirName}/dist/**/*`],
-          },
-        };
-
+        // skip
         break;
       }
 

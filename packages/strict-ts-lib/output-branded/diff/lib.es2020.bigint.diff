@@ -1,0 +1,1047 @@
+@@ -14,8 +14,9 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+-/// <reference lib="es2020.intl" />
++/// <reference path="./lib.es2020.intl.d.ts" />
+ 
+ interface BigIntToLocaleStringOptions {
+   /**
+@@ -23,11 +24,11 @@ interface BigIntToLocaleStringOptions {
+    * information about this option, see the
+    * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation Intl page}.
+    */
+-  localeMatcher?: string;
++  readonly localeMatcher?: string;
+   /** The formatting style to use , the default is "decimal". */
+-  style?: string;
++  readonly style?: string;
+ 
+-  numberingSystem?: string;
++  readonly numberingSystem?: string;
+   /**
+    * The unit to use in unit formatting, Possible values are core unit
+    * identifiers, defined in UTS #35, Part 2, Section 6. A subset of units from
+@@ -35,13 +36,13 @@ interface BigIntToLocaleStringOptions {
+    * be concatenated with "-per-" to make a compound unit. There is no default
+    * value; if the style is "unit", the unit property must be provided.
+    */
+-  unit?: string;
++  readonly unit?: string;
+ 
+   /**
+    * The unit formatting style to use in unit formatting, the defaults is
+    * "short".
+    */
+-  unitDisplay?: string;
++  readonly unitDisplay?: string;
+ 
+   /**
+    * The currency to use in currency formatting. Possible values are the ISO
+@@ -51,7 +52,7 @@ interface BigIntToLocaleStringOptions {
+    * property must be provided. It is only used when [[Style]] has the value
+    * "currency".
+    */
+-  currency?: string;
++  readonly currency?: string;
+ 
+   /**
+    * How to display the currency in currency formatting. It is only used when
+@@ -63,40 +64,19 @@ interface BigIntToLocaleStringOptions {
+    *
+    * "name" to use a localized currency name such as "dollar"
+    */
+-  currencyDisplay?: string;
++  readonly currencyDisplay?: string;
+ 
+   /**
+    * Whether to use grouping separators, such as thousands separators or
+    * thousand/lakh/crore separators. The default is true.
+    */
+-  useGrouping?: boolean;
++  readonly useGrouping?: boolean;
+ 
+   /**
+    * The minimum number of integer digits to use. Possible values are from 1 to
+    * 21; the default is 1.
+    */
+-  minimumIntegerDigits?:
+-    | 1
+-    | 2
+-    | 3
+-    | 4
+-    | 5
+-    | 6
+-    | 7
+-    | 8
+-    | 9
+-    | 10
+-    | 11
+-    | 12
+-    | 13
+-    | 14
+-    | 15
+-    | 16
+-    | 17
+-    | 18
+-    | 19
+-    | 20
+-    | 21;
++  readonly minimumIntegerDigits?: UintRange<1, 22>;
+ 
+   /**
+    * The minimum number of fraction digits to use. Possible values are from 0 to
+@@ -105,28 +85,7 @@ interface BigIntToLocaleStringOptions {
+    * {@link http://www.currency-iso.org/en/home/tables/table-a1.html ISO 4217 currency codes list}
+    * (2 if the list doesn't provide that information).
+    */
+-  minimumFractionDigits?:
+-    | 0
+-    | 1
+-    | 2
+-    | 3
+-    | 4
+-    | 5
+-    | 6
+-    | 7
+-    | 8
+-    | 9
+-    | 10
+-    | 11
+-    | 12
+-    | 13
+-    | 14
+-    | 15
+-    | 16
+-    | 17
+-    | 18
+-    | 19
+-    | 20;
++  readonly minimumFractionDigits?: UintRange<0, 21>;
+ 
+   /**
+    * The maximum number of fraction digits to use. Possible values are from 0 to
+@@ -138,82 +97,19 @@ interface BigIntToLocaleStringOptions {
+    * (2 if the list doesn't provide that information); the default for percent
+    * formatting is the larger of minimumFractionDigits and 0.
+    */
+-  maximumFractionDigits?:
+-    | 0
+-    | 1
+-    | 2
+-    | 3
+-    | 4
+-    | 5
+-    | 6
+-    | 7
+-    | 8
+-    | 9
+-    | 10
+-    | 11
+-    | 12
+-    | 13
+-    | 14
+-    | 15
+-    | 16
+-    | 17
+-    | 18
+-    | 19
+-    | 20;
++  readonly maximumFractionDigits?: UintRange<0, 21>;
+ 
+   /**
+    * The minimum number of significant digits to use. Possible values are from 1
+    * to 21; the default is 1.
+    */
+-  minimumSignificantDigits?:
+-    | 1
+-    | 2
+-    | 3
+-    | 4
+-    | 5
+-    | 6
+-    | 7
+-    | 8
+-    | 9
+-    | 10
+-    | 11
+-    | 12
+-    | 13
+-    | 14
+-    | 15
+-    | 16
+-    | 17
+-    | 18
+-    | 19
+-    | 20
+-    | 21;
++  readonly minimumSignificantDigits?: UintRange<1, 22>;
+ 
+   /**
+    * The maximum number of significant digits to use. Possible values are from 1
+    * to 21; the default is 21.
+    */
+-  maximumSignificantDigits?:
+-    | 1
+-    | 2
+-    | 3
+-    | 4
+-    | 5
+-    | 6
+-    | 7
+-    | 8
+-    | 9
+-    | 10
+-    | 11
+-    | 12
+-    | 13
+-    | 14
+-    | 15
+-    | 16
+-    | 17
+-    | 18
+-    | 19
+-    | 20
+-    | 21;
++  readonly maximumSignificantDigits?: UintRange<1, 22>;
+ 
+   /**
+    * The formatting that should be displayed for the number, the defaults is
+@@ -227,10 +123,10 @@ interface BigIntToLocaleStringOptions {
+    *
+    *     "compact" string representing exponent, defaults is using the "short" form
+    */
+-  notation?: string;
++  readonly notation?: string;
+ 
+   /** Used only when notation is "compact" */
+-  compactDisplay?: string;
++  readonly compactDisplay?: string;
+ }
+ 
+ interface BigInt {
+@@ -239,7 +135,7 @@ interface BigInt {
+    *
+    * @param radix Specifies a radix for converting numeric values to strings.
+    */
+-  toString(radix?: number): string;
++  toString(radix?: UintRange<2, 37>): string;
+ 
+   /**
+    * Returns a string representation appropriate to the host environment's
+@@ -267,7 +163,7 @@ interface BigIntConstructor {
+    * @param bits The number of low bits to use
+    * @param int The BigInt whose bits to extract
+    */
+-  asIntN(bits: number, int: bigint): bigint;
++  asIntN(bits: UintRange<0, 65>, int: bigint): bigint;
+   /**
+    * Interprets the low bits of a BigInt as an unsigned integer. All higher bits
+    * are discarded.
+@@ -275,10 +171,10 @@ interface BigIntConstructor {
+    * @param bits The number of low bits to use
+    * @param int The BigInt whose bits to extract
+    */
+-  asUintN(bits: number, int: bigint): bigint;
++  asUintN(bits: UintRange<0, 65>, int: bigint): bigint;
+ }
+ 
+-declare var BigInt: BigIntConstructor;
++declare const BigInt: BigIntConstructor;
+ 
+ /**
+  * A typed array of 64-bit signed integer values. The contents are initialized
+@@ -287,16 +183,16 @@ declare var BigInt: BigIntConstructor;
+  */
+ interface BigInt64Array {
+   /** The size in bytes of each element in the array. */
+-  readonly BYTES_PER_ELEMENT: number;
++  readonly BYTES_PER_ELEMENT: 8;
+ 
+   /** The ArrayBuffer instance referenced by the array. */
+   readonly buffer: ArrayBufferLike;
+ 
+   /** The length in bytes of the array. */
+-  readonly byteLength: number;
++  readonly byteLength: NumberType.TypedArraySize;
+ 
+   /** The offset in bytes of the array. */
+-  readonly byteOffset: number;
++  readonly byteOffset: NumberType.TypedArraySize;
+ 
+   /**
+    * Returns the this object after copying a section of the array identified by
+@@ -309,10 +205,14 @@ interface BigInt64Array {
+    * @param end If not specified, length of the this object is used as its
+    *   default value.
+    */
+-  copyWithin(target: number, start: number, end?: number): this;
++  copyWithin(
++    target: NumberType.TypedArraySizeArg,
++    start: NumberType.TypedArraySizeArg,
++    end?: NumberType.TypedArraySizeArg,
++  ): this;
+ 
+   /** Yields index, value pairs for every entry in the array. */
+-  entries(): IterableIterator<[number, bigint]>;
++  entries(): IterableIterator<readonly [NumberType.TypedArraySize, BigInt64]>;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -325,8 +225,12 @@ interface BigInt64Array {
+    *   value.
+    */
+   every(
+-    predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
+-    thisArg?: any,
++    predicate: (
++      value: BigInt64,
++      index: NumberType.TypedArraySize,
++      array: BigInt64Array,
++    ) => boolean,
++    thisArg?: unknown,
+   ): boolean;
+ 
+   /**
+@@ -339,7 +243,11 @@ interface BigInt64Array {
+    * @param end Index to stop filling the array at. If end is negative, it is
+    *   treated as length+end.
+    */
+-  fill(value: bigint, start?: number, end?: number): this;
++  fill(
++    value: BigInt64,
++    start?: NumberType.TypedArraySizeArg,
++    end?: NumberType.TypedArraySizeArg,
++  ): this;
+ 
+   /**
+    * Returns the elements of an array that meet the condition specified in a
+@@ -353,8 +261,12 @@ interface BigInt64Array {
+    *   value.
+    */
+   filter(
+-    predicate: (value: bigint, index: number, array: BigInt64Array) => any,
+-    thisArg?: any,
++    predicate: (
++      value: BigInt64,
++      index: NumberType.TypedArraySize,
++      array: BigInt64Array,
++    ) => boolean,
++    thisArg?: unknown,
+   ): BigInt64Array;
+ 
+   /**
+@@ -370,9 +282,13 @@ interface BigInt64Array {
+    *   instead.
+    */
+   find(
+-    predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
+-    thisArg?: any,
+-  ): bigint | undefined;
++    predicate: (
++      value: BigInt64,
++      index: NumberType.TypedArraySize,
++      array: BigInt64Array,
++    ) => boolean,
++    thisArg?: unknown,
++  ): BigInt64 | undefined;
+ 
+   /**
+    * Returns the index of the first element in the array where predicate is
+@@ -387,9 +303,13 @@ interface BigInt64Array {
+    *   instead.
+    */
+   findIndex(
+-    predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
+-    thisArg?: any,
+-  ): number;
++    predicate: (
++      value: BigInt64,
++      index: NumberType.TypedArraySize,
++      array: BigInt64Array,
++    ) => boolean,
++    thisArg?: unknown,
++  ): NumberType.TypedArraySearchResult;
+ 
+   /**
+    * Performs the specified action for each element in an array.
+@@ -401,8 +321,12 @@ interface BigInt64Array {
+    *   value.
+    */
+   forEach(
+-    callbackfn: (value: bigint, index: number, array: BigInt64Array) => void,
+-    thisArg?: any,
++    callbackfn: (
++      value: BigInt64,
++      index: NumberType.TypedArraySize,
++      array: BigInt64Array,
++    ) => void,
++    thisArg?: unknown,
+   ): void;
+ 
+   /**
+@@ -413,7 +337,10 @@ interface BigInt64Array {
+    * @param fromIndex The position in this array at which to begin searching for
+    *   searchElement.
+    */
+-  includes(searchElement: bigint, fromIndex?: number): boolean;
++  includes(
++    searchElement: BigInt64,
++    fromIndex?: NumberType.TypedArraySizeArg,
++  ): boolean;
+ 
+   /**
+    * Returns the index of the first occurrence of a value in an array.
+@@ -422,7 +349,10 @@ interface BigInt64Array {
+    * @param fromIndex The array index at which to begin the search. If fromIndex
+    *   is omitted, the search starts at index 0.
+    */
+-  indexOf(searchElement: bigint, fromIndex?: number): number;
++  indexOf(
++    searchElement: BigInt64,
++    fromIndex?: NumberType.TypedArraySizeArg,
++  ): NumberType.TypedArraySearchResult;
+ 
+   /**
+    * Adds all the elements of an array separated by the specified separator
+@@ -435,7 +365,7 @@ interface BigInt64Array {
+   join(separator?: string): string;
+ 
+   /** Yields each index in the array. */
+-  keys(): IterableIterator<number>;
++  keys(): IterableIterator<NumberType.TypedArraySize>;
+ 
+   /**
+    * Returns the index of the last occurrence of a value in an array.
+@@ -444,7 +374,10 @@ interface BigInt64Array {
+    * @param fromIndex The array index at which to begin the search. If fromIndex
+    *   is omitted, the search starts at index 0.
+    */
+-  lastIndexOf(searchElement: bigint, fromIndex?: number): number;
++  lastIndexOf(
++    searchElement: BigInt64,
++    fromIndex?: NumberType.TypedArraySizeArg,
++  ): NumberType.TypedArraySearchResult;
+ 
+   /** The length of the array. */
+   readonly length: number;
+@@ -461,8 +394,12 @@ interface BigInt64Array {
+    *   value.
+    */
+   map(
+-    callbackfn: (value: bigint, index: number, array: BigInt64Array) => bigint,
+-    thisArg?: any,
++    callbackfn: (
++      value: BigInt64,
++      index: NumberType.TypedArraySize,
++      array: BigInt64Array,
++    ) => BigInt64,
++    thisArg?: unknown,
+   ): BigInt64Array;
+ 
+   /**
+@@ -479,12 +416,12 @@ interface BigInt64Array {
+    */
+   reduce(
+     callbackfn: (
+-      previousValue: bigint,
+-      currentValue: bigint,
+-      currentIndex: number,
++      previousValue: BigInt64,
++      currentValue: BigInt64,
++      currentIndex: NumberType.TypedArraySize,
+       array: BigInt64Array,
+-    ) => bigint,
+-  ): bigint;
++    ) => BigInt64,
++  ): BigInt64;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The
+@@ -501,8 +438,8 @@ interface BigInt64Array {
+   reduce<U>(
+     callbackfn: (
+       previousValue: U,
+-      currentValue: bigint,
+-      currentIndex: number,
++      currentValue: BigInt64,
++      currentIndex: NumberType.TypedArraySize,
+       array: BigInt64Array,
+     ) => U,
+     initialValue: U,
+@@ -523,12 +460,12 @@ interface BigInt64Array {
+    */
+   reduceRight(
+     callbackfn: (
+-      previousValue: bigint,
+-      currentValue: bigint,
+-      currentIndex: number,
++      previousValue: BigInt64,
++      currentValue: BigInt64,
++      currentIndex: NumberType.TypedArraySize,
+       array: BigInt64Array,
+-    ) => bigint,
+-  ): bigint;
++    ) => BigInt64,
++  ): BigInt64;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array, in
+@@ -546,8 +483,8 @@ interface BigInt64Array {
+   reduceRight<U>(
+     callbackfn: (
+       previousValue: U,
+-      currentValue: bigint,
+-      currentIndex: number,
++      currentValue: BigInt64,
++      currentIndex: NumberType.TypedArraySize,
+       array: BigInt64Array,
+     ) => U,
+     initialValue: U,
+@@ -563,7 +500,10 @@ interface BigInt64Array {
+    * @param offset The index in the current array at which the values are to be
+    *   written.
+    */
+-  set(array: ArrayLike<bigint>, offset?: number): void;
++  set(
++    array: ArrayLike<BigInt64>,
++    offset?: NumberType.TypedArraySizeArgNonNegative,
++  ): void;
+ 
+   /**
+    * Returns a section of an array.
+@@ -571,7 +511,10 @@ interface BigInt64Array {
+    * @param start The beginning of the specified portion of the array.
+    * @param end The end of the specified portion of the array.
+    */
+-  slice(start?: number, end?: number): BigInt64Array;
++  slice(
++    start?: NumberType.TypedArraySizeArg,
++    end?: NumberType.TypedArraySizeArg,
++  ): BigInt64Array;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any
+@@ -585,8 +528,12 @@ interface BigInt64Array {
+    *   value.
+    */
+   some(
+-    predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
+-    thisArg?: any,
++    predicate: (
++      value: BigInt64,
++      index: NumberType.TypedArraySize,
++      array: BigInt64Array,
++    ) => boolean,
++    thisArg?: unknown,
+   ): boolean;
+ 
+   /**
+@@ -595,7 +542,7 @@ interface BigInt64Array {
+    * @param compareFn The function used to determine the order of the elements.
+    *   If omitted, the elements are sorted in ascending order.
+    */
+-  sort(compareFn?: (a: bigint, b: bigint) => number | bigint): this;
++  sort(compareFn?: (a: BigInt64, b: BigInt64) => number | bigint): this;
+ 
+   /**
+    * Gets a new BigInt64Array view of the ArrayBuffer store for this array,
+@@ -604,7 +551,10 @@ interface BigInt64Array {
+    * @param begin The index of the beginning of the array.
+    * @param end The index of the end of the array.
+    */
+-  subarray(begin?: number, end?: number): BigInt64Array;
++  subarray(
++    begin?: NumberType.TypedArraySizeArg,
++    end?: NumberType.TypedArraySizeArg,
++  ): BigInt64Array;
+ 
+   /** Converts the array to a string by using the current locale. */
+   toLocaleString(): string;
+@@ -616,34 +566,34 @@ interface BigInt64Array {
+   valueOf(): BigInt64Array;
+ 
+   /** Yields each value in the array. */
+-  values(): IterableIterator<bigint>;
++  values(): IterableIterator<BigInt64>;
+ 
+-  [Symbol.iterator](): IterableIterator<bigint>;
++  [Symbol.iterator](): IterableIterator<BigInt64>;
+ 
+   readonly [Symbol.toStringTag]: 'BigInt64Array';
+ 
+-  [index: number]: bigint;
++  [index: number]: BigInt64;
+ }
+ 
+ interface BigInt64ArrayConstructor {
+   readonly prototype: BigInt64Array;
+-  new (length?: number): BigInt64Array;
+-  new (array: Iterable<bigint>): BigInt64Array;
++  new (length?: NumberType.TypedArraySize): BigInt64Array;
++  new (array: Iterable<BigInt64>): BigInt64Array;
+   new (
+     buffer: ArrayBufferLike,
+-    byteOffset?: number,
+-    length?: number,
++    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
++    length?: NumberType.TypedArraySize,
+   ): BigInt64Array;
+ 
+   /** The size in bytes of each element in the array. */
+-  readonly BYTES_PER_ELEMENT: number;
++  readonly BYTES_PER_ELEMENT: 8;
+ 
+   /**
+    * Returns a new array from a set of elements.
+    *
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: bigint[]): BigInt64Array;
++  of(...items: readonly BigInt64[]): BigInt64Array;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -652,15 +602,15 @@ interface BigInt64ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: ArrayLike<bigint>): BigInt64Array;
++  from(arrayLike: ArrayLike<BigInt64>): BigInt64Array;
+   from<U>(
+     arrayLike: ArrayLike<U>,
+-    mapfn: (v: U, k: number) => bigint,
+-    thisArg?: any,
++    mapfn: (v: U, k: NumberType.TypedArraySize) => BigInt64,
++    thisArg?: unknown,
+   ): BigInt64Array;
+ }
+ 
+-declare var BigInt64Array: BigInt64ArrayConstructor;
++declare const BigInt64Array: BigInt64ArrayConstructor;
+ 
+ /**
+  * A typed array of 64-bit unsigned integer values. The contents are initialized
+@@ -669,16 +619,16 @@ declare var BigInt64Array: BigInt64ArrayConstructor;
+  */
+ interface BigUint64Array {
+   /** The size in bytes of each element in the array. */
+-  readonly BYTES_PER_ELEMENT: number;
++  readonly BYTES_PER_ELEMENT: 8;
+ 
+   /** The ArrayBuffer instance referenced by the array. */
+   readonly buffer: ArrayBufferLike;
+ 
+   /** The length in bytes of the array. */
+-  readonly byteLength: number;
++  readonly byteLength: NumberType.TypedArraySize;
+ 
+   /** The offset in bytes of the array. */
+-  readonly byteOffset: number;
++  readonly byteOffset: NumberType.TypedArraySize;
+ 
+   /**
+    * Returns the this object after copying a section of the array identified by
+@@ -691,10 +641,14 @@ interface BigUint64Array {
+    * @param end If not specified, length of the this object is used as its
+    *   default value.
+    */
+-  copyWithin(target: number, start: number, end?: number): this;
++  copyWithin(
++    target: NumberType.TypedArraySizeArg,
++    start: NumberType.TypedArraySizeArg,
++    end?: NumberType.TypedArraySizeArg,
++  ): this;
+ 
+   /** Yields index, value pairs for every entry in the array. */
+-  entries(): IterableIterator<[number, bigint]>;
++  entries(): IterableIterator<readonly [NumberType.TypedArraySize, BigUint64]>;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -707,8 +661,12 @@ interface BigUint64Array {
+    *   value.
+    */
+   every(
+-    predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
+-    thisArg?: any,
++    predicate: (
++      value: BigUint64,
++      index: NumberType.TypedArraySize,
++      array: BigUint64Array,
++    ) => boolean,
++    thisArg?: unknown,
+   ): boolean;
+ 
+   /**
+@@ -721,7 +679,11 @@ interface BigUint64Array {
+    * @param end Index to stop filling the array at. If end is negative, it is
+    *   treated as length+end.
+    */
+-  fill(value: bigint, start?: number, end?: number): this;
++  fill(
++    value: BigUint64,
++    start?: NumberType.TypedArraySizeArg,
++    end?: NumberType.TypedArraySizeArg,
++  ): this;
+ 
+   /**
+    * Returns the elements of an array that meet the condition specified in a
+@@ -735,8 +697,12 @@ interface BigUint64Array {
+    *   value.
+    */
+   filter(
+-    predicate: (value: bigint, index: number, array: BigUint64Array) => any,
+-    thisArg?: any,
++    predicate: (
++      value: BigUint64,
++      index: NumberType.TypedArraySize,
++      array: BigUint64Array,
++    ) => boolean,
++    thisArg?: unknown,
+   ): BigUint64Array;
+ 
+   /**
+@@ -752,9 +718,13 @@ interface BigUint64Array {
+    *   instead.
+    */
+   find(
+-    predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
+-    thisArg?: any,
+-  ): bigint | undefined;
++    predicate: (
++      value: BigUint64,
++      index: NumberType.TypedArraySize,
++      array: BigUint64Array,
++    ) => boolean,
++    thisArg?: unknown,
++  ): BigUint64 | undefined;
+ 
+   /**
+    * Returns the index of the first element in the array where predicate is
+@@ -769,9 +739,13 @@ interface BigUint64Array {
+    *   instead.
+    */
+   findIndex(
+-    predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
+-    thisArg?: any,
+-  ): number;
++    predicate: (
++      value: BigUint64,
++      index: NumberType.TypedArraySize,
++      array: BigUint64Array,
++    ) => boolean,
++    thisArg?: unknown,
++  ): NumberType.TypedArraySearchResult;
+ 
+   /**
+    * Performs the specified action for each element in an array.
+@@ -783,8 +757,12 @@ interface BigUint64Array {
+    *   value.
+    */
+   forEach(
+-    callbackfn: (value: bigint, index: number, array: BigUint64Array) => void,
+-    thisArg?: any,
++    callbackfn: (
++      value: BigUint64,
++      index: NumberType.TypedArraySize,
++      array: BigUint64Array,
++    ) => void,
++    thisArg?: unknown,
+   ): void;
+ 
+   /**
+@@ -795,7 +773,10 @@ interface BigUint64Array {
+    * @param fromIndex The position in this array at which to begin searching for
+    *   searchElement.
+    */
+-  includes(searchElement: bigint, fromIndex?: number): boolean;
++  includes(
++    searchElement: BigUint64,
++    fromIndex?: NumberType.TypedArraySizeArg,
++  ): boolean;
+ 
+   /**
+    * Returns the index of the first occurrence of a value in an array.
+@@ -804,7 +785,10 @@ interface BigUint64Array {
+    * @param fromIndex The array index at which to begin the search. If fromIndex
+    *   is omitted, the search starts at index 0.
+    */
+-  indexOf(searchElement: bigint, fromIndex?: number): number;
++  indexOf(
++    searchElement: BigUint64,
++    fromIndex?: NumberType.TypedArraySizeArg,
++  ): NumberType.TypedArraySearchResult;
+ 
+   /**
+    * Adds all the elements of an array separated by the specified separator
+@@ -817,7 +801,7 @@ interface BigUint64Array {
+   join(separator?: string): string;
+ 
+   /** Yields each index in the array. */
+-  keys(): IterableIterator<number>;
++  keys(): IterableIterator<NumberType.TypedArraySize>;
+ 
+   /**
+    * Returns the index of the last occurrence of a value in an array.
+@@ -826,7 +810,10 @@ interface BigUint64Array {
+    * @param fromIndex The array index at which to begin the search. If fromIndex
+    *   is omitted, the search starts at index 0.
+    */
+-  lastIndexOf(searchElement: bigint, fromIndex?: number): number;
++  lastIndexOf(
++    searchElement: BigUint64,
++    fromIndex?: NumberType.TypedArraySizeArg,
++  ): NumberType.TypedArraySearchResult;
+ 
+   /** The length of the array. */
+   readonly length: number;
+@@ -843,8 +830,12 @@ interface BigUint64Array {
+    *   value.
+    */
+   map(
+-    callbackfn: (value: bigint, index: number, array: BigUint64Array) => bigint,
+-    thisArg?: any,
++    callbackfn: (
++      value: BigUint64,
++      index: NumberType.TypedArraySize,
++      array: BigUint64Array,
++    ) => BigUint64,
++    thisArg?: unknown,
+   ): BigUint64Array;
+ 
+   /**
+@@ -861,12 +852,12 @@ interface BigUint64Array {
+    */
+   reduce(
+     callbackfn: (
+-      previousValue: bigint,
+-      currentValue: bigint,
+-      currentIndex: number,
++      previousValue: BigUint64,
++      currentValue: BigUint64,
++      currentIndex: NumberType.TypedArraySize,
+       array: BigUint64Array,
+-    ) => bigint,
+-  ): bigint;
++    ) => BigUint64,
++  ): BigUint64;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The
+@@ -883,8 +874,8 @@ interface BigUint64Array {
+   reduce<U>(
+     callbackfn: (
+       previousValue: U,
+-      currentValue: bigint,
+-      currentIndex: number,
++      currentValue: BigUint64,
++      currentIndex: NumberType.TypedArraySize,
+       array: BigUint64Array,
+     ) => U,
+     initialValue: U,
+@@ -905,12 +896,12 @@ interface BigUint64Array {
+    */
+   reduceRight(
+     callbackfn: (
+-      previousValue: bigint,
+-      currentValue: bigint,
+-      currentIndex: number,
++      previousValue: BigUint64,
++      currentValue: BigUint64,
++      currentIndex: NumberType.TypedArraySize,
+       array: BigUint64Array,
+-    ) => bigint,
+-  ): bigint;
++    ) => BigUint64,
++  ): BigUint64;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array, in
+@@ -928,8 +919,8 @@ interface BigUint64Array {
+   reduceRight<U>(
+     callbackfn: (
+       previousValue: U,
+-      currentValue: bigint,
+-      currentIndex: number,
++      currentValue: BigUint64,
++      currentIndex: NumberType.TypedArraySize,
+       array: BigUint64Array,
+     ) => U,
+     initialValue: U,
+@@ -945,7 +936,10 @@ interface BigUint64Array {
+    * @param offset The index in the current array at which the values are to be
+    *   written.
+    */
+-  set(array: ArrayLike<bigint>, offset?: number): void;
++  set(
++    array: ArrayLike<BigUint64>,
++    offset?: NumberType.TypedArraySizeArgNonNegative,
++  ): void;
+ 
+   /**
+    * Returns a section of an array.
+@@ -953,7 +947,10 @@ interface BigUint64Array {
+    * @param start The beginning of the specified portion of the array.
+    * @param end The end of the specified portion of the array.
+    */
+-  slice(start?: number, end?: number): BigUint64Array;
++  slice(
++    start?: NumberType.TypedArraySizeArg,
++    end?: NumberType.TypedArraySizeArg,
++  ): BigUint64Array;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any
+@@ -967,8 +964,12 @@ interface BigUint64Array {
+    *   value.
+    */
+   some(
+-    predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
+-    thisArg?: any,
++    predicate: (
++      value: BigUint64,
++      index: NumberType.TypedArraySize,
++      array: BigUint64Array,
++    ) => boolean,
++    thisArg?: unknown,
+   ): boolean;
+ 
+   /**
+@@ -977,7 +978,7 @@ interface BigUint64Array {
+    * @param compareFn The function used to determine the order of the elements.
+    *   If omitted, the elements are sorted in ascending order.
+    */
+-  sort(compareFn?: (a: bigint, b: bigint) => number | bigint): this;
++  sort(compareFn?: (a: BigUint64, b: BigUint64) => number | bigint): this;
+ 
+   /**
+    * Gets a new BigUint64Array view of the ArrayBuffer store for this array,
+@@ -986,7 +987,10 @@ interface BigUint64Array {
+    * @param begin The index of the beginning of the array.
+    * @param end The index of the end of the array.
+    */
+-  subarray(begin?: number, end?: number): BigUint64Array;
++  subarray(
++    begin?: NumberType.TypedArraySizeArg,
++    end?: NumberType.TypedArraySizeArg,
++  ): BigUint64Array;
+ 
+   /** Converts the array to a string by using the current locale. */
+   toLocaleString(): string;
+@@ -998,34 +1002,34 @@ interface BigUint64Array {
+   valueOf(): BigUint64Array;
+ 
+   /** Yields each value in the array. */
+-  values(): IterableIterator<bigint>;
++  values(): IterableIterator<BigUint64>;
+ 
+-  [Symbol.iterator](): IterableIterator<bigint>;
++  [Symbol.iterator](): IterableIterator<BigUint64>;
+ 
+   readonly [Symbol.toStringTag]: 'BigUint64Array';
+ 
+-  [index: number]: bigint;
++  [index: number]: BigUint64;
+ }
+ 
+ interface BigUint64ArrayConstructor {
+   readonly prototype: BigUint64Array;
+-  new (length?: number): BigUint64Array;
+-  new (array: Iterable<bigint>): BigUint64Array;
++  new (length?: NumberType.TypedArraySize): BigUint64Array;
++  new (array: Iterable<BigUint64>): BigUint64Array;
+   new (
+     buffer: ArrayBufferLike,
+-    byteOffset?: number,
+-    length?: number,
++    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
++    length?: NumberType.TypedArraySize,
+   ): BigUint64Array;
+ 
+   /** The size in bytes of each element in the array. */
+-  readonly BYTES_PER_ELEMENT: number;
++  readonly BYTES_PER_ELEMENT: 8;
+ 
+   /**
+    * Returns a new array from a set of elements.
+    *
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: bigint[]): BigUint64Array;
++  of(...items: readonly BigUint64[]): BigUint64Array;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -1034,15 +1038,15 @@ interface BigUint64ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: ArrayLike<bigint>): BigUint64Array;
++  from(arrayLike: ArrayLike<BigUint64>): BigUint64Array;
+   from<U>(
+     arrayLike: ArrayLike<U>,
+-    mapfn: (v: U, k: number) => bigint,
+-    thisArg?: any,
++    mapfn: (v: U, k: NumberType.TypedArraySize) => BigUint64,
++    thisArg?: unknown,
+   ): BigUint64Array;
+ }
+ 
+-declare var BigUint64Array: BigUint64ArrayConstructor;
++declare const BigUint64Array: BigUint64ArrayConstructor;
+ 
+ interface DataView {
+   /**
+@@ -1055,7 +1059,10 @@ interface DataView {
+    * @param littleEndian If false or undefined, a big-endian value should be
+    *   read.
+    */
+-  getBigInt64(byteOffset: number, littleEndian?: boolean): bigint;
++  getBigInt64(
++    byteOffset: NumberType.TypedArraySizeArgNonNegative,
++    littleEndian?: boolean,
++  ): BigInt64;
+ 
+   /**
+    * Gets the BigUint64 value at the specified byte offset from the start of the
+@@ -1067,7 +1074,10 @@ interface DataView {
+    * @param littleEndian If false or undefined, a big-endian value should be
+    *   read.
+    */
+-  getBigUint64(byteOffset: number, littleEndian?: boolean): bigint;
++  getBigUint64(
++    byteOffset: NumberType.TypedArraySizeArgNonNegative,
++    littleEndian?: boolean,
++  ): BigUint64;
+ 
+   /**
+    * Stores a BigInt64 value at the specified byte offset from the start of the
+@@ -1078,7 +1088,11 @@ interface DataView {
+    * @param littleEndian If false or undefined, a big-endian value should be
+    *   written.
+    */
+-  setBigInt64(byteOffset: number, value: bigint, littleEndian?: boolean): void;
++  setBigInt64(
++    byteOffset: NumberType.TypedArraySizeArgNonNegative,
++    value: BigInt64,
++    littleEndian?: boolean,
++  ): void;
+ 
+   /**
+    * Stores a BigUint64 value at the specified byte offset from the start of the
+@@ -1089,7 +1103,11 @@ interface DataView {
+    * @param littleEndian If false or undefined, a big-endian value should be
+    *   written.
+    */
+-  setBigUint64(byteOffset: number, value: bigint, littleEndian?: boolean): void;
++  setBigUint64(
++    byteOffset: NumberType.TypedArraySizeArgNonNegative,
++    value: BigUint64,
++    littleEndian?: boolean,
++  ): void;
+ }
+ 
+ declare namespace Intl {

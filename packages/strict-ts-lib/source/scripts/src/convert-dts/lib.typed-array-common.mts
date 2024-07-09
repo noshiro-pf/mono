@@ -35,7 +35,7 @@ export const convertTypedArrayCommon = ({
     ),
   );
 
-export type TypedArrayElemType =
+export type TypedArrayNumberElemType =
   | 'Float32'
   | 'Float64'
   | 'Int8'
@@ -48,7 +48,11 @@ export type TypedArrayElemType =
 
 export type TypedArrayBigintElemType = 'BigInt64' | 'BigUint64';
 
-export const typedArrayElemTypes = [
+export type TypedArrayElemType =
+  | TypedArrayBigintElemType
+  | TypedArrayNumberElemType;
+
+export const typedArrayNumberElemTypes = [
   'Int8',
   'Uint8',
   'Uint8Clamped',
@@ -58,19 +62,55 @@ export const typedArrayElemTypes = [
   'Uint32',
   'Float32',
   'Float64',
-] as const satisfies readonly TypedArrayElemType[];
+] as const satisfies readonly TypedArrayNumberElemType[];
 
-expectType<(typeof typedArrayElemTypes)[number], TypedArrayElemType>('=');
+expectType<
+  (typeof typedArrayNumberElemTypes)[number],
+  TypedArrayNumberElemType
+>('=');
 
 export const typedArrayBigIntElemTypes = [
   'BigInt64',
   'BigUint64',
 ] as const satisfies readonly TypedArrayBigintElemType[];
 
+expectType<
+  (typeof typedArrayBigIntElemTypes)[number],
+  TypedArrayBigintElemType
+>('=');
+
+export const typedArrayElemTypes = [
+  ...typedArrayNumberElemTypes,
+  ...typedArrayBigIntElemTypes,
+] as const satisfies readonly TypedArrayElemType[];
+
+expectType<(typeof typedArrayElemTypes)[number], TypedArrayElemType>('=');
+
+export const typedArrayTypeToElemBaseType = (
+  s: TypedArrayElemType,
+): 'bigint' | 'number' => {
+  switch (s) {
+    case 'Uint8Clamped':
+    case 'Int8':
+    case 'Uint8':
+    case 'Int16':
+    case 'Int32':
+    case 'Uint16':
+    case 'Uint32':
+    case 'Float32':
+    case 'Float64':
+      return 'number';
+
+    case 'BigInt64':
+    case 'BigUint64':
+      return 'bigint';
+  }
+};
+
 export const typedArrayTypeToElemType = (
   s: TypedArrayElemType,
   useBrandedNumber: boolean,
-): Exclude<TypedArrayElemType, 'Uint8Clamped'> | 'number' => {
+): Exclude<TypedArrayElemType, 'Uint8Clamped'> | 'bigint' | 'number' => {
   switch (s) {
     case 'Uint8Clamped':
       return enumType.Uint8;
@@ -86,6 +126,10 @@ export const typedArrayTypeToElemType = (
     case 'Float32':
     case 'Float64':
       return useBrandedNumber ? s : 'number';
+
+    case 'BigInt64':
+    case 'BigUint64':
+      return useBrandedNumber ? s : 'bigint';
   }
 };
 
@@ -108,6 +152,8 @@ export const BYTES_PER_ELEMENT = (
       return 4;
 
     case 'Float64':
+    case 'BigInt64':
+    case 'BigUint64':
       return 8;
   }
 };

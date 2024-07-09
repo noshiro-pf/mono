@@ -194,18 +194,20 @@ export const convert = (
           return convertLibEs2019Object(options);
 
         case 'lib.es2019.string.d.ts':
-          return convertLibEs2019String();
+          return convertLibEs2019String(options);
 
         case 'lib.es2020.bigint.d.ts':
           return convertLibEs2020Bigint(options);
 
         case 'lib.es2020.number.d.ts':
-          return replaceWithNoMatchCheck(
-            //
-            '): string;',
-            // eslint-disable-next-line no-template-curly-in-string
-            '): `${number}`;',
-          );
+          // (Number.NEGATIVE_INFINITY).toLocaleString() が '-∞' になるためこの変更はできない。
+          // return replaceWithNoMatchCheck(
+          //   //
+          //   '): string;',
+          //   // eslint-disable-next-line no-template-curly-in-string
+          //   '): `${number}`;',
+          // );
+          return idFn;
 
         case 'lib.es2020.promise.d.ts':
           return composeMonoTypeFns(
@@ -246,7 +248,7 @@ export const convert = (
           return convertLibEs2022Array(options);
 
         case 'lib.es2022.object.d.ts':
-          return convertLibEs2022Object();
+          return convertLibEs2022Object(options);
 
         case 'lib.es2022.string.d.ts':
           return replaceWithNoMatchCheck(

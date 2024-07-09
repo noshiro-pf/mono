@@ -1,0 +1,12 @@
+@@ -14,7 +14,8 @@ and limitations under the License.
+ ***************************************************************************** */
+ 
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+ 
+-/// <reference lib="es2022" />
+-/// <reference lib="es2023.array" />
+-/// <reference lib="es2023.collection" />
++/// <reference path="./lib.es2022.d.ts" />
++/// <reference path="./lib.es2023.array.d.ts" />
++/// <reference path="./lib.es2023.collection.d.ts" />

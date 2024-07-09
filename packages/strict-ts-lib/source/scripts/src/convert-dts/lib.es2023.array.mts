@@ -5,8 +5,8 @@ import {
 } from '@noshiro/mono-scripts';
 import { closeBraceRegexp, type ConverterOptions } from './common.mjs';
 import {
-  typedArrayBigIntElemTypes,
   typedArrayElemTypes,
+  typedArrayTypeToElemBaseType,
   typedArrayTypeToElemType,
 } from './lib.typed-array-common.mjs';
 
@@ -42,25 +42,28 @@ export const convertLibEs2023Array = ({
         endRegexp: closeBraceRegexp,
         mapFn: composeMonoTypeFns(
           replaceWithNoMatchCheck(
-            `index: number`,
-            `index: ${brandedNumber.ArraySize}`,
+            `findLast<S extends T>(predicate: (value: T, index: number, array: readonly T[]) => value is S, thisArg?: unknown): S | undefined;`,
+            `findLast<S extends T>(predicate: (value: T, index: ${brandedNumber.ArraySize}, array: readonly T[]) => value is S, thisArg?: unknown): S | undefined;`,
           ),
           replaceWithNoMatchCheck(
-            //
-            `): number;`,
-            `): ${brandedNumber.ArraySearchResult};`,
+            `findLast(predicate: (value: T, index: number, array: readonly T[]) => unknown, thisArg?: unknown): T | undefined;`,
+            `findLast(predicate: (value: T, index: ${brandedNumber.ArraySize}, array: readonly T[]) => boolean, thisArg?: unknown): T | undefined;`,
           ),
           replaceWithNoMatchCheck(
-            `start: number`,
-            `start: ${brandedNumber.ArraySizeArg}`,
+            'findLastIndex(predicate: (value: T, index: number, array: readonly T[]) => unknown, thisArg?: unknown): number;',
+            `findLastIndex(predicate: (value: T, index: ${brandedNumber.ArraySize}, array: readonly T[]) => boolean, thisArg?: unknown): ${brandedNumber.ArraySearchResult};`,
           ),
           replaceWithNoMatchCheck(
-            `deleteCount: number`,
-            `deleteCount: ${brandedNumber.ArraySizeArg}`,
+            'toSpliced(start: number, deleteCount: number, ...items: readonly T[]): readonly T[];',
+            `toSpliced(start: ${brandedNumber.ArraySizeArg}, deleteCount: ${brandedNumber.ArraySizeArg}, ...items: readonly T[]): readonly T[];`,
           ),
           replaceWithNoMatchCheck(
-            `deleteCount?: number`,
-            `deleteCount?: ${brandedNumber.ArraySizeArg}`,
+            'toSpliced(start: number, deleteCount?: number): readonly T[];',
+            `toSpliced(start: ${brandedNumber.ArraySizeArg}, deleteCount?: ${brandedNumber.ArraySizeArg}): readonly T[];`,
+          ),
+          replaceWithNoMatchCheck(
+            `with(index: number, value: T): readonly T[];`,
+            `with(index: ${brandedNumber.ArraySizeArg}, value: T): readonly T[];`,
           ),
         ),
       }),
@@ -111,96 +114,50 @@ export const convertLibEs2023Array = ({
         mapFn: composeMonoTypeFns(
           replaceWithNoMatchCheck(
             // TODO: remove if fixed
-            `   * Copies the array and inserts the given number at the provided index.`,
+            `   * Copies the array and inserts the given ${typedArrayTypeToElemBaseType(elemType)} at the provided index.`,
             [
               '   * Copies an array, then overwrites the value at the provided index with the',
               '   * given value. If the index is negative, then it replaces from the end',
               '   * of the array.',
             ].join('\n'),
-          ),
-          replaceWithNoMatchCheck(
-            'findLast<S extends number>',
-            `findLast<S extends ${typedArrayTypeToElemType(elemType, useBrandedNumber)}>`,
-          ),
-          replaceWithNoMatchCheck(
-            'toSorted(compareFn?: (a: number, b: number) => number)',
-            `toSorted(compareFn?: (a: ${typedArrayTypeToElemType(elemType, useBrandedNumber)}, b: ${typedArrayTypeToElemType(elemType, useBrandedNumber)}) => number)`,
-          ),
-          replaceWithNoMatchCheck(
-            'with(index: number, value: number)',
-            `with(index: ${brandedNumber.TypedArraySize}, value: ${typedArrayTypeToElemType(elemType, useBrandedNumber)})`,
-          ),
-          replaceWithNoMatchCheck(
-            'value: number,',
-            `value: ${typedArrayTypeToElemType(elemType, useBrandedNumber)},`,
-          ),
-          replaceWithNoMatchCheck(
-            `index: number`,
-            `index: ${brandedNumber.TypedArraySize}`,
-          ),
-          replaceWithNoMatchCheck(
-            '): number | undefined;',
-            `): ${typedArrayTypeToElemType(elemType, useBrandedNumber)} | undefined;`,
-          ),
-          replaceWithNoMatchCheck(
-            //
-            `): number;`,
-            `): ${brandedNumber.TypedArraySearchResult};`,
-          ),
-        ),
-      }),
-    ),
-
-    ...typedArrayBigIntElemTypes.map((elemType) =>
-      replaceWithNoMatchCheckBetweenRegexp({
-        startRegexp: markers[elemType],
-        endRegexp: closeBraceRegexp,
-        mapFn: composeMonoTypeFns(
-          replaceWithNoMatchCheck(
-            `index: number`,
-            `index: ${brandedNumber.TypedArraySize}`,
-          ),
-          replaceWithNoMatchCheck(
-            `): number;`,
-            `): ${brandedNumber.TypedArraySearchResult};`,
           ),
           replaceWithNoMatchCheck(
             // TODO: remove if fixed
-            `   * Copies the array and inserts the given bigint at the provided index.`,
-            [
-              '   * Copies an array, then overwrites the value at the provided index with the',
-              '   * given value. If the index is negative, then it replaces from the end',
-              '   * of the array.',
-            ].join('\n'),
+            'Copies the array and returns the copy with the elements in reverse order.',
+            'Returns a copy of an array with its elements reversed.',
           ),
-          replaceWithNoMatchCheck(`bigint`, elemType),
+          replaceWithNoMatchCheck(
+            // TODO: remove if fixed
+            '@param value The value to insert into the copied array.',
+            '@param value The value to write into the copied array.',
+          ),
+          replaceWithNoMatchCheck(
+            // TODO: remove if fixed
+            '@returns A copy of the original array with the inserted value.',
+            '@returns The copied array with the updated value.',
+          ),
+          replaceWithNoMatchCheck(
+            `findLast<S extends ${typedArrayTypeToElemBaseType(elemType)}>(predicate: (value: ${typedArrayTypeToElemBaseType(elemType)}, index: number, array: ${elemType}Array) => value is S, thisArg?: unknown): S | undefined;`,
+            `findLast<S extends ${typedArrayTypeToElemType(elemType, useBrandedNumber)}>(predicate: (value: ${typedArrayTypeToElemType(elemType, useBrandedNumber)}, index: ${brandedNumber.TypedArraySize}, array: ${elemType}Array) => value is S, thisArg?: unknown): S | undefined;`,
+          ),
+          replaceWithNoMatchCheck(
+            `findLast(predicate: (value: ${typedArrayTypeToElemBaseType(elemType)}, index: number, array: ${elemType}Array) => unknown, thisArg?: unknown): ${typedArrayTypeToElemBaseType(elemType)} | undefined;`,
+            `findLast(predicate: (value: ${typedArrayTypeToElemType(elemType, useBrandedNumber)}, index: ${brandedNumber.TypedArraySize}, array: ${elemType}Array) => boolean, thisArg?: unknown): ${typedArrayTypeToElemType(elemType, useBrandedNumber)} | undefined;`,
+          ),
+          replaceWithNoMatchCheck(
+            `findLastIndex(predicate: (value: ${typedArrayTypeToElemBaseType(elemType)}, index: number, array: ${elemType}Array) => unknown, thisArg?: unknown): number;`,
+            `findLastIndex(predicate: (value: ${typedArrayTypeToElemType(elemType, useBrandedNumber)}, index: ${brandedNumber.TypedArraySize}, array: ${elemType}Array) => boolean, thisArg?: unknown): ${brandedNumber.TypedArraySearchResult};`,
+          ),
+          replaceWithNoMatchCheck(
+            `toSorted(compareFn?: (a: ${typedArrayTypeToElemBaseType(elemType)}, b: ${typedArrayTypeToElemBaseType(elemType)}) => number)`,
+            `toSorted(compareFn?: (a: ${typedArrayTypeToElemType(elemType, useBrandedNumber)}, b: ${typedArrayTypeToElemType(elemType, useBrandedNumber)}) => number)`,
+          ),
+          replaceWithNoMatchCheck(
+            `with(index: number, value: ${typedArrayTypeToElemBaseType(elemType)})`,
+            `with(index: ${brandedNumber.TypedArraySizeArg}, value: ${typedArrayTypeToElemType(elemType, useBrandedNumber)})`,
+          ),
         ),
       }),
-    ),
-
-    ...([...typedArrayElemTypes, ...typedArrayBigIntElemTypes] as const).map(
-      (elemType) =>
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: markers[elemType],
-          endRegexp: closeBraceRegexp,
-          mapFn: composeMonoTypeFns(
-            replaceWithNoMatchCheck(
-              // TODO: remove if fixed
-              'Copies the array and returns the copy with the elements in reverse order.',
-              'Returns a copy of an array with its elements reversed.',
-            ),
-            replaceWithNoMatchCheck(
-              // TODO: remove if fixed
-              '@param value The value to insert into the copied array.',
-              '@param value The value to write into the copied array.',
-            ),
-            replaceWithNoMatchCheck(
-              // TODO: remove if fixed
-              '@returns A copy of the original array with the inserted value.',
-              '@returns The copied array with the updated value.',
-            ),
-          ),
-        }),
     ),
 
     replaceWithNoMatchCheck(
@@ -208,4 +165,13 @@ export const convertLibEs2023Array = ({
       'Copies and sorts the array.',
       'Returns a copy of an array with its elements sorted.', // use the same description with Array
     ),
+    replaceWithNoMatchCheckBetweenRegexp({
+      startRegexp: markers.Int8,
+      endRegexp: closeBraceRegexp,
+      mapFn: replaceWithNoMatchCheck(
+        //
+        'Uint8Array',
+        'Int8Array',
+      ),
+    }),
   );

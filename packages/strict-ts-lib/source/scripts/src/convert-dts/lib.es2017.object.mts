@@ -2,10 +2,11 @@ import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
 } from '@noshiro/mono-scripts';
-import { type ConverterOptions } from './common.mjs';
+import { idFn, type ConverterOptions } from './common.mjs';
 
 export const convertLibEs2017Object = ({
   readonlyModifier,
+  config: { returnType },
 }: ConverterOptions): MonoTypeFunction<string> =>
   composeMonoTypeFns(
     replaceWithNoMatchCheck(
@@ -29,7 +30,7 @@ export const convertLibEs2017Object = ({
         '  >;',
         '',
         '  /** @internal */',
-        '  export type RecordUtilsEntries<R extends RecordBase> = R extends R',
+        '  export type ToObjectEntries<R extends RecordBase> = R extends R',
         `    ? ${readonlyModifier}{`,
         `        ${readonlyModifier}[K in keyof R]: readonly [`,
         '          ToObjectKeysValue<keyof PickByValue<R, R[K]>>,',
@@ -62,7 +63,19 @@ export const convertLibEs2017Object = ({
         '   * ```',
         '   *',
         '   */',
-        'entries<R extends RecordBase>(object: R): StrictLibInternals.RecordUtilsEntries<R>;',
+        'entries<R extends RecordBase>(object: R): StrictLibInternals.ToObjectEntries<R>;',
       ].join('\n'),
     ),
+    returnType === 'readonly'
+      ? idFn
+      : composeMonoTypeFns(
+          replaceWithNoMatchCheck(
+            'readonly [P in keyof T]: TypedPropertyDescriptor<T[P]>',
+            '[P in keyof T]: TypedPropertyDescriptor<T[P]>',
+          ),
+          replaceWithNoMatchCheck(
+            'readonly [x: string]: PropertyDescriptor',
+            '[x: string]: PropertyDescriptor',
+          ),
+        ),
   );

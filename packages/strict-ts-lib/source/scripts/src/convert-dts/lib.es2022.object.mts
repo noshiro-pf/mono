@@ -2,9 +2,11 @@ import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
 } from '@noshiro/mono-scripts';
-import { typeUtilsName } from './common.mjs';
+import { typeUtilsName, type ConverterOptions } from './common.mjs';
 
-export const convertLibEs2022Object = (): MonoTypeFunction<string> =>
+export const convertLibEs2022Object = ({
+  config: { returnType },
+}: ConverterOptions): MonoTypeFunction<string> =>
   composeMonoTypeFns(
     replaceWithNoMatchCheck(
       `/// <reference types="${typeUtilsName}" />`,
@@ -20,7 +22,7 @@ export const convertLibEs2022Object = (): MonoTypeFunction<string> =>
         ' * @internal',
         ' * R が union 型（要素数1の場合も含む）のとき、 union の要素の中に K をキーとして含むものが一つでもあれば、',
         ' * union 型を K をキーとして含むもののみに絞った型を返す。',
-        ' * union の要素の中に K をキーとして含むものが一つも無ければ、`MutableRecord<K, unknown>` を返す。',
+        ` * union の要素の中に K をキーとして含むものが一つも無ければ、\`${returnType === 'mutable' ? 'Mutable' : ''}Record<K, unknown>\` を返す。`,
         ' * 結果には Readonly を付ける。',
         ' */',
         'declare namespace StrictLibInternals {',
@@ -30,11 +32,11 @@ export const convertLibEs2022Object = (): MonoTypeFunction<string> =>
         '  > = R extends R // union distribution',
         '    ? K extends keyof R',
         '      ? string extends keyof R',
-        '        ? MutableRecord<K, R[keyof R]> & R',
+        `        ? ${returnType === 'mutable' ? 'Mutable' : ''}Record<K, R[keyof R]> & R`,
         '        : number extends keyof R',
-        '        ? MutableRecord<K, R[keyof R]> & R',
+        `        ? ${returnType === 'mutable' ? 'Mutable' : ''}Record<K, R[keyof R]> & R`,
         '        : symbol extends keyof R',
-        '        ? MutableRecord<K, R[keyof R]> & R',
+        `        ? ${returnType === 'mutable' ? 'Mutable' : ''}Record<K, R[keyof R]> & R`,
         '        : R',
         '      : never // omit union member that does not have key K',
         '    : never; // dummy case for union distribution',
