@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@noshiro/mono-scripts": "*",
-    "@noshiro/ts-type-utils-no-stdlib": "*"
+    "@noshiro/ts-type-utils": "*"
   },
   "wireit": {
     "z:gen:lib-files": {

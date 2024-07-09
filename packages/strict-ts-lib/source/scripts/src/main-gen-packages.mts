@@ -14,7 +14,7 @@ const strictTsLibDir = path.resolve(thisDir, '../../..');
 
 const tsTypeUtilsDir = path.resolve(
   strictTsLibDir,
-  '../utils/ts-type-utils-no-stdlib/package.json',
+  '../ts-type-utils/package.json',
 );
 
 const sourcePackageJsonDir = path.resolve(

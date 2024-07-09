@@ -87,7 +87,7 @@
   "devDependencies": {
     "@noshiro/eslint-utils": "*",
     "@noshiro/mono-scripts": "*",
-    "@noshiro/ts-type-utils-no-stdlib": "*"
+    "@noshiro/ts-type-utils": "*"
   },
   "wireit": {
     "type-check": {

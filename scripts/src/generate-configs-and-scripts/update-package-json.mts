@@ -83,9 +83,9 @@ const updatePackageJsonImpl = (
     mut_packageJson['exports'] = {
       '.': {
         import:
-          packageName === 'ts-type-utils-no-stdlib'
+          packageName === 'ts-type-utils'
             ? {
-                types: './ts-type-utils-no-stdlib.d.mts',
+                types: './ts-type-utils.d.mts',
               }
             : packageName.startsWith('global-')
               ? {
@@ -98,8 +98,8 @@ const updatePackageJsonImpl = (
       },
     };
 
-    if (packageName === 'ts-type-utils-no-stdlib') {
-      mut_packageJson['types'] = './ts-type-utils-no-stdlib.d.mts';
+    if (packageName === 'ts-type-utils') {
+      mut_packageJson['types'] = './ts-type-utils.d.mts';
     }
 
     if (packageName === 'event-schedule-app-shared') {
@@ -158,7 +158,7 @@ const updatePackageJsonImpl = (
     };
 
     switch (packageName) {
-      case 'ts-type-utils-no-stdlib': {
+      case 'ts-type-utils': {
         // reset
         mut_packageJson['wireit'] = {};
 
@@ -166,7 +166,7 @@ const updatePackageJsonImpl = (
         const mut_wireit = mut_packageJson['wireit'];
 
         {
-          const filename = './ts-type-utils-no-stdlib.d.mts';
+          const filename = './ts-type-utils.d.mts';
 
           mut_packageJson['scripts'] = {
             build: 'yarn zz:cmd:build:seq',
@@ -842,10 +842,10 @@ const updatePackageJsonImpl = (
     if (
       packageName !== 'goober' &&
       packageName !== 'eslint-utils' &&
-      packageName !== 'ts-type-utils-no-stdlib' &&
+      packageName !== 'ts-type-utils' &&
       packageName !== 'strict-ts-lib'
     ) {
-      mut_ref['@noshiro/ts-type-utils-no-stdlib'] = '*';
+      mut_ref['@noshiro/ts-type-utils'] = '*';
     }
   }
 

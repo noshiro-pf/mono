@@ -2,7 +2,7 @@
  ***************************************************************************** */
  
  /// <reference no-default-lib="true"/>
-+/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
++/// <reference types="@noshiro/ts-type-utils" />
  
  interface Int8ArrayConstructor {
    new (): Int8Array;

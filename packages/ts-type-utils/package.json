@@ -1,5 +1,5 @@
 {
-  "name": "@noshiro/ts-type-utils-no-stdlib",
+  "name": "@noshiro/ts-type-utils",
   "version": "1.1.0",
   "private": false,
   "license": "MIT",
@@ -9,11 +9,11 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./ts-type-utils-no-stdlib.d.mts"
+        "types": "./ts-type-utils.d.mts"
       }
     }
   },
-  "types": "./ts-type-utils-no-stdlib.d.mts",
+  "types": "./ts-type-utils.d.mts",
   "scripts": {
     "build": "yarn zz:cmd:build:seq",
     "clean": "run-p clean:**",
@@ -27,10 +27,10 @@
     "tscw": "yarn type-check --watch",
     "type-check": "tsc --noEmit",
     "zz:cmd:build:seq": "run-s zz:cmd:build:step1",
-    "zz:cmd:build:step1": "ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path=\"./\\1\" />@g' > ./ts-type-utils-no-stdlib.d.mts",
+    "zz:cmd:build:step1": "ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path=\"./\\1\" />@g' > ./ts-type-utils.d.mts",
     "zz:cmd:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
     "zz:cmd:eslint:src-and-test": "yarn zz:cmd:eslint \"./{src,test}/**\" --cache --cache-location ./.eslintcache",
-    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
+    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../.prettierignore --write",
     "zz:cmd:publish": "yarn publish --no-git-tag-version --access=public"
   },
   "devDependencies": {
@@ -40,7 +40,7 @@
   "wireit": {
     "lint": {
       "dependencies": [
-        "../../../packages/utils/eslint-utils:build"
+        "../../packages/utils/eslint-utils:build"
       ],
       "command": "yarn zz:cmd:eslint:src-and-test",
       "files": [
@@ -48,8 +48,8 @@
         "eslint.config.js",
         "package.json",
         "tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
+        "../../package.json",
+        "../../config/tsconfig/**"
       ],
       "output": []
     },
@@ -60,8 +60,8 @@
         "eslint.config.js",
         "package.json",
         "tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
+        "../../package.json",
+        "../../config/tsconfig/**"
       ],
       "clean": false,
       "output": [

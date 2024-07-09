@@ -12,7 +12,7 @@
   "sideEffects": false,
   "type": "module",
   "dependencies": {
-    "@noshiro/ts-type-utils-no-stdlib": "^1.1.0",
+    "@noshiro/ts-type-utils": "^1.1.0",
     "@typescript/lib-decorators": "file:../packages/decorators",
     "@typescript/lib-dom": "file:../packages/dom",
     "@typescript/lib-es2015": "file:../packages/es2015",

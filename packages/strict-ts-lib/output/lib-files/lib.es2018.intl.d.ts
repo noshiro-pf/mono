@@ -14,7 +14,7 @@ and limitations under the License.
 ***************************************************************************** */
 
 /// <reference no-default-lib="true"/>
-/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+/// <reference types="@noshiro/ts-type-utils" />
 
 declare namespace Intl {
   // http://cldr.unicode.org/index/cldr-spec/plural-rules#TOC-Determining-Plural-Categories

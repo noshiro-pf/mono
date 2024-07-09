@@ -14,7 +14,7 @@ and limitations under the License.
 ***************************************************************************** */
 
 /// <reference no-default-lib="true"/>
-/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
+/// <reference types="@noshiro/ts-type-utils" />
 
 /// <reference path="./lib.decorators.d.ts" />
 /// <reference path="./lib.decorators.legacy.d.ts" />

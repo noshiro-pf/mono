@@ -2,7 +2,7 @@
  ***************************************************************************** */
  
  /// <reference no-default-lib="true"/>
-+/// <reference types="@noshiro/ts-type-utils-no-stdlib" />
++/// <reference types="@noshiro/ts-type-utils" />
  
 -/// <reference lib="es2019" />
 -/// <reference lib="es2020.bigint" />

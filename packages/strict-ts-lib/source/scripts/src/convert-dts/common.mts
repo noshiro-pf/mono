@@ -19,7 +19,7 @@ export type ConverterOptions = Readonly<{
 
 export const closeBraceRegexp = /\n\}\n/gu;
 
-export const typeUtilsName = '@noshiro/ts-type-utils-no-stdlib';
+export const typeUtilsName = '@noshiro/ts-type-utils';
 
 export const enumType = generateKeyValueRecordFromKeys([
   'Int8',
