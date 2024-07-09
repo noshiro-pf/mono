@@ -82,9 +82,6 @@
       "output": []
     },
     "lint": {
-      "dependencies": [
-        "../../../packages/utils/eslint-utils:build"
-      ],
       "command": "yarn zz:cmd:eslint:src",
       "files": [
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
@@ -97,9 +94,6 @@
       "output": []
     },
     "lint:fix": {
-      "dependencies": [
-        "../../../packages/utils/eslint-utils:build"
-      ],
       "command": "yarn zz:cmd:eslint:src --fix",
       "files": [
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",

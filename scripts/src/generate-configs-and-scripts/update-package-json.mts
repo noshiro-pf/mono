@@ -204,9 +204,6 @@ const updatePackageJsonImpl = (
           ];
 
           mut_wireit['lint'] = {
-            dependencies: [
-              `${pathPrefixToRoot}/packages/utils/eslint-utils:build`,
-            ],
             command: 'yarn zz:cmd:eslint:src-and-test',
             files,
             output: [],
@@ -479,14 +476,6 @@ const updatePackageJsonImpl = (
           ].join(' ');
 
           {
-            const dependencies = {
-              dependencies: [
-                packageName === 'eslint-utils'
-                  ? 'build'
-                  : `${pathPrefixToRoot}/packages/utils/eslint-utils:build`,
-              ],
-            };
-
             const files = [
               wireitDeps.src,
               `./${eslintConfigName}`,
@@ -501,7 +490,6 @@ const updatePackageJsonImpl = (
                 ? 'lint:src'
                 : 'lint'
             ] = {
-              ...dependencies,
               command:
                 packageName === 'syncflow'
                   ? 'yarn zz:cmd:eslint:src-and-test'
@@ -515,7 +503,6 @@ const updatePackageJsonImpl = (
                 ? 'lint:fix:src'
                 : 'lint:fix'
             ] = {
-              ...dependencies,
               command:
                 packageName === 'syncflow'
                   ? 'yarn zz:cmd:eslint:src-and-test --fix'
@@ -543,18 +530,12 @@ const updatePackageJsonImpl = (
             ];
 
             mut_wireit['lint:cy'] = {
-              dependencies: [
-                `${pathPrefixToRoot}/packages/utils/eslint-utils:build`,
-              ],
               command: 'yarn zz:cmd:eslint:cy',
               files,
               output: [],
             };
 
             mut_wireit['lint:fix:cy'] = {
-              dependencies: [
-                `${pathPrefixToRoot}/packages/utils/eslint-utils:build`,
-              ],
               command: 'yarn zz:cmd:eslint:cy --fix',
               files,
               clean: false,
