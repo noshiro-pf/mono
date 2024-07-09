@@ -152,9 +152,6 @@
       ]
     },
     "lint:src": {
-      "dependencies": [
-        "build"
-      ],
       "command": "yarn zz:cmd:eslint:src",
       "files": [
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
@@ -167,9 +164,6 @@
       "output": []
     },
     "lint:fix:src": {
-      "dependencies": [
-        "build"
-      ],
       "command": "yarn zz:cmd:eslint:src --fix",
       "files": [
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
