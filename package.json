@@ -36,6 +36,8 @@
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "pub:all": "scripts/bash/publish.sh",
     "setup": "run-s build:mono-scripts generate-configs ws:build:utils",
+    "type-check-eslint-configs": "tsc --noEmit",
+    "type-check-eslint-configs:watch": "tsc --noEmit --watch",
     "ws:build": "yarn zz:cmd:wsrun-stages build",
     "ws:build:apps": "wireit",
     "ws:build:globals": "yarn zz:cmd:wsrun-stages -p '@noshiro/global-*' -c build",

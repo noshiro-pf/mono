@@ -39,6 +39,7 @@ jobs:
         command:
           - fmt:all
           - ws:gi
+          - type-check-eslint-configs
           - ws:type-check
           - ws:test
           - ws:build:non-utils
