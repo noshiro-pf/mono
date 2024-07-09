@@ -481,7 +481,7 @@
     *   This value is only used for numbers.
     */
 -  toString(radix?: number): string;
-+  toString(radix?: UintRange<2, 37>): `${number}`;
++  toString(radix?: UintRange<2, 37>): string;
  
    /**
     * Returns a string representing a number in fixed-point notation.
@@ -490,7 +490,7 @@
     *   the range 0 - 20, inclusive.
     */
 -  toFixed(fractionDigits?: number): string;
-+  toFixed(fractionDigits?: UintRange<0, 21>): `${number}`;
++  toFixed(fractionDigits?: UintRange<0, 101>): string;
  
    /**
     * Returns a string containing a number represented in exponential notation.
@@ -499,7 +499,7 @@
     *   the range 0 - 20, inclusive.
     */
 -  toExponential(fractionDigits?: number): string;
-+  toExponential(fractionDigits?: UintRange<0, 21>): `${number}`;
++  toExponential(fractionDigits?: UintRange<1, 101>): string;
  
    /**
     * Returns a string containing a number represented either in exponential or
@@ -508,7 +508,7 @@
     *   inclusive.
     */
 -  toPrecision(precision?: number): string;
-+  toPrecision(precision?: UintRange<1, 22>): `${number}`;
++  toPrecision(precision?: UintRange<1, 101>): string;
  
    /** Returns the primitive value of the specified object. */
    valueOf(): number;

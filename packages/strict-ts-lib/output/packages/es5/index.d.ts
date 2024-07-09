@@ -780,7 +780,7 @@ interface Number {
    * @param radix Specifies a radix for converting numeric values to strings.
    *   This value is only used for numbers.
    */
-  toString(radix?: UintRange<2, 37>): `${number}`;
+  toString(radix?: UintRange<2, 37>): string;
 
   /**
    * Returns a string representing a number in fixed-point notation.
@@ -788,7 +788,7 @@ interface Number {
    * @param fractionDigits Number of digits after the decimal point. Must be in
    *   the range 0 - 20, inclusive.
    */
-  toFixed(fractionDigits?: UintRange<0, 21>): `${number}`;
+  toFixed(fractionDigits?: UintRange<0, 101>): string;
 
   /**
    * Returns a string containing a number represented in exponential notation.
@@ -796,7 +796,7 @@ interface Number {
    * @param fractionDigits Number of digits after the decimal point. Must be in
    *   the range 0 - 20, inclusive.
    */
-  toExponential(fractionDigits?: UintRange<0, 21>): `${number}`;
+  toExponential(fractionDigits?: UintRange<1, 101>): string;
 
   /**
    * Returns a string containing a number represented either in exponential or
@@ -805,7 +805,7 @@ interface Number {
    * @param precision Number of significant digits. Must be in the range 1 - 21,
    *   inclusive.
    */
-  toPrecision(precision?: UintRange<1, 22>): `${number}`;
+  toPrecision(precision?: UintRange<1, 101>): string;
 
   /** Returns the primitive value of the specified object. */
   valueOf(): number;
