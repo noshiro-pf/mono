@@ -34,7 +34,7 @@ describe('nested record', () => {
 
   describe('is', () => {
     test('truthy case', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         xs: [1, 2, 3],
         rec: {
           a: 1,
@@ -46,14 +46,14 @@ describe('nested record', () => {
       if (nestedRecord.is(x)) {
         expectType<typeof x, NestedRecord>('=');
       } else {
-        expectType<typeof x, RecordBase>('=');
+        expectType<typeof x, UnknownRecord>('=');
       }
 
       expect(nestedRecord.is(x)).toBe(true);
     });
 
     test('falsy case', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         xs: [-1, 2.2, 3.3],
         rec: {
           a: 123,
@@ -65,7 +65,7 @@ describe('nested record', () => {
       if (nestedRecord.is(x)) {
         expectType<typeof x, NestedRecord>('=');
       } else {
-        expectType<typeof x, RecordBase>('=');
+        expectType<typeof x, UnknownRecord>('=');
       }
 
       expect(nestedRecord.is(x)).toBe(false);
@@ -74,7 +74,7 @@ describe('nested record', () => {
 
   describe('validate', () => {
     test('falsy case', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         xs: [-1, 2.2, 3.3],
         rec: {
           a: 123,
@@ -93,7 +93,7 @@ describe('nested record', () => {
 
   describe('fill', () => {
     test('from an empty record', () => {
-      const x: RecordBase = {};
+      const x: UnknownRecord = {};
 
       expect(nestedRecord.fill(x)).toStrictEqual({
         xs: [],
@@ -106,7 +106,7 @@ describe('nested record', () => {
     });
 
     test('from a filled record', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         xs: [-1, 2.2, 3.3],
         rec: {
           a: 123,
@@ -126,7 +126,7 @@ describe('nested record', () => {
     });
 
     test('from a partial record', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         xs: [11, 22],
         rec: {
           a: 3,
@@ -144,7 +144,7 @@ describe('nested record', () => {
     });
 
     test('from a partial record with excess property', () => {
-      const x: RecordBase = {
+      const x: UnknownRecord = {
         xs: [11, 22],
         rec: {
           a: 3,

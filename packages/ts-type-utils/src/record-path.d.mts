@@ -17,7 +17,7 @@ type KeyPathAndValueTypeAtPathTuple<R> = AttachValueTypeAtPath<R, Paths<R>>;
 
 type LeafPaths<R> = R extends readonly unknown[]
   ? LeafPathsImplListCase<R, keyof R>
-  : R extends RecordBase
+  : R extends UnknownRecord
     ? LeafPathsImplRecordCase<R, keyof R>
     : readonly [];
 
@@ -37,7 +37,7 @@ type LeafPathsImplListCase<
 
 /** @internal */
 type LeafPathsImplRecordCase<
-  R extends RecordBase,
+  R extends UnknownRecord,
   PathHead extends keyof R,
 > = string extends PathHead
   ? readonly []
@@ -47,7 +47,7 @@ type LeafPathsImplRecordCase<
 
 type LeafPathsWithIndex<R> = R extends readonly unknown[]
   ? _LeafPathsWithIndexImplListCase<R, keyof R>
-  : R extends RecordBase
+  : R extends UnknownRecord
     ? LeafPathsWithIndexImplRecordCase<R, keyof R>
     : readonly [];
 
@@ -67,7 +67,7 @@ type _LeafPathsWithIndexImplListCase<
 
 /** @internal */
 type LeafPathsWithIndexImplRecordCase<
-  R extends RecordBase,
+  R extends UnknownRecord,
   PathHead extends keyof R,
 > = PathHead extends keyof R
   ? readonly [PathHead, ...LeafPathsWithIndex<R[PathHead]>]
@@ -81,13 +81,13 @@ type RecordUpdated<
   ? ValueAfter
   : R extends readonly unknown[]
     ? RecordUpdatedImplTupleCase<R, Path, ValueAfter>
-    : R extends RecordBase
+    : R extends UnknownRecord
       ? RecordUpdatedImplRecordCase<R, Path, ValueAfter>
       : R;
 
 /** @internal */
 type RecordUpdatedImplRecordCase<
-  R extends RecordBase,
+  R extends UnknownRecord,
   Path extends Paths<R>,
   ValueAfter,
 > = Path extends readonly [infer Head, ...infer Rest]

@@ -255,11 +255,11 @@ const nextState = setIn(initialState, ['b'], ['4', '5', '6']);
 
 ```ts
 type RecordKeyType = keyof never; // number | string | symbol
-type ReadonlyRecordBase = Readonly<Record<RecordKeyType, unknown>>;
+type ReadonlyUnknownRecord = Readonly<Record<RecordKeyType, unknown>>;
 
 type KeyPathAndValueTypeAtPathTuple<R> = /* implement here */;
 
-export function setIn<R extends ReadonlyRecordBase>(
+export function setIn<R extends ReadonlyUnknownRecord>(
   record: R,
   ...[keyPath, newValue]: KeyPathAndValueTypeAtPathTuple<R>
 ): R {
@@ -318,7 +318,7 @@ assertNotType<TypeEq<{ x: any }, { x: number }>>();
 ```ts
 export type DeepReadonly<T> = T extends (...args: readonly unknown[]) => unknown
     ? T
-    : T extends ReadonlyRecordBase | readonly unknown[]
+    : T extends ReadonlyUnknownRecord | readonly unknown[]
       ? { readonly [P in keyof T]: DeepReadonly<T[P]> }
       : T;
 
@@ -401,7 +401,7 @@ assertType<
 ```ts
 export type LeafPaths<R> = R extends readonly unknown[]
   ? LeafPathsImplListCase<R>
-  : R extends ReadonlyRecordBase
+  : R extends ReadonlyUnknownRecord
   ? LeafPathsImplRecordCase<R>
   : readonly [];
 
@@ -419,7 +419,7 @@ type LeafPathsImplListCase<
   : never;
 
 type LeafPathsImplRecordCase<
-  R extends ReadonlyRecordBase,
+  R extends ReadonlyUnknownRecord,
   PathHead extends keyof R = keyof R
 > = string extends PathHead
   ? readonly []
@@ -438,7 +438,7 @@ assertType<TypeEq<ToNumber<'9999'>, 9999>>();
 
 例として `LeafPaths<R0>` がどう展開されるのかを説明します。
 
-まず、`R0` はレコード型なので `LeafPaths` の中の条件 `R0 extends ReadonlyRecordBase` にマッチし `LeafPathsImplRecordCase` が呼び出されます。
+まず、`R0` はレコード型なので `LeafPaths` の中の条件 `R0 extends ReadonlyUnknownRecord` にマッチし `LeafPathsImplRecordCase` が呼び出されます。
 第 2 型引数の `PathHead extends keyof R = keyof R` は引数というよりは型変数 `PathHead` を宣言しておくために置いています。
 `string extends PathHead ? readonly []` のところは index signature の場合を除外する（＝再帰を止める）ためにあります。 `PathHead` = `'a' | 'b'` などは `string` を部分型に含まないためマッチしませんが、 `R` = `Record<string, number>` とかなら `PathHead` = `keyof R` = `string` はこれにマッチして再帰がここで止まります。
 `PathHead extends keyof R` という部分は、 `PathHead` ＝ `keyof R` なので常に true になり一見意味が無さそうに見えますが、 **union distribution** を起こすために挟んでいます。union 型（ここでは `'x' | 'y' | 'z'`）の要素について配列の map のような処理を行いたいときによく使うテクニックです（参考： [TypeScript の型初級 - # conditional type における union distribution](https://qiita.com/uhyo/items/da21e2b3c10c8a03952f#conditional-type%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8Bunion-distribution)）。
@@ -738,7 +738,7 @@ assertType<
 
 ```ts
 const UNSAFE_setIn_impl = (
-    record: ReadonlyRecordBase,
+    record: ReadonlyUnknownRecord,
     keyPath: readonly (number | string)[],
     index: number,
     newValue: unknown,
@@ -750,7 +750,7 @@ const UNSAFE_setIn_impl = (
                 i === keyPath[index]
                     ? UNSAFE_setIn_impl(
                           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                          record[keyPath[index]!] as ReadonlyRecordBase,
+                          record[keyPath[index]!] as ReadonlyUnknownRecord,
                           keyPath,
                           index + 1,
                           newValue,
@@ -762,14 +762,14 @@ const UNSAFE_setIn_impl = (
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 [keyPath[index]!]: UNSAFE_setIn_impl(
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    record[keyPath[index]!] as ReadonlyRecordBase,
+                    record[keyPath[index]!] as ReadonlyUnknownRecord,
                     keyPath,
                     index + 1,
                     newValue,
                 ),
             };
 
-export const setIn = <R extends ReadonlyRecordBase>(
+export const setIn = <R extends ReadonlyUnknownRecord>(
     record: R,
     ...[keyPath, newValue]: KeyPathAndValueTypeAtPathTuple<R>
 ): R =>

@@ -175,7 +175,7 @@ import { expectType } from './expect-type.mjs';
      * `Object.hasOwn(obj, 'a')` で絞った結果の `obj.a` が `1` ではなく `unknown` に広がってしまい、あまり上手くいかない。
      */
 
-    const hasOwnNaive = <R extends RecordBase, K extends string>(
+    const hasOwnNaive = <R extends UnknownRecord, K extends string>(
       obj: R,
       key: K,
     ): obj is R & Record<K, R[K]> => Object.hasOwn(obj, key);

@@ -1,24 +1,24 @@
 import { Uint32 } from '../num/index.mjs';
 
-const get = <R extends RecordBase, K extends keyof R>(
+const get = <R extends UnknownRecord, K extends keyof R>(
   record: R,
   key: K,
 ): R[K] => record[key];
 
-const set = <R extends RecordBase, K extends keyof R>(
+const set = <R extends UnknownRecord, K extends keyof R>(
   record: R,
   key: K,
   newValue: R[K],
 ): R => ({ ...record, [key]: newValue });
 
-const update = <R extends RecordBase, K extends keyof R>(
+const update = <R extends UnknownRecord, K extends keyof R>(
   record: R,
   key: K,
   updater: (prev: R[K]) => R[K],
 ): R => ({ ...record, [key]: updater(record[key]) });
 
 const UNSAFE_getIn_impl = (
-  obj: RecordBase,
+  obj: UnknownRecord,
   keyPath: readonly (number | string)[],
   index: NumberType.ArraySizeArgNonNegative,
 ): unknown =>
@@ -26,12 +26,12 @@ const UNSAFE_getIn_impl = (
     ? obj
     : UNSAFE_getIn_impl(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-restricted-syntax
-        obj[keyPath[index]!] as RecordBase,
+        obj[keyPath[index]!] as UnknownRecord,
         keyPath,
         Uint32.add(index, 1),
       );
 
-const getIn = <R extends RecordBase, Path extends Paths<R>>(
+const getIn = <R extends UnknownRecord, Path extends Paths<R>>(
   record: R,
   keyPath: Path,
 ): RecordValueAtPath<R, Path> =>
@@ -44,7 +44,7 @@ const getIn = <R extends RecordBase, Path extends Paths<R>>(
   ) as RecordValueAtPath<R, Path>;
 
 const UNSAFE_updateIn_impl = (
-  obj: RecordBase,
+  obj: UnknownRecord,
   keyPath: readonly (number | string)[],
   index: NumberType.ArraySizeArgNonNegative,
   updater: (prev: unknown) => unknown,
@@ -56,7 +56,7 @@ const UNSAFE_updateIn_impl = (
           i === keyPath[index]
             ? UNSAFE_updateIn_impl(
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-restricted-syntax
-                obj[keyPath[index]!] as RecordBase,
+                obj[keyPath[index]!] as UnknownRecord,
                 keyPath,
                 Uint32.add(index, 1),
                 updater,
@@ -68,14 +68,14 @@ const UNSAFE_updateIn_impl = (
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           [keyPath[index]!]: UNSAFE_updateIn_impl(
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-restricted-syntax
-            obj[keyPath[index]!] as RecordBase,
+            obj[keyPath[index]!] as UnknownRecord,
             keyPath,
             Uint32.add(index, 1),
             updater,
           ),
         };
 
-const setIn = <R extends RecordBase>(
+const setIn = <R extends UnknownRecord>(
   record: R,
   ...[keyPath, newValue]: KeyPathAndValueTypeAtPathTuple<R>
 ): R =>
@@ -88,7 +88,7 @@ const setIn = <R extends RecordBase>(
     () => newValue,
   ) as R;
 
-const updateIn = <R extends RecordBase, Path extends Paths<R>>(
+const updateIn = <R extends UnknownRecord, Path extends Paths<R>>(
   record: R,
   keyPath: IsUnion<Path> extends true ? never : Path,
   updater: IsUnion<Path> extends true
@@ -105,7 +105,7 @@ const updateIn = <R extends RecordBase, Path extends Paths<R>>(
     updater as (prev: unknown) => unknown,
   ) as R;
 
-const removeProperties = <R extends RecordBase, K extends keyof R>(
+const removeProperties = <R extends UnknownRecord, K extends keyof R>(
   record: R,
   keys: readonly K[],
 ): Readonly<{
@@ -125,7 +125,7 @@ const removeProperties = <R extends RecordBase, K extends keyof R>(
  * If `record1` and `record2` share some properties, `record2` value have
  * priority.
  */
-const merge = <R1 extends RecordBase, R2 extends RecordBase>(
+const merge = <R1 extends UnknownRecord, R2 extends UnknownRecord>(
   record1: R1,
   record2: R2,
 ): Readonly<{
@@ -137,14 +137,14 @@ const merge = <R1 extends RecordBase, R2 extends RecordBase>(
   // eslint-disable-next-line no-restricted-syntax
 }> => ({ ...record1, ...record2 }) as never;
 
-function hasKeyValue<R extends RecordBase, K extends keyof R, V extends R[K]>(
-  rec: R,
-  key: K,
-  valueChecker: (v: R[K]) => v is V,
-): rec is R & Record<K, V>;
+function hasKeyValue<
+  R extends UnknownRecord,
+  K extends keyof R,
+  V extends R[K],
+>(rec: R, key: K, valueChecker: (v: R[K]) => v is V): rec is R & Record<K, V>;
 
 function hasKeyValue<
-  R extends RecordBase,
+  R extends UnknownRecord,
   K extends PropertyKey,
   V extends R[keyof R],
 >(
@@ -154,7 +154,7 @@ function hasKeyValue<
 ): rec is R & Record<K, V>;
 
 function hasKeyValue<
-  R extends RecordBase,
+  R extends UnknownRecord,
   K extends PropertyKey,
   V extends R[keyof R],
 >(

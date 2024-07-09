@@ -230,7 +230,7 @@
     *   object.
     */
 -  keys(o: object): string[];
-+  keys<R extends RecordBase>(
++  keys<R extends UnknownRecord>(
 +    object: R,
 +  ): readonly StrictLibInternals.ToObjectKeysValue<keyof R>[];
  }

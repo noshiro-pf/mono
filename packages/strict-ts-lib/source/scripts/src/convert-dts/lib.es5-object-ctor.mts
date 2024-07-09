@@ -39,7 +39,7 @@ export const convertLibEs5_ObjectConstructor = ({
           "   * const ks = Object.keys({ x: 1, y: 2, z: '3', 3: 4 }); // ('3' | 'x' | 'y' | 'z')[]",
           '   * ```',
           '   */',
-          `  keys<R extends RecordBase>(object: R): ${readonlyModifier}StrictLibInternals.ToObjectKeysValue<keyof R>[];`,
+          `  keys<R extends UnknownRecord>(object: R): ${readonlyModifier}StrictLibInternals.ToObjectKeysValue<keyof R>[];`,
         ].join('\n'),
       ),
     ),

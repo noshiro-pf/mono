@@ -10,7 +10,7 @@ export type WorkspaceConfig = DeepReadonly<{
     lint: boolean;
   };
   tsconfig?: {
-    compilerOptions: RecordBase;
+    compilerOptions: UnknownRecord;
   };
   packageJson: {
     scripts: {

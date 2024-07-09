@@ -33,7 +33,7 @@ declare namespace StrictLibInternals {
   >;
 
   /** @internal */
-  export type ToObjectEntries<R extends RecordBase> = R extends R
+  export type ToObjectEntries<R extends UnknownRecord> = R extends R
     ? readonly {
         readonly [K in keyof R]: readonly [
           ToObjectKeysValue<keyof PickByValue<R, R[K]>>,
@@ -81,7 +81,7 @@ interface ObjectConstructor {
    *   const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]
    *   ```
    */
-  entries<R extends RecordBase>(
+  entries<R extends UnknownRecord>(
     object: R,
   ): StrictLibInternals.ToObjectEntries<R>;
 
