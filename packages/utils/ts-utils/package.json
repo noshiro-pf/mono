@@ -38,7 +38,7 @@
     "zz:cmd:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "devDependencies": {
-    "@noshiro/eslint-utils": "*",
+    "@noshiro/eslint-configs": "*",
     "@noshiro/mono-scripts": "*",
     "@noshiro/ts-type-utils": "*"
   },

@@ -67,7 +67,7 @@ plugin ごとに全ルールを逐一設定していく作業が mono repo な�
 
 最近 eslint のより新しい config スタイルである [Flat Config](https://eslint.org/docs/latest/use/configure/configuration-files-new) を採用した上で、 config ファイル記述にも TypeScript を使用する状態に移行しつつあります。
 
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/eslint-utils
+https://github.com/noshiro-pf/mono/blob/develop/packages/eslint-configs
 
 mono repo から CommonJS スタイルを完全に排除して ES Module に統一する（共通ユーティリティ群を esm と cjs 向けにコンパイルしていてビルド時間の無駄が多かった）作業を行う上で、 旧 eslint config 形式である `.eslintrc.js` だけは CommonJS 形式でしか書けないという問題が生じたため、 ESModule 形式でも記述可能な Flat Config の導入に至りました。
 

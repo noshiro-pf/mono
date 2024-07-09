@@ -34,7 +34,7 @@
     "zz:cmd:publish": "yarn publish --no-git-tag-version --access=public"
   },
   "devDependencies": {
-    "@noshiro/eslint-utils": "*",
+    "@noshiro/eslint-configs": "*",
     "@noshiro/mono-scripts": "*"
   },
   "wireit": {

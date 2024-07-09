@@ -13,7 +13,7 @@ export const generateVitestConfigForUtils = async (
     throw new Error(`workspaceConfig for package "${packageName}" not found.`);
   }
 
-  if (!(cfg.gen.test || cfg.gen.build)) return;
+  if (!cfg.gen.test) return;
 
   const content = [
     "import { toThisDir } from '@noshiro/mono-scripts';",

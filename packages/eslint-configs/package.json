@@ -1,5 +1,5 @@
 {
-  "name": "@noshiro/eslint-utils",
+  "name": "@noshiro/eslint-configs",
   "version": "1.0.0",
   "private": false,
   "license": "MIT",
@@ -39,7 +39,7 @@
     "zz:cmd:eslint:print-config": "yarn zz:cmd:eslint --print-config src/index.mts",
     "zz:cmd:eslint:scripts": "yarn zz:cmd:eslint --config eslint.config.js \"./scripts/**/*\" --cache --cache-location ./scripts/.eslintcache",
     "zz:cmd:eslint:src": "yarn zz:cmd:eslint --config eslint.config.js './src/**/*' --cache --cache-location ./src/.eslintcache",
-    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write"
+    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../.prettierignore --write"
   },
   "devDependencies": {
     "@noshiro/mono-scripts": "*"
@@ -50,15 +50,15 @@
       "files": [
         "./**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
         "./tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
+        "../../package.json",
+        "../../config/tsconfig/**"
       ],
       "output": []
     },
     "gi": {
-      "command": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
+      "command": "bash ../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
       "files": [
-        "../../../scripts/bash/index_ts_generator.sh",
+        "../../scripts/bash/index_ts_generator.sh",
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
       ],
       "clean": false,
@@ -72,8 +72,8 @@
       "files": [
         "./scripts/**/*.{mts,ts,d.ts}",
         "./configs/tsconfig.scripts.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
+        "../../package.json",
+        "../../config/tsconfig/**"
       ],
       "clean": true,
       "output": [
@@ -87,13 +87,13 @@
       ],
       "command": "node ./scripts/main.mjs",
       "files": [
-        "../../../scripts/**",
+        "../../scripts/**",
         "./scripts/*.mjs",
         "./scripts/tsconfig.gen.json",
         "./scripts/eslint.config.gen.mjs",
-        "../../../package.json",
-        "../../../.prettierrc",
-        "../../../config/tsconfig/**"
+        "../../package.json",
+        "../../.prettierrc",
+        "../../config/tsconfig/**"
       ],
       "clean": false,
       "output": [
@@ -109,8 +109,8 @@
       "files": [
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
         "./configs/tsconfig.build.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
+        "../../package.json",
+        "../../config/tsconfig/**"
       ],
       "clean": "if-file-deleted",
       "output": [
@@ -128,8 +128,8 @@
         "eslint.config.js",
         "package.json",
         "tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
+        "../../package.json",
+        "../../config/tsconfig/**"
       ],
       "output": []
     },
@@ -143,8 +143,8 @@
         "eslint.config.js",
         "package.json",
         "tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
+        "../../package.json",
+        "../../config/tsconfig/**"
       ],
       "clean": false,
       "output": [
@@ -158,8 +158,8 @@
         "./eslint.config.js",
         "./package.json",
         "./tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
+        "../../package.json",
+        "../../config/tsconfig/**"
       ],
       "output": []
     },
@@ -170,8 +170,8 @@
         "./eslint.config.js",
         "./package.json",
         "./tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
+        "../../package.json",
+        "../../config/tsconfig/**"
       ],
       "clean": false,
       "output": [

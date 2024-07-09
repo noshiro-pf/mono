@@ -85,7 +85,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@noshiro/eslint-utils": "*",
+    "@noshiro/eslint-configs": "*",
     "@noshiro/global-emotion-react": "*",
     "@noshiro/global-emotion-styled": "*",
     "@noshiro/global-react": "*",

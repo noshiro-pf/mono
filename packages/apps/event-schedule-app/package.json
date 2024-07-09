@@ -101,7 +101,7 @@
     "url-regex": "^5.0.0"
   },
   "devDependencies": {
-    "@noshiro/eslint-utils": "*",
+    "@noshiro/eslint-configs": "*",
     "@noshiro/global-emotion-react": "*",
     "@noshiro/global-emotion-styled": "*",
     "@noshiro/global-react": "*",

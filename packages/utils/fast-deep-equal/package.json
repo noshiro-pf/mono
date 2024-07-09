@@ -41,7 +41,7 @@
     "fast-deep-equal": "^3.1.3"
   },
   "devDependencies": {
-    "@noshiro/eslint-utils": "*",
+    "@noshiro/eslint-configs": "*",
     "@noshiro/mono-scripts": "*",
     "@noshiro/ts-type-utils": "*"
   },

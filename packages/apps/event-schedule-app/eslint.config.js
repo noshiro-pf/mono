@@ -1,10 +1,10 @@
-/** @typedef {import('@noshiro/eslint-utils').FlatConfig} FlatConfig */
+/** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */
 
 import {
   banTypes,
   eslintFlatConfigForReact,
   genEsLintRestrictedImportsDefFromDevDependencies,
-} from '@noshiro/eslint-utils';
+} from '@noshiro/eslint-configs';
 import { toThisDir } from '@noshiro/mono-scripts';
 import * as nodePath from 'node:path';
 import packageJson from './package.json' assert { type: 'json' };
@@ -18,7 +18,7 @@ const defineConfig = async () => {
       packageJson.devDependencies,
     );
 
-  /** @type {import('@noshiro/eslint-utils').RestrictedImportsOption} */
+  /** @type {import('@noshiro/eslint-configs').RestrictedImportsOption} */
   const restrictedImportsAdded = {
     paths: [
       ...restrictedImports[0].paths,

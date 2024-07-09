@@ -1,10 +1,10 @@
-/** @typedef {import('@noshiro/eslint-utils').FlatConfig} FlatConfig */
-/** @typedef {import('@noshiro/eslint-utils').EslintImportsRules} EslintImportsRules */
+/** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */
+/** @typedef {import('@noshiro/eslint-configs').EslintImportsRules} EslintImportsRules */
 
 import {
   eslintFlatConfigCommon,
   genEsLintRestrictedImportsDefFromDevDependencies,
-} from '@noshiro/eslint-utils';
+} from '@noshiro/eslint-configs';
 import { toThisDir } from '@noshiro/mono-scripts';
 import * as nodePath from 'node:path';
 import packageJson from './package.json' assert { type: 'json' };

@@ -1,7 +1,7 @@
 {
   "extends": [
-    "../../../../config/tsconfig/tsconfig.lib.build.json",
-    "../../../../config/tsconfig/tsconfig.vite.json"
+    "../../../config/tsconfig/tsconfig.lib.build.json",
+    "../../../config/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
     "outDir": "../esm"

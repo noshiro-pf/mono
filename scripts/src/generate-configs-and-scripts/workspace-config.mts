@@ -239,7 +239,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
     draft.typeCheckIncludes.push('test');
   }),
 
-  'eslint-utils': produce(defaultsForUtil, (draft) => {
+  'eslint-configs': produce(defaultsForUtil, (draft) => {
     draft.packageJson.scripts.publish = false;
 
     draft.gen = {
@@ -250,6 +250,8 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
     };
 
     draft.typeCheckIncludes.push(workspaceScriptsDirName);
+
+    draft.gen.test = false;
   }),
 
   'ts-type-utils': produce(defaultsForUtil, (draft) => {

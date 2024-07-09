@@ -1,9 +1,9 @@
-/** @typedef {import('@noshiro/eslint-utils').FlatConfig} FlatConfig */
+/** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */
 
 import {
   eslintFlatConfigCommon,
   restrictedSyntax,
-} from '@noshiro/eslint-utils';
+} from '@noshiro/eslint-configs';
 import { toThisDir } from '@noshiro/mono-scripts';
 import * as nodePath from 'node:path';
 
@@ -21,7 +21,7 @@ const defineConfig = () => [
   }),
   {
     rules: {
-      /** @satisfies {import('@noshiro/eslint-utils').EslintRules['no-restricted-syntax']} */
+      /** @satisfies {import('@noshiro/eslint-configs').EslintRules['no-restricted-syntax']} */
       'no-restricted-syntax': [
         'error',
         ...restrictedSyntax,

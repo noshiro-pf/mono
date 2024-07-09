@@ -14,7 +14,7 @@ const config = [
   ...eslintFlatConfigCommon({
     tsconfigRootDir: thisDir,
     tsconfigFileName: 'tsconfig.json',
-    packageDirs: [nodePath.resolve(thisDir, '../../..'), thisDir],
+    packageDirs: [nodePath.resolve(thisDir, '../..'), thisDir],
   }),
   {
     files: ['**/*.mts'],
