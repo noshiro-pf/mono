@@ -1,18 +1,8 @@
 import { forEachPackages } from '../esm/index.mjs';
+import { utilsDirs, wsrunOptions } from './constants.mjs';
 
 forEachPackages({
-  prefixes: [
-    'packages/utils',
-    'packages/apps/lambda-calculus-interpreter-core',
-    'packages/apps/event-schedule-app-shared',
-  ],
+  prefixes: utilsDirs,
   command: 'lint',
-  wsrunOptions: [
-    '--exclude-missing',
-    '--fast-exit',
-    '--prefix ',
-    '--serial',
-    '--ifDependency',
-    '--report',
-  ].join(' '),
+  wsrunOptions,
 }).catch(console.error);

@@ -1,14 +1,8 @@
 import { forEachPackages } from '../esm/index.mjs';
+import { wsrunOptions } from './constants.mjs';
 
 forEachPackages({
   prefixes: ['packages/apps'],
   command: 'build',
-  wsrunOptions: [
-    '--exclude-missing',
-    '--fast-exit',
-    '--prefix ',
-    '--serial',
-    '--ifDependency',
-    '--report',
-  ].join(' '),
+  wsrunOptions,
 }).catch(console.error);
