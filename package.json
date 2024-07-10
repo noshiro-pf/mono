@@ -32,7 +32,6 @@
     "fmt:diff": "yarn zz:cmd:prettier:cache $(git status --short --porcelain | awk -F ' ' '{print $2}')",
     "fmt:diff:no-cache": "yarn zz:cmd:prettier $(git status --short --porcelain | awk -F ' ' '{print $2}')",
     "generate-configs": "wireit",
-    "i": "yarn --ignore-scripts",
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "pub:all": "scripts/bash/publish.sh",
     "setup": "run-s build:mono-scripts generate-configs ws:build:utils",
