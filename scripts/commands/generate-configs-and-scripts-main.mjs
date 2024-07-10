@@ -39,6 +39,7 @@ const main = async () => {
       workspace.location === 'packages/strict-ts-lib/source' ||
       workspace.location.startsWith('packages/utils') ||
       workspace.location === 'packages/ts-type-utils' ||
+      workspace.location === 'packages/eslint-configs' ||
       workspace.location === 'packages/apps/lambda-calculus-interpreter-core' ||
       workspace.location === 'packages/apps/event-schedule-app-shared'
     ) {
@@ -46,6 +47,7 @@ const main = async () => {
 
       const packageName = workspace.location
         .replace('packages/ts-type-utils', 'ts-type-utils')
+        .replace('packages/eslint-configs', 'eslint-configs')
         .replace('packages/utils/', '')
         .replace('packages/apps/', '')
         .replace('packages/strict-ts-lib/source', 'strict-ts-lib');

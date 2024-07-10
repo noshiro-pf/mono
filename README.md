@@ -52,11 +52,11 @@ $  yarn ws:build
     -   tsconfig
         -   各 workspace で継承する共通 tsconfig 定義を置いている。
 -   特殊 utility の説明
-    -   `packages/utils/eslint-utils`
+    -   `packages/eslint-configs`
         -   eslint 共通設定を定義している。
         -   ESModule で記述するために flat config を導入（2023/11）
         -   TypeScript で記述している
-            -   `yarn workspace @noshiro/eslint-utils build` により生成（その後一部手動修正が必要）
+            -   `yarn workspace @noshiro/eslint-configs build` により生成（その後一部手動修正が必要）
         -   `plugin:@typescript-eslint:recommended` 等の public な config は使っておらず、 rule の設定を明示的に記述している。
             -   主に多数の config を extends に追加した際のルール設定の上書き結果が曖昧になる問題を避けるため。各ルールはちょうど 1 回ずつ定義されている状態になっている。
             -   `@typescript-eslint` のルールに対応する `eslint` のルールや `prettier` と競合するルール無効化が必要な場合があるが、これらは適宜 plugin の提供している config を参考に手動で設定している。

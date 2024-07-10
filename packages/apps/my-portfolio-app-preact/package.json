@@ -80,7 +80,7 @@
     "preact-media-hook": "^1.0.3"
   },
   "devDependencies": {
-    "@noshiro/eslint-utils": "*",
+    "@noshiro/eslint-configs": "*",
     "@noshiro/global-goober": "*",
     "@noshiro/global-preact": "*",
     "@noshiro/global-preact-utils": "*",

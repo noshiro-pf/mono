@@ -41,7 +41,7 @@
     "deep-object-diff": "^1.1.7"
   },
   "devDependencies": {
-    "@noshiro/eslint-utils": "*",
+    "@noshiro/eslint-configs": "*",
     "@noshiro/mono-scripts": "*",
     "@noshiro/ts-type-utils": "*"
   },

@@ -52,7 +52,7 @@
     "@noshiro/ts-utils-additional": "*"
   },
   "devDependencies": {
-    "@noshiro/eslint-utils": "*",
+    "@noshiro/eslint-configs": "*",
     "@noshiro/mono-scripts": "*",
     "@noshiro/ts-type-utils": "*"
   },

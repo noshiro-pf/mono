@@ -43,7 +43,7 @@
     "resize-observer": "^1.0.0"
   },
   "devDependencies": {
-    "@noshiro/eslint-utils": "*",
+    "@noshiro/eslint-configs": "*",
     "@noshiro/mono-scripts": "*",
     "@noshiro/ts-type-utils": "*"
   },

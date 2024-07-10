@@ -37,7 +37,7 @@
     "firebase": "^10.6.0"
   },
   "devDependencies": {
-    "@noshiro/eslint-utils": "*",
+    "@noshiro/eslint-configs": "*",
     "@noshiro/global-ts-utils": "*",
     "@noshiro/mono-scripts": "*",
     "@noshiro/ts-type-utils": "*"

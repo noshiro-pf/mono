@@ -360,8 +360,9 @@ const updatePackageJsonImpl = (
         }
 
         if (generateFlag.build) {
-          mut_scripts[packageName === 'eslint-utils' ? 'build:src' : 'build'] =
-            'wireit';
+          mut_scripts[
+            packageName === 'eslint-configs' ? 'build:src' : 'build'
+          ] = 'wireit';
           mut_scripts['clean:build'] =
             cfg.useVite === true ? 'rimraf build' : 'rimraf esm';
 
@@ -383,28 +384,29 @@ const updatePackageJsonImpl = (
           } else {
             const tsConfigPath = `./${workspaceConfigsDirName}/${tsconfigBuildJsonName}`;
 
-            mut_wireit[packageName === 'eslint-utils' ? 'build:src' : 'build'] =
-              {
-                ...(packageName.startsWith('global-')
+            mut_wireit[
+              packageName === 'eslint-configs' ? 'build:src' : 'build'
+            ] = {
+              ...(packageName.startsWith('global-')
+                ? {
+                    dependencies: ['zz:cmd:setup'],
+                  }
+                : packageName === 'eslint-configs'
                   ? {
-                      dependencies: ['zz:cmd:setup'],
+                      dependencies: ['gi', 'gen-rules-type'],
                     }
-                  : packageName === 'eslint-utils'
-                    ? {
-                        dependencies: ['gi', 'gen-rules-type'],
-                      }
-                    : {}),
-                command: `tsc --project ${tsConfigPath}`,
-                files: [
-                  wireitDeps.src,
-                  tsConfigPath,
-                  wireitDeps.rootPackageJson,
-                  wireitDeps.tsConfigs,
-                ],
-                clean:
-                  packageName === 'eslint-utils' ? 'if-file-deleted' : true,
-                output: ['esm/**', '.tsbuildinfo'],
-              };
+                  : {}),
+              command: `tsc --project ${tsConfigPath}`,
+              files: [
+                wireitDeps.src,
+                tsConfigPath,
+                wireitDeps.rootPackageJson,
+                wireitDeps.tsConfigs,
+              ],
+              clean:
+                packageName === 'eslint-configs' ? 'if-file-deleted' : true,
+              output: ['esm/**', '.tsbuildinfo'],
+            };
           }
         }
 
@@ -444,7 +446,7 @@ const updatePackageJsonImpl = (
             mut_scripts['lint:fix:src'] = 'wireit';
             mut_scripts['lint:fix:cy'] = 'wireit';
           } else {
-            if (packageName === 'eslint-utils') {
+            if (packageName === 'eslint-configs') {
               mut_scripts['lint:src'] = 'wireit';
               mut_scripts['lint:fix:src'] = 'wireit';
             } else {
@@ -486,7 +488,7 @@ const updatePackageJsonImpl = (
             ];
 
             mut_wireit[
-              cfg.useVite === true || packageName === 'eslint-utils'
+              cfg.useVite === true || packageName === 'eslint-configs'
                 ? 'lint:src'
                 : 'lint'
             ] = {
@@ -499,7 +501,7 @@ const updatePackageJsonImpl = (
             };
 
             mut_wireit[
-              cfg.useVite === true || packageName === 'eslint-utils'
+              cfg.useVite === true || packageName === 'eslint-configs'
                 ? 'lint:fix:src'
                 : 'lint:fix'
             ] = {
@@ -702,7 +704,7 @@ const updatePackageJsonImpl = (
             'vitest --config ./configs/vitest.config.stream.ts';
         }
 
-        if (packageName === 'eslint-utils') {
+        if (packageName === 'eslint-configs') {
           mut_scripts['build'] = 'run-s build:scripts build:src';
           mut_scripts['build:scripts'] = 'wireit';
 
@@ -811,18 +813,18 @@ const updatePackageJsonImpl = (
     const mut_ref = mut_packageJson['devDependencies'];
 
     if (
-      packageName === 'eslint-utils' ||
+      packageName === 'eslint-configs' ||
       packageName === 'goober' ||
       packageName === 'strict-ts-lib'
     ) {
-      delete mut_ref['@noshiro/eslint-utils'];
+      delete mut_ref['@noshiro/eslint-configs'];
     } else {
-      mut_ref['@noshiro/eslint-utils'] = '*';
+      mut_ref['@noshiro/eslint-configs'] = '*';
     }
 
     if (
       packageName !== 'goober' &&
-      packageName !== 'eslint-utils' &&
+      packageName !== 'eslint-configs' &&
       packageName !== 'ts-type-utils' &&
       packageName !== 'strict-ts-lib'
     ) {
