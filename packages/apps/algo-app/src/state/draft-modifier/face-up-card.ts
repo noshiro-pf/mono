@@ -3,7 +3,7 @@ import { type Card, type GameState } from '../../types';
 
 export const faceUpCard = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  draft: DeepWritable<GameState>,
+  draft: DeepMutable<GameState>,
   target: Card | undefined,
 ): void => {
   for (const mut_cards of draft.playerCards) {

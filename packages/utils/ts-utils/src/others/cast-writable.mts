@@ -1,7 +1,7 @@
-export const castWritable = <T,>(mutable: T): Writable<T> =>
+export const castMutable = <T,>(mutable: T): Mutable<T> =>
   // eslint-disable-next-line no-restricted-syntax
-  mutable as Writable<T>;
+  mutable as Mutable<T>;
 
-export const castDeepWritable = <T,>(mutable: T): DeepWritable<T> =>
+export const castDeepMutable = <T,>(mutable: T): DeepMutable<T> =>
   // eslint-disable-next-line no-restricted-syntax
-  mutable as DeepWritable<T>;
+  mutable as DeepMutable<T>;

@@ -10,7 +10,7 @@ export const googleSignInWithPopup = (): Promise<
       a,
       (result: UserCredential) =>
         // This gives you a Google Access Token. You can use it to access the Google API.
-        GoogleAuthProvider.credentialFromResult(castDeepWritable(result)) ??
+        GoogleAuthProvider.credentialFromResult(castDeepMutable(result)) ??
         undefined,
       (error) =>
         // The AuthCredential type that was used.

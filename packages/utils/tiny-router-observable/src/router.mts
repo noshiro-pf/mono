@@ -3,7 +3,7 @@ import {
   mapI,
   type InitializedObservable,
 } from '@noshiro/syncflow';
-import { castWritable, pipe } from '@noshiro/ts-utils';
+import { castMutable, pipe } from '@noshiro/ts-utils';
 
 /**
  * @param sortParams - Sort query params by key. Default is true.
@@ -86,7 +86,7 @@ export const createRouter = (): Router => {
     recipe: (draft: URLSearchParams) => URLSearchParams,
     options?: UpdateQueryParamsOptions,
   ): void => {
-    const mut_url = castWritable(getCurrentUrl());
+    const mut_url = castMutable(getCurrentUrl());
 
     const { sortParams = true, method = 'pushState' } = options ?? {};
 

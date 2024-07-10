@@ -3,7 +3,7 @@ import { getImageSizeFromImageElement } from './get-image-size-from-img-element.
 
 export const getImageSizeFromUrl = (url: string): Promise<RectSize> =>
   new Promise((resolve, reject) => {
-    const mut_img: Writable<HTMLImageElement> = new Image();
+    const mut_img: Mutable<HTMLImageElement> = new Image();
 
     mut_img.addEventListener('load', () => {
       resolve(getImageSizeFromImageElement(mut_img));
