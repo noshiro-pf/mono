@@ -220,6 +220,7 @@ const updatePackageJsonImpl = (
         break;
       }
 
+      case 'eslint-configs':
       case 'strict-ts-lib': {
         // skip
         break;
