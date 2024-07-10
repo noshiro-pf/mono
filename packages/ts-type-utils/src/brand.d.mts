@@ -1,38 +1,39 @@
 type BrandBase = Brand<unknown, never, never>;
 
+/** @internal */
+declare namespace TSTypeUtilsInternals {
+  type ExtractTrueKeys<B, K extends keyof B> = K extends K
+    ? TypeEq<B[K], true> extends true
+      ? K
+      : never
+    : never;
+
+  type ExtractFalseKeys<B extends BrandBase, K extends keyof B> = K extends K
+    ? TypeEq<B[K], false> extends true
+      ? K
+      : never
+    : never;
+
+  /** @internal */
+  type ExtractBooleanKeys<B extends BrandBase, K extends keyof B> = K extends K
+    ? TypeEq<B[K], boolean> extends true
+      ? K
+      : never
+    : never;
+}
+
 type Brand<T, TrueKeys extends string, FalseKeys extends string = never> = T & {
   readonly [key in FalseKeys | TrueKeys]: key extends TrueKeys ? true : false;
 };
 
-/** @internal */
-type _ExtractTrueKeys<B, K extends keyof B> = K extends K
-  ? TypeEq<B[K], true> extends true
-    ? K
-    : never
-  : never;
+type UnwrapBrandTrueKeys<B extends BrandBase> =
+  TSTypeUtilsInternals.ExtractTrueKeys<B, keyof B>;
 
-type UnwrapBrandTrueKeys<B extends BrandBase> = _ExtractTrueKeys<B, keyof B>;
+type UnwrapBrandFalseKeys<B extends BrandBase> =
+  TSTypeUtilsInternals.ExtractFalseKeys<B, keyof B>;
 
-/** @internal */
-type _ExtractFalseKeys<B extends BrandBase, K extends keyof B> = K extends K
-  ? TypeEq<B[K], false> extends true
-    ? K
-    : never
-  : never;
-
-type UnwrapBrandFalseKeys<B extends BrandBase> = _ExtractFalseKeys<B, keyof B>;
-
-/** @internal */
-type _ExtractBooleanKeys<B extends BrandBase, K extends keyof B> = K extends K
-  ? TypeEq<B[K], boolean> extends true
-    ? K
-    : never
-  : never;
-
-type UnwrapBrandBooleanKeys<B extends BrandBase> = _ExtractBooleanKeys<
-  B,
-  keyof B
->;
+type UnwrapBrandBooleanKeys<B extends BrandBase> =
+  TSTypeUtilsInternals.ExtractBooleanKeys<B, keyof B>;
 
 type UnwrapBrandKeys<B extends BrandBase> =
   | UnwrapBrandBooleanKeys<B>
