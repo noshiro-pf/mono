@@ -46,7 +46,7 @@ export const BpDateRangeInput = memoNamed<Props>(
   }) => {
     const value = useMemo(
       () =>
-        castWritable(
+        castMutable(
           tp(
             pipe(dateRange.start).chainOptional((d) =>
               DateUtils.toDate(
@@ -74,7 +74,7 @@ export const BpDateRangeInput = memoNamed<Props>(
 
     const minDate: RawDateMutType | undefined = useMemo(
       () =>
-        castWritable(
+        castMutable(
           pipe(_minDate).chainOptional((d) =>
             DateUtils.toDate(
               ymdhm2Date({
@@ -90,7 +90,7 @@ export const BpDateRangeInput = memoNamed<Props>(
 
     const maxDate: RawDateMutType | undefined = useMemo(
       () =>
-        castWritable(
+        castMutable(
           pipe(_maxDate).chainOptional((d) =>
             DateUtils.toDate(
               ymdhm2Date({

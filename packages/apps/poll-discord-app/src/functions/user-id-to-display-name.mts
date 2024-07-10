@@ -16,7 +16,7 @@ export const createUserIdToDisplayNameMap = async (
   > = await Result.fromPromise(
     userIds === undefined
       ? guild.members.fetch()
-      : guild.members.fetch({ user: castWritable(userIds) }),
+      : guild.members.fetch({ user: castMutable(userIds) }),
   );
 
   if (Result.isErr(guildMembersResult)) {

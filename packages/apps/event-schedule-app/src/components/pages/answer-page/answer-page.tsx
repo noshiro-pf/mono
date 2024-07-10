@@ -45,7 +45,7 @@ const saveAsImage = (canvas: HTMLCanvasElement): void => {
   const downloadLink = document.createElement('a');
 
   if (typeof downloadLink.download === 'string') {
-    const mut_downloadLink = castWritable(downloadLink);
+    const mut_downloadLink = castMutable(downloadLink);
 
     mut_downloadLink.href = targetImgUri;
 

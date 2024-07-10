@@ -7,7 +7,7 @@ export const countSuccess = (
   y: TwoDiceSumValue,
   z: TwoDiceSumValue,
 ): Count => {
-  const mut_count: Writable<Record<keyof Count, number>> = {
+  const mut_count: Mutable<Record<keyof Count, number>> = {
     oneLine: 0,
     twoLine: 0,
     noLine: 0,

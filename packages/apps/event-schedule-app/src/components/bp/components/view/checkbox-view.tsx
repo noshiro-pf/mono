@@ -20,7 +20,7 @@ export const CheckboxView = ({
       [onCheck, onChange],
     );
 
-  const inputRef = useRef<Writable<HTMLInputElement>>(null);
+  const inputRef = useRef<Mutable<HTMLInputElement>>(null);
 
   useEffect(() => {
     if (inputRef.current !== null) {

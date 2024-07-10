@@ -84,7 +84,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
         parseDate={parseDate}
         placeholder={placeholder}
         reverseMonthAndYearMenus={reverseMonthAndYearMenus}
-        shortcuts={castWritable(shortcuts)}
+        shortcuts={castMutable(shortcuts)}
         showActionsBar={showActionsBar}
         /**
          * FIXME: Blueprintjs v5 から showTimezoneSelect = true としていると

@@ -21,7 +21,7 @@ import { createToaster, showToast } from '../functions';
 
 if (isProduction) {
   // eslint-disable-next-line no-restricted-syntax
-  (window.onerror as Writable<typeof window.onerror>) = (e: unknown) => {
+  (window.onerror as Mutable<typeof window.onerror>) = (e: unknown) => {
     const errorString = Result.unwrapThrow(Json.stringify(e));
     console.error(errorString);
 

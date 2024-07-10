@@ -42,11 +42,11 @@ import {
   type Uint32 as VAR_Uint32,
   type Uint8 as VAR_Uint8,
   type assertNotUndefined as VAR_assertNotUndefined,
+  type castDeepMutable as VAR_castDeepMutable,
   type castDeepReadonly as VAR_castDeepReadonly,
-  type castDeepWritable as VAR_castDeepWritable,
+  type castMutable as VAR_castMutable,
   type castReadonly as VAR_castReadonly,
   type castRemoveSmallInt as VAR_castRemoveSmallInt,
-  type castWritable as VAR_castWritable,
   type createQueue as VAR_createQueue,
   type createTinyObservable as VAR_createTinyObservable,
   type expectType as VAR_expectType,
@@ -127,10 +127,10 @@ declare global {
   const ArrayUtils: typeof VAR_ArrayUtils;
   const assertNotUndefined: typeof VAR_assertNotUndefined;
   const castDeepReadonly: typeof VAR_castDeepReadonly;
-  const castDeepWritable: typeof VAR_castDeepWritable;
+  const castDeepMutable: typeof VAR_castDeepMutable;
   const castReadonly: typeof VAR_castReadonly;
   const castRemoveSmallInt: typeof VAR_castRemoveSmallInt;
-  const castWritable: typeof VAR_castWritable;
+  const castMutable: typeof VAR_castMutable;
   const createQueue: typeof VAR_createQueue;
   const createTinyObservable: typeof VAR_createTinyObservable;
   const DateUtils: typeof VAR_DateUtils;

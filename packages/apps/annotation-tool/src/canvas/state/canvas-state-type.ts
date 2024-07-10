@@ -4,9 +4,9 @@ import { type Direction } from '../functions';
 import { type PixiBbox, type PixiTempRect } from '../types';
 
 export type CanvasAppState = {
-  pointerPos: Writable<Point>;
-  dragStartPoint: Writable<Point>;
-  dragEndPoint: Writable<Point>;
+  pointerPos: Mutable<Point>;
+  dragStartPoint: Mutable<Point>;
+  dragEndPoint: Mutable<Point>;
   grabbingObject: Readonly<
     | {
         type: 'bbox-point';

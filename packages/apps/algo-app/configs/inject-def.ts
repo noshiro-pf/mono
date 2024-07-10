@@ -3,7 +3,7 @@
 /* eslint-disable import/no-internal-modules */
 
 import { genGlobalImportDefsFromDevDependencies } from '@noshiro/mono-scripts';
-import { castDeepWritable, tp } from '@noshiro/ts-utils';
+import { castDeepMutable, tp } from '@noshiro/ts-utils';
 import inject from '@rollup/plugin-inject';
 import packageJson from '../package.json' assert { type: 'json' };
 
@@ -13,7 +13,7 @@ export const createInjectDef = async () => {
   );
 
   return inject({
-    modules: castDeepWritable({
+    modules: castDeepMutable({
       ...injectionRules,
       dict: tp('~/constants/dictionary/dictionary', 'dict'),
     }),

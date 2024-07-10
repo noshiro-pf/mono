@@ -59,7 +59,7 @@ type UnionToIntersection<T> = (
   ? F
   : never;
 
-type Writable<T> = { -readonly [P in keyof T]: T[P] };
+type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ToMutableMap<T extends ReadonlyMap<any, any>> =
@@ -87,17 +87,17 @@ type MutableSet<K> = Set<K>;
 
 type MutableMap<K, V> = Map<K, V>;
 
-type DeepWritable<T> = T extends Primitive
+type DeepMutable<T> = T extends Primitive
   ? T
   : T extends Function
     ? T
     : T extends ReadonlyMap<infer K, infer V>
-      ? MutableMap<DeepWritable<K>, DeepWritable<V>>
+      ? MutableMap<DeepMutable<K>, DeepMutable<V>>
       : T extends ReadonlySet<infer V>
-        ? MutableSet<DeepWritable<V>>
+        ? MutableSet<DeepMutable<V>>
         : T extends object | readonly unknown[]
           ? {
-              -readonly [K in keyof T]: DeepWritable<T[K]>;
+              -readonly [K in keyof T]: DeepMutable<T[K]>;
             }
           : T;
 
@@ -142,7 +142,7 @@ type ArrayElement<S> = S extends readonly (infer T)[] ? T : never;
 
 type ArrayOfLength<N extends number, Elm> = MakeTuple<Elm, N>;
 
-type MutableArrayOfLength<N extends number, Elm> = Writable<
+type MutableArrayOfLength<N extends number, Elm> = Mutable<
   ArrayOfLength<N, Elm>
 >;
 
@@ -154,7 +154,7 @@ type MutableArrayOfLengthOrMore<N extends number, Elm> = MutableArrayAtLeastLen<
   N,
   Elm
 >;
-type MutableArrayAtLeastLen<N extends number, Elm> = Writable<
+type MutableArrayAtLeastLen<N extends number, Elm> = Mutable<
   ArrayAtLeastLen<N, Elm>
 >;
 

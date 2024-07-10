@@ -121,7 +121,7 @@ function length<T extends readonly unknown[]>(list: T): NumberType.ArraySize {
 
 const size = length;
 
-const asMut: <T extends readonly unknown[]>(list: T) => Writable<T> = idfn;
+const asMut: <T extends readonly unknown[]>(list: T) => Mutable<T> = idfn;
 
 function zeros<N extends SmallUint>(len: N): ArrayOfLength<N, 0>;
 function zeros(len: WithSmallInt<PositiveInt & Uint32>): NonEmptyArray<0>;

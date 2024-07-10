@@ -1,6 +1,6 @@
 import { DateInput, type DatePickerShortcut } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
-import { DateUtils, castWritable, pipe, toSafeUint } from '@noshiro/ts-utils';
+import { DateUtils, castMutable, pipe, toSafeUint } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { type Ymdhm } from './types/index.mjs';
 
@@ -82,7 +82,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
         parseDate={parseDate}
         placeholder={placeholder}
         reverseMonthAndYearMenus={reverseMonthAndYearMenus}
-        shortcuts={castWritable(shortcuts)}
+        shortcuts={castMutable(shortcuts)}
         showActionsBar={showActionsBar}
         timePrecision={'minute'}
         value={dateObj}

@@ -3,12 +3,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import { autoImportDef } from '@noshiro/global-ts-utils/auto-imports';
-import { castDeepWritable } from '@noshiro/ts-utils';
+import { castDeepMutable } from '@noshiro/ts-utils';
 import autoImport from 'unplugin-auto-import/esbuild';
 
 export const autoImportsDef = autoImport({
   include: [/\.m?[jt]sx?$/u],
   dts: false,
   /* options */
-  imports: [castDeepWritable(autoImportDef)],
+  imports: [castDeepMutable(autoImportDef)],
 });
