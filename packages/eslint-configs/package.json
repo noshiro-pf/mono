@@ -16,15 +16,17 @@
   },
   "scripts": {
     "build": "run-s build:scripts build:src",
-    "build:scripts": "wireit",
-    "build:src": "wireit",
+    "build:scripts": "tsc --project ./configs/tsconfig.scripts.json",
+    "build:src": "run-s gi gen-rules-type build:src:command",
+    "build:src:command": "tsc --project ./configs/tsconfig.build.json",
     "clean": "run-p clean:**",
     "clean:build": "rimraf esm",
     "clean:eslintcache": "rimraf .eslintcache",
     "clean:wireit": "rimraf .wireit/**",
     "fmt": "yarn zz:cmd:prettier .",
-    "gen-rules-type": "wireit",
-    "gi": "wireit",
+    "gen-rules-type": "run-s build:scripts gen-rules-type:command",
+    "gen-rules-type:command": "node ./scripts/main.mjs",
+    "gi": "bash ../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
     "lint": "run-p lint:scripts lint:src",
     "lint:fix": "run-p lint:fix:scripts lint:fix:src",
     "lint:fix:scripts": "wireit",
@@ -33,7 +35,7 @@
     "lint:src": "wireit",
     "tsc": "yarn type-check",
     "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit",
+    "type-check": "tsc --noEmit",
     "watch": "yarn build:src --watch",
     "zz:cmd:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
     "zz:cmd:eslint:print-config": "yarn zz:cmd:eslint --print-config src/index.mts",
@@ -45,79 +47,6 @@
     "@noshiro/mono-scripts": "*"
   },
   "wireit": {
-    "type-check": {
-      "command": "tsc --noEmit",
-      "files": [
-        "./**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./tsconfig.json",
-        "../../package.json",
-        "../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "gi": {
-      "command": "bash ../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
-      "files": [
-        "../../scripts/bash/index_ts_generator.sh",
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
-      ],
-      "clean": false,
-      "output": [
-        "src/**/index.mts"
-      ],
-      "packageLocks": []
-    },
-    "build:scripts": {
-      "command": "tsc --project ./configs/tsconfig.scripts.json",
-      "files": [
-        "./scripts/**/*.{mts,ts,d.ts}",
-        "./configs/tsconfig.scripts.json",
-        "../../package.json",
-        "../../config/tsconfig/**"
-      ],
-      "clean": true,
-      "output": [
-        "scripts/**/*.mjs",
-        "!scripts/eslint.config.gen.mjs"
-      ]
-    },
-    "gen-rules-type": {
-      "dependencies": [
-        "build:scripts"
-      ],
-      "command": "node ./scripts/main.mjs",
-      "files": [
-        "../../scripts/**",
-        "./scripts/*.mjs",
-        "./scripts/tsconfig.gen.json",
-        "./scripts/eslint.config.gen.mjs",
-        "../../package.json",
-        "../../.prettierrc",
-        "../../config/tsconfig/**"
-      ],
-      "clean": false,
-      "output": [
-        "./src/types/rules/**/*.mts"
-      ]
-    },
-    "build:src": {
-      "dependencies": [
-        "gi",
-        "gen-rules-type"
-      ],
-      "command": "tsc --project ./configs/tsconfig.build.json",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./configs/tsconfig.build.json",
-        "../../package.json",
-        "../../config/tsconfig/**"
-      ],
-      "clean": "if-file-deleted",
-      "output": [
-        "esm/**",
-        ".tsbuildinfo"
-      ]
-    },
     "lint:scripts": {
       "dependencies": [
         "build"
