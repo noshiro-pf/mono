@@ -17,7 +17,12 @@ import { expectType } from './expect-type.mjs';
 
   // <= かつ >= だがなぜか '=' にならない…
   expectType<AB, Readonly<{ T: true; B: boolean; F: false }> & number>('<=');
-  expectType<Readonly<{ T: true; B: boolean; F: false }> & number, AB>('<=');
+  expectType<
+    Readonly<{ T: true; B: boolean; F: false }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
+      number,
+    AB
+  >('<=');
   expectType<Readonly<{ T: true; B: boolean; F: false }> & number, AB>('!=');
 
   expectType<GetBrandValuePart<A>, number>('=');
@@ -29,6 +34,7 @@ import { expectType } from './expect-type.mjs';
       T: true;
       F: false;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -47,6 +53,7 @@ import { expectType } from './expect-type.mjs';
       Int: true;
       SafeInt: true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -65,6 +72,7 @@ import { expectType } from './expect-type.mjs';
       Int: true;
       SafeInt: true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -83,6 +91,7 @@ import { expectType } from './expect-type.mjs';
       Int: true;
       SafeInt: true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('!=');
 
@@ -95,7 +104,10 @@ import { expectType } from './expect-type.mjs';
   expectType<GetBrandKeysPart<AB>, Readonly<{ B: boolean; T: true; F: false }>>(
     '=',
   );
-  expectType<NormalizeBrandUnion<AB>, Readonly<{ T: true; F: false }> & number>(
-    '=',
-  );
+  expectType<
+    NormalizeBrandUnion<AB>,
+    Readonly<{ T: true; F: false }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
+      number
+  >('=');
 }
