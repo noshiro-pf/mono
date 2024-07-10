@@ -1,13 +1,15 @@
-type Min<N extends Uint10> = _MinImpl<N, []>;
+type Min<N extends Uint10> = TSTypeUtilsInternals.MinImpl<N, []>;
 
-type _MinImpl<N extends Uint10, T extends readonly unknown[]> =
-  IsNever<N> extends true
-    ? never
-    : T['length'] extends N
-      ? T['length']
-      : _MinImpl<N, [0, ...T]>;
+/** @internal */
+declare namespace TSTypeUtilsInternals {
+  type MinImpl<N extends Uint10, T extends readonly unknown[]> =
+    IsNever<N> extends true
+      ? never
+      : T['length'] extends N
+        ? T['length']
+        : MinImpl<N, [0, ...T]>;
+}
 
-// /** @internal */
 // type _MinImpl<
 //   N extends Index<64>,
 //   Count extends number
@@ -17,4 +19,4 @@ type _MinImpl<N extends Uint10, T extends readonly unknown[]> =
 //   ? Count
 //   : _MinImpl<Decrement<N>, Increment<Count> & number>;
 
-// export type Min<N extends Index<64>> = _MinImpl<N, 0>;
+// type Min<N extends Index<64>> = _MinImpl<N, 0>;

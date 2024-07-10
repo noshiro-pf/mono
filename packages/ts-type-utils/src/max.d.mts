@@ -1,13 +1,15 @@
-type Max<N extends Uint10> = _MaxImpl<N, []>;
+type Max<N extends Uint10> = TSTypeUtilsInternals.MaxImpl<N, []>;
 
-type _MaxImpl<N extends Uint10, T extends readonly unknown[]> =
-  IsNever<N> extends true
-    ? never
-    : [N] extends [Partial<T>['length']]
-      ? T['length']
-      : _MaxImpl<N, [0, ...T]>;
+/** @internal */
+declare namespace TSTypeUtilsInternals {
+  type MaxImpl<N extends Uint10, T extends readonly unknown[]> =
+    IsNever<N> extends true
+      ? never
+      : [N] extends [Partial<T>['length']]
+        ? T['length']
+        : MaxImpl<N, [0, ...T]>;
+}
 
-// /** @internal */
 // namespace _MaxImpl {
 //   /**
 //    * LEQ[3 | 5] == 0 | 1 | 2 | 3 | 4 | 5;
@@ -48,7 +50,7 @@ type _MaxImpl<N extends Uint10, T extends readonly unknown[]> =
 //    * }
 //    * ```
 //    */
-//   export type Main<
+//   type Main<
 //     N extends number,
 //     U extends number = LEQ[Extract<N, keyof LEQ>]
 //   > = {
@@ -56,14 +58,13 @@ type _MaxImpl<N extends Uint10, T extends readonly unknown[]> =
 //   }[keyof LEQ];
 // }
 
-// export type Max<N extends Uint10> = _MaxImpl.Main<N>;
+// type Max<N extends Uint10> = _MaxImpl.Main<N>;
 
-// /** @internal */
 // type _MaxImpl<N extends Index<64>, T extends readonly unknown[]> = {
 //   b: T['length'];
 //   r: _MaxImpl<N, [0, ...T]>;
 // }[[N] extends [Partial<T>['length']] ? 'b' : 'r'];
 
-// export type Max<N extends Index<64>> = _MaxImpl<N, []>;
+// type Max<N extends Index<64>> = _MaxImpl<N, []>;
 
 // https://stackoverflow.com/questions/62968955/how-to-implement-a-type-level-max-function-over-a-union-of-literals-in-typescri

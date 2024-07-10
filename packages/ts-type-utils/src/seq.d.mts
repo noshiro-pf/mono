@@ -1,6 +1,10 @@
-type Seq<N extends number> = _SeqImpl<MakeTuple<unknown, N>>;
+type Seq<N extends number> = TSTypeUtilsInternals.SeqImpl<
+  MakeTuple<unknown, N>
+>;
 
 /** @internal */
-type _SeqImpl<T extends readonly unknown[]> = {
-  readonly [i in keyof T]: i extends `${number}` ? ToNumber<i> : never;
-};
+declare namespace TSTypeUtilsInternals {
+  type SeqImpl<T extends readonly unknown[]> = {
+    readonly [i in keyof T]: i extends `${number}` ? ToNumber<i> : never;
+  };
+}
