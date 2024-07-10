@@ -19,7 +19,8 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': false;
       '>=0': false;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -31,7 +32,8 @@ import { expectType } from './expect-type.mjs';
       Int: false;
       SafeInt: false;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -52,7 +54,8 @@ import { expectType } from './expect-type.mjs';
       '< 2^31': false;
       '< 2^32': false;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -73,7 +76,8 @@ import { expectType } from './expect-type.mjs';
       '< 2^31': true;
       '< 2^32': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<POSITIVE_INFINITY, PositiveNumber>('<=');
@@ -85,7 +89,8 @@ import { expectType } from './expect-type.mjs';
       NaNValue: false;
       '!=0': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -98,7 +103,8 @@ import { expectType } from './expect-type.mjs';
       '>= -2^15': true;
       '>= -2^31': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -116,7 +122,8 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<PositiveNumber, NonNegativeNumber>('<=');
@@ -137,7 +144,8 @@ import { expectType } from './expect-type.mjs';
       // '>= -2^31': true;
       '>=0': false;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -146,7 +154,8 @@ import { expectType } from './expect-type.mjs';
       NaNValue: false;
       Finite: true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   // integer types
@@ -158,7 +167,8 @@ import { expectType } from './expect-type.mjs';
       Finite: true;
       Int: true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -178,7 +188,8 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -198,7 +209,8 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -218,7 +230,8 @@ import { expectType } from './expect-type.mjs';
       // '>= -2^31': true;
       '>=0': false;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -229,7 +242,8 @@ import { expectType } from './expect-type.mjs';
       Int: true;
       '!=0': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -240,7 +254,8 @@ import { expectType } from './expect-type.mjs';
       Int: true;
       SafeInt: true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -261,7 +276,8 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -282,7 +298,8 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -303,7 +320,8 @@ import { expectType } from './expect-type.mjs';
       // '>= -2^31': true;
       '>=0': false;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -315,7 +333,8 @@ import { expectType } from './expect-type.mjs';
       SafeInt: true;
       '!=0': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -336,7 +355,8 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       // '>=0': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -357,7 +377,8 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       // '>=0': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -378,7 +399,8 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -399,7 +421,8 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -420,7 +443,8 @@ import { expectType } from './expect-type.mjs';
       // '>= -2^31': true;
       '>=0': false;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -441,7 +465,8 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': false;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -449,7 +474,8 @@ import { expectType } from './expect-type.mjs';
     Readonly<{
       Float32: true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -457,7 +483,8 @@ import { expectType } from './expect-type.mjs';
     Readonly<{
       Float64: true;
     }> &
-      number
+      number &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -468,7 +495,8 @@ import { expectType } from './expect-type.mjs';
       NaNValue: false;
       BigInt64: true;
     }> &
-      bigint
+      bigint &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 
   expectType<
@@ -479,7 +507,8 @@ import { expectType } from './expect-type.mjs';
       NaNValue: false;
       BigUint64: true;
     }> &
-      bigint
+      bigint &
+      TSTypeUtilsInternals.BrandUniqueSymbol
   >('=');
 }
 

@@ -1,47 +1,51 @@
-type BrandBase = Brand<unknown, never, never>;
+type UnknownBrand = Brand<unknown, never, never>;
+
+/** @internal */
+declare namespace TSTypeUtilsInternals {
+  const brandUniqueSymbol: unique symbol;
+
+  export type BrandUniqueSymbol = {
+    readonly [brandUniqueSymbol]: never;
+  };
+
+  export type ExtractTrueKeys<B, K extends keyof B> = K extends K
+    ? TypeEq<B[K], true> extends true
+      ? K
+      : never
+    : never;
+
+  export type ExtractFalseKeys<
+    B extends UnknownBrand,
+    K extends keyof B,
+  > = K extends K ? (TypeEq<B[K], false> extends true ? K : never) : never;
+
+  export type ExtractBooleanKeys<
+    B extends UnknownBrand,
+    K extends keyof B,
+  > = K extends K ? (TypeEq<B[K], boolean> extends true ? K : never) : never;
+}
 
 type Brand<T, TrueKeys extends string, FalseKeys extends string = never> = T & {
   readonly [key in FalseKeys | TrueKeys]: key extends TrueKeys ? true : false;
-};
+} & TSTypeUtilsInternals.BrandUniqueSymbol;
 
-/** @internal */
-type _ExtractTrueKeys<B, K extends keyof B> = K extends K
-  ? TypeEq<B[K], true> extends true
-    ? K
-    : never
-  : never;
+type UnwrapBrandTrueKeys<B extends UnknownBrand> =
+  TSTypeUtilsInternals.ExtractTrueKeys<B, keyof B>;
 
-type UnwrapBrandTrueKeys<B extends BrandBase> = _ExtractTrueKeys<B, keyof B>;
+type UnwrapBrandFalseKeys<B extends UnknownBrand> =
+  TSTypeUtilsInternals.ExtractFalseKeys<B, keyof B>;
 
-/** @internal */
-type _ExtractFalseKeys<B extends BrandBase, K extends keyof B> = K extends K
-  ? TypeEq<B[K], false> extends true
-    ? K
-    : never
-  : never;
+type UnwrapBrandBooleanKeys<B extends UnknownBrand> =
+  TSTypeUtilsInternals.ExtractBooleanKeys<B, keyof B>;
 
-type UnwrapBrandFalseKeys<B extends BrandBase> = _ExtractFalseKeys<B, keyof B>;
-
-/** @internal */
-type _ExtractBooleanKeys<B extends BrandBase, K extends keyof B> = K extends K
-  ? TypeEq<B[K], boolean> extends true
-    ? K
-    : never
-  : never;
-
-type UnwrapBrandBooleanKeys<B extends BrandBase> = _ExtractBooleanKeys<
-  B,
-  keyof B
->;
-
-type UnwrapBrandKeys<B extends BrandBase> =
+type UnwrapBrandKeys<B extends UnknownBrand> =
   | UnwrapBrandBooleanKeys<B>
   | UnwrapBrandFalseKeys<B>
   | UnwrapBrandTrueKeys<B>;
 
-type GetBrandKeysPart<B extends BrandBase> = Pick<B, UnwrapBrandKeys<B>>;
+type GetBrandKeysPart<B extends UnknownBrand> = Pick<B, UnwrapBrandKeys<B>>;
 
-type GetBrandValuePart<B extends BrandBase> =
+type GetBrandValuePart<B extends UnknownBrand> =
   B extends Brand<
     infer T,
     UnwrapBrandTrueKeys<B> & string,
@@ -51,7 +55,7 @@ type GetBrandValuePart<B extends BrandBase> =
     : never;
 
 type ExtendBrand<
-  B extends BrandBase,
+  B extends UnknownBrand,
   T extends string,
   F extends string = never,
 > =
@@ -63,22 +67,22 @@ type ExtendBrand<
       >
     : never;
 
-type ChangeBaseBrand<B extends BrandBase, T> = Brand<
+type ChangeBaseBrand<B extends UnknownBrand, T> = Brand<
   T,
   UnwrapBrandTrueKeys<B> & string,
   UnwrapBrandFalseKeys<B> & string
 >;
 
-type IntersectBrand<B1 extends BrandBase, B2 extends BrandBase> = Brand<
+type IntersectBrand<B1 extends UnknownBrand, B2 extends UnknownBrand> = Brand<
   GetBrandValuePart<B1> & GetBrandValuePart<B2>,
   string & (UnwrapBrandTrueKeys<B1> | UnwrapBrandTrueKeys<B2>),
   string & (UnwrapBrandFalseKeys<B1> | UnwrapBrandFalseKeys<B2>)
 >;
 
 /** ある key が true | false になる場合、その key を削除する */
-type NormalizeBrandUnion<B extends BrandBase> = GetBrandValuePart<B> & {
+type NormalizeBrandUnion<B extends UnknownBrand> = GetBrandValuePart<B> & {
   readonly [key in Exclude<
     UnwrapBrandKeys<B>,
     UnwrapBrandBooleanKeys<B>
   >]: B[key];
-};
+} & TSTypeUtilsInternals.BrandUniqueSymbol;
