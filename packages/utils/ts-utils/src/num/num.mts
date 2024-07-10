@@ -1,3 +1,5 @@
+import { expectType } from '../expect-type.mjs';
+
 const from: (n: unknown) => number = Number;
 
 /** `lowerBound <= x < upperBound` */
@@ -53,6 +55,10 @@ const clamp =
 const isNonZero = <N extends number>(
   a: N,
 ): a is NonZeroNumber & RelaxedExclude<N, 0> => a !== 0;
+
+if (import.meta.vitest !== undefined) {
+  expectType<NonZeroNumber & RelaxedExclude<123, 0>, UnknownBrand>('<=');
+}
 
 const isNonNegative = <N extends number>(
   a: N,
