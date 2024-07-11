@@ -6,7 +6,6 @@ import { type Workspace } from '../index.mjs';
 import { isNotUndefined, isRecord } from '../ts-utils/index.mjs';
 import {
   eslintConfigName,
-  tsconfigBuildJsonName,
   viteConfigName,
   vitestConfigName,
   workspaceConfigsDirName,
@@ -271,14 +270,16 @@ const updatePackageJsonImpl = (
               command: 'yarn zz:vite build',
             };
           } else {
-            const tsConfigPath = `./${workspaceConfigsDirName}/${tsconfigBuildJsonName}`;
-
             mut_wireit['build'] = {
               dependencies: [
                 'clean:build',
-                ...(packageName.startsWith('global-') ? ['zz:setup'] : []),
+                ...(packageName.startsWith('global-')
+                  ? ['zz:setup']
+                  : generateFlag.gi === false
+                    ? []
+                    : ['gi']),
               ],
-              command: `tsc --project ${tsConfigPath}`,
+              command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript`,
             };
           }
         }

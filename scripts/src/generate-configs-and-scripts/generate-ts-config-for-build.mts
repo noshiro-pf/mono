@@ -34,16 +34,12 @@ export const generateTsConfigForBuild = async (
         cfg.useVite,
       ),
 
-      compilerOptions: pipe(cfg.tsconfig?.compilerOptions).chain((op) =>
-        op === undefined
-          ? {
-              outDir: '../esm',
-            }
-          : {
-              ...op,
-              outDir: '../esm',
-            },
-      ).value,
+      compilerOptions: pipe(cfg.tsconfig?.compilerOptions).chain((op) => ({
+        ...op,
+        outDir: '../esm',
+        declarationDir: '../esm',
+        rootDir: '../src',
+      })).value,
 
       include: ['../src'],
       exclude: toTestTargetGlob(cfg).map((s) => `../${s}`),

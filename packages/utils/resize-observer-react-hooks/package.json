@@ -52,7 +52,7 @@
       "dependencies": [
         "clean:build"
       ],
-      "command": "tsc --project ./configs/tsconfig.build.json"
+      "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
     }
   }
 }

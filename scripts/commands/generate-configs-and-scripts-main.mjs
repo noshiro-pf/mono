@@ -4,6 +4,7 @@ import {
   generateEsLintConfig,
   generateEsLintConfigForGlobalUtils,
   generateInjectDef,
+  generateRollupConfigForUtils,
   generateTsConfigForBuild,
   generateTsConfigForTest,
   generateTsConfigForTypeCheck,
@@ -20,6 +21,7 @@ const executeFlag = {
   test: true,
   packageJson: true,
   eslintConfig: true,
+  rollupConfig: true,
   viteConfig: true,
   vitestConfig: true,
   cypress: true,
@@ -64,6 +66,9 @@ const main = async () => {
           : undefined,
         executeFlag.test
           ? generateTsConfigForTest(workspace.location, packageName)
+          : undefined,
+        executeFlag.rollupConfig
+          ? generateRollupConfigForUtils(workspace.location, packageName)
           : undefined,
         executeFlag.vitestConfig
           ? generateVitestConfigForUtils(workspace.location, packageName)

@@ -3,6 +3,7 @@ export * from './generate-cypress-directory.mjs';
 export * from './generate-eslint-config-for-global-utils.mjs';
 export * from './generate-eslint-config-for-utils.mjs';
 export * from './generate-inject-def.mjs';
+export * from './generate-rollup-config.mjs';
 export * from './generate-ts-config-for-build.mjs';
 export * from './generate-ts-config-for-test.mjs';
 export * from './generate-ts-config-for-type-check.mjs';

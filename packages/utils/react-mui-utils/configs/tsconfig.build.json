@@ -5,7 +5,9 @@
     "../../../../config/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
-    "outDir": "../esm"
+    "outDir": "../esm",
+    "declarationDir": "../esm",
+    "rootDir": "../src"
   },
   "include": ["../src"],
   "exclude": ["../src/**/*.test.{mts,tsx}"]

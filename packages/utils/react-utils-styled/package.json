@@ -53,9 +53,10 @@
   "wireit": {
     "build": {
       "dependencies": [
-        "clean:build"
+        "clean:build",
+        "gi"
       ],
-      "command": "tsc --project ./configs/tsconfig.build.json"
+      "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
     }
   }
 }
