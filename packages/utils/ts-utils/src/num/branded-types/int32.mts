@@ -1,4 +1,5 @@
 import { Num } from '../num.mjs';
+import { castType } from './to-type.mjs';
 
 const MIN_VALUE = -(2 ** 31);
 const MAX_VALUE = 2 ** 31 - 1;
@@ -8,12 +9,7 @@ const isInt32Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 export const isInt32 = (a: number): a is Int32 =>
   Number.isInteger(a) && isInt32Range(a);
 
-export const toInt32 = (a: number): Int32 => {
-  if (!isInt32(a)) {
-    throw new TypeError(`Expected integer in [-2^31, 2^31), got: ${a}`);
-  }
-  return a;
-};
+export const toInt32 = castType<Int32>(isInt32, 'integer in [-2^31, 2^31)');
 
 const to = toInt32;
 

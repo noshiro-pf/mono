@@ -58,6 +58,9 @@ const isNonZero = <N extends number>(
 
 if (import.meta.vitest !== undefined) {
   expectType<NonZeroNumber & RelaxedExclude<123, 0>, UnknownBrand>('<=');
+  test('dummy', () => {
+    expect(0).toBe(0);
+  });
 }
 
 const isNonNegative = <N extends number>(

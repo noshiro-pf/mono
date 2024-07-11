@@ -1,14 +1,14 @@
+import { castType } from './to-type.mjs';
+
 const MIN_VALUE = Number.MIN_VALUE;
 
 export const isPositiveFiniteNumber = (a: number): a is PositiveFiniteNumber =>
   Number.isFinite(a) && a > 0;
 
-export const toPositiveFiniteNumber = (a: number): PositiveFiniteNumber => {
-  if (!isPositiveFiniteNumber(a)) {
-    throw new TypeError(`Expected positive finite number, got: ${a}`);
-  }
-  return a;
-};
+export const toPositiveFiniteNumber = castType<PositiveFiniteNumber>(
+  isPositiveFiniteNumber,
+  'positive finite number',
+);
 
 const to = toPositiveFiniteNumber;
 

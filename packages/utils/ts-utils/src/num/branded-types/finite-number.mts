@@ -1,9 +1,9 @@
-export const toFiniteNumber = (a: number): FiniteNumber => {
-  if (!Number.isFinite(a)) {
-    throw new TypeError(`Expected finite number, got: ${a}`);
-  }
-  return a;
-};
+import { castType } from './to-type.mjs';
+
+export const toFiniteNumber = castType<FiniteNumber>(
+  Number.isFinite,
+  'finite number',
+);
 
 const to = toFiniteNumber;
 
@@ -24,13 +24,18 @@ const sub = (x: FiniteNumber, y: FiniteNumber): FiniteNumber => to(x - y);
 const mul = (x: FiniteNumber, y: FiniteNumber): FiniteNumber => to(x * y);
 
 const div = (x: FiniteNumber, y: NonZeroFiniteNumber): FiniteNumber =>
-  Math.floor(toFiniteNumber(x / y));
+  to(Math.floor(x / y));
 
 const random = (min: FiniteNumber, max: FiniteNumber): FiniteNumber =>
-  add(
-    min,
-    Math.floor(toFiniteNumber((Math.max(max, min) - min + 1) * Math.random())),
-  );
+  add(min, to((Math.max(max, min) - min + 1) * Math.random()));
+
+if (import.meta.vitest !== undefined) {
+  test('NonZeroInt.random() should throw a TypeError', () => {
+    const result = random(to(-2.3), to(4.5));
+    expect(result).toBeGreaterThanOrEqual(-2.3);
+    expect(result).toBeLessThanOrEqual(4.5);
+  });
+}
 
 const floor = (x: FiniteNumber): Int => Math.floor(x);
 const ceil = (x: FiniteNumber): Int => Math.ceil(x);

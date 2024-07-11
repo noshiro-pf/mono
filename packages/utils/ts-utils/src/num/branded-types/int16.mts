@@ -1,4 +1,5 @@
 import { Num } from '../num.mjs';
+import { castType } from './to-type.mjs';
 
 const MIN_VALUE = -(2 ** 15);
 const MAX_VALUE = 2 ** 15 - 1;
@@ -8,12 +9,15 @@ const isInt16Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 export const isInt16 = (a: number): a is Int16 =>
   Number.isInteger(a) && isInt16Range(a);
 
-export const toInt16 = (a: number): Int16 => {
-  if (!isInt16(a)) {
-    throw new TypeError(`Expected integer in [-2^15, 2^15), got: ${a}`);
-  }
-  return a;
-};
+export const toInt16 = castType<Int16>(isInt16, 'integer in [-2^15, 2^15)');
+
+if (import.meta.vitest !== undefined) {
+  test('toInt16(1.2) should throw a TypeError', () => {
+    expect(toInt16(1.2)).throws(
+      new TypeError('Expected integer in [-2^15, 2^15), got: 1.2'),
+    );
+  });
+}
 
 const to = toInt16;
 

@@ -4,7 +4,10 @@
     "../../../../config/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
-    "outDir": "../esm"
+    "removeComments": true,
+    "outDir": "../esm",
+    "declarationDir": "../esm",
+    "rootDir": "../src"
   },
   "include": ["../src"],
   "exclude": ["../src/**/*.test.mts"]

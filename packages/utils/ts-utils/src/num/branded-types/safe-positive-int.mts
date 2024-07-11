@@ -1,4 +1,5 @@
 import { Num } from '../num.mjs';
+import { castType } from './to-type.mjs';
 
 const MIN_VALUE = 1;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
@@ -6,12 +7,10 @@ const MAX_VALUE = Number.MAX_SAFE_INTEGER;
 export const isPositiveSafeInt = (a: number): a is PositiveSafeInt =>
   Number.isSafeInteger(a) && Num.isNonNegative(a) && Num.isNonZero(a);
 
-export const toPositiveSafeInt = (a: number): PositiveSafeInt => {
-  if (!isPositiveSafeInt(a)) {
-    throw new TypeError(`Expected positive safe integer, got: ${a}`);
-  }
-  return a;
-};
+export const toPositiveSafeInt = castType<PositiveSafeInt>(
+  isPositiveSafeInt,
+  'positive safe integer',
+);
 
 const to = toPositiveSafeInt;
 

@@ -1,4 +1,5 @@
 import { Num } from '../num.mjs';
+import { castType } from './to-type.mjs';
 
 const MIN_VALUE = 0;
 const MAX_VALUE = 2 ** 32 - 1;
@@ -8,14 +9,10 @@ const isUint32Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 export const isUint32 = (a: number): a is Uint32 =>
   Number.isInteger(a) && isUint32Range(a);
 
-export const toUint32 = (a: number): Uint32 => {
-  if (!isUint32(a)) {
-    throw new TypeError(
-      `Expected non-negative integer less than 2^32, got: ${a}`,
-    );
-  }
-  return a;
-};
+export const toUint32 = castType<Uint32>(
+  isUint32,
+  'non-negative integer less than 2^32',
+);
 
 const to = toUint32;
 

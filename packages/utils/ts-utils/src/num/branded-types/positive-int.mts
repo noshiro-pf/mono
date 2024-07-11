@@ -1,16 +1,23 @@
 import { Num } from '../num.mjs';
+import { castType } from './to-type.mjs';
 
 const MIN_VALUE = 1;
 
 export const isPositiveInt = (a: number): a is PositiveInt =>
   Number.isInteger(a) && Num.isNonNegative(a) && Num.isNonZero(a);
 
-export const toPositiveInt = (a: number): PositiveInt => {
-  if (!isPositiveInt(a)) {
-    throw new TypeError(`Expected positive integer, got: ${a}`);
-  }
-  return a;
-};
+export const toPositiveInt = castType<PositiveInt>(
+  isPositiveInt,
+  'positive integer',
+);
+
+if (import.meta.vitest !== undefined) {
+  test('toPositiveInt(-1) should throw a TypeError', () => {
+    expect(toPositiveInt(-1)).throws(
+      new TypeError('Expected positive integer, got: -1'),
+    );
+  });
+}
 
 const to = toPositiveInt;
 

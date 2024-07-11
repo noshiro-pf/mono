@@ -1,16 +1,12 @@
 import { Num } from '../num.mjs';
+import { castType } from './to-type.mjs';
 
 const MIN_VALUE = 0;
 
 export const isUint = (a: number): a is Uint =>
   Number.isInteger(a) && Num.isNonNegative(a);
 
-export const toUint = (a: number): Uint => {
-  if (!isUint(a)) {
-    throw new TypeError(`Expected non-negative integer, got: ${a}`);
-  }
-  return a;
-};
+export const toUint = castType<Uint>(isUint, 'non-negative integer');
 
 const to = toUint;
 

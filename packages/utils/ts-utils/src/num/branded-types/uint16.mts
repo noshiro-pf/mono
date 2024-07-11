@@ -1,4 +1,5 @@
 import { Num } from '../num.mjs';
+import { castType } from './to-type.mjs';
 
 const MIN_VALUE = 0;
 const MAX_VALUE = 2 ** 16 - 1;
@@ -8,14 +9,10 @@ const isUint16Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 export const isUint16 = (a: number): a is Uint16 =>
   Number.isInteger(a) && isUint16Range(a);
 
-export const toUint16 = (a: number): Uint16 => {
-  if (!isUint16(a)) {
-    throw new TypeError(
-      `Expected non-negative integer less than 2^16, got: ${a}`,
-    );
-  }
-  return a;
-};
+export const toUint16 = castType<Uint16>(
+  isUint16,
+  'non-negative integer less than 2^16',
+);
 
 const to = toUint16;
 

@@ -1,17 +1,15 @@
+import { castType } from './to-type.mjs';
+
 const MIN_VALUE = 0;
 
 export const isNonNegativeFiniteNumber = (
   a: number,
 ): a is NonNegativeFiniteNumber => Number.isFinite(a) && a >= 0;
 
-export const toNonNegativeFiniteNumber = (
-  a: number,
-): NonNegativeFiniteNumber => {
-  if (!isNonNegativeFiniteNumber(a)) {
-    throw new TypeError(`Expected non-negative finite number, got: ${a}`);
-  }
-  return a;
-};
+export const toNonNegativeFiniteNumber = castType<NonNegativeFiniteNumber>(
+  isNonNegativeFiniteNumber,
+  'non-negative finite number',
+);
 
 const to = toNonNegativeFiniteNumber;
 

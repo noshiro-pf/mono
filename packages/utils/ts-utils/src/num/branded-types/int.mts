@@ -1,11 +1,15 @@
 import { toFiniteNumber } from './finite-number.mjs';
+import { castType } from './to-type.mjs';
 
-export const toInt = (a: number): Int => {
-  if (!Number.isInteger(a)) {
-    throw new TypeError(`Expected integer, got: ${a}`);
-  }
-  return a;
-};
+export const toInt = castType<Int>(Number.isInteger, 'integer');
+
+if (import.meta.vitest !== undefined) {
+  test('toInt(1.2) should throw a TypeError', () => {
+    expect(() => toInt(1.2)).toThrow(
+      new TypeError('Expected integer, got: 1.2'),
+    );
+  });
+}
 
 const to = toInt;
 

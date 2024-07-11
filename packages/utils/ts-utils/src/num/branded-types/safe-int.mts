@@ -1,15 +1,14 @@
 import { Num } from '../num.mjs';
 import { toFiniteNumber } from './finite-number.mjs';
+import { castType } from './to-type.mjs';
 
 const MIN_VALUE = Number.MIN_SAFE_INTEGER;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
 
-export const toSafeInt = (a: number): SafeInt => {
-  if (!Number.isSafeInteger(a)) {
-    throw new TypeError(`Expected safe integer, got: ${a}`);
-  }
-  return a;
-};
+export const toSafeInt = castType<SafeInt>(
+  Number.isSafeInteger,
+  'safe integer',
+);
 
 const to = toSafeInt;
 
