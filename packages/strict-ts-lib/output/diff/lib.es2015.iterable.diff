@@ -1,6 +1,19 @@
-@@ -14,8 +14,9 @@ and limitations under the License.
- ***************************************************************************** */
- 
+@@ -1,21 +1,7 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
@@ -9,7 +22,7 @@
  
  interface SymbolConstructor {
    /**
-@@ -26,13 +27,13 @@ interface SymbolConstructor {
+@@ -26,13 +12,13 @@ interface SymbolConstructor {
  }
  
  interface IteratorYieldResult<TYield> {
@@ -27,7 +40,7 @@
  }
  
  type IteratorResult<T, TReturn = any> =
-@@ -41,9 +42,9 @@ type IteratorResult<T, TReturn = any> =
+@@ -41,9 +27,9 @@ type IteratorResult<T, TReturn = any> =
  
  interface Iterator<T, TReturn = any, TNext = undefined> {
    // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
@@ -39,7 +52,7 @@
  }
  
  interface Iterable<T> {
-@@ -59,7 +60,7 @@ interface Array<T> {
+@@ -59,7 +45,7 @@ interface Array<T> {
    [Symbol.iterator](): IterableIterator<T>;
  
    /** Returns an iterable of key, value pairs for every entry in the array */
@@ -48,7 +61,7 @@
  
    /** Returns an iterable of keys in the array */
    keys(): IterableIterator<number>;
-@@ -86,7 +87,7 @@ interface ArrayConstructor {
+@@ -86,7 +72,7 @@ interface ArrayConstructor {
    from<T, U>(
      iterable: Iterable<T> | ArrayLike<T>,
      mapfn: (v: T, k: number) => U,
@@ -57,7 +70,7 @@
    ): U[];
  }
  
-@@ -95,7 +96,7 @@ interface ReadonlyArray<T> {
+@@ -95,7 +81,7 @@ interface ReadonlyArray<T> {
    [Symbol.iterator](): IterableIterator<T>;
  
    /** Returns an iterable of key, value pairs for every entry in the array */
@@ -66,7 +79,7 @@
  
    /** Returns an iterable of keys in the array */
    keys(): IterableIterator<number>;
-@@ -106,15 +107,15 @@ interface ReadonlyArray<T> {
+@@ -106,15 +92,15 @@ interface ReadonlyArray<T> {
  
  interface IArguments {
    /** Iterator */
@@ -85,7 +98,7 @@
  
    /** Returns an iterable of keys in the map */
    keys(): IterableIterator<K>;
-@@ -125,10 +126,10 @@ interface Map<K, V> {
+@@ -125,10 +111,10 @@ interface Map<K, V> {
  
  interface ReadonlyMap<K, V> {
    /** Returns an iterable of entries in the map. */
@@ -98,7 +111,7 @@
  
    /** Returns an iterable of keys in the map */
    keys(): IterableIterator<K>;
-@@ -138,7 +139,7 @@ interface ReadonlyMap<K, V> {
+@@ -138,7 +124,7 @@ interface ReadonlyMap<K, V> {
  }
  
  interface MapConstructor {
@@ -107,7 +120,7 @@
    new <K, V>(iterable?: Iterable<readonly [K, V]> | null): Map<K, V>;
  }
  
-@@ -153,8 +154,10 @@ interface WeakMapConstructor {
+@@ -153,8 +139,10 @@ interface WeakMapConstructor {
  interface Set<T> {
    /** Iterates over values in the set. */
    [Symbol.iterator](): IterableIterator<T>;
@@ -119,7 +132,7 @@
    /** Despite its name, returns an iterable of the values in the set. */
    keys(): IterableIterator<T>;
  
-@@ -167,7 +170,7 @@ interface ReadonlySet<T> {
+@@ -167,7 +155,7 @@ interface ReadonlySet<T> {
    [Symbol.iterator](): IterableIterator<T>;
  
    /** Returns an iterable of [v,v] pairs for every value `v` in the set. */
@@ -128,7 +141,7 @@
  
    /** Despite its name, returns an iterable of the values in the set. */
    keys(): IterableIterator<T>;
-@@ -177,6 +180,7 @@ interface ReadonlySet<T> {
+@@ -177,6 +165,7 @@ interface ReadonlySet<T> {
  }
  
  interface SetConstructor {
@@ -136,7 +149,7 @@
    new <T>(iterable?: Iterable<T> | null): Set<T>;
  }
  
-@@ -214,13 +218,15 @@ interface String {
+@@ -214,13 +203,15 @@ interface String {
  }
  
  interface Int8Array {
@@ -155,7 +168,7 @@
  }
  
  interface Int8ArrayConstructor {
-@@ -233,21 +239,23 @@ interface Int8ArrayConstructor {
+@@ -233,21 +224,23 @@ interface Int8ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -186,7 +199,7 @@
  }
  
  interface Uint8ArrayConstructor {
-@@ -260,23 +268,23 @@ interface Uint8ArrayConstructor {
+@@ -260,23 +253,23 @@ interface Uint8ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -217,7 +230,7 @@
  }
  
  interface Uint8ClampedArrayConstructor {
-@@ -289,17 +297,17 @@ interface Uint8ClampedArrayConstructor {
+@@ -289,17 +282,17 @@ interface Uint8ClampedArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -240,7 +253,7 @@
  
    /** Returns an list of keys in the array */
    keys(): IterableIterator<number>;
-@@ -318,19 +326,21 @@ interface Int16ArrayConstructor {
+@@ -318,19 +311,21 @@ interface Int16ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -267,7 +280,7 @@
    /** Returns an list of values in the array */
    values(): IterableIterator<number>;
  }
-@@ -345,19 +355,21 @@ interface Uint16ArrayConstructor {
+@@ -345,19 +340,21 @@ interface Uint16ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -294,7 +307,7 @@
    /** Returns an list of values in the array */
    values(): IterableIterator<number>;
  }
-@@ -372,19 +384,21 @@ interface Int32ArrayConstructor {
+@@ -372,19 +369,21 @@ interface Int32ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -321,7 +334,7 @@
    /** Returns an list of values in the array */
    values(): IterableIterator<number>;
  }
-@@ -399,19 +413,21 @@ interface Uint32ArrayConstructor {
+@@ -399,19 +398,21 @@ interface Uint32ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -348,7 +361,7 @@
    /** Returns an list of values in the array */
    values(): IterableIterator<number>;
  }
-@@ -426,19 +442,21 @@ interface Float32ArrayConstructor {
+@@ -426,19 +427,21 @@ interface Float32ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -375,7 +388,7 @@
    /** Returns an list of values in the array */
    values(): IterableIterator<number>;
  }
-@@ -453,9 +471,9 @@ interface Float64ArrayConstructor {
+@@ -453,9 +456,9 @@ interface Float64ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */

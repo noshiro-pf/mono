@@ -1,6 +1,19 @@
-@@ -14,8 +14,9 @@ and limitations under the License.
- ***************************************************************************** */
- 
+@@ -1,21 +1,7 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
@@ -9,7 +22,7 @@
  
  interface BigIntToLocaleStringOptions {
    /**
-@@ -23,11 +24,11 @@ interface BigIntToLocaleStringOptions {
+@@ -23,11 +9,11 @@ interface BigIntToLocaleStringOptions {
     * information about this option, see the
     * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation Intl page}.
     */
@@ -24,7 +37,7 @@
    /**
     * The unit to use in unit formatting, Possible values are core unit
     * identifiers, defined in UTS #35, Part 2, Section 6. A subset of units from
-@@ -35,13 +36,13 @@ interface BigIntToLocaleStringOptions {
+@@ -35,13 +21,13 @@ interface BigIntToLocaleStringOptions {
     * be concatenated with "-per-" to make a compound unit. There is no default
     * value; if the style is "unit", the unit property must be provided.
     */
@@ -40,7 +53,7 @@
  
    /**
     * The currency to use in currency formatting. Possible values are the ISO
-@@ -51,7 +52,7 @@ interface BigIntToLocaleStringOptions {
+@@ -51,7 +37,7 @@ interface BigIntToLocaleStringOptions {
     * property must be provided. It is only used when [[Style]] has the value
     * "currency".
     */
@@ -49,7 +62,7 @@
  
    /**
     * How to display the currency in currency formatting. It is only used when
-@@ -63,40 +64,19 @@ interface BigIntToLocaleStringOptions {
+@@ -63,40 +49,19 @@ interface BigIntToLocaleStringOptions {
     *
     * "name" to use a localized currency name such as "dollar"
     */
@@ -93,7 +106,7 @@
  
    /**
     * The minimum number of fraction digits to use. Possible values are from 0 to
-@@ -105,28 +85,7 @@ interface BigIntToLocaleStringOptions {
+@@ -105,28 +70,7 @@ interface BigIntToLocaleStringOptions {
     * {@link http://www.currency-iso.org/en/home/tables/table-a1.html ISO 4217 currency codes list}
     * (2 if the list doesn't provide that information).
     */
@@ -123,7 +136,7 @@
  
    /**
     * The maximum number of fraction digits to use. Possible values are from 0 to
-@@ -138,82 +97,19 @@ interface BigIntToLocaleStringOptions {
+@@ -138,82 +82,19 @@ interface BigIntToLocaleStringOptions {
     * (2 if the list doesn't provide that information); the default for percent
     * formatting is the larger of minimumFractionDigits and 0.
     */
@@ -209,7 +222,7 @@
  
    /**
     * The formatting that should be displayed for the number, the defaults is
-@@ -227,10 +123,10 @@ interface BigIntToLocaleStringOptions {
+@@ -227,10 +108,10 @@ interface BigIntToLocaleStringOptions {
     *
     *     "compact" string representing exponent, defaults is using the "short" form
     */
@@ -222,7 +235,7 @@
  }
  
  interface BigInt {
-@@ -239,7 +135,7 @@ interface BigInt {
+@@ -239,7 +120,7 @@ interface BigInt {
     *
     * @param radix Specifies a radix for converting numeric values to strings.
     */
@@ -231,7 +244,7 @@
  
    /**
     * Returns a string representation appropriate to the host environment's
-@@ -267,7 +163,7 @@ interface BigIntConstructor {
+@@ -267,7 +148,7 @@ interface BigIntConstructor {
     * @param bits The number of low bits to use
     * @param int The BigInt whose bits to extract
     */
@@ -240,7 +253,7 @@
    /**
     * Interprets the low bits of a BigInt as an unsigned integer. All higher bits
     * are discarded.
-@@ -275,10 +171,10 @@ interface BigIntConstructor {
+@@ -275,10 +156,10 @@ interface BigIntConstructor {
     * @param bits The number of low bits to use
     * @param int The BigInt whose bits to extract
     */
@@ -253,7 +266,7 @@
  
  /**
   * A typed array of 64-bit signed integer values. The contents are initialized
-@@ -287,16 +183,16 @@ declare var BigInt: BigIntConstructor;
+@@ -287,16 +168,16 @@ declare var BigInt: BigIntConstructor;
   */
  interface BigInt64Array {
    /** The size in bytes of each element in the array. */
@@ -273,7 +286,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -309,10 +205,14 @@ interface BigInt64Array {
+@@ -309,10 +190,14 @@ interface BigInt64Array {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -290,7 +303,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -325,8 +225,12 @@ interface BigInt64Array {
+@@ -325,8 +210,12 @@ interface BigInt64Array {
     *   value.
     */
    every(
@@ -305,7 +318,7 @@
    ): boolean;
  
    /**
-@@ -339,7 +243,11 @@ interface BigInt64Array {
+@@ -339,7 +228,11 @@ interface BigInt64Array {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -318,7 +331,7 @@
  
    /**
     * Returns the elements of an array that meet the condition specified in a
-@@ -353,8 +261,12 @@ interface BigInt64Array {
+@@ -353,8 +246,12 @@ interface BigInt64Array {
     *   value.
     */
    filter(
@@ -333,7 +346,7 @@
    ): BigInt64Array;
  
    /**
-@@ -370,9 +282,13 @@ interface BigInt64Array {
+@@ -370,9 +267,13 @@ interface BigInt64Array {
     *   instead.
     */
    find(
@@ -350,7 +363,7 @@
  
    /**
     * Returns the index of the first element in the array where predicate is
-@@ -387,9 +303,13 @@ interface BigInt64Array {
+@@ -387,9 +288,13 @@ interface BigInt64Array {
     *   instead.
     */
    findIndex(
@@ -367,7 +380,7 @@
  
    /**
     * Performs the specified action for each element in an array.
-@@ -401,8 +321,12 @@ interface BigInt64Array {
+@@ -401,8 +306,12 @@ interface BigInt64Array {
     *   value.
     */
    forEach(
@@ -382,7 +395,7 @@
    ): void;
  
    /**
-@@ -413,7 +337,10 @@ interface BigInt64Array {
+@@ -413,7 +322,10 @@ interface BigInt64Array {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -394,7 +407,7 @@
  
    /**
     * Returns the index of the first occurrence of a value in an array.
-@@ -422,7 +349,10 @@ interface BigInt64Array {
+@@ -422,7 +334,10 @@ interface BigInt64Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -406,7 +419,7 @@
  
    /**
     * Adds all the elements of an array separated by the specified separator
-@@ -435,7 +365,7 @@ interface BigInt64Array {
+@@ -435,7 +350,7 @@ interface BigInt64Array {
    join(separator?: string): string;
  
    /** Yields each index in the array. */
@@ -415,7 +428,7 @@
  
    /**
     * Returns the index of the last occurrence of a value in an array.
-@@ -444,7 +374,10 @@ interface BigInt64Array {
+@@ -444,7 +359,10 @@ interface BigInt64Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -427,7 +440,7 @@
  
    /** The length of the array. */
    readonly length: number;
-@@ -461,8 +394,12 @@ interface BigInt64Array {
+@@ -461,8 +379,12 @@ interface BigInt64Array {
     *   value.
     */
    map(
@@ -442,7 +455,7 @@
    ): BigInt64Array;
  
    /**
-@@ -479,12 +416,12 @@ interface BigInt64Array {
+@@ -479,12 +401,12 @@ interface BigInt64Array {
     */
    reduce(
      callbackfn: (
@@ -460,7 +473,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array. The
-@@ -501,8 +438,8 @@ interface BigInt64Array {
+@@ -501,8 +423,8 @@ interface BigInt64Array {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -471,7 +484,7 @@
        array: BigInt64Array,
      ) => U,
      initialValue: U,
-@@ -523,12 +460,12 @@ interface BigInt64Array {
+@@ -523,12 +445,12 @@ interface BigInt64Array {
     */
    reduceRight(
      callbackfn: (
@@ -489,7 +502,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array, in
-@@ -546,8 +483,8 @@ interface BigInt64Array {
+@@ -546,8 +468,8 @@ interface BigInt64Array {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -500,7 +513,7 @@
        array: BigInt64Array,
      ) => U,
      initialValue: U,
-@@ -563,7 +500,10 @@ interface BigInt64Array {
+@@ -563,7 +485,10 @@ interface BigInt64Array {
     * @param offset The index in the current array at which the values are to be
     *   written.
     */
@@ -512,7 +525,7 @@
  
    /**
     * Returns a section of an array.
-@@ -571,7 +511,10 @@ interface BigInt64Array {
+@@ -571,7 +496,10 @@ interface BigInt64Array {
     * @param start The beginning of the specified portion of the array.
     * @param end The end of the specified portion of the array.
     */
@@ -524,7 +537,7 @@
  
    /**
     * Determines whether the specified callback function returns true for any
-@@ -585,8 +528,12 @@ interface BigInt64Array {
+@@ -585,8 +513,12 @@ interface BigInt64Array {
     *   value.
     */
    some(
@@ -539,7 +552,7 @@
    ): boolean;
  
    /**
-@@ -595,7 +542,7 @@ interface BigInt64Array {
+@@ -595,7 +527,7 @@ interface BigInt64Array {
     * @param compareFn The function used to determine the order of the elements.
     *   If omitted, the elements are sorted in ascending order.
     */
@@ -548,7 +561,7 @@
  
    /**
     * Gets a new BigInt64Array view of the ArrayBuffer store for this array,
-@@ -604,7 +551,10 @@ interface BigInt64Array {
+@@ -604,7 +536,10 @@ interface BigInt64Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -560,7 +573,7 @@
  
    /** Converts the array to a string by using the current locale. */
    toLocaleString(): string;
-@@ -616,34 +566,34 @@ interface BigInt64Array {
+@@ -616,34 +551,34 @@ interface BigInt64Array {
    valueOf(): BigInt64Array;
  
    /** Yields each value in the array. */
@@ -604,7 +617,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -652,15 +602,15 @@ interface BigInt64ArrayConstructor {
+@@ -652,15 +587,15 @@ interface BigInt64ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -624,7 +637,7 @@
  
  /**
   * A typed array of 64-bit unsigned integer values. The contents are initialized
-@@ -669,16 +619,16 @@ declare var BigInt64Array: BigInt64ArrayConstructor;
+@@ -669,16 +604,16 @@ declare var BigInt64Array: BigInt64ArrayConstructor;
   */
  interface BigUint64Array {
    /** The size in bytes of each element in the array. */
@@ -644,7 +657,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -691,10 +641,14 @@ interface BigUint64Array {
+@@ -691,10 +626,14 @@ interface BigUint64Array {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -661,7 +674,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -707,8 +661,12 @@ interface BigUint64Array {
+@@ -707,8 +646,12 @@ interface BigUint64Array {
     *   value.
     */
    every(
@@ -676,7 +689,7 @@
    ): boolean;
  
    /**
-@@ -721,7 +679,11 @@ interface BigUint64Array {
+@@ -721,7 +664,11 @@ interface BigUint64Array {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -689,7 +702,7 @@
  
    /**
     * Returns the elements of an array that meet the condition specified in a
-@@ -735,8 +697,12 @@ interface BigUint64Array {
+@@ -735,8 +682,12 @@ interface BigUint64Array {
     *   value.
     */
    filter(
@@ -704,7 +717,7 @@
    ): BigUint64Array;
  
    /**
-@@ -752,9 +718,13 @@ interface BigUint64Array {
+@@ -752,9 +703,13 @@ interface BigUint64Array {
     *   instead.
     */
    find(
@@ -721,7 +734,7 @@
  
    /**
     * Returns the index of the first element in the array where predicate is
-@@ -769,9 +739,13 @@ interface BigUint64Array {
+@@ -769,9 +724,13 @@ interface BigUint64Array {
     *   instead.
     */
    findIndex(
@@ -738,7 +751,7 @@
  
    /**
     * Performs the specified action for each element in an array.
-@@ -783,8 +757,12 @@ interface BigUint64Array {
+@@ -783,8 +742,12 @@ interface BigUint64Array {
     *   value.
     */
    forEach(
@@ -753,7 +766,7 @@
    ): void;
  
    /**
-@@ -795,7 +773,10 @@ interface BigUint64Array {
+@@ -795,7 +758,10 @@ interface BigUint64Array {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -765,7 +778,7 @@
  
    /**
     * Returns the index of the first occurrence of a value in an array.
-@@ -804,7 +785,10 @@ interface BigUint64Array {
+@@ -804,7 +770,10 @@ interface BigUint64Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -777,7 +790,7 @@
  
    /**
     * Adds all the elements of an array separated by the specified separator
-@@ -817,7 +801,7 @@ interface BigUint64Array {
+@@ -817,7 +786,7 @@ interface BigUint64Array {
    join(separator?: string): string;
  
    /** Yields each index in the array. */
@@ -786,7 +799,7 @@
  
    /**
     * Returns the index of the last occurrence of a value in an array.
-@@ -826,7 +810,10 @@ interface BigUint64Array {
+@@ -826,7 +795,10 @@ interface BigUint64Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -798,7 +811,7 @@
  
    /** The length of the array. */
    readonly length: number;
-@@ -843,8 +830,12 @@ interface BigUint64Array {
+@@ -843,8 +815,12 @@ interface BigUint64Array {
     *   value.
     */
    map(
@@ -813,7 +826,7 @@
    ): BigUint64Array;
  
    /**
-@@ -861,12 +852,12 @@ interface BigUint64Array {
+@@ -861,12 +837,12 @@ interface BigUint64Array {
     */
    reduce(
      callbackfn: (
@@ -831,7 +844,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array. The
-@@ -883,8 +874,8 @@ interface BigUint64Array {
+@@ -883,8 +859,8 @@ interface BigUint64Array {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -842,7 +855,7 @@
        array: BigUint64Array,
      ) => U,
      initialValue: U,
-@@ -905,12 +896,12 @@ interface BigUint64Array {
+@@ -905,12 +881,12 @@ interface BigUint64Array {
     */
    reduceRight(
      callbackfn: (
@@ -860,7 +873,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array, in
-@@ -928,8 +919,8 @@ interface BigUint64Array {
+@@ -928,8 +904,8 @@ interface BigUint64Array {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -871,7 +884,7 @@
        array: BigUint64Array,
      ) => U,
      initialValue: U,
-@@ -945,7 +936,10 @@ interface BigUint64Array {
+@@ -945,7 +921,10 @@ interface BigUint64Array {
     * @param offset The index in the current array at which the values are to be
     *   written.
     */
@@ -883,7 +896,7 @@
  
    /**
     * Returns a section of an array.
-@@ -953,7 +947,10 @@ interface BigUint64Array {
+@@ -953,7 +932,10 @@ interface BigUint64Array {
     * @param start The beginning of the specified portion of the array.
     * @param end The end of the specified portion of the array.
     */
@@ -895,7 +908,7 @@
  
    /**
     * Determines whether the specified callback function returns true for any
-@@ -967,8 +964,12 @@ interface BigUint64Array {
+@@ -967,8 +949,12 @@ interface BigUint64Array {
     *   value.
     */
    some(
@@ -910,7 +923,7 @@
    ): boolean;
  
    /**
-@@ -977,7 +978,7 @@ interface BigUint64Array {
+@@ -977,7 +963,7 @@ interface BigUint64Array {
     * @param compareFn The function used to determine the order of the elements.
     *   If omitted, the elements are sorted in ascending order.
     */
@@ -919,7 +932,7 @@
  
    /**
     * Gets a new BigUint64Array view of the ArrayBuffer store for this array,
-@@ -986,7 +987,10 @@ interface BigUint64Array {
+@@ -986,7 +972,10 @@ interface BigUint64Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -931,7 +944,7 @@
  
    /** Converts the array to a string by using the current locale. */
    toLocaleString(): string;
-@@ -998,34 +1002,34 @@ interface BigUint64Array {
+@@ -998,34 +987,34 @@ interface BigUint64Array {
    valueOf(): BigUint64Array;
  
    /** Yields each value in the array. */
@@ -975,7 +988,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -1034,15 +1038,15 @@ interface BigUint64ArrayConstructor {
+@@ -1034,15 +1023,15 @@ interface BigUint64ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -995,7 +1008,7 @@
  
  interface DataView {
    /**
-@@ -1055,7 +1059,10 @@ interface DataView {
+@@ -1055,7 +1044,10 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   read.
     */
@@ -1007,7 +1020,7 @@
  
    /**
     * Gets the BigUint64 value at the specified byte offset from the start of the
-@@ -1067,7 +1074,10 @@ interface DataView {
+@@ -1067,7 +1059,10 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   read.
     */
@@ -1019,7 +1032,7 @@
  
    /**
     * Stores a BigInt64 value at the specified byte offset from the start of the
-@@ -1078,7 +1088,11 @@ interface DataView {
+@@ -1078,7 +1073,11 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   written.
     */
@@ -1032,7 +1045,7 @@
  
    /**
     * Stores a BigUint64 value at the specified byte offset from the start of the
-@@ -1089,7 +1103,11 @@ interface DataView {
+@@ -1089,7 +1088,11 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   written.
     */
