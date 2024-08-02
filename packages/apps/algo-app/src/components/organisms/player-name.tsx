@@ -1,14 +1,16 @@
 import { type Rect } from '@noshiro/ts-utils-additional';
-import { createElement, Fragment } from 'preact';
+import { createElement } from 'preact';
+import { useRef } from 'preact/hooks';
 import {
   inTurnColor,
   playerNameRectPadding,
   playerNameRectSize,
   zIndex,
 } from '../../constants';
+import { LoadingDots } from '../styled';
 
 type Props = Readonly<{
-  playerName: string;
+  playerName: string | undefined;
   rotate: 0 | 90 | 180 | 270;
   isInTurn: boolean;
   windowSize: Rect;
@@ -25,47 +27,23 @@ export const PlayerName = memoNamed<Props>(
     onBoundingClientRectChange,
   }) => {
     const rotateStyle = useMemo<preact.JSX.CSSProperties>(
-      () =>
-        match(rotate, {
-          0: {
-            width: `${playerNameRectSize.width - 2 * playerNameRectPadding}px`,
-            height: `${
-              playerNameRectSize.height - 2 * playerNameRectPadding
-            }px`,
-          },
-          90: {
-            writingMode: 'vertical-rl',
-            textOrientation: 'sideways',
-            width: `${playerNameRectSize.height - 2 * playerNameRectPadding}px`,
-            height: `${playerNameRectSize.width - 2 * playerNameRectPadding}px`,
-          },
-          180: {
-            transform: `rotate(180deg)`,
-            width: `${playerNameRectSize.width - 2 * playerNameRectPadding}px`,
-            height: `${
-              playerNameRectSize.height - 2 * playerNameRectPadding
-            }px`,
-          },
-          270: {
-            writingMode: 'vertical-rl',
-            textOrientation: 'sideways',
-            transform: `rotate(180deg)`,
-            width: `${playerNameRectSize.height - 2 * playerNameRectPadding}px`,
-            height: `${playerNameRectSize.width - 2 * playerNameRectPadding}px`,
-          },
-        }),
+      () => ({
+        transform: `rotate(${rotate}deg)`,
+      }),
       [rotate],
     );
 
-    const styleMerged = useMemo<preact.JSX.CSSProperties>(
+    const nameStyle = useMemo<preact.JSX.CSSProperties>(
       () => ({
-        ...rotateStyle,
+        width: `${playerNameRectSize.width - 2 * playerNameRectPadding}px`,
+        height: `${playerNameRectSize.height - 2 * playerNameRectPadding}px`,
         backgroundColor: isInTurn ? inTurnColor : undefined,
       }),
-      [isInTurn, rotateStyle],
+      [isInTurn],
     );
 
     const ref = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
       const el = ref.current;
       if (el !== null) {
@@ -76,10 +54,12 @@ export const PlayerName = memoNamed<Props>(
     return (
       <Wrapper>
         {createElement(
-          isInTurn ? InTurnHighlighter : Fragment,
-          null,
+          isInTurn ? InTurnHighlighter : HighlighterBase,
+          {
+            style: rotateStyle,
+          },
           <div ref={ref}>
-            <Name style={styleMerged}>{playerName}</Name>
+            <Name style={nameStyle}>{playerName ?? <LoadingDots />}</Name>
           </div>,
         )}
       </Wrapper>
@@ -96,7 +76,11 @@ const Wrapper = styled('div')`
   align-items: center;
 `;
 
-const InTurnHighlighter = styled('div')`
+const HighlighterBase = styled('div')`
+  z-index: ${zIndex.playerName};
+`;
+
+const InTurnHighlighter = styled(HighlighterBase)`
   margin: 10px;
   border-radius: 30px;
 `;
@@ -104,12 +88,9 @@ const InTurnHighlighter = styled('div')`
 const Name = styled('div')`
   font-size: 18px;
   font-weight: bold;
-  padding: 10px;
   background-color: #3d3d3d;
   border-radius: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
-  z-index: ${zIndex.playerName};
 `;

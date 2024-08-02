@@ -65,8 +65,7 @@ export type Room = t.TypeOf<typeof roomTypeDef>;
 
 expectType<(typeof roomStateList)[number], Room['state']>('=');
 
-export const assertIsRoomRemote: (a: unknown) => asserts a is RoomRemote =
-  roomRemoteTypeDef.assertIs;
+export const validateRoomRemote = roomRemoteTypeDef.validate;
 
 export const convertRoomRemoteToRoom = (
   roomRemote: RoomRemote,
@@ -74,22 +73,20 @@ export const convertRoomRemoteToRoom = (
 ): Room => ({
   id,
   password: roomRemote.password,
-  players: roomRemote.players,
   shuffleDef: roomRemote.shuffleDef,
   state: roomRemote.state,
-  playerCards: [
+  playerCards: tp(
     roomRemote.playerCards.p0,
     roomRemote.playerCards.p1,
     roomRemote.playerCards.p2,
     roomRemote.playerCards.p3,
-  ] as const,
+  ),
 });
 
 export const convertRoomToRoomRemote = (
   room: Omit<Room, 'id'>,
 ): RoomRemote => ({
   password: room.password,
-  players: room.players,
   shuffleDef: room.shuffleDef,
   state: room.state,
   playerCards: {
