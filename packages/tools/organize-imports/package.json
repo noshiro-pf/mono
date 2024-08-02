@@ -11,7 +11,7 @@
     "organizeimports": "lib/index.js"
   },
   "dependencies": {
-    "command-line-args": "^5.1.1",
+    "command-line-args": "^6.0.0",
     "command-line-usage": "^7.0.1",
     "ts-morph": "^22.0.0"
   }
