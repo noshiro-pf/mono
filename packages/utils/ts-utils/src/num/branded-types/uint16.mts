@@ -4,6 +4,8 @@ import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
 type ElementType = Uint16;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
+const typeName = 'Uint16';
+
 const MIN_VALUE = 0;
 const MAX_VALUE = 2 ** 16 - 1;
 
@@ -18,7 +20,7 @@ export const toUint16 = castType<ElementType>(
 );
 
 if (import.meta.vitest !== undefined) {
-  test('toUint16(1.2) should throw a TypeError', () => {
+  test(`to${typeName}(1.2) should throw a TypeError`, () => {
     expect(() => toUint16(1.2)).toThrow(
       new TypeError('Expected a non-negative integer less than 2^16, got: 1.2'),
     );
@@ -68,7 +70,7 @@ const random = (
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 if (import.meta.vitest !== undefined) {
-  test('Uint16.random', () => {
+  test(`${typeName}.random`, () => {
     const r = random(0, 5);
     expect(r).toBeGreaterThanOrEqual(0);
     expect(r).toBeLessThanOrEqual(5);

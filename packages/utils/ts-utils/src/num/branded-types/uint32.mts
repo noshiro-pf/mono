@@ -4,6 +4,8 @@ import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
 type ElementType = Uint32;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
+const typeName = 'Uint32';
+
 const MIN_VALUE = 0;
 const MAX_VALUE = 2 ** 32 - 1;
 
@@ -18,7 +20,7 @@ export const toUint32 = castType<ElementType>(
 );
 
 if (import.meta.vitest !== undefined) {
-  test('toUint32(1.2) should throw a TypeError', () => {
+  test(`to${typeName}(1.2) should throw a TypeError`, () => {
     expect(() => toUint32(1.2)).toThrow(
       new TypeError('Expected a non-negative integer less than 2^32, got: 1.2'),
     );
@@ -68,7 +70,7 @@ const random = (
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 if (import.meta.vitest !== undefined) {
-  test('Uint32.random', () => {
+  test(`${typeName}.random`, () => {
     const r = random(0, 5);
     expect(r).toBeGreaterThanOrEqual(0);
     expect(r).toBeLessThanOrEqual(5);

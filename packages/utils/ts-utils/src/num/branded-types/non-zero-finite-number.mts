@@ -1,57 +1,75 @@
-import { castType } from './utils.mjs';
+import { expectType } from '../../expect-type.mjs';
+import { castType, type ToNonNegative, type ToNonZero } from './utils.mjs';
 
-export const isNonZeroFiniteNumber = (a: number): a is NonZeroFiniteNumber =>
+type ElementType = NonZeroFiniteNumber;
+
+const typeName = 'NonZeroFiniteNumber';
+
+export const isNonZeroFiniteNumber = (a: number): a is ElementType =>
   Number.isFinite(a) && a !== 0;
 
-export const toNonZeroFiniteNumber = castType<NonZeroFiniteNumber>(
+export const toNonZeroFiniteNumber = castType<ElementType>(
   isNonZeroFiniteNumber,
-  'non-zero finite number',
+  'a non-zero finite number',
 );
+
+if (import.meta.vitest !== undefined) {
+  test.each([
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => toNonZeroFiniteNumber(value)).toThrow(
+      new TypeError(`Expected a non-zero finite number, got: ${value}`),
+    );
+  });
+}
 
 const to = toNonZeroFiniteNumber;
 
-const abs = (x: NonZeroFiniteNumber): PositiveFiniteNumber => to(Math.abs(x));
+const abs = (x: ElementType): ToNonNegative<ElementType> => to(Math.abs(x));
 
-const _min = (...values: readonly NonZeroFiniteNumber[]): NonZeroFiniteNumber =>
+if (import.meta.vitest !== undefined) {
+  expectType<ToNonNegative<ElementType>, PositiveFiniteNumber>('=');
+}
+
+const _min = (...values: readonly ElementType[]): ElementType =>
   to(Math.min(...values));
 
-const _max = (...values: readonly NonZeroFiniteNumber[]): NonZeroFiniteNumber =>
+const _max = (...values: readonly ElementType[]): ElementType =>
   to(Math.max(...values));
 
-const pow = (
-  x: NonZeroFiniteNumber,
-  y: NonZeroFiniteNumber,
-): NonZeroFiniteNumber => to(x ** y);
+const pow = (x: ElementType, y: ElementType): ElementType => to(x ** y);
 
-const add = (
-  x: NonZeroFiniteNumber,
-  y: NonZeroFiniteNumber,
-): NonZeroFiniteNumber => to(x + y);
+const add = (x: ElementType, y: ElementType): ElementType => to(x + y);
 
-const sub = (
-  x: NonZeroFiniteNumber,
-  y: NonZeroFiniteNumber,
-): NonZeroFiniteNumber => to(x - y);
+const sub = (x: ElementType, y: ElementType): ElementType => to(x - y);
 
-const mul = (
-  x: NonZeroFiniteNumber,
-  y: NonZeroFiniteNumber,
-): NonZeroFiniteNumber => to(x * y);
+const mul = (x: ElementType, y: ElementType): ElementType => to(x * y);
 
-const div = (
-  x: NonZeroFiniteNumber,
-  y: NonZeroFiniteNumber,
-): NonZeroFiniteNumber => Math.floor(to(x / y));
+const div = (x: ElementType, y: ToNonZero<ElementType>): ElementType =>
+  to(Math.floor(x / y));
 
-const random = (
-  min: NonZeroFiniteNumber,
-  max: NonZeroFiniteNumber,
-): NonZeroFiniteNumber =>
-  add(min, Math.floor(to((Math.max(max, min) - min + 1) * Math.random())));
+const random = (min: ElementType, max: ElementType): ElementType =>
+  add(min, to((Math.max(max, min) - min + 1) * Math.random()));
 
-const floor = (x: NonZeroFiniteNumber): Int => Math.floor(x);
-const ceil = (x: NonZeroFiniteNumber): Int => Math.ceil(x);
-const round = (x: NonZeroFiniteNumber): Int => Math.round(x);
+if (import.meta.vitest !== undefined) {
+  test(`${typeName}.random() should throw a TypeError`, () => {
+    const min = -2.3;
+    const max = 4.5;
+
+    const result = random(to(min), to(max));
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
+  });
+}
+
+// 0 にならないようにする妥当な丸め演算が定義できないので提供しない
+// const floor = (x: ElementType): ToInt<ElementType> => Math.floor(x);
+// const ceil = (x: ElementType): ToInt<ElementType> => Math.ceil(x);
+// const round = (x: ElementType): ToInt<ElementType> => Math.round(x);
+
+// if (import.meta.vitest !== undefined) {
+//   expectType<ToInt<ElementType>, NonZeroInt>('=');
+// }
 
 export const NonZeroFiniteNumber = {
   abs,
@@ -59,9 +77,6 @@ export const NonZeroFiniteNumber = {
   min: _min,
   max: _max,
 
-  floor,
-  ceil,
-  round,
   random,
 
   /** @returns `a ** b` */

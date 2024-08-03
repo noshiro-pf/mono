@@ -4,6 +4,8 @@ import { castType, type ToNonNegative } from './utils.mjs';
 type ElementType = NonZeroInt;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
+const typeName = 'NonZeroInt';
+
 export const isNonZeroInt = (a: number): a is ElementType =>
   Number.isInteger(a) && a !== 0;
 
@@ -13,7 +15,7 @@ export const toNonZeroInt = castType<ElementType>(
 );
 
 if (import.meta.vitest !== undefined) {
-  test('toNonZeroInt(1.2) should throw a TypeError', () => {
+  test(`to${typeName}(1.2) should throw a TypeError`, () => {
     expect(() => toNonZeroInt(1.2)).toThrow(
       new TypeError('Expected an integer, got: 1.2'),
     );
@@ -68,7 +70,7 @@ const random = (
 };
 
 if (import.meta.vitest !== undefined) {
-  test('NonZeroInt.random', () => {
+  test(`${typeName}.random`, () => {
     const r = random(-5, 5);
     expect(r).toBeGreaterThanOrEqual(-5);
     expect(r).toBeLessThanOrEqual(5);

@@ -4,6 +4,8 @@ import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
 type ElementType = Uint;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
+const typeName = 'Uint';
+
 const MIN_VALUE = 0;
 
 export const isUint = (a: number): a is ElementType =>
@@ -12,7 +14,7 @@ export const isUint = (a: number): a is ElementType =>
 export const toUint = castType<ElementType>(isUint, 'a non-negative integer');
 
 if (import.meta.vitest !== undefined) {
-  test('toUint(1.2) should throw a TypeError', () => {
+  test(`to${typeName}(1.2) should throw a TypeError`, () => {
     expect(() => toUint(1.2)).toThrow(
       new TypeError('Expected a non-negative integer, got: 1.2'),
     );
@@ -62,7 +64,7 @@ const random = (
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 if (import.meta.vitest !== undefined) {
-  test('Uint.random', () => {
+  test(`${typeName}.random`, () => {
     const r = random(0, 5);
     expect(r).toBeGreaterThanOrEqual(0);
     expect(r).toBeLessThanOrEqual(5);

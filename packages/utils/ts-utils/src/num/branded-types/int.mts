@@ -8,10 +8,12 @@ import {
 type ElementType = Int;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
+const typeName = 'Int';
+
 export const toInt = castType<ElementType>(Number.isInteger, 'an integer');
 
 if (import.meta.vitest !== undefined) {
-  test('toInt(1.2) should throw a TypeError', () => {
+  test(`to${typeName}(1.2) should throw a TypeError`, () => {
     expect(() => toInt(1.2)).toThrow(
       new TypeError('Expected an integer, got: 1.2'),
     );
@@ -61,7 +63,7 @@ const random = (
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 if (import.meta.vitest !== undefined) {
-  test('Int.random', () => {
+  test(`${typeName}.random`, () => {
     const r = random(-5, 5);
     expect(r).toBeGreaterThanOrEqual(-5);
     expect(r).toBeLessThanOrEqual(5);

@@ -8,6 +8,8 @@ import {
 type ElementType = Int32;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
+const typeName = 'Int32';
+
 const MIN_VALUE = -(2 ** 31);
 const MAX_VALUE = 2 ** 31 - 1;
 
@@ -22,7 +24,7 @@ export const toInt32 = castType<ElementType>(
 );
 
 if (import.meta.vitest !== undefined) {
-  test('toInt32(1.2) should throw a TypeError', () => {
+  test(`to${typeName}(1.2) should throw a TypeError`, () => {
     expect(() => toInt32(1.2)).toThrow(
       new TypeError('Expected an integer in [-2^31, 2^31), got: 1.2'),
     );
@@ -75,7 +77,7 @@ const random = (
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 if (import.meta.vitest !== undefined) {
-  test('Int32.random', () => {
+  test(`${typeName}.random`, () => {
     const r = random(-5, 5);
     expect(r).toBeGreaterThanOrEqual(-5);
     expect(r).toBeLessThanOrEqual(5);

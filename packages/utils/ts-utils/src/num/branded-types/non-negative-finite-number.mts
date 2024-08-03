@@ -1,6 +1,9 @@
-import { castType } from './utils.mjs';
+import { expectType } from '../../expect-type.mjs';
+import { castType, type ToInt } from './utils.mjs';
 
 type ElementType = NonNegativeFiniteNumber;
+
+const typeName = 'NonNegativeFiniteNumber';
 
 const MIN_VALUE = 0;
 
@@ -13,7 +16,7 @@ export const toNonNegativeFiniteNumber = castType<ElementType>(
 );
 
 if (import.meta.vitest !== undefined) {
-  test('toNonNegativeFiniteNumber(-1.2) should throw a TypeError', () => {
+  test(`to${typeName}(-1.2) should throw a TypeError`, () => {
     const value = -1.2;
     expect(() => toNonNegativeFiniteNumber(value)).toThrow(
       new TypeError(`Expected a non-negative finite number, got: ${value}`),
@@ -46,16 +49,20 @@ const random = (min: ElementType, max: ElementType): ElementType =>
   add(min, to((Math.max(max, min) - min + 1) * Math.random()));
 
 if (import.meta.vitest !== undefined) {
-  test('NonNegativeFiniteNumber.random() should throw a TypeError', () => {
+  test(`${typeName}.random() should throw a TypeError`, () => {
     const result = random(to(-2.3), to(4.5));
     expect(result).toBeGreaterThanOrEqual(-2.3);
     expect(result).toBeLessThanOrEqual(4.5);
   });
 }
 
-const floor = (x: ElementType): Uint => Math.floor(x);
-const ceil = (x: ElementType): Uint => Math.ceil(x);
-const round = (x: ElementType): Uint => Math.round(x);
+const floor = (x: ElementType): ToInt<ElementType> => Math.floor(x);
+const ceil = (x: ElementType): ToInt<ElementType> => Math.ceil(x);
+const round = (x: ElementType): ToInt<ElementType> => Math.round(x);
+
+if (import.meta.vitest !== undefined) {
+  expectType<ToInt<ElementType>, Uint>('=');
+}
 
 export const NonNegativeFiniteNumber = {
   min: _min,

@@ -4,6 +4,8 @@ import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
 type ElementType = PositiveInt;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
+const typeName = 'PositiveInt';
+
 const MIN_VALUE = 1;
 
 export const isPositiveInt = (a: number): a is ElementType =>
@@ -15,7 +17,7 @@ export const toPositiveInt = castType<ElementType>(
 );
 
 if (import.meta.vitest !== undefined) {
-  test('toPositiveInt(-1) should throw a TypeError', () => {
+  test(`to${typeName}(-1) should throw a TypeError`, () => {
     expect(toPositiveInt(-1)).throws(
       new TypeError('Expected a positive integer, got: -1'),
     );
@@ -65,7 +67,7 @@ const random = (
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 if (import.meta.vitest !== undefined) {
-  test('PositiveInt.random', () => {
+  test(`${typeName}.random`, () => {
     const r = random(1, 5);
     expect(r).toBeGreaterThanOrEqual(1);
     expect(r).toBeLessThanOrEqual(5);

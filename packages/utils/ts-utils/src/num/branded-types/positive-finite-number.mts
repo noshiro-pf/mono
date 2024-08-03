@@ -7,7 +7,7 @@ export const isPositiveFiniteNumber = (a: number): a is PositiveFiniteNumber =>
 
 export const toPositiveFiniteNumber = castType<PositiveFiniteNumber>(
   isPositiveFiniteNumber,
-  'positive finite number',
+  'a positive finite number',
 );
 
 const to = toPositiveFiniteNumber;

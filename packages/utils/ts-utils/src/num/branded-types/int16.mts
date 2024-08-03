@@ -8,6 +8,8 @@ import {
 type ElementType = Int16;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
+const typeName = 'Int16';
+
 const MIN_VALUE = -(2 ** 15);
 const MAX_VALUE = 2 ** 15 - 1;
 
@@ -22,7 +24,7 @@ export const toInt16 = castType<ElementType>(
 );
 
 if (import.meta.vitest !== undefined) {
-  test('toInt16(1.2) should throw a TypeError', () => {
+  test(`to${typeName}(1.2) should throw a TypeError`, () => {
     expect(() => toInt16(1.2)).toThrow(
       new TypeError('Expected an integer in [-2^15, 2^15), got: 1.2'),
     );
@@ -75,7 +77,7 @@ const random = (
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 if (import.meta.vitest !== undefined) {
-  test('Int16.random', () => {
+  test(`${typeName}.random`, () => {
     const r = random(-5, 5);
     expect(r).toBeGreaterThanOrEqual(-5);
     expect(r).toBeLessThanOrEqual(5);

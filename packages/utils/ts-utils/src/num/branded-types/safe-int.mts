@@ -9,6 +9,8 @@ import {
 type ElementType = SafeInt;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
+const typeName = 'SafeInt';
+
 const MIN_VALUE = Number.MIN_SAFE_INTEGER;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
 
@@ -18,7 +20,7 @@ export const toSafeInt = castType<ElementType>(
 );
 
 if (import.meta.vitest !== undefined) {
-  test('toSafeInt(1.2) should throw a TypeError', () => {
+  test(`to${typeName}(1.2) should throw a TypeError`, () => {
     expect(() => toSafeInt(1.2)).toThrow(
       new TypeError('Expected a safe integer, got: 1.2'),
     );
@@ -71,7 +73,7 @@ const random = (
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 if (import.meta.vitest !== undefined) {
-  test('SafeInt.random', () => {
+  test(`${typeName}.random`, () => {
     const r = random(0, 5);
     expect(r).toBeGreaterThanOrEqual(0);
     expect(r).toBeLessThanOrEqual(5);

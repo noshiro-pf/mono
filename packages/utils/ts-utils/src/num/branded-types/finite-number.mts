@@ -1,7 +1,14 @@
 import { expectType } from '../../expect-type.mjs';
-import { castType, type ToInt } from './utils.mjs';
+import {
+  castType,
+  type ToInt,
+  type ToNonNegative,
+  type ToNonZero,
+} from './utils.mjs';
 
 type ElementType = FiniteNumber;
+
+const typeName = 'FiniteNumber';
 
 export const toFiniteNumber = castType<ElementType>(
   Number.isFinite,
@@ -9,8 +16,9 @@ export const toFiniteNumber = castType<ElementType>(
 );
 
 if (import.meta.vitest !== undefined) {
-  test('toFiniteNumber(Number.POSITIVE_INFINITY) should throw a TypeError', () => {
-    const value = Number.POSITIVE_INFINITY;
+  test.each([
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
     expect(() => toFiniteNumber(value)).toThrow(
       new TypeError(`Expected a finite number, got: ${value}`),
     );
@@ -19,7 +27,11 @@ if (import.meta.vitest !== undefined) {
 
 const to = toFiniteNumber;
 
-const abs = (x: ElementType): NonNegativeFiniteNumber => Math.abs(x);
+const abs = (x: ElementType): ToNonNegative<ElementType> => Math.abs(x);
+
+if (import.meta.vitest !== undefined) {
+  expectType<ToNonNegative<ElementType>, NonNegativeFiniteNumber>('=');
+}
 
 const _min = (...values: readonly ElementType[]): ElementType =>
   to(Math.min(...values));
@@ -35,17 +47,20 @@ const sub = (x: ElementType, y: ElementType): ElementType => to(x - y);
 
 const mul = (x: ElementType, y: ElementType): ElementType => to(x * y);
 
-const div = (x: ElementType, y: NonZeroFiniteNumber): ElementType =>
+const div = (x: ElementType, y: ToNonZero<ElementType>): ElementType =>
   to(Math.floor(x / y));
 
 const random = (min: ElementType, max: ElementType): ElementType =>
   add(min, to((Math.max(max, min) - min + 1) * Math.random()));
 
 if (import.meta.vitest !== undefined) {
-  test('FiniteNumber.random() should throw a TypeError', () => {
-    const result = random(to(-2.3), to(4.5));
-    expect(result).toBeGreaterThanOrEqual(-2.3);
-    expect(result).toBeLessThanOrEqual(4.5);
+  test(`${typeName}.random() should throw a TypeError`, () => {
+    const min = -2.3;
+    const max = 4.5;
+
+    const result = random(to(min), to(max));
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
   });
 }
 
