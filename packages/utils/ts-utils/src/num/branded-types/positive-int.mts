@@ -1,5 +1,9 @@
 import { Num } from '../num.mjs';
-import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
+import {
+  castType,
+  type NumberClass,
+  type ToNonZeroIntWithSmallInt,
+} from './utils.mjs';
 
 type ElementType = PositiveInt;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
@@ -107,4 +111,4 @@ export const PositiveInt = {
 
   /** @returns `⌊a / b⌋`, but never less than 1 */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'int' | 'positive'>;

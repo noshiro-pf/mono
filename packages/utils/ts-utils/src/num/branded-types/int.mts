@@ -1,6 +1,7 @@
 import { toFiniteNumber } from './finite-number.mjs';
 import {
   castType,
+  type NumberClass,
   type ToNonNegative,
   type ToNonZeroIntWithSmallInt,
 } from './utils.mjs';
@@ -102,4 +103,4 @@ export const Int = {
 
   /** @returns `⌊a / b⌋` */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'int'>;

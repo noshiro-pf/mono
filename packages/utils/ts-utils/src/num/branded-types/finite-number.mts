@@ -101,4 +101,4 @@ export const FiniteNumber = {
 
   /** @returns `a / b` */
   div,
-} as const satisfies NumberClass<ElementType, 'none'>;
+} as const satisfies NumberClass<ElementType, never>;

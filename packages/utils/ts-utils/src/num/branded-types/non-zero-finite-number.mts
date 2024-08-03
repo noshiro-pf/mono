@@ -112,4 +112,4 @@ export const NonZeroFiniteNumber = {
 
   /** @returns `a / b` */
   div,
-} as const satisfies NumberClass<ElementType, 'none'>;
+} as const satisfies NumberClass<ElementType, never>;

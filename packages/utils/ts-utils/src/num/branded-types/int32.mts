@@ -1,6 +1,7 @@
 import { Num } from '../num.mjs';
 import {
   castType,
+  type NumberClass,
   type ToNonNegative,
   type ToNonZeroIntWithSmallInt,
 } from './utils.mjs';
@@ -114,4 +115,4 @@ export const Int32 = {
 
   /** @returns `⌊a / b⌋`, but clamped to `[-2^31, 2^31)` */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'int' | 'range'>;

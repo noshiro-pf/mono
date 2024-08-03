@@ -1,5 +1,10 @@
 import { Int } from './int.mjs';
-import { castType, type ToNonNegative } from './utils.mjs';
+import {
+  castType,
+  type NumberClass,
+  type ToNonNegative,
+  type ToNonZeroIntWithSmallInt,
+} from './utils.mjs';
 
 type ElementType = NonZeroInt;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
@@ -64,7 +69,7 @@ const mul = (
 
 const div = (
   x: ElementTypeWithSmallInt,
-  y: NonZeroIntWithSmallInt,
+  y: ToNonZeroIntWithSmallInt<ElementType>,
 ): ElementType => Math.floor(to(x / y));
 
 const random = (
@@ -93,6 +98,8 @@ export const NonZeroInt = {
   min: _min,
   max: _max,
 
+  random,
+
   /** @returns `a ** b` */
   pow,
 
@@ -107,4 +114,4 @@ export const NonZeroInt = {
 
   /** @returns `⌊a / b⌋` */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'int'>;

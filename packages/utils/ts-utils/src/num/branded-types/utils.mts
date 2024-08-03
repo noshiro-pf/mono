@@ -38,29 +38,23 @@ type CastToInt<N> = N extends Int ? N : never;
 
 export type NumberClass<
   N extends UnknownBrand,
-  classes extends
-    | 'has-max-value'
-    | 'has-min-value'
-    | 'int'
-    | 'non-negative'
-    | 'none'
-    | 'positive',
+  classes extends 'int' | 'non-negative' | 'positive' | 'range',
 > = Readonly<
-  (classes extends 'has-max-value'
+  ('int' | 'non-negative' extends classes
     ? {
-        MAX_VALUE: number;
+        MIN_VALUE: number;
         clamp: (a: number) => N;
       }
     : unknown) &
-    (classes extends 'has-min-value'
+    ('int' | 'positive' extends classes
       ? {
           MIN_VALUE: number;
           clamp: (a: number) => N;
         }
       : unknown) &
-    (classes extends 'int'
+    ('int' extends classes
       ? unknown
-      : classes extends 'positive'
+      : 'positive' extends classes
         ? {
             floor: (x: N, y: N) => RemoveNonZeroKey<ToInt<N>>;
             ceil: (x: N, y: N) => ToInt<N>;
@@ -71,11 +65,20 @@ export type NumberClass<
             ceil: (x: N, y: N) => ToInt<N>;
             round: (x: N, y: N) => ToInt<N>;
           }) &
-    (classes extends 'non-negative' | 'positive'
+    ('non-negative' extends classes
       ? unknown
-      : {
-          abs: (x: N) => N;
-        }) & {
+      : 'positive' extends classes
+        ? unknown
+        : {
+            abs: (x: N) => N;
+          }) &
+    ('range' extends classes
+      ? {
+          MIN_VALUE: number;
+          MAX_VALUE: number;
+          clamp: (a: number) => N;
+        }
+      : unknown) & {
       min: (...values: readonly N[]) => N;
       max: (...values: readonly N[]) => N;
       random: (min: N, max: N) => N;
@@ -103,7 +106,7 @@ if (import.meta.vitest !== undefined) {
   expectType<keyof NumberClass<UnknownBrand, 'int'>, BaseKeys | 'abs'>('=');
 
   expectType<
-    keyof NumberClass<UnknownBrand, 'none'>,
+    keyof NumberClass<UnknownBrand, never>,
     BaseKeys | FloatMethods | 'abs'
   >('=');
 
@@ -118,8 +121,8 @@ if (import.meta.vitest !== undefined) {
   >('=');
 
   expectType<
-    keyof NumberClass<UnknownBrand, 'has-min-value' | 'int'>,
-    BaseKeys | 'abs'
+    keyof NumberClass<UnknownBrand, 'int' | 'range'>,
+    BaseKeys | 'abs' | 'clamp' | 'MAX_VALUE' | 'MIN_VALUE'
   >('=');
 }
 

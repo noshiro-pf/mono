@@ -1,5 +1,6 @@
 import { Num } from '../num.mjs';
 import { toFiniteNumber } from './finite-number.mjs';
+import { Int } from './int.mjs';
 import {
   castType,
   type NumberClass,
@@ -7,21 +8,24 @@ import {
   type ToNonZeroIntWithSmallInt,
 } from './utils.mjs';
 
-type ElementType = SafeInt;
+type ElementType = NonZeroSafeInt;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
-const typeName = 'SafeInt';
+const typeName = 'NonZeroSafeInt';
 
-const typeNameInMessage = 'a safe integer';
+const typeNameInMessage = 'a non-zero safe integer';
 
 const MIN_VALUE = Number.MIN_SAFE_INTEGER;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
 
-const is = Number.isSafeInteger;
+export const isNonZeroInt = (a: number): a is ElementType =>
+  Number.isSafeInteger(a) && a !== 0;
 
-export const toSafeInt = castType<ElementType>(is, typeNameInMessage);
+const is = isNonZeroInt;
 
-const to = toSafeInt;
+export const toNonZeroInt = castType<ElementType>(is, typeNameInMessage);
+
+const to = toNonZeroInt;
 
 if (import.meta.vitest !== undefined) {
   test.each([
@@ -30,6 +34,7 @@ if (import.meta.vitest !== undefined) {
     { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
     { name: '1.2', value: 1.2 },
     { name: '-3.4', value: -3.4 },
+    { name: '0', value: 0 },
   ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
     expect(() => to(value)).toThrow(
       new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
@@ -77,20 +82,24 @@ const div = (
 const random = (
   min: ElementTypeWithSmallInt,
   max: ElementTypeWithSmallInt,
-): ElementType =>
-  add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+): ElementType => {
+  let mut_r = 0;
+  while (mut_r === 0) {
+    mut_r = Int.random(min, max);
+  }
+  return to(mut_r);
+};
 
 if (import.meta.vitest !== undefined) {
   test(`${typeName}.random`, () => {
-    const min = 0;
-    const max = 5;
-    const r = random(min, max);
-    expect(r).toBeGreaterThanOrEqual(min);
-    expect(r).toBeLessThanOrEqual(max);
+    const r = random(-5, 5);
+    expect(r).toBeGreaterThanOrEqual(-5);
+    expect(r).toBeLessThanOrEqual(5);
+    expect(r).not.toBe(0);
   });
 }
 
-export const SafeInt = {
+export const NonZeroSafeInt = {
   MIN_VALUE,
   MAX_VALUE,
 

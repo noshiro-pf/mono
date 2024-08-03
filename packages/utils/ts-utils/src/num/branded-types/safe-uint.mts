@@ -1,5 +1,9 @@
 import { Num } from '../num.mjs';
-import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
+import {
+  castType,
+  type NumberClass,
+  type ToNonZeroIntWithSmallInt,
+} from './utils.mjs';
 
 type ElementType = SafeUint;
 type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
@@ -105,4 +109,4 @@ export const SafeUint = {
 
   /** @returns `⌊a / b⌋`, but clamped to `[0, MAX_SAFE_INTEGER]` */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'int' | 'non-negative' | 'range'>;
