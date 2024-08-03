@@ -20,7 +20,9 @@ const to = toFiniteNumber;
 
 if (import.meta.vitest !== undefined) {
   test.each([
+    { name: 'Number.NaN', value: Number.NaN },
     { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
   ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
     expect(() => to(value)).toThrow(
       new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),

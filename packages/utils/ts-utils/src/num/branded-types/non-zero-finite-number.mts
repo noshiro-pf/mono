@@ -21,7 +21,10 @@ const to = toNonZeroFiniteNumber;
 
 if (import.meta.vitest !== undefined) {
   test.each([
+    { name: 'Number.NaN', value: Number.NaN },
     { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
+    { name: '-1.2', value: -1.2 },
     { name: '0', value: 0 },
   ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
     expect(() => to(value)).toThrow(

@@ -19,15 +19,23 @@ export const toPositiveSafeInt = castType<ElementType>(
   typeNameInMessage,
 );
 
+const to = toPositiveSafeInt;
+
 if (import.meta.vitest !== undefined) {
-  test(`to${typeName}(-1) should throw a TypeError`, () => {
-    expect(toPositiveSafeInt(-1)).throws(
-      new TypeError('Expected a positive safe integer, got: -1'),
+  test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
+    { name: '1.2', value: 1.2 },
+    { name: '-3.4', value: -3.4 },
+    { name: '0', value: 0 },
+    { name: '-1', value: -1 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => to(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
     );
   });
 }
-
-const to = toPositiveSafeInt;
 
 const _c = Num.clamp<number>(MIN_VALUE, MAX_VALUE);
 const clamp = (a: number): ElementType => to(Math.round(_c(a)));

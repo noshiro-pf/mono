@@ -20,6 +20,9 @@ const to = toInt;
 
 if (import.meta.vitest !== undefined) {
   test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
     { name: '1.2', value: 1.2 },
     { name: '-3.4', value: -3.4 },
   ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {

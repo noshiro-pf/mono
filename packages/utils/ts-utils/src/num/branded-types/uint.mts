@@ -19,8 +19,12 @@ const to = toUint;
 
 if (import.meta.vitest !== undefined) {
   test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
     { name: '1.2', value: 1.2 },
     { name: '-3.4', value: -3.4 },
+    { name: '-1', value: -1 },
   ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
     expect(() => to(value)).toThrow(
       new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
