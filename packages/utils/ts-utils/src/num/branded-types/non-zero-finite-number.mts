@@ -1,5 +1,12 @@
 import { expectType } from '../../expect-type.mjs';
-import { castType, type ToNonNegative, type ToNonZero } from './utils.mjs';
+import {
+  castType,
+  type NumberClass,
+  type RemoveNonZeroKey,
+  type ToInt,
+  type ToNonNegative,
+  type ToNonZero,
+} from './utils.mjs';
 
 type ElementType = NonZeroFiniteNumber;
 
@@ -71,13 +78,14 @@ if (import.meta.vitest !== undefined) {
 }
 
 // 0 にならないようにする妥当な丸め演算が定義できないので提供しない
-// const floor = (x: ElementType): ToInt<ElementType> => Math.floor(x);
-// const ceil = (x: ElementType): ToInt<ElementType> => Math.ceil(x);
-// const round = (x: ElementType): ToInt<ElementType> => Math.round(x);
+const floor = (x: ElementType): ToInt<ElementType> => Math.floor(x);
+const ceil = (x: ElementType): ToInt<ElementType> => Math.ceil(x);
+const round = (x: ElementType): ToInt<ElementType> => Math.round(x);
 
-// if (import.meta.vitest !== undefined) {
-//   expectType<ToInt<ElementType>, NonZeroInt>('=');
-// }
+if (import.meta.vitest !== undefined) {
+  expectType<ToInt<ElementType>, NonZeroInt>('=');
+  expectType<RemoveNonZeroKey<ToInt<ElementType>>, Int>('=');
+}
 
 export const NonZeroFiniteNumber = {
   abs,
@@ -85,6 +93,9 @@ export const NonZeroFiniteNumber = {
   min: _min,
   max: _max,
 
+  floor,
+  ceil,
+  round,
   random,
 
   /** @returns `a ** b` */
@@ -101,4 +112,4 @@ export const NonZeroFiniteNumber = {
 
   /** @returns `a / b` */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'none'>;

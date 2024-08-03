@@ -1,5 +1,10 @@
 import { expectType } from '../../expect-type.mjs';
-import { castType, type ToInt } from './utils.mjs';
+import {
+  castType,
+  type NumberClass,
+  type RemoveNonZeroKey,
+  type ToInt,
+} from './utils.mjs';
 
 type ElementType = PositiveFiniteNumber;
 
@@ -66,12 +71,15 @@ if (import.meta.vitest !== undefined) {
   });
 }
 
-const floor = (x: ElementType): Uint => Math.floor(x);
+const floor = (x: ElementType): RemoveNonZeroKey<ToInt<ElementType>> =>
+  Math.floor(x);
 const ceil = (x: ElementType): ToInt<ElementType> => Math.ceil(x);
-const round = (x: ElementType): Uint => Math.round(x);
+const round = (x: ElementType): RemoveNonZeroKey<ToInt<ElementType>> =>
+  Math.round(x);
 
 if (import.meta.vitest !== undefined) {
   expectType<ToInt<ElementType>, PositiveInt>('=');
+  expectType<RemoveNonZeroKey<ToInt<ElementType>>, Uint>('=');
 }
 
 export const PositiveFiniteNumber = {
@@ -97,4 +105,4 @@ export const PositiveFiniteNumber = {
 
   /** @returns `a / b`, but greater than 0 */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'positive'>;

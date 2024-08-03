@@ -26,4 +26,54 @@ export type ToNonNegative<N extends UnknownBrand> = IntersectBrand<
   NonNegativeNumber
 >;
 
+export type RemoveNonZeroKey<N extends UnknownBrand> = Brand<
+  GetBrandValuePart<N>,
+  RelaxedExclude<UnwrapBrandTrueKeys<N>, '!=0'> & string,
+  UnwrapBrandFalseKeys<N> & string
+>;
+
 type CastToInt<N> = N extends Int ? N : never;
+
+export type NumberClass<
+  N extends UnknownBrand,
+  classes extends 'int' | 'non-negative' | 'none' | 'positive',
+> = Readonly<
+  (classes extends 'int'
+    ? unknown
+    : classes extends 'positive'
+      ? {
+          floor: (x: N, y: N) => RemoveNonZeroKey<ToInt<N>>;
+          ceil: (x: N, y: N) => ToInt<N>;
+          round: (x: N, y: N) => RemoveNonZeroKey<ToInt<N>>;
+        }
+      : {
+          floor: (x: N, y: N) => ToInt<N>;
+          ceil: (x: N, y: N) => ToInt<N>;
+          round: (x: N, y: N) => ToInt<N>;
+        }) &
+    (classes extends 'non-negative' | 'positive'
+      ? unknown
+      : {
+          abs: (x: N) => N;
+        }) & {
+      min: (...values: readonly N[]) => N;
+      max: (...values: readonly N[]) => N;
+      random: (min: N, max: N) => N;
+      pow: (x: N, y: N) => N;
+      add: (x: N, y: N) => N;
+      sub: (x: N, y: N) => N;
+      mul: (x: N, y: N) => N;
+      div: (x: N, y: ToNonZero<N>) => N;
+    }
+>;
+
+// type CommonProperties<N extends UnknownBrand> = Readonly<{
+//   min: (...values: readonly N[]) => N;
+//   max: (...values: readonly N[]) => N;
+//   random: (min: N, max: N) => N;
+//   pow: (x: N, y: N) => N;
+//   add: (x: N, y: N) => N;
+//   sub: (x: N, y: N) => N;
+//   mul: (x: N, y: N) => N;
+//   div: (x: N, y: ToNonZero<N>) => N;
+// }>;
