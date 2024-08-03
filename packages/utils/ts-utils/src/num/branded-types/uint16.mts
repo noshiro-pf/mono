@@ -2,7 +2,7 @@ import { Num } from '../num.mjs';
 import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
 
 type ElementType = Uint16;
-type ElementTypeWithSmallInt = Uint16WithSmallInt;
+type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const MIN_VALUE = 0;
 const MAX_VALUE = 2 ** 16 - 1;
@@ -14,13 +14,13 @@ export const isUint16 = (a: number): a is ElementType =>
 
 export const toUint16 = castType<ElementType>(
   isUint16,
-  'non-negative integer less than 2^16',
+  'a non-negative integer less than 2^16',
 );
 
 if (import.meta.vitest !== undefined) {
   test('toUint16(1.2) should throw a TypeError', () => {
     expect(() => toUint16(1.2)).toThrow(
-      new TypeError('Expected non-negative integer less than 2^16, got: 1.2'),
+      new TypeError('Expected a non-negative integer less than 2^16, got: 1.2'),
     );
   });
 }

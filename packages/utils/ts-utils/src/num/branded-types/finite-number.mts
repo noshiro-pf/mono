@@ -1,45 +1,61 @@
-import { castType } from './utils.mjs';
+import { expectType } from '../../expect-type.mjs';
+import { castType, type ToInt } from './utils.mjs';
 
-export const toFiniteNumber = castType<FiniteNumber>(
+type ElementType = FiniteNumber;
+
+export const toFiniteNumber = castType<ElementType>(
   Number.isFinite,
-  'finite number',
+  'a finite number',
 );
+
+if (import.meta.vitest !== undefined) {
+  test('toFiniteNumber(Number.POSITIVE_INFINITY) should throw a TypeError', () => {
+    const value = Number.POSITIVE_INFINITY;
+    expect(() => toFiniteNumber(value)).toThrow(
+      new TypeError(`Expected a finite number, got: ${value}`),
+    );
+  });
+}
 
 const to = toFiniteNumber;
 
-const abs = (x: FiniteNumber): NonNegativeFiniteNumber => Math.abs(x);
+const abs = (x: ElementType): NonNegativeFiniteNumber => Math.abs(x);
 
-const _min = (...values: readonly FiniteNumber[]): FiniteNumber =>
+const _min = (...values: readonly ElementType[]): ElementType =>
   to(Math.min(...values));
 
-const _max = (...values: readonly FiniteNumber[]): FiniteNumber =>
+const _max = (...values: readonly ElementType[]): ElementType =>
   to(Math.max(...values));
 
-const pow = (x: FiniteNumber, y: FiniteNumber): FiniteNumber => to(x ** y);
+const pow = (x: ElementType, y: ElementType): ElementType => to(x ** y);
 
-const add = (x: FiniteNumber, y: FiniteNumber): FiniteNumber => to(x + y);
+const add = (x: ElementType, y: ElementType): ElementType => to(x + y);
 
-const sub = (x: FiniteNumber, y: FiniteNumber): FiniteNumber => to(x - y);
+const sub = (x: ElementType, y: ElementType): ElementType => to(x - y);
 
-const mul = (x: FiniteNumber, y: FiniteNumber): FiniteNumber => to(x * y);
+const mul = (x: ElementType, y: ElementType): ElementType => to(x * y);
 
-const div = (x: FiniteNumber, y: NonZeroFiniteNumber): FiniteNumber =>
+const div = (x: ElementType, y: NonZeroFiniteNumber): ElementType =>
   to(Math.floor(x / y));
 
-const random = (min: FiniteNumber, max: FiniteNumber): FiniteNumber =>
+const random = (min: ElementType, max: ElementType): ElementType =>
   add(min, to((Math.max(max, min) - min + 1) * Math.random()));
 
 if (import.meta.vitest !== undefined) {
-  test('NonZeroInt.random() should throw a TypeError', () => {
+  test('FiniteNumber.random() should throw a TypeError', () => {
     const result = random(to(-2.3), to(4.5));
     expect(result).toBeGreaterThanOrEqual(-2.3);
     expect(result).toBeLessThanOrEqual(4.5);
   });
 }
 
-const floor = (x: FiniteNumber): Int => Math.floor(x);
-const ceil = (x: FiniteNumber): Int => Math.ceil(x);
-const round = (x: FiniteNumber): Int => Math.round(x);
+const floor = (x: ElementType): ToInt<ElementType> => Math.floor(x);
+const ceil = (x: ElementType): ToInt<ElementType> => Math.ceil(x);
+const round = (x: ElementType): ToInt<ElementType> => Math.round(x);
+
+if (import.meta.vitest !== undefined) {
+  expectType<ToInt<ElementType>, Int>('=');
+}
 
 export const FiniteNumber = {
   abs,

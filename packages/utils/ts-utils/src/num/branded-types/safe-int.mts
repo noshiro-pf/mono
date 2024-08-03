@@ -7,20 +7,20 @@ import {
 } from './utils.mjs';
 
 type ElementType = SafeInt;
-type ElementTypeWithSmallInt = SafeIntWithSmallInt;
+type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const MIN_VALUE = Number.MIN_SAFE_INTEGER;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
 
 export const toSafeInt = castType<ElementType>(
   Number.isSafeInteger,
-  'safe integer',
+  'a safe integer',
 );
 
 if (import.meta.vitest !== undefined) {
   test('toSafeInt(1.2) should throw a TypeError', () => {
     expect(() => toSafeInt(1.2)).toThrow(
-      new TypeError('Expected safe integer, got: 1.2'),
+      new TypeError('Expected a safe integer, got: 1.2'),
     );
   });
 }

@@ -2,7 +2,7 @@ import { Num } from '../num.mjs';
 import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
 
 type ElementType = Uint32;
-type ElementTypeWithSmallInt = Uint32WithSmallInt;
+type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const MIN_VALUE = 0;
 const MAX_VALUE = 2 ** 32 - 1;
@@ -14,13 +14,13 @@ export const isUint32 = (a: number): a is ElementType =>
 
 export const toUint32 = castType<ElementType>(
   isUint32,
-  'non-negative integer less than 2^32',
+  'a non-negative integer less than 2^32',
 );
 
 if (import.meta.vitest !== undefined) {
   test('toUint32(1.2) should throw a TypeError', () => {
     expect(() => toUint32(1.2)).toThrow(
-      new TypeError('Expected non-negative integer less than 2^32, got: 1.2'),
+      new TypeError('Expected a non-negative integer less than 2^32, got: 1.2'),
     );
   });
 }

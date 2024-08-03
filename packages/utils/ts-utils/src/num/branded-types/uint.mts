@@ -2,19 +2,19 @@ import { Num } from '../num.mjs';
 import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
 
 type ElementType = Uint;
-type ElementTypeWithSmallInt = UintWithSmallInt;
+type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const MIN_VALUE = 0;
 
 export const isUint = (a: number): a is ElementType =>
   Number.isInteger(a) && Num.isNonNegative(a);
 
-export const toUint = castType<ElementType>(isUint, 'non-negative integer');
+export const toUint = castType<ElementType>(isUint, 'a non-negative integer');
 
 if (import.meta.vitest !== undefined) {
   test('toUint(1.2) should throw a TypeError', () => {
     expect(() => toUint(1.2)).toThrow(
-      new TypeError('Expected non-negative integer, got: 1.2'),
+      new TypeError('Expected a non-negative integer, got: 1.2'),
     );
   });
 }

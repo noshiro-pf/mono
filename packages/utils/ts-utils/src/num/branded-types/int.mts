@@ -6,14 +6,14 @@ import {
 } from './utils.mjs';
 
 type ElementType = Int;
-type ElementTypeWithSmallInt = IntWithSmallInt;
+type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
-export const toInt = castType<ElementType>(Number.isInteger, 'integer');
+export const toInt = castType<ElementType>(Number.isInteger, 'an integer');
 
 if (import.meta.vitest !== undefined) {
   test('toInt(1.2) should throw a TypeError', () => {
     expect(() => toInt(1.2)).toThrow(
-      new TypeError('Expected integer, got: 1.2'),
+      new TypeError('Expected an integer, got: 1.2'),
     );
   });
 }

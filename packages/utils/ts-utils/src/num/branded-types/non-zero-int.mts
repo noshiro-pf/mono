@@ -1,8 +1,8 @@
 import { Int } from './int.mjs';
-import { castType } from './utils.mjs';
+import { castType, type ToNonNegative } from './utils.mjs';
 
 type ElementType = NonZeroInt;
-type ElementTypeWithSmallInt = NonZeroIntWithSmallInt;
+type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 export const isNonZeroInt = (a: number): a is ElementType =>
   Number.isInteger(a) && a !== 0;
@@ -15,14 +15,14 @@ export const toNonZeroInt = castType<ElementType>(
 if (import.meta.vitest !== undefined) {
   test('toNonZeroInt(1.2) should throw a TypeError', () => {
     expect(() => toNonZeroInt(1.2)).toThrow(
-      new TypeError('Expected integer, got: 1.2'),
+      new TypeError('Expected an integer, got: 1.2'),
     );
   });
 }
 
 const to = toNonZeroInt;
 
-const abs = (x: ElementTypeWithSmallInt): PositiveInt =>
+const abs = (x: ElementTypeWithSmallInt): ToNonNegative<ElementType> =>
   Math.abs(toNonZeroInt(x));
 
 const _min = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
@@ -68,10 +68,10 @@ const random = (
 };
 
 if (import.meta.vitest !== undefined) {
-  test('Int.random', () => {
-    const r = random(-3, 2);
-    expect(r).toBeGreaterThanOrEqual(-3);
-    expect(r).toBeLessThanOrEqual(2);
+  test('NonZeroInt.random', () => {
+    const r = random(-5, 5);
+    expect(r).toBeGreaterThanOrEqual(-5);
+    expect(r).toBeLessThanOrEqual(5);
     expect(r).not.toBe(0);
   });
 }

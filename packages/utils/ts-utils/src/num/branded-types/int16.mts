@@ -6,7 +6,7 @@ import {
 } from './utils.mjs';
 
 type ElementType = Int16;
-type ElementTypeWithSmallInt = Int16WithSmallInt;
+type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const MIN_VALUE = -(2 ** 15);
 const MAX_VALUE = 2 ** 15 - 1;
@@ -18,13 +18,13 @@ export const isInt16 = (a: number): a is ElementType =>
 
 export const toInt16 = castType<ElementType>(
   isInt16,
-  'integer in [-2^15, 2^15)',
+  'an integer in [-2^15, 2^15)',
 );
 
 if (import.meta.vitest !== undefined) {
   test('toInt16(1.2) should throw a TypeError', () => {
     expect(() => toInt16(1.2)).toThrow(
-      new TypeError('Expected integer in [-2^15, 2^15), got: 1.2'),
+      new TypeError('Expected an integer in [-2^15, 2^15), got: 1.2'),
     );
   });
 }

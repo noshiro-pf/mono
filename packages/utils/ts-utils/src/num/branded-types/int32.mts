@@ -6,7 +6,7 @@ import {
 } from './utils.mjs';
 
 type ElementType = Int32;
-type ElementTypeWithSmallInt = Int32WithSmallInt;
+type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const MIN_VALUE = -(2 ** 31);
 const MAX_VALUE = 2 ** 31 - 1;
@@ -18,13 +18,13 @@ export const isInt32 = (a: number): a is ElementType =>
 
 export const toInt32 = castType<ElementType>(
   isInt32,
-  'integer in [-2^31, 2^31)',
+  'an integer in [-2^31, 2^31)',
 );
 
 if (import.meta.vitest !== undefined) {
   test('toInt32(1.2) should throw a TypeError', () => {
     expect(() => toInt32(1.2)).toThrow(
-      new TypeError('Expected integer in [-2^31, 2^31), got: 1.2'),
+      new TypeError('Expected an integer in [-2^31, 2^31), got: 1.2'),
     );
   });
 }

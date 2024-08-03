@@ -2,7 +2,7 @@ import { Num } from '../num.mjs';
 import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
 
 type ElementType = SafeUint;
-type ElementTypeWithSmallInt = SafeUintWithSmallInt;
+type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const MIN_VALUE = 0;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
@@ -12,13 +12,13 @@ export const isSafeUint = (a: number): a is ElementType =>
 
 export const toSafeUint = castType<ElementType>(
   isSafeUint,
-  'non-negative safe integer',
+  'a non-negative safe integer',
 );
 
 if (import.meta.vitest !== undefined) {
   test('toSafeUint(1.2) should throw a TypeError', () => {
     expect(() => toSafeUint(1.2)).toThrow(
-      new TypeError('Expected non-negative safe integer, got: 1.2'),
+      new TypeError('Expected a non-negative safe integer, got: 1.2'),
     );
   });
 }
