@@ -6,16 +6,14 @@ import { brand } from '../brand.mjs';
 const is = (a: number): a is NonZeroInt =>
   Number.isInteger(a) && Num.isNonZero(a);
 
-export const nonZeroInt = (defaultValue: number = 0): Type<NonZeroInt> => {
-  if (!is(defaultValue)) {
-    throw new Error('defaultValue must be a non-zero integer number');
-  }
-
-  return brand({
+export const nonZeroInt = (
+  // eslint-disable-next-line no-restricted-syntax
+  defaultValue: NonZeroInt = 0 as NonZeroInt,
+): Type<NonZeroInt> =>
+  brand({
     codec: number(defaultValue),
     is,
     defaultValue,
     brandKeys: ['Finite', 'Int', '!=0'],
     brandFalseKeys: ['NaNValue'],
   } as const);
-};

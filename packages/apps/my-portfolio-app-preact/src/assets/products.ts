@@ -24,7 +24,7 @@ export const products: DeepReadonly<{
       subtitle: 'リアクティブプログラミング用のTypeScriptのライブラリ',
       description:
         'RxJS風の構文のリアクティブプログラミングライブラリ。前作の「rnjs」と同じく「グリッチ」が起きないRxJSを目指し作ったものだが、rnjs で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。priority queueを使わず、topological sortによりObservable全体のDAGの依存関係を事前に計算して更新を実行することでglitchを回避するようにし、都度queueを挟む実装より高速に実行できるようにした。',
-      implementation: 'TypeScriptで実装。（最終更新：2022年8月19日）',
+      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
       imageUrl: '',
     },
     {
@@ -35,17 +35,17 @@ export const products: DeepReadonly<{
         '外界から来た値の型チェックをより便利に行うためのTypeScriptライブラリ',
       description:
         '説明ページ → https://docs.google.com/presentation/d/19YwEkeNl8x3IWglTv8YjcOZPyMVympXn0qyDLf2mXUI/edit#slide=id.p',
-      implementation: 'TypeScriptで実装。（最終更新：2022年8月19日）',
+      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
       imageUrl: '',
     },
     {
       id: 'ts-type-utils',
-      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-type-utils',
+      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/ts-type-utils',
       title: '@noshiro/ts-type-utils',
       subtitle: 'TypeScriptの型ユーティリティ集',
       description:
         '`type UintRange<1, 5> = 1 | 2 | 3 | 4` のような型ユーティリティのライブラリ',
-      implementation: 'TypeScriptで実装。（最終更新：2022年8月17日）',
+      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
       imageUrl: '',
     },
     {
@@ -54,7 +54,7 @@ export const products: DeepReadonly<{
       title: '@noshiro/ts-utils',
       subtitle: 'TypeScriptのユーティリティ集',
       description: 'Result型や配列・オブジェクト操作ユーティリティなど',
-      implementation: 'TypeScriptで実装。（最終更新：2022年8月7日）',
+      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
       imageUrl: '',
     },
     {
@@ -63,7 +63,7 @@ export const products: DeepReadonly<{
       title: '@noshiro/tiny-router-observable',
       subtitle: '簡易的なRouterライブラリ',
       description: 'React Router より簡単なAPIのライブラリが欲しかったので自作',
-      implementation: 'TypeScriptで実装。（最終更新：2022年4月1日）',
+      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
       imageUrl: '',
     },
     {
@@ -87,7 +87,7 @@ export const products: DeepReadonly<{
       subtitle: 'イベントのスケジュール調整用アプリケーション',
       description:
         '説明ページ → https://www.notion.so/noshiro/c40d53907f204a3e9961a4a2b623ca22',
-      implementation: `React・TypeScript・Immutable.js・RxJSで実装。CSSライブラリに Blueprint.js を使用。バックエンドはFirebase FirestoreとFunctions（制作日：2020年1月5日、最終更新：2021年9月22日）
+      implementation: `React・TypeScript・Immutable.js・RxJSで実装。CSSライブラリに Blueprint.js を使用。バックエンドはFirebase FirestoreとFunctions（制作日：2020年1月5日、最終更新：2024年7月9日）
         → 2021-03-10にRxJSを自作ライブラリ SyncFlow に差し替えた。Immutable.js も自作ライブラリに差し替えた。`,
       imageUrl: EventScheduleAppImage,
     },
@@ -99,7 +99,7 @@ export const products: DeepReadonly<{
       description:
         'Pixi.jsでぬるぬる動かしてみたくて作ったおもちゃ。もし需要があったら入出力とかできるように整えるかも。',
       implementation:
-        'React・TypeScript・Pixi.jsで実装。CSSライブラリに Blueprint.js を使用。（最終更新：2020年9月28日）',
+        'React・TypeScript・Pixi.jsで実装。CSSライブラリに Blueprint.js を使用。（最終更新：2024年7月9日）',
       imageUrl: AnnotationToolAppImage,
     },
     {
@@ -110,7 +110,7 @@ export const products: DeepReadonly<{
       description:
         '表計算ソフトで済む内容ではあるが Blueprint.js を試したくなったのもあって React で作成。クエリパラメータで設定を保存可能。',
       implementation:
-        'React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2019年11月17日、最終更新：2021年9月22日）',
+        'React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2019年11月17日、最終更新：2024年7月9日）',
       imageUrl: HousingLoanCalculatorAppImage,
     },
     {
@@ -120,7 +120,7 @@ export const products: DeepReadonly<{
       subtitle: '',
       description: '期待値等を調べるために作成。',
       implementation:
-        'React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2021年1月22日）',
+        'React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2024年7月9日）',
       imageUrl: CantStopProbabilityAppImage,
     },
     {
@@ -131,7 +131,7 @@ export const products: DeepReadonly<{
         '色のコントラストなどについて書いた記事（https://qiita.com/pikohideaki/items/59415524503f833ce41e）のために作ったデモアプリ。',
       description: '',
       implementation:
-        'React・TypeScriptで実装。CSSライブラリに material-UI を使用。（制作日：2019年12月7日、最終更新：2020年1月27日）',
+        'React・TypeScriptで実装。CSSライブラリに material-UI を使用。（制作日：2019年12月7日、最終更新：2024年7月9日）',
       imageUrl: ColorDemoAppImage,
     },
     {
@@ -176,6 +176,7 @@ export const products: DeepReadonly<{
         'Angular・RxJS・TypeScriptで実装。（制作時期：2017年12月）',
         ' → 2019年8月7日にReactで再実装 → 2021/1/27にPreactやSolidにも移植',
         ' → 2021-03-12にRxJSを自作ライブラリ SyncFlow に差し替えた。',
+        '（最終更新：2024年7月9日）',
       ].join(''),
       imageUrl: LambdaInterpreterAppImage,
     },

@@ -3,6 +3,8 @@ export * from './int.mjs';
 export * from './int16.mjs';
 export * from './int32.mjs';
 export * from './non-negative-finite-number.mjs';
+export * from './non-zero-finite-number.mjs';
+export * from './non-zero-int.mjs';
 export * from './positive-finite-number.mjs';
 export * from './positive-int.mjs';
 export * from './safe-int.mjs';

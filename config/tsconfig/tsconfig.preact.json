@@ -1,4 +1,5 @@
 {
+  "extends": "./tsconfig.dom.json",
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "preact"

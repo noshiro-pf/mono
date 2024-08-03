@@ -1,50 +1,98 @@
 import { Num } from '../num.mjs';
+import { Int } from './int.mjs';
+import {
+  castType,
+  type NumberClass,
+  type ToNonNegative,
+  type ToNonZeroIntWithSmallInt,
+} from './utils.mjs';
+
+type ElementType = Int16;
+type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
+
+const typeName = 'Int16';
+
+const typeNameInMessage = 'an integer in [-2^15, 2^15)';
 
 const MIN_VALUE = -(2 ** 15);
 const MAX_VALUE = 2 ** 15 - 1;
 
 const isInt16Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 
-export const isInt16 = (a: number): a is Int16 =>
+export const isInt16 = (a: number): a is ElementType =>
   Number.isInteger(a) && isInt16Range(a);
 
-export const toInt16 = (a: number): Int16 => {
-  if (!isInt16(a)) {
-    throw new TypeError(`Expected integer in [-2^15, 2^15), got: ${a}`);
-  }
-  return a;
-};
+const is = isInt16;
+
+export const toInt16 = castType<ElementType>(is, typeNameInMessage);
 
 const to = toInt16;
 
-const _c = Num.clamp(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): Int16 => to(Math.round(_c(a)));
+if (import.meta.vitest !== undefined) {
+  test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
+    { name: '1.2', value: 1.2 },
+    { name: '-3.4', value: -3.4 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => to(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+    );
+  });
+}
 
-const abs = (x: Int16WithSmallInt): IntersectBrand<Int16, NonNegativeNumber> =>
+const _c = Num.clamp(MIN_VALUE, MAX_VALUE);
+const clamp = (a: number): ElementType => to(Math.round(_c(a)));
+
+const abs = (x: ElementTypeWithSmallInt): ToNonNegative<ElementType> =>
   Math.abs(to(x));
 
-const _min = (...values: readonly Int16WithSmallInt[]): Int16 =>
+const _min = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.min(...values));
 
-const _max = (...values: readonly Int16WithSmallInt[]): Int16 =>
+const _max = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.max(...values));
 
-const pow = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 =>
-  clamp(x ** y);
+const pow = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x ** y);
 
-const add = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x + y);
+const add = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x + y);
 
-const sub = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x - y);
+const sub = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x - y);
 
-const mul = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x * y);
+const mul = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x * y);
 
 const div = (
-  x: Int16WithSmallInt,
-  y: WithSmallInt<IntersectBrand<Int16, NonZeroNumber>>,
-): Int16 => clamp(Math.floor(x / y));
+  x: ElementTypeWithSmallInt,
+  y: ToNonZeroIntWithSmallInt<ElementType>,
+): ElementType => clamp(Math.floor(x / y));
 
-const random = (min: Int16WithSmallInt, max: Int16WithSmallInt): Int16 =>
-  add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+const random = (
+  min: ElementTypeWithSmallInt,
+  max: ElementTypeWithSmallInt,
+): ElementType => to(Int.random(min, max));
+
+if (import.meta.vitest !== undefined) {
+  test(`${typeName}.random`, () => {
+    const min = -5;
+    const max = 5;
+    const result = random(min, max);
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
+  });
+}
 
 export const Int16 = {
   MIN_VALUE,
@@ -71,4 +119,4 @@ export const Int16 = {
 
   /** @returns `⌊a / b⌋`, but clamped to `[-2^15, 2^15)` */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'int' | 'range'>;

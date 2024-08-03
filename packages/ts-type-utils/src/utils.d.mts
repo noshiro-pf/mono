@@ -171,7 +171,6 @@ type ArrayAtLeastLen<N extends number, Elm> = readonly [
 //   []
 // >;
 
-// /** @internal */
 // type ArrayAtLeastLenRec<
 //   Num,
 //   Elm,

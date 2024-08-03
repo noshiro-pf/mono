@@ -1,65 +1,80 @@
+import { expectType } from '../../expect-type.mjs';
+import { FiniteNumber } from './finite-number.mjs';
+import { castType, type NumberClass, type ToInt } from './utils.mjs';
+
+type ElementType = NonNegativeFiniteNumber;
+
+const typeName = 'NonNegativeFiniteNumber';
+
+const typeNameInMessage = 'a non-negative finite number';
+
 const MIN_VALUE = 0;
 
-export const isNonNegativeFiniteNumber = (
-  a: number,
-): a is NonNegativeFiniteNumber => Number.isFinite(a) && a >= 0;
+export const isNonNegativeFiniteNumber = (a: number): a is ElementType =>
+  Number.isFinite(a) && a >= 0;
 
-export const toNonNegativeFiniteNumber = (
-  a: number,
-): NonNegativeFiniteNumber => {
-  if (!isNonNegativeFiniteNumber(a)) {
-    throw new TypeError(`Expected non-negative finite number, got: ${a}`);
-  }
-  return a;
-};
+const is = isNonNegativeFiniteNumber;
+
+export const toNonNegativeFiniteNumber = castType<ElementType>(
+  is,
+  typeNameInMessage,
+);
 
 const to = toNonNegativeFiniteNumber;
 
-const clamp = (a: number): NonNegativeFiniteNumber =>
-  to(Math.max(MIN_VALUE, a));
+if (import.meta.vitest !== undefined) {
+  test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: '-1.2', value: -1.2 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => to(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+    );
+  });
+}
 
-const _min = (
-  ...values: readonly NonNegativeFiniteNumber[]
-): NonNegativeFiniteNumber => clamp(Math.min(...values));
+const clamp = (a: number): ElementType => to(Math.max(MIN_VALUE, a));
 
-const _max = (
-  ...values: readonly NonNegativeFiniteNumber[]
-): NonNegativeFiniteNumber => clamp(Math.max(...values));
+const _min = (...values: readonly ElementType[]): ElementType =>
+  clamp(Math.min(...values));
 
-const pow = (
-  x: NonNegativeFiniteNumber,
-  y: NonNegativeFiniteNumber,
-): NonNegativeFiniteNumber => clamp(x ** y);
+const _max = (...values: readonly ElementType[]): ElementType =>
+  clamp(Math.max(...values));
 
-const add = (
-  x: NonNegativeFiniteNumber,
-  y: NonNegativeFiniteNumber,
-): NonNegativeFiniteNumber => clamp(x + y);
+const pow = (x: ElementType, y: ElementType): ElementType => clamp(x ** y);
 
-const sub = (
-  x: NonNegativeFiniteNumber,
-  y: NonNegativeFiniteNumber,
-): NonNegativeFiniteNumber => clamp(x - y);
+const add = (x: ElementType, y: ElementType): ElementType => clamp(x + y);
 
-const mul = (
-  x: NonNegativeFiniteNumber,
-  y: NonNegativeFiniteNumber,
-): NonNegativeFiniteNumber => clamp(x * y);
+const sub = (x: ElementType, y: ElementType): ElementType => clamp(x - y);
 
-const div = (
-  x: NonNegativeFiniteNumber,
-  y: PositiveFiniteNumber,
-): NonNegativeFiniteNumber => clamp(x / y);
+const mul = (x: ElementType, y: ElementType): ElementType => clamp(x * y);
 
-const random = (
-  min: NonNegativeFiniteNumber,
-  max: NonNegativeFiniteNumber,
-): NonNegativeFiniteNumber =>
-  add(min, to((Math.max(max, min) - min + 1) * Math.random()));
+const div = (x: ElementType, y: PositiveFiniteNumber): ElementType =>
+  clamp(x / y);
 
-const floor = (x: NonNegativeFiniteNumber): Uint => Math.floor(x);
-const ceil = (x: NonNegativeFiniteNumber): Uint => Math.ceil(x);
-const round = (x: NonNegativeFiniteNumber): Uint => Math.round(x);
+const random = (min: ElementType, max: ElementType): ElementType =>
+  to(FiniteNumber.random(min, max));
+
+if (import.meta.vitest !== undefined) {
+  test(`${typeName}.random`, () => {
+    const min = -2.3;
+    const max = 4.5;
+    const result = random(to(min), to(max));
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
+  });
+}
+
+const floor = (x: ElementType): ToInt<ElementType> => Math.floor(x);
+const ceil = (x: ElementType): ToInt<ElementType> => Math.ceil(x);
+const round = (x: ElementType): ToInt<ElementType> => Math.round(x);
+
+if (import.meta.vitest !== undefined) {
+  expectType<ToInt<ElementType>, Uint>('=');
+}
 
 export const NonNegativeFiniteNumber = {
   min: _min,
@@ -84,4 +99,4 @@ export const NonNegativeFiniteNumber = {
 
   /** @returns `a / b`, but never less than 0 */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'non-negative'>;

@@ -1,16 +1,19 @@
-type IndexOfTuple<T extends readonly unknown[]> = _IndexOfTupleImpl<T, keyof T>;
+type IndexOfTuple<T extends readonly unknown[]> =
+  TSTypeUtilsInternals.IndexOfTupleImpl<T, keyof T>;
 
 /** @internal */
-type _IndexOfTupleImpl<T extends readonly unknown[], K> =
-  IsFixedLengthList<T> extends true
-    ? K extends keyof T
-      ? K extends `${number}`
-        ? ToNumber<K>
+declare namespace TSTypeUtilsInternals {
+  type IndexOfTupleImpl<T extends readonly unknown[], K> =
+    IsFixedLengthList<T> extends true
+      ? K extends keyof T
+        ? K extends `${number}`
+          ? ToNumber<K>
+          : never
         : never
-      : never
-    : number;
+      : number;
+}
 
-// export type IndexOfTuple<T extends readonly unknown[]> = TypeEq<
+// type IndexOfTuple<T extends readonly unknown[]> = TypeEq<
 //   T,
 //   readonly []
 // > extends true

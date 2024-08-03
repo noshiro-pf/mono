@@ -1,58 +1,93 @@
 import { Num } from '../num.mjs';
+import { Int } from './int.mjs';
+import {
+  castType,
+  type NumberClass,
+  type ToNonZeroIntWithSmallInt,
+} from './utils.mjs';
+
+type ElementType = PositiveInt;
+type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
+
+const typeName = 'PositiveInt';
+
+const typeNameInMessage = 'a positive integer';
 
 const MIN_VALUE = 1;
 
-export const isPositiveInt = (a: number): a is PositiveInt =>
+export const isPositiveInt = (a: number): a is ElementType =>
   Number.isInteger(a) && Num.isNonNegative(a) && Num.isNonZero(a);
 
-export const toPositiveInt = (a: number): PositiveInt => {
-  if (!isPositiveInt(a)) {
-    throw new TypeError(`Expected positive integer, got: ${a}`);
-  }
-  return a;
-};
+const is = isPositiveInt;
+
+export const toPositiveInt = castType<ElementType>(is, typeNameInMessage);
 
 const to = toPositiveInt;
 
-const clamp = (a: number): PositiveInt =>
+if (import.meta.vitest !== undefined) {
+  test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
+    { name: '1.2', value: 1.2 },
+    { name: '-3.4', value: -3.4 },
+    { name: '0', value: 0 },
+    { name: '-1', value: -1 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => to(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+    );
+  });
+}
+
+const clamp = (a: number): ElementType =>
   to(Math.round(Math.max(MIN_VALUE, a)));
 
-const _min = (...values: readonly PositiveIntWithSmallInt[]): PositiveInt =>
+const _min = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.min(...values));
 
-const _max = (...values: readonly PositiveIntWithSmallInt[]): PositiveInt =>
+const _max = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.max(...values));
 
 const pow = (
-  x: PositiveIntWithSmallInt,
-  y: PositiveIntWithSmallInt,
-): PositiveInt => clamp(x ** y);
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x ** y);
 
 const add = (
-  x: PositiveIntWithSmallInt,
-  y: PositiveIntWithSmallInt,
-): PositiveInt => clamp(x + y);
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x + y);
 
 const sub = (
-  x: PositiveIntWithSmallInt,
-  y: PositiveIntWithSmallInt,
-): PositiveInt => clamp(x - y);
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x - y);
 
 const mul = (
-  x: PositiveIntWithSmallInt,
-  y: PositiveIntWithSmallInt,
-): PositiveInt => clamp(x * y);
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x * y);
 
 const div = (
-  x: PositiveIntWithSmallInt,
-  y: PositiveIntWithSmallInt,
-): PositiveInt => clamp(Math.floor(x / y));
+  x: ElementTypeWithSmallInt,
+  y: ToNonZeroIntWithSmallInt<ElementType>,
+): ElementType => clamp(Math.floor(x / y));
 
 const random = (
-  min: PositiveIntWithSmallInt,
-  max: PositiveIntWithSmallInt,
-): PositiveInt =>
-  add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+  min: ElementTypeWithSmallInt,
+  max: ElementTypeWithSmallInt,
+): ElementType => to(Int.random(min, max));
+
+if (import.meta.vitest !== undefined) {
+  test(`${typeName}.random`, () => {
+    const min = 1;
+    const max = 5;
+    const result = random(min, max);
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
+  });
+}
 
 export const PositiveInt = {
   MIN_VALUE,
@@ -77,4 +112,4 @@ export const PositiveInt = {
 
   /** @returns `⌊a / b⌋`, but never less than 1 */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'int' | 'positive'>;

@@ -1,61 +1,86 @@
+import { expectType } from '../../expect-type.mjs';
+import { FiniteNumber } from './finite-number.mjs';
+import {
+  castType,
+  type NumberClass,
+  type RemoveNonZeroKey,
+  type ToInt,
+} from './utils.mjs';
+
+type ElementType = PositiveFiniteNumber;
+
+const typeName = 'PositiveFiniteNumber';
+
+const typeNameInMessage = 'a positive finite number';
+
 const MIN_VALUE = Number.MIN_VALUE;
 
 export const isPositiveFiniteNumber = (a: number): a is PositiveFiniteNumber =>
   Number.isFinite(a) && a > 0;
 
-export const toPositiveFiniteNumber = (a: number): PositiveFiniteNumber => {
-  if (!isPositiveFiniteNumber(a)) {
-    throw new TypeError(`Expected positive finite number, got: ${a}`);
-  }
-  return a;
-};
+const is = isPositiveFiniteNumber;
+
+export const toPositiveFiniteNumber = castType<PositiveFiniteNumber>(
+  is,
+  typeNameInMessage,
+);
 
 const to = toPositiveFiniteNumber;
 
-const clamp = (a: number): PositiveFiniteNumber => to(Math.max(MIN_VALUE, a));
+if (import.meta.vitest !== undefined) {
+  test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
+    { name: '-1.2', value: -1.2 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => to(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+    );
+  });
+}
 
-const _min = (
-  ...values: readonly PositiveFiniteNumber[]
-): PositiveFiniteNumber => clamp(Math.min(...values));
+const clamp = (a: number): ElementType => to(Math.max(MIN_VALUE, a));
 
-const _max = (
-  ...values: readonly PositiveFiniteNumber[]
-): PositiveFiniteNumber => clamp(Math.max(...values));
+const _min = (...values: readonly ElementType[]): ElementType =>
+  clamp(Math.min(...values));
 
-const pow = (
-  x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber,
-): PositiveFiniteNumber => clamp(x ** y);
+const _max = (...values: readonly ElementType[]): ElementType =>
+  clamp(Math.max(...values));
 
-const add = (
-  x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber,
-): PositiveFiniteNumber => clamp(x + y);
+const pow = (x: ElementType, y: ElementType): ElementType => clamp(x ** y);
 
-const sub = (
-  x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber,
-): PositiveFiniteNumber => clamp(x - y);
+const add = (x: ElementType, y: ElementType): ElementType => clamp(x + y);
 
-const mul = (
-  x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber,
-): PositiveFiniteNumber => clamp(x * y);
+const sub = (x: ElementType, y: ElementType): ElementType => clamp(x - y);
 
-const div = (
-  x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber,
-): PositiveFiniteNumber => clamp(x / y);
+const mul = (x: ElementType, y: ElementType): ElementType => clamp(x * y);
 
-const random = (
-  min: PositiveFiniteNumber,
-  max: PositiveFiniteNumber,
-): PositiveFiniteNumber =>
-  add(min, to((Math.max(max, min) - min + 1) * Math.random()));
+const div = (x: ElementType, y: ElementType): ElementType => clamp(x / y);
 
-const floor = (x: PositiveFiniteNumber): Uint => Math.floor(x);
-const ceil = (x: PositiveFiniteNumber): PositiveInt => Math.ceil(x);
-const round = (x: PositiveFiniteNumber): Uint => Math.round(x);
+const random = (min: ElementType, max: ElementType): ElementType =>
+  to(FiniteNumber.random(min, max));
+
+if (import.meta.vitest !== undefined) {
+  test(`${typeName}.random`, () => {
+    const min = 2.3;
+    const max = 4.5;
+    const result = random(to(min), to(max));
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
+  });
+}
+
+const floor = (x: ElementType): RemoveNonZeroKey<ToInt<ElementType>> =>
+  Math.floor(x);
+const ceil = (x: ElementType): ToInt<ElementType> => Math.ceil(x);
+const round = (x: ElementType): RemoveNonZeroKey<ToInt<ElementType>> =>
+  Math.round(x);
+
+if (import.meta.vitest !== undefined) {
+  expectType<ToInt<ElementType>, PositiveInt>('=');
+  expectType<RemoveNonZeroKey<ToInt<ElementType>>, Uint>('=');
+}
 
 export const PositiveFiniteNumber = {
   min: _min,
@@ -80,4 +105,4 @@ export const PositiveFiniteNumber = {
 
   /** @returns `a / b`, but greater than 0 */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'positive'>;

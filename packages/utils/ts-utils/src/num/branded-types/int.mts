@@ -1,35 +1,87 @@
 import { toFiniteNumber } from './finite-number.mjs';
+import {
+  castType,
+  type NumberClass,
+  type ToNonNegative,
+  type ToNonZeroIntWithSmallInt,
+} from './utils.mjs';
 
-export const toInt = (a: number): Int => {
-  if (!Number.isInteger(a)) {
-    throw new TypeError(`Expected integer, got: ${a}`);
-  }
-  return a;
-};
+type ElementType = Int;
+type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
+
+const typeName = 'Int';
+
+const typeNameInMessage = 'an integer';
+
+const is = Number.isInteger;
+
+export const toInt = castType<ElementType>(is, typeNameInMessage);
 
 const to = toInt;
 
-const abs = (x: IntWithSmallInt): Uint => Math.abs(toInt(x));
+if (import.meta.vitest !== undefined) {
+  test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
+    { name: '1.2', value: 1.2 },
+    { name: '-3.4', value: -3.4 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => to(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+    );
+  });
+}
 
-const _min = (...values: readonly IntWithSmallInt[]): Int =>
+const abs = (x: ElementTypeWithSmallInt): ToNonNegative<ElementType> =>
+  Math.abs(to(x));
+
+const _min = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.min(...values));
 
-const _max = (...values: readonly IntWithSmallInt[]): Int =>
+const _max = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.max(...values));
 
-const pow = (x: IntWithSmallInt, y: IntWithSmallInt): Int => to(x ** y);
+const pow = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => to(x ** y);
 
-const add = (x: IntWithSmallInt, y: IntWithSmallInt): Int => to(x + y);
+const add = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => to(x + y);
 
-const sub = (x: IntWithSmallInt, y: IntWithSmallInt): Int => to(x - y);
+const sub = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => to(x - y);
 
-const mul = (x: IntWithSmallInt, y: IntWithSmallInt): Int => to(x * y);
+const mul = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => to(x * y);
 
-const div = (x: IntWithSmallInt, y: NonZeroIntWithSmallInt): Int =>
-  Math.floor(toFiniteNumber(x / y));
+const div = (
+  x: ElementTypeWithSmallInt,
+  y: ToNonZeroIntWithSmallInt<ElementType>,
+): ElementType => Math.floor(toFiniteNumber(x / y));
 
-const random = (min: IntWithSmallInt, max: IntWithSmallInt): Int =>
+const random = (
+  min: ElementTypeWithSmallInt,
+  max: ElementTypeWithSmallInt,
+): ElementType =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+
+if (import.meta.vitest !== undefined) {
+  test(`${typeName}.random`, () => {
+    const min = -5;
+    const max = 5;
+    const result = random(min, max);
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
+  });
+}
 
 export const Int = {
   abs,
@@ -53,4 +105,4 @@ export const Int = {
 
   /** @returns `⌊a / b⌋` */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'int'>;

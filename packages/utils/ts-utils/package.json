@@ -66,10 +66,11 @@
       "packageLocks": []
     },
     "build": {
-      "command": "tsc --project ./configs/tsconfig.build.json",
+      "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript",
       "files": [
         "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
         "./configs/tsconfig.build.json",
+        "./configs/rollup.config.ts",
         "../../../package.json",
         "../../../config/tsconfig/**"
       ],
