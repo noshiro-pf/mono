@@ -25,14 +25,14 @@ export const toInt32 = castType<ElementType>(isInt32, typeNameInMessage);
 const to = toInt32;
 
 if (import.meta.vitest !== undefined) {
-  test.each([{ name: '1.2', value: 1.2 }] as const)(
-    `to${typeName}($name) should throw a TypeError`,
-    ({ value }) => {
-      expect(() => to(value)).toThrow(
-        new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
-      );
-    },
-  );
+  test.each([
+    { name: '1.2', value: 1.2 },
+    { name: '-3.4', value: -3.4 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => to(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+    );
+  });
 }
 
 const _c = Num.clamp(MIN_VALUE, MAX_VALUE);

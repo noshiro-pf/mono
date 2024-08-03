@@ -18,14 +18,14 @@ export const toUint = castType<ElementType>(isUint, typeNameInMessage);
 const to = toUint;
 
 if (import.meta.vitest !== undefined) {
-  test.each([{ name: '1.2', value: 1.2 }] as const)(
-    `to${typeName}($name) should throw a TypeError`,
-    ({ value }) => {
-      expect(() => to(value)).toThrow(
-        new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
-      );
-    },
-  );
+  test.each([
+    { name: '1.2', value: 1.2 },
+    { name: '-3.4', value: -3.4 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => to(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+    );
+  });
 }
 
 const clamp = (a: number): ElementType =>
