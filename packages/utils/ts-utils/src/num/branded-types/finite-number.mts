@@ -55,13 +55,12 @@ const div = (x: ElementType, y: ToNonZero<ElementType>): ElementType =>
   to(Math.floor(x / y));
 
 const random = (min: ElementType, max: ElementType): ElementType =>
-  add(min, to((Math.max(max, min) - min + 1) * Math.random()));
+  add(min, to((Math.max(max, min) - min) * Math.random()));
 
 if (import.meta.vitest !== undefined) {
-  test(`${typeName}.random() should throw a TypeError`, () => {
+  test(`${typeName}.random`, () => {
     const min = -2.3;
     const max = 4.5;
-
     const result = random(to(min), to(max));
     expect(result).toBeGreaterThanOrEqual(min);
     expect(result).toBeLessThanOrEqual(max);

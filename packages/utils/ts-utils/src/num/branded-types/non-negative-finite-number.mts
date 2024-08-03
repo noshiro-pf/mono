@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { FiniteNumber } from './finite-number.mjs';
 import { castType, type NumberClass, type ToInt } from './utils.mjs';
 
 type ElementType = NonNegativeFiniteNumber;
@@ -53,13 +54,15 @@ const div = (x: ElementType, y: PositiveFiniteNumber): ElementType =>
   clamp(x / y);
 
 const random = (min: ElementType, max: ElementType): ElementType =>
-  add(min, to((Math.max(max, min) - min + 1) * Math.random()));
+  to(FiniteNumber.random(min, max));
 
 if (import.meta.vitest !== undefined) {
-  test(`${typeName}.random() should throw a TypeError`, () => {
-    const result = random(to(-2.3), to(4.5));
-    expect(result).toBeGreaterThanOrEqual(-2.3);
-    expect(result).toBeLessThanOrEqual(4.5);
+  test(`${typeName}.random`, () => {
+    const min = -2.3;
+    const max = 4.5;
+    const result = random(to(min), to(max));
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
   });
 }
 

@@ -1,6 +1,6 @@
 import { Num } from '../num.mjs';
 import { toFiniteNumber } from './finite-number.mjs';
-import { Int } from './int.mjs';
+import { NonZeroInt } from './non-zero-int.mjs';
 import {
   castType,
   type NumberClass,
@@ -82,20 +82,16 @@ const div = (
 const random = (
   min: ElementTypeWithSmallInt,
   max: ElementTypeWithSmallInt,
-): ElementType => {
-  let mut_r = 0;
-  while (mut_r === 0) {
-    mut_r = Int.random(min, max);
-  }
-  return to(mut_r);
-};
+): ElementType => to(NonZeroInt.random(min, max));
 
 if (import.meta.vitest !== undefined) {
   test(`${typeName}.random`, () => {
-    const r = random(-5, 5);
-    expect(r).toBeGreaterThanOrEqual(-5);
-    expect(r).toBeLessThanOrEqual(5);
-    expect(r).not.toBe(0);
+    const min = -5;
+    const max = 5;
+    const result = random(min, max);
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
+    expect(result).not.toBe(0);
   });
 }
 

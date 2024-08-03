@@ -1,4 +1,5 @@
 import { Num } from '../num.mjs';
+import { Int } from './int.mjs';
 import {
   castType,
   type NumberClass,
@@ -76,14 +77,15 @@ const div = (
 const random = (
   min: ElementTypeWithSmallInt,
   max: ElementTypeWithSmallInt,
-): ElementType =>
-  add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+): ElementType => to(Int.random(min, max));
 
 if (import.meta.vitest !== undefined) {
   test(`${typeName}.random`, () => {
-    const r = random(0, 5);
-    expect(r).toBeGreaterThanOrEqual(0);
-    expect(r).toBeLessThanOrEqual(5);
+    const min = 0;
+    const max = 5;
+    const result = random(min, max);
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
   });
 }
 

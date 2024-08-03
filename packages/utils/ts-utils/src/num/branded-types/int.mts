@@ -75,9 +75,11 @@ const random = (
 
 if (import.meta.vitest !== undefined) {
   test(`${typeName}.random`, () => {
-    const r = random(-5, 5);
-    expect(r).toBeGreaterThanOrEqual(-5);
-    expect(r).toBeLessThanOrEqual(5);
+    const min = -5;
+    const max = 5;
+    const result = random(min, max);
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
   });
 }
 
