@@ -1,6 +1,7 @@
 import { Num } from '../num.mjs';
 import {
   castType,
+  type NumberClass,
   type ToNonNegative,
   type ToNonZeroIntWithSmallInt,
 } from './utils.mjs';
@@ -90,8 +91,8 @@ if (import.meta.vitest !== undefined) {
 }
 
 export const Int16 = {
-  MIN_VALUE,
-  MAX_VALUE,
+  // MIN_VALUE,
+  // MAX_VALUE,
   abs,
 
   min: _min,
@@ -114,4 +115,7 @@ export const Int16 = {
 
   /** @returns `⌊a / b⌋`, but clamped to `[-2^15, 2^15)` */
   div,
-} as const;
+} as const satisfies NumberClass<
+  ElementType,
+  'has-max-value' | 'has-min-value' | 'int'
+>;

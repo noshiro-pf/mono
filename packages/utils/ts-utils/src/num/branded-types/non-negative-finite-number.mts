@@ -1,5 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
-import { castType, type ToInt } from './utils.mjs';
+import { castType, type NumberClass, type ToInt } from './utils.mjs';
 
 type ElementType = NonNegativeFiniteNumber;
 
@@ -94,4 +94,4 @@ export const NonNegativeFiniteNumber = {
 
   /** @returns `a / b`, but never less than 0 */
   div,
-} as const;
+} as const satisfies NumberClass<ElementType, 'non-negative'>;

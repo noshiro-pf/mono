@@ -1,3 +1,5 @@
+import { expectType } from '@noshiro/mono-scripts';
+
 export const castType =
   <BrandedType extends number>(
     is: (n: number) => n is BrandedType,
@@ -36,21 +38,39 @@ type CastToInt<N> = N extends Int ? N : never;
 
 export type NumberClass<
   N extends UnknownBrand,
-  classes extends 'int' | 'non-negative' | 'none' | 'positive',
+  classes extends
+    | 'has-max-value'
+    | 'has-min-value'
+    | 'int'
+    | 'non-negative'
+    | 'none'
+    | 'positive',
 > = Readonly<
-  (classes extends 'int'
-    ? unknown
-    : classes extends 'positive'
+  (classes extends 'has-max-value'
+    ? {
+        MAX_VALUE: number;
+        clamp: (a: number) => N;
+      }
+    : unknown) &
+    (classes extends 'has-min-value'
       ? {
-          floor: (x: N, y: N) => RemoveNonZeroKey<ToInt<N>>;
-          ceil: (x: N, y: N) => ToInt<N>;
-          round: (x: N, y: N) => RemoveNonZeroKey<ToInt<N>>;
+          MIN_VALUE: number;
+          clamp: (a: number) => N;
         }
-      : {
-          floor: (x: N, y: N) => ToInt<N>;
-          ceil: (x: N, y: N) => ToInt<N>;
-          round: (x: N, y: N) => ToInt<N>;
-        }) &
+      : unknown) &
+    (classes extends 'int'
+      ? unknown
+      : classes extends 'positive'
+        ? {
+            floor: (x: N, y: N) => RemoveNonZeroKey<ToInt<N>>;
+            ceil: (x: N, y: N) => ToInt<N>;
+            round: (x: N, y: N) => RemoveNonZeroKey<ToInt<N>>;
+          }
+        : {
+            floor: (x: N, y: N) => ToInt<N>;
+            ceil: (x: N, y: N) => ToInt<N>;
+            round: (x: N, y: N) => ToInt<N>;
+          }) &
     (classes extends 'non-negative' | 'positive'
       ? unknown
       : {
@@ -66,6 +86,42 @@ export type NumberClass<
       div: (x: N, y: ToNonZero<N>) => N;
     }
 >;
+
+if (import.meta.vitest !== undefined) {
+  type BaseKeys =
+    | 'add'
+    | 'div'
+    | 'max'
+    | 'min'
+    | 'mul'
+    | 'pow'
+    | 'random'
+    | 'sub';
+
+  type FloatMethods = 'ceil' | 'floor' | 'round';
+
+  expectType<keyof NumberClass<UnknownBrand, 'int'>, BaseKeys | 'abs'>('=');
+
+  expectType<
+    keyof NumberClass<UnknownBrand, 'none'>,
+    BaseKeys | FloatMethods | 'abs'
+  >('=');
+
+  expectType<
+    keyof NumberClass<UnknownBrand, 'non-negative'>,
+    BaseKeys | FloatMethods
+  >('=');
+
+  expectType<
+    keyof NumberClass<UnknownBrand, 'positive'>,
+    BaseKeys | FloatMethods
+  >('=');
+
+  expectType<
+    keyof NumberClass<UnknownBrand, 'has-min-value' | 'int'>,
+    BaseKeys | 'abs'
+  >('=');
+}
 
 // type CommonProperties<N extends UnknownBrand> = Readonly<{
 //   min: (...values: readonly N[]) => N;
