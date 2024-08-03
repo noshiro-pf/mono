@@ -10,17 +10,24 @@ type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const typeName = 'Int';
 
-export const toInt = castType<ElementType>(Number.isInteger, 'an integer');
+const typeNameInMessage = 'an integer';
 
-if (import.meta.vitest !== undefined) {
-  test(`to${typeName}(1.2) should throw a TypeError`, () => {
-    expect(() => toInt(1.2)).toThrow(
-      new TypeError('Expected an integer, got: 1.2'),
-    );
-  });
-}
+const is = Number.isInteger;
+
+export const toInt = castType<ElementType>(is, typeNameInMessage);
 
 const to = toInt;
+
+if (import.meta.vitest !== undefined) {
+  test.each([{ name: '1.2', value: 1.2 }] as const)(
+    `to${typeName}($name) should throw a TypeError`,
+    ({ value }) => {
+      expect(() => to(value)).toThrow(
+        new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+      );
+    },
+  );
+}
 
 const abs = (x: ElementTypeWithSmallInt): ToNonNegative<ElementType> =>
   Math.abs(to(x));

@@ -5,25 +5,30 @@ type ElementType = NonZeroFiniteNumber;
 
 const typeName = 'NonZeroFiniteNumber';
 
+const typeNameInMessage = 'a non-zero finite number';
+
 export const isNonZeroFiniteNumber = (a: number): a is ElementType =>
   Number.isFinite(a) && a !== 0;
 
+const is = isNonZeroFiniteNumber;
+
 export const toNonZeroFiniteNumber = castType<ElementType>(
-  isNonZeroFiniteNumber,
-  'a non-zero finite number',
+  is,
+  typeNameInMessage,
 );
+
+const to = toNonZeroFiniteNumber;
 
 if (import.meta.vitest !== undefined) {
   test.each([
     { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: '0', value: 0 },
   ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
-    expect(() => toNonZeroFiniteNumber(value)).toThrow(
-      new TypeError(`Expected a non-zero finite number, got: ${value}`),
+    expect(() => to(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
     );
   });
 }
-
-const to = toNonZeroFiniteNumber;
 
 const abs = (x: ElementType): ToNonNegative<ElementType> => to(Math.abs(x));
 

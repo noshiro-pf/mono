@@ -6,26 +6,28 @@ type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const typeName = 'SafeUint';
 
+const typeNameInMessage = 'a non-negative safe integer';
+
 const MIN_VALUE = 0;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
 
 export const isSafeUint = (a: number): a is ElementType =>
   Number.isSafeInteger(a) && Num.isNonNegative(a);
 
-export const toSafeUint = castType<ElementType>(
-  isSafeUint,
-  'a non-negative safe integer',
-);
-
-if (import.meta.vitest !== undefined) {
-  test(`to${typeName}(1.2) should throw a TypeError`, () => {
-    expect(() => toSafeUint(1.2)).toThrow(
-      new TypeError('Expected a non-negative safe integer, got: 1.2'),
-    );
-  });
-}
+export const toSafeUint = castType<ElementType>(isSafeUint, typeNameInMessage);
 
 const to = toSafeUint;
+
+if (import.meta.vitest !== undefined) {
+  test.each([{ name: '1.2', value: 1.2 }] as const)(
+    `to${typeName}($name) should throw a TypeError`,
+    ({ value }) => {
+      expect(() => to(value)).toThrow(
+        new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+      );
+    },
+  );
+}
 
 const _c = Num.clamp<number>(MIN_VALUE, MAX_VALUE);
 const clamp = (a: number): ElementType => to(Math.round(_c(a)));

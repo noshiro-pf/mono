@@ -5,6 +5,8 @@ type ElementType = NonNegativeFiniteNumber;
 
 const typeName = 'NonNegativeFiniteNumber';
 
+const typeNameInMessage = 'a non-negative finite number';
+
 const MIN_VALUE = 0;
 
 export const isNonNegativeFiniteNumber = (a: number): a is ElementType =>
@@ -12,19 +14,21 @@ export const isNonNegativeFiniteNumber = (a: number): a is ElementType =>
 
 export const toNonNegativeFiniteNumber = castType<ElementType>(
   isNonNegativeFiniteNumber,
-  'a non-negative finite number',
+  typeNameInMessage,
 );
 
+const to = toNonNegativeFiniteNumber;
+
 if (import.meta.vitest !== undefined) {
-  test(`to${typeName}(-1.2) should throw a TypeError`, () => {
-    const value = -1.2;
-    expect(() => toNonNegativeFiniteNumber(value)).toThrow(
-      new TypeError(`Expected a non-negative finite number, got: ${value}`),
+  test.each([
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: '1.2', value: 1.2 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => to(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
     );
   });
 }
-
-const to = toNonNegativeFiniteNumber;
 
 const clamp = (a: number): ElementType => to(Math.max(MIN_VALUE, a));
 

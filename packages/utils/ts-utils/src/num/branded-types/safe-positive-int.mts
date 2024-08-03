@@ -6,6 +6,8 @@ type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const typeName = 'PositiveSafeInt';
 
+const typeNameInMessage = 'a positive safe integer';
+
 const MIN_VALUE = 1;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
 
@@ -14,7 +16,7 @@ export const isPositiveSafeInt = (a: number): a is ElementType =>
 
 export const toPositiveSafeInt = castType<ElementType>(
   isPositiveSafeInt,
-  'a positive safe integer',
+  typeNameInMessage,
 );
 
 if (import.meta.vitest !== undefined) {

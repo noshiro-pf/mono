@@ -6,6 +6,8 @@ type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const typeName = 'Uint16';
 
+const typeNameInMessage = 'a non-negative integer less than 2^16';
+
 const MIN_VALUE = 0;
 const MAX_VALUE = 2 ** 16 - 1;
 
@@ -14,20 +16,20 @@ const isUint16Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 export const isUint16 = (a: number): a is ElementType =>
   Number.isInteger(a) && isUint16Range(a);
 
-export const toUint16 = castType<ElementType>(
-  isUint16,
-  'a non-negative integer less than 2^16',
-);
-
-if (import.meta.vitest !== undefined) {
-  test(`to${typeName}(1.2) should throw a TypeError`, () => {
-    expect(() => toUint16(1.2)).toThrow(
-      new TypeError('Expected a non-negative integer less than 2^16, got: 1.2'),
-    );
-  });
-}
+export const toUint16 = castType<ElementType>(isUint16, typeNameInMessage);
 
 const to = toUint16;
+
+if (import.meta.vitest !== undefined) {
+  test.each([{ name: '1.2', value: 1.2 }] as const)(
+    `to${typeName}($name) should throw a TypeError`,
+    ({ value }) => {
+      expect(() => to(value)).toThrow(
+        new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+      );
+    },
+  );
+}
 
 const _c = Num.clamp(MIN_VALUE, MAX_VALUE);
 const clamp = (a: number): ElementType => to(Math.round(_c(a)));

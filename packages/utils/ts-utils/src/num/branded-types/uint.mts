@@ -6,22 +6,27 @@ type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const typeName = 'Uint';
 
+const typeNameInMessage = 'a non-negative integer';
+
 const MIN_VALUE = 0;
 
 export const isUint = (a: number): a is ElementType =>
   Number.isInteger(a) && Num.isNonNegative(a);
 
-export const toUint = castType<ElementType>(isUint, 'a non-negative integer');
-
-if (import.meta.vitest !== undefined) {
-  test(`to${typeName}(1.2) should throw a TypeError`, () => {
-    expect(() => toUint(1.2)).toThrow(
-      new TypeError('Expected a non-negative integer, got: 1.2'),
-    );
-  });
-}
+export const toUint = castType<ElementType>(isUint, typeNameInMessage);
 
 const to = toUint;
+
+if (import.meta.vitest !== undefined) {
+  test.each([{ name: '1.2', value: 1.2 }] as const)(
+    `to${typeName}($name) should throw a TypeError`,
+    ({ value }) => {
+      expect(() => to(value)).toThrow(
+        new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+      );
+    },
+  );
+}
 
 const clamp = (a: number): ElementType =>
   to(Math.round(Math.max(MIN_VALUE, a)));

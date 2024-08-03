@@ -10,22 +10,23 @@ type ElementType = FiniteNumber;
 
 const typeName = 'FiniteNumber';
 
-export const toFiniteNumber = castType<ElementType>(
-  Number.isFinite,
-  'a finite number',
-);
+const typeNameInMessage = 'a finite number';
+
+const is = Number.isFinite;
+
+export const toFiniteNumber = castType<ElementType>(is, typeNameInMessage);
+
+const to = toFiniteNumber;
 
 if (import.meta.vitest !== undefined) {
   test.each([
     { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
   ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
-    expect(() => toFiniteNumber(value)).toThrow(
-      new TypeError(`Expected a finite number, got: ${value}`),
+    expect(() => to(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
     );
   });
 }
-
-const to = toFiniteNumber;
 
 const abs = (x: ElementType): ToNonNegative<ElementType> => Math.abs(x);
 

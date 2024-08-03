@@ -6,6 +6,8 @@ type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const typeName = 'PositiveInt';
 
+const typeNameInMessage = 'a positive integer';
+
 const MIN_VALUE = 1;
 
 export const isPositiveInt = (a: number): a is ElementType =>
@@ -13,13 +15,13 @@ export const isPositiveInt = (a: number): a is ElementType =>
 
 export const toPositiveInt = castType<ElementType>(
   isPositiveInt,
-  'a positive integer',
+  typeNameInMessage,
 );
 
 if (import.meta.vitest !== undefined) {
   test(`to${typeName}(-1) should throw a TypeError`, () => {
     expect(toPositiveInt(-1)).throws(
-      new TypeError('Expected a positive integer, got: -1'),
+      new TypeError(`Expected ${typeNameInMessage}, got: -1`),
     );
   });
 }

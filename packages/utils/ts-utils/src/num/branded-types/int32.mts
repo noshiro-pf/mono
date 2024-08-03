@@ -10,6 +10,8 @@ type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const typeName = 'Int32';
 
+const typeNameInMessage = 'an integer in [-2^31, 2^31)';
+
 const MIN_VALUE = -(2 ** 31);
 const MAX_VALUE = 2 ** 31 - 1;
 
@@ -18,20 +20,20 @@ const isInt32Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 export const isInt32 = (a: number): a is ElementType =>
   Number.isInteger(a) && isInt32Range(a);
 
-export const toInt32 = castType<ElementType>(
-  isInt32,
-  'an integer in [-2^31, 2^31)',
-);
-
-if (import.meta.vitest !== undefined) {
-  test(`to${typeName}(1.2) should throw a TypeError`, () => {
-    expect(() => toInt32(1.2)).toThrow(
-      new TypeError('Expected an integer in [-2^31, 2^31), got: 1.2'),
-    );
-  });
-}
+export const toInt32 = castType<ElementType>(isInt32, typeNameInMessage);
 
 const to = toInt32;
+
+if (import.meta.vitest !== undefined) {
+  test.each([{ name: '1.2', value: 1.2 }] as const)(
+    `to${typeName}($name) should throw a TypeError`,
+    ({ value }) => {
+      expect(() => to(value)).toThrow(
+        new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+      );
+    },
+  );
+}
 
 const _c = Num.clamp(MIN_VALUE, MAX_VALUE);
 const clamp = (a: number): ElementType => to(Math.round(_c(a)));

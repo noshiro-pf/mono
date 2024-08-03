@@ -6,23 +6,28 @@ type ElementTypeWithSmallInt = WithSmallInt<ElementType>;
 
 const typeName = 'NonZeroInt';
 
+const typeNameInMessage = 'a non-zero integer';
+
 export const isNonZeroInt = (a: number): a is ElementType =>
   Number.isInteger(a) && a !== 0;
 
 export const toNonZeroInt = castType<ElementType>(
   isNonZeroInt,
-  'non-zero integer',
+  typeNameInMessage,
 );
 
+const to = toNonZeroInt;
+
 if (import.meta.vitest !== undefined) {
-  test(`to${typeName}(1.2) should throw a TypeError`, () => {
-    expect(() => toNonZeroInt(1.2)).toThrow(
-      new TypeError('Expected an integer, got: 1.2'),
+  test.each([
+    { name: '1.2', value: 1.2 },
+    { name: '0', value: 0 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => to(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
     );
   });
 }
-
-const to = toNonZeroInt;
 
 const abs = (x: ElementTypeWithSmallInt): ToNonNegative<ElementType> =>
   Math.abs(toNonZeroInt(x));
