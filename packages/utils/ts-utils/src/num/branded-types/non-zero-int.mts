@@ -1,16 +1,20 @@
-import { castType } from './to-type.mjs';
+import { Int } from './int.mjs';
+import { castType } from './utils.mjs';
 
-export const isNonZeroInt = (a: number): a is NonZeroInt =>
+type ElementType = NonZeroInt;
+type ElementTypeWithSmallInt = NonZeroIntWithSmallInt;
+
+export const isNonZeroInt = (a: number): a is ElementType =>
   Number.isInteger(a) && a !== 0;
 
-export const toNonZeroInt = castType<NonZeroInt>(
+export const toNonZeroInt = castType<ElementType>(
   isNonZeroInt,
   'non-zero integer',
 );
 
 if (import.meta.vitest !== undefined) {
   test('toNonZeroInt(1.2) should throw a TypeError', () => {
-    expect(toNonZeroInt(1.2)).throws(
+    expect(() => toNonZeroInt(1.2)).toThrow(
       new TypeError('Expected integer, got: 1.2'),
     );
   });
@@ -18,49 +22,57 @@ if (import.meta.vitest !== undefined) {
 
 const to = toNonZeroInt;
 
-const abs = (x: NonZeroIntWithSmallInt): PositiveInt =>
+const abs = (x: ElementTypeWithSmallInt): PositiveInt =>
   Math.abs(toNonZeroInt(x));
 
-const _min = (...values: readonly NonZeroIntWithSmallInt[]): NonZeroInt =>
+const _min = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.min(...values));
 
-const _max = (...values: readonly NonZeroIntWithSmallInt[]): NonZeroInt =>
+const _max = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.max(...values));
 
 const pow = (
-  x: NonZeroIntWithSmallInt,
-  y: NonZeroIntWithSmallInt,
-): NonZeroInt => to(x ** y);
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => to(x ** y);
 
 const add = (
-  x: NonZeroIntWithSmallInt,
-  y: NonZeroIntWithSmallInt,
-): NonZeroInt => to(x + y);
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => to(x + y);
 
 const sub = (
-  x: NonZeroIntWithSmallInt,
-  y: NonZeroIntWithSmallInt,
-): NonZeroInt => to(x - y);
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => to(x - y);
 
 const mul = (
-  x: NonZeroIntWithSmallInt,
-  y: NonZeroIntWithSmallInt,
-): NonZeroInt => to(x * y);
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => to(x * y);
 
 const div = (
-  x: NonZeroIntWithSmallInt,
+  x: ElementTypeWithSmallInt,
   y: NonZeroIntWithSmallInt,
-): NonZeroInt => Math.floor(to(x / y));
+): ElementType => Math.floor(to(x / y));
 
 const random = (
-  min: NonZeroIntWithSmallInt,
-  max: NonZeroIntWithSmallInt,
-): NonZeroInt =>
-  add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+  min: ElementTypeWithSmallInt,
+  max: ElementTypeWithSmallInt,
+): ElementType => {
+  let mut_r = 0;
+  while (mut_r === 0) {
+    mut_r = Int.random(min, max);
+  }
+  return to(mut_r);
+};
 
 if (import.meta.vitest !== undefined) {
-  test('NonZeroInt.random() should throw a TypeError', () => {
-    expect(random()).throws(new TypeError('Expected integer, got: 1.2'));
+  test('Int.random', () => {
+    const r = random(-3, 2);
+    expect(r).toBeGreaterThanOrEqual(-3);
+    expect(r).toBeLessThanOrEqual(2);
+    expect(r).not.toBe(0);
   });
 }
 
@@ -69,8 +81,6 @@ export const NonZeroInt = {
 
   min: _min,
   max: _max,
-
-  random,
 
   /** @returns `a ** b` */
   pow,

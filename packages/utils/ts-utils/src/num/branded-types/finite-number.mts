@@ -1,4 +1,4 @@
-import { castType } from './to-type.mjs';
+import { castType } from './utils.mjs';
 
 export const toFiniteNumber = castType<FiniteNumber>(
   Number.isFinite,

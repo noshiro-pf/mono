@@ -1,50 +1,77 @@
 import { Num } from '../num.mjs';
-import { castType } from './to-type.mjs';
+import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
+
+type ElementType = SafeUint;
+type ElementTypeWithSmallInt = SafeUintWithSmallInt;
 
 const MIN_VALUE = 0;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
 
-export const isSafeUint = (a: number): a is SafeUint =>
+export const isSafeUint = (a: number): a is ElementType =>
   Number.isSafeInteger(a) && Num.isNonNegative(a);
 
-export const toSafeUint = castType<SafeUint>(
+export const toSafeUint = castType<ElementType>(
   isSafeUint,
   'non-negative safe integer',
 );
 
+if (import.meta.vitest !== undefined) {
+  test('toSafeUint(1.2) should throw a TypeError', () => {
+    expect(() => toSafeUint(1.2)).toThrow(
+      new TypeError('Expected non-negative safe integer, got: 1.2'),
+    );
+  });
+}
+
 const to = toSafeUint;
 
 const _c = Num.clamp<number>(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): SafeUint => to(Math.round(_c(a)));
+const clamp = (a: number): ElementType => to(Math.round(_c(a)));
 
-const _min = (...values: readonly SafeUintWithSmallInt[]): SafeUint =>
+const _min = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.min(...values));
 
-const _max = (...values: readonly SafeUintWithSmallInt[]): SafeUint =>
+const _max = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.max(...values));
 
-const pow = (x: SafeUintWithSmallInt, y: SafeUintWithSmallInt): SafeUint =>
-  clamp(x ** y);
+const pow = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x ** y);
 
-const add = (x: SafeUintWithSmallInt, y: SafeUintWithSmallInt): SafeUint =>
-  clamp(x + y);
+const add = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x + y);
 
-const sub = (x: SafeUintWithSmallInt, y: SafeUintWithSmallInt): SafeUint =>
-  clamp(x - y);
+const sub = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x - y);
 
-const mul = (x: SafeUintWithSmallInt, y: SafeUintWithSmallInt): SafeUint =>
-  clamp(x * y);
+const mul = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x * y);
 
 const div = (
-  x: SafeUintWithSmallInt,
-  y: PositiveSafeIntWithSmallInt,
-): SafeUint => clamp(Math.floor(x / y));
+  x: ElementTypeWithSmallInt,
+  y: ToNonZeroIntWithSmallInt<ElementType>,
+): ElementType => clamp(Math.floor(x / y));
 
 const random = (
-  min: SafeUintWithSmallInt,
-  max: SafeUintWithSmallInt,
-): SafeUint =>
+  min: ElementTypeWithSmallInt,
+  max: ElementTypeWithSmallInt,
+): ElementType =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+
+if (import.meta.vitest !== undefined) {
+  test('SafeUint.random', () => {
+    const r = random(0, 5);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(5);
+  });
+}
 
 export const SafeUint = {
   MIN_VALUE,

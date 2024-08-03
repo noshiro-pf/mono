@@ -1,7 +1,14 @@
 import { toFiniteNumber } from './finite-number.mjs';
-import { castType } from './to-type.mjs';
+import {
+  castType,
+  type ToNonNegative,
+  type ToNonZeroIntWithSmallInt,
+} from './utils.mjs';
 
-export const toInt = castType<Int>(Number.isInteger, 'integer');
+type ElementType = Int;
+type ElementTypeWithSmallInt = IntWithSmallInt;
+
+export const toInt = castType<ElementType>(Number.isInteger, 'integer');
 
 if (import.meta.vitest !== undefined) {
   test('toInt(1.2) should throw a TypeError', () => {
@@ -13,27 +20,53 @@ if (import.meta.vitest !== undefined) {
 
 const to = toInt;
 
-const abs = (x: IntWithSmallInt): Uint => Math.abs(toInt(x));
+const abs = (x: ElementTypeWithSmallInt): ToNonNegative<ElementType> =>
+  Math.abs(to(x));
 
-const _min = (...values: readonly IntWithSmallInt[]): Int =>
+const _min = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.min(...values));
 
-const _max = (...values: readonly IntWithSmallInt[]): Int =>
+const _max = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.max(...values));
 
-const pow = (x: IntWithSmallInt, y: IntWithSmallInt): Int => to(x ** y);
+const pow = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => to(x ** y);
 
-const add = (x: IntWithSmallInt, y: IntWithSmallInt): Int => to(x + y);
+const add = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => to(x + y);
 
-const sub = (x: IntWithSmallInt, y: IntWithSmallInt): Int => to(x - y);
+const sub = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => to(x - y);
 
-const mul = (x: IntWithSmallInt, y: IntWithSmallInt): Int => to(x * y);
+const mul = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => to(x * y);
 
-const div = (x: IntWithSmallInt, y: NonZeroIntWithSmallInt): Int =>
-  Math.floor(toFiniteNumber(x / y));
+const div = (
+  x: ElementTypeWithSmallInt,
+  y: ToNonZeroIntWithSmallInt<ElementType>,
+): ElementType => Math.floor(toFiniteNumber(x / y));
 
-const random = (min: IntWithSmallInt, max: IntWithSmallInt): Int =>
+const random = (
+  min: ElementTypeWithSmallInt,
+  max: ElementTypeWithSmallInt,
+): ElementType =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+
+if (import.meta.vitest !== undefined) {
+  test('Int.random', () => {
+    const r = random(-5, 5);
+    expect(r).toBeGreaterThanOrEqual(-5);
+    expect(r).toBeLessThanOrEqual(5);
+  });
+}
 
 export const Int = {
   abs,

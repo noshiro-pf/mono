@@ -1,5 +1,5 @@
 import { Num } from '../num.mjs';
-import { castType } from './to-type.mjs';
+import { castType } from './utils.mjs';
 
 const MIN_VALUE = 1;
 

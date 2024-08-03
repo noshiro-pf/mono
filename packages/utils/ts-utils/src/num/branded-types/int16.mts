@@ -1,19 +1,29 @@
 import { Num } from '../num.mjs';
-import { castType } from './to-type.mjs';
+import {
+  castType,
+  type ToNonNegative,
+  type ToNonZeroIntWithSmallInt,
+} from './utils.mjs';
+
+type ElementType = Int16;
+type ElementTypeWithSmallInt = Int16WithSmallInt;
 
 const MIN_VALUE = -(2 ** 15);
 const MAX_VALUE = 2 ** 15 - 1;
 
 const isInt16Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 
-export const isInt16 = (a: number): a is Int16 =>
+export const isInt16 = (a: number): a is ElementType =>
   Number.isInteger(a) && isInt16Range(a);
 
-export const toInt16 = castType<Int16>(isInt16, 'integer in [-2^15, 2^15)');
+export const toInt16 = castType<ElementType>(
+  isInt16,
+  'integer in [-2^15, 2^15)',
+);
 
 if (import.meta.vitest !== undefined) {
   test('toInt16(1.2) should throw a TypeError', () => {
-    expect(toInt16(1.2)).throws(
+    expect(() => toInt16(1.2)).toThrow(
       new TypeError('Expected integer in [-2^15, 2^15), got: 1.2'),
     );
   });
@@ -22,33 +32,55 @@ if (import.meta.vitest !== undefined) {
 const to = toInt16;
 
 const _c = Num.clamp(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): Int16 => to(Math.round(_c(a)));
+const clamp = (a: number): ElementType => to(Math.round(_c(a)));
 
-const abs = (x: Int16WithSmallInt): IntersectBrand<Int16, NonNegativeNumber> =>
+const abs = (x: ElementTypeWithSmallInt): ToNonNegative<ElementType> =>
   Math.abs(to(x));
 
-const _min = (...values: readonly Int16WithSmallInt[]): Int16 =>
+const _min = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.min(...values));
 
-const _max = (...values: readonly Int16WithSmallInt[]): Int16 =>
+const _max = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.max(...values));
 
-const pow = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 =>
-  clamp(x ** y);
+const pow = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x ** y);
 
-const add = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x + y);
+const add = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x + y);
 
-const sub = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x - y);
+const sub = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x - y);
 
-const mul = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x * y);
+const mul = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x * y);
 
 const div = (
-  x: Int16WithSmallInt,
-  y: WithSmallInt<IntersectBrand<Int16, NonZeroNumber>>,
-): Int16 => clamp(Math.floor(x / y));
+  x: ElementTypeWithSmallInt,
+  y: ToNonZeroIntWithSmallInt<ElementType>,
+): ElementType => clamp(Math.floor(x / y));
 
-const random = (min: Int16WithSmallInt, max: Int16WithSmallInt): Int16 =>
+const random = (
+  min: ElementTypeWithSmallInt,
+  max: ElementTypeWithSmallInt,
+): ElementType =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+
+if (import.meta.vitest !== undefined) {
+  test('Int16.random', () => {
+    const r = random(-5, 5);
+    expect(r).toBeGreaterThanOrEqual(-5);
+    expect(r).toBeLessThanOrEqual(5);
+  });
+}
 
 export const Int16 = {
   MIN_VALUE,

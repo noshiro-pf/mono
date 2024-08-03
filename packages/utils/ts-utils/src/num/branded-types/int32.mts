@@ -1,46 +1,86 @@
 import { Num } from '../num.mjs';
-import { castType } from './to-type.mjs';
+import {
+  castType,
+  type ToNonNegative,
+  type ToNonZeroIntWithSmallInt,
+} from './utils.mjs';
+
+type ElementType = Int32;
+type ElementTypeWithSmallInt = Int32WithSmallInt;
 
 const MIN_VALUE = -(2 ** 31);
 const MAX_VALUE = 2 ** 31 - 1;
 
 const isInt32Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 
-export const isInt32 = (a: number): a is Int32 =>
+export const isInt32 = (a: number): a is ElementType =>
   Number.isInteger(a) && isInt32Range(a);
 
-export const toInt32 = castType<Int32>(isInt32, 'integer in [-2^31, 2^31)');
+export const toInt32 = castType<ElementType>(
+  isInt32,
+  'integer in [-2^31, 2^31)',
+);
+
+if (import.meta.vitest !== undefined) {
+  test('toInt32(1.2) should throw a TypeError', () => {
+    expect(() => toInt32(1.2)).toThrow(
+      new TypeError('Expected integer in [-2^31, 2^31), got: 1.2'),
+    );
+  });
+}
 
 const to = toInt32;
 
 const _c = Num.clamp(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): Int32 => to(Math.round(_c(a)));
+const clamp = (a: number): ElementType => to(Math.round(_c(a)));
 
-const abs = (x: Int32WithSmallInt): IntersectBrand<Int32, NonNegativeNumber> =>
+const abs = (x: ElementTypeWithSmallInt): ToNonNegative<ElementType> =>
   Math.abs(to(x));
 
-const _min = (...values: readonly Int32WithSmallInt[]): Int32 =>
+const _min = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.min(...values));
 
-const _max = (...values: readonly Int32WithSmallInt[]): Int32 =>
+const _max = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.max(...values));
 
-const pow = (x: Int32WithSmallInt, y: Int32WithSmallInt): Int32 =>
-  clamp(x ** y);
+const pow = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x ** y);
 
-const add = (x: Int32WithSmallInt, y: Int32WithSmallInt): Int32 => clamp(x + y);
+const add = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x + y);
 
-const sub = (x: Int32WithSmallInt, y: Int32WithSmallInt): Int32 => clamp(x - y);
+const sub = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x - y);
 
-const mul = (x: Int32WithSmallInt, y: Int32WithSmallInt): Int32 => clamp(x * y);
+const mul = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x * y);
 
 const div = (
-  x: Int32WithSmallInt,
-  y: WithSmallInt<IntersectBrand<Int32, NonZeroNumber>>,
-): Int32 => clamp(Math.floor(x / y));
+  x: ElementTypeWithSmallInt,
+  y: ToNonZeroIntWithSmallInt<ElementType>,
+): ElementType => clamp(Math.floor(x / y));
 
-const random = (min: Int32WithSmallInt, max: Int32WithSmallInt): Int32 =>
+const random = (
+  min: ElementTypeWithSmallInt,
+  max: ElementTypeWithSmallInt,
+): ElementType =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+
+if (import.meta.vitest !== undefined) {
+  test('Int32.random', () => {
+    const r = random(-5, 5);
+    expect(r).toBeGreaterThanOrEqual(-5);
+    expect(r).toBeLessThanOrEqual(5);
+  });
+}
 
 export const Int32 = {
   MIN_VALUE,

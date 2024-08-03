@@ -9,3 +9,12 @@ export const castType =
     }
     return a;
   };
+export type ToNonZeroIntWithSmallInt<N extends Int> = WithSmallInt<
+  Cast<IntersectBrand<N, NonZeroNumber>>
+>;
+export type ToNonNegative<N extends UnknownBrand> = IntersectBrand<
+  N,
+  NonNegativeNumber
+>;
+
+type Cast<N> = N extends Int ? N : never;

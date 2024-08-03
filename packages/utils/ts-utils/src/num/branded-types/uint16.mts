@@ -1,49 +1,79 @@
 import { Num } from '../num.mjs';
-import { castType } from './to-type.mjs';
+import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
+
+type ElementType = Uint16;
+type ElementTypeWithSmallInt = Uint16WithSmallInt;
 
 const MIN_VALUE = 0;
 const MAX_VALUE = 2 ** 16 - 1;
 
 const isUint16Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 
-export const isUint16 = (a: number): a is Uint16 =>
+export const isUint16 = (a: number): a is ElementType =>
   Number.isInteger(a) && isUint16Range(a);
 
-export const toUint16 = castType<Uint16>(
+export const toUint16 = castType<ElementType>(
   isUint16,
   'non-negative integer less than 2^16',
 );
 
+if (import.meta.vitest !== undefined) {
+  test('toUint16(1.2) should throw a TypeError', () => {
+    expect(() => toUint16(1.2)).toThrow(
+      new TypeError('Expected non-negative integer less than 2^16, got: 1.2'),
+    );
+  });
+}
+
 const to = toUint16;
 
 const _c = Num.clamp(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): Uint16 => to(Math.round(_c(a)));
+const clamp = (a: number): ElementType => to(Math.round(_c(a)));
 
-const _min = (...values: readonly Uint32WithSmallInt[]): Uint16 =>
+const _min = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.min(...values));
 
-const _max = (...values: readonly Uint32WithSmallInt[]): Uint16 =>
+const _max = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.max(...values));
 
-const pow = (x: Uint32WithSmallInt, y: Uint32WithSmallInt): Uint16 =>
-  clamp(x ** y);
+const pow = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x ** y);
 
-const add = (x: Uint32WithSmallInt, y: Uint32WithSmallInt): Uint16 =>
-  clamp(x + y);
+const add = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x + y);
 
-const sub = (x: Uint32WithSmallInt, y: Uint32WithSmallInt): Uint16 =>
-  clamp(x - y);
+const sub = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x - y);
 
-const mul = (x: Uint32WithSmallInt, y: Uint32WithSmallInt): Uint16 =>
-  clamp(x * y);
+const mul = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x * y);
 
 const div = (
-  x: Uint32WithSmallInt,
-  y: WithSmallInt<IntersectBrand<Uint16, NonZeroNumber>>,
-): Uint16 => clamp(Math.floor(x / y));
+  x: ElementTypeWithSmallInt,
+  y: ToNonZeroIntWithSmallInt<ElementType>,
+): ElementType => clamp(Math.floor(x / y));
 
-const random = (min: Uint32WithSmallInt, max: Uint32WithSmallInt): Uint16 =>
+const random = (
+  min: ElementTypeWithSmallInt,
+  max: ElementTypeWithSmallInt,
+): ElementType =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+
+if (import.meta.vitest !== undefined) {
+  test('Uint16.random', () => {
+    const r = random(0, 5);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(5);
+  });
+}
 
 export const Uint16 = {
   MIN_VALUE,

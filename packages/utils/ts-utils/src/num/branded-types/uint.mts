@@ -1,36 +1,73 @@
 import { Num } from '../num.mjs';
-import { castType } from './to-type.mjs';
+import { castType, type ToNonZeroIntWithSmallInt } from './utils.mjs';
+
+type ElementType = Uint;
+type ElementTypeWithSmallInt = UintWithSmallInt;
 
 const MIN_VALUE = 0;
 
-export const isUint = (a: number): a is Uint =>
+export const isUint = (a: number): a is ElementType =>
   Number.isInteger(a) && Num.isNonNegative(a);
 
-export const toUint = castType<Uint>(isUint, 'non-negative integer');
+export const toUint = castType<ElementType>(isUint, 'non-negative integer');
+
+if (import.meta.vitest !== undefined) {
+  test('toUint(1.2) should throw a TypeError', () => {
+    expect(() => toUint(1.2)).toThrow(
+      new TypeError('Expected non-negative integer, got: 1.2'),
+    );
+  });
+}
 
 const to = toUint;
 
-const clamp = (a: number): Uint => to(Math.round(Math.max(MIN_VALUE, a)));
+const clamp = (a: number): ElementType =>
+  to(Math.round(Math.max(MIN_VALUE, a)));
 
-const _min = (...values: readonly UintWithSmallInt[]): Uint =>
+const _min = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.min(...values));
 
-const _max = (...values: readonly UintWithSmallInt[]): Uint =>
+const _max = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
   to(Math.max(...values));
 
-const pow = (x: UintWithSmallInt, y: UintWithSmallInt): Uint => clamp(x ** y);
+const pow = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x ** y);
 
-const add = (x: UintWithSmallInt, y: UintWithSmallInt): Uint => clamp(x + y);
+const add = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x + y);
 
-const sub = (x: UintWithSmallInt, y: UintWithSmallInt): Uint => clamp(x - y);
+const sub = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x - y);
 
-const mul = (x: UintWithSmallInt, y: UintWithSmallInt): Uint => clamp(x * y);
+const mul = (
+  x: ElementTypeWithSmallInt,
+  y: ElementTypeWithSmallInt,
+): ElementType => clamp(x * y);
 
-const div = (x: UintWithSmallInt, y: PositiveIntWithSmallInt): Uint =>
-  clamp(Math.floor(x / y));
+const div = (
+  x: ElementTypeWithSmallInt,
+  y: ToNonZeroIntWithSmallInt<ElementType>,
+): ElementType => clamp(Math.floor(x / y));
 
-const random = (min: UintWithSmallInt, max: UintWithSmallInt): Uint =>
+const random = (
+  min: ElementTypeWithSmallInt,
+  max: ElementTypeWithSmallInt,
+): ElementType =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+
+if (import.meta.vitest !== undefined) {
+  test('Uint.random', () => {
+    const r = random(0, 5);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(5);
+  });
+}
 
 export const Uint = {
   MIN_VALUE,

@@ -1,4 +1,4 @@
-import { castType } from './to-type.mjs';
+import { castType } from './utils.mjs';
 
 export const isNonZeroFiniteNumber = (a: number): a is NonZeroFiniteNumber =>
   Number.isFinite(a) && a !== 0;
