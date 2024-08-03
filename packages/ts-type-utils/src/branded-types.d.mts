@@ -12,7 +12,7 @@ declare namespace TSTypeUtilsInternals {
     | '>=0';
 
   type _Keys =
-    | TSTypeUtilsInternals.IntRangeKeys
+    | IntRangeKeys
     | '!=0'
     | 'Finite'
     | 'Float32'
@@ -24,7 +24,7 @@ declare namespace TSTypeUtilsInternals {
   type BrandedNumberBaseType = Brand<number, never, never>;
 
   type ExtendNumberBrand<
-    B extends TSTypeUtilsInternals.BrandedNumberBaseType,
+    B extends BrandedNumberBaseType,
     T extends RelaxedExclude<_Keys, UnwrapBrandTrueKeys<B>>,
     F extends RelaxedExclude<_Keys, T | UnwrapBrandFalseKeys<B>> = never,
   > = Brand<
@@ -36,14 +36,12 @@ declare namespace TSTypeUtilsInternals {
   type SmallIntIndexMax = 512;
 
   /** Integers in `[1, MaxIndex - 1]` */
-  type SmallPositiveInt<
-    MaxIndex extends number = TSTypeUtilsInternals.SmallIntIndexMax,
-  > = RelaxedExclude<Index<MaxIndex>, 0>;
+  type SmallPositiveInt<MaxIndex extends number = SmallIntIndexMax> =
+    RelaxedExclude<Index<MaxIndex>, 0>;
 
   /** Integers in `[-MaxIndex, -1]` */
-  type SmallNegativeInt<
-    MaxIndex extends number = TSTypeUtilsInternals.SmallIntIndexMax,
-  > = NegativeIndex<MaxIndex>;
+  type SmallNegativeInt<MaxIndex extends number = SmallIntIndexMax> =
+    NegativeIndex<MaxIndex>;
 }
 
 /** Numeric brand type for `NaN` */
