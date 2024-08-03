@@ -230,12 +230,12 @@ const nextState = produce(initialState, (draft) => {
 一応以下のように右辺を `readonly` を除去した型にキャストすればエラーを黙らせることはできますが、記述量も増えてしまう上にいちいちキャストが発生するのも少し気持ち悪い気がします。
 
 ```ts
-type Writable<T> = { -readonly [P in keyof T]: T[P] };
+type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
-const castWritable = <T>(a: T): Writable<T> => a as Writable<T>;
+const castMutable = <T>(a: T): Mutable<T> => a as Mutable<T>;
 
 const nextState = produce(initialState, (draft) => {
-    draft.a = castWritable(initialState.a);
+    draft.a = castMutable(initialState.a);
 });
 ```
 

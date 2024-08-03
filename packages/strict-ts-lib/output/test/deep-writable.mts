@@ -2,7 +2,7 @@
 import { expectType } from './expect-type.mjs';
 
 expectType<
-  DeepWritable<{
+  DeepMutable<{
     readonly a: {
       readonly b: {
         readonly c: [1, 2, 3];
@@ -23,7 +23,7 @@ expectType<
 >('=');
 
 expectType<
-  DeepWritable<{
+  DeepMutable<{
     readonly a: { readonly b: { readonly c: readonly [1, 2, 5] } };
   }>,
   {

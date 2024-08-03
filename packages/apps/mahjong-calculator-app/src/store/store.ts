@@ -146,7 +146,7 @@ export const numRemainingTiles$: InitializedObservable<
   Record<TileName, NumTiles>
 > = combineLatestI([handSorted$, doraIndicators$, revealedBlocks$]).chain(
   mapI(([hand, doraIndicators, revealedBlocks]) => {
-    const mut_counts: Writable<Record<TileName, NumTiles>> = {
+    const mut_counts: Mutable<Record<TileName, NumTiles>> = {
       Manzu1: 4,
       Manzu2: 4,
       Manzu3: 4,

@@ -22,7 +22,7 @@ export const generateInjectDef = async (
     '',
 
     `import { genGlobalImportDefsFromDevDependencies } from '@noshiro/mono-scripts';`,
-    `import { castDeepWritable, tp } from '@noshiro/ts-utils';`,
+    `import { castDeepMutable, tp } from '@noshiro/ts-utils';`,
     `import inject from '@rollup/plugin-inject';`,
     `import packageJson from '../package.json' assert { type: 'json' };`,
     ``,
@@ -32,7 +32,7 @@ export const generateInjectDef = async (
     `  );`,
     ``,
     `  return inject({`,
-    `    modules: castDeepWritable({`,
+    `    modules: castDeepMutable({`,
     `      ...injectionRules,`,
     `      dict: tp('~/constants/dictionary/dictionary', 'dict'),`,
     `    }),`,

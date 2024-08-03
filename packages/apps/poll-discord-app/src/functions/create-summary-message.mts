@@ -13,7 +13,7 @@ export const rpCreateSummaryMessage = (
   new EmbedBuilder()
     .setColor(embedMessageColor)
     .setTitle(`Collected Results for "${poll.title}"`)
-    .addFields(castWritable(rpCreateSummaryFields(poll, userIdToDisplayName)))
+    .addFields(castMutable(rpCreateSummaryFields(poll, userIdToDisplayName)))
     .setFooter({ text: footerText })
     .setTimestamp();
 
@@ -30,7 +30,7 @@ export const gpCreateSummaryMessage = (
 ): EmbedBuilder =>
   new EmbedBuilder()
     .setColor(embedMessageColor)
-    .addFields(castWritable(gpCreateFields(groups)));
+    .addFields(castMutable(gpCreateFields(groups)));
 
 const gpCreateFields = (groups: readonly Group[]): readonly EmbedField[] =>
   groups.map(gpCreateSummaryField);
