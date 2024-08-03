@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@noshiro/ts-utils": "*",
-    "preact": "^10.19.6"
+    "preact": "^10.23.1"
   },
   "devDependencies": {
     "@noshiro/eslint-configs": "*",
