@@ -18,10 +18,9 @@ const MIN_VALUE = 1;
 export const isPositiveInt = (a: number): a is ElementType =>
   Number.isInteger(a) && Num.isNonNegative(a) && Num.isNonZero(a);
 
-export const toPositiveInt = castType<ElementType>(
-  isPositiveInt,
-  typeNameInMessage,
-);
+const is = isPositiveInt;
+
+export const toPositiveInt = castType<ElementType>(is, typeNameInMessage);
 
 const to = toPositiveInt;
 

@@ -21,7 +21,9 @@ const isUint32Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 export const isUint32 = (a: number): a is ElementType =>
   Number.isInteger(a) && isUint32Range(a);
 
-export const toUint32 = castType<ElementType>(isUint32, typeNameInMessage);
+const is = isUint32;
+
+export const toUint32 = castType<ElementType>(is, typeNameInMessage);
 
 const to = toUint32;
 

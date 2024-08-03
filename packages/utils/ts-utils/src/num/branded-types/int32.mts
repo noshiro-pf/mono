@@ -22,7 +22,9 @@ const isInt32Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 export const isInt32 = (a: number): a is ElementType =>
   Number.isInteger(a) && isInt32Range(a);
 
-export const toInt32 = castType<ElementType>(isInt32, typeNameInMessage);
+const is = isInt32;
+
+export const toInt32 = castType<ElementType>(is, typeNameInMessage);
 
 const to = toInt32;
 

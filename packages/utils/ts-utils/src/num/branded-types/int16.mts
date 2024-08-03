@@ -22,7 +22,9 @@ const isInt16Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 export const isInt16 = (a: number): a is ElementType =>
   Number.isInteger(a) && isInt16Range(a);
 
-export const toInt16 = castType<ElementType>(isInt16, typeNameInMessage);
+const is = isInt16;
+
+export const toInt16 = castType<ElementType>(is, typeNameInMessage);
 
 const to = toInt16;
 

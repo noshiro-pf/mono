@@ -13,8 +13,10 @@ const MIN_VALUE = 0;
 export const isNonNegativeFiniteNumber = (a: number): a is ElementType =>
   Number.isFinite(a) && a >= 0;
 
+const is = isNonNegativeFiniteNumber;
+
 export const toNonNegativeFiniteNumber = castType<ElementType>(
-  isNonNegativeFiniteNumber,
+  is,
   typeNameInMessage,
 );
 

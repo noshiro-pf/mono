@@ -16,10 +16,9 @@ const typeNameInMessage = 'a non-zero integer';
 export const isNonZeroInt = (a: number): a is ElementType =>
   Number.isInteger(a) && a !== 0;
 
-export const toNonZeroInt = castType<ElementType>(
-  isNonZeroInt,
-  typeNameInMessage,
-);
+const is = isNonZeroInt;
+
+export const toNonZeroInt = castType<ElementType>(is, typeNameInMessage);
 
 const to = toNonZeroInt;
 

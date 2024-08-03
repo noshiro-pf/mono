@@ -19,10 +19,9 @@ const MAX_VALUE = Number.MAX_SAFE_INTEGER;
 export const isPositiveSafeInt = (a: number): a is ElementType =>
   Number.isSafeInteger(a) && Num.isNonNegative(a) && Num.isNonZero(a);
 
-export const toPositiveSafeInt = castType<ElementType>(
-  isPositiveSafeInt,
-  typeNameInMessage,
-);
+const is = isPositiveSafeInt;
+
+export const toPositiveSafeInt = castType<ElementType>(is, typeNameInMessage);
 
 const to = toPositiveSafeInt;
 

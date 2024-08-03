@@ -18,7 +18,9 @@ const MIN_VALUE = 0;
 export const isUint = (a: number): a is ElementType =>
   Number.isInteger(a) && Num.isNonNegative(a);
 
-export const toUint = castType<ElementType>(isUint, typeNameInMessage);
+const is = isUint;
+
+export const toUint = castType<ElementType>(is, typeNameInMessage);
 
 const to = toUint;
 
