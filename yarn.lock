@@ -14459,10 +14459,10 @@ preact-media-hook@^1.0.3:
   resolved "https://registry.yarnpkg.com/preact-media-hook/-/preact-media-hook-1.0.3.tgz#1e208a90bfae9a351d97415c58e9b3a8d2bfef7c"
   integrity sha512-Vl32i29Hyb5DGg7atJ/Fp4dXhMrgRG9n3/99tRfxH7Wixapgguil0PGnzgXJMOWisPp/VAx6ShlWhXVaTYMITg==
 
-preact@^10.19.6:
-  version "10.19.6"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.19.6.tgz#66007b67aad4d11899f583df1b0116d94a89b8f5"
-  integrity sha512-gympg+T2Z1fG1unB8NH29yHJwnEaCH37Z32diPDku316OTnRPeMbiRV9kTrfZpocXjdfnWuFUl/Mj4BHaf6gnw==
+preact@^10.23.1:
+  version "10.23.1"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-10.23.1.tgz#d400107289bc979881c5212cb5f5cd22cd1dc38c"
+  integrity sha512-O5UdRsNh4vdZaTieWe3XOgSpdMAmkIYBCT3VhQDlKrzyCm8lUYsk0fmVEvoQQifoOjFRTaHZO69ylrzTW2BH+A==
 
 prelude-ls@^1.2.1:
   version "1.2.1"
