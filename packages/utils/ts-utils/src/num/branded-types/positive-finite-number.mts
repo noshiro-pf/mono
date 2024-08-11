@@ -1,65 +1,52 @@
-const MIN_VALUE = Number.MIN_VALUE;
+import { expectType } from '../../expect-type.mjs';
+import { RefinedNumberUtils as U } from '../refined-number-utils.mjs';
 
-export const isPositiveFiniteNumber = (a: number): a is PositiveFiniteNumber =>
-  Number.isFinite(a) && a > 0;
+type ElementType = PositiveFiniteNumber;
+const typeName = 'PositiveFiniteNumber';
+const typeNameInMessage = 'a positive finite number';
 
-export const toPositiveFiniteNumber = (a: number): PositiveFiniteNumber => {
-  if (!isPositiveFiniteNumber(a)) {
-    throw new TypeError(`Expected positive finite number, got: ${a}`);
-  }
-  return a;
-};
-
-const to = toPositiveFiniteNumber;
-
-const clamp = (a: number): PositiveFiniteNumber => to(Math.max(MIN_VALUE, a));
-
-const _min = (
-  ...values: readonly PositiveFiniteNumber[]
-): PositiveFiniteNumber => clamp(Math.min(...values));
-
-const _max = (
-  ...values: readonly PositiveFiniteNumber[]
-): PositiveFiniteNumber => clamp(Math.max(...values));
-
-const pow = (
-  x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber,
-): PositiveFiniteNumber => clamp(x ** y);
-
-const add = (
-  x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber,
-): PositiveFiniteNumber => clamp(x + y);
-
-const sub = (
-  x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber,
-): PositiveFiniteNumber => clamp(x - y);
-
-const mul = (
-  x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber,
-): PositiveFiniteNumber => clamp(x * y);
-
-const div = (
-  x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber,
-): PositiveFiniteNumber => clamp(x / y);
-
-const random = (
-  min: PositiveFiniteNumber,
-  max: PositiveFiniteNumber,
-): PositiveFiniteNumber =>
-  add(min, to((Math.max(max, min) - min + 1) * Math.random()));
-
-const floor = (x: PositiveFiniteNumber): Uint => Math.floor(x);
-const ceil = (x: PositiveFiniteNumber): PositiveInt => Math.ceil(x);
-const round = (x: PositiveFiniteNumber): Uint => Math.round(x);
-
-export const PositiveFiniteNumber = {
+const {
+  MIN_VALUE,
   min: _min,
   max: _max,
+  pow,
+  add,
+  sub,
+  mul,
+  div,
+  random,
+  is,
+  castTo,
+  clamp,
+} = U.operatorsForFloat<ElementType, number, undefined>({
+  MIN_VALUE: Number.MIN_VALUE,
+  MAX_VALUE: undefined,
+  typeNameInMessage,
+} as const);
+
+const floor = (x: ElementType): U.RemoveNonZeroBrandKey<U.ToInt<ElementType>> =>
+  Math.floor(x);
+const ceil = (x: ElementType): U.ToInt<ElementType> => Math.ceil(x);
+const round = (x: ElementType): U.RemoveNonZeroBrandKey<U.ToInt<ElementType>> =>
+  Math.round(x);
+
+if (import.meta.vitest !== undefined) {
+  expectType<U.ToInt<ElementType>, PositiveInt>('=');
+  expectType<U.RemoveNonZeroBrandKey<U.ToInt<ElementType>>, Uint>('=');
+}
+
+export const isPositiveFiniteNumber = is;
+export const toPositiveFiniteNumber = castTo;
+
+export const PositiveFiniteNumber = {
+  is,
+
+  /** `Number.MIN_VALUE` */
+  MIN_VALUE,
+
+  min: _min,
+  max: _max,
+  clamp,
 
   floor,
   ceil,
@@ -81,3 +68,34 @@ export const PositiveFiniteNumber = {
   /** @returns `a / b`, but greater than 0 */
   div,
 } as const;
+
+if (import.meta.vitest !== undefined) {
+  test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
+    { name: '-1.2', value: -1.2 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => castTo(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+    );
+  });
+
+  test(`${typeName}.random`, () => {
+    const min = castTo(2.3);
+    const max = castTo(4.5);
+    const result = random(min, max);
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
+  });
+
+  expectType<
+    keyof typeof PositiveFiniteNumber,
+    keyof U.NumberClass<ElementType, 'positive'>
+  >('=');
+
+  expectType<
+    typeof PositiveFiniteNumber,
+    U.NumberClass<ElementType, 'positive'>
+  >('<=');
+}

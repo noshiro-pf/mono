@@ -1,12 +1,12 @@
 import { expectType } from '../../expect-type.mjs';
 import { RefinedNumberUtils as U } from '../refined-number-utils.mjs';
 
-type ElementType = NonNegativeFiniteNumber;
-const typeName = 'NonNegativeFiniteNumber';
-const typeNameInMessage = 'a non-negative finite number';
+type ElementType = NonZeroFiniteNumber;
+const typeName = 'NonZeroFiniteNumber';
+const typeNameInMessage = 'a non-zero finite number';
 
 const {
-  MIN_VALUE,
+  abs,
   min: _min,
   max: _max,
   pow,
@@ -14,55 +14,55 @@ const {
   sub,
   mul,
   div,
-  random,
+  randomNonZero: random,
   is,
   castTo,
-  clamp,
-} = U.operatorsForFloat<ElementType, 0, undefined>({
-  MIN_VALUE: 0,
+} = U.operatorsForFloat<ElementType, undefined, undefined>({
+  nonZero: true,
+  MIN_VALUE: undefined,
   MAX_VALUE: undefined,
   typeNameInMessage,
 } as const);
 
+// 0 にならないようにする妥当な丸め演算が定義できないので提供しない
 const floor = (x: ElementType): U.ToInt<ElementType> => Math.floor(x);
 const ceil = (x: ElementType): U.ToInt<ElementType> => Math.ceil(x);
 const round = (x: ElementType): U.ToInt<ElementType> => Math.round(x);
 
 if (import.meta.vitest !== undefined) {
-  expectType<U.ToInt<ElementType>, Uint>('=');
+  expectType<U.ToInt<ElementType>, NonZeroInt>('=');
+  expectType<U.RemoveNonZeroBrandKey<U.ToInt<ElementType>>, Int>('=');
 }
 
-export const isNonNegativeFiniteNumber = is;
-export const toNonNegativeFiniteNumber = castTo;
+export const isNonZeroFiniteNumber = is;
+export const toNonZeroFiniteNumber = castTo;
 
-export const NonNegativeFiniteNumber = {
+export const NonZeroFiniteNumber = {
   is,
 
-  /** `0` */
-  MIN_VALUE,
+  abs,
 
   min: _min,
   max: _max,
-  clamp,
 
   floor,
   ceil,
   round,
   random,
 
-  /** @returns `a ** b`, but never less than 0 */
+  /** @returns `a ** b` */
   pow,
 
-  /** @returns `a + b`, but never less than 0 */
+  /** @returns `a + b` */
   add,
 
-  /** @returns `a - b`, but never less than 0 */
+  /** @returns `a - b` */
   sub,
 
-  /** @returns `a * b`, but never less than 0 */
+  /** @returns `a * b` */
   mul,
 
-  /** @returns `a / b`, but never less than 0 */
+  /** @returns `a / b` */
   div,
 } as const;
 
@@ -71,28 +71,29 @@ if (import.meta.vitest !== undefined) {
     { name: 'Number.NaN', value: Number.NaN },
     { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
     { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
-    { name: '-1.2', value: -1.2 },
+    { name: '0', value: 0 },
   ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
     expect(() => castTo(value)).toThrow(
       new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
     );
   });
 
+  expectType<U.ToNonNegative<ElementType>, PositiveFiniteNumber>('=');
+
   test(`${typeName}.random`, () => {
-    const min = castTo(2.3);
+    const min = castTo(-2.3);
     const max = castTo(4.5);
     const result = random(min, max);
     expect(result).toBeGreaterThanOrEqual(min);
     expect(result).toBeLessThanOrEqual(max);
+    expect(result).not.toBe(0);
   });
 
   expectType<
-    keyof typeof NonNegativeFiniteNumber,
-    keyof U.NumberClass<ElementType, 'non-negative'>
+    keyof typeof NonZeroFiniteNumber,
+    keyof U.NumberClass<ElementType, never>
   >('=');
-
-  expectType<
-    typeof NonNegativeFiniteNumber,
-    U.NumberClass<ElementType, 'non-negative'>
-  >('<=');
+  expectType<typeof NonZeroFiniteNumber, U.NumberClass<ElementType, never>>(
+    '<=',
+  );
 }

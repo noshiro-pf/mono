@@ -1,48 +1,66 @@
-import { Num } from '../num.mjs';
+import { expectType } from '../../expect-type.mjs';
+import { RefinedNumberUtils as U } from '../refined-number-utils.mjs';
 
-const MIN_VALUE = -128;
-const MAX_VALUE = 127;
+const typeName = 'Int8';
+const typeNameInMessage = 'an integer in [-128, 127]';
 
-const _r = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
-const isInInt8Range = (a: number): a is Int8 => Number.isInteger(a) && _r(a);
+const {
+  MIN_VALUE,
+  MAX_VALUE,
+  min: minImpl,
+  max: maxImpl,
+  pow: powImpl,
+  add: addImpl,
+  sub: subImpl,
+  mul: mulImpl,
+  div: divImpl,
+  random: randomImpl,
+  is: isImpl,
+  castTo: castToImpl,
+  clamp: clampImpl,
+} = U.operatorsForInteger<Int16, -128, 127>({
+  integerOrSafeInteger: 'SafeInteger',
+  MIN_VALUE: -128,
+  MAX_VALUE: 127,
+  typeNameInMessage,
+} as const);
 
-export const toInt8 = (a: number): Int8 => {
-  if (!isInInt8Range(a)) {
-    throw new TypeError(
-      `Expected integer in [${MIN_VALUE}, ${MAX_VALUE}], got: ${a}`,
-    );
-  }
-  return a;
-};
+const is = (x: number): x is Int8 => isImpl(x);
 
-const to = toInt8;
+const castTo = (x: number): Int8 =>
+  // eslint-disable-next-line no-restricted-syntax
+  castToImpl(x) as Int8;
 
-const _c = Num.clamp<number>(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): Int8 => to(Math.round(_c(a)));
+const clamp = (a: number): Int8 => castTo(clampImpl(a));
 
-type Abs = Index<129>;
+const abs = <N extends Int8>(x: N): AbsoluteValue<N> => Math.abs(x);
 
-const abs = (x: Int8): Abs => Math.abs(x);
+const _min = (...values: readonly Int8[]): Int8 => castTo(minImpl(...values));
 
-const _min = (...values: readonly Int8[]): Int8 => to(Math.min(...values));
+const _max = (...values: readonly Int8[]): Int8 => castTo(maxImpl(...values));
 
-const _max = (...values: readonly Int8[]): Int8 => to(Math.max(...values));
+const pow = (x: Int8, y: Int8): Int8 => castTo(powImpl(x, y));
 
-const pow = (x: Int8, y: Int8): Int8 => clamp(x ** y);
+const add = (x: Int8, y: Int8): Int8 => castTo(addImpl(x, y));
 
-const add = (x: Int8, y: Int8): Int8 => clamp(x + y);
+const sub = (x: Int8, y: Int8): Int8 => castTo(subImpl(x, y));
 
-const sub = (x: Int8, y: Int8): Int8 => clamp(x - y);
+const mul = (x: Int8, y: Int8): Int8 => castTo(mulImpl(x, y));
 
-const mul = (x: Int8, y: Int8): Int8 => clamp(x * y);
+const div = (x: Int8, y: Exclude<Int8, 0>): Int8 => castTo(divImpl(x, y));
 
-const div = (x: Int8, y: Exclude<Int8, 0>): Int8 => clamp(Math.floor(x / y));
+const random = (min: Int8, max: Int8): Int8 => castTo(randomImpl(min, max));
 
-const random = (min: Int8, max: Int8): Int8 =>
-  add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+export const isInt8 = is;
+export const toInt8 = castTo;
 
 export const Int8 = {
+  is,
+
+  /** `-128` */
   MIN_VALUE,
+
+  /** `127` */
   MAX_VALUE,
 
   min: _min,
@@ -67,3 +85,31 @@ export const Int8 = {
   /** @returns `⌊a / b⌋`, but clamped to `[-128, 127]` */
   div,
 } as const;
+
+if (import.meta.vitest !== undefined) {
+  test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
+    { name: '1.2', value: 1.2 },
+    { name: '-3.4', value: -3.4 },
+    { name: '128', value: 128 },
+    { name: '-129', value: -129 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => castTo(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+    );
+  });
+
+  test(`${typeName}.random`, () => {
+    const min = -5;
+    const max = 5;
+    const result = random(min, max);
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
+  });
+
+  expectType<keyof typeof Int8, keyof U.NumberClass<Int16, 'int' | 'range'>>(
+    '=',
+  );
+}

@@ -1,13 +1,14 @@
 import { expectType } from '../../expect-type.mjs';
 import { RefinedNumberUtils as U } from '../refined-number-utils.mjs';
 
-type ElementType = SafeUint;
-const typeName = 'SafeUint';
-const typeNameInMessage = 'a non-negative safe integer';
+type ElementType = NonZeroSafeInt;
+const typeName = 'NonZeroSafeInt';
+const typeNameInMessage = 'a non-zero safe integer';
 
 const {
   MIN_VALUE,
   MAX_VALUE,
+  abs,
   min: _min,
   max: _max,
   pow,
@@ -15,28 +16,31 @@ const {
   sub,
   mul,
   div,
-  random,
+  randomNonZero: random,
   is,
   castTo,
   clamp,
-} = U.operatorsForInteger<ElementType, 0, SafeUint>({
+} = U.operatorsForInteger<ElementType, SafeInt, SafeUint>({
   integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: 0,
+  nonZero: true,
+  MIN_VALUE: Number.MIN_SAFE_INTEGER,
   MAX_VALUE: Number.MAX_SAFE_INTEGER,
   typeNameInMessage,
 } as const);
 
-export const isSafeUint = is;
-export const toSafeUint = castTo;
+export const isNonZeroSafeInt = is;
+export const toNonZeroSafeInt = castTo;
 
-export const SafeUint = {
+export const NonZeroSafeInt = {
   is,
 
-  /** `0` */
+  /** `Number.MIN_SAFE_INTEGER` */
   MIN_VALUE,
 
   /** `Number.MAX_SAFE_INTEGER` */
   MAX_VALUE,
+
+  abs,
 
   min: _min,
   max: _max,
@@ -44,19 +48,19 @@ export const SafeUint = {
 
   random,
 
-  /** @returns `a ** b`, but clamped to `[0, MAX_SAFE_INTEGER]` */
+  /** @returns `a ** b`, but clamped to `[MIN_SAFE_INTEGER, MAX_SAFE_INTEGER]` */
   pow,
 
-  /** @returns `a + b`, but clamped to `[0, MAX_SAFE_INTEGER]` */
+  /** @returns `a + b`, but clamped to `[MIN_SAFE_INTEGER, MAX_SAFE_INTEGER]` */
   add,
 
-  /** @returns `a - b`, but clamped to `[0, MAX_SAFE_INTEGER]` */
+  /** @returns `a - b`, but clamped to `[MIN_SAFE_INTEGER, MAX_SAFE_INTEGER]` */
   sub,
 
-  /** @returns `a * b`, but clamped to `[0, MAX_SAFE_INTEGER]` */
+  /** @returns `a * b`, but clamped to `[MIN_SAFE_INTEGER, MAX_SAFE_INTEGER]` */
   mul,
 
-  /** @returns `⌊a / b⌋`, but clamped to `[0, MAX_SAFE_INTEGER]` */
+  /** @returns `⌊a / b⌋`, but clamped to `[MIN_SAFE_INTEGER, MAX_SAFE_INTEGER]` */
   div,
 } as const;
 
@@ -67,7 +71,7 @@ if (import.meta.vitest !== undefined) {
     { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
     { name: '1.2', value: 1.2 },
     { name: '-3.4', value: -3.4 },
-    { name: '-1', value: -1 },
+    { name: '0', value: 0 },
   ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
     expect(() => castTo(value)).toThrow(
       new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
@@ -75,20 +79,21 @@ if (import.meta.vitest !== undefined) {
   });
 
   test(`${typeName}.random`, () => {
-    const min = 0;
+    const min = -5;
     const max = 5;
     const result = random(min, max);
     expect(result).toBeGreaterThanOrEqual(min);
     expect(result).toBeLessThanOrEqual(max);
+    expect(result).not.toBe(0);
   });
 
   expectType<
-    keyof typeof SafeUint,
-    keyof U.NumberClass<ElementType, 'int' | 'non-negative' | 'range'>
+    keyof typeof NonZeroSafeInt,
+    keyof U.NumberClass<ElementType, 'int' | 'range'>
   >('=');
 
   expectType<
-    typeof SafeUint,
-    U.NumberClass<ElementType, 'int' | 'non-negative' | 'range'>
+    typeof NonZeroSafeInt,
+    U.NumberClass<ElementType, 'int' | 'range'>
   >('<=');
 }

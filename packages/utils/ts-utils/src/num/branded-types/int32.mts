@@ -1,54 +1,44 @@
-import { Num } from '../num.mjs';
+import { expectType } from '../../expect-type.mjs';
+import { RefinedNumberUtils as U } from '../refined-number-utils.mjs';
 
-const MIN_VALUE = -(2 ** 31);
-const MAX_VALUE = 2 ** 31 - 1;
+type ElementType = Int32;
+const typeName = 'Int32';
+const typeNameInMessage = 'an integer in [-2^31, 2^31)';
 
-const isInt32Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
-
-export const isInt32 = (a: number): a is Int32 =>
-  Number.isInteger(a) && isInt32Range(a);
-
-export const toInt32 = (a: number): Int32 => {
-  if (!isInt32(a)) {
-    throw new TypeError(`Expected integer in [-2^31, 2^31), got: ${a}`);
-  }
-  return a;
-};
-
-const to = toInt32;
-
-const _c = Num.clamp(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): Int32 => to(Math.round(_c(a)));
-
-const abs = (x: Int32WithSmallInt): IntersectBrand<Int32, NonNegativeNumber> =>
-  Math.abs(to(x));
-
-const _min = (...values: readonly Int32WithSmallInt[]): Int32 =>
-  to(Math.min(...values));
-
-const _max = (...values: readonly Int32WithSmallInt[]): Int32 =>
-  to(Math.max(...values));
-
-const pow = (x: Int32WithSmallInt, y: Int32WithSmallInt): Int32 =>
-  clamp(x ** y);
-
-const add = (x: Int32WithSmallInt, y: Int32WithSmallInt): Int32 => clamp(x + y);
-
-const sub = (x: Int32WithSmallInt, y: Int32WithSmallInt): Int32 => clamp(x - y);
-
-const mul = (x: Int32WithSmallInt, y: Int32WithSmallInt): Int32 => clamp(x * y);
-
-const div = (
-  x: Int32WithSmallInt,
-  y: WithSmallInt<IntersectBrand<Int32, NonZeroNumber>>,
-): Int32 => clamp(Math.floor(x / y));
-
-const random = (min: Int32WithSmallInt, max: Int32WithSmallInt): Int32 =>
-  add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
-
-export const Int32 = {
+const {
   MIN_VALUE,
   MAX_VALUE,
+  min: _min,
+  max: _max,
+  abs,
+  pow,
+  add,
+  sub,
+  mul,
+  div,
+  random,
+  is,
+  castTo,
+  clamp,
+} = U.operatorsForInteger<ElementType, number, number>({
+  integerOrSafeInteger: 'SafeInteger',
+  MIN_VALUE: -(2 ** 31),
+  MAX_VALUE: 2 ** 31 - 1,
+  typeNameInMessage,
+} as const);
+
+export const isInt32 = is;
+export const toInt32 = castTo;
+
+export const Int32 = {
+  is,
+
+  /** `-2^31` */
+  MIN_VALUE,
+
+  /** `2^31 - 1` */
+  MAX_VALUE,
+
   abs,
 
   min: _min,
@@ -72,3 +62,31 @@ export const Int32 = {
   /** @returns `⌊a / b⌋`, but clamped to `[-2^31, 2^31)` */
   div,
 } as const;
+
+if (import.meta.vitest !== undefined) {
+  test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
+    { name: '1.2', value: 1.2 },
+    { name: '-3.4', value: -3.4 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => castTo(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+    );
+  });
+
+  test(`${typeName}.random`, () => {
+    const min = -5;
+    const max = 5;
+    const result = random(min, max);
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
+  });
+
+  expectType<
+    keyof typeof Int32,
+    keyof U.NumberClass<ElementType, 'int' | 'range'>
+  >('=');
+  expectType<typeof Int32, U.NumberClass<ElementType, 'int' | 'range'>>('<=');
+}

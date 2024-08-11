@@ -1,42 +1,37 @@
-import { Num } from '../num.mjs';
+import { expectType } from '../../expect-type.mjs';
+import { RefinedNumberUtils as U } from '../refined-number-utils.mjs';
 
-const MIN_VALUE = 0;
+type ElementType = Uint;
+const typeName = 'Uint';
+const typeNameInMessage = 'a non-negative integer';
 
-export const isUint = (a: number): a is Uint =>
-  Number.isInteger(a) && Num.isNonNegative(a);
+const {
+  MIN_VALUE,
+  min: _min,
+  max: _max,
+  pow,
+  add,
+  sub,
+  mul,
+  div,
+  random,
+  is,
+  castTo,
+  clamp,
+} = U.operatorsForInteger<ElementType, 0, undefined>({
+  integerOrSafeInteger: 'Integer',
+  MIN_VALUE: 0,
+  MAX_VALUE: undefined,
+  typeNameInMessage,
+} as const);
 
-export const toUint = (a: number): Uint => {
-  if (!isUint(a)) {
-    throw new TypeError(`Expected non-negative integer, got: ${a}`);
-  }
-  return a;
-};
-
-const to = toUint;
-
-const clamp = (a: number): Uint => to(Math.round(Math.max(MIN_VALUE, a)));
-
-const _min = (...values: readonly UintWithSmallInt[]): Uint =>
-  to(Math.min(...values));
-
-const _max = (...values: readonly UintWithSmallInt[]): Uint =>
-  to(Math.max(...values));
-
-const pow = (x: UintWithSmallInt, y: UintWithSmallInt): Uint => clamp(x ** y);
-
-const add = (x: UintWithSmallInt, y: UintWithSmallInt): Uint => clamp(x + y);
-
-const sub = (x: UintWithSmallInt, y: UintWithSmallInt): Uint => clamp(x - y);
-
-const mul = (x: UintWithSmallInt, y: UintWithSmallInt): Uint => clamp(x * y);
-
-const div = (x: UintWithSmallInt, y: PositiveIntWithSmallInt): Uint =>
-  clamp(Math.floor(x / y));
-
-const random = (min: UintWithSmallInt, max: UintWithSmallInt): Uint =>
-  add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+export const isUint = is;
+export const toUint = castTo;
 
 export const Uint = {
+  is,
+
+  /** `0` */
   MIN_VALUE,
 
   min: _min,
@@ -60,3 +55,35 @@ export const Uint = {
   /** @returns `⌊a / b⌋`, but never less than 0 */
   div,
 } as const;
+
+if (import.meta.vitest !== undefined) {
+  test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
+    { name: '1.2', value: 1.2 },
+    { name: '-3.4', value: -3.4 },
+    { name: '-1', value: -1 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => castTo(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+    );
+  });
+
+  test(`${typeName}.random`, () => {
+    const min = 0;
+    const max = 5;
+    const result = random(min, max);
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
+  });
+
+  expectType<
+    keyof typeof Uint,
+    keyof U.NumberClass<ElementType, 'int' | 'non-negative'>
+  >('=');
+
+  expectType<typeof Uint, U.NumberClass<ElementType, 'int' | 'non-negative'>>(
+    '<=',
+  );
+}
