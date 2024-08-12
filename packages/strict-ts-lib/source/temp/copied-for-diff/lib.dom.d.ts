@@ -16684,8 +16684,7 @@ declare var HTMLLabelElement: {
 };
 
 /**
- * The HTMLLegendElement is an interface allowing to access properties of
- * the<legend> elements. It inherits properties and methods from the HTMLElement
+ * The HTMLLegendElement is an interface allowing to access properties of the<legend> elements. It inherits properties and methods from the HTMLElement
  * interface.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLLegendElement)

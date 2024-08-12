@@ -1,6 +1,19 @@
-@@ -14,28 +14,32 @@ and limitations under the License.
- ***************************************************************************** */
- 
+@@ -1,41 +1,30 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
@@ -38,7 +51,7 @@
  }
  
  interface Atomics {
-@@ -45,16 +49,35 @@ interface Atomics {
+@@ -45,16 +34,35 @@ interface Atomics {
     * write operation against the array will block.
     */
    add(
@@ -84,7 +97,7 @@
  
    /**
     * Stores the bitwise AND of a value with the value at the given position in
-@@ -62,16 +85,35 @@ interface Atomics {
+@@ -62,16 +70,35 @@ interface Atomics {
     * completes, any other read or write operation against the array will block.
     */
    and(
@@ -130,7 +143,7 @@
  
    /**
     * Replaces the value at the given position in the array if the original value
-@@ -80,17 +122,41 @@ interface Atomics {
+@@ -80,17 +107,41 @@ interface Atomics {
     * array will block.
     */
    compareExchange(
@@ -183,7 +196,7 @@
  
    /**
     * Replaces the value at the given position in the array, returning the
-@@ -98,39 +164,54 @@ interface Atomics {
+@@ -98,39 +149,54 @@ interface Atomics {
     * write operation against the array will block.
     */
    exchange(
@@ -259,7 +272,7 @@
  
    /**
     * Stores the bitwise OR of a value with the value at the given position in
-@@ -138,16 +219,35 @@ interface Atomics {
+@@ -138,16 +204,35 @@ interface Atomics {
     * completes, any other read or write operation against the array will block.
     */
    or(
@@ -305,7 +318,7 @@
  
    /**
     * Stores a value at the given position in the array, returning the new value.
-@@ -155,16 +255,35 @@ interface Atomics {
+@@ -155,16 +240,35 @@ interface Atomics {
     * against the array will block.
     */
    store(
@@ -351,7 +364,7 @@
  
    /**
     * Subtracts a value from the value at the given position in the array,
-@@ -172,16 +291,35 @@ interface Atomics {
+@@ -172,16 +276,35 @@ interface Atomics {
     * other read or write operation against the array will block.
     */
    sub(
@@ -397,7 +410,7 @@
  
    /**
     * If the value at the given position in the array is equal to the provided
-@@ -191,8 +329,8 @@ interface Atomics {
+@@ -191,8 +314,8 @@ interface Atomics {
     */
    wait(
      typedArray: Int32Array,
@@ -408,7 +421,7 @@
      timeout?: number,
    ): 'ok' | 'not-equal' | 'timed-out';
  
-@@ -205,7 +343,11 @@ interface Atomics {
+@@ -205,7 +328,11 @@ interface Atomics {
     * @param count The number of sleeping agents to notify. Defaults to
     *   +Infinity.
     */
@@ -421,7 +434,7 @@
  
    /**
     * Stores the bitwise XOR of a value with the value at the given position in
-@@ -213,18 +355,37 @@ interface Atomics {
+@@ -213,18 +340,37 @@ interface Atomics {
     * completes, any other read or write operation against the array will block.
     */
    xor(

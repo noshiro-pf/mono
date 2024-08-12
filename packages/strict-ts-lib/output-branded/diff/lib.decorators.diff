@@ -1,12 +1,25 @@
-@@ -14,6 +14,7 @@ and limitations under the License.
- ***************************************************************************** */
- 
+@@ -1,19 +1,5 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
  /** The decorator context types provided to class element decorators. */
  type ClassMemberDecoratorContext =
-@@ -29,7 +30,7 @@ type DecoratorContext = ClassDecoratorContext | ClassMemberDecoratorContext;
+@@ -29,7 +15,7 @@ type DecoratorContext = ClassDecoratorContext | ClassMemberDecoratorContext;
  type DecoratorMetadataObject = Record<PropertyKey, unknown> & object;
  
  type DecoratorMetadata = typeof globalThis extends {
@@ -15,7 +28,7 @@
  }
    ? DecoratorMetadataObject
    : DecoratorMetadataObject | undefined;
-@@ -40,9 +41,9 @@ type DecoratorMetadata = typeof globalThis extends {
+@@ -40,9 +26,9 @@ type DecoratorMetadata = typeof globalThis extends {
   * @template Class The type of the decorated class associated with this context.
   */
  interface ClassDecoratorContext<
@@ -28,7 +41,7 @@
  > {
    /** The kind of element that was decorated. */
    readonly kind: 'class';
-@@ -83,10 +84,10 @@ interface ClassDecoratorContext<
+@@ -83,10 +69,10 @@ interface ClassDecoratorContext<
   */
  interface ClassMethodDecoratorContext<
    This = unknown,

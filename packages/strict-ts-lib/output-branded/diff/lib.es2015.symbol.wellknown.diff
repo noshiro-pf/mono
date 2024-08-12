@@ -1,6 +1,19 @@
-@@ -14,8 +14,9 @@ and limitations under the License.
- ***************************************************************************** */
- 
+@@ -1,21 +1,7 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
@@ -9,7 +22,7 @@
  
  interface SymbolConstructor {
    /**
-@@ -95,7 +96,7 @@ interface Array<T> {
+@@ -95,7 +81,7 @@ interface Array<T> {
     * absent when used in a 'with' statement.
     */
    readonly [Symbol.unscopables]: {
@@ -18,7 +31,7 @@
    };
  }
  
-@@ -105,7 +106,7 @@ interface ReadonlyArray<T> {
+@@ -105,7 +91,7 @@ interface ReadonlyArray<T> {
     * absent when used in a 'with' statement.
     */
    readonly [Symbol.unscopables]: {
@@ -27,7 +40,7 @@
    };
  }
  
-@@ -157,7 +158,7 @@ interface Function {
+@@ -157,7 +143,7 @@ interface Function {
     * A constructor function can control which objects are recognized as its
     * instances by 'instanceof' by overriding this method.
     */
@@ -36,7 +49,7 @@
  }
  
  interface GeneratorFunction {
-@@ -204,7 +205,7 @@ interface RegExp {
+@@ -204,7 +190,7 @@ interface RegExp {
     */
    [Symbol.replace](
      string: string,
@@ -45,7 +58,7 @@
    ): string;
  
    /**
-@@ -213,7 +214,7 @@ interface RegExp {
+@@ -213,7 +199,7 @@ interface RegExp {
     *
     * @param string The string to search within.
     */
@@ -54,7 +67,7 @@
  
    /**
     * Returns an array of substrings that were delimited by strings in the
-@@ -227,7 +228,10 @@ interface RegExp {
+@@ -227,7 +213,10 @@ interface RegExp {
     * @param limit If not undefined, the output array is truncated so that it
     *   contains no more than 'limit' elements.
     */
@@ -66,7 +79,7 @@
  }
  
  interface RegExpConstructor {
-@@ -274,10 +278,10 @@ interface String {
+@@ -274,10 +263,10 @@ interface String {
      searchValue: {
        [Symbol.replace](
          string: string,
@@ -79,7 +92,7 @@
    ): string;
  
    /**
-@@ -296,9 +300,11 @@ interface String {
+@@ -296,9 +285,11 @@ interface String {
     *   array.
     */
    split(

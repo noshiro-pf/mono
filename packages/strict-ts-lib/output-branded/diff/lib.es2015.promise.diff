@@ -1,6 +1,19 @@
-@@ -14,10 +14,11 @@ and limitations under the License.
- ***************************************************************************** */
- 
+@@ -1,23 +1,9 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
@@ -11,7 +24,7 @@
  
    /**
     * Creates a new Promise.
-@@ -30,7 +31,7 @@ interface PromiseConstructor {
+@@ -30,7 +16,7 @@ interface PromiseConstructor {
    new <T>(
      executor: (
        resolve: (value: T | PromiseLike<T>) => void,
@@ -20,7 +33,7 @@
      ) => void,
    ): Promise<T>;
  
-@@ -41,7 +42,7 @@ interface PromiseConstructor {
+@@ -41,7 +27,7 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
@@ -29,7 +42,7 @@
      values: T,
    ): Promise<{ -readonly [P in keyof T]: Awaited<T[P]> }>;
  
-@@ -55,7 +56,7 @@ interface PromiseConstructor {
+@@ -55,7 +41,7 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
@@ -38,7 +51,7 @@
      values: T,
    ): Promise<Awaited<T[number]>>;
  
-@@ -68,7 +69,7 @@ interface PromiseConstructor {
+@@ -68,7 +54,7 @@ interface PromiseConstructor {
     * @param reason The reason the promise was rejected.
     * @returns A new rejected Promise.
     */
@@ -47,7 +60,7 @@
  
    /**
     * Creates a new resolved promise.
-@@ -92,4 +93,4 @@ interface PromiseConstructor {
+@@ -92,4 +78,4 @@ interface PromiseConstructor {
    resolve<T>(value: T | PromiseLike<T>): Promise<Awaited<T>>;
  }
  

@@ -1,12 +1,25 @@
-@@ -14,6 +14,7 @@ and limitations under the License.
- ***************************************************************************** */
- 
+@@ -1,19 +1,5 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
  interface Array<T> {
    /**
-@@ -29,12 +30,20 @@ interface Array<T> {
+@@ -29,12 +15,20 @@ interface Array<T> {
     *   instead.
     */
    find<S extends T>(
@@ -31,7 +44,7 @@
    ): T | undefined;
  
    /**
-@@ -50,9 +59,13 @@ interface Array<T> {
+@@ -50,9 +44,13 @@ interface Array<T> {
     *   instead.
     */
    findIndex(
@@ -48,7 +61,7 @@
  
    /**
     * Changes all array elements from `start` to `end` index to a static `value`
-@@ -64,7 +77,11 @@ interface Array<T> {
+@@ -64,7 +62,11 @@ interface Array<T> {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -61,7 +74,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -77,7 +94,11 @@ interface Array<T> {
+@@ -77,7 +79,11 @@ interface Array<T> {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -74,7 +87,7 @@
  }
  
  interface ArrayConstructor {
-@@ -86,7 +107,7 @@ interface ArrayConstructor {
+@@ -86,7 +92,7 @@ interface ArrayConstructor {
     *
     * @param arrayLike An array-like object to convert to an array.
     */
@@ -83,7 +96,7 @@
  
    /**
     * Creates an array from an iterable object.
-@@ -97,16 +118,16 @@ interface ArrayConstructor {
+@@ -97,16 +103,16 @@ interface ArrayConstructor {
     */
    from<T, U>(
      arrayLike: ArrayLike<T>,
@@ -104,7 +117,7 @@
  }
  
  interface DateConstructor {
-@@ -128,7 +149,7 @@ interface Math {
+@@ -128,7 +134,7 @@ interface Math {
     *
     * @param x A numeric expression.
     */
@@ -113,7 +126,7 @@
  
    /**
     * Returns the result of 32-bit multiplication of two numbers.
-@@ -136,7 +157,7 @@ interface Math {
+@@ -136,7 +142,7 @@ interface Math {
     * @param x First number
     * @param y Second number
     */
@@ -122,7 +135,7 @@
  
    /**
     * Returns the sign of the x, indicating whether x is positive, negative or
-@@ -144,7 +165,7 @@ interface Math {
+@@ -144,7 +150,7 @@ interface Math {
     *
     * @param x The numeric expression to test
     */
@@ -131,7 +144,7 @@
  
    /**
     * Returns the base 10 logarithm of a number.
-@@ -181,7 +202,7 @@ interface Math {
+@@ -181,7 +187,7 @@ interface Math {
     *
     * @param x A numeric expression that contains an angle measured in radians.
     */
@@ -140,7 +153,7 @@
  
    /**
     * Returns the hyperbolic sine of a number.
-@@ -202,7 +223,7 @@ interface Math {
+@@ -202,7 +208,7 @@ interface Math {
     *
     * @param x A numeric expression that contains an angle measured in radians.
     */
@@ -149,7 +162,7 @@
  
    /**
     * Returns the inverse hyperbolic sine of a number.
-@@ -227,7 +248,7 @@ interface Math {
+@@ -227,7 +233,7 @@ interface Math {
     *   is +Infinity. If any argument is NaN, the result is NaN. If all arguments
     *   are either +0 or −0, the result is +0.
     */
@@ -158,7 +171,7 @@
  
    /**
     * Returns the integral part of the a numeric expression, x, removing any
-@@ -235,14 +256,14 @@ interface Math {
+@@ -235,14 +241,14 @@ interface Math {
     *
     * @param x A numeric expression.
     */
@@ -175,7 +188,7 @@
  
    /**
     * Returns an implementation-dependent approximation to the cube root of
-@@ -259,7 +280,7 @@ interface NumberConstructor {
+@@ -259,7 +265,7 @@ interface NumberConstructor {
     * value greater than 1 that is representable as a Number value, which is
     * approximately: 2.2204460492503130808472633361816 x 10‍−‍16.
     */
@@ -184,7 +197,7 @@
  
    /**
     * Returns true if passed value is finite. Unlike the global isFinite,
-@@ -268,14 +289,14 @@ interface NumberConstructor {
+@@ -268,14 +274,14 @@ interface NumberConstructor {
     *
     * @param number A numeric value.
     */
@@ -201,7 +214,7 @@
  
    /**
     * Returns a Boolean value that indicates whether a value is the reserved
-@@ -285,35 +306,35 @@ interface NumberConstructor {
+@@ -285,35 +291,35 @@ interface NumberConstructor {
     *
     * @param number A numeric value.
     */
@@ -242,7 +255,7 @@
  
    /**
     * Converts A string to an integer.
-@@ -324,7 +345,7 @@ interface NumberConstructor {
+@@ -324,7 +330,7 @@ interface NumberConstructor {
     *   '0x' are considered hexadecimal. All other strings are considered
     *   decimal.
     */
@@ -251,7 +264,7 @@
  }
  
  interface ObjectConstructor {
-@@ -370,14 +391,14 @@ interface ObjectConstructor {
+@@ -370,14 +376,14 @@ interface ObjectConstructor {
     * @param target The target object to copy to.
     * @param sources One or more source objects from which to copy properties
     */
@@ -268,7 +281,7 @@
  
    /**
     * Returns the names of the enumerable string properties and methods of an
-@@ -387,7 +408,7 @@ interface ObjectConstructor {
+@@ -387,7 +393,7 @@ interface ObjectConstructor {
     *   object that you created or an existing Document Object Model (DOM)
     *   object.
     */
@@ -277,7 +290,7 @@
  
    /**
     * Returns true if the values are the same value, false otherwise.
-@@ -395,7 +416,7 @@ interface ObjectConstructor {
+@@ -395,7 +401,7 @@ interface ObjectConstructor {
     * @param value1 The first value.
     * @param value2 The second value.
     */
@@ -286,7 +299,7 @@
  
    /**
     * Sets the prototype of a specified object o to object proto or null. Returns
-@@ -404,7 +425,7 @@ interface ObjectConstructor {
+@@ -404,7 +410,7 @@ interface ObjectConstructor {
     * @param o The object to change its prototype.
     * @param proto The value of the new prototype or null.
     */
@@ -295,7 +308,7 @@
  }
  
  interface ReadonlyArray<T> {
-@@ -421,12 +442,20 @@ interface ReadonlyArray<T> {
+@@ -421,12 +427,20 @@ interface ReadonlyArray<T> {
     *   instead.
     */
    find<S extends T>(
@@ -320,7 +333,7 @@
    ): T | undefined;
  
    /**
-@@ -442,9 +471,13 @@ interface ReadonlyArray<T> {
+@@ -442,9 +456,13 @@ interface ReadonlyArray<T> {
     *   instead.
     */
    findIndex(
@@ -337,7 +350,7 @@
  }
  
  interface RegExp {
-@@ -490,7 +523,7 @@ interface String {
+@@ -490,7 +508,7 @@ interface String {
     * undefined. If a valid UTF-16 surrogate pair does not begin at pos, the
     * result is the code unit at pos.
     */
@@ -346,7 +359,7 @@
  
    /**
     * Returns true if searchString appears as a substring of the result of
-@@ -501,7 +534,10 @@ interface String {
+@@ -501,7 +519,10 @@ interface String {
     * @param position If position is undefined, 0 is assumed, so as to search all
     *   of the String.
     */
@@ -358,7 +371,7 @@
  
    /**
     * Returns true if the sequence of elements of searchString converted to a
-@@ -509,7 +545,10 @@ interface String {
+@@ -509,7 +530,10 @@ interface String {
     * to a String) starting at endPosition – length(this). Otherwise returns
     * false.
     */
@@ -370,7 +383,7 @@
  
    /**
     * Returns the String value result of normalizing the string into the
-@@ -537,14 +576,17 @@ interface String {
+@@ -537,14 +561,17 @@ interface String {
     *
     * @param count Number of copies to append
     */
@@ -390,7 +403,7 @@
  
    /**
     * Returns an `<a>` HTML anchor element and sets the name attribute to the
-@@ -652,7 +694,7 @@ interface StringConstructor {
+@@ -652,7 +679,7 @@ interface StringConstructor {
     * Return the String value whose elements are, in order, the elements in the
     * List elements. If length is 0, the empty string is returned.
     */
@@ -399,7 +412,7 @@
  
    /**
     * String.raw is usually used as a tag function of a Tagged Template String.
-@@ -666,7 +708,7 @@ interface StringConstructor {
+@@ -666,7 +693,7 @@ interface StringConstructor {
     * @param substitutions A set of substitution values.
     */
    raw(

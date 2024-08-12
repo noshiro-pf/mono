@@ -1,6 +1,19 @@
-@@ -14,15 +14,16 @@ and limitations under the License.
- ***************************************************************************** */
- 
+@@ -1,28 +1,14 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
@@ -17,7 +30,7 @@
  
  interface ITextWriter {
    Write(s: string): void;
-@@ -32,10 +33,10 @@ interface ITextWriter {
+@@ -32,10 +18,10 @@ interface ITextWriter {
  
  interface TextStreamBase {
    /** The column number of the current character position in an input stream. */
@@ -30,7 +43,7 @@
  
    /**
     * Closes a text stream. It is not necessary to close standard streams; they
-@@ -99,70 +100,70 @@ interface TextStreamReader extends TextStreamBase {
+@@ -99,70 +85,70 @@ interface TextStreamReader extends TextStreamBase {
    SkipLine(): void;
  
    /** Indicates whether the stream pointer position is at the end of a line. */
@@ -118,7 +131,7 @@
  
    /**
     * Creates a COM object.
-@@ -171,10 +172,10 @@ declare var WScript: {
+@@ -171,10 +157,10 @@ declare var WScript: {
     * @param strPrefix Function names in the form prefix_event will be bound to
     *   this object's COM events.
     */
@@ -131,7 +144,7 @@
  
    /**
     * Retrieves an existing object with the specified ProgID from memory, or
-@@ -186,7 +187,11 @@ declare var WScript: {
+@@ -186,7 +172,11 @@ declare var WScript: {
     * @param strPrefix Function names in the form prefix_event will be bound to
     *   this object's COM events.
     */
@@ -144,7 +157,7 @@
  
    /**
     * Suspends script execution for a specified length of time, then continues
-@@ -198,10 +203,10 @@ declare var WScript: {
+@@ -198,10 +188,10 @@ declare var WScript: {
  };
  
  /** WSH is an alias for WScript under Windows Script Host */
@@ -157,7 +170,7 @@
    private constructor();
    private SafeArray_typekey: SafeArray<T>;
  }
-@@ -210,7 +215,7 @@ declare class SafeArray<T = any> {
+@@ -210,7 +200,7 @@ declare class SafeArray<T = any> {
   * Allows enumerating over a COM collection, which may not have indexed item
   * access.
   */
@@ -166,7 +179,7 @@
    /**
     * Returns true if the current item is the last one in the collection, or the
     * collection is empty, or the current item is undefined.
-@@ -235,18 +240,18 @@ interface Enumerator<T = any> {
+@@ -235,18 +225,18 @@ interface Enumerator<T = any> {
  }
  
  interface EnumeratorConstructor {
@@ -190,7 +203,7 @@
    /** Returns the number of dimensions (1-based). */
    dimensions(): number;
  
-@@ -254,7 +259,7 @@ interface VBArray<T = any> {
+@@ -254,7 +244,7 @@ interface VBArray<T = any> {
     * Takes an index for each dimension in the array, and returns the item at the
     * corresponding location.
     */
@@ -199,7 +212,7 @@
  
    /**
     * Returns the smallest available index for a given dimension.
-@@ -279,10 +284,10 @@ interface VBArray<T = any> {
+@@ -279,10 +269,10 @@ interface VBArray<T = any> {
  }
  
  interface VBArrayConstructor {
@@ -212,7 +225,7 @@
  
  /** Automation date (VT_DATE) */
  declare class VarDate {
-@@ -295,5 +300,5 @@ interface DateConstructor {
+@@ -295,5 +285,5 @@ interface DateConstructor {
  }
  
  interface Date {

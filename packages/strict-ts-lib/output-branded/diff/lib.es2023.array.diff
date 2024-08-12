@@ -1,12 +1,25 @@
-@@ -14,6 +14,7 @@ and limitations under the License.
- ***************************************************************************** */
- 
+@@ -1,19 +1,5 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
  interface Array<T> {
    /**
-@@ -29,12 +30,20 @@ interface Array<T> {
+@@ -29,12 +15,20 @@ interface Array<T> {
     *   instead.
     */
    findLast<S extends T>(
@@ -31,7 +44,7 @@
    ): T | undefined;
  
    /**
-@@ -50,12 +59,16 @@ interface Array<T> {
+@@ -50,12 +44,16 @@ interface Array<T> {
     *   instead.
     */
    findLastIndex(
@@ -52,7 +65,7 @@
  
    /**
     * Returns a copy of an array with its elements sorted.
-@@ -70,20 +83,24 @@ interface Array<T> {
+@@ -70,20 +68,24 @@ interface Array<T> {
     *   [11, 2, 22, 1].toSorted((a, b) => a - b); // [1, 2, 11, 22]
     *   ```
     */
@@ -82,7 +95,7 @@
  
    /**
     * Copies an array and removes elements while returning the remaining
-@@ -94,7 +111,10 @@ interface Array<T> {
+@@ -94,7 +96,10 @@ interface Array<T> {
     * @param deleteCount The number of elements to remove.
     * @returns A copy of the original array with the remaining elements.
     */
@@ -94,7 +107,7 @@
  
    /**
     * Copies an array, then overwrites the value at the provided index with the
-@@ -106,7 +126,7 @@ interface Array<T> {
+@@ -106,7 +111,7 @@ interface Array<T> {
     * @param value The value to write into the copied array.
     * @returns The copied array with the updated value.
     */
@@ -103,7 +116,7 @@
  }
  
  interface ReadonlyArray<T> {
-@@ -123,12 +143,20 @@ interface ReadonlyArray<T> {
+@@ -123,12 +128,20 @@ interface ReadonlyArray<T> {
     *   instead.
     */
    findLast<S extends T>(
@@ -128,7 +141,7 @@
    ): T | undefined;
  
    /**
-@@ -144,18 +172,19 @@ interface ReadonlyArray<T> {
+@@ -144,18 +157,19 @@ interface ReadonlyArray<T> {
     *   instead.
     */
    findLastIndex(
@@ -157,7 +170,7 @@
     *
     * @param compareFn Function used to determine the order of the elements. It
     *   is expected to return a negative value if the first argument is less than
-@@ -167,7 +196,7 @@ interface ReadonlyArray<T> {
+@@ -167,7 +181,7 @@ interface ReadonlyArray<T> {
     *   [11, 2, 22, 1].toSorted((a, b) => a - b); // [1, 2, 11, 22]
     *   ```
     */
@@ -166,7 +179,7 @@
  
    /**
     * Copies an array and removes elements while, if necessary, inserting new
-@@ -180,7 +209,11 @@ interface ReadonlyArray<T> {
+@@ -180,7 +194,11 @@ interface ReadonlyArray<T> {
     *   deleted elements.
     * @returns A copy of the original array with the remaining elements.
     */
@@ -179,7 +192,7 @@
  
    /**
     * Copies an array and removes elements while returning the remaining
-@@ -191,7 +224,10 @@ interface ReadonlyArray<T> {
+@@ -191,7 +209,10 @@ interface ReadonlyArray<T> {
     * @param deleteCount The number of elements to remove.
     * @returns A copy of the original array with the remaining elements.
     */
@@ -191,7 +204,7 @@
  
    /**
     * Copies an array, then overwrites the value at the provided index with the
-@@ -200,10 +236,10 @@ interface ReadonlyArray<T> {
+@@ -200,10 +221,10 @@ interface ReadonlyArray<T> {
     *
     * @param index The index of the value to overwrite. If the index is negative,
     *   then it replaces from the end of the array.
@@ -205,7 +218,7 @@
  }
  
  interface Int8Array {
-@@ -219,14 +255,22 @@ interface Int8Array {
+@@ -219,14 +240,22 @@ interface Int8Array {
     *   invocation of predicate. If it is not provided, undefined is used
     *   instead.
     */
@@ -234,7 +247,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true,
-@@ -241,15 +285,19 @@ interface Int8Array {
+@@ -241,15 +270,19 @@ interface Int8Array {
     *   instead.
     */
    findLastIndex(
@@ -260,7 +273,7 @@
     *
     * @param compareFn Function used to determine the order of the elements. It
     *   is expected to return a negative value if the first argument is less than
-@@ -257,21 +305,23 @@ interface Int8Array {
+@@ -257,21 +290,23 @@ interface Int8Array {
     *   otherwise. If omitted, the elements are sorted in ascending order.
     *
     *   ```ts
@@ -291,7 +304,7 @@
  }
  
  interface Uint8Array {
-@@ -287,14 +337,22 @@ interface Uint8Array {
+@@ -287,14 +322,22 @@ interface Uint8Array {
     *   invocation of predicate. If it is not provided, undefined is used
     *   instead.
     */
@@ -320,7 +333,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true,
-@@ -309,15 +367,19 @@ interface Uint8Array {
+@@ -309,15 +352,19 @@ interface Uint8Array {
     *   instead.
     */
    findLastIndex(
@@ -345,7 +358,7 @@
     *
     * @param compareFn Function used to determine the order of the elements. It
     *   is expected to return a negative value if the first argument is less than
-@@ -329,17 +391,19 @@ interface Uint8Array {
+@@ -329,17 +376,19 @@ interface Uint8Array {
     *   myNums.toSorted((a, b) => a - b); // Uint8Array(4) [1, 2, 11, 22]
     *   ```
     */
@@ -370,7 +383,7 @@
  }
  
  interface Uint8ClampedArray {
-@@ -355,22 +419,22 @@ interface Uint8ClampedArray {
+@@ -355,22 +404,22 @@ interface Uint8ClampedArray {
     *   invocation of predicate. If it is not provided, undefined is used
     *   instead.
     */
@@ -402,7 +415,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true,
-@@ -386,18 +450,18 @@ interface Uint8ClampedArray {
+@@ -386,18 +435,18 @@ interface Uint8ClampedArray {
     */
    findLastIndex(
      predicate: (
@@ -428,7 +441,7 @@
     *
     * @param compareFn Function used to determine the order of the elements. It
     *   is expected to return a negative value if the first argument is less than
-@@ -409,17 +473,19 @@ interface Uint8ClampedArray {
+@@ -409,17 +458,19 @@ interface Uint8ClampedArray {
     *   myNums.toSorted((a, b) => a - b); // Uint8ClampedArray(4) [1, 2, 11, 22]
     *   ```
     */
@@ -453,7 +466,7 @@
  }
  
  interface Int16Array {
-@@ -435,14 +501,22 @@ interface Int16Array {
+@@ -435,14 +486,22 @@ interface Int16Array {
     *   invocation of predicate. If it is not provided, undefined is used
     *   instead.
     */
@@ -482,7 +495,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true,
-@@ -457,15 +531,19 @@ interface Int16Array {
+@@ -457,15 +516,19 @@ interface Int16Array {
     *   instead.
     */
    findLastIndex(
@@ -507,7 +520,7 @@
     *
     * @param compareFn Function used to determine the order of the elements. It
     *   is expected to return a negative value if the first argument is less than
-@@ -477,17 +555,19 @@ interface Int16Array {
+@@ -477,17 +540,19 @@ interface Int16Array {
     *   myNums.toSorted((a, b) => a - b); // Int16Array(4) [-22, 1, 2, 11]
     *   ```
     */
@@ -532,7 +545,7 @@
  }
  
  interface Uint16Array {
-@@ -503,14 +583,22 @@ interface Uint16Array {
+@@ -503,14 +568,22 @@ interface Uint16Array {
     *   invocation of predicate. If it is not provided, undefined is used
     *   instead.
     */
@@ -561,7 +574,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true,
-@@ -525,15 +613,19 @@ interface Uint16Array {
+@@ -525,15 +598,19 @@ interface Uint16Array {
     *   instead.
     */
    findLastIndex(
@@ -586,7 +599,7 @@
     *
     * @param compareFn Function used to determine the order of the elements. It
     *   is expected to return a negative value if the first argument is less than
-@@ -545,17 +637,19 @@ interface Uint16Array {
+@@ -545,17 +622,19 @@ interface Uint16Array {
     *   myNums.toSorted((a, b) => a - b); // Uint16Array(4) [1, 2, 11, 22]
     *   ```
     */
@@ -611,7 +624,7 @@
  }
  
  interface Int32Array {
-@@ -571,14 +665,22 @@ interface Int32Array {
+@@ -571,14 +650,22 @@ interface Int32Array {
     *   invocation of predicate. If it is not provided, undefined is used
     *   instead.
     */
@@ -640,7 +653,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true,
-@@ -593,15 +695,19 @@ interface Int32Array {
+@@ -593,15 +680,19 @@ interface Int32Array {
     *   instead.
     */
    findLastIndex(
@@ -665,7 +678,7 @@
     *
     * @param compareFn Function used to determine the order of the elements. It
     *   is expected to return a negative value if the first argument is less than
-@@ -613,17 +719,19 @@ interface Int32Array {
+@@ -613,17 +704,19 @@ interface Int32Array {
     *   myNums.toSorted((a, b) => a - b); // Int32Array(4) [-22, 1, 2, 11]
     *   ```
     */
@@ -690,7 +703,7 @@
  }
  
  interface Uint32Array {
-@@ -639,14 +747,22 @@ interface Uint32Array {
+@@ -639,14 +732,22 @@ interface Uint32Array {
     *   invocation of predicate. If it is not provided, undefined is used
     *   instead.
     */
@@ -719,7 +732,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true,
-@@ -661,15 +777,19 @@ interface Uint32Array {
+@@ -661,15 +762,19 @@ interface Uint32Array {
     *   instead.
     */
    findLastIndex(
@@ -744,7 +757,7 @@
     *
     * @param compareFn Function used to determine the order of the elements. It
     *   is expected to return a negative value if the first argument is less than
-@@ -681,17 +801,19 @@ interface Uint32Array {
+@@ -681,17 +786,19 @@ interface Uint32Array {
     *   myNums.toSorted((a, b) => a - b); // Uint32Array(4) [1, 2, 11, 22]
     *   ```
     */
@@ -769,7 +782,7 @@
  }
  
  interface Float32Array {
-@@ -707,18 +829,22 @@ interface Float32Array {
+@@ -707,18 +814,22 @@ interface Float32Array {
     *   invocation of predicate. If it is not provided, undefined is used
     *   instead.
     */
@@ -799,7 +812,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true,
-@@ -733,15 +859,19 @@ interface Float32Array {
+@@ -733,15 +844,19 @@ interface Float32Array {
     *   instead.
     */
    findLastIndex(
@@ -824,7 +837,7 @@
     *
     * @param compareFn Function used to determine the order of the elements. It
     *   is expected to return a negative value if the first argument is less than
-@@ -753,17 +883,19 @@ interface Float32Array {
+@@ -753,17 +868,19 @@ interface Float32Array {
     *   myNums.toSorted((a, b) => a - b); // Float32Array(4) [-22.5, 1, 2, 11.5]
     *   ```
     */
@@ -849,7 +862,7 @@
  }
  
  interface Float64Array {
-@@ -779,18 +911,22 @@ interface Float64Array {
+@@ -779,18 +896,22 @@ interface Float64Array {
     *   invocation of predicate. If it is not provided, undefined is used
     *   instead.
     */
@@ -879,7 +892,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true,
-@@ -805,15 +941,19 @@ interface Float64Array {
+@@ -805,15 +926,19 @@ interface Float64Array {
     *   instead.
     */
    findLastIndex(
@@ -904,7 +917,7 @@
     *
     * @param compareFn Function used to determine the order of the elements. It
     *   is expected to return a negative value if the first argument is less than
-@@ -825,17 +965,19 @@ interface Float64Array {
+@@ -825,17 +950,19 @@ interface Float64Array {
     *   myNums.toSorted((a, b) => a - b); // Float64Array(4) [-22.5, 1, 2, 11.5]
     *   ```
     */
@@ -929,7 +942,7 @@
  }
  
  interface BigInt64Array {
-@@ -851,18 +993,22 @@ interface BigInt64Array {
+@@ -851,18 +978,22 @@ interface BigInt64Array {
     *   invocation of predicate. If it is not provided, undefined is used
     *   instead.
     */
@@ -959,7 +972,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true,
-@@ -877,15 +1023,19 @@ interface BigInt64Array {
+@@ -877,15 +1008,19 @@ interface BigInt64Array {
     *   instead.
     */
    findLastIndex(
@@ -984,7 +997,7 @@
     *
     * @param compareFn Function used to determine the order of the elements. It
     *   is expected to return a negative value if the first argument is less than
-@@ -897,17 +1047,19 @@ interface BigInt64Array {
+@@ -897,17 +1032,19 @@ interface BigInt64Array {
     *   myNums.toSorted((a, b) => Number(a - b)); // BigInt64Array(4) [-22n, 1n, 2n, 11n]
     *   ```
     */
@@ -1009,7 +1022,7 @@
  }
  
  interface BigUint64Array {
-@@ -923,18 +1075,22 @@ interface BigUint64Array {
+@@ -923,18 +1060,22 @@ interface BigUint64Array {
     *   invocation of predicate. If it is not provided, undefined is used
     *   instead.
     */
@@ -1039,7 +1052,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true,
-@@ -949,15 +1105,19 @@ interface BigUint64Array {
+@@ -949,15 +1090,19 @@ interface BigUint64Array {
     *   instead.
     */
    findLastIndex(
@@ -1064,7 +1077,7 @@
     *
     * @param compareFn Function used to determine the order of the elements. It
     *   is expected to return a negative value if the first argument is less than
-@@ -969,15 +1129,17 @@ interface BigUint64Array {
+@@ -969,15 +1114,17 @@ interface BigUint64Array {
     *   myNums.toSorted((a, b) => Number(a - b)); // BigUint64Array(4) [1n, 2n, 11n, 22n]
     *   ```
     */

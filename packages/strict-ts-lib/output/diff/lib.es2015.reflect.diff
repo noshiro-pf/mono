@@ -1,12 +1,25 @@
-@@ -14,6 +14,7 @@ and limitations under the License.
- ***************************************************************************** */
- 
+@@ -1,19 +1,5 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
  declare namespace Reflect {
    /**
-@@ -25,16 +26,16 @@ declare namespace Reflect {
+@@ -25,16 +11,16 @@ declare namespace Reflect {
     * @param argumentsList An array of argument values to be passed to the
     *   function.
     */
@@ -27,7 +40,7 @@
  
    /**
     * Constructs the target with the elements of specified array as the arguments
-@@ -45,16 +46,16 @@ declare namespace Reflect {
+@@ -45,16 +31,16 @@ declare namespace Reflect {
     *   constructor.
     * @param newTarget The constructor to be used as the `new.target` object.
     */
@@ -48,7 +61,7 @@
  
    /**
     * Adds a property to an object, or modifies attributes of an existing
-@@ -70,7 +71,7 @@ declare namespace Reflect {
+@@ -70,7 +56,7 @@ declare namespace Reflect {
    function defineProperty(
      target: object,
      propertyKey: PropertyKey,
@@ -57,7 +70,7 @@
    ): boolean;
  
    /**
-@@ -97,7 +98,7 @@ declare namespace Reflect {
+@@ -97,7 +83,7 @@ declare namespace Reflect {
      target: T,
      propertyKey: P,
      receiver?: unknown,
@@ -66,7 +79,7 @@
  
    /**
     * Gets the own property descriptor of the specified object. An own property
-@@ -110,7 +111,7 @@ declare namespace Reflect {
+@@ -110,7 +96,7 @@ declare namespace Reflect {
    function getOwnPropertyDescriptor<T extends object, P extends PropertyKey>(
      target: T,
      propertyKey: P,
@@ -75,7 +88,7 @@
  
    /**
     * Returns the prototype of an object.
-@@ -166,14 +167,14 @@ declare namespace Reflect {
+@@ -166,14 +152,14 @@ declare namespace Reflect {
    function set<T extends object, P extends PropertyKey>(
      target: T,
      propertyKey: P,

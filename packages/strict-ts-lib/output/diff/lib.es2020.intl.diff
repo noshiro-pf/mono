@@ -1,6 +1,19 @@
-@@ -14,8 +14,9 @@ and limitations under the License.
- ***************************************************************************** */
- 
+@@ -1,21 +1,7 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
@@ -9,7 +22,7 @@
  declare namespace Intl {
    /**
     * A string that is a valid [Unicode BCP 47 Locale
-@@ -115,11 +116,11 @@ declare namespace Intl {
+@@ -115,11 +101,11 @@ declare namespace Intl {
       * see [Intl
       * page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation).
       */
@@ -24,7 +37,7 @@
    }
  
    /**
-@@ -129,10 +130,10 @@ declare namespace Intl {
+@@ -129,10 +115,10 @@ declare namespace Intl {
     * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/resolvedOptions#Description).
     */
    interface ResolvedRelativeTimeFormatOptions {
@@ -39,7 +52,7 @@
    }
  
    /**
-@@ -143,13 +144,13 @@ declare namespace Intl {
+@@ -143,13 +129,13 @@ declare namespace Intl {
     */
    type RelativeTimeFormatPart =
      | {
@@ -58,7 +71,7 @@
        };
  
    interface RelativeTimeFormat {
-@@ -267,38 +268,43 @@ declare namespace Intl {
+@@ -267,38 +253,43 @@ declare namespace Intl {
    };
  
    interface NumberFormatOptions {
@@ -122,7 +135,7 @@
    }
  
    type LocaleHourCycleKey = 'h12' | 'h23' | 'h11' | 'h24';
-@@ -306,44 +312,44 @@ declare namespace Intl {
+@@ -306,44 +297,44 @@ declare namespace Intl {
  
    interface LocaleOptions {
      /** A string containing the language, and the script and region if available. */
@@ -179,7 +192,7 @@
      /**
       * Gets the most likely values for the language, script, and region of the
       * locale based on existing values.
-@@ -396,19 +402,19 @@ declare namespace Intl {
+@@ -396,19 +387,19 @@ declare namespace Intl {
    type DisplayNamesLanguageDisplay = 'dialect' | 'standard';
  
    interface DisplayNamesOptions {
@@ -209,7 +222,7 @@
    }
  
    interface DisplayNames {
-@@ -459,7 +465,7 @@ declare namespace Intl {
+@@ -459,7 +450,7 @@ declare namespace Intl {
     * [Compatibility](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames#browser_compatibility).
     */
    const DisplayNames: {
@@ -218,7 +231,7 @@
  
      /**
       * @param locales A string with a BCP 47 language tag, or an array of such
-@@ -492,7 +498,7 @@ declare namespace Intl {
+@@ -492,7 +483,7 @@ declare namespace Intl {
       */
      supportedLocalesOf(
        locales?: LocalesArgument,
@@ -227,7 +240,7 @@
      ): UnicodeBCP47LocaleIdentifier[];
    };
  
-@@ -538,7 +544,7 @@ declare namespace Intl {
+@@ -538,7 +529,7 @@ declare namespace Intl {
  
      supportedLocalesOf(
        locales: LocalesArgument,

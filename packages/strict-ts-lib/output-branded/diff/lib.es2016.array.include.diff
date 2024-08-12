@@ -1,12 +1,25 @@
-@@ -14,6 +14,7 @@ and limitations under the License.
- ***************************************************************************** */
- 
+@@ -1,19 +1,5 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
  interface Array<T> {
    /**
-@@ -24,7 +25,10 @@ interface Array<T> {
+@@ -24,7 +10,10 @@ interface Array<T> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -18,7 +31,7 @@
  }
  
  interface ReadonlyArray<T> {
-@@ -36,7 +40,10 @@ interface ReadonlyArray<T> {
+@@ -36,7 +25,10 @@ interface ReadonlyArray<T> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -30,7 +43,7 @@
  }
  
  interface Int8Array {
-@@ -48,7 +55,10 @@ interface Int8Array {
+@@ -48,7 +40,10 @@ interface Int8Array {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -42,7 +55,7 @@
  }
  
  interface Uint8Array {
-@@ -60,7 +70,10 @@ interface Uint8Array {
+@@ -60,7 +55,10 @@ interface Uint8Array {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -54,7 +67,7 @@
  }
  
  interface Uint8ClampedArray {
-@@ -72,7 +85,10 @@ interface Uint8ClampedArray {
+@@ -72,7 +70,10 @@ interface Uint8ClampedArray {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -66,7 +79,7 @@
  }
  
  interface Int16Array {
-@@ -84,7 +100,10 @@ interface Int16Array {
+@@ -84,7 +85,10 @@ interface Int16Array {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -78,7 +91,7 @@
  }
  
  interface Uint16Array {
-@@ -96,7 +115,10 @@ interface Uint16Array {
+@@ -96,7 +100,10 @@ interface Uint16Array {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -90,7 +103,7 @@
  }
  
  interface Int32Array {
-@@ -108,7 +130,10 @@ interface Int32Array {
+@@ -108,7 +115,10 @@ interface Int32Array {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -102,7 +115,7 @@
  }
  
  interface Uint32Array {
-@@ -120,7 +145,10 @@ interface Uint32Array {
+@@ -120,7 +130,10 @@ interface Uint32Array {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -114,7 +127,7 @@
  }
  
  interface Float32Array {
-@@ -132,7 +160,10 @@ interface Float32Array {
+@@ -132,7 +145,10 @@ interface Float32Array {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -126,7 +139,7 @@
  }
  
  interface Float64Array {
-@@ -144,5 +175,8 @@ interface Float64Array {
+@@ -144,5 +160,8 @@ interface Float64Array {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
