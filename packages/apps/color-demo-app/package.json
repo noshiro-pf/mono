@@ -97,7 +97,7 @@
   "wireit": {
     "type-check:src": {
       "dependencies": [
-        "z:setup"
+        "z:setup:gen-global-dts"
       ],
       "command": "tsc --noEmit"
     },
