@@ -4,14 +4,14 @@ export const toCapitalCase = (str: string): string =>
     .replace(/^./u, (x) => x[0]?.toUpperCase() ?? str);
 
 export const deepCopy = <T,>(obj: T): T =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, unicorn/prefer-structured-clone
   JSON.parse(JSON.stringify(obj)) as T;
 
 export const deepReplace = <T,>(obj: T, from: string, to: string): T => {
   const s = JSON.stringify(obj);
   const r = s.replaceAll(from, to);
   const parsed = JSON.parse(r);
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return parsed as T;
 };
 

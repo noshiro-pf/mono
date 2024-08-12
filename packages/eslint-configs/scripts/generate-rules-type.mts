@@ -157,7 +157,7 @@ const createResult = async (
       if (schema.length > 0) {
         mut_resultToWrite.push(...rawSchemaToString(rawSchema));
       }
-      mut_resultToWrite.push('  export type RuleEntry = "off";');
+      mut_resultToWrite.push('  export type RuleEntry = 0;');
     } else {
       switch (schema.length) {
         case 0:
@@ -174,7 +174,7 @@ const createResult = async (
 
           /* e.g. "export type Options = { ... };" */
           const optionsType = await compile(
-            // eslint-disable-next-line no-restricted-syntax
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             sc as JSONSchema4,
             'Options',
             compilerConfig,
@@ -197,8 +197,12 @@ const createResult = async (
           /* e.g. "export type Options = { ... };" */
           const optionsTypeList: readonly string[] = await Promise.all(
             schema.map((s, index) =>
-              // eslint-disable-next-line no-restricted-syntax
-              compile(s as JSONSchema4, `Options${index}`, compilerConfig),
+              compile(
+                // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+                s as JSONSchema4,
+                `Options${index}`,
+                compilerConfig,
+              ),
             ),
           ).catch((error) => {
             throw new Error(toStr(error));

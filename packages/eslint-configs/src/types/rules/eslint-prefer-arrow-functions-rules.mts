@@ -60,10 +60,10 @@ namespace PreferArrowFunctions {
     | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
-export type PreferArrowFunctionRules = {
+export type EslintPreferArrowFunctionRules = {
   readonly 'prefer-arrow-functions/prefer-arrow-functions': PreferArrowFunctions.RuleEntry;
 };
 
-export type PreferArrowFunctionRulesOption = {
+export type EslintPreferArrowFunctionRulesOption = {
   readonly 'prefer-arrow-functions/prefer-arrow-functions': PreferArrowFunctions.Options;
 };

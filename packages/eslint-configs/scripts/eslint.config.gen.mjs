@@ -29,10 +29,8 @@ const config = [
       reportUnusedDisableDirectives: true,
     },
     plugins: {
-      // @ts-expect-error
       '@typescript-eslint': typescriptEslintPlugin,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      // @ts-expect-error
       functional,
     },
   },

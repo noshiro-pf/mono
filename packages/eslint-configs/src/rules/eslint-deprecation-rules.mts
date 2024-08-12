@@ -1,4 +1,4 @@
-import { type EslintDeprecationRules } from '../types/rules/eslint-deprecation-rules.mjs';
+import { type EslintDeprecationRules } from '../types/index.mjs';
 
 export const eslintDeprecationRules: EslintDeprecationRules = {
   'deprecation/deprecation': 'error',

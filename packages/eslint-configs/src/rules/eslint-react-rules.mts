@@ -1,4 +1,4 @@
-import { type EslintReactRules } from '../types/rules/eslint-react-rules.mjs';
+import { type EslintReactRules } from '../types/index.mjs';
 
 export const eslintReactRules: EslintReactRules = {
   /**
@@ -41,9 +41,12 @@ export const eslintReactRules: EslintReactRules = {
   ], // modified
   'react/hook-use-state': 'off', // disabled
   'react/iframe-missing-sandbox': 'error',
-  'react/jsx-boolean-value': ['error', 'always'], // disabled
+  'react/jsx-boolean-value': ['error', 'always'],
   'react/jsx-curly-brace-presence': 'off', // disabled
+
+  /** ファイル名の統一 */
   'react/jsx-filename-extension': ['error', { extensions: ['.tsx'] }], // modified
+
   'react/jsx-fragments': 'error',
   'react/jsx-handler-names': 'off', // disabled
   'react/jsx-key': 'error',
@@ -75,8 +78,12 @@ export const eslintReactRules: EslintReactRules = {
     'error',
     { callbacksLast: true, reservedFirst: true },
   ], // modified
+
   'react/jsx-uses-react': 'off', // disabled
+
+  /** ファイル名の統一 */
   'react/jsx-uses-vars': 'error',
+
   'react/no-access-state-in-setstate': 'error',
   'react/no-adjacent-inline-elements': 'error',
   'react/no-array-index-key': 'error', // modified
@@ -100,7 +107,10 @@ export const eslintReactRules: EslintReactRules = {
   'react/no-this-in-sfc': 'error',
   'react/no-typos': 'error',
   'react/no-unescaped-entities': 'error',
+
+  // @emotion/react の css prop を使用するため
   'react/no-unknown-property': ['error', { ignore: ['css'] }],
+
   'react/no-unsafe': 'error',
   'react/no-object-type-as-default-prop': 'error',
   'react/no-unstable-nested-components': 'error',
@@ -137,6 +147,6 @@ export const eslintReactRules: EslintReactRules = {
   'react/checked-requires-onchange-or-readonly': 'error',
 
   // deprecated
-  'react/jsx-sort-default-props': 'off',
-  'react/jsx-space-before-closing': 'off',
+  'react/jsx-sort-default-props': 0,
+  'react/jsx-space-before-closing': 0,
 };

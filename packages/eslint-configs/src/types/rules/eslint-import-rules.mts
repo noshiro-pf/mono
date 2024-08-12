@@ -2090,7 +2090,7 @@ namespace ImportsFirst {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 export type EslintImportsRules = {

@@ -5,13 +5,14 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
   T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
 
 /**
- * Prevent assigning return values of cy calls
+ * Disallow assigning return values of `cy` calls
  *
- * @link https://on.cypress.io/best-practices#Assigning-Return-Values
+ * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-assigning-return-values.md
  *
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | type        | problem         |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -21,13 +22,14 @@ namespace NoAssigningReturnValues {
 }
 
 /**
- * Actions should be in the end of chains, not in the middle
+ * Disallow actions within chains
  *
- * @link https://docs.cypress.io/guides/core-concepts/retry-ability#Actions-should-be-at-the-end-of-chains-not-the-middle
+ * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/unsafe-to-chain-command.md
  *
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | type        | problem         |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -40,7 +42,7 @@ namespace UnsafeToChainCommand {
    * [
    *   {
    *     "title": "rules",
-   *     "description": "Actions should be in the end of chains, not in the middle",
+   *     "description": "disallow actions within chains",
    *     "type": "object",
    *     "properties": {
    *       "methods": {
@@ -53,7 +55,7 @@ namespace UnsafeToChainCommand {
    * ]
    * ```
    */
-  /** Actions should be in the end of chains, not in the middle */
+  /** Disallow actions within chains */
   export type Options = {
     /** An additional list of methods to check for unsafe chaining. */
     readonly methods?: readonly unknown[];
@@ -66,13 +68,14 @@ namespace UnsafeToChainCommand {
 }
 
 /**
- * Prevent waiting for arbitrary time periods
+ * Disallow waiting for arbitrary time periods
  *
- * @link https://on.cypress.io/best-practices#Unnecessary-Waiting
+ * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-unnecessary-waiting.md
  *
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | type        | problem         |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -82,44 +85,65 @@ namespace NoUnnecessaryWaiting {
 }
 
 /**
- * Prevent using async/await in Cypress test cases
+ * Disallow using `async`/`await` in Cypress `before` methods
  *
- * ```md
- * | key         | value           |
- * | :---------- | :-------------- |
- * | category    | Possible Errors |
- * | recommended | true            |
- * ```
+ * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-async-before.md
+ *
+ *  ```md
+ *  | key         | value           |
+ *  | :---------- | :-------------- |
+ *  | type        | problem         |
+ *  | category    | Possible Errors |
+ *  | recommended | true            |
+ *  ```
+ */
+namespace NoAsyncBefore {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
+ * Disallow using `async`/`await` in Cypress test cases
+ *
+ * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-async-tests.md
+ *
+ *  ```md
+ *  | key         | value           |
+ *  | :---------- | :-------------- |
+ *  | type        | problem         |
+ *  | category    | Possible Errors |
+ *  | recommended | true            |
+ *  ```
  */
 namespace NoAsyncTests {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * Assert on the page state before taking a screenshot, so the screenshot is
- * consistent
+ * Require screenshots to be preceded by an assertion
  *
- * ```md
- * | key         | value           |
- * | :---------- | :-------------- |
- * | category    | Possible Errors |
- * | recommended | false           |
- * ```
+ * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/assertion-before-screenshot.md
+ *
+ *  ```md
+ *  | key         | value           |
+ *  | :---------- | :-------------- |
+ *  | type        | problem         |
+ *  | category    | Possible Errors |
+ *  | recommended | false           |
+ *  ```
  */
 namespace AssertionBeforeScreenshot {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * Use data-* attributes to provide context to your selectors and insulate them
- * from CSS or JS changes
- * https://docs.cypress.io/guides/references/best-practices.html#Selecting-Elements
+ * Require `data-*` attribute selectors
  *
- * @link https://docs.cypress.io/guides/references/best-practices.html#Selecting-Elements
+ * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/require-data-selectors.md
  *
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | type        | suggestion      |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -129,30 +153,53 @@ namespace RequireDataSelectors {
 }
 
 /**
- * Disallow using of 'force: true' option for click and type calls
+ * Disallow using `force: true` with action commands
  *
- * ```md
- * | key         | value           |
- * | :---------- | :-------------- |
- * | category    | Possible Errors |
- * | recommended | false           |
- * ```
+ * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-force.md
+ *
+ *  ```md
+ *  | key         | value           |
+ *  | :---------- | :-------------- |
+ *  | type        | suggestion      |
+ *  | category    | Possible Errors |
+ *  | recommended | false           |
+ *  ```
  */
 namespace NoForce {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * Disallow using of 'cy.pause' calls
+ * Disallow using `cy.pause()` calls
  *
- * ```md
- * | key         | value           |
- * | :---------- | :-------------- |
- * | category    | Possible Errors |
- * | recommended | false           |
- * ```
+ * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-pause.md
+ *
+ *  ```md
+ *  | key         | value           |
+ *  | :---------- | :-------------- |
+ *  | type        | suggestion      |
+ *  | category    | Possible Errors |
+ *  | recommended | false           |
+ *  ```
  */
 namespace NoPause {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
+ * Disallow using `cy.debug()` calls
+ *
+ * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-debug.md
+ *
+ *  ```md
+ *  | key         | value           |
+ *  | :---------- | :-------------- |
+ *  | type        | suggestion      |
+ *  | category    | Possible Errors |
+ *  | recommended | false           |
+ *  ```
+ */
+namespace NoDebug {
   export type RuleEntry = Linter.RuleLevel;
 }
 
@@ -160,11 +207,13 @@ export type EslintCypressRules = {
   readonly 'cypress/no-assigning-return-values': NoAssigningReturnValues.RuleEntry;
   readonly 'cypress/unsafe-to-chain-command': UnsafeToChainCommand.RuleEntry;
   readonly 'cypress/no-unnecessary-waiting': NoUnnecessaryWaiting.RuleEntry;
+  readonly 'cypress/no-async-before': NoAsyncBefore.RuleEntry;
   readonly 'cypress/no-async-tests': NoAsyncTests.RuleEntry;
   readonly 'cypress/assertion-before-screenshot': AssertionBeforeScreenshot.RuleEntry;
   readonly 'cypress/require-data-selectors': RequireDataSelectors.RuleEntry;
   readonly 'cypress/no-force': NoForce.RuleEntry;
   readonly 'cypress/no-pause': NoPause.RuleEntry;
+  readonly 'cypress/no-debug': NoDebug.RuleEntry;
 };
 
 export type EslintCypressRulesOption = {

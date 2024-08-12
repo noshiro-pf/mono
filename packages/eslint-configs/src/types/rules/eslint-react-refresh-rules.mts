@@ -42,10 +42,10 @@ namespace OnlyExportComponents {
     | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
-export type EslintReactRefresh = {
+export type EslintReactRefreshRules = {
   readonly 'react-refresh/only-export-components': OnlyExportComponents.RuleEntry;
 };
 
-export type EslintReactRefreshOption = {
+export type EslintReactRefreshRulesOption = {
   readonly 'react-refresh/only-export-components': OnlyExportComponents.Options;
 };

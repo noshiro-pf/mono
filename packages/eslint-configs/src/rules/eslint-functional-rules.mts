@@ -1,8 +1,7 @@
-import { type EslintFunctionalRules } from '../types/rules/eslint-functional-rules.mjs';
 import {
-  type ImmutableDataOptions,
-  type NoLetOptions,
-} from '../types/types.mjs';
+  type EslintFunctionalRules,
+  type EslintFunctionalRulesOption,
+} from '../types/index.mjs';
 
 export const ignorePattern = [
   '^draft', // allow immer.js draft object
@@ -11,17 +10,20 @@ export const ignorePattern = [
   '^#mut_',
 ];
 
-export const immutableDataOptions: ImmutableDataOptions = {
-  ignoreClasses: true,
-  ignoreImmediateMutation: true,
-  ignoreIdentifierPattern: ignorePattern,
-  ignoreNonConstDeclarations: false,
-  ignoreAccessorPattern: [
-    '**.current.**', // allow React Ref object
-  ],
-};
+export const immutableDataOptions: EslintFunctionalRulesOption['functional/immutable-data'] =
+  {
+    ignoreClasses: true,
+    ignoreImmediateMutation: true,
+    ignoreIdentifierPattern: [...ignorePattern, 'window.location.href'],
+    ignoreNonConstDeclarations: false,
+    ignoreAccessorPattern: [
+      '**.current.**', // allow React Ref object
+      '**.displayName', // allow React component displayName
+      '**.scrollTop', // allow modifying scrollTop
+    ],
+  };
 
-export const noLetOptions: NoLetOptions = {
+export const noLetOptions: EslintFunctionalRulesOption['functional/no-let'] = {
   allowInForLoopInit: false,
   allowInFunctions: false,
   ignoreIdentifierPattern: ignorePattern.filter((p) => p !== '^draft'),
@@ -46,7 +48,6 @@ export const eslintFunctionalRules: EslintFunctionalRules = {
   'functional/no-let': ['error', noLetOptions],
   'functional/prefer-property-signatures': 'error',
   // 'functional/prefer-readonly-type': ['warn', preferReadonlyTypeOptions],
-  'functional/prefer-readonly-type': 'off',
 
   // No Object-Orientation Rules
   'functional/no-classes': 'off',
@@ -132,4 +133,7 @@ export const eslintFunctionalRules: EslintFunctionalRules = {
   //     ignoreInterfaces: false,
   //   },
   // ],
+
+  // deprecated
+  'functional/prefer-readonly-type': 0,
 };

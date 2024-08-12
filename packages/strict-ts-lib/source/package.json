@@ -49,7 +49,11 @@
   },
   "devDependencies": {
     "@noshiro/mono-scripts": "*",
-    "@noshiro/ts-type-utils": "*"
+    "@noshiro/ts-type-utils": "*",
+    "@typescript-eslint/eslint-plugin": "^7.9.0",
+    "@typescript-eslint/parser": "^7.9.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-functional": "^6.5.1"
   },
   "wireit": {
     "z:gen:lib-files": {

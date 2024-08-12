@@ -1,8 +1,9 @@
 import typescriptEslintParser from '@typescript-eslint/parser';
-import { type FlatConfig } from '../types/flat-config.mjs';
+import globals from 'globals';
+import { type FlatConfig } from '../types/index.mjs';
 import { plugins } from './plugins.mjs';
 
-export const eslintConfigForTypeScriptWithoutRules = ({
+export const eslintFlatConfigForTypeScriptWithoutRules = ({
   tsconfigFileName,
   tsconfigRootDir,
 }: Readonly<{
@@ -10,20 +11,7 @@ export const eslintConfigForTypeScriptWithoutRules = ({
   tsconfigRootDir: string;
 }>): readonly FlatConfig[] => [
   {
-    ignores: [
-      'esm',
-      'cjs',
-      'dist',
-      'build',
-      'lib',
-      '.wireit',
-      '*_bs.ts',
-      '*.d.ts',
-      '*.d.mts',
-      '*.d.cts',
-      'eslint.config.js',
-      'eslint.config.*.mjs',
-    ],
+    ignores: ['eslint.config.js', 'eslint.config.*.mjs'],
   },
   {
     languageOptions: {
@@ -41,11 +29,9 @@ export const eslintConfigForTypeScriptWithoutRules = ({
         jsxPragma: null, // for @typescript/eslint-parser
         sourceType: 'module',
       },
-
-      // https://github.com/sindresorhus/globals/blob/main/globals.json
-      // globals: {
-      //   es2021: true,
-      // },
+      globals: {
+        ...globals.es2021,
+      },
     },
     linterOptions: {
       noInlineConfig: false,
@@ -56,14 +42,14 @@ export const eslintConfigForTypeScriptWithoutRules = ({
       'import/parsers': {
         '@typescript-eslint/parser': [
           '.test.ts',
-          '.mts',
-          '.cts',
-          '.ts',
-          '.tsx',
-          '.mjs',
-          '.cjs',
           '.js',
+          '.ts',
+          '.mjs',
+          '.mts',
+          '.cjs',
+          '.cts',
           '.jsx',
+          '.tsx',
         ],
       },
       'import/resolver': {
@@ -76,27 +62,27 @@ export const eslintConfigForTypeScriptWithoutRules = ({
         node: {
           extensions: [
             '.test.ts',
-            '.mts',
-            '.cts',
-            '.ts',
-            '.tsx',
-            '.mjs',
-            '.cjs',
             '.js',
+            '.ts',
+            '.mjs',
+            '.mts',
+            '.cjs',
+            '.cts',
             '.jsx',
+            '.tsx',
           ],
         },
       },
       // copied from default config
       'import/extensions': [
-        '.mts',
-        '.cts',
-        '.ts',
-        '.tsx',
-        '.mjs',
-        '.cjs',
         '.js',
+        '.ts',
+        '.mjs',
+        '.mts',
+        '.cjs',
+        '.cts',
         '.jsx',
+        '.tsx',
       ],
       'import/external-module-folders': ['node_modules', 'node_modules/@types'],
     },

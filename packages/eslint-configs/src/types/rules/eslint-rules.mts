@@ -104,7 +104,7 @@ namespace ArrayBracketNewline {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -151,7 +151,7 @@ namespace ArrayBracketSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -273,7 +273,7 @@ namespace ArrayElementNewline {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -384,7 +384,7 @@ namespace ArrowParens {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -424,7 +424,7 @@ namespace ArrowSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -473,7 +473,7 @@ namespace BlockSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -516,7 +516,7 @@ namespace BraceStyle {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -547,7 +547,7 @@ namespace CallbackReturn {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -845,7 +845,7 @@ namespace CommaDangle {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -885,7 +885,7 @@ namespace CommaSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -929,7 +929,7 @@ namespace CommaStyle {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -1026,7 +1026,7 @@ namespace ComputedPropertySpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -1277,7 +1277,7 @@ namespace DotLocation {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -1357,7 +1357,7 @@ namespace EolLast {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -1498,7 +1498,7 @@ namespace FuncCallSpacing {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -1721,7 +1721,7 @@ namespace FunctionCallArgumentNewline {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -1770,7 +1770,7 @@ namespace FunctionParenNewline {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -1892,7 +1892,7 @@ namespace GeneratorStarSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -1949,7 +1949,7 @@ namespace GetterReturn {
  *  ```
  */
 namespace GlobalRequire {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -2028,7 +2028,7 @@ namespace HandleCallbackErr {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -2058,7 +2058,7 @@ namespace IdBlacklist {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -2251,7 +2251,7 @@ namespace ImplicitArrowLinebreak {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -2534,7 +2534,7 @@ namespace Indent {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -2704,7 +2704,7 @@ namespace IndentLegacy {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -2805,7 +2805,7 @@ namespace JsxQuotes {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -3030,7 +3030,7 @@ namespace KeySpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -3892,7 +3892,7 @@ namespace KeywordSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -3991,7 +3991,7 @@ namespace LinebreakStyle {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -4075,7 +4075,7 @@ namespace LinesAroundComment {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -4130,7 +4130,7 @@ namespace LinesAroundDirective {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -4220,7 +4220,7 @@ namespace LinesBetweenClassMembers {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -4557,7 +4557,7 @@ namespace MaxLen {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -4892,7 +4892,7 @@ namespace MaxStatementsPerLine {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -4992,7 +4992,7 @@ namespace MultilineTernary {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -5096,7 +5096,7 @@ namespace NewParens {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -5128,7 +5128,7 @@ namespace NewlineAfterVar {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -5146,7 +5146,7 @@ namespace NewlineAfterVar {
  *  ```
  */
 namespace NewlineBeforeReturn {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -5184,7 +5184,7 @@ namespace NewlinePerChainedCall {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -5342,7 +5342,7 @@ namespace NoBitwise {
  *  ```
  */
 namespace NoBufferConstructor {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -5392,7 +5392,7 @@ namespace NoCaseDeclarations {
  *  ```
  */
 namespace NoCatchShadow {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -5498,7 +5498,7 @@ namespace NoConfusingArrow {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -6337,7 +6337,7 @@ namespace NoExtraParens {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -6355,7 +6355,7 @@ namespace NoExtraParens {
  *  ```
  */
 namespace NoExtraSemi {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -6418,7 +6418,7 @@ namespace NoFallthrough {
  *  ```
  */
 namespace NoFloatingDecimal {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7145,7 +7145,7 @@ namespace NoMixedOperators {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7189,7 +7189,7 @@ namespace NoMixedRequires {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7221,7 +7221,7 @@ namespace NoMixedSpacesAndTabs {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7306,7 +7306,7 @@ namespace NoMultiSpaces {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7369,7 +7369,7 @@ namespace NoMultipleEmptyLines {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7407,7 +7407,7 @@ namespace NoNativeReassign {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7440,7 +7440,7 @@ namespace NoNegatedCondition {
  *  ```
  */
 namespace NoNegatedInLhs {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7521,7 +7521,7 @@ namespace NoNewNativeNonconstructor {
  *  ```
  */
 namespace NoNewObject {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7538,7 +7538,7 @@ namespace NoNewObject {
  *  ```
  */
 namespace NoNewRequire {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7745,7 +7745,7 @@ namespace NoParamReassign {
  *  ```
  */
 namespace NoPathConcat {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7802,7 +7802,7 @@ namespace NoPlusplus {
  *  ```
  */
 namespace NoProcessEnv {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7819,7 +7819,7 @@ namespace NoProcessEnv {
  *  ```
  */
 namespace NoProcessExit {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -8382,7 +8382,7 @@ namespace NoRestrictedModules {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -8569,7 +8569,7 @@ namespace NoReturnAssign {
  *  ```
  */
 namespace NoReturnAwait {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -8793,7 +8793,7 @@ namespace NoShadowRestrictedNames {
  *  ```
  */
 namespace NoSpacedFunc {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -8844,7 +8844,7 @@ namespace NoSync {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -8879,7 +8879,7 @@ namespace NoTabs {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -8983,7 +8983,7 @@ namespace NoTrailingSpaces {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -9964,7 +9964,7 @@ namespace NoWarningComments {
  *  ```
  */
 namespace NoWhitespaceBeforeProperty {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10058,7 +10058,7 @@ namespace NonblockStatementBodyPosition {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10230,7 +10230,7 @@ namespace ObjectCurlyNewline {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10274,7 +10274,7 @@ namespace ObjectCurlySpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10314,7 +10314,7 @@ namespace ObjectPropertyNewline {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10570,7 +10570,7 @@ namespace OneVarDeclarationPerLine {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10656,7 +10656,7 @@ namespace OperatorLinebreak {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10726,7 +10726,7 @@ namespace PaddedBlocks {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10867,7 +10867,7 @@ namespace PaddingLineBetweenStatements {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -11243,7 +11243,7 @@ namespace PreferReflect {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -11407,7 +11407,7 @@ namespace QuoteProps {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -11461,7 +11461,7 @@ namespace Quotes {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -11611,7 +11611,7 @@ namespace RequireJsdoc {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -11676,7 +11676,7 @@ namespace RestSpreadSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -11745,7 +11745,7 @@ namespace Semi {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -11785,7 +11785,7 @@ namespace SemiSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -11817,7 +11817,7 @@ namespace SemiStyle {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12066,7 +12066,7 @@ namespace SpaceBeforeBlocks {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12129,7 +12129,7 @@ namespace SpaceBeforeFunctionParen {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12179,7 +12179,7 @@ namespace SpaceInParens {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12215,7 +12215,7 @@ namespace SpaceInfixOps {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12261,7 +12261,7 @@ namespace SpaceUnaryOps {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12351,7 +12351,7 @@ namespace SpacedComment {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12428,7 +12428,7 @@ namespace SwitchColonSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12476,7 +12476,7 @@ namespace TemplateCurlySpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12508,7 +12508,7 @@ namespace TemplateTagSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12655,7 +12655,7 @@ namespace ValidJsdoc {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12755,7 +12755,7 @@ namespace WrapIife {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12773,7 +12773,7 @@ namespace WrapIife {
  *  ```
  */
 namespace WrapRegex {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -12823,7 +12823,7 @@ namespace YieldStarSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**

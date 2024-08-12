@@ -21,19 +21,18 @@ export const generateEsLintConfigForGlobalUtils = async (
   const content = [
     "/** @typedef { import('@noshiro/eslint-configs').FlatConfig } FlatConfig */",
     '',
-    "import { eslintConfigForTypeScript } from '@noshiro/eslint-configs';",
+    "import { eslintFlatConfigForTypeScript } from '@noshiro/eslint-configs';",
     "import { toThisDir } from '@noshiro/mono-scripts",
     "import * as nodePath from 'node:path';",
     '',
     'const thisDir = toThisDir(import.meta.url);',
     '',
     '/** @type {readonly FlatConfig[]} */',
-    'const config = eslintConfigForTypeScript({',
+    'const config = eslintFlatConfigForTypeScript({',
     '  tsconfigRootDir: thisDir,',
     "  tsconfigFileName: './tsconfig.json',",
     `  packageDirs: [nodePath.resolve(thisDir, '${pathPrefixToRoot}'), thisDir],`,
     '});',
-
     '',
     'export default config;',
   ].join('\n');

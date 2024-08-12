@@ -1,11 +1,9 @@
-import { type EslintImportsRules } from '../types/rules/eslint-import-rules.mjs';
+import { type EslintImportsRules } from '../types/index.mjs';
 
 export const eslintImportsRules: EslintImportsRules = {
-  // staticAnalysis
-  'import/no-unresolved': [
-    'error',
-    { commonjs: true, caseSensitiveStrict: true },
-  ],
+  // TypeScript を使っている場合このチェックは必要ない。
+  'import/no-unresolved': 'off',
+
   'import/named': 'off',
   'import/default': 'error',
   'import/namespace': 'error',
@@ -78,17 +76,21 @@ export const eslintImportsRules: EslintImportsRules = {
       pattern: { json: 'always', mjs: 'always' },
     },
   ],
-  'import/order': [
-    'error',
-    {
-      groups: [], // using prettier-plugin-organize-imports
-      'newlines-between': 'never',
-    },
-  ],
+
+  'import/order': 'off',
+  // 'import/order': [
+  //   'error',
+  //   {
+  //     groups: [], // using prettier-plugin-organize-imports
+  //     'newlines-between': 'never',
+  //   },
+  // ],
+
   'import/newline-after-import': [
     'error',
     {
       considerComments: true,
+      count: 1,
     },
   ],
   'import/prefer-default-export': 'off',
@@ -111,5 +113,5 @@ export const eslintImportsRules: EslintImportsRules = {
   'import/no-empty-named-blocks': 'error',
 
   // deprecated rules
-  'import/imports-first': 'off',
+  'import/imports-first': 0,
 };

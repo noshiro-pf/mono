@@ -1,7 +1,7 @@
 /** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */
 
 import {
-  eslintConfigForTypeScript,
+  eslintFlatConfigForTypeScript,
   restrictedSyntax,
 } from '@noshiro/eslint-configs';
 import { toThisDir } from '@noshiro/mono-scripts';
@@ -14,7 +14,7 @@ const defineConfig = () => [
   {
     ignores: ['**/*.d.ts', '**/*.d.mts'],
   },
-  ...eslintConfigForTypeScript({
+  ...eslintFlatConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
     packageDirs: [nodePath.resolve(thisDir, '../../..'), thisDir],

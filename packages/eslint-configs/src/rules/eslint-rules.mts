@@ -1,4 +1,4 @@
-import { type EslintRules } from '../types/rules/eslint-rules.mjs';
+import { type EslintRules, type EslintRulesOption } from '../types/index.mjs';
 
 export const restrictedSyntax = [
   {
@@ -15,7 +15,7 @@ export const restrictedSyntax = [
   {
     // ban "new Array" expression
     selector: "NewExpression[callee.name='Array']",
-    message: "use Array.from or 'Arr.zeros' from @utils/Array instead.",
+    message: "use Array.from or 'Arr.zeros' from '@noshiro/ts-utils' instead.",
   },
   {
     // ban "React.useImperativeHandle"
@@ -23,11 +23,13 @@ export const restrictedSyntax = [
       "MemberExpression[object.name='React'][property.name='useImperativeHandle']",
     message: 'pass Observable via props instead.',
   },
-  {
-    // ban "as"
-    selector: "TSAsExpression[typeAnnotation.typeName.name!='const']",
-    message: "Don't use `as`.",
-  },
+
+  // replaced by @typescript-eslint/consistent-type-assertions and total-functions/no-unsafe-type-assertion
+  // {
+  //   // ban "as"
+  //   selector: "TSAsExpression[typeAnnotation.typeName.name!='const']",
+  //   message: "Don't use `as`.",
+  // },
   // {
   //   selector:
   //     "Identifier[name='draft'][parent.parent.callee.name!='produce'][parent.parent.parent.parent.parent.parent.callee.name!='produce']",
@@ -40,6 +42,71 @@ export const restrictedSyntax = [
     message: "use Str.from from '@noshiro/ts-utils' instead.",
   },
 ];
+
+export const restrictedGlobals = [
+  'eval',
+  'Function',
+  'globalThis',
+  {
+    name: 'Infinity',
+    message: "use 'Number.Infinity' instead.",
+  },
+  {
+    name: 'isFinite',
+    message: "use 'Number.isFinite' instead.",
+  },
+  {
+    name: 'isNaN',
+    message: "use 'Number.isNaN' instead.",
+  },
+  {
+    name: 'NaN',
+    message: "use 'Number.NaN'  instead.",
+  },
+  {
+    name: 'parseFloat',
+    message: "use 'Number.parseFloat' instead.",
+  },
+  {
+    name: 'parseInt',
+    message: "use 'Number.parseInt' instead.",
+  },
+  {
+    name: 'Map',
+    message: "use 'IMap' or 'MutableMap' in '@noshiro/ts-utils' instead.",
+  },
+  {
+    name: 'Set',
+    message: "use 'ISet' or 'MutableSet' from '@noshiro/ts-utils' instead.",
+  },
+  {
+    name: 'Boolean',
+    message: "use toBoolean from '@noshiro/ts-utils' instead.",
+  },
+  {
+    name: 'JSON',
+    message: "use Json from '@noshiro/ts-utils' instead.",
+  },
+] as const satisfies EslintRulesOption['no-restricted-globals'];
+
+export const restrictedGlobalsForFrontend = [
+  ...restrictedGlobals,
+  {
+    // react-router の location との曖昧性回避のため
+    name: 'location',
+    message: "use 'window.location' instead.",
+  },
+  {
+    // react-router の history との曖昧性回避のため
+    name: 'history',
+    message: "use 'window.history' instead.",
+  },
+  {
+    // react-router の navigator との曖昧性回避のため
+    name: 'navigator',
+    message: "use 'window.navigator' instead.",
+  },
+] as const satisfies EslintRulesOption['no-restricted-globals'];
 
 /** @link https://github.com/eslint/eslint/blob/main/conf/eslint-all.js */
 export const eslintRules: EslintRules = {
@@ -54,75 +121,75 @@ export const eslintRules: EslintRules = {
   // information. (These are marked with `0` instead of `"off"` so that a
   // script can distinguish them.)
   curly: 'off',
-  'lines-around-comment': 'off',
-  'max-len': 'off',
-  'no-confusing-arrow': 'off',
-  'no-mixed-operators': 'off',
-  'no-tabs': 'off',
+  'lines-around-comment': 0,
+  'max-len': 0,
+  'no-confusing-arrow': 0,
+  'no-mixed-operators': 0,
+  'no-tabs': 0,
   'no-unexpected-multiline': 'off',
-  quotes: 'off',
+  quotes: 0,
 
   // The rest are rules that you never need to enable when using Prettier.
-  'array-bracket-newline': 'off',
-  'array-bracket-spacing': 'off',
-  'array-element-newline': 'off',
-  'arrow-parens': 'off',
-  'arrow-spacing': 'off',
-  'block-spacing': 'off',
-  'brace-style': 'off',
-  'comma-dangle': 'off',
-  'comma-spacing': 'off',
-  'comma-style': 'off',
-  'computed-property-spacing': 'off',
-  'dot-location': 'off',
-  'eol-last': 'off',
-  'func-call-spacing': 'off',
-  'function-call-argument-newline': 'off',
-  'function-paren-newline': 'off',
-  'generator-star-spacing': 'off',
-  'implicit-arrow-linebreak': 'off',
-  indent: 'off',
-  'jsx-quotes': 'off',
-  'key-spacing': 'off',
-  'keyword-spacing': 'off',
-  'linebreak-style': 'off',
-  'multiline-ternary': 'off',
-  'newline-per-chained-call': 'off',
+  'array-bracket-newline': 0,
+  'array-bracket-spacing': 0,
+  'array-element-newline': 0,
+  'arrow-parens': 0,
+  'arrow-spacing': 0,
+  'block-spacing': 0,
+  'brace-style': 0,
+  'comma-dangle': 0,
+  'comma-spacing': 0,
+  'comma-style': 0,
+  'computed-property-spacing': 0,
+  'dot-location': 0,
+  'eol-last': 0,
+  'func-call-spacing': 0,
+  'function-call-argument-newline': 0,
+  'function-paren-newline': 0,
+  'generator-star-spacing': 0,
+  'implicit-arrow-linebreak': 0,
+  indent: 0,
+  'jsx-quotes': 0,
+  'key-spacing': 0,
+  'keyword-spacing': 0,
+  'linebreak-style': 0,
+  'multiline-ternary': 0,
+  'newline-per-chained-call': 0,
   // 'new-parens': 'off',
-  'no-extra-parens': 'off',
-  'no-extra-semi': 'off',
-  'no-floating-decimal': 'off',
-  'no-mixed-spaces-and-tabs': 'off',
-  'no-multi-spaces': 'off',
-  'no-multiple-empty-lines': 'off',
-  'no-trailing-spaces': 'off',
-  'no-whitespace-before-property': 'off',
-  'nonblock-statement-body-position': 'off',
-  'object-curly-newline': 'off',
-  'object-curly-spacing': 'off',
-  'object-property-newline': 'off',
-  'one-var-declaration-per-line': 'off',
-  'operator-linebreak': 'off',
-  'padded-blocks': 'off',
-  'quote-props': 'off',
-  'rest-spread-spacing': 'off',
-  semi: 'off',
-  'semi-spacing': 'off',
-  'semi-style': 'off',
-  'space-before-blocks': 'off',
-  'space-before-function-paren': 'off',
-  'space-in-parens': 'off',
-  'space-infix-ops': 'off',
-  'space-unary-ops': 'off',
-  'switch-colon-spacing': 'off',
-  'template-curly-spacing': 'off',
-  'template-tag-spacing': 'off',
+  'no-extra-parens': 0,
+  'no-extra-semi': 0,
+  'no-floating-decimal': 0,
+  'no-mixed-spaces-and-tabs': 0,
+  'no-multi-spaces': 0,
+  'no-multiple-empty-lines': 0,
+  'no-trailing-spaces': 0,
+  'no-whitespace-before-property': 0,
+  'nonblock-statement-body-position': 0,
+  'object-curly-newline': 0,
+  'object-curly-spacing': 0,
+  'object-property-newline': 0,
+  'one-var-declaration-per-line': 0,
+  'operator-linebreak': 0,
+  'padded-blocks': 0,
+  'quote-props': 0,
+  'rest-spread-spacing': 0,
+  semi: 0,
+  'semi-spacing': 0,
+  'semi-style': 0,
+  'space-before-blocks': 0,
+  'space-before-function-paren': 0,
+  'space-in-parens': 0,
+  'space-infix-ops': 0,
+  'space-unary-ops': 0,
+  'switch-colon-spacing': 0,
+  'template-curly-spacing': 0,
+  'template-tag-spacing': 0,
   'unicode-bom': 'off',
-  'wrap-iife': 'off',
-  'wrap-regex': 'off',
-  'yield-star-spacing': 'off',
+  'wrap-iife': 0,
+  'wrap-regex': 0,
+  'yield-star-spacing': 0,
 
-  'new-parens': 'off',
+  'new-parens': 0,
 
   /**
    * Disable in favor of @typescript-eslint
@@ -156,7 +223,7 @@ export const eslintRules: EslintRules = {
   'default-param-last': 'off',
   'dot-notation': 'off',
   'init-declarations': 'off',
-  'lines-between-class-members': 'off',
+  'lines-between-class-members': 0,
   'no-array-constructor': 'off',
   'no-duplicate-imports': 'off',
   'no-empty-function': 'off',
@@ -172,16 +239,19 @@ export const eslintRules: EslintRules = {
   'no-unused-vars': 'off',
   'no-use-before-define': 'off',
   'no-useless-constructor': 'off',
-  'padding-line-between-statements': 'off',
+  'padding-line-between-statements': 0,
   'require-await': 'off',
-  'no-return-await': 'off',
+  'no-return-await': 0,
   'class-methods-use-this': 'off',
   'prefer-promise-reject-errors': 'off',
   'consistent-return': 'off',
 
   // customized
   'accessor-pairs': 'error',
-  'array-callback-return': 'error',
+
+  // When there is no default case for a switch statement, there is a false positive that reports an error without considering type information.
+  'array-callback-return': 'off',
+
   'arrow-body-style': ['error', 'as-needed'],
   'block-scoped-var': 'error',
   camelcase: 'off', // disabled
@@ -212,7 +282,7 @@ export const eslintRules: EslintRules = {
   'max-lines': 'off', // disabled
   'max-nested-callbacks': 'error',
   'max-params': 'off', // disabled
-  'max-statements-per-line': 'off',
+  'max-statements-per-line': 0,
   'max-statements': 'off', // disabled
   'multiline-comment-style': 'off', // disabled
   'new-cap': 'off', // disabled
@@ -246,11 +316,25 @@ export const eslintRules: EslintRules = {
   'no-ex-assign': 'error',
   'no-extend-native': 'error',
   'no-extra-bind': 'error',
-  'no-extra-boolean-cast': 'error',
+  'no-extra-boolean-cast': [
+    'error',
+    {
+      enforceForLogicalOperands: true,
+    },
+  ],
   'no-extra-label': 'error',
   'no-fallthrough': 'error',
   'no-global-assign': 'error',
-  'no-implicit-coercion': 'error',
+  'no-implicit-coercion': [
+    'error',
+    {
+      allow: [],
+      boolean: false,
+      disallowTemplateShorthand: true,
+      number: true,
+      string: true,
+    },
+  ],
   'no-implicit-globals': 'error',
   'no-inline-comments': 'off', // disabled
   'no-inner-declarations': 'error',
@@ -268,7 +352,7 @@ export const eslintRules: EslintRules = {
   'no-nested-ternary': 'off', // unicorn/no-nested-ternary
   'no-new-func': 'error',
   'no-new-native-nonconstructor': 'error',
-  'no-new-object': 'off',
+  'no-new-object': 0,
   'no-new-wrappers': 'error',
   'no-new': 'error',
   'no-nonoctal-decimal-escape': 'error',
@@ -276,73 +360,21 @@ export const eslintRules: EslintRules = {
   'no-octal-escape': 'error',
   'no-octal': 'error',
   'no-param-reassign': 'error',
-  'no-plusplus': 'error',
+
+  /** `++x` や `x++` という式の値を使用しているコードは可読性が落ちやすいため警告を出す */
+  'no-plusplus': [
+    'error',
+    {
+      allowForLoopAfterthoughts: true,
+    },
+  ],
+
   'no-promise-executor-return': 'error',
   'no-proto': 'error',
   'no-prototype-builtins': 'error',
   'no-regex-spaces': 'error',
   'no-restricted-exports': 'error',
-  'no-restricted-globals': [
-    'error',
-    'eval',
-    'Function',
-    'globalThis',
-    {
-      // react-router の location との曖昧性回避のため
-      name: 'location',
-      message: "use 'window.location' instead.",
-    },
-    {
-      // react-router の history との曖昧性回避のため
-      name: 'history',
-      message: "use 'window.history' instead.",
-    },
-    {
-      // react-router の navigator との曖昧性回避のため
-      name: 'navigator',
-      message: "use 'window.navigator' instead.",
-    },
-    {
-      name: 'Infinity',
-      message: "use 'Number.Infinity' instead.",
-    },
-    {
-      name: 'isFinite',
-      message: "use 'Number.isFinite' instead.",
-    },
-    {
-      name: 'isNaN',
-      message: "use 'Number.isNaN' instead.",
-    },
-    {
-      name: 'NaN',
-      message: "use 'Number.NaN'  instead.",
-    },
-    {
-      name: 'parseFloat',
-      message: "use 'Number.parseFloat' instead.",
-    },
-    {
-      name: 'parseInt',
-      message: "use 'Number.parseInt' instead.",
-    },
-    {
-      name: 'Map',
-      message: "use 'IMap' or 'MutableMap' in '@noshiro/ts-utils' instead.",
-    },
-    {
-      name: 'Set',
-      message: "use 'ISet' or 'MutableSet' from '@noshiro/ts-utils' instead.",
-    },
-    {
-      name: 'Boolean',
-      message: "use toBoolean from '@noshiro/ts-utils' instead.",
-    },
-    {
-      name: 'JSON',
-      message: "use Json from '@noshiro/ts-utils' instead.",
-    },
-  ],
+  'no-restricted-globals': ['error', ...restrictedGlobals],
   'no-restricted-properties': 'error',
 
   /**
@@ -389,7 +421,7 @@ export const eslintRules: EslintRules = {
   'prefer-arrow-callback': 'error',
   'prefer-destructuring': 'off', // disabled
   'prefer-exponentiation-operator': 'error',
-  'prefer-named-capture-group': 'error',
+  'prefer-named-capture-group': 'off', // disabled
   'prefer-numeric-literals': 'error',
   'prefer-object-has-own': 'error',
   'prefer-object-spread': 'error',
@@ -404,6 +436,9 @@ export const eslintRules: EslintRules = {
    *     - s_1 + s_2 + ... + s_n -> [s_1, ..., s_n].join("")
    */
   'prefer-template': 'error',
+
+  // 'no-useless-assignment': 'error',
+
   radix: 'error',
   'require-atomic-updates': 'error',
   'require-unicode-regexp': 'error',
@@ -411,7 +446,6 @@ export const eslintRules: EslintRules = {
   'sort-imports': 'off', // disabled
   'sort-keys': 'off', // disabled
   'sort-vars': 'off', // disabled
-  'spaced-comment': 'off', // disabled
   strict: 'error',
   'symbol-description': 'off', // disabled
   'use-isnan': 'error',
@@ -419,27 +453,28 @@ export const eslintRules: EslintRules = {
   yoda: 'off', // disabled
 
   // deprecated
-  'callback-return': 'off',
-  'global-require': 'off',
-  'handle-callback-err': 'off',
-  'id-blacklist': 'off',
-  'indent-legacy': 'off',
-  'lines-around-directive': 'off',
-  'newline-after-var': 'off',
-  'newline-before-return': 'off',
-  'no-buffer-constructor': 'off',
-  'no-catch-shadow': 'off',
-  'no-mixed-requires': 'off',
-  'no-native-reassign': 'off',
-  'no-negated-in-lhs': 'off',
-  'no-new-require': 'off',
-  'no-path-concat': 'off',
-  'no-process-env': 'off',
-  'no-process-exit': 'off',
-  'no-restricted-modules': 'off',
-  'no-spaced-func': 'off',
-  'no-sync': 'off',
-  'prefer-reflect': 'off',
-  'require-jsdoc': 'off',
-  'valid-jsdoc': 'off',
+  'spaced-comment': 0,
+  'callback-return': 0,
+  'global-require': 0,
+  'handle-callback-err': 0,
+  'id-blacklist': 0,
+  'indent-legacy': 0,
+  'lines-around-directive': 0,
+  'newline-after-var': 0,
+  'newline-before-return': 0,
+  'no-buffer-constructor': 0,
+  'no-catch-shadow': 0,
+  'no-mixed-requires': 0,
+  'no-native-reassign': 0,
+  'no-negated-in-lhs': 0,
+  'no-new-require': 0,
+  'no-path-concat': 0,
+  'no-process-env': 0,
+  'no-process-exit': 0,
+  'no-restricted-modules': 0,
+  'no-spaced-func': 0,
+  'no-sync': 0,
+  'prefer-reflect': 0,
+  'require-jsdoc': 0,
+  'valid-jsdoc': 0,
 };
