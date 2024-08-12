@@ -1,6 +1,6 @@
 /** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */
 
-import { eslintFlatConfigCommon } from '@noshiro/eslint-configs';
+import { eslintConfigForTypeScript } from '@noshiro/eslint-configs';
 import * as nodePath from 'node:path';
 import * as nodeUrl from 'node:url';
 
@@ -14,7 +14,7 @@ const configs = [
   {
     ignores: ['**/*.d.mts', 'esm'],
   },
-  ...eslintFlatConfigCommon({
+  ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
     packageDirs: [nodePath.resolve(thisDir, '..'), thisDir],

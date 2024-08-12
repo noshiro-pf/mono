@@ -22,8 +22,8 @@ export const generateEsLintConfig = async (
     preact: 'eslintFlatConfigForPreact',
     react: 'eslintFlatConfigForReact',
     'react-emotion': 'eslintFlatConfigForReact',
-    mts: 'eslintFlatConfigCommon',
-    dom: 'eslintFlatConfigCommon',
+    mts: 'eslintConfigForTypeScript',
+    dom: 'eslintConfigForTypeScript',
   }[cfg.tsType];
 
   const content = [
