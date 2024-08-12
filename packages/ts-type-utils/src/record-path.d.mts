@@ -9,69 +9,74 @@ type Prefixes<L extends readonly unknown[]> = L extends readonly [
   : readonly [];
 
 /** @internal */
-type AttachValueTypeAtPath<R, Path extends Paths<R>> = Path extends Path
-  ? readonly [Path, RecordValueAtPath<R, Path>]
-  : never;
+declare namespace TSTypeUtilsInternals {
+  type AttachValueTypeAtPath<R, Path extends Paths<R>> = Path extends Path
+    ? readonly [Path, RecordValueAtPath<R, Path>]
+    : never;
+}
 
-type KeyPathAndValueTypeAtPathTuple<R> = AttachValueTypeAtPath<R, Paths<R>>;
+type KeyPathAndValueTypeAtPathTuple<R> =
+  TSTypeUtilsInternals.AttachValueTypeAtPath<R, Paths<R>>;
 
 type LeafPaths<R> = R extends readonly unknown[]
-  ? LeafPathsImplListCase<R, keyof R>
+  ? TSTypeUtilsInternals.LeafPathsImplListCase<R, keyof R>
   : R extends UnknownRecord
-    ? LeafPathsImplRecordCase<R, keyof R>
+    ? TSTypeUtilsInternals.LeafPathsImplRecordCase<R, keyof R>
     : readonly [];
 
 /** @internal */
-type LeafPathsImplListCase<
-  T extends readonly unknown[],
-  PathHead extends keyof T,
-> = T extends readonly []
-  ? readonly []
-  : IsNotFixedLengthList<T> extends true
+declare namespace TSTypeUtilsInternals {
+  type LeafPathsImplListCase<
+    T extends readonly unknown[],
+    PathHead extends keyof T,
+  > = T extends readonly []
     ? readonly []
-    : PathHead extends keyof T
-      ? PathHead extends `${number}`
-        ? readonly [ToNumber<PathHead>, ...LeafPaths<T[PathHead]>]
-        : never
-      : never;
+    : IsNotFixedLengthList<T> extends true
+      ? readonly []
+      : PathHead extends keyof T
+        ? PathHead extends `${number}`
+          ? readonly [ToNumber<PathHead>, ...LeafPaths<T[PathHead]>]
+          : never
+        : never;
 
-/** @internal */
-type LeafPathsImplRecordCase<
-  R extends UnknownRecord,
-  PathHead extends keyof R,
-> = string extends PathHead
-  ? readonly []
-  : PathHead extends keyof R
-    ? readonly [PathHead, ...LeafPaths<R[PathHead]>]
-    : never;
+  type LeafPathsImplRecordCase<
+    R extends UnknownRecord,
+    PathHead extends keyof R,
+  > = string extends PathHead
+    ? readonly []
+    : PathHead extends keyof R
+      ? readonly [PathHead, ...LeafPaths<R[PathHead]>]
+      : never;
+}
 
 type LeafPathsWithIndex<R> = R extends readonly unknown[]
-  ? _LeafPathsWithIndexImplListCase<R, keyof R>
+  ? TSTypeUtilsInternals.LeafPathsWithIndexImplListCase<R, keyof R>
   : R extends UnknownRecord
-    ? LeafPathsWithIndexImplRecordCase<R, keyof R>
+    ? TSTypeUtilsInternals.LeafPathsWithIndexImplRecordCase<R, keyof R>
     : readonly [];
 
 /** @internal */
-type _LeafPathsWithIndexImplListCase<
-  T extends readonly unknown[],
-  PathHead extends keyof T,
-> = T extends readonly []
-  ? readonly []
-  : IsNotFixedLengthList<T> extends true
-    ? readonly [number, ...LeafPathsWithIndex<T[number]>]
-    : PathHead extends keyof T
-      ? PathHead extends `${number}`
-        ? readonly [ToNumber<PathHead>, ...LeafPathsWithIndex<T[PathHead]>]
-        : never
-      : never;
+declare namespace TSTypeUtilsInternals {
+  type LeafPathsWithIndexImplListCase<
+    T extends readonly unknown[],
+    PathHead extends keyof T,
+  > = T extends readonly []
+    ? readonly []
+    : IsNotFixedLengthList<T> extends true
+      ? readonly [number, ...LeafPathsWithIndex<T[number]>]
+      : PathHead extends keyof T
+        ? PathHead extends `${number}`
+          ? readonly [ToNumber<PathHead>, ...LeafPathsWithIndex<T[PathHead]>]
+          : never
+        : never;
 
-/** @internal */
-type LeafPathsWithIndexImplRecordCase<
-  R extends UnknownRecord,
-  PathHead extends keyof R,
-> = PathHead extends keyof R
-  ? readonly [PathHead, ...LeafPathsWithIndex<R[PathHead]>]
-  : never;
+  type LeafPathsWithIndexImplRecordCase<
+    R extends UnknownRecord,
+    PathHead extends keyof R,
+  > = PathHead extends keyof R
+    ? readonly [PathHead, ...LeafPathsWithIndex<R[PathHead]>]
+    : never;
+}
 
 type RecordUpdated<
   R,
@@ -80,40 +85,41 @@ type RecordUpdated<
 > = Path extends readonly []
   ? ValueAfter
   : R extends readonly unknown[]
-    ? RecordUpdatedImplTupleCase<R, Path, ValueAfter>
+    ? TSTypeUtilsInternals.RecordUpdatedImplTupleCase<R, Path, ValueAfter>
     : R extends UnknownRecord
-      ? RecordUpdatedImplRecordCase<R, Path, ValueAfter>
+      ? TSTypeUtilsInternals.RecordUpdatedImplRecordCase<R, Path, ValueAfter>
       : R;
 
 /** @internal */
-type RecordUpdatedImplRecordCase<
-  R extends UnknownRecord,
-  Path extends Paths<R>,
-  ValueAfter,
-> = Path extends readonly [infer Head, ...infer Rest]
-  ? Head extends keyof R
-    ? Rest extends Paths<R[Head]>
-      ? {
-          readonly [Key in keyof R]: Key extends Head
-            ? RecordUpdated<R[Head], Rest, ValueAfter>
-            : R[Key];
-        }
+declare namespace TSTypeUtilsInternals {
+  type RecordUpdatedImplRecordCase<
+    R extends UnknownRecord,
+    Path extends Paths<R>,
+    ValueAfter,
+  > = Path extends readonly [infer Head, ...infer Rest]
+    ? Head extends keyof R
+      ? Rest extends Paths<R[Head]>
+        ? {
+            readonly [Key in keyof R]: Key extends Head
+              ? RecordUpdated<R[Head], Rest, ValueAfter>
+              : R[Key];
+          }
+        : never
       : never
-    : never
-  : never;
+    : never;
 
-/** @internal */
-type RecordUpdatedImplTupleCase<
-  T extends readonly unknown[],
-  Path extends Paths<T>,
-  ValueAfter,
-> = Path extends readonly [infer Head, ...infer Rest]
-  ? Head extends IndexOfTuple<T>
-    ? Rest extends Paths<T[Head]>
-      ? Tuple.SetAt<T, Head, RecordUpdated<T[Head], Rest, ValueAfter>>
+  type RecordUpdatedImplTupleCase<
+    T extends readonly unknown[],
+    Path extends Paths<T>,
+    ValueAfter,
+  > = Path extends readonly [infer Head, ...infer Rest]
+    ? Head extends IndexOfTuple<T>
+      ? Rest extends Paths<T[Head]>
+        ? Tuple.SetAt<T, Head, RecordUpdated<T[Head], Rest, ValueAfter>>
+        : never
       : never
-    : never
-  : never;
+    : never;
+}
 
 type RecordValueAtPath<R, Path extends Paths<R>> = Path extends readonly [
   infer Head,
@@ -129,21 +135,23 @@ type RecordValueAtPath<R, Path extends Paths<R>> = Path extends readonly [
 type RecordValueAtPathWithIndex<
   R,
   Path extends PathsWithIndex<R>,
-> = RecordValueAtPathWithIndexImpl<R, Path, never>;
+> = TSTypeUtilsInternals.RecordValueAtPathWithIndexImpl<R, Path, never>;
 
 /** @internal */
-type RecordValueAtPathWithIndexImpl<
-  R,
-  Path extends PathsWithIndex<R>,
-  LastPathElement,
-> = Path extends readonly [infer Head, ...infer Rest]
-  ? Head extends keyof R
-    ? Rest extends PathsWithIndex<R[Head]>
-      ? RecordValueAtPathWithIndexImpl<R[Head], Rest, Head>
+declare namespace TSTypeUtilsInternals {
+  type RecordValueAtPathWithIndexImpl<
+    R,
+    Path extends PathsWithIndex<R>,
+    LastPathElement,
+  > = Path extends readonly [infer Head, ...infer Rest]
+    ? Head extends keyof R
+      ? Rest extends PathsWithIndex<R[Head]>
+        ? RecordValueAtPathWithIndexImpl<R[Head], Rest, Head>
+        : never
       : never
-    : never
-  : number extends LastPathElement
-    ? R | undefined
-    : string extends LastPathElement
+    : number extends LastPathElement
       ? R | undefined
-      : R;
+      : string extends LastPathElement
+        ? R | undefined
+        : R;
+}
