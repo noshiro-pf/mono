@@ -1,35 +1,35 @@
 import {
+  composeMonoTypeFns,
   pipe,
   replaceWithNoMatchCheck,
-  sliceByMatch,
+  replaceWithNoMatchCheckBetweenRegexp,
 } from '@noshiro/mono-scripts';
 import { eslintPlugins } from './eslint-plugins.mjs';
+import { closeBraceRegexp } from './utils.mjs';
 
 export const replaceRulesType = (content: string, typeName: string): string => {
   switch (typeName) {
-    case eslintPlugins.EslintRules.typeName: {
-      const slice = sliceFn(content, 'LogicalAssignmentOperators');
-
-      return content.replaceAll(
-        slice,
-        pipe(slice)
-          .chain(
+    case eslintPlugins.EslintRules.typeName:
+      return pipe(content).chain(
+        replaceWithNoMatchCheckBetweenRegexp({
+          startRegexp: 'namespace LogicalAssignmentOperators {',
+          endRegexp: closeBraceRegexp,
+          mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'export type Options = ',
               ['/* modified */', '  export type Options = '].join('\n'),
             ),
-          )
-          .chain(replaceWithNoMatchCheck('readonly unknown[] &', '')).value,
-      );
-    }
+            replaceWithNoMatchCheck('readonly unknown[] &', ''),
+          ),
+        }),
+      ).value;
 
-    case eslintPlugins.EslintJestRules.typeName: {
-      const slice = sliceFn(content, 'ValidTitle');
-
-      return content.replaceAll(
-        slice,
-        pipe(slice).chain(
-          replaceWithNoMatchCheck(
+    case eslintPlugins.EslintJestRules.typeName:
+      return pipe(content).chain(
+        replaceWithNoMatchCheckBetweenRegexp({
+          startRegexp: 'namespace ValidTitle {',
+          endRegexp: closeBraceRegexp,
+          mapFn: replaceWithNoMatchCheck(
             [
               '  export type Options = {',
               '    readonly ignoreSpaces?: boolean;',
@@ -62,45 +62,39 @@ export const replaceRulesType = (content: string, typeName: string): string => {
               '  >;',
             ].join('\n'),
           ),
-        ).value,
-      );
-    }
+        }),
+      ).value;
 
-    case eslintPlugins.PreferArrowFunctionRules.typeName: {
-      const slice = sliceFn(content, 'PreferArrowFunctions');
-
-      return content.replaceAll(
-        slice,
-        pipe(slice).chain(
-          replaceWithNoMatchCheck(
+    case eslintPlugins.PreferArrowFunctionRules.typeName:
+      return pipe(content).chain(
+        replaceWithNoMatchCheckBetweenRegexp({
+          startRegexp: 'namespace PreferArrowFunctions {',
+          endRegexp: closeBraceRegexp,
+          mapFn: replaceWithNoMatchCheck(
             'returnStyle?: string;',
             "returnStyle?: 'explicit' | 'implicit' | 'unchanged'; // modified",
           ),
-        ).value,
-      );
-    }
+        }),
+      ).value;
 
-    case eslintPlugins.EslintCypressRules.typeName: {
-      const slice = sliceFn(content, 'UnsafeToChainCommand');
-
-      return content.replaceAll(
-        slice,
-        pipe(slice).chain(
-          replaceWithNoMatchCheck(
+    case eslintPlugins.EslintCypressRules.typeName:
+      return pipe(content).chain(
+        replaceWithNoMatchCheckBetweenRegexp({
+          startRegexp: 'namespace UnsafeToChainCommand {',
+          endRegexp: closeBraceRegexp,
+          mapFn: replaceWithNoMatchCheck(
             'export type Rules = {',
             'export type Options = {',
           ),
-        ).value,
-      );
-    }
+        }),
+      ).value;
 
-    case eslintPlugins.EslintUnicornRules.typeName: {
-      const slice = sliceFn(content, 'ImportStyle');
-
-      return content.replaceAll(
-        slice,
-        pipe(slice).chain(
-          replaceWithNoMatchCheck(
+    case eslintPlugins.EslintUnicornRules.typeName:
+      return pipe(content).chain(
+        replaceWithNoMatchCheckBetweenRegexp({
+          startRegexp: 'namespace ImportStyle {',
+          endRegexp: closeBraceRegexp,
+          mapFn: replaceWithNoMatchCheck(
             '  export type BooleanObject = Readonly<Record<string, boolean>>;',
             [
               '  export type BooleanObject = Readonly<',
@@ -108,18 +102,10 @@ export const replaceRulesType = (content: string, typeName: string): string => {
               '  >;',
             ].join('\n'),
           ),
-        ).value,
-      );
-    }
+        }),
+      ).value;
 
     default:
       return content;
   }
 };
-
-const sliceFn = (target: string, ruleName: string): string =>
-  sliceByMatch({
-    target,
-    startRegexp: `namespace ${ruleName} {`,
-    endRegexp: /\n\}\n/u,
-  });

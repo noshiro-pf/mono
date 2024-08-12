@@ -18,3 +18,10 @@ export const deepReplace = <T,>(obj: T, from: string, to: string): T => {
 export const toStr: (v: unknown) => string =
   // eslint-disable-next-line no-restricted-syntax
   String;
+
+export const closeBraceRegexp = /\n\}\n/gu;
+
+type FilterArray<T> = T extends readonly unknown[] ? T : never;
+
+export const isArray = <T,>(maybeArray: T): maybeArray is FilterArray<T> =>
+  Array.isArray(maybeArray);
