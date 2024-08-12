@@ -270,17 +270,21 @@ const updatePackageJsonImpl = (
               command: 'yarn zz:vite build',
             };
           } else {
-            mut_wireit['build'] = {
-              dependencies: [
-                'clean:build',
-                ...(packageName.startsWith('global-')
-                  ? ['zz:setup']
-                  : generateFlag.gi === false
-                    ? []
-                    : ['gi']),
-              ],
-              command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript`,
-            };
+            if (packageName.startsWith('global-')) {
+              mut_wireit['build'] = {
+                dependencies: ['clean:build', 'zz:setup'],
+                command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript`,
+              };
+            } else {
+              mut_wireit['build'] = {
+                dependencies: [
+                  'clean:build',
+                  ...(generateFlag.gi === false ? [] : ['gi']),
+                  'type-check',
+                ],
+                command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript`,
+              };
+            }
           }
         }
 
@@ -482,7 +486,8 @@ const updatePackageJsonImpl = (
         if (packageName.startsWith('global-')) {
           mut_scripts['zz:fmt-src'] = 'yarn zz:prettier ./src';
           mut_scripts['zz:gen'] = `node ./${workspaceScriptsDirName}/gen.mjs`;
-          mut_scripts['zz:setup'] = 'run-s clean:src zz:gen zz:fmt-src';
+          mut_scripts['zz:setup'] =
+            'run-s clean:src zz:gen zz:fmt-src type-check';
         }
 
         if (packageName === 'syncflow') {

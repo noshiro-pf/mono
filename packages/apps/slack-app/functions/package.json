@@ -6,7 +6,7 @@
   "author": "noshiro",
   "type": "module",
   "scripts": {
-    "build": "tsc --project tsconfig.json",
+    "build": "wireit",
     "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
     "clean:eslintcache": "rimraf .eslintcache",
@@ -51,6 +51,13 @@
     "node": ">=16"
   },
   "wireit": {
+    "build": {
+      "dependencies": [
+        "clean:build",
+        "type-check"
+      ],
+      "command": "tsc --project tsconfig.json"
+    },
     "z:fb:deploy": {
       "dependencies": [
         "build"
