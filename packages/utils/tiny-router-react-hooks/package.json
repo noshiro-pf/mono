@@ -20,22 +20,22 @@
     "clean:build": "rimraf esm",
     "clean:eslintcache": "rimraf .eslintcache",
     "clean:wireit": "rimraf .wireit/**",
-    "fmt": "yarn zz:cmd:prettier .",
-    "gi": "wireit",
-    "lint": "wireit",
-    "lint:fix": "wireit",
-    "pub": "yarn zz:cmd:publish",
-    "test": "wireit",
-    "testw": "yarn zz:cmd:vitest watch",
+    "fmt": "yarn zz:prettier .",
+    "gi": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
+    "lint": "yarn zz:eslint:src",
+    "lint:fix": "yarn zz:eslint:src --fix",
+    "pub": "yarn zz:publish",
+    "test": "yarn zz:vitest run",
+    "testw": "yarn zz:vitest watch",
     "tsc": "yarn type-check",
     "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit",
-    "zz:cmd:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
-    "zz:cmd:eslint:print-config": "yarn zz:cmd:eslint --print-config src/index.mts",
-    "zz:cmd:eslint:src": "yarn zz:cmd:eslint --config eslint.config.js './src/**/*' --cache --cache-location ./src/.eslintcache",
-    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
-    "zz:cmd:publish": "yarn publish --no-git-tag-version --access=public",
-    "zz:cmd:vitest": "vitest --config ./configs/vitest.config.ts"
+    "type-check": "tsc --noEmit",
+    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
+    "zz:eslint:print-config": "yarn zz:eslint --print-config src/index.mts",
+    "zz:eslint:src": "yarn zz:eslint --config eslint.config.js './src/**/*' --cache --cache-location ./src/.eslintcache",
+    "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
+    "zz:publish": "yarn publish --no-git-tag-version --access=public",
+    "zz:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
     "@noshiro/syncflow-react-hooks": "*",
@@ -49,79 +49,11 @@
     "@noshiro/ts-type-utils": "*"
   },
   "wireit": {
-    "type-check": {
-      "command": "tsc --noEmit",
-      "files": [
-        "./**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "gi": {
-      "command": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
-      "files": [
-        "../../../scripts/bash/index_ts_generator.sh",
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
-      ],
-      "clean": false,
-      "output": [
-        "src/**/index.mts"
-      ],
-      "packageLocks": []
-    },
     "build": {
-      "command": "tsc --project ./configs/tsconfig.build.json",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./configs/tsconfig.build.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
+      "dependencies": [
+        "clean:build"
       ],
-      "clean": true,
-      "output": [
-        "esm/**",
-        ".tsbuildinfo"
-      ]
-    },
-    "test": {
-      "command": "yarn zz:cmd:vitest run",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./configs/vitest.config.ts",
-        "./configs/tsconfig.test.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "lint": {
-      "command": "yarn zz:cmd:eslint:src",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./eslint.config.js",
-        "./package.json",
-        "./tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "lint:fix": {
-      "command": "yarn zz:cmd:eslint:src --fix",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./eslint.config.js",
-        "./package.json",
-        "./tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "clean": false,
-      "output": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
-      ]
+      "command": "tsc --project ./configs/tsconfig.build.json"
     }
   }
 }

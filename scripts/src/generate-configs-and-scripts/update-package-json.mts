@@ -6,9 +6,7 @@ import { type Workspace } from '../index.mjs';
 import { isNotUndefined, isRecord } from '../ts-utils/index.mjs';
 import {
   eslintConfigName,
-  jsOrTsExt,
   tsconfigBuildJsonName,
-  tsconfigTestJsonName,
   viteConfigName,
   vitestConfigName,
   workspaceConfigsDirName,
@@ -147,75 +145,32 @@ const updatePackageJsonImpl = (
       publish: cfg.packageJson.scripts.publish,
     };
 
-    const wireitDeps = {
-      src: `./${
-        cfg.srcDirs.length >= 2 ? `(${cfg.srcDirs.join('|')})` : cfg.srcDirs[0]
-      }/**/*.{${jsOrTsExt}}`,
-      typeCheckTarget: `./**/*.{${jsOrTsExt}}`,
-      tsConfigs: `${pathPrefixToRoot}/config/tsconfig/**`,
-      rootPackageJson: `${pathPrefixToRoot}/package.json`,
-      rootPrettierrc: `${pathPrefixToRoot}/.prettierrc`,
-    };
-
     switch (packageName) {
       case 'ts-type-utils': {
-        // reset
-        mut_packageJson['wireit'] = {};
+        const filename = './ts-type-utils.d.mts';
 
-        // aliases
-        const mut_wireit = mut_packageJson['wireit'];
+        mut_packageJson['scripts'] = {
+          build: 'yarn zz:build:seq',
+          clean: 'run-p clean:**',
+          'clean:eslintcache': 'rimraf .eslintcache',
+          'clean:wireit': 'rimraf .wireit/**',
+          fmt: 'yarn zz:prettier .',
+          lint: 'yarn zz:eslint:src-and-test',
+          'lint:fix': 'yarn zz:eslint:src-and-test --fix',
+          pub: 'yarn zz:publish',
+          tsc: 'yarn type-check',
+          tscw: 'yarn type-check --watch',
+          'type-check': 'tsc --noEmit',
+          'zz:build:seq': 'run-s zz:build:step1',
 
-        {
-          const filename = './ts-type-utils.d.mts';
+          'zz:build:step1': `ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path="./\\1" />@g' > ${filename}`,
 
-          mut_packageJson['scripts'] = {
-            build: 'yarn zz:cmd:build:seq',
-            clean: 'run-p clean:**',
-            'clean:eslintcache': 'rimraf .eslintcache',
-            'clean:wireit': 'rimraf .wireit/**',
-            fmt: 'yarn zz:cmd:prettier .',
-            lint: 'wireit',
-            'lint:fix': 'wireit',
-            pub: 'yarn zz:cmd:publish',
-            tsc: 'yarn type-check',
-            tscw: 'yarn type-check --watch',
-            'type-check': 'tsc --noEmit',
-            'zz:cmd:build:seq': 'run-s zz:cmd:build:step1',
-
-            'zz:cmd:build:step1': `ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path="./\\1" />@g' > ${filename}`,
-
-            'zz:cmd:eslint': 'ESLINT_USE_FLAT_CONFIG=true eslint',
-            'zz:cmd:eslint:src-and-test':
-              'yarn zz:cmd:eslint "./{src,test}/**" --cache --cache-location ./.eslintcache',
-            'zz:cmd:prettier': `prettier --cache --cache-strategy content --ignore-path ${pathPrefixToRoot}/.prettierignore --write`,
-            'zz:cmd:publish':
-              'yarn publish --no-git-tag-version --access=public',
-          };
-        }
-
-        {
-          const files = [
-            wireitDeps.src,
-            eslintConfigName,
-            'package.json',
-            'tsconfig.json',
-            wireitDeps.rootPackageJson,
-            wireitDeps.tsConfigs,
-          ];
-
-          mut_wireit['lint'] = {
-            command: 'yarn zz:cmd:eslint:src-and-test',
-            files,
-            output: [],
-          };
-
-          mut_wireit['lint:fix'] = {
-            command: 'yarn zz:cmd:eslint:src-and-test --fix',
-            files,
-            clean: false,
-            output: ['src/**/*.mts'],
-          };
-        }
+          'zz:eslint': 'ESLINT_USE_FLAT_CONFIG=true eslint',
+          'zz:eslint:src-and-test':
+            'yarn zz:eslint "./{src,test}/**" --cache --cache-location ./.eslintcache',
+          'zz:prettier': `prettier --cache --cache-strategy content --ignore-path ${pathPrefixToRoot}/.prettierignore --write`,
+          'zz:publish': 'yarn publish --no-git-tag-version --access=public',
+        };
 
         break;
       }
@@ -249,8 +204,8 @@ const updatePackageJsonImpl = (
         }
 
         {
-          mut_scripts['fmt'] = 'yarn zz:cmd:prettier .';
-          mut_scripts['zz:cmd:prettier'] =
+          mut_scripts['fmt'] = 'yarn zz:prettier .';
+          mut_scripts['zz:prettier'] =
             `prettier --cache --cache-strategy content --ignore-path ${pathPrefixToRoot}/.prettierignore --write`;
         }
 
@@ -260,7 +215,8 @@ const updatePackageJsonImpl = (
 
           if (cfg.useVite === true) {
             mut_scripts['type-check'] = 'run-p type-check:src type-check:cy';
-            mut_scripts['type-check:cy'] = 'wireit';
+            mut_scripts['type-check:cy'] =
+              'tsc --noEmit -p ./cypress/tsconfig.json';
             mut_scripts['type-check:src'] = 'wireit';
 
             mut_wireit['type-check:src'] = {
@@ -269,144 +225,60 @@ const updatePackageJsonImpl = (
                   ? ['z:setup', 'z:setup:service-account-key']
                   : ['z:setup'],
               command: 'tsc --noEmit',
-              files: [
-                wireitDeps.typeCheckTarget,
-                './tsconfig.json',
-                wireitDeps.rootPackageJson,
-                wireitDeps.tsConfigs,
-              ],
-              output: [],
-            };
-
-            mut_wireit['type-check:cy'] = {
-              command: 'tsc --noEmit -p ./cypress/tsconfig.json',
-              files: [
-                `./cypress/**/*.{${jsOrTsExt}}`,
-                './cypress/tsconfig.json',
-                wireitDeps.rootPackageJson,
-                wireitDeps.tsConfigs,
-              ],
-              output: [],
             };
           } else {
-            mut_scripts['type-check'] = 'wireit';
-
-            mut_wireit['type-check'] = {
-              command: 'tsc --noEmit',
-              files: [
-                wireitDeps.typeCheckTarget,
-                './tsconfig.json',
-                wireitDeps.rootPackageJson,
-                wireitDeps.tsConfigs,
-              ],
-              output: [],
-            };
+            mut_scripts['type-check'] = 'tsc --noEmit';
           }
         }
 
         if (generateFlag.gi !== false) {
-          mut_scripts['gi'] = 'wireit';
-
           const minDepth = generateFlag.gi;
           const giIgnore = cfg.packageJson.scripts.giIgnore;
 
           const mts = cfg.useVite !== true;
 
-          const content = {
-            command: [
-              `bash ${pathPrefixToRoot}/scripts/bash/index_ts_generator.sh`,
-              './src',
-              `--min-depth ${minDepth}`,
-              mts ? '--ext .mts' : undefined,
-              giIgnore === undefined
-                ? undefined
-                : `--ignore ${giIgnore.join(',')}`,
-            ]
-              .filter(isNotUndefined)
-              .join(' '),
-
-            files: [
-              `${pathPrefixToRoot}/scripts/bash/index_ts_generator.sh`,
-              wireitDeps.src,
-            ],
-
-            clean: false,
-            output: [
-              `src/${Array.from({ length: minDepth }, () => '*/').join('')}**/${
-                mts ? 'index.mts' : 'index.ts'
-              }`,
-            ],
-            packageLocks: [],
-          };
+          const command = [
+            `bash ${pathPrefixToRoot}/scripts/bash/index_ts_generator.sh`,
+            './src',
+            `--min-depth ${minDepth}`,
+            mts ? '--ext .mts' : undefined,
+            giIgnore === undefined
+              ? undefined
+              : `--ignore ${giIgnore.join(',')}`,
+          ]
+            .filter(isNotUndefined)
+            .join(' ');
 
           if (packageName === 'syncflow') {
             mut_scripts['gi'] = 'run-p gi:src gi:test';
-            mut_scripts['gi:src'] = 'wireit';
-            mut_scripts['gi:test'] = 'wireit';
 
-            mut_wireit['gi:src'] = content;
-            mut_wireit['gi:test'] = {
-              command: `bash ${pathPrefixToRoot}/scripts/bash/index_ts_generator.sh ./test/cases --min-depth 0 --ext .mts`,
-              files: [
-                `${pathPrefixToRoot}/scripts/bash/index_ts_generator.sh`,
-                'test/cases/**',
-              ],
-              clean: false,
-              output: ['test/cases/**/index.mts'],
-              packageLocks: [],
-            };
+            mut_scripts['gi:src'] = command;
+            mut_scripts['gi:test'] =
+              `bash ${pathPrefixToRoot}/scripts/bash/index_ts_generator.sh ./test/cases --min-depth 0 --ext .mts`;
           } else {
-            mut_wireit['gi'] = content;
+            mut_scripts['gi'] = command;
           }
         }
 
         if (generateFlag.build) {
-          mut_scripts[
-            packageName === 'eslint-configs' ? 'build:src' : 'build'
-          ] = 'wireit';
+          mut_scripts['build'] = 'wireit';
           mut_scripts['clean:build'] =
             cfg.useVite === true ? 'rimraf build' : 'rimraf esm';
 
           if (cfg.useVite === true) {
-            const viteConfigPath = `./${workspaceConfigsDirName}/${viteConfigName}`;
-
             mut_wireit['build'] = {
-              dependencies: ['type-check'],
-              command: 'yarn zz:cmd:vite build',
-              files: [
-                './public/**',
-                wireitDeps.src,
-                viteConfigPath,
-                wireitDeps.rootPackageJson,
-                wireitDeps.tsConfigs,
-              ],
-              output: ['build/**'],
+              dependencies: ['clean:build', 'type-check'],
+              command: 'yarn zz:vite build',
             };
           } else {
             const tsConfigPath = `./${workspaceConfigsDirName}/${tsconfigBuildJsonName}`;
 
-            mut_wireit[
-              packageName === 'eslint-configs' ? 'build:src' : 'build'
-            ] = {
-              ...(packageName.startsWith('global-')
-                ? {
-                    dependencies: ['zz:cmd:setup'],
-                  }
-                : packageName === 'eslint-configs'
-                  ? {
-                      dependencies: ['gi', 'gen-rules-type'],
-                    }
-                  : {}),
-              command: `tsc --project ${tsConfigPath}`,
-              files: [
-                wireitDeps.src,
-                tsConfigPath,
-                wireitDeps.rootPackageJson,
-                wireitDeps.tsConfigs,
+            mut_wireit['build'] = {
+              dependencies: [
+                'clean:build',
+                ...(packageName.startsWith('global-') ? ['zz:setup'] : []),
               ],
-              clean:
-                packageName === 'eslint-configs' ? 'if-file-deleted' : true,
-              output: ['esm/**', '.tsbuildinfo'],
+              command: `tsc --project ${tsConfigPath}`,
             };
           }
         }
@@ -417,22 +289,10 @@ const updatePackageJsonImpl = (
               ? `./${workspaceConfigsDirName}/${viteConfigName}`
               : `./${workspaceConfigsDirName}/${vitestConfigName}`;
 
-          mut_scripts['test'] = 'wireit';
-          mut_scripts['testw'] = 'yarn zz:cmd:vitest watch';
+          mut_scripts['test'] = 'yarn zz:vitest run';
+          mut_scripts['testw'] = 'yarn zz:vitest watch';
 
-          mut_scripts['zz:cmd:vitest'] = `vitest --config ${vitestConfigPath}`;
-
-          mut_wireit['test'] = {
-            command: 'yarn zz:cmd:vitest run',
-            files: [
-              wireitDeps.src,
-              vitestConfigPath,
-              `./${workspaceConfigsDirName}/${tsconfigTestJsonName}`,
-              wireitDeps.rootPackageJson,
-              wireitDeps.tsConfigs,
-            ],
-            output: [],
-          };
+          mut_scripts['zz:vitest'] = `vitest --config ${vitestConfigPath}`;
         }
 
         if (generateFlag.lint) {
@@ -440,26 +300,33 @@ const updatePackageJsonImpl = (
 
           if (cfg.useVite === true) {
             mut_scripts['lint'] = 'run-p lint:src lint:cy';
-            mut_scripts['lint:src'] = 'wireit';
-            mut_scripts['lint:cy'] = 'wireit';
+            mut_scripts['lint:src'] =
+              packageName === 'syncflow'
+                ? 'yarn zz:eslint:src-and-test'
+                : 'yarn zz:eslint:src';
+            mut_scripts['lint:cy'] = 'yarn zz:eslint:cy';
 
             mut_scripts['lint:fix'] = 'run-p lint:fix:src lint:fix:cy';
-            mut_scripts['lint:fix:src'] = 'wireit';
-            mut_scripts['lint:fix:cy'] = 'wireit';
+            mut_scripts['lint:fix:src'] =
+              packageName === 'syncflow'
+                ? 'yarn zz:eslint:src-and-test --fix'
+                : 'yarn zz:eslint:src --fix';
+            mut_scripts['lint:fix:cy'] = 'yarn zz:eslint:cy --fix';
           } else {
-            if (packageName === 'eslint-configs') {
-              mut_scripts['lint:src'] = 'wireit';
-              mut_scripts['lint:fix:src'] = 'wireit';
-            } else {
-              mut_scripts['lint'] = 'wireit';
-              mut_scripts['lint:fix'] = 'wireit';
-            }
+            mut_scripts['lint'] =
+              packageName === 'syncflow'
+                ? 'yarn zz:eslint:src-and-test'
+                : 'yarn zz:eslint:src';
+            mut_scripts['lint:fix'] =
+              packageName === 'syncflow'
+                ? 'yarn zz:eslint:src-and-test --fix'
+                : 'yarn zz:eslint:src --fix';
           }
 
-          mut_scripts['zz:cmd:eslint'] = 'ESLINT_USE_FLAT_CONFIG=true eslint';
+          mut_scripts['zz:eslint'] = 'ESLINT_USE_FLAT_CONFIG=true eslint';
 
-          mut_scripts['zz:cmd:eslint:print-config'] = [
-            'yarn zz:cmd:eslint --print-config',
+          mut_scripts['zz:eslint:print-config'] = [
+            'yarn zz:eslint --print-config',
             cfg.useVite === true ? 'src/main.tsx' : 'src/index.mts',
           ].join(' ');
 
@@ -470,86 +337,26 @@ const updatePackageJsonImpl = (
 
           mut_scripts[
             packageName === 'syncflow'
-              ? 'zz:cmd:eslint:src-and-test'
-              : 'zz:cmd:eslint:src'
+              ? 'zz:eslint:src-and-test'
+              : 'zz:eslint:src'
           ] = [
-            `yarn zz:cmd:eslint --config ${eslintConfigName}`,
+            `yarn zz:eslint --config ${eslintConfigName}`,
             `'./${srcDirStr}/**/*'`,
             '--cache --cache-location ./src/.eslintcache',
           ].join(' ');
 
-          {
-            const files = [
-              wireitDeps.src,
-              `./${eslintConfigName}`,
-              './package.json',
-              './tsconfig.json',
-              wireitDeps.rootPackageJson,
-              wireitDeps.tsConfigs,
-            ];
-
-            mut_wireit[
-              cfg.useVite === true || packageName === 'eslint-configs'
-                ? 'lint:src'
-                : 'lint'
-            ] = {
-              command:
-                packageName === 'syncflow'
-                  ? 'yarn zz:cmd:eslint:src-and-test'
-                  : 'yarn zz:cmd:eslint:src',
-              files,
-              output: [],
-            };
-
-            mut_wireit[
-              cfg.useVite === true || packageName === 'eslint-configs'
-                ? 'lint:fix:src'
-                : 'lint:fix'
-            ] = {
-              command:
-                packageName === 'syncflow'
-                  ? 'yarn zz:cmd:eslint:src-and-test --fix'
-                  : 'yarn zz:cmd:eslint:src --fix',
-              files,
-              clean: false,
-              output: [wireitDeps.src],
-            };
-          }
-
           if (cfg.useVite === true) {
-            mut_scripts['zz:cmd:eslint:cy'] = [
-              `yarn zz:cmd:eslint --config ./cypress/${eslintConfigName}`,
+            mut_scripts['zz:eslint:cy'] = [
+              `yarn zz:eslint --config ./cypress/${eslintConfigName}`,
               "'./cypress/**/*.ts'",
               '--cache --cache-location ./cypress/.eslintcache',
             ].join(' ');
-
-            const files = [
-              './cypress/**/*.ts',
-              `./cypress/${eslintConfigName}`,
-              './cypress/tsconfig.json',
-              './package.json',
-              wireitDeps.rootPackageJson,
-              wireitDeps.tsConfigs,
-            ];
-
-            mut_wireit['lint:cy'] = {
-              command: 'yarn zz:cmd:eslint:cy',
-              files,
-              output: [],
-            };
-
-            mut_wireit['lint:fix:cy'] = {
-              command: 'yarn zz:cmd:eslint:cy --fix',
-              files,
-              clean: false,
-              output: ['./cypress/**/*.ts'],
-            };
           }
         }
 
         if (generateFlag.publish) {
-          mut_scripts['pub'] = 'yarn zz:cmd:publish';
-          mut_scripts['zz:cmd:publish'] =
+          mut_scripts['pub'] = 'yarn zz:publish';
+          mut_scripts['zz:publish'] =
             'yarn publish --no-git-tag-version --access=public';
         }
 
@@ -585,22 +392,17 @@ const updatePackageJsonImpl = (
           mut_scripts['fb:login'] = 'firebase login';
           mut_scripts['fb:login:ci'] = 'firebase login:ci';
 
-          mut_scripts['preview'] = 'yarn zz:cmd:vite:preview';
+          mut_scripts['preview'] = 'yarn zz:vite:preview';
           mut_scripts['serve'] = 'firebase serve';
           mut_scripts['start'] = 'run-p start:**';
-          mut_scripts['start:dev-server'] = 'wireit';
+          mut_scripts['start:dev-server'] = 'yarn zz:vite --port 5180';
 
           mut_scripts['z:setup'] = 'run-p z:setup:gen-global-dts';
           mut_scripts['z:setup:gen-global-dts'] =
             'node ./scripts/gen-global-dts.mjs';
 
-          mut_wireit['start:dev-server'] = {
-            service: true,
-            command: 'yarn zz:cmd:vite --port 5180',
-          };
-
-          mut_scripts['zz:cmd:vite'] = 'vite --config configs/vite.config.ts';
-          mut_scripts['zz:cmd:vite:preview'] = 'yarn zz:cmd:vite preview';
+          mut_scripts['zz:vite'] = 'vite --config configs/vite.config.ts';
+          mut_scripts['zz:vite:preview'] = 'yarn zz:vite preview';
 
           if (
             packageName === 'lambda-calculus-interpreter-preact' ||
@@ -644,12 +446,8 @@ const updatePackageJsonImpl = (
           }
 
           if (packageName === 'event-schedule-app') {
-            mut_scripts['fb:export'] = 'wireit';
-
-            mut_wireit['fb:export'] = {
-              command:
-                'node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --cache --cache-strategy content --write ./scripts/firestore_backup.json',
-            };
+            mut_scripts['fb:export'] =
+              'node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --cache --cache-strategy content --write ./scripts/firestore_backup.json';
 
             mut_scripts['build:functions'] =
               'yarn workspace @noshiro/event-schedule-app-functions build';
@@ -672,16 +470,6 @@ const updatePackageJsonImpl = (
                   '../event-schedule-app-shared:build',
                 ],
                 command: `tsc --project ${tsConfigPath}`,
-                files: [
-                  tsConfigPath,
-                  `./${workspaceScriptsDirName}/**/*.ts`,
-                  wireitDeps.tsConfigs,
-                ],
-                clean: false,
-                output: [
-                  `./${workspaceScriptsDirName}/**/*.js`,
-                  `!./${workspaceScriptsDirName}/gen-global-dts.mjs`,
-                ],
               };
             }
 
@@ -691,115 +479,16 @@ const updatePackageJsonImpl = (
         }
 
         if (packageName.startsWith('global-')) {
-          mut_scripts['zz:cmd:fmt-src'] = 'yarn zz:cmd:prettier ./src';
-          mut_scripts['zz:cmd:gen'] =
-            `node ./${workspaceScriptsDirName}/gen.mjs`;
-          mut_scripts['zz:cmd:setup'] =
-            'run-s clean:src zz:cmd:gen zz:cmd:fmt-src';
+          mut_scripts['zz:fmt-src'] = 'yarn zz:prettier ./src';
+          mut_scripts['zz:gen'] = `node ./${workspaceScriptsDirName}/gen.mjs`;
+          mut_scripts['zz:setup'] = 'run-s clean:src zz:gen zz:fmt-src';
         }
 
         if (packageName === 'syncflow') {
           mut_scripts['start'] = 'node esm/test/preview-main.js';
-          mut_scripts['test:stream'] = 'yarn zz:cmd:vitest:stream run';
-          mut_scripts['zz:cmd:vitest:stream'] =
+          mut_scripts['test:stream'] = 'yarn zz:vitest:stream run';
+          mut_scripts['zz:vitest:stream'] =
             'vitest --config ./configs/vitest.config.stream.ts';
-        }
-
-        if (packageName === 'eslint-configs') {
-          mut_scripts['build'] = 'run-s build:scripts build:src';
-          mut_scripts['build:scripts'] = 'wireit';
-
-          mut_scripts['watch'] = 'yarn build:src --watch';
-
-          {
-            const tsConfigPath = `./${workspaceConfigsDirName}/tsconfig.scripts.json`;
-
-            mut_wireit['build:scripts'] = {
-              command: `tsc --project ${tsConfigPath}`,
-              files: [
-                `./${workspaceScriptsDirName}/**/*.{mts,ts,d.ts}`,
-                tsConfigPath,
-                wireitDeps.rootPackageJson,
-                wireitDeps.tsConfigs,
-              ],
-              clean: true,
-              output: [
-                `${workspaceScriptsDirName}/**/*.mjs`,
-                `!${workspaceScriptsDirName}/eslint.config.gen.mjs`,
-              ],
-            };
-          }
-
-          mut_scripts['lint'] = 'run-p lint:scripts lint:src';
-          mut_scripts['lint:fix'] = 'run-p lint:fix:scripts lint:fix:src';
-
-          mut_scripts['lint:scripts'] = 'wireit';
-          mut_scripts['lint:fix:scripts'] = 'wireit';
-          mut_scripts['zz:cmd:eslint:scripts'] =
-            `yarn zz:cmd:eslint --config ${eslintConfigName} "./${workspaceScriptsDirName}/**/*" --cache --cache-location ./${workspaceScriptsDirName}/.eslintcache`;
-
-          {
-            const files = [
-              `${workspaceScriptsDirName}/**/*.mts`,
-              eslintConfigName,
-              'package.json',
-              'tsconfig.json',
-              wireitDeps.rootPackageJson,
-              wireitDeps.tsConfigs,
-            ];
-
-            mut_wireit['lint:scripts'] = {
-              dependencies: ['build'],
-              command: 'yarn zz:cmd:eslint:scripts',
-              files,
-              output: [],
-            };
-
-            mut_wireit['lint:fix:scripts'] = {
-              dependencies: ['build'],
-              command: 'yarn zz:cmd:eslint:scripts --fix',
-              files,
-              clean: false,
-              output: [`${workspaceScriptsDirName}/**/*.mts`],
-            };
-          }
-
-          mut_scripts['gen-rules-type'] = 'wireit';
-          mut_wireit['gen-rules-type'] = {
-            dependencies: ['build:scripts'],
-            command: `node ./${workspaceScriptsDirName}/main.mjs`,
-            files: [
-              `${pathPrefixToRoot}/scripts/**`,
-              `./${workspaceScriptsDirName}/*.mjs`,
-              `./${workspaceScriptsDirName}/tsconfig.gen.json`,
-              `./${workspaceScriptsDirName}/eslint.config.gen.mjs`,
-              wireitDeps.rootPackageJson,
-              wireitDeps.rootPrettierrc,
-              wireitDeps.tsConfigs,
-            ],
-            clean: false, // index.mts を削除しないため
-            output: ['./src/types/rules/**/*.mts'],
-          };
-
-          {
-            // re-order properties
-
-            const keys = [
-              'build:src',
-              'lint:scripts',
-              'lint:fix:scripts',
-              'lint:src',
-              'lint:fix:src',
-            ];
-
-            for (const key of keys) {
-              const property = mut_wireit[key];
-              delete mut_wireit[key];
-              if (property !== undefined) {
-                mut_wireit[key] = property;
-              }
-            }
-          }
         }
       }
     }
@@ -844,5 +533,9 @@ const updatePackageJsonImpl = (
         ],
       };
     }
+  }
+
+  if (Object.keys(mut_packageJson['wireit']).length === 0) {
+    delete mut_packageJson['wireit'];
   }
 };

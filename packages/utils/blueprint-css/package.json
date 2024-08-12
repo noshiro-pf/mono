@@ -14,8 +14,8 @@
     "resources/icons/*"
   ],
   "scripts": {
-    "fmt": "yarn zz:cmd:prettier .",
-    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write"
+    "fmt": "yarn zz:prettier .",
+    "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write"
   },
   "devDependencies": {
     "@noshiro/mono-scripts": "*",

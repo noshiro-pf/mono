@@ -68,7 +68,7 @@ jobs:
           cache-dependency-path: yarn.lock
 
       # Set up GitHub Actions caching for Wireit.
-      - uses: google/wireit@setup-github-actions-caching/v1.0.2
+      # - uses: google/wireit@setup-github-actions-caching/v1.0.2
 
       # - run: echo '${{ toJSON(steps.setup_node_id.outputs) }}'
       # - if: ${{ steps.setup_node_id.outputs.cache-hit != 'true' }}
@@ -76,7 +76,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: Build dependencies
-        run: yarn zz:cmd:wsrun-stages --recursive -p @noshiro/${{ matrix.app_name }} -c build
+        run: yarn zz:wsrun-stages --recursive -p @noshiro/${{ matrix.app_name }} -c build
 
       - name: Cypress run on Chrome
         uses: cypress-io/github-action@v6.7.1
@@ -118,7 +118,7 @@ jobs:
           cache-dependency-path: yarn.lock
 
       # Set up GitHub Actions caching for Wireit.
-      - uses: google/wireit@setup-github-actions-caching/v1.0.2
+      # - uses: google/wireit@setup-github-actions-caching/v1.0.2
 
       # - run: echo '${{ toJSON(steps.setup_node_id.outputs) }}'
       # - if: ${{ steps.setup_node_id.outputs.cache-hit != 'true' }}
@@ -126,7 +126,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: Build dependencies
-        run: yarn zz:cmd:wsrun-stages --recursive -p @noshiro/event-schedule-app -c build
+        run: yarn zz:wsrun-stages --recursive -p @noshiro/event-schedule-app -c build
 
       - name: build functions
         run: yarn workspace @noshiro/event-schedule-app-functions build

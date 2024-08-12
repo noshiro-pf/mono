@@ -25,35 +25,35 @@
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "fb:login:ci": "firebase login:ci",
-    "fmt": "yarn zz:cmd:prettier .",
-    "gi": "wireit",
+    "fmt": "yarn zz:prettier .",
+    "gi": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 1 --ignore assets",
     "lint": "run-p lint:src lint:cy",
-    "lint:cy": "wireit",
+    "lint:cy": "yarn zz:eslint:cy",
     "lint:fix": "run-p lint:fix:src lint:fix:cy",
-    "lint:fix:cy": "wireit",
-    "lint:fix:src": "wireit",
-    "lint:src": "wireit",
-    "preview": "yarn zz:cmd:vite:preview",
+    "lint:fix:cy": "yarn zz:eslint:cy --fix",
+    "lint:fix:src": "yarn zz:eslint:src --fix",
+    "lint:src": "yarn zz:eslint:src",
+    "preview": "yarn zz:vite:preview",
     "serve": "firebase serve",
     "start": "run-p start:**",
-    "start:dev-server": "wireit",
-    "test": "wireit",
-    "testw": "yarn zz:cmd:vitest watch",
+    "start:dev-server": "yarn zz:vite --port 5180",
+    "test": "yarn zz:vitest run",
+    "testw": "yarn zz:vitest watch",
     "tsc": "yarn type-check",
     "tscw": "tsc --noEmit --watch",
     "type-check": "run-p type-check:src type-check:cy",
-    "type-check:cy": "wireit",
+    "type-check:cy": "tsc --noEmit -p ./cypress/tsconfig.json",
     "type-check:src": "wireit",
     "z:setup": "run-p z:setup:gen-global-dts",
     "z:setup:gen-global-dts": "node ./scripts/gen-global-dts.mjs",
-    "zz:cmd:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
-    "zz:cmd:eslint:cy": "yarn zz:cmd:eslint --config ./cypress/eslint.config.js './cypress/**/*.ts' --cache --cache-location ./cypress/.eslintcache",
-    "zz:cmd:eslint:print-config": "yarn zz:cmd:eslint --print-config src/main.tsx",
-    "zz:cmd:eslint:src": "yarn zz:cmd:eslint --config eslint.config.js './src/**/*' --cache --cache-location ./src/.eslintcache",
-    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
-    "zz:cmd:vite": "vite --config configs/vite.config.ts",
-    "zz:cmd:vite:preview": "yarn zz:cmd:vite preview",
-    "zz:cmd:vitest": "vitest --config ./configs/vite.config.ts"
+    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
+    "zz:eslint:cy": "yarn zz:eslint --config ./cypress/eslint.config.js './cypress/**/*.ts' --cache --cache-location ./cypress/.eslintcache",
+    "zz:eslint:print-config": "yarn zz:eslint --print-config src/main.tsx",
+    "zz:eslint:src": "yarn zz:eslint --config eslint.config.js './src/**/*' --cache --cache-location ./src/.eslintcache",
+    "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
+    "zz:vite": "vite --config configs/vite.config.ts",
+    "zz:vite:preview": "yarn zz:vite preview",
+    "zz:vitest": "vitest --config ./configs/vite.config.ts"
   },
   "browserslist": {
     "production": [
@@ -103,117 +103,14 @@
       "dependencies": [
         "z:setup"
       ],
-      "command": "tsc --noEmit",
-      "files": [
-        "./**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "type-check:cy": {
-      "command": "tsc --noEmit -p ./cypress/tsconfig.json",
-      "files": [
-        "./cypress/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./cypress/tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "gi": {
-      "command": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 1 --ignore assets",
-      "files": [
-        "../../../scripts/bash/index_ts_generator.sh",
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
-      ],
-      "clean": false,
-      "output": [
-        "src/*/**/index.ts"
-      ],
-      "packageLocks": []
+      "command": "tsc --noEmit"
     },
     "build": {
       "dependencies": [
+        "clean:build",
         "type-check"
       ],
-      "command": "yarn zz:cmd:vite build",
-      "files": [
-        "./public/**",
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./configs/vite.config.ts",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "output": [
-        "build/**"
-      ]
-    },
-    "test": {
-      "command": "yarn zz:cmd:vitest run",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./configs/vite.config.ts",
-        "./configs/tsconfig.test.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "lint:src": {
-      "command": "yarn zz:cmd:eslint:src",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./eslint.config.js",
-        "./package.json",
-        "./tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "lint:fix:src": {
-      "command": "yarn zz:cmd:eslint:src --fix",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./eslint.config.js",
-        "./package.json",
-        "./tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "clean": false,
-      "output": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
-      ]
-    },
-    "lint:cy": {
-      "command": "yarn zz:cmd:eslint:cy",
-      "files": [
-        "./cypress/**/*.ts",
-        "./cypress/eslint.config.js",
-        "./cypress/tsconfig.json",
-        "./package.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "lint:fix:cy": {
-      "command": "yarn zz:cmd:eslint:cy --fix",
-      "files": [
-        "./cypress/**/*.ts",
-        "./cypress/eslint.config.js",
-        "./cypress/tsconfig.json",
-        "./package.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "clean": false,
-      "output": [
-        "./cypress/**/*.ts"
-      ]
+      "command": "yarn zz:vite build"
     },
     "fb:deploy": {
       "dependencies": [
@@ -226,10 +123,6 @@
         "build"
       ],
       "command": "firebase deploy --only hosting"
-    },
-    "start:dev-server": {
-      "service": true,
-      "command": "yarn zz:cmd:vite --port 5180"
     }
   }
 }

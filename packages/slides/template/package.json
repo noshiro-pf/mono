@@ -7,7 +7,7 @@
   "sideEffects": true,
   "type": "module",
   "scripts": {
-    "build": "wireit",
+    "build": "vite build",
     "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
     "fb:deploy": "yarn z:fb:deploy:wireit",
@@ -26,21 +26,10 @@
   },
   "wireit": {
     "z:fb:deploy:wireit": {
-      "command": "yarn z:fb:deploy:impl",
       "dependencies": [
         "build"
-      ]
-    },
-    "build": {
-      "command": "vite build",
-      "clean": "if-file-deleted",
-      "files": [
-        "src/**/*"
       ],
-      "output": [
-        "dist/**",
-        ".tsbuildinfo"
-      ]
+      "command": "yarn z:fb:deploy:impl"
     }
   }
 }

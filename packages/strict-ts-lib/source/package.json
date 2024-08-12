@@ -65,11 +65,10 @@
       "command": "./scripts/gen-packages.sh"
     },
     "build": {
-      "command": "tsc --project ./configs/tsconfig.build.json",
-      "clean": true,
-      "output": [
-        "./scripts/dist/**/*"
-      ]
+      "dependencies": [
+        "clean:build"
+      ],
+      "command": "tsc --project ./configs/tsconfig.build.json"
     }
   }
 }

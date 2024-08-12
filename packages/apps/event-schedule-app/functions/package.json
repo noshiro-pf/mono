@@ -22,10 +22,10 @@
     "fb:logs": "firebase functions:log",
     "fb:shell": "firebase functions:shell",
     "fb:showlog": "firebase functions:log",
-    "fmt": "yarn zz:cmd:prettier .",
-    "gi": "wireit",
-    "lint": "wireit",
-    "lint:fix": "wireit",
+    "fmt": "yarn zz:prettier .",
+    "gi": "bash ../../../../scripts/bash/index_ts_generator.sh ./src --min-depth 1 --ext .mts",
+    "lint": "yarn zz:eslint:src",
+    "lint:fix": "yarn zz:eslint:src --fix",
     "start:emulators": "firebase emulators:start --only functions",
     "start:shell": "yarn shell",
     "tsc": "yarn type-check",
@@ -35,9 +35,9 @@
     "z:setup": "run-p z:setup:fb:emulators:gen-runtimeconfig",
     "z:setup:fb:emulators:gen-dummy-runtimeconfig": "echo '{ \"gmail\": { \"email\": \"dummy@gmail.com\", \"password\": \"dummy\", \"app-password\": \"dummy\", \"email-address-for-error-log\": \"dummy@gmail.com\" } }' > .runtimeconfig.json",
     "z:setup:fb:emulators:gen-runtimeconfig": "firebase functions:config:get > .runtimeconfig.json",
-    "zz:cmd:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
-    "zz:cmd:eslint:src": "yarn zz:cmd:eslint --config ./eslint.config.js './src/**/*' --cache --cache-location ./.eslintcache",
-    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../../.prettierignore --write"
+    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
+    "zz:eslint:src": "yarn zz:eslint --config ./eslint.config.js './src/**/*' --cache --cache-location ./.eslintcache",
+    "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../../.prettierignore --write"
   },
   "dependencies": {
     "@noshiro/event-schedule-app-shared": "*",
@@ -53,71 +53,17 @@
   },
   "wireit": {
     "type-check": {
-      "command": "tsc --noEmit",
       "dependencies": [
         "../../event-schedule-app-shared:build"
       ],
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "../../../../package.json",
-        "../../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "gi": {
-      "command": "bash ../../../../scripts/bash/index_ts_generator.sh ./src --min-depth 1 --ext .mts",
-      "files": [
-        "../../../../scripts/bash/index_ts_generator.sh",
-        "src/**"
-      ],
-      "clean": false,
-      "output": [
-        "src/*/**/index.ts"
-      ],
-      "packageLocks": []
+      "command": "tsc --noEmit"
     },
     "build": {
       "dependencies": [
+        "clean:build",
         "../../event-schedule-app-shared:build"
       ],
-      "command": "tsc --project tsconfig.json",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "../../../../package.json",
-        "../../../../config/tsconfig/**"
-      ],
-      "clean": true,
-      "output": [
-        "build/**",
-        ".tsbuildinfo"
-      ]
-    },
-    "lint": {
-      "command": "yarn zz:cmd:eslint:src",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./eslint.config.js",
-        "./package.json",
-        "./tsconfig.json",
-        "../../../../package.json",
-        "../../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "lint:fix": {
-      "command": "yarn zz:cmd:eslint:src --fix",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./eslint.config.js",
-        "./package.json",
-        "./tsconfig.json",
-        "../../../../package.json",
-        "../../../../config/tsconfig/**"
-      ],
-      "clean": false,
-      "output": [
-        "src/**/*.ts"
-      ]
+      "command": "tsc --project tsconfig.json"
     },
     "fb:deploy": {
       "dependencies": [
