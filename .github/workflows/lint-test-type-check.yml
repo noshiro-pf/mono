@@ -69,11 +69,11 @@ jobs:
         run: yarn setup
 
       - name: Check if there is no file diff
-        run: yarn zz:cmd:check:no-diff
+        run: yarn zz:check:no-diff
 
       - name: Run "${{ matrix.command }}"
         run: yarn ${{ matrix.command }}
 
       - if: ${{ !contains(fromJSON('["ws:type-check", "ws:test", "workspace @noshiro/syncflow test:stream"]'), matrix.command) }}
         name: Check if there is no file diff
-        run: yarn zz:cmd:check:no-diff
+        run: yarn zz:check:no-diff

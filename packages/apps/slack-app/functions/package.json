@@ -19,10 +19,10 @@
     "fb:logs": "firebase functions:log",
     "fb:shell": "firebase functions:shell",
     "fb:showlog": "firebase functions:log",
-    "fmt": "yarn zz:cmd:prettier .",
+    "fmt": "yarn zz:prettier .",
     "gi": "bash ../../../../scripts/bash/index_ts_generator.sh ./src --min-depth 1",
-    "lint": "yarn zz:cmd:eslint:src",
-    "lint:fix": "yarn zz:cmd:eslint:src --fix",
+    "lint": "yarn zz:eslint:src",
+    "lint:fix": "yarn zz:eslint:src --fix",
     "start:emulators": "firebase emulators:start --only functions",
     "start:shell": "yarn shell",
     "tsc": "yarn z:type-check:wireit",
@@ -31,10 +31,10 @@
     "watch": "tsc --watch --incremental --pretty --project tsconfig.json",
     "z:fb:deploy": "wireit",
     "z:fb:deploy:impl": "firebase deploy",
-    "zz:cmd:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
-    "zz:cmd:eslint:src": "yarn zz:cmd:eslint --config ./eslint.config.js src --cache --cache-location ./.eslintcache",
-    "zz:cmd:gi": "bash ../../../../scripts/bash/index_ts_generator.sh",
-    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../../.prettierignore --write"
+    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
+    "zz:eslint:src": "yarn zz:eslint --config ./eslint.config.js src --cache --cache-location ./.eslintcache",
+    "zz:gi": "bash ../../../../scripts/bash/index_ts_generator.sh",
+    "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../../.prettierignore --write"
   },
   "dependencies": {
     "@noshiro/io-ts": "*",

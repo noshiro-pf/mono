@@ -29,19 +29,19 @@
     "clean:eslintcache": "rimraf .eslintcache",
     "clean:src": "rimraf src/*.mts",
     "clean:wireit": "rimraf .wireit/**",
-    "fmt": "yarn zz:cmd:prettier .",
-    "lint": "yarn zz:cmd:eslint:src",
-    "lint:fix": "yarn zz:cmd:eslint:src --fix",
+    "fmt": "yarn zz:prettier .",
+    "lint": "yarn zz:eslint:src",
+    "lint:fix": "yarn zz:eslint:src --fix",
     "tsc": "yarn type-check",
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit",
-    "zz:cmd:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
-    "zz:cmd:eslint:print-config": "yarn zz:cmd:eslint --print-config src/index.mts",
-    "zz:cmd:eslint:src": "yarn zz:cmd:eslint --config eslint.config.js './src/**/*' --cache --cache-location ./src/.eslintcache",
-    "zz:cmd:fmt-src": "yarn zz:cmd:prettier ./src",
-    "zz:cmd:gen": "node ./scripts/gen.mjs",
-    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
-    "zz:cmd:setup": "run-s clean:src zz:cmd:gen zz:cmd:fmt-src"
+    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
+    "zz:eslint:print-config": "yarn zz:eslint --print-config src/index.mts",
+    "zz:eslint:src": "yarn zz:eslint --config eslint.config.js './src/**/*' --cache --cache-location ./src/.eslintcache",
+    "zz:fmt-src": "yarn zz:prettier ./src",
+    "zz:gen": "node ./scripts/gen.mjs",
+    "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
+    "zz:setup": "run-s clean:src zz:gen zz:fmt-src"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -56,7 +56,7 @@
     "build": {
       "dependencies": [
         "clean:build",
-        "zz:cmd:setup"
+        "zz:setup"
       ],
       "command": "tsc --project ./configs/tsconfig.build.json"
     }

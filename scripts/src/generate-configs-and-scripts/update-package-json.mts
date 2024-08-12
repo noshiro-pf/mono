@@ -150,26 +150,26 @@ const updatePackageJsonImpl = (
         const filename = './ts-type-utils.d.mts';
 
         mut_packageJson['scripts'] = {
-          build: 'yarn zz:cmd:build:seq',
+          build: 'yarn zz:build:seq',
           clean: 'run-p clean:**',
           'clean:eslintcache': 'rimraf .eslintcache',
           'clean:wireit': 'rimraf .wireit/**',
-          fmt: 'yarn zz:cmd:prettier .',
-          lint: 'yarn zz:cmd:eslint:src-and-test',
-          'lint:fix': 'yarn zz:cmd:eslint:src-and-test --fix',
-          pub: 'yarn zz:cmd:publish',
+          fmt: 'yarn zz:prettier .',
+          lint: 'yarn zz:eslint:src-and-test',
+          'lint:fix': 'yarn zz:eslint:src-and-test --fix',
+          pub: 'yarn zz:publish',
           tsc: 'yarn type-check',
           tscw: 'yarn type-check --watch',
           'type-check': 'tsc --noEmit',
-          'zz:cmd:build:seq': 'run-s zz:cmd:build:step1',
+          'zz:build:seq': 'run-s zz:build:step1',
 
-          'zz:cmd:build:step1': `ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path="./\\1" />@g' > ${filename}`,
+          'zz:build:step1': `ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path="./\\1" />@g' > ${filename}`,
 
-          'zz:cmd:eslint': 'ESLINT_USE_FLAT_CONFIG=true eslint',
-          'zz:cmd:eslint:src-and-test':
-            'yarn zz:cmd:eslint "./{src,test}/**" --cache --cache-location ./.eslintcache',
-          'zz:cmd:prettier': `prettier --cache --cache-strategy content --ignore-path ${pathPrefixToRoot}/.prettierignore --write`,
-          'zz:cmd:publish': 'yarn publish --no-git-tag-version --access=public',
+          'zz:eslint': 'ESLINT_USE_FLAT_CONFIG=true eslint',
+          'zz:eslint:src-and-test':
+            'yarn zz:eslint "./{src,test}/**" --cache --cache-location ./.eslintcache',
+          'zz:prettier': `prettier --cache --cache-strategy content --ignore-path ${pathPrefixToRoot}/.prettierignore --write`,
+          'zz:publish': 'yarn publish --no-git-tag-version --access=public',
         };
 
         break;
@@ -204,8 +204,8 @@ const updatePackageJsonImpl = (
         }
 
         {
-          mut_scripts['fmt'] = 'yarn zz:cmd:prettier .';
-          mut_scripts['zz:cmd:prettier'] =
+          mut_scripts['fmt'] = 'yarn zz:prettier .';
+          mut_scripts['zz:prettier'] =
             `prettier --cache --cache-strategy content --ignore-path ${pathPrefixToRoot}/.prettierignore --write`;
         }
 
@@ -268,7 +268,7 @@ const updatePackageJsonImpl = (
           if (cfg.useVite === true) {
             mut_wireit['build'] = {
               dependencies: ['clean:build', 'type-check'],
-              command: 'yarn zz:cmd:vite build',
+              command: 'yarn zz:vite build',
             };
           } else {
             const tsConfigPath = `./${workspaceConfigsDirName}/${tsconfigBuildJsonName}`;
@@ -276,7 +276,7 @@ const updatePackageJsonImpl = (
             mut_wireit['build'] = {
               dependencies: [
                 'clean:build',
-                ...(packageName.startsWith('global-') ? ['zz:cmd:setup'] : []),
+                ...(packageName.startsWith('global-') ? ['zz:setup'] : []),
               ],
               command: `tsc --project ${tsConfigPath}`,
             };
@@ -289,10 +289,10 @@ const updatePackageJsonImpl = (
               ? `./${workspaceConfigsDirName}/${viteConfigName}`
               : `./${workspaceConfigsDirName}/${vitestConfigName}`;
 
-          mut_scripts['test'] = 'yarn zz:cmd:vitest run';
-          mut_scripts['testw'] = 'yarn zz:cmd:vitest watch';
+          mut_scripts['test'] = 'yarn zz:vitest run';
+          mut_scripts['testw'] = 'yarn zz:vitest watch';
 
-          mut_scripts['zz:cmd:vitest'] = `vitest --config ${vitestConfigPath}`;
+          mut_scripts['zz:vitest'] = `vitest --config ${vitestConfigPath}`;
         }
 
         if (generateFlag.lint) {
@@ -302,31 +302,31 @@ const updatePackageJsonImpl = (
             mut_scripts['lint'] = 'run-p lint:src lint:cy';
             mut_scripts['lint:src'] =
               packageName === 'syncflow'
-                ? 'yarn zz:cmd:eslint:src-and-test'
-                : 'yarn zz:cmd:eslint:src';
-            mut_scripts['lint:cy'] = 'yarn zz:cmd:eslint:cy';
+                ? 'yarn zz:eslint:src-and-test'
+                : 'yarn zz:eslint:src';
+            mut_scripts['lint:cy'] = 'yarn zz:eslint:cy';
 
             mut_scripts['lint:fix'] = 'run-p lint:fix:src lint:fix:cy';
             mut_scripts['lint:fix:src'] =
               packageName === 'syncflow'
-                ? 'yarn zz:cmd:eslint:src-and-test --fix'
-                : 'yarn zz:cmd:eslint:src --fix';
-            mut_scripts['lint:fix:cy'] = 'yarn zz:cmd:eslint:cy --fix';
+                ? 'yarn zz:eslint:src-and-test --fix'
+                : 'yarn zz:eslint:src --fix';
+            mut_scripts['lint:fix:cy'] = 'yarn zz:eslint:cy --fix';
           } else {
             mut_scripts['lint'] =
               packageName === 'syncflow'
-                ? 'yarn zz:cmd:eslint:src-and-test'
-                : 'yarn zz:cmd:eslint:src';
+                ? 'yarn zz:eslint:src-and-test'
+                : 'yarn zz:eslint:src';
             mut_scripts['lint:fix'] =
               packageName === 'syncflow'
-                ? 'yarn zz:cmd:eslint:src-and-test --fix'
-                : 'yarn zz:cmd:eslint:src --fix';
+                ? 'yarn zz:eslint:src-and-test --fix'
+                : 'yarn zz:eslint:src --fix';
           }
 
-          mut_scripts['zz:cmd:eslint'] = 'ESLINT_USE_FLAT_CONFIG=true eslint';
+          mut_scripts['zz:eslint'] = 'ESLINT_USE_FLAT_CONFIG=true eslint';
 
-          mut_scripts['zz:cmd:eslint:print-config'] = [
-            'yarn zz:cmd:eslint --print-config',
+          mut_scripts['zz:eslint:print-config'] = [
+            'yarn zz:eslint --print-config',
             cfg.useVite === true ? 'src/main.tsx' : 'src/index.mts',
           ].join(' ');
 
@@ -337,17 +337,17 @@ const updatePackageJsonImpl = (
 
           mut_scripts[
             packageName === 'syncflow'
-              ? 'zz:cmd:eslint:src-and-test'
-              : 'zz:cmd:eslint:src'
+              ? 'zz:eslint:src-and-test'
+              : 'zz:eslint:src'
           ] = [
-            `yarn zz:cmd:eslint --config ${eslintConfigName}`,
+            `yarn zz:eslint --config ${eslintConfigName}`,
             `'./${srcDirStr}/**/*'`,
             '--cache --cache-location ./src/.eslintcache',
           ].join(' ');
 
           if (cfg.useVite === true) {
-            mut_scripts['zz:cmd:eslint:cy'] = [
-              `yarn zz:cmd:eslint --config ./cypress/${eslintConfigName}`,
+            mut_scripts['zz:eslint:cy'] = [
+              `yarn zz:eslint --config ./cypress/${eslintConfigName}`,
               "'./cypress/**/*.ts'",
               '--cache --cache-location ./cypress/.eslintcache',
             ].join(' ');
@@ -355,8 +355,8 @@ const updatePackageJsonImpl = (
         }
 
         if (generateFlag.publish) {
-          mut_scripts['pub'] = 'yarn zz:cmd:publish';
-          mut_scripts['zz:cmd:publish'] =
+          mut_scripts['pub'] = 'yarn zz:publish';
+          mut_scripts['zz:publish'] =
             'yarn publish --no-git-tag-version --access=public';
         }
 
@@ -392,17 +392,17 @@ const updatePackageJsonImpl = (
           mut_scripts['fb:login'] = 'firebase login';
           mut_scripts['fb:login:ci'] = 'firebase login:ci';
 
-          mut_scripts['preview'] = 'yarn zz:cmd:vite:preview';
+          mut_scripts['preview'] = 'yarn zz:vite:preview';
           mut_scripts['serve'] = 'firebase serve';
           mut_scripts['start'] = 'run-p start:**';
-          mut_scripts['start:dev-server'] = 'yarn zz:cmd:vite --port 5180';
+          mut_scripts['start:dev-server'] = 'yarn zz:vite --port 5180';
 
           mut_scripts['z:setup'] = 'run-p z:setup:gen-global-dts';
           mut_scripts['z:setup:gen-global-dts'] =
             'node ./scripts/gen-global-dts.mjs';
 
-          mut_scripts['zz:cmd:vite'] = 'vite --config configs/vite.config.ts';
-          mut_scripts['zz:cmd:vite:preview'] = 'yarn zz:cmd:vite preview';
+          mut_scripts['zz:vite'] = 'vite --config configs/vite.config.ts';
+          mut_scripts['zz:vite:preview'] = 'yarn zz:vite preview';
 
           if (
             packageName === 'lambda-calculus-interpreter-preact' ||
@@ -479,17 +479,15 @@ const updatePackageJsonImpl = (
         }
 
         if (packageName.startsWith('global-')) {
-          mut_scripts['zz:cmd:fmt-src'] = 'yarn zz:cmd:prettier ./src';
-          mut_scripts['zz:cmd:gen'] =
-            `node ./${workspaceScriptsDirName}/gen.mjs`;
-          mut_scripts['zz:cmd:setup'] =
-            'run-s clean:src zz:cmd:gen zz:cmd:fmt-src';
+          mut_scripts['zz:fmt-src'] = 'yarn zz:prettier ./src';
+          mut_scripts['zz:gen'] = `node ./${workspaceScriptsDirName}/gen.mjs`;
+          mut_scripts['zz:setup'] = 'run-s clean:src zz:gen zz:fmt-src';
         }
 
         if (packageName === 'syncflow') {
           mut_scripts['start'] = 'node esm/test/preview-main.js';
-          mut_scripts['test:stream'] = 'yarn zz:cmd:vitest:stream run';
-          mut_scripts['zz:cmd:vitest:stream'] =
+          mut_scripts['test:stream'] = 'yarn zz:vitest:stream run';
+          mut_scripts['zz:vitest:stream'] =
             'vitest --config ./configs/vitest.config.stream.ts';
         }
       }
