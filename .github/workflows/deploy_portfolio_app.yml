@@ -33,7 +33,7 @@ jobs:
           cache-dependency-path: yarn.lock
 
       # Set up GitHub Actions caching for Wireit.
-      - uses: google/wireit@setup-github-actions-caching/v1.0.2
+      # - uses: google/wireit@setup-github-actions-caching/v1.0.2
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
