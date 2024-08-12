@@ -16,7 +16,7 @@ export const getLuminanceListAccumulated = (
   )
     .chain(Arr.rest)
     .chain((list) =>
-      Arr.scan(
+      Arr.scan<FiniteNumber, readonly [FiniteNumber, NonNegativeFiniteNumber]>(
         list,
         ([prev, acc], curr) =>
           tp(

@@ -1,9 +1,9 @@
 import { expectType } from '../../expect-type.mjs';
 import { RefinedNumberUtils as U } from '../refined-number-utils.mjs';
 
-type ElementType = Int;
-const typeName = 'Int';
-const typeNameInMessage = 'an integer';
+type ElementType = NonZeroInt;
+const typeName = 'NonZeroInt';
+const typeNameInMessage = 'a non-zero integer';
 
 const {
   abs,
@@ -14,19 +14,21 @@ const {
   sub,
   mul,
   div,
-  random,
+  randomNonZero: random,
   is,
   castTo,
 } = U.operatorsForInteger<ElementType, undefined, undefined>({
   integerOrSafeInteger: 'Integer',
+  nonZero: true,
   MIN_VALUE: undefined,
   MAX_VALUE: undefined,
   typeNameInMessage,
 } as const);
 
-export const toInt = castTo;
+export const isNonZeroInt = is;
+export const toNonZeroInt = castTo;
 
-export const Int = {
+export const NonZeroInt = {
   is,
 
   abs,
@@ -59,6 +61,7 @@ if (import.meta.vitest !== undefined) {
     { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
     { name: '1.2', value: 1.2 },
     { name: '-3.4', value: -3.4 },
+    { name: '0', value: 0 },
   ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
     expect(() => castTo(value)).toThrow(
       new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
@@ -71,8 +74,11 @@ if (import.meta.vitest !== undefined) {
     const result = random(min, max);
     expect(result).toBeGreaterThanOrEqual(min);
     expect(result).toBeLessThanOrEqual(max);
+    expect(result).not.toBe(0);
   });
 
-  expectType<keyof typeof Int, keyof U.NumberClass<ElementType, 'int'>>('=');
-  expectType<typeof Int, U.NumberClass<ElementType, 'int'>>('<=');
+  expectType<keyof typeof NonZeroInt, keyof U.NumberClass<ElementType, 'int'>>(
+    '=',
+  );
+  expectType<typeof NonZeroInt, U.NumberClass<ElementType, 'int'>>('<=');
 }

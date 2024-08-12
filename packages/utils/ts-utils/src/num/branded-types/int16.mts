@@ -1,54 +1,44 @@
-import { Num } from '../num.mjs';
+import { expectType } from '../../expect-type.mjs';
+import { RefinedNumberUtils as U } from '../refined-number-utils.mjs';
 
-const MIN_VALUE = -(2 ** 15);
-const MAX_VALUE = 2 ** 15 - 1;
+type ElementType = Int16;
+const typeName = 'Int16';
+const typeNameInMessage = 'an integer in [-2^15, 2^15)';
 
-const isInt16Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
-
-export const isInt16 = (a: number): a is Int16 =>
-  Number.isInteger(a) && isInt16Range(a);
-
-export const toInt16 = (a: number): Int16 => {
-  if (!isInt16(a)) {
-    throw new TypeError(`Expected integer in [-2^15, 2^15), got: ${a}`);
-  }
-  return a;
-};
-
-const to = toInt16;
-
-const _c = Num.clamp(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): Int16 => to(Math.round(_c(a)));
-
-const abs = (x: Int16WithSmallInt): IntersectBrand<Int16, NonNegativeNumber> =>
-  Math.abs(to(x));
-
-const _min = (...values: readonly Int16WithSmallInt[]): Int16 =>
-  to(Math.min(...values));
-
-const _max = (...values: readonly Int16WithSmallInt[]): Int16 =>
-  to(Math.max(...values));
-
-const pow = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 =>
-  clamp(x ** y);
-
-const add = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x + y);
-
-const sub = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x - y);
-
-const mul = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x * y);
-
-const div = (
-  x: Int16WithSmallInt,
-  y: WithSmallInt<IntersectBrand<Int16, NonZeroNumber>>,
-): Int16 => clamp(Math.floor(x / y));
-
-const random = (min: Int16WithSmallInt, max: Int16WithSmallInt): Int16 =>
-  add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
-
-export const Int16 = {
+const {
   MIN_VALUE,
   MAX_VALUE,
+  min: _min,
+  max: _max,
+  abs,
+  pow,
+  add,
+  sub,
+  mul,
+  div,
+  random,
+  is,
+  castTo,
+  clamp,
+} = U.operatorsForInteger<ElementType, number, number>({
+  integerOrSafeInteger: 'SafeInteger',
+  MIN_VALUE: -(2 ** 15),
+  MAX_VALUE: 2 ** 15 - 1,
+  typeNameInMessage,
+} as const);
+
+export const isInt16 = is;
+export const toInt16 = castTo;
+
+export const Int16 = {
+  is,
+
+  /** -2^15` */
+  MIN_VALUE,
+
+  /** 2^15 - 1` */
+  MAX_VALUE,
+
   abs,
 
   min: _min,
@@ -72,3 +62,31 @@ export const Int16 = {
   /** @returns `⌊a / b⌋`, but clamped to `[-2^15, 2^15)` */
   div,
 } as const;
+
+if (import.meta.vitest !== undefined) {
+  test.each([
+    { name: 'Number.NaN', value: Number.NaN },
+    { name: 'Number.POSITIVE_INFINITY', value: Number.POSITIVE_INFINITY },
+    { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
+    { name: '1.2', value: 1.2 },
+    { name: '-3.4', value: -3.4 },
+  ] as const)(`to${typeName}($name) should throw a TypeError`, ({ value }) => {
+    expect(() => castTo(value)).toThrow(
+      new TypeError(`Expected ${typeNameInMessage}, got: ${value}`),
+    );
+  });
+
+  test(`${typeName}.random`, () => {
+    const min = -5;
+    const max = 5;
+    const result = random(min, max);
+    expect(result).toBeGreaterThanOrEqual(min);
+    expect(result).toBeLessThanOrEqual(max);
+  });
+
+  expectType<
+    keyof typeof Int16,
+    keyof U.NumberClass<ElementType, 'int' | 'range'>
+  >('=');
+  expectType<typeof Int16, U.NumberClass<ElementType, 'int' | 'range'>>('<=');
+}

@@ -20,7 +20,7 @@ export const getLuminanceListAccumulated = (
   const luminanceDiffAccumulated = pipe(luminanceListCorrected)
     .chain(Arr.rest)
     .chain((list) =>
-      Arr.scan(
+      Arr.scan<FiniteNumber, readonly [FiniteNumber, FiniteNumber]>(
         list,
         ([prev, acc], curr) =>
           tp(
