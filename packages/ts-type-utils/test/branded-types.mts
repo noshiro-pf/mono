@@ -19,6 +19,7 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': false;
       '>=0': false;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -31,6 +32,7 @@ import { expectType } from './expect-type.mjs';
       Int: false;
       SafeInt: false;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -52,6 +54,7 @@ import { expectType } from './expect-type.mjs';
       '< 2^31': false;
       '< 2^32': false;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -73,6 +76,7 @@ import { expectType } from './expect-type.mjs';
       '< 2^31': true;
       '< 2^32': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -85,6 +89,7 @@ import { expectType } from './expect-type.mjs';
       NaNValue: false;
       '!=0': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -98,6 +103,7 @@ import { expectType } from './expect-type.mjs';
       '>= -2^15': true;
       '>= -2^31': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -116,6 +122,7 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -137,6 +144,7 @@ import { expectType } from './expect-type.mjs';
       // '>= -2^31': true;
       '>=0': false;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -146,6 +154,7 @@ import { expectType } from './expect-type.mjs';
       NaNValue: false;
       Finite: true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -158,6 +167,7 @@ import { expectType } from './expect-type.mjs';
       Finite: true;
       Int: true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -178,6 +188,7 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -198,6 +209,7 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -218,6 +230,7 @@ import { expectType } from './expect-type.mjs';
       // '>= -2^31': true;
       '>=0': false;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -229,6 +242,7 @@ import { expectType } from './expect-type.mjs';
       Int: true;
       '!=0': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -240,6 +254,7 @@ import { expectType } from './expect-type.mjs';
       Int: true;
       SafeInt: true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -261,6 +276,7 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -282,6 +298,7 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -303,6 +320,7 @@ import { expectType } from './expect-type.mjs';
       // '>= -2^31': true;
       '>=0': false;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -315,6 +333,7 @@ import { expectType } from './expect-type.mjs';
       SafeInt: true;
       '!=0': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -336,6 +355,7 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       // '>=0': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -357,6 +377,7 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       // '>=0': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -378,6 +399,7 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -399,6 +421,7 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -420,6 +443,7 @@ import { expectType } from './expect-type.mjs';
       // '>= -2^31': true;
       '>=0': false;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -441,6 +465,7 @@ import { expectType } from './expect-type.mjs';
       '>= -2^31': true;
       '>=0': false;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -449,6 +474,7 @@ import { expectType } from './expect-type.mjs';
     Readonly<{
       Float32: true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -457,6 +483,7 @@ import { expectType } from './expect-type.mjs';
     Readonly<{
       Float64: true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       number
   >('=');
 
@@ -468,6 +495,7 @@ import { expectType } from './expect-type.mjs';
       NaNValue: false;
       BigInt64: true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       bigint
   >('=');
 
@@ -479,6 +507,7 @@ import { expectType } from './expect-type.mjs';
       NaNValue: false;
       BigUint64: true;
     }> &
+      TSTypeUtilsInternals.BrandUniqueKey &
       bigint
   >('=');
 }
