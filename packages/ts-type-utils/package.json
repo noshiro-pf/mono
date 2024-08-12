@@ -20,8 +20,8 @@
     "clean:eslintcache": "rimraf .eslintcache",
     "clean:wireit": "rimraf .wireit/**",
     "fmt": "yarn zz:cmd:prettier .",
-    "lint": "wireit",
-    "lint:fix": "wireit",
+    "lint": "yarn zz:cmd:eslint:src-and-test",
+    "lint:fix": "yarn zz:cmd:eslint:src-and-test --fix",
     "pub": "yarn zz:cmd:publish",
     "tsc": "yarn type-check",
     "tscw": "yarn type-check --watch",
@@ -36,34 +36,5 @@
   "devDependencies": {
     "@noshiro/eslint-configs": "*",
     "@noshiro/mono-scripts": "*"
-  },
-  "wireit": {
-    "lint": {
-      "command": "yarn zz:cmd:eslint:src-and-test",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "eslint.config.js",
-        "package.json",
-        "tsconfig.json",
-        "../../package.json",
-        "../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "lint:fix": {
-      "command": "yarn zz:cmd:eslint:src-and-test --fix",
-      "files": [
-        "./src/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "eslint.config.js",
-        "package.json",
-        "tsconfig.json",
-        "../../package.json",
-        "../../config/tsconfig/**"
-      ],
-      "clean": false,
-      "output": [
-        "src/**/*.mts"
-      ]
-    }
   }
 }

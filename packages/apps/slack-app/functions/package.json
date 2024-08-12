@@ -6,7 +6,7 @@
   "author": "noshiro",
   "type": "module",
   "scripts": {
-    "build": "wireit",
+    "build": "tsc --project tsconfig.json",
     "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
     "clean:eslintcache": "rimraf .eslintcache",
@@ -20,17 +20,17 @@
     "fb:shell": "firebase functions:shell",
     "fb:showlog": "firebase functions:log",
     "fmt": "yarn zz:cmd:prettier .",
-    "gi": "wireit",
-    "lint": "wireit",
-    "lint:fix": "wireit",
+    "gi": "bash ../../../../scripts/bash/index_ts_generator.sh ./src --min-depth 1",
+    "lint": "yarn zz:cmd:eslint:src",
+    "lint:fix": "yarn zz:cmd:eslint:src --fix",
     "start:emulators": "firebase emulators:start --only functions",
     "start:shell": "yarn shell",
     "tsc": "yarn z:type-check:wireit",
     "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit",
+    "type-check": "tsc --noEmit --project tsconfig.json",
     "watch": "tsc --watch --incremental --pretty --project tsconfig.json",
+    "z:fb:deploy": "wireit",
     "z:fb:deploy:impl": "firebase deploy",
-    "z:fb:deploy:wireit": "wireit",
     "zz:cmd:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
     "zz:cmd:eslint:src": "yarn zz:cmd:eslint --config ./eslint.config.js src --cache --cache-location ./.eslintcache",
     "zz:cmd:gi": "bash ../../../../scripts/bash/index_ts_generator.sh",
@@ -51,78 +51,11 @@
     "node": ">=16"
   },
   "wireit": {
-    "build": {
-      "command": "tsc --project tsconfig.json",
-      "clean": "if-file-deleted",
-      "files": [
-        "src/**/*.ts",
-        "src/**/*.mts",
-        "tsconfig.json",
-        "../../../../config/tsconfig/**"
-      ],
-      "output": [
-        "esm/**",
-        ".tsbuildinfo"
-      ]
-    },
-    "z:fb:deploy:wireit": {
-      "command": "yarn z:fb:deploy:impl",
+    "z:fb:deploy": {
       "dependencies": [
         "build"
-      ]
-    },
-    "gi": {
-      "command": "bash ../../../../scripts/bash/index_ts_generator.sh ./src --min-depth 1",
-      "clean": false,
-      "files": [
-        "../../../../scripts/bash/index_ts_generator.sh",
-        "src/**"
       ],
-      "output": [
-        "src/*/**/index.ts"
-      ],
-      "packageLocks": []
-    },
-    "lint": {
-      "command": "yarn zz:cmd:eslint:src",
-      "files": [
-        "src/**/*.ts",
-        "src/**/*.mts",
-        "eslint.config.js",
-        "package.json",
-        "tsconfig.json",
-        "../../../../package.json",
-        "../../../../config/tsconfig/**",
-        "../../../../config/eslint/**"
-      ],
-      "output": []
-    },
-    "lint:fix": {
-      "command": "yarn zz:cmd:eslint:src --fix",
-      "files": [
-        "src/**/*.ts",
-        "src/**/*.mts",
-        "eslint.config.js",
-        "package.json",
-        "tsconfig.json",
-        "../../../../package.json",
-        "../../../../config/tsconfig/**",
-        "../../../../config/eslint/**"
-      ],
-      "clean": false,
-      "output": [
-        "src/**/*.ts"
-      ]
-    },
-    "type-check": {
-      "command": "tsc --noEmit --project tsconfig.json",
-      "files": [
-        "src/**/*.ts",
-        "src/**/*.mts",
-        "tsconfig.json",
-        "../../../../config/tsconfig/**"
-      ],
-      "output": []
+      "command": "yarn z:fb:deploy:impl"
     }
   }
 }

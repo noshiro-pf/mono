@@ -27,18 +27,18 @@
     "clean:wireit": "rimraf .wireit/**",
     "fmt": "yarn zz:cmd:prettier .",
     "gi": "run-p gi:src gi:test",
-    "gi:src": "wireit",
-    "gi:test": "wireit",
-    "lint": "wireit",
-    "lint:fix": "wireit",
+    "gi:src": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
+    "gi:test": "bash ../../../scripts/bash/index_ts_generator.sh ./test/cases --min-depth 0 --ext .mts",
+    "lint": "yarn zz:cmd:eslint:src-and-test",
+    "lint:fix": "yarn zz:cmd:eslint:src-and-test --fix",
     "pub": "yarn zz:cmd:publish",
     "start": "node esm/test/preview-main.js",
-    "test": "wireit",
+    "test": "yarn zz:cmd:vitest run",
     "test:stream": "yarn zz:cmd:vitest:stream run",
     "testw": "yarn zz:cmd:vitest watch",
     "tsc": "yarn type-check",
     "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit",
+    "type-check": "tsc --noEmit",
     "zz:cmd:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
     "zz:cmd:eslint:print-config": "yarn zz:cmd:eslint --print-config src/index.mts",
     "zz:cmd:eslint:src-and-test": "yarn zz:cmd:eslint --config eslint.config.js './{src,test}/**/*' --cache --cache-location ./src/.eslintcache",
@@ -61,91 +61,11 @@
     "typescript": "^4.9.3"
   },
   "wireit": {
-    "type-check": {
-      "command": "tsc --noEmit",
-      "files": [
-        "./**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "gi:src": {
-      "command": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
-      "files": [
-        "../../../scripts/bash/index_ts_generator.sh",
-        "./(src|test)/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
-      ],
-      "clean": false,
-      "output": [
-        "src/**/index.mts"
-      ],
-      "packageLocks": []
-    },
-    "gi:test": {
-      "command": "bash ../../../scripts/bash/index_ts_generator.sh ./test/cases --min-depth 0 --ext .mts",
-      "files": [
-        "../../../scripts/bash/index_ts_generator.sh",
-        "test/cases/**"
-      ],
-      "clean": false,
-      "output": [
-        "test/cases/**/index.mts"
-      ],
-      "packageLocks": []
-    },
     "build": {
-      "command": "tsc --project ./configs/tsconfig.build.json",
-      "files": [
-        "./(src|test)/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./configs/tsconfig.build.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
+      "dependencies": [
+        "clean:build"
       ],
-      "clean": true,
-      "output": [
-        "esm/**",
-        ".tsbuildinfo"
-      ]
-    },
-    "test": {
-      "command": "yarn zz:cmd:vitest run",
-      "files": [
-        "./(src|test)/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./configs/vitest.config.ts",
-        "./configs/tsconfig.test.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "lint": {
-      "command": "yarn zz:cmd:eslint:src-and-test",
-      "files": [
-        "./(src|test)/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./eslint.config.js",
-        "./package.json",
-        "./tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "output": []
-    },
-    "lint:fix": {
-      "command": "yarn zz:cmd:eslint:src-and-test --fix",
-      "files": [
-        "./(src|test)/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}",
-        "./eslint.config.js",
-        "./package.json",
-        "./tsconfig.json",
-        "../../../package.json",
-        "../../../config/tsconfig/**"
-      ],
-      "clean": false,
-      "output": [
-        "./(src|test)/**/*.{mjs,mts,js,ts,jsx,tsx,d.mts,d.ts}"
-      ]
+      "command": "tsc --project ./configs/tsconfig.build.json"
     }
   }
 }
