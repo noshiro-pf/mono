@@ -64,7 +64,8 @@
     "build": {
       "dependencies": [
         "clean:build",
-        "gi"
+        "gi",
+        "type-check"
       ],
       "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
     }

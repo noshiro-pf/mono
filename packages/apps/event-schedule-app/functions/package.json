@@ -61,7 +61,8 @@
     "build": {
       "dependencies": [
         "clean:build",
-        "../../event-schedule-app-shared:build"
+        "../../event-schedule-app-shared:build",
+        "type-check"
       ],
       "command": "tsc --project tsconfig.json"
     },

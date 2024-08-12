@@ -16,11 +16,12 @@
   },
   "scripts": {
     "build": "run-s build:scripts build:src",
-    "build:scripts": "tsc --project ./configs/tsconfig.scripts.json",
-    "build:src": "run-s gi gen-rules-type build:src:command",
+    "build:scripts": "wireit",
+    "build:src": "wireit",
     "build:src:command": "tsc --project ./configs/tsconfig.build.json",
     "clean": "run-p clean:**",
     "clean:build": "rimraf esm",
+    "clean:build:scripts": "rimraf \"scripts/!(eslint.config.gen).mjs\"",
     "clean:eslintcache": "rimraf .eslintcache",
     "clean:wireit": "rimraf .wireit/**",
     "fmt": "yarn zz:prettier .",
@@ -29,9 +30,9 @@
     "gi": "bash ../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
     "lint": "run-p lint:scripts lint:src",
     "lint:fix": "run-p lint:fix:scripts lint:fix:src",
-    "lint:fix:scripts": "wireit",
+    "lint:fix:scripts": "yarn zz:eslint:scripts --fix",
     "lint:fix:src": "yarn zz:eslint:src --fix",
-    "lint:scripts": "wireit",
+    "lint:scripts": "yarn zz:eslint:scripts",
     "lint:src": "yarn zz:eslint:src",
     "tsc": "yarn type-check",
     "tscw": "tsc --noEmit --watch",
@@ -47,17 +48,17 @@
     "@noshiro/mono-scripts": "*"
   },
   "wireit": {
-    "lint:scripts": {
+    "build:scripts": {
       "dependencies": [
-        "build"
+        "clean:build:scripts"
       ],
-      "command": "yarn zz:eslint:scripts"
+      "command": "tsc --project ./configs/tsconfig.scripts.json"
     },
-    "lint:fix:scripts": {
+    "build:src": {
       "dependencies": [
-        "build"
+        "clean:build"
       ],
-      "command": "yarn zz:eslint:scripts --fix"
+      "command": "run-s gi gen-rules-type build:src:command"
     }
   }
 }

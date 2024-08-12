@@ -41,7 +41,7 @@
     "zz:fmt-src": "yarn zz:prettier ./src",
     "zz:gen": "node ./scripts/gen.mjs",
     "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
-    "zz:setup": "run-s clean:src zz:gen zz:fmt-src"
+    "zz:setup": "run-s clean:src zz:gen zz:fmt-src type-check"
   },
   "dependencies": {
     "@noshiro/ts-utils": "*",

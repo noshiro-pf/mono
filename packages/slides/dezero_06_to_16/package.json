@@ -7,7 +7,7 @@
   "sideEffects": true,
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "wireit",
     "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
     "fb:deploy": "yarn z:fb:deploy:wireit",
@@ -15,7 +15,6 @@
     "fb:login": "firebase login",
     "preview": "vite preview",
     "start": "vite",
-    "z:build:impl": "vite build",
     "z:fb:deploy:impl": "firebase deploy",
     "z:fb:deploy:wireit": "wireit"
   },
@@ -26,6 +25,12 @@
     "@noshiro/eslint-configs": "*"
   },
   "wireit": {
+    "build": {
+      "dependencies": [
+        "clean:build"
+      ],
+      "command": "vite build"
+    },
     "z:fb:deploy:wireit": {
       "dependencies": [
         "build"

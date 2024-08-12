@@ -48,7 +48,8 @@
   "wireit": {
     "build": {
       "dependencies": [
-        "clean:build"
+        "clean:build",
+        "type-check"
       ],
       "command": "node ./scripts/esbuild.mjs"
     },

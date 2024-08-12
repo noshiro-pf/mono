@@ -50,7 +50,8 @@
   "wireit": {
     "build": {
       "dependencies": [
-        "clean:build"
+        "clean:build",
+        "type-check"
       ],
       "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
     }
