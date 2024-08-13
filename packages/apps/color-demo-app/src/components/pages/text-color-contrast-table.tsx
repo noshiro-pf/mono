@@ -10,11 +10,9 @@ import {
   blackHsl,
   contrastRatioHsl,
   whiteHsl,
-  type Hue,
 } from '@noshiro/ts-utils-additional';
 import { Fragment } from 'react';
-
-const hues: readonly Hue[] = Arr.seq(360);
+import { huesDefault } from '../../constants';
 
 const indices = [0, 1, 2] as const;
 const saturationList = [80, 80, 100] as const satisfies readonly Percent[];
@@ -73,7 +71,7 @@ const componentElement = (
           </TableRow>
         </TableHead>
         <TableBody>
-          {hues.map((hue, idx) => (
+          {huesDefault.map((hue, idx) => (
             <TableRow key={hue}>
               <TableCell align='center'>{idx}</TableCell>
               {SL.map(([[saturation, lightness], key]) => {

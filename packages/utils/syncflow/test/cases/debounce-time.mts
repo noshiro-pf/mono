@@ -1,4 +1,4 @@
-import { tp } from '@noshiro/ts-utils';
+import { toPositiveSafeInt, tp } from '@noshiro/ts-utils';
 import {
   combineLatest,
   debounceTime,
@@ -31,7 +31,7 @@ const createStreams1 = (
   debouncedWithIndex$: Observable<readonly [number, number]>;
 }> => {
   const interval$ = interval(tick, true);
-  const counter$ = interval$.chain(take(200));
+  const counter$ = interval$.chain(take(toPositiveSafeInt(200)));
 
   const even$ = counter$.chain(filter((n) => n % 2 === 0));
   const filtered$ = counter$.chain(filter((n) => n % 10 < 5));
@@ -63,7 +63,7 @@ const createStreams2 = (
   combined$: Observable<readonly [number, number]>;
 }> => {
   const interval$ = interval(tick, true);
-  const counter$ = interval$.chain(take(40));
+  const counter$ = interval$.chain(take(toPositiveSafeInt(40)));
 
   const even$ = counter$.chain(filter((n) => n % 2 === 0));
   const filtered$ = counter$.chain(filter((n) => n % 10 < 5));

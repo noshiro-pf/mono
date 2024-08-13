@@ -1,11 +1,12 @@
-import { Arr, Num, Tpl } from '@noshiro/ts-utils';
+import { Arr, Num, Tpl, toUint16 } from '@noshiro/ts-utils';
 import { toHue } from '../../to-hue.mjs';
 import { type Hue } from '../../types/index.mjs';
 import { hslToRgb } from '../rgb-hsl-conversion/index.mjs';
 import { getLuminanceListAccumulated } from './get-luminance-list-acc.mjs';
 import { relativeLuminance } from './relative-luminance.mjs';
 
-const hues = Arr.seq(360) satisfies Seq<360>;
+// eslint-disable-next-line no-restricted-syntax
+const hues = Arr.seq(toUint16(360)) as unknown as Seq<360>;
 
 /** RelativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（=hue）を返す */
 export function pickupHighContrastHues<N extends SmallUint>(

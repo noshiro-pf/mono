@@ -7,13 +7,6 @@ const typeNameInMessage = 'an non-negative integer less than 256';
 const {
   MIN_VALUE,
   MAX_VALUE,
-  min: minImpl,
-  max: maxImpl,
-  pow: powImpl,
-  add: addImpl,
-  sub: subImpl,
-  mul: mulImpl,
-  div: divImpl,
   random: randomImpl,
   is: isImpl,
   castTo: castToImpl,
@@ -33,21 +26,24 @@ const castTo = (x: number): Uint8 =>
 
 const clamp = (a: number): Uint8 => castTo(clampImpl(a));
 
-const _min = (...values: readonly Uint8[]): Uint8 => castTo(minImpl(...values));
+const _min = (...values: readonly Uint8[]): Uint8 =>
+  castTo(Math.min(...values));
 
-const _max = (...values: readonly Uint8[]): Uint8 => castTo(maxImpl(...values));
+const _max = (...values: readonly Uint8[]): Uint8 =>
+  castTo(Math.max(...values));
 
-const pow = (x: Uint8, y: Uint8): Uint8 => castTo(powImpl(x, y));
+const pow = (x: Uint8, y: Uint8): Uint8 => castTo(x ** y);
 
-const add = (x: Uint8, y: Uint8): Uint8 => castTo(addImpl(x, y));
+const add = (x: Uint8, y: Uint8): Uint8 => castTo(x + y);
 
-const sub = (x: Uint8, y: Uint8): Uint8 => castTo(subImpl(x, y));
+const sub = (x: Uint8, y: Uint8): Uint8 => castTo(x - y);
 
-const mul = (x: Uint8, y: Uint8): Uint8 => castTo(mulImpl(x, y));
+const mul = (x: Uint8, y: Uint8): Uint8 => castTo(x * y);
 
-const div = (x: Uint8, y: Exclude<Uint8, 0>): Uint8 => castTo(divImpl(x, y));
+const div = (x: Uint8, y: Exclude<Uint8, 0>): Uint8 => castTo(x / y);
 
-const random = (min: Uint8, max: Uint8): Uint8 => castTo(randomImpl(min, max));
+const random = (min: Uint8, max: Uint8): Uint8 =>
+  castTo(randomImpl(castToImpl(min), castToImpl(max)));
 
 export const isUint8 = is;
 export const toUint8 = castTo;

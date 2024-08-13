@@ -61,7 +61,7 @@ export const generateCalendar = (
   const rowSize = numWeeks(year, month);
 
   return Arr.range(0, rowSize).map((i) =>
-    cells1d.slice(Uint8.mul(7, i), Uint8.mul(7, Uint8.add(i, 1))),
+    cells1d.slice(toUint32(7 * i), toUint32(7 * (i + 1))),
   );
 };
 

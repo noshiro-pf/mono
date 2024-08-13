@@ -33,7 +33,7 @@ declare namespace TSTypeUtilsInternals {
     F | (UnwrapBrandFalseKeys<B> & string)
   >;
 
-  type SmallIntIndexMax = 512;
+  type SmallIntIndexMax = 40;
 
   /** Integers in `[1, MaxIndex - 1]` */
   type SmallPositiveInt<MaxIndex extends number = SmallIntIndexMax> =
@@ -275,7 +275,7 @@ type BigUint64 = ExtendBrand<ChangeBaseBrand<Int, bigint>, 'BigUint64'>;
  *     - `'>0'`  : integers in `[1, MaxIndex - 1]`
  *     - `'>=0'` : integers in `[0, MaxIndex - 1]`
  *
- * @default MaxIndex = 512
+ * @default MaxIndex = 128
  */
 type SmallInt<
   T extends '!=0' | '' | '<=0' | '<0' | '>=0' | '>0' = '',
@@ -307,11 +307,11 @@ type CastToInt<T> = T extends Int ? T : never;
 /**
  * Append optimal small integers union to number type
  *
- *     - `SmallInt`         : integers in `[-512, 511]`
- *     - `SmallUint`        : integers in `[0, 511]`
- *     - `SmallPositiveInt` : integers in `[1, 511]`
- *     - `NonZeroSmallInt`  : integers in `[-512, 511] \ { 0 }`
- *     - `SmallNegativeInt` : integers in `[-512, -1]`
+ *     - `SmallInt`         : integers in `[-128, 127]`
+ *     - `SmallUint`        : integers in `[0, 127]`
+ *     - `SmallPositiveInt` : integers in `[1, 127]`
+ *     - `NonZeroSmallInt`  : integers in `[-128, 127] \ { 0 }`
+ *     - `SmallNegativeInt` : integers in `[-128, -1]`
  */
 type WithSmallInt<
   N extends Int,
