@@ -40,8 +40,8 @@
     "watch": "yarn build:src --watch",
     "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
     "zz:eslint:print-config": "yarn zz:eslint --print-config src/index.mts",
-    "zz:eslint:scripts": "yarn zz:eslint --config eslint.config.js \"./scripts/**/*\" --cache --cache-location ./scripts/.eslintcache",
-    "zz:eslint:src": "yarn zz:eslint --config eslint.config.js './src/**/*' --cache --cache-location ./src/.eslintcache",
+    "zz:eslint:scripts": "yarn zz:eslint --config eslint.config.js \"./scripts/**/*\"",
+    "zz:eslint:src": "yarn zz:eslint --config eslint.config.js './src/**/*'",
     "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../.prettierignore --write"
   },
   "devDependencies": {

@@ -41,7 +41,7 @@
     "type-check": "tsc --noEmit",
     "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint",
     "zz:eslint:print-config": "yarn zz:eslint --print-config src/index.mts",
-    "zz:eslint:src-and-test": "yarn zz:eslint --config eslint.config.js './{src,test}/**/*' --cache --cache-location ./src/.eslintcache",
+    "zz:eslint:src-and-test": "yarn zz:eslint --config eslint.config.js './{src,test}/**/*'",
     "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
     "zz:publish": "yarn publish --no-git-tag-version --access=public",
     "zz:vitest": "vitest --config ./configs/vitest.config.ts",

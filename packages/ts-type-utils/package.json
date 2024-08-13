@@ -29,7 +29,7 @@
     "zz:build:seq": "run-s zz:build:step1",
     "zz:build:step1": "ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path=\"./\\1\" />@g' > ./ts-type-utils.d.mts",
     "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint",
-    "zz:eslint:src-and-test": "yarn zz:eslint \"./{src,test}/**\" --cache --cache-location ./.eslintcache",
+    "zz:eslint:src-and-test": "yarn zz:eslint \"./{src,test}/**\"",
     "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../.prettierignore --write",
     "zz:publish": "yarn publish --no-git-tag-version --access=public"
   },

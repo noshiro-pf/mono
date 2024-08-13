@@ -165,8 +165,7 @@ const updatePackageJsonImpl = (
           'zz:build:step1': `ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path="./\\1" />@g' > ${filename}`,
 
           'zz:eslint': 'ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint',
-          'zz:eslint:src-and-test':
-            'yarn zz:eslint "./{src,test}/**" --cache --cache-location ./.eslintcache',
+          'zz:eslint:src-and-test': 'yarn zz:eslint "./{src,test}/**"',
           'zz:prettier': `prettier --cache --cache-strategy content --ignore-path ${pathPrefixToRoot}/.prettierignore --write`,
           'zz:publish': 'yarn publish --no-git-tag-version --access=public',
         };
@@ -348,14 +347,12 @@ const updatePackageJsonImpl = (
           ] = [
             `yarn zz:eslint --config ${eslintConfigName}`,
             `'./${srcDirStr}/**/*'`,
-            '--cache --cache-location ./src/.eslintcache',
           ].join(' ');
 
           if (cfg.useVite === true) {
             mut_scripts['zz:eslint:cy'] = [
               `yarn zz:eslint --config ./cypress/${eslintConfigName}`,
               "'./cypress/**/*.ts'",
-              '--cache --cache-location ./cypress/.eslintcache',
             ].join(' ');
           }
         }

@@ -44,7 +44,7 @@
     "z:get:lib-files": "./scripts/get-lib-files.sh",
     "z:rename-lib": "mv ../output/lib/package.json ../output/lib/package.json_bk",
     "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
-    "zz:eslint:scripts": "yarn zz:eslint --config eslint.config.js scripts --cache --cache-location ./scripts/.eslintcache",
+    "zz:eslint:scripts": "yarn zz:eslint --config eslint.config.js scripts",
     "zz:prettier": "prettier --ignore-path ../.prettierignore --write --log-level warn"
   },
   "devDependencies": {
