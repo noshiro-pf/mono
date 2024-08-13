@@ -164,7 +164,7 @@ const updatePackageJsonImpl = (
 
           'zz:build:step1': `ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path="./\\1" />@g' > ${filename}`,
 
-          'zz:eslint': 'ESLINT_USE_FLAT_CONFIG=true eslint',
+          'zz:eslint': 'ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint',
           'zz:eslint:src-and-test':
             'yarn zz:eslint "./{src,test}/**" --cache --cache-location ./.eslintcache',
           'zz:prettier': `prettier --cache --cache-strategy content --ignore-path ${pathPrefixToRoot}/.prettierignore --write`,
@@ -328,7 +328,8 @@ const updatePackageJsonImpl = (
                 : 'yarn zz:eslint:src --fix';
           }
 
-          mut_scripts['zz:eslint'] = 'ESLINT_USE_FLAT_CONFIG=true eslint';
+          mut_scripts['zz:eslint'] =
+            'ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint';
 
           mut_scripts['zz:eslint:print-config'] = [
             'yarn zz:eslint --print-config',

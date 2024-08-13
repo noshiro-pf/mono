@@ -35,7 +35,7 @@
     "tsc": "yarn type-check",
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit",
-    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
+    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint",
     "zz:eslint:print-config": "yarn zz:eslint --print-config src/index.mts",
     "zz:eslint:src": "yarn zz:eslint --config eslint.config.js './src/**/*' --cache --cache-location ./src/.eslintcache",
     "zz:fmt-src": "yarn zz:prettier ./src",

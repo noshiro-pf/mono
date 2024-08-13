@@ -46,7 +46,7 @@
     "type-check:src": "wireit",
     "z:setup": "run-p z:setup:gen-global-dts",
     "z:setup:gen-global-dts": "node ./scripts/gen-global-dts.mjs",
-    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
+    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint",
     "zz:eslint:cy": "yarn zz:eslint --config ./cypress/eslint.config.js './cypress/**/*.ts' --cache --cache-location ./cypress/.eslintcache",
     "zz:eslint:print-config": "yarn zz:eslint --print-config src/main.tsx",
     "zz:eslint:src": "yarn zz:eslint --config eslint.config.js './src/**/*' --cache --cache-location ./src/.eslintcache",
