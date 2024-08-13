@@ -58,9 +58,8 @@
     "zz:check:no-diff": "scripts/bash/git_no_changes.sh",
     "zz:prettier": "prettier --ignore-unknown --no-error-on-unmatched-pattern --write",
     "zz:prettier:cache": "yarn zz:prettier --cache --cache-strategy content",
-    "zz:wsrun": "wsrun --exclude-missing --fast-exit --prefix --ifDependency",
+    "zz:wsrun": "wsrun --exclude-missing --fast-exit --prefix --ifDependency --report",
     "zz:wsrun-parallel": "yarn zz:wsrun --parallel --concurrency 5",
-    "zz:wsrun-serial": "yarn zz:wsrun --serial",
     "zz:wsrun-stages": "yarn zz:wsrun --stages"
   },
   "dependencies": {

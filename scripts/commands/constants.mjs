@@ -8,8 +8,17 @@ export const utilsDirs = [
 export const wsrunOptions = [
   '--exclude-missing',
   '--fast-exit',
-  '--prefix ',
-  '--serial',
+  '--prefix',
+  '--parallel --concurrency 5',
+  '--ifDependency',
+  '--report',
+].join(' ');
+
+export const wsrunStagesOptions = [
+  '--exclude-missing',
+  '--fast-exit',
+  '--prefix',
+  '--stages',
   '--ifDependency',
   '--report',
 ].join(' ');
