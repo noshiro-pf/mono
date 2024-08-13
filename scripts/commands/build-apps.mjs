@@ -1,8 +1,8 @@
 import { forEachPackages } from '../esm/index.mjs';
-import { wsrunOptions } from './constants.mjs';
+import { wsrunStagesOptions } from './constants.mjs';
 
 forEachPackages({
   prefixes: ['packages/apps'],
   command: 'build',
-  wsrunOptions,
+  wsrunOptions: wsrunStagesOptions,
 }).catch(console.error);
