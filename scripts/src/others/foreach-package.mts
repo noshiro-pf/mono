@@ -14,13 +14,21 @@ export const forEachPackages = async ({
 }>): Promise<void> => {
   const workspaces = await getWorkspaces();
 
-  const packageNameList = prefixes.flatMap((prefix) =>
-    workspaces
-      .filter(
-        (ws) => ws.location.startsWith(prefix) === !treatPrefixesAsExcludeList,
-      )
-      .map((ws) => ws.name),
-  );
+  const packageNameList = workspaces
+    .filter((ws) =>
+      treatPrefixesAsExcludeList
+        ? prefixes.every((prefix) => !ws.location.startsWith(prefix))
+        : prefixes.some((prefix) => ws.location.startsWith(prefix)),
+    )
+    .map((ws) => ws.name);
+
+  {
+    console.log('');
+    for (const packageName of packageNameList) {
+      console.log('-', packageName);
+    }
+    console.log('');
+  }
 
   const fullCommand: string = [
     'yarn',
