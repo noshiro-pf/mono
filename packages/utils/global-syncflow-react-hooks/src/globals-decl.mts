@@ -1,4 +1,7 @@
 import {
+  type createBooleanState as VAR_createBooleanState,
+  type createReducer as VAR_createReducer,
+  type createState as VAR_createState,
   type useEventObservable as VAR_useEventObservable,
   type useObservable as VAR_useObservable,
   type useObservableEffect as VAR_useObservableEffect,
@@ -20,6 +23,9 @@ declare global {
   const useObservableValue: typeof VAR_useObservableValue;
   const useValueAsObservable: typeof VAR_useValueAsObservable;
   const useVoidEventObservable: typeof VAR_useVoidEventObservable;
+  const createBooleanState: typeof VAR_createBooleanState;
+  const createReducer: typeof VAR_createReducer;
+  const createState: typeof VAR_createState;
 
   /* custom variables */
 }

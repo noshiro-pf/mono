@@ -8,5 +8,8 @@ export const autoImportDef = {
     'useObservableValue',
     'useValueAsObservable',
     'useVoidEventObservable',
+    'createBooleanState',
+    'createReducer',
+    'createState',
   ],
 } as const;

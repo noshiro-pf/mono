@@ -13,7 +13,7 @@ type ConfirmEmailDialogProps = Readonly<{
 export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
   'ConfirmEmailDialog',
   ({ isOpen }) => {
-    const state = useObservableValue(ConfirmEmailDialogStore.state$);
+    const state = useObservableValue(ConfirmEmailDialogStore.state);
 
     const helperText = useMemo(
       () =>

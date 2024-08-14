@@ -14,43 +14,41 @@ const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-const [formState$, dispatch] = createReducer(
+const { state: formState$, dispatch } = createReducer(
   updatePasswordPageStateReducer,
   updatePasswordPageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || updatePasswordPageHasError(state)),
+  map((st) => st.isWaitingResponse || updatePasswordPageHasError(st)),
 );
 
 const oldPasswordFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) =>
-    state.oldPassword.error === undefined ? 'primary' : 'danger',
-  ),
+  map((st) => (st.oldPassword.error === undefined ? 'primary' : 'danger')),
 );
 
 const newPasswordFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) =>
-    state.newPassword.password.error === undefined &&
-    state.newPassword.passwordConfirmation.error === undefined
+  map((st) =>
+    st.newPassword.password.error === undefined &&
+    st.newPassword.passwordConfirmation.error === undefined
       ? 'primary'
       : 'danger',
   ),
 );
 
 const {
-  state$: oldPasswordIsOpen$,
+  state: oldPasswordIsOpen$,
   setFalse: hideOldPassword,
   toggle: toggleOldPasswordLock,
 } = createBooleanState(false);
 
 const {
-  state$: newPasswordIsOpen$,
+  state: newPasswordIsOpen$,
   setFalse: hideNewPassword,
   toggle: toggleNewPasswordLock,
 } = createBooleanState(false);
 
-const state$ = combineLatestI([
+const state = combine([
   formState$,
   enterButtonDisabled$,
   oldPasswordFormIntent$,
@@ -58,7 +56,7 @@ const state$ = combineLatestI([
   oldPasswordIsOpen$,
   newPasswordIsOpen$,
 ]).chain(
-  mapI(
+  map(
     ([
       formState,
       enterButtonDisabled,
@@ -202,7 +200,7 @@ UpdateUserInfoDialogStore.openingDialog$.subscribe((openingDialog) => {
 });
 
 export const UpdatePasswordPageStore = {
-  state$,
+  state,
   toggleOldPasswordLock,
   inputOldPasswordHandler,
   inputNewPasswordHandler,

@@ -13,16 +13,13 @@ const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-const [formState$, dispatch] = createReducer(
+const { state: formState$, dispatch } = createReducer(
   emailInputStateReducer,
   emailInputInitialState,
 );
 
-const enterButtonDisabled$ = combineLatestI([
-  formState$,
-  Auth.fireAuthUser$,
-]).chain(
-  mapI(
+const enterButtonDisabled$ = combine([formState$, Auth.fireAuthUser$]).chain(
+  map(
     ([formState, fireAuthUser]) => formState.inputValue !== fireAuthUser?.email,
   ),
 );
@@ -30,20 +27,20 @@ const enterButtonDisabled$ = combineLatestI([
 const {
   setFalse: setFalseIsWaitingResponse,
   setTrue: setTrueIsWaitingResponse,
-  state$: isWaitingResponse$,
+  state: isWaitingResponse$,
 } = createBooleanState(false);
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.error === undefined ? 'primary' : 'danger')),
+  map((st) => (st.error === undefined ? 'primary' : 'danger')),
 );
 
-const state$ = combineLatestI([
+const state = combine([
   formState$,
   enterButtonDisabled$,
   isWaitingResponse$,
   emailFormIntent$,
 ]).chain(
-  mapI(
+  map(
     ([formState, enterButtonDisabled, isWaitingResponse, emailFormIntent]) => ({
       formState,
       enterButtonDisabled,
@@ -156,7 +153,7 @@ UpdateUserInfoDialogStore.openingDialog$.subscribe((openingDialog) => {
 });
 
 export const DeleteAccountCreatedWithGoogleStore = {
-  state$,
+  state,
   enterClickHandler,
   inputEmailHandler,
 } as const;

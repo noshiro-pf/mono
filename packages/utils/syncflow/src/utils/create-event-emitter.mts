@@ -1,6 +1,9 @@
 import { source, type Observable } from '../core/index.mjs';
 
-export const createVoidEventEmitter = (): [Observable<void>, () => void] => {
+export const createVoidEventEmitter = (): readonly [
+  Observable<void>,
+  () => void,
+] => {
   const src$ = source<undefined>();
 
   const emitter = (): void => {
@@ -10,7 +13,7 @@ export const createVoidEventEmitter = (): [Observable<void>, () => void] => {
   return [src$, emitter];
 };
 
-export const createEventEmitter = <A,>(): [
+export const createEventEmitter = <A,>(): readonly [
   Observable<A>,
   (value: A) => void,
 ] => {

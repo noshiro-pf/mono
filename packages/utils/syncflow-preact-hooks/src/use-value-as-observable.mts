@@ -12,7 +12,7 @@ export const useChangeValueEffect = <A,>(
 };
 
 export const useValueAsObservable = <A,>(input: A): Observable<A> => {
-  const { state$, setState } = useObservableState<A>(input);
+  const { state, setState } = useObservableState<A>(input);
   useChangeValueEffect(input, setState);
-  return state$;
+  return state;
 };

@@ -1,23 +1,21 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
-  type InitializedToInitializedOperator,
+  type KeepInitialValueOperator,
   type Observable,
   type ThrottleTimeOperatorObservable,
-  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
-export const throttleTime =
-  <A,>(milliSeconds: number): ToUninitializedOperator<A, A> =>
-  (parentObservable: Observable<A>) =>
-    new ThrottleTimeObservableClass(parentObservable, milliSeconds);
-
-export const throttleTimeI = <A,>(
+export const throttleTime = <A,>(
   milliSeconds: number,
-): InitializedToInitializedOperator<A, A> =>
+): KeepInitialValueOperator<A, A> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  throttleTime(milliSeconds) as InitializedToInitializedOperator<A, A>;
+  ((parentObservable) =>
+    new ThrottleTimeObservableClass(
+      parentObservable,
+      milliSeconds,
+    )) as KeepInitialValueOperator<A, A>;
 
 class ThrottleTimeObservableClass<A>
   extends SyncChildObservableClass<A, 'throttleTime', readonly [A]>

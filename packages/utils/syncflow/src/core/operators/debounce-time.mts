@@ -2,22 +2,20 @@ import { Maybe } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class/index.mjs';
 import {
   type DebounceTimeOperatorObservable,
-  type InitializedToInitializedOperator,
+  type KeepInitialValueOperator,
   type Observable,
-  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
-export const debounceTime =
-  <A,>(milliSeconds: number): ToUninitializedOperator<A, A> =>
-  (parentObservable: Observable<A>) =>
-    new DebounceTimeObservableClass(parentObservable, milliSeconds);
-
-export const debounceTimeI = <A,>(
+export const debounceTime = <A,>(
   milliSeconds: number,
-): InitializedToInitializedOperator<A, A> =>
+): KeepInitialValueOperator<A, A> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  debounceTime(milliSeconds) as InitializedToInitializedOperator<A, A>;
+  ((parentObservable) =>
+    new DebounceTimeObservableClass(
+      parentObservable,
+      milliSeconds,
+    )) as KeepInitialValueOperator<A, A>;
 
 class DebounceTimeObservableClass<A>
   extends AsyncChildObservableClass<A, 'debounceTime', readonly [A]>

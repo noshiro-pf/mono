@@ -31,19 +31,19 @@ type ReturnValues = Readonly<{
 
 export const createEventScheduleSettingStore = (): ReturnValues => {
   const {
-    state$: title$,
+    state: title$,
     setState: setTitle,
     resetState: resetTitle,
   } = createState<string>(eventScheduleInitialValue.title);
 
   const {
-    state$: notes$,
+    state: notes$,
     setState: setNotes,
     resetState: resetNotes,
   } = createState<string>(eventScheduleInitialValue.notes);
 
   const {
-    state$: datetimeSpecification$,
+    state: datetimeSpecification$,
     setState: setDatetimeSpecification,
     resetState: resetDatetimeSpecification,
   } = createState<DatetimeSpecificationEnumType>(
@@ -51,7 +51,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
   );
 
   const {
-    state$: datetimeRangeList$,
+    state: datetimeRangeList$,
     setState: setDatetimeRangeList,
     resetState: resetDatetimeRangeList,
   } = createState<readonly DatetimeRange[]>(
@@ -74,16 +74,16 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
   });
 
   const {
-    state$: answerIcons$,
+    state: answerIcons$,
     setState: setAnswerIcons,
     resetState: resetAnswerIcons,
   } = createState<AnswerIconSettings>(eventScheduleInitialValue.answerIcons);
 
-  const initialNotificationSettingsWithEmailFilled$ = combineLatestI([
+  const initialNotificationSettingsWithEmailFilled$ = combine([
     Auth.fireAuthUser$,
     answerDeadline$,
   ]).chain(
-    mapI(([user, answerDeadline]) => ({
+    map(([user, answerDeadline]) => ({
       ...notificationSettingsInitialValue,
       email: user?.email ?? '',
       notifyAfterAnswerDeadline: answerDeadline !== undefined,
@@ -164,7 +164,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
   };
 
   const eventScheduleNormalized$: InitializedObservable<EventSchedule> =
-    combineLatestI([
+    combine([
       title$,
       notes$,
       datetimeSpecification$,
@@ -174,7 +174,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       notificationSettingsWithEmail$,
       Auth.fireAuthUser$,
     ]).chain(
-      mapI(
+      map(
         ([
           title,
           notes,
@@ -212,13 +212,13 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     );
 
   const eventScheduleValidation$: InitializedObservable<EventScheduleValidation> =
-    combineLatestI([
+    combine([
       title$,
       datetimeRangeList$,
       answerIcons$,
       notificationSettingsWithEmail$,
     ]).chain(
-      mapI(
+      map(
         ([
           title,
           datetimeRangeList,
@@ -236,11 +236,11 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     );
 
   const eventScheduleValidationOk$ = eventScheduleValidation$.chain(
-    mapI(validateEventScheduleAll),
+    map(validateEventScheduleAll),
   );
 
   const commonState$: InitializedObservable<EventScheduleSettingCommonState> =
-    combineLatestI([
+    combine([
       title$,
       notes$,
       datetimeSpecification$,
@@ -254,7 +254,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       eventScheduleNormalized$,
       eventScheduleValidationOk$,
     ]).chain(
-      mapI(
+      map(
         ([
           title,
           notes,

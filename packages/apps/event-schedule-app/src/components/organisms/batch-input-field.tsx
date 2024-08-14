@@ -155,15 +155,15 @@ export const BatchInputAnswerForm = memoNamed<Props>(
 
 const dc = dict.answerPage.answerBeingEdited;
 
-const { state$: comment$, setState: setComment } = createState('');
+const { state: comment$, setState: setComment } = createState('');
 
-const { state$: selectedIconId$, updateState: updateSelectedIconId } =
+const { state: selectedIconId$, updateState: updateSelectedIconId } =
   createState<AnswerIconIdWithNone>('none');
 
-const { state$: defaultFairPoint$, setState: setDefaultFairPoint } =
+const { state: defaultFairPoint$, setState: setDefaultFairPoint } =
   createState<AnswerIconPoint>(0);
 
-const { state$: fairPoint$, setState: setFairPoint } =
+const { state: fairPoint$, setState: setFairPoint } =
   createState<AnswerIconPoint>(0);
 
 const onGoodClick = (): void => {

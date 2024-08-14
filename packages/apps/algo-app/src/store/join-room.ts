@@ -1,7 +1,7 @@
 import { db } from './database';
 import { setMyName } from './my-name';
 
-const { state$: isWaitingResponse$, setState: setIsWaitingResponse } =
+const { state: isWaitingResponse$, setState: setIsWaitingResponse } =
   createBooleanState(false);
 
 const dispatch = async (roomId: string, username: string): Promise<void> => {

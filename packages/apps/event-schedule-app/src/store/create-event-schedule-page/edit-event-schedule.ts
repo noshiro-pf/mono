@@ -16,12 +16,12 @@ const toast = createToaster();
 const { commonState$, commonStateHandlers } = createEventScheduleSettingStore();
 
 const {
-  state$: eventScheduleFromDatabase$,
+  state: eventScheduleFromDatabase$,
   setState: setEventScheduleFromDatabase,
 } = createState<EventSchedule | undefined>(undefined);
 
 const {
-  state$: emailVerified$,
+  state: emailVerified$,
   setState: setEmailVerified,
   resetState: resetEmailVerified,
 } = createState<string | undefined>(undefined);
@@ -65,41 +65,40 @@ const setEventSchedule = (
   }
 };
 
-const diff$: InitializedObservable<EventSettingsPageDiffResult> =
-  combineLatestI([
-    emailVerified$,
-    eventScheduleFromDatabase$,
-    commonState$,
-  ]).chain(
-    mapI(
-      ([
+const diff$: InitializedObservable<EventSettingsPageDiffResult> = combine([
+  emailVerified$,
+  eventScheduleFromDatabase$,
+  commonState$,
+]).chain(
+  map(
+    ([
+      emailVerified,
+      eventScheduleFromDatabase,
+      { eventScheduleNormalized, notificationSettingsWithEmail },
+    ]) =>
+      collectEventSettingsPageDiff(
+        eventScheduleFromDatabase ?? eventScheduleInitialValue,
+        eventScheduleNormalized,
         emailVerified,
-        eventScheduleFromDatabase,
-        { eventScheduleNormalized, notificationSettingsWithEmail },
-      ]) =>
-        collectEventSettingsPageDiff(
-          eventScheduleFromDatabase ?? eventScheduleInitialValue,
-          eventScheduleNormalized,
-          emailVerified,
-          notificationSettingsWithEmail?.email,
-        ),
-    ),
-  );
+        notificationSettingsWithEmail?.email,
+      ),
+  ),
+);
 
 const hasDeletedDatetimeChanges$: InitializedObservable<boolean> = diff$.chain(
-  mapI(
+  map(
     (diff) =>
       diff.datetimeRangeList?.deleted !== undefined &&
       Arr.isNonEmpty(diff.datetimeRangeList.deleted),
   ),
 );
 
-const hasNoChanges$: InitializedObservable<boolean> = combineLatestI([
+const hasNoChanges$: InitializedObservable<boolean> = combine([
   emailVerified$,
   eventScheduleFromDatabase$,
   commonState$,
 ]).chain(
-  mapI(
+  map(
     ([
       emailVerified,
       eventScheduleFromDatabase,
@@ -111,7 +110,7 @@ const hasNoChanges$: InitializedObservable<boolean> = combineLatestI([
 );
 
 const answerPagePath$ = Router.eventId$.chain(
-  mapI((eventId) => Routes.routes.answerPage(eventId ?? '')),
+  map((eventId) => Routes.routes.answerPage(eventId ?? '')),
 );
 
 const onBackToAnswerPage = (): void => {
@@ -178,7 +177,7 @@ const onEditEventClick = (): void => {
 };
 
 const {
-  state$: isLoading$,
+  state: isLoading$,
   setTrue: setIsLoadingTrue,
   setFalse: setIsLoadingFalse,
 } = createBooleanState(false);

@@ -16,7 +16,7 @@ export const ResetPasswordPage = memoNamed<Props>(
   'ResetPasswordPage',
   ({ hidePasswordResetForm }) => {
     const { formState, enterButtonDisabled, emailFormIntent } =
-      useObservableValue(ResetPasswordPageStore.state$);
+      useObservableValue(ResetPasswordPageStore.state);
 
     return (
       <FormRectWrapper>

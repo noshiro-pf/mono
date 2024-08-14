@@ -22,7 +22,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
     emailFormIntent,
     passwordFormIntent,
     passwordIsOpen,
-  } = useObservableValue(RegisterPageStore.state$);
+  } = useObservableValue(RegisterPageStore.state);
 
   return (
     <SignInStyled.Wrapper>

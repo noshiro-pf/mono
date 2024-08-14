@@ -3,7 +3,7 @@ import { InitializedSyncChildObservableClass } from '../class/index.mjs';
 import {
   type Observable,
   type ScanOperatorObservable,
-  type ToInitializedOperator,
+  type SetInitialValueOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
@@ -11,8 +11,8 @@ export const scan =
   <A, B>(
     reducer: (acc: B, curr: A) => B,
     initialValue: B,
-  ): ToInitializedOperator<A, B> =>
-  (parentObservable: Observable<A>) =>
+  ): SetInitialValueOperator<A, B> =>
+  (parentObservable) =>
     new ScanObservableClass(parentObservable, reducer, initialValue);
 
 class ScanObservableClass<A, B>

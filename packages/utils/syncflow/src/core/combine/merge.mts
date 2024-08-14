@@ -1,8 +1,12 @@
-import { Maybe } from '@noshiro/ts-utils';
+import { Maybe, expectType } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
+import { fromArray } from '../create/index.mjs';
 import {
   type MergeObservable,
+  type MergeObservableRefined,
   type NonEmptyUnknownList,
+  type Observable,
+  type SyncChildObservable,
   type UpdaterSymbol,
   type Wrap,
 } from '../types/index.mjs';
@@ -12,9 +16,11 @@ import {
  *   instead of `merge`, and subscribe to `parents` and call `setState` within
  *   it.
  */
-export const merge = <P extends NonEmptyUnknownList>(
-  parents: Wrap<P>,
-): MergeObservable<P> => new MergeObservableClass(parents);
+export const merge = <OS extends NonEmptyArray<Observable<unknown>>>(
+  parents: OS,
+): MergeObservableRefined<OS> =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  new MergeObservableClass(parents) as never;
 
 class MergeObservableClass<P extends NonEmptyUnknownList>
   extends SyncChildObservableClass<ArrayElement<P>, 'merge', P>
@@ -40,4 +46,18 @@ class MergeObservableClass<P extends NonEmptyUnknownList>
 
     this.setNext(nextValue, updaterSymbol);
   }
+}
+
+if (import.meta.vitest !== undefined) {
+  test('type test', () => {
+    expect(1).toBe(1); // dummy
+  });
+
+  const r1 = fromArray([1, 2, 3]);
+  const r2 = fromArray(['a', 'b', 'c']);
+
+  // eslint-disable-next-line deprecation/deprecation
+  const _m = merge([r1, r2] as const);
+
+  expectType<typeof _m, SyncChildObservable<number | string, 'merge'>>('<=');
 }

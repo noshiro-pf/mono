@@ -1,7 +1,7 @@
 import './app.css';
 import { reactLogo } from './assets';
 
-const { state$: count$, updateState: updateCount } = createState(0);
+const { state: count$, updateState: updateCount } = createState(0);
 
 const increment = (): void => {
   updateCount((c) => c + 1);

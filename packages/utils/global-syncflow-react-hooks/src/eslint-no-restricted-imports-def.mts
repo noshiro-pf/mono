@@ -9,6 +9,9 @@ export const eslintNoRestrictedImportsDef = {
     'useObservableValue',
     'useValueAsObservable',
     'useVoidEventObservable',
+    'createBooleanState',
+    'createReducer',
+    'createState',
   ],
   message: 'use global variable instead.',
 };

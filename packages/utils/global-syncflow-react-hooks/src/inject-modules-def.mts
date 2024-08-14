@@ -10,5 +10,8 @@ export const injectModulesDef = Object.fromEntries(
     'useObservableValue',
     'useValueAsObservable',
     'useVoidEventObservable',
+    'createBooleanState',
+    'createReducer',
+    'createState',
   ].map((key) => tp(key, tp('@noshiro/syncflow-react-hooks', key))),
 );

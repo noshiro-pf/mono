@@ -1,5 +1,4 @@
 import { type EventListItem } from '@noshiro/event-schedule-app-shared';
-import { withLatestI } from '@noshiro/syncflow';
 import { api } from '../../api';
 import { fetchThrottleTime } from '../../constants';
 import { Auth } from '../auth';
@@ -11,7 +10,7 @@ const fetchEventListThrottled$ = fetchEventList$.chain(
   throttleTime(fetchThrottleTime),
 );
 
-const { state$: eventListResult$, setState: setEventListResult } = createState<
+const { state: eventListResult$, setState: setEventListResult } = createState<
   | Result<
       readonly EventListItem[] | undefined,
       Readonly<{ type: 'others' | 'wrong-type-response'; message: string }>
@@ -21,11 +20,11 @@ const { state$: eventListResult$, setState: setEventListResult } = createState<
 
 const result$ = eventListResult$;
 
-const { state$: refreshButtonIsLoading$, setState: setRefreshButtonIsLoading } =
+const { state: refreshButtonIsLoading$, setState: setRefreshButtonIsLoading } =
   createBooleanState(false);
 
 const {
-  state$: refreshButtonIsDisabled$,
+  state: refreshButtonIsDisabled$,
   setState: setRefreshButtonIsDisabled,
 } = createBooleanState(false);
 
@@ -36,15 +35,15 @@ const refreshEventList = (): void => {
 
 /* subscriptions */
 
-combineLatest(
+combine(
   tp(
     fetchEventListThrottled$,
     Auth.fireAuthUser$,
 
     EventListPageFilterStore.filterByText$
-      .chain(withInitialValue(undefined))
-      .chain(withLatestI(EventListPageFilterStore.filterText$))
-      .chain(mapI(([_, filterText]) => filterText)),
+      .chain(setInitialValue(undefined))
+      .chain(withCurrentValueFrom(EventListPageFilterStore.filterText$))
+      .chain(map(([_, filterText]) => filterText)),
     EventListPageFilterStore.filterOptionState$,
     EventListPageFilterStore.showAllPastDaysEvent$,
     EventListPageFilterStore.showOnlyEventSchedulesICreated$,
@@ -105,7 +104,7 @@ export const eventList$: InitializedObservable<
 > = result$
   .chain(filter(isNotUndefined))
   .chain(unwrapResultOk())
-  .chain(withInitialValue(undefined));
+  .chain(setInitialValue(undefined));
 
 export const EventListStore = {
   fetchEventList,

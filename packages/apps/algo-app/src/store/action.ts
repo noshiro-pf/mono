@@ -70,7 +70,7 @@ export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
 //   console.log({ merged });
 // });
 
-combineLatest([
+combine([
   db.room$.chain(filter(isNotUndefined)),
   localGameStateActionSource$,
 ] as const).subscribe(([room, localAction]) => {

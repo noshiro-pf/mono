@@ -1,16 +1,15 @@
-const { state$: filterOptionState$, setState: setFilterOptionState } =
+const { state: filterOptionState$, setState: setFilterOptionState } =
   createState<'archive' | 'inProgress'>('inProgress');
 
 const {
-  state$: showOnlyEventSchedulesICreated$,
+  state: showOnlyEventSchedulesICreated$,
   setState: setShowOnlyEventSchedulesICreated,
 } = createBooleanState(false);
 
-const { state$: showAllPastDaysEvent$, setState: setShowAllPastDaysEvent } =
+const { state: showAllPastDaysEvent$, setState: setShowAllPastDaysEvent } =
   createBooleanState(false);
 
-const { state$: filterText$, setState: setFilterText } =
-  createState<string>('');
+const { state: filterText$, setState: setFilterText } = createState<string>('');
 
 const [filterByText$, filterByText] = createVoidEventEmitter();
 

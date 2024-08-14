@@ -1,32 +1,27 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
-  type DistinctUntilChangedOperatorObservable,
-  type InitializedToInitializedOperator,
+  type KeepInitialValueOperator,
   type Observable,
-  type ToUninitializedOperator,
+  type SkipIfNoChangeOperatorObservable,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
-export const distinctUntilChanged =
-  <A,>(
-    eq: (x: A, y: A) => boolean = (x, y) => x === y,
-  ): ToUninitializedOperator<A, A> =>
-  (parentObservable: Observable<A>) =>
-    new DistinctUntilChangedObservableClass(parentObservable, eq);
-
-export const distinctUntilChangedI = <A,>(
+export const skipIfNoChange = <A,>(
   eq: (x: A, y: A) => boolean = (x, y) => x === y,
-): InitializedToInitializedOperator<A, A> =>
+): KeepInitialValueOperator<A, A> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  distinctUntilChanged(eq) as InitializedToInitializedOperator<A, A>;
+  ((parentObservable) =>
+    new SkipIfNoChangeObservableClass(
+      parentObservable,
+      eq,
+    )) as KeepInitialValueOperator<A, A>;
 
-export const skipUnchanged = distinctUntilChanged; // alias
-export const skipUnchangedI = distinctUntilChangedI; // alias
+export const distinctUntilChanged = skipIfNoChange; // alias
 
-class DistinctUntilChangedObservableClass<A>
-  extends SyncChildObservableClass<A, 'distinctUntilChanged', readonly [A]>
-  implements DistinctUntilChangedOperatorObservable<A>
+class SkipIfNoChangeObservableClass<A>
+  extends SyncChildObservableClass<A, 'skipIfNoChange', readonly [A]>
+  implements SkipIfNoChangeOperatorObservable<A>
 {
   readonly #eq: (x: A, y: A) => boolean;
   #previousValue: Maybe<A>;
@@ -34,7 +29,7 @@ class DistinctUntilChangedObservableClass<A>
   constructor(parentObservable: Observable<A>, eq: (x: A, y: A) => boolean) {
     super({
       parents: [parentObservable],
-      type: 'distinctUntilChanged',
+      type: 'skipIfNoChange',
       initialValue: parentObservable.snapshot,
     });
     // parentObservable.snapshot has value

@@ -30,7 +30,7 @@ const resultsSortedByProbability = pipe(Array.from(results)).chain((list) =>
   Arr.sorted(list, (a, b) => -(a.countSum - b.countSum)),
 ).value;
 
-const { state$: sortBy$, setState: setSortBy } = createState<'dice' | 'prob'>(
+const { state: sortBy$, setState: setSortBy } = createState<'dice' | 'prob'>(
   'prob',
 );
 
@@ -42,10 +42,10 @@ const sortByProbability = (): void => {
   setSortBy('prob');
 };
 
-const { state$: filterByString$, setState: setFilterByString } =
+const { state: filterByString$, setState: setFilterByString } =
   createState<string>('');
 
-const { state$: selectedTabId$, setState: setSelectedTabId } = createState<
+const { state: selectedTabId$, setState: setSelectedTabId } = createState<
   'deadColumnUI' | 'table'
 >('table');
 
@@ -57,7 +57,7 @@ const handleTabChange = (a: string): void => {
   }
 };
 
-const { state$: columnsAlive$, updateState: updateDeadColumns } = createState<
+const { state: columnsAlive$, updateState: updateDeadColumns } = createState<
   readonly boolean[]
 >(Arr.newArray(11, true));
 

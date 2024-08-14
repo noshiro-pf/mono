@@ -6,14 +6,14 @@ import {
   type ChildObservable,
   type InitializedObservable,
   type InitializedSyncChildObservable,
-  type InitializedToInitializedOperator,
+  type KeepInitialValueOperator,
   type NonEmptyUnknownList,
   type Observable,
   type ObservableId,
   type Operator,
+  type SetInitialValueOperator,
   type SyncChildObservable,
   type SyncChildObservableType,
-  type ToInitializedOperator,
   type Wrap,
 } from '../types/index.mjs';
 import { binarySearch, issueUpdaterSymbol, maxDepth } from '../utils/index.mjs';
@@ -229,9 +229,7 @@ export class InitializedSyncChildObservableClass<
   }
 
   override chain<B>(
-    operator:
-      | InitializedToInitializedOperator<A, B>
-      | ToInitializedOperator<A, B>,
+    operator: KeepInitialValueOperator<A, B> | SetInitialValueOperator<A, B>,
   ): InitializedObservable<B>;
 
   override chain<B>(operator: Operator<A, B>): Observable<B>;

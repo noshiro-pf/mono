@@ -238,7 +238,7 @@ const restoreFromQueryParams = (
   setSortOrderAndKey: (v: readonly ['date' | 'score', 'asc' | 'desc']) => void,
   filterStateDispatch: (action: AnswerFilterStateAction) => void,
 ): void => {
-  const queryParams = Router.state$.snapshot.value.searchParams;
+  const queryParams = Router.state.snapshot.value.searchParams;
 
   const sortKey =
     queryParams.get(keyDef.sortBy) === Routes.queryParamValue.sortBy.score

@@ -23,7 +23,7 @@ const toast = createToaster();
 const { commonState$, commonStateHandlers } = createEventScheduleSettingStore();
 
 const hasNoChanges$: InitializedObservable<boolean> = commonState$.chain(
-  mapI(({ eventScheduleNormalized }) =>
+  map(({ eventScheduleNormalized }) =>
     deepEqual(eventScheduleInitialValue, eventScheduleNormalized),
   ),
 );
@@ -94,18 +94,18 @@ const saveToLocalStorage = (
 };
 
 const {
-  state$: isLoading$,
+  state: isLoading$,
   setTrue: setIsLoadingTrue,
   setFalse: setIsLoadingFalse,
 } = createBooleanState(false);
 
 const {
-  state$: createResultDialogIsOpen$,
+  state: createResultDialogIsOpen$,
   setTrue: openCreateResultDialog,
   setFalse: closeCreateResultDialog,
 } = createBooleanState(false);
 
-const { state$: url$, setState: setUrl } = createState<string>('');
+const { state: url$, setState: setUrl } = createState<string>('');
 
 const createEvent = async (): Promise<Result<undefined, string>> => {
   const commonState = commonState$.snapshot.value;

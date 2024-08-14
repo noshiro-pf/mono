@@ -17,7 +17,7 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
   'UpdateDisplayNameDialog',
   ({ dialogIsOpen }) => {
     const { formState, displayNameFormIntent, enterButtonDisabled } =
-      useObservableValue(UpdateDisplayNamePageStore.state$);
+      useObservableValue(UpdateDisplayNamePageStore.state);
 
     return (
       <UpdateUserInfoDialogTemplate

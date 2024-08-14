@@ -23,7 +23,7 @@ export const DeleteAccountDialog = memoNamed<Props>(
       emailFormIntent,
       passwordFormIntent,
       passwordIsOpen,
-    } = useObservableValue(DeleteAccountPageStore.state$);
+    } = useObservableValue(DeleteAccountPageStore.state);
 
     return (
       <UpdateUserInfoDialogTemplate

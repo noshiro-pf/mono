@@ -4,17 +4,18 @@ import { visibleLabelsReducer } from '../functions';
 import { type AppEventHandler } from '../types';
 
 const {
-  state$: sideBarIsHidden$,
+  state: sideBarIsHidden$,
   setTrue: hideSideBar,
   setFalse: showSideBar,
 } = createBooleanState(false);
 
-const [visibleLabelIndices$, visibleLabelIndicesDispatcher] = createReducer(
-  visibleLabelsReducer,
-  labels.map(() => true),
-);
+const { state: visibleLabelIndices$, dispatch: visibleLabelIndicesDispatcher } =
+  createReducer(
+    visibleLabelsReducer,
+    labels.map(() => true),
+  );
 
-const { state$: selectedLabel$, setState: setSelectedLabel } =
+const { state: selectedLabel$, setState: setSelectedLabel } =
   createState<Label>(labelInit);
 
 const selectLabel = (labelId: IdType): void => {
@@ -38,7 +39,7 @@ const handlers: AppEventHandler = {
 };
 
 const visibleLabels$ = visibleLabelIndices$.chain(
-  mapI((visibleLabelIndices) =>
+  map((visibleLabelIndices) =>
     labels.filter((_, i) => visibleLabelIndices[i] === true),
   ),
 );

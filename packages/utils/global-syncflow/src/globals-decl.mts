@@ -3,52 +3,32 @@ import {
   type Observable as TYPE_Observable,
   type Subscription as TYPE_Subscription,
   type auditTime as VAR_auditTime,
-  type auditTimeI as VAR_auditTimeI,
-  type combineLatest as VAR_combineLatest,
-  type combineLatestI as VAR_combineLatestI,
-  type createBooleanState as VAR_createBooleanState,
+  type combine as VAR_combine,
   type createEventEmitter as VAR_createEventEmitter,
-  type createReducer as VAR_createReducer,
-  type createState as VAR_createState,
   type createVoidEventEmitter as VAR_createVoidEventEmitter,
   type debounceTime as VAR_debounceTime,
-  type debounceTimeI as VAR_debounceTimeI,
-  type distinctUntilChanged as VAR_distinctUntilChanged,
-  type distinctUntilChangedI as VAR_distinctUntilChangedI,
   type filter as VAR_filter,
   type fromPromise as VAR_fromPromise,
   type map as VAR_map,
-  type mapI as VAR_mapI,
   type mapMaybe as VAR_mapMaybe,
-  type mapMaybeI as VAR_mapMaybeI,
   type mapResultErr as VAR_mapResultErr,
-  type mapResultErrI as VAR_mapResultErrI,
   type mapResultOk as VAR_mapResultOk,
-  type mapResultOkI as VAR_mapResultOkI,
   type mapTo as VAR_mapTo,
-  type mapToI as VAR_mapToI,
   type mapWithIndex as VAR_mapWithIndex,
-  type mapWithIndexI as VAR_mapWithIndexI,
   type of as VAR_of,
   type pairwise as VAR_pairwise,
   type pluck as VAR_pluck,
-  type pluckI as VAR_pluckI,
   type scan as VAR_scan,
+  type setInitialValue as VAR_setInitialValue,
   type skip as VAR_skip,
+  type skipIfNoChange as VAR_skipIfNoChange,
   type source as VAR_source,
   type throttleTime as VAR_throttleTime,
-  type throttleTimeI as VAR_throttleTimeI,
   type unwrapMaybe as VAR_unwrapMaybe,
-  type unwrapMaybeI as VAR_unwrapMaybeI,
   type unwrapResultErr as VAR_unwrapResultErr,
-  type unwrapResultErrI as VAR_unwrapResultErrI,
   type unwrapResultOk as VAR_unwrapResultOk,
-  type unwrapResultOkI as VAR_unwrapResultOkI,
-  type withInitialValue as VAR_withInitialValue,
-  type withLatestFrom as VAR_withLatestFrom,
-  type withLatestFromI as VAR_withLatestFromI,
+  type withCurrentValueFrom as VAR_withCurrentValueFrom,
   type zip as VAR_zip,
-  type zipI as VAR_zipI,
 } from '@noshiro/syncflow';
 
 declare global {
@@ -59,52 +39,32 @@ declare global {
   /* custom types */
 
   const auditTime: typeof VAR_auditTime;
-  const auditTimeI: typeof VAR_auditTimeI;
-  const combineLatest: typeof VAR_combineLatest;
-  const combineLatestI: typeof VAR_combineLatestI;
-  const createBooleanState: typeof VAR_createBooleanState;
+  const combine: typeof VAR_combine;
   const createEventEmitter: typeof VAR_createEventEmitter;
-  const createReducer: typeof VAR_createReducer;
-  const createState: typeof VAR_createState;
   const createVoidEventEmitter: typeof VAR_createVoidEventEmitter;
   const debounceTime: typeof VAR_debounceTime;
-  const debounceTimeI: typeof VAR_debounceTimeI;
-  const distinctUntilChanged: typeof VAR_distinctUntilChanged;
-  const distinctUntilChangedI: typeof VAR_distinctUntilChangedI;
   const filter: typeof VAR_filter;
   const fromPromise: typeof VAR_fromPromise;
   const map: typeof VAR_map;
-  const mapI: typeof VAR_mapI;
   const mapMaybe: typeof VAR_mapMaybe;
-  const mapMaybeI: typeof VAR_mapMaybeI;
   const mapResultErr: typeof VAR_mapResultErr;
-  const mapResultErrI: typeof VAR_mapResultErrI;
   const mapResultOk: typeof VAR_mapResultOk;
-  const mapResultOkI: typeof VAR_mapResultOkI;
   const mapTo: typeof VAR_mapTo;
-  const mapToI: typeof VAR_mapToI;
   const mapWithIndex: typeof VAR_mapWithIndex;
-  const mapWithIndexI: typeof VAR_mapWithIndexI;
   const of: typeof VAR_of;
   const pairwise: typeof VAR_pairwise;
   const pluck: typeof VAR_pluck;
-  const pluckI: typeof VAR_pluckI;
   const scan: typeof VAR_scan;
+  const setInitialValue: typeof VAR_setInitialValue;
   const skip: typeof VAR_skip;
+  const skipIfNoChange: typeof VAR_skipIfNoChange;
   const source: typeof VAR_source;
   const throttleTime: typeof VAR_throttleTime;
-  const throttleTimeI: typeof VAR_throttleTimeI;
   const unwrapMaybe: typeof VAR_unwrapMaybe;
-  const unwrapMaybeI: typeof VAR_unwrapMaybeI;
   const unwrapResultErr: typeof VAR_unwrapResultErr;
-  const unwrapResultErrI: typeof VAR_unwrapResultErrI;
   const unwrapResultOk: typeof VAR_unwrapResultOk;
-  const unwrapResultOkI: typeof VAR_unwrapResultOkI;
-  const withInitialValue: typeof VAR_withInitialValue;
-  const withLatestFrom: typeof VAR_withLatestFrom;
-  const withLatestFromI: typeof VAR_withLatestFromI;
+  const withCurrentValueFrom: typeof VAR_withCurrentValueFrom;
   const zip: typeof VAR_zip;
-  const zipI: typeof VAR_zipI;
 
   /* custom variables */
 }

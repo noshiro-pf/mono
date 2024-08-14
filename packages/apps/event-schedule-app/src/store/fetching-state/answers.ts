@@ -8,18 +8,18 @@ const fetchAnswersThrottled$ = fetchAnswers$.chain(
   throttleTime(fetchThrottleTime),
 );
 
-const { state$: answersResult$, setState: setAnswersResult } = createState<
+const { state: answersResult$, setState: setAnswersResult } = createState<
   | Result<readonly Answer[], Readonly<{ type: 'others'; message: string }>>
   | undefined
 >(undefined);
 
 const result$ = answersResult$;
 
-const { state$: refreshButtonIsLoading$, setState: setRefreshButtonIsLoading } =
+const { state: refreshButtonIsLoading$, setState: setRefreshButtonIsLoading } =
   createBooleanState(false);
 
 const {
-  state$: refreshButtonIsDisabled$,
+  state: refreshButtonIsDisabled$,
   setState: setRefreshButtonIsDisabled,
 } = createBooleanState(false);
 
@@ -30,7 +30,7 @@ const refreshAnswers = (): void => {
 
 /* subscriptions */
 
-combineLatest([fetchAnswersThrottled$, Router.eventId$] as const).subscribe(
+combine([fetchAnswersThrottled$, Router.eventId$] as const).subscribe(
   ([_, eventId]) => {
     if (eventId === undefined) return;
 
@@ -69,7 +69,7 @@ result$.subscribe((e) => {
 const answers$: InitializedObservable<readonly Answer[] | undefined> = result$
   .chain(filter(isNotUndefined))
   .chain(unwrapResultOk())
-  .chain(withInitialValue(undefined));
+  .chain(setInitialValue(undefined));
 
 export const AnswersStore = {
   answers$,

@@ -1,5 +1,6 @@
-import { Arr } from '@noshiro/ts-utils';
+import { Arr, Maybe } from '@noshiro/ts-utils';
 import {
+  isRootObservable,
   type ChildObservable,
   type ObservableId,
   type RootObservable,
@@ -55,4 +56,17 @@ export class RootObservableClass<A, Type extends RootObservableType>
       p.tryUpdate(updaterSymbol);
     }
   }
+}
+
+if (import.meta.vitest !== undefined) {
+  test('isRootObservable', () => {
+    expect(
+      isRootObservable(
+        new RootObservableClass({
+          initialValue: Maybe.some(0),
+          type: 'Of',
+        }),
+      ),
+    ).toBe(true);
+  });
 }

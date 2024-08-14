@@ -22,7 +22,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
     emailFormIntent,
     passwordFormIntent,
     passwordIsOpen,
-  } = useObservableValue(SignInPageStore.state$);
+  } = useObservableValue(SignInPageStore.state);
 
   const {
     state: isPasswordResetForm,

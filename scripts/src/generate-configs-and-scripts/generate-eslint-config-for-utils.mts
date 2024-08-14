@@ -55,14 +55,23 @@ export const generateEsLintConfig = async (
         ? '...eslintFlatConfigForReact(),'
         : '',
     '',
-    '    {',
-    '      rules: {',
-    "        '@typescript-eslint/no-restricted-imports': [",
-    "           'error',",
-    '           ...restrictedImports,',
-    '        ]',
-    '      },',
-    '    },',
+
+    "{ rules: { '@typescript-eslint/no-restricted-imports': [ 'error', ...restrictedImports ] } },",
+
+    packageName === 'syncflow-preact-hooks' ||
+    packageName === 'syncflow-react-hooks'
+      ? JSON.stringify(
+          {
+            files: ['src/index.mts'],
+            rules: {
+              'import/export': 'off',
+            },
+          },
+          undefined,
+          2,
+        )
+      : '',
+
     '  ];',
     '',
     packageName === 'annotation-tool'

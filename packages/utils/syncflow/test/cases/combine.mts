@@ -1,5 +1,5 @@
 import {
-  combineLatest,
+  combine,
   filter,
   interval,
   map,
@@ -39,7 +39,7 @@ const createStreams = (
   const quad$ = counter$.chain(map((x) => x * 2)).chain(map((x) => x * 2));
   const square$ = counter$.chain(map((x) => x * x));
   const squareEven$ = square$.chain(filter((x) => x % 2 === 0));
-  const combined$ = combineLatest([
+  const combined$ = combine([
     counter$,
     double$,
     quad$,
@@ -72,7 +72,7 @@ const createStreams2 = (
   const counter$ = interval$.chain(take(5));
 
   const multiplied$ = counter$.chain(map((x) => 1000 * x));
-  const sum$ = combineLatest([counter$, multiplied$] as const).chain(
+  const sum$ = combine([counter$, multiplied$] as const).chain(
     map(([a, b]) => a + b),
   );
 
@@ -86,12 +86,12 @@ const createStreams2 = (
   };
 };
 
-export const combineLatestTestCases: readonly [
+export const combineTestCases: readonly [
   StreamTestCase<[number, number, number, number, number]>,
   StreamTestCase<number>,
 ] = [
   {
-    name: 'combineLatest case 1',
+    name: 'combine case 1',
     expectedOutput: [
       [0, 0, 0, 0, 0],
       [1, 2, 4, 1, 0],
@@ -144,7 +144,7 @@ export const combineLatestTestCases: readonly [
     },
   },
   {
-    name: 'combineLatest case 2',
+    name: 'combine case 2',
     expectedOutput: [0, 1001, 2002, 3003, 4004],
     run: (tick: number): Promise<readonly number[]> => {
       const { startSource, sum$ } = createStreams2(tick);

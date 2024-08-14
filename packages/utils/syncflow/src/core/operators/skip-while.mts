@@ -1,36 +1,51 @@
-import { Maybe } from '@noshiro/ts-utils';
+import { Maybe, SafeUint, idfn, toSafeUint } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
+  type DropInitialValueOperator,
   type Observable,
   type SkipWhileOperatorObservable,
-  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
+import { isPositiveSafeInteger } from '../utils/index.mjs';
 
 export const skipWhile =
-  <A,>(predicate: (value: A) => boolean): ToUninitializedOperator<A, A> =>
-  (parentObservable: Observable<A>) =>
+  <A,>(
+    predicate: (value: A, index: SafeUint | -1) => boolean,
+  ): DropInitialValueOperator<A, A> =>
+  (parentObservable) =>
     new SkipWhileObservableClass(parentObservable, predicate);
+
+/* Specialized operators */
+
+export const skip = <A,>(
+  n: PositiveSafeIntWithSmallInt,
+): DropInitialValueOperator<A, A> =>
+  !isPositiveSafeInteger(n) ? idfn : skipWhile((_, index) => index + 1 <= n);
+
+/* implementation */
 
 class SkipWhileObservableClass<A>
   extends SyncChildObservableClass<A, 'skipWhile', readonly [A]>
   implements SkipWhileOperatorObservable<A>
 {
-  readonly #predicate: (value: A) => boolean;
+  readonly #predicate: (value: A, index: SafeUint | -1) => boolean;
+  #mut_index: SafeUint | -1;
 
   constructor(
     parentObservable: Observable<A>,
-    predicate: (value: A) => boolean,
+    predicate: (value: A, index: SafeUint | -1) => boolean,
   ) {
     super({
       parents: [parentObservable],
       type: 'skipWhile',
       initialValue: Maybe.isNone(parentObservable.snapshot)
         ? Maybe.none
-        : predicate(parentObservable.snapshot.value)
+        : predicate(parentObservable.snapshot.value, -1)
           ? Maybe.none
           : parentObservable.snapshot,
     });
+
+    this.#mut_index = -1;
     this.#predicate = predicate;
   }
 
@@ -40,7 +55,10 @@ class SkipWhileObservableClass<A>
       return; // skip update
     }
 
-    if (!this.#predicate(par.snapshot.value)) {
+    this.#mut_index =
+      this.#mut_index === -1 ? toSafeUint(0) : SafeUint.add(1, this.#mut_index);
+
+    if (!this.#predicate(par.snapshot.value, this.#mut_index)) {
       this.setNext(par.snapshot.value, updaterSymbol);
     }
   }

@@ -20,7 +20,7 @@ import {
 
 // 手牌
 export const {
-  state$: hand$,
+  state: hand$,
   setState: setHand,
   updateState: updateHand,
   resetState: resetHand,
@@ -28,7 +28,7 @@ export const {
 
 // ドラ表示牌
 export const {
-  state$: doraIndicators$,
+  state: doraIndicators$,
   setState: setDoraIndicators,
   updateState: updateDoraIndicators,
   resetState: resetDoraIndicators,
@@ -36,17 +36,17 @@ export const {
 
 // 鳴き面子
 export const {
-  state$: revealedBlocks$,
+  state: revealedBlocks$,
   setState: setRevealedBlocks,
   updateState: updateRevealedBlocks,
   resetState: resetRevealedBlocks,
 } = createState<readonly RevealedBlock[]>([]);
 
-export const { state$: isCalculating$, setState: setIsCalculating } =
+export const { state: isCalculating$, setState: setIsCalculating } =
   createBooleanState(false);
 
 export const {
-  state$: result$,
+  state: result$,
   setState: setResult,
   resetState: resetResult,
 } = createState<
@@ -72,31 +72,31 @@ export const {
 >(undefined);
 
 export const {
-  state$: bakaze$,
+  state: bakaze$,
   setState: setBakaze,
   resetState: resetBakaze,
 } = createState<Bakaze>('Ton');
 
 export const {
-  state$: jikaze$,
+  state: jikaze$,
   setState: setJikaze,
   resetState: resetJikaze,
 } = createState<Jikaze>('Ton');
 
 export const {
-  state$: tehaiType$,
+  state: tehaiType$,
   setState: setTehaiType,
   resetState: resetTehaiType,
 } = createState<TehaiType>('normal');
 
 export const {
-  state$: turn$,
+  state: turn$,
   setState: setTurn,
   resetState: resetTurn,
 } = createState<Turn>(3);
 
 export const {
-  state$: flagOptions$,
+  state: flagOptions$,
   setState: setFlagOptions,
   resetState: resetFlagOptions,
 } = createState<
@@ -121,31 +121,28 @@ export const {
 });
 
 export const {
-  state$: maximizeTarget$,
+  state: maximizeTarget$,
   setState: setMaximizeTarget,
   resetState: resetMaximizeTarget,
 } = createState<MaximizeTarget>('exp');
 
 /* calculated values */
 
-export const handSorted$ = hand$.chain(mapI(sortTiles));
+export const handSorted$ = hand$.chain(map(sortTiles));
 
 // 手牌の枚数
-export const numHandTiles$ = combineLatestI([
-  handSorted$,
-  revealedBlocks$,
-]).chain(
-  mapI(([hand, revealedBlocks]) => hand.length + revealedBlocks.length * 3),
+export const numHandTiles$ = combine([handSorted$, revealedBlocks$]).chain(
+  map(([hand, revealedBlocks]) => hand.length + revealedBlocks.length * 3),
 );
 
 // ドラの枚数
-export const numDoraTiles$ = doraIndicators$.chain(mapI((a) => a.length));
+export const numDoraTiles$ = doraIndicators$.chain(map((a) => a.length));
 
 // 残りの牌の枚数
 export const numRemainingTiles$: InitializedObservable<
   Record<TileName, NumTiles>
-> = combineLatestI([handSorted$, doraIndicators$, revealedBlocks$]).chain(
-  mapI(([hand, doraIndicators, revealedBlocks]) => {
+> = combine([handSorted$, doraIndicators$, revealedBlocks$]).chain(
+  map(([hand, doraIndicators, revealedBlocks]) => {
     const mut_counts: Mutable<Record<TileName, NumTiles>> = {
       Manzu1: 4,
       Manzu2: 4,
@@ -209,15 +206,15 @@ export const numRemainingTiles$: InitializedObservable<
 
 // 「天鳳 / 牌理」の URL
 export const tenhoURL$ = handSorted$.chain(
-  mapI((hand) => `https://tenhou.net/2/?q=${hand2TenhoString(hand)}`),
+  map((hand) => `https://tenhou.net/2/?q=${hand2TenhoString(hand)}`),
 );
 
 // 「ツモアガリ確率計算機」用の文字列
 export const tsumoProbStr$ = handSorted$.chain(
-  mapI((hand) => hand.map((x) => tileDef[x].TsumoProbString).join(',')),
+  map((hand) => hand.map((x) => tileDef[x].TsumoProbString).join(',')),
 );
 
-export const problemAsText$ = combineLatestI([
+export const problemAsText$ = combine([
   bakaze$,
   jikaze$,
   turn$,
@@ -225,7 +222,7 @@ export const problemAsText$ = combineLatestI([
   hand$,
   revealedBlocks$,
 ]).chain(
-  mapI(([bakaze, jikaze, turn, doraIndicators, hand, revealedBlocks]) =>
+  map(([bakaze, jikaze, turn, doraIndicators, hand, revealedBlocks]) =>
     problem2String(bakaze, jikaze, turn, doraIndicators, hand, revealedBlocks),
   ),
 );

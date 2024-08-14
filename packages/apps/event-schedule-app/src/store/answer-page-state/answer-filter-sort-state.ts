@@ -10,12 +10,12 @@ import { AnswersStore, eventSchedule$ } from '../fetching-state';
 import { AnswerFilterQueryParam } from './answer-filter-query-param';
 
 const {
-  state$: sortKeyAndOrder$,
+  state: sortKeyAndOrder$,
   setState: setSortOrderAndKey,
   resetState: _resetSortOrderAndKey,
 } = createState<readonly ['date' | 'score', 'asc' | 'desc']>(['date', 'asc']);
 
-const [filterState$, filterStateDispatch] = createReducer(
+const { state: filterState$, dispatch: filterStateDispatch } = createReducer(
   AnswerFilterState.reducer,
   AnswerFilterState.initialState,
 );
@@ -184,8 +184,8 @@ const iconOfSpecifiedRespondentCheckState$: InitializedObservable<
       >;
     }[]
   >
-> = combineLatestI([AnswersStore.answers$, filterState$]).chain(
-  mapI(
+> = combine([AnswersStore.answers$, filterState$]).chain(
+  map(
     ([answers, filterState]) =>
       answers?.map((ans) => ({
         key: ans.id,
@@ -259,8 +259,8 @@ const respondentCheckState$: InitializedObservable<
       };
     }[]
   >
-> = combineLatestI([AnswersStore.answers$, filterState$]).chain(
-  mapI(
+> = combine([AnswersStore.answers$, filterState$]).chain(
+  map(
     ([answers, filterState]) =>
       answers?.map((ans) => ({
         key: ans.id,
@@ -468,8 +468,8 @@ const dc = dict.answerPage.answers.tagInput;
 
 const tags$: InitializedObservable<
   DeepReadonly<{ value: string; props: TagProps }[]>
-> = combineLatestI([sortKeyAndOrder$, filterState$]).chain(
-  mapI(
+> = combine([sortKeyAndOrder$, filterState$]).chain(
+  map(
     ([
       sortKeyAndOrder,
       {
@@ -648,7 +648,7 @@ const tags$: InitializedObservable<
 );
 
 const tagValues$: InitializedObservable<readonly string[]> = tags$.chain(
-  mapI((tags) => tags.map((t) => t.value)),
+  map((tags) => tags.map((t) => t.value)),
 );
 
 const tagProps$: InitializedObservable<
@@ -657,7 +657,7 @@ const tagProps$: InitializedObservable<
     index: number,
   ) => DeepReadonly<TagProps>
 > = tags$.chain(
-  mapI(
+  map(
     (tags) =>
       (value: DeepReadonly<React.ReactNode>): DeepReadonly<TagProps> =>
         tags.find((t) => t.value === value)?.props ?? {
@@ -673,11 +673,11 @@ const clearTags = (): void => {
 
 /* subscriptions */
 
-export const answersFiltered$ = combineLatestI([
+export const answersFiltered$ = combine([
   AnswersStore.answers$,
   filterState$,
 ]).chain(
-  mapI(([answers, filterState]) =>
+  map(([answers, filterState]) =>
     answers?.filter((a) => !filterState.respondent.falseKeys.has(a.user.name)),
   ),
 );
@@ -685,7 +685,7 @@ export const answersFiltered$ = combineLatestI([
 answersFiltered$
   .chain(filter(isNotUndefined))
   .chain(map((answers) => answers.length))
-  .chain(distinctUntilChanged())
+  .chain(skipIfNoChange())
   .subscribe((numAnswers) => {
     filterStateDispatch({
       type: 'icon',
@@ -704,7 +704,7 @@ eventSchedule$
       end: Arr.last(eventSchedule.datetimeRangeList).ymd,
     })),
   )
-  .chain(distinctUntilChanged(deepEqual))
+  .chain(skipIfNoChange(deepEqual))
   .subscribe((range) => {
     setDateRangeDefaultValue(range);
   });

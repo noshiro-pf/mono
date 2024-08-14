@@ -1,6 +1,6 @@
 import {
+  setInitialValue,
   source,
-  withInitialValue,
   type InitializedObservable,
   type SourceObservable,
 } from '@noshiro/syncflow';
@@ -14,13 +14,11 @@ export const useObservableReducer = <S, A>(
 ): readonly [InitializedObservable<S>, (action: A) => S] => {
   const source$ = useMemo<SourceObservable<S>>(source, []);
 
-  const state$ = useObservable(() =>
-    source$.chain(withInitialValue(initialState)),
-  );
+  const st = useObservable(() => source$.chain(setInitialValue(initialState)));
 
   const dispatch = useCallback(
     (action: A): S => {
-      const nextState = reducer(state$.snapshot.value, action);
+      const nextState = reducer(st.snapshot.value, action);
       source$.next(nextState);
       return nextState;
     },
@@ -28,5 +26,5 @@ export const useObservableReducer = <S, A>(
     [],
   );
 
-  return [state$, dispatch];
+  return [st, dispatch];
 };

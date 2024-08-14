@@ -5,10 +5,10 @@ import {
   type Observable,
   type ObservableBase,
   type Operator,
+  type SetInitialValueOperator,
   type Subscriber,
   type SubscriberId,
   type Subscription,
-  type ToInitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 import {
@@ -133,7 +133,7 @@ export class ObservableBaseClass<
     }
   }
 
-  chain<B>(operator: ToInitializedOperator<A, B>): InitializedObservable<B>;
+  chain<B>(operator: SetInitialValueOperator<A, B>): InitializedObservable<B>;
   chain<B>(operator: Operator<A, B>): Observable<B>;
   chain<B>(operator: Operator<A, B>): Observable<B> {
     return operator(

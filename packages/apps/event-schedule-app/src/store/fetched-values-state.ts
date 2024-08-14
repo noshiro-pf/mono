@@ -18,7 +18,7 @@ export const errorType$: InitializedObservable<
       }
     | undefined
   >
-> = combineLatest([EventScheduleStore.result$, AnswersStore.result$] as const)
+> = combine([EventScheduleStore.result$, AnswersStore.result$] as const)
   .chain(
     map(([esr, ar]) =>
       esr !== undefined && Result.isErr(esr)
@@ -34,7 +34,7 @@ export const errorType$: InitializedObservable<
           : undefined,
     ),
   )
-  .chain(withInitialValue(undefined));
+  .chain(setInitialValue(undefined));
 
 Router.eventId$.subscribe(() => {
   EventScheduleStore.fetchEventSchedule();
@@ -42,8 +42,8 @@ Router.eventId$.subscribe(() => {
 });
 
 Auth.fireAuthUser$
-  .chain(mapI((u) => mapOptional(u, (a) => a.uid)))
-  .chain(distinctUntilChangedI())
+  .chain(map((u) => mapOptional(u, (a) => a.uid)))
+  .chain(skipIfNoChange())
   .subscribe(() => {
     EventListStore.fetchEventList();
   });

@@ -14,34 +14,34 @@ const dc = dict.answerPage.eventInfo.verifyEmailDialog;
 
 const toast = createToaster();
 
-const [formState$, dispatch] = createReducer(
+const { state: formState$, dispatch } = createReducer(
   confirmEmailDialogFormStateReducer,
   confirmEmailDialogFormInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || confirmEmailDialogHasError(state)),
+  map((st) => st.isWaitingResponse || confirmEmailDialogHasError(st)),
 );
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger')),
+  map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
 );
 
 const emailIsVerified = createBooleanState(false);
 
-const isOpen$ = combineLatestI([emailIsVerified.state$, eventSchedule$]).chain(
-  mapI(
+const isOpen$ = combine([emailIsVerified.state, eventSchedule$]).chain(
+  map(
     ([verified, eventSchedule]) =>
       eventSchedule?.notificationSettings !== 'none' && !verified,
   ),
 );
 
-const state$ = combineLatestI([
+const state = combine([
   formState$,
   enterButtonDisabled$,
   emailFormIntent$,
 ]).chain(
-  mapI(([formState, enterButtonDisabled, emailFormIntent]) => ({
+  map(([formState, enterButtonDisabled, emailFormIntent]) => ({
     formState,
     enterButtonDisabled,
     emailFormIntent,
@@ -127,7 +127,7 @@ const resetInput = (): void => {
 
 const resetAllState = (): void => {
   resetInput();
-  emailIsVerified.reset();
+  emailIsVerified.resetState();
 };
 
 /* subscriptions */
@@ -145,7 +145,7 @@ isOpen$.subscribe((isOpen) => {
 });
 
 export const ConfirmEmailDialogStore = {
-  state$,
+  state,
   isOpen$,
   enterClickHandler,
   inputEmailHandler,

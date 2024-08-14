@@ -8,7 +8,7 @@ const dc = dict.register;
 const toast = createToaster();
 
 const {
-  state$: googleSignInButtonDisabled$,
+  state: googleSignInButtonDisabled$,
   setTrue: disableGoogleSignInButton,
   setFalse: enableGoogleSignInButton,
 } = createBooleanState(false);
