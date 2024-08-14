@@ -1,26 +1,28 @@
 import {
   type RestrictedImportsOption,
   type TypeScriptEslintRules,
+  type TypeScriptEslintRulesOption,
 } from '../types/index.mjs';
 
-export const banTypes = {
-  Date: {
-    message: 'Use `DateType` from @noshiro/ts-utils instead.',
-  },
-  Set: {
-    message: 'Use `ISet` or `MutableSet` from @noshiro/ts-utils instead.',
-  },
-  Map: {
-    message: 'Use `IMap` or `MutableMap` from @noshiro/ts-utils instead.',
-  },
-  JSON: {
-    message: 'Use `Json` from @noshiro/ts-utils instead.',
-  },
-  object: {
-    message: 'Use `Record<string, unknown>` instead.',
-    fixWith: 'Record<string, unknown>',
-  },
-} as const satisfies Record<string, { message: string; fixWith?: string }>;
+export const banTypes: TypeScriptEslintRulesOption['@typescript-eslint/no-restricted-types']['types'] =
+  {
+    Date: {
+      message: 'Use `DateType` from @noshiro/ts-utils instead.',
+    },
+    Set: {
+      message: 'Use `ISet` or `MutableSet` from @noshiro/ts-utils instead.',
+    },
+    Map: {
+      message: 'Use `IMap` or `MutableMap` from @noshiro/ts-utils instead.',
+    },
+    JSON: {
+      message: 'Use `Json` from @noshiro/ts-utils instead.',
+    },
+    object: {
+      message: 'Use `Record<string, unknown>` instead.',
+      fixWith: 'Record<string, unknown>',
+    },
+  } as const;
 
 // Note: 同名の name の path を複数回定義すると後から定義したもので上書きされている可能性あり
 export const restrictedImportsOption: RestrictedImportsOption = {
@@ -56,39 +58,6 @@ export const restrictedImportsOption: RestrictedImportsOption = {
 };
 
 export const typescriptEslintRules: TypeScriptEslintRules = {
-  /**
-   * Disable in favor of prettier
-   *
-   * @link https://github.com/prettier/eslint-config-prettier/blob/main/index.js
-   */
-  // The following rules can be used in some cases. See the README for more
-  // information. (These are marked with `0` instead of `"off"` so that a
-  // script can distinguish them.)
-  '@typescript-eslint/quotes': 0,
-
-  /**
-   * Disable in favor of prettier
-   *
-   * @link https://github.com/prettier/eslint-config-prettier/blob/main/index.js
-   */
-  '@typescript-eslint/brace-style': 0,
-  '@typescript-eslint/comma-dangle': 0,
-  '@typescript-eslint/comma-spacing': 0,
-  '@typescript-eslint/func-call-spacing': 0,
-  '@typescript-eslint/indent': 0,
-  '@typescript-eslint/keyword-spacing': 0,
-  '@typescript-eslint/member-delimiter-style': 0,
-  '@typescript-eslint/no-extra-parens': 0,
-  '@typescript-eslint/no-extra-semi': 0,
-  '@typescript-eslint/object-curly-spacing': 0,
-  '@typescript-eslint/semi': 0,
-  '@typescript-eslint/space-before-blocks': 0,
-  '@typescript-eslint/space-before-function-paren': 0,
-  '@typescript-eslint/space-infix-ops': 0,
-  '@typescript-eslint/type-annotation-spacing': 0,
-  '@typescript-eslint/key-spacing': 0,
-  '@typescript-eslint/lines-around-comment': 0,
-
   '@typescript-eslint/adjacent-overload-signatures': 'error',
   '@typescript-eslint/array-type': [
     'error',
@@ -100,10 +69,12 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/await-thenable': 'error',
   '@typescript-eslint/ban-ts-comment': 'error',
   '@typescript-eslint/ban-tslint-comment': 'error',
-  '@typescript-eslint/ban-types': [
+  '@typescript-eslint/no-restricted-types': [
     'error',
-    { types: banTypes, extendDefaults: true },
-  ], // modified
+    {
+      types: banTypes,
+    },
+  ],
   '@typescript-eslint/class-literal-property-style': 'error',
   '@typescript-eslint/consistent-indexed-object-style': 'error',
   '@typescript-eslint/consistent-type-assertions': [
@@ -155,7 +126,6 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   ], // modified
   '@typescript-eslint/explicit-module-boundary-types': 'off', // preferred to use explicit-function-return-type
   '@typescript-eslint/init-declarations': 'error',
-  '@typescript-eslint/lines-between-class-members': 0,
   '@typescript-eslint/member-ordering': 'off', // disabled
 
   /**
@@ -173,7 +143,6 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-dupe-class-members': 'error',
   '@typescript-eslint/no-dynamic-delete': 'error',
   '@typescript-eslint/no-empty-function': 'off', // disabled
-  '@typescript-eslint/no-empty-interface': 'off', // disabled
   '@typescript-eslint/no-explicit-any': 'error',
   '@typescript-eslint/no-extra-non-null-assertion': 'error',
   '@typescript-eslint/no-extraneous-class': 'error',
@@ -187,7 +156,6 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-invalid-this': 'error',
   '@typescript-eslint/no-invalid-void-type': 'error',
   '@typescript-eslint/no-loop-func': 'error',
-  '@typescript-eslint/no-loss-of-precision': 'error',
   '@typescript-eslint/no-magic-numbers': 'off', // disabled
   '@typescript-eslint/no-meaningless-void-operator': 'error',
   '@typescript-eslint/no-misused-new': 'error',
@@ -252,7 +220,6 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-use-before-define': 'off', // disabled
   '@typescript-eslint/no-useless-empty-export': 'error',
   '@typescript-eslint/no-useless-constructor': 'error',
-  '@typescript-eslint/no-var-requires': 'error',
   '@typescript-eslint/non-nullable-type-assertion-style': 'error',
   '@typescript-eslint/prefer-as-const': 'error',
   '@typescript-eslint/prefer-enum-initializers': 'error',
@@ -471,7 +438,6 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/prefer-destructuring': 'off',
 
   '@typescript-eslint/no-unsafe-unary-minus': 'error',
-  '@typescript-eslint/no-useless-template-literals': 0,
 
   '@typescript-eslint/consistent-return': 'off',
   '@typescript-eslint/no-array-delete': 'error',
@@ -501,7 +467,7 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-wrapper-object-types': 'error',
 
   // deprecated
-  '@typescript-eslint/block-spacing': 0,
-  '@typescript-eslint/padding-line-between-statements': 0,
-  '@typescript-eslint/no-throw-literal': 0,
+  '@typescript-eslint/no-var-requires': 0,
+  '@typescript-eslint/no-empty-interface': 0,
+  '@typescript-eslint/no-loss-of-precision': 0,
 };

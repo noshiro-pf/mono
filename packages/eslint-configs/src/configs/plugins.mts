@@ -13,7 +13,6 @@ import eslintPluginTotalFunctions from 'eslint-plugin-total-functions';
 // @ts-expect-error no type definition
 import eslintPluginSecurity from 'eslint-plugin-security';
 
-// @ts-expect-error no type definition
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 
 // @ts-expect-error no type definition

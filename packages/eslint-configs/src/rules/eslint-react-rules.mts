@@ -145,6 +145,7 @@ export const eslintReactRules: EslintReactRules = {
     },
   ],
   'react/checked-requires-onchange-or-readonly': 'error',
+  'react/jsx-props-no-spread-multi': 'error',
 
   // deprecated
   'react/jsx-sort-default-props': 0,
