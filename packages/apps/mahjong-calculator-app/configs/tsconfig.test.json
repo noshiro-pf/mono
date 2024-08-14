@@ -1,9 +1,9 @@
 {
   "extends": [
-    "../../../../config/tsconfig/tsconfig.test.json",
-    "../../../../config/tsconfig/tsconfig.preact.json",
-    "../../../../config/tsconfig/tsconfig.vite.json",
-    "../../../../config/tsconfig/tsconfig.absolute-path.json"
+    "../../../../configs/tsconfig/tsconfig.test.json",
+    "../../../../configs/tsconfig/tsconfig.preact.json",
+    "../../../../configs/tsconfig/tsconfig.vite.json",
+    "../../../../configs/tsconfig/tsconfig.absolute-path.json"
   ],
   "include": ["../src"]
 }

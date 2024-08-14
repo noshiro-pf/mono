@@ -1,5 +1,5 @@
 {
-  "extends": "../../../config/tsconfig/tsconfig.lib.type-check.json",
+  "extends": "../../../configs/tsconfig/tsconfig.lib.type-check.json",
   "compilerOptions": {
     "types": ["node"]
   },

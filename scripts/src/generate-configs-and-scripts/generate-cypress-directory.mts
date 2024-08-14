@@ -32,7 +32,7 @@ export const generateCypressDirectory = async (
   await fs.writeFile(
     `${workspaceLocation}/cypress/tsconfig.json`,
     JSON.stringify({
-      extends: `${pathPrefixToRoot}/config/tsconfig/tsconfig.type-check.json`,
+      extends: `${pathPrefixToRoot}/configs/tsconfig/tsconfig.type-check.json`,
       include: ['./cypress.config.ts', './cypress'],
     }),
   );
@@ -47,7 +47,7 @@ export const generateCypressDirectory = async (
   await fs.writeFile(
     `${workspaceLocation}/cypress/cypress/tsconfig.json`,
     JSON.stringify({
-      extends: `${pathPrefixToRoot}/../config/tsconfig/tsconfig.type-check.json`,
+      extends: `${pathPrefixToRoot}/../configs/tsconfig/tsconfig.type-check.json`,
       include: ['./**/*.ts'],
     }),
   );

@@ -1,9 +1,9 @@
 {
   "extends": [
-    "../../../config/tsconfig/tsconfig.type-check.json",
-    "../../../config/tsconfig/tsconfig.react-emotion.json",
-    "../../../config/tsconfig/tsconfig.vite.json",
-    "../../../config/tsconfig/tsconfig.absolute-path.json"
+    "../../../configs/tsconfig/tsconfig.type-check.json",
+    "../../../configs/tsconfig/tsconfig.react-emotion.json",
+    "../../../configs/tsconfig/tsconfig.vite.json",
+    "../../../configs/tsconfig/tsconfig.absolute-path.json"
   ],
   "include": ["./src", "./configs", "./scripts"]
 }

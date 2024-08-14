@@ -5,7 +5,7 @@ packages/**/dist
 packages/**/lib
 packages/**/esm
 packages/**/cjs
-packages/**/config/**/*.js
+packages/**/configs/**/*.js
 packages/**/scripts/**/*.js
 experimental/**/build
 experimental/**/dist

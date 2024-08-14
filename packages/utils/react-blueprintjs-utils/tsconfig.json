@@ -1,8 +1,8 @@
 {
   "extends": [
-    "../../../config/tsconfig/tsconfig.lib.type-check.json",
-    "../../../config/tsconfig/tsconfig.react.json",
-    "../../../config/tsconfig/tsconfig.vite.json"
+    "../../../configs/tsconfig/tsconfig.lib.type-check.json",
+    "../../../configs/tsconfig/tsconfig.react.json",
+    "../../../configs/tsconfig/tsconfig.vite.json"
   ],
   "include": ["./src", "./configs"]
 }

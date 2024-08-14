@@ -1,8 +1,8 @@
 {
   "extends": [
-    "../../../../config/tsconfig/tsconfig.lib.build.json",
-    "../../../../config/tsconfig/tsconfig.react-emotion.json",
-    "../../../../config/tsconfig/tsconfig.vite.json"
+    "../../../../configs/tsconfig/tsconfig.lib.build.json",
+    "../../../../configs/tsconfig/tsconfig.react-emotion.json",
+    "../../../../configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
     "outDir": "../esm",
