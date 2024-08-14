@@ -10,4 +10,10 @@ for (const c of filterTestCases) {
 // type tests
 const obs$ = fromArray([1, '2', 3]).chain(filter(isNumber));
 
-expectType<typeof obs$, Observable<number>>('=');
+if (import.meta.vitest !== undefined) {
+  test('type-check', () => {
+    expectType<typeof obs$, Observable<number>>('=');
+
+    expect(obs$).toBe(obs$);
+  });
+}

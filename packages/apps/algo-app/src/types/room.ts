@@ -43,7 +43,7 @@ const roomRemoteTypeDef = t.record(
   'RoomRemote',
 );
 
-const roomTypeDef = t.record(
+export const roomTypeDef = t.record(
   {
     ...commonRecordTypeDefs,
     id: t.string(''),

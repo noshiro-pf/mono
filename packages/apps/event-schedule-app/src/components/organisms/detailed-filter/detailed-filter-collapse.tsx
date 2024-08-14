@@ -30,10 +30,10 @@ export const DetailedFilterCollapse = memoNamed<Props>(
       iconState,
       scoreRange,
       rank,
-      ...rest
+      ..._rest
     } = useObservableValue(AnswerFilterAndSortStore.filterState$);
 
-    expectType<keyof typeof rest, never>('=');
+    expectType<keyof typeof _rest, never>('=');
 
     const iconOfSpecifiedRespondentCheckState = useObservableValue(
       AnswerFilterAndSortStore.iconOfSpecifiedRespondentCheckState$,

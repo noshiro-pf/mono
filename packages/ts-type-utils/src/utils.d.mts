@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-globals */
 // https://github.com/microsoft/TypeScript/issues/27024
 // prettier-ignore
 type TypeEq<A, B> =
-   
+
   (<T>() => T extends A ? 1 : 2) extends
-   
+
   (<T>() => T extends B ? 1 : 2)
     ? true
     : false;
@@ -65,10 +64,12 @@ type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ToMutableMap<T extends ReadonlyMap<any, any>> =
+  // eslint-disable-next-line @typescript-eslint/no-restricted-types
   T extends ReadonlyMap<infer K, infer V> ? Map<K, V> : never;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ToMutableSet<T extends ReadonlySet<any>> =
+  // eslint-disable-next-line @typescript-eslint/no-restricted-types
   T extends ReadonlySet<infer V> ? Set<V> : never;
 
 type DeepReadonly<T> = T extends Primitive
@@ -80,14 +81,17 @@ type DeepReadonly<T> = T extends Primitive
       ? ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>
       : T extends MutableSet<infer V>
         ? ReadonlySet<DeepReadonly<V>>
-        : T extends object | readonly unknown[]
+        : // eslint-disable-next-line @typescript-eslint/no-restricted-types
+          T extends object | readonly unknown[]
           ? {
               readonly [K in keyof T]: DeepReadonly<T[K]>;
             }
           : T;
 
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 type MutableSet<K> = Set<K>;
 
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 type MutableMap<K, V> = Map<K, V>;
 
 type DeepMutable<T> = T extends Primitive
@@ -99,7 +103,8 @@ type DeepMutable<T> = T extends Primitive
       ? MutableMap<DeepMutable<K>, DeepMutable<V>>
       : T extends ReadonlySet<infer V>
         ? MutableSet<DeepMutable<V>>
-        : T extends object | readonly unknown[]
+        : // eslint-disable-next-line @typescript-eslint/no-restricted-types
+          T extends object | readonly unknown[]
           ? {
               -readonly [K in keyof T]: DeepMutable<T[K]>;
             }
@@ -114,7 +119,8 @@ type DeepPartial<T> = T extends Primitive
       ? ReadonlyMap<DeepPartial<K>, DeepPartial<V>>
       : T extends MutableSet<infer V>
         ? ReadonlySet<DeepPartial<V>>
-        : T extends object | readonly unknown[]
+        : // eslint-disable-next-line @typescript-eslint/no-restricted-types
+          T extends object | readonly unknown[]
           ? {
               [K in keyof T]?: DeepPartial<T[K]>;
             }

@@ -36,7 +36,7 @@ export const convertLibEs2017Object = ({
         '          ToObjectKeysValue<keyof PickByValue<R, R[K]>>,',
         '          R[K]',
         '        ];',
-        '        // eslint-disable-next-line @typescript-eslint/ban-types',
+        '        // eslint-disable-next-line @typescript-eslint/no-restricted-types',
         '      }[RelaxedExclude<keyof R, symbol>][]',
         '    : never;',
         '  }',

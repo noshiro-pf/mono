@@ -1,6 +1,6 @@
 import * as t from '@noshiro/io-ts';
 
-const NWESTypeDef = t.enumType({
+export const NWESTypeDef = t.enumType({
   values: ['N', 'W', 'E', 'S'] as const,
   defaultValue: 'S',
   typeName: 'NWES',

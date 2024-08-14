@@ -19,15 +19,18 @@ const zi = zipI([
   r2.chain(withInitialValue('0')),
 ] as const);
 
-expectType<typeof z, SyncChildObservable<readonly [number, string], 'zip'>>(
-  '<=',
-);
+if (import.meta.vitest !== undefined) {
+  test('type-check', () => {
+    expectType<typeof z, SyncChildObservable<readonly [number, string], 'zip'>>(
+      '<=',
+    );
 
-expectType<
-  typeof zi,
-  InitializedSyncChildObservable<readonly [number, string], 'zip'>
->('<=');
+    expectType<
+      typeof zi,
+      InitializedSyncChildObservable<readonly [number, string], 'zip'>
+    >('<=');
 
-test('dummy', () => {
-  expect(1).toBe(1);
-});
+    expect(z).toBe(z);
+    expect(zi).toBe(zi);
+  });
+}

@@ -314,10 +314,10 @@ const tableBodyValuesFiltered$ = combineLatestI([
         dateRange: {
           value: { start: dateStart, end: dateEnd },
         },
-        ...rest
+        ..._rest
       } = filterState;
 
-      expectType<keyof typeof rest, 'rank' | 'respondent'>('=');
+      expectType<keyof typeof _rest, 'rank' | 'respondent'>('=');
 
       const day = ymd2day(datetimeRange.ymd);
 
