@@ -16,7 +16,7 @@ export const mapTo =
 export const mapToI = <A, B>(
   value: B,
 ): InitializedToInitializedOperator<A, B> =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   mapTo(value) as InitializedToInitializedOperator<A, B>;
 
 class MapToObservableClass<A, B>

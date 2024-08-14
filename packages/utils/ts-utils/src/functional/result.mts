@@ -45,20 +45,28 @@ export namespace Result {
     mapFn: (value: UnwrapOk<R>) => S2,
   ): Result<S2, UnwrapErr<R>> =>
     isErr(result)
-      ? // eslint-disable-next-line no-restricted-syntax
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (result as Err<UnwrapErr<R>>)
-      : // eslint-disable-next-line no-restricted-syntax
-        ok(mapFn(result.value as UnwrapOk<R>));
+      : ok(
+          mapFn(
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            result.value as UnwrapOk<R>,
+          ),
+        );
 
   export const mapErr = <R extends Base, E2>(
     result: R,
     mapFn: (error: UnwrapErr<R>) => E2,
   ): Result<UnwrapOk<R>, E2> =>
     isOk(result)
-      ? // eslint-disable-next-line no-restricted-syntax
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (result as Ok<UnwrapOk<R>>)
-      : // eslint-disable-next-line no-restricted-syntax
-        err(mapFn(result.value as UnwrapErr<R>));
+      : err(
+          mapFn(
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            result.value as UnwrapErr<R>,
+          ),
+        );
 
   export const fold = <R extends Base, S2, E2>(
     result: R,
@@ -66,48 +74,68 @@ export namespace Result {
     mapErrFn: (error: UnwrapErr<R>) => E2,
   ): Result<S2, E2> =>
     isOk(result)
-      ? // eslint-disable-next-line no-restricted-syntax
-        ok(mapFn(result.value as UnwrapOk<R>))
-      : // eslint-disable-next-line no-restricted-syntax
-        err(mapErrFn(result.value as UnwrapErr<R>));
+      ? ok(
+          mapFn(
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            result.value as UnwrapOk<R>,
+          ),
+        )
+      : err(
+          mapErrFn(
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            result.value as UnwrapErr<R>,
+          ),
+        );
 
   export const unwrapThrow = <R extends Base>(
     result: R,
     toStr: (e: UnwrapErr<R>) => string = _toStr,
   ): UnwrapOk<R> => {
     if (isErr(result)) {
-      // eslint-disable-next-line no-restricted-syntax
-      throw new Error(toStr(result.value as UnwrapErr<R>));
+      throw new Error(
+        toStr(
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          result.value as UnwrapErr<R>,
+        ),
+      );
     }
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return result.value as UnwrapOk<R>;
   };
 
   export const unwrapOk = <R extends Base>(
     result: R,
   ): UnwrapOk<R> | undefined =>
-    // eslint-disable-next-line no-restricted-syntax
-    isErr(result) ? undefined : (result.value as UnwrapOk<R>);
+    isErr(result)
+      ? undefined
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        (result.value as UnwrapOk<R>);
 
   export const unwrapOkOr = <R extends Base, D>(
     result: R,
     defaultValue: D,
   ): D | UnwrapOk<R> =>
-    // eslint-disable-next-line no-restricted-syntax
-    isErr(result) ? defaultValue : (result.value as UnwrapOk<R>);
+    isErr(result)
+      ? defaultValue
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        (result.value as UnwrapOk<R>);
 
   export const unwrapErr = <R extends Base>(
     result: R,
   ): UnwrapErr<R> | undefined =>
-    // eslint-disable-next-line no-restricted-syntax
-    isErr(result) ? (result.value as UnwrapErr<R>) : undefined;
+    isErr(result)
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        (result.value as UnwrapErr<R>)
+      : undefined;
 
   export const unwrapErrOr = <R extends Base, D>(
     result: R,
     defaultValue: D,
   ): D | UnwrapErr<R> =>
-    // eslint-disable-next-line no-restricted-syntax
-    isErr(result) ? (result.value as UnwrapErr<R>) : defaultValue;
+    isErr(result)
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        (result.value as UnwrapErr<R>)
+      : defaultValue;
 
   export const expectToBe =
     <R extends Base>(message: string) =>
@@ -115,7 +143,7 @@ export namespace Result {
       if (isErr(result)) {
         throw new Error(message);
       }
-      // eslint-disable-next-line no-restricted-syntax
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return result.value as UnwrapOk<R>;
     };
 
@@ -125,6 +153,11 @@ export namespace Result {
   export const fromPromise = <P extends Promise<unknown>>(
     promise: P,
   ): Promise<Result<UnwrapPromise<P>, unknown>> =>
-    // eslint-disable-next-line no-restricted-syntax
-    promise.then((v) => ok(v) as Ok<UnwrapPromise<P>>).catch(err);
+    promise
+      .then(
+        (v) =>
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          ok(v) as Ok<UnwrapPromise<P>>,
+      )
+      .catch(err);
 }

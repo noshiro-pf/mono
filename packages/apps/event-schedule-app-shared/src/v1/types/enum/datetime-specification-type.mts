@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/sort-type-constituents */
 export type DatetimeSpecificationEnumType =
   | 'noStartEndSpecified'
   | 'startSpecified'

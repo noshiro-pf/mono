@@ -85,8 +85,11 @@ export const Table = memoNamed(
     }>(() => {
       const innerRectWidth =
         tableSize.width - 2 * (sidesWidth + containerPaddingPx); /* px */
-      const r = 225 / 145;
-      const w = (innerRectWidth - 11 * paddingPx) / (2 * r + 6);
+      const r = toPositiveFiniteNumber(225 / 145);
+      const w = Num.div(
+        innerRectWidth - 11 * paddingPx,
+        toPositiveFiniteNumber(2 * r + 6),
+      );
       const h = r * w;
       const areaWidth = 6 * w + 7 * paddingPx;
       const areaHeight = h + 2 * paddingPx;

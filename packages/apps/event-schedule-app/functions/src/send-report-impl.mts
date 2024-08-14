@@ -7,6 +7,6 @@ export const sendReportImpl = ({ error }: SendReportPayload): Promise<void> =>
     createMailOptions({
       to: firebaseConfig.gmail['email-address-for-error-log'],
       subject: `エラー報告がありました。`,
-      text: error.split('\\n').join('\n'),
+      text: error.split(String.raw`\n`).join('\n'),
     }),
   );

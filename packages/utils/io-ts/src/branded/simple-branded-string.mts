@@ -8,8 +8,11 @@ export const simpleBrandedString = <S extends string>(
 ): Type<Brand<string, S>> =>
   brand({
     codec: string(defaultValue),
-    // eslint-disable-next-line no-restricted-syntax
-    defaultValue: defaultValue as Brand<string, S>,
+
+    defaultValue:
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      defaultValue as Brand<string, S>,
+
     is: (_id: string): _id is Brand<string, S> => true,
     brandKeys: [typeName],
   });

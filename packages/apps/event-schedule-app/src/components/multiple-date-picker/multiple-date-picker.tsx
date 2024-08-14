@@ -58,6 +58,7 @@ export const MultipleDatePicker = memoNamed<Props>(
                 flex-direction: column;
                 align-items: center;
               `}
+              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
               tabIndex={0}
             >
               <DatepickerNav
@@ -68,8 +69,10 @@ export const MultipleDatePicker = memoNamed<Props>(
                 onPrevMonthClick={onPrevMonthClick}
                 onYearChange={onYearChange}
               />
+              {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role */}
               <DatePickerMonthStyled role='grid'>
                 <WeekdaysHeader onClick={onWeekdaysHeaderCellClick} />
+                {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role */}
                 <DatePickerBodyStyled role='rowgroup'>
                   {calendarCells.map((week) => (
                     <Week

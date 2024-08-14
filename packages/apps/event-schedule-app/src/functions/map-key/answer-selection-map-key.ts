@@ -10,17 +10,18 @@ type AnswerSelectionData = Readonly<{
 export const answerSelectionToMapKey = (
   answerSelection: AnswerSelectionData,
 ): AnswerSelectionMapKey =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   Result.unwrapThrow(Json.stringify(answerSelection)) as AnswerSelectionMapKey;
 
 export const answerSelectionFromMapKey = (
   key: AnswerSelectionMapKey,
 ): AnswerSelectionData => {
-  // eslint-disable-next-line no-restricted-syntax
-  const parsed = Result.unwrapThrow(Json.parse(key)) as {
-    answerId: AnswerId;
-    datetimeRange: DatetimeRange;
-  };
+  const parsed =
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    Result.unwrapThrow(Json.parse(key)) as {
+      answerId: AnswerId;
+      datetimeRange: DatetimeRange;
+    };
   return {
     answerId: parsed.answerId,
     datetimeRange: fillDatetimeRange(parsed.datetimeRange),

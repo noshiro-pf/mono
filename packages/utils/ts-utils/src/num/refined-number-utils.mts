@@ -297,7 +297,13 @@ export namespace RefinedNumberUtils {
     const div = (
       x: ElementTypeWithSmallInt,
       y: ToNonZeroIntWithSmallInt<ElementType>,
-    ): ElementType => clampOrCastFn(Math.floor(x / y));
+    ): ElementType =>
+      clampOrCastFn(
+        Math.floor(
+          // eslint-disable-next-line total-functions/no-partial-division
+          x / y,
+        ),
+      );
 
     const randomImpl = (
       min: ElementTypeWithSmallInt,
@@ -338,10 +344,11 @@ export namespace RefinedNumberUtils {
       randomNonZero,
       castTo,
 
-      // eslint-disable-next-line no-restricted-syntax
-      clamp: clamp as TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
-        ? undefined
-        : (x: number) => ElementType,
+      clamp:
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        clamp as TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
+          ? undefined
+          : (x: number) => ElementType,
     } as const;
   };
 
@@ -406,7 +413,7 @@ export namespace RefinedNumberUtils {
     const clampOrCastFn: (a: number) => ElementType = clamp ?? castTo;
 
     const abs = (x: ElementType): ToNonNegative<ElementType> =>
-      // eslint-disable-next-line no-restricted-syntax
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       Math.abs(x) as ToNonNegative<ElementType>;
 
     const _min = (...values: readonly ElementType[]): ElementType =>
@@ -428,7 +435,10 @@ export namespace RefinedNumberUtils {
       clampOrCastFn(x * y);
 
     const div = (x: ElementType, y: ToNonZero<ElementType>): ElementType =>
-      clampOrCastFn(x / y);
+      clampOrCastFn(
+        // eslint-disable-next-line total-functions/no-partial-division
+        x / y,
+      );
 
     const random = (min: ElementType, max: ElementType): ElementType =>
       clampOrCastFn(min + (Math.max(max, min) - min) * Math.random());
@@ -457,10 +467,11 @@ export namespace RefinedNumberUtils {
       randomNonZero,
       castTo,
 
-      // eslint-disable-next-line no-restricted-syntax
-      clamp: clamp as TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
-        ? undefined
-        : (x: number) => ElementType,
+      clamp:
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        clamp as TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
+          ? undefined
+          : (x: number) => ElementType,
     } as const;
   };
 }

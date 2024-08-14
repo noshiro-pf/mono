@@ -48,6 +48,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
                 >
                   <BpInput
                     autoComplete={'email'}
+                    // eslint-disable-next-line jsx-a11y/no-autofocus
                     autoFocus={true}
                     disabled={formState.isWaitingResponse}
                     fill={true}

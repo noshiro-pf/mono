@@ -15,7 +15,6 @@ export type DoraIndicatorPosition = UintRange<0, 5>;
 export type NumTiles = UintRange<0, 5>;
 
 export type TileName =
-  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
   | 'Manzu1'
   | 'Manzu2'
   | 'Manzu3'
@@ -57,7 +56,6 @@ export type TileName =
 export type RevealedBlockType = 'Ankan' | 'Chi-' | 'Kakan' | 'Minkan' | 'Pon';
 
 export type RevealedBlock =
-  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
   | 'Ankantsu-Manzu1'
   | 'Ankantsu-Manzu2'
   | 'Ankantsu-Manzu3'

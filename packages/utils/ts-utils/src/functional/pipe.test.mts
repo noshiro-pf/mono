@@ -19,12 +19,11 @@ describe('pipe', () => {
   });
 
   test('case 3', () => {
-    // eslint-disable-next-line no-restricted-syntax
     const y = 1 as number | undefined;
 
     const z = pipe(y)
       .chainOptional((x) => x + 1)
-      .chainOptional((x) => `${x}`).value;
+      .chainOptional((x) => x.toString()).value;
 
     expectType<typeof z, string | undefined>('=');
 

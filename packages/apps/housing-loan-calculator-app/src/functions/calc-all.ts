@@ -22,7 +22,7 @@ export const calcAll = ({
   const propertyPriceYen = toYen(propertyPriceManYen * 10_000);
   const borrowingPeriodMonth = Uint32.mul(borrowingPeriodYear, 12);
   const interestRatePerMonth = toPercentFloat(
-    interestRatePercentPerYear / (100 * 12),
+    interestRatePercentPerYear / 1200,
   );
 
   const borrowingTotalYen = toYen(propertyPriceYen - downPaymentYen); // 借入金額

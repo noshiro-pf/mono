@@ -78,6 +78,7 @@ export const DatePickerDate = memoNamed<Props>(
     }, [dayType, onClick, selected, outside, useOutlinedSelectedStyle]);
 
     return (
+      // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
       <DatePickerDayResolved
         aria-disabled={outside}
         aria-label={dateString}

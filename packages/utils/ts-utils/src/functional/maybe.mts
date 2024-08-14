@@ -44,20 +44,27 @@ export namespace Maybe {
   ): Maybe<S2> =>
     isNone(maybe)
       ? none
-      : // eslint-disable-next-line no-restricted-syntax
-        some(mapFn((maybe as NarrowToSome<M>).value as Unwrap<M>));
+      : some(
+          mapFn(
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            (maybe as NarrowToSome<M>).value as Unwrap<M>,
+          ),
+        );
 
   export const unwrapThrow = <M extends Base>(maybe: M): Unwrap<M> => {
     if (isNone(maybe)) {
       throw new Error('`unwrapThrow()` has failed because it is `None`');
     }
-    // eslint-disable-next-line no-restricted-syntax
+
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return (maybe as NarrowToSome<M>).value as Unwrap<M>;
   };
 
   export const unwrap = <M extends Base>(maybe: M): Unwrap<M> | undefined =>
-    // eslint-disable-next-line no-restricted-syntax
-    isNone(maybe) ? undefined : ((maybe as NarrowToSome<M>).value as Unwrap<M>);
+    isNone(maybe)
+      ? undefined
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        ((maybe as NarrowToSome<M>).value as Unwrap<M>);
 
   export const unwrapOr = <M extends Base, D>(
     maybe: M,
@@ -65,7 +72,7 @@ export namespace Maybe {
   ): D | Unwrap<M> =>
     isNone(maybe)
       ? defaultValue
-      : // eslint-disable-next-line no-restricted-syntax
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         ((maybe as NarrowToSome<M>).value as Unwrap<M>);
 
   export const expectToBe =
@@ -74,7 +81,7 @@ export namespace Maybe {
       if (isNone(maybe)) {
         throw new Error(message);
       }
-      // eslint-disable-next-line no-restricted-syntax
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return (maybe as NarrowToSome<M>).value as Unwrap<M>;
     };
 }

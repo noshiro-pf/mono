@@ -47,6 +47,7 @@ export const AnnotationCanvas = memoNamed<Props>(
         >
           <div css={absoluteWrapperStyle}>
             <div style={imgWrapperStyle}>
+              {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <img
                 css={css`
                   display: block;

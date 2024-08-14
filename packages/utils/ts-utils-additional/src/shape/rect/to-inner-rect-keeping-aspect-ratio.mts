@@ -1,3 +1,4 @@
+import { FiniteNumber, Num } from '@noshiro/ts-utils';
 import { type Rect, type RectSize } from '../../types/index.mjs';
 
 /**
@@ -25,16 +26,20 @@ export const toInnerRectSizeKeepingAspectRatio = (
   outerRectSize: RectSize,
   aspectRatio: number,
 ): RectSize => {
-  if (aspectRatio <= 0 || !Number.isFinite(aspectRatio)) {
+  if (!Num.isPositive(aspectRatio) || !Number.isFinite(aspectRatio)) {
     return outerRectSize;
   }
 
   const { height: oh, width: ow } = outerRectSize;
 
+  if (!Number.isFinite(oh) || !Number.isFinite(ow)) {
+    return outerRectSize;
+  }
+
   if (ow < aspectRatio * oh) {
     // ow / oh < aspectRatio
     // outerがinnerより縦長のとき
-    const padNSx2 = oh - ow / aspectRatio;
+    const padNSx2 = oh - FiniteNumber.div(ow, aspectRatio);
 
     return {
       width: ow,

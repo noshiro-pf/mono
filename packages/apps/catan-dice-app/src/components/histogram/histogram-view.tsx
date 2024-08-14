@@ -69,7 +69,7 @@ export const HistogramView = memoNamed<Props>(
                   align-items: center;
                   padding: 5% 0;
                   font-weight: bold;
-                  height: ${max > 0 ? (100 * y) / max : 0}%;
+                  height: ${Num.isPositive(max) ? Num.div(100 * y, max) : 0}%;
                 `}
               >
                 {y > 0 ? y : ''}

@@ -21,7 +21,7 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
     selected: tp(x, y, z),
     count,
     countSum,
-    probability: countSum / denom,
+    probability: Num.div(countSum, denom),
     expected: calcExpected(count),
   };
 });
@@ -111,11 +111,16 @@ export const App = memoNamed('App', () => {
 
   const hitSomeAliveColumnProbability = useMemo(
     () =>
-      countSuccessForRemains(
-        ISet.new(
-          columnsAliveWithHandler.filter((a) => a.alive).map((a) => a.columnId),
+      Num.div(
+        countSuccessForRemains(
+          ISet.new(
+            columnsAliveWithHandler
+              .filter((a) => a.alive)
+              .map((a) => a.columnId),
+          ),
         ),
-      ) / denom,
+        denom,
+      ),
     [columnsAliveWithHandler],
   );
 

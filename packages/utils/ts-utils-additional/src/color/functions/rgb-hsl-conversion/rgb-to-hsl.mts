@@ -1,4 +1,10 @@
 import {
+  FiniteNumber,
+  Num,
+  toFiniteNumber,
+  toPositiveFiniteNumber,
+} from '@noshiro/ts-utils';
+import {
   type Hsl,
   type Hsla,
   type Rgb,
@@ -7,10 +13,19 @@ import {
 import { numberToHue, numberToPercent } from '../from-number/index.mjs';
 
 export const rgbToHsl = ([r, g, b]: Rgb): Hsl => {
-  const [r01, g01, b01] = [r / 255, g / 255, b / 255];
+  const [r01, g01, b01] = [
+    toFiniteNumber(r / 255),
+    toFiniteNumber(g / 255),
+    toFiniteNumber(b / 255),
+  ];
 
+  /** `0 <= max <= 1` */
   const max = Math.max(r01, g01, b01);
+
+  /** `0 <= min <= 1` */
   const min = Math.min(r01, g01, b01);
+
+  /** `0 <= l <= 1` */
   const l = (max + min) / 2;
 
   if (max === min) {
@@ -18,17 +33,18 @@ export const rgbToHsl = ([r, g, b]: Rgb): Hsl => {
     return [0, 0, numberToPercent(100 * l)];
   }
 
-  const d = max - min;
+  /** `0 < d <= 1` */
+  const d = toPositiveFiniteNumber(max - min);
 
   const h =
     (() => {
       switch (max) {
         case r01:
-          return (g01 - b01) / d + (g01 < b01 ? 6 : 0);
+          return Num.div(FiniteNumber.sub(g01, b01), d) + (g01 < b01 ? 6 : 0);
         case g01:
-          return (b01 - r01) / d + 2;
+          return Num.div(FiniteNumber.sub(b01, r01), d) + 2;
         case b01:
-          return (r01 - g01) / d + 4;
+          return Num.div(FiniteNumber.sub(r01, g01), d) + 4;
         default:
           return 0;
       }
@@ -36,7 +52,12 @@ export const rgbToHsl = ([r, g, b]: Rgb): Hsl => {
 
   return [
     numberToHue(h * 360),
-    numberToPercent(100 * (l > 0.5 ? d / (2 - max - min) : d / (max + min))),
+    numberToPercent(
+      100 *
+        (l > 0.5
+          ? Num.div(d, toPositiveFiniteNumber(2 - max - min))
+          : Num.div(d, toPositiveFiniteNumber(max + min))),
+    ),
     numberToPercent(100 * l),
   ];
 };

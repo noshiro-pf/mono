@@ -20,7 +20,6 @@ import { isProduction } from '../env';
 import { createToaster, showToast } from '../functions';
 
 if (isProduction) {
-  // eslint-disable-next-line no-restricted-syntax
   (window.onerror as Mutable<typeof window.onerror>) = (e: unknown) => {
     const errorString = Result.unwrapThrow(Json.stringify(e));
     console.error(errorString);
@@ -58,7 +57,6 @@ export class ErrorBoundary extends Component<Props, State> {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   constructor(props: Props) {
     super(props);
     this.state = {

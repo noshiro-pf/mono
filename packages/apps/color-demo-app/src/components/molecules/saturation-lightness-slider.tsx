@@ -25,8 +25,10 @@ export const AllSliders = memoNamed<Props>('AllSliders', (props) => (
         min={0}
         step={5}
         value={props.saturation}
-        // eslint-disable-next-line no-restricted-syntax
-        onChange={props.saturationOnChange as (s: number) => void}
+        onChange={
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          props.saturationOnChange as (s: number) => void
+        }
       />
     </SliderWrapper>
     <SliderWrapper>
@@ -37,8 +39,10 @@ export const AllSliders = memoNamed<Props>('AllSliders', (props) => (
         min={0}
         step={5}
         value={props.lightness}
-        // eslint-disable-next-line no-restricted-syntax
-        onChange={props.lightnessOnChange as (l: number) => void}
+        onChange={
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          props.lightnessOnChange as (l: number) => void
+        }
       />
     </SliderWrapper>
     <FirstHueSlider

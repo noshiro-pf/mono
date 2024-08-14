@@ -27,8 +27,10 @@ const toLocaleLowerCase =
     try {
       return Result.ok(str.toLocaleLowerCase(locales));
     } catch (error) {
-      // eslint-disable-next-line no-restricted-syntax
-      return Result.err(error as RangeError | TypeError);
+      return Result.err(
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        error as RangeError | TypeError,
+      );
     }
   };
 
@@ -42,8 +44,10 @@ const toLocaleUpperCase =
     try {
       return Result.ok(str.toLocaleUpperCase(locales));
     } catch (error) {
-      // eslint-disable-next-line no-restricted-syntax
-      return Result.err(error as RangeError | TypeError);
+      return Result.err(
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        error as RangeError | TypeError,
+      );
     }
   };
 

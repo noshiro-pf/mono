@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 type Props = Readonly<{
   message: string;
   isOpen: boolean;
-  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
+
   onClose: (yn: 'yes' | 'no') => void;
 }>;
 

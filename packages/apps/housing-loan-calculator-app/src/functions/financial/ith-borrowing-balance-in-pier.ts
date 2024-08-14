@@ -17,5 +17,7 @@ export const ithBorrowingBalanceInPIER = ({
   ith: SafeUint;
 }>): number => {
   const q = 1 + r;
-  return total * ((1 - q ** (i - n)) / (1 - q ** (-1 * n)));
+  return (
+    total * Num.div(1 - q ** (i - n), toNonZeroFiniteNumber(1 - q ** (-1 * n)))
+  );
 };

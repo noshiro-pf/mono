@@ -192,6 +192,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
             label={dc.notification.emailAddress}
           >
             <BpInput
+              // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus={true}
               disabled={disabled}
               focus$={focusEmailInput$}

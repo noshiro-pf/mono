@@ -18,15 +18,19 @@ export const WeekdaysHeader = memoNamed<Props>(
         daysOfWeekList.en.map((w, idx) => ({
           ...w,
           onClickHandler: mapOptional(onClick, (f) => () => {
-            // eslint-disable-next-line no-restricted-syntax
-            f(idx as DayOfWeekIndex);
+            f(
+              // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+              idx as DayOfWeekIndex,
+            );
           }),
         })),
       [onClick],
     );
 
     return (
+      // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
       <DatePickerWeekdaysStyled role='rowgroup'>
+        {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role */}
         <DatePickerWeekdaysRowStyled role='row'>
           {listWithHandler.map(({ name: title, abbr, onClickHandler }) => (
             <HeaderCell
@@ -57,6 +61,7 @@ const HeaderCell = memoNamed<PropsHeaderCell>(
         : DatePickerWeekdayStyled;
 
     return (
+      // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
       <DatePickerWeekdayResolved role={'columnheader'} onClick={onClick}>
         <abbr
           css={css`

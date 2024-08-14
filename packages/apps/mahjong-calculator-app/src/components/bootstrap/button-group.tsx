@@ -14,10 +14,10 @@ type Props = PropsTyped<string>;
 export const ButtonGroupTyped = <T,>(
   props: PropsTyped<T>,
 ): preact.VNode<PropsTyped<T>> | null =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   createElement(
     ButtonGroup,
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     props as unknown as Props,
   ) as unknown as preact.VNode<PropsTyped<T>>;
 
@@ -37,8 +37,10 @@ export const ButtonGroup = memoNamed<Props>(
     );
 
     return (
+      // eslint-disable-next-line jsx-a11y/aria-role
       <Root role={'radio-group'}>
         {buttonWithHandler.map((btn) => (
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
           <div
             key={btn.id}
             className={btn.id === selectedId ? 'selected' : undefined}

@@ -23,5 +23,7 @@ import { type Count } from '../types';
  */
 export const calcExpected = (count: Count): number => {
   const { noLine, oneLine, twoLine } = count;
-  return Math.floor((oneLine + 2 * twoLine) / noLine);
+  return Num.isPositive(noLine)
+    ? Math.floor(Num.div(oneLine + 2 * twoLine, noLine))
+    : 0;
 };

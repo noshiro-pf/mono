@@ -16,7 +16,7 @@ export const auditTime =
 export const auditTimeI = <A,>(
   milliSeconds: number,
 ): InitializedToInitializedOperator<A, A> =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   auditTime(milliSeconds) as InitializedToInitializedOperator<A, A>;
 
 class AuditTimeObservableClass<A>

@@ -48,8 +48,12 @@ export const DatepickerNav = memoNamed<Props>(
     const onMonthChangeHandler = useCallback(
       (value: string) => {
         onMonthChange(
-          // eslint-disable-next-line no-restricted-syntax
-          mapOptional(Num.from(value), (a) => a as MonthEnum) ?? thisMonth,
+          mapOptional(
+            Num.from(value),
+            (a) =>
+              // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+              a as MonthEnum,
+          ) ?? thisMonth,
         );
       },
       [onMonthChange],

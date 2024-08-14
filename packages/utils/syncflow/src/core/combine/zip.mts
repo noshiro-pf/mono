@@ -17,7 +17,7 @@ export const zip = <A extends NonEmptyUnknownList>(
 export const zipI = <A extends NonEmptyUnknownList>(
   parents: WrapInitialized<A>,
 ): InitializedZipObservable<A> =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   new ZipObservableClass(parents as Wrap<A>) as InitializedZipObservable<A>;
 
 class ZipObservableClass<A extends NonEmptyUnknownList>
@@ -32,13 +32,16 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
       parents,
       type: 'zip',
       initialValue: parentsValues.every(Maybe.isSome)
-        ? // eslint-disable-next-line no-restricted-syntax
-          Maybe.some(parentsValues.map((c) => c.value) as unknown as A)
+        ? Maybe.some(
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            parentsValues.map((c) => c.value) as unknown as A,
+          )
         : Maybe.none,
     });
 
-    // eslint-disable-next-line no-restricted-syntax
-    this.#queues = parents.map(createQueue) as unknown as TupleToQueueTuple<A>;
+    this.#queues =
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      parents.map(createQueue) as unknown as TupleToQueueTuple<A>;
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
@@ -50,8 +53,10 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
     }
 
     if (queues.every((list) => !list.isEmpty)) {
-      // eslint-disable-next-line no-restricted-syntax
-      const nextValue = queues.map((q) => q.dequeue()) as unknown as A;
+      const nextValue =
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        queues.map((q) => q.dequeue()) as unknown as A;
+
       this.setNext(nextValue, updaterSymbol);
     }
   }

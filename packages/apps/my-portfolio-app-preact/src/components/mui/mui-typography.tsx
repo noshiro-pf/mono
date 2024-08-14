@@ -1,5 +1,4 @@
 type Props = DeepReadonly<{
-  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
   variant: 'title' | 'subtitle1' | 'body1' | 'body2';
   children: preact.ComponentChildren;
 }>;

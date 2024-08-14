@@ -17,7 +17,7 @@ export const withIndexI = <A,>(): InitializedToInitializedOperator<
   A,
   readonly [SafeUint | -1, A]
 > =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   withIndex() as InitializedToInitializedOperator<
     A,
     readonly [SafeUint | -1, A]

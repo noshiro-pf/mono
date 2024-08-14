@@ -110,7 +110,12 @@ export const createScore = (
       );
       const scoreMax: number = calcScoreSumMax(weightList);
 
-      return [datetimeRange, answers.length === 0 ? 0 : scoreSum / scoreMax];
+      return [
+        datetimeRange,
+        answers.length === 0 || !Num.isPositive(scoreMax)
+          ? 0
+          : Num.div(scoreSum, scoreMax),
+      ];
     }),
     datetimeRangeToMapKey,
     datetimeRangeFromMapKey,

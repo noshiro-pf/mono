@@ -10,5 +10,5 @@ export const ymdhmDateDiff = (a: Ymdhm, b: Ymdhm): number => {
       .chain(ymdhm2Date)
       .chain(DateUtils.toMidnight)
       .chain(DateUtils.toTimestamp).value;
-  return Math.round(diff / (24 * 60 * 60 * 1000));
+  return Math.round(Num.div(diff, toPositiveSafeInt(24 * 60 * 60 * 1000)));
 };

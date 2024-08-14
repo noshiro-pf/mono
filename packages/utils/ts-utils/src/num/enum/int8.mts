@@ -21,13 +21,13 @@ const {
 const is = (x: number): x is Int8 => isImpl(x);
 
 const castTo = (x: number): Int8 =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   castToImpl(x) as Int8;
 
 const clamp = (a: number): Int8 => castTo(clampImpl(a));
 
 const abs = <N extends Int8>(x: N): AbsoluteValue<N> =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   Math.abs(x) as unknown as AbsoluteValue<N>;
 
 const _min = (...values: readonly Int8[]): Int8 => castTo(Math.min(...values));

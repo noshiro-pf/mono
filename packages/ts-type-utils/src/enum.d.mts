@@ -38,9 +38,7 @@ type DateEnum = Exclude<Index<32>, 0>;
 type DayOfWeekIndex = Index<7>;
 
 /** `'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thr' | 'Fri' | 'Sat'` */
-type DayOfWeekName =
-  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
-  'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thr' | 'Fri' | 'Sat';
+type DayOfWeekName = 'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thr' | 'Fri' | 'Sat';
 
 /** `0 | 1 | ... | 23` */
 type HoursEnum = Index<24>;

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-dynamic-delete */
-
 import * as fs from 'fs/promises';
 import path from 'node:path';
 import { type Workspace } from '../index.mjs';
@@ -30,7 +28,7 @@ export const updatePackageJson = async (
 
   const packageJsonPath = path.resolve(workspace.location, './package.json');
 
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   const mut_packageJson = JSON.parse(
     await fs.readFile(packageJsonPath, { encoding: 'utf8' }),
   ) as MutableJsonValue;
@@ -39,7 +37,7 @@ export const updatePackageJson = async (
 
   updatePackageJsonImpl(
     workspace,
-    // eslint-disable-next-line no-restricted-syntax
+
     mut_packageJson as MutableRecord<string, MutableJsonValue | undefined>,
     packageName,
     pathPrefixToRoot,

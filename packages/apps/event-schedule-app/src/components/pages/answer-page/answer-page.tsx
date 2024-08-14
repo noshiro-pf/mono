@@ -265,7 +265,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                         />
                       }
                       tagProps={
-                        // eslint-disable-next-line no-restricted-syntax
+                        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
                         tagProps as (
                           value: DeepReadonly<React.ReactNode>,
                           index: number,

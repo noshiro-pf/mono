@@ -81,6 +81,7 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
         label={formGroupLabel}
       >
         <BpInput
+          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus={autoFocus}
           disabled={disabled}
           focus$={focus$}

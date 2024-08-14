@@ -29,6 +29,7 @@ export const Week = memoNamed<Props>(
     );
 
     return (
+      // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
       <DatePickerWeekStyled role='row'>
         {listWithHandler.map(({ value, handler, index }) => (
           <DatePickerDate

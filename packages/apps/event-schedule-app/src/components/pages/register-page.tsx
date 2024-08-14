@@ -38,6 +38,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                 label={<Label>{dc.username}</Label>}
               >
                 <BpInput
+                  // eslint-disable-next-line jsx-a11y/no-autofocus
                   autoFocus={true}
                   disabled={formState.isWaitingResponse}
                   intent={usernameFormIntent}
