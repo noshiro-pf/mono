@@ -1,8 +1,8 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
+type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
+  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
 
 /**
  * Enforces consistent naming for boolean props
@@ -61,8 +61,8 @@ namespace BooleanPropNaming {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -111,8 +111,8 @@ namespace ButtonHasType {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -153,8 +153,8 @@ namespace CheckedRequiresOnchangeOrReadonly {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -192,8 +192,8 @@ namespace DefaultPropsMatchPropTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -250,9 +250,9 @@ namespace DestructuringAssignment {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, Options1]
-    | readonly [Linter.RuleLevel, Options0];
+    | Linter.RuleSeverity
+    | readonly [Linter.RuleSeverity, Options0, Options1]
+    | readonly [Linter.RuleSeverity, Options0];
 }
 
 /**
@@ -294,8 +294,8 @@ namespace DisplayName {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -367,6 +367,48 @@ namespace ForbidComponentProps {
    *                 "disallowedFor"
    *               ],
    *               "additionalProperties": false
+   *             },
+   *             {
+   *               "type": "object",
+   *               "properties": {
+   *                 "propNamePattern": {
+   *                   "type": "string"
+   *                 },
+   *                 "allowedFor": {
+   *                   "type": "array",
+   *                   "uniqueItems": true,
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "message": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "additionalProperties": false
+   *             },
+   *             {
+   *               "type": "object",
+   *               "properties": {
+   *                 "propNamePattern": {
+   *                   "type": "string"
+   *                 },
+   *                 "disallowedFor": {
+   *                   "type": "array",
+   *                   "uniqueItems": true,
+   *                   "minItems": 1,
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "message": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "disallowedFor"
+   *               ],
+   *               "additionalProperties": false
    *             }
    *           ]
    *         }
@@ -390,13 +432,24 @@ namespace ForbidComponentProps {
           readonly allowedFor?: readonly string[];
           readonly message?: string;
         }
+      | {
+          readonly propNamePattern?: string;
+          /** @minItems 1 */
+          readonly disallowedFor: readonly [string, ...(readonly string[])];
+          readonly message?: string;
+        }
+      | {
+          readonly propNamePattern?: string;
+          readonly allowedFor?: readonly string[];
+          readonly message?: string;
+        }
     )[];
     readonly [k: string]: unknown;
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -469,8 +522,8 @@ namespace ForbidDomProps {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -536,8 +589,8 @@ namespace ForbidElements {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -575,8 +628,8 @@ namespace ForbidForeignPropTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -626,8 +679,8 @@ namespace ForbidPropTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -717,8 +770,8 @@ namespace FunctionComponentDefinition {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -760,8 +813,8 @@ namespace HookUseState {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -777,7 +830,7 @@ namespace HookUseState {
  *  ```
  */
 namespace IframeMissingSandbox {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -886,8 +939,8 @@ namespace JsxBooleanValue {
     | readonly [];
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -904,7 +957,7 @@ namespace JsxBooleanValue {
  *  ```
  */
 namespace JsxChildElementSpacing {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -1007,8 +1060,8 @@ namespace JsxClosingBracketLocation {
       };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1025,7 +1078,46 @@ namespace JsxClosingBracketLocation {
  *  ```
  */
 namespace JsxClosingTagLocation {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "enum": [
+   *           "tag-aligned",
+   *           "line-aligned"
+   *         ]
+   *       },
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "location": {
+   *             "enum": [
+   *               "tag-aligned",
+   *               "line-aligned"
+   *             ]
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       }
+   *     ]
+   *   }
+   * ]
+   * ```
+   */
+  export type Options =
+    | 'line-aligned'
+    | 'tag-aligned'
+    | {
+        readonly location?: 'line-aligned' | 'tag-aligned';
+      };
+
+  export type RuleEntry =
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1167,8 +1259,8 @@ namespace JsxCurlySpacing {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1234,8 +1326,8 @@ namespace JsxCurlyNewline {
       };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1269,8 +1361,8 @@ namespace JsxEqualsSpacing {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1322,8 +1414,8 @@ namespace JsxFilenameExtension {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1365,8 +1457,8 @@ namespace JsxFirstPropNewLine {
     | 'never';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1403,6 +1495,13 @@ namespace JsxHandlerNames {
    *           },
    *           "checkInlineFunction": {
    *             "type": "boolean"
+   *           },
+   *           "ignoreComponentNames": {
+   *             "type": "array",
+   *             "uniqueItems": true,
+   *             "items": {
+   *               "type": "string"
+   *             }
    *           }
    *         },
    *         "additionalProperties": false
@@ -1424,6 +1523,13 @@ namespace JsxHandlerNames {
    *           },
    *           "checkInlineFunction": {
    *             "type": "boolean"
+   *           },
+   *           "ignoreComponentNames": {
+   *             "type": "array",
+   *             "uniqueItems": true,
+   *             "items": {
+   *               "type": "string"
+   *             }
    *           }
    *         },
    *         "additionalProperties": false
@@ -1445,6 +1551,13 @@ namespace JsxHandlerNames {
    *           },
    *           "checkInlineFunction": {
    *             "type": "boolean"
+   *           },
+   *           "ignoreComponentNames": {
+   *             "type": "array",
+   *             "uniqueItems": true,
+   *             "items": {
+   *               "type": "string"
+   *             }
    *           }
    *         },
    *         "additionalProperties": false
@@ -1466,6 +1579,18 @@ namespace JsxHandlerNames {
    *           }
    *         },
    *         "additionalProperties": false
+   *       },
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "ignoreComponentNames": {
+   *             "type": "array",
+   *             "uniqueItems": true,
+   *             "items": {
+   *               "type": "string"
+   *             }
+   *           }
+   *         }
    *       }
    *     ]
    *   }
@@ -1484,23 +1609,30 @@ namespace JsxHandlerNames {
         readonly eventHandlerPropPrefix?: string;
         readonly checkLocalVariables?: boolean;
         readonly checkInlineFunction?: boolean;
+        readonly ignoreComponentNames?: readonly string[];
       }
     | {
         readonly eventHandlerPrefix?: string;
         readonly eventHandlerPropPrefix?: false;
         readonly checkLocalVariables?: boolean;
         readonly checkInlineFunction?: boolean;
+        readonly ignoreComponentNames?: readonly string[];
       }
     | {
         readonly eventHandlerPrefix?: string;
         readonly eventHandlerPropPrefix?: string;
         readonly checkLocalVariables?: boolean;
         readonly checkInlineFunction?: boolean;
+        readonly ignoreComponentNames?: readonly string[];
+      }
+    | {
+        readonly ignoreComponentNames?: readonly string[];
+        readonly [k: string]: unknown;
       };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1557,9 +1689,9 @@ namespace JsxIndent {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, Options1]
-    | readonly [Linter.RuleLevel, Options0];
+    | Linter.RuleSeverity
+    | readonly [Linter.RuleSeverity, Options0, Options1]
+    | readonly [Linter.RuleSeverity, Options0];
 }
 
 /**
@@ -1629,8 +1761,8 @@ namespace JsxIndentProps {
       };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1679,8 +1811,8 @@ namespace JsxKey {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1719,8 +1851,8 @@ namespace JsxMaxDepth {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1799,8 +1931,8 @@ namespace JsxMaxPropsPerLine {
       };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1862,8 +1994,8 @@ namespace JsxNewline {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1922,8 +2054,8 @@ namespace JsxNoBind {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1939,7 +2071,7 @@ namespace JsxNoBind {
  *  ```
  */
 namespace JsxNoCommentTextnodes {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -1956,18 +2088,7 @@ namespace JsxNoCommentTextnodes {
  *  ```
  */
 namespace JsxNoConstructedContextValues {
-  /**
-   * ### schema
-   *
-   * ```json
-   * {}
-   * ```
-   */
-  export type Options = Readonly<Record<string, unknown>>;
-
-  export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -2005,8 +2126,8 @@ namespace JsxNoDuplicateProps {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2056,8 +2177,8 @@ namespace JsxNoLeakedRender {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2111,8 +2232,8 @@ namespace JsxNoLiterals {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2215,8 +2336,8 @@ namespace JsxNoScriptUrl {
     | readonly [];
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2276,8 +2397,8 @@ namespace JsxNoTargetBlank {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2317,8 +2438,8 @@ namespace JsxNoUselessFragment {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2365,8 +2486,8 @@ namespace JsxOneExpressionPerLine {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2404,8 +2525,8 @@ namespace JsxNoUndef {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2478,8 +2599,8 @@ namespace JsxCurlyBracePresence {
     | ('always' | 'ignore' | 'never');
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2537,8 +2658,8 @@ namespace JsxPascalCase {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2572,8 +2693,8 @@ namespace JsxFragments {
   export type Options = 'element' | 'syntax';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2590,7 +2711,7 @@ namespace JsxFragments {
  *  ```
  */
 namespace JsxPropsNoMultiSpaces {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -2676,8 +2797,24 @@ namespace JsxPropsNoSpreading {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+}
+
+/**
+ * Disallow JSX prop spreading the same identifier multiple times
+ *
+ * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-props-no-spread-multi.md
+ *
+ *  ```md
+ *  | key         | value          |
+ *  | :---------- | :------------- |
+ *  | category    | Best Practices |
+ *  | recommended | false          |
+ *  ```
+ */
+namespace JsxPropsNoSpreadMulti {
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -2787,8 +2924,8 @@ namespace JsxSortProps {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2904,8 +3041,8 @@ namespace JsxTagSpacing {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -2921,7 +3058,7 @@ namespace JsxTagSpacing {
  *  ```
  */
 namespace JsxUsesReact {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -2937,7 +3074,7 @@ namespace JsxUsesReact {
  *  ```
  */
 namespace JsxUsesVars {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3091,8 +3228,8 @@ namespace JsxWrapMultilines {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3129,8 +3266,8 @@ namespace NoInvalidHtmlAttribute {
   export type Options = readonly 'rel'[];
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3146,7 +3283,7 @@ namespace NoInvalidHtmlAttribute {
  *  ```
  */
 namespace NoAccessStateInSetstate {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3162,7 +3299,7 @@ namespace NoAccessStateInSetstate {
  *  ```
  */
 namespace NoAdjacentInlineElements {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3178,7 +3315,7 @@ namespace NoAdjacentInlineElements {
  *  ```
  */
 namespace NoArrayIndexKey {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3195,7 +3332,7 @@ namespace NoArrayIndexKey {
  *  ```
  */
 namespace NoArrowFunctionLifecycle {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3234,8 +3371,8 @@ namespace NoChildrenProp {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3251,7 +3388,36 @@ namespace NoChildrenProp {
  *  ```
  */
 namespace NoDanger {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "customComponentNames": {
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "minItems": 0,
+   *         "type": "array",
+   *         "uniqueItems": true
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    /** @minItems 0 */
+    readonly customComponentNames?: readonly string[];
+    readonly [k: string]: unknown;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3268,7 +3434,7 @@ namespace NoDanger {
  *  ```
  */
 namespace NoDangerWithChildren {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3284,7 +3450,7 @@ namespace NoDangerWithChildren {
  *  ```
  */
 namespace NoDeprecated {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3316,8 +3482,8 @@ namespace NoDidMountSetState {
   export type Options = 'disallow-in-func';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3349,8 +3515,8 @@ namespace NoDidUpdateSetState {
   export type Options = 'disallow-in-func';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3366,7 +3532,7 @@ namespace NoDidUpdateSetState {
  *  ```
  */
 namespace NoDirectMutationState {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3382,7 +3548,7 @@ namespace NoDirectMutationState {
  *  ```
  */
 namespace NoFindDomNode {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3398,7 +3564,7 @@ namespace NoFindDomNode {
  *  ```
  */
 namespace NoIsMounted {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3437,8 +3603,8 @@ namespace NoMultiComp {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3454,7 +3620,7 @@ namespace NoMultiComp {
  *  ```
  */
 namespace NoNamespace {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3470,7 +3636,7 @@ namespace NoNamespace {
  *  ```
  */
 namespace NoSetState {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3508,8 +3674,8 @@ namespace NoStringRefs {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3525,7 +3691,7 @@ namespace NoStringRefs {
  *  ```
  */
 namespace NoRedundantShouldComponentUpdate {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3541,7 +3707,7 @@ namespace NoRedundantShouldComponentUpdate {
  *  ```
  */
 namespace NoRenderReturnValue {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3557,7 +3723,7 @@ namespace NoRenderReturnValue {
  *  ```
  */
 namespace NoThisInSfc {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3573,7 +3739,7 @@ namespace NoThisInSfc {
  *  ```
  */
 namespace NoTypos {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3640,8 +3806,8 @@ namespace NoUnescapedEntities {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3688,8 +3854,8 @@ namespace NoUnknownProperty {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3728,8 +3894,8 @@ namespace NoUnsafe {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3774,8 +3940,8 @@ namespace NoUnstableNestedComponents {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3791,7 +3957,7 @@ namespace NoUnstableNestedComponents {
  *  ```
  */
 namespace NoUnusedClassComponentMethods {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3844,8 +4010,8 @@ namespace NoUnusedPropTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3861,7 +4027,7 @@ namespace NoUnusedPropTypes {
  *  ```
  */
 namespace NoUnusedState {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3878,7 +4044,7 @@ namespace NoUnusedState {
  *  ```
  */
 namespace NoObjectTypeAsDefaultProp {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3910,8 +4076,8 @@ namespace NoWillUpdateSetState {
   export type Options = 'disallow-in-func';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3944,8 +4110,8 @@ namespace PreferEs6Class {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3961,7 +4127,7 @@ namespace PreferEs6Class {
  *  ```
  */
 namespace PreferExactProps {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -3978,7 +4144,7 @@ namespace PreferExactProps {
  *  ```
  */
 namespace PreferReadOnlyProps {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -4017,8 +4183,8 @@ namespace PreferStatelessFunction {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -4070,8 +4236,8 @@ namespace PropTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -4087,7 +4253,7 @@ namespace PropTypes {
  *  ```
  */
 namespace ReactInJsxScope {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -4143,8 +4309,8 @@ namespace RequireDefaultProps {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -4185,8 +4351,8 @@ namespace RequireOptimization {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -4202,7 +4368,7 @@ namespace RequireOptimization {
  *  ```
  */
 namespace RequireRenderReturn {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -4247,8 +4413,8 @@ namespace SelfClosingComp {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -4301,8 +4467,8 @@ namespace SortComp {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -4340,8 +4506,8 @@ namespace SortDefaultProps {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -4400,8 +4566,8 @@ namespace SortPropTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -4434,8 +4600,8 @@ namespace StateInConstructor {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -4547,9 +4713,9 @@ namespace StaticPropertyPlacement {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, Options1]
-    | readonly [Linter.RuleLevel, Options0];
+    | Linter.RuleSeverity
+    | readonly [Linter.RuleSeverity, Options0, Options1]
+    | readonly [Linter.RuleSeverity, Options0];
 }
 
 /**
@@ -4592,8 +4758,8 @@ namespace StylePropObject {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -4609,7 +4775,7 @@ namespace StylePropObject {
  *  ```
  */
 namespace VoidDomElementsNoChildren {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 export type EslintReactRules = {
@@ -4659,6 +4825,7 @@ export type EslintReactRules = {
   readonly 'react/jsx-fragments': JsxFragments.RuleEntry;
   readonly 'react/jsx-props-no-multi-spaces': JsxPropsNoMultiSpaces.RuleEntry;
   readonly 'react/jsx-props-no-spreading': JsxPropsNoSpreading.RuleEntry;
+  readonly 'react/jsx-props-no-spread-multi': JsxPropsNoSpreadMulti.RuleEntry;
   readonly 'react/jsx-sort-props': JsxSortProps.RuleEntry;
   readonly 'react/jsx-tag-spacing': JsxTagSpacing.RuleEntry;
   readonly 'react/jsx-uses-react': JsxUsesReact.RuleEntry;
@@ -4737,6 +4904,7 @@ export type EslintReactRulesOption = {
   readonly 'react/hook-use-state': HookUseState.Options;
   readonly 'react/jsx-boolean-value': JsxBooleanValue.Options;
   readonly 'react/jsx-closing-bracket-location': JsxClosingBracketLocation.Options;
+  readonly 'react/jsx-closing-tag-location': JsxClosingTagLocation.Options;
   readonly 'react/jsx-curly-spacing': JsxCurlySpacing.Options;
   readonly 'react/jsx-curly-newline': JsxCurlyNewline.Options;
   readonly 'react/jsx-equals-spacing': JsxEqualsSpacing.Options;
@@ -4753,7 +4921,6 @@ export type EslintReactRulesOption = {
   readonly 'react/jsx-max-props-per-line': JsxMaxPropsPerLine.Options;
   readonly 'react/jsx-newline': JsxNewline.Options;
   readonly 'react/jsx-no-bind': JsxNoBind.Options;
-  readonly 'react/jsx-no-constructed-context-values': JsxNoConstructedContextValues.Options;
   readonly 'react/jsx-no-duplicate-props': JsxNoDuplicateProps.Options;
   readonly 'react/jsx-no-leaked-render': JsxNoLeakedRender.Options;
   readonly 'react/jsx-no-literals': JsxNoLiterals.Options;
@@ -4771,6 +4938,7 @@ export type EslintReactRulesOption = {
   readonly 'react/jsx-wrap-multilines': JsxWrapMultilines.Options;
   readonly 'react/no-invalid-html-attribute': NoInvalidHtmlAttribute.Options;
   readonly 'react/no-children-prop': NoChildrenProp.Options;
+  readonly 'react/no-danger': NoDanger.Options;
   readonly 'react/no-did-mount-set-state': NoDidMountSetState.Options;
   readonly 'react/no-did-update-set-state': NoDidUpdateSetState.Options;
   readonly 'react/no-multi-comp': NoMultiComp.Options;

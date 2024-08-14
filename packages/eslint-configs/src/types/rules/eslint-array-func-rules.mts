@@ -13,7 +13,7 @@ import { type Linter } from 'eslint';
  * ```
  */
 namespace FromMap {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -29,7 +29,7 @@ namespace FromMap {
  * ```
  */
 namespace NoUnnecessaryThisArg {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -45,7 +45,7 @@ namespace NoUnnecessaryThisArg {
  * ```
  */
 namespace PreferArrayFrom {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -60,7 +60,7 @@ namespace PreferArrayFrom {
  * ```
  */
 namespace AvoidReverse {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -75,7 +75,7 @@ namespace AvoidReverse {
  * ```
  */
 namespace PreferFlatMap {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -90,7 +90,7 @@ namespace PreferFlatMap {
  * ```
  */
 namespace PreferFlat {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 export type EslintArrayFuncRules = {

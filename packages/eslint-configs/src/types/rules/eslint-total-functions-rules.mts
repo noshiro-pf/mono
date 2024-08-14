@@ -14,7 +14,7 @@ import { type Linter } from 'eslint';
  *  ```
  */
 namespace RequireStrictMode {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -30,7 +30,7 @@ namespace RequireStrictMode {
  *  ```
  */
 namespace NoUnsafeTypeAssertion {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -46,7 +46,7 @@ namespace NoUnsafeTypeAssertion {
  *  ```
  */
 namespace NoUnsafeReadonlyMutableAssignment {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -62,7 +62,7 @@ namespace NoUnsafeReadonlyMutableAssignment {
  *  ```
  */
 namespace NoUnsafeMutableReadonlyAssignment {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -78,7 +78,7 @@ namespace NoUnsafeMutableReadonlyAssignment {
  *  ```
  */
 namespace NoEnums {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -94,7 +94,7 @@ namespace NoEnums {
  *  ```
  */
 namespace NoPartialUrlConstructor {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -110,7 +110,7 @@ namespace NoPartialUrlConstructor {
  *  ```
  */
 namespace NoPartialDivision {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -126,7 +126,7 @@ namespace NoPartialDivision {
  *  ```
  */
 namespace NoPartialStringNormalize {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -142,7 +142,7 @@ namespace NoPartialStringNormalize {
  *  ```
  */
 namespace NoPrematureFpTsEffects {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -158,7 +158,7 @@ namespace NoPrematureFpTsEffects {
  *  ```
  */
 namespace NoNestedFpTsEffects {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -174,7 +174,7 @@ namespace NoNestedFpTsEffects {
  *  ```
  */
 namespace NoPartialArrayReduce {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -190,7 +190,7 @@ namespace NoPartialArrayReduce {
  *  ```
  */
 namespace NoHiddenTypeAssertions {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 export type EslintTotalFunctionsRules = {

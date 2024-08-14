@@ -14,7 +14,7 @@ import { type Linter } from 'eslint';
  *  ```
  */
 namespace Deprecation {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 export type EslintDeprecationRules = {
