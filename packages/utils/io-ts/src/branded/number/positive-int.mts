@@ -1,12 +1,14 @@
-import { isUint, toUint } from '@noshiro/ts-utils';
+import { isPositiveInt, toPositiveInt } from '@noshiro/ts-utils';
 import { number } from '../../primitives/index.mjs';
 import { type Type } from '../../type.mjs';
 import { brand } from '../brand.mjs';
 
-export const uint = (defaultValue: Uint = toUint(0)): Type<Uint> =>
+export const positiveInt = (
+  defaultValue: PositiveInt = toPositiveInt(0),
+): Type<PositiveInt> =>
   brand({
     codec: number(defaultValue),
-    is: isUint,
+    is: isPositiveInt,
     defaultValue,
     brandKeys: [
       'Finite',
@@ -16,6 +18,7 @@ export const uint = (defaultValue: Uint = toUint(0)): Type<Uint> =>
       '> -2^16',
       '>= -2^15',
       '>=0',
+      '!=0',
     ],
     brandFalseKeys: ['NaNValue'],
   } as const);

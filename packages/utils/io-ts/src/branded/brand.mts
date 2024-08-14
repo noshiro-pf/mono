@@ -41,20 +41,19 @@ export const brand = <
   const validate: Type<T>['validate'] = (a) =>
     pipe(a)
       .chain(codec.validate)
-      .chain((v): Result<T, readonly string[]> => {
-        if (Result.isErr(v)) return v;
-
-        if (is(v.value)) {
-          return Result.ok(v.value);
-        } else {
-          return Result.err([
-            validationErrorMessage(
-              v.value,
-              `The value must satisfy the constraint corresponding to the brand keys: <${brandKeysStr}>`,
-            ),
-          ]);
-        }
-      }).value;
+      .chain(
+        (v): Result<T, readonly string[]> =>
+          Result.isErr(v)
+            ? v
+            : is(v.value)
+              ? Result.ok(v.value)
+              : Result.err([
+                  validationErrorMessage(
+                    v.value,
+                    `The value must satisfy the constraint corresponding to the brand keys: <${brandKeysStr}>`,
+                  ),
+                ]),
+      ).value;
 
   const fill: Type<T>['fill'] = (a) =>
     pipe(a)

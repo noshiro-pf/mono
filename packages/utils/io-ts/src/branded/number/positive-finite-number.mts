@@ -1,24 +1,26 @@
-import { isSafeUint, toSafeUint } from '@noshiro/ts-utils';
+import {
+  isPositiveFiniteNumber,
+  toPositiveFiniteNumber,
+} from '@noshiro/ts-utils';
 import { number } from '../../primitives/index.mjs';
 import { type Type } from '../../type.mjs';
 import { brand } from '../brand.mjs';
 
-export const safeUint = (
-  defaultValue: SafeUint = toSafeUint(0),
-): Type<SafeUint> =>
+export const positiveFiniteNumber = (
+  defaultValue: PositiveFiniteNumber = toPositiveFiniteNumber(0),
+): Type<PositiveFiniteNumber> =>
   brand({
     codec: number(defaultValue),
-    is: isSafeUint,
+    is: isPositiveFiniteNumber,
     defaultValue,
     brandKeys: [
-      'Finite',
-      'Int',
-      'SafeInt',
+      '>=0',
       '> -2^16',
       '> -2^32',
       '>= -2^15',
       '>= -2^31',
-      '>=0',
+      'Finite',
+      '!=0',
     ],
     brandFalseKeys: ['NaNValue'],
   } as const);

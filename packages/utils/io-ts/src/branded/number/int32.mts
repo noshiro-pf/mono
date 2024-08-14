@@ -1,20 +1,12 @@
-import { isInt32 } from '@noshiro/ts-utils';
+import { isInt32, toInt32 } from '@noshiro/ts-utils';
 import { number } from '../../primitives/index.mjs';
 import { type Type } from '../../type.mjs';
 import { brand } from '../brand.mjs';
 
-const is = isInt32 as (u: number) => u is Int32;
-
-export const int32 = (defaultValue: number = 0): Type<Int32> => {
-  if (!is(defaultValue)) {
-    throw new Error(
-      'defaultValue must be a integer in the range of 32-bit signed',
-    );
-  }
-
-  return brand({
+export const int32 = (defaultValue: Int32 = toInt32(0)): Type<Int32> =>
+  brand({
     codec: number(defaultValue),
-    is,
+    is: isInt32,
     defaultValue,
     brandKeys: [
       'Finite',
@@ -27,4 +19,3 @@ export const int32 = (defaultValue: number = 0): Type<Int32> => {
     ],
     brandFalseKeys: ['NaNValue'],
   } as const);
-};
