@@ -1,5 +1,7 @@
-import { type TypeScriptEslintRules } from '../types/rules/typescript-eslint-rules.mjs';
-import { type RestrictedImportsOption } from '../types/types.mjs';
+import {
+  type RestrictedImportsOption,
+  type TypeScriptEslintRules,
+} from '../types/index.mjs';
 
 export const banTypes = {
   Date: {
@@ -62,30 +64,30 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   // The following rules can be used in some cases. See the README for more
   // information. (These are marked with `0` instead of `"off"` so that a
   // script can distinguish them.)
-  '@typescript-eslint/quotes': 'off',
+  '@typescript-eslint/quotes': 0,
 
   /**
    * Disable in favor of prettier
    *
    * @link https://github.com/prettier/eslint-config-prettier/blob/main/index.js
    */
-  '@typescript-eslint/brace-style': 'off',
-  '@typescript-eslint/comma-dangle': 'off',
-  '@typescript-eslint/comma-spacing': 'off',
-  '@typescript-eslint/func-call-spacing': 'off',
-  '@typescript-eslint/indent': 'off',
-  '@typescript-eslint/keyword-spacing': 'off',
-  '@typescript-eslint/member-delimiter-style': 'off',
-  '@typescript-eslint/no-extra-parens': 'off',
-  '@typescript-eslint/no-extra-semi': 'off',
-  '@typescript-eslint/object-curly-spacing': 'off',
-  '@typescript-eslint/semi': 'off',
-  '@typescript-eslint/space-before-blocks': 'off',
-  '@typescript-eslint/space-before-function-paren': 'off',
-  '@typescript-eslint/space-infix-ops': 'off',
-  '@typescript-eslint/type-annotation-spacing': 'off',
-  '@typescript-eslint/key-spacing': 'off',
-  '@typescript-eslint/lines-around-comment': 'off',
+  '@typescript-eslint/brace-style': 0,
+  '@typescript-eslint/comma-dangle': 0,
+  '@typescript-eslint/comma-spacing': 0,
+  '@typescript-eslint/func-call-spacing': 0,
+  '@typescript-eslint/indent': 0,
+  '@typescript-eslint/keyword-spacing': 0,
+  '@typescript-eslint/member-delimiter-style': 0,
+  '@typescript-eslint/no-extra-parens': 0,
+  '@typescript-eslint/no-extra-semi': 0,
+  '@typescript-eslint/object-curly-spacing': 0,
+  '@typescript-eslint/semi': 0,
+  '@typescript-eslint/space-before-blocks': 0,
+  '@typescript-eslint/space-before-function-paren': 0,
+  '@typescript-eslint/space-infix-ops': 0,
+  '@typescript-eslint/type-annotation-spacing': 0,
+  '@typescript-eslint/key-spacing': 0,
+  '@typescript-eslint/lines-around-comment': 0,
 
   '@typescript-eslint/adjacent-overload-signatures': 'error',
   '@typescript-eslint/array-type': [
@@ -104,7 +106,13 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   ], // modified
   '@typescript-eslint/class-literal-property-style': 'error',
   '@typescript-eslint/consistent-indexed-object-style': 'error',
-  '@typescript-eslint/consistent-type-assertions': 'error',
+  '@typescript-eslint/consistent-type-assertions': [
+    'error',
+    {
+      assertionStyle: 'as',
+      objectLiteralTypeAssertions: 'never',
+    },
+  ],
   '@typescript-eslint/consistent-type-definitions': ['error', 'type'], // modified
   '@typescript-eslint/consistent-type-imports': [
     // relates to import/consistent-type-specifier-style rule
@@ -120,10 +128,14 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     { fixMixedExportsWithInlineTypeSpecifier: true },
   ],
   '@typescript-eslint/default-param-last': 'error',
-  '@typescript-eslint/dot-notation': [
-    'error',
-    { allowIndexSignaturePropertyAccess: true },
-  ], // modified
+
+  /** Prefer noPropertyAccessFromIndexSignature */
+  '@typescript-eslint/dot-notation': 'off',
+  // '@typescript-eslint/dot-notation': [
+  //   'error',
+  //   { allowIndexSignaturePropertyAccess: true },
+  // ], // modified
+
   '@typescript-eslint/explicit-function-return-type': [
     'error',
     {
@@ -143,9 +155,16 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   ], // modified
   '@typescript-eslint/explicit-module-boundary-types': 'off', // preferred to use explicit-function-return-type
   '@typescript-eslint/init-declarations': 'error',
-  '@typescript-eslint/lines-between-class-members': 'off', // disabled
+  '@typescript-eslint/lines-between-class-members': 0,
   '@typescript-eslint/member-ordering': 'off', // disabled
+
+  /**
+   * 関数メンバーをメソッド記法で書くと双変になり安全性が低くなるため
+   * https://github.com/Microsoft/TypeScript/wiki/FAQ#why-are-function-parameters-bivariant
+   */
   '@typescript-eslint/method-signature-style': 'error',
+  '@typescript-eslint/prefer-function-type': 'error',
+
   '@typescript-eslint/naming-convention': 'off', // disabled
   '@typescript-eslint/no-array-constructor': 'error',
   '@typescript-eslint/no-base-to-string': 'error',
@@ -153,7 +172,7 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-confusing-void-expression': 'error',
   '@typescript-eslint/no-dupe-class-members': 'error',
   '@typescript-eslint/no-dynamic-delete': 'error',
-  '@typescript-eslint/no-empty-function': 'error',
+  '@typescript-eslint/no-empty-function': 'off', // disabled
   '@typescript-eslint/no-empty-interface': 'off', // disabled
   '@typescript-eslint/no-explicit-any': 'error',
   '@typescript-eslint/no-extra-non-null-assertion': 'error',
@@ -161,7 +180,10 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-floating-promises': 'error',
   '@typescript-eslint/no-for-in-array': 'error',
   '@typescript-eslint/no-implied-eval': 'error',
+
+  /** 型を明示的に書きたい場合もあるためオフに */
   '@typescript-eslint/no-inferrable-types': 'off', // disabled
+
   '@typescript-eslint/no-invalid-this': 'error',
   '@typescript-eslint/no-invalid-void-type': 'error',
   '@typescript-eslint/no-loop-func': 'error',
@@ -169,7 +191,12 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-magic-numbers': 'off', // disabled
   '@typescript-eslint/no-meaningless-void-operator': 'error',
   '@typescript-eslint/no-misused-new': 'error',
-  '@typescript-eslint/no-misused-promises': 'error', // modified
+  '@typescript-eslint/no-misused-promises': [
+    'error',
+    {
+      checksConditionals: false, // strict-boolean-expression で十分
+    },
+  ],
   '@typescript-eslint/no-namespace': 'off', // disabled
   '@typescript-eslint/no-non-null-asserted-nullish-coalescing': 'error',
   '@typescript-eslint/no-non-null-asserted-optional-chain': 'error',
@@ -192,14 +219,7 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     },
   ], // modified
   '@typescript-eslint/no-this-alias': 'error',
-  '@typescript-eslint/only-throw-error': [
-    'error',
-    {
-      allowThrowingAny: false,
-      allowThrowingUnknown: false,
-    },
-  ],
-  '@typescript-eslint/no-type-alias': 'off', // disabled
+  '@typescript-eslint/no-type-alias': 0,
   '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
   '@typescript-eslint/no-unnecessary-condition': [
     'error',
@@ -219,9 +239,14 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-unused-vars': [
     'error',
     {
+      vars: 'all',
+      varsIgnorePattern: '^jsx$|^_',
+      args: 'all',
       argsIgnorePattern: '^_',
-      varsIgnorePattern: '^_',
-      args: 'after-used',
+      ignoreRestSiblings: true,
+      caughtErrors: 'all',
+      caughtErrorsIgnorePattern: '^_',
+      destructuredArrayIgnorePattern: '^_',
     },
   ], // modified
   '@typescript-eslint/no-use-before-define': 'off', // disabled
@@ -233,11 +258,6 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/prefer-enum-initializers': 'error',
   '@typescript-eslint/prefer-for-of': 'error',
 
-  /**
-   * 関数メンバーをメソッド記法で書くと双変になり安全性が低くなるため
-   * https://github.com/Microsoft/TypeScript/wiki/FAQ#why-are-function-parameters-bivariant
-   */
-  '@typescript-eslint/prefer-function-type': 'error',
   '@typescript-eslint/prefer-includes': 'error',
   '@typescript-eslint/prefer-literal-enum-member': 'error',
   '@typescript-eslint/prefer-namespace-keyword': 'error',
@@ -358,7 +378,7 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/prefer-regexp-exec': 'error',
   '@typescript-eslint/prefer-return-this-type': 'error',
   '@typescript-eslint/prefer-string-starts-ends-with': 'error',
-  '@typescript-eslint/prefer-ts-expect-error': 'error',
+  '@typescript-eslint/prefer-ts-expect-error': 0,
   '@typescript-eslint/promise-function-async': 'off', // disabled
 
   /** `sort` はデフォルトで文字列としての比較を行うため、数値のソートを行おうとしたときに比較関数を忘れることを防ぐため使用。 */
@@ -398,10 +418,11 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
       allowAny: false,
       allowNever: false,
       allowRegExp: false,
+      allowArray: false,
     },
   ], // modified
   '@typescript-eslint/return-await': 'error',
-  '@typescript-eslint/sort-type-constituents': 'error',
+  '@typescript-eslint/sort-type-constituents': 0,
 
   /**
    * Boolean への暗黙のキャストを回避するために使用。 数値 `0`, `NaN` や 文字列 `""` が条件部に来たときに false
@@ -450,7 +471,7 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/prefer-destructuring': 'off',
 
   '@typescript-eslint/no-unsafe-unary-minus': 'error',
-  '@typescript-eslint/no-useless-template-literals': 'error',
+  '@typescript-eslint/no-useless-template-literals': 0,
 
   '@typescript-eslint/consistent-return': 'off',
   '@typescript-eslint/no-array-delete': 'error',
@@ -461,9 +482,26 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   // [ 'error', { allowEmptyReject: false }, ],
 
   '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off', // unnecessary in TypeScript with strict-ts-lib
+  '@typescript-eslint/only-throw-error': [
+    'error',
+    {
+      allowThrowingAny: false,
+      allowThrowingUnknown: false,
+    },
+  ],
+
+  '@typescript-eslint/no-empty-object-type': 'error',
+  '@typescript-eslint/no-unnecessary-parameter-property-assignment': 'error',
+  '@typescript-eslint/no-unnecessary-template-expression': 'error',
+
+  // 再帰型で無限ループが発生して落ちるバグがあるため一旦オフ
+  '@typescript-eslint/no-unnecessary-type-parameters': 'off',
+
+  '@typescript-eslint/no-unsafe-function-type': 'error',
+  '@typescript-eslint/no-wrapper-object-types': 'error',
 
   // deprecated
-  '@typescript-eslint/block-spacing': 'off',
-  '@typescript-eslint/padding-line-between-statements': 'off',
-  '@typescript-eslint/no-throw-literal': 'off',
+  '@typescript-eslint/block-spacing': 0,
+  '@typescript-eslint/padding-line-between-statements': 0,
+  '@typescript-eslint/no-throw-literal': 0,
 };

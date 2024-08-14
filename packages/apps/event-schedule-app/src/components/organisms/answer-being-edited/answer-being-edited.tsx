@@ -112,13 +112,16 @@ export const AnswerBeingEdited = memoNamed<Props>(
             label={dc.yourName}
           >
             <BpInput
+              // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus={true}
               data-cy={'username'}
               intent={showUserNameError ? 'danger' : 'primary'}
               value={answerBeingEdited.user.name}
               onBlur={onUserNameBlur}
-              // eslint-disable-next-line no-restricted-syntax
-              onValueChange={onUserNameChangeLocal as (v: string) => void}
+              onValueChange={
+                // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+                onUserNameChangeLocal as (v: string) => void
+              }
             />
           </FormGroup>
         </WidthRestrictedInputWrapper>

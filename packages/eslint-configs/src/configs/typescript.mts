@@ -1,47 +1,39 @@
 import {
   eslintArrayFuncRules,
-  eslintCypressRules,
   eslintDeprecationRules,
   eslintFunctionalRules,
   eslintImportsRules,
-  eslintJestRules,
   eslintPromiseRules,
   eslintRules,
   eslintSecurityRules,
+  eslintTotalFunctionsRules,
   eslintUnicornRules,
   typescriptEslintRules,
 } from '../rules/index.mjs';
-import { type FlatConfig } from '../types/flat-config.mjs';
-import { type EslintImportsRules } from '../types/rules/eslint-import-rules.mjs';
-import {
-  type TypeScriptEslintRules,
-  type TypeScriptEslintRulesOption,
-} from '../types/rules/typescript-eslint-rules.mjs';
-import { eslintConfigForTypeScriptWithoutRules } from './typescript-without-rules.mjs';
+import { type EslintImportsRules, type FlatConfig } from '../types/index.mjs';
+import { eslintFlatConfigForTypeScriptWithoutRules } from './typescript-without-rules.mjs';
 
-export const eslintConfigForTypeScript = ({
+export const eslintFlatConfigForTypeScript = ({
   tsconfigFileName,
   tsconfigRootDir,
   packageDirs,
-  restrictedImports,
 }: Readonly<{
   tsconfigFileName: string;
   tsconfigRootDir: string;
   packageDirs: readonly string[];
-  restrictedImports?: TypeScriptEslintRulesOption['@typescript-eslint/no-restricted-imports'];
 }>): readonly FlatConfig[] => [
-  ...eslintConfigForTypeScriptWithoutRules({
+  ...eslintFlatConfigForTypeScriptWithoutRules({
     tsconfigFileName,
     tsconfigRootDir,
   }),
   {
+    files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
     rules: {
       ...eslintArrayFuncRules,
-      ...eslintCypressRules,
       ...eslintDeprecationRules,
       ...eslintFunctionalRules,
+      ...eslintTotalFunctionsRules,
       ...eslintImportsRules,
-      ...eslintJestRules,
       ...eslintPromiseRules,
       ...eslintRules,
       ...eslintSecurityRules,
@@ -55,18 +47,6 @@ export const eslintConfigForTypeScript = ({
         },
       ] satisfies EslintImportsRules['import/no-extraneous-dependencies'],
     },
-  } satisfies FlatConfig,
-  {
-    files: ['**/*.{js,ts,mjs,mts,cjs,cts,jsx,tsx}'],
-    rules:
-      restrictedImports === undefined
-        ? {}
-        : {
-            '@typescript-eslint/no-restricted-imports': [
-              'error',
-              ...restrictedImports,
-            ] satisfies TypeScriptEslintRules['@typescript-eslint/no-restricted-imports'],
-          },
   } satisfies FlatConfig,
   {
     files: ['**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'],

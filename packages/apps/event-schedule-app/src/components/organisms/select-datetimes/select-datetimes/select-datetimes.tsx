@@ -59,8 +59,10 @@ export const SelectDatetimes = memoNamed<Props>(
             <BpSelect
               options={selectorOptions}
               value={datetimeSpecification}
-              // eslint-disable-next-line no-restricted-syntax
-              onValueChange={onDatetimeSpecificationChange as CastedHandlerType}
+              onValueChange={
+                // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+                onDatetimeSpecificationChange as CastedHandlerType
+              }
             />
           </div>
           <div

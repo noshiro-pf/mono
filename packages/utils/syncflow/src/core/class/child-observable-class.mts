@@ -224,7 +224,7 @@ export class InitializedSyncChildObservableClass<
   }
 
   override get snapshot(): Maybe.Some<A> {
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return super.getCurrentValue() as Maybe.Some<A>;
   }
 
@@ -236,7 +236,9 @@ export class InitializedSyncChildObservableClass<
 
   override chain<B>(operator: Operator<A, B>): Observable<B>;
   override chain<B>(operator: Operator<A, B>): Observable<B> {
-    // eslint-disable-next-line no-restricted-syntax
-    return operator(this as unknown as InitializedObservable<A>);
+    return operator(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      this as unknown as InitializedObservable<A>,
+    );
   }
 }

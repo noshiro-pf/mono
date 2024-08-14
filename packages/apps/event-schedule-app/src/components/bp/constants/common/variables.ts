@@ -13,12 +13,13 @@ export const ptFontFamily = `
     "Icons16",
     sans-serif;`;
 
-export const ptFontSizePx = ptGridSizePx * 1.4;
-export const ptFontSizeLargePx = ptGridSizePx * 1.6;
-export const ptFontSizeSmallPx = ptGridSizePx * 1.2;
+export const ptFontSizePx = toPositiveFiniteNumber(ptGridSizePx * 1.4);
+export const ptFontSizeLargePx = toPositiveFiniteNumber(ptGridSizePx * 1.6);
+export const ptFontSizeSmallPx = toPositiveFiniteNumber(ptGridSizePx * 1.2);
 
 // a little bit extra to ensure the height comes out to just over 18px (and browser rounds to 18px)
-export const ptLineHeightPx = (ptGridSizePx * 1.8) / ptFontSizePx + 0.0001;
+export const ptLineHeightPx =
+  Num.div(ptGridSizePx * 1.8, ptFontSizePx) + 0.0001;
 
 // Icon variables
 

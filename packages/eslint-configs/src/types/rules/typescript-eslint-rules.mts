@@ -350,7 +350,7 @@ namespace BlockSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -392,7 +392,7 @@ namespace BraceStyle {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -588,7 +588,7 @@ namespace CommaDangle {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -627,7 +627,7 @@ namespace CommaSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -1376,7 +1376,7 @@ namespace FuncCallSpacing {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -1658,7 +1658,7 @@ namespace Indent {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -1949,7 +1949,7 @@ namespace KeySpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -2822,7 +2822,7 @@ namespace KeywordSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -2925,7 +2925,7 @@ namespace LinesAroundComment {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -3018,7 +3018,7 @@ namespace LinesBetweenClassMembers {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -3187,7 +3187,7 @@ namespace MemberDelimiterStyle {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -6387,6 +6387,63 @@ namespace NoEmptyInterface {
 }
 
 /**
+ * Disallow accidentally using the "empty object" type
+ *
+ * @link https://typescript-eslint.io/rules/no-empty-object-type
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | hasSuggestions | true       |
+ *  ```
+ */
+namespace NoEmptyObjectType {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "allowInterfaces": {
+   *         "enum": [
+   *           "always",
+   *           "never",
+   *           "with-single-extends"
+   *         ],
+   *         "type": "string"
+   *       },
+   *       "allowObjectTypes": {
+   *         "enum": [
+   *           "always",
+   *           "in-type-alias-with-name",
+   *           "never"
+   *         ],
+   *         "type": "string"
+   *       },
+   *       "allowWithName": {
+   *         "type": "string"
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly allowInterfaces?: 'always' | 'never' | 'with-single-extends';
+    readonly allowObjectTypes?: 'always' | 'in-type-alias-with-name' | 'never';
+    readonly allowWithName?: string;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
  * Disallow the `any` type
  *
  * @link https://typescript-eslint.io/rules/no-explicit-any
@@ -6535,7 +6592,7 @@ namespace NoExtraParens {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -6552,7 +6609,7 @@ namespace NoExtraParens {
  *  ```
  */
 namespace NoExtraSemi {
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -6637,6 +6694,120 @@ namespace NoFloatingPromises {
    *   {
    *     "type": "object",
    *     "properties": {
+   *       "allowForKnownSafePromises": {
+   *         "type": "array",
+   *         "items": {
+   *           "oneOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "type": "object",
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "type": "string",
+   *                   "enum": [
+   *                     "file"
+   *                   ]
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "type": "array",
+   *                       "minItems": 1,
+   *                       "uniqueItems": true,
+   *                       "items": {
+   *                         "type": "string"
+   *                       }
+   *                     }
+   *                   ]
+   *                 },
+   *                 "path": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ]
+   *             },
+   *             {
+   *               "type": "object",
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "type": "string",
+   *                   "enum": [
+   *                     "lib"
+   *                   ]
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "type": "array",
+   *                       "minItems": 1,
+   *                       "uniqueItems": true,
+   *                       "items": {
+   *                         "type": "string"
+   *                       }
+   *                     }
+   *                   ]
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ]
+   *             },
+   *             {
+   *               "type": "object",
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "type": "string",
+   *                   "enum": [
+   *                     "package"
+   *                   ]
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "type": "array",
+   *                       "minItems": 1,
+   *                       "uniqueItems": true,
+   *                       "items": {
+   *                         "type": "string"
+   *                       }
+   *                     }
+   *                   ]
+   *                 },
+   *                 "package": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name",
+   *                 "package"
+   *               ]
+   *             }
+   *           ]
+   *         }
+   *       },
+   *       "checkThenables": {
+   *         "description": "Whether to check all \"Thenable\"s, not just the built-in Promise type.",
+   *         "type": "boolean"
+   *       },
    *       "ignoreVoid": {
    *         "description": "Whether to ignore `void` expressions.",
    *         "type": "boolean"
@@ -6652,6 +6823,25 @@ namespace NoFloatingPromises {
    * ```
    */
   export type Options = {
+    readonly allowForKnownSafePromises?: readonly (
+      | string
+      | {
+          readonly from: 'file';
+          readonly name: string | readonly [string, ...(readonly string[])];
+          readonly path?: string;
+        }
+      | {
+          readonly from: 'lib';
+          readonly name: string | readonly [string, ...(readonly string[])];
+        }
+      | {
+          readonly from: 'package';
+          readonly name: string | readonly [string, ...(readonly string[])];
+          readonly package: string;
+        }
+    )[];
+    /** Whether to check all "Thenable"s, not just the built-in Promise type. */
+    readonly checkThenables?: boolean;
     /** Whether to ignore `void` expressions. */
     readonly ignoreVoid?: boolean;
     /** Whether to ignore async IIFEs (Immediately Invoked Function Expressions). */
@@ -7697,7 +7887,7 @@ namespace NoThrowLiteral {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7778,7 +7968,7 @@ namespace NoTypeAlias {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7889,6 +8079,21 @@ namespace NoUnnecessaryCondition {
 }
 
 /**
+ * Disallow unnecessary assignment of constructor property parameter
+ *
+ * @link https://typescript-eslint.io/rules/no-unnecessary-parameter-property-assignment
+ *
+ *  ```md
+ *  | key  | value      |
+ *  | :--- | :--------- |
+ *  | type | suggestion |
+ *  ```
+ */
+namespace NoUnnecessaryParameterPropertyAssignment {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
  * Disallow unnecessary namespace qualifiers
  *
  * @link https://typescript-eslint.io/rules/no-unnecessary-qualifier
@@ -7902,6 +8107,24 @@ namespace NoUnnecessaryCondition {
  *  ```
  */
 namespace NoUnnecessaryQualifier {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
+ * Disallow unnecessary template expressions
+ *
+ * @link https://typescript-eslint.io/rules/no-unnecessary-template-expression
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | fixable              | code       |
+ *  | recommended          | strict     |
+ *  | requiresTypeChecking | true       |
+ *  ```
+ */
+namespace NoUnnecessaryTemplateExpression {
   export type RuleEntry = Linter.RuleLevel;
 }
 
@@ -7983,6 +8206,22 @@ namespace NoUnnecessaryTypeAssertion {
  *  ```
  */
 namespace NoUnnecessaryTypeConstraint {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
+ * Disallow type parameters that only appear once
+ *
+ * @link https://typescript-eslint.io/rules/no-unnecessary-type-parameters
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | requiresTypeChecking | true    |
+ *  ```
+ */
+namespace NoUnnecessaryTypeParameters {
   export type RuleEntry = Linter.RuleLevel;
 }
 
@@ -8069,6 +8308,22 @@ namespace NoUnsafeDeclarationMerging {
  *  ```
  */
 namespace NoUnsafeEnumComparison {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
+ * Disallow using the unsafe built-in Function type
+ *
+ * @link https://typescript-eslint.io/rules/no-unsafe-function-type
+ *
+ *  ```md
+ *  | key     | value   |
+ *  | :------ | :------ |
+ *  | type    | problem |
+ *  | fixable | code    |
+ *  ```
+ */
+namespace NoUnsafeFunctionType {
   export type RuleEntry = Linter.RuleLevel;
 }
 
@@ -8378,7 +8633,7 @@ namespace NoUselessEmptyExport {
 }
 
 /**
- * Disallow unnecessary template literals
+ * Disallow unnecessary template expressions
  *
  * @link https://typescript-eslint.io/rules/no-useless-template-literals
  *
@@ -8386,13 +8641,13 @@ namespace NoUselessEmptyExport {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | true       |
  *  | fixable              | code       |
- *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  *  ```
  */
 namespace NoUselessTemplateLiterals {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -8437,6 +8692,22 @@ namespace NoVarRequires {
   export type RuleEntry =
     | Linter.RuleLevel
     | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
+ * Disallow using confusing built-in primitive class wrappers
+ *
+ * @link https://typescript-eslint.io/rules/no-wrapper-object-types
+ *
+ *  ```md
+ *  | key     | value   |
+ *  | :------ | :------ |
+ *  | type    | problem |
+ *  | fixable | code    |
+ *  ```
+ */
+namespace NoWrapperObjectTypes {
+  export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
@@ -8497,7 +8768,7 @@ namespace ObjectCurlySpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -8691,7 +8962,7 @@ namespace PaddingLineBetweenStatements {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -9601,15 +9872,15 @@ namespace PreferStringStartsEndsWith {
  * @link https://typescript-eslint.io/rules/prefer-ts-expect-error
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | fixable     | code    |
- *  | recommended | strict  |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | true    |
+ *  | fixable    | code    |
  *  ```
  */
 namespace PreferTsExpectError {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -9729,7 +10000,7 @@ namespace Quotes {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -9775,7 +10046,8 @@ namespace RequireArraySortCompare {
 }
 
 /**
- * Disallow async functions which have no `await` expression
+ * Disallow async functions which do not return promises and have no `await`
+ * expression
  *
  * @link https://typescript-eslint.io/rules/require-await
  *
@@ -9946,7 +10218,7 @@ namespace RestrictTemplateExpressions {
 }
 
 /**
- * Enforce consistent returning of awaited values
+ * Enforce consistent awaiting of returned promises
  *
  * @link https://typescript-eslint.io/rules/return-await
  *
@@ -9970,13 +10242,18 @@ namespace ReturnAwait {
    *     "enum": [
    *       "in-try-catch",
    *       "always",
-   *       "never"
+   *       "never",
+   *       "error-handling-correctness-only"
    *     ]
    *   }
    * ]
    * ```
    */
-  export type Options = 'always' | 'in-try-catch' | 'never';
+  export type Options =
+    | 'always'
+    | 'error-handling-correctness-only'
+    | 'in-try-catch'
+    | 'never';
 
   export type RuleEntry =
     | Linter.RuleLevel
@@ -10048,7 +10325,7 @@ namespace Semi {
    * }
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10060,6 +10337,7 @@ namespace Semi {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | true       |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
@@ -10080,6 +10358,10 @@ namespace SortTypeConstituents {
    *       },
    *       "checkUnions": {
    *         "description": "Whether to check union types.",
+   *         "type": "boolean"
+   *       },
+   *       "caseSensitive": {
+   *         "description": "Whether to sort using case sensitive sorting.",
    *         "type": "boolean"
    *       },
    *       "groupOrder": {
@@ -10108,31 +10390,7 @@ namespace SortTypeConstituents {
    * ]
    * ```
    */
-  export type Options = {
-    /** Whether to check intersection types. */
-    readonly checkIntersections?: boolean;
-    /** Whether to check union types. */
-    readonly checkUnions?: boolean;
-    /** Ordering of the groups. */
-    readonly groupOrder?: readonly (
-      | 'conditional'
-      | 'function'
-      | 'import'
-      | 'intersection'
-      | 'keyword'
-      | 'literal'
-      | 'named'
-      | 'nullish'
-      | 'object'
-      | 'operator'
-      | 'tuple'
-      | 'union'
-    )[];
-  };
-
-  export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10194,7 +10452,7 @@ namespace SpaceBeforeBlocks {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10260,7 +10518,7 @@ namespace SpaceBeforeFunctionParen {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10295,7 +10553,7 @@ namespace SpaceInfixOps {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10555,7 +10813,7 @@ namespace TypeAnnotationSpacing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -10767,6 +11025,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-dynamic-delete': NoDynamicDelete.RuleEntry;
   readonly '@typescript-eslint/no-empty-function': NoEmptyFunction.RuleEntry;
   readonly '@typescript-eslint/no-empty-interface': NoEmptyInterface.RuleEntry;
+  readonly '@typescript-eslint/no-empty-object-type': NoEmptyObjectType.RuleEntry;
   readonly '@typescript-eslint/no-explicit-any': NoExplicitAny.RuleEntry;
   readonly '@typescript-eslint/no-extra-non-null-assertion': NoExtraNonNullAssertion.RuleEntry;
   readonly '@typescript-eslint/no-extraneous-class': NoExtraneousClass.RuleEntry;
@@ -10796,15 +11055,19 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-this-alias': NoThisAlias.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-boolean-literal-compare': NoUnnecessaryBooleanLiteralCompare.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-condition': NoUnnecessaryCondition.RuleEntry;
+  readonly '@typescript-eslint/no-unnecessary-parameter-property-assignment': NoUnnecessaryParameterPropertyAssignment.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-qualifier': NoUnnecessaryQualifier.RuleEntry;
+  readonly '@typescript-eslint/no-unnecessary-template-expression': NoUnnecessaryTemplateExpression.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-type-arguments': NoUnnecessaryTypeArguments.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-type-assertion': NoUnnecessaryTypeAssertion.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-type-constraint': NoUnnecessaryTypeConstraint.RuleEntry;
+  readonly '@typescript-eslint/no-unnecessary-type-parameters': NoUnnecessaryTypeParameters.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-argument': NoUnsafeArgument.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-assignment': NoUnsafeAssignment.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-call': NoUnsafeCall.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-declaration-merging': NoUnsafeDeclarationMerging.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-enum-comparison': NoUnsafeEnumComparison.RuleEntry;
+  readonly '@typescript-eslint/no-unsafe-function-type': NoUnsafeFunctionType.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-member-access': NoUnsafeMemberAccess.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-return': NoUnsafeReturn.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-unary-minus': NoUnsafeUnaryMinus.RuleEntry;
@@ -10813,8 +11076,8 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-use-before-define': NoUseBeforeDefine.RuleEntry;
   readonly '@typescript-eslint/no-useless-constructor': NoUselessConstructor.RuleEntry;
   readonly '@typescript-eslint/no-useless-empty-export': NoUselessEmptyExport.RuleEntry;
-  readonly '@typescript-eslint/no-useless-template-literals': NoUselessTemplateLiterals.RuleEntry;
   readonly '@typescript-eslint/no-var-requires': NoVarRequires.RuleEntry;
+  readonly '@typescript-eslint/no-wrapper-object-types': NoWrapperObjectTypes.RuleEntry;
   readonly '@typescript-eslint/non-nullable-type-assertion-style': NonNullableTypeAssertionStyle.RuleEntry;
   readonly '@typescript-eslint/only-throw-error': OnlyThrowError.RuleEntry;
   readonly '@typescript-eslint/parameter-properties': ParameterProperties.RuleEntry;
@@ -10836,14 +11099,12 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/prefer-regexp-exec': PreferRegexpExec.RuleEntry;
   readonly '@typescript-eslint/prefer-return-this-type': PreferReturnThisType.RuleEntry;
   readonly '@typescript-eslint/prefer-string-starts-ends-with': PreferStringStartsEndsWith.RuleEntry;
-  readonly '@typescript-eslint/prefer-ts-expect-error': PreferTsExpectError.RuleEntry;
   readonly '@typescript-eslint/promise-function-async': PromiseFunctionAsync.RuleEntry;
   readonly '@typescript-eslint/require-array-sort-compare': RequireArraySortCompare.RuleEntry;
   readonly '@typescript-eslint/require-await': RequireAwait.RuleEntry;
   readonly '@typescript-eslint/restrict-plus-operands': RestrictPlusOperands.RuleEntry;
   readonly '@typescript-eslint/restrict-template-expressions': RestrictTemplateExpressions.RuleEntry;
   readonly '@typescript-eslint/return-await': ReturnAwait.RuleEntry;
-  readonly '@typescript-eslint/sort-type-constituents': SortTypeConstituents.RuleEntry;
   readonly '@typescript-eslint/strict-boolean-expressions': StrictBooleanExpressions.RuleEntry;
   readonly '@typescript-eslint/switch-exhaustiveness-check': SwitchExhaustivenessCheck.RuleEntry;
   readonly '@typescript-eslint/triple-slash-reference': TripleSlashReference.RuleEntry;
@@ -10868,10 +11129,13 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-extra-semi': NoExtraSemi.RuleEntry;
   readonly '@typescript-eslint/no-throw-literal': NoThrowLiteral.RuleEntry;
   readonly '@typescript-eslint/no-type-alias': NoTypeAlias.RuleEntry;
+  readonly '@typescript-eslint/no-useless-template-literals': NoUselessTemplateLiterals.RuleEntry;
   readonly '@typescript-eslint/object-curly-spacing': ObjectCurlySpacing.RuleEntry;
   readonly '@typescript-eslint/padding-line-between-statements': PaddingLineBetweenStatements.RuleEntry;
+  readonly '@typescript-eslint/prefer-ts-expect-error': PreferTsExpectError.RuleEntry;
   readonly '@typescript-eslint/quotes': Quotes.RuleEntry;
   readonly '@typescript-eslint/semi': Semi.RuleEntry;
+  readonly '@typescript-eslint/sort-type-constituents': SortTypeConstituents.RuleEntry;
   readonly '@typescript-eslint/space-before-blocks': SpaceBeforeBlocks.RuleEntry;
   readonly '@typescript-eslint/space-before-function-paren': SpaceBeforeFunctionParen.RuleEntry;
   readonly '@typescript-eslint/space-infix-ops': SpaceInfixOps.RuleEntry;
@@ -10905,6 +11169,7 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/no-duplicate-type-constituents': NoDuplicateTypeConstituents.Options;
   readonly '@typescript-eslint/no-empty-function': NoEmptyFunction.Options;
   readonly '@typescript-eslint/no-empty-interface': NoEmptyInterface.Options;
+  readonly '@typescript-eslint/no-empty-object-type': NoEmptyObjectType.Options;
   readonly '@typescript-eslint/no-explicit-any': NoExplicitAny.Options;
   readonly '@typescript-eslint/no-extraneous-class': NoExtraneousClass.Options;
   readonly '@typescript-eslint/no-floating-promises': NoFloatingPromises.Options;
@@ -10945,7 +11210,6 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/restrict-plus-operands': RestrictPlusOperands.Options;
   readonly '@typescript-eslint/restrict-template-expressions': RestrictTemplateExpressions.Options;
   readonly '@typescript-eslint/return-await': ReturnAwait.Options;
-  readonly '@typescript-eslint/sort-type-constituents': SortTypeConstituents.Options;
   readonly '@typescript-eslint/strict-boolean-expressions': StrictBooleanExpressions.Options;
   readonly '@typescript-eslint/switch-exhaustiveness-check': SwitchExhaustivenessCheck.Options;
   readonly '@typescript-eslint/triple-slash-reference': TripleSlashReference.Options;

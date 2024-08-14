@@ -18,7 +18,7 @@ export const distinctUntilChanged =
 export const distinctUntilChangedI = <A,>(
   eq: (x: A, y: A) => boolean = (x, y) => x === y,
 ): InitializedToInitializedOperator<A, A> =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   distinctUntilChanged(eq) as InitializedToInitializedOperator<A, A>;
 
 export const skipUnchanged = distinctUntilChanged; // alias

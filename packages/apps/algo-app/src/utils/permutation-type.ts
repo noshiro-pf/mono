@@ -48,8 +48,10 @@ export const permutationType = <
       ]);
     }
 
-    // eslint-disable-next-line no-restricted-syntax
-    return Result.ok(a as P);
+    return Result.ok(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      a as P,
+    );
   };
 
   const is = createIsFn<P>(validate);

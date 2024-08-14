@@ -12,7 +12,9 @@ export const firestoreTimestampTypeDef: t.Type<FieldValue> = createType({
       ]);
     }
 
-    // eslint-disable-next-line no-restricted-syntax
-    return Result.ok(a as FieldValue);
+    return Result.ok(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      a as FieldValue,
+    );
   },
 });

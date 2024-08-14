@@ -22,6 +22,6 @@ export const getAlphabets = <Case extends 'lower' | 'upper'>(
       ? UpperAlphabet[]
       : never;
 
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return ret as Ret;
 };

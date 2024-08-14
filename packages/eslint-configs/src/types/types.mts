@@ -1,5 +1,5 @@
 import { type Linter } from 'eslint';
-import { type EslintFunctionalRules } from './rules/eslint-functional-rules.mjs';
+import { type EslintFunctionalRules } from './rules/index.mjs';
 
 export type LinterRulesRecord = Readonly<Partial<Linter.RulesRecord>>;
 

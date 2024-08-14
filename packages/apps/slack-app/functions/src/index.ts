@@ -59,7 +59,7 @@ export const makeUppercase = firestore
           })
           .on('end', () => {
             const events = Buffer.concat(mut_data);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any, no-restricted-syntax
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any
             const r = Json.parse(events.toString()) as any;
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

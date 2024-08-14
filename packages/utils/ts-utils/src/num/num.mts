@@ -49,7 +49,7 @@ const clamp =
   (target: N): N =>
     !Number.isFinite(target)
       ? lowerBound
-      : // eslint-disable-next-line no-restricted-syntax
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (Math.max(lowerBound, Math.min(upperBound, target)) as N);
 
 const isNonZero = <N extends number>(
@@ -71,7 +71,9 @@ const isPositive = <N extends number>(
   a: N,
 ): a is PositiveNumber & RelaxedExclude<N, NegativeIndex<1024> | 0> => a > 0;
 
-const div = (a: number, b: NonZeroNumber | SmallInt<'!=0'>): number => a / b;
+const div = (a: number, b: NonZeroNumber | SmallInt<'!=0'>): number =>
+  // eslint-disable-next-line total-functions/no-partial-division
+  a / b;
 
 // ValidNumber
 // FiniteNumber
@@ -103,34 +105,41 @@ const div = (a: number, b: NonZeroNumber | SmallInt<'!=0'>): number => a / b;
 const roundAt = (val: number, precision: number): number => {
   const digit = 10 ** precision;
 
+  // eslint-disable-next-line total-functions/no-partial-division
   return Math.round(val * digit) / digit;
 };
 
 const roundBy = (digit: number, value: number): number =>
+  // eslint-disable-next-line total-functions/no-partial-division
   Math.round(value * 10 ** digit) / 10 ** digit;
 
-// eslint-disable-next-line no-restricted-syntax
-const roundToInt = (n: number): Int => (0 | (n + 0.5)) as Int;
+const roundToInt = (n: number): Int =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  (0 | (n + 0.5)) as Int;
 
 const round = (digit: number): ((x: number) => number) => {
   const powAmount = 10 ** digit;
 
-  return (target: number) => roundToInt(powAmount * target) / powAmount;
+  return (target: number) =>
+    // eslint-disable-next-line total-functions/no-partial-division
+    roundToInt(powAmount * target) / powAmount;
 };
 
 const mapNaN2Undefined = <N extends number>(
   value: N,
 ): RelaxedExclude<N, NaNType> | undefined =>
-  // eslint-disable-next-line no-restricted-syntax
-  Number.isNaN(value) ? undefined : (value as RelaxedExclude<N, NaNType>);
+  Number.isNaN(value)
+    ? undefined
+    : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      (value as RelaxedExclude<N, NaNType>);
 
 const increment = <N extends SmallUint>(n: N): Increment<N> =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   (n + 1) as Increment<N>;
 
 type PositiveSmallInt = SmallInt<'>0'>;
 const decrement = <N extends PositiveSmallInt>(n: N): Decrement<N> =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   (n - 1) as Decrement<N>;
 
 export const Num = {

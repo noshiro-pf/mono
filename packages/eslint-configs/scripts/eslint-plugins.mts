@@ -2,7 +2,7 @@ export const eslintPlugins = {
   EslintRules: {
     typeName: 'EslintRules',
     pluginName: 'eslint',
-    rulePrefix: 'xxx',
+    rulePrefix: 'xxx/',
     outputFileName: 'eslint-rules.mts',
   },
   EslintArrayFuncRules: {
@@ -11,11 +11,17 @@ export const eslintPlugins = {
     rulePrefix: 'array-func/',
     outputFileName: 'eslint-array-func-rules.mts',
   },
-  PreferArrowFunctionRules: {
-    typeName: 'PreferArrowFunctionRules',
+  EslintPreferArrowFunctionRules: {
+    typeName: 'EslintPreferArrowFunctionRules',
     pluginName: 'eslint-plugin-prefer-arrow-functions',
     rulePrefix: 'prefer-arrow-functions/',
     outputFileName: 'eslint-prefer-arrow-functions-rules.mts',
+  },
+  EslintTotalFunctions: {
+    typeName: 'EslintTotalFunctionsRules',
+    pluginName: 'eslint-plugin-total-functions',
+    rulePrefix: 'total-functions/',
+    outputFileName: 'eslint-total-functions-rules.mts',
   },
   EslintCypressRules: {
     typeName: 'EslintCypressRules',
@@ -35,11 +41,11 @@ export const eslintPlugins = {
     rulePrefix: 'import/',
     outputFileName: 'eslint-import-rules.mts',
   },
-  EslintJestRules: {
-    typeName: 'EslintJestRules',
-    pluginName: 'eslint-plugin-jest',
-    rulePrefix: 'jest/',
-    outputFileName: 'eslint-jest-rules.mts',
+  EslintStrictDependencies: {
+    typeName: 'EslintStrictDependenciesRules',
+    pluginName: 'eslint-plugin-strict-dependencies',
+    rulePrefix: 'strict-dependencies/',
+    outputFileName: 'eslint-strict-dependencies-rules.mts',
   },
   EslintPromiseRules: {
     typeName: 'EslintPromiseRules',
@@ -78,10 +84,34 @@ export const eslintPlugins = {
     outputFileName: 'eslint-react-hooks-rules.mts',
   },
   EslintReactRefresh: {
-    typeName: 'EslintReactRefresh',
+    typeName: 'EslintReactRefreshRules',
     pluginName: 'eslint-plugin-react-refresh',
     rulePrefix: 'react-refresh/',
     outputFileName: 'eslint-react-refresh-rules.mts',
+  },
+  EslintJsxA11y: {
+    typeName: 'EslintJsxA11yRules',
+    pluginName: 'eslint-plugin-jsx-a11y',
+    rulePrefix: 'jsx-a11y/',
+    outputFileName: 'eslint-jsx-a11y-rules.mts',
+  },
+  EslintJestRules: {
+    typeName: 'EslintJestRules',
+    pluginName: 'eslint-plugin-jest',
+    rulePrefix: 'jest/',
+    outputFileName: 'eslint-jest-rules.mts',
+  },
+  EslintVitestRules: {
+    typeName: 'EslintVitestRules',
+    pluginName: 'eslint-plugin-vitest',
+    rulePrefix: 'vitest/',
+    outputFileName: 'eslint-vitest-rules.mts',
+  },
+  EslintTestingLibrary: {
+    typeName: 'EslintTestingLibraryRules',
+    pluginName: 'eslint-plugin-testing-library',
+    rulePrefix: 'testing-library/',
+    outputFileName: 'eslint-testing-library-rules.mts',
   },
   TypeScriptEslintRules: {
     typeName: 'TypeScriptEslintRules',
@@ -89,4 +119,15 @@ export const eslintPlugins = {
     rulePrefix: '@typescript-eslint/',
     outputFileName: 'typescript-eslint-rules.mts',
   },
-} as const;
+} as const satisfies Record<
+  string,
+  {
+    typeName: `${string}Rules`;
+    pluginName:
+      | '@typescript-eslint/eslint-plugin'
+      | 'eslint'
+      | `eslint-plugin-${string}`;
+    rulePrefix: `${string}/`;
+    outputFileName: `${string}.mts`;
+  }
+>;

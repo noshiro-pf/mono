@@ -1,6 +1,9 @@
 /** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */
 
-import { eslintFlatConfigForCypress } from '@noshiro/eslint-configs';
+import {
+  eslintFlatConfigForCypress,
+  eslintFlatConfigForTypeScript,
+} from '@noshiro/eslint-configs';
 import { toThisDir } from '@noshiro/mono-scripts';
 import * as nodePath from 'node:path';
 
@@ -8,13 +11,16 @@ import * as nodePath from 'node:path';
 const thisDir = toThisDir(import.meta.url);
 
 /** @type {readonly FlatConfig[]} */
-const configs = eslintFlatConfigForCypress({
-  packageDirs: [
-    nodePath.resolve(thisDir, '../../../..'),
-    nodePath.resolve(thisDir, '..'),
-  ],
-  tsconfigFileName: './tsconfig.json',
-  tsconfigRootDir: thisDir,
-});
+const configs = [
+  ...eslintFlatConfigForTypeScript({
+    packageDirs: [
+      nodePath.resolve(thisDir, '../../../..'),
+      nodePath.resolve(thisDir, '..'),
+    ],
+    tsconfigFileName: './tsconfig.json',
+    tsconfigRootDir: thisDir,
+  }),
+  eslintFlatConfigForCypress(),
+];
 
 export default configs;

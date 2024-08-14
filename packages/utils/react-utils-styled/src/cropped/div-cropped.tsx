@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { memoNamed } from '@noshiro/react-utils';
+import { Num, isPositiveFiniteNumber } from '@noshiro/ts-utils';
 import { type Rect } from '@noshiro/ts-utils-additional';
 import { useMemo } from 'react';
 
@@ -46,20 +47,32 @@ type Props = DeepReadonly<{
 
 export const DivCropped = memoNamed<Props>(
   'DivCropped',
-  ({ children, cropRectRelative }: Props) => {
+  ({ children, cropRectRelative: r }: Props) => {
     const zoomedImgStyle = useMemo(() => {
-      const { width, height, top: top_, left } = cropRectRelative;
-      const W = 1 / width;
-      const H = 1 / height;
-      const L = -W * left;
-      const T = -H * top_;
-      return {
-        width: `${W * 100}%`,
-        height: `${H * 100}%`,
-        top: `${T * 100}%`,
-        left: `${L * 100}%`,
-      };
-    }, [cropRectRelative]);
+      if (isPositiveFiniteNumber(r.width) && isPositiveFiniteNumber(r.height)) {
+        const W = Num.div(1, r.width);
+        const H = Num.div(1, r.height);
+        const L = -W * r.left;
+        const T = -H * r.top;
+
+        return {
+          width: `${W * 100}%`,
+          height: `${H * 100}%`,
+          top: `${T * 100}%`,
+          left: `${L * 100}%`,
+        };
+      } else {
+        const L = r.left;
+        const T = r.top;
+
+        return {
+          width: '100%',
+          height: '100%',
+          top: `${T * 100}%`,
+          left: `${L * 100}%`,
+        };
+      }
+    }, [r]);
 
     return (
       <RelativeWrapper>

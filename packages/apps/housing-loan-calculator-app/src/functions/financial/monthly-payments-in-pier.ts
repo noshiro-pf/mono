@@ -13,4 +13,5 @@ export const monthlyPaymentsInPIER = ({
   total: number;
   numPayments: SafeUint;
   interestRate: PercentFloat;
-}>): number => total * r * (1 + 1 / ((1 + r) ** n - 1));
+}>): number =>
+  total * r * (1 + Num.div(1, toPositiveFiniteNumber((1 + r) ** n - 1)));

@@ -2,7 +2,7 @@
 
 import { toThisDir } from '@noshiro/mono-scripts';
 import * as nodePath from 'node:path';
-import { eslintConfigForTypeScript } from './esm/configs/typescript.mjs';
+import { eslintFlatConfigForTypeScript } from './esm/configs/typescript.mjs';
 
 const thisDir = toThisDir(import.meta.url);
 
@@ -11,7 +11,7 @@ const config = [
   {
     ignores: ['esm/**', 'scripts/**/*.mjs'],
   },
-  ...eslintConfigForTypeScript({
+  ...eslintFlatConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: 'tsconfig.json',
     packageDirs: [nodePath.resolve(thisDir, '../..'), thisDir],

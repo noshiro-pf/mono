@@ -53,7 +53,12 @@ export const useSliderHandleStateManager = ({
 
   const trackSize = trackElementRef.current?.clientWidth ?? 0;
 
-  const tickSizeRatio = useMemo(() => 1 / (max - min), [min, max]);
+  const tickSizeRatio = useMemo(
+    () =>
+      pipe(max - min).chain((l) => (Num.isPositive(l) ? Num.div(1, l) : 0))
+        .value,
+    [min, max],
+  );
 
   const tickSize = useMemo(
     () => trackSize * tickSizeRatio,
@@ -94,7 +99,12 @@ export const useSliderHandleStateManager = ({
     // convert pixels to range value in increments of `stepSize`
     return (
       valueRef.current +
-      Math.round(pixelDelta / (tickSizeRef.current * stepSizeRef.current)) *
+      Math.round(
+        Num.div(
+          pixelDelta,
+          toNonZeroFiniteNumber(tickSizeRef.current * stepSizeRef.current),
+        ),
+      ) *
         stepSizeRef.current
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps

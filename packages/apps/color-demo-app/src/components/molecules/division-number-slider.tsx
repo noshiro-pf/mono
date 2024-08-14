@@ -21,8 +21,10 @@ export const DivisionNumberSlider = memoNamed<Props>(
         min={2}
         step={1}
         value={props.divisionNumber}
-        // eslint-disable-next-line no-restricted-syntax
-        onChange={props.divisionNumberOnChange as (value: number) => void}
+        onChange={
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          props.divisionNumberOnChange as (value: number) => void
+        }
       />
     </div>
   ),

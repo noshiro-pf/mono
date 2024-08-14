@@ -29,10 +29,14 @@ const getViewBox = (strokeWidth: number): string => {
 };
 
 export const Spinner = memoNamed<Props>('Spinner', ({ size: _size, value }) => {
-  const size = Math.max(MIN_SIZE, _size);
+  const size = toPositiveFiniteNumber(Math.max(MIN_SIZE, _size));
 
   const strokeWidth = useMemo(
-    () => Math.min(MIN_STROKE_WIDTH, (STROKE_WIDTH * spinnerSize.LARGE) / size),
+    () =>
+      Math.min(
+        MIN_STROKE_WIDTH,
+        Num.div(STROKE_WIDTH * spinnerSize.LARGE, size),
+      ),
     [size],
   );
 
@@ -54,6 +58,7 @@ export const Spinner = memoNamed<Props>('Spinner', ({ size: _size, value }) => {
   // - SVG elements in IE do not support anim/trans so they must be set on a parent HTML element.
   // - SPINNER_ANIMATION isolates svg from parent display and is always centered inside root element.
   return (
+    // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
     <Root role='progressbar'>
       <SpinnerAnimation style={animationStyle}>
         <svg

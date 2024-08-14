@@ -24,6 +24,47 @@ export const replaceRulesType = (content: string, typeName: string): string => {
         }),
       ).value;
 
+    case eslintPlugins.EslintVitestRules.typeName:
+      return pipe(content).chain(
+        replaceWithNoMatchCheckBetweenRegexp({
+          startRegexp: 'namespace ValidTitle {',
+          endRegexp: closeBraceRegexp,
+          mapFn: replaceWithNoMatchCheck(
+            [
+              '  export type Options = {',
+              '    readonly ignoreTypeOfDescribeName?: boolean;',
+              '    readonly allowArguments?: boolean;',
+              '    readonly disallowedWords?: readonly string[];',
+              '    /**',
+              "     * This interface was referenced by `Options`'s JSON-Schema definition via",
+              '     * the `patternProperty` "^must(?:Not)?Match$".',
+              '     */',
+              '    readonly [k: string]:',
+              '      | Record<string, string | readonly [string, string] | readonly [string]>',
+              '      | string',
+              '      | readonly [string, string]',
+              '      | readonly [string];',
+              '  };',
+            ].join('\n'),
+
+            [
+              '/* modified */',
+              '  export type Options = {',
+              '    readonly ignoreTypeOfDescribeName?: boolean;',
+              '    readonly allowArguments?: boolean;',
+              '    readonly disallowedWords?: readonly string[];',
+              '    readonly mustNotMatch?: MustMatchType | string;',
+              '    readonly mustMatch?: MustMatchType | string;',
+              '  };',
+              '',
+              '  type MustMatchType = Readonly<',
+              "    Partial<Record<'describe' | 'it' | 'test', string>>",
+              '  >;',
+            ].join('\n'),
+          ),
+        }),
+      ).value;
+
     case eslintPlugins.EslintJestRules.typeName:
       return pipe(content).chain(
         replaceWithNoMatchCheckBetweenRegexp({
@@ -65,7 +106,7 @@ export const replaceRulesType = (content: string, typeName: string): string => {
         }),
       ).value;
 
-    case eslintPlugins.PreferArrowFunctionRules.typeName:
+    case eslintPlugins.EslintPreferArrowFunctionRules.typeName:
       return pipe(content).chain(
         replaceWithNoMatchCheckBetweenRegexp({
           startRegexp: 'namespace PreferArrowFunctions {',

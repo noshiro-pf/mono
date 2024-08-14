@@ -21,7 +21,7 @@ const {
 const is = (x: number): x is Uint8 => isImpl(x);
 
 const castTo = (x: number): Uint8 =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   castToImpl(x) as Uint8;
 
 const clamp = (a: number): Uint8 => castTo(clampImpl(a));

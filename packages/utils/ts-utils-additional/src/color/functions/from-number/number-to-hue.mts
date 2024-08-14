@@ -1,7 +1,8 @@
 import { Num } from '@noshiro/ts-utils';
 import { type Hue } from '../../types/index.mjs';
 
-// eslint-disable-next-line no-restricted-syntax
-const clamp359 = Num.clamp(0, 359) as (x: number) => Hue;
+const clamp = Num.clamp<number>(0, 359);
 
-export const numberToHue = (x: number): Hue => clamp359(Num.roundToInt(x));
+export const numberToHue = (x: number): Hue =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  clamp(Num.roundToInt(x)) as Hue;

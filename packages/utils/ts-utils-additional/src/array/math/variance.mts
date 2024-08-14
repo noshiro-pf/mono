@@ -1,4 +1,10 @@
-import { Arr, toNonNegativeFiniteNumber } from '@noshiro/ts-utils';
+import {
+  Arr,
+  Num,
+  toFiniteNumber,
+  toNonNegativeFiniteNumber,
+  toPositiveFiniteNumber,
+} from '@noshiro/ts-utils';
 
 export const sqSum = (list: readonly number[]): number =>
   list.reduce((a, b) => a + b ** 2, 0);
@@ -10,8 +16,14 @@ export function variance(
 export function variance(
   list: readonly number[],
 ): NonNegativeFiniteNumber | undefined {
-  if (list.length === 0) return undefined;
-  return toNonNegativeFiniteNumber(
-    sqSum(list) / list.length - Arr.sum(list) ** 2 / list.length ** 2,
-  );
+  const len = Arr.length(list);
+  return Num.isNonZero(len)
+    ? toNonNegativeFiniteNumber(
+        Num.div(toFiniteNumber(sqSum(list)), len) -
+          Num.div(
+            toFiniteNumber(Arr.sum(list) ** 2),
+            toPositiveFiniteNumber(len ** 2),
+          ),
+      )
+    : undefined;
 }

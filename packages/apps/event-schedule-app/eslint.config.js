@@ -3,6 +3,8 @@
 import {
   banTypes,
   eslintFlatConfigForReact,
+  eslintFlatConfigForTypeScript,
+  eslintFlatConfigForVitest,
   genEsLintRestrictedImportsDefFromDevDependencies,
 } from '@noshiro/eslint-configs';
 import { toThisDir } from '@noshiro/mono-scripts';
@@ -93,15 +95,19 @@ const defineConfig = async () => {
 
   /** @type {readonly FlatConfig[]} */
   const configs = [
-    ...eslintFlatConfigForReact({
+    ...eslintFlatConfigForTypeScript({
       tsconfigRootDir: thisDir,
+      tsconfigFileName: './tsconfig.json',
       packageDirs: [nodePath.resolve(thisDir, '../../..'), thisDir],
-      tsconfigFileName: 'tsconfig.json',
-      restrictedImports: [restrictedImportsAdded],
-      isViteProject: true,
     }),
+    eslintFlatConfigForVitest(),
+    ...eslintFlatConfigForReact(),
     {
       rules: {
+        '@typescript-eslint/no-restricted-imports': [
+          'error',
+          restrictedImportsAdded,
+        ],
         '@typescript-eslint/ban-types': [
           'error',
           {

@@ -45,7 +45,7 @@ export function pickupHighContrastHues(
 
   const mut_result: MutableNonEmptyArray<Hue> = Arr.asMut(Arr.zeros(n));
 
-  let mut_i = 0;
+  let mut_i: SafeUint = toSafeUint(0);
   let mut_y = 0;
 
   const maxValue = Arr.max(luminanceDiffAccumulated);
@@ -53,7 +53,13 @@ export function pickupHighContrastHues(
   for (const [x, value] of luminanceDiffAccumulated.entries()) {
     if (value > mut_y) {
       mut_result[mut_i] = toHue(x);
-      [mut_i, mut_y] = [mut_i + 1, (maxValue * (mut_i + 1)) / n];
+      [mut_i, mut_y] = [
+        SafeUint.add(mut_i, 1),
+        Num.div(
+          FiniteNumber.mul(maxValue, SafeUint.add(mut_i, 1)),
+          toPositiveFiniteNumber(n),
+        ),
+      ];
     }
   }
 

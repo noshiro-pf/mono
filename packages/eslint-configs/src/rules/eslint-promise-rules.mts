@@ -1,4 +1,4 @@
-import { type EslintPromiseRules } from '../types/rules/eslint-promise-rules.mjs';
+import { type EslintPromiseRules } from '../types/index.mjs';
 
 export const eslintPromiseRules: EslintPromiseRules = {
   'promise/catch-or-return': ['error', { allowFinally: true }],

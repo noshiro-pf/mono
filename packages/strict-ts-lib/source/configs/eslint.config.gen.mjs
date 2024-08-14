@@ -31,9 +31,7 @@ const defineConfig = () => [
       reportUnusedDisableDirectives: true,
     },
     plugins: {
-      // @ts-expect-error FIXME
       '@typescript-eslint': typescriptEslint,
-      // @ts-expect-error FIXME
       functional,
     },
   },

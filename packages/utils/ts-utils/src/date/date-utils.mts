@@ -43,8 +43,11 @@ export type DateType = Omit<
 const getValueHelper = <N extends number>(
   date: DateType,
   getFn: (d: RawDateType) => N,
-  // eslint-disable-next-line no-restricted-syntax
-): N => getFn(date as RawDateType);
+): N =>
+  getFn(
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    date as RawDateType,
+  );
 
 /** Gets the year, using local time. */
 const getLocaleYear = (date: DateType): YearEnum =>
@@ -408,23 +411,32 @@ const toTimestamp = (d: DateType): SafeUint => d.getTime();
 
 /* yesterday & tomorrow */
 
-// eslint-disable-next-line no-restricted-syntax
-const getLocaleYesterday = updateLocaleDate((d) => (d - 1) as DateEnum);
+const getLocaleYesterday = updateLocaleDate(
+  (d) =>
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    (d - 1) as DateEnum,
+);
 
-// eslint-disable-next-line no-restricted-syntax
-const getLocaleTomorrow = updateLocaleDate((d) => (d + 1) as DateEnum);
+const getLocaleTomorrow = updateLocaleDate(
+  (d) =>
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    (d + 1) as DateEnum,
+);
 
 /* convert */
 
 const toMidnight = (date: DateType): DateType => {
-  // eslint-disable-next-line no-restricted-syntax
-  const mut_midnight = new Date(date as RawDateType);
+  const mut_midnight = new Date(
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    date as RawDateType,
+  );
   mut_midnight.setHours(0, 0, 0, 0);
   return mut_midnight;
 };
 
-// eslint-disable-next-line no-restricted-syntax
-const toDate = (date: DateType): RawDateType => date as RawDateType;
+const toDate = (date: DateType): RawDateType =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  date as RawDateType;
 
 /**
  * - `date1 < date2` --> `-1`
@@ -448,7 +460,7 @@ const weekNumberLocale = (date: DateType): 0 | 1 | 2 | 3 | 4 | 5 => {
   const date0Saturday =
     getLocaleDate(date) - 1 + (6 - getLocaleDayOfWeek(date)); // 同じ週の土曜日
 
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return Math.floor(date0Saturday / 7) as 0 | 1 | 2 | 3 | 4 | 5;
 };
 
@@ -456,14 +468,21 @@ const weekNumberLocale = (date: DateType): 0 | 1 | 2 | 3 | 4 | 5 => {
 const weekNumberUTC = (date: DateType): 0 | 1 | 2 | 3 | 4 | 5 => {
   const date0Saturday = getUTCDate(date) - 1 + (6 - getLocaleDayOfWeek(date)); // 同じ週の土曜日
 
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return Math.floor(date0Saturday / 7) as 0 | 1 | 2 | 3 | 4 | 5;
 };
 
 /** 引数の日が含まれる月の最終日(28-31)の数値を返す */
 const getLastDateNumberOfMonth = (year: YearEnum, month: MonthEnum): DateEnum =>
-  // eslint-disable-next-line no-restricted-syntax
-  getLocaleDate(create(year, (month + 1) as MonthEnum, 0 as DateEnum));
+  getLocaleDate(
+    create(
+      year,
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      (month + 1) as MonthEnum,
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      0 as DateEnum,
+    ),
+  );
 
 const getAllDatesOfMonth = (
   year: YearEnum,

@@ -2711,7 +2711,7 @@ namespace JsxSortDefaultProps {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**
@@ -2820,7 +2820,7 @@ namespace JsxSpaceBeforeClosing {
    * ]
    * ```
    */
-  export type RuleEntry = 'off';
+  export type RuleEntry = 0;
 }
 
 /**

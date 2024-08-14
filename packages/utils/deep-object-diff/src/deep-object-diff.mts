@@ -10,5 +10,6 @@ type DetailedDiffResult<T> = Readonly<{
 export const deepObjectDiff = <T extends object>(
   a: T,
   b: T,
-  // eslint-disable-next-line no-restricted-syntax
-): DetailedDiffResult<T> => detailedDiff(a, b) as DetailedDiffResult<T>;
+): DetailedDiffResult<T> =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  detailedDiff(a, b) as DetailedDiffResult<T>;

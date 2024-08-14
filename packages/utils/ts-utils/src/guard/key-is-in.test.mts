@@ -6,7 +6,6 @@ const f = <Key extends string, V, KeySub extends Key>(
 ): V | undefined => (keyIsIn(key, obj) ? obj[key] : undefined);
 
 describe('keyIsIn', () => {
-  // eslint-disable-next-line no-restricted-syntax
   f('a' as 'a' | 'b' | 'c', { a: 0, b: 1 });
 
   test('', () => {

@@ -20,7 +20,7 @@ export const withLatestFrom =
 export const withLatestFromI = <A, B>(
   observable: InitializedObservable<B>,
 ): InitializedToInitializedOperator<A, readonly [A, B]> =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   withLatestFrom(observable) as InitializedToInitializedOperator<
     A,
     readonly [A, B]

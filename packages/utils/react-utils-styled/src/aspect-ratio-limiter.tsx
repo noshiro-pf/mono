@@ -1,6 +1,11 @@
 import styled from '@emotion/styled';
 import { memoNamed } from '@noshiro/react-utils';
 import { useResizeObserver } from '@noshiro/resize-observer-react-hooks';
+import {
+  Num,
+  toNonZeroFiniteNumber,
+  toPositiveFiniteNumber,
+} from '@noshiro/ts-utils';
 import { useMemo } from 'react';
 
 const Root = styled.div`
@@ -31,7 +36,9 @@ export const AspectRatioLimiter = memoNamed<Props>(
         width < minWidthPerHeight * height
       ) {
         // 制約条件より縦長な場合 => 上下に余白を作る
-        const pad = (height - width / minWidthPerHeight) / 2;
+        const pad =
+          (height - Num.div(width, toPositiveFiniteNumber(minWidthPerHeight))) /
+          2;
         return {
           top: pad,
           left: 0,
@@ -41,7 +48,7 @@ export const AspectRatioLimiter = memoNamed<Props>(
       }
       if (
         maxWidthPerHeight !== undefined &&
-        width / height > maxWidthPerHeight
+        Num.div(width, toNonZeroFiniteNumber(height)) > maxWidthPerHeight
       ) {
         // 制約条件より横長な場合 => 左右に余白を作る
         const pad = (width - height * maxWidthPerHeight) / 2;

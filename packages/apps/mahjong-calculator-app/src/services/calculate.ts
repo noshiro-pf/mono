@@ -165,7 +165,7 @@ export const calculate = (): void => {
     .then((data) => {
       setResult(
         Result.ok(
-          // eslint-disable-next-line no-restricted-syntax
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           data as JsonValue,
         ),
       );

@@ -81,6 +81,7 @@ export const LabelButtonItemView = memoNamed<Props>(
         >
           <Icon icon={'tick'} style={isSelectedIconStyle} />
           <LabelButtonText>{props.labelText}</LabelButtonText>
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
           <div
             css={disabled ? iconWrapperStyle : iconButtonWrapperStyle}
             onClick={onVisibilityIconClickConditional}

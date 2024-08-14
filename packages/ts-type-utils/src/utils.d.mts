@@ -3,7 +3,9 @@
 // https://github.com/microsoft/TypeScript/issues/27024
 // prettier-ignore
 type TypeEq<A, B> =
+   
   (<T>() => T extends A ? 1 : 2) extends
+   
   (<T>() => T extends B ? 1 : 2)
     ? true
     : false;
@@ -71,7 +73,8 @@ type ToMutableSet<T extends ReadonlySet<any>> =
 
 type DeepReadonly<T> = T extends Primitive
   ? T
-  : T extends Function
+  : // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+    T extends Function
     ? T
     : T extends MutableMap<infer K, infer V>
       ? ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>
@@ -89,7 +92,8 @@ type MutableMap<K, V> = Map<K, V>;
 
 type DeepMutable<T> = T extends Primitive
   ? T
-  : T extends Function
+  : // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+    T extends Function
     ? T
     : T extends ReadonlyMap<infer K, infer V>
       ? MutableMap<DeepMutable<K>, DeepMutable<V>>
@@ -103,7 +107,8 @@ type DeepMutable<T> = T extends Primitive
 
 type DeepPartial<T> = T extends Primitive
   ? T
-  : T extends Function
+  : // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+    T extends Function
     ? T
     : T extends MutableMap<infer K, infer V>
       ? ReadonlyMap<DeepPartial<K>, DeepPartial<V>>

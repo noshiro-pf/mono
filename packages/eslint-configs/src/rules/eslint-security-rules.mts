@@ -1,4 +1,4 @@
-import { type EslintSecurityRules } from '../types/rules/eslint-security-rules.mjs';
+import { type EslintSecurityRules } from '../types/index.mjs';
 
 export const eslintSecurityRules: EslintSecurityRules = {
   'security/detect-unsafe-regex': 'error',

@@ -49,14 +49,16 @@ export const tuple = <A extends readonly Type<unknown>[]>(
       }
     }
 
-    // eslint-disable-next-line no-restricted-syntax
-    return Result.ok(a as T);
+    return Result.ok(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      a as T,
+    );
   };
 
   const fill: Type<T>['fill'] = (a) =>
     !Array.isArray(a)
       ? defaultValue
-      : // eslint-disable-next-line no-restricted-syntax
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (types.map((t, i) => t.fill(a[i])) as MapTuple<A>);
 
   return {

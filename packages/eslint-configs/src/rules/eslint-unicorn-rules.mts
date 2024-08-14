@@ -1,4 +1,4 @@
-import { type EslintUnicornRules } from '../types/rules/eslint-unicorn-rules.mjs';
+import { type EslintUnicornRules } from '../types/index.mjs';
 
 export const eslintUnicornRules: EslintUnicornRules = {
   /**
@@ -13,6 +13,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/better-regex': 'error',
   'unicorn/catch-error-name': 'error',
 
+  /** Props を展開して使うかどうかを統一する。 */
   'unicorn/consistent-destructuring': 'error',
 
   'unicorn/consistent-function-scoping': 'error',
@@ -21,6 +22,8 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/escape-case': 'error',
   'unicorn/expiring-todo-comments': 'error',
   'unicorn/explicit-length-check': 'off',
+
+  /** ファイル名の統一 */
   'unicorn/filename-case': [
     'error',
     {
@@ -28,6 +31,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
       ignore: ['serviceWorker.ts', 'setupTests.ts'],
     },
   ],
+
   'unicorn/import-style': [
     'error',
     {
@@ -80,7 +84,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/no-typeof-undefined': 'error',
   'unicorn/no-unnecessary-await': 'error',
   'unicorn/no-unreadable-array-destructuring': 'error',
-  'unicorn/no-unsafe-regex': 'off', // dup of "security/detect-unsafe-regex"
+  'unicorn/no-unsafe-regex': 0, // dup of "security/detect-unsafe-regex"
   'unicorn/no-unused-properties': 'error',
   'unicorn/no-useless-fallback-in-spread': 'error',
   'unicorn/no-useless-length-check': 'error',
@@ -156,7 +160,17 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/no-unreadable-iife': 'error',
   'unicorn/no-useless-switch-case': 'error',
   'unicorn/prefer-modern-math-apis': 'error',
-  'unicorn/prefer-native-coercion-functions': 'error',
+
+  /**
+   * `.some(b => b)` is better than `.some(Boolean)` because `Boolean` coerce
+   * non-boolean type to boolean.
+   *
+   * Related rules:
+   *
+   * - `@typescript-eslint/strict-boolean-expressions`
+   */
+  'unicorn/prefer-native-coercion-functions': 'off',
+
   'unicorn/prefer-event-target': 'error',
   'unicorn/prefer-logical-operator-over-ternary': 'error',
   'unicorn/prefer-blob-reading-methods': 'error',
@@ -164,22 +178,27 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/no-anonymous-default-export': 'error',
   'unicorn/no-await-in-promise-methods': 'error',
   'unicorn/no-single-promise-in-promise-methods': 'error',
+  'unicorn/consistent-empty-array-spread': 'error',
+  'unicorn/no-invalid-fetch-options': 'error',
+  'unicorn/no-magic-array-flat-depth': 'error',
+  'unicorn/prefer-string-raw': 'error',
+  'unicorn/prefer-structured-clone': 'error',
 
   // deprecated rules
-  'unicorn/import-index': 'off',
-  'unicorn/no-array-instanceof': 'off',
-  'unicorn/no-fn-reference-in-iterator': 'off',
-  'unicorn/no-reduce': 'off',
-  'unicorn/prefer-dataset': 'off',
-  'unicorn/prefer-event-key': 'off',
-  'unicorn/prefer-exponentiation-operator': 'off',
-  'unicorn/prefer-flat-map': 'off',
-  'unicorn/prefer-node-append': 'off',
-  'unicorn/prefer-node-remove': 'off',
-  'unicorn/prefer-object-has-own': 'off',
-  'unicorn/prefer-replace-all': 'off',
-  'unicorn/prefer-starts-ends-with': 'off',
-  'unicorn/prefer-text-content': 'off',
-  'unicorn/prefer-trim-start-end': 'off',
-  'unicorn/regex-shorthand': 'off',
+  'unicorn/import-index': 0,
+  'unicorn/no-array-instanceof': 0,
+  'unicorn/no-fn-reference-in-iterator': 0,
+  'unicorn/no-reduce': 0,
+  'unicorn/prefer-dataset': 0,
+  'unicorn/prefer-event-key': 0,
+  'unicorn/prefer-exponentiation-operator': 0,
+  'unicorn/prefer-flat-map': 0,
+  'unicorn/prefer-node-append': 0,
+  'unicorn/prefer-node-remove': 0,
+  'unicorn/prefer-object-has-own': 0,
+  'unicorn/prefer-replace-all': 0,
+  'unicorn/prefer-starts-ends-with': 0,
+  'unicorn/prefer-text-content': 0,
+  'unicorn/prefer-trim-start-end': 0,
+  'unicorn/regex-shorthand': 0,
 };

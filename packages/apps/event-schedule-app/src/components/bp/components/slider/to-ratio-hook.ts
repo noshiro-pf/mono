@@ -12,7 +12,10 @@ export const useRangeSliderRatios = ({
   rightRatio: number;
 }> => {
   const toRatio = useCallback(
-    (x: number) => (max === min ? undefined : (x - min) / (max - min)),
+    (x: number) =>
+      pipe(max - min).chain((l) =>
+        Num.isPositive(l) ? Num.div(x - min, l) : undefined,
+      ).value,
     [min, max],
   );
 

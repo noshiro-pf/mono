@@ -48,6 +48,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
             >
               <BpInput
                 autoComplete={'username'}
+                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus={true}
                 disabled={formState.isWaitingResponse}
                 intent={emailFormIntent}

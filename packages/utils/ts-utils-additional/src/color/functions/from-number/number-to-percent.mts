@@ -1,7 +1,7 @@
 import { Num } from '@noshiro/ts-utils';
 
-// eslint-disable-next-line no-restricted-syntax
-const clamp100 = Num.clamp<number>(0, 100) as (x: number) => Percent;
+const clamp = Num.clamp<number>(0, 100);
 
 export const numberToPercent = (x: number): Percent =>
-  clamp100(Num.roundToInt(x));
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  clamp(Num.roundToInt(x)) as Percent;

@@ -22,8 +22,10 @@ export const enumType = <Values extends readonly Primitive[]>({
 
   const validate: Type<T>['validate'] = (a) =>
     valueSet.has(a)
-      ? // eslint-disable-next-line no-restricted-syntax
-        Result.ok(a as T)
+      ? Result.ok(
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          a as T,
+        )
       : Result.err([
           validationErrorMessage(
             a,

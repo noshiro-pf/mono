@@ -1,4 +1,4 @@
-import { type EslintCypressRules } from '../types/rules/eslint-cypress-rules.mjs';
+import { type EslintCypressRules } from '../types/index.mjs';
 
 export const eslintCypressRules: EslintCypressRules = {
   'cypress/no-assigning-return-values': 'error',
@@ -9,4 +9,6 @@ export const eslintCypressRules: EslintCypressRules = {
   'cypress/no-force': 'error',
   'cypress/no-pause': 'error',
   'cypress/unsafe-to-chain-command': 'error',
+  'cypress/no-async-before': 'error',
+  'cypress/no-debug': 'error',
 };

@@ -1,6 +1,7 @@
 import { type EslintJestRules } from '../types/rules/eslint-jest-rules.mjs';
 
 export const eslintJestRules: EslintJestRules = {
+  /* vitest と共通のルール（設定値をなるべく合わせる） */
   'jest/consistent-test-it': ['error', { fn: 'test' }],
   'jest/expect-expect': 'error',
   'jest/max-expects': 'off',
@@ -9,16 +10,12 @@ export const eslintJestRules: EslintJestRules = {
   'jest/no-commented-out-tests': 'off',
   'jest/no-conditional-expect': 'error',
   'jest/no-conditional-in-test': 'off',
-  'jest/no-deprecated-functions': 'error',
   'jest/no-disabled-tests': 'error',
-  'jest/no-done-callback': 'error',
   'jest/no-duplicate-hooks': 'error',
-  'jest/no-export': 'off',
   'jest/no-focused-tests': 'error',
   'jest/no-hooks': 'error',
   'jest/no-identical-title': 'error',
   'jest/no-interpolation-in-snapshots': 'error',
-  'jest/no-jasmine-globals': 'error',
   'jest/no-large-snapshots': 'error',
   'jest/no-mocks-import': 'error',
   'jest/no-restricted-jest-methods': [
@@ -31,14 +28,14 @@ export const eslintJestRules: EslintJestRules = {
   'jest/no-restricted-matchers': [
     'error',
     {
-      toBeTruthy: null,
-      toBeFalsy: null,
+      toBeTruthy: 'Use `.toBe(true)` instead.',
+      toBeFalsy: 'Use `.toBe(false)` instead.',
     },
   ],
+
   'jest/no-standalone-expect': 'error',
   'jest/no-test-prefixes': 'error',
   'jest/no-test-return-statement': 'error',
-  'jest/no-untyped-mock-factory': 'error',
   'jest/prefer-called-with': 'error',
   'jest/prefer-comparison-matcher': 'error',
   'jest/prefer-each': 'error',
@@ -59,13 +56,28 @@ export const eslintJestRules: EslintJestRules = {
   'jest/require-hook': 'off',
   'jest/require-to-throw-message': 'error',
   'jest/require-top-level-describe': 'off',
-  'jest/unbound-method': 'error',
   'jest/valid-describe-callback': 'error',
-  'jest/valid-expect-in-promise': 'error',
-  'jest/valid-expect': 'error',
   'jest/valid-title': 'off',
-  'jest/no-confusing-set-timeout': 'error',
+  'jest/valid-expect': 'error',
 
-  // deprecated
-  'jest/no-if': 'off',
+  /* eslint-plugin-jest 独自ルール */
+
+  'jest/valid-expect-in-promise': 'error',
+  'jest/unbound-method': 'error',
+  'jest/no-confusing-set-timeout': 'error',
+  'jest/prefer-importing-jest-globals': 'error',
+  'jest/no-deprecated-functions': 'error',
+  'jest/no-done-callback': 'error',
+  'jest/no-export': 'off',
+  'jest/no-jasmine-globals': 'error',
+  'jest/no-untyped-mock-factory': 'error',
+  'jest/padding-around-after-all-blocks': 'error',
+  'jest/padding-around-after-each-blocks': 'error',
+  'jest/padding-around-all': 'error',
+  'jest/padding-around-before-all-blocks': 'error',
+  'jest/padding-around-before-each-blocks': 'error',
+  'jest/padding-around-describe-blocks': 'error',
+  'jest/padding-around-expect-groups': 'error',
+  'jest/padding-around-test-blocks': 'error',
+  'jest/prefer-jest-mocked': 'error',
 };

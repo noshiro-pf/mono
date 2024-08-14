@@ -32,6 +32,7 @@ export const binarySearch = <N extends number>(
     }
     mut_mid = SafeInt.add(mut_left, halfInt(SafeInt.sub(mut_right, mut_left)));
   }
-  // eslint-disable-next-line no-restricted-syntax
+
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return mut_mid as NegativeInt32 | Uint32;
 };

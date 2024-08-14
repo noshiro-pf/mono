@@ -1,4 +1,6 @@
-import { Arr } from '@noshiro/ts-utils';
+import { Arr, Num, toFiniteNumber } from '@noshiro/ts-utils';
 
 export const average = (array: readonly number[]): number =>
-  Arr.isEmpty(array) ? 0 : Arr.sum(array) / array.length;
+  Arr.isNonEmpty(array)
+    ? Num.div(toFiniteNumber(Arr.sum(array)), Arr.length(array))
+    : 0;

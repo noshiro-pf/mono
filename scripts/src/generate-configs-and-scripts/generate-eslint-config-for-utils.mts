@@ -18,19 +18,14 @@ export const generateEsLintConfig = async (
 
   const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
 
-  const baseConfigName = {
-    preact: 'eslintFlatConfigForPreact',
-    react: 'eslintFlatConfigForReact',
-    'react-emotion': 'eslintFlatConfigForReact',
-    mts: 'eslintConfigForTypeScript',
-    dom: 'eslintConfigForTypeScript',
-  }[cfg.tsType];
-
   const content = [
     "/** @typedef { import('@noshiro/eslint-configs').FlatConfig } FlatConfig */",
     '',
     'import {',
-    `  ${baseConfigName},`,
+    '  eslintFlatConfigForTypeScript,',
+    '  eslintFlatConfigForVitest',
+    '  eslintFlatConfigForPreact', // maybe removed by prettier
+    '  eslintFlatConfigForReact', // maybe removed by prettier
     '  genEsLintRestrictedImportsDefFromDevDependencies,',
     "} from '@noshiro/eslint-configs';",
     "import { toThisDir } from '@noshiro/mono-scripts",
@@ -47,13 +42,28 @@ export const generateEsLintConfig = async (
     '    );',
     '',
     '  /** @type {readonly FlatConfig[]} */',
-    `  const configs = ${baseConfigName}({`,
-    '    tsconfigRootDir: thisDir,',
-    "    tsconfigFileName: './tsconfig.json',",
-    `    packageDirs: [nodePath.resolve(thisDir, '${pathPrefixToRoot}'), thisDir],`,
-    '    restrictedImports,',
-    cfg.useVite === true ? '    isViteProject: true,' : '',
-    '  });',
+    '  const configs = [',
+    '    ...eslintFlatConfigForTypeScript({',
+    '      tsconfigRootDir: thisDir,',
+    "      tsconfigFileName: './tsconfig.json',",
+    `      packageDirs: [nodePath.resolve(thisDir, '${pathPrefixToRoot}'), thisDir],`,
+    '    }),',
+    '    eslintFlatConfigForVitest(),',
+    cfg.tsType === 'preact'
+      ? '...eslintFlatConfigForPreact(),'
+      : cfg.tsType === 'react' || cfg.tsType === 'react-emotion'
+        ? '...eslintFlatConfigForReact(),'
+        : '',
+    '',
+    '    {',
+    '      rules: {',
+    "        '@typescript-eslint/no-restricted-imports': [",
+    "           'error',",
+    '           ...restrictedImports,',
+    '        ]',
+    '      },',
+    '    },',
+    '  ];',
     '',
     packageName === 'annotation-tool'
       ? "  return [...configs, { rules: { '@typescript-eslint/prefer-readonly-parameter-types': 'off' } }]"

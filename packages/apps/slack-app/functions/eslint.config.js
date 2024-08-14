@@ -1,8 +1,8 @@
 /** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */
-/** @typedef {import('@noshiro/eslint-configs').EslintImportsRules} EslintImportsRules */
 
 import {
-  eslintConfigForTypeScript,
+  eslintFlatConfigForTypeScript,
+  eslintFlatConfigForVitest,
   genEsLintRestrictedImportsDefFromDevDependencies,
 } from '@noshiro/eslint-configs';
 import { toThisDir } from '@noshiro/mono-scripts';
@@ -23,12 +23,21 @@ const defineConfig = async () => {
     {
       ignores: ['src/globals.d.ts'],
     },
-    ...eslintConfigForTypeScript({
+    ...eslintFlatConfigForTypeScript({
       tsconfigRootDir: thisDir,
       tsconfigFileName: './tsconfig.json',
       packageDirs: [nodePath.resolve(thisDir, '../../../..'), thisDir],
-      restrictedImports,
     }),
+    eslintFlatConfigForVitest(),
+
+    {
+      rules: {
+        '@typescript-eslint/no-restricted-imports': [
+          'error',
+          ...restrictedImports,
+        ],
+      },
+    },
   ];
 
   return configs;

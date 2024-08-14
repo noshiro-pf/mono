@@ -40,6 +40,7 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
               <BpInput
                 // suppress auto complete
                 autoComplete={'new-password'}
+                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus={true}
                 disabled={isWaitingResponse}
                 intent={emailFormIntent}

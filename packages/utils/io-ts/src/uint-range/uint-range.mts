@@ -39,8 +39,10 @@ export const uintRange = <
       return Result.err([`${prefix}, but it is actually '${str}'.`]);
     }
 
-    // eslint-disable-next-line no-restricted-syntax
-    return Result.ok(a as T);
+    return Result.ok(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      a as T,
+    );
   };
 
   const is = createIsFn<T>(validate);

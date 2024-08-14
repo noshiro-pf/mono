@@ -61,6 +61,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
             >
               <BpInput
                 autoComplete={'current-password'}
+                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus={true}
                 disabled={formState.isWaitingResponse}
                 intent={oldPasswordFormIntent}

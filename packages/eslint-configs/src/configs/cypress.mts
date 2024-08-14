@@ -1,40 +1,21 @@
-import { eslintCypressRules } from '../rules/eslint-cypress-rules.mjs';
-import { type FlatConfig } from '../types/flat-config.mjs';
-import { type TypeScriptEslintRulesOption } from '../types/rules/typescript-eslint-rules.mjs';
-import { eslintConfigForTypeScript } from './typescript.mjs';
+import globals from 'globals';
+import { eslintCypressRules } from '../rules/index.mjs';
+import { type FlatConfig } from '../types/index.mjs';
 
-export const eslintFlatConfigForCypress = ({
-  tsconfigFileName,
-  tsconfigRootDir,
-  packageDirs,
-  restrictedImports,
-}: Readonly<{
-  tsconfigFileName: string;
-  tsconfigRootDir: string;
-  packageDirs: readonly string[];
-  restrictedImports?: TypeScriptEslintRulesOption['@typescript-eslint/no-restricted-imports'];
-}>): readonly FlatConfig[] =>
-  [
-    ...eslintConfigForTypeScript({
-      tsconfigFileName,
-      tsconfigRootDir,
-      packageDirs,
-      restrictedImports,
-    }),
-    {
-      languageOptions: {
-        // https://github.com/sindresorhus/globals/blob/main/globals.json
-        globals: {
-          browser: true,
-          node: true,
-          es2021: true,
-        },
+export const eslintFlatConfigForCypress = (): FlatConfig =>
+  ({
+    languageOptions: {
+      // https://github.com/sindresorhus/globals/blob/main/globals.json
+      globals: {
+        ...globals.es2021,
+        ...globals.browser,
+        ...globals.node,
       },
-      rules: {
-        ...eslintCypressRules,
-        'jest/consistent-test-it': 'off',
-        'jest/expect-expect': 'off',
-        'jest/valid-describe-callback': 'off',
-      },
-    } satisfies FlatConfig,
-  ] as const;
+    },
+    rules: {
+      ...eslintCypressRules,
+      'jest/consistent-test-it': 'off',
+      'jest/expect-expect': 'off',
+      'jest/valid-describe-callback': 'off',
+    },
+  }) as const;

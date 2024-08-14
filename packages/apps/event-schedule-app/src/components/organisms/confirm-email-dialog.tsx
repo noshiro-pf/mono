@@ -60,6 +60,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
               label={''}
             >
               <BpInput
+                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus={true}
                 intent={state.emailFormIntent}
                 rightElement={

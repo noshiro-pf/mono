@@ -1,4 +1,4 @@
-import { type EslintReactHooksRules } from '../types/rules/eslint-react-hooks-rules.mjs';
+import { type EslintReactHooksRules } from '../types/index.mjs';
 
 export const eslintReactHooksRules: EslintReactHooksRules = {
   'react-hooks/rules-of-hooks': 'error',

@@ -43,6 +43,7 @@ export const ResetPasswordPage = memoNamed<Props>(
               >
                 <BpInput
                   autoComplete={'email'}
+                  // eslint-disable-next-line jsx-a11y/no-autofocus
                   autoFocus={true}
                   disabled={formState.isWaitingResponse}
                   intent={emailFormIntent}

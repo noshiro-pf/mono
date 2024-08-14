@@ -14,7 +14,10 @@ export const calcPrincipalEqualPayment = ({
   interestYen: readonly Yen[];
   monthlyPaymentTotalYen: readonly Yen[];
 }> => {
-  const fixedPrincipalYenPerMonth = toYen(borrowingTotalYen / numPayments);
+  const fixedPrincipalYenPerMonth = toYen(
+    // TODO: `numPayments` を `Uint32` ではなく `PositiveSafeInt` 等の正の整数型にする
+    Num.div(borrowingTotalYen, toPositiveSafeInt(numPayments)),
+  );
 
   const borrowingBalanceYen = Arr.seq(Uint32.add(numPayments, 1)).map((i) =>
     toYen(borrowingTotalYen - i * fixedPrincipalYenPerMonth),
