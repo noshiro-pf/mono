@@ -7,7 +7,7 @@
     "url": "https://github.com/noshiro-pf/mono.git"
   },
   "license": "MIT",
-  "author": "noshiro",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "sideEffects": false,
   "type": "module",
   "scripts": {

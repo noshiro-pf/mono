@@ -4,7 +4,7 @@
   "private": false,
   "description": "Reactive Programming Library for TypeScript/JavaScript",
   "license": "MIT",
-  "author": "noshiro",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "sideEffects": false,
   "type": "module",
   "exports": {
