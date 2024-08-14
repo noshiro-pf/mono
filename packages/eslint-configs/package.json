@@ -16,9 +16,9 @@
   },
   "scripts": {
     "build": "run-s build:scripts build:src",
+    "build:no-gen": "tsc --project ./configs/tsconfig.build.json",
     "build:scripts": "wireit",
     "build:src": "wireit",
-    "build:src:command": "tsc --project ./configs/tsconfig.build.json",
     "clean": "run-p clean:**",
     "clean:build": "rimraf esm",
     "clean:build:scripts": "rimraf \"scripts/!(eslint.config.gen).mjs\"",
@@ -87,7 +87,7 @@
       "dependencies": [
         "clean:build"
       ],
-      "command": "run-s gi gen-rules-type build:src:command"
+      "command": "run-s gi gen-rules-type build:no-gen"
     }
   }
 }
