@@ -771,29 +771,29 @@ import { expectType } from './expect-type.mjs';
   expectType<-1, SmallInt<'>=0'>>('!<=');
   expectType<-1, SmallInt<'>0'>>('!<=');
 
-  expectType<511, SmallInt<''>>('<=');
-  expectType<511, SmallInt<'<0'>>('!<=');
-  expectType<511, SmallInt<'<=0'>>('!<=');
-  expectType<511, SmallInt<'>=0'>>('<=');
-  expectType<511, SmallInt<'>0'>>('<=');
+  expectType<39, SmallInt<''>>('<=');
+  expectType<39, SmallInt<'<0'>>('!<=');
+  expectType<39, SmallInt<'<=0'>>('!<=');
+  expectType<39, SmallInt<'>=0'>>('<=');
+  expectType<39, SmallInt<'>0'>>('<=');
 
-  expectType<512, SmallInt<''>>('!<=');
-  expectType<512, SmallInt<'<0'>>('!<=');
-  expectType<512, SmallInt<'<=0'>>('!<=');
-  expectType<512, SmallInt<'>=0'>>('!<=');
-  expectType<512, SmallInt<'>0'>>('!<=');
+  expectType<40, SmallInt<''>>('!<=');
+  expectType<40, SmallInt<'<0'>>('!<=');
+  expectType<40, SmallInt<'<=0'>>('!<=');
+  expectType<40, SmallInt<'>=0'>>('!<=');
+  expectType<40, SmallInt<'>0'>>('!<=');
 
-  expectType<-512, SmallInt<''>>('<=');
-  expectType<-512, SmallInt<'<0'>>('<=');
-  expectType<-512, SmallInt<'<=0'>>('<=');
-  expectType<-512, SmallInt<'>=0'>>('!<=');
-  expectType<-512, SmallInt<'>0'>>('!<=');
+  expectType<-40, SmallInt<''>>('<=');
+  expectType<-40, SmallInt<'<0'>>('<=');
+  expectType<-40, SmallInt<'<=0'>>('<=');
+  expectType<-40, SmallInt<'>=0'>>('!<=');
+  expectType<-40, SmallInt<'>0'>>('!<=');
 
-  expectType<-513, SmallInt<''>>('!<=');
-  expectType<-513, SmallInt<'<0'>>('!<=');
-  expectType<-513, SmallInt<'<=0'>>('!<=');
-  expectType<-513, SmallInt<'>=0'>>('!<=');
-  expectType<-513, SmallInt<'>0'>>('!<=');
+  expectType<-41, SmallInt<''>>('!<=');
+  expectType<-41, SmallInt<'<0'>>('!<=');
+  expectType<-41, SmallInt<'<=0'>>('!<=');
+  expectType<-41, SmallInt<'>=0'>>('!<=');
+  expectType<-41, SmallInt<'>0'>>('!<=');
 }
 
 {

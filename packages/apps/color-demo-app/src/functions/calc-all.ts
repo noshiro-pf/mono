@@ -5,14 +5,13 @@ import {
   type Hsl,
   type Hue,
 } from '@noshiro/ts-utils-additional';
+import { huesDefault } from '../constants';
 import { type ColorResult, type DivisionNumber } from '../types';
 import { hueListToContrastRatioList } from './get-contrast-ratio-list';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 import { normalizeList } from './normalize-list';
 import { pickupHighContrastHues } from './pickup-high-contrast-hues';
 import { toHue } from './to-hue';
-
-const hueListDefault = Arr.seq(360);
 
 export const calcAll = ({
   saturation,
@@ -32,7 +31,7 @@ export const calcAll = ({
 }> => {
   /* values */
 
-  const hueList: ArrayOfLength<360, Hue> = Tpl.map(hueListDefault, (h) =>
+  const hueList: ArrayOfLength<360, Hue> = Tpl.map(huesDefault, (h) =>
     toHue((h - firstHue + 360) % 360),
   );
 
@@ -84,7 +83,7 @@ export const calcAll = ({
       NonEmptyArray<NonNegativeFiniteNumber>
     >(
       hslList,
-      Tpl.map(hueListDefault, (i) =>
+      Tpl.map(huesDefault, (i) =>
         NonNegativeFiniteNumber.div(
           toNonNegativeFiniteNumber(i),
           toPositiveSafeInt(360),

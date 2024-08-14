@@ -3,10 +3,9 @@ import {
   relativeLuminance,
   type Hue,
 } from '@noshiro/ts-utils-additional';
+import { huesDefault } from '../constants';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 import { toHue } from './to-hue';
-
-const huesDefault = Arr.seq(360) satisfies Seq<360>;
 
 /** RelativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（=hue）を返す */
 export function pickupHighContrastHues<N extends SmallUint>(

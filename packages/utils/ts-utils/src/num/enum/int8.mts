@@ -7,13 +7,6 @@ const typeNameInMessage = 'an integer in [-128, 127]';
 const {
   MIN_VALUE,
   MAX_VALUE,
-  min: minImpl,
-  max: maxImpl,
-  pow: powImpl,
-  add: addImpl,
-  sub: subImpl,
-  mul: mulImpl,
-  div: divImpl,
   random: randomImpl,
   is: isImpl,
   castTo: castToImpl,
@@ -33,23 +26,26 @@ const castTo = (x: number): Int8 =>
 
 const clamp = (a: number): Int8 => castTo(clampImpl(a));
 
-const abs = <N extends Int8>(x: N): AbsoluteValue<N> => Math.abs(x);
+const abs = <N extends Int8>(x: N): AbsoluteValue<N> =>
+  // eslint-disable-next-line no-restricted-syntax
+  Math.abs(x) as unknown as AbsoluteValue<N>;
 
-const _min = (...values: readonly Int8[]): Int8 => castTo(minImpl(...values));
+const _min = (...values: readonly Int8[]): Int8 => castTo(Math.min(...values));
 
-const _max = (...values: readonly Int8[]): Int8 => castTo(maxImpl(...values));
+const _max = (...values: readonly Int8[]): Int8 => castTo(Math.max(...values));
 
-const pow = (x: Int8, y: Int8): Int8 => castTo(powImpl(x, y));
+const pow = (x: Int8, y: Int8): Int8 => castTo(x ** y);
 
-const add = (x: Int8, y: Int8): Int8 => castTo(addImpl(x, y));
+const add = (x: Int8, y: Int8): Int8 => castTo(x + y);
 
-const sub = (x: Int8, y: Int8): Int8 => castTo(subImpl(x, y));
+const sub = (x: Int8, y: Int8): Int8 => castTo(x - y);
 
-const mul = (x: Int8, y: Int8): Int8 => castTo(mulImpl(x, y));
+const mul = (x: Int8, y: Int8): Int8 => castTo(x * y);
 
-const div = (x: Int8, y: Exclude<Int8, 0>): Int8 => castTo(divImpl(x, y));
+const div = (x: Int8, y: Exclude<Int8, 0>): Int8 => castTo(x / y);
 
-const random = (min: Int8, max: Int8): Int8 => castTo(randomImpl(min, max));
+const random = (min: Int8, max: Int8): Int8 =>
+  castTo(randomImpl(castToImpl(min), castToImpl(max)));
 
 export const isInt8 = is;
 export const toInt8 = castTo;

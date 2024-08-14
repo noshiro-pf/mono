@@ -151,7 +151,7 @@ describe('ArrayUtils', () => {
     test('range(SmallUint, SmallUint)', () => {
       const result = Arr.range<SmallUint, SmallUint>(0, 1);
 
-      expectType<typeof result, readonly Exclude<SmallUint, 511>[]>('=');
+      expectType<typeof result, readonly Exclude<SmallUint, 39>[]>('=');
 
       expect(result).toStrictEqual([0]);
     });

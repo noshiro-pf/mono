@@ -1,4 +1,4 @@
-import { range } from '@noshiro/ts-utils';
+import { range, toSafeUint } from '@noshiro/ts-utils';
 import { MAX_STEPS } from '../../constants/index.mjs';
 import { type LambdaTerm } from '../../types/index.mjs';
 import { isLambdaTerm } from '../is-lambda-term.mjs';
@@ -13,7 +13,7 @@ export const evalSequence = (term: LambdaTerm): LambdaTerm[] => {
   const mut_seq: LambdaTerm[] = [];
   mut_seq.push(term);
 
-  for (const _counter of range(MAX_STEPS, 0, -1)) {
+  for (const _counter of range(toSafeUint(MAX_STEPS), 0, -1)) {
     const next = evaluate1step(mut_curr);
     if (termEq(next, mut_curr)) break;
     mut_seq.push(next);

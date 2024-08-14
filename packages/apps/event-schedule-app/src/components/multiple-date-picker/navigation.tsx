@@ -6,8 +6,8 @@ const thisYear = toSafeUint(DateUtils.getLocaleYear(DateUtils.today()));
 const thisMonth = DateUtils.getLocaleMonth(DateUtils.today());
 
 const yearOption: readonly YearEnum[] = Arr.range(
-  SafeUint.sub(thisYear, 100),
-  SafeUint.add(thisYear, 100),
+  SafeUint.sub(thisYear, toSafeUint(100)),
+  SafeUint.add(thisYear, toSafeUint(100)),
 );
 const monthOption: readonly OptionProps[] = monthsList.en.map((e) => ({
   value: e.value,

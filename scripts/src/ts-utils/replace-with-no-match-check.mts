@@ -1,3 +1,5 @@
+import { toSafeUint } from './utils.mjs';
+
 /**
  * Replace all instances of a substring in a string, using a regular expression
  * or search string.
@@ -96,7 +98,7 @@ export const replaceWithNoMatchCheck =
     return result;
   };
 
-const sliceMaxLength = 100;
+const sliceMaxLength = toSafeUint(100);
 
 const chopIfLong = (str: RegExp | string): string =>
   typeof str === 'string'
