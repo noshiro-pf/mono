@@ -36,7 +36,7 @@
     "z:setup:fb:emulators:gen-dummy-runtimeconfig": "echo '{ \"gmail\": { \"email\": \"dummy@gmail.com\", \"password\": \"dummy\", \"app-password\": \"dummy\", \"email-address-for-error-log\": \"dummy@gmail.com\" } }' > .runtimeconfig.json",
     "z:setup:fb:emulators:gen-runtimeconfig": "firebase functions:config:get > .runtimeconfig.json",
     "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
-    "zz:eslint:src": "yarn zz:eslint --config ./eslint.config.js './src/**/*' --cache --cache-location ./.eslintcache",
+    "zz:eslint:src": "yarn zz:eslint --config ./eslint.config.js './src/**/*'",
     "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../../.prettierignore --write"
   },
   "dependencies": {
