@@ -2,7 +2,7 @@
 /* eslint-disable import/no-internal-modules */
 
 import { toThisDir } from '@noshiro/mono-scripts';
-import { defineRollupConfig } from '../../../config/define-rollup-config.mjs';
+import { defineRollupConfig } from '../../../configs/define-rollup-config.mjs';
 import tsconfig from './tsconfig.build.json' assert { type: 'json' };
 
 export default defineRollupConfig({

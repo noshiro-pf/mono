@@ -32,7 +32,7 @@ eslint を使う際、 `eslint:recommended`, `plugin:@typescript-eslint/eslint-r
 
 基本的に使用している plugin のほぼすべてのルールが有効（`error`）な設定にしており、より優先したい ESLint ルールと競合するものや、 TypeScript ・ prettier（フォーマッター）と機能が重複していて冗長なもの、その他自分のコーディングスタイルでは邪魔になる安全性やパフォーマンスをほぼ損なわないルール（TypeScript の `namespace` 禁止など）だけ無効化するという強めの設定をしています。ルールのオプションもなるべく厳格な設定にしています。
 
-https://github.com/noshiro-pf/mono/blob/main/config/eslint
+https://github.com/noshiro-pf/mono/blob/main/configs/eslint
 
 以前私が eslint 設定を recommended config よりもう少し強化したいと考え始めた時、config を組み合わせる eslint config 記述スタイルでは、設定が増えるにつれ
 
@@ -59,7 +59,7 @@ plugin ごとに全ルールを逐一設定していく作業が mono repo な�
 
 については、各ルールのオプションにまで個別に型が付いた config の型を各 plugin の json schema から自動生成することまでやっています。自動生成スクリプトも上のリンクに置いてあります [^generate-rules-type]。これをやってみて副産物として得られたメリットではありますが、 plugin のバージョンを上げたときに追加されたルールやオプション、あるルールが deprecated になったことなどにも気づきやすくなったのは良い点でした。
 
-[^generate-rules-type]: `generate-rules-type` ディレクトリの [`main.mjs`](https://github.com/noshiro-pf/mono/blob/main/config/eslint/generate-rules-type/main.mjs) 中をよく読めば分かりますが、一部 `json-schema-to-typescript` による型生成が上手くいっていない箇所を後でアドホックに修正しているところがあったりもします。
+[^generate-rules-type]: `generate-rules-type` ディレクトリの [`main.mjs`](https://github.com/noshiro-pf/mono/blob/main/configs/eslint/generate-rules-type/main.mjs) 中をよく読めば分かりますが、一部 `json-schema-to-typescript` による型生成が上手くいっていない箇所を後でアドホックに修正しているところがあったりもします。
 
 これらの実装についてもどこかで紹介しようと思っているのですが、今回は詳細は省きます。
 

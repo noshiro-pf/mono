@@ -7,7 +7,7 @@ export const tsConfigExtend = (
   baseTsConfigName: string,
   useVite: boolean | 'vitest-only',
 ): string | readonly string[] => {
-  const pathToSharedTsConfig = `${pathPrefixToRoot}/config/tsconfig`;
+  const pathToSharedTsConfig = `${pathPrefixToRoot}/configs/tsconfig`;
 
   switch (tsType) {
     case 'mts':
