@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": false,
   "license": "MIT",
-  "author": "noshiro",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "sideEffects": true,
   "type": "module",
   "browser": "src/main.tsx",

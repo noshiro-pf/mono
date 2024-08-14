@@ -3,7 +3,7 @@
   "version": "1.0.3",
   "private": false,
   "license": "MIT",
-  "author": "noshiro",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "sideEffects": false,
   "type": "module",
   "exports": {

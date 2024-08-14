@@ -67,7 +67,7 @@ const updatePackageJsonImpl = (
 ): void => {
   mut_packageJson['private'] = false;
   mut_packageJson['license'] = 'MIT';
-  mut_packageJson['author'] = 'noshiro';
+  mut_packageJson['author'] = 'noshiro-pf <noshiro.pf@gmail.com>';
   mut_packageJson['sideEffects'] =
     cfg.useVite === true || packageName.startsWith('global-');
   mut_packageJson['type'] = 'module';
