@@ -19,19 +19,22 @@ const cmi = combineLatestI([
   r2.chain(withInitialValue(0)),
 ] as const);
 
-expectType<
-  typeof cm,
-  SyncChildObservable<readonly [number, string], 'combineLatest'>
->('<=');
+if (import.meta.vitest !== undefined) {
+  test('type-check', () => {
+    expectType<
+      typeof cm,
+      SyncChildObservable<readonly [number, string], 'combineLatest'>
+    >('<=');
 
-expectType<
-  typeof cmi,
-  InitializedSyncChildObservable<
-    readonly [number, number | string],
-    'combineLatest'
-  >
->('<=');
+    expectType<
+      typeof cmi,
+      InitializedSyncChildObservable<
+        readonly [number, number | string],
+        'combineLatest'
+      >
+    >('<=');
 
-test('dummy', () => {
-  expect(1).toBe(1);
-});
+    expect(cm).toBe(cm);
+    expect(cmi).toBe(cmi);
+  });
+}

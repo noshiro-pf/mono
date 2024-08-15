@@ -120,9 +120,9 @@ const saveFilterStateToQueryParams = ({
   filledDateOnly,
   dayOfWeek,
   rank,
-  ...rest
+  ..._rest
 }: AnswerFilterState): void => {
-  expectType<keyof typeof rest, 'iconOfSpecifiedRespondent' | 'respondent'>(
+  expectType<keyof typeof _rest, 'iconOfSpecifiedRespondent' | 'respondent'>(
     '=',
   );
 

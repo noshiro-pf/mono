@@ -6,6 +6,7 @@ import { compile } from 'json-schema-to-typescript';
 import {
   deepCopy,
   deepReplace,
+  falseToUndefined,
   isArray,
   toCapitalCase,
   toStr,
@@ -143,8 +144,8 @@ const createResult = async (
     ...(schemaList.some(({ schema }) => schema.length === 1)
       ? [
           '',
-          'type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =',
-          'T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;',
+          'type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =',
+          'T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;',
         ]
       : []),
     '',
@@ -161,7 +162,9 @@ const createResult = async (
     } else {
       switch (schema.length) {
         case 0:
-          mut_resultToWrite.push('  export type RuleEntry = Linter.RuleLevel;');
+          mut_resultToWrite.push(
+            '  export type RuleEntry = Linter.RuleSeverity;',
+          );
           break;
 
         case 1: {
@@ -185,8 +188,8 @@ const createResult = async (
           mut_resultToWrite.push(
             optionsType,
             '',
-            '  export type RuleEntry = Linter.RuleLevel',
-            '   | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;',
+            '  export type RuleEntry = Linter.RuleSeverity',
+            '   | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;',
           );
           break;
         }
@@ -215,10 +218,10 @@ const createResult = async (
           mut_resultToWrite.push(
             ...optionsTypeList,
             '',
-            '  export type RuleEntry = Linter.RuleLevel',
+            '  export type RuleEntry = Linter.RuleSeverity',
             ...OptionsStrs.map(
               (_, i) =>
-                `   | readonly [Linter.RuleLevel, ${OptionsStrs.slice(
+                `   | readonly [Linter.RuleSeverity, ${OptionsStrs.slice(
                   0,
                   toUint32(i + 1),
                 ).join(', ')}]`,
@@ -326,13 +329,15 @@ export const generateRulesType = async (
   > = rules.map(([ruleName, { meta }]) => ({
     ruleName,
     schema: normalizeToSchemaArray(
-      pluginName === '@typescript-eslint/eslint-plugin'
-        ? // schema に入った変更で compile できなくなってしまったので暫定対応
-          deepReplace(meta?.schema, '#/items/0/', '#/')
-        : meta?.schema,
+      falseToUndefined(
+        pluginName === '@typescript-eslint/eslint-plugin'
+          ? // schema に入った変更で compile できなくなってしまったので暫定対応
+            deepReplace(meta?.schema, '#/items/0/', '#/')
+          : meta?.schema,
+      ),
     ),
     deprecated: meta?.deprecated ?? false,
-    rawSchema: meta?.schema ?? [],
+    rawSchema: falseToUndefined(meta?.schema) ?? [],
     docs: metaToString(meta),
   }));
 

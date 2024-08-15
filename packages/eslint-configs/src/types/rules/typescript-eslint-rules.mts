@@ -1,8 +1,8 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
+type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
+  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
 
 /**
  * Require that function overload signatures be consecutive
@@ -17,7 +17,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
  *  ```
  */
 namespace AdjacentOverloadSignatures {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -77,8 +77,8 @@ namespace ArrayType {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -96,7 +96,7 @@ namespace ArrayType {
  *  ```
  */
 namespace AwaitThenable {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -184,8 +184,8 @@ namespace BanTsComment {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -202,197 +202,7 @@ namespace BanTsComment {
  *  ```
  */
 namespace BanTslintComment {
-  export type RuleEntry = Linter.RuleLevel;
-}
-
-/**
- * Disallow certain types
- *
- * @link https://typescript-eslint.io/rules/ban-types
- *
- *  ```md
- *  | key            | value       |
- *  | :------------- | :---------- |
- *  | type           | suggestion  |
- *  | fixable        | code        |
- *  | hasSuggestions | true        |
- *  | recommended    | recommended |
- *  ```
- */
-namespace BanTypes {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "$defs": {
-   *       "banConfig": {
-   *         "oneOf": [
-   *           {
-   *             "type": "null",
-   *             "description": "Bans the type with the default message"
-   *           },
-   *           {
-   *             "type": "boolean",
-   *             "enum": [
-   *               false
-   *             ],
-   *             "description": "Un-bans the type (useful when paired with `extendDefaults`)"
-   *           },
-   *           {
-   *             "type": "boolean",
-   *             "enum": [
-   *               true
-   *             ],
-   *             "description": "Bans the type with the default message"
-   *           },
-   *           {
-   *             "type": "string",
-   *             "description": "Bans the type with a custom message"
-   *           },
-   *           {
-   *             "type": "object",
-   *             "description": "Bans a type",
-   *             "properties": {
-   *               "message": {
-   *                 "type": "string",
-   *                 "description": "Custom error message"
-   *               },
-   *               "fixWith": {
-   *                 "type": "string",
-   *                 "description": "Type to autofix replace with. Note that autofixers can be applied automatically - so you need to be careful with this option."
-   *               },
-   *               "suggest": {
-   *                 "type": "array",
-   *                 "items": {
-   *                   "type": "string"
-   *                 },
-   *                 "description": "Types to suggest replacing with.",
-   *                 "additionalItems": false
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           }
-   *         ]
-   *       }
-   *     },
-   *     "type": "object",
-   *     "properties": {
-   *       "types": {
-   *         "type": "object",
-   *         "additionalProperties": {
-   *           "$ref": "#/items/0/$defs/banConfig"
-   *         }
-   *       },
-   *       "extendDefaults": {
-   *         "type": "boolean"
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type BanConfig =
-    | string
-    | false
-    | true
-    | {
-        /** Custom error message */
-        readonly message?: string;
-        /**
-         * Type to autofix replace with. Note that autofixers can be applied
-         * automatically - so you need to be careful with this option.
-         */
-        readonly fixWith?: string;
-        /** Types to suggest replacing with. */
-        readonly suggest?: readonly string[];
-      }
-    | null;
-
-  export type Options = {
-    readonly types?: Record<string, BanConfig>;
-    readonly extendDefaults?: boolean;
-  };
-
-  export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
-}
-
-/**
- * Disallow or enforce spaces inside of blocks after opening block and before
- * closing block
- *
- * @link https://typescript-eslint.io/rules/block-spacing
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace BlockSpacing {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "enum": [
-   *       "always",
-   *       "never"
-   *     ]
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
-}
-
-/**
- * Enforce consistent brace style for blocks
- *
- * @link https://typescript-eslint.io/rules/brace-style
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace BraceStyle {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "enum": [
-   *       "1tbs",
-   *       "stroustrup",
-   *       "allman"
-   *     ]
-   *   },
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "allowSingleLine": {
-   *         "type": "boolean",
-   *         "default": false
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -427,8 +237,8 @@ namespace ClassLiteralPropertyStyle {
   export type Options = 'fields' | 'getters';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -505,129 +315,8 @@ namespace ClassMethodsUseThis {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
-}
-
-/**
- * Require or disallow trailing commas
- *
- * @link https://typescript-eslint.io/rules/comma-dangle
- *
- *  ```md
- *  | key        | value  |
- *  | :--------- | :----- |
- *  | type       | layout |
- *  | deprecated | true   |
- *  | fixable    | code   |
- *  ```
- */
-namespace CommaDangle {
-  /**
-   * ### schema
-   *
-   * ```json
-   * {
-   *   "$defs": {
-   *     "value": {
-   *       "type": "string",
-   *       "enum": ["always-multiline", "always", "never", "only-multiline"]
-   *     },
-   *     "valueWithIgnore": {
-   *       "type": "string",
-   *       "enum": [
-   *         "always-multiline",
-   *         "always",
-   *         "never",
-   *         "only-multiline",
-   *         "ignore"
-   *       ]
-   *     }
-   *   },
-   *   "type": "array",
-   *   "items": [
-   *     {
-   *       "oneOf": [
-   *         {
-   *           "$ref": "#/$defs/value"
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "arrays": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "objects": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "imports": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "exports": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "functions": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "enums": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "generics": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "tuples": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             }
-   *           },
-   *           "additionalProperties": false
-   *         }
-   *       ]
-   *     }
-   *   ],
-   *   "additionalItems": false
-   * }
-   * ```
-   */
-  export type RuleEntry = 0;
-}
-
-/**
- * Enforce consistent spacing before and after commas
- *
- * @link https://typescript-eslint.io/rules/comma-spacing
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace CommaSpacing {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "before": {
-   *         "type": "boolean",
-   *         "default": false
-   *       },
-   *       "after": {
-   *         "type": "boolean",
-   *         "default": true
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -663,8 +352,8 @@ namespace ConsistentGenericConstructors {
   export type Options = 'constructor' | 'type-annotation';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -699,8 +388,8 @@ namespace ConsistentIndexedObjectStyle {
   export type Options = 'index-signature' | 'record';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -739,8 +428,8 @@ namespace ConsistentReturn {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -822,8 +511,8 @@ namespace ConsistentTypeAssertions {
       };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -858,8 +547,8 @@ namespace ConsistentTypeDefinitions {
   export type Options = 'interface' | 'type';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -898,8 +587,8 @@ namespace ConsistentTypeExports {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -953,8 +642,8 @@ namespace ConsistentTypeImports {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -969,7 +658,7 @@ namespace ConsistentTypeImports {
  *  ```
  */
 namespace DefaultParamLast {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -1030,8 +719,8 @@ namespace DotNotation {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1130,8 +819,8 @@ namespace ExplicitFunctionReturnType {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1234,8 +923,8 @@ namespace ExplicitMemberAccessibility {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1316,349 +1005,8 @@ namespace ExplicitModuleBoundaryTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
-}
-
-/**
- * Require or disallow spacing between function identifiers and their
- * invocations
- *
- * @link https://typescript-eslint.io/rules/func-call-spacing
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace FuncCallSpacing {
-  /**
-   * ### schema
-   *
-   * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["never"]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["always"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "allowNewlines": {
-   *               "type": "boolean"
-   *             }
-   *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
-   * ```
-   */
-  export type RuleEntry = 0;
-}
-
-/**
- * Enforce consistent indentation
- *
- * @link https://typescript-eslint.io/rules/indent
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace Indent {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "oneOf": [
-   *       {
-   *         "enum": [
-   *           "tab"
-   *         ]
-   *       },
-   *       {
-   *         "type": "integer",
-   *         "minimum": 0
-   *       }
-   *     ]
-   *   },
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "SwitchCase": {
-   *         "type": "integer",
-   *         "minimum": 0,
-   *         "default": 0
-   *       },
-   *       "VariableDeclarator": {
-   *         "oneOf": [
-   *           {
-   *             "oneOf": [
-   *               {
-   *                 "type": "integer",
-   *                 "minimum": 0
-   *               },
-   *               {
-   *                 "enum": [
-   *                   "first",
-   *                   "off"
-   *                 ]
-   *               }
-   *             ]
-   *           },
-   *           {
-   *             "type": "object",
-   *             "properties": {
-   *               "var": {
-   *                 "oneOf": [
-   *                   {
-   *                     "type": "integer",
-   *                     "minimum": 0
-   *                   },
-   *                   {
-   *                     "enum": [
-   *                       "first",
-   *                       "off"
-   *                     ]
-   *                   }
-   *                 ]
-   *               },
-   *               "let": {
-   *                 "oneOf": [
-   *                   {
-   *                     "type": "integer",
-   *                     "minimum": 0
-   *                   },
-   *                   {
-   *                     "enum": [
-   *                       "first",
-   *                       "off"
-   *                     ]
-   *                   }
-   *                 ]
-   *               },
-   *               "const": {
-   *                 "oneOf": [
-   *                   {
-   *                     "type": "integer",
-   *                     "minimum": 0
-   *                   },
-   *                   {
-   *                     "enum": [
-   *                       "first",
-   *                       "off"
-   *                     ]
-   *                   }
-   *                 ]
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           }
-   *         ]
-   *       },
-   *       "outerIIFEBody": {
-   *         "oneOf": [
-   *           {
-   *             "type": "integer",
-   *             "minimum": 0
-   *           },
-   *           {
-   *             "enum": [
-   *               "off"
-   *             ]
-   *           }
-   *         ]
-   *       },
-   *       "MemberExpression": {
-   *         "oneOf": [
-   *           {
-   *             "type": "integer",
-   *             "minimum": 0
-   *           },
-   *           {
-   *             "enum": [
-   *               "off"
-   *             ]
-   *           }
-   *         ]
-   *       },
-   *       "FunctionDeclaration": {
-   *         "type": "object",
-   *         "properties": {
-   *           "parameters": {
-   *             "oneOf": [
-   *               {
-   *                 "type": "integer",
-   *                 "minimum": 0
-   *               },
-   *               {
-   *                 "enum": [
-   *                   "first",
-   *                   "off"
-   *                 ]
-   *               }
-   *             ]
-   *           },
-   *           "body": {
-   *             "type": "integer",
-   *             "minimum": 0
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       },
-   *       "FunctionExpression": {
-   *         "type": "object",
-   *         "properties": {
-   *           "parameters": {
-   *             "oneOf": [
-   *               {
-   *                 "type": "integer",
-   *                 "minimum": 0
-   *               },
-   *               {
-   *                 "enum": [
-   *                   "first",
-   *                   "off"
-   *                 ]
-   *               }
-   *             ]
-   *           },
-   *           "body": {
-   *             "type": "integer",
-   *             "minimum": 0
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       },
-   *       "StaticBlock": {
-   *         "type": "object",
-   *         "properties": {
-   *           "body": {
-   *             "type": "integer",
-   *             "minimum": 0
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       },
-   *       "CallExpression": {
-   *         "type": "object",
-   *         "properties": {
-   *           "arguments": {
-   *             "oneOf": [
-   *               {
-   *                 "type": "integer",
-   *                 "minimum": 0
-   *               },
-   *               {
-   *                 "enum": [
-   *                   "first",
-   *                   "off"
-   *                 ]
-   *               }
-   *             ]
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       },
-   *       "ArrayExpression": {
-   *         "oneOf": [
-   *           {
-   *             "type": "integer",
-   *             "minimum": 0
-   *           },
-   *           {
-   *             "enum": [
-   *               "first",
-   *               "off"
-   *             ]
-   *           }
-   *         ]
-   *       },
-   *       "ObjectExpression": {
-   *         "oneOf": [
-   *           {
-   *             "type": "integer",
-   *             "minimum": 0
-   *           },
-   *           {
-   *             "enum": [
-   *               "first",
-   *               "off"
-   *             ]
-   *           }
-   *         ]
-   *       },
-   *       "ImportDeclaration": {
-   *         "oneOf": [
-   *           {
-   *             "type": "integer",
-   *             "minimum": 0
-   *           },
-   *           {
-   *             "enum": [
-   *               "first",
-   *               "off"
-   *             ]
-   *           }
-   *         ]
-   *       },
-   *       "flatTernaryExpressions": {
-   *         "type": "boolean",
-   *         "default": false
-   *       },
-   *       "offsetTernaryExpressions": {
-   *         "type": "boolean",
-   *         "default": false
-   *       },
-   *       "ignoredNodes": {
-   *         "type": "array",
-   *         "items": {
-   *           "type": "string",
-   *           "not": {
-   *             "pattern": ":exit$"
-   *           }
-   *         }
-   *       },
-   *       "ignoreComments": {
-   *         "type": "boolean",
-   *         "default": false
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -1724,1301 +1072,8 @@ namespace InitDeclarations {
     | readonly [];
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
-}
-
-/**
- * Enforce consistent spacing between property names and type annotations in
- * types and interfaces
- *
- * @link https://typescript-eslint.io/rules/key-spacing
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace KeySpacing {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "anyOf": [
-   *       {
-   *         "type": "object",
-   *         "properties": {
-   *           "align": {
-   *             "anyOf": [
-   *               {
-   *                 "enum": [
-   *                   "colon",
-   *                   "value"
-   *                 ]
-   *               },
-   *               {
-   *                 "type": "object",
-   *                 "properties": {
-   *                   "mode": {
-   *                     "enum": [
-   *                       "strict",
-   *                       "minimum"
-   *                     ]
-   *                   },
-   *                   "on": {
-   *                     "enum": [
-   *                       "colon",
-   *                       "value"
-   *                     ]
-   *                   },
-   *                   "beforeColon": {
-   *                     "type": "boolean"
-   *                   },
-   *                   "afterColon": {
-   *                     "type": "boolean"
-   *                   }
-   *                 },
-   *                 "additionalProperties": false
-   *               }
-   *             ]
-   *           },
-   *           "mode": {
-   *             "enum": [
-   *               "strict",
-   *               "minimum"
-   *             ]
-   *           },
-   *           "beforeColon": {
-   *             "type": "boolean"
-   *           },
-   *           "afterColon": {
-   *             "type": "boolean"
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       },
-   *       {
-   *         "type": "object",
-   *         "properties": {
-   *           "singleLine": {
-   *             "type": "object",
-   *             "properties": {
-   *               "mode": {
-   *                 "enum": [
-   *                   "strict",
-   *                   "minimum"
-   *                 ]
-   *               },
-   *               "beforeColon": {
-   *                 "type": "boolean"
-   *               },
-   *               "afterColon": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "multiLine": {
-   *             "type": "object",
-   *             "properties": {
-   *               "align": {
-   *                 "anyOf": [
-   *                   {
-   *                     "enum": [
-   *                       "colon",
-   *                       "value"
-   *                     ]
-   *                   },
-   *                   {
-   *                     "type": "object",
-   *                     "properties": {
-   *                       "mode": {
-   *                         "enum": [
-   *                           "strict",
-   *                           "minimum"
-   *                         ]
-   *                       },
-   *                       "on": {
-   *                         "enum": [
-   *                           "colon",
-   *                           "value"
-   *                         ]
-   *                       },
-   *                       "beforeColon": {
-   *                         "type": "boolean"
-   *                       },
-   *                       "afterColon": {
-   *                         "type": "boolean"
-   *                       }
-   *                     },
-   *                     "additionalProperties": false
-   *                   }
-   *                 ]
-   *               },
-   *               "mode": {
-   *                 "enum": [
-   *                   "strict",
-   *                   "minimum"
-   *                 ]
-   *               },
-   *               "beforeColon": {
-   *                 "type": "boolean"
-   *               },
-   *               "afterColon": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       },
-   *       {
-   *         "type": "object",
-   *         "properties": {
-   *           "singleLine": {
-   *             "type": "object",
-   *             "properties": {
-   *               "mode": {
-   *                 "enum": [
-   *                   "strict",
-   *                   "minimum"
-   *                 ]
-   *               },
-   *               "beforeColon": {
-   *                 "type": "boolean"
-   *               },
-   *               "afterColon": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "multiLine": {
-   *             "type": "object",
-   *             "properties": {
-   *               "mode": {
-   *                 "enum": [
-   *                   "strict",
-   *                   "minimum"
-   *                 ]
-   *               },
-   *               "beforeColon": {
-   *                 "type": "boolean"
-   *               },
-   *               "afterColon": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "align": {
-   *             "type": "object",
-   *             "properties": {
-   *               "mode": {
-   *                 "enum": [
-   *                   "strict",
-   *                   "minimum"
-   *                 ]
-   *               },
-   *               "on": {
-   *                 "enum": [
-   *                   "colon",
-   *                   "value"
-   *                 ]
-   *               },
-   *               "beforeColon": {
-   *                 "type": "boolean"
-   *               },
-   *               "afterColon": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       }
-   *     ]
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
-}
-
-/**
- * Enforce consistent spacing before and after keywords
- *
- * @link https://typescript-eslint.io/rules/keyword-spacing
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace KeywordSpacing {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "before": {
-   *         "type": "boolean",
-   *         "default": true
-   *       },
-   *       "after": {
-   *         "type": "boolean",
-   *         "default": true
-   *       },
-   *       "overrides": {
-   *         "type": "object",
-   *         "properties": {
-   *           "abstract": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "as": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "async": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "await": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "boolean": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "break": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "byte": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "case": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "catch": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "char": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "class": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "const": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "continue": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "debugger": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "default": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "delete": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "do": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "double": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "else": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "enum": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "export": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "extends": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "false": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "final": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "finally": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "float": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "for": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "from": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "function": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "get": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "goto": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "if": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "implements": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "import": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "in": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "instanceof": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "int": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "interface": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "let": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "long": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "native": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "new": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "null": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "of": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "package": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "private": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "protected": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "public": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "return": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "set": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "short": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "static": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "super": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "switch": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "synchronized": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "this": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "throw": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "throws": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "transient": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "true": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "try": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "typeof": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "var": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "void": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "volatile": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "while": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "with": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "yield": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "type": {
-   *             "type": "object",
-   *             "properties": {
-   *               "before": {
-   *                 "type": "boolean"
-   *               },
-   *               "after": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
-}
-
-/**
- * Require empty lines around comments
- *
- * @link https://typescript-eslint.io/rules/lines-around-comment
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace LinesAroundComment {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "beforeBlockComment": {
-   *         "type": "boolean",
-   *         "default": true
-   *       },
-   *       "afterBlockComment": {
-   *         "type": "boolean",
-   *         "default": false
-   *       },
-   *       "beforeLineComment": {
-   *         "type": "boolean",
-   *         "default": false
-   *       },
-   *       "afterLineComment": {
-   *         "type": "boolean",
-   *         "default": false
-   *       },
-   *       "allowBlockStart": {
-   *         "type": "boolean",
-   *         "default": false
-   *       },
-   *       "allowBlockEnd": {
-   *         "type": "boolean",
-   *         "default": false
-   *       },
-   *       "allowClassStart": {
-   *         "type": "boolean"
-   *       },
-   *       "allowClassEnd": {
-   *         "type": "boolean"
-   *       },
-   *       "allowObjectStart": {
-   *         "type": "boolean"
-   *       },
-   *       "allowObjectEnd": {
-   *         "type": "boolean"
-   *       },
-   *       "allowArrayStart": {
-   *         "type": "boolean"
-   *       },
-   *       "allowArrayEnd": {
-   *         "type": "boolean"
-   *       },
-   *       "allowInterfaceStart": {
-   *         "type": "boolean"
-   *       },
-   *       "allowInterfaceEnd": {
-   *         "type": "boolean"
-   *       },
-   *       "allowTypeStart": {
-   *         "type": "boolean"
-   *       },
-   *       "allowTypeEnd": {
-   *         "type": "boolean"
-   *       },
-   *       "allowEnumStart": {
-   *         "type": "boolean"
-   *       },
-   *       "allowEnumEnd": {
-   *         "type": "boolean"
-   *       },
-   *       "allowModuleStart": {
-   *         "type": "boolean"
-   *       },
-   *       "allowModuleEnd": {
-   *         "type": "boolean"
-   *       },
-   *       "ignorePattern": {
-   *         "type": "string"
-   *       },
-   *       "applyDefaultIgnorePatterns": {
-   *         "type": "boolean"
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
-}
-
-/**
- * Require or disallow an empty line between class members
- *
- * @link https://typescript-eslint.io/rules/lines-between-class-members
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace LinesBetweenClassMembers {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "anyOf": [
-   *       {
-   *         "type": "object",
-   *         "properties": {
-   *           "enforce": {
-   *             "type": "array",
-   *             "items": {
-   *               "type": "object",
-   *               "properties": {
-   *                 "blankLine": {
-   *                   "enum": [
-   *                     "always",
-   *                     "never"
-   *                   ]
-   *                 },
-   *                 "prev": {
-   *                   "enum": [
-   *                     "method",
-   *                     "field",
-   *                     "*"
-   *                   ]
-   *                 },
-   *                 "next": {
-   *                   "enum": [
-   *                     "method",
-   *                     "field",
-   *                     "*"
-   *                   ]
-   *                 }
-   *               },
-   *               "additionalProperties": false,
-   *               "required": [
-   *                 "blankLine",
-   *                 "prev",
-   *                 "next"
-   *               ]
-   *             },
-   *             "minItems": 1
-   *           }
-   *         },
-   *         "additionalProperties": false,
-   *         "required": [
-   *           "enforce"
-   *         ]
-   *       },
-   *       {
-   *         "enum": [
-   *           "always",
-   *           "never"
-   *         ]
-   *       }
-   *     ]
-   *   },
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "exceptAfterSingleLine": {
-   *         "type": "boolean",
-   *         "default": false
-   *       },
-   *       "exceptAfterOverload": {
-   *         "type": "boolean",
-   *         "default": true
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3065,129 +1120,8 @@ namespace MaxParams {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
-}
-
-/**
- * Require a specific member delimiter style for interfaces and type literals
- *
- * @link https://typescript-eslint.io/rules/member-delimiter-style
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace MemberDelimiterStyle {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "$defs": {
-   *       "multiLineOption": {
-   *         "type": "string",
-   *         "enum": [
-   *           "none",
-   *           "semi",
-   *           "comma"
-   *         ]
-   *       },
-   *       "singleLineOption": {
-   *         "type": "string",
-   *         "enum": [
-   *           "semi",
-   *           "comma"
-   *         ]
-   *       },
-   *       "delimiterConfig": {
-   *         "type": "object",
-   *         "properties": {
-   *           "multiline": {
-   *             "type": "object",
-   *             "properties": {
-   *               "delimiter": {
-   *                 "$ref": "#/items/0/$defs/multiLineOption"
-   *               },
-   *               "requireLast": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
-   *           "singleline": {
-   *             "type": "object",
-   *             "properties": {
-   *               "delimiter": {
-   *                 "$ref": "#/items/0/$defs/singleLineOption"
-   *               },
-   *               "requireLast": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       }
-   *     },
-   *     "type": "object",
-   *     "properties": {
-   *       "multiline": {
-   *         "type": "object",
-   *         "properties": {
-   *           "delimiter": {
-   *             "$ref": "#/items/0/$defs/multiLineOption"
-   *           },
-   *           "requireLast": {
-   *             "type": "boolean"
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       },
-   *       "singleline": {
-   *         "type": "object",
-   *         "properties": {
-   *           "delimiter": {
-   *             "$ref": "#/items/0/$defs/singleLineOption"
-   *           },
-   *           "requireLast": {
-   *             "type": "boolean"
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       },
-   *       "overrides": {
-   *         "type": "object",
-   *         "properties": {
-   *           "interface": {
-   *             "$ref": "#/items/0/$defs/delimiterConfig"
-   *           },
-   *           "typeLiteral": {
-   *             "$ref": "#/items/0/$defs/delimiterConfig"
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       },
-   *       "multilineDetection": {
-   *         "type": "string",
-   *         "enum": [
-   *           "brackets",
-   *           "last-member"
-   *         ]
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3745,8 +1679,8 @@ namespace MemberOrdering {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -3780,8 +1714,8 @@ namespace MethodSignatureStyle {
   export type Options = 'method' | 'property';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -6031,8 +3965,8 @@ namespace NamingConvention {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -6049,7 +3983,7 @@ namespace NamingConvention {
  *  ```
  */
 namespace NoArrayConstructor {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -6058,16 +3992,16 @@ namespace NoArrayConstructor {
  * @link https://typescript-eslint.io/rules/no-array-delete
  *
  *  ```md
- *  | key                  | value   |
- *  | :------------------- | :------ |
- *  | type                 | problem |
- *  | hasSuggestions       | true    |
- *  | recommended          | strict  |
- *  | requiresTypeChecking | true    |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | problem     |
+ *  | hasSuggestions       | true        |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace NoArrayDelete {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -6110,8 +4044,8 @@ namespace NoBaseToString {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -6128,7 +4062,7 @@ namespace NoBaseToString {
  *  ```
  */
 namespace NoConfusingNonNullAssertion {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -6173,8 +4107,8 @@ namespace NoConfusingVoidExpression {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -6189,7 +4123,7 @@ namespace NoConfusingVoidExpression {
  *  ```
  */
 namespace NoDupeClassMembers {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -6206,7 +4140,7 @@ namespace NoDupeClassMembers {
  *  ```
  */
 namespace NoDuplicateEnumValues {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -6250,8 +4184,8 @@ namespace NoDuplicateTypeConstituents {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -6268,7 +4202,7 @@ namespace NoDuplicateTypeConstituents {
  *  ```
  */
 namespace NoDynamicDelete {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -6341,8 +4275,8 @@ namespace NoEmptyFunction {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -6354,9 +4288,9 @@ namespace NoEmptyFunction {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | true       |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
- *  | recommended    | stylistic  |
  *  ```
  */
 namespace NoEmptyInterface {
@@ -6377,13 +4311,7 @@ namespace NoEmptyInterface {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowSingleExtends?: boolean;
-  };
-
-  export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -6392,10 +4320,11 @@ namespace NoEmptyInterface {
  * @link https://typescript-eslint.io/rules/no-empty-object-type
  *
  *  ```md
- *  | key            | value      |
- *  | :------------- | :--------- |
- *  | type           | suggestion |
- *  | hasSuggestions | true       |
+ *  | key            | value       |
+ *  | :------------- | :---------- |
+ *  | type           | suggestion  |
+ *  | hasSuggestions | true        |
+ *  | recommended    | recommended |
  *  ```
  */
 namespace NoEmptyObjectType {
@@ -6419,7 +4348,6 @@ namespace NoEmptyObjectType {
    *       "allowObjectTypes": {
    *         "enum": [
    *           "always",
-   *           "in-type-alias-with-name",
    *           "never"
    *         ],
    *         "type": "string"
@@ -6434,13 +4362,13 @@ namespace NoEmptyObjectType {
    */
   export type Options = {
     readonly allowInterfaces?: 'always' | 'never' | 'with-single-extends';
-    readonly allowObjectTypes?: 'always' | 'in-type-alias-with-name' | 'never';
+    readonly allowObjectTypes?: 'always' | 'never';
     readonly allowWithName?: string;
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -6491,8 +4419,8 @@ namespace NoExplicitAny {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -6509,107 +4437,7 @@ namespace NoExplicitAny {
  *  ```
  */
 namespace NoExtraNonNullAssertion {
-  export type RuleEntry = Linter.RuleLevel;
-}
-
-/**
- * Disallow unnecessary parentheses
- *
- * @link https://typescript-eslint.io/rules/no-extra-parens
- *
- *  ```md
- *  | key        | value  |
- *  | :--------- | :----- |
- *  | type       | layout |
- *  | deprecated | true   |
- *  | fixable    | code   |
- *  ```
- */
-namespace NoExtraParens {
-  /**
-   * ### schema
-   *
-   * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["functions"]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["all"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "conditionalAssign": {
-   *               "type": "boolean"
-   *             },
-   *             "ternaryOperandBinaryExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "nestedBinaryExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "returnAssign": {
-   *               "type": "boolean"
-   *             },
-   *             "ignoreJSX": {
-   *               "enum": ["none", "all", "single-line", "multi-line"]
-   *             },
-   *             "enforceForArrowConditionals": {
-   *               "type": "boolean"
-   *             },
-   *             "enforceForSequenceExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "enforceForNewInMemberExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "enforceForFunctionPrototypeMethods": {
-   *               "type": "boolean"
-   *             },
-   *             "allowParensAfterCommentPattern": {
-   *               "type": "string"
-   *             }
-   *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
-   * ```
-   */
-  export type RuleEntry = 0;
-}
-
-/**
- * Disallow unnecessary semicolons
- *
- * @link https://typescript-eslint.io/rules/no-extra-semi
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | true       |
- *  | fixable    | code       |
- *  ```
- */
-namespace NoExtraSemi {
-  export type RuleEntry = 0;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -6667,8 +4495,8 @@ namespace NoExtraneousClass {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -6695,6 +4523,116 @@ namespace NoFloatingPromises {
    *     "type": "object",
    *     "properties": {
    *       "allowForKnownSafePromises": {
+   *         "type": "array",
+   *         "items": {
+   *           "oneOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "type": "object",
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "type": "string",
+   *                   "enum": [
+   *                     "file"
+   *                   ]
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "type": "array",
+   *                       "minItems": 1,
+   *                       "uniqueItems": true,
+   *                       "items": {
+   *                         "type": "string"
+   *                       }
+   *                     }
+   *                   ]
+   *                 },
+   *                 "path": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ]
+   *             },
+   *             {
+   *               "type": "object",
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "type": "string",
+   *                   "enum": [
+   *                     "lib"
+   *                   ]
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "type": "array",
+   *                       "minItems": 1,
+   *                       "uniqueItems": true,
+   *                       "items": {
+   *                         "type": "string"
+   *                       }
+   *                     }
+   *                   ]
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ]
+   *             },
+   *             {
+   *               "type": "object",
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "type": "string",
+   *                   "enum": [
+   *                     "package"
+   *                   ]
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "type": "array",
+   *                       "minItems": 1,
+   *                       "uniqueItems": true,
+   *                       "items": {
+   *                         "type": "string"
+   *                       }
+   *                     }
+   *                   ]
+   *                 },
+   *                 "package": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name",
+   *                 "package"
+   *               ]
+   *             }
+   *           ]
+   *         }
+   *       },
+   *       "allowForKnownSafeCalls": {
    *         "type": "array",
    *         "items": {
    *           "oneOf": [
@@ -6840,6 +4778,23 @@ namespace NoFloatingPromises {
           readonly package: string;
         }
     )[];
+    readonly allowForKnownSafeCalls?: readonly (
+      | string
+      | {
+          readonly from: 'file';
+          readonly name: string | readonly [string, ...(readonly string[])];
+          readonly path?: string;
+        }
+      | {
+          readonly from: 'lib';
+          readonly name: string | readonly [string, ...(readonly string[])];
+        }
+      | {
+          readonly from: 'package';
+          readonly name: string | readonly [string, ...(readonly string[])];
+          readonly package: string;
+        }
+    )[];
     /** Whether to check all "Thenable"s, not just the built-in Promise type. */
     readonly checkThenables?: boolean;
     /** Whether to ignore `void` expressions. */
@@ -6849,8 +4804,8 @@ namespace NoFloatingPromises {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -6867,7 +4822,7 @@ namespace NoFloatingPromises {
  *  ```
  */
 namespace NoForInArray {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -6884,7 +4839,7 @@ namespace NoForInArray {
  *  ```
  */
 namespace NoImpliedEval {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -6901,7 +4856,7 @@ namespace NoImpliedEval {
  *  ```
  */
 namespace NoImportTypeSideEffects {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -6945,8 +4900,8 @@ namespace NoInferrableTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -6984,8 +4939,8 @@ namespace NoInvalidThis {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -7040,8 +4995,8 @@ namespace NoInvalidVoidType {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -7057,7 +5012,7 @@ namespace NoInvalidVoidType {
  *  ```
  */
 namespace NoLoopFunc {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -7066,14 +5021,14 @@ namespace NoLoopFunc {
  * @link https://typescript-eslint.io/rules/no-loss-of-precision
  *
  *  ```md
- *  | key         | value       |
- *  | :---------- | :---------- |
- *  | type        | problem     |
- *  | recommended | recommended |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | true    |
  *  ```
  */
 namespace NoLossOfPrecision {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7163,8 +5118,8 @@ namespace NoMagicNumbers {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -7206,8 +5161,8 @@ namespace NoMeaninglessVoidOperator {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -7223,7 +5178,7 @@ namespace NoMeaninglessVoidOperator {
  *  ```
  */
 namespace NoMisusedNew {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -7266,6 +5221,9 @@ namespace NoMisusedPromises {
    *               "attributes": {
    *                 "type": "boolean"
    *               },
+   *               "inheritedMethods": {
+   *                 "type": "boolean"
+   *               },
    *               "properties": {
    *                 "type": "boolean"
    *               },
@@ -7295,6 +5253,7 @@ namespace NoMisusedPromises {
       | {
           readonly arguments?: boolean;
           readonly attributes?: boolean;
+          readonly inheritedMethods?: boolean;
           readonly properties?: boolean;
           readonly returns?: boolean;
           readonly variables?: boolean;
@@ -7303,8 +5262,8 @@ namespace NoMisusedPromises {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -7321,7 +5280,7 @@ namespace NoMisusedPromises {
  *  ```
  */
 namespace NoMixedEnums {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -7370,8 +5329,8 @@ namespace NoNamespace {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -7389,7 +5348,7 @@ namespace NoNamespace {
  *  ```
  */
 namespace NoNonNullAssertedNullishCoalescing {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -7406,7 +5365,7 @@ namespace NoNonNullAssertedNullishCoalescing {
  *  ```
  */
 namespace NoNonNullAssertedOptionalChain {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -7423,7 +5382,7 @@ namespace NoNonNullAssertedOptionalChain {
  *  ```
  */
 namespace NoNonNullAssertion {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -7464,8 +5423,8 @@ namespace NoRedeclare {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -7483,7 +5442,7 @@ namespace NoRedeclare {
  *  ```
  */
 namespace NoRedundantTypeConstituents {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -7492,9 +5451,10 @@ namespace NoRedundantTypeConstituents {
  * @link https://typescript-eslint.io/rules/no-require-imports
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key         | value       |
+ *  | :---------- | :---------- |
+ *  | type        | problem     |
+ *  | recommended | recommended |
  *  ```
  */
 namespace NoRequireImports {
@@ -7512,6 +5472,10 @@ namespace NoRequireImports {
    *           "type": "string"
    *         },
    *         "description": "Patterns of import paths to allow requiring from."
+   *       },
+   *       "allowAsImport": {
+   *         "type": "boolean",
+   *         "description": "Allows `require` statements in import declarations."
    *       }
    *     },
    *     "additionalProperties": false
@@ -7522,11 +5486,13 @@ namespace NoRequireImports {
   export type Options = {
     /** Patterns of import paths to allow requiring from. */
     readonly allow?: readonly string[];
+    /** Allows `require` statements in import declarations. */
+    readonly allowAsImport?: boolean;
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -7729,8 +5695,105 @@ namespace NoRestrictedImports {
     | readonly [];
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+}
+
+/**
+ * Disallow certain types
+ *
+ * @link https://typescript-eslint.io/rules/no-restricted-types
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  ```
+ */
+namespace NoRestrictedTypes {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "$defs": {
+   *       "banConfig": {
+   *         "oneOf": [
+   *           {
+   *             "type": "boolean",
+   *             "enum": [
+   *               true
+   *             ],
+   *             "description": "Bans the type with the default message"
+   *           },
+   *           {
+   *             "type": "string",
+   *             "description": "Bans the type with a custom message"
+   *           },
+   *           {
+   *             "type": "object",
+   *             "description": "Bans a type",
+   *             "properties": {
+   *               "message": {
+   *                 "type": "string",
+   *                 "description": "Custom error message"
+   *               },
+   *               "fixWith": {
+   *                 "type": "string",
+   *                 "description": "Type to autofix replace with. Note that autofixers can be applied automatically - so you need to be careful with this option."
+   *               },
+   *               "suggest": {
+   *                 "type": "array",
+   *                 "items": {
+   *                   "type": "string"
+   *                 },
+   *                 "description": "Types to suggest replacing with."
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ]
+   *       }
+   *     },
+   *     "type": "object",
+   *     "properties": {
+   *       "types": {
+   *         "type": "object",
+   *         "additionalProperties": {
+   *           "$ref": "#/items/0/$defs/banConfig"
+   *         }
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type BanConfig =
+    | string
+    | true
+    | {
+        /** Custom error message */
+        readonly message?: string;
+        /**
+         * Type to autofix replace with. Note that autofixers can be applied
+         * automatically - so you need to be careful with this option.
+         */
+        readonly fixWith?: string;
+        /** Types to suggest replacing with. */
+        readonly suggest?: readonly string[];
+      };
+
+  export type Options = {
+    readonly types?: Record<string, BanConfig>;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -7796,8 +5859,8 @@ namespace NoShadow {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -7849,45 +5912,8 @@ namespace NoThisAlias {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
-}
-
-/**
- * Disallow throwing literals as exceptions
- *
- * @link https://typescript-eslint.io/rules/no-throw-literal
- *
- *  ```md
- *  | key                  | value   |
- *  | :------------------- | :------ |
- *  | type                 | problem |
- *  | deprecated           | true    |
- *  | requiresTypeChecking | true    |
- *  ```
- */
-namespace NoThrowLiteral {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "allowThrowingAny": {
-   *         "type": "boolean"
-   *       },
-   *       "allowThrowingUnknown": {
-   *         "type": "boolean"
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -8022,8 +6048,8 @@ namespace NoUnnecessaryBooleanLiteralCompare {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -8074,8 +6100,8 @@ namespace NoUnnecessaryCondition {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -8090,7 +6116,7 @@ namespace NoUnnecessaryCondition {
  *  ```
  */
 namespace NoUnnecessaryParameterPropertyAssignment {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8107,7 +6133,7 @@ namespace NoUnnecessaryParameterPropertyAssignment {
  *  ```
  */
 namespace NoUnnecessaryQualifier {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8125,7 +6151,7 @@ namespace NoUnnecessaryQualifier {
  *  ```
  */
 namespace NoUnnecessaryTemplateExpression {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8143,7 +6169,7 @@ namespace NoUnnecessaryTemplateExpression {
  *  ```
  */
 namespace NoUnnecessaryTypeArguments {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8188,8 +6214,8 @@ namespace NoUnnecessaryTypeAssertion {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -8206,11 +6232,11 @@ namespace NoUnnecessaryTypeAssertion {
  *  ```
  */
 namespace NoUnnecessaryTypeConstraint {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
- * Disallow type parameters that only appear once
+ * Disallow type parameters that aren't used multiple times
  *
  * @link https://typescript-eslint.io/rules/no-unnecessary-type-parameters
  *
@@ -8218,11 +6244,12 @@ namespace NoUnnecessaryTypeConstraint {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | recommended          | strict  |
  *  | requiresTypeChecking | true    |
  *  ```
  */
 namespace NoUnnecessaryTypeParameters {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8239,7 +6266,7 @@ namespace NoUnnecessaryTypeParameters {
  *  ```
  */
 namespace NoUnsafeArgument {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8256,7 +6283,7 @@ namespace NoUnsafeArgument {
  *  ```
  */
 namespace NoUnsafeAssignment {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8273,7 +6300,7 @@ namespace NoUnsafeAssignment {
  *  ```
  */
 namespace NoUnsafeCall {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8290,7 +6317,7 @@ namespace NoUnsafeCall {
  *  ```
  */
 namespace NoUnsafeDeclarationMerging {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8308,7 +6335,7 @@ namespace NoUnsafeDeclarationMerging {
  *  ```
  */
 namespace NoUnsafeEnumComparison {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8317,14 +6344,15 @@ namespace NoUnsafeEnumComparison {
  * @link https://typescript-eslint.io/rules/no-unsafe-function-type
  *
  *  ```md
- *  | key     | value   |
- *  | :------ | :------ |
- *  | type    | problem |
- *  | fixable | code    |
+ *  | key         | value       |
+ *  | :---------- | :---------- |
+ *  | type        | problem     |
+ *  | fixable     | code        |
+ *  | recommended | recommended |
  *  ```
  */
 namespace NoUnsafeFunctionType {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8341,7 +6369,7 @@ namespace NoUnsafeFunctionType {
  *  ```
  */
 namespace NoUnsafeMemberAccess {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8358,7 +6386,7 @@ namespace NoUnsafeMemberAccess {
  *  ```
  */
 namespace NoUnsafeReturn {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8367,14 +6395,15 @@ namespace NoUnsafeReturn {
  * @link https://typescript-eslint.io/rules/no-unsafe-unary-minus
  *
  *  ```md
- *  | key                  | value   |
- *  | :------------------- | :------ |
- *  | type                 | problem |
- *  | requiresTypeChecking | true    |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | problem     |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace NoUnsafeUnaryMinus {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8383,9 +6412,10 @@ namespace NoUnsafeUnaryMinus {
  * @link https://typescript-eslint.io/rules/no-unused-expressions
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key         | value       |
+ *  | :---------- | :---------- |
+ *  | type        | suggestion  |
+ *  | recommended | recommended |
  *  ```
  */
 namespace NoUnusedExpressions {
@@ -8427,8 +6457,8 @@ namespace NoUnusedExpressions {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -8497,6 +6527,12 @@ namespace NoUnusedVars {
    *           },
    *           "destructuredArrayIgnorePattern": {
    *             "type": "string"
+   *           },
+   *           "ignoreClassWithStaticInitBlock": {
+   *             "type": "boolean"
+   *           },
+   *           "reportUsedIgnorePattern": {
+   *             "type": "boolean"
    *           }
    *         },
    *         "additionalProperties": false
@@ -8518,11 +6554,13 @@ namespace NoUnusedVars {
         readonly caughtErrors?: 'all' | 'none';
         readonly caughtErrorsIgnorePattern?: string;
         readonly destructuredArrayIgnorePattern?: string;
+        readonly ignoreClassWithStaticInitBlock?: boolean;
+        readonly reportUsedIgnorePattern?: boolean;
       };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -8595,8 +6633,8 @@ namespace NoUseBeforeDefine {
       };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -8612,7 +6650,7 @@ namespace NoUseBeforeDefine {
  *  ```
  */
 namespace NoUselessConstructor {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8629,25 +6667,7 @@ namespace NoUselessConstructor {
  *  ```
  */
 namespace NoUselessEmptyExport {
-  export type RuleEntry = Linter.RuleLevel;
-}
-
-/**
- * Disallow unnecessary template expressions
- *
- * @link https://typescript-eslint.io/rules/no-useless-template-literals
- *
- *  ```md
- *  | key                  | value      |
- *  | :------------------- | :--------- |
- *  | type                 | suggestion |
- *  | deprecated           | true       |
- *  | fixable              | code       |
- *  | requiresTypeChecking | true       |
- *  ```
- */
-namespace NoUselessTemplateLiterals {
-  export type RuleEntry = 0;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8656,10 +6676,10 @@ namespace NoUselessTemplateLiterals {
  * @link https://typescript-eslint.io/rules/no-var-requires
  *
  *  ```md
- *  | key         | value       |
- *  | :---------- | :---------- |
- *  | type        | problem     |
- *  | recommended | recommended |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | true    |
  *  ```
  */
 namespace NoVarRequires {
@@ -8684,14 +6704,7 @@ namespace NoVarRequires {
    * ]
    * ```
    */
-  export type Options = {
-    /** Patterns of import paths to allow requiring from. */
-    readonly allow?: readonly string[];
-  };
-
-  export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -8700,14 +6713,15 @@ namespace NoVarRequires {
  * @link https://typescript-eslint.io/rules/no-wrapper-object-types
  *
  *  ```md
- *  | key     | value   |
- *  | :------ | :------ |
- *  | type    | problem |
- *  | fixable | code    |
+ *  | key         | value       |
+ *  | :---------- | :---------- |
+ *  | type        | problem     |
+ *  | fixable     | code        |
+ *  | recommended | recommended |
  *  ```
  */
 namespace NoWrapperObjectTypes {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8725,50 +6739,7 @@ namespace NoWrapperObjectTypes {
  *  ```
  */
 namespace NonNullableTypeAssertionStyle {
-  export type RuleEntry = Linter.RuleLevel;
-}
-
-/**
- * Enforce consistent spacing inside braces
- *
- * @link https://typescript-eslint.io/rules/object-curly-spacing
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace ObjectCurlySpacing {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "enum": [
-   *       "always",
-   *       "never"
-   *     ]
-   *   },
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "arraysInObjects": {
-   *         "type": "boolean"
-   *       },
-   *       "objectsInObjects": {
-   *         "type": "boolean"
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -8777,11 +6748,11 @@ namespace ObjectCurlySpacing {
  * @link https://typescript-eslint.io/rules/only-throw-error
  *
  *  ```md
- *  | key                  | value   |
- *  | :------------------- | :------ |
- *  | type                 | problem |
- *  | recommended          | strict  |
- *  | requiresTypeChecking | true    |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | problem     |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace OnlyThrowError {
@@ -8811,158 +6782,8 @@ namespace OnlyThrowError {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
-}
-
-/**
- * Require or disallow padding lines between statements
- *
- * @link https://typescript-eslint.io/rules/padding-line-between-statements
- *
- *  ```md
- *  | key            | value      |
- *  | :------------- | :--------- |
- *  | type           | layout     |
- *  | deprecated     | true       |
- *  | fixable        | whitespace |
- *  | hasSuggestions | false      |
- *  ```
- */
-namespace PaddingLineBetweenStatements {
-  /**
-   * ### schema
-   *
-   * ```json
-   * {
-   *   "$defs": {
-   *     "paddingType": {
-   *       "type": "string",
-   *       "enum": ["any", "never", "always"]
-   *     },
-   *     "statementType": {
-   *       "anyOf": [
-   *         {
-   *           "type": "string",
-   *           "enum": [
-   *             "*",
-   *             "block-like",
-   *             "exports",
-   *             "require",
-   *             "directive",
-   *             "expression",
-   *             "iife",
-   *             "multiline-block-like",
-   *             "multiline-expression",
-   *             "multiline-const",
-   *             "multiline-let",
-   *             "multiline-var",
-   *             "singleline-const",
-   *             "singleline-let",
-   *             "singleline-var",
-   *             "block",
-   *             "empty",
-   *             "function",
-   *             "break",
-   *             "case",
-   *             "class",
-   *             "const",
-   *             "continue",
-   *             "debugger",
-   *             "default",
-   *             "do",
-   *             "export",
-   *             "for",
-   *             "if",
-   *             "import",
-   *             "let",
-   *             "return",
-   *             "switch",
-   *             "throw",
-   *             "try",
-   *             "var",
-   *             "while",
-   *             "with",
-   *             "interface",
-   *             "type"
-   *           ]
-   *         },
-   *         {
-   *           "type": "array",
-   *           "items": {
-   *             "type": "string",
-   *             "enum": [
-   *               "*",
-   *               "block-like",
-   *               "exports",
-   *               "require",
-   *               "directive",
-   *               "expression",
-   *               "iife",
-   *               "multiline-block-like",
-   *               "multiline-expression",
-   *               "multiline-const",
-   *               "multiline-let",
-   *               "multiline-var",
-   *               "singleline-const",
-   *               "singleline-let",
-   *               "singleline-var",
-   *               "block",
-   *               "empty",
-   *               "function",
-   *               "break",
-   *               "case",
-   *               "class",
-   *               "const",
-   *               "continue",
-   *               "debugger",
-   *               "default",
-   *               "do",
-   *               "export",
-   *               "for",
-   *               "if",
-   *               "import",
-   *               "let",
-   *               "return",
-   *               "switch",
-   *               "throw",
-   *               "try",
-   *               "var",
-   *               "while",
-   *               "with",
-   *               "interface",
-   *               "type"
-   *             ]
-   *           },
-   *           "minItems": 1,
-   *           "uniqueItems": true,
-   *           "additionalItems": false
-   *         }
-   *       ]
-   *     }
-   *   },
-   *   "type": "array",
-   *   "additionalItems": false,
-   *   "items": {
-   *     "type": "object",
-   *     "properties": {
-   *       "blankLine": {
-   *         "$ref": "#/$defs/paddingType"
-   *       },
-   *       "prev": {
-   *         "$ref": "#/$defs/statementType"
-   *       },
-   *       "next": {
-   *         "$ref": "#/$defs/statementType"
-   *       }
-   *     },
-   *     "additionalProperties": false,
-   *     "required": ["blankLine", "prev", "next"]
-   *   }
-   * }
-   * ```
-   */
-  export type RuleEntry = 0;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -9033,8 +6854,8 @@ namespace ParameterProperties {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -9052,7 +6873,7 @@ namespace ParameterProperties {
  *  ```
  */
 namespace PreferAsConst {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -9157,9 +6978,9 @@ namespace PreferDestructuring {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, Options1]
-    | readonly [Linter.RuleLevel, Options0];
+    | Linter.RuleSeverity
+    | readonly [Linter.RuleSeverity, Options0, Options1]
+    | readonly [Linter.RuleSeverity, Options0];
 }
 
 /**
@@ -9175,7 +6996,7 @@ namespace PreferDestructuring {
  *  ```
  */
 namespace PreferEnumInitializers {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -9189,11 +7010,12 @@ namespace PreferEnumInitializers {
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | hasSuggestions       | true       |
+ *  | recommended          | stylistic  |
  *  | requiresTypeChecking | true       |
  *  ```
  */
 namespace PreferFind {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -9209,7 +7031,7 @@ namespace PreferFind {
  *  ```
  */
 namespace PreferForOf {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -9226,7 +7048,7 @@ namespace PreferForOf {
  *  ```
  */
 namespace PreferFunctionType {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -9239,12 +7061,12 @@ namespace PreferFunctionType {
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | fixable              | code       |
- *  | recommended          | strict     |
+ *  | recommended          | stylistic  |
  *  | requiresTypeChecking | true       |
  *  ```
  */
 namespace PreferIncludes {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -9283,8 +7105,8 @@ namespace PreferLiteralEnumMember {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -9294,15 +7116,15 @@ namespace PreferLiteralEnumMember {
  * @link https://typescript-eslint.io/rules/prefer-namespace-keyword
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | fixable     | code       |
- *  | recommended | stylistic  |
+ *  | key         | value       |
+ *  | :---------- | :---------- |
+ *  | type        | suggestion  |
+ *  | fixable     | code        |
+ *  | recommended | recommended |
  *  ```
  */
 namespace PreferNamespaceKeyword {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -9391,8 +7213,8 @@ namespace PreferNullishCoalescing {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -9502,8 +7324,8 @@ namespace PreferOptionalChain {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -9512,11 +7334,11 @@ namespace PreferOptionalChain {
  * @link https://typescript-eslint.io/rules/prefer-promise-reject-errors
  *
  *  ```md
- *  | key                  | value      |
- *  | :------------------- | :--------- |
- *  | type                 | suggestion |
- *  | recommended          | strict     |
- *  | requiresTypeChecking | true       |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace PreferPromiseRejectErrors {
@@ -9542,8 +7364,8 @@ namespace PreferPromiseRejectErrors {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -9583,8 +7405,8 @@ namespace PreferReadonly {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -9758,8 +7580,8 @@ namespace PreferReadonlyParameterTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -9777,7 +7599,7 @@ namespace PreferReadonlyParameterTypes {
  *  ```
  */
 namespace PreferReduceTypeParameter {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -9790,11 +7612,12 @@ namespace PreferReduceTypeParameter {
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | fixable              | code       |
+ *  | recommended          | stylistic  |
  *  | requiresTypeChecking | true       |
  *  ```
  */
 namespace PreferRegexpExec {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -9812,7 +7635,7 @@ namespace PreferRegexpExec {
  *  ```
  */
 namespace PreferReturnThisType {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -9862,8 +7685,8 @@ namespace PreferStringStartsEndsWith {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -9946,61 +7769,8 @@ namespace PromiseFunctionAsync {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
-}
-
-/**
- * Enforce the consistent use of either backticks, double, or single quotes
- *
- * @link https://typescript-eslint.io/rules/quotes
- *
- *  ```md
- *  | key        | value  |
- *  | :--------- | :----- |
- *  | type       | layout |
- *  | deprecated | true   |
- *  | fixable    | code   |
- *  ```
- */
-namespace Quotes {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "enum": [
-   *       "single",
-   *       "double",
-   *       "backtick"
-   *     ]
-   *   },
-   *   {
-   *     "anyOf": [
-   *       {
-   *         "enum": [
-   *           "avoid-escape"
-   *         ]
-   *       },
-   *       {
-   *         "type": "object",
-   *         "properties": {
-   *           "avoidEscape": {
-   *             "type": "boolean"
-   *           },
-   *           "allowTemplateLiterals": {
-   *             "type": "boolean"
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       }
-   *     ]
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -10041,8 +7811,8 @@ namespace RequireArraySortCompare {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -10060,7 +7830,7 @@ namespace RequireArraySortCompare {
  *  ```
  */
 namespace RequireAwait {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -10135,8 +7905,8 @@ namespace RestrictPlusOperands {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -10213,8 +7983,8 @@ namespace RestrictTemplateExpressions {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -10223,12 +7993,13 @@ namespace RestrictTemplateExpressions {
  * @link https://typescript-eslint.io/rules/return-await
  *
  *  ```md
- *  | key                  | value   |
- *  | :------------------- | :------ |
- *  | type                 | problem |
- *  | fixable              | code    |
- *  | hasSuggestions       | true    |
- *  | requiresTypeChecking | true    |
+ *  | key                  | value           |
+ *  | :------------------- | :-------------- |
+ *  | type                 | problem         |
+ *  | fixable              | code            |
+ *  | hasSuggestions       | true            |
+ *  | recommended          | [object Object] |
+ *  | requiresTypeChecking | true            |
  *  ```
  */
 namespace ReturnAwait {
@@ -10256,76 +8027,8 @@ namespace ReturnAwait {
     | 'never';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
-}
-
-/**
- * Require or disallow semicolons instead of ASI
- *
- * @link https://typescript-eslint.io/rules/semi
- *
- *  ```md
- *  | key        | value  |
- *  | :--------- | :----- |
- *  | type       | layout |
- *  | deprecated | true   |
- *  | fixable    | code   |
- *  ```
- */
-namespace Semi {
-  /**
-   * ### schema
-   *
-   * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["never"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "beforeStatementContinuationChars": {
-   *               "enum": ["always", "any", "never"]
-   *             }
-   *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["always"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "omitLastInOneLineBlock": {
-   *               "type": "boolean"
-   *             },
-   *             "omitLastInOneLineClassBody": {
-   *               "type": "boolean"
-   *             }
-   *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
-   * ```
-   */
-  export type RuleEntry = 0;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -10386,169 +8089,6 @@ namespace SortTypeConstituents {
    *         }
    *       }
    *     }
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
-}
-
-/**
- * Enforce consistent spacing before blocks
- *
- * @link https://typescript-eslint.io/rules/space-before-blocks
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace SpaceBeforeBlocks {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "oneOf": [
-   *       {
-   *         "enum": [
-   *           "always",
-   *           "never"
-   *         ]
-   *       },
-   *       {
-   *         "type": "object",
-   *         "properties": {
-   *           "keywords": {
-   *             "enum": [
-   *               "always",
-   *               "never",
-   *               "off"
-   *             ]
-   *           },
-   *           "functions": {
-   *             "enum": [
-   *               "always",
-   *               "never",
-   *               "off"
-   *             ]
-   *           },
-   *           "classes": {
-   *             "enum": [
-   *               "always",
-   *               "never",
-   *               "off"
-   *             ]
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       }
-   *     ]
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
-}
-
-/**
- * Enforce consistent spacing before function parenthesis
- *
- * @link https://typescript-eslint.io/rules/space-before-function-paren
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace SpaceBeforeFunctionParen {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "oneOf": [
-   *       {
-   *         "type": "string",
-   *         "enum": [
-   *           "always",
-   *           "never"
-   *         ]
-   *       },
-   *       {
-   *         "type": "object",
-   *         "properties": {
-   *           "anonymous": {
-   *             "type": "string",
-   *             "enum": [
-   *               "always",
-   *               "never",
-   *               "ignore"
-   *             ]
-   *           },
-   *           "named": {
-   *             "type": "string",
-   *             "enum": [
-   *               "always",
-   *               "never",
-   *               "ignore"
-   *             ]
-   *           },
-   *           "asyncArrow": {
-   *             "type": "string",
-   *             "enum": [
-   *               "always",
-   *               "never",
-   *               "ignore"
-   *             ]
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       }
-   *     ]
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
-}
-
-/**
- * Require spacing around infix operators
- *
- * @link https://typescript-eslint.io/rules/space-infix-ops
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace SpaceInfixOps {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "int32Hint": {
-   *         "type": "boolean",
-   *         "default": false
-   *       }
-   *     },
-   *     "additionalProperties": false
    *   }
    * ]
    * ```
@@ -10625,8 +8165,8 @@ namespace StrictBooleanExpressions {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -10676,8 +8216,8 @@ namespace SwitchExhaustivenessCheck {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -10737,83 +8277,8 @@ namespace TripleSlashReference {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
-}
-
-/**
- * Require consistent spacing around type annotations
- *
- * @link https://typescript-eslint.io/rules/type-annotation-spacing
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | layout     |
- *  | deprecated | true       |
- *  | fixable    | whitespace |
- *  ```
- */
-namespace TypeAnnotationSpacing {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "$defs": {
-   *       "spacingConfig": {
-   *         "type": "object",
-   *         "properties": {
-   *           "before": {
-   *             "type": "boolean"
-   *           },
-   *           "after": {
-   *             "type": "boolean"
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       }
-   *     },
-   *     "type": "object",
-   *     "properties": {
-   *       "before": {
-   *         "type": "boolean"
-   *       },
-   *       "after": {
-   *         "type": "boolean"
-   *       },
-   *       "overrides": {
-   *         "type": "object",
-   *         "properties": {
-   *           "colon": {
-   *             "$ref": "#/items/0/$defs/spacingConfig"
-   *           },
-   *           "arrow": {
-   *             "$ref": "#/items/0/$defs/spacingConfig"
-   *           },
-   *           "variable": {
-   *             "$ref": "#/items/0/$defs/spacingConfig"
-   *           },
-   *           "parameter": {
-   *             "$ref": "#/items/0/$defs/spacingConfig"
-   *           },
-   *           "property": {
-   *             "$ref": "#/items/0/$defs/spacingConfig"
-   *           },
-   *           "returnType": {
-   *             "$ref": "#/items/0/$defs/spacingConfig"
-   *           }
-   *         },
-   *         "additionalProperties": false
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -10878,8 +8343,8 @@ namespace Typedef {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -10920,8 +8385,8 @@ namespace UnboundMethod {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -10965,8 +8430,8 @@ namespace UnifiedSignatures {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -10985,7 +8450,7 @@ namespace UnifiedSignatures {
  *  ```
  */
 namespace UseUnknownInCatchCallbackVariable {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 export type TypeScriptEslintRules = {
@@ -10994,7 +8459,6 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/await-thenable': AwaitThenable.RuleEntry;
   readonly '@typescript-eslint/ban-ts-comment': BanTsComment.RuleEntry;
   readonly '@typescript-eslint/ban-tslint-comment': BanTslintComment.RuleEntry;
-  readonly '@typescript-eslint/ban-types': BanTypes.RuleEntry;
   readonly '@typescript-eslint/class-literal-property-style': ClassLiteralPropertyStyle.RuleEntry;
   readonly '@typescript-eslint/class-methods-use-this': ClassMethodsUseThis.RuleEntry;
   readonly '@typescript-eslint/consistent-generic-constructors': ConsistentGenericConstructors.RuleEntry;
@@ -11024,7 +8488,6 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-duplicate-type-constituents': NoDuplicateTypeConstituents.RuleEntry;
   readonly '@typescript-eslint/no-dynamic-delete': NoDynamicDelete.RuleEntry;
   readonly '@typescript-eslint/no-empty-function': NoEmptyFunction.RuleEntry;
-  readonly '@typescript-eslint/no-empty-interface': NoEmptyInterface.RuleEntry;
   readonly '@typescript-eslint/no-empty-object-type': NoEmptyObjectType.RuleEntry;
   readonly '@typescript-eslint/no-explicit-any': NoExplicitAny.RuleEntry;
   readonly '@typescript-eslint/no-extra-non-null-assertion': NoExtraNonNullAssertion.RuleEntry;
@@ -11037,7 +8500,6 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-invalid-this': NoInvalidThis.RuleEntry;
   readonly '@typescript-eslint/no-invalid-void-type': NoInvalidVoidType.RuleEntry;
   readonly '@typescript-eslint/no-loop-func': NoLoopFunc.RuleEntry;
-  readonly '@typescript-eslint/no-loss-of-precision': NoLossOfPrecision.RuleEntry;
   readonly '@typescript-eslint/no-magic-numbers': NoMagicNumbers.RuleEntry;
   readonly '@typescript-eslint/no-meaningless-void-operator': NoMeaninglessVoidOperator.RuleEntry;
   readonly '@typescript-eslint/no-misused-new': NoMisusedNew.RuleEntry;
@@ -11051,6 +8513,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-redundant-type-constituents': NoRedundantTypeConstituents.RuleEntry;
   readonly '@typescript-eslint/no-require-imports': NoRequireImports.RuleEntry;
   readonly '@typescript-eslint/no-restricted-imports': NoRestrictedImports.RuleEntry;
+  readonly '@typescript-eslint/no-restricted-types': NoRestrictedTypes.RuleEntry;
   readonly '@typescript-eslint/no-shadow': NoShadow.RuleEntry;
   readonly '@typescript-eslint/no-this-alias': NoThisAlias.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-boolean-literal-compare': NoUnnecessaryBooleanLiteralCompare.RuleEntry;
@@ -11076,7 +8539,6 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-use-before-define': NoUseBeforeDefine.RuleEntry;
   readonly '@typescript-eslint/no-useless-constructor': NoUselessConstructor.RuleEntry;
   readonly '@typescript-eslint/no-useless-empty-export': NoUselessEmptyExport.RuleEntry;
-  readonly '@typescript-eslint/no-var-requires': NoVarRequires.RuleEntry;
   readonly '@typescript-eslint/no-wrapper-object-types': NoWrapperObjectTypes.RuleEntry;
   readonly '@typescript-eslint/non-nullable-type-assertion-style': NonNullableTypeAssertionStyle.RuleEntry;
   readonly '@typescript-eslint/only-throw-error': OnlyThrowError.RuleEntry;
@@ -11114,38 +8576,17 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/use-unknown-in-catch-callback-variable': UseUnknownInCatchCallbackVariable.RuleEntry;
 
   // deprecated
-  readonly '@typescript-eslint/block-spacing': BlockSpacing.RuleEntry;
-  readonly '@typescript-eslint/brace-style': BraceStyle.RuleEntry;
-  readonly '@typescript-eslint/comma-dangle': CommaDangle.RuleEntry;
-  readonly '@typescript-eslint/comma-spacing': CommaSpacing.RuleEntry;
-  readonly '@typescript-eslint/func-call-spacing': FuncCallSpacing.RuleEntry;
-  readonly '@typescript-eslint/indent': Indent.RuleEntry;
-  readonly '@typescript-eslint/key-spacing': KeySpacing.RuleEntry;
-  readonly '@typescript-eslint/keyword-spacing': KeywordSpacing.RuleEntry;
-  readonly '@typescript-eslint/lines-around-comment': LinesAroundComment.RuleEntry;
-  readonly '@typescript-eslint/lines-between-class-members': LinesBetweenClassMembers.RuleEntry;
-  readonly '@typescript-eslint/member-delimiter-style': MemberDelimiterStyle.RuleEntry;
-  readonly '@typescript-eslint/no-extra-parens': NoExtraParens.RuleEntry;
-  readonly '@typescript-eslint/no-extra-semi': NoExtraSemi.RuleEntry;
-  readonly '@typescript-eslint/no-throw-literal': NoThrowLiteral.RuleEntry;
+  readonly '@typescript-eslint/no-empty-interface': NoEmptyInterface.RuleEntry;
+  readonly '@typescript-eslint/no-loss-of-precision': NoLossOfPrecision.RuleEntry;
   readonly '@typescript-eslint/no-type-alias': NoTypeAlias.RuleEntry;
-  readonly '@typescript-eslint/no-useless-template-literals': NoUselessTemplateLiterals.RuleEntry;
-  readonly '@typescript-eslint/object-curly-spacing': ObjectCurlySpacing.RuleEntry;
-  readonly '@typescript-eslint/padding-line-between-statements': PaddingLineBetweenStatements.RuleEntry;
+  readonly '@typescript-eslint/no-var-requires': NoVarRequires.RuleEntry;
   readonly '@typescript-eslint/prefer-ts-expect-error': PreferTsExpectError.RuleEntry;
-  readonly '@typescript-eslint/quotes': Quotes.RuleEntry;
-  readonly '@typescript-eslint/semi': Semi.RuleEntry;
   readonly '@typescript-eslint/sort-type-constituents': SortTypeConstituents.RuleEntry;
-  readonly '@typescript-eslint/space-before-blocks': SpaceBeforeBlocks.RuleEntry;
-  readonly '@typescript-eslint/space-before-function-paren': SpaceBeforeFunctionParen.RuleEntry;
-  readonly '@typescript-eslint/space-infix-ops': SpaceInfixOps.RuleEntry;
-  readonly '@typescript-eslint/type-annotation-spacing': TypeAnnotationSpacing.RuleEntry;
 };
 
 export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/array-type': ArrayType.Options;
   readonly '@typescript-eslint/ban-ts-comment': BanTsComment.Options;
-  readonly '@typescript-eslint/ban-types': BanTypes.Options;
   readonly '@typescript-eslint/class-literal-property-style': ClassLiteralPropertyStyle.Options;
   readonly '@typescript-eslint/class-methods-use-this': ClassMethodsUseThis.Options;
   readonly '@typescript-eslint/consistent-generic-constructors': ConsistentGenericConstructors.Options;
@@ -11168,7 +8609,6 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/no-confusing-void-expression': NoConfusingVoidExpression.Options;
   readonly '@typescript-eslint/no-duplicate-type-constituents': NoDuplicateTypeConstituents.Options;
   readonly '@typescript-eslint/no-empty-function': NoEmptyFunction.Options;
-  readonly '@typescript-eslint/no-empty-interface': NoEmptyInterface.Options;
   readonly '@typescript-eslint/no-empty-object-type': NoEmptyObjectType.Options;
   readonly '@typescript-eslint/no-explicit-any': NoExplicitAny.Options;
   readonly '@typescript-eslint/no-extraneous-class': NoExtraneousClass.Options;
@@ -11183,6 +8623,7 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/no-redeclare': NoRedeclare.Options;
   readonly '@typescript-eslint/no-require-imports': NoRequireImports.Options;
   readonly '@typescript-eslint/no-restricted-imports': NoRestrictedImports.Options;
+  readonly '@typescript-eslint/no-restricted-types': NoRestrictedTypes.Options;
   readonly '@typescript-eslint/no-shadow': NoShadow.Options;
   readonly '@typescript-eslint/no-this-alias': NoThisAlias.Options;
   readonly '@typescript-eslint/no-unnecessary-boolean-literal-compare': NoUnnecessaryBooleanLiteralCompare.Options;
@@ -11191,7 +8632,6 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/no-unused-expressions': NoUnusedExpressions.Options;
   readonly '@typescript-eslint/no-unused-vars': NoUnusedVars.Options;
   readonly '@typescript-eslint/no-use-before-define': NoUseBeforeDefine.Options;
-  readonly '@typescript-eslint/no-var-requires': NoVarRequires.Options;
   readonly '@typescript-eslint/only-throw-error': OnlyThrowError.Options;
   readonly '@typescript-eslint/parameter-properties': ParameterProperties.Options;
   readonly '@typescript-eslint/prefer-destructuring': readonly [

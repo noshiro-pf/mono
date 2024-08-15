@@ -1,10 +1,12 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
+type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
+  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
 
 /**
+ * Enforce consistent param names and ordering when creating new promises.
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/param-names.md
  *
  *  ```md
@@ -40,11 +42,14 @@ namespace ParamNames {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
+ * Disallow wrapping values in `Promise.resolve` or `Promise.reject` when not
+ * needed.
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-return-wrap.md
  *
  *  ```md
@@ -76,11 +81,14 @@ namespace NoReturnWrap {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
+ * Require returning inside each `then()` to create readable and reusable
+ * Promise chains.
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/always-return.md
  *
  *  ```md
@@ -112,11 +120,13 @@ namespace AlwaysReturn {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
+ * Enforce the use of `catch()` on un-returned promises.
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/catch-or-return.md
  *
  *  ```md
@@ -166,11 +176,13 @@ namespace CatchOrReturn {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
+ * Prefer `async`/`await` to the callback pattern.
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-await-to-callbacks.md
  *
  *  ```md
@@ -180,10 +192,12 @@ namespace CatchOrReturn {
  *  ```
  */
 namespace PreferAwaitToCallbacks {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
+ * Prefer `await` to `then()`/`catch()`/`finally()` for reading Promise values.
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-await-to-then.md
  *
  *  ```md
@@ -193,10 +207,36 @@ namespace PreferAwaitToCallbacks {
  *  ```
  */
 namespace PreferAwaitToThen {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "strict": {
+   *         "type": "boolean"
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly strict?: boolean;
+    readonly [k: string]: unknown;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
+ * Require creating a `Promise` constructor before using it in an ES5
+ * environment.
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-native.md
  *
  *  ```md
@@ -206,10 +246,13 @@ namespace PreferAwaitToThen {
  *  ```
  */
 namespace NoNative {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
+ * Disallow calling `cb()` inside of a `then()` (use [util.callbackify][]
+ * instead).
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-callback-in-promise.md
  *
  *  ```md
@@ -244,11 +287,13 @@ namespace NoCallbackInPromise {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
+ * Disallow using promises inside of callbacks.
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-promise-in-callback.md
  *
  *  ```md
@@ -258,10 +303,12 @@ namespace NoCallbackInPromise {
  *  ```
  */
 namespace NoPromiseInCallback {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
+ * Disallow nested `then()` or `catch()` statements.
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-nesting.md
  *
  *  ```md
@@ -271,10 +318,13 @@ namespace NoPromiseInCallback {
  *  ```
  */
 namespace NoNesting {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
+ * Disallow creating `new` promises outside of utility libs (use
+ * [util.promisify][] instead).
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/avoid-new.md
  *
  *  ```md
@@ -284,10 +334,12 @@ namespace NoNesting {
  *  ```
  */
 namespace AvoidNew {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
+ * Disallow calling `new` on a Promise static method.
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-new-statics.md
  *
  *  ```md
@@ -298,10 +350,12 @@ namespace AvoidNew {
  *  ```
  */
 namespace NoNewStatics {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
+ * Disallow return statements in `finally()`.
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-return-in-finally.md
  *
  *  ```md
@@ -311,11 +365,11 @@ namespace NoNewStatics {
  *  ```
  */
 namespace NoReturnInFinally {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
- * Ensures the proper number of arguments are passed to Promise functions
+ * Enforces the proper number of arguments are passed to Promise functions.
  *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/valid-params.md
  *
@@ -326,10 +380,12 @@ namespace NoReturnInFinally {
  *  ```
  */
 namespace ValidParams {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
+ * Disallow creating new promises with paths that resolve multiple times.
+ *
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-multiple-resolved.md
  *
  *  ```md
@@ -339,7 +395,48 @@ namespace ValidParams {
  *  ```
  */
 namespace NoMultipleResolved {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
+}
+
+/**
+ * Disallow use of non-standard Promise static methods.
+ *
+ * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/spec-only.md
+ *
+ *  ```md
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
+ *  ```
+ */
+namespace SpecOnly {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowedMethods": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly allowedMethods?: readonly string[];
+  };
+
+  export type RuleEntry =
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 export type EslintPromiseRules = {
@@ -358,6 +455,7 @@ export type EslintPromiseRules = {
   readonly 'promise/no-return-in-finally': NoReturnInFinally.RuleEntry;
   readonly 'promise/valid-params': ValidParams.RuleEntry;
   readonly 'promise/no-multiple-resolved': NoMultipleResolved.RuleEntry;
+  readonly 'promise/spec-only': SpecOnly.RuleEntry;
 };
 
 export type EslintPromiseRulesOption = {
@@ -365,5 +463,7 @@ export type EslintPromiseRulesOption = {
   readonly 'promise/no-return-wrap': NoReturnWrap.Options;
   readonly 'promise/always-return': AlwaysReturn.Options;
   readonly 'promise/catch-or-return': CatchOrReturn.Options;
+  readonly 'promise/prefer-await-to-then': PreferAwaitToThen.Options;
   readonly 'promise/no-callback-in-promise': NoCallbackInPromise.Options;
+  readonly 'promise/spec-only': SpecOnly.Options;
 };

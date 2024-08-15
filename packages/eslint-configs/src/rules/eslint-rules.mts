@@ -205,7 +205,6 @@ export const eslintRules: EslintRules = {
   'no-dupe-keys': 'off', // ts(1117)
   'no-func-assign': 'off', // ts(2539)
   'no-import-assign': 'off', // ts(2539) & ts(2540)
-  'no-new-symbol': 'off', // ts(2588)
   'no-obj-calls': 'off', // ts(2349)
   'no-redeclare': 'off', // ts(2451)
   'no-setter-return': 'off', // ts(2408)
@@ -270,7 +269,6 @@ export const eslintRules: EslintRules = {
   'id-denylist': 'error',
   'id-length': 'off', // disabled
   'id-match': 'error',
-  'line-comment-position': 'off', // disabled
   'logical-assignment-operators': [
     'error',
     'always',
@@ -284,7 +282,6 @@ export const eslintRules: EslintRules = {
   'max-params': 'off', // disabled
   'max-statements-per-line': 0,
   'max-statements': 'off', // disabled
-  'multiline-comment-style': 'off', // disabled
   'new-cap': 'off', // disabled
   'no-alert': 'error',
   'no-async-promise-executor': 'error',
@@ -437,8 +434,6 @@ export const eslintRules: EslintRules = {
    */
   'prefer-template': 'error',
 
-  // 'no-useless-assignment': 'error',
-
   radix: 'error',
   'require-atomic-updates': 'error',
   'require-unicode-regexp': 'error',
@@ -451,6 +446,9 @@ export const eslintRules: EslintRules = {
   'use-isnan': 'error',
   'vars-on-top': 'error',
   yoda: 'off', // disabled
+
+  // TODO: enable after updating to v9
+  // 'no-useless-assignment': 'error',
 
   // deprecated
   'spaced-comment': 0,
@@ -475,6 +473,9 @@ export const eslintRules: EslintRules = {
   'no-spaced-func': 0,
   'no-sync': 0,
   'prefer-reflect': 0,
+  'no-new-symbol': 0, // ts(2588)
+  'line-comment-position': 0, // disabled
+  'multiline-comment-style': 0, // disabled
   'require-jsdoc': 0,
   'valid-jsdoc': 0,
 };

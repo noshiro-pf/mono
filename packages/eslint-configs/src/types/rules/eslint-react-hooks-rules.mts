@@ -1,8 +1,8 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
+type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
+  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
 
 /**
  * Enforces the Rules of Hooks
@@ -17,7 +17,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
  *  ```
  */
 namespace RulesOfHooks {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -62,8 +62,8 @@ namespace ExhaustiveDeps {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 export type EslintReactHooksRules = {

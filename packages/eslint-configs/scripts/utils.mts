@@ -15,6 +15,12 @@ export const deepReplace = <T,>(obj: T, from: string, to: string): T => {
   return parsed as T;
 };
 
+export const falseToUndefined = <T,>(
+  a: T,
+): RelaxedExclude<T, false> | undefined =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  (a === false ? undefined : a) as RelaxedExclude<T, false>;
+
 export const toStr: (v: unknown) => string =
   // eslint-disable-next-line no-restricted-syntax
   String;

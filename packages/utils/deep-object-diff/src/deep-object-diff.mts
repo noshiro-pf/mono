@@ -6,7 +6,7 @@ type DetailedDiffResult<T> = Readonly<{
   updated: DeepPartial<T>;
 }>;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export const deepObjectDiff = <T extends object>(
   a: T,
   b: T,

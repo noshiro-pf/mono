@@ -183,6 +183,8 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/no-magic-array-flat-depth': 'error',
   'unicorn/prefer-string-raw': 'error',
   'unicorn/prefer-structured-clone': 'error',
+  'unicorn/no-length-as-slice-end': 'error',
+  'unicorn/no-negation-in-equality-check': 'error',
 
   // deprecated rules
   'unicorn/import-index': 0,

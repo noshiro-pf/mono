@@ -1,20 +1,21 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
+type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
+  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
 
 /**
  * Enforce functional parameters.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/functional-parameters.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/functional-parameters.md
  *
  *  ```md
- *  | key         | value       |
- *  | :---------- | :---------- |
- *  | type        | suggestion  |
- *  | category    | Currying    |
- *  | recommended | recommended |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | category             | Currying    |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace FunctionalParameters {
@@ -88,6 +89,501 @@ namespace FunctionalParameters {
    *             "additionalProperties": false
    *           }
    *         ]
+   *       },
+   *       "overrides": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "object",
+   *           "properties": {
+   *             "specifiers": {
+   *               "oneOf": [
+   *                 {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "name": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "pattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignoreName": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignorePattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "from": {
+   *                           "type": "string",
+   *                           "enum": [
+   *                             "file"
+   *                           ]
+   *                         },
+   *                         "path": {
+   *                           "type": "string"
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     },
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "name": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "pattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignoreName": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignorePattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "from": {
+   *                           "type": "string",
+   *                           "enum": [
+   *                             "lib"
+   *                           ]
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     },
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "name": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "pattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignoreName": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignorePattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "from": {
+   *                           "type": "string",
+   *                           "enum": [
+   *                             "package"
+   *                           ]
+   *                         },
+   *                         "package": {
+   *                           "type": "string"
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     }
+   *                   ]
+   *                 },
+   *                 {
+   *                   "type": "array",
+   *                   "items": {
+   *                     "oneOf": [
+   *                       {
+   *                         "type": "object",
+   *                         "properties": {
+   *                           "name": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "pattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignoreName": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignorePattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "from": {
+   *                             "type": "string",
+   *                             "enum": [
+   *                               "file"
+   *                             ]
+   *                           },
+   *                           "path": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "additionalProperties": false
+   *                       },
+   *                       {
+   *                         "type": "object",
+   *                         "properties": {
+   *                           "name": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "pattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignoreName": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignorePattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "from": {
+   *                             "type": "string",
+   *                             "enum": [
+   *                               "lib"
+   *                             ]
+   *                           }
+   *                         },
+   *                         "additionalProperties": false
+   *                       },
+   *                       {
+   *                         "type": "object",
+   *                         "properties": {
+   *                           "name": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "pattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignoreName": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignorePattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "from": {
+   *                             "type": "string",
+   *                             "enum": [
+   *                               "package"
+   *                             ]
+   *                           },
+   *                           "package": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "additionalProperties": false
+   *                       }
+   *                     ]
+   *                   }
+   *                 }
+   *               ]
+   *             },
+   *             "options": {
+   *               "type": "object",
+   *               "properties": {
+   *                 "ignoreIdentifierPattern": {
+   *                   "type": [
+   *                     "string",
+   *                     "array"
+   *                   ],
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "ignorePrefixSelector": {
+   *                   "type": [
+   *                     "string",
+   *                     "array"
+   *                   ],
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "allowRestParameter": {
+   *                   "type": "boolean"
+   *                 },
+   *                 "allowArgumentsKeyword": {
+   *                   "type": "boolean"
+   *                 },
+   *                 "enforceParameterCount": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "boolean",
+   *                       "enum": [
+   *                         false
+   *                       ]
+   *                     },
+   *                     {
+   *                       "type": "string",
+   *                       "enum": [
+   *                         "atLeastOne",
+   *                         "exactlyOne"
+   *                       ]
+   *                     },
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "count": {
+   *                           "type": "string",
+   *                           "enum": [
+   *                             "atLeastOne",
+   *                             "exactlyOne"
+   *                           ]
+   *                         },
+   *                         "ignoreGettersAndSetters": {
+   *                           "type": "boolean"
+   *                         },
+   *                         "ignoreLambdaExpression": {
+   *                           "type": "boolean"
+   *                         },
+   *                         "ignoreIIFE": {
+   *                           "type": "boolean"
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     }
+   *                   ]
+   *                 }
+   *               },
+   *               "additionalProperties": false
+   *             },
+   *             "inherit": {
+   *               "type": "boolean"
+   *             },
+   *             "disable": {
+   *               "type": "boolean"
+   *             }
+   *           },
+   *           "additionalProperties": false
+   *         }
    *       }
    *     },
    *     "additionalProperties": false
@@ -110,17 +606,86 @@ namespace FunctionalParameters {
           readonly ignoreLambdaExpression?: boolean;
           readonly ignoreIIFE?: boolean;
         };
+    readonly overrides?: readonly {
+      readonly specifiers?:
+        | readonly (
+            | {
+                readonly name?: string | readonly string[];
+                readonly pattern?: string | readonly string[];
+                readonly ignoreName?: string | readonly string[];
+                readonly ignorePattern?: string | readonly string[];
+                readonly from?: 'file';
+                readonly path?: string;
+              }
+            | {
+                readonly name?: string | readonly string[];
+                readonly pattern?: string | readonly string[];
+                readonly ignoreName?: string | readonly string[];
+                readonly ignorePattern?: string | readonly string[];
+                readonly from?: 'lib';
+              }
+            | {
+                readonly name?: string | readonly string[];
+                readonly pattern?: string | readonly string[];
+                readonly ignoreName?: string | readonly string[];
+                readonly ignorePattern?: string | readonly string[];
+                readonly from?: 'package';
+                readonly package?: string;
+              }
+          )[]
+        | {
+            readonly name?: string | readonly string[];
+            readonly pattern?: string | readonly string[];
+            readonly ignoreName?: string | readonly string[];
+            readonly ignorePattern?: string | readonly string[];
+            readonly from?: 'file';
+            readonly path?: string;
+          }
+        | {
+            readonly name?: string | readonly string[];
+            readonly pattern?: string | readonly string[];
+            readonly ignoreName?: string | readonly string[];
+            readonly ignorePattern?: string | readonly string[];
+            readonly from?: 'lib';
+          }
+        | {
+            readonly name?: string | readonly string[];
+            readonly pattern?: string | readonly string[];
+            readonly ignoreName?: string | readonly string[];
+            readonly ignorePattern?: string | readonly string[];
+            readonly from?: 'package';
+            readonly package?: string;
+          };
+      readonly options?: {
+        readonly ignoreIdentifierPattern?: string | readonly string[];
+        readonly ignorePrefixSelector?: string | readonly string[];
+        readonly allowRestParameter?: boolean;
+        readonly allowArgumentsKeyword?: boolean;
+        readonly enforceParameterCount?:
+          | 'atLeastOne'
+          | 'exactlyOne'
+          | false
+          | {
+              readonly count?: 'atLeastOne' | 'exactlyOne';
+              readonly ignoreGettersAndSetters?: boolean;
+              readonly ignoreLambdaExpression?: boolean;
+              readonly ignoreIIFE?: boolean;
+            };
+      };
+      readonly inherit?: boolean;
+      readonly disable?: boolean;
+    }[];
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Enforce treating data as immutable.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/immutable-data.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/immutable-data.md
  *
  *  ```md
  *  | key                  | value        |
@@ -189,6 +754,488 @@ namespace ImmutableData {
    *             "additionalProperties": false
    *           }
    *         ]
+   *       },
+   *       "overrides": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "object",
+   *           "properties": {
+   *             "specifiers": {
+   *               "oneOf": [
+   *                 {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "name": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "pattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignoreName": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignorePattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "from": {
+   *                           "type": "string",
+   *                           "enum": [
+   *                             "file"
+   *                           ]
+   *                         },
+   *                         "path": {
+   *                           "type": "string"
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     },
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "name": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "pattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignoreName": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignorePattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "from": {
+   *                           "type": "string",
+   *                           "enum": [
+   *                             "lib"
+   *                           ]
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     },
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "name": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "pattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignoreName": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignorePattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "from": {
+   *                           "type": "string",
+   *                           "enum": [
+   *                             "package"
+   *                           ]
+   *                         },
+   *                         "package": {
+   *                           "type": "string"
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     }
+   *                   ]
+   *                 },
+   *                 {
+   *                   "type": "array",
+   *                   "items": {
+   *                     "oneOf": [
+   *                       {
+   *                         "type": "object",
+   *                         "properties": {
+   *                           "name": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "pattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignoreName": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignorePattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "from": {
+   *                             "type": "string",
+   *                             "enum": [
+   *                               "file"
+   *                             ]
+   *                           },
+   *                           "path": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "additionalProperties": false
+   *                       },
+   *                       {
+   *                         "type": "object",
+   *                         "properties": {
+   *                           "name": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "pattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignoreName": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignorePattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "from": {
+   *                             "type": "string",
+   *                             "enum": [
+   *                               "lib"
+   *                             ]
+   *                           }
+   *                         },
+   *                         "additionalProperties": false
+   *                       },
+   *                       {
+   *                         "type": "object",
+   *                         "properties": {
+   *                           "name": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "pattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignoreName": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignorePattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "from": {
+   *                             "type": "string",
+   *                             "enum": [
+   *                               "package"
+   *                             ]
+   *                           },
+   *                           "package": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "additionalProperties": false
+   *                       }
+   *                     ]
+   *                   }
+   *                 }
+   *               ]
+   *             },
+   *             "options": {
+   *               "type": "object",
+   *               "properties": {
+   *                 "ignoreIdentifierPattern": {
+   *                   "type": [
+   *                     "string",
+   *                     "array"
+   *                   ],
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "ignoreAccessorPattern": {
+   *                   "type": [
+   *                     "string",
+   *                     "array"
+   *                   ],
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "ignoreClasses": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "boolean"
+   *                     },
+   *                     {
+   *                       "type": "string",
+   *                       "enum": [
+   *                         "fieldsOnly"
+   *                       ]
+   *                     }
+   *                   ]
+   *                 },
+   *                 "ignoreImmediateMutation": {
+   *                   "type": "boolean"
+   *                 },
+   *                 "ignoreNonConstDeclarations": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "boolean"
+   *                     },
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "treatParametersAsConst": {
+   *                           "type": "boolean"
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     }
+   *                   ]
+   *                 }
+   *               },
+   *               "additionalProperties": false
+   *             },
+   *             "inherit": {
+   *               "type": "boolean"
+   *             },
+   *             "disable": {
+   *               "type": "boolean"
+   *             }
+   *           },
+   *           "additionalProperties": false
+   *         }
    *       }
    *     },
    *     "additionalProperties": false
@@ -206,34 +1253,138 @@ namespace ImmutableData {
       | {
           readonly treatParametersAsConst?: boolean;
         };
+    readonly overrides?: readonly {
+      readonly specifiers?:
+        | readonly (
+            | {
+                readonly name?: string | readonly string[];
+                readonly pattern?: string | readonly string[];
+                readonly ignoreName?: string | readonly string[];
+                readonly ignorePattern?: string | readonly string[];
+                readonly from?: 'file';
+                readonly path?: string;
+              }
+            | {
+                readonly name?: string | readonly string[];
+                readonly pattern?: string | readonly string[];
+                readonly ignoreName?: string | readonly string[];
+                readonly ignorePattern?: string | readonly string[];
+                readonly from?: 'lib';
+              }
+            | {
+                readonly name?: string | readonly string[];
+                readonly pattern?: string | readonly string[];
+                readonly ignoreName?: string | readonly string[];
+                readonly ignorePattern?: string | readonly string[];
+                readonly from?: 'package';
+                readonly package?: string;
+              }
+          )[]
+        | {
+            readonly name?: string | readonly string[];
+            readonly pattern?: string | readonly string[];
+            readonly ignoreName?: string | readonly string[];
+            readonly ignorePattern?: string | readonly string[];
+            readonly from?: 'file';
+            readonly path?: string;
+          }
+        | {
+            readonly name?: string | readonly string[];
+            readonly pattern?: string | readonly string[];
+            readonly ignoreName?: string | readonly string[];
+            readonly ignorePattern?: string | readonly string[];
+            readonly from?: 'lib';
+          }
+        | {
+            readonly name?: string | readonly string[];
+            readonly pattern?: string | readonly string[];
+            readonly ignoreName?: string | readonly string[];
+            readonly ignorePattern?: string | readonly string[];
+            readonly from?: 'package';
+            readonly package?: string;
+          };
+      readonly options?: {
+        readonly ignoreIdentifierPattern?: string | readonly string[];
+        readonly ignoreAccessorPattern?: string | readonly string[];
+        readonly ignoreClasses?: boolean | 'fieldsOnly';
+        readonly ignoreImmediateMutation?: boolean;
+        readonly ignoreNonConstDeclarations?:
+          | boolean
+          | {
+              readonly treatParametersAsConst?: boolean;
+            };
+      };
+      readonly inherit?: boolean;
+      readonly disable?: boolean;
+    }[];
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Disallow classes.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/no-classes.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/no-classes.md
  *
  *  ```md
- *  | key         | value              |
- *  | :---------- | :----------------- |
- *  | type        | suggestion         |
- *  | category    | No Other Paradigms |
- *  | recommended | recommended        |
+ *  | key                  | value              |
+ *  | :------------------- | :----------------- |
+ *  | type                 | suggestion         |
+ *  | category             | No Other Paradigms |
+ *  | recommended          | recommended        |
+ *  | requiresTypeChecking | false              |
  *  ```
  */
 namespace NoClasses {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "ignoreIdentifierPattern": {
+   *         "type": [
+   *           "string",
+   *           "array"
+   *         ],
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
+   *       "ignoreCodePattern": {
+   *         "type": [
+   *           "string",
+   *           "array"
+   *         ],
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly ignoreIdentifierPattern?: string | readonly string[];
+    readonly ignoreCodePattern?: string | readonly string[];
+  };
+
+  export type RuleEntry =
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Disallow conditional statements.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/no-conditional-statements.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/no-conditional-statements.md
  *
  *  ```md
  *  | key                  | value         |
@@ -277,14 +1428,14 @@ namespace NoConditionalStatements {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Disallow expression statements.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/no-expression-statements.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/no-expression-statements.md
  *
  *  ```md
  *  | key                  | value         |
@@ -332,21 +1483,22 @@ namespace NoExpressionStatements {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Disallow mutable variables.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/no-let.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/no-let.md
  *
  *  ```md
- *  | key         | value        |
- *  | :---------- | :----------- |
- *  | type        | suggestion   |
- *  | category    | No Mutations |
- *  | recommended | recommended  |
+ *  | key                  | value        |
+ *  | :------------------- | :----------- |
+ *  | type                 | suggestion   |
+ *  | category             | No Mutations |
+ *  | recommended          | recommended  |
+ *  | requiresTypeChecking | false        |
  *  ```
  */
 namespace NoLet {
@@ -386,31 +1538,32 @@ namespace NoLet {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Disallow imperative loops.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/no-loop-statements.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/no-loop-statements.md
  *
  *  ```md
- *  | key         | value         |
- *  | :---------- | :------------ |
- *  | type        | suggestion    |
- *  | category    | No Statements |
- *  | recommended | recommended   |
+ *  | key                  | value         |
+ *  | :------------------- | :------------ |
+ *  | type                 | suggestion    |
+ *  | category             | No Statements |
+ *  | recommended          | recommended   |
+ *  | requiresTypeChecking | false         |
  *  ```
  */
 namespace NoLoopStatements {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
  * Restrict types so that only members of the same kind are allowed in them.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/no-mixed-types.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/no-mixed-types.md
  *
  *  ```md
  *  | key                  | value              |
@@ -448,31 +1601,32 @@ namespace NoMixedTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Disallow rejecting promises.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/no-promise-reject.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/no-promise-reject.md
  *
  *  ```md
- *  | key         | value         |
- *  | :---------- | :------------ |
- *  | type        | suggestion    |
- *  | category    | No Exceptions |
- *  | recommended | false         |
+ *  | key                  | value         |
+ *  | :------------------- | :------------ |
+ *  | type                 | suggestion    |
+ *  | category             | No Exceptions |
+ *  | recommended          | false         |
+ *  | requiresTypeChecking | false         |
  *  ```
  */
 namespace NoPromiseReject {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
  * Disallow functions that don't return anything.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/no-return-void.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/no-return-void.md
  *
  *  ```md
  *  | key                  | value         |
@@ -514,38 +1668,40 @@ namespace NoReturnVoid {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Disallow this access.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/no-this-expressions.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/no-this-expressions.md
  *
  *  ```md
- *  | key         | value              |
- *  | :---------- | :----------------- |
- *  | type        | suggestion         |
- *  | category    | No Other Paradigms |
- *  | recommended | recommended        |
+ *  | key                  | value              |
+ *  | :------------------- | :----------------- |
+ *  | type                 | suggestion         |
+ *  | category             | No Other Paradigms |
+ *  | recommended          | recommended        |
+ *  | requiresTypeChecking | false              |
  *  ```
  */
 namespace NoThisExpressions {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
  * Disallow throwing exceptions.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/no-throw-statements.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/no-throw-statements.md
  *
  *  ```md
- *  | key         | value         |
- *  | :---------- | :------------ |
- *  | type        | suggestion    |
- *  | category    | No Exceptions |
- *  | recommended | recommended   |
+ *  | key                  | value         |
+ *  | :------------------- | :------------ |
+ *  | type                 | suggestion    |
+ *  | category             | No Exceptions |
+ *  | recommended          | recommended   |
+ *  | requiresTypeChecking | false         |
  *  ```
  */
 namespace NoThrowStatements {
@@ -557,7 +1713,7 @@ namespace NoThrowStatements {
    *   {
    *     "type": "object",
    *     "properties": {
-   *       "allowInAsyncFunctions": {
+   *       "allowToRejectPromises": {
    *         "type": "boolean"
    *       }
    *     },
@@ -567,25 +1723,26 @@ namespace NoThrowStatements {
    * ```
    */
   export type Options = {
-    readonly allowInAsyncFunctions?: boolean;
+    readonly allowToRejectPromises?: boolean;
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Disallow try-catch[-finally] and try-finally patterns.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/no-try-statements.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/no-try-statements.md
  *
  *  ```md
- *  | key         | value         |
- *  | :---------- | :------------ |
- *  | type        | suggestion    |
- *  | category    | No Exceptions |
- *  | recommended | recommended   |
+ *  | key                  | value         |
+ *  | :------------------- | :------------ |
+ *  | type                 | suggestion    |
+ *  | category             | No Exceptions |
+ *  | recommended          | recommended   |
+ *  | requiresTypeChecking | false         |
  *  ```
  */
 namespace NoTryStatements {
@@ -615,14 +1772,14 @@ namespace NoTryStatements {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Require function parameters to be typed as certain immutability
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/prefer-immutable-types.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/prefer-immutable-types.md
  *
  *  ```md
  *  | key                  | value        |
@@ -1120,6 +2277,915 @@ namespace PreferImmutableTypes {
    *           }
    *         },
    *         "additionalProperties": false
+   *       },
+   *       "overrides": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "object",
+   *           "properties": {
+   *             "specifiers": {
+   *               "oneOf": [
+   *                 {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "name": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "pattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignoreName": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignorePattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "from": {
+   *                           "type": "string",
+   *                           "enum": [
+   *                             "file"
+   *                           ]
+   *                         },
+   *                         "path": {
+   *                           "type": "string"
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     },
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "name": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "pattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignoreName": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignorePattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "from": {
+   *                           "type": "string",
+   *                           "enum": [
+   *                             "lib"
+   *                           ]
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     },
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "name": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "pattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignoreName": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "ignorePattern": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "string"
+   *                             },
+   *                             {
+   *                               "type": "array",
+   *                               "items": {
+   *                                 "type": "string"
+   *                               }
+   *                             }
+   *                           ]
+   *                         },
+   *                         "from": {
+   *                           "type": "string",
+   *                           "enum": [
+   *                             "package"
+   *                           ]
+   *                         },
+   *                         "package": {
+   *                           "type": "string"
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     }
+   *                   ]
+   *                 },
+   *                 {
+   *                   "type": "array",
+   *                   "items": {
+   *                     "oneOf": [
+   *                       {
+   *                         "type": "object",
+   *                         "properties": {
+   *                           "name": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "pattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignoreName": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignorePattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "from": {
+   *                             "type": "string",
+   *                             "enum": [
+   *                               "file"
+   *                             ]
+   *                           },
+   *                           "path": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "additionalProperties": false
+   *                       },
+   *                       {
+   *                         "type": "object",
+   *                         "properties": {
+   *                           "name": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "pattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignoreName": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignorePattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "from": {
+   *                             "type": "string",
+   *                             "enum": [
+   *                               "lib"
+   *                             ]
+   *                           }
+   *                         },
+   *                         "additionalProperties": false
+   *                       },
+   *                       {
+   *                         "type": "object",
+   *                         "properties": {
+   *                           "name": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "pattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignoreName": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "ignorePattern": {
+   *                             "oneOf": [
+   *                               {
+   *                                 "type": "string"
+   *                               },
+   *                               {
+   *                                 "type": "array",
+   *                                 "items": {
+   *                                   "type": "string"
+   *                                 }
+   *                               }
+   *                             ]
+   *                           },
+   *                           "from": {
+   *                             "type": "string",
+   *                             "enum": [
+   *                               "package"
+   *                             ]
+   *                           },
+   *                           "package": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "additionalProperties": false
+   *                       }
+   *                     ]
+   *                   }
+   *                 }
+   *               ]
+   *             },
+   *             "options": {
+   *               "type": "object",
+   *               "properties": {
+   *                 "ignoreClasses": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "boolean"
+   *                     },
+   *                     {
+   *                       "type": "string",
+   *                       "enum": [
+   *                         "fieldsOnly"
+   *                       ]
+   *                     }
+   *                   ]
+   *                 },
+   *                 "enforcement": {
+   *                   "type": [
+   *                     "string",
+   *                     "number",
+   *                     "boolean"
+   *                   ],
+   *                   "enum": [
+   *                     "ReadonlyShallow",
+   *                     "ReadonlyDeep",
+   *                     "Immutable",
+   *                     null,
+   *                     3,
+   *                     4,
+   *                     5,
+   *                     null,
+   *                     "Calculating",
+   *                     "None",
+   *                     false
+   *                   ]
+   *                 },
+   *                 "ignoreInferredTypes": {
+   *                   "type": "boolean"
+   *                 },
+   *                 "ignoreNamePattern": {
+   *                   "type": [
+   *                     "string",
+   *                     "array"
+   *                   ],
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "ignoreTypePattern": {
+   *                   "type": [
+   *                     "string",
+   *                     "array"
+   *                   ],
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "parameters": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "ignoreClasses": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "boolean"
+   *                             },
+   *                             {
+   *                               "type": "string",
+   *                               "enum": [
+   *                                 "fieldsOnly"
+   *                               ]
+   *                             }
+   *                           ]
+   *                         },
+   *                         "enforcement": {
+   *                           "type": [
+   *                             "string",
+   *                             "number",
+   *                             "boolean"
+   *                           ],
+   *                           "enum": [
+   *                             "ReadonlyShallow",
+   *                             "ReadonlyDeep",
+   *                             "Immutable",
+   *                             null,
+   *                             3,
+   *                             4,
+   *                             5,
+   *                             null,
+   *                             "Calculating",
+   *                             "None",
+   *                             false
+   *                           ]
+   *                         },
+   *                         "ignoreInferredTypes": {
+   *                           "type": "boolean"
+   *                         },
+   *                         "ignoreNamePattern": {
+   *                           "type": [
+   *                             "string",
+   *                             "array"
+   *                           ],
+   *                           "items": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "ignoreTypePattern": {
+   *                           "type": [
+   *                             "string",
+   *                             "array"
+   *                           ],
+   *                           "items": {
+   *                             "type": "string"
+   *                           }
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     },
+   *                     {
+   *                       "type": [
+   *                         "string",
+   *                         "number",
+   *                         "boolean"
+   *                       ],
+   *                       "enum": [
+   *                         "ReadonlyShallow",
+   *                         "ReadonlyDeep",
+   *                         "Immutable",
+   *                         null,
+   *                         3,
+   *                         4,
+   *                         5,
+   *                         null,
+   *                         "Calculating",
+   *                         "None",
+   *                         false
+   *                       ]
+   *                     }
+   *                   ]
+   *                 },
+   *                 "returnTypes": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "ignoreClasses": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "boolean"
+   *                             },
+   *                             {
+   *                               "type": "string",
+   *                               "enum": [
+   *                                 "fieldsOnly"
+   *                               ]
+   *                             }
+   *                           ]
+   *                         },
+   *                         "enforcement": {
+   *                           "type": [
+   *                             "string",
+   *                             "number",
+   *                             "boolean"
+   *                           ],
+   *                           "enum": [
+   *                             "ReadonlyShallow",
+   *                             "ReadonlyDeep",
+   *                             "Immutable",
+   *                             null,
+   *                             3,
+   *                             4,
+   *                             5,
+   *                             null,
+   *                             "Calculating",
+   *                             "None",
+   *                             false
+   *                           ]
+   *                         },
+   *                         "ignoreInferredTypes": {
+   *                           "type": "boolean"
+   *                         },
+   *                         "ignoreNamePattern": {
+   *                           "type": [
+   *                             "string",
+   *                             "array"
+   *                           ],
+   *                           "items": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "ignoreTypePattern": {
+   *                           "type": [
+   *                             "string",
+   *                             "array"
+   *                           ],
+   *                           "items": {
+   *                             "type": "string"
+   *                           }
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     },
+   *                     {
+   *                       "type": [
+   *                         "string",
+   *                         "number",
+   *                         "boolean"
+   *                       ],
+   *                       "enum": [
+   *                         "ReadonlyShallow",
+   *                         "ReadonlyDeep",
+   *                         "Immutable",
+   *                         null,
+   *                         3,
+   *                         4,
+   *                         5,
+   *                         null,
+   *                         "Calculating",
+   *                         "None",
+   *                         false
+   *                       ]
+   *                     }
+   *                   ]
+   *                 },
+   *                 "variables": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "ignoreClasses": {
+   *                           "oneOf": [
+   *                             {
+   *                               "type": "boolean"
+   *                             },
+   *                             {
+   *                               "type": "string",
+   *                               "enum": [
+   *                                 "fieldsOnly"
+   *                               ]
+   *                             }
+   *                           ]
+   *                         },
+   *                         "enforcement": {
+   *                           "type": [
+   *                             "string",
+   *                             "number",
+   *                             "boolean"
+   *                           ],
+   *                           "enum": [
+   *                             "ReadonlyShallow",
+   *                             "ReadonlyDeep",
+   *                             "Immutable",
+   *                             null,
+   *                             3,
+   *                             4,
+   *                             5,
+   *                             null,
+   *                             "Calculating",
+   *                             "None",
+   *                             false
+   *                           ]
+   *                         },
+   *                         "ignoreInferredTypes": {
+   *                           "type": "boolean"
+   *                         },
+   *                         "ignoreNamePattern": {
+   *                           "type": [
+   *                             "string",
+   *                             "array"
+   *                           ],
+   *                           "items": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "ignoreTypePattern": {
+   *                           "type": [
+   *                             "string",
+   *                             "array"
+   *                           ],
+   *                           "items": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "ignoreInFunctions": {
+   *                           "type": "boolean"
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     },
+   *                     {
+   *                       "type": [
+   *                         "string",
+   *                         "number",
+   *                         "boolean"
+   *                       ],
+   *                       "enum": [
+   *                         "ReadonlyShallow",
+   *                         "ReadonlyDeep",
+   *                         "Immutable",
+   *                         null,
+   *                         3,
+   *                         4,
+   *                         5,
+   *                         null,
+   *                         "Calculating",
+   *                         "None",
+   *                         false
+   *                       ]
+   *                     }
+   *                   ]
+   *                 },
+   *                 "fixer": {
+   *                   "type": "object",
+   *                   "properties": {
+   *                     "ReadonlyShallow": {
+   *                       "oneOf": [
+   *                         {
+   *                           "type": "object",
+   *                           "properties": {
+   *                             "pattern": {
+   *                               "type": "string"
+   *                             },
+   *                             "replace": {
+   *                               "type": "string"
+   *                             }
+   *                           },
+   *                           "additionalProperties": false
+   *                         },
+   *                         {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "object",
+   *                             "properties": {
+   *                               "pattern": {
+   *                                 "type": "string"
+   *                               },
+   *                               "replace": {
+   *                                 "type": "string"
+   *                               }
+   *                             },
+   *                             "additionalProperties": false
+   *                           }
+   *                         }
+   *                       ]
+   *                     },
+   *                     "ReadonlyDeep": {
+   *                       "oneOf": [
+   *                         {
+   *                           "type": "object",
+   *                           "properties": {
+   *                             "pattern": {
+   *                               "type": "string"
+   *                             },
+   *                             "replace": {
+   *                               "type": "string"
+   *                             }
+   *                           },
+   *                           "additionalProperties": false
+   *                         },
+   *                         {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "object",
+   *                             "properties": {
+   *                               "pattern": {
+   *                                 "type": "string"
+   *                               },
+   *                               "replace": {
+   *                                 "type": "string"
+   *                               }
+   *                             },
+   *                             "additionalProperties": false
+   *                           }
+   *                         }
+   *                       ]
+   *                     },
+   *                     "Immutable": {
+   *                       "oneOf": [
+   *                         {
+   *                           "type": "object",
+   *                           "properties": {
+   *                             "pattern": {
+   *                               "type": "string"
+   *                             },
+   *                             "replace": {
+   *                               "type": "string"
+   *                             }
+   *                           },
+   *                           "additionalProperties": false
+   *                         },
+   *                         {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "object",
+   *                             "properties": {
+   *                               "pattern": {
+   *                                 "type": "string"
+   *                               },
+   *                               "replace": {
+   *                                 "type": "string"
+   *                               }
+   *                             },
+   *                             "additionalProperties": false
+   *                           }
+   *                         }
+   *                       ]
+   *                     }
+   *                   },
+   *                   "additionalProperties": false
+   *                 },
+   *                 "suggestions": {
+   *                   "type": "object",
+   *                   "properties": {
+   *                     "ReadonlyShallow": {
+   *                       "type": "array",
+   *                       "items": {
+   *                         "type": "array",
+   *                         "items": {
+   *                           "type": "object",
+   *                           "properties": {
+   *                             "pattern": {
+   *                               "type": "string"
+   *                             },
+   *                             "replace": {
+   *                               "type": "string"
+   *                             },
+   *                             "message": {
+   *                               "type": "string"
+   *                             }
+   *                           },
+   *                           "additionalProperties": false
+   *                         }
+   *                       }
+   *                     },
+   *                     "ReadonlyDeep": {
+   *                       "type": "array",
+   *                       "items": {
+   *                         "type": "array",
+   *                         "items": {
+   *                           "type": "object",
+   *                           "properties": {
+   *                             "pattern": {
+   *                               "type": "string"
+   *                             },
+   *                             "replace": {
+   *                               "type": "string"
+   *                             },
+   *                             "message": {
+   *                               "type": "string"
+   *                             }
+   *                           },
+   *                           "additionalProperties": false
+   *                         }
+   *                       }
+   *                     },
+   *                     "Immutable": {
+   *                       "type": "array",
+   *                       "items": {
+   *                         "type": "array",
+   *                         "items": {
+   *                           "type": "object",
+   *                           "properties": {
+   *                             "pattern": {
+   *                               "type": "string"
+   *                             },
+   *                             "replace": {
+   *                               "type": "string"
+   *                             },
+   *                             "message": {
+   *                               "type": "string"
+   *                             }
+   *                           },
+   *                           "additionalProperties": false
+   *                         }
+   *                       }
+   *                     }
+   *                   },
+   *                   "additionalProperties": false
+   *                 }
+   *               },
+   *               "additionalProperties": false
+   *             },
+   *             "inherit": {
+   *               "type": "boolean"
+   *             },
+   *             "disable": {
+   *               "type": "boolean"
+   *             }
+   *           },
+   *           "additionalProperties": false
+   *         }
    *       }
    *     },
    *     "additionalProperties": false
@@ -1280,17 +3346,224 @@ namespace PreferImmutableTypes {
         readonly message?: string;
       }[])[];
     };
+    readonly overrides?: readonly {
+      readonly specifiers?:
+        | readonly (
+            | {
+                readonly name?: string | readonly string[];
+                readonly pattern?: string | readonly string[];
+                readonly ignoreName?: string | readonly string[];
+                readonly ignorePattern?: string | readonly string[];
+                readonly from?: 'file';
+                readonly path?: string;
+              }
+            | {
+                readonly name?: string | readonly string[];
+                readonly pattern?: string | readonly string[];
+                readonly ignoreName?: string | readonly string[];
+                readonly ignorePattern?: string | readonly string[];
+                readonly from?: 'lib';
+              }
+            | {
+                readonly name?: string | readonly string[];
+                readonly pattern?: string | readonly string[];
+                readonly ignoreName?: string | readonly string[];
+                readonly ignorePattern?: string | readonly string[];
+                readonly from?: 'package';
+                readonly package?: string;
+              }
+          )[]
+        | {
+            readonly name?: string | readonly string[];
+            readonly pattern?: string | readonly string[];
+            readonly ignoreName?: string | readonly string[];
+            readonly ignorePattern?: string | readonly string[];
+            readonly from?: 'file';
+            readonly path?: string;
+          }
+        | {
+            readonly name?: string | readonly string[];
+            readonly pattern?: string | readonly string[];
+            readonly ignoreName?: string | readonly string[];
+            readonly ignorePattern?: string | readonly string[];
+            readonly from?: 'lib';
+          }
+        | {
+            readonly name?: string | readonly string[];
+            readonly pattern?: string | readonly string[];
+            readonly ignoreName?: string | readonly string[];
+            readonly ignorePattern?: string | readonly string[];
+            readonly from?: 'package';
+            readonly package?: string;
+          };
+      readonly options?: {
+        readonly ignoreClasses?: boolean | 'fieldsOnly';
+        readonly enforcement?:
+          | 'Calculating'
+          | 'Immutable'
+          | 'None'
+          | 'ReadonlyDeep'
+          | 'ReadonlyShallow'
+          | 3
+          | 4
+          | 5
+          | false
+          | null;
+        readonly ignoreInferredTypes?: boolean;
+        readonly ignoreNamePattern?: string | readonly string[];
+        readonly ignoreTypePattern?: string | readonly string[];
+        readonly parameters?:
+          | {
+              readonly ignoreClasses?: boolean | 'fieldsOnly';
+              readonly enforcement?:
+                | 'Calculating'
+                | 'Immutable'
+                | 'None'
+                | 'ReadonlyDeep'
+                | 'ReadonlyShallow'
+                | 3
+                | 4
+                | 5
+                | false
+                | null;
+              readonly ignoreInferredTypes?: boolean;
+              readonly ignoreNamePattern?: string | readonly string[];
+              readonly ignoreTypePattern?: string | readonly string[];
+            }
+          | (
+              | 'Calculating'
+              | 'Immutable'
+              | 'None'
+              | 'ReadonlyDeep'
+              | 'ReadonlyShallow'
+              | 3
+              | 4
+              | 5
+              | false
+              | null
+            );
+        readonly returnTypes?:
+          | {
+              readonly ignoreClasses?: boolean | 'fieldsOnly';
+              readonly enforcement?:
+                | 'Calculating'
+                | 'Immutable'
+                | 'None'
+                | 'ReadonlyDeep'
+                | 'ReadonlyShallow'
+                | 3
+                | 4
+                | 5
+                | false
+                | null;
+              readonly ignoreInferredTypes?: boolean;
+              readonly ignoreNamePattern?: string | readonly string[];
+              readonly ignoreTypePattern?: string | readonly string[];
+            }
+          | (
+              | 'Calculating'
+              | 'Immutable'
+              | 'None'
+              | 'ReadonlyDeep'
+              | 'ReadonlyShallow'
+              | 3
+              | 4
+              | 5
+              | false
+              | null
+            );
+        readonly variables?:
+          | {
+              readonly ignoreClasses?: boolean | 'fieldsOnly';
+              readonly enforcement?:
+                | 'Calculating'
+                | 'Immutable'
+                | 'None'
+                | 'ReadonlyDeep'
+                | 'ReadonlyShallow'
+                | 3
+                | 4
+                | 5
+                | false
+                | null;
+              readonly ignoreInferredTypes?: boolean;
+              readonly ignoreNamePattern?: string | readonly string[];
+              readonly ignoreTypePattern?: string | readonly string[];
+              readonly ignoreInFunctions?: boolean;
+            }
+          | (
+              | 'Calculating'
+              | 'Immutable'
+              | 'None'
+              | 'ReadonlyDeep'
+              | 'ReadonlyShallow'
+              | 3
+              | 4
+              | 5
+              | false
+              | null
+            );
+        readonly fixer?: {
+          readonly ReadonlyShallow?:
+            | readonly {
+                readonly pattern?: string;
+                readonly replace?: string;
+              }[]
+            | {
+                readonly pattern?: string;
+                readonly replace?: string;
+              };
+          readonly ReadonlyDeep?:
+            | readonly {
+                readonly pattern?: string;
+                readonly replace?: string;
+              }[]
+            | {
+                readonly pattern?: string;
+                readonly replace?: string;
+              };
+          readonly Immutable?:
+            | readonly {
+                readonly pattern?: string;
+                readonly replace?: string;
+              }[]
+            | {
+                readonly pattern?: string;
+                readonly replace?: string;
+              };
+        };
+        readonly suggestions?: {
+          readonly ReadonlyShallow?: readonly (readonly {
+            readonly pattern?: string;
+            readonly replace?: string;
+            readonly message?: string;
+          }[])[];
+          readonly ReadonlyDeep?: readonly (readonly {
+            readonly pattern?: string;
+            readonly replace?: string;
+            readonly message?: string;
+          }[])[];
+          readonly Immutable?: readonly (readonly {
+            readonly pattern?: string;
+            readonly replace?: string;
+            readonly message?: string;
+          }[])[];
+        };
+      };
+      readonly inherit?: boolean;
+      readonly disable?: boolean;
+    }[];
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Prefer property signatures over method signatures.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/prefer-property-signatures.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/prefer-property-signatures.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1325,14 +3598,14 @@ namespace PreferPropertySignatures {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Prefer readonly types over mutable types.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/prefer-readonly-type.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/prefer-readonly-type.md
  *
  *  ```md
  *  | key                  | value        |
@@ -1403,7 +3676,7 @@ namespace PreferReadonlyType {
 /**
  * Replaces `x => f(x)` with just `f`.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/prefer-tacit.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/prefer-tacit.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1438,14 +3711,14 @@ namespace PreferTacit {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Require consistently using either `readonly` keywords or `Readonly<T>`
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/readonly-type.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/readonly-type.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1476,14 +3749,14 @@ namespace ReadonlyType {
   export type Options = 'generic' | 'keyword';
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
  * Enforce the immutability of types based on patterns.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v6.6.3/docs/rules/type-declaration-immutability.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.0.1/docs/rules/type-declaration-immutability.md
  *
  *  ```md
  *  | key                  | value        |
@@ -1693,8 +3966,8 @@ namespace TypeDeclarationImmutability {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 export type EslintFunctionalRules = {
@@ -1724,6 +3997,7 @@ export type EslintFunctionalRules = {
 export type EslintFunctionalRulesOption = {
   readonly 'functional/functional-parameters': FunctionalParameters.Options;
   readonly 'functional/immutable-data': ImmutableData.Options;
+  readonly 'functional/no-classes': NoClasses.Options;
   readonly 'functional/no-conditional-statements': NoConditionalStatements.Options;
   readonly 'functional/no-expression-statements': NoExpressionStatements.Options;
   readonly 'functional/no-let': NoLet.Options;

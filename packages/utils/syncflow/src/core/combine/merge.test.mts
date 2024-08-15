@@ -11,8 +11,10 @@ const r2 = fromArray(['a', 'b', 'c']);
 // eslint-disable-next-line deprecation/deprecation
 const m = merge([r1, r2] as const);
 
-expectType<typeof m, SyncChildObservable<number | string, 'merge'>>('<=');
+if (import.meta.vitest !== undefined) {
+  test('type-check', () => {
+    expectType<typeof m, SyncChildObservable<number | string, 'merge'>>('<=');
 
-test('dummy', () => {
-  expect(1).toBe(1);
-});
+    expect(m).toBe(m);
+  });
+}

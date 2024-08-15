@@ -108,7 +108,7 @@ const defineConfig = async () => {
           'error',
           restrictedImportsAdded,
         ],
-        '@typescript-eslint/ban-types': [
+        '@typescript-eslint/no-restricted-types': [
           'error',
           {
             types: {
@@ -118,7 +118,6 @@ const defineConfig = async () => {
               'DeepReadonly<UserCredential>': 'use UserCredential instead',
               'DeepReadonly<User>': 'use User instead',
             },
-            extendDefaults: true,
           },
         ],
       },

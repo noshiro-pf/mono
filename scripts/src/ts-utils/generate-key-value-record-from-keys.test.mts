@@ -5,7 +5,7 @@ describe('generateKeyValueRecordFromKeys', () => {
   test('should map empty array to {}', () => {
     const result = generateKeyValueRecordFromKeys([] as const);
 
-    // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-empty-object-type
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     expectType<typeof result, Readonly<{}>>('=');
 
     expect(result).toStrictEqual({});

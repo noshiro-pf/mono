@@ -16,4 +16,5 @@ export const eslintPromiseRules: EslintPromiseRules = {
   'promise/prefer-await-to-then': 'off',
   'promise/prefer-await-to-callbacks': 'off',
   'promise/no-multiple-resolved': 'error',
+  'promise/spec-only': 'error',
 };

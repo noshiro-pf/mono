@@ -481,10 +481,10 @@ const tags$: InitializedObservable<
         dayOfWeek,
         iconOfSpecifiedRespondent,
         respondent,
-        ...rest
+        ..._rest
       },
     ]) => {
-      expectType<keyof typeof rest, never>('=');
+      expectType<keyof typeof _rest, never>('=');
 
       return [
         {

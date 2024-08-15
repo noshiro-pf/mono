@@ -1,8 +1,8 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
+type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
+  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
 
 /**
  * Disallow assigning return values of `cy` calls
@@ -18,7 +18,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
  *  ```
  */
 namespace NoAssigningReturnValues {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -63,8 +63,8 @@ namespace UnsafeToChainCommand {
   };
 
   export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -81,7 +81,7 @@ namespace UnsafeToChainCommand {
  *  ```
  */
 namespace NoUnnecessaryWaiting {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -98,7 +98,7 @@ namespace NoUnnecessaryWaiting {
  *  ```
  */
 namespace NoAsyncBefore {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -115,7 +115,7 @@ namespace NoAsyncBefore {
  *  ```
  */
 namespace NoAsyncTests {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -132,7 +132,7 @@ namespace NoAsyncTests {
  *  ```
  */
 namespace AssertionBeforeScreenshot {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -149,7 +149,7 @@ namespace AssertionBeforeScreenshot {
  *  ```
  */
 namespace RequireDataSelectors {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -166,7 +166,7 @@ namespace RequireDataSelectors {
  *  ```
  */
 namespace NoForce {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -183,7 +183,7 @@ namespace NoForce {
  *  ```
  */
 namespace NoPause {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -200,7 +200,7 @@ namespace NoPause {
  *  ```
  */
 namespace NoDebug {
-  export type RuleEntry = Linter.RuleLevel;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 export type EslintCypressRules = {
