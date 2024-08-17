@@ -1202,10 +1202,10 @@
     classnames "^2.3.1"
     tslib "~2.5.0"
 
-"@blueprintjs/icons@^5.5.0", "@blueprintjs/icons@^5.9.0":
-  version "5.9.0"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-5.9.0.tgz#f1d6ebffa3033bbdd8ea05dbfa6fb8e5e88cf119"
-  integrity sha512-9W9DYFqSORBr1QPSEwpbjnftbU+hfWB/gFtpa4LdzR7VhtQaCdcrinyXFmNUFacQ9czYrmr72bP567Rv6pRUDg==
+"@blueprintjs/icons@^5.11.0", "@blueprintjs/icons@^5.5.0":
+  version "5.11.0"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-5.11.0.tgz#dafb5905a6d940be6a2bf712a9a1d7191e363f9e"
+  integrity sha512-2SyJgeol61hSaxdGrwPdzCx0cA5TEboc18oJYWQ31TZkidN3NWuH0Z4aEvugtM1+NR3W0Vcd/+1xIe5Y32pwTQ==
   dependencies:
     change-case "^4.1.2"
     classnames "^2.3.1"
