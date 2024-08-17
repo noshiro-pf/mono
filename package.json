@@ -87,7 +87,7 @@
     "@types/styled-components": "^5.1.29",
     "@types/uuid": "^9.0.8",
     "@vitejs/plugin-legacy": "^4.1.1",
-    "@vitejs/plugin-react-swc": "^3.4.0",
+    "@vitejs/plugin-react-swc": "^3.7.0",
     "argparse": "^2.0.1",
     "command-line-args": "^6.0.0",
     "cpx": "^1.5.0",
