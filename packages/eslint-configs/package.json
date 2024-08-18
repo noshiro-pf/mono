@@ -15,8 +15,8 @@
     }
   },
   "scripts": {
-    "build": "run-s build:scripts build:src",
-    "build:no-gen": "tsc --project ./configs/tsconfig.build.json",
+    "build": "tsc --project ./configs/tsconfig.build.json",
+    "build:full": "run-s build:scripts build:src",
     "build:scripts": "wireit",
     "build:src": "wireit",
     "clean": "run-p clean:**",
