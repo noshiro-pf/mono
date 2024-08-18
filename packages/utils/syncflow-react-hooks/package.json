@@ -21,6 +21,7 @@
     "clean:eslintcache": "rimraf .eslintcache",
     "clean:wireit": "rimraf .wireit/**",
     "fmt": "yarn zz:prettier .",
+    "gi": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
     "lint": "yarn zz:eslint:src",
     "lint:fix": "yarn zz:eslint:src --fix",
     "pub": "yarn zz:publish",
@@ -54,6 +55,7 @@
     "build": {
       "dependencies": [
         "clean:build",
+        "gi",
         "type-check"
       ],
       "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"

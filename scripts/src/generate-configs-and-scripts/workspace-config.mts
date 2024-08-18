@@ -197,12 +197,12 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
 
   'syncflow-preact-hooks': fillDefaultsForUtil({
     tsType: 'preact',
-    gi: false,
+    gi: 0,
     passWithNoTests: true,
   }),
   'syncflow-react-hooks': fillDefaultsForUtil({
     tsType: 'react',
-    gi: false,
+    gi: 0,
     passWithNoTests: true,
   }),
 
