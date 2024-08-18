@@ -40,11 +40,11 @@ const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
   ),
 );
 
-const passwordIsOpenState = createBooleanState(false);
-
-const togglePasswordLock = passwordIsOpenState.toggle;
-
-const { state: passwordIsOpen$, setFalse: hidePassword } = passwordIsOpenState;
+const {
+  state: passwordIsOpen$,
+  setFalse: hidePassword,
+  toggle: togglePasswordLock,
+} = createBooleanState(false);
 
 const state = combine([
   formState$,
@@ -187,7 +187,7 @@ const inputPasswordConfirmationHandler = (value: string): void => {
 const enterClickHandler = (): void => {
   if (
     enterButtonDisabled$.snapshot.value ||
-    GoogleSignInStore.googleSignInButtonDisabled$.snapshot.value
+    GoogleSignInStore.googleSignInButtonDisabledState.snapshot.value
   )
     return;
 

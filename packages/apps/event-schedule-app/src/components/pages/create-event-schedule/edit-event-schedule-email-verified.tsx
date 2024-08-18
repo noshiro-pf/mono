@@ -31,9 +31,7 @@ export const EditEventScheduleEmailVerified = memoNamed<Props>(
       );
     }, [eventScheduleFromDb, emailVerified]);
 
-    const editButtonIsLoading = useObservableValue(
-      EditEventScheduleStore.isLoading$,
-    );
+    const editButtonIsLoading = EditEventScheduleStore.useIsLoading();
 
     const diff = useObservableValue(EditEventScheduleStore.diff$);
 

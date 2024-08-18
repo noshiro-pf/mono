@@ -27,9 +27,7 @@ export const FilterByIconPopover = memoNamed<Props>(
       AnswerFilterAndSortStore.disableFilteringByIcon(answerIconId);
     }, [answerIconId]);
 
-    const filterState = useObservableValue(
-      AnswerFilterAndSortStore.filterState$,
-    );
+    const filterState = AnswerFilterAndSortStore.useFilterState();
 
     const state = filterState.iconState[answerIconId];
     const upperLimit = filterState.iconState.upperLimit;

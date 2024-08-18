@@ -25,9 +25,9 @@ const enterButtonDisabled$ = combine([formState$, Auth.fireAuthUser$]).chain(
 );
 
 const {
+  state: isWaitingResponseState,
   setFalse: setFalseIsWaitingResponse,
   setTrue: setTrueIsWaitingResponse,
-  state: isWaitingResponse$,
 } = createBooleanState(false);
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
@@ -37,7 +37,7 @@ const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
 const state = combine([
   formState$,
   enterButtonDisabled$,
-  isWaitingResponse$,
+  isWaitingResponseState,
   emailFormIntent$,
 ]).chain(
   map(

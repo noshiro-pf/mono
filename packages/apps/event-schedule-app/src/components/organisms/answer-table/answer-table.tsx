@@ -53,17 +53,11 @@ export const AnswerTable = memoNamed<Props>(
       AnswerTableStore.tableBodyValuesFiltered$,
     );
 
-    const dateStringIsMinimized = useObservableValue(
-      AnswerTableStore.dateStringIsMinimized$,
-    );
+    const dateStringIsMinimized = AnswerTableStore.useDateStringIsMinimized();
 
-    const answerIconIsHidden = useObservableValue(
-      AnswerTableStore.answerIconIsHidden$,
-    );
+    const answerIconIsHidden = AnswerTableStore.useAnswerIconIsHidden();
 
-    const tableMinimized = useObservableValue(
-      AnswerTableStore.tableIsMinimized$,
-    );
+    const tableMinimized = AnswerTableStore.useTableIsMinimized();
 
     return (
       <StickyHeaderTable

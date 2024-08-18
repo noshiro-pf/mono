@@ -15,15 +15,12 @@ export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
 
   const { eventScheduleValidationOk } = commonState;
 
-  const createButtonIsLoading = useObservableValue(
-    CreateEventScheduleStore.isLoading$,
-  );
+  const createButtonIsLoading = CreateEventScheduleStore.useIsLoading();
 
-  const createResultDialogIsOpen = useObservableValue(
-    CreateEventScheduleStore.createResultDialogIsOpen$,
-  );
+  const createResultDialogIsOpen =
+    CreateEventScheduleStore.useCreateResultDialogIsOpen();
 
-  const url = useObservableValue(CreateEventScheduleStore.url$);
+  const url = CreateEventScheduleStore.useUrl();
 
   const hasNoChanges = useObservableValue(
     CreateEventScheduleStore.hasNoChanges$,

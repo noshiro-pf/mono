@@ -21,6 +21,7 @@ const {
 } = createState<EventSchedule | undefined>(undefined);
 
 const {
+  useCurrentValue: useEmailVerified,
   state: emailVerified$,
   setState: setEmailVerified,
   resetState: resetEmailVerified,
@@ -177,7 +178,7 @@ const onEditEventClick = (): void => {
 };
 
 const {
-  state: isLoading$,
+  useCurrentValue: useIsLoading,
   setTrue: setIsLoadingTrue,
   setFalse: setIsLoadingFalse,
 } = createBooleanState(false);
@@ -186,10 +187,10 @@ export const EditEventScheduleStore = {
   commonState$,
   commonStateHandlers,
   diff$,
-  emailVerified$,
+  useEmailVerified,
   hasDeletedDatetimeChanges$,
   hasNoChanges$,
-  isLoading$,
+  useIsLoading,
   setEmailVerified,
   onBackToAnswerPage,
   onEditEventClick,

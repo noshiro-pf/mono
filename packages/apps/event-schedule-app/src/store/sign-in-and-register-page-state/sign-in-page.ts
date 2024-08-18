@@ -31,11 +31,11 @@ const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
   map((st) => (st.password.error === undefined ? 'primary' : 'danger')),
 );
 
-const passwordIsOpenState = createBooleanState(false);
-
-const togglePasswordLock = passwordIsOpenState.toggle;
-
-const { state: passwordIsOpen$, setFalse: hidePassword } = passwordIsOpenState;
+const {
+  state: passwordIsOpen$,
+  setFalse: hidePassword,
+  toggle: togglePasswordLock,
+} = createBooleanState(false);
 
 const state = combine([
   formState$,
@@ -136,7 +136,7 @@ const inputPasswordHandler = (value: string): void => {
 const enterClickHandler = (): void => {
   if (
     enterButtonDisabled$.snapshot.value ||
-    GoogleSignInStore.googleSignInButtonDisabled$.snapshot.value
+    GoogleSignInStore.googleSignInButtonDisabledState.snapshot.value
   )
     return;
 

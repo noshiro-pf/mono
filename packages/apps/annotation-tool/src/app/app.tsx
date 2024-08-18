@@ -7,15 +7,15 @@ import {
 import { labels, lightnessDarker, saturationDarker } from '../constants';
 import {
   handlers,
-  selectedLabel$,
-  sideBarIsHidden$,
+  useSelectedLabel,
+  useSideBarIsHidden,
   visibleLabels$,
 } from '../store';
 import { Sidebar } from './sidebar';
 
 export const App = memoNamed('App', () => {
-  const sideBarIsHidden = useObservableValue(sideBarIsHidden$);
-  const selectedLabel = useObservableValue(selectedLabel$);
+  const sideBarIsHidden = useSideBarIsHidden();
+  const selectedLabel = useSelectedLabel();
   const visibleLabels = useObservableValue(visibleLabels$);
 
   return (

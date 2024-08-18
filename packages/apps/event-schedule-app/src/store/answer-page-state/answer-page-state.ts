@@ -25,19 +25,22 @@ const toast = createToaster();
 
 /* states */
 
-const { state: selectedAnswerSaved$, setState: setSelectedAnswerSaved } =
+const { state: selectedAnswerSavedState$, setState: setSelectedAnswerSaved } =
   createState<Answer | undefined>(undefined);
 
-const { state: submitButtonIsLoading$, setState: setSubmitButtonIsLoading } =
-  createBooleanState(false);
+const {
+  useCurrentValue: useSubmitButtonIsLoading,
+  setState: setSubmitButtonIsLoading,
+} = createBooleanState(false);
 
 const {
-  state: alertOnAnswerClickIsOpen$,
+  useCurrentValue: useAlertOnAnswerClickIsOpen,
   setTrue: openAlertOnAnswerClick,
   setFalse: closeAlertOnAnswerClick,
 } = createBooleanState(false);
 
 const {
+  useCurrentValue: useAnswerBeingEditedSectionState,
   state: answerBeingEditedSectionState$,
   setState: setAnswerBeingEditedSectionState_,
 } = createState<'creating' | 'editing' | 'hidden'>('hidden');
@@ -72,6 +75,7 @@ const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =
 
 const {
   state: checkboxesState$,
+  useCurrentValue: useCheckboxesState,
   setState: setCheckboxesState,
   updateState: updateCheckboxesState,
   resetState: resetCheckboxesState,
@@ -83,8 +87,10 @@ const {
   ),
 );
 
-const { state: batchInputFieldIsOpen$, toggle: toggleBatchInputField_ } =
-  createBooleanState(false);
+const {
+  useCurrentValue: useBatchInputFieldIsOpen,
+  toggle: toggleBatchInputField_,
+} = createBooleanState(false);
 
 const toggleBatchInputField = (): void => {
   toggleBatchInputField_();
@@ -93,7 +99,7 @@ const toggleBatchInputField = (): void => {
 
 /* mapped values */
 
-const selectedAnswerUserName$ = selectedAnswerSaved$.chain(
+const selectedAnswerUserName$ = selectedAnswerSavedState$.chain(
   map((selectedAnswerSaved) => selectedAnswerSaved?.user.name),
 );
 
@@ -157,7 +163,7 @@ const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combine([
 
 const submitButtonIsDisabled$: InitializedObservable<boolean> = combine([
   answerBeingEdited$,
-  selectedAnswerSaved$,
+  selectedAnswerSavedState$,
   theNameIsAlreadyUsed$,
 ]).chain(
   map(
@@ -262,13 +268,13 @@ const onAddAnswerButtonClickImpl = (user: FireAuthUser | undefined): void => {
 const onSubmitAnswerImpl = async (
   eventId: string | undefined,
   answerBeingEdited: Answer,
-  answerBeingEditedSectionState: 'creating' | 'editing' | 'hidden',
+  answerBeingEditedSection: 'creating' | 'editing' | 'hidden',
 ): Promise<void> => {
   if (eventId === undefined) return;
 
   setSubmitButtonIsLoading(true);
 
-  switch (answerBeingEditedSectionState) {
+  switch (answerBeingEditedSection) {
     case 'creating':
       await api.answers
         .add(eventId, Obj.set(answerBeingEdited, 'createdAt', DateUtils.now()))
@@ -658,10 +664,10 @@ const hasUnanswered$: InitializedObservable<boolean> =
   );
 
 export const AnswerPageStore = {
-  alertOnAnswerClickIsOpen$,
+  useAlertOnAnswerClickIsOpen,
   answerBeingEdited$,
   answerBeingEditedList$,
-  answerBeingEditedSectionState$,
+  useAnswerBeingEditedSectionState,
   hasUnanswered$,
   iconHeader$,
   requiredParticipantsExist$,
@@ -669,10 +675,10 @@ export const AnswerPageStore = {
   selectedDates$,
   setYearMonth$,
   submitButtonIsDisabled$,
-  submitButtonIsLoading$,
+  useSubmitButtonIsLoading,
   theNameIsAlreadyUsed$,
-  checkboxesState$,
-  batchInputFieldIsOpen$,
+  useCheckboxesState,
+  useBatchInputFieldIsOpen,
   closeAlertOnAnswerClick,
   onAddAnswerButtonClick,
   onAnswerClick,

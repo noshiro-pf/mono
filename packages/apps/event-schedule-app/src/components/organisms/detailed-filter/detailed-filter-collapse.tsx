@@ -31,7 +31,7 @@ export const DetailedFilterCollapse = memoNamed<Props>(
       scoreRange,
       rank,
       ..._rest
-    } = useObservableValue(AnswerFilterAndSortStore.filterState$);
+    } = AnswerFilterAndSortStore.useFilterState();
 
     expectType<keyof typeof _rest, never>('=');
 

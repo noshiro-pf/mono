@@ -30,7 +30,7 @@ export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
     createRoom.dispatch({ username, password }).catch(console.error);
   }, [username, password]);
 
-  const loading = useObservableValue(createRoom.isWaitingResponse$);
+  const loading = createRoom.useIsWaitingResponse();
 
   return (
     <Centering>

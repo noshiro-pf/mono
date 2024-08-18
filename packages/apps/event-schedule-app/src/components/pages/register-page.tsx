@@ -11,9 +11,8 @@ const dc = dict.register;
 const returnFalse = (): false => false;
 
 export const RegisterPage = memoNamed('RegisterPage', () => {
-  const googleSignInButtonDisabled = useObservableValue(
-    GoogleSignInStore.googleSignInButtonDisabled$,
-  );
+  const googleSignInButtonDisabled =
+    GoogleSignInStore.useGoogleSignInButtonDisabled();
 
   const {
     formState,

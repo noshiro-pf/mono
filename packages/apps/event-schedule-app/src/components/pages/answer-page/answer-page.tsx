@@ -64,25 +64,19 @@ const saveAsImage = (canvas: HTMLCanvasElement): void => {
 export const AnswerPage = memoNamed('AnswerPage', () => {
   /* values */
 
-  const alertOnAnswerClickIsOpen = useObservableValue(
-    AnswerPageStore.alertOnAnswerClickIsOpen$,
-  );
+  const alertOnAnswerClickIsOpen =
+    AnswerPageStore.useAlertOnAnswerClickIsOpen();
   const answerBeingEdited = useObservableValue(
     AnswerPageStore.answerBeingEdited$,
   );
-  const answerBeingEditedSectionState = useObservableValue(
-    AnswerPageStore.answerBeingEditedSectionState$,
-  );
+  const answerBeingEditedSectionState =
+    AnswerPageStore.useAnswerBeingEditedSectionState();
   const answers = useObservableValue(answersFiltered$);
   const errorType = useObservableValue(errorType$);
   const eventId = useObservableValue(Router.eventId$);
   const eventSchedule = useObservableValue(eventSchedule$);
-  const refreshButtonIsDisabled = useObservableValue(
-    AnswersStore.refreshButtonIsDisabled$,
-  );
-  const refreshButtonIsLoading = useObservableValue(
-    AnswersStore.refreshButtonIsLoading$,
-  );
+  const refreshButtonIsDisabled = AnswersStore.useRefreshButtonIsDisabled();
+  const refreshButtonIsLoading = AnswersStore.useRefreshButtonIsLoading();
   const requiredParticipantsExist = useObservableValue(
     AnswerPageStore.requiredParticipantsExist$,
   );
@@ -93,13 +87,10 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   const submitButtonIsDisabled = useObservableValue(
     AnswerPageStore.submitButtonIsDisabled$,
   );
-  const submitButtonIsLoading = useObservableValue(
-    AnswerPageStore.submitButtonIsLoading$,
-  );
+  const submitButtonIsLoading = AnswerPageStore.useSubmitButtonIsLoading();
 
-  const detailedFilterDialogIsDisplayed = useObservableValue(
-    AnswerTableStore.detailedFilterIsOpen$,
-  );
+  const detailedFilterDialogIsDisplayed =
+    AnswerTableStore.useDetailedFilterIsOpen();
 
   const afterDeadline = useMemo(
     () => eventIsAfterDeadline(eventSchedule),
@@ -170,17 +161,11 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     }
   }, []);
 
-  const dateStringIsMinimized = useObservableValue(
-    AnswerTableStore.dateStringIsMinimized$,
-  );
+  const dateStringIsMinimized = AnswerTableStore.useDateStringIsMinimized();
 
-  const answerIconIsHidden = useObservableValue(
-    AnswerTableStore.answerIconIsHidden$,
-  );
+  const answerIconIsHidden = AnswerTableStore.useAnswerIconIsHidden();
 
-  const tableIsMinimized = useObservableValue(
-    AnswerTableStore.tableIsMinimized$,
-  );
+  const tableIsMinimized = AnswerTableStore.useTableIsMinimized();
 
   return errorType !== undefined && errorType.type.type === 'not-found' ? (
     <NotFoundPage />

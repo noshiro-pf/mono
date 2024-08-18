@@ -20,11 +20,13 @@ const { state: eventListResult$, setState: setEventListResult } = createState<
 
 const result$ = eventListResult$;
 
-const { state: refreshButtonIsLoading$, setState: setRefreshButtonIsLoading } =
-  createBooleanState(false);
+const {
+  useCurrentValue: useRefreshButtonIsLoading,
+  setState: setRefreshButtonIsLoading,
+} = createBooleanState(false);
 
 const {
-  state: refreshButtonIsDisabled$,
+  useCurrentValue: useRefreshButtonIsDisabled,
   setState: setRefreshButtonIsDisabled,
 } = createBooleanState(false);
 
@@ -108,7 +110,7 @@ export const eventList$: InitializedObservable<
 
 export const EventListStore = {
   fetchEventList,
-  refreshButtonIsDisabled$,
-  refreshButtonIsLoading$,
+  useRefreshButtonIsDisabled,
+  useRefreshButtonIsLoading,
   refreshEventList,
 } as const;

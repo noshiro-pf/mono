@@ -30,9 +30,9 @@ export const SetTimesPopoverContent = memoNamed<Props>(
       dispatch({ type: 'init', timeRange: initialValue });
     }, [initialValue]);
 
-    const timeRange = useObservableValue(timeRange$);
+    const timeRange = useTimeRange();
 
-    const checkboxState = useObservableValue(checkboxState$);
+    const checkboxState = useCheckboxState();
 
     const onOkClickHandler = useCallback(() => {
       onOkClick({ timeRange, checkboxState });
@@ -176,7 +176,7 @@ export const SetTimesPopoverContent = memoNamed<Props>(
   },
 );
 
-const { state: timeRange$, dispatch } = createReducer(
+const { useCurrentValue: useTimeRange, dispatch } = createReducer(
   timeRangeReducer,
   timeRangeDefaultValue,
 );
@@ -221,7 +221,7 @@ const dayCheckboxReducer: Reducer<
         }
       : Obj.set(state, action.key, action.checked);
 
-const { state: checkboxState$, dispatch: checkboxStateDispatch } =
+const { useCurrentValue: useCheckboxState, dispatch: checkboxStateDispatch } =
   createReducer(dayCheckboxReducer, {
     Sun: true,
     Mon: true,

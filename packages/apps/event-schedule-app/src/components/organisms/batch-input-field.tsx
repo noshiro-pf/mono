@@ -28,9 +28,9 @@ type Props = DeepReadonly<{
 export const BatchInputAnswerForm = memoNamed<Props>(
   'BatchInputAnswerForm',
   ({ isOpen, answerIcons, toggleOpen, applyBatchInput }) => {
-    const comment = useObservableValue(comment$);
-    const selectedIconId = useObservableValue(selectedIconId$);
-    const point = useObservableValue(fairPoint$);
+    const comment = useComment();
+    const selectedIconId = useSelectedIconId();
+    const point = useFairPoint();
 
     useEffect(() => {
       setDefaultFairPoint(answerIcons.fair.point);
@@ -155,26 +155,31 @@ export const BatchInputAnswerForm = memoNamed<Props>(
 
 const dc = dict.answerPage.answerBeingEdited;
 
-const { state: comment$, setState: setComment } = createState('');
+const { useCurrentValue: useComment, setState: setComment } = createState('');
 
-const { state: selectedIconId$, updateState: updateSelectedIconId } =
-  createState<AnswerIconIdWithNone>('none');
+const {
+  useCurrentValue: useSelectedIconId,
+  state: selectedIconId$,
+  updateState: updateSelectedIconId,
+} = createState<AnswerIconIdWithNone>('none');
 
 const { state: defaultFairPoint$, setState: setDefaultFairPoint } =
   createState<AnswerIconPoint>(0);
 
-const { state: fairPoint$, setState: setFairPoint } =
+const { useCurrentValue: useFairPoint, setState: setFairPoint } =
   createState<AnswerIconPoint>(0);
 
 const onGoodClick = (): void => {
   updateSelectedIconId((prev) => (prev === 'good' ? 'none' : 'good'));
 };
+
 const onFairClick = (): void => {
   updateSelectedIconId((prev) => (prev === 'fair' ? 'none' : 'fair'));
   if (selectedIconId$.snapshot.value === 'fair') {
     setFairPoint(defaultFairPoint$.snapshot.value);
   }
 };
+
 const onPoorClick = (): void => {
   updateSelectedIconId((prev) => (prev === 'poor' ? 'none' : 'poor'));
 };

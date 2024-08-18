@@ -28,9 +28,11 @@ const { state: roomId$, setState: setRoomId } = createState<string | undefined>(
   undefined,
 );
 
-const { state: room$, setState: setRoom } = createState<Room | undefined>(
-  undefined,
-);
+const {
+  useCurrentValue: useRoom,
+  state: room$,
+  setState: setRoom,
+} = createState<Room | undefined>(undefined);
 
 const [actionsFromDb$, setActionsFromDb_] =
   createEventEmitter<readonly GameStateAction[]>();
@@ -44,10 +46,6 @@ const paths = {
   actions: 'actions',
   players: 'players',
 } as const;
-
-const { state: myName$, setState: setMyName } = createState<string | undefined>(
-  undefined,
-);
 
 const addAction = (
   roomId: string,
@@ -99,12 +97,11 @@ const createRoom = async ({
 export const db = {
   setRoomId,
   room$,
+  useRoom,
   actionsFromDb$,
   fbApp,
   paths,
   firestore,
-  myName$,
-  setMyName,
   addAction,
   addPlayer,
   createRoom,

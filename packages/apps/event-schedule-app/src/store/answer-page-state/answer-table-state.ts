@@ -378,26 +378,32 @@ const tableBodyValuesFiltered$ = combine([
   }),
 );
 
-const { state: tableIsMinimized$, toggle: toggleTableIsMinimized } =
+const { useCurrentValue: useTableIsMinimized, toggle: toggleTableIsMinimized } =
   createBooleanState(false);
 
-const { state: answerIconIsHidden$, toggle: toggleAnswerIconIsHidden } =
-  createBooleanState(false);
+const {
+  useCurrentValue: useAnswerIconIsHidden,
+  toggle: toggleAnswerIconIsHidden,
+} = createBooleanState(false);
 
-const { state: dateStringIsMinimized$, toggle: toggleDateStringIsMinimized } =
-  createBooleanState(false);
+const {
+  useCurrentValue: useDateStringIsMinimized,
+  toggle: toggleDateStringIsMinimized,
+} = createBooleanState(false);
 
-const { state: detailedFilterIsOpen$, toggle: toggleDetailedFilter } =
-  createBooleanState(false);
+const {
+  useCurrentValue: useDetailedFilterIsOpen,
+  toggle: toggleDetailedFilter,
+} = createBooleanState(false);
 
 export const AnswerTableStore = {
   tableBodyValuesFiltered$,
-  detailedFilterIsOpen$,
+  useDetailedFilterIsOpen,
   toggleDetailedFilter,
-  dateStringIsMinimized$,
+  useDateStringIsMinimized,
   toggleDateStringIsMinimized,
-  answerIconIsHidden$,
+  useAnswerIconIsHidden,
   toggleAnswerIconIsHidden,
-  tableIsMinimized$,
+  useTableIsMinimized,
   toggleTableIsMinimized,
 } as const;

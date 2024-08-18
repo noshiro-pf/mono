@@ -94,18 +94,22 @@ const saveToLocalStorage = (
 };
 
 const {
-  state: isLoading$,
+  useCurrentValue: useIsLoading,
   setTrue: setIsLoadingTrue,
   setFalse: setIsLoadingFalse,
 } = createBooleanState(false);
 
 const {
-  state: createResultDialogIsOpen$,
+  useCurrentValue: useCreateResultDialogIsOpen,
   setTrue: openCreateResultDialog,
   setFalse: closeCreateResultDialog,
 } = createBooleanState(false);
 
-const { state: url$, setState: setUrl } = createState<string>('');
+const {
+  useCurrentValue: useUrl,
+  state: url$,
+  setState: setUrl,
+} = createState<string>('');
 
 const createEvent = async (): Promise<Result<undefined, string>> => {
   const commonState = commonState$.snapshot.value;
@@ -203,12 +207,12 @@ export const CreateEventScheduleStore = {
   closeCreateResultDialog,
   commonState$,
   commonStateHandlers,
-  createResultDialogIsOpen$,
+  useCreateResultDialogIsOpen,
   hasNoChanges$,
-  isLoading$,
+  useIsLoading,
   onClipboardButtonClick,
   onCreateEventClick,
   resetAllState,
   restoreFromLocalStorage,
-  url$,
+  useUrl,
 } as const;

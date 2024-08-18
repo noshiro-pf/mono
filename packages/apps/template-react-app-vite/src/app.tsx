@@ -1,14 +1,14 @@
 import './app.css';
 import { reactLogo } from './assets';
 
-const { state: count$, updateState: updateCount } = createState(0);
+const { useCurrentValue: useCount, updateState: updateCount } = createState(0);
 
 const increment = (): void => {
   updateCount((c) => c + 1);
 };
 
 export const App = memoNamed('App', () => {
-  const count = useObservableValue(count$);
+  const count = useCount();
 
   return (
     <div className='App'>

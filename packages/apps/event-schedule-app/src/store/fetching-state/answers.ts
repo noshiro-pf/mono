@@ -15,11 +15,13 @@ const { state: answersResult$, setState: setAnswersResult } = createState<
 
 const result$ = answersResult$;
 
-const { state: refreshButtonIsLoading$, setState: setRefreshButtonIsLoading } =
-  createBooleanState(false);
+const {
+  useCurrentValue: useRefreshButtonIsLoading,
+  setState: setRefreshButtonIsLoading,
+} = createBooleanState(false);
 
 const {
-  state: refreshButtonIsDisabled$,
+  useCurrentValue: useRefreshButtonIsDisabled,
   setState: setRefreshButtonIsDisabled,
 } = createBooleanState(false);
 
@@ -74,8 +76,8 @@ const answers$: InitializedObservable<readonly Answer[] | undefined> = result$
 export const AnswersStore = {
   answers$,
   result$,
-  refreshButtonIsDisabled$,
-  refreshButtonIsLoading$,
+  useRefreshButtonIsDisabled,
+  useRefreshButtonIsLoading,
   fetchAnswers,
   refreshAnswers,
 } as const;
