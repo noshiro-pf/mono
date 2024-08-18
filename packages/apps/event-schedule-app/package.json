@@ -121,6 +121,7 @@
     "type-check:src": {
       "dependencies": [
         "z:setup:gen-global-dts",
+        "../event-schedule-app-shared:type-check",
         "z:setup:service-account-key"
       ],
       "command": "tsc --noEmit"
