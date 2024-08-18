@@ -218,7 +218,11 @@ const updatePackageJsonImpl = (
             mut_wireit['type-check:src'] = {
               dependencies:
                 packageName === 'event-schedule-app'
-                  ? ['z:setup:gen-global-dts', 'z:setup:service-account-key']
+                  ? [
+                      'z:setup:gen-global-dts',
+                      '../event-schedule-app-shared:type-check',
+                      'z:setup:service-account-key',
+                    ]
                   : ['z:setup:gen-global-dts'],
               command: 'tsc --noEmit',
             };

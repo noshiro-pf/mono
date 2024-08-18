@@ -128,7 +128,7 @@ jobs:
       - name: Build dependencies
         run: yarn zz:wsrun-stages --recursive -p @noshiro/event-schedule-app -c build
 
-      - name: build functions
+      - name: Build functions
         run: yarn workspace @noshiro/event-schedule-app-functions build
 
       # - name: create runtimeconfig

@@ -8,7 +8,9 @@
   "type": "module",
   "main": "build/index.mjs",
   "scripts": {
-    "build": "wireit",
+    "build": "run-s clean:build type-check build:deps",
+    "build:deps": "wireit",
+    "build:impl": "tsc --project tsconfig.json",
     "clean": "run-p clean:**",
     "clean:build": "rimraf build",
     "clean:eslintcache": "rimraf .eslintcache",
@@ -30,7 +32,7 @@
     "start:shell": "yarn shell",
     "tsc": "yarn type-check",
     "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit",
+    "type-check": "tsc --noEmit",
     "watch": "tsc --watch --incremental --pretty --project tsconfig.json",
     "z:setup": "run-p z:setup:fb:emulators:gen-runtimeconfig",
     "z:setup:fb:emulators:gen-dummy-runtimeconfig": "echo '{ \"gmail\": { \"email\": \"dummy@gmail.com\", \"password\": \"dummy\", \"app-password\": \"dummy\", \"email-address-for-error-log\": \"dummy@gmail.com\" } }' > .runtimeconfig.json",
@@ -52,19 +54,10 @@
     "node": "20"
   },
   "wireit": {
-    "type-check": {
+    "build:deps": {
       "dependencies": [
         "../../event-schedule-app-shared:build"
-      ],
-      "command": "tsc --noEmit"
-    },
-    "build": {
-      "dependencies": [
-        "clean:build",
-        "../../event-schedule-app-shared:build",
-        "type-check"
-      ],
-      "command": "tsc --project tsconfig.json"
+      ]
     },
     "fb:deploy": {
       "dependencies": [
