@@ -55,6 +55,9 @@
     "ws:test": "yarn zz:wsrun-parallel test",
     "ws:test:utils": "wireit",
     "ws:type-check": "yarn zz:wsrun-parallel type-check",
+    "ws:type-check:apps": "wireit",
+    "ws:type-check:non-utils": "wireit",
+    "ws:type-check:utils": "wireit",
     "zz:check:no-diff": "scripts/bash/git_no_changes.sh",
     "zz:prettier": "prettier --ignore-unknown --no-error-on-unmatched-pattern --write",
     "zz:prettier:cache": "yarn zz:prettier --cache --cache-strategy content",
@@ -144,6 +147,24 @@
         "build:mono-scripts"
       ],
       "command": "node scripts/commands/generate-configs-and-scripts-main.mjs"
+    },
+    "ws:type-check:apps": {
+      "dependencies": [
+        "build:mono-scripts"
+      ],
+      "command": "node scripts/commands/type-check-apps.mjs"
+    },
+    "ws:type-check:utils": {
+      "dependencies": [
+        "build:mono-scripts"
+      ],
+      "command": "node scripts/commands/type-check-utils.mjs"
+    },
+    "ws:type-check:non-utils": {
+      "dependencies": [
+        "build:mono-scripts"
+      ],
+      "command": "node scripts/commands/type-check-non-utils.mjs"
     },
     "ws:build:apps": {
       "dependencies": [
