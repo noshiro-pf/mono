@@ -14,17 +14,21 @@
       }
     }
   },
+  "files": [
+    "./src/**/*.mts",
+    "./esm"
+  ],
   "scripts": {
-    "build": "tsc --project ./configs/tsconfig.build.json",
-    "build:full": "run-s build:scripts build:src",
+    "build": "yarn build:src",
+    "build:full": "run-s gen-rules-type build:src",
     "build:scripts": "wireit",
     "build:src": "wireit",
     "clean": "run-p clean:**",
     "clean:build": "rimraf esm",
     "clean:build:scripts": "rimraf \"scripts/!(eslint.config.gen).mjs\"",
-    "clean:wireit": "rimraf .wireit/**",
+    "clean:wireit": "rimraf .wireit",
     "fmt": "yarn zz:prettier .",
-    "gen-rules-type": "run-s build:scripts gen-rules-type:command",
+    "gen-rules-type": "wireit",
     "gen-rules-type:command": "node ./scripts/main.mjs",
     "gi": "bash ../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
     "lint": "run-p lint:scripts lint:src",
@@ -76,6 +80,12 @@
     "json-schema-to-typescript": "^14.0.4"
   },
   "wireit": {
+    "gen-rules-type": {
+      "dependencies": [
+        "build:scripts"
+      ],
+      "command": "node ./scripts/main.mjs"
+    },
     "build:scripts": {
       "dependencies": [
         "clean:build:scripts"
@@ -84,9 +94,10 @@
     },
     "build:src": {
       "dependencies": [
-        "clean:build"
+        "clean:build",
+        "gi"
       ],
-      "command": "run-s gi gen-rules-type build:no-gen"
+      "command": "tsc --project ./configs/tsconfig.build.json"
     }
   }
 }
