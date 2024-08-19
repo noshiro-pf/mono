@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "../../../configs/tsconfig/tsconfig.lib.type-check.json",
+    "../../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    // rollup が extends の設定を正常に読み込まないせいで警告が出るので必要
+    "module": "Node16",
+    "moduleResolution": "Node16",
+
+    // rollup がdefault export を使っているせいで必要
+    "allowSyntheticDefaultImports": false
+  },
+  "include": ["./src", "./configs"]
+}
