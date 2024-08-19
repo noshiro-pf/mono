@@ -24,9 +24,8 @@
   },
   "scripts": {
     "build": "wireit",
-    "clean": "run-p clean:build clean:eslintcache clean:wireit",
+    "clean": "run-p clean:build clean:wireit",
     "clean:build": "rimraf esm",
-    "clean:eslintcache": "rimraf .eslintcache",
     "clean:src": "rimraf src/*.mts",
     "clean:wireit": "rimraf .wireit/**",
     "fmt": "yarn zz:prettier .",

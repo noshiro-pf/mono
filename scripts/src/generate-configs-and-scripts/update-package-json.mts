@@ -149,7 +149,6 @@ const updatePackageJsonImpl = (
         mut_packageJson['scripts'] = {
           build: 'yarn zz:build:seq',
           clean: 'run-p clean:**',
-          'clean:eslintcache': 'rimraf .eslintcache',
           'clean:wireit': 'rimraf .wireit/**',
           fmt: 'yarn zz:prettier .',
           lint: 'yarn zz:eslint:src-and-test',
@@ -192,8 +191,7 @@ const updatePackageJsonImpl = (
 
           if (packageName.startsWith('global-')) {
             mut_scripts['clean:src'] = 'rimraf src/*.mts';
-            mut_scripts['clean'] =
-              'run-p clean:build clean:eslintcache clean:wireit';
+            mut_scripts['clean'] = 'run-p clean:build clean:wireit';
           } else {
             mut_scripts['clean'] = 'run-p clean:**';
           }
@@ -302,8 +300,6 @@ const updatePackageJsonImpl = (
         }
 
         if (generateFlag.lint) {
-          mut_scripts['clean:eslintcache'] = 'rimraf .eslintcache';
-
           if (cfg.useVite === true) {
             mut_scripts['lint'] = 'run-p lint:src lint:cy';
             mut_scripts['lint:src'] =

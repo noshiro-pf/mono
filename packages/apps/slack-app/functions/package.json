@@ -9,7 +9,6 @@
     "build": "wireit",
     "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
-    "clean:eslintcache": "rimraf .eslintcache",
     "clean:firebase": "rimraf .firebase",
     "clean:wireit": "rimraf .wireit/**",
     "fb:config:get": "firebase functions:config:get",

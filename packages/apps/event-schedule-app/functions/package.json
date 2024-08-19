@@ -13,7 +13,6 @@
     "build:impl": "tsc --project tsconfig.json",
     "clean": "run-p clean:**",
     "clean:build": "rimraf build",
-    "clean:eslintcache": "rimraf .eslintcache",
     "clean:firebase": "rimraf .firebase",
     "clean:wireit": "rimraf .wireit/**",
     "fb:config:get": "firebase functions:config:get",

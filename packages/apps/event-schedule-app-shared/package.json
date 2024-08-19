@@ -60,7 +60,6 @@
     "build": "wireit",
     "clean": "run-p clean:**",
     "clean:build": "rimraf esm",
-    "clean:eslintcache": "rimraf .eslintcache",
     "clean:wireit": "rimraf .wireit/**",
     "fmt": "yarn zz:prettier .",
     "gi": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 2 --ext .mts",

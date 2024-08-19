@@ -17,7 +17,6 @@
   "scripts": {
     "build": "yarn zz:build:seq",
     "clean": "run-p clean:**",
-    "clean:eslintcache": "rimraf .eslintcache",
     "clean:wireit": "rimraf .wireit/**",
     "fmt": "yarn zz:prettier .",
     "lint": "yarn zz:eslint:src-and-test",

@@ -18,7 +18,6 @@
     "build": "wireit",
     "clean": "run-p clean:**",
     "clean:build": "rimraf esm",
-    "clean:eslintcache": "rimraf .eslintcache",
     "clean:wireit": "rimraf .wireit/**",
     "fmt": "yarn zz:prettier .",
     "lint": "yarn zz:eslint:src",
