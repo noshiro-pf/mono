@@ -3,9 +3,9 @@ import { Routes } from '../constants';
 const _router = createRouter();
 
 const pathSegments$: InitializedObservable<readonly string[]> =
-  _router.state$.chain(mapI((state) => state.pathSegments));
+  _router.state.chain(map((state) => state.pathSegments));
 
-const pageToBack$ = _router.state$.chain(pluckI('pathname')).chain(
+const pageToBack$ = _router.state.chain(pluck('pathname')).chain(
   filter((pathname) => {
     const pathSegments = _router.utils.splitToPathSegments(pathname);
 
@@ -24,27 +24,27 @@ export const Router = {
 
   isRoute: {
     createPage$: pathSegments$
-      .chain(mapI(Routes.isRoute.createPage))
-      .chain(distinctUntilChangedI()),
+      .chain(map(Routes.isRoute.createPage))
+      .chain(skipIfNoChange()),
     answerPage$: pathSegments$
-      .chain(mapI(Routes.isRoute.answerPage))
-      .chain(distinctUntilChangedI()),
+      .chain(map(Routes.isRoute.answerPage))
+      .chain(skipIfNoChange()),
     editPage$: pathSegments$
-      .chain(mapI(Routes.isRoute.editPage))
-      .chain(distinctUntilChangedI()),
+      .chain(map(Routes.isRoute.editPage))
+      .chain(skipIfNoChange()),
     eventListPage$: pathSegments$
-      .chain(mapI(Routes.isRoute.eventListPage))
-      .chain(distinctUntilChangedI()),
+      .chain(map(Routes.isRoute.eventListPage))
+      .chain(skipIfNoChange()),
     registerPage$: pathSegments$
-      .chain(mapI(Routes.isRoute.registerPage))
-      .chain(distinctUntilChangedI()),
+      .chain(map(Routes.isRoute.registerPage))
+      .chain(skipIfNoChange()),
     signInPage$: pathSegments$
-      .chain(mapI(Routes.isRoute.signInPage))
-      .chain(distinctUntilChangedI()),
+      .chain(map(Routes.isRoute.signInPage))
+      .chain(skipIfNoChange()),
   },
   eventId$: pathSegments$
-    .chain(mapI(Routes.getEventIdFromPathname))
-    .chain(distinctUntilChangedI()),
+    .chain(map(Routes.getEventIdFromPathname))
+    .chain(skipIfNoChange()),
 
   useShowPage: (): Readonly<{
     createPage: boolean;
@@ -72,7 +72,7 @@ export const Router = {
   },
 } as const;
 
-Router.state$.subscribe(({ pathname }) => {
+Router.state.subscribe(({ pathname }) => {
   const to = Routes.redirectRules.get(pathname);
   if (to !== undefined) {
     Router.redirect(to);

@@ -1,4 +1,4 @@
-import { combineLatest, map, of, withLatestFrom } from '../src/index.mjs';
+import { combine, map, of, withCurrentValueFrom } from '../src/index.mjs';
 
 describe('graph-structure', () => {
   test('case 1', () => {
@@ -16,7 +16,7 @@ describe('graph-structure', () => {
     const source$ = of(0);
     const double$ = source$.chain(map((x) => x * 2));
     const quad$ = source$.chain(map((x) => x * 2)).chain(map((x) => x * 2));
-    const combined$ = combineLatest([source$, double$, quad$] as const);
+    const combined$ = combine([source$, double$, quad$] as const);
 
     expect(source$.depth).toBe(0);
     expect(double$.depth).toBe(1);
@@ -27,7 +27,7 @@ describe('graph-structure', () => {
   test('case 2', () => {
     const source$ = of(0);
     const double$ = source$.chain(map((x) => x * 2));
-    const combined$ = double$.chain(withLatestFrom(source$));
+    const combined$ = double$.chain(withCurrentValueFrom(source$));
 
     expect(source$.depth).toBe(0);
     expect(double$.depth).toBe(1);
@@ -39,8 +39,8 @@ describe('graph-structure', () => {
     const double$ = source$.chain(map((x) => x * 2));
     const quad$ = source$.chain(map((x) => x * 2)).chain(map((x) => x * 2));
     const combined$ = double$
-      .chain(withLatestFrom(source$))
-      .chain(withLatestFrom(quad$));
+      .chain(withCurrentValueFrom(source$))
+      .chain(withCurrentValueFrom(quad$));
 
     expect(source$.depth).toBe(0);
     expect(double$.depth).toBe(1);

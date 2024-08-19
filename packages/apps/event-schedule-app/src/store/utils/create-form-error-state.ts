@@ -4,7 +4,7 @@ export const createFormError = <T>(
   onValueChange: (v: T) => void,
 ): [InitializedObservable<boolean>, (v: T) => void, () => void] => {
   const {
-    state$: errorShown$,
+    state: errorShown$,
     setTrue: show,
     setFalse: hide,
   } = createBooleanState(false);

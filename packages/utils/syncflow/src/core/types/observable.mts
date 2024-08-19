@@ -1,4 +1,4 @@
-import { type Maybe } from '@noshiro/ts-utils';
+import { expectType, type Maybe } from '@noshiro/ts-utils';
 import { type ObservableId, type UpdaterSymbol } from './id.mjs';
 import { type ObservableKind } from './observable-kind.mjs';
 import {
@@ -23,13 +23,17 @@ import { type NonEmptyUnknownList, type Subscription } from './types.mjs';
  * ```
  */
 
-export type ObservableBase<A> = Readonly<{
+type CreateObservableType<
+  A,
+  Kind extends ObservableKind,
+  Type extends ObservableType,
+> = Readonly<{
   id: ObservableId;
-  kind: ObservableKind;
-  type: ObservableType;
+  kind: Kind;
+  type: Type;
 
   // reactive dependency tree structure
-  depth: number;
+  depth: ObservableKind extends 'root' ? 0 : number;
   addChild: <B>(child: ChildObservable<B>) => void;
 
   // state
@@ -45,57 +49,93 @@ export type ObservableBase<A> = Readonly<{
   complete: () => void;
   subscribe: (onNext: (v: A) => void, onComplete?: () => void) => Subscription;
 
-  chain: (<B>(
-    operator: ToInitializedOperator<A, B>,
-  ) => InitializedObservable<B>) &
-    (<B>(operator: ToUninitializedOperator<A, B>) => Observable<B>);
+  chain: //
+  (<B>(operator: SetInitialValueOperator<A, B>) => InitializedObservable<B>) &
+    (<B>(operator: DropInitialValueOperator<A, B>) => Observable<B>) &
+    (<B>(operator: KeepInitialValueOperator<A, B>) => Observable<B>);
 }>;
 
-export type InitializedObservableBase<A> = ObservableBase<A> &
-  Readonly<{
-    snapshot: Maybe.Some<A>;
-    chain: (<B>(
-      operator:
-        | InitializedToInitializedOperator<A, B>
-        | ToInitializedOperator<A, B>,
-    ) => InitializedObservable<B>) &
-      (<B>(operator: ToUninitializedOperator<A, B>) => Observable<B>);
-  }>;
+export type ObservableBase<A> = CreateObservableType<
+  A,
+  ObservableKind,
+  ObservableType
+>;
+
+/** @internal */
+namespace ObservableTypeConverter {
+  export type ToInitialized<
+    A,
+    O extends CreateObservableType<A, ObservableKind, ObservableType>,
+  > = Omit<O, 'chain' | 'snapshot'> &
+    Readonly<{
+      snapshot: Maybe.Some<A>;
+
+      chain: //
+      (<B>(
+        operator: SetInitialValueOperator<A, B>,
+      ) => InitializedObservable<B>) &
+        (<B>(operator: DropInitialValueOperator<A, B>) => Observable<B>) &
+        (<B>(
+          operator: KeepInitialValueOperator<A, B>,
+        ) => InitializedObservable<B>);
+    }>;
+
+  export type ToChild<
+    A,
+    O extends CreateObservableType<A, ObservableKind, ObservableType>,
+    P extends NonEmptyUnknownList = NonEmptyUnknownList,
+  > = O &
+    Readonly<{
+      parents: Wrap<P>;
+    }>;
+
+  export type ToManager<
+    A,
+    O extends CreateObservableType<
+      A,
+      'async child' | 'root',
+      AsyncChildObservableType | RootObservableType
+    >,
+  > = O &
+    Readonly<{
+      addDescendant: <B>(child: ChildObservable<B>) => void;
+    }>;
+}
 
 export type SyncChildObservable<
   A,
   Type extends SyncChildObservableType,
   P extends NonEmptyUnknownList = NonEmptyUnknownList,
-> = ObservableBase<A> &
-  Readonly<{
-    kind: 'sync child';
-    type: Type;
-    parents: Wrap<P>;
-  }>;
+> = ObservableTypeConverter.ToChild<
+  A,
+  CreateObservableType<A, 'sync child', Type>,
+  P
+>;
 
 export type InitializedSyncChildObservable<
   A,
   Type extends SyncChildObservableType,
   P extends NonEmptyUnknownList = NonEmptyUnknownList,
-> = InitializedObservableBase<A> & SyncChildObservable<A, Type, P>;
+> = ObservableTypeConverter.ToInitialized<A, SyncChildObservable<A, Type, P>>;
 
 export type AsyncChildObservable<
   A,
   Type extends AsyncChildObservableType,
   P extends NonEmptyUnknownList = NonEmptyUnknownList,
-> = ObservableBase<A> &
-  Readonly<{
-    kind: 'async child';
-    type: Type;
-    parents: Wrap<P>;
-    addDescendant: <B>(child: ChildObservable<B>) => void;
-  }>;
+> = ObservableTypeConverter.ToManager<
+  A,
+  ObservableTypeConverter.ToChild<
+    A,
+    CreateObservableType<A, 'async child', Type>,
+    P
+  >
+>;
 
 export type InitializedAsyncChildObservable<
   A,
   Type extends AsyncChildObservableType,
   P extends NonEmptyUnknownList = NonEmptyUnknownList,
-> = AsyncChildObservable<A, Type, P> & InitializedObservableBase<A>;
+> = ObservableTypeConverter.ToInitialized<A, AsyncChildObservable<A, Type, P>>;
 
 export type ChildObservable<
   A,
@@ -107,18 +147,12 @@ export type ChildObservable<
 export type RootObservable<
   A,
   Type extends RootObservableType,
-> = ObservableBase<A> &
-  Readonly<{
-    kind: 'root';
-    type: Type;
-    depth: 0;
-    addDescendant: <B>(child: ChildObservable<B>) => void;
-  }>;
+> = ObservableTypeConverter.ToManager<A, CreateObservableType<A, 'root', Type>>;
 
 export type InitializedRootObservable<
   A,
   Type extends RootObservableType,
-> = InitializedObservableBase<A> & RootObservable<A, Type>;
+> = ObservableTypeConverter.ToInitialized<A, RootObservable<A, Type>>;
 
 export type Observable<A> =
   | AsyncChildObservable<A, AsyncChildObservableType>
@@ -134,27 +168,24 @@ export type ManagerObservable<A> =
   | AsyncChildObservable<A, AsyncChildObservableType>
   | RootObservable<A, RootObservableType>;
 
-export type InitializedToInitializedOperator<A, B> = (
+/* operator types */
+
+export type SetInitialValueOperator<A, B> = (
+  src: Observable<A>,
+) => InitializedObservable<B>;
+
+export type DropInitialValueOperator<A, B> = (
+  src: InitializedObservable<A> | Observable<A>,
+) => Observable<B>;
+
+export type KeepInitialValueOperator<A, B> = (
   src: InitializedObservable<A>,
 ) => InitializedObservable<B>;
 
-export type ToInitializedOperator<A, B> = (
-  src: InitializedObservable<A> | Observable<A>,
-) => InitializedObservable<B>;
-
-export type ToUninitializedOperator<A, B> = (
-  src: InitializedObservable<A> | Observable<A>,
-) => Observable<B>;
-
-type UninitializedToUninitializedOperator<A, B> = (
-  src: Observable<A>,
-) => Observable<B>;
-
 export type Operator<A, B> =
-  | InitializedToInitializedOperator<A, B>
-  | ToInitializedOperator<A, B>
-  | ToUninitializedOperator<A, B>
-  | UninitializedToUninitializedOperator<A, B>;
+  | SetInitialValueOperator<A, B>
+  | DropInitialValueOperator<A, B>
+  | KeepInitialValueOperator<A, B>;
 
 export const isManagerObservable = <A,>(
   obs: Observable<A>,
@@ -182,3 +213,38 @@ export type Wrap<A extends readonly unknown[]> = {
 export type WrapInitialized<A extends readonly unknown[]> = {
   readonly [P in keyof A]: InitializedObservable<A[P]>;
 };
+
+// type GetDestTypeOfOperator<Op extends Operator<unknown, unknown>> =
+//   Op extends Operator<unknown, infer B> ? B : never;
+
+if (import.meta.vitest !== undefined) {
+  test('type test', () => {
+    expect(1).toBe(1); // dummy
+  });
+
+  expectType<keyof AsyncChildObservable<unknown, 'auditTime'>, 'addDescendant'>(
+    '>=',
+  );
+
+  expectType<keyof RootObservable<unknown, 'Source'>, 'addDescendant'>('>=');
+
+  expectType<Unwrap<Wrap<readonly [1, 2, 3]>>, readonly [1, 2, 3]>('=');
+
+  expectType<number, ObservableValue<Observable<number>>>('<=');
+  expectType<number, ObservableValue<Observable<string>>>('!<=');
+
+  expectType<
+    readonly [number, string],
+    Unwrap<readonly [Observable<number>, Observable<string>]>
+  >('<=');
+  expectType<number, ObservableValue<Observable<string>>>('!<=');
+
+  expectType<
+    readonly [Observable<number>, Observable<number>],
+    Wrap<readonly [number, number]>
+  >('<=');
+  expectType<
+    readonly [Observable<number>, Observable<string>],
+    Wrap<readonly [number, number]>
+  >('!<=');
+}

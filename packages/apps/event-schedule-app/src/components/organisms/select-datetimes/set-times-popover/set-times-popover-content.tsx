@@ -176,7 +176,7 @@ export const SetTimesPopoverContent = memoNamed<Props>(
   },
 );
 
-const [timeRange$, dispatch] = createReducer(
+const { state: timeRange$, dispatch } = createReducer(
   timeRangeReducer,
   timeRangeDefaultValue,
 );
@@ -221,9 +221,8 @@ const dayCheckboxReducer: Reducer<
         }
       : Obj.set(state, action.key, action.checked);
 
-const [checkboxState$, checkboxStateDispatch] = createReducer(
-  dayCheckboxReducer,
-  {
+const { state: checkboxState$, dispatch: checkboxStateDispatch } =
+  createReducer(dayCheckboxReducer, {
     Sun: true,
     Mon: true,
     Tue: true,
@@ -231,8 +230,7 @@ const [checkboxState$, checkboxStateDispatch] = createReducer(
     Thr: true,
     Fri: true,
     Sat: true,
-  },
-);
+  });
 
 const setSundayCheck = (checked: boolean): void => {
   checkboxStateDispatch({ key: 'Sun', checked });

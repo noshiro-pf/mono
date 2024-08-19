@@ -26,7 +26,7 @@ export const Root = memoNamed('Root', () => {
   });
 
   const { pathname, searchParams: queryParams } = useObservableValue(
-    Router.state$,
+    Router.state,
   );
 
   const showMain = useMemo(() => isMainPage(pathname), [pathname]);

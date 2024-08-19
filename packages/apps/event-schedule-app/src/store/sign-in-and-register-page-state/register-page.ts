@@ -14,27 +14,27 @@ const dc = dict.register;
 
 const toast = createToaster();
 
-const [formState$, dispatch] = createReducer(
+const { state: formState$, dispatch } = createReducer(
   registerPageStateReducer,
   registerPageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || registerPageHasError(state)),
+  map((st) => st.isWaitingResponse || registerPageHasError(st)),
 );
 
 const usernameFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.username.error === undefined ? 'primary' : 'danger')),
+  map((st) => (st.username.error === undefined ? 'primary' : 'danger')),
 );
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger')),
+  map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
 );
 
 const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) =>
-    state.password.password.error === undefined &&
-    state.password.passwordConfirmation.error === undefined
+  map((st) =>
+    st.password.password.error === undefined &&
+    st.password.passwordConfirmation.error === undefined
       ? 'primary'
       : 'danger',
   ),
@@ -44,9 +44,9 @@ const passwordIsOpenState = createBooleanState(false);
 
 const togglePasswordLock = passwordIsOpenState.toggle;
 
-const { state$: passwordIsOpen$, setFalse: hidePassword } = passwordIsOpenState;
+const { state: passwordIsOpen$, setFalse: hidePassword } = passwordIsOpenState;
 
-const state$ = combineLatestI([
+const state = combine([
   formState$,
   enterButtonDisabled$,
   usernameFormIntent$,
@@ -54,7 +54,7 @@ const state$ = combineLatestI([
   passwordFormIntent$,
   passwordIsOpen$,
 ]).chain(
-  mapI(
+  map(
     ([
       formState,
       enterButtonDisabled,
@@ -207,7 +207,7 @@ Router.isRoute.registerPage$.subscribe((isRegisterPage) => {
 });
 
 export const RegisterPageStore = {
-  state$,
+  state,
   togglePasswordLock,
   inputUsernameHandler,
   inputEmailHandler,

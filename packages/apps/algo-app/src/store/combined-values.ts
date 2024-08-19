@@ -19,32 +19,34 @@ import { gameState$ } from './game-state';
 import { myPlayerIndex$ } from './my-player-index';
 import { cardPositions$, playerNamePositions$ } from './position';
 
-const isMyTurn$: InitializedObservable<boolean> = combineLatestI([
+const isMyTurn$: InitializedObservable<boolean> = combine([
   gameState$,
   myPlayerIndex$,
 ] as const).chain(
-  mapI(
+  map(
     ([gameState, myPlayerIndex]) =>
       gameState.currentPlayerIndex === myPlayerIndex,
   ),
 );
 
-export const displayValues$: InitializedObservable<DisplayValues> =
-  combineLatestI([gameState$, myPlayerIndex$] as const).chain(
-    mapI(([gameState, myPlayerIndex]) =>
-      mapToDisplayValue({
-        gameState,
-        myPlayerIndex: myPlayerIndex ?? 0,
-        onCardClick,
-      }),
-    ),
-  );
+export const displayValues$: InitializedObservable<DisplayValues> = combine([
+  gameState$,
+  myPlayerIndex$,
+] as const).chain(
+  map(([gameState, myPlayerIndex]) =>
+    mapToDisplayValue({
+      gameState,
+      myPlayerIndex: myPlayerIndex ?? 0,
+      onCardClick,
+    }),
+  ),
+);
 
-export const turnPlayerHighlighterPosition$ = combineLatestI([
+export const turnPlayerHighlighterPosition$ = combine([
   playerNamePositions$,
   displayValues$,
 ] as const).chain(
-  mapI(([playerNamePositions, displayValues]) =>
+  map(([playerNamePositions, displayValues]) =>
     playerNamePositions === undefined
       ? undefined
       : playerNamePositions[displayValues.turnPlayer],
@@ -53,8 +55,8 @@ export const turnPlayerHighlighterPosition$ = combineLatestI([
 
 export const confirmTossBalloonProps$: InitializedObservable<
   ConfirmTossBalloonProps | undefined
-> = combineLatestI([isMyTurn$, gameState$, cardPositions$] as const).chain(
-  mapI(([isMyTurn, gameState, cardPositions]) => {
+> = combine([isMyTurn$, gameState$, cardPositions$] as const).chain(
+  map(([isMyTurn, gameState, cardPositions]) => {
     if (!isMyTurn) return undefined;
     if (!gameState.confirmTossBalloonIsOpen) return undefined;
     if (cardPositions === undefined) return undefined;
@@ -76,13 +78,13 @@ export const confirmTossBalloonProps$: InitializedObservable<
 
 export const selectAnswerBalloonProps$: InitializedObservable<
   SelectAnswerBalloonProps | undefined
-> = combineLatestI([
+> = combine([
   isMyTurn$,
   gameState$,
   cardPositions$,
   displayValues$,
 ] as const).chain(
-  mapI(([isMyTurn, gameState, cardPositions, displayValues]) => {
+  map(([isMyTurn, gameState, cardPositions, displayValues]) => {
     if (!isMyTurn) return undefined;
     if (!gameState.selectAnswerBalloonIsOpen) return undefined;
     if (cardPositions === undefined) return undefined;
@@ -110,8 +112,8 @@ export const selectAnswerBalloonProps$: InitializedObservable<
 
 export const decidedAnswerBalloonProps$: InitializedObservable<
   DecidedAnswerBalloonProps | undefined
-> = combineLatestI([cardPositions$, gameState$, displayValues$] as const).chain(
-  mapI(([cardPositions, gameState, displayValues]) => {
+> = combine([cardPositions$, gameState$, displayValues$] as const).chain(
+  map(([cardPositions, gameState, displayValues]) => {
     if (cardPositions === undefined) return undefined;
 
     if (!gameState.decidedAnswerBalloonIsOpen) return undefined;

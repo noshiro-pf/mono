@@ -24,7 +24,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
       emailFormIntent,
       passwordFormIntent,
       passwordIsOpen,
-    } = useObservableValue(UpdateEmailPageStore.state$);
+    } = useObservableValue(UpdateEmailPageStore.state);
 
     return (
       <UpdateUserInfoDialogTemplate

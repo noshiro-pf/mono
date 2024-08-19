@@ -28,7 +28,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
       newPasswordFormIntent,
       oldPasswordIsOpen,
       newPasswordIsOpen,
-    } = useObservableValue(UpdatePasswordPageStore.state$);
+    } = useObservableValue(UpdatePasswordPageStore.state);
 
     return (
       <UpdateUserInfoDialogTemplate

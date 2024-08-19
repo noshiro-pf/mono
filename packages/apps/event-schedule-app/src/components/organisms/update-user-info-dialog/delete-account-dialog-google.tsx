@@ -21,7 +21,7 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
       enterButtonDisabled,
       isWaitingResponse,
       emailFormIntent,
-    } = useObservableValue(DeleteAccountCreatedWithGoogleStore.state$);
+    } = useObservableValue(DeleteAccountCreatedWithGoogleStore.state);
 
     return (
       <UpdateUserInfoDialogTemplate

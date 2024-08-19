@@ -1,9 +1,12 @@
-import { type Maybe, type Result } from '@noshiro/ts-utils';
+import { expectType, type Result } from '@noshiro/ts-utils';
 import {
   type AsyncChildObservable,
+  type InitializedObservable,
   type InitializedSyncChildObservable,
+  type Observable,
   type RootObservable,
   type SyncChildObservable,
+  type Unwrap,
 } from './observable.mjs';
 import { type NonEmptyUnknownList } from './types.mjs';
 
@@ -46,10 +49,11 @@ export type TimerObservable = Readonly<{
 
 // InitializedSyncChildObservable
 
-export type WithInitialValueOperatorObservable<
+export type SetInitialValueOperatorObservable<
   A,
   I = A,
-> = InitializedSyncChildObservable<A | I, 'withInitialValue', readonly [A]>;
+> = InitializedSyncChildObservable<A | I, 'setInitialValue', readonly [A]>;
+
 export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
   B,
   'scan',
@@ -58,127 +62,167 @@ export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
 
 // SyncChildObservable
 
-export type InitializedCombineLatestObservable<A extends NonEmptyUnknownList> =
-  InitializedSyncChildObservable<A, 'combineLatest', A>;
+namespace SyncFlowInternals {
+  type Cast<A> = A extends NonEmptyUnknownList ? A : never;
 
-export type CombineLatestObservable<A extends NonEmptyUnknownList> =
-  SyncChildObservable<A, 'combineLatest', A>;
+  type EveryInitialized<OS extends NonEmptyArray<Observable<unknown>>> =
+    OS extends NonEmptyArray<InitializedObservable<unknown>> ? true : false;
 
-export type InitializedZipObservable<A extends NonEmptyUnknownList> =
-  InitializedSyncChildObservable<A, 'zip', A>;
+  type IsInitialized<O> = [O] extends [InitializedObservable<unknown>]
+    ? true
+    : false;
 
-export type ZipObservable<A extends NonEmptyUnknownList> = SyncChildObservable<
-  A,
-  'zip',
-  A
->;
+  /** True | false を boolean ではなく true に評価する */
+  type LogicalValue<B extends boolean> = [B] extends [true]
+    ? true
+    : [B] extends [false]
+      ? false
+      : true;
 
-export type InitializedMergeObservable<P extends NonEmptyUnknownList> =
-  InitializedSyncChildObservable<ArrayElement<P>, 'merge', P>;
+  type SomeInitializedImpl<OS extends Observable<unknown>> =
+    // union distribution
+    LogicalValue<OS extends OS ? IsInitialized<OS> : never>;
 
-export type MergeObservable<P extends NonEmptyUnknownList> =
-  SyncChildObservable<ArrayElement<P>, 'merge', P>;
+  type SomeInitialized<OS extends NonEmptyArray<Observable<unknown>>> =
+    SomeInitializedImpl<OS[number]>;
 
-export type MapOperatorObservable<A, B> = SyncChildObservable<
-  B,
-  'map',
-  readonly [A]
->;
+  if (import.meta.vitest !== undefined) {
+    test('type test', () => {
+      expect(1).toBe(1); // dummy
+    });
+
+    expectType<EveryInitialized<[Observable<1>]>, false>('=');
+
+    expectType<EveryInitialized<[InitializedObservable<1>]>, true>('=');
+
+    expectType<
+      EveryInitialized<[InitializedObservable<1>, InitializedObservable<2>]>,
+      true
+    >('=');
+
+    expectType<
+      EveryInitialized<[Observable<1>, InitializedObservable<2>]>,
+      false
+    >('=');
+
+    expectType<SomeInitialized<[Observable<1>]>, false>('=');
+
+    expectType<SomeInitialized<[InitializedObservable<1>]>, true>('=');
+
+    expectType<
+      SomeInitialized<[InitializedObservable<1>, InitializedObservable<2>]>,
+      true
+    >('=');
+
+    expectType<
+      SomeInitialized<[Observable<1>, InitializedObservable<2>]>,
+      true
+    >('=');
+  }
+
+  type InitializedCombineObservableImpl<A extends NonEmptyUnknownList> =
+    InitializedSyncChildObservable<A, 'combine', A>;
+
+  export type CombineObservableImpl<A extends NonEmptyUnknownList> =
+    SyncChildObservable<A, 'combine', A>;
+
+  export type CombineObservableRefinedImpl<
+    OS extends NonEmptyArray<Observable<unknown>>,
+  > =
+    EveryInitialized<OS> extends true
+      ? InitializedCombineObservableImpl<Cast<Unwrap<OS>>>
+      : CombineObservableImpl<Unwrap<OS>>;
+
+  type InitializedZipObservableImpl<A extends NonEmptyUnknownList> =
+    InitializedSyncChildObservable<A, 'zip', A>;
+
+  export type ZipObservableImpl<A extends NonEmptyUnknownList> =
+    SyncChildObservable<A, 'zip', A>;
+
+  export type ZipObservableRefinedImpl<
+    OS extends NonEmptyArray<Observable<unknown>>,
+  > =
+    EveryInitialized<OS> extends true
+      ? InitializedZipObservableImpl<Cast<Unwrap<OS>>>
+      : ZipObservableImpl<Unwrap<OS>>;
+
+  type InitializedMergeObservableImpl<P extends NonEmptyUnknownList> =
+    InitializedSyncChildObservable<ArrayElement<P>, 'merge', P>;
+
+  export type MergeObservableImpl<P extends NonEmptyUnknownList> =
+    SyncChildObservable<ArrayElement<P>, 'merge', P>;
+
+  export type MergeObservableRefinedImpl<
+    OS extends NonEmptyArray<Observable<unknown>>,
+  > =
+    SomeInitialized<OS> extends true
+      ? InitializedMergeObservableImpl<Cast<Unwrap<OS>>>
+      : MergeObservableImpl<Unwrap<OS>>;
+}
+
+export type CombineObservable<A extends NonEmptyUnknownList> =
+  SyncFlowInternals.CombineObservableImpl<A>;
+
+export type CombineObservableRefined<
+  OS extends NonEmptyArray<Observable<unknown>>,
+> = SyncFlowInternals.CombineObservableRefinedImpl<OS>;
+
+export type ZipObservable<A extends NonEmptyUnknownList> =
+  SyncFlowInternals.ZipObservableImpl<A>;
+
+export type ZipObservableRefined<
+  OS extends NonEmptyArray<Observable<unknown>>,
+> = SyncFlowInternals.ZipObservableRefinedImpl<OS>;
+
+export type MergeObservable<A extends NonEmptyUnknownList> =
+  SyncFlowInternals.MergeObservableImpl<A>;
+
+export type MergeObservableRefined<
+  OS extends NonEmptyArray<Observable<unknown>>,
+> = SyncFlowInternals.MergeObservableRefinedImpl<OS>;
+
 export type MapWithIndexOperatorObservable<A, B> = SyncChildObservable<
   B,
   'mapWithIndex',
   readonly [A]
 >;
-export type MapToOperatorObservable<A, B> = SyncChildObservable<
-  B,
-  'mapTo',
-  readonly [A]
->;
-export type PluckOperatorObservable<A, K extends keyof A> = SyncChildObservable<
-  A[K],
-  'pluck',
-  readonly [A]
->;
-export type UnwrapMaybeOperatorObservable<M extends Maybe.Base> =
-  SyncChildObservable<Maybe.Unwrap<M> | undefined, 'unwrapMaybe', readonly [M]>;
-export type UnwrapResultOkOperatorObservable<R extends Result.Base> =
-  SyncChildObservable<
-    Result.UnwrapOk<R> | undefined,
-    'unwrapResultOk',
-    readonly [R]
-  >;
-export type UnwrapResultErrOperatorObservable<R extends Result.Base> =
-  SyncChildObservable<
-    Result.UnwrapErr<R> | undefined,
-    'unwrapResultErr',
-    readonly [R]
-  >;
-export type MapMaybeOperatorObservable<
-  M extends Maybe.Base,
-  B,
-> = SyncChildObservable<Maybe<B>, 'mapMaybe', readonly [M]>;
-export type MapResultOkOperatorObservable<
-  R extends Result.Base,
-  S2,
-> = SyncChildObservable<
-  Result<S2, Result.UnwrapErr<R>>,
-  'mapResultOk',
-  readonly [R]
->;
-export type MapResultErrOperatorObservable<
-  R extends Result.Base,
-  E2,
-> = SyncChildObservable<
-  Result<Result.UnwrapOk<R>, E2>,
-  'mapResultErr',
-  readonly [R]
->;
-export type WithIndexOperatorObservable<A> = SyncChildObservable<
-  readonly [SafeUint | -1, A],
-  'withIndex',
-  readonly [A]
->;
+
 export type PairwiseOperatorObservable<A> = SyncChildObservable<
   readonly [A, A],
   'pairwise',
   readonly [A]
 >;
 
-export type TakeOperatorObservable<A> = SyncChildObservable<
-  A,
-  'take',
-  readonly [A]
->;
 export type TakeWhileOperatorObservable<A> = SyncChildObservable<
   A,
   'takeWhile',
   readonly [A]
 >;
+
 export type TakeUntilOperatorObservable<A> = SyncChildObservable<
   A,
   'takeUntil',
   readonly [A]
 >;
-export type SkipOperatorObservable<A> = SyncChildObservable<
-  A,
-  'skip',
-  readonly [A]
->;
+
 export type SkipWhileOperatorObservable<A> = SyncChildObservable<
   A,
   'skipWhile',
   readonly [A]
 >;
+
 export type SkipUntilOperatorObservable<A> = SyncChildObservable<
   A,
   'skipUntil',
   readonly [A]
 >;
-export type WithLatestFromOperatorObservable<A, B> = SyncChildObservable<
+
+export type WithCurrentValueFromOperatorObservable<A, B> = SyncChildObservable<
   readonly [A, B],
-  'withLatestFrom',
+  'withCurrentValueFrom',
   readonly [A]
 >;
+
 export type WithBufferedFromOperatorObservable<A, B> = SyncChildObservable<
   readonly [A, readonly B[]],
   'withBufferedFrom',
@@ -190,11 +234,13 @@ export type FilterOperatorObservable<A> = SyncChildObservable<
   'filter',
   readonly [A]
 >;
-export type DistinctUntilChangedOperatorObservable<A> = SyncChildObservable<
+
+export type SkipIfNoChangeOperatorObservable<A> = SyncChildObservable<
   A,
-  'distinctUntilChanged',
+  'skipIfNoChange',
   readonly [A]
 >;
+
 export type ThrottleTimeOperatorObservable<A> = SyncChildObservable<
   A,
   'throttleTime',
@@ -208,16 +254,19 @@ export type AuditTimeOperatorObservable<A> = AsyncChildObservable<
   'auditTime',
   readonly [A]
 >;
+
 export type DebounceTimeOperatorObservable<A> = AsyncChildObservable<
   A,
   'debounceTime',
   readonly [A]
 >;
+
 export type SwitchMapOperatorObservable<A, B> = AsyncChildObservable<
   B,
   'switchMap',
   readonly [A]
 >;
+
 export type MergeMapOperatorObservable<A, B> = AsyncChildObservable<
   B,
   'mergeMap',

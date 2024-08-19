@@ -22,21 +22,21 @@ const history$ =
 
 const undoable$ = history$
   .chain(map((h) => h.index > -1))
-  .chain(withInitialValue(false));
+  .chain(setInitialValue(false));
 
 const redoable$ = history$
   .chain(map((h) => h.index < h.history.length - 1))
-  .chain(withInitialValue(false));
+  .chain(setInitialValue(false));
 
 const diceValues$: InitializedObservable<readonly [number, number]> = history$
   .chain(
     map((histState) => histState.history[histState.index] ?? ([0, 0] as const)),
   )
-  .chain(withInitialValue([0, 0] as const));
+  .chain(setInitialValue([0, 0] as const));
 
 const sumCount$: InitializedObservable<ArrayOfLength<11, SafeUint>> = history$
   .chain(map(historyToSumCount))
-  .chain(withInitialValue(sumCountInitial));
+  .chain(setInitialValue(sumCountInitial));
 
 const opacity$: InitializedObservable<number> = rollDices$
   .chain(
@@ -47,7 +47,7 @@ const opacity$: InitializedObservable<number> = rollDices$
         .chain(map((i) => (10 - i) / 10)),
     ),
   )
-  .chain(withInitialValue(0));
+  .chain(setInitialValue(0));
 
 export const App = memoNamed('App', () => {
   const [dice1, dice2] = useObservableValue(diceValues$);

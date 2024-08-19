@@ -13,25 +13,25 @@ const dc = dict.register;
 
 const toast = createToaster();
 
-const [formState$, dispatch] = createReducer(
+const { state: formState$, dispatch } = createReducer(
   resetPasswordPageStateReducer,
   resetPasswordPageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || resetPasswordPageHasError(state)),
+  map((st) => st.isWaitingResponse || resetPasswordPageHasError(st)),
 );
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger')),
+  map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
 );
 
-const state$ = combineLatestI([
+const state = combine([
   formState$,
   enterButtonDisabled$,
   emailFormIntent$,
 ]).chain(
-  mapI(([formState, enterButtonDisabled, emailFormIntent]) => ({
+  map(([formState, enterButtonDisabled, emailFormIntent]) => ({
     formState,
     enterButtonDisabled,
     emailFormIntent,
@@ -114,7 +114,7 @@ Router.isRoute.signInPage$.subscribe((isSignInPage) => {
 });
 
 export const ResetPasswordPageStore = {
-  state$,
+  state,
   enterClickHandler,
   inputEmailHandler,
 } as const;

@@ -1,9 +1,9 @@
 import {
-  combineLatest,
+  combine,
   interval,
+  setInitialValue,
   take,
   timer,
-  withInitialValue,
   type Observable,
   type TimerObservable,
 } from '../../src/index.mjs';
@@ -15,8 +15,8 @@ import { type StreamTestCase } from '../typedef.mjs';
   counter               : 0         1         2         3         4         5
   timer                 :                                    0
   timerWithInitialValue : -1                                 0
-  combineLatest1        :                                    [3,0][4,0]     [5,0]
-  combineLatest2        : [0,-1]    [1,-1]    [2,-1]   [3,-1][3,0][4,0]     [5,0]
+  combine1        :                                    [3,0][4,0]     [5,0]
+  combine2        : [0,-1]    [1,-1]    [2,-1]   [3,-1][3,0][4,0]     [5,0]
 */
 
 const createStreams = (
@@ -25,18 +25,18 @@ const createStreams = (
   startSource: () => void;
   counter$: Observable<SafeUint>;
   timer$: TimerObservable;
-  combineLatest1$: Observable<readonly [number, number]>;
-  combineLatest2$: Observable<readonly [number, number]>;
+  combined1$: Observable<readonly [number, number]>;
+  combined2$: Observable<readonly [number, number]>;
 }> => {
   const interval$ = interval(tick * 2, true);
   const counter$ = interval$.chain(take(6));
 
   const timer$ = timer(tick * 7, true);
 
-  const combineLatest1$ = combineLatest([counter$, timer$] as const);
-  const combineLatest2$ = combineLatest([
+  const combined1$ = combine([counter$, timer$] as const);
+  const combined2$ = combine([
     counter$,
-    timer$.chain(withInitialValue(-1)),
+    timer$.chain(setInitialValue(-1)),
   ] as const);
 
   return {
@@ -46,45 +46,44 @@ const createStreams = (
     },
     counter$,
     timer$,
-    combineLatest1$,
-    combineLatest2$,
+    combined1$,
+    combined2$,
   };
 };
 
-export const withInitialValueTestCases: readonly [
+export const setInitialValueTestCases: readonly [
   StreamTestCase<[number, number]>,
   StreamTestCase<[number, number]>,
 ] = [
   {
-    name: 'withInitialValue case 1',
+    name: 'setInitialValue case 1',
     expectedOutput: [
       [3, 0],
       [4, 0],
       [5, 0],
     ],
     run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
-      const { startSource, combineLatest1$ } = createStreams(tick);
-      return getStreamOutputAsPromise(combineLatest1$, startSource);
+      const { startSource, combined1$ } = createStreams(tick);
+      return getStreamOutputAsPromise(combined1$, startSource);
     },
     preview: (tick: number): void => {
-      const { startSource, counter$, timer$, combineLatest1$ } =
-        createStreams(tick);
+      const { startSource, counter$, timer$, combined1$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter       ', a);
+        console.log('counter  ', a);
       });
       timer$.subscribe((a) => {
-        console.log('timer         ', a);
+        console.log('timer    ', a);
       });
-      combineLatest1$.subscribe((a) => {
-        console.log('combineLatest1', a);
+      combined1$.subscribe((a) => {
+        console.log('combined1', a);
       });
 
       startSource();
     },
   },
   {
-    name: 'withInitialValue case 2',
+    name: 'setInitialValue case 2',
     expectedOutput: [
       [0, -1],
       [1, -1],
@@ -95,21 +94,20 @@ export const withInitialValueTestCases: readonly [
       [5, 0],
     ],
     run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
-      const { startSource, combineLatest2$ } = createStreams(tick);
-      return getStreamOutputAsPromise(combineLatest2$, startSource);
+      const { startSource, combined2$ } = createStreams(tick);
+      return getStreamOutputAsPromise(combined2$, startSource);
     },
     preview: (tick: number): void => {
-      const { startSource, counter$, timer$, combineLatest2$ } =
-        createStreams(tick);
+      const { startSource, counter$, timer$, combined2$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter       ', a);
+        console.log('counter  ', a);
       });
       timer$.subscribe((a) => {
-        console.log('timer         ', a);
+        console.log('timer    ', a);
       });
-      combineLatest2$.subscribe((a) => {
-        console.log('combineLatest2', a);
+      combined2$.subscribe((a) => {
+        console.log('combined2', a);
       });
 
       startSource();

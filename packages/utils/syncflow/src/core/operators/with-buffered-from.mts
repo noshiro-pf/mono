@@ -1,33 +1,24 @@
 import { Arr, Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
-  type InitializedObservable,
-  type InitializedToInitializedOperator,
+  type KeepInitialValueOperator,
   type Observable,
-  type ToUninitializedOperator,
   type UpdaterSymbol,
   type WithBufferedFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
 
-export const withBufferedFrom =
-  <A, B>(
-    observable: Observable<B>,
-  ): ToUninitializedOperator<A, readonly [A, readonly B[]]> =>
-  (parentObservable: Observable<A>) =>
-    new WithBufferedFromObservableClass(parentObservable, observable);
-
-export const withBufferedFromI = <A, B>(
-  observable: InitializedObservable<B>,
-): InitializedToInitializedOperator<A, readonly [A, readonly B[]]> =>
+export const withBufferedFrom = <A, B>(
+  observable: Observable<B>,
+): KeepInitialValueOperator<A, readonly [A, readonly B[]]> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  withBuffered(observable) as InitializedToInitializedOperator<
-    A,
-    readonly [A, readonly B[]]
-  >;
+  ((parentObservable) =>
+    new WithBufferedFromObservableClass(
+      parentObservable,
+      observable,
+    )) as KeepInitialValueOperator<A, readonly [A, readonly B[]]>;
 
 export const withBuffered = withBufferedFrom; // alias
-export const withBufferedI = withBufferedFromI; // alias
 
 class WithBufferedFromObservableClass<A, B>
   extends SyncChildObservableClass<

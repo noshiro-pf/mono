@@ -1,16 +1,17 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
+  type DropInitialValueOperator,
   type Observable,
   type PairwiseOperatorObservable,
-  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
-export const pairwise =
-  <A,>(): ToUninitializedOperator<A, readonly [A, A]> =>
-  (parentObservable: Observable<A>) =>
-    new PairwiseObservableClass(parentObservable);
+export const pairwise = <A,>(): DropInitialValueOperator<A, readonly [A, A]> =>
+  f;
+
+const f = <A,>(parentObservable: Observable<A>): Observable<readonly [A, A]> =>
+  new PairwiseObservableClass(parentObservable);
 
 class PairwiseObservableClass<A>
   extends SyncChildObservableClass<readonly [A, A], 'pairwise', readonly [A]>

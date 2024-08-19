@@ -14,37 +14,37 @@ const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-const [formState$, dispatch] = createReducer(
+const { state: formState$, dispatch } = createReducer(
   updateEmailPageStateReducer,
   updateEmailPageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || updateEmailPageHasError(state)),
+  map((st) => st.isWaitingResponse || updateEmailPageHasError(st)),
 );
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger')),
+  map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
 );
 
 const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.password.error === undefined ? 'primary' : 'danger')),
+  map((st) => (st.password.error === undefined ? 'primary' : 'danger')),
 );
 
 const {
-  state$: passwordIsOpen$,
+  state: passwordIsOpen$,
   setFalse: hidePassword,
   toggle: togglePasswordLock,
 } = createBooleanState(false);
 
-const state$ = combineLatestI([
+const state = combine([
   formState$,
   enterButtonDisabled$,
   emailFormIntent$,
   passwordFormIntent$,
   passwordIsOpen$,
 ]).chain(
-  mapI(
+  map(
     ([
       formState,
       enterButtonDisabled,
@@ -169,7 +169,7 @@ const resetAllDialogState = (): void => {
 /* subscriptions */
 
 UpdateUserInfoDialogStore.openingDialog$
-  .chain(withLatestFromI(Auth.fireAuthUser$))
+  .chain(withCurrentValueFrom(Auth.fireAuthUser$))
   .subscribe(([openingDialog, user]) => {
     if (openingDialog === undefined) {
       resetAllDialogState();
@@ -181,7 +181,7 @@ UpdateUserInfoDialogStore.openingDialog$
 
 export const UpdateEmailPageStore = {
   togglePasswordLock,
-  state$,
+  state,
   enterClickHandler,
   inputEmailHandler,
   inputPasswordHandler,

@@ -1,22 +1,22 @@
 import { expectType } from '@noshiro/ts-utils';
 import {
   interval,
-  mapI,
+  map,
+  setInitialValue,
   take,
-  withInitialValue,
   type InitializedObservable,
 } from '../../src/index.mjs';
 import { testStream } from '../test-stream.mjs';
-import { withInitialValueTestCases } from './with-initial-value.mjs';
+import { setInitialValueTestCases } from './set-initial-value.mjs';
 
-for (const c of withInitialValueTestCases) {
+for (const c of setInitialValueTestCases) {
   testStream(c);
 }
 
 const s0 = interval(1000).chain(take(1));
-const s1 = s0.chain(withInitialValue(0));
-const s2 = s1.chain(mapI((x) => x * 2));
-const s3 = s0.chain(withInitialValue(0)).chain(mapI((x) => x * 2));
+const s1 = s0.chain(setInitialValue(0));
+const s2 = s1.chain(map((x) => x * 2));
+const s3 = s0.chain(setInitialValue(0)).chain(map((x) => x * 2));
 
 if (import.meta.vitest !== undefined) {
   test('type-check', () => {

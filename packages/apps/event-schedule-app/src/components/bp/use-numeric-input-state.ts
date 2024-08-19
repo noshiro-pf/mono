@@ -37,12 +37,12 @@ export const useNumericInputState = <NumericValue extends number>({
     }),
   );
 
-  const [state$, dispatch] = useObservableReducer(reducer.current, {
+  const [state, dispatch] = useObservableReducer(reducer.current, {
     value: initialState,
     normalizerFn: normalizeValue,
   });
 
-  const { value: valueAsStr, normalizerFn } = useObservableValue(state$);
+  const { value: valueAsStr, normalizerFn } = useObservableValue(state);
 
   const onValueStrChange = useCallback(
     (value: string) => {

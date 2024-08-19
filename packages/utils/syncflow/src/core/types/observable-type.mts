@@ -8,8 +8,8 @@ export type RootObservableType =
   | 'Timer';
 
 export type SyncChildObservableType =
-  | 'combineLatest'
-  | 'distinctUntilChanged'
+  | 'combine'
+  | 'skipIfNoChange'
   | 'filter'
   | 'map'
   | 'mapMaybe'
@@ -32,9 +32,9 @@ export type SyncChildObservableType =
   | 'unwrapResultErr'
   | 'unwrapResultOk'
   | 'withBufferedFrom'
-  | 'withIndex'
-  | 'withInitialValue'
-  | 'withLatestFrom'
+  | 'attachIndex'
+  | 'setInitialValue'
+  | 'withCurrentValueFrom'
   | 'zip';
 
 export type AsyncChildObservableType =

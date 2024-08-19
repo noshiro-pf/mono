@@ -3,7 +3,7 @@ import { fbAuth } from '../initialize-firebase';
 import { clog } from '../utils';
 import { Router } from './router';
 
-const { state$: fireAuthUser$, setState: setUser } = createState<
+const { state: fireAuthUser$, setState: setUser } = createState<
   FireAuthUser | undefined
 >(undefined);
 
@@ -12,7 +12,7 @@ const useFireAuthUser = (): FireAuthUser | undefined =>
 
 const passwordProviderIncluded$: InitializedObservable<boolean> =
   fireAuthUser$.chain(
-    mapI(
+    map(
       (user) =>
         user?.providerData.some((p) => p.providerId === 'password') ?? false,
     ),

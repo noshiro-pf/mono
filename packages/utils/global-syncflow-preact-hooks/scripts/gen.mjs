@@ -14,6 +14,9 @@ await generateAllGlobalDefs({
     'useObservableValue',
     'useValueAsObservable',
     'useVoidEventObservable',
+    'createBooleanState',
+    'createReducer',
+    'createState',
   ],
   typeImportsList: [],
 });

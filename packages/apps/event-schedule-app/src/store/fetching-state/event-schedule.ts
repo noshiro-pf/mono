@@ -10,7 +10,7 @@ const fetchEventScheduleThrottled$ = fetchEventSchedule$.chain(
   throttleTime(fetchThrottleTime),
 );
 
-const { state$: eventScheduleResult$, setState: setEventScheduleResult } =
+const { state: eventScheduleResult$, setState: setEventScheduleResult } =
   createState<
     | Result<
         EventSchedule,
@@ -21,19 +21,18 @@ const { state$: eventScheduleResult$, setState: setEventScheduleResult } =
 
 const result$ = eventScheduleResult$;
 
-combineLatest([
-  fetchEventScheduleThrottled$,
-  Router.eventId$,
-] as const).subscribe(([_, eventId]) => {
-  if (eventId === undefined) return;
+combine([fetchEventScheduleThrottled$, Router.eventId$] as const).subscribe(
+  ([_, eventId]) => {
+    if (eventId === undefined) return;
 
-  api.event
-    .fetch(eventId)
-    .then((result) => {
-      setEventScheduleResult(result);
-    })
-    .catch(noop);
-});
+    api.event
+      .fetch(eventId)
+      .then((result) => {
+        setEventScheduleResult(result);
+      })
+      .catch(noop);
+  },
+);
 
 result$.subscribe((e) => {
   if (e !== undefined && Result.isErr(e)) {
@@ -46,7 +45,7 @@ export const eventSchedule$: InitializedObservable<EventSchedule | undefined> =
   result$
     .chain(filter(isNotUndefined))
     .chain(unwrapResultOk())
-    .chain(withInitialValue(undefined));
+    .chain(setInitialValue(undefined));
 
 export const EventScheduleStore = {
   result$,

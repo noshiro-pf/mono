@@ -1,6 +1,6 @@
 import {
   createState,
-  mapI,
+  map,
   type InitializedObservable,
 } from '@noshiro/syncflow';
 import { castMutable, pipe } from '@noshiro/ts-utils';
@@ -36,7 +36,7 @@ export type RouterState = Readonly<{
 }>;
 
 export type Router = Readonly<{
-  state$: InitializedObservable<RouterState>;
+  state: InitializedObservable<RouterState>;
 
   push: (nextUrl: string) => void;
 
@@ -68,10 +68,10 @@ export type Router = Readonly<{
 export const createRouter = (): Router => {
   const getCurrentUrl = (): URL => new URL(window.location.href);
 
-  const { state$: url$, setState: setUrl } = createState<URL>(getCurrentUrl());
+  const { state: url$, setState: setUrl } = createState<URL>(getCurrentUrl());
 
-  const state$ = url$.chain(
-    mapI((a) => ({
+  const state = url$.chain(
+    map((a) => ({
       pathname: a.pathname,
       searchParams: a.searchParams,
       pathSegments: splitToPathSegments(a.pathname),
@@ -156,7 +156,7 @@ export const createRouter = (): Router => {
   window.addEventListener('popstate', updateState);
 
   return {
-    state$,
+    state,
     push,
     redirect,
     go,

@@ -29,11 +29,11 @@ const answerSelectionMap$: InitializedObservable<
     >
   | undefined
 > = answersFiltered$.chain(
-  mapI((answers) => mapOptional(answers, createAnswerSelectionMapFromAnswers)),
+  map((answers) => mapOptional(answers, createAnswerSelectionMapFromAnswers)),
 );
 
 const answerSelectionMapFn$ = answerSelectionMap$.chain(
-  mapI(
+  map(
     (answerSelectionMap) =>
       (
         datetimeRange: DatetimeRange,
@@ -61,12 +61,8 @@ const answerTable$: InitializedObservable<
       DatetimeRangeMapKey
     >
   | undefined
-> = combineLatestI([
-  eventSchedule$,
-  answerSelectionMapFn$,
-  answersFiltered$,
-]).chain(
-  mapI(([eventSchedule, answerSelectionMapFn, answers]) =>
+> = combine([eventSchedule$, answerSelectionMapFn$, answersFiltered$]).chain(
+  map(([eventSchedule, answerSelectionMapFn, answers]) =>
     eventSchedule === undefined || answers === undefined
       ? undefined
       : createAnswerTable(
@@ -81,8 +77,8 @@ const answerTable$: InitializedObservable<
 const answerSummary$: InitializedObservable<
   | IMapMapped<DatetimeRange, ArrayOfLength<3, number>, DatetimeRangeMapKey>
   | undefined
-> = combineLatestI([eventSchedule$, answerTable$]).chain(
-  mapI(([eventSchedule, answerTable]) =>
+> = combine([eventSchedule$, answerTable$]).chain(
+  map(([eventSchedule, answerTable]) =>
     eventSchedule === undefined || answerTable === undefined
       ? undefined
       : createAnswerSummary(eventSchedule.datetimeRangeList, answerTable),
@@ -91,13 +87,13 @@ const answerSummary$: InitializedObservable<
 
 const scores$: InitializedObservable<
   IMapMapped<DatetimeRange, number, DatetimeRangeMapKey> | undefined
-> = combineLatestI([
+> = combine([
   eventSchedule$,
   answerSummary$,
   answerTable$,
   answersFiltered$,
 ]).chain(
-  mapI(([eventSchedule, answerSummary, answerTable, answers]) =>
+  map(([eventSchedule, answerSummary, answerTable, answers]) =>
     eventSchedule === undefined ||
     answerSummary === undefined ||
     answerTable === undefined ||
@@ -113,18 +109,18 @@ const scores$: InitializedObservable<
 );
 
 const datetimeRangeList$ = eventSchedule$.chain(
-  mapI((eventSchedule) => eventSchedule?.datetimeRangeList),
+  map((eventSchedule) => eventSchedule?.datetimeRangeList),
 );
 
 const datetimeRangeListReversed$ = eventSchedule$.chain(
-  mapI((eventSchedule) => eventSchedule?.datetimeRangeList.toReversed()),
+  map((eventSchedule) => eventSchedule?.datetimeRangeList.toReversed()),
 );
 
-const datetimeRangeListSortedByScores$ = combineLatestI([
+const datetimeRangeListSortedByScores$ = combine([
   eventSchedule$,
   scores$,
 ]).chain(
-  mapI(([eventSchedule, scores]) =>
+  map(([eventSchedule, scores]) =>
     eventSchedule === undefined || scores === undefined
       ? undefined
       : Arr.sortedBy(
@@ -136,19 +132,19 @@ const datetimeRangeListSortedByScores$ = combineLatestI([
 
 const datetimeRangeListSortedByScoresReversed$ =
   datetimeRangeListSortedByScores$.chain(
-    mapI((datetimeRangeListSortedByScores) =>
+    map((datetimeRangeListSortedByScores) =>
       datetimeRangeListSortedByScores?.toReversed(),
     ),
   );
 
-const datetimeRangeListReordered$ = combineLatestI([
+const datetimeRangeListReordered$ = combine([
   AnswerFilterAndSortStore.sortKeyAndOrder$,
   datetimeRangeList$,
   datetimeRangeListReversed$,
   datetimeRangeListSortedByScores$,
   datetimeRangeListSortedByScoresReversed$,
 ]).chain(
-  mapI(
+  map(
     ([
       [sortKey, sortOrder],
       datetimeRangeList,
@@ -179,7 +175,7 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
       }>
     >
   | undefined
-> = combineLatestI([
+> = combine([
   datetimeRangeList$,
   scores$,
   answerSummary$,
@@ -187,7 +183,7 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
   eventSchedule$,
   answersFiltered$,
 ]).chain(
-  mapI(
+  map(
     ([
       datetimeRangeList,
       scores,
@@ -266,11 +262,11 @@ const tableBodyValues$: InitializedObservable<
       style: React.CSSProperties;
     }[]
   >
-> = combineLatestI([
+> = combine([
   datetimeRangeListReordered$,
   datetimeRangeToTableRowValuesMap$,
 ]).chain(
-  mapI(([datetimeRangeListReordered, datetimeRangeToTableRowValuesMap]) =>
+  map(([datetimeRangeListReordered, datetimeRangeToTableRowValuesMap]) =>
     datetimeRangeListReordered === undefined ||
     datetimeRangeToTableRowValuesMap === undefined
       ? []
@@ -282,12 +278,12 @@ const tableBodyValues$: InitializedObservable<
   ),
 );
 
-const tableBodyValuesFiltered$ = combineLatestI([
+const tableBodyValuesFiltered$ = combine([
   tableBodyValues$,
   AnswerFilterAndSortStore.filterState$,
   answersFiltered$,
 ]).chain(
-  mapI(([tableBodyValues, filterState, answers]) => {
+  map(([tableBodyValues, filterState, answers]) => {
     const tableBodyValuesFiltered = tableBodyValues.filter((row) => {
       const { answerTableRow, answerSummaryRow, score, datetimeRange } = row;
       if (answerSummaryRow === undefined || answerTableRow === undefined)
@@ -382,16 +378,16 @@ const tableBodyValuesFiltered$ = combineLatestI([
   }),
 );
 
-const { state$: tableIsMinimized$, toggle: toggleTableIsMinimized } =
+const { state: tableIsMinimized$, toggle: toggleTableIsMinimized } =
   createBooleanState(false);
 
-const { state$: answerIconIsHidden$, toggle: toggleAnswerIconIsHidden } =
+const { state: answerIconIsHidden$, toggle: toggleAnswerIconIsHidden } =
   createBooleanState(false);
 
-const { state$: dateStringIsMinimized$, toggle: toggleDateStringIsMinimized } =
+const { state: dateStringIsMinimized$, toggle: toggleDateStringIsMinimized } =
   createBooleanState(false);
 
-const { state$: detailedFilterIsOpen$, toggle: toggleDetailedFilter } =
+const { state: detailedFilterIsOpen$, toggle: toggleDetailedFilter } =
   createBooleanState(false);
 
 export const AnswerTableStore = {

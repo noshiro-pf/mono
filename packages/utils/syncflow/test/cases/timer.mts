@@ -1,5 +1,5 @@
 import {
-  combineLatest,
+  combine,
   interval,
   take,
   timer,
@@ -29,7 +29,7 @@ const createStreams = (
   const timer2$ = timer(tick * 5, true);
   const interval$ = interval(tick * 2, true);
   const counter$ = interval$.chain(take(7));
-  const combined$ = combineLatest([timer1$, timer2$, counter$] as const);
+  const combined$ = combine([timer1$, timer2$, counter$] as const);
 
   return {
     startSource: () => {

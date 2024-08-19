@@ -1,10 +1,10 @@
 import { Arr, Maybe } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class/index.mjs';
 import {
+  type DropInitialValueOperator,
   type MergeMapOperatorObservable,
   type Observable,
   type Subscription,
-  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
@@ -16,8 +16,8 @@ import {
 export const mergeMap =
   <A, B>(
     mapToObservable: (curr: A) => Observable<B>,
-  ): ToUninitializedOperator<A, B> =>
-  (parentObservable: Observable<A>) =>
+  ): DropInitialValueOperator<A, B> =>
+  (parentObservable) =>
     new MergeMapObservableClass(parentObservable, mapToObservable);
 
 /**

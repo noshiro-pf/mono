@@ -5,11 +5,11 @@ import { store$ } from './store';
 const calcAllSources$ = store$;
 
 export const calculatedValues$ = calcAllSources$
-  .chain(debounceTimeI(500))
-  .chain(mapI(calcAll));
+  .chain(debounceTime(500))
+  .chain(map(calcAll));
 
 // eslint-disable-next-line deprecation/deprecation
 export const isCalculating$: InitializedObservable<boolean> = merge([
   calcAllSources$.chain(mapTo(true)),
   calculatedValues$.chain(mapTo(false)),
-] as const).chain(withInitialValue(false));
+] as const).chain(setInitialValue(false));

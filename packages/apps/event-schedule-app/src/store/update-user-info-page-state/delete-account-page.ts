@@ -14,37 +14,37 @@ const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-const [formState$, dispatch] = createReducer(
+const { state: formState$, dispatch } = createReducer(
   deleteAccountPageStateReducer,
   deleteAccountPageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || deleteAccountPageHasError(state)),
+  map((st) => st.isWaitingResponse || deleteAccountPageHasError(st)),
 );
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger')),
+  map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
 );
 
 const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.password.error === undefined ? 'primary' : 'danger')),
+  map((st) => (st.password.error === undefined ? 'primary' : 'danger')),
 );
 
 const {
-  state$: passwordIsOpenState$,
+  state: passwordIsOpenState$,
   setFalse: hidePassword,
   toggle: togglePasswordLock,
 } = createBooleanState(false);
 
-const state$ = combineLatestI([
+const state = combine([
   formState$,
   enterButtonDisabled$,
   emailFormIntent$,
   passwordFormIntent$,
   passwordIsOpenState$,
 ]).chain(
-  mapI(
+  map(
     ([
       formState,
       enterButtonDisabled,
@@ -173,7 +173,7 @@ UpdateUserInfoDialogStore.openingDialog$.subscribe((openingDialog) => {
 });
 
 export const DeleteAccountPageStore = {
-  state$,
+  state,
   togglePasswordLock,
   enterClickHandler,
   inputEmailHandler,

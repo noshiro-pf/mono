@@ -1,8 +1,8 @@
 import {
   interval,
   pairwise,
+  setInitialValue,
   take,
-  withInitialValue,
   type Observable,
 } from '../../src/index.mjs';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
@@ -37,9 +37,7 @@ const createStreams2 = (
   pairwise$: Observable<readonly [number, number]>;
 }> => {
   const interval$ = interval(tick, true);
-  const counter$ = interval$
-    .chain(take(6))
-    .chain(withInitialValue(-1 as const));
+  const counter$ = interval$.chain(take(6)).chain(setInitialValue(-1 as const));
 
   const pairwise$ = counter$.chain(pairwise());
 

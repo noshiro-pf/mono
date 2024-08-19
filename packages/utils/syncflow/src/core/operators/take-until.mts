@@ -1,23 +1,21 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
-  type InitializedToInitializedOperator,
+  type KeepInitialValueOperator,
   type Observable,
   type TakeUntilOperatorObservable,
-  type ToUninitializedOperator,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
-export const takeUntil =
-  <A,>(notifier: Observable<unknown>): ToUninitializedOperator<A, A> =>
-  (parentObservable: Observable<A>) =>
-    new TakeUntilObservableClass(parentObservable, notifier);
-
-export const takeUntilI = <A,>(
+export const takeUntil = <A,>(
   notifier: Observable<unknown>,
-): InitializedToInitializedOperator<A, A> =>
+): KeepInitialValueOperator<A, A> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  takeUntil(notifier) as InitializedToInitializedOperator<A, A>;
+  ((parentObservable) =>
+    new TakeUntilObservableClass(
+      parentObservable,
+      notifier,
+    )) as KeepInitialValueOperator<A, A>;
 
 class TakeUntilObservableClass<A>
   extends SyncChildObservableClass<A, 'takeUntil', readonly [A]>

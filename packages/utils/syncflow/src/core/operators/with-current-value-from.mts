@@ -1,41 +1,29 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
-  type InitializedObservable,
-  type InitializedToInitializedOperator,
+  type DropInitialValueOperator,
   type Observable,
-  type ToUninitializedOperator,
   type UpdaterSymbol,
-  type WithLatestFromOperatorObservable,
+  type WithCurrentValueFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
 
-export const withLatestFrom =
+export const withCurrentValueFrom =
   <A, B>(
     observable: Observable<B>,
-  ): ToUninitializedOperator<A, readonly [A, B]> =>
-  (parentObservable: Observable<A>) =>
-    new WithLatestFromObservableClass(parentObservable, observable);
+  ): DropInitialValueOperator<A, readonly [A, B]> =>
+  (parentObservable) =>
+    new WithCurrentValueFromObservableClass(parentObservable, observable);
 
-export const withLatestFromI = <A, B>(
-  observable: InitializedObservable<B>,
-): InitializedToInitializedOperator<A, readonly [A, B]> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  withLatestFrom(observable) as InitializedToInitializedOperator<
-    A,
-    readonly [A, B]
-  >;
+export const withLatestFrom = withCurrentValueFrom; // alias
 
-export const withLatest = withLatestFrom; // alias
-export const withLatestI = withLatestFromI; // alias
-
-class WithLatestFromObservableClass<A, B>
+class WithCurrentValueFromObservableClass<A, B>
   extends SyncChildObservableClass<
     readonly [A, B],
-    'withLatestFrom',
+    'withCurrentValueFrom',
     readonly [A]
   >
-  implements WithLatestFromOperatorObservable<A, B>
+  implements WithCurrentValueFromOperatorObservable<A, B>
 {
   readonly #observable: Observable<B>;
 
@@ -43,7 +31,7 @@ class WithLatestFromObservableClass<A, B>
     super({
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
-      type: 'withLatestFrom',
+      type: 'withCurrentValueFrom',
       initialValue:
         Maybe.isNone(parentObservable.snapshot) ||
         Maybe.isNone(observable.snapshot)

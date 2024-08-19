@@ -49,7 +49,7 @@ const pages = {
 };
 
 export const App = memoNamed('App', () => {
-  const { pathname } = useObservableValue(Router.state$);
+  const { pathname } = useObservableValue(Router.state);
 
   const pathNameLast = useMemo(
     () => Arr.last(pathname.split('/').filter((s) => s !== '')) ?? '',

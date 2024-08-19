@@ -37,6 +37,12 @@ const defineConfig = async () => {
         ],
       },
     },
+    {
+      files: ['src/index.mts'],
+      rules: {
+        'import/export': 'off',
+      },
+    },
   ];
 
   return configs;

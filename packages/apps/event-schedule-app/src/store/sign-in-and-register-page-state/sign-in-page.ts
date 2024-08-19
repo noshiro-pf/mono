@@ -14,37 +14,37 @@ const dc = dict.register;
 
 const toast = createToaster();
 
-const [formState$, dispatch] = createReducer(
+const { state: formState$, dispatch } = createReducer(
   signInPageStateReducer,
   signInPageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || signInPageHasError(state)),
+  map((st) => st.isWaitingResponse || signInPageHasError(st)),
 );
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger')),
+  map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
 );
 
 const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.password.error === undefined ? 'primary' : 'danger')),
+  map((st) => (st.password.error === undefined ? 'primary' : 'danger')),
 );
 
 const passwordIsOpenState = createBooleanState(false);
 
 const togglePasswordLock = passwordIsOpenState.toggle;
 
-const { state$: passwordIsOpen$, setFalse: hidePassword } = passwordIsOpenState;
+const { state: passwordIsOpen$, setFalse: hidePassword } = passwordIsOpenState;
 
-const state$ = combineLatestI([
+const state = combine([
   formState$,
   enterButtonDisabled$,
   emailFormIntent$,
   passwordFormIntent$,
   passwordIsOpen$,
 ]).chain(
-  mapI(
+  map(
     ([
       formState,
       enterButtonDisabled,
@@ -158,7 +158,7 @@ Router.isRoute.signInPage$.subscribe((isSignInPage) => {
 });
 
 export const SignInPageStore = {
-  state$,
+  state,
   togglePasswordLock,
   inputEmailHandler,
   inputPasswordHandler,

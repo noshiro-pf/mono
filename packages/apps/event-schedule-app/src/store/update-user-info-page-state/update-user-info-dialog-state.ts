@@ -1,5 +1,5 @@
 const {
-  state$: openingDialog$,
+  state: openingDialog$,
   setState: setOpeningDialog,
   resetState: closeDialog,
 } = createState<

@@ -25,25 +25,25 @@ const toast = createToaster();
 
 /* states */
 
-const { state$: selectedAnswerSaved$, setState: setSelectedAnswerSaved } =
+const { state: selectedAnswerSaved$, setState: setSelectedAnswerSaved } =
   createState<Answer | undefined>(undefined);
 
-const { state$: submitButtonIsLoading$, setState: setSubmitButtonIsLoading } =
+const { state: submitButtonIsLoading$, setState: setSubmitButtonIsLoading } =
   createBooleanState(false);
 
 const {
-  state$: alertOnAnswerClickIsOpen$,
+  state: alertOnAnswerClickIsOpen$,
   setTrue: openAlertOnAnswerClick,
   setFalse: closeAlertOnAnswerClick,
 } = createBooleanState(false);
 
 const {
-  state$: answerBeingEditedSectionState$,
+  state: answerBeingEditedSectionState$,
   setState: _setAnswerBeingEditedSectionState,
 } = createState<'creating' | 'editing' | 'hidden'>('hidden');
 
 const {
-  state$: answerBeingEdited$,
+  state: answerBeingEdited$,
   setState: setAnswerBeingEdited,
   updateState: updateAnswerBeingEdited,
 } = createState(answerDefaultValue);
@@ -71,7 +71,7 @@ const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =
   createVoidEventEmitter();
 
 const {
-  state$: checkboxesState$,
+  state: checkboxesState$,
   setState: setCheckboxesState,
   updateState: updateCheckboxesState,
   resetState: resetCheckboxesState,
@@ -83,7 +83,7 @@ const {
   ),
 );
 
-const { state$: batchInputFieldIsOpen$, toggle: _toggleBatchInputField } =
+const { state: batchInputFieldIsOpen$, toggle: _toggleBatchInputField } =
   createBooleanState(false);
 
 const toggleBatchInputField = (): void => {
@@ -94,17 +94,17 @@ const toggleBatchInputField = (): void => {
 /* mapped values */
 
 const selectedAnswerUserName$ = selectedAnswerSaved$.chain(
-  mapI((selectedAnswerSaved) => selectedAnswerSaved?.user.name),
+  map((selectedAnswerSaved) => selectedAnswerSaved?.user.name),
 );
 
 const requiredParticipantsExist$: InitializedObservable<boolean> =
   AnswersStore.answers$.chain(
-    mapI((answers) => answers?.some((a) => a.isRequiredParticipants) === true),
+    map((answers) => answers?.some((a) => a.isRequiredParticipants) === true),
   );
 
 const selectedDates$: InitializedObservable<readonly YearMonthDate[]> =
   eventSchedule$.chain(
-    mapI(
+    map(
       (eventSchedule) =>
         eventSchedule?.datetimeRangeList.map((d) => d.ymd) ?? [],
     ),
@@ -138,15 +138,15 @@ const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
       ),
     ),
   )
-  .chain(distinctUntilChanged(deepEqual))
-  .chain(withInitialValue(answerDefaultValue));
+  .chain(skipIfNoChange(deepEqual))
+  .chain(setInitialValue(answerDefaultValue));
 
-const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combineLatestI([
+const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combine([
   AnswersStore.answers$,
   answerBeingEdited$,
   selectedAnswerUserName$,
 ]).chain(
-  mapI(([answers, answerBeingEdited, selectedAnswerUserName]) =>
+  map(([answers, answerBeingEdited, selectedAnswerUserName]) =>
     theNameIsAlreadyUsedFn(
       answerBeingEdited.user.name,
       answers ?? [],
@@ -155,12 +155,12 @@ const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combineLatestI([
   ),
 );
 
-const submitButtonIsDisabled$: InitializedObservable<boolean> = combineLatestI([
+const submitButtonIsDisabled$: InitializedObservable<boolean> = combine([
   answerBeingEdited$,
   selectedAnswerSaved$,
   theNameIsAlreadyUsed$,
 ]).chain(
-  mapI(
+  map(
     ([answerBeingEdited, selectedAnswerSaved, theNameIsAlreadyUsed]) =>
       answerBeingEdited.user.name === '' ||
       deepEqual(selectedAnswerSaved, answerBeingEdited) ||
@@ -170,14 +170,14 @@ const submitButtonIsDisabled$: InitializedObservable<boolean> = combineLatestI([
 
 const answerSelectionMap$: InitializedObservable<
   IMapMapped<DatetimeRange, AnswerSelectionValue, DatetimeRangeMapKey>
-> = combineLatestI([
+> = combine([
   answerBeingEdited$,
   eventSchedule$
     .chain(filter(isNotUndefined))
     .chain(pluck('datetimeRangeList'))
-    .chain(withInitialValue<readonly DatetimeRange[]>([])),
+    .chain(setInitialValue<readonly DatetimeRange[]>([])),
 ]).chain(
-  mapI(([{ selection }, datetimeRangeList]) => {
+  map(([{ selection }, datetimeRangeList]) => {
     const entries: DeepReadonly<[DatetimeRange, AnswerSelectionValue][]> =
       Arr.concat(
         datetimeRangeList.map((d) => [
@@ -426,7 +426,7 @@ const toggleProtectedSectionImpl = (user: FireAuthUser | undefined): void => {
 
 /* subscriptions */
 
-combineLatest([emptyAnswerSelection$, resetAnswerBeingEditedAction$] as const)
+combine([emptyAnswerSelection$, resetAnswerBeingEditedAction$] as const)
   .chain(map(([x, _]) => x))
   .subscribe(setAnswerBeingEdited);
 
@@ -507,7 +507,7 @@ const iconHeader$: InitializedObservable<
     >
   | undefined
 > = eventSchedule$.chain(
-  mapI((e) =>
+  map((e) =>
     mapOptional(e, (eventSchedule) => ({
       good: {
         iconDescription: eventSchedule.answerIcons.good.description,
@@ -561,8 +561,8 @@ const answerBeingEditedList$: InitializedObservable<
       onCheck: (checked: boolean) => void;
     }[]
   >
-> = combineLatestI([eventSchedule$, answerSelectionMap$]).chain(
-  mapI(
+> = combine([eventSchedule$, answerSelectionMap$]).chain(
+  map(
     ([e, answerSelectionMap]) =>
       mapOptional(e, (eventSchedule) =>
         eventSchedule.datetimeRangeList.map(
@@ -650,7 +650,7 @@ const onCheckAll = (checked: boolean): void => {
 
 const hasUnanswered$: InitializedObservable<boolean> =
   answerBeingEditedList$.chain(
-    mapI((answerBeingEditedList) =>
+    map((answerBeingEditedList) =>
       answerBeingEditedList.some(
         (a) => a.answerSelectionValue.iconId === 'none',
       ),

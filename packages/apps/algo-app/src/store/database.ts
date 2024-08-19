@@ -24,11 +24,11 @@ import {
   type Room,
 } from '../types';
 
-const { state$: roomId$, setState: setRoomId } = createState<
-  string | undefined
->(undefined);
+const { state: roomId$, setState: setRoomId } = createState<string | undefined>(
+  undefined,
+);
 
-const { state$: room$, setState: setRoom } = createState<Room | undefined>(
+const { state: room$, setState: setRoom } = createState<Room | undefined>(
   undefined,
 );
 
@@ -45,9 +45,9 @@ const paths = {
   players: 'players',
 } as const;
 
-const { state$: myName$, setState: setMyName } = createState<
-  string | undefined
->(undefined);
+const { state: myName$, setState: setMyName } = createState<string | undefined>(
+  undefined,
+);
 
 const addAction = (
   roomId: string,

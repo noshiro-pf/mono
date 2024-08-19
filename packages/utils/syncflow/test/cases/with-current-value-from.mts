@@ -2,7 +2,7 @@ import {
   interval,
   map,
   take,
-  withLatestFrom,
+  withCurrentValueFrom,
   type Observable,
 } from '../../src/index.mjs';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
@@ -13,28 +13,28 @@ const createStreams = (
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<SafeUint>;
-  withLatest$: Observable<readonly [number, number]>;
+  withCurrentValueFrom$: Observable<readonly [number, number]>;
 }> => {
   const interval$ = interval(tick, true);
   const counter$ = interval$.chain(take(11));
 
   const double$ = counter$.chain(map((x) => x * 2));
-  const withLatest$ = counter$.chain(withLatestFrom(double$));
+  const withCurrentValueFrom$ = counter$.chain(withCurrentValueFrom(double$));
 
   return {
     startSource: () => {
       interval$.start();
     },
     counter$,
-    withLatest$,
+    withCurrentValueFrom$,
   };
 };
 
-export const withLatestFromTestCases: readonly [
+export const withCurrentValueFromTestCases: readonly [
   StreamTestCase<[number, number]>,
 ] = [
   {
-    name: 'withLatestFrom case 1',
+    name: 'withCurrentValueFrom case 1',
     expectedOutput: [
       [0, 0],
       [1, 2],
@@ -49,17 +49,18 @@ export const withLatestFromTestCases: readonly [
       [10, 20],
     ],
     run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
-      const { startSource, withLatest$ } = createStreams(tick);
-      return getStreamOutputAsPromise(withLatest$, startSource);
+      const { startSource, withCurrentValueFrom$ } = createStreams(tick);
+      return getStreamOutputAsPromise(withCurrentValueFrom$, startSource);
     },
     preview: (tick: number): void => {
-      const { startSource, counter$, withLatest$ } = createStreams(tick);
+      const { startSource, counter$, withCurrentValueFrom$ } =
+        createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter   ', a);
+        console.log('counter             ', a);
       });
-      withLatest$.subscribe((a) => {
-        console.log('withLatest', a);
+      withCurrentValueFrom$.subscribe((a) => {
+        console.log('withCurrentValueFrom', a);
       });
 
       startSource();

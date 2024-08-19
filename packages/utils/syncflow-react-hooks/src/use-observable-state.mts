@@ -19,12 +19,12 @@ const reducer = <S,>(state: S, action: Action<S>): S => {
 export const useObservableState = <S,>(
   initialState: S,
 ): Readonly<{
-  state$: InitializedObservable<S>;
+  state: InitializedObservable<S>;
   setState: (v: S) => S;
   updateState: (updateFn: (prev: S) => S) => S;
   resetState: () => S;
 }> => {
-  const [state$, dispatch] = useObservableReducer<S, Action<S>>(
+  const [state, dispatch] = useObservableReducer<S, Action<S>>(
     reducer,
     initialState,
   );
@@ -47,5 +47,5 @@ export const useObservableState = <S,>(
     [],
   );
 
-  return { state$, setState, updateState, resetState };
+  return { state, setState, updateState, resetState };
 };

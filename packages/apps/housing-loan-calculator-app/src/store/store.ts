@@ -12,7 +12,7 @@ import { uriWithQueryParams } from '../utils';
 
 const [userInput$, nextUserInput] = createVoidEventEmitter();
 
-const { state$: repaymentType$, setState: _setRepaymentType } =
+const { state: repaymentType$, setState: _setRepaymentType } =
   createState<RepaymentType>(defaultValues.repaymentType);
 
 const setRepaymentType = (value: RepaymentType): void => {
@@ -21,7 +21,7 @@ const setRepaymentType = (value: RepaymentType): void => {
 };
 
 // 頭金（円）
-const { state$: downPaymentManYen$, setState: _setDownPaymentManYen } =
+const { state: downPaymentManYen$, setState: _setDownPaymentManYen } =
   createState<Yen>(defaultValues.downPaymentManYen);
 
 const setDownPaymentManYen = (value: Yen): void => {
@@ -30,7 +30,7 @@ const setDownPaymentManYen = (value: Yen): void => {
 };
 
 // 物件の金額（円）
-const { state$: propertyPriceManYen$, setState: _setPropertyPriceManYen } =
+const { state: propertyPriceManYen$, setState: _setPropertyPriceManYen } =
   createState<Yen>(defaultValues.propertyPriceManYen);
 
 const setPropertyPriceManYen = (value: Yen): void => {
@@ -39,7 +39,7 @@ const setPropertyPriceManYen = (value: Yen): void => {
 };
 
 // 借入期間（年）
-const { state$: borrowingPeriodYear$, setState: _setBorrowingPeriodYear } =
+const { state: borrowingPeriodYear$, setState: _setBorrowingPeriodYear } =
   createState<Uint32>(toUint32(defaultValues.borrowingPeriodYear));
 
 const setBorrowingPeriodYear = (value: Uint32): void => {
@@ -49,7 +49,7 @@ const setBorrowingPeriodYear = (value: Uint32): void => {
 
 // 年当たりの金利
 const {
-  state$: interestRatePercentPerYear$,
+  state: interestRatePercentPerYear$,
   setState: _setInterestRatePercentPerYear,
 } = createState<PercentFloat>(defaultValues.interestRatePercentPerYear);
 
@@ -58,14 +58,14 @@ const setInterestRatePercentPerYear = (value: PercentFloat): void => {
   nextUserInput();
 };
 
-const store$: InitializedObservable<Store> = combineLatestI([
+const store$: InitializedObservable<Store> = combine([
   repaymentType$,
   downPaymentManYen$,
   propertyPriceManYen$,
   borrowingPeriodYear$,
   interestRatePercentPerYear$,
 ] as const).chain(
-  mapI(
+  map(
     ([
       repaymentType,
       downPaymentManYen,
@@ -82,7 +82,7 @@ const store$: InitializedObservable<Store> = combineLatestI([
   ),
 );
 
-Router.state$.subscribe(({ searchParams: query }) => {
+Router.state.subscribe(({ searchParams: query }) => {
   const paramsAsStr = {
     repaymentType: query.get(queryParamKey.repaymentType),
     downPayment: query.get(queryParamKey.downPayment),
@@ -126,7 +126,7 @@ Router.state$.subscribe(({ searchParams: query }) => {
   }
 });
 
-userInput$.chain(withLatestFrom(store$)).subscribe(([_, store]) => {
+userInput$.chain(withCurrentValueFrom(store$)).subscribe(([_, store]) => {
   Router.push(
     uriWithQueryParams('/', [
       [queryParamKey.repaymentType, store.repaymentType],

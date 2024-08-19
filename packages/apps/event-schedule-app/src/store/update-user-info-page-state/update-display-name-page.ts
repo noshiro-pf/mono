@@ -13,29 +13,25 @@ const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-const [formState$, dispatch] = createReducer(
+const { state: formState$, dispatch } = createReducer(
   updateDisplayNamePageStateReducer,
   updateDisplayNamePageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI(
-    (state) => state.isWaitingResponse || updateDisplayNamePageHasError(state),
-  ),
+  map((st) => st.isWaitingResponse || updateDisplayNamePageHasError(st)),
 );
 
 const displayNameFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) =>
-    state.displayName.error === undefined ? 'primary' : 'danger',
-  ),
+  map((st) => (st.displayName.error === undefined ? 'primary' : 'danger')),
 );
 
-const state$ = combineLatestI([
+const state = combine([
   formState$,
   enterButtonDisabled$,
   displayNameFormIntent$,
 ]).chain(
-  mapI(([formState, enterButtonDisabled, displayNameFormIntent]) => ({
+  map(([formState, enterButtonDisabled, displayNameFormIntent]) => ({
     formState,
     enterButtonDisabled,
     displayNameFormIntent,
@@ -105,7 +101,7 @@ const resetAllDialogState = (): void => {
 /* subscriptions */
 
 UpdateUserInfoDialogStore.openingDialog$
-  .chain(withLatestFromI(Auth.fireAuthUser$))
+  .chain(withCurrentValueFrom(Auth.fireAuthUser$))
   .subscribe(([openingDialog, fireAuthUser]) => {
     if (openingDialog === undefined) {
       resetAllDialogState();
@@ -119,7 +115,7 @@ UpdateUserInfoDialogStore.openingDialog$
   });
 
 export const UpdateDisplayNamePageStore = {
-  state$,
+  state,
   enterClickHandler,
   inputDisplayNameHandler,
 } as const;

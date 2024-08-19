@@ -23,7 +23,7 @@ export const createToggleSectionState = <A>({
   const toggleState = createBooleanState(initialToggleState);
 
   const {
-    state$: value$,
+    state: value$,
     setState: setValue,
     updateState: updateValue,
   } = createState<A>(initialState);
@@ -38,7 +38,7 @@ export const createToggleSectionState = <A>({
     });
 
   return {
-    toggleState$: toggleState.state$,
+    toggleState$: toggleState.state,
     toggle,
     value$,
     setValue,
@@ -67,7 +67,7 @@ const createToggleSectionStateManager = <A>({
     setTrue: () => void;
     setFalse: () => void;
     toggle: () => boolean;
-    reset: () => void;
+    resetState: () => void;
   }>;
   initialState: A;
   valueToBeSetWhenTurnedOff: () => A;
@@ -87,7 +87,7 @@ const createToggleSectionStateManager = <A>({
   };
 
   const resetState = (): void => {
-    toggleState.reset();
+    toggleState.resetState();
     setValue(initialState);
   };
 
