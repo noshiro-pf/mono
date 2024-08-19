@@ -187,7 +187,6 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     },
   ], // modified
   '@typescript-eslint/no-this-alias': 'error',
-  '@typescript-eslint/no-type-alias': 0,
   '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
   '@typescript-eslint/no-unnecessary-condition': [
     'error',
@@ -209,12 +208,14 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     {
       vars: 'all',
       varsIgnorePattern: '^jsx$|^_',
-      args: 'all',
+      args: 'none',
       argsIgnorePattern: '^_',
       ignoreRestSiblings: true,
       caughtErrors: 'all',
       caughtErrorsIgnorePattern: '^_',
       destructuredArrayIgnorePattern: '^_',
+      ignoreClassWithStaticInitBlock: false,
+      reportUsedIgnorePattern: false,
     },
   ], // modified
   '@typescript-eslint/no-use-before-define': 'off', // disabled
@@ -345,7 +346,6 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/prefer-regexp-exec': 'error',
   '@typescript-eslint/prefer-return-this-type': 'error',
   '@typescript-eslint/prefer-string-starts-ends-with': 'error',
-  '@typescript-eslint/prefer-ts-expect-error': 0,
   '@typescript-eslint/promise-function-async': 'off', // disabled
 
   /** `sort` はデフォルトで文字列としての比較を行うため、数値のソートを行おうとしたときに比較関数を忘れることを防ぐため使用。 */
@@ -389,7 +389,6 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     },
   ], // modified
   '@typescript-eslint/return-await': 'error',
-  '@typescript-eslint/sort-type-constituents': 0,
 
   /**
    * Boolean への暗黙のキャストを回避するために使用。 数値 `0`, `NaN` や 文字列 `""` が条件部に来たときに false
@@ -467,6 +466,9 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-wrapper-object-types': 'error',
 
   // deprecated
+  '@typescript-eslint/no-type-alias': 0,
+  '@typescript-eslint/prefer-ts-expect-error': 0,
+  '@typescript-eslint/sort-type-constituents': 0,
   '@typescript-eslint/no-var-requires': 0,
   '@typescript-eslint/no-empty-interface': 0,
   '@typescript-eslint/no-loss-of-precision': 0,

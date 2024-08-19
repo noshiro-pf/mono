@@ -85,7 +85,6 @@ const pluginsDef = {
   'testing-library': eslintPluginTestingLibrary,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'total-functions': eslintPluginTotalFunctions,
-
   unicorn: eslintPluginUnicorn,
 } as const;
 

@@ -1,4 +1,4 @@
-import { type EslintJestRules } from '../types/rules/eslint-jest-rules.mjs';
+import { type EslintJestRules } from '../types/index.mjs';
 
 export const eslintJestRules: EslintJestRules = {
   /* vitest と共通のルール（設定値をなるべく合わせる） */
