@@ -170,14 +170,17 @@ export type ManagerObservable<A> =
 
 /* operator types */
 
+/** Observable を初期値有り Observable に変換するオペレータの型 */
 export type SetInitialValueOperator<A, B> = (
   src: Observable<A>,
 ) => InitializedObservable<B>;
 
+/** Observable を初期値無し Observable に変換するオペレータの型 */
 export type DropInitialValueOperator<A, B> = (
   src: InitializedObservable<A> | Observable<A>,
 ) => Observable<B>;
 
+/** Observable の初期値の有無を維持するオペレータの型 */
 export type KeepInitialValueOperator<A, B> = (
   src: InitializedObservable<A>,
 ) => InitializedObservable<B>;

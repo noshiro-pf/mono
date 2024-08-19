@@ -8,7 +8,7 @@ import {
 } from '../types/index.mjs';
 
 export const skipIfNoChange = <A,>(
-  eq: (x: A, y: A) => boolean = (x, y) => x === y,
+  eq: (x: A, y: A) => boolean = (x, y) => Object.is(x, y),
 ): KeepInitialValueOperator<A, A> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
