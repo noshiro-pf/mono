@@ -10,7 +10,6 @@
     "build": "wireit",
     "clean": "run-p clean:**",
     "clean:build": "rimraf build",
-    "clean:eslintcache": "rimraf .eslintcache",
     "clean:wireit": "rimraf .wireit/**",
     "fb:init": "firebase init",
     "fb:login": "firebase login",

@@ -22,7 +22,6 @@
     "clean": "run-p clean:**",
     "clean:build": "rimraf esm",
     "clean:build:scripts": "rimraf \"scripts/!(eslint.config.gen).mjs\"",
-    "clean:eslintcache": "rimraf .eslintcache",
     "clean:wireit": "rimraf .wireit/**",
     "fmt": "yarn zz:prettier .",
     "gen-rules-type": "run-s build:scripts gen-rules-type:command",

@@ -12,7 +12,6 @@
     "build:no-minify": "yarn build --minify false",
     "clean": "run-p clean:**",
     "clean:build": "rimraf build",
-    "clean:eslintcache": "rimraf .eslintcache",
     "clean:firebase": "rimraf .firebase",
     "clean:wireit": "rimraf .wireit/**",
     "cy:open": "yarn workspace @noshiro/my-portfolio-app-preact-cypress cy:open",
