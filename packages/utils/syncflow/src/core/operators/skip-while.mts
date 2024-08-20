@@ -25,7 +25,7 @@ export const skip = <A,>(
 /* implementation */
 
 class SkipWhileObservableClass<A>
-  extends SyncChildObservableClass<A, 'skipWhile', readonly [A]>
+  extends SyncChildObservableClass<A, readonly [A]>
   implements SkipWhileOperatorObservable<A>
 {
   readonly #predicate: (value: A, index: SafeUint | -1) => boolean;
@@ -37,7 +37,6 @@ class SkipWhileObservableClass<A>
   ) {
     super({
       parents: [parentObservable],
-      type: 'skipWhile',
       initialValue: Maybe.isNone(parentObservable.snapshot)
         ? Maybe.none
         : predicate(parentObservable.snapshot.value, -1)

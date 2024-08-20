@@ -21,11 +21,7 @@ export const withBufferedFrom = <A, B>(
 export const withBuffered = withBufferedFrom; // alias
 
 class WithBufferedFromObservableClass<A, B>
-  extends SyncChildObservableClass<
-    readonly [A, readonly B[]],
-    'withBufferedFrom',
-    readonly [A]
-  >
+  extends SyncChildObservableClass<readonly [A, readonly B[]], readonly [A]>
   implements WithBufferedFromOperatorObservable<A, B>
 {
   #mut_bufferedValues: readonly B[] = [];
@@ -34,7 +30,6 @@ class WithBufferedFromObservableClass<A, B>
     super({
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
-      type: 'withBufferedFrom',
       initialValue: Maybe.isNone(parentObservable.snapshot)
         ? Maybe.none
         : Maybe.some([

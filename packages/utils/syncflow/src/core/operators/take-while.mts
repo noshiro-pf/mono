@@ -26,7 +26,7 @@ export const take = <A,>(
 /* implementation */
 
 class TakeWhileObservableClass<A>
-  extends SyncChildObservableClass<A, 'takeWhile', readonly [A]>
+  extends SyncChildObservableClass<A, readonly [A]>
   implements TakeWhileOperatorObservable<A>
 {
   readonly #predicate: (value: A, index: SafeUint | -1) => boolean;
@@ -38,7 +38,6 @@ class TakeWhileObservableClass<A>
   ) {
     super({
       parents: [parentObservable],
-      type: 'takeWhile',
       initialValue: Maybe.isNone(parentObservable.snapshot)
         ? Maybe.none
         : predicate(parentObservable.snapshot.value, -1)

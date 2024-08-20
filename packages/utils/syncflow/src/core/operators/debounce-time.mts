@@ -18,7 +18,7 @@ export const debounceTime = <A,>(
     )) as KeepInitialValueOperator<A, A>;
 
 class DebounceTimeObservableClass<A>
-  extends AsyncChildObservableClass<A, 'debounceTime', readonly [A]>
+  extends AsyncChildObservableClass<A, readonly [A]>
   implements DebounceTimeOperatorObservable<A>
 {
   readonly #milliSeconds: number;
@@ -27,7 +27,6 @@ class DebounceTimeObservableClass<A>
   constructor(parentObservable: Observable<A>, milliSeconds: number) {
     super({
       parents: [parentObservable],
-      type: 'debounceTime',
       initialValue: parentObservable.snapshot,
     });
     this.#timerId = undefined;

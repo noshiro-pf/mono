@@ -18,11 +18,7 @@ export const withCurrentValueFrom =
 export const withLatestFrom = withCurrentValueFrom; // alias
 
 class WithCurrentValueFromObservableClass<A, B>
-  extends SyncChildObservableClass<
-    readonly [A, B],
-    'withCurrentValueFrom',
-    readonly [A]
-  >
+  extends SyncChildObservableClass<readonly [A, B], readonly [A]>
   implements WithCurrentValueFromOperatorObservable<A, B>
 {
   readonly #observable: Observable<B>;
@@ -31,7 +27,6 @@ class WithCurrentValueFromObservableClass<A, B>
     super({
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
-      type: 'withCurrentValueFrom',
       initialValue:
         Maybe.isNone(parentObservable.snapshot) ||
         Maybe.isNone(observable.snapshot)

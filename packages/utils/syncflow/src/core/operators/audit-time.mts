@@ -18,7 +18,7 @@ export const auditTime = <A,>(
     )) as KeepInitialValueOperator<A, A>;
 
 class AuditTimeObservableClass<A>
-  extends AsyncChildObservableClass<A, 'auditTime', readonly [A]>
+  extends AsyncChildObservableClass<A, readonly [A]>
   implements AuditTimeOperatorObservable<A>
 {
   readonly #milliSeconds: number;
@@ -28,7 +28,6 @@ class AuditTimeObservableClass<A>
   constructor(parentObservable: Observable<A>, milliSeconds: number) {
     super({
       parents: [parentObservable],
-      type: 'auditTime',
       initialValue: parentObservable.snapshot,
     });
     this.#isSkipping = false;

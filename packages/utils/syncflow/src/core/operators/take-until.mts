@@ -18,13 +18,12 @@ export const takeUntil = <A,>(
     )) as KeepInitialValueOperator<A, A>;
 
 class TakeUntilObservableClass<A>
-  extends SyncChildObservableClass<A, 'takeUntil', readonly [A]>
+  extends SyncChildObservableClass<A, readonly [A]>
   implements TakeUntilOperatorObservable<A>
 {
   constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
     super({
       parents: [parentObservable],
-      type: 'takeUntil',
       initialValue: parentObservable.snapshot,
     });
 

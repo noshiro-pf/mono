@@ -29,7 +29,7 @@ export const mergeMap =
 export const flatMap = mergeMap;
 
 class MergeMapObservableClass<A, B>
-  extends AsyncChildObservableClass<B, 'mergeMap', readonly [A]>
+  extends AsyncChildObservableClass<B, readonly [A]>
   implements MergeMapOperatorObservable<A, B>
 {
   readonly #mapToObservable: (curr: A) => Observable<B>;
@@ -42,7 +42,6 @@ class MergeMapObservableClass<A, B>
   ) {
     super({
       parents: [parentObservable],
-      type: 'mergeMap',
       initialValue: Maybe.none,
     });
     this.#mapToObservable = mapToObservable;

@@ -26,7 +26,6 @@ export class ObservableBaseClass<
 {
   readonly id;
   readonly kind: Kind;
-  readonly type;
   readonly depth: Depth;
   #children: readonly ChildObservable<unknown>[];
   readonly #subscribers: MutableMap<SubscriberId, Subscriber<A>>;
@@ -36,17 +35,14 @@ export class ObservableBaseClass<
 
   constructor({
     kind,
-    type,
     depth,
     initialValue,
   }: Readonly<{
     kind: Kind;
-    type: ObservableBase<A>['type'];
     depth: Depth;
     initialValue: ObservableBase<A>['snapshot'];
   }>) {
     this.kind = kind;
-    this.type = type;
     this.depth = depth;
     this.id = issueObservableId();
     this.#currentValue = initialValue;

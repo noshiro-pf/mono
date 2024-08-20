@@ -23,13 +23,12 @@ export const merge = <OS extends NonEmptyArray<Observable<unknown>>>(
   new MergeObservableClass(parents) as never;
 
 class MergeObservableClass<P extends NonEmptyUnknownList>
-  extends SyncChildObservableClass<ArrayElement<P>, 'merge', P>
+  extends SyncChildObservableClass<ArrayElement<P>, P>
   implements MergeObservable<P>
 {
   constructor(parents: Wrap<P>) {
     super({
       parents,
-      type: 'merge',
       initialValue: Maybe.none,
     });
   }
@@ -59,5 +58,5 @@ if (import.meta.vitest !== undefined) {
   // eslint-disable-next-line deprecation/deprecation
   const _m = merge([r1, r2] as const);
 
-  expectType<typeof _m, SyncChildObservable<number | string, 'merge'>>('<=');
+  expectType<typeof _m, SyncChildObservable<number | string>>('<=');
 }

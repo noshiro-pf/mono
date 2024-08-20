@@ -23,14 +23,13 @@ export const combine = <OS extends NonEmptyArray<Observable<unknown>>>(
 export const combineLatest = combine; // alias
 
 class CombineObservableClass<A extends NonEmptyUnknownList>
-  extends SyncChildObservableClass<A, 'combine', A>
+  extends SyncChildObservableClass<A, A>
   implements CombineObservable<A>
 {
   constructor(parents: Wrap<A>) {
     const parentsValues = parents.map((p) => p.snapshot);
     super({
       parents,
-      type: 'combine',
       initialValue: parentsValues.every(Maybe.isSome)
         ? Maybe.some(
             // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -95,16 +94,10 @@ if (import.meta.vitest !== undefined) {
     r2.chain(setInitialValue(0)),
   ] as const);
 
-  expectType<
-    typeof _c,
-    SyncChildObservable<readonly [number, string], 'combine'>
-  >('<=');
+  expectType<typeof _c, SyncChildObservable<readonly [number, string]>>('<=');
 
   expectType<
     typeof _ci,
-    InitializedSyncChildObservable<
-      readonly [number, number | string],
-      'combine'
-    >
+    InitializedSyncChildObservable<readonly [number, number | string]>
   >('<=');
 }

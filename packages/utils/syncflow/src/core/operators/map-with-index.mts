@@ -79,7 +79,7 @@ export const mapResultErr = <R extends Result.Base, E2>(
 /* implementation */
 
 class MapWithIndexObservableClass<A, B>
-  extends SyncChildObservableClass<B, 'mapWithIndex', readonly [A]>
+  extends SyncChildObservableClass<B, readonly [A]>
   implements MapWithIndexOperatorObservable<A, B>
 {
   readonly #mapFn: (x: A, index: SafeUint | -1) => B;
@@ -91,7 +91,6 @@ class MapWithIndexObservableClass<A, B>
   ) {
     super({
       parents: [parentObservable],
-      type: 'mapWithIndex',
       initialValue: Maybe.map(parentObservable.snapshot, (x) => mapFn(x, -1)),
     });
 

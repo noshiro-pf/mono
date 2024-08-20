@@ -8,13 +8,13 @@ export const of = <A,>(
 ): OfObservable<A> => new OfObservableClass<A>(value, startManually);
 
 class OfObservableClass<A>
-  extends RootObservableClass<A, 'Of'>
+  extends RootObservableClass<A>
   implements OfObservable<A>
 {
   readonly #value: A;
 
   constructor(value: A, startManually: boolean = false) {
-    super({ type: 'Of', initialValue: Maybe.none });
+    super({ initialValue: Maybe.none });
     this.#value = value;
     if (!startManually) {
       setTimeout(() => {

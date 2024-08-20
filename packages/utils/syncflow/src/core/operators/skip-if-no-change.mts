@@ -20,7 +20,7 @@ export const skipIfNoChange = <A,>(
 export const distinctUntilChanged = skipIfNoChange; // alias
 
 class SkipIfNoChangeObservableClass<A>
-  extends SyncChildObservableClass<A, 'skipIfNoChange', readonly [A]>
+  extends SyncChildObservableClass<A, readonly [A]>
   implements SkipIfNoChangeOperatorObservable<A>
 {
   readonly #eq: (x: A, y: A) => boolean;
@@ -29,7 +29,6 @@ class SkipIfNoChangeObservableClass<A>
   constructor(parentObservable: Observable<A>, eq: (x: A, y: A) => boolean) {
     super({
       parents: [parentObservable],
-      type: 'skipIfNoChange',
       initialValue: parentObservable.snapshot,
     });
     // parentObservable.snapshot has value

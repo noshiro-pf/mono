@@ -18,7 +18,7 @@ export const throttleTime = <A,>(
     )) as KeepInitialValueOperator<A, A>;
 
 class ThrottleTimeObservableClass<A>
-  extends SyncChildObservableClass<A, 'throttleTime', readonly [A]>
+  extends SyncChildObservableClass<A, readonly [A]>
   implements ThrottleTimeOperatorObservable<A>
 {
   readonly #milliSeconds: number;
@@ -28,7 +28,6 @@ class ThrottleTimeObservableClass<A>
   constructor(parentObservable: Observable<A>, milliSeconds: number) {
     super({
       parents: [parentObservable],
-      type: 'throttleTime',
       initialValue: parentObservable.snapshot,
     });
     this.#mut_timerId = undefined;

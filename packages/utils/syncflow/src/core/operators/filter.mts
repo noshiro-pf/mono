@@ -24,7 +24,7 @@ export function filter<A>(
 }
 
 class FilterObservableClass<A>
-  extends SyncChildObservableClass<A, 'filter', readonly [A]>
+  extends SyncChildObservableClass<A, readonly [A]>
   implements FilterOperatorObservable<A>
 {
   readonly #predicate: (x: A, index: SafeUint | -1) => boolean;
@@ -36,7 +36,6 @@ class FilterObservableClass<A>
   ) {
     super({
       parents: [parentObservable],
-      type: 'filter',
       initialValue: Maybe.isNone(parentObservable.snapshot)
         ? Maybe.none
         : predicate(parentObservable.snapshot.value, -1)

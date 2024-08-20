@@ -15,17 +15,12 @@ export const setInitialValue =
     new SetInitialValueObservableClass(parentObservable, initialValue);
 
 class SetInitialValueObservableClass<A, I>
-  extends InitializedSyncChildObservableClass<
-    A | I,
-    'setInitialValue',
-    readonly [A]
-  >
+  extends InitializedSyncChildObservableClass<A | I, readonly [A]>
   implements SetInitialValueOperatorObservable<A, I>
 {
   constructor(parentObservable: Observable<A>, initialValue: I) {
     super({
       parents: [parentObservable],
-      type: 'setInitialValue',
       initialValue: Maybe.some(initialValue),
     });
   }

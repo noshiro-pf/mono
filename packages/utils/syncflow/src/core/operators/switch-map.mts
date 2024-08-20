@@ -21,7 +21,7 @@ export const switchMap =
     new SwitchMapObservableClass(parentObservable, mapToObservable);
 
 class SwitchMapObservableClass<A, B>
-  extends AsyncChildObservableClass<B, 'switchMap', readonly [A]>
+  extends AsyncChildObservableClass<B, readonly [A]>
   implements SwitchMapOperatorObservable<A, B>
 {
   readonly #mapToObservable: (curr: A) => Observable<B>;
@@ -34,7 +34,6 @@ class SwitchMapObservableClass<A, B>
   ) {
     super({
       parents: [parentObservable],
-      type: 'switchMap',
       initialValue: Maybe.none,
     });
     this.#mapToObservable = mapToObservable;

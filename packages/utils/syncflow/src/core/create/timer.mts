@@ -8,7 +8,7 @@ export const timer = (
 ): TimerObservable => new TimerObservableClass(milliSeconds, startManually);
 
 class TimerObservableClass
-  extends RootObservableClass<0, 'Timer'>
+  extends RootObservableClass<0>
   implements TimerObservable
 {
   readonly #milliSeconds: number;
@@ -16,7 +16,7 @@ class TimerObservableClass
   #isStarted: boolean;
 
   constructor(milliSeconds: number, startManually: boolean) {
-    super({ type: 'Timer', initialValue: Maybe.none });
+    super({ initialValue: Maybe.none });
     this.#milliSeconds = milliSeconds;
     this.#timerId = undefined;
     this.#isStarted = false;

@@ -16,7 +16,7 @@ export const scan =
     new ScanObservableClass(parentObservable, reducer, initialValue);
 
 class ScanObservableClass<A, B>
-  extends InitializedSyncChildObservableClass<B, 'scan', readonly [A]>
+  extends InitializedSyncChildObservableClass<B, readonly [A]>
   implements ScanOperatorObservable<A, B>
 {
   readonly #reducer: (acc: B, curr: A) => B;
@@ -28,7 +28,6 @@ class ScanObservableClass<A, B>
   ) {
     super({
       parents: [parentObservable],
-      type: 'scan',
       initialValue: Maybe.some(initialValue),
     });
     this.#reducer = reducer;

@@ -22,7 +22,7 @@ export const zip = <OS extends NonEmptyArray<Observable<unknown>>>(
   new ZipObservableClass(parents) as never;
 
 class ZipObservableClass<A extends NonEmptyUnknownList>
-  extends SyncChildObservableClass<A, 'zip', A>
+  extends SyncChildObservableClass<A, A>
   implements ZipObservable<A>
 {
   readonly #queues: TupleToQueueTuple<A>;
@@ -31,7 +31,6 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
     const parentsValues = parents.map((p) => p.snapshot);
     super({
       parents,
-      type: 'zip',
       initialValue: parentsValues.every(Maybe.isSome)
         ? Maybe.some(
             // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -105,12 +104,10 @@ if (import.meta.vitest !== undefined) {
     r2.chain(setInitialValue('0')),
   ] as const);
 
-  expectType<typeof _z, SyncChildObservable<readonly [number, string], 'zip'>>(
-    '<=',
-  );
+  expectType<typeof _z, SyncChildObservable<readonly [number, string]>>('<=');
 
   expectType<
     typeof _zi,
-    InitializedSyncChildObservable<readonly [number, string], 'zip'>
+    InitializedSyncChildObservable<readonly [number, string]>
   >('<=');
 }

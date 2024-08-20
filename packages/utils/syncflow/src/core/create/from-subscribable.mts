@@ -11,11 +11,11 @@ export const fromSubscribable = <A, E = unknown>(
   new FromSubscribableObservableClass(subscribable);
 
 class FromSubscribableObservableClass<A, E = unknown>
-  extends RootObservableClass<Result<A, E>, 'FromSubscribable'>
+  extends RootObservableClass<Result<A, E>>
   implements FromSubscribableObservable<A, E>
 {
   constructor(subscribable: Subscribable<A>) {
-    super({ type: 'FromSubscribable', initialValue: Maybe.none });
+    super({ initialValue: Maybe.none });
 
     subscribable.subscribe(
       (nextValue) => {

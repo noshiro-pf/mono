@@ -14,7 +14,7 @@ const f = <A,>(parentObservable: Observable<A>): Observable<readonly [A, A]> =>
   new PairwiseObservableClass(parentObservable);
 
 class PairwiseObservableClass<A>
-  extends SyncChildObservableClass<readonly [A, A], 'pairwise', readonly [A]>
+  extends SyncChildObservableClass<readonly [A, A], readonly [A]>
   implements PairwiseOperatorObservable<A>
 {
   #previousValue: Maybe<A>;
@@ -22,7 +22,6 @@ class PairwiseObservableClass<A>
   constructor(parentObservable: Observable<A>) {
     super({
       parents: [parentObservable],
-      type: 'pairwise',
       initialValue: Maybe.none,
     });
     // parentObservable.snapshot has value

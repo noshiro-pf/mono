@@ -8,11 +8,11 @@ export const source = <A,>(): SourceObservable<A> =>
 export const subject = source; // alias
 
 class SourceObservableClass<A>
-  extends RootObservableClass<A, 'Source'>
+  extends RootObservableClass<A>
   implements SourceObservable<A>
 {
   constructor() {
-    super({ type: 'Source', initialValue: Maybe.none });
+    super({ initialValue: Maybe.none });
   }
 
   next(nextValue: A): void {
