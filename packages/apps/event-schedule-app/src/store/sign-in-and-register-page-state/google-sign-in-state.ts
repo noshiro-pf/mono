@@ -45,10 +45,10 @@ const googleSignInSubmit = async (
 };
 
 const googleSignInClickHandler = (): void => {
-  if (googleSignInButtonDisabledState.snapshot.value) return;
+  if (googleSignInButtonDisabledState.getSnapshot().value) return;
 
   // TODO: use toast
-  googleSignInSubmit(Maybe.unwrap(Router.pageToBack$.snapshot)).catch(
+  googleSignInSubmit(Maybe.unwrap(Router.pageToBack$.getSnapshot())).catch(
     console.error,
   );
 };

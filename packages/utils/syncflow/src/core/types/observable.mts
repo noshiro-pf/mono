@@ -26,7 +26,7 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
   addChild: <B>(child: ChildObservable<B>) => void;
 
   // state
-  snapshot: Maybe<A>;
+  getSnapshot: () => Maybe<A>;
   isCompleted: boolean;
   updaterSymbol: UpdaterSymbol;
   hasSubscriber: boolean;
@@ -51,9 +51,9 @@ namespace ObservableTypeConverter {
   export type ToInitialized<
     A,
     O extends CreateObservableType<A, ObservableKind>,
-  > = Omit<O, 'chain' | 'snapshot'> &
+  > = Omit<O, 'chain' | 'getSnapshot'> &
     Readonly<{
-      snapshot: Maybe.Some<A>;
+      getSnapshot: () => Maybe.Some<A>;
 
       chain: //
       (<B>(

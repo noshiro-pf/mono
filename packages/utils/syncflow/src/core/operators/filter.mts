@@ -1,4 +1,10 @@
-import { expectType, Maybe, SafeUint, toSafeUint } from '@noshiro/ts-utils';
+import {
+  expectType,
+  Maybe,
+  pipe,
+  SafeUint,
+  toSafeUint,
+} from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import {
@@ -36,11 +42,13 @@ class FilterObservableClass<A>
   ) {
     super({
       parents: [parentObservable],
-      initialValue: Maybe.isNone(parentObservable.snapshot)
-        ? Maybe.none
-        : predicate(parentObservable.snapshot.value, -1)
-          ? parentObservable.snapshot
-          : Maybe.none,
+      initialValue: pipe(parentObservable.getSnapshot()).chain((sn) =>
+        Maybe.isNone(sn)
+          ? Maybe.none
+          : predicate(sn.value, -1)
+            ? sn
+            : Maybe.none,
+      ).value,
     });
 
     this.#mut_index = -1;
@@ -49,15 +57,17 @@ class FilterObservableClass<A>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+    const sn = par.getSnapshot();
+
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(sn)) {
       return; // skip update
     }
 
     this.#mut_index =
       this.#mut_index === -1 ? toSafeUint(0) : SafeUint.add(1, this.#mut_index);
 
-    if (this.#predicate(par.snapshot.value, this.#mut_index)) {
-      this.setNext(par.snapshot.value, updaterSymbol);
+    if (this.#predicate(sn.value, this.#mut_index)) {
+      this.setNext(sn.value, updaterSymbol);
     }
   }
 }

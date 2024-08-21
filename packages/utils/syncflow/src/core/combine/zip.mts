@@ -28,7 +28,7 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
   readonly #queues: TupleToQueueTuple<A>;
 
   constructor(parents: Wrap<A>) {
-    const parentsValues = parents.map((p) => p.snapshot);
+    const parentsValues = parents.map((p) => p.getSnapshot());
     super({
       parents,
       initialValue: parentsValues.every(Maybe.isSome)
@@ -47,8 +47,9 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const queues = this.#queues;
     for (const [index, par] of this.parents.entries()) {
-      if (par.updaterSymbol === updaterSymbol && Maybe.isSome(par.snapshot)) {
-        queues[index]?.enqueue(par.snapshot.value);
+      const sn = par.getSnapshot();
+      if (par.updaterSymbol === updaterSymbol && Maybe.isSome(sn)) {
+        queues[index]?.enqueue(sn.value);
       }
     }
 

@@ -35,17 +35,16 @@ class ScanObservableClass<A, B>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
+    const psn = par.getSnapshot();
+    const sn = this.getSnapshot();
     if (
       par.updaterSymbol !== updaterSymbol ||
-      Maybe.isNone(par.snapshot) ||
-      Maybe.isNone(this.snapshot)
+      Maybe.isNone(psn) ||
+      Maybe.isNone(sn)
     ) {
       return; // skip update
     }
 
-    this.setNext(
-      this.#reducer(this.snapshot.value, par.snapshot.value),
-      updaterSymbol,
-    );
+    this.setNext(this.#reducer(sn.value, psn.value), updaterSymbol);
   }
 }

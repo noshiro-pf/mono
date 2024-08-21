@@ -28,7 +28,7 @@ class ThrottleTimeObservableClass<A>
   constructor(parentObservable: Observable<A>, milliSeconds: number) {
     super({
       parents: [parentObservable],
-      initialValue: parentObservable.snapshot,
+      initialValue: parentObservable.getSnapshot(),
     });
     this.#mut_timerId = undefined;
     this.#mut_isSkipping = false;
@@ -37,15 +37,17 @@ class ThrottleTimeObservableClass<A>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
+    const sn = par.getSnapshot();
+
     if (
       par.updaterSymbol !== updaterSymbol ||
-      Maybe.isNone(par.snapshot) ||
+      Maybe.isNone(sn) ||
       this.#mut_isSkipping
     ) {
       return; // skip update
     }
 
-    this.setNext(par.snapshot.value, updaterSymbol);
+    this.setNext(sn.value, updaterSymbol);
 
     this.#mut_isSkipping = true;
     // set timer

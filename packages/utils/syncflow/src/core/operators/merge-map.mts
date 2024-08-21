@@ -51,11 +51,13 @@ class MergeMapObservableClass<A, B>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+    const sn = par.getSnapshot();
+
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(sn)) {
       return; // skip update
     }
 
-    const observable = this.#mapToObservable(par.snapshot.value);
+    const observable = this.#mapToObservable(sn.value);
     this.#observables = Arr.pushed(this.#observables, observable);
 
     const subscription = observable.subscribe((curr) => {

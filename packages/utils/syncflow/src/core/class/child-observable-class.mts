@@ -82,7 +82,7 @@ export class AsyncChildObservableClass<A, P extends NonEmptyUnknownList>
   }: Readonly<{
     parents: Wrap<P>;
     depth?: number;
-    initialValue: AsyncChildObservable<A>['snapshot'];
+    initialValue: ReturnType<AsyncChildObservable<A>['getSnapshot']>;
   }>) {
     super({
       kind: 'async child',
@@ -151,7 +151,7 @@ export class SyncChildObservableClass<A, P extends NonEmptyUnknownList>
   }: Readonly<{
     parents: Wrap<P>;
     depth?: number;
-    initialValue: SyncChildObservable<A>['snapshot'];
+    initialValue: ReturnType<SyncChildObservable<A>['getSnapshot']>;
   }>) {
     super({
       kind: 'sync child',
@@ -195,12 +195,12 @@ export class InitializedSyncChildObservableClass<
   }: Readonly<{
     parents: Wrap<P>;
     depth?: number;
-    initialValue: InitializedSyncChildObservable<A>['snapshot'];
+    initialValue: ReturnType<InitializedSyncChildObservable<A>['getSnapshot']>;
   }>) {
     super({ parents, depth, initialValue });
   }
 
-  override get snapshot(): Maybe.Some<A> {
+  override getSnapshot(): Maybe.Some<A> {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return super.getCurrentValue() as Maybe.Some<A>;
   }

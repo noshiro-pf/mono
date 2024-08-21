@@ -27,7 +27,7 @@ class CombineObservableClass<A extends NonEmptyUnknownList>
   implements CombineObservable<A>
 {
   constructor(parents: Wrap<A>) {
-    const parentsValues = parents.map((p) => p.snapshot);
+    const parentsValues = parents.map((p) => p.getSnapshot());
     super({
       parents,
       initialValue: parentsValues.every(Maybe.isSome)
@@ -42,7 +42,7 @@ class CombineObservableClass<A extends NonEmptyUnknownList>
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     if (this.parents.every((o) => o.updaterSymbol !== updaterSymbol)) return; // all parents are skipped
 
-    const parentValues = this.parents.map((a) => a.snapshot);
+    const parentValues = this.parents.map((a) => a.getSnapshot());
     if (parentValues.every(Maybe.isSome)) {
       const nextValue =
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion

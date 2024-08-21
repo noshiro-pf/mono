@@ -37,14 +37,16 @@ class SkipUntilObservableClass<A>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
+    const sn = par.getSnapshot();
+
     if (
       par.updaterSymbol !== updaterSymbol ||
-      Maybe.isNone(par.snapshot) ||
+      Maybe.isNone(sn) ||
       this.#isSkipping
     ) {
       return; // skip update
     }
 
-    this.setNext(par.snapshot.value, updaterSymbol);
+    this.setNext(sn.value, updaterSymbol);
   }
 }

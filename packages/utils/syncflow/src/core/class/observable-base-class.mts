@@ -29,7 +29,7 @@ export class ObservableBaseClass<
   readonly depth: Depth;
   #children: readonly ChildObservable<unknown>[];
   readonly #subscribers: MutableMap<SubscriberId, Subscriber<A>>;
-  #currentValue: ObservableBase<A>['snapshot'];
+  #currentValue: ReturnType<ObservableBase<A>['getSnapshot']>;
   #isCompleted: ObservableBase<A>['isCompleted'];
   #updaterSymbol: ObservableBase<A>['updaterSymbol'];
 
@@ -40,7 +40,7 @@ export class ObservableBaseClass<
   }: Readonly<{
     kind: Kind;
     depth: Depth;
-    initialValue: ObservableBase<A>['snapshot'];
+    initialValue: ReturnType<ObservableBase<A>['getSnapshot']>;
   }>) {
     this.kind = kind;
     this.depth = depth;
@@ -61,11 +61,11 @@ export class ObservableBaseClass<
     );
   }
 
-  get snapshot(): ObservableBase<A>['snapshot'] {
+  getSnapshot(): ReturnType<ObservableBase<A>['getSnapshot']> {
     return this.#currentValue;
   }
 
-  protected getCurrentValue(): ObservableBase<A>['snapshot'] {
+  protected getCurrentValue(): ReturnType<ObservableBase<A>['getSnapshot']> {
     return this.#currentValue;
   }
 
@@ -140,7 +140,7 @@ export class ObservableBaseClass<
 
   subscribe(onNext: (v: A) => void, onComplete?: () => void): Subscription {
     // first emit
-    const curr = this.snapshot;
+    const curr = this.getSnapshot();
     if (Maybe.isSome(curr)) {
       onNext(curr.value);
     }

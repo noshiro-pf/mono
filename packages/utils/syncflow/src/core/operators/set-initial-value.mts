@@ -27,11 +27,13 @@ class SetInitialValueObservableClass<A, I>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+    const sn = par.getSnapshot();
+
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(sn)) {
       return; // skip update
     }
 
-    this.setNext(par.snapshot.value, updaterSymbol);
+    this.setNext(sn.value, updaterSymbol);
   }
 }
 

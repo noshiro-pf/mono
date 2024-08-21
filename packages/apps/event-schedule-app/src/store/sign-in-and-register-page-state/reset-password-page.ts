@@ -88,10 +88,10 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
 };
 
 const enterClickHandler = (): void => {
-  if (enterButtonDisabled$.snapshot.value) return;
+  if (enterButtonDisabled$.getSnapshot().value) return;
 
   // TODO: use toast
-  submit(Maybe.unwrap(Router.pageToBack$.snapshot)).catch(console.error);
+  submit(Maybe.unwrap(Router.pageToBack$.getSnapshot())).catch(console.error);
 };
 
 const inputEmailHandler = (value: string): void => {

@@ -94,9 +94,9 @@ const submit = async (eventId: string, email: string): Promise<void> => {
 };
 
 const enterClickHandler = (): void => {
-  const eventId = Router.eventId$.snapshot.value;
-  const formState = formState$.snapshot.value;
-  const enterButtonDisabled = enterButtonDisabled$.snapshot.value;
+  const eventId = Router.eventId$.getSnapshot().value;
+  const formState = formState$.getSnapshot().value;
+  const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
 
   if (enterButtonDisabled) return;
 

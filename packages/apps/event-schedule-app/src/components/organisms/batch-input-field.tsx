@@ -175,8 +175,8 @@ const onGoodClick = (): void => {
 
 const onFairClick = (): void => {
   updateSelectedIconId((prev) => (prev === 'fair' ? 'none' : 'fair'));
-  if (selectedIconId$.snapshot.value === 'fair') {
-    setFairPoint(defaultFairPoint$.snapshot.value);
+  if (selectedIconId$.getSnapshot().value === 'fair') {
+    setFairPoint(defaultFairPoint$.getSnapshot().value);
   }
 };
 

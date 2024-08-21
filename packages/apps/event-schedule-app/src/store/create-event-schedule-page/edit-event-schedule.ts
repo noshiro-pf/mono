@@ -115,13 +115,13 @@ const answerPagePath$ = Router.eventId$.chain(
 );
 
 const onBackToAnswerPage = (): void => {
-  const answerPagePath = answerPagePath$.snapshot.value;
+  const answerPagePath = answerPagePath$.getSnapshot().value;
   Router.push(answerPagePath);
 };
 
 const saveToDatabase = async (): Promise<void> => {
-  const commonState = commonState$.snapshot.value;
-  const eventId = Router.eventId$.snapshot.value;
+  const commonState = commonState$.getSnapshot().value;
+  const eventId = Router.eventId$.getSnapshot().value;
 
   const {
     eventScheduleNormalized,

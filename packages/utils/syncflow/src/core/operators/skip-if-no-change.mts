@@ -29,31 +29,31 @@ class SkipIfNoChangeObservableClass<A>
   constructor(parentObservable: Observable<A>, eq: (x: A, y: A) => boolean) {
     super({
       parents: [parentObservable],
-      initialValue: parentObservable.snapshot,
+      initialValue: parentObservable.getSnapshot(),
     });
     // parentObservable.snapshot has value
     // if parentObservable is InitializedObservable
-    this.#previousValue = parentObservable.snapshot;
+    this.#previousValue = parentObservable.getSnapshot();
     this.#eq = eq;
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
+    const sn = par.getSnapshot();
 
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(sn)) {
       return; // skip update
     }
 
     const prev = this.#previousValue;
 
-    const cond =
-      Maybe.isNone(prev) || !this.#eq(prev.value, par.snapshot.value);
+    const cond = Maybe.isNone(prev) || !this.#eq(prev.value, sn.value);
 
     // NOTE: setNext より先に更新しないと tryUpdate が連続して呼ばれたときに Maybe.isNone(prev) が true になり続けてしまう
-    this.#previousValue = par.snapshot;
+    this.#previousValue = sn;
 
     if (cond) {
-      this.setNext(par.snapshot.value, updaterSymbol);
+      this.setNext(sn.value, updaterSymbol);
     }
   }
 }

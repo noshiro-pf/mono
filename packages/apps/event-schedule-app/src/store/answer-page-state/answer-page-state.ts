@@ -58,7 +58,7 @@ const setAnswerBeingEditedSectionState = (
 
   // 回答追加開始時にデフォルトで「回答を保護する」を有効にする
   if (nextState === 'creating') {
-    const user = Auth.fireAuthUser$.snapshot.value;
+    const user = Auth.fireAuthUser$.getSnapshot().value;
 
     updateAnswerBeingEdited((ans) =>
       Obj.set(
@@ -439,46 +439,46 @@ combine([emptyAnswerSelection$, resetAnswerBeingEditedAction$] as const)
 /* callbacks using subscribed values */
 
 const onAnswerClick = (answer: Answer): void => {
-  onAnswerClickImpl(answer, Auth.fireAuthUser$.snapshot.value);
+  onAnswerClickImpl(answer, Auth.fireAuthUser$.getSnapshot().value);
 };
 
 const onAddAnswerButtonClick = (): void => {
-  onAddAnswerButtonClickImpl(Auth.fireAuthUser$.snapshot.value);
+  onAddAnswerButtonClickImpl(Auth.fireAuthUser$.getSnapshot().value);
 };
 
 const onEditButtonClick = (): void => {
-  onEditButtonClickImpl(Router.eventId$.snapshot.value);
+  onEditButtonClickImpl(Router.eventId$.getSnapshot().value);
 };
 
 const onSubmitAnswerClickPromise = (): Promise<void> =>
   onSubmitAnswerImpl(
-    Router.eventId$.snapshot.value,
-    answerBeingEdited$.snapshot.value,
-    answerBeingEditedSectionState$.snapshot.value,
+    Router.eventId$.getSnapshot().value,
+    answerBeingEdited$.getSnapshot().value,
+    answerBeingEditedSectionState$.getSnapshot().value,
   );
 
 const onSubmitAnswerClick = (): void => {
   onSubmitAnswerImpl(
-    Router.eventId$.snapshot.value,
-    answerBeingEdited$.snapshot.value,
-    answerBeingEditedSectionState$.snapshot.value,
+    Router.eventId$.getSnapshot().value,
+    answerBeingEdited$.getSnapshot().value,
+    answerBeingEditedSectionState$.getSnapshot().value,
   ).catch(noop);
 };
 
 const onSubmitEmptyAnswerClick = (): Promise<void> =>
   onSubmitEmptyAnswerImpl(
-    Router.eventId$.snapshot.value,
-    Auth.fireAuthUser$.snapshot.value,
+    Router.eventId$.getSnapshot().value,
+    Auth.fireAuthUser$.getSnapshot().value,
   );
 
 const onDeleteAnswerClick = (): Promise<void> =>
   onDeleteAnswerImpl(
-    Router.eventId$.snapshot.value,
-    answerBeingEdited$.snapshot.value,
+    Router.eventId$.getSnapshot().value,
+    answerBeingEdited$.getSnapshot().value,
   );
 
 const toggleProtectedSection = (): void => {
-  toggleProtectedSectionImpl(Auth.fireAuthUser$.snapshot.value);
+  toggleProtectedSectionImpl(Auth.fireAuthUser$.getSnapshot().value);
 };
 
 const applyBatchInput = ({
@@ -495,7 +495,7 @@ const applyBatchInput = ({
     comment,
     selectedIconId,
     point,
-    checkboxState: checkboxesState$.snapshot.value,
+    checkboxState: checkboxesState$.getSnapshot().value,
   });
 };
 
@@ -639,7 +639,7 @@ const answerBeingEditedList$: InitializedObservable<
 );
 
 const onCheckAll = (checked: boolean): void => {
-  const dates = eventSchedule$.snapshot.value?.datetimeRangeList ?? [];
+  const dates = eventSchedule$.getSnapshot().value?.datetimeRangeList ?? [];
 
   if (checked) {
     setCheckboxesState(

@@ -16,7 +16,7 @@ export const createReducer = <S, A>(
 
   const dispatch = (action: A): S => {
     const nextState = reducer(
-      Maybe.unwrapOr(src.snapshot, initialState),
+      Maybe.unwrapOr(src.getSnapshot(), initialState),
       action,
     );
 

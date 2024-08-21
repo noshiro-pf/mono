@@ -91,7 +91,9 @@ class MapWithIndexObservableClass<A, B>
   ) {
     super({
       parents: [parentObservable],
-      initialValue: Maybe.map(parentObservable.snapshot, (x) => mapFn(x, -1)),
+      initialValue: Maybe.map(parentObservable.getSnapshot(), (x) =>
+        mapFn(x, -1),
+      ),
     });
 
     this.#mut_index = -1;
@@ -100,17 +102,16 @@ class MapWithIndexObservableClass<A, B>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+    const sn = par.getSnapshot();
+
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(sn)) {
       return; // skip update
     }
 
     this.#mut_index =
       this.#mut_index === -1 ? toSafeUint(0) : SafeUint.add(1, this.#mut_index);
 
-    this.setNext(
-      this.#mapFn(par.snapshot.value, this.#mut_index),
-      updaterSymbol,
-    );
+    this.setNext(this.#mapFn(sn.value, this.#mut_index), updaterSymbol);
   }
 }
 

@@ -67,7 +67,7 @@ const restoreFromLocalStorage = (): void => {
       commonStateHandlers.turnOnNotificationSection();
       commonStateHandlers.setNotificationSettingsWithEmail({
         ...ev.notificationSettings,
-        email: Auth.fireAuthUser$.snapshot.value?.email ?? '',
+        email: Auth.fireAuthUser$.getSnapshot().value?.email ?? '',
       });
     }
   }
@@ -112,8 +112,8 @@ const {
 } = createState<string>('');
 
 const createEvent = async (): Promise<Result<undefined, string>> => {
-  const commonState = commonState$.snapshot.value;
-  const fireAuthUser = Auth.fireAuthUser$.snapshot.value;
+  const commonState = commonState$.getSnapshot().value;
+  const fireAuthUser = Auth.fireAuthUser$.getSnapshot().value;
 
   const {
     eventScheduleNormalized,
@@ -182,7 +182,7 @@ const onCreateEventClick = (): void => {
 };
 
 const onClipboardButtonClick = (): void => {
-  const url = url$.snapshot.value;
+  const url = url$.getSnapshot().value;
 
   // https://stackoverflow.com/questions/51805395/navigator-clipboard-is-undefined
   if (

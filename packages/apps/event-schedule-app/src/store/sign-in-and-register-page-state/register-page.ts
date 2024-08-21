@@ -186,13 +186,13 @@ const inputPasswordConfirmationHandler = (value: string): void => {
 
 const enterClickHandler = (): void => {
   if (
-    enterButtonDisabled$.snapshot.value ||
-    GoogleSignInStore.googleSignInButtonDisabledState.snapshot.value
+    enterButtonDisabled$.getSnapshot().value ||
+    GoogleSignInStore.googleSignInButtonDisabledState.getSnapshot().value
   )
     return;
 
   // TODO: use toast
-  submit(Maybe.unwrap(Router.pageToBack$.snapshot)).catch(console.error);
+  submit(Maybe.unwrap(Router.pageToBack$.getSnapshot())).catch(console.error);
 };
 
 const resetAllState = (): void => {

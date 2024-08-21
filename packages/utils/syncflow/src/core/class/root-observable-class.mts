@@ -18,7 +18,7 @@ export class RootObservableClass<A>
   constructor({
     initialValue,
   }: Readonly<{
-    initialValue: RootObservable<A>['snapshot'];
+    initialValue: ReturnType<RootObservable<A>['getSnapshot']>;
   }>) {
     super({
       kind: 'root',

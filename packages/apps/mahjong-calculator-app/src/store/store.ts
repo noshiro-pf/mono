@@ -326,7 +326,7 @@ export const setRandomHand = (): void => {
   const mut_yama = pipe(Arr.copy(allTiles)).chain(Arr.asMut).value;
 
   // ドラ表示牌は削除する。
-  const doraIndicators = doraIndicators$.snapshot;
+  const doraIndicators = doraIndicators$.getSnapshot();
   if (Maybe.isSome(doraIndicators)) {
     for (const tile of doraIndicators.value) {
       const i = mut_yama.indexOf(tile);

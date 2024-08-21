@@ -35,13 +35,13 @@ class MergeObservableClass<P extends NonEmptyUnknownList>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const parentToUse = this.parents.find(
-      (o) => o.updaterSymbol === updaterSymbol && Maybe.isSome(o.snapshot),
+      (o) => o.updaterSymbol === updaterSymbol && Maybe.isSome(o.getSnapshot()),
     );
     if (parentToUse === undefined) return;
 
     const nextValue =
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      Maybe.unwrap(parentToUse.snapshot) as ArrayElement<P>;
+      Maybe.unwrap(parentToUse.getSnapshot()) as ArrayElement<P>;
 
     this.setNext(nextValue, updaterSymbol);
   }
