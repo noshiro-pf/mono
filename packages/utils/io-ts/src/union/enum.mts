@@ -7,25 +7,26 @@ import {
   validationErrorMessage,
 } from '../utils/index.mjs';
 
-export const enumType = <Values extends readonly Primitive[]>({
-  typeName = 'enum',
-  values,
-  defaultValue,
-}: Readonly<{
-  typeName?: string;
-  values: Values;
-  defaultValue: ArrayElement<Values>;
-}>): Type<ArrayElement<Values>> => {
+export const enumType = <const Values extends NonEmptyArray<Primitive>>(
+  values: Values,
+  options?: Readonly<{
+    typeName?: string;
+    defaultValue?: ArrayElement<Values>;
+  }>,
+): Type<ArrayElement<Values>> => {
   type T = ArrayElement<Values>;
 
   const valueSet = ISet.new<unknown>(values);
 
+  const defaultValueFilled =
+    options?.defaultValue ??
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    (values[0] as ArrayElement<Values>);
+
   const validate: Type<T>['validate'] = (a) =>
     valueSet.has(a)
-      ? Result.ok(
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          a as T,
-        )
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        Result.ok(a as T)
       : Result.err([
           validationErrorMessage(
             a,
@@ -37,11 +38,11 @@ export const enumType = <Values extends readonly Primitive[]>({
 
   const is = createIsFn<T>(validate);
 
-  const fill: Type<T>['fill'] = (a) => (is(a) ? a : defaultValue);
+  const fill: Type<T>['fill'] = (a) => (is(a) ? a : defaultValueFilled);
 
   return {
-    typeName,
-    defaultValue,
+    typeName: options?.typeName ?? 'enum',
+    defaultValue: defaultValueFilled,
     fill,
     validate,
     is,

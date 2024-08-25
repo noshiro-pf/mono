@@ -5,4 +5,5 @@ export * from './record/index.mjs';
 export * from './type.mjs';
 export * from './uint-range/index.mjs';
 export * from './union/index.mjs';
+export * from './unknown.mjs';
 export * from './utils/index.mjs';

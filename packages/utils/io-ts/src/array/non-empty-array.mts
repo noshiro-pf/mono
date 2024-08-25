@@ -9,14 +9,15 @@ import {
 
 export const nonEmptyArray = <A,>(
   elementType: Type<A>,
-  defaultValue: NonEmptyArray<A>,
   options?: Readonly<{
     typeName?: string;
+    defaultValue?: NonEmptyArray<A>;
   }>,
 ): Type<NonEmptyArray<A>> => {
   type T = NonEmptyArray<A>;
 
-  const { typeName } = options ?? {};
+  const { typeName, defaultValue = Arr.newArray(1, elementType.defaultValue) } =
+    options ?? {};
 
   const typeNameFilled: string =
     typeName ?? `NonEmptyArray<${elementType.typeName}>`;
@@ -48,10 +49,8 @@ export const nonEmptyArray = <A,>(
       }
     }
 
-    return Result.ok(
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      a as T,
-    );
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>

@@ -4,7 +4,27 @@ import { type TypeOf } from '../type.mjs';
 import { nonEmptyArray } from './non-empty-array.mjs';
 
 describe('nonEmptyArray', () => {
-  const xs = nonEmptyArray(number(0), [1], {
+  describe('arg patterns', () => {
+    test('without explicit default value', () => {
+      expect(nonEmptyArray(number()).defaultValue).toStrictEqual([0]);
+    });
+
+    test('with explicit default value, case 1', () => {
+      expect(nonEmptyArray(number(1)).defaultValue).toStrictEqual([1]);
+    });
+
+    test('with explicit default value, case 2', () => {
+      expect(
+        nonEmptyArray(number(0), {
+          typeName: 'xs',
+          defaultValue: [2],
+        }).defaultValue,
+      ).toStrictEqual([2]);
+    });
+  });
+
+  const xs = nonEmptyArray(number(0), {
+    defaultValue: [1],
     typeName: 'xs',
   });
 

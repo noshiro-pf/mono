@@ -9,23 +9,21 @@ import {
 
 type MapUnion<T extends Type<unknown>> = T extends T ? TypeOf<T> : never;
 
-export const union = <A extends NonEmptyArray<Type<unknown>>>({
-  typeName = 'union',
-  types,
-  defaultType,
-}: Readonly<{
-  typeName?: string;
-  types: A;
-  defaultType: ArrayElement<A>;
-}>): Type<MapUnion<ArrayElement<A>>> => {
+export const union = <const A extends NonEmptyArray<Type<unknown>>>(
+  types: A,
+  options?: Readonly<{
+    typeName?: string;
+    defaultType?: ArrayElement<A>;
+  }>,
+): Type<MapUnion<ArrayElement<A>>> => {
   type T = MapUnion<ArrayElement<A>>;
+
+  const defaultType = options?.defaultType ?? types[0];
 
   const validate: Type<T>['validate'] = (a) =>
     types.some((t) => t.is(a))
-      ? Result.ok(
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          a as T,
-        )
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        Result.ok(a as T)
       : Result.err([
           validationErrorMessage(
             a,
@@ -44,7 +42,7 @@ export const union = <A extends NonEmptyArray<Type<unknown>>>({
         (defaultType.fill(a) as T);
 
   return {
-    typeName,
+    typeName: options?.typeName ?? 'union',
 
     defaultValue:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion

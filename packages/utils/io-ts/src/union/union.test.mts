@@ -5,14 +5,16 @@ import { type TypeOf } from '../type.mjs';
 import { union } from './union.mjs';
 
 describe('union', () => {
-  const targetType = union({
-    defaultType: numberLiteral(3),
-    types: [
+  const targetType = union(
+    [
       record({ x: number(0), y: number(0) }),
       numberLiteral(3),
       stringLiteral('2'),
     ],
-  } as const);
+    {
+      defaultType: numberLiteral(3),
+    },
+  );
 
   type TargetType = TypeOf<typeof targetType>;
 

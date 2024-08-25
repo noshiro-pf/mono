@@ -1,4 +1,4 @@
-import { isRecord, Result, tp } from '@noshiro/ts-utils';
+import { ISet, isRecord, Result, tp } from '@noshiro/ts-utils';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -7,18 +7,22 @@ import {
   validationErrorMessage,
 } from '../utils/index.mjs';
 
-type RecordResultType<A extends Record<string, Type<unknown>>> = Readonly<{
-  [key in keyof A]: TypeOf<A[key]>;
-}>;
-
-export const record = <A extends Record<string, Type<unknown>>>(
+export const record = <
+  const A extends Record<string, Type<unknown>>,
+  const OptionalKeyList extends readonly (keyof A)[] = [],
+>(
   recordType: A,
-  typeName?: string,
-): Type<RecordResultType<A>> => {
-  type T = RecordResultType<A>;
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      optionalKeys: OptionalKeyList;
+    }>
+  >,
+): Type<RecordResultType<A, OptionalKeyList>> => {
+  type T = RecordResultType<A, OptionalKeyList>;
 
   const typeNameFilled: string =
-    typeName ??
+    options?.typeName ??
     `{ ${Object.entries(recordType)
       .map(([k, v]) => `${k}: ${v.typeName}`)
       .join(', ')} }`;
@@ -31,6 +35,8 @@ export const record = <A extends Record<string, Type<unknown>>>(
       ),
     ) as T;
 
+  const optionalKeys = ISet.new(options?.optionalKeys ?? []);
+
   const validate: Type<T>['validate'] = (a) => {
     if (!isRecord(a)) {
       return Result.err([
@@ -40,6 +46,8 @@ export const record = <A extends Record<string, Type<unknown>>>(
 
     for (const [k, valueType] of Object.entries(recordType)) {
       if (!Object.hasOwn(a, k)) {
+        if (optionalKeys.has(k) || recordType[k]?.optional === true) continue;
+
         return Result.err([`The record is expected to have the key "${k}".`]);
       }
 
@@ -56,10 +64,8 @@ export const record = <A extends Record<string, Type<unknown>>>(
       }
     }
 
-    return Result.ok(
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      a as T,
-    );
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>
@@ -82,3 +88,26 @@ export const record = <A extends Record<string, Type<unknown>>>(
     cast: createCastFn(validate),
   };
 };
+
+type RecordResultType<
+  A extends Record<string, Type<unknown>>,
+  OptionalKeyList extends readonly (keyof A)[],
+> = RecordResultTypeImpl<
+  A,
+  ArrayElement<OptionalKeyList> | OptionalTypeKeys<A>
+>;
+
+type RecordResultTypeImpl<
+  A extends Record<string, Type<unknown>>,
+  OptionalKeys extends keyof A,
+> = Readonly<
+  {
+    [key in OptionalKeys]?: TypeOf<A[key]>;
+  } & {
+    [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]>;
+  }
+>;
+
+type OptionalTypeKeys<A extends Record<string, Type<unknown>>> = {
+  [K in keyof A]: A[K] extends { optional: true } ? K : never;
+}[keyof A];

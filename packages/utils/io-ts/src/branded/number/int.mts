@@ -10,4 +10,4 @@ export const int = (defaultValue: Int = toInt(0)): Type<Int> =>
     defaultValue,
     brandKeys: ['Finite', 'Int'],
     brandFalseKeys: ['NaNValue'],
-  } as const);
+  });

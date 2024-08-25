@@ -4,7 +4,7 @@ import { type Type } from '../../type.mjs';
 import { brand } from '../brand.mjs';
 
 export const positiveSafeInt = (
-  defaultValue: PositiveSafeInt = toPositiveSafeInt(0),
+  defaultValue: PositiveSafeInt = toPositiveSafeInt(1),
 ): Type<PositiveSafeInt> =>
   brand({
     codec: number(defaultValue),
@@ -22,4 +22,4 @@ export const positiveSafeInt = (
       '!=0',
     ],
     brandFalseKeys: ['NaNValue'],
-  } as const);
+  });

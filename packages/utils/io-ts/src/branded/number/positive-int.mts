@@ -4,7 +4,7 @@ import { type Type } from '../../type.mjs';
 import { brand } from '../brand.mjs';
 
 export const positiveInt = (
-  defaultValue: PositiveInt = toPositiveInt(0),
+  defaultValue: PositiveInt = toPositiveInt(1),
 ): Type<PositiveInt> =>
   brand({
     codec: number(defaultValue),
@@ -21,4 +21,4 @@ export const positiveInt = (
       '!=0',
     ],
     brandFalseKeys: ['NaNValue'],
-  } as const);
+  });

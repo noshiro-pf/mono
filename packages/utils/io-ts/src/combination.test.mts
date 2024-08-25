@@ -5,6 +5,7 @@ import { number } from './primitives/index.mjs';
 import { record } from './record/index.mjs';
 import { type TypeOf } from './type.mjs';
 import { uintRange } from './uint-range/index.mjs';
+import { unknown } from './unknown.mjs';
 
 describe('nested record', () => {
   const nestedRecord = record({
@@ -14,6 +15,7 @@ describe('nested record', () => {
       b: uintRange({ start: 0, end: 11, defaultValue: 0 }),
     }),
     meta: number(100),
+    u: unknown(),
   });
 
   type NestedRecord = TypeOf<typeof nestedRecord>;
@@ -27,6 +29,7 @@ describe('nested record', () => {
         b: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
       }>;
       meta: number;
+      u: unknown;
     }>
   >('=');
 
@@ -41,6 +44,7 @@ describe('nested record', () => {
           b: 2,
         },
         meta: 3,
+        u: undefined,
       };
 
       if (nestedRecord.is(x)) {
@@ -60,6 +64,7 @@ describe('nested record', () => {
           b: 234,
         },
         meta: 345,
+        u: undefined,
       };
 
       if (nestedRecord.is(x)) {
@@ -81,6 +86,7 @@ describe('nested record', () => {
           b: 234,
         },
         meta: 345,
+        u: undefined,
       };
 
       expect(nestedRecord.validate(x).value).toStrictEqual([
@@ -102,6 +108,7 @@ describe('nested record', () => {
           b: 0,
         },
         meta: 100,
+        u: undefined,
       });
     });
 
@@ -113,6 +120,7 @@ describe('nested record', () => {
           b: 234,
         },
         meta: 345,
+        u: undefined,
       };
 
       expect(nestedRecord.fill(x)).toStrictEqual({
@@ -122,6 +130,7 @@ describe('nested record', () => {
           b: 0,
         },
         meta: 345,
+        u: undefined,
       });
     });
 
@@ -140,6 +149,7 @@ describe('nested record', () => {
           b: 0,
         },
         meta: 100,
+        u: undefined,
       });
     });
 
@@ -150,6 +160,7 @@ describe('nested record', () => {
           a: 3,
           c: 9988,
         },
+        u: undefined,
         aaaaa: [9999],
       };
 
@@ -160,6 +171,7 @@ describe('nested record', () => {
           b: 0,
         },
         meta: 100,
+        u: undefined,
       });
     });
   });

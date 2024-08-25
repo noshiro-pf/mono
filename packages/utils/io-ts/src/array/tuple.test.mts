@@ -5,11 +5,28 @@ import { type TypeOf } from '../type.mjs';
 import { tuple } from './tuple.mjs';
 
 describe('tuple', () => {
+  describe('arg patterns', () => {
+    test('without explicit default value', () => {
+      expect(
+        tuple([numberLiteral(1), numberLiteral(2), numberLiteral(3)])
+          .defaultValue,
+      ).toStrictEqual([1, 2, 3]);
+    });
+
+    test('with explicit default value', () => {
+      expect(
+        tuple([numberLiteral(1), numberLiteral(2), numberLiteral(3)], {
+          typeName: 'tpl',
+        }).typeName,
+      ).toBe('tpl');
+    });
+  });
+
   const targetType = tuple([
     record({ x: number(0), y: number(0) }),
     numberLiteral(3),
     stringLiteral('2'),
-  ] as const);
+  ]);
 
   type TargetType = TypeOf<typeof targetType>;
 

@@ -10,4 +10,4 @@ export const safeInt = (defaultValue: SafeInt = toSafeInt(0)): Type<SafeInt> =>
     defaultValue,
     brandKeys: ['Finite', 'Int', 'SafeInt'],
     brandFalseKeys: ['NaNValue'],
-  } as const);
+  });

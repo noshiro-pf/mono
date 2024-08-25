@@ -4,6 +4,25 @@ import { type TypeOf } from '../type.mjs';
 import { arrayOfLength } from './array-of-length.mjs';
 
 describe('arrayOfLength', () => {
+  describe('arg patterns', () => {
+    test('without explicit default value', () => {
+      expect(arrayOfLength(3, number()).defaultValue).toStrictEqual([0, 0, 0]);
+    });
+
+    test('with explicit default value, case 1', () => {
+      expect(arrayOfLength(3, number(2)).defaultValue).toStrictEqual([2, 2, 2]);
+    });
+
+    test('with explicit default value, case 2', () => {
+      expect(
+        arrayOfLength(4, number(0), {
+          typeName: 'xs',
+          defaultValue: [1, 2, 3, 4],
+        }).defaultValue,
+      ).toStrictEqual([1, 2, 3, 4]);
+    });
+  });
+
   const xs = arrayOfLength(4, number(0), {
     typeName: 'xs',
     defaultValue: [1, 2, 3, 4],
