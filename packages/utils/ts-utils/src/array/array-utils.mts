@@ -400,21 +400,6 @@ const partition = <N extends WithSmallInt<PositiveInt & Uint32>, A>(
       ) as ArrayOfLength<N, A>,
   );
 
-function sorted<N extends number>(list: readonly N[]): readonly N[];
-function sorted<A>(
-  list: readonly A[],
-  comparator: (x: A, y: A) => number,
-): readonly A[];
-function sorted<A>(
-  list: readonly A[],
-  comparator?: (x: A, y: A) => number,
-): readonly A[] {
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  const cmp = comparator ?? ((x, y) => (x as number) - (y as number));
-
-  return list.toSorted(cmp);
-}
-
 function sortedBy<A>(
   list: readonly A[],
   comparatorValueMapper: (value: A) => number,
@@ -430,7 +415,7 @@ function sortedBy<A, B>(
   comparatorValueMapper: (value: A) => B,
   comparator?: (x: B, y: B) => number,
 ): readonly A[] {
-  return sorted(list, (x, y) =>
+  return list.toSorted((x, y) =>
     comparator === undefined
       ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (comparatorValueMapper(x) as number) -
@@ -820,7 +805,6 @@ export const ArrayUtils = {
   newArray,
   head,
   last,
-  sorted,
   sortedBy,
   min,
   max,

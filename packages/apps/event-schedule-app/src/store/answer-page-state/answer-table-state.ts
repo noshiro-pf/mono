@@ -367,7 +367,7 @@ const tableBodyValuesFiltered$ = combine([
     const scoreThreshold = pipe(tableBodyValuesFiltered)
       .chain((ar) => ar.map((a) => a.score))
       .chain(
-        (ar) => Arr.sorted(ar, (a, b) => b - a)[filterState.rank.value - 1],
+        (ar) => ar.toSorted((a, b) => b - a)[filterState.rank.value - 1],
       ).value;
 
     return tableBodyValuesFiltered.filter(
