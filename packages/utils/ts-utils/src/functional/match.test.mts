@@ -17,7 +17,7 @@ describe('match', () => {
     W: 5,
   });
 
-  expectTypeOf(res).toEqualTypeOf<number>();
+  expectTypeOf(res).toEqualTypeOf<2 | 3 | 4 | 5>();
 
   const res2 = match(direction as string, {
     E: 2,
@@ -26,7 +26,7 @@ describe('match', () => {
     W: 5,
   });
 
-  expectTypeOf(res2).toEqualTypeOf<number | undefined>();
+  expectTypeOf(res2).toEqualTypeOf<2 | 3 | 4 | 5 | undefined>();
 
   const res3 =
     match('N' as string, {

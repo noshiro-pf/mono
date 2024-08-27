@@ -27,20 +27,28 @@ export namespace Result {
 
   export type NarrowToErr<R extends Base> = R extends Ok<unknown> ? never : R;
 
-  export const ok = <S,>(value: S): Ok<S> => ({ type: OkTypeSymbol, value });
+  export const ok = <const S,>(value: S): Ok<S> => ({
+    type: OkTypeSymbol,
+    value,
+  });
 
-  export const err = <E,>(value: E): Err<E> => ({ type: ErrTypeSymbol, value });
+  export const err = <const E,>(value: E): Err<E> => ({
+    type: ErrTypeSymbol,
+    value,
+  });
 
   // eslint-disable-next-line no-restricted-syntax
   const _toStr = String;
 
-  export const isOk = <R extends Base>(result: R): result is NarrowToOk<R> =>
-    result.type === OkTypeSymbol;
+  export const isOk = <const R extends Base>(
+    result: R,
+  ): result is NarrowToOk<R> => result.type === OkTypeSymbol;
 
-  export const isErr = <R extends Base>(result: R): result is NarrowToErr<R> =>
-    result.type === ErrTypeSymbol;
+  export const isErr = <const R extends Base>(
+    result: R,
+  ): result is NarrowToErr<R> => result.type === ErrTypeSymbol;
 
-  export const map = <R extends Base, S2>(
+  export const map = <const R extends Base, S2>(
     result: R,
     mapFn: (value: UnwrapOk<R>) => S2,
   ): Result<S2, UnwrapErr<R>> =>
@@ -54,7 +62,7 @@ export namespace Result {
           ),
         );
 
-  export const mapErr = <R extends Base, E2>(
+  export const mapErr = <const R extends Base, E2>(
     result: R,
     mapFn: (error: UnwrapErr<R>) => E2,
   ): Result<UnwrapOk<R>, E2> =>
@@ -68,7 +76,7 @@ export namespace Result {
           ),
         );
 
-  export const fold = <R extends Base, S2, E2>(
+  export const fold = <const R extends Base, S2, E2>(
     result: R,
     mapFn: (value: UnwrapOk<R>) => S2,
     mapErrFn: (error: UnwrapErr<R>) => E2,
@@ -87,7 +95,7 @@ export namespace Result {
           ),
         );
 
-  export const unwrapThrow = <R extends Base>(
+  export const unwrapThrow = <const R extends Base>(
     result: R,
     toStr: (e: UnwrapErr<R>) => string = _toStr,
   ): UnwrapOk<R> => {
@@ -103,7 +111,7 @@ export namespace Result {
     return result.value as UnwrapOk<R>;
   };
 
-  export const unwrapOk = <R extends Base>(
+  export const unwrapOk = <const R extends Base>(
     result: R,
   ): UnwrapOk<R> | undefined =>
     isErr(result)
@@ -111,7 +119,7 @@ export namespace Result {
       : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (result.value as UnwrapOk<R>);
 
-  export const unwrapOkOr = <R extends Base, D>(
+  export const unwrapOkOr = <const R extends Base, D>(
     result: R,
     defaultValue: D,
   ): D | UnwrapOk<R> =>
@@ -120,7 +128,7 @@ export namespace Result {
       : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (result.value as UnwrapOk<R>);
 
-  export const unwrapErr = <R extends Base>(
+  export const unwrapErr = <const R extends Base>(
     result: R,
   ): UnwrapErr<R> | undefined =>
     isErr(result)
@@ -128,7 +136,7 @@ export namespace Result {
         (result.value as UnwrapErr<R>)
       : undefined;
 
-  export const unwrapErrOr = <R extends Base, D>(
+  export const unwrapErrOr = <const R extends Base, D>(
     result: R,
     defaultValue: D,
   ): D | UnwrapErr<R> =>
@@ -138,7 +146,7 @@ export namespace Result {
       : defaultValue;
 
   export const expectToBe =
-    <R extends Base>(message: string) =>
+    <const R extends Base>(message: string) =>
     (result: R): UnwrapOk<R> => {
       if (isErr(result)) {
         throw new Error(message);
@@ -150,7 +158,7 @@ export namespace Result {
   type UnwrapPromise<P extends Promise<unknown>> =
     P extends Promise<infer V> ? V : never;
 
-  export const fromPromise = <P extends Promise<unknown>>(
+  export const fromPromise = <const P extends Promise<unknown>>(
     promise: P,
   ): Promise<Result<UnwrapPromise<P>, unknown>> =>
     promise

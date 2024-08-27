@@ -1,4 +1,4 @@
-export const memoizeFunction = <A extends readonly unknown[], R, K>(
+export const memoizeFunction = <const A extends readonly unknown[], R, K>(
   fn: (...args: A) => R,
   argsToCacheKey: (...args: A) => K,
 ): ((...args: A) => R) => {

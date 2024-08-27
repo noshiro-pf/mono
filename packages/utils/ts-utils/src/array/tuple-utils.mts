@@ -1,10 +1,12 @@
 import { Num } from '../num/index.mjs';
 
-function length<T extends readonly unknown[]>(list: T): Length<T> {
+function length<const T extends readonly unknown[]>(list: T): Length<T> {
   return list.length;
 }
 
-const reversed = <T extends readonly unknown[]>(tpl: T): Tuple.Reverse<T> =>
+const reversed = <const T extends readonly unknown[]>(
+  tpl: T,
+): Tuple.Reverse<T> =>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, total-functions/no-unsafe-type-assertion
   tpl.toReversed() as unknown as Tuple.Reverse<T>;
 
@@ -17,7 +19,7 @@ type MapNumberToArraySearchResult<T> = T extends number
 type IndexOfTupleRefined<T extends readonly unknown[]> =
   MapNumberToArraySearchResult<IndexOfTuple<T>>;
 
-const findIndex = <T extends readonly unknown[]>(
+const findIndex = <const T extends readonly unknown[]>(
   tpl: T,
   predicate: (value: T[number], index: NumberType.ArraySize) => boolean,
 ): IndexOfTupleRefined<T> | -1 =>
@@ -26,7 +28,7 @@ const findIndex = <T extends readonly unknown[]>(
     predicate as (value: T[number], index: NumberType.ArraySize) => boolean,
   ) as IndexOfTupleRefined<T> | -1;
 
-const indexOf = <T extends readonly unknown[]>(
+const indexOf = <const T extends readonly unknown[]>(
   tpl: T,
   searchElement: T[number],
   fromIndex?: IndexOfTupleRefined<T> | undefined,
@@ -36,7 +38,7 @@ const indexOf = <T extends readonly unknown[]>(
     | MapNumberToArraySearchResult<IndexOfTuple<T>>
     | -1;
 
-const lastIndexOf = <T extends readonly unknown[]>(
+const lastIndexOf = <const T extends readonly unknown[]>(
   tpl: T,
   searchElement: T[number],
   fromIndex?: IndexOfTupleRefined<T> | undefined,
@@ -44,7 +46,7 @@ const lastIndexOf = <T extends readonly unknown[]>(
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   tpl.lastIndexOf(searchElement, fromIndex) as IndexOfTupleRefined<T>;
 
-const map = <T extends readonly unknown[], B>(
+const map = <const T extends readonly unknown[], const B>(
   tpl: T,
   mapFn: (a: T[number], index: NumberType.ArraySize) => B,
 ): { readonly [K in keyof T]: B } =>
@@ -53,7 +55,7 @@ const map = <T extends readonly unknown[], B>(
     readonly [K in keyof T]: B;
   };
 
-const set = <T extends readonly unknown[], N>(
+const set = <const T extends readonly unknown[], const N>(
   tpl: T,
   index: Index<Length<T>>,
   newValue: N,
@@ -63,7 +65,7 @@ const set = <T extends readonly unknown[], N>(
   };
 
 // TODO: improve type
-const update = <T extends readonly unknown[], N>(
+const update = <const T extends readonly unknown[], const N>(
   tpl: T,
 
   index: NumberType.ArraySize | (Index<Length<T>> & SmallUint),
@@ -73,15 +75,15 @@ const update = <T extends readonly unknown[], N>(
     readonly [K in keyof T]: N | T[K];
   };
 
-function sorted<T extends readonly number[]>(
+function sorted<const T extends readonly number[]>(
   tpl: T,
 ): { readonly [K in keyof T]: T[number] };
-function sorted<T extends readonly unknown[]>(
+function sorted<const T extends readonly unknown[]>(
   tpl: T,
   // eslint-disable-next-line @typescript-eslint/unified-signatures
   comparator: (x: T[number], y: T[number]) => number,
 ): { readonly [K in keyof T]: T[number] };
-function sorted<T extends readonly unknown[]>(
+function sorted<const T extends readonly unknown[]>(
   tpl: T,
   comparator?: (x: T[number], y: T[number]) => number,
 ): { readonly [K in keyof T]: T[number] } {
@@ -93,17 +95,17 @@ function sorted<T extends readonly unknown[]>(
   };
 }
 
-function sortedBy<T extends readonly unknown[]>(
+function sortedBy<const T extends readonly unknown[]>(
   tpl: T,
   comparatorValueMapper: (value: T[number]) => number,
   comparator?: (x: number, y: number) => number,
 ): { readonly [K in keyof T]: T[number] };
-function sortedBy<T extends readonly unknown[], B>(
+function sortedBy<const T extends readonly unknown[], const B>(
   tpl: T,
   comparatorValueMapper: (value: T[number]) => B,
   comparator: (x: B, y: B) => number,
 ): { readonly [K in keyof T]: T[number] };
-function sortedBy<T extends readonly unknown[], B>(
+function sortedBy<const T extends readonly unknown[], const B>(
   tpl: T,
   comparatorValueMapper: (value: T[number]) => B,
   comparator?: (x: B, y: B) => number,
