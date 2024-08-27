@@ -268,10 +268,10 @@ export namespace RefinedNumberUtils {
     const abs = (x: ElementTypeWithSmallInt): ToNonNegative<ElementType> =>
       Math.abs(clampOrCastFn(x));
 
-    const _min = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
+    const min_ = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
       clampOrCastFn(Math.min(...values));
 
-    const _max = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
+    const max_ = (...values: readonly ElementTypeWithSmallInt[]): ElementType =>
       clampOrCastFn(Math.max(...values));
 
     const pow = (
@@ -333,8 +333,8 @@ export namespace RefinedNumberUtils {
       MAX_VALUE,
       is,
       abs,
-      min: _min,
-      max: _max,
+      min: min_,
+      max: max_,
       pow,
       add,
       sub,
@@ -416,10 +416,10 @@ export namespace RefinedNumberUtils {
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       Math.abs(x) as ToNonNegative<ElementType>;
 
-    const _min = (...values: readonly ElementType[]): ElementType =>
+    const min_ = (...values: readonly ElementType[]): ElementType =>
       clampOrCastFn(Math.min(...values));
 
-    const _max = (...values: readonly ElementType[]): ElementType =>
+    const max_ = (...values: readonly ElementType[]): ElementType =>
       clampOrCastFn(Math.max(...values));
 
     const pow = (x: ElementType, y: ElementType): ElementType =>
@@ -456,8 +456,8 @@ export namespace RefinedNumberUtils {
       MAX_VALUE,
       is,
       abs,
-      min: _min,
-      max: _max,
+      min: min_,
+      max: max_,
       pow,
       add,
       sub,

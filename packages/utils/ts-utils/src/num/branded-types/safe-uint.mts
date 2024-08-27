@@ -8,8 +8,8 @@ const typeNameInMessage = 'a non-negative safe integer';
 const {
   MIN_VALUE,
   MAX_VALUE,
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   pow,
   add,
   sub,
@@ -38,8 +38,8 @@ export const SafeUint = {
   /** `Number.MAX_SAFE_INTEGER` */
   MAX_VALUE,
 
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   clamp,
 
   random,

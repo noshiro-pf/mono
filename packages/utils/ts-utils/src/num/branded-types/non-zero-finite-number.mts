@@ -7,8 +7,8 @@ const typeNameInMessage = 'a non-zero finite number';
 
 const {
   abs,
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   pow,
   add,
   sub,
@@ -42,8 +42,8 @@ export const NonZeroFiniteNumber = {
 
   abs,
 
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
 
   floor,
   ceil,

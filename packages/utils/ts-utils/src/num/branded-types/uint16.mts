@@ -8,8 +8,8 @@ const typeNameInMessage = 'a non-negative integer less than 2^16';
 const {
   MIN_VALUE,
   MAX_VALUE,
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   pow,
   add,
   sub,
@@ -38,8 +38,8 @@ export const Uint16 = {
   /** `2^16 - 1` */
   MAX_VALUE,
 
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   clamp,
 
   random,

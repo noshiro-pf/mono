@@ -7,8 +7,8 @@ const typeNameInMessage = 'a non-negative finite number';
 
 const {
   MIN_VALUE,
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   pow,
   add,
   sub,
@@ -41,8 +41,8 @@ export const NonNegativeFiniteNumber = {
   /** `0` */
   MIN_VALUE,
 
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   clamp,
 
   floor,

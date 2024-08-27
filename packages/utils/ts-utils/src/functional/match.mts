@@ -1,7 +1,8 @@
+import { expectType } from '../expect-type.mjs';
 import { keyIsIn } from '../guard/index.mjs';
 
 /** @internal */
-export type _IsLiteralType<T extends RecordKeyType> = string extends T
+type IsLiteralTypeImpl<T extends RecordKeyType> = string extends T
   ? false
   : number extends T
     ? false
@@ -12,7 +13,7 @@ export type _IsLiteralType<T extends RecordKeyType> = string extends T
 export function match<const Case extends RecordKeyType, const V>(
   target: Case,
   cases: Record<Case, V>,
-): _IsLiteralType<Case> extends true ? V : V | undefined;
+): IsLiteralTypeImpl<Case> extends true ? V : V | undefined;
 
 export function match<
   const Case extends RecordKeyType,
@@ -26,4 +27,15 @@ export function match<
   const CaseSub extends Case,
 >(target: Case, cases: Record<CaseSub, V>): V | undefined {
   return keyIsIn(target, cases) ? cases[target] : undefined;
+}
+
+if (import.meta.vitest !== undefined) {
+  expectType<IsLiteralTypeImpl<'aaa'>, true>('=');
+  expectType<IsLiteralTypeImpl<33>, true>('=');
+  expectType<IsLiteralTypeImpl<number | 'aa'>, false>('=');
+  expectType<IsLiteralTypeImpl<'aa' | 32>, true>('=');
+
+  test('dummy', () => {
+    expect(true).toBe(true);
+  });
 }
