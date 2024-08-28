@@ -627,8 +627,8 @@ const b: BarType = 1;
 foo('aaa');
 ```
 
-前者は `type` を import する型一つ一つに書く必要があるのに対し、後者は type only import とそうでない import で同じ import path を 2 回書く必要が生じます。
-後者の方が不便であることが多い（ファイル移動時のパス文字列修正とか）ので、後者の inline スタイルを採用し以下の設定を使うのが個人的にはおすすめです。
+前者では type only import とそうでない import で同じ import path を 2 回書く必要があり、後者では `type` を import する型一つ一つに書く必要があります。
+前者の top-level style の方が不便であることが多い（ファイル移動時のパス文字列修正とか）ので、後者の inline スタイルを採用し以下の設定を使うのが個人的にはおすすめです。
 
 ```json
 {
@@ -649,7 +649,7 @@ foo('aaa');
 
 ### [`no-restricted-syntax`](https://eslint.org/docs/latest/rules/no-restricted-syntax)（★★★★★）
 
-既存ルールに求めているものが見つからなかったら、このルールを使えば（自分で ESLint plugin を自作するよりは）比較的簡単に特定の構文を禁止する設定ができる場合があります。
+既存ルールに求めているものが見つからなかったら、このルールを使えば（自分で ESLint plugin を自作するよりは）比較的簡単に特定の構文を禁止する設定ができる場合がありそうです。
 禁止したい構文にマッチする selector を調べるには [AST checker](https://typescript-eslint.io/play/#ts=4.7.2&sourceType=module&showAST=es) が便利です。
 
 - `as` の禁止設定例
@@ -712,14 +712,14 @@ foo('aaa');
 
 - [`@typescript-eslint/require-array-sort-compare`](https://typescript-eslint.io/rules/require-array-sort-compare/)（★★★★★）
 
-JavaScript の `Array.prototype.sort` はデフォルトで文字列比較によるソートを行うので、特に数値配列に対して使った場合に意図しない結果になるリスクがあります。
+JavaScript の `Array.prototype.sort` はデフォルトで文字列比較による辞書順ソートを行うので、特に数値配列に対して使った場合に意図しない結果になるリスクがあります。
 
 ```ts
 [1, 2, 3, 10, 20, 30].sort(); // → [1, 10, 2, 20, 3, 30]
 ```
 
 この ESLint ルールを有効にすると `.sort()` の引数を省略できないようになります。
-文字列の配列に関しては比較関数を省略しても意図通りに動くので、 `ignoreStringArrays` option も有効にしておくと省略しても lint エラーにならず便利です。
+文字列の配列に関しては比較関数省略時のデフォルト動作が自然であり採用したい場合が多いので、 `ignoreStringArrays` option も有効にしておくのが有効です。
 
 ```json
 {
