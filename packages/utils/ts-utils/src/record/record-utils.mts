@@ -1,17 +1,17 @@
 import { Uint32 } from '../num/index.mjs';
 
-const get = <R extends UnknownRecord, K extends keyof R>(
+const get = <const R extends UnknownRecord, const K extends keyof R>(
   record: R,
   key: K,
 ): R[K] => record[key];
 
-const set = <R extends UnknownRecord, K extends keyof R>(
+const set = <const R extends UnknownRecord, const K extends keyof R>(
   record: R,
   key: K,
   newValue: R[K],
 ): R => ({ ...record, [key]: newValue });
 
-const update = <R extends UnknownRecord, K extends keyof R>(
+const update = <const R extends UnknownRecord, const K extends keyof R>(
   record: R,
   key: K,
   updater: (prev: R[K]) => R[K],
@@ -31,7 +31,7 @@ const UNSAFE_getIn_impl = (
         Uint32.add(index, 1),
       );
 
-const getIn = <R extends UnknownRecord, Path extends Paths<R>>(
+const getIn = <const R extends UnknownRecord, const Path extends Paths<R>>(
   record: R,
   keyPath: Path,
 ): RecordValueAtPath<R, Path> =>
@@ -74,7 +74,7 @@ const UNSAFE_updateIn_impl = (
           ),
         };
 
-const setIn = <R extends UnknownRecord>(
+const setIn = <const R extends UnknownRecord>(
   record: R,
   ...[keyPath, newValue]: KeyPathAndValueTypeAtPathTuple<R>
 ): R =>
@@ -86,7 +86,7 @@ const setIn = <R extends UnknownRecord>(
     () => newValue,
   ) as R;
 
-const updateIn = <R extends UnknownRecord, Path extends Paths<R>>(
+const updateIn = <const R extends UnknownRecord, const Path extends Paths<R>>(
   record: R,
   keyPath: IsUnion<Path> extends true ? never : Path,
   updater: IsUnion<Path> extends true
@@ -102,7 +102,10 @@ const updateIn = <R extends UnknownRecord, Path extends Paths<R>>(
     updater as (prev: unknown) => unknown,
   ) as R;
 
-const removeProperties = <R extends UnknownRecord, K extends keyof R>(
+const removeProperties = <
+  const R extends UnknownRecord,
+  const K extends keyof R,
+>(
   record: R,
   keys: readonly K[],
 ): Readonly<{
@@ -122,7 +125,7 @@ const removeProperties = <R extends UnknownRecord, K extends keyof R>(
  * If `record1` and `record2` share some properties, `record2` value have
  * priority.
  */
-const merge = <R1 extends UnknownRecord, R2 extends UnknownRecord>(
+const merge = <const R1 extends UnknownRecord, const R2 extends UnknownRecord>(
   record1: R1,
   record2: R2,
 ): Readonly<{
@@ -136,15 +139,15 @@ const merge = <R1 extends UnknownRecord, R2 extends UnknownRecord>(
   ({ ...record1, ...record2 }) as never;
 
 function hasKeyValue<
-  R extends UnknownRecord,
-  K extends keyof R,
-  V extends R[K],
+  const R extends UnknownRecord,
+  const K extends keyof R,
+  const V extends R[K],
 >(rec: R, key: K, valueChecker: (v: R[K]) => v is V): rec is R & Record<K, V>;
 
 function hasKeyValue<
-  R extends UnknownRecord,
-  K extends PropertyKey,
-  V extends R[keyof R],
+  const R extends UnknownRecord,
+  const K extends PropertyKey,
+  const V extends R[keyof R],
 >(
   rec: R,
   key: K,
@@ -152,9 +155,9 @@ function hasKeyValue<
 ): rec is R & Record<K, V>;
 
 function hasKeyValue<
-  R extends UnknownRecord,
-  K extends PropertyKey,
-  V extends R[keyof R],
+  const R extends UnknownRecord,
+  const K extends PropertyKey,
+  const V extends R[keyof R],
 >(
   rec: R,
   key: K,

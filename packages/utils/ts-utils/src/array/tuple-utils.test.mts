@@ -2,8 +2,7 @@ import { expectType } from '../expect-type.mjs';
 import { Tpl } from './tuple-utils.mjs';
 
 describe('Tuple.map', () => {
-  const xs = [1, 2, 3] as const;
-  const mapped = Tpl.map(xs, (x, i): number => x * x * i);
+  const mapped = Tpl.map([1, 2, 3], (x, i): number => x * x * i);
 
   expectType<typeof mapped, ArrayOfLength<3, number>>('=');
 
@@ -13,8 +12,7 @@ describe('Tuple.map', () => {
 });
 
 describe('TupleUtils.set', () => {
-  const xs = [1, 2, 3] as const;
-  const result = Tpl.set(xs, 1, 4 as const);
+  const result = Tpl.set([1, 2, 3], 1, 4);
 
   expectType<typeof result, readonly [1 | 4, 2 | 4, 3 | 4]>('=');
 
@@ -24,8 +22,7 @@ describe('TupleUtils.set', () => {
 });
 
 describe('TupleUtils.update', () => {
-  const xs = [1, 2, 3] as const;
-  const result = Tpl.update(xs, 1, (x) => x + 2);
+  const result = Tpl.update([1, 2, 3], 1, (x) => x + 2);
 
   expectType<typeof result, readonly [number, number, number]>('=');
 
@@ -36,8 +33,7 @@ describe('TupleUtils.update', () => {
 
 describe('TupleUtils.reverse', () => {
   {
-    const xs = [1, 2, 3] as const;
-    const result = Tpl.reversed(xs);
+    const result = Tpl.reversed([1, 2, 3]);
 
     expectType<typeof result, readonly [3, 2, 1]>('=');
 
@@ -49,8 +45,8 @@ describe('TupleUtils.reverse', () => {
 
 describe('TupleUtils.sorted', () => {
   {
-    const xs = [2, 1, 3] as const;
-    const result = Tpl.sorted(xs);
+    // as const 無しでも動くこと
+    const result = Tpl.sorted([2, 1, 3]);
 
     expectType<typeof result, ArrayOfLength<3, 1 | 2 | 3>>('=');
 
@@ -59,8 +55,8 @@ describe('TupleUtils.sorted', () => {
     });
   }
   {
-    const xs = [2, 1, 3] as const;
-    const result = Tpl.sorted(xs, (a, b) => a - b);
+    // as const 無しでも動くこと
+    const result = Tpl.sorted([2, 1, 3], (a, b) => a - b);
 
     expectType<typeof result, ArrayOfLength<3, 1 | 2 | 3>>('=');
 
@@ -82,8 +78,7 @@ describe('TupleUtils.sorted', () => {
 
 describe('TupleUtils.sortedBy', () => {
   {
-    const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
-    const sorted = Tpl.sortedBy(xs, (x) => x.v);
+    const sorted = Tpl.sortedBy([{ v: 2 }, { v: 1 }, { v: 3 }], (x) => x.v);
 
     expectType<
       typeof sorted,
@@ -98,9 +93,8 @@ describe('TupleUtils.sortedBy', () => {
     });
   }
   {
-    const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
     const sorted = Tpl.sortedBy(
-      xs,
+      [{ v: 2 }, { v: 1 }, { v: 3 }],
       (x) => x.v,
       (a, b) => a - b,
     );
@@ -121,8 +115,10 @@ describe('TupleUtils.sortedBy', () => {
 
 describe('TupleUtils.findIndex', () => {
   {
-    const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
-    const result = Tpl.findIndex(xs, (x) => x.v === 1);
+    const result = Tpl.findIndex(
+      [{ v: 2 }, { v: 1 }, { v: 3 }],
+      (x) => x.v === 1,
+    );
 
     expectType<typeof result, -1 | 0 | 1 | 2>('=');
 
@@ -136,6 +132,7 @@ describe('TupleUtils.findIndex', () => {
       { v: 1 },
       { v: 3 },
     ] as const;
+
     const result = Tpl.findIndex(xs, (x) => x.v === 1);
 
     expectType<typeof result, NumberType.ArraySearchResult>('=');

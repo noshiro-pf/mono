@@ -1,4 +1,4 @@
-export const pipe = <A,>(a: A): Pipe<A> => ({
+export const pipe = <const A,>(a: A): Pipe<A> => ({
   value: a,
   chain: (fn) => pipe(fn(a)),
   chainOptional: (fn) => pipe(a == null ? undefined : fn(a)),

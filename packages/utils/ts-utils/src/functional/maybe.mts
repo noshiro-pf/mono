@@ -25,20 +25,22 @@ export namespace Maybe {
   export type NarrowToNone<M extends Base> =
     M extends Some<unknown> ? never : M;
 
-  export const some = <S,>(value: S): Some<S> => ({
+  export const some = <const S,>(value: S): Some<S> => ({
     type: SomeTypeSymbol,
     value,
   });
 
   export const none: None = { type: NoneTypeSymbol } as const;
 
-  export const isSome = <M extends Base>(maybe: M): maybe is NarrowToSome<M> =>
-    maybe.type === SomeTypeSymbol;
+  export const isSome = <const M extends Base>(
+    maybe: M,
+  ): maybe is NarrowToSome<M> => maybe.type === SomeTypeSymbol;
 
-  export const isNone = <M extends Base>(maybe: M): maybe is NarrowToNone<M> =>
-    maybe.type === NoneTypeSymbol;
+  export const isNone = <const M extends Base>(
+    maybe: M,
+  ): maybe is NarrowToNone<M> => maybe.type === NoneTypeSymbol;
 
-  export const map = <M extends Base, S2>(
+  export const map = <const M extends Base, S2>(
     maybe: M,
     mapFn: (value: Unwrap<M>) => S2,
   ): Maybe<S2> =>
@@ -51,7 +53,7 @@ export namespace Maybe {
           ),
         );
 
-  export const unwrapThrow = <M extends Base>(maybe: M): Unwrap<M> => {
+  export const unwrapThrow = <const M extends Base>(maybe: M): Unwrap<M> => {
     if (isNone(maybe)) {
       throw new Error('`unwrapThrow()` has failed because it is `None`');
     }
@@ -60,13 +62,15 @@ export namespace Maybe {
     return (maybe as NarrowToSome<M>).value as Unwrap<M>;
   };
 
-  export const unwrap = <M extends Base>(maybe: M): Unwrap<M> | undefined =>
+  export const unwrap = <const M extends Base>(
+    maybe: M,
+  ): Unwrap<M> | undefined =>
     isNone(maybe)
       ? undefined
       : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         ((maybe as NarrowToSome<M>).value as Unwrap<M>);
 
-  export const unwrapOr = <M extends Base, D>(
+  export const unwrapOr = <const M extends Base, D>(
     maybe: M,
     defaultValue: D,
   ): D | Unwrap<M> =>
@@ -76,7 +80,7 @@ export namespace Maybe {
         ((maybe as NarrowToSome<M>).value as Unwrap<M>);
 
   export const expectToBe =
-    <M extends Base>(message: string) =>
+    <const M extends Base>(message: string) =>
     (maybe: M): Unwrap<M> => {
       if (isNone(maybe)) {
         throw new Error(message);
