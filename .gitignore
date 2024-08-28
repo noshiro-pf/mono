@@ -103,3 +103,5 @@ build/Release
 *.njsproj
 *.sln
 *.sw?
+
+rollup.config-*.mjs
