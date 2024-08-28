@@ -215,7 +215,7 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
       caughtErrorsIgnorePattern: '^_',
       destructuredArrayIgnorePattern: '^_',
       ignoreClassWithStaticInitBlock: false,
-      reportUsedIgnorePattern: false,
+      reportUsedIgnorePattern: true,
     },
   ], // modified
   '@typescript-eslint/no-use-before-define': 'off', // disabled
