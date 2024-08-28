@@ -30,9 +30,9 @@ const abs = <N extends Int8>(x: N): AbsoluteValue<N> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   Math.abs(x) as unknown as AbsoluteValue<N>;
 
-const _min = (...values: readonly Int8[]): Int8 => castTo(Math.min(...values));
+const min_ = (...values: readonly Int8[]): Int8 => castTo(Math.min(...values));
 
-const _max = (...values: readonly Int8[]): Int8 => castTo(Math.max(...values));
+const max_ = (...values: readonly Int8[]): Int8 => castTo(Math.max(...values));
 
 const pow = (x: Int8, y: Int8): Int8 => castTo(x ** y);
 
@@ -59,8 +59,8 @@ export const Int8 = {
   /** `127` */
   MAX_VALUE,
 
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   clamp,
 
   abs,

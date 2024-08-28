@@ -12,7 +12,7 @@ import { AnswerFilterQueryParam } from './answer-filter-query-param';
 const {
   state: sortKeyAndOrder$,
   setState: setSortOrderAndKey,
-  resetState: _resetSortOrderAndKey,
+  resetState: resetSortOrderAndKey_,
 } = createState<readonly ['date' | 'score', 'asc' | 'desc']>(['date', 'asc']);
 
 const { state: filterState$, dispatch: filterStateDispatch } = createReducer(
@@ -21,7 +21,7 @@ const { state: filterState$, dispatch: filterStateDispatch } = createReducer(
 );
 
 const resetSortOrderAndKey = (): void => {
-  AnswerFilterQueryParam.saveSortStateToQueryParams(_resetSortOrderAndKey());
+  AnswerFilterQueryParam.saveSortStateToQueryParams(resetSortOrderAndKey_());
 };
 
 const resetState = (): void => {

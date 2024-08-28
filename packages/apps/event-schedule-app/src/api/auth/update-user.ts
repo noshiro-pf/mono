@@ -1,8 +1,8 @@
 import {
-  deleteUser as _deleteUser,
-  reauthenticateWithCredential as _reauthenticateWithCredential,
-  updateEmail as _updateEmail,
-  updatePassword as _updatePassword,
+  deleteUser as deleteUser_,
+  reauthenticateWithCredential as reauthenticateWithCredential_,
+  updateEmail as updateEmail_,
+  updatePassword as updatePassword_,
   updateProfile,
 } from 'firebase/auth';
 import { assertIsCredentialError } from '../../types';
@@ -26,7 +26,7 @@ export const updateEmail = (
   user: FireAuthUser,
   email: string,
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
-  Result.fromPromise(_updateEmail(castDeepMutable(user), email)).then((a) =>
+  Result.fromPromise(updateEmail_(castDeepMutable(user), email)).then((a) =>
     Result.mapErr(a, (error) => {
       assertIsCredentialError(error);
       return error;
@@ -37,7 +37,7 @@ export const updatePassword = (
   user: FireAuthUser,
   password: string,
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
-  Result.fromPromise(_updatePassword(castDeepMutable(user), password)).then(
+  Result.fromPromise(updatePassword_(castDeepMutable(user), password)).then(
     (a) =>
       Result.mapErr(a, (error) => {
         assertIsCredentialError(error);
@@ -48,7 +48,7 @@ export const updatePassword = (
 export const deleteUser = (
   user: FireAuthUser,
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
-  Result.fromPromise(_deleteUser(castDeepMutable(user))).then((a) =>
+  Result.fromPromise(deleteUser_(castDeepMutable(user))).then((a) =>
     Result.mapErr(a, (error) => {
       assertIsCredentialError(error);
       return error;
@@ -62,7 +62,7 @@ export const reauthenticateWithCredential = (
   Result<UserCredential, Readonly<{ code: string; message: string }>>
 > =>
   Result.fromPromise(
-    _reauthenticateWithCredential(
+    reauthenticateWithCredential_(
       castDeepMutable(user),
       castMutable(authCredential),
     ),

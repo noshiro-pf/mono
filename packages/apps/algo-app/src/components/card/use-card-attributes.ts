@@ -76,16 +76,16 @@ export const useCardAttributes = (
     [visibilityFromMe],
   );
 
-  const _showOutline =
+  const showOutline_ =
     showOutline === 'always' || (showOutline === 'onHover' && isMouseOver);
 
   const rectStyle = useMemo<preact.JSX.CSSProperties>(
     () => ({
-      stroke: _showOutline ? outlineColor : '',
-      strokeWidth: _showOutline ? 8 : 0,
+      stroke: showOutline_ ? outlineColor : '',
+      strokeWidth: showOutline_ ? 8 : 0,
       fill: color,
     }),
-    [_showOutline, color, outlineColor],
+    [showOutline_, color, outlineColor],
   );
 
   return {

@@ -70,11 +70,11 @@ export const useSliderHandleStateManager = ({
   /** Clamp value and invoke callback if it differs from current value */
   const changeValue = useCallback(
     (newValue: number, callback: (v: number) => void = onChangeRef.current) => {
-      const _newValue = clampRef.current(newValue);
-      if (!Number.isNaN(_newValue) && valueRef.current !== _newValue) {
-        callback(_newValue);
+      const newValue_ = clampRef.current(newValue);
+      if (!Number.isNaN(newValue_) && valueRef.current !== newValue_) {
+        callback(newValue_);
       }
-      return _newValue;
+      return newValue_;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],

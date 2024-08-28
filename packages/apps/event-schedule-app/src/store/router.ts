@@ -1,13 +1,13 @@
 import { Routes } from '../constants';
 
-const _router = createRouter();
+const router_ = createRouter();
 
 const pathSegments$: InitializedObservable<readonly string[]> =
-  _router.state.chain(map((state) => state.pathSegments));
+  router_.state.chain(map((state) => state.pathSegments));
 
-const pageToBack$ = _router.state.chain(pluck('pathname')).chain(
+const pageToBack$ = router_.state.chain(pluck('pathname')).chain(
   filter((pathname) => {
-    const pathSegments = _router.utils.splitToPathSegments(pathname);
+    const pathSegments = router_.utils.splitToPathSegments(pathname);
 
     return (
       // ログインページ・新規登録ページは除外
@@ -18,7 +18,7 @@ const pageToBack$ = _router.state.chain(pluck('pathname')).chain(
 );
 
 export const Router = {
-  ..._router,
+  ...router_,
   pathSegments$,
   pageToBack$,
 

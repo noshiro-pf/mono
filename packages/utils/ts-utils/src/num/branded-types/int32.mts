@@ -8,8 +8,8 @@ const typeNameInMessage = 'an integer in [-2^31, 2^31)';
 const {
   MIN_VALUE,
   MAX_VALUE,
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   abs,
   pow,
   add,
@@ -41,8 +41,8 @@ export const Int32 = {
 
   abs,
 
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   clamp,
 
   random,

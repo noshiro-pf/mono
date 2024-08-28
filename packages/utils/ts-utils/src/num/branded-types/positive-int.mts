@@ -7,8 +7,8 @@ const typeNameInMessage = 'a positive integer';
 
 const {
   MIN_VALUE,
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   pow,
   add,
   sub,
@@ -34,8 +34,8 @@ export const PositiveInt = {
   /** `1` */
   MIN_VALUE,
 
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   clamp,
 
   random,

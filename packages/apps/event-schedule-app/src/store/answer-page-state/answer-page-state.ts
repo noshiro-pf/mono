@@ -39,7 +39,7 @@ const {
 
 const {
   state: answerBeingEditedSectionState$,
-  setState: _setAnswerBeingEditedSectionState,
+  setState: setAnswerBeingEditedSectionState_,
 } = createState<'creating' | 'editing' | 'hidden'>('hidden');
 
 const {
@@ -51,7 +51,7 @@ const {
 const setAnswerBeingEditedSectionState = (
   nextState: 'creating' | 'editing' | 'hidden',
 ): void => {
-  _setAnswerBeingEditedSectionState(nextState);
+  setAnswerBeingEditedSectionState_(nextState);
 
   // 回答追加開始時にデフォルトで「回答を保護する」を有効にする
   if (nextState === 'creating') {
@@ -83,11 +83,11 @@ const {
   ),
 );
 
-const { state: batchInputFieldIsOpen$, toggle: _toggleBatchInputField } =
+const { state: batchInputFieldIsOpen$, toggle: toggleBatchInputField_ } =
   createBooleanState(false);
 
 const toggleBatchInputField = (): void => {
-  _toggleBatchInputField();
+  toggleBatchInputField_();
   resetCheckboxesState();
 };
 

@@ -9,8 +9,8 @@ const {
   MIN_VALUE,
   MAX_VALUE,
   abs,
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   pow,
   add,
   sub,
@@ -42,8 +42,8 @@ export const NonZeroSafeInt = {
 
   abs,
 
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   clamp,
 
   random,

@@ -26,10 +26,10 @@ const castTo = (x: number): Uint8 =>
 
 const clamp = (a: number): Uint8 => castTo(clampImpl(a));
 
-const _min = (...values: readonly Uint8[]): Uint8 =>
+const min_ = (...values: readonly Uint8[]): Uint8 =>
   castTo(Math.min(...values));
 
-const _max = (...values: readonly Uint8[]): Uint8 =>
+const max_ = (...values: readonly Uint8[]): Uint8 =>
   castTo(Math.max(...values));
 
 const pow = (x: Uint8, y: Uint8): Uint8 => castTo(x ** y);
@@ -57,8 +57,8 @@ export const Uint8 = {
   /** `255` */
   MAX_VALUE,
 
-  max: _max,
-  min: _min,
+  max: max_,
+  min: min_,
   clamp,
 
   random,

@@ -1,12 +1,6 @@
-import { expectType } from '../expect-type.mjs';
-import { match, type _IsLiteralType } from './match.mjs';
+import { match } from './match.mjs';
 
 describe('match', () => {
-  expectType<_IsLiteralType<'aaa'>, true>('=');
-  expectType<_IsLiteralType<33>, true>('=');
-  expectType<_IsLiteralType<number | 'aa'>, false>('=');
-  expectType<_IsLiteralType<'aa' | 32>, true>('=');
-
   type Direction = 'E' | 'N' | 'S' | 'W';
   const direction: Direction = 'N';
 

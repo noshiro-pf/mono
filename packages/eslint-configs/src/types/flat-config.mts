@@ -1,6 +1,6 @@
-import { type FlatConfig as _FlatConfig } from '@typescript-eslint/utils/ts-eslint';
+import { type FlatConfig as FlatConfig_ } from '@typescript-eslint/utils/ts-eslint';
 
-export type FlatConfig = DeepReadonly<_FlatConfig.Config>;
+export type FlatConfig = DeepReadonly<FlatConfig_.Config>;
 
 // import { type Linter } from 'eslint';
 

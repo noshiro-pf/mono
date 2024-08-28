@@ -1,20 +1,20 @@
 const SomeTypeSymbol: unique symbol = Symbol('Maybe.some');
 const NoneTypeSymbol: unique symbol = Symbol('Maybe.none');
 
-type _Some<S> = Readonly<{
+type Some_<S> = Readonly<{
   type: typeof SomeTypeSymbol;
   value: S;
 }>;
 
-type _None = Readonly<{
+type None_ = Readonly<{
   type: typeof NoneTypeSymbol;
 }>;
 
-export type Maybe<S> = _None | _Some<S>;
+export type Maybe<S> = None_ | Some_<S>;
 
 export namespace Maybe {
-  export type Some<S> = _Some<S>;
-  export type None = _None;
+  export type Some<S> = Some_<S>;
+  export type None = None_;
 
   export type Base = Maybe<unknown>;
 

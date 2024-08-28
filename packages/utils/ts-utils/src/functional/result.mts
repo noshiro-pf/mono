@@ -1,21 +1,21 @@
 const OkTypeSymbol: unique symbol = Symbol('Result.ok');
 const ErrTypeSymbol: unique symbol = Symbol('Result.err');
 
-type _Ok<S> = Readonly<{
+type Ok_<S> = Readonly<{
   type: typeof OkTypeSymbol;
   value: S;
 }>;
 
-type _Err<E> = Readonly<{
+type Err_<E> = Readonly<{
   type: typeof ErrTypeSymbol;
   value: E;
 }>;
 
-export type Result<S, E> = _Err<E> | _Ok<S>;
+export type Result<S, E> = Err_<E> | Ok_<S>;
 
 export namespace Result {
-  export type Ok<S> = _Ok<S>;
-  export type Err<E> = _Err<E>;
+  export type Ok<S> = Ok_<S>;
+  export type Err<E> = Err_<E>;
 
   export type Base = Result<unknown, unknown>;
 
@@ -38,7 +38,7 @@ export namespace Result {
   });
 
   // eslint-disable-next-line no-restricted-syntax
-  const _toStr = String;
+  const toStr_ = String;
 
   export const isOk = <const R extends Base>(
     result: R,
@@ -97,7 +97,7 @@ export namespace Result {
 
   export const unwrapThrow = <const R extends Base>(
     result: R,
-    toStr: (e: UnwrapErr<R>) => string = _toStr,
+    toStr: (e: UnwrapErr<R>) => string = toStr_,
   ): UnwrapOk<R> => {
     if (isErr(result)) {
       throw new Error(

@@ -1,5 +1,5 @@
 import { expectType } from '../expect-type.mjs';
-import { type _DeepReadonly as DeepReadonly } from '../utils-for-test.mjs';
+import { type DeepReadonly_ as DeepReadonly } from '../utils-for-test.mjs';
 
 type R0 = DeepReadonly<{
   x: {

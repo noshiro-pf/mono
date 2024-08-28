@@ -7,8 +7,8 @@ const typeNameInMessage = 'a non-zero integer';
 
 const {
   abs,
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
   pow,
   add,
   sub,
@@ -33,8 +33,8 @@ export const NonZeroInt = {
 
   abs,
 
-  min: _min,
-  max: _max,
+  min: min_,
+  max: max_,
 
   random,
 
