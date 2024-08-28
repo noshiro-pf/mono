@@ -60,11 +60,11 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
 
   const {
     toggleState$: useAnswerDeadline$,
-    toggle: _toggleAnswerDeadlineSection,
+    toggle: toggleAnswerDeadlineSection_,
     value$: answerDeadline$,
     setValue: setAnswerDeadline,
     resetState: resetAnswerDeadlineSection,
-    turnOff: _turnOffAnswerDeadlineSection,
+    turnOff: turnOffAnswerDeadlineSection_,
     turnOn: turnOnAnswerDeadlineSection,
   } = createToggleSectionState<Ymdhm | undefined>({
     initialToggleState: eventScheduleInitialValue.answerDeadline !== 'none',
@@ -116,7 +116,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
 
   // 回答期限をオフにしたら通知設定の回答期限関連のチェックもオフにする
   const toggleAnswerDeadlineSection = (): void => {
-    _toggleAnswerDeadlineSection();
+    toggleAnswerDeadlineSection_();
     if (!useAnswerDeadline$.snapshot.value) {
       updateNotificationSettingsWithEmail((prev) =>
         prev === undefined
@@ -138,7 +138,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
 
   // 回答期限をオフにしたら通知設定の回答期限関連のチェックもオフにする
   const turnOffAnswerDeadlineSection = (): void => {
-    _turnOffAnswerDeadlineSection();
+    turnOffAnswerDeadlineSection_();
     updateNotificationSettingsWithEmail((prev) =>
       prev === undefined
         ? prev

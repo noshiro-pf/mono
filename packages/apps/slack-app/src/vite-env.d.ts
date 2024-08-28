@@ -2,8 +2,8 @@
 
 /// <reference types="vite/client" />
 
-import { type dict as _dict } from './constants';
+import { type dict as dict_ } from './constants';
 
 declare global {
-  const dict: typeof _dict;
+  const dict: typeof dict_;
 }

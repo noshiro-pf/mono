@@ -11,7 +11,7 @@ declare namespace TSTypeUtilsInternals {
     | '>= -2^31'
     | '>=0';
 
-  type _Keys =
+  type Keys_ =
     | IntRangeKeys
     | '!=0'
     | 'Finite'
@@ -25,8 +25,8 @@ declare namespace TSTypeUtilsInternals {
 
   type ExtendNumberBrand<
     B extends BrandedNumberBaseType,
-    T extends RelaxedExclude<_Keys, UnwrapBrandTrueKeys<B>>,
-    F extends RelaxedExclude<_Keys, T | UnwrapBrandFalseKeys<B>> = never,
+    T extends RelaxedExclude<Keys_, UnwrapBrandTrueKeys<B>>,
+    F extends RelaxedExclude<Keys_, T | UnwrapBrandFalseKeys<B>> = never,
   > = Brand<
     GetBrandValuePart<B>,
     T | (UnwrapBrandTrueKeys<B> & string),

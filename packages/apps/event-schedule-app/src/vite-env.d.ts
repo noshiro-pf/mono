@@ -9,63 +9,63 @@
 /* eslint-disable import/no-internal-modules */
 
 import {
-  type HTMLInputProps as _HTMLInputProps,
-  type HTMLSelectProps as _HTMLSelectProps,
-  type IconName as _IconName,
-  type InputGroupProps as _InputGroupProps,
-  type Intent as _Intent,
-  type OptionProps as _OptionProps,
-  type PopperModifiers as _PopperModifiers,
-  type Toaster as _Toaster,
+  type HTMLInputProps as HTMLInputProps_,
+  type HTMLSelectProps as HTMLSelectProps_,
+  type IconName as IconName_,
+  type InputGroupProps as InputGroupProps_,
+  type Intent as Intent_,
+  type OptionProps as OptionProps_,
+  type PopperModifiers as PopperModifiers_,
+  type Toaster as Toaster_,
 } from '@blueprintjs/core';
 import { type DateInputProps } from '@blueprintjs/datetime';
 import {
-  type Answer as _Answer,
-  type AnswerIconId as _AnswerIconId,
-  type AnswerIconIdWithNone as _AnswerIconIdWithNone,
-  type AnswerIconPoint as _AnswerIconPoint,
-  type AnswerIconSetting as _AnswerIconSetting,
-  type AnswerIconSettings as _AnswerIconSettings,
-  type AnswerId as _AnswerId,
-  type AnswerSelection as _AnswerSelection,
-  type DatetimeRange as _DatetimeRange,
-  type DatetimeSpecificationEnumType as _DatetimeSpecificationEnumType,
-  type DayType as _DayType,
-  type EventSchedule as _EventSchedule,
-  type HoursMinutes as _HoursMinutes,
-  type NotificationSettings as _NotificationSettings,
-  type TimeRange as _TimeRange,
-  type User as _User,
-  type UserId as _UserId,
-  type UserName as _UserName,
-  type Weight as _Weight,
-  type YearMonthDate as _YearMonthDate,
-  type Ymdhm as _Ymdhm,
+  type AnswerIconIdWithNone as AnswerIconIdWithNone_,
+  type AnswerIconId as AnswerIconId_,
+  type AnswerIconPoint as AnswerIconPoint_,
+  type AnswerIconSetting as AnswerIconSetting_,
+  type AnswerIconSettings as AnswerIconSettings_,
+  type AnswerId as AnswerId_,
+  type AnswerSelection as AnswerSelection_,
+  type Answer as Answer_,
+  type DatetimeRange as DatetimeRange_,
+  type DatetimeSpecificationEnumType as DatetimeSpecificationEnumType_,
+  type DayType as DayType_,
+  type EventSchedule as EventSchedule_,
+  type HoursMinutes as HoursMinutes_,
+  type NotificationSettings as NotificationSettings_,
+  type TimeRange as TimeRange_,
+  type UserId as UserId_,
+  type UserName as UserName_,
+  type User as User_,
+  type Weight as Weight_,
+  type YearMonthDate as YearMonthDate_,
+  type Ymdhm as Ymdhm_,
 } from '@noshiro/event-schedule-app-shared';
-import { type dict as _dict } from './constants';
+import { type dict as dict_ } from './constants';
 import {
-  type AnswerSelectionMapKey as _AnswerSelectionMapKey,
-  type DatetimeRangeMapKey as _DatetimeRangeMapKey,
-  type YmdKey as _YmdKey,
+  type AnswerSelectionMapKey as AnswerSelectionMapKey_,
+  type DatetimeRangeMapKey as DatetimeRangeMapKey_,
+  type YmdKey as YmdKey_,
 } from './functions';
 import {
-  type AuthCredential as _AuthCredential,
-  type FireAuthUser as _FireAuthUser,
-  type OAuthCredential as _OAuthCredential,
-  type UserCredential as _UserCredential,
+  type AuthCredential as AuthCredential_,
+  type FireAuthUser as FireAuthUser_,
+  type OAuthCredential as OAuthCredential_,
+  type UserCredential as UserCredential_,
 } from './types/firebase-types-wrapper';
 
 declare global {
   /* @blueprintjs/core */
-  type HTMLInputProps = _HTMLInputProps;
-  type HTMLSelectProps = _HTMLSelectProps;
-  type IconName = _IconName;
-  type InputGroupProps = _InputGroupProps;
-  type Intent = _Intent;
+  type HTMLInputProps = HTMLInputProps_;
+  type HTMLSelectProps = HTMLSelectProps_;
+  type IconName = IconName_;
+  type InputGroupProps = InputGroupProps_;
+  type Intent = Intent_;
 
-  type Toaster = _Toaster;
-  type OptionProps = _OptionProps;
-  type PopperModifiers = _PopperModifiers;
+  type Toaster = Toaster_;
+  type OptionProps = OptionProps_;
+  type PopperModifiers = PopperModifiers_;
 
   /* @blueprintjs/datetime */
   type DatePickerShortcut = Readonly<
@@ -73,35 +73,35 @@ declare global {
   >;
 
   /* @noshiro/event-schedule-app-shared */
-  type Answer = _Answer;
-  type AnswerIconId = _AnswerIconId;
-  type AnswerIconIdWithNone = _AnswerIconIdWithNone;
-  type AnswerIconPoint = _AnswerIconPoint;
-  type AnswerIconSetting = _AnswerIconSetting;
-  type AnswerIconSettings = _AnswerIconSettings;
-  type AnswerId = _AnswerId;
-  type AnswerSelection = _AnswerSelection;
-  type DatetimeRange = _DatetimeRange;
-  type DatetimeSpecificationEnumType = _DatetimeSpecificationEnumType;
-  type DayType = _DayType;
-  type EventSchedule = _EventSchedule;
-  type HoursMinutes = _HoursMinutes;
-  type NotificationSettings = _NotificationSettings;
-  type TimeRange = _TimeRange;
-  type User = _User;
-  type UserId = _UserId;
-  type UserName = _UserName;
-  type Weight = _Weight;
-  type YearMonthDate = _YearMonthDate;
-  type Ymdhm = _Ymdhm;
+  type Answer = Answer_;
+  type AnswerIconId = AnswerIconId_;
+  type AnswerIconIdWithNone = AnswerIconIdWithNone_;
+  type AnswerIconPoint = AnswerIconPoint_;
+  type AnswerIconSetting = AnswerIconSetting_;
+  type AnswerIconSettings = AnswerIconSettings_;
+  type AnswerId = AnswerId_;
+  type AnswerSelection = AnswerSelection_;
+  type DatetimeRange = DatetimeRange_;
+  type DatetimeSpecificationEnumType = DatetimeSpecificationEnumType_;
+  type DayType = DayType_;
+  type EventSchedule = EventSchedule_;
+  type HoursMinutes = HoursMinutes_;
+  type NotificationSettings = NotificationSettings_;
+  type TimeRange = TimeRange_;
+  type User = User_;
+  type UserId = UserId_;
+  type UserName = UserName_;
+  type Weight = Weight_;
+  type YearMonthDate = YearMonthDate_;
+  type Ymdhm = Ymdhm_;
 
   /* others */
-  const dict: typeof _dict;
-  type FireAuthUser = _FireAuthUser;
-  type AuthCredential = _AuthCredential;
-  type OAuthCredential = _OAuthCredential;
-  type UserCredential = _UserCredential;
-  type YmdKey = _YmdKey;
-  type DatetimeRangeMapKey = _DatetimeRangeMapKey;
-  type AnswerSelectionMapKey = _AnswerSelectionMapKey;
+  const dict: typeof dict_;
+  type FireAuthUser = FireAuthUser_;
+  type AuthCredential = AuthCredential_;
+  type OAuthCredential = OAuthCredential_;
+  type UserCredential = UserCredential_;
+  type YmdKey = YmdKey_;
+  type DatetimeRangeMapKey = DatetimeRangeMapKey_;
+  type AnswerSelectionMapKey = AnswerSelectionMapKey_;
 }

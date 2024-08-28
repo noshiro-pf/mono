@@ -2,9 +2,9 @@ import { api } from '../../api';
 import { fetchThrottleTime } from '../../constants';
 import { Router } from '../router';
 
-const [fetchEventSchedule$, _fetchEventSchedule] = createVoidEventEmitter();
+const [fetchEventSchedule$, fetchEventSchedule_] = createVoidEventEmitter();
 
-const fetchEventSchedule = _fetchEventSchedule;
+const fetchEventSchedule = fetchEventSchedule_;
 
 const fetchEventScheduleThrottled$ = fetchEventSchedule$.chain(
   throttleTime(fetchThrottleTime),

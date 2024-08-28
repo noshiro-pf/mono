@@ -32,7 +32,7 @@ const { state: room$, setState: setRoom } = createState<Room | undefined>(
   undefined,
 );
 
-const [actionsFromDb$, _setActionsFromDb] =
+const [actionsFromDb$, setActionsFromDb_] =
   createEventEmitter<readonly GameStateAction[]>();
 
 const fbApp = initializeApp(firebaseConfig);
@@ -150,6 +150,6 @@ roomId$.subscribe((roomId) => {
       mut_actions.push(data);
     });
 
-    _setActionsFromDb(mut_actions);
+    setActionsFromDb_(mut_actions);
   });
 });

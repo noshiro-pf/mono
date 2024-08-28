@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { useState as _useState, useCallback } from 'preact/hooks';
+import { useCallback, useState as useState_ } from 'preact/hooks';
 
 export const useState = <T,>(
   initialState: T,
@@ -9,7 +9,7 @@ export const useState = <T,>(
   resetState: () => void;
   updateState: (updateFn: (v: T) => T) => void;
 }> => {
-  const [state, setState] = _useState<T>(initialState);
+  const [state, setState] = useState_<T>(initialState);
 
   const resetState = useCallback(() => {
     setState(initialState);

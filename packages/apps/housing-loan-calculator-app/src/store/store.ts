@@ -12,49 +12,49 @@ import { uriWithQueryParams } from '../utils';
 
 const [userInput$, nextUserInput] = createVoidEventEmitter();
 
-const { state: repaymentType$, setState: _setRepaymentType } =
+const { state: repaymentType$, setState: setRepaymentType_ } =
   createState<RepaymentType>(defaultValues.repaymentType);
 
 const setRepaymentType = (value: RepaymentType): void => {
-  _setRepaymentType(value);
+  setRepaymentType_(value);
   nextUserInput();
 };
 
 // 頭金（円）
-const { state: downPaymentManYen$, setState: _setDownPaymentManYen } =
+const { state: downPaymentManYen$, setState: setDownPaymentManYen_ } =
   createState<Yen>(defaultValues.downPaymentManYen);
 
 const setDownPaymentManYen = (value: Yen): void => {
-  _setDownPaymentManYen(value);
+  setDownPaymentManYen_(value);
   nextUserInput();
 };
 
 // 物件の金額（円）
-const { state: propertyPriceManYen$, setState: _setPropertyPriceManYen } =
+const { state: propertyPriceManYen$, setState: setPropertyPriceManYen_ } =
   createState<Yen>(defaultValues.propertyPriceManYen);
 
 const setPropertyPriceManYen = (value: Yen): void => {
-  _setPropertyPriceManYen(value);
+  setPropertyPriceManYen_(value);
   nextUserInput();
 };
 
 // 借入期間（年）
-const { state: borrowingPeriodYear$, setState: _setBorrowingPeriodYear } =
+const { state: borrowingPeriodYear$, setState: setBorrowingPeriodYear_ } =
   createState<Uint32>(toUint32(defaultValues.borrowingPeriodYear));
 
 const setBorrowingPeriodYear = (value: Uint32): void => {
-  _setBorrowingPeriodYear(value);
+  setBorrowingPeriodYear_(value);
   nextUserInput();
 };
 
 // 年当たりの金利
 const {
   state: interestRatePercentPerYear$,
-  setState: _setInterestRatePercentPerYear,
+  setState: setInterestRatePercentPerYear_,
 } = createState<PercentFloat>(defaultValues.interestRatePercentPerYear);
 
 const setInterestRatePercentPerYear = (value: PercentFloat): void => {
-  _setInterestRatePercentPerYear(value);
+  setInterestRatePercentPerYear_(value);
   nextUserInput();
 };
 
@@ -108,19 +108,19 @@ Router.state.subscribe(({ searchParams: query }) => {
     paramsAsStr.repaymentType === 'principal-and-interest-equal-repayment' ||
     paramsAsStr.repaymentType === 'principal-equal-payment'
   ) {
-    _setRepaymentType(paramsAsStr.repaymentType);
+    setRepaymentType_(paramsAsStr.repaymentType);
   }
   if (paramsAsNumber.downPayment !== undefined) {
-    _setDownPaymentManYen(toYen(paramsAsNumber.downPayment));
+    setDownPaymentManYen_(toYen(paramsAsNumber.downPayment));
   }
   if (paramsAsNumber.propertyPrice !== undefined) {
-    _setPropertyPriceManYen(toYen(paramsAsNumber.propertyPrice));
+    setPropertyPriceManYen_(toYen(paramsAsNumber.propertyPrice));
   }
   if (paramsAsNumber.borrowingPeriodMonth !== undefined) {
-    _setBorrowingPeriodYear(toUint32(paramsAsNumber.borrowingPeriodMonth));
+    setBorrowingPeriodYear_(toUint32(paramsAsNumber.borrowingPeriodMonth));
   }
   if (paramsAsNumber.interestRatePerMonth !== undefined) {
-    _setInterestRatePercentPerYear(
+    setInterestRatePercentPerYear_(
       toPercentFloat(paramsAsNumber.interestRatePerMonth),
     );
   }
