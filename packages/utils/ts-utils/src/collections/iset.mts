@@ -7,7 +7,7 @@ interface ISetInterface<K> {
   // Getting information
   size: NumberType.ArraySize;
   isEmpty: boolean;
-  has: (key: K) => boolean;
+  has: (key: K | (WidenLiteral<K> & {})) => boolean;
 
   // Reducing a value
   every: ((predicate: (key: K) => boolean) => boolean) &
@@ -91,7 +91,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
     return this.size === 0;
   }
 
-  has(key: K): boolean {
+  has(key: K | (WidenLiteral<K> & {})): boolean {
     return this.#set.has(key);
   }
 

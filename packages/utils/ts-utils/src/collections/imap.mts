@@ -8,7 +8,7 @@ interface IMapInterface<K, V> {
 
   // Getting information
   size: NumberType.ArraySize;
-  has: (key: K) => boolean;
+  has: (key: K | (WidenLiteral<K> & {})) => boolean;
   get: (key: K) => V | undefined;
 
   // Reducing a value
@@ -80,7 +80,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
     return this.#map.size;
   }
 
-  has(key: K): boolean {
+  has(key: K | (WidenLiteral<K> & {})): boolean {
     return this.#map.has(key);
   }
 
