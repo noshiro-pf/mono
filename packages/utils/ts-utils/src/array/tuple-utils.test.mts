@@ -1,5 +1,4 @@
 import { expectType } from '../expect-type.mjs';
-import { Arr } from './array-utils.mjs';
 import { Tpl } from './tuple-utils.mjs';
 
 describe('Tuple.map', () => {
@@ -71,7 +70,7 @@ describe('TupleUtils.sorted', () => {
   }
   {
     const xs = [2, 1, 3] as const;
-    const result = Arr.sorted(xs, (a, b) => b - a);
+    const result = xs.toSorted((a, b) => b - a);
 
     expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 

@@ -56,7 +56,7 @@ export const datetimeListReducer: Reducer<
               .map((ymd) => ({ ymd, timeRange: timeRangeDefaultValue })),
           ),
         )
-        .chain((list) => Arr.sorted(list, compareDatetimeRange)).value;
+        .chain((list) => list.toSorted(compareDatetimeRange)).value;
     }
 
     case 'ymd':
@@ -94,6 +94,6 @@ export const datetimeListReducer: Reducer<
       );
 
     case 'sort':
-      return Arr.sorted(state, compareDatetimeRange);
+      return state.toSorted(compareDatetimeRange);
   }
 };

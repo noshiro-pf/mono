@@ -64,7 +64,7 @@ describe('ArrayUtils', () => {
   describe('sorted', () => {
     {
       const xs = [2, 1, 3] as const;
-      const result = Arr.sorted(xs);
+      const result = xs.toSorted();
 
       expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 
@@ -74,7 +74,7 @@ describe('ArrayUtils', () => {
     }
     {
       const xs = [2, 1, 3] as const;
-      const result = Arr.sorted(xs, (a, b) => a - b);
+      const result = xs.toSorted((a, b) => a - b);
 
       expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 
@@ -84,7 +84,7 @@ describe('ArrayUtils', () => {
     }
     {
       const xs = [2, 1, 3] as const;
-      const result = Arr.sorted(xs, (a, b) => b - a);
+      const result = xs.toSorted((a, b) => b - a);
 
       expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 

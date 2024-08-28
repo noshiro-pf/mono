@@ -27,7 +27,7 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
 });
 
 const resultsSortedByProbability = pipe(Array.from(results)).chain((list) =>
-  Arr.sorted(list, (a, b) => -(a.countSum - b.countSum)),
+  list.toSorted((a, b) => -(a.countSum - b.countSum)),
 ).value;
 
 const { state: sortBy$, setState: setSortBy } = createState<'dice' | 'prob'>(

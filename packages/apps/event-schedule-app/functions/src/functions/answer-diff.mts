@@ -6,7 +6,7 @@ import {
   type DatetimeRange,
   type DatetimeSpecificationEnumType,
 } from '@noshiro/event-schedule-app-shared';
-import { Arr, IMapMapped, ISetMapped, tp } from '@noshiro/ts-utils';
+import { IMapMapped, ISetMapped, tp } from '@noshiro/ts-utils';
 import {
   datetimeRange2str,
   datetimeRangeFromMapKey,
@@ -63,10 +63,9 @@ export const answerDiffAsString = (
       datetimeRangeFromMapKey,
     );
 
-    const allDatetimeRangeSorted = Arr.sorted(
-      allDatetimeRangeSet.toArray(),
-      compareDatetimeRange,
-    );
+    const allDatetimeRangeSorted = allDatetimeRangeSet
+      .toArray()
+      .toSorted(compareDatetimeRange);
 
     const datetimeRangeToBeforeIconIdMap = IMapMapped.new(
       before.selection.map((s) =>

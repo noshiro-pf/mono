@@ -10,7 +10,7 @@ export const generateGroups = (
   )
     .chain((list) => Tpl.map(list, (n, i) => tp(n, i, Math.random())))
     .chain((list) =>
-      Arr.sorted(list, ([_n1, _i1, r1], [_n2, _i2, r2]) => r1 - r2),
+      list.toSorted(([_n1, _i1, r1], [_n2, _i2, r2]) => r1 - r2),
     ).value;
 
   return getAlphabets('upper')

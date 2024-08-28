@@ -82,7 +82,7 @@ const stringifySortedKey = (
 ): Result<string, string> => {
   const allKeys = pipe(keysDeep(value))
     .chain((keys) => Arr.uniq(keys))
-    .chain((ks) => Arr.sorted(ks, Str.cmp)).value;
+    .chain((ks) => ks.toSorted(Str.cmp)).value;
 
   return stringifySelected(value, allKeys, space);
 };
