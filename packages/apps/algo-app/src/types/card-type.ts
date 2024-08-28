@@ -9,14 +9,16 @@ const def = {
   number: cardNumberTypeDef,
 } as const;
 
-export const cardTypeDef = t.record(def, 'Card');
+export const cardTypeDef = t.record(def, { typeName: 'Card' });
 
 export const cardWithVisibilityTypeDef = t.record(
   {
     ...def,
     visibleTo: visibleToTypeDef,
   },
-  'Card',
+  {
+    typeName: 'Card',
+  },
 );
 
 export type Card = t.TypeOf<typeof cardTypeDef>;

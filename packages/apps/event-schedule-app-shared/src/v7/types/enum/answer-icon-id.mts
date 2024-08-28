@@ -1,14 +1,13 @@
 import * as t from '@noshiro/io-ts';
 
-export const answerIconIdTypeDef = t.enumType({
-  defaultValue: 'poor',
-  values: ['fair', 'good', 'poor'],
-} as const);
+export const answerIconIdTypeDef = t.enumType(['poor', 'fair', 'good']);
 
-export const answerIconIdWithNoneTypeDef = t.enumType({
-  defaultValue: 'none',
-  values: ['fair', 'good', 'poor', 'none'],
-} as const);
+export const answerIconIdWithNoneTypeDef = t.enumType([
+  'none',
+  'poor',
+  'fair',
+  'good',
+]);
 
 export type AnswerIconId = t.TypeOf<typeof answerIconIdTypeDef>;
 

@@ -1,9 +1,8 @@
 import * as t from '@noshiro/io-ts';
 
 // prettier-ignore
-const answersScoreTypeDef = t.enumType({
-  defaultValue: 0,
-  values: [
+const answersScoreTypeDef = t.enumType(
+  [
       0   , 0.01 , 0.02 , 0.03 , 0.04 , 0.05 , 0.06 , 0.07 , 0.08 , 0.09
     , 0.1 , 0.11 , 0.12 , 0.13 , 0.14 , 0.15 , 0.16 , 0.17 , 0.18 , 0.19
     , 0.2 , 0.21 , 0.22 , 0.23 , 0.24 , 0.25 , 0.26 , 0.27 , 0.28 , 0.29
@@ -15,8 +14,9 @@ const answersScoreTypeDef = t.enumType({
     , 0.8 , 0.81 , 0.82 , 0.83 , 0.84 , 0.85 , 0.86 , 0.87 , 0.88 , 0.89
     , 0.9 , 0.91 , 0.92 , 0.93 , 0.94 , 0.95 , 0.96 , 0.97 , 0.98 , 0.99
     , 1
-  ] as const,
-});
+  ],
+  { defaultValue: 0 }
+);
 
 export type AnswersScore = t.TypeOf<typeof answersScoreTypeDef>;
 

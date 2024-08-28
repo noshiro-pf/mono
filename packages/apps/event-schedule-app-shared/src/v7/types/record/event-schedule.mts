@@ -16,18 +16,17 @@ export const eventScheduleTypeDef = t.record({
   title: t.string(''),
   notes: t.string(''),
   datetimeSpecification: datetimeSpecificationTypeDef,
-  datetimeRangeList: t.nonEmptyArray(datetimeRangeTypeDef, [
-    datetimeRangeDefaultValue,
-  ]),
-  answerDeadline: t.union({
-    types: [t.stringLiteral('none'), ymdhmTypeDef],
-    defaultType: t.stringLiteral('none'),
+  datetimeRangeList: t.nonEmptyArray(datetimeRangeTypeDef, {
+    defaultValue: [datetimeRangeDefaultValue],
   }),
+  answerDeadline: t.union([t.stringLiteral('none'), ymdhmTypeDef]),
   answerIcons: answerIconSettingsTypeDef,
-  notificationSettings: t.union({
-    types: [t.stringLiteral('none'), notificationSettingsTypeDef],
-    defaultType: t.stringLiteral('none'),
-  }),
+  notificationSettings: t.union(
+    [t.stringLiteral('none'), notificationSettingsTypeDef],
+    {
+      defaultType: t.stringLiteral('none'),
+    },
+  ),
   timezoneOffsetMinutes: t.number(DateUtils.today().getTimezoneOffset()),
   author: userTypeDef,
   archivedBy: t.array(userTypeDef),

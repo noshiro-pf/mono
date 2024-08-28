@@ -27,8 +27,7 @@ const commandMessageIdToPollIdMapCollection = firestore.collection(
 );
 
 const valueType = t.record({
-  value: t.union({
-    types: [t.string(''), t.undefinedType],
+  value: t.union([t.string(''), t.undefinedType], {
     defaultType: t.undefinedType,
   }),
 });

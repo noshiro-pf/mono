@@ -1,7 +1,6 @@
 import * as t from '@noshiro/io-ts';
 
-export const cardColorTypeDef = t.enumType({
-  values: ['black', 'white'] as const,
+export const cardColorTypeDef = t.enumType(['black', 'white'], {
   defaultValue: 'black',
   typeName: 'CardColor',
 });

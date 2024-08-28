@@ -1,14 +1,16 @@
 import * as t from '@noshiro/io-ts';
 
-export const datetimeSpecificationTypeDef = t.enumType({
-  values: [
+export const datetimeSpecificationTypeDef = t.enumType(
+  [
     'noStartEndSpecified',
     'startSpecified',
     'endSpecified',
     'startAndEndSpecified',
-  ] as const,
-  defaultValue: 'noStartEndSpecified',
-});
+  ],
+  {
+    defaultValue: 'noStartEndSpecified',
+  },
+);
 
 export type DatetimeSpecificationEnumType = t.TypeOf<
   typeof datetimeSpecificationTypeDef
