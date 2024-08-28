@@ -2,9 +2,7 @@
 // https://github.com/microsoft/TypeScript/issues/27024
 // prettier-ignore
 type TypeEq<A, B> =
-
   (<T>() => T extends A ? 1 : 2) extends
-
   (<T>() => T extends B ? 1 : 2)
     ? true
     : false;
@@ -254,10 +252,16 @@ type OptionalKeys<Obj> = PickUndefined<MapToNever<Obj>>;
  */
 type RequiredKeys<Obj> = Exclude<keyof Obj, OptionalKeys<Obj>>;
 
-type PartiallyOptional<T, K extends keyof T> = MergeIntersection<
-  Omit<T, K> & Partial<Pick<T, K>>
->;
+type PartiallyOptional<T, K extends keyof T> = {
+  [P in K]?: T[P];
+} & {
+  [P in Exclude<keyof T, K>]: T[P];
+};
 
 type PartiallyRequired<T, K extends keyof T> = MergeIntersection<
-  Omit<T, K> & Required<Pick<T, K>>
+  {
+    [P in K]-?: T[P];
+  } & {
+    [P in Exclude<keyof T, K>]: T[P];
+  }
 >;
