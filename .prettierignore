@@ -47,6 +47,8 @@ packages/strict-ts-lib/output-branded/diff
 packages/strict-ts-lib/output-branded/final
 packages/strict-ts-lib/output-branded/packages
 
+packages/others/slack-archive-tools/archive
+
 # Optional eslint cache
 .eslintcache
 .eslintcache-deps

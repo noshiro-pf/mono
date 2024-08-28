@@ -1,0 +1,53 @@
+{
+  "name": "@noshiro/slack-archive-tools",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": true,
+  "type": "module",
+  "main": "main.mjs",
+  "scripts": {
+    "build": "wireit",
+    "clean": "run-p clean:build clean:wireit",
+    "clean:build": "rimraf esm",
+    "clean:src": "rimraf src/*.mts",
+    "clean:wireit": "rimraf .wireit/**",
+    "fmt": "yarn zz:prettier .",
+    "lint": "yarn zz:eslint:src",
+    "lint:fix": "yarn zz:eslint:src --fix",
+    "main": "wireit",
+    "test": "yarn zz:vitest run",
+    "testw": "yarn zz:vitest watch",
+    "tsc": "yarn type-check",
+    "tscw": "tsc --noEmit --watch",
+    "type-check": "tsc --noEmit",
+    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint",
+    "zz:eslint:print-config": "yarn zz:eslint --print-config src/index.mts",
+    "zz:eslint:src": "yarn zz:eslint --config eslint.config.js './src/**/*'",
+    "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
+    "zz:vitest": "vitest --config ./configs/vitest.config.ts"
+  },
+  "dependencies": {
+    "@noshiro/io-ts": "*",
+    "@noshiro/ts-utils": "*"
+  },
+  "devDependencies": {
+    "@noshiro/eslint-configs": "*",
+    "@noshiro/mono-scripts": "*",
+    "@noshiro/ts-type-utils": "*"
+  },
+  "wireit": {
+    "build": {
+      "dependencies": [
+        "clean:build"
+      ],
+      "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
+    },
+    "main": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "node ./dist/main.mjs"
+    }
+  }
+}
