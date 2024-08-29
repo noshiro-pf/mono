@@ -159,12 +159,14 @@ const { useCurrentValue: useComment, setState: setComment } = createState('');
 
 const {
   useCurrentValue: useSelectedIconId,
-  state: selectedIconId$,
   updateState: updateSelectedIconId,
+  getSnapshot: getSelectedIconIdSnapshot,
 } = createState<AnswerIconIdWithNone>('none');
 
-const { state: defaultFairPoint$, setState: setDefaultFairPoint } =
-  createState<AnswerIconPoint>(0);
+const {
+  setState: setDefaultFairPoint,
+  getSnapshot: getDefaultFairPointSnapshot,
+} = createState<AnswerIconPoint>(0);
 
 const { useCurrentValue: useFairPoint, setState: setFairPoint } =
   createState<AnswerIconPoint>(0);
@@ -175,8 +177,8 @@ const onGoodClick = (): void => {
 
 const onFairClick = (): void => {
   updateSelectedIconId((prev) => (prev === 'fair' ? 'none' : 'fair'));
-  if (selectedIconId$.getSnapshot().value === 'fair') {
-    setFairPoint(defaultFairPoint$.getSnapshot().value);
+  if (getSelectedIconIdSnapshot() === 'fair') {
+    setFairPoint(getDefaultFairPointSnapshot());
   }
 };
 

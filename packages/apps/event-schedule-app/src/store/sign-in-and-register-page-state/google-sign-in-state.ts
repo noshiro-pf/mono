@@ -9,6 +9,7 @@ const toast = createToaster();
 
 const {
   useCurrentValue: useGoogleSignInButtonDisabled,
+  getSnapshot: getGoogleSignInButtonDisabledStateSnapshot,
   state: googleSignInButtonDisabledState,
   setTrue: disableGoogleSignInButton,
   setFalse: enableGoogleSignInButton,
@@ -45,7 +46,7 @@ const googleSignInSubmit = async (
 };
 
 const googleSignInClickHandler = (): void => {
-  if (googleSignInButtonDisabledState.getSnapshot().value) return;
+  if (getGoogleSignInButtonDisabledStateSnapshot()) return;
 
   // TODO: use toast
   googleSignInSubmit(Maybe.unwrap(Router.pageToBack$.getSnapshot())).catch(

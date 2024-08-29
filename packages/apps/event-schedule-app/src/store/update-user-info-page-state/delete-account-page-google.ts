@@ -124,7 +124,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
 
 const enterClickHandler = (): void => {
   const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
-  const fireAuthUser = Auth.fireAuthUser$.getSnapshot().value;
+  const fireAuthUser = Auth.getFireAuthUserSnapshot();
 
   if (enterButtonDisabled || fireAuthUser === undefined) return;
 

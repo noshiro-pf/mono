@@ -41,12 +41,13 @@ const {
 
 const {
   useCurrentValue: useAnswerBeingEditedSectionState,
-  state: answerBeingEditedSectionState$,
+  getSnapshot: getAnswerBeingEditedSectionStateSnapshot,
   setState: setAnswerBeingEditedSectionState_,
 } = createState<'creating' | 'editing' | 'hidden'>('hidden');
 
 const {
   state: answerBeingEdited$,
+  getSnapshot: getAnswerBeingEditedSnapshot,
   setState: setAnswerBeingEdited,
   updateState: updateAnswerBeingEdited,
 } = createState(answerDefaultValue);
@@ -58,7 +59,7 @@ const setAnswerBeingEditedSectionState = (
 
   // 回答追加開始時にデフォルトで「回答を保護する」を有効にする
   if (nextState === 'creating') {
-    const user = Auth.fireAuthUser$.getSnapshot().value;
+    const user = Auth.getFireAuthUserSnapshot();
 
     updateAnswerBeingEdited((ans) =>
       Obj.set(
@@ -74,7 +75,7 @@ const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =
   createVoidEventEmitter();
 
 const {
-  state: checkboxesState$,
+  getSnapshot: getCheckboxesStateSnapshot,
   useCurrentValue: useCheckboxesState,
   setState: setCheckboxesState,
   updateState: updateCheckboxesState,
@@ -439,11 +440,11 @@ combine([emptyAnswerSelection$, resetAnswerBeingEditedAction$] as const)
 /* callbacks using subscribed values */
 
 const onAnswerClick = (answer: Answer): void => {
-  onAnswerClickImpl(answer, Auth.fireAuthUser$.getSnapshot().value);
+  onAnswerClickImpl(answer, Auth.getFireAuthUserSnapshot());
 };
 
 const onAddAnswerButtonClick = (): void => {
-  onAddAnswerButtonClickImpl(Auth.fireAuthUser$.getSnapshot().value);
+  onAddAnswerButtonClickImpl(Auth.getFireAuthUserSnapshot());
 };
 
 const onEditButtonClick = (): void => {
@@ -453,32 +454,32 @@ const onEditButtonClick = (): void => {
 const onSubmitAnswerClickPromise = (): Promise<void> =>
   onSubmitAnswerImpl(
     Router.eventId$.getSnapshot().value,
-    answerBeingEdited$.getSnapshot().value,
-    answerBeingEditedSectionState$.getSnapshot().value,
+    getAnswerBeingEditedSnapshot(),
+    getAnswerBeingEditedSectionStateSnapshot(),
   );
 
 const onSubmitAnswerClick = (): void => {
   onSubmitAnswerImpl(
     Router.eventId$.getSnapshot().value,
-    answerBeingEdited$.getSnapshot().value,
-    answerBeingEditedSectionState$.getSnapshot().value,
+    getAnswerBeingEditedSnapshot(),
+    getAnswerBeingEditedSectionStateSnapshot(),
   ).catch(noop);
 };
 
 const onSubmitEmptyAnswerClick = (): Promise<void> =>
   onSubmitEmptyAnswerImpl(
     Router.eventId$.getSnapshot().value,
-    Auth.fireAuthUser$.getSnapshot().value,
+    Auth.getFireAuthUserSnapshot(),
   );
 
 const onDeleteAnswerClick = (): Promise<void> =>
   onDeleteAnswerImpl(
     Router.eventId$.getSnapshot().value,
-    answerBeingEdited$.getSnapshot().value,
+    getAnswerBeingEditedSnapshot(),
   );
 
 const toggleProtectedSection = (): void => {
-  toggleProtectedSectionImpl(Auth.fireAuthUser$.getSnapshot().value);
+  toggleProtectedSectionImpl(Auth.getFireAuthUserSnapshot());
 };
 
 const applyBatchInput = ({
@@ -495,7 +496,7 @@ const applyBatchInput = ({
     comment,
     selectedIconId,
     point,
-    checkboxState: checkboxesState$.getSnapshot().value,
+    checkboxState: getCheckboxesStateSnapshot(),
   });
 };
 

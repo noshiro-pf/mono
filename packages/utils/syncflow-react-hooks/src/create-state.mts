@@ -13,13 +13,21 @@ export const createState = <S,>(
   updateState: (updateFn: (prev: S) => S) => S;
   resetState: () => S;
   useCurrentValue: () => S;
+  getSnapshot: () => S;
 }> => {
-  const { state, setState, updateState, resetState } =
+  const { state, setState, updateState, resetState, getSnapshot } =
     createStateImpl(initialState);
 
   const useCurrentValue = (): S => useObservableValue(state);
 
-  return { state, setState, updateState, resetState, useCurrentValue };
+  return {
+    state,
+    setState,
+    updateState,
+    resetState,
+    useCurrentValue,
+    getSnapshot,
+  };
 };
 
 export const createBooleanState = (
@@ -33,6 +41,7 @@ export const createBooleanState = (
   updateState: (updateFn: (prev: boolean) => boolean) => boolean;
   resetState: () => void;
   useCurrentValue: () => boolean;
+  getSnapshot: () => boolean;
 }> => {
   const {
     state,
@@ -42,6 +51,7 @@ export const createBooleanState = (
     setFalse,
     setTrue,
     toggle,
+    getSnapshot,
   } = createBooleanStateImpl(initialState);
 
   const useCurrentValue = (): boolean => useObservableValue(state);
@@ -55,5 +65,6 @@ export const createBooleanState = (
     setTrue,
     toggle,
     useCurrentValue,
+    getSnapshot,
   };
 };
