@@ -18,4 +18,4 @@ export const uint = (defaultValue: Uint = toUint(0)): Type<Uint> =>
       '>=0',
     ],
     brandFalseKeys: ['NaNValue'],
-  } as const);
+  });

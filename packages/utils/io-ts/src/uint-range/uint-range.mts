@@ -6,19 +6,23 @@ export const uintRange = <
   Start extends Uint8,
   End extends Exclude<Uint8, Start>,
 >({
-  defaultValue,
-  end,
   start,
-  typeName,
+  end,
+  ...options
 }: Readonly<{
   typeName?: string;
   start: Start;
   end: End;
-  defaultValue: UintRange<Start, End>;
+  defaultValue?: UintRange<Start, End>;
 }>): Type<UintRange<Start, End>> => {
   type T = UintRange<Start, End>;
 
-  const typeNameFilled = typeName ?? `uintRange(${start}, ${end})`;
+  const typeNameFilled = options.typeName ?? `uintRange(${start}, ${end})`;
+
+  const defaultValue: T =
+    options.defaultValue ??
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    (start as T);
 
   const validate: Type<T>['validate'] = (a) => {
     if (!(isNumber(a) && Number.isInteger(a) && Num.isInRange(start, end)(a))) {
@@ -39,10 +43,8 @@ export const uintRange = <
       return Result.err([`${prefix}, but it is actually '${str}'.`]);
     }
 
-    return Result.ok(
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      a as T,
-    );
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return Result.ok(a as T);
   };
 
   const is = createIsFn<T>(validate);

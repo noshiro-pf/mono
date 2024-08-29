@@ -21,4 +21,4 @@ export const safeUint = (
       '>=0',
     ],
     brandFalseKeys: ['NaNValue'],
-  } as const);
+  });

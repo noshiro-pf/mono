@@ -2,9 +2,8 @@ import * as t from '@noshiro/io-ts';
 import { cardTypeDef } from './card-type';
 import { firestoreTimestampTypeDef } from './firestore-timestamp-type';
 
-const gameStateActionTypeDef = t.union({
-  typeName: 'GameStateAction',
-  types: [
+const gameStateActionTypeDef = t.union(
+  [
     t.record({
       timestamp: firestoreTimestampTypeDef,
       type: t.stringLiteral('selectMyCard'),
@@ -49,12 +48,15 @@ const gameStateActionTypeDef = t.union({
       type: t.stringLiteral('goToNextTurn'),
     }),
   ],
-  defaultType: t.record({
-    timestamp: firestoreTimestampTypeDef,
-    type: t.stringLiteral('selectMyCard'),
-    card: cardTypeDef,
-  }),
-});
+  {
+    typeName: 'GameStateAction',
+    defaultType: t.record({
+      timestamp: firestoreTimestampTypeDef,
+      type: t.stringLiteral('selectMyCard'),
+      card: cardTypeDef,
+    }),
+  },
+);
 
 export type GameStateAction = t.TypeOf<typeof gameStateActionTypeDef>;
 

@@ -12,8 +12,7 @@ const nonNullUserIdTypeDef = t.simpleBrandedString('UserId', '');
 
 export const toUserId = nonNullUserIdTypeDef.cast;
 
-export const userIdTypeDef = t.union({
-  types: [nonNullUserIdTypeDef, t.nullType],
+export const userIdTypeDef = t.union([nonNullUserIdTypeDef, t.nullType], {
   defaultType: t.nullType,
 });
 

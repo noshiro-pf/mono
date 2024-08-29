@@ -15,4 +15,4 @@ export const nonNegativeFiniteNumber = (
     defaultValue,
     brandKeys: ['>=0', '> -2^16', '> -2^32', '>= -2^15', '>= -2^31', 'Finite'],
     brandFalseKeys: ['NaNValue'],
-  } as const);
+  });

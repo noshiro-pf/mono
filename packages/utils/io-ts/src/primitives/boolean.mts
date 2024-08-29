@@ -2,7 +2,7 @@ import { isBoolean, Str } from '@noshiro/ts-utils';
 import { type Type } from '../type.mjs';
 import { createPrimitiveType } from '../utils/index.mjs';
 
-export const boolean = (defaultValue: boolean): Type<boolean> =>
+export const boolean = (defaultValue: boolean = false): Type<boolean> =>
   createPrimitiveType({ typeName: 'boolean', defaultValue, is: isBoolean });
 
 export const booleanLiteral = <L extends boolean>(literal: L): Type<L> =>

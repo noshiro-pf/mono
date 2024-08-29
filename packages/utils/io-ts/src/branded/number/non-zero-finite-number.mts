@@ -1,13 +1,10 @@
-import {
-  isNonZeroFiniteNumber,
-  toNonZeroFiniteNumber,
-} from '@noshiro/ts-utils';
+import { isNonZeroFiniteNumber } from '@noshiro/ts-utils';
 import { number } from '../../primitives/index.mjs';
 import { type Type } from '../../type.mjs';
 import { brand } from '../brand.mjs';
 
 export const nonZeroFiniteNumber = (
-  defaultValue: NonZeroFiniteNumber = toNonZeroFiniteNumber(0),
+  defaultValue: NonZeroFiniteNumber,
 ): Type<NonZeroFiniteNumber> =>
   brand({
     codec: number(defaultValue),
@@ -15,4 +12,4 @@ export const nonZeroFiniteNumber = (
     defaultValue,
     brandKeys: ['!=0', 'Finite'],
     brandFalseKeys: ['NaNValue'],
-  } as const);
+  });

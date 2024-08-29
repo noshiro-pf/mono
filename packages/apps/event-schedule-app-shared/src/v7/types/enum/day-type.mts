@@ -1,7 +1,6 @@
 import * as t from '@noshiro/io-ts';
 
-const dayTypeDef = t.enumType({
-  values: ['holiday', 'normal', 'Saturday', 'Sunday'] as const,
+const dayTypeDef = t.enumType(['holiday', 'normal', 'Saturday', 'Sunday'], {
   defaultValue: 'normal',
 });
 

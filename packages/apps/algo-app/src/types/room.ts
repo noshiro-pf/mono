@@ -17,14 +17,12 @@ const playerCardsTypeDef = t.tuple(
 const roomStateList = ['not-started', 'playing', 'finished'] as const;
 
 const commonRecordTypeDefs = {
-  password: t.union({
-    types: [t.string(''), t.undefinedType],
+  password: t.union([t.string(''), t.undefinedType], {
     defaultType: t.undefinedType,
   }),
   shuffleDef: shuffleDefType,
   players: t.array(playerTypeDef),
-  state: t.enumType({
-    values: roomStateList,
+  state: t.enumType(roomStateList, {
     defaultValue: 'not-started',
   }),
 } as const;
@@ -40,7 +38,9 @@ const roomRemoteTypeDef = t.record(
       p3: playerCardsTypeDef,
     }),
   },
-  'RoomRemote',
+  {
+    typeName: 'RoomRemote',
+  },
 );
 
 export const roomTypeDef = t.record(
@@ -56,7 +56,9 @@ export const roomTypeDef = t.record(
       ),
     ),
   },
-  'Room',
+  {
+    typeName: 'Room',
+  },
 );
 
 export type RoomRemote = t.TypeOf<typeof roomRemoteTypeDef>;

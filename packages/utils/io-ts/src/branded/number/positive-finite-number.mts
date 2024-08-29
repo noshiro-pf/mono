@@ -1,13 +1,10 @@
-import {
-  isPositiveFiniteNumber,
-  toPositiveFiniteNumber,
-} from '@noshiro/ts-utils';
+import { isPositiveFiniteNumber } from '@noshiro/ts-utils';
 import { number } from '../../primitives/index.mjs';
 import { type Type } from '../../type.mjs';
 import { brand } from '../brand.mjs';
 
 export const positiveFiniteNumber = (
-  defaultValue: PositiveFiniteNumber = toPositiveFiniteNumber(0),
+  defaultValue: PositiveFiniteNumber,
 ): Type<PositiveFiniteNumber> =>
   brand({
     codec: number(defaultValue),
@@ -23,4 +20,4 @@ export const positiveFiniteNumber = (
       '!=0',
     ],
     brandFalseKeys: ['NaNValue'],
-  } as const);
+  });

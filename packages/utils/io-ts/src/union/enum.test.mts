@@ -3,10 +3,9 @@ import { type TypeOf } from '../type.mjs';
 import { enumType } from './enum.mjs';
 
 describe('enumType', () => {
-  const targetType = enumType({
-    values: [3, '2', 'a'],
+  const targetType = enumType([3, '2', 'a'], {
     defaultValue: 3,
-  } as const);
+  });
 
   type TargetType = TypeOf<typeof targetType>;
 
