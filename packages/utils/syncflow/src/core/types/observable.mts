@@ -38,11 +38,16 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
   complete: () => void;
   subscribe: (onNext: (v: A) => void, onComplete?: () => void) => Subscription;
 
-  chain: //
-  (<B>(operator: SetInitialValueOperator<A, B>) => InitializedObservable<B>) &
-    (<B>(operator: DropInitialValueOperator<A, B>) => Observable<B>) &
-    (<B>(operator: KeepInitialValueOperator<A, B>) => Observable<B>);
+  chain: ChainMethod<A>;
+  pipe: ChainMethod<A>;
 }>;
+
+/** @internal */
+type ChainMethod<A> = (<B>(
+  operator: SetInitialValueOperator<A, B>,
+) => InitializedObservable<B>) &
+  (<B>(operator: DropInitialValueOperator<A, B>) => Observable<B>) &
+  (<B>(operator: KeepInitialValueOperator<A, B>) => Observable<B>);
 
 export type ObservableBase<A> = CreateObservableType<A, ObservableKind>;
 
@@ -55,15 +60,15 @@ namespace ObservableTypeConverter {
     Readonly<{
       getSnapshot: () => Maybe.Some<A>;
 
-      chain: //
-      (<B>(
-        operator: SetInitialValueOperator<A, B>,
-      ) => InitializedObservable<B>) &
-        (<B>(operator: DropInitialValueOperator<A, B>) => Observable<B>) &
-        (<B>(
-          operator: KeepInitialValueOperator<A, B>,
-        ) => InitializedObservable<B>);
+      pipe: ChainMethodForInitialized<A>;
+      chain: ChainMethodForInitialized<A>;
     }>;
+
+  type ChainMethodForInitialized<A> = (<B>(
+    operator: SetInitialValueOperator<A, B>,
+  ) => InitializedObservable<B>) &
+    (<B>(operator: DropInitialValueOperator<A, B>) => Observable<B>) &
+    (<B>(operator: KeepInitialValueOperator<A, B>) => InitializedObservable<B>);
 
   export type ToChild<
     A,

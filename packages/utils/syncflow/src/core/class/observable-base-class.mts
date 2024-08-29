@@ -129,6 +129,15 @@ export class ObservableBaseClass<
     }
   }
 
+  pipe<B>(operator: SetInitialValueOperator<A, B>): InitializedObservable<B>;
+  pipe<B>(operator: Operator<A, B>): Observable<B>;
+  pipe<B>(operator: Operator<A, B>): Observable<B> {
+    return operator(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      this as unknown as InitializedObservable<A>,
+    );
+  }
+
   chain<B>(operator: SetInitialValueOperator<A, B>): InitializedObservable<B>;
   chain<B>(operator: Operator<A, B>): Observable<B>;
   chain<B>(operator: Operator<A, B>): Observable<B> {

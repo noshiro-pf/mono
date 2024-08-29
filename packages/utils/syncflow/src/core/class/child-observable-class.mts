@@ -205,6 +205,18 @@ export class InitializedSyncChildObservableClass<
     return super.getCurrentValue() as Maybe.Some<A>;
   }
 
+  override pipe<B>(
+    operator: KeepInitialValueOperator<A, B> | SetInitialValueOperator<A, B>,
+  ): InitializedObservable<B>;
+
+  override pipe<B>(operator: Operator<A, B>): Observable<B>;
+  override pipe<B>(operator: Operator<A, B>): Observable<B> {
+    return operator(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      this as unknown as InitializedObservable<A>,
+    );
+  }
+
   override chain<B>(
     operator: KeepInitialValueOperator<A, B> | SetInitialValueOperator<A, B>,
   ): InitializedObservable<B>;
