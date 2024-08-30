@@ -32,21 +32,19 @@ const refreshAnswers = (): void => {
 
 /* subscriptions */
 
-combine([fetchAnswersThrottled$, Router.eventId$] as const).subscribe(
-  ([_, eventId]) => {
-    if (eventId === undefined) return;
+combine([fetchAnswersThrottled$, Router.eventId$]).subscribe(([_, eventId]) => {
+  if (eventId === undefined) return;
 
-    setRefreshButtonIsLoading(true);
+  setRefreshButtonIsLoading(true);
 
-    api.answers
-      .fetchList(eventId)
-      .then((result) => {
-        setAnswersResult(result);
-        setRefreshButtonIsLoading(false);
-      })
-      .catch(noop);
-  },
-);
+  api.answers
+    .fetchList(eventId)
+    .then((result) => {
+      setAnswersResult(result);
+      setRefreshButtonIsLoading(false);
+    })
+    .catch(noop);
+});
 
 result$.subscribe((e) => {
   if (e !== undefined && Result.isErr(e)) {

@@ -67,7 +67,7 @@ const tryComplete = <A,>({
   }
 };
 
-export class AsyncChildObservableClass<A, P extends NonEmptyUnknownList>
+export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   extends ObservableBaseClass<A, 'async child', number>
   implements AsyncChildObservable<A, P>
 {
@@ -138,7 +138,7 @@ export class AsyncChildObservableClass<A, P extends NonEmptyUnknownList>
   }
 }
 
-export class SyncChildObservableClass<A, P extends NonEmptyUnknownList>
+export class SyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   extends ObservableBaseClass<A, 'sync child', number>
   implements SyncChildObservable<A, P>
 {
@@ -183,7 +183,7 @@ export class SyncChildObservableClass<A, P extends NonEmptyUnknownList>
 
 export class InitializedSyncChildObservableClass<
     A,
-    P extends NonEmptyUnknownList,
+    const P extends NonEmptyUnknownList,
   >
   extends SyncChildObservableClass<A, P>
   implements InitializedSyncChildObservable<A, P>

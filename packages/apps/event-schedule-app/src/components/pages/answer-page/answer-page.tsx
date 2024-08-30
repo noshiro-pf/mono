@@ -66,9 +66,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
 
   const alertOnAnswerClickIsOpen =
     AnswerPageStore.useAlertOnAnswerClickIsOpen();
-  const answerBeingEdited = useObservableValue(
-    AnswerPageStore.answerBeingEdited$,
-  );
+  const answerBeingEdited = AnswerPageStore.useAnswerBeingEdited();
   const answerBeingEditedSectionState =
     AnswerPageStore.useAnswerBeingEditedSectionState();
   const answers = useObservableValue(answersFiltered$);

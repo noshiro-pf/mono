@@ -12,4 +12,4 @@ export const calculatedValues$ = calcAllSources$
 export const isCalculating$: InitializedObservable<boolean> = merge([
   calcAllSources$.chain(mapTo(true)),
   calculatedValues$.chain(mapTo(false)),
-] as const).chain(setInitialValue(false));
+]).chain(setInitialValue(false));

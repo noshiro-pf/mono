@@ -1,12 +1,12 @@
 import {
-  inputAreaString$,
   outputAreaString$,
   setInputAreaString,
+  useInputAreaString,
 } from '../state';
 import { CodeArea } from './code-area';
 
 export const App = memoNamed('App', () => {
-  const inputAreaString = useObservableValue(inputAreaString$);
+  const inputAreaString = useInputAreaString();
   const outputAreaString = useObservableValue(outputAreaString$);
 
   return (

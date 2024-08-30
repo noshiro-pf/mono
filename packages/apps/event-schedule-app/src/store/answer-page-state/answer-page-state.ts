@@ -46,6 +46,7 @@ const {
 } = createState<'creating' | 'editing' | 'hidden'>('hidden');
 
 const {
+  useCurrentValue: useAnswerBeingEdited,
   state: answerBeingEdited$,
   getSnapshot: getAnswerBeingEditedSnapshot,
   setState: setAnswerBeingEdited,
@@ -433,7 +434,7 @@ const toggleProtectedSectionImpl = (user: FireAuthUser | undefined): void => {
 
 /* subscriptions */
 
-combine([emptyAnswerSelection$, resetAnswerBeingEditedAction$] as const)
+combine([emptyAnswerSelection$, resetAnswerBeingEditedAction$])
   .chain(map(([x, _]) => x))
   .subscribe(setAnswerBeingEdited);
 
@@ -666,7 +667,7 @@ const hasUnanswered$: InitializedObservable<boolean> =
 
 export const AnswerPageStore = {
   useAlertOnAnswerClickIsOpen,
-  answerBeingEdited$,
+  useAnswerBeingEdited,
   answerBeingEditedList$,
   useAnswerBeingEditedSectionState,
   hasUnanswered$,

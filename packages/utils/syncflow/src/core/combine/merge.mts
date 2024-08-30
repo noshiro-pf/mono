@@ -16,13 +16,13 @@ import {
  *   instead of `merge`, and subscribe to `parents` and call `setState` within
  *   it.
  */
-export const merge = <OS extends NonEmptyArray<Observable<unknown>>>(
+export const merge = <const OS extends NonEmptyArray<Observable<unknown>>>(
   parents: OS,
 ): MergeObservableRefined<OS> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   new MergeObservableClass(parents) as never;
 
-class MergeObservableClass<P extends NonEmptyUnknownList>
+class MergeObservableClass<const P extends NonEmptyUnknownList>
   extends SyncChildObservableClass<ArrayElement<P>, P>
   implements MergeObservable<P>
 {

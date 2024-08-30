@@ -9,7 +9,7 @@ const dc = dict.eventSettingsPage;
 
 export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
   const eventId = useObservableValue(Router.eventId$);
-  const eventScheduleResult = useObservableValue(EventScheduleStore.result$);
+  const eventScheduleResult = EventScheduleStore.useEventScheduleResult();
 
   return eventScheduleResult !== undefined &&
     Result.isErr(eventScheduleResult) &&

@@ -14,7 +14,7 @@ import {
   type Wrap,
 } from '../types/index.mjs';
 
-export const combine = <OS extends NonEmptyArray<Observable<unknown>>>(
+export const combine = <const OS extends NonEmptyArray<Observable<unknown>>>(
   parents: OS,
 ): CombineObservableRefined<OS> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -22,7 +22,7 @@ export const combine = <OS extends NonEmptyArray<Observable<unknown>>>(
 
 export const combineLatest = combine; // alias
 
-class CombineObservableClass<A extends NonEmptyUnknownList>
+class CombineObservableClass<const A extends NonEmptyUnknownList>
   extends SyncChildObservableClass<A, A>
   implements CombineObservable<A>
 {
@@ -87,12 +87,12 @@ if (import.meta.vitest !== undefined) {
   const r1 = fromArray([1, 2, 3]);
   const r2 = fromArray(['a', 'b', 'c']);
 
-  const _c = combine([r1, r2] as const);
+  const _c = combine([r1, r2]);
 
   const _ci = combine([
     r1.chain(setInitialValue(0)),
     r2.chain(setInitialValue(0)),
-  ] as const);
+  ]);
 
   expectType<typeof _c, SyncChildObservable<readonly [number, string]>>('<=');
 

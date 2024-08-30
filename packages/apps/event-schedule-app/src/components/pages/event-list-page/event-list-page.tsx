@@ -50,9 +50,7 @@ export const EventListPage = memoNamed('EventListPage', () => {
 
   const refreshButtonIsDisabled = EventListStore.useRefreshButtonIsDisabled();
   const refreshButtonIsLoading = EventListStore.useRefreshButtonIsLoading();
-  const filterOptionState = useObservableValue(
-    EventListPageFilterStore.filterOptionState$,
-  );
+  const filterOptionState = EventListPageFilterStore.useFilterOptionState();
   const showOnlyEventSchedulesICreated =
     EventListPageFilterStore.useShowOnlyEventSchedulesICreated();
   const showAllPastDaysEvent =

@@ -100,7 +100,7 @@ const resetAllDialogState = (): void => {
 
 /* subscriptions */
 
-UpdateUserInfoDialogStore.openingDialog$
+UpdateUserInfoDialogStore.openingDialogType$
   .chain(withCurrentValueFrom(Auth.fireAuthUser$))
   .subscribe(([openingDialog, fireAuthUser]) => {
     if (openingDialog === undefined) {

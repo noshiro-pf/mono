@@ -1,5 +1,8 @@
-const { state: filterOptionState$, setState: setFilterOptionState } =
-  createState<'archive' | 'inProgress'>('inProgress');
+const {
+  state: filterOptionState$,
+  useCurrentValue: useFilterOptionState,
+  setState: setFilterOptionState,
+} = createState<'archive' | 'inProgress'>('inProgress');
 
 const {
   useCurrentValue: useShowOnlyEventSchedulesICreated,
@@ -22,6 +25,7 @@ const {
 const [filterByText$, filterByText] = createVoidEventEmitter();
 
 export const EventListPageFilterStore = {
+  useFilterOptionState,
   filterOptionState$,
   setFilterOptionState,
   showOnlyEventSchedulesICreated$,

@@ -64,7 +64,7 @@ const store$: InitializedObservable<Store> = combine([
   propertyPriceManYen$,
   borrowingPeriodYear$,
   interestRatePercentPerYear$,
-] as const).chain(
+]).chain(
   map(
     ([
       repaymentType,

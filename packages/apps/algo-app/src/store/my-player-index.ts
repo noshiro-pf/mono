@@ -3,7 +3,7 @@ import { db } from './database';
 import { myName$ } from './my-name';
 
 export const myPlayerIndex$: InitializedObservable<PlayerIndex | undefined> =
-  combine([db.room$, myName$] as const).chain(
+  combine([db.room$, myName$]).chain(
     map(([room, myName]) => {
       if (room === undefined || myName === undefined) return undefined;
 

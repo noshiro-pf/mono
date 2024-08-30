@@ -39,13 +39,7 @@ const createStreams = (
   const quad$ = counter$.chain(map((x) => x * 2)).chain(map((x) => x * 2));
   const square$ = counter$.chain(map((x) => x * x));
   const squareEven$ = square$.chain(filter((x) => x % 2 === 0));
-  const combined$ = combine([
-    counter$,
-    double$,
-    quad$,
-    square$,
-    squareEven$,
-  ] as const);
+  const combined$ = combine([counter$, double$, quad$, square$, squareEven$]);
 
   return {
     startSource: () => {
@@ -72,9 +66,7 @@ const createStreams2 = (
   const counter$ = interval$.chain(take(5));
 
   const multiplied$ = counter$.chain(map((x) => 1000 * x));
-  const sum$ = combine([counter$, multiplied$] as const).chain(
-    map(([a, b]) => a + b),
-  );
+  const sum$ = combine([counter$, multiplied$]).chain(map(([a, b]) => a + b));
 
   return {
     startSource: () => {

@@ -166,7 +166,7 @@ const resetAllDialogState = (): void => {
 
 /* subscriptions */
 
-UpdateUserInfoDialogStore.openingDialog$.subscribe((openingDialog) => {
+UpdateUserInfoDialogStore.openingDialogType$.subscribe((openingDialog) => {
   if (openingDialog === undefined) {
     resetAllDialogState();
   }
