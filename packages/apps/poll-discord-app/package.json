@@ -33,7 +33,7 @@
     "@noshiro/ts-utils-additional": "*",
     "discord.js": "^14.12.1",
     "dotenv": "^16.0.3",
-    "firebase": "^10.6.0"
+    "firebase": "^10.13.1"
   },
   "devDependencies": {
     "@noshiro/eslint-configs": "*",
