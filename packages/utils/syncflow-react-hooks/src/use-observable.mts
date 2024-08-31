@@ -55,7 +55,7 @@ export function useObservableValue<A, B = A>(
       const { unsubscribe } = observable$.subscribe(onStoreChange);
       return unsubscribe;
     },
-    () => observable$.snapshot,
+    () => observable$.getSnapshot(),
   );
 
   return Maybe.unwrapOr(value, initialValue);

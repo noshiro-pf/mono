@@ -4,8 +4,10 @@ import { setMyName } from './my-name';
 
 const [response$, setResponse] = createEventEmitter<Room>();
 
-const { state: isWaitingResponse$, setState: setIsWaitingResponse } =
-  createBooleanState(false);
+const {
+  useCurrentValue: useIsWaitingResponse,
+  setState: setIsWaitingResponse,
+} = createBooleanState(false);
 
 const dispatch = async (
   payload: Readonly<{
@@ -27,6 +29,6 @@ const dispatch = async (
 
 export const createRoom = {
   response$,
-  isWaitingResponse$,
+  useIsWaitingResponse,
   dispatch,
 } as const;

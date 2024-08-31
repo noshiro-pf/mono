@@ -14,7 +14,7 @@ const f = <A,>(parentObservable: Observable<A>): Observable<readonly [A, A]> =>
   new PairwiseObservableClass(parentObservable);
 
 class PairwiseObservableClass<A>
-  extends SyncChildObservableClass<readonly [A, A], 'pairwise', readonly [A]>
+  extends SyncChildObservableClass<readonly [A, A], readonly [A]>
   implements PairwiseOperatorObservable<A>
 {
   #previousValue: Maybe<A>;
@@ -22,18 +22,18 @@ class PairwiseObservableClass<A>
   constructor(parentObservable: Observable<A>) {
     super({
       parents: [parentObservable],
-      type: 'pairwise',
       initialValue: Maybe.none,
     });
     // parentObservable.snapshot has value
     // if parentObservable is InitializedObservable
-    this.#previousValue = parentObservable.snapshot;
+    this.#previousValue = parentObservable.getSnapshot();
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
+    const sn = par.getSnapshot();
 
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(sn)) {
       return; // skip update
     }
 
@@ -41,10 +41,10 @@ class PairwiseObservableClass<A>
     const cond = !Maybe.isNone(prev);
 
     // NOTE: setNext より先に更新しないと tryUpdate が連続して呼ばれたときに Maybe.isNone(prev) が true になり続けてしまう
-    this.#previousValue = par.snapshot;
+    this.#previousValue = par.getSnapshot();
 
     if (cond) {
-      this.setNext([prev.value, par.snapshot.value], updaterSymbol);
+      this.setNext([prev.value, sn.value], updaterSymbol);
     }
   }
 }

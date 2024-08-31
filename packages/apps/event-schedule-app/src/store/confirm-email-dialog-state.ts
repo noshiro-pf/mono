@@ -14,7 +14,11 @@ const dc = dict.answerPage.eventInfo.verifyEmailDialog;
 
 const toast = createToaster();
 
-const { state: formState$, dispatch } = createReducer(
+const {
+  state: formState$,
+  dispatch,
+  getSnapshot: getFormStateSnapshot,
+} = createReducer(
   confirmEmailDialogFormStateReducer,
   confirmEmailDialogFormInitialState,
 );
@@ -94,9 +98,9 @@ const submit = async (eventId: string, email: string): Promise<void> => {
 };
 
 const enterClickHandler = (): void => {
-  const eventId = Router.eventId$.snapshot.value;
-  const formState = formState$.snapshot.value;
-  const enterButtonDisabled = enterButtonDisabled$.snapshot.value;
+  const eventId = Router.eventId$.getSnapshot().value;
+  const formState = getFormStateSnapshot();
+  const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
 
   if (enterButtonDisabled) return;
 

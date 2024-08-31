@@ -13,14 +13,13 @@ export const skipUntil =
     new SkipUntilObservableClass(parentObservable, notifier);
 
 class SkipUntilObservableClass<A>
-  extends SyncChildObservableClass<A, 'skipUntil', [A]>
+  extends SyncChildObservableClass<A, [A]>
   implements SkipUntilOperatorObservable<A>
 {
   #isSkipping: boolean;
   constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
     super({
       parents: [parentObservable],
-      type: 'skipUntil',
       initialValue: Maybe.none,
     });
 
@@ -38,14 +37,16 @@ class SkipUntilObservableClass<A>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
+    const sn = par.getSnapshot();
+
     if (
       par.updaterSymbol !== updaterSymbol ||
-      Maybe.isNone(par.snapshot) ||
+      Maybe.isNone(sn) ||
       this.#isSkipping
     ) {
       return; // skip update
     }
 
-    this.setNext(par.snapshot.value, updaterSymbol);
+    this.setNext(sn.value, updaterSymbol);
   }
 }

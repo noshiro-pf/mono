@@ -8,7 +8,7 @@ import {
 } from '../types/index.mjs';
 
 export const skipIfNoChange = <A,>(
-  eq: (x: A, y: A) => boolean = (x, y) => x === y,
+  eq: (x: A, y: A) => boolean = (x, y) => Object.is(x, y),
 ): KeepInitialValueOperator<A, A> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
@@ -20,7 +20,7 @@ export const skipIfNoChange = <A,>(
 export const distinctUntilChanged = skipIfNoChange; // alias
 
 class SkipIfNoChangeObservableClass<A>
-  extends SyncChildObservableClass<A, 'skipIfNoChange', readonly [A]>
+  extends SyncChildObservableClass<A, readonly [A]>
   implements SkipIfNoChangeOperatorObservable<A>
 {
   readonly #eq: (x: A, y: A) => boolean;
@@ -29,32 +29,31 @@ class SkipIfNoChangeObservableClass<A>
   constructor(parentObservable: Observable<A>, eq: (x: A, y: A) => boolean) {
     super({
       parents: [parentObservable],
-      type: 'skipIfNoChange',
-      initialValue: parentObservable.snapshot,
+      initialValue: parentObservable.getSnapshot(),
     });
     // parentObservable.snapshot has value
     // if parentObservable is InitializedObservable
-    this.#previousValue = parentObservable.snapshot;
+    this.#previousValue = parentObservable.getSnapshot();
     this.#eq = eq;
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
+    const sn = par.getSnapshot();
 
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(sn)) {
       return; // skip update
     }
 
     const prev = this.#previousValue;
 
-    const cond =
-      Maybe.isNone(prev) || !this.#eq(prev.value, par.snapshot.value);
+    const cond = Maybe.isNone(prev) || !this.#eq(prev.value, sn.value);
 
     // NOTE: setNext より先に更新しないと tryUpdate が連続して呼ばれたときに Maybe.isNone(prev) が true になり続けてしまう
-    this.#previousValue = par.snapshot;
+    this.#previousValue = sn;
 
     if (cond) {
-      this.setNext(par.snapshot.value, updaterSymbol);
+      this.setNext(sn.value, updaterSymbol);
     }
   }
 }

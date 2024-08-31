@@ -2,7 +2,6 @@ import { Arr, type Maybe } from '@noshiro/ts-utils';
 import {
   isManagerObservable,
   type AsyncChildObservable,
-  type AsyncChildObservableType,
   type ChildObservable,
   type InitializedObservable,
   type InitializedSyncChildObservable,
@@ -13,7 +12,6 @@ import {
   type Operator,
   type SetInitialValueOperator,
   type SyncChildObservable,
-  type SyncChildObservableType,
   type Wrap,
 } from '../types/index.mjs';
 import { binarySearch, issueUpdaterSymbol, maxDepth } from '../utils/index.mjs';
@@ -69,37 +67,28 @@ const tryComplete = <A,>({
   }
 };
 
-export class AsyncChildObservableClass<
-    A,
-    Type extends AsyncChildObservableType,
-    P extends NonEmptyUnknownList,
-  >
+export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   extends ObservableBaseClass<A, 'async child', number>
-  implements AsyncChildObservable<A, Type, P>
+  implements AsyncChildObservable<A, P>
 {
-  override readonly type: Type;
   readonly parents;
   #procedure: readonly ChildObservable<unknown>[];
   protected readonly _descendantsIdSet: MutableSet<ObservableId>;
 
   constructor({
-    type,
     parents,
     depth = 1 + maxDepth(parents),
     initialValue,
   }: Readonly<{
-    type: Type;
     parents: Wrap<P>;
     depth?: number;
-    initialValue: AsyncChildObservable<A, Type>['snapshot'];
+    initialValue: ReturnType<AsyncChildObservable<A>['getSnapshot']>;
   }>) {
     super({
       kind: 'async child',
-      type,
       depth,
       initialValue,
     });
-    this.type = type;
     this.parents = parents;
     this.#procedure = [];
     // eslint-disable-next-line no-restricted-globals
@@ -149,35 +138,26 @@ export class AsyncChildObservableClass<
   }
 }
 
-export class SyncChildObservableClass<
-    A,
-    Type extends SyncChildObservableType,
-    P extends NonEmptyUnknownList,
-  >
+export class SyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   extends ObservableBaseClass<A, 'sync child', number>
-  implements SyncChildObservable<A, Type, P>
+  implements SyncChildObservable<A, P>
 {
-  override readonly type: Type;
   readonly parents;
 
   constructor({
-    type,
     parents,
     depth = 1 + maxDepth(parents),
     initialValue,
   }: Readonly<{
-    type: Type;
     parents: Wrap<P>;
     depth?: number;
-    initialValue: SyncChildObservable<A, Type>['snapshot'];
+    initialValue: ReturnType<SyncChildObservable<A>['getSnapshot']>;
   }>) {
     super({
       kind: 'sync child',
-      type,
       depth,
       initialValue,
     });
-    this.type = type;
     this.parents = parents;
     registerChild(this, parents);
   }
@@ -203,29 +183,38 @@ export class SyncChildObservableClass<
 
 export class InitializedSyncChildObservableClass<
     A,
-    Type extends SyncChildObservableType,
-    P extends NonEmptyUnknownList,
+    const P extends NonEmptyUnknownList,
   >
-  extends SyncChildObservableClass<A, Type, P>
-  implements InitializedSyncChildObservable<A, Type, P>
+  extends SyncChildObservableClass<A, P>
+  implements InitializedSyncChildObservable<A, P>
 {
   constructor({
-    type,
     parents,
     depth = 1 + maxDepth(parents),
     initialValue,
   }: Readonly<{
-    type: Type;
     parents: Wrap<P>;
     depth?: number;
-    initialValue: InitializedSyncChildObservable<A, Type>['snapshot'];
+    initialValue: ReturnType<InitializedSyncChildObservable<A>['getSnapshot']>;
   }>) {
-    super({ type, parents, depth, initialValue });
+    super({ parents, depth, initialValue });
   }
 
-  override get snapshot(): Maybe.Some<A> {
+  override getSnapshot(): Maybe.Some<A> {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return super.getCurrentValue() as Maybe.Some<A>;
+  }
+
+  override pipe<B>(
+    operator: KeepInitialValueOperator<A, B> | SetInitialValueOperator<A, B>,
+  ): InitializedObservable<B>;
+
+  override pipe<B>(operator: Operator<A, B>): Observable<B>;
+  override pipe<B>(operator: Operator<A, B>): Observable<B> {
+    return operator(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      this as unknown as InitializedObservable<A>,
+    );
   }
 
   override chain<B>(

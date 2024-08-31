@@ -18,7 +18,7 @@ export const errorType$: InitializedObservable<
       }
     | undefined
   >
-> = combine([EventScheduleStore.result$, AnswersStore.result$] as const)
+> = combine([EventScheduleStore.result$, AnswersStore.result$])
   .chain(
     map(([esr, ar]) =>
       esr !== undefined && Result.isErr(esr)

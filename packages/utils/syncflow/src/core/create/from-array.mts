@@ -9,13 +9,13 @@ export const fromArray = <A,>(
   new FromArrayObservableClass<A>(values, startManually);
 
 class FromArrayObservableClass<A>
-  extends RootObservableClass<A, 'FromArray'>
+  extends RootObservableClass<A>
   implements FromArrayObservable<A>
 {
   readonly #values: readonly A[];
 
   constructor(values: readonly A[], startManually: boolean = false) {
-    super({ type: 'FromArray', initialValue: Maybe.none });
+    super({ initialValue: Maybe.none });
     this.#values = values;
     if (!startManually) {
       setTimeout(() => {

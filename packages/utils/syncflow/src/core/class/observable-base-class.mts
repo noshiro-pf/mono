@@ -26,27 +26,23 @@ export class ObservableBaseClass<
 {
   readonly id;
   readonly kind: Kind;
-  readonly type;
   readonly depth: Depth;
   #children: readonly ChildObservable<unknown>[];
   readonly #subscribers: MutableMap<SubscriberId, Subscriber<A>>;
-  #currentValue: ObservableBase<A>['snapshot'];
+  #currentValue: ReturnType<ObservableBase<A>['getSnapshot']>;
   #isCompleted: ObservableBase<A>['isCompleted'];
   #updaterSymbol: ObservableBase<A>['updaterSymbol'];
 
   constructor({
     kind,
-    type,
     depth,
     initialValue,
   }: Readonly<{
     kind: Kind;
-    type: ObservableBase<A>['type'];
     depth: Depth;
-    initialValue: ObservableBase<A>['snapshot'];
+    initialValue: ReturnType<ObservableBase<A>['getSnapshot']>;
   }>) {
     this.kind = kind;
-    this.type = type;
     this.depth = depth;
     this.id = issueObservableId();
     this.#currentValue = initialValue;
@@ -65,11 +61,11 @@ export class ObservableBaseClass<
     );
   }
 
-  get snapshot(): ObservableBase<A>['snapshot'] {
+  getSnapshot(): ReturnType<ObservableBase<A>['getSnapshot']> {
     return this.#currentValue;
   }
 
-  protected getCurrentValue(): ObservableBase<A>['snapshot'] {
+  protected getCurrentValue(): ReturnType<ObservableBase<A>['getSnapshot']> {
     return this.#currentValue;
   }
 
@@ -133,6 +129,15 @@ export class ObservableBaseClass<
     }
   }
 
+  pipe<B>(operator: SetInitialValueOperator<A, B>): InitializedObservable<B>;
+  pipe<B>(operator: Operator<A, B>): Observable<B>;
+  pipe<B>(operator: Operator<A, B>): Observable<B> {
+    return operator(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      this as unknown as InitializedObservable<A>,
+    );
+  }
+
   chain<B>(operator: SetInitialValueOperator<A, B>): InitializedObservable<B>;
   chain<B>(operator: Operator<A, B>): Observable<B>;
   chain<B>(operator: Operator<A, B>): Observable<B> {
@@ -144,7 +149,7 @@ export class ObservableBaseClass<
 
   subscribe(onNext: (v: A) => void, onComplete?: () => void): Subscription {
     // first emit
-    const curr = this.snapshot;
+    const curr = this.getSnapshot();
     if (Maybe.isSome(curr)) {
       onNext(curr.value);
     }

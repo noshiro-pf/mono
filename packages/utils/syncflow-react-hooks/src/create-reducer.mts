@@ -11,10 +11,15 @@ export const createReducer = <S, A>(
   state: InitializedObservable<S>;
   dispatch: (action: A) => S;
   useCurrentValue: () => S;
+  getSnapshot: () => S;
 }> => {
-  const { state: st, dispatch } = createReducerBase(reducer, initialState);
+  const {
+    state: state_,
+    dispatch,
+    getSnapshot,
+  } = createReducerBase(reducer, initialState);
 
-  const useCurrentValue = (): S => useObservableValue(st);
+  const useCurrentValue = (): S => useObservableValue(state_);
 
-  return { state: st, dispatch, useCurrentValue };
+  return { state: state_, dispatch, useCurrentValue, getSnapshot };
 };

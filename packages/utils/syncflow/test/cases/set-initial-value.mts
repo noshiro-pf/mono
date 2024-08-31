@@ -33,11 +33,8 @@ const createStreams = (
 
   const timer$ = timer(tick * 7, true);
 
-  const combined1$ = combine([counter$, timer$] as const);
-  const combined2$ = combine([
-    counter$,
-    timer$.chain(setInitialValue(-1)),
-  ] as const);
+  const combined1$ = combine([counter$, timer$]);
+  const combined2$ = combine([counter$, timer$.chain(setInitialValue(-1))]);
 
   return {
     startSource: () => {

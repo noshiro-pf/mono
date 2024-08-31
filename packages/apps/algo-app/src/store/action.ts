@@ -73,7 +73,7 @@ export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
 combine([
   db.room$.chain(filter(isNotUndefined)),
   localGameStateActionSource$,
-] as const).subscribe(([room, localAction]) => {
+]).subscribe(([room, localAction]) => {
   db.addAction(room.id, localAction)
     .then(() => {
       if (returnFalse()) {

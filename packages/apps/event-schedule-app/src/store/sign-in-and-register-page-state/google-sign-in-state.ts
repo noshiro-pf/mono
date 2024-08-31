@@ -8,7 +8,9 @@ const dc = dict.register;
 const toast = createToaster();
 
 const {
-  state: googleSignInButtonDisabled$,
+  useCurrentValue: useGoogleSignInButtonDisabled,
+  getSnapshot: getGoogleSignInButtonDisabledStateSnapshot,
+  state: googleSignInButtonDisabledState,
   setTrue: disableGoogleSignInButton,
   setFalse: enableGoogleSignInButton,
 } = createBooleanState(false);
@@ -44,15 +46,16 @@ const googleSignInSubmit = async (
 };
 
 const googleSignInClickHandler = (): void => {
-  if (googleSignInButtonDisabled$.snapshot.value) return;
+  if (getGoogleSignInButtonDisabledStateSnapshot()) return;
 
   // TODO: use toast
-  googleSignInSubmit(Maybe.unwrap(Router.pageToBack$.snapshot)).catch(
+  googleSignInSubmit(Maybe.unwrap(Router.pageToBack$.getSnapshot())).catch(
     console.error,
   );
 };
 
 export const GoogleSignInStore = {
-  googleSignInButtonDisabled$,
+  googleSignInButtonDisabledState,
+  useGoogleSignInButtonDisabled,
   googleSignInClickHandler,
 } as const;

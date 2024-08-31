@@ -15,10 +15,11 @@ const {
   resetState: resetSortOrderAndKey_,
 } = createState<readonly ['date' | 'score', 'asc' | 'desc']>(['date', 'asc']);
 
-const { state: filterState$, dispatch: filterStateDispatch } = createReducer(
-  AnswerFilterState.reducer,
-  AnswerFilterState.initialState,
-);
+const {
+  useCurrentValue: useFilterState,
+  state: filterState$,
+  dispatch: filterStateDispatch,
+} = createReducer(AnswerFilterState.reducer, AnswerFilterState.initialState);
 
 const resetSortOrderAndKey = (): void => {
   AnswerFilterQueryParam.saveSortStateToQueryParams(resetSortOrderAndKey_());
@@ -712,6 +713,7 @@ eventSchedule$
 export const AnswerFilterAndSortStore = {
   sortKeyAndOrder$,
   filterState$,
+  useFilterState,
   iconOfSpecifiedRespondentCheckState$,
   respondentCheckState$,
   tagValues$,

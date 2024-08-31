@@ -15,23 +15,22 @@ import {
   type ZipObservableRefined,
 } from '../types/index.mjs';
 
-export const zip = <OS extends NonEmptyArray<Observable<unknown>>>(
+export const zip = <const OS extends NonEmptyArray<Observable<unknown>>>(
   parents: OS,
 ): ZipObservableRefined<OS> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   new ZipObservableClass(parents) as never;
 
-class ZipObservableClass<A extends NonEmptyUnknownList>
-  extends SyncChildObservableClass<A, 'zip', A>
+class ZipObservableClass<const A extends NonEmptyUnknownList>
+  extends SyncChildObservableClass<A, A>
   implements ZipObservable<A>
 {
   readonly #queues: TupleToQueueTuple<A>;
 
   constructor(parents: Wrap<A>) {
-    const parentsValues = parents.map((p) => p.snapshot);
+    const parentsValues = parents.map((p) => p.getSnapshot());
     super({
       parents,
-      type: 'zip',
       initialValue: parentsValues.every(Maybe.isSome)
         ? Maybe.some(
             // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -48,8 +47,9 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const queues = this.#queues;
     for (const [index, par] of this.parents.entries()) {
-      if (par.updaterSymbol === updaterSymbol && Maybe.isSome(par.snapshot)) {
-        queues[index]?.enqueue(par.snapshot.value);
+      const sn = par.getSnapshot();
+      if (par.updaterSymbol === updaterSymbol && Maybe.isSome(sn)) {
+        queues[index]?.enqueue(sn.value);
       }
     }
 
@@ -105,12 +105,10 @@ if (import.meta.vitest !== undefined) {
     r2.chain(setInitialValue('0')),
   ] as const);
 
-  expectType<typeof _z, SyncChildObservable<readonly [number, string], 'zip'>>(
-    '<=',
-  );
+  expectType<typeof _z, SyncChildObservable<readonly [number, string]>>('<=');
 
   expectType<
     typeof _zi,
-    InitializedSyncChildObservable<readonly [number, string], 'zip'>
+    InitializedSyncChildObservable<readonly [number, string]>
   >('<=');
 }

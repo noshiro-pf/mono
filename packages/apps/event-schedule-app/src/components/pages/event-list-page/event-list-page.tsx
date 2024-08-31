@@ -48,22 +48,14 @@ export const EventListPage = memoNamed('EventListPage', () => {
     [eventList, fireAuthUser],
   );
 
-  const refreshButtonIsDisabled = useObservableValue(
-    EventListStore.refreshButtonIsDisabled$,
-  );
-  const refreshButtonIsLoading = useObservableValue(
-    EventListStore.refreshButtonIsLoading$,
-  );
-  const filterOptionState = useObservableValue(
-    EventListPageFilterStore.filterOptionState$,
-  );
-  const showOnlyEventSchedulesICreated = useObservableValue(
-    EventListPageFilterStore.showOnlyEventSchedulesICreated$,
-  );
-  const showAllPastDaysEvent = useObservableValue(
-    EventListPageFilterStore.showAllPastDaysEvent$,
-  );
-  const filterText = useObservableValue(EventListPageFilterStore.filterText$);
+  const refreshButtonIsDisabled = EventListStore.useRefreshButtonIsDisabled();
+  const refreshButtonIsLoading = EventListStore.useRefreshButtonIsLoading();
+  const filterOptionState = EventListPageFilterStore.useFilterOptionState();
+  const showOnlyEventSchedulesICreated =
+    EventListPageFilterStore.useShowOnlyEventSchedulesICreated();
+  const showAllPastDaysEvent =
+    EventListPageFilterStore.useShowAllPastDaysEvent();
+  const filterText = EventListPageFilterStore.useFilterText();
 
   const formElementsAreDisabled =
     refreshButtonIsDisabled || refreshButtonIsLoading;

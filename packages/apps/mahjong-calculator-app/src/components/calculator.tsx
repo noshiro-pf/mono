@@ -1,10 +1,10 @@
 import {
-  bakaze$,
-  jikaze$,
   setBakaze,
   setJikaze,
   setTehaiType,
-  tehaiType$,
+  useBakaze,
+  useJikaze,
+  useTehaiType,
 } from '../store';
 import {
   BakazeButtonGroup,
@@ -13,9 +13,9 @@ import {
 } from './atoms';
 
 export const Calculator = memoNamed('Calculator', () => {
-  const bakaze = useObservableValue(bakaze$);
-  const jikaze = useObservableValue(jikaze$);
-  const tehaiType = useObservableValue(tehaiType$);
+  const bakaze = useBakaze();
+  const jikaze = useJikaze();
+  const tehaiType = useTehaiType();
 
   return (
     <div>

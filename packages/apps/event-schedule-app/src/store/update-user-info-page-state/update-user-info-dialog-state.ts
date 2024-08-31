@@ -1,6 +1,7 @@
 const {
-  state: openingDialog$,
-  setState: setOpeningDialog,
+  useCurrentValue: useOpeningDialogType,
+  state: openingDialogType$,
+  setState: setOpeningDialogType,
   resetState: closeDialog,
 } = createState<
   | 'deleteAccount'
@@ -12,27 +13,28 @@ const {
 >(undefined);
 
 const changeUsername = (): void => {
-  setOpeningDialog('updateDisplayName');
+  setOpeningDialogType('updateDisplayName');
 };
 
 const changeEmail = (): void => {
-  setOpeningDialog('updateEmail');
+  setOpeningDialogType('updateEmail');
 };
 
 const changePassword = (): void => {
-  setOpeningDialog('updatePassword');
+  setOpeningDialogType('updatePassword');
 };
 
 const deleteAccount = (): void => {
-  setOpeningDialog('deleteAccount');
+  setOpeningDialogType('deleteAccount');
 };
 
 const deleteAccountCreatedWithGoogle = (): void => {
-  setOpeningDialog('deleteAccountCreatedWithGoogle');
+  setOpeningDialogType('deleteAccountCreatedWithGoogle');
 };
 
 export const UpdateUserInfoDialogStore = {
-  openingDialog$,
+  openingDialogType$,
+  useOpeningDialogType,
   closeDialog,
   changeUsername,
   changeEmail,

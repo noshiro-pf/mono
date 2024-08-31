@@ -21,8 +21,9 @@ export const createState = <S,>(
   setState: (v: S) => S;
   updateState: (updateFn: (prev: S) => S) => S;
   resetState: () => S;
+  getSnapshot: () => S;
 }> => {
-  const { state, dispatch } = createReducer<S, Action<S>>(
+  const { state, dispatch, getSnapshot } = createReducer<S, Action<S>>(
     reducer,
     initialState,
   );
@@ -35,7 +36,7 @@ export const createState = <S,>(
   const resetState = (): S =>
     dispatch({ type: 'set', nextState: initialState });
 
-  return { state, setState, updateState, resetState };
+  return { state, setState, updateState, resetState, getSnapshot };
 };
 
 export const createBooleanState = (
@@ -48,8 +49,9 @@ export const createBooleanState = (
   toggle: () => boolean;
   updateState: (updateFn: (prev: boolean) => boolean) => boolean;
   resetState: () => void;
+  getSnapshot: () => boolean;
 }> => {
-  const { state, setState, updateState, resetState } =
+  const { state, setState, updateState, resetState, getSnapshot } =
     createState(initialState);
 
   return {
@@ -64,5 +66,6 @@ export const createBooleanState = (
     setState,
     updateState,
     resetState,
+    getSnapshot,
   };
 };

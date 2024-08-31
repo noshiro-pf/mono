@@ -16,7 +16,7 @@ describe('graph-structure', () => {
     const source$ = of(0);
     const double$ = source$.chain(map((x) => x * 2));
     const quad$ = source$.chain(map((x) => x * 2)).chain(map((x) => x * 2));
-    const combined$ = combine([source$, double$, quad$] as const);
+    const combined$ = combine([source$, double$, quad$]);
 
     expect(source$.depth).toBe(0);
     expect(double$.depth).toBe(1);

@@ -37,7 +37,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
   const { state: showPasswordError, setState: setShowPasswordError } =
     useState<boolean>(false);
 
-  const room = useObservableValue(db.room$);
+  const room = db.useRoom();
 
   const onJoinRoomButtonClick = useCallback(() => {
     if (room === undefined) return;
@@ -48,7 +48,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
     joinRoom.dispatch(roomId, username).catch(console.error);
   }, [room, roomId, username, password, setShowPasswordError]);
 
-  const loading = useObservableValue(joinRoom.isWaitingResponse$);
+  const loading = joinRoom.useIsWaitingResponse();
 
   return (
     <Centering>

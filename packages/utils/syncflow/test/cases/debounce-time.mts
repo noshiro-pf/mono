@@ -68,7 +68,7 @@ const createStreams2 = (
   const even$ = counter$.chain(filter((n) => n % 2 === 0));
   const filtered$ = counter$.chain(filter((n) => n % 10 < 5));
   const debounced$ = filtered$.chain(debounceTime(tick * 3));
-  const combined$ = combine([even$, debounced$] as const);
+  const combined$ = combine([even$, debounced$]);
 
   return {
     startSource: () => {

@@ -15,28 +15,25 @@ export const setInitialValue =
     new SetInitialValueObservableClass(parentObservable, initialValue);
 
 class SetInitialValueObservableClass<A, I>
-  extends InitializedSyncChildObservableClass<
-    A | I,
-    'setInitialValue',
-    readonly [A]
-  >
+  extends InitializedSyncChildObservableClass<A | I, readonly [A]>
   implements SetInitialValueOperatorObservable<A, I>
 {
   constructor(parentObservable: Observable<A>, initialValue: I) {
     super({
       parents: [parentObservable],
-      type: 'setInitialValue',
       initialValue: Maybe.some(initialValue),
     });
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+    const sn = par.getSnapshot();
+
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(sn)) {
       return; // skip update
     }
 
-    this.setNext(par.snapshot.value, updaterSymbol);
+    this.setNext(sn.value, updaterSymbol);
   }
 }
 

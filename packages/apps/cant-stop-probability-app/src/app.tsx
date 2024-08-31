@@ -30,9 +30,9 @@ const resultsSortedByProbability = pipe(Array.from(results)).chain((list) =>
   list.toSorted((a, b) => -(a.countSum - b.countSum)),
 ).value;
 
-const { state: sortBy$, setState: setSortBy } = createState<'dice' | 'prob'>(
-  'prob',
-);
+const { useCurrentValue: useSortBy, setState: setSortBy } = createState<
+  'dice' | 'prob'
+>('prob');
 
 const sortByDice = (): void => {
   setSortBy('dice');
@@ -42,12 +42,11 @@ const sortByProbability = (): void => {
   setSortBy('prob');
 };
 
-const { state: filterByString$, setState: setFilterByString } =
+const { useCurrentValue: useFilterByString, setState: setFilterByString } =
   createState<string>('');
 
-const { state: selectedTabId$, setState: setSelectedTabId } = createState<
-  'deadColumnUI' | 'table'
->('table');
+const { useCurrentValue: useSelectedTabId, setState: setSelectedTabId } =
+  createState<'deadColumnUI' | 'table'>('table');
 
 const handleTabChange = (a: string): void => {
   if (a === 'deadColumnUI' || a === 'table') {
@@ -57,15 +56,14 @@ const handleTabChange = (a: string): void => {
   }
 };
 
-const { state: columnsAlive$, updateState: updateDeadColumns } = createState<
-  readonly boolean[]
->(Arr.newArray(11, true));
+const { useCurrentValue: useColumnsAlive, updateState: updateDeadColumns } =
+  createState<readonly boolean[]>(Arr.newArray(11, true));
 
 export const App = memoNamed('App', () => {
-  const sortBy = useObservableValue(sortBy$);
-  const filterByString = useObservableValue(filterByString$);
-  const selectedTabId = useObservableValue(selectedTabId$);
-  const columnsAlive = useObservableValue(columnsAlive$);
+  const sortBy = useSortBy();
+  const filterByString = useFilterByString();
+  const selectedTabId = useSelectedTabId();
+  const columnsAlive = useColumnsAlive();
 
   const filterBy: readonly TwoDiceSumValue[] = useMemo(
     () =>

@@ -21,6 +21,7 @@ const {
 } = createState<EventSchedule | undefined>(undefined);
 
 const {
+  useCurrentValue: useEmailVerified,
   state: emailVerified$,
   setState: setEmailVerified,
   resetState: resetEmailVerified,
@@ -114,13 +115,13 @@ const answerPagePath$ = Router.eventId$.chain(
 );
 
 const onBackToAnswerPage = (): void => {
-  const answerPagePath = answerPagePath$.snapshot.value;
+  const answerPagePath = answerPagePath$.getSnapshot().value;
   Router.push(answerPagePath);
 };
 
 const saveToDatabase = async (): Promise<void> => {
-  const commonState = commonState$.snapshot.value;
-  const eventId = Router.eventId$.snapshot.value;
+  const commonState = commonState$.getSnapshot().value;
+  const eventId = Router.eventId$.getSnapshot().value;
 
   const {
     eventScheduleNormalized,
@@ -177,7 +178,7 @@ const onEditEventClick = (): void => {
 };
 
 const {
-  state: isLoading$,
+  useCurrentValue: useIsLoading,
   setTrue: setIsLoadingTrue,
   setFalse: setIsLoadingFalse,
 } = createBooleanState(false);
@@ -186,10 +187,10 @@ export const EditEventScheduleStore = {
   commonState$,
   commonStateHandlers,
   diff$,
-  emailVerified$,
+  useEmailVerified,
   hasDeletedDatetimeChanges$,
   hasNoChanges$,
-  isLoading$,
+  useIsLoading,
   setEmailVerified,
   onBackToAnswerPage,
   onEditEventClick,

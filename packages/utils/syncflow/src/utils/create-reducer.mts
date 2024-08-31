@@ -1,4 +1,3 @@
-import { Maybe } from '@noshiro/ts-utils';
 import {
   setInitialValue,
   source,
@@ -11,22 +10,25 @@ export const createReducer = <S, A>(
 ): Readonly<{
   state: InitializedObservable<S>;
   dispatch: (action: A) => S;
+  getSnapshot: () => S;
 }> => {
   const src = source<S>();
 
+  const state_ = src.chain(setInitialValue(initialState));
+
   const dispatch = (action: A): S => {
-    const nextState = reducer(
-      Maybe.unwrapOr(src.snapshot, initialState),
-      action,
-    );
+    const nextState = reducer(state_.getSnapshot().value, action);
 
     src.next(nextState);
 
     return nextState;
   };
 
+  const getSnapshot = (): S => state_.getSnapshot().value;
+
   return {
-    state: src.chain(setInitialValue(initialState)),
+    state: state_,
     dispatch,
+    getSnapshot,
   };
 };

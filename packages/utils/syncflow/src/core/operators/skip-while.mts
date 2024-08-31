@@ -1,4 +1,4 @@
-import { Maybe, SafeUint, idfn, toSafeUint } from '@noshiro/ts-utils';
+import { Maybe, SafeUint, idfn, pipe, toSafeUint } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type DropInitialValueOperator,
@@ -25,7 +25,7 @@ export const skip = <A,>(
 /* implementation */
 
 class SkipWhileObservableClass<A>
-  extends SyncChildObservableClass<A, 'skipWhile', readonly [A]>
+  extends SyncChildObservableClass<A, readonly [A]>
   implements SkipWhileOperatorObservable<A>
 {
   readonly #predicate: (value: A, index: SafeUint | -1) => boolean;
@@ -37,12 +37,13 @@ class SkipWhileObservableClass<A>
   ) {
     super({
       parents: [parentObservable],
-      type: 'skipWhile',
-      initialValue: Maybe.isNone(parentObservable.snapshot)
-        ? Maybe.none
-        : predicate(parentObservable.snapshot.value, -1)
+      initialValue: pipe(parentObservable.getSnapshot()).chain((sn) =>
+        Maybe.isNone(sn)
           ? Maybe.none
-          : parentObservable.snapshot,
+          : predicate(sn.value, -1)
+            ? Maybe.none
+            : sn,
+      ).value,
     });
 
     this.#mut_index = -1;
@@ -51,15 +52,17 @@ class SkipWhileObservableClass<A>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+    const sn = par.getSnapshot();
+
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(sn)) {
       return; // skip update
     }
 
     this.#mut_index =
       this.#mut_index === -1 ? toSafeUint(0) : SafeUint.add(1, this.#mut_index);
 
-    if (!this.#predicate(par.snapshot.value, this.#mut_index)) {
-      this.setNext(par.snapshot.value, updaterSymbol);
+    if (!this.#predicate(sn.value, this.#mut_index)) {
+      this.setNext(sn.value, updaterSymbol);
     }
   }
 }

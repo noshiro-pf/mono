@@ -29,7 +29,7 @@ export const mergeMap =
 export const flatMap = mergeMap;
 
 class MergeMapObservableClass<A, B>
-  extends AsyncChildObservableClass<B, 'mergeMap', readonly [A]>
+  extends AsyncChildObservableClass<B, readonly [A]>
   implements MergeMapOperatorObservable<A, B>
 {
   readonly #mapToObservable: (curr: A) => Observable<B>;
@@ -42,7 +42,6 @@ class MergeMapObservableClass<A, B>
   ) {
     super({
       parents: [parentObservable],
-      type: 'mergeMap',
       initialValue: Maybe.none,
     });
     this.#mapToObservable = mapToObservable;
@@ -52,11 +51,13 @@ class MergeMapObservableClass<A, B>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+    const sn = par.getSnapshot();
+
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(sn)) {
       return; // skip update
     }
 
-    const observable = this.#mapToObservable(par.snapshot.value);
+    const observable = this.#mapToObservable(sn.value);
     this.#observables = Arr.pushed(this.#observables, observable);
 
     const subscription = observable.subscribe((curr) => {

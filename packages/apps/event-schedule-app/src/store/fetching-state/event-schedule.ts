@@ -10,18 +10,21 @@ const fetchEventScheduleThrottled$ = fetchEventSchedule$.chain(
   throttleTime(fetchThrottleTime),
 );
 
-const { state: eventScheduleResult$, setState: setEventScheduleResult } =
-  createState<
-    | Result<
-        EventSchedule,
-        Readonly<{ type: 'not-found' | 'others'; message: string }>
-      >
-    | undefined
-  >(undefined);
+const {
+  state: eventScheduleResult$,
+  useCurrentValue: useEventScheduleResult,
+  setState: setEventScheduleResult,
+} = createState<
+  | Result<
+      EventSchedule,
+      Readonly<{ type: 'not-found' | 'others'; message: string }>
+    >
+  | undefined
+>(undefined);
 
 const result$ = eventScheduleResult$;
 
-combine([fetchEventScheduleThrottled$, Router.eventId$] as const).subscribe(
+combine([fetchEventScheduleThrottled$, Router.eventId$]).subscribe(
   ([_, eventId]) => {
     if (eventId === undefined) return;
 
@@ -49,5 +52,6 @@ export const eventSchedule$: InitializedObservable<EventSchedule | undefined> =
 
 export const EventScheduleStore = {
   result$,
+  useEventScheduleResult,
   fetchEventSchedule,
 } as const;

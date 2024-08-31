@@ -7,18 +7,18 @@ import {
 } from '../constants';
 import { revealedBlockToApiPayload, toTiles34 } from '../functions';
 import {
-  bakaze$,
   doraIndicators$,
   flagOptions$,
+  getBakazeSnapshot,
+  getJikazeSnapshot,
+  getTehaiTypeSnapshot,
   handSorted$,
-  jikaze$,
   maximizeTarget$,
   numRemainingTiles$,
   resetResult,
   revealedBlocks$,
   setIsCalculating,
   setResult,
-  tehaiType$,
   turn$,
 } from '../store';
 import { type ApiPayload } from '../types';
@@ -27,16 +27,16 @@ export const calculate = (): void => {
   setIsCalculating(true);
   resetResult();
 
-  const maybeHand = handSorted$.snapshot;
-  const maybeRevealedBlocks = revealedBlocks$.snapshot;
-  const maybeTurn = turn$.snapshot;
-  const maybeBakaze = bakaze$.snapshot;
-  const maybeJikaze = jikaze$.snapshot;
-  const maybeTehaiType = tehaiType$.snapshot;
-  const maybeDoraIndicators = doraIndicators$.snapshot;
-  const maybeNumRemainingTiles = numRemainingTiles$.snapshot;
-  const maybeFlagOptions = flagOptions$.snapshot;
-  const maybeMaximizeTarget = maximizeTarget$.snapshot;
+  const maybeHand = handSorted$.getSnapshot();
+  const maybeRevealedBlocks = revealedBlocks$.getSnapshot();
+  const maybeTurn = turn$.getSnapshot();
+  const maybeBakaze = getBakazeSnapshot();
+  const maybeJikaze = getJikazeSnapshot();
+  const maybeTehaiType = getTehaiTypeSnapshot();
+  const maybeDoraIndicators = doraIndicators$.getSnapshot();
+  const maybeNumRemainingTiles = numRemainingTiles$.getSnapshot();
+  const maybeFlagOptions = flagOptions$.getSnapshot();
+  const maybeMaximizeTarget = maximizeTarget$.getSnapshot();
 
   if (Maybe.isNone(maybeHand)) {
     setResult(Result.err({ type: 'hand-is-undefined', message: '' } as const));
@@ -50,18 +50,6 @@ export const calculate = (): void => {
 
   if (Maybe.isNone(maybeTurn)) {
     setResult(Result.err({ type: 'turn-is-undefined', message: '' } as const));
-  }
-
-  if (Maybe.isNone(maybeBakaze)) {
-    setResult(
-      Result.err({ type: 'bakaze-is-undefined', message: '' } as const),
-    );
-  }
-
-  if (Maybe.isNone(maybeJikaze)) {
-    setResult(
-      Result.err({ type: 'jikaze-is-undefined', message: '' } as const),
-    );
   }
 
   if (Maybe.isNone(maybeDoraIndicators)) {
@@ -97,23 +85,14 @@ export const calculate = (): void => {
     );
   }
 
-  if (Maybe.isNone(maybeTehaiType)) {
-    setResult(
-      Result.err({
-        type: 'tehaiType-is-undefined',
-        message: '',
-      } as const),
-    );
-  }
-
   const revealedBlocks = maybeRevealedBlocks.value;
-  const bakaze = maybeBakaze.value;
-  const jikaze = maybeJikaze.value;
+  const bakaze = maybeBakaze;
+  const jikaze = maybeJikaze;
   const turn = maybeTurn.value;
   const numRemainingTiles = maybeNumRemainingTiles.value;
   const flagOptions = maybeFlagOptions.value;
   const maximizeTarget = maybeMaximizeTarget.value;
-  const tehaiType = maybeTehaiType.value;
+  const tehaiType = maybeTehaiType;
   const doraIndicators = maybeDoraIndicators.value;
   const hand = maybeHand.value;
 

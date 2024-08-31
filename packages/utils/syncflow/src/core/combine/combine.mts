@@ -14,7 +14,7 @@ import {
   type Wrap,
 } from '../types/index.mjs';
 
-export const combine = <OS extends NonEmptyArray<Observable<unknown>>>(
+export const combine = <const OS extends NonEmptyArray<Observable<unknown>>>(
   parents: OS,
 ): CombineObservableRefined<OS> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -22,15 +22,14 @@ export const combine = <OS extends NonEmptyArray<Observable<unknown>>>(
 
 export const combineLatest = combine; // alias
 
-class CombineObservableClass<A extends NonEmptyUnknownList>
-  extends SyncChildObservableClass<A, 'combine', A>
+class CombineObservableClass<const A extends NonEmptyUnknownList>
+  extends SyncChildObservableClass<A, A>
   implements CombineObservable<A>
 {
   constructor(parents: Wrap<A>) {
-    const parentsValues = parents.map((p) => p.snapshot);
+    const parentsValues = parents.map((p) => p.getSnapshot());
     super({
       parents,
-      type: 'combine',
       initialValue: parentsValues.every(Maybe.isSome)
         ? Maybe.some(
             // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -43,7 +42,7 @@ class CombineObservableClass<A extends NonEmptyUnknownList>
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     if (this.parents.every((o) => o.updaterSymbol !== updaterSymbol)) return; // all parents are skipped
 
-    const parentValues = this.parents.map((a) => a.snapshot);
+    const parentValues = this.parents.map((a) => a.getSnapshot());
     if (parentValues.every(Maybe.isSome)) {
       const nextValue =
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -88,23 +87,17 @@ if (import.meta.vitest !== undefined) {
   const r1 = fromArray([1, 2, 3]);
   const r2 = fromArray(['a', 'b', 'c']);
 
-  const _c = combine([r1, r2] as const);
+  const _c = combine([r1, r2]);
 
   const _ci = combine([
     r1.chain(setInitialValue(0)),
     r2.chain(setInitialValue(0)),
-  ] as const);
+  ]);
 
-  expectType<
-    typeof _c,
-    SyncChildObservable<readonly [number, string], 'combine'>
-  >('<=');
+  expectType<typeof _c, SyncChildObservable<readonly [number, string]>>('<=');
 
   expectType<
     typeof _ci,
-    InitializedSyncChildObservable<
-      readonly [number, number | string],
-      'combine'
-    >
+    InitializedSyncChildObservable<readonly [number, number | string]>
   >('<=');
 }

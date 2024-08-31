@@ -1,4 +1,4 @@
-import { Arr, Maybe } from '@noshiro/ts-utils';
+import { Arr, Maybe, pipe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type KeepInitialValueOperator,
@@ -21,11 +21,7 @@ export const withBufferedFrom = <A, B>(
 export const withBuffered = withBufferedFrom; // alias
 
 class WithBufferedFromObservableClass<A, B>
-  extends SyncChildObservableClass<
-    readonly [A, readonly B[]],
-    'withBufferedFrom',
-    readonly [A]
-  >
+  extends SyncChildObservableClass<readonly [A, readonly B[]], readonly [A]>
   implements WithBufferedFromOperatorObservable<A, B>
 {
   #mut_bufferedValues: readonly B[] = [];
@@ -34,15 +30,17 @@ class WithBufferedFromObservableClass<A, B>
     super({
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
-      type: 'withBufferedFrom',
-      initialValue: Maybe.isNone(parentObservable.snapshot)
-        ? Maybe.none
-        : Maybe.some([
-            parentObservable.snapshot.value,
-            Maybe.isNone(observable.snapshot)
-              ? []
-              : [observable.snapshot.value],
-          ]),
+      initialValue: pipe({
+        par: parentObservable.getSnapshot(),
+        me: observable.getSnapshot(),
+      }).chain(({ par, me }) =>
+        Maybe.isNone(par)
+          ? Maybe.none
+          : Maybe.some([
+              par.value,
+              Maybe.isNone(me) ? [] : [me.value],
+            ] as const),
+      ).value,
     });
 
     observable.subscribe((value) => {
@@ -52,11 +50,13 @@ class WithBufferedFromObservableClass<A, B>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+    const sn = par.getSnapshot();
+
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(sn)) {
       return; // skip update
     }
 
-    this.setNext([par.snapshot.value, this.#mut_bufferedValues], updaterSymbol);
+    this.setNext([sn.value, this.#mut_bufferedValues], updaterSymbol);
     this.#clearBuffer();
   }
 

@@ -15,48 +15,45 @@ import { type NonEmptyUnknownList } from './types.mjs';
 export type SourceObservable<A> = Readonly<{
   next: (value: A) => void;
 }> &
-  RootObservable<A, 'Source'>;
+  RootObservable<A>;
 
 export type OfObservable<A> = Readonly<{
   emit: () => OfObservable<A>;
 }> &
-  RootObservable<A, 'Of'>;
+  RootObservable<A>;
 
 export type FromArrayObservable<A> = Readonly<{
   emit: () => FromArrayObservable<A>;
 }> &
-  RootObservable<A, 'FromArray'>;
+  RootObservable<A>;
 
 export type FromPromiseObservable<A, E = unknown> = RootObservable<
-  Result<A, E>,
-  'FromPromise'
+  Result<A, E>
 >;
 
 export type FromSubscribableObservable<A, E = unknown> = RootObservable<
-  Result<A, E>,
-  'FromSubscribable'
+  Result<A, E>
 >;
 
 export type IntervalObservable = Readonly<{
   start: () => IntervalObservable;
 }> &
-  RootObservable<SafeUint, 'Interval'>;
+  RootObservable<SafeUint>;
 
 export type TimerObservable = Readonly<{
   start: () => TimerObservable;
 }> &
-  RootObservable<0, 'Timer'>;
+  RootObservable<0>;
 
 // InitializedSyncChildObservable
 
 export type SetInitialValueOperatorObservable<
   A,
   I = A,
-> = InitializedSyncChildObservable<A | I, 'setInitialValue', readonly [A]>;
+> = InitializedSyncChildObservable<A | I, readonly [A]>;
 
 export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
   B,
-  'scan',
   readonly [A]
 >;
 
@@ -121,10 +118,10 @@ namespace SyncFlowInternals {
   }
 
   type InitializedCombineObservableImpl<A extends NonEmptyUnknownList> =
-    InitializedSyncChildObservable<A, 'combine', A>;
+    InitializedSyncChildObservable<A, A>;
 
   export type CombineObservableImpl<A extends NonEmptyUnknownList> =
-    SyncChildObservable<A, 'combine', A>;
+    SyncChildObservable<A, A>;
 
   export type CombineObservableRefinedImpl<
     OS extends NonEmptyArray<Observable<unknown>>,
@@ -134,10 +131,10 @@ namespace SyncFlowInternals {
       : CombineObservableImpl<Unwrap<OS>>;
 
   type InitializedZipObservableImpl<A extends NonEmptyUnknownList> =
-    InitializedSyncChildObservable<A, 'zip', A>;
+    InitializedSyncChildObservable<A, A>;
 
   export type ZipObservableImpl<A extends NonEmptyUnknownList> =
-    SyncChildObservable<A, 'zip', A>;
+    SyncChildObservable<A, A>;
 
   export type ZipObservableRefinedImpl<
     OS extends NonEmptyArray<Observable<unknown>>,
@@ -147,10 +144,10 @@ namespace SyncFlowInternals {
       : ZipObservableImpl<Unwrap<OS>>;
 
   type InitializedMergeObservableImpl<P extends NonEmptyUnknownList> =
-    InitializedSyncChildObservable<ArrayElement<P>, 'merge', P>;
+    InitializedSyncChildObservable<ArrayElement<P>, P>;
 
   export type MergeObservableImpl<P extends NonEmptyUnknownList> =
-    SyncChildObservable<ArrayElement<P>, 'merge', P>;
+    SyncChildObservable<ArrayElement<P>, P>;
 
   export type MergeObservableRefinedImpl<
     OS extends NonEmptyArray<Observable<unknown>>,
@@ -183,67 +180,53 @@ export type MergeObservableRefined<
 
 export type MapWithIndexOperatorObservable<A, B> = SyncChildObservable<
   B,
-  'mapWithIndex',
   readonly [A]
 >;
 
 export type PairwiseOperatorObservable<A> = SyncChildObservable<
   readonly [A, A],
-  'pairwise',
   readonly [A]
 >;
 
 export type TakeWhileOperatorObservable<A> = SyncChildObservable<
   A,
-  'takeWhile',
   readonly [A]
 >;
 
 export type TakeUntilOperatorObservable<A> = SyncChildObservable<
   A,
-  'takeUntil',
   readonly [A]
 >;
 
 export type SkipWhileOperatorObservable<A> = SyncChildObservable<
   A,
-  'skipWhile',
   readonly [A]
 >;
 
 export type SkipUntilOperatorObservable<A> = SyncChildObservable<
   A,
-  'skipUntil',
   readonly [A]
 >;
 
 export type WithCurrentValueFromOperatorObservable<A, B> = SyncChildObservable<
   readonly [A, B],
-  'withCurrentValueFrom',
   readonly [A]
 >;
 
 export type WithBufferedFromOperatorObservable<A, B> = SyncChildObservable<
   readonly [A, readonly B[]],
-  'withBufferedFrom',
   readonly [A]
 >;
 
-export type FilterOperatorObservable<A> = SyncChildObservable<
-  A,
-  'filter',
-  readonly [A]
->;
+export type FilterOperatorObservable<A> = SyncChildObservable<A, readonly [A]>;
 
 export type SkipIfNoChangeOperatorObservable<A> = SyncChildObservable<
   A,
-  'skipIfNoChange',
   readonly [A]
 >;
 
 export type ThrottleTimeOperatorObservable<A> = SyncChildObservable<
   A,
-  'throttleTime',
   readonly [A]
 >;
 
@@ -251,24 +234,20 @@ export type ThrottleTimeOperatorObservable<A> = SyncChildObservable<
 
 export type AuditTimeOperatorObservable<A> = AsyncChildObservable<
   A,
-  'auditTime',
   readonly [A]
 >;
 
 export type DebounceTimeOperatorObservable<A> = AsyncChildObservable<
   A,
-  'debounceTime',
   readonly [A]
 >;
 
 export type SwitchMapOperatorObservable<A, B> = AsyncChildObservable<
   B,
-  'switchMap',
   readonly [A]
 >;
 
 export type MergeMapOperatorObservable<A, B> = AsyncChildObservable<
   B,
-  'mergeMap',
   readonly [A]
 >;

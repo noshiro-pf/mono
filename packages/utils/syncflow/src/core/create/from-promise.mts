@@ -7,11 +7,11 @@ export const fromPromise = <A, E = unknown>(
 ): FromPromiseObservable<A, E> => new FromPromiseObservableClass(promise);
 
 class FromPromiseObservableClass<A, E = unknown>
-  extends RootObservableClass<Result<A, E>, 'FromPromise'>
+  extends RootObservableClass<Result<A, E>>
   implements FromPromiseObservable<A, E>
 {
   constructor(promise: Readonly<Promise<A>>) {
-    super({ type: 'FromPromise', initialValue: Maybe.none });
+    super({ initialValue: Maybe.none });
 
     promise
       .then((value) => {

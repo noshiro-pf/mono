@@ -1,4 +1,10 @@
-import { Maybe, SafeUint, expectType, toSafeUint } from '@noshiro/ts-utils';
+import {
+  Maybe,
+  SafeUint,
+  expectType,
+  pipe,
+  toSafeUint,
+} from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import {
@@ -26,7 +32,7 @@ export const take = <A,>(
 /* implementation */
 
 class TakeWhileObservableClass<A>
-  extends SyncChildObservableClass<A, 'takeWhile', readonly [A]>
+  extends SyncChildObservableClass<A, readonly [A]>
   implements TakeWhileOperatorObservable<A>
 {
   readonly #predicate: (value: A, index: SafeUint | -1) => boolean;
@@ -38,12 +44,13 @@ class TakeWhileObservableClass<A>
   ) {
     super({
       parents: [parentObservable],
-      type: 'takeWhile',
-      initialValue: Maybe.isNone(parentObservable.snapshot)
-        ? Maybe.none
-        : predicate(parentObservable.snapshot.value, -1)
-          ? parentObservable.snapshot
-          : Maybe.none,
+      initialValue: pipe(parentObservable.getSnapshot()).chain((par) =>
+        Maybe.isNone(par)
+          ? Maybe.none
+          : predicate(par.value, -1)
+            ? par
+            : Maybe.none,
+      ).value,
     });
 
     this.#mut_index = -1;
@@ -52,15 +59,18 @@ class TakeWhileObservableClass<A>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+
+    const sn = par.getSnapshot();
+
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(sn)) {
       return; // skip update
     }
 
     this.#mut_index =
       this.#mut_index === -1 ? toSafeUint(0) : SafeUint.add(1, this.#mut_index);
 
-    if (this.#predicate(par.snapshot.value, this.#mut_index)) {
-      this.setNext(par.snapshot.value, updaterSymbol);
+    if (this.#predicate(sn.value, this.#mut_index)) {
+      this.setNext(sn.value, updaterSymbol);
     } else {
       this.complete();
     }

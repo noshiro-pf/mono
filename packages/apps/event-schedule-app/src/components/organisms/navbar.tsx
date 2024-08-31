@@ -26,9 +26,7 @@ export const NavBar = memoNamed('NavBar', () => {
     redirectFn: Router.redirect,
   });
 
-  const openingDialog = useObservableValue(
-    UpdateUserInfoDialogStore.openingDialog$,
-  );
+  const openingDialog = UpdateUserInfoDialogStore.useOpeningDialogType();
 
   const passwordProviderIncluded = Auth.usePasswordProviderIncluded();
 

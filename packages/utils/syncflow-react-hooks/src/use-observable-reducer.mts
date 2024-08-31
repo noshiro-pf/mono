@@ -18,7 +18,7 @@ export const useObservableReducer = <S, A>(
 
   const dispatch = useCallback(
     (action: A): S => {
-      const nextState = reducer(st.snapshot.value, action);
+      const nextState = reducer(st.getSnapshot().value, action);
       source$.next(nextState);
       return nextState;
     },

@@ -4,8 +4,11 @@ import {
   termToString,
 } from '@noshiro/lambda-calculus-interpreter-core';
 
-const { state: inputAreaString$, setState: setInputAreaString } =
-  createState<string>('((+ 2) 3)');
+const {
+  state: inputAreaString$,
+  useCurrentValue: useInputAreaString,
+  setState: setInputAreaString,
+} = createState<string>('((+ 2) 3)');
 
 const outputAreaString$: InitializedObservable<string | undefined> =
   inputAreaString$.chain(debounceTime(200 /* ms */)).chain(
@@ -20,4 +23,4 @@ const outputAreaString$: InitializedObservable<string | undefined> =
     ),
   );
 
-export { inputAreaString$, outputAreaString$, setInputAreaString };
+export { outputAreaString$, setInputAreaString, useInputAreaString };

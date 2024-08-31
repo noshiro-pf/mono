@@ -1,4 +1,4 @@
-import { Maybe } from '@noshiro/ts-utils';
+import { Maybe, pipe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type DropInitialValueOperator,
@@ -18,11 +18,7 @@ export const withCurrentValueFrom =
 export const withLatestFrom = withCurrentValueFrom; // alias
 
 class WithCurrentValueFromObservableClass<A, B>
-  extends SyncChildObservableClass<
-    readonly [A, B],
-    'withCurrentValueFrom',
-    readonly [A]
-  >
+  extends SyncChildObservableClass<readonly [A, B], readonly [A]>
   implements WithCurrentValueFromOperatorObservable<A, B>
 {
   readonly #observable: Observable<B>;
@@ -31,15 +27,14 @@ class WithCurrentValueFromObservableClass<A, B>
     super({
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
-      type: 'withCurrentValueFrom',
-      initialValue:
-        Maybe.isNone(parentObservable.snapshot) ||
-        Maybe.isNone(observable.snapshot)
+      initialValue: pipe({
+        par: parentObservable.getSnapshot(),
+        me: observable.getSnapshot(),
+      }).chain(({ me, par }) =>
+        Maybe.isNone(par) || Maybe.isNone(me)
           ? Maybe.none
-          : Maybe.some([
-              parentObservable.snapshot.value,
-              observable.snapshot.value,
-            ]),
+          : Maybe.some([par.value, me.value] as const),
+      ).value,
     });
 
     this.#observable = observable;
@@ -47,13 +42,15 @@ class WithCurrentValueFromObservableClass<A, B>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
+    const ps = par.getSnapshot();
+
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(ps)) {
       return; // skip update
     }
 
-    const curr = this.#observable.snapshot;
+    const curr = this.#observable.getSnapshot();
     if (Maybe.isNone(curr)) return; // skip update
 
-    this.setNext([par.snapshot.value, curr.value], updaterSymbol);
+    this.setNext([ps.value, curr.value], updaterSymbol);
   }
 }

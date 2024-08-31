@@ -111,13 +111,13 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     })).value,
     valueToBeSetWhenTurnedOff: () => undefined,
     valueToBeSetWhenTurnedOn: () =>
-      initialNotificationSettingsWithEmailFilled$.snapshot.value,
+      initialNotificationSettingsWithEmailFilled$.getSnapshot().value,
   });
 
   // 回答期限をオフにしたら通知設定の回答期限関連のチェックもオフにする
   const toggleAnswerDeadlineSection = (): void => {
     toggleAnswerDeadlineSection_();
-    if (!useAnswerDeadline$.snapshot.value) {
+    if (!useAnswerDeadline$.getSnapshot().value) {
       updateNotificationSettingsWithEmail((prev) =>
         prev === undefined
           ? prev

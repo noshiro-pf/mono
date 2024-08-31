@@ -3,12 +3,12 @@ import { fbAuth } from '../initialize-firebase';
 import { clog } from '../utils';
 import { Router } from './router';
 
-const { state: fireAuthUser$, setState: setUser } = createState<
-  FireAuthUser | undefined
->(undefined);
-
-const useFireAuthUser = (): FireAuthUser | undefined =>
-  useObservableValue(fireAuthUser$);
+const {
+  state: fireAuthUser$,
+  setState: setFireAuthUser,
+  getSnapshot: getFireAuthUserSnapshot,
+  useCurrentValue: useFireAuthUser,
+} = createState<FireAuthUser | undefined>(undefined);
 
 const passwordProviderIncluded$: InitializedObservable<boolean> =
   fireAuthUser$.chain(
@@ -22,12 +22,12 @@ const usePasswordProviderIncluded = (): boolean =>
   useObservableValue(passwordProviderIncluded$);
 
 const emitAuthStateChange = (): void => {
-  setUser(fbAuth.currentUser ?? undefined);
+  setFireAuthUser(fbAuth.currentUser ?? undefined);
 };
 
 fbAuth.onAuthStateChanged((user) => {
   clog('onAuthStateChanged', user);
-  setUser(user ?? undefined);
+  setFireAuthUser(user ?? undefined);
 });
 
 const signOut = async (): Promise<void> => {
@@ -42,6 +42,7 @@ const signOutClick = (): void => {
 
 export const Auth = {
   fireAuthUser$,
+  getFireAuthUserSnapshot,
   passwordProviderIncluded$,
   useFireAuthUser,
   usePasswordProviderIncluded,

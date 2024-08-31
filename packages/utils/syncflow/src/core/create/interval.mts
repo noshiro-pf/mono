@@ -9,7 +9,7 @@ export const interval = (
   new IntervalObservableClass(milliSeconds, startManually);
 
 class IntervalObservableClass
-  extends RootObservableClass<SafeUint, 'Interval'>
+  extends RootObservableClass<SafeUint>
   implements IntervalObservable
 {
   readonly #milliSeconds: number;
@@ -19,7 +19,7 @@ class IntervalObservableClass
   #isStarted: boolean;
 
   constructor(milliSeconds: number, startManually?: boolean) {
-    super({ type: 'Interval', initialValue: Maybe.none });
+    super({ initialValue: Maybe.none });
     this.#milliSeconds = milliSeconds;
     this.#counter = toSafeUint(0);
     this.#timerId0 = undefined;

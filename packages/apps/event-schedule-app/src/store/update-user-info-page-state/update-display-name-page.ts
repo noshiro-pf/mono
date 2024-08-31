@@ -78,8 +78,8 @@ const submit = async (user: FireAuthUser): Promise<void> => {
 };
 
 const enterClickHandler = (): void => {
-  const enterButtonDisabled = enterButtonDisabled$.snapshot.value;
-  const fireAuthUser = Auth.fireAuthUser$.snapshot.value;
+  const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
+  const fireAuthUser = Auth.getFireAuthUserSnapshot();
 
   if (enterButtonDisabled || fireAuthUser === undefined) return;
 
@@ -100,7 +100,7 @@ const resetAllDialogState = (): void => {
 
 /* subscriptions */
 
-UpdateUserInfoDialogStore.openingDialog$
+UpdateUserInfoDialogStore.openingDialogType$
   .chain(withCurrentValueFrom(Auth.fireAuthUser$))
   .subscribe(([openingDialog, fireAuthUser]) => {
     if (openingDialog === undefined) {

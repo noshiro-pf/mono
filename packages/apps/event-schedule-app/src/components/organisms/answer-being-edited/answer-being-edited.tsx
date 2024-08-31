@@ -81,13 +81,9 @@ export const AnswerBeingEdited = memoNamed<Props>(
 
     const forNonLoggedInUserDialogState = useBoolState(false);
 
-    const batchInputFieldIsOpen = useObservableValue(
-      AnswerPageStore.batchInputFieldIsOpen$,
-    );
+    const batchInputFieldIsOpen = AnswerPageStore.useBatchInputFieldIsOpen();
 
-    const checkboxesState = useObservableValue(
-      AnswerPageStore.checkboxesState$,
-    );
+    const checkboxesState = AnswerPageStore.useCheckboxesState();
 
     return (
       <>

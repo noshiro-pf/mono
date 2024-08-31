@@ -71,23 +71,34 @@ export const {
   | undefined
 >(undefined);
 
-export const {
+const {
+  useCurrentValue: useBakaze,
+  getSnapshot: getBakazeSnapshot,
   state: bakaze$,
   setState: setBakaze,
   resetState: resetBakaze,
 } = createState<Bakaze>('Ton');
 
-export const {
+export { getBakazeSnapshot, setBakaze, useBakaze };
+
+const {
+  useCurrentValue: useJikaze,
+  getSnapshot: getJikazeSnapshot,
   state: jikaze$,
   setState: setJikaze,
   resetState: resetJikaze,
 } = createState<Jikaze>('Ton');
 
-export const {
-  state: tehaiType$,
+export { getJikazeSnapshot, setJikaze, useJikaze };
+
+const {
+  useCurrentValue: useTehaiType,
+  getSnapshot: getTehaiTypeSnapshot,
   setState: setTehaiType,
   resetState: resetTehaiType,
 } = createState<TehaiType>('normal');
+
+export { getTehaiTypeSnapshot, setTehaiType, useTehaiType };
 
 export const {
   state: turn$,
@@ -326,7 +337,7 @@ export const setRandomHand = (): void => {
   const mut_yama = pipe(Arr.copy(allTiles)).chain(Arr.asMut).value;
 
   // ドラ表示牌は削除する。
-  const doraIndicators = doraIndicators$.snapshot;
+  const doraIndicators = doraIndicators$.getSnapshot();
   if (Maybe.isSome(doraIndicators)) {
     for (const tile of doraIndicators.value) {
       const i = mut_yama.indexOf(tile);

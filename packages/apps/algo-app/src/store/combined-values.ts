@@ -22,7 +22,7 @@ import { cardPositions$, playerNamePositions$ } from './position';
 const isMyTurn$: InitializedObservable<boolean> = combine([
   gameState$,
   myPlayerIndex$,
-] as const).chain(
+]).chain(
   map(
     ([gameState, myPlayerIndex]) =>
       gameState.currentPlayerIndex === myPlayerIndex,
@@ -32,7 +32,7 @@ const isMyTurn$: InitializedObservable<boolean> = combine([
 export const displayValues$: InitializedObservable<DisplayValues> = combine([
   gameState$,
   myPlayerIndex$,
-] as const).chain(
+]).chain(
   map(([gameState, myPlayerIndex]) =>
     mapToDisplayValue({
       gameState,
@@ -45,7 +45,7 @@ export const displayValues$: InitializedObservable<DisplayValues> = combine([
 export const turnPlayerHighlighterPosition$ = combine([
   playerNamePositions$,
   displayValues$,
-] as const).chain(
+]).chain(
   map(([playerNamePositions, displayValues]) =>
     playerNamePositions === undefined
       ? undefined
@@ -55,7 +55,7 @@ export const turnPlayerHighlighterPosition$ = combine([
 
 export const confirmTossBalloonProps$: InitializedObservable<
   ConfirmTossBalloonProps | undefined
-> = combine([isMyTurn$, gameState$, cardPositions$] as const).chain(
+> = combine([isMyTurn$, gameState$, cardPositions$]).chain(
   map(([isMyTurn, gameState, cardPositions]) => {
     if (!isMyTurn) return undefined;
     if (!gameState.confirmTossBalloonIsOpen) return undefined;
@@ -78,12 +78,7 @@ export const confirmTossBalloonProps$: InitializedObservable<
 
 export const selectAnswerBalloonProps$: InitializedObservable<
   SelectAnswerBalloonProps | undefined
-> = combine([
-  isMyTurn$,
-  gameState$,
-  cardPositions$,
-  displayValues$,
-] as const).chain(
+> = combine([isMyTurn$, gameState$, cardPositions$, displayValues$]).chain(
   map(([isMyTurn, gameState, cardPositions, displayValues]) => {
     if (!isMyTurn) return undefined;
     if (!gameState.selectAnswerBalloonIsOpen) return undefined;
@@ -112,7 +107,7 @@ export const selectAnswerBalloonProps$: InitializedObservable<
 
 export const decidedAnswerBalloonProps$: InitializedObservable<
   DecidedAnswerBalloonProps | undefined
-> = combine([cardPositions$, gameState$, displayValues$] as const).chain(
+> = combine([cardPositions$, gameState$, displayValues$]).chain(
   map(([cardPositions, gameState, displayValues]) => {
     if (cardPositions === undefined) return undefined;
 

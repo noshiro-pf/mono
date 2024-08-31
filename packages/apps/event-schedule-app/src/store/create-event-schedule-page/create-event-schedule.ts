@@ -67,7 +67,7 @@ const restoreFromLocalStorage = (): void => {
       commonStateHandlers.turnOnNotificationSection();
       commonStateHandlers.setNotificationSettingsWithEmail({
         ...ev.notificationSettings,
-        email: Auth.fireAuthUser$.snapshot.value?.email ?? '',
+        email: Auth.getFireAuthUserSnapshot()?.email ?? '',
       });
     }
   }
@@ -94,22 +94,26 @@ const saveToLocalStorage = (
 };
 
 const {
-  state: isLoading$,
+  useCurrentValue: useIsLoading,
   setTrue: setIsLoadingTrue,
   setFalse: setIsLoadingFalse,
 } = createBooleanState(false);
 
 const {
-  state: createResultDialogIsOpen$,
+  useCurrentValue: useCreateResultDialogIsOpen,
   setTrue: openCreateResultDialog,
   setFalse: closeCreateResultDialog,
 } = createBooleanState(false);
 
-const { state: url$, setState: setUrl } = createState<string>('');
+const {
+  useCurrentValue: useUrl,
+  getSnapshot: getUrlSnapshot,
+  setState: setUrl,
+} = createState<string>('');
 
 const createEvent = async (): Promise<Result<undefined, string>> => {
-  const commonState = commonState$.snapshot.value;
-  const fireAuthUser = Auth.fireAuthUser$.snapshot.value;
+  const commonState = commonState$.getSnapshot().value;
+  const fireAuthUser = Auth.getFireAuthUserSnapshot();
 
   const {
     eventScheduleNormalized,
@@ -178,7 +182,7 @@ const onCreateEventClick = (): void => {
 };
 
 const onClipboardButtonClick = (): void => {
-  const url = url$.snapshot.value;
+  const url = getUrlSnapshot();
 
   // https://stackoverflow.com/questions/51805395/navigator-clipboard-is-undefined
   if (
@@ -203,12 +207,12 @@ export const CreateEventScheduleStore = {
   closeCreateResultDialog,
   commonState$,
   commonStateHandlers,
-  createResultDialogIsOpen$,
+  useCreateResultDialogIsOpen,
   hasNoChanges$,
-  isLoading$,
+  useIsLoading,
   onClipboardButtonClick,
   onCreateEventClick,
   resetAllState,
   restoreFromLocalStorage,
-  url$,
+  useUrl,
 } as const;

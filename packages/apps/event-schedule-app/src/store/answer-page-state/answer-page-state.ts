@@ -25,25 +25,30 @@ const toast = createToaster();
 
 /* states */
 
-const { state: selectedAnswerSaved$, setState: setSelectedAnswerSaved } =
+const { state: selectedAnswerSavedState$, setState: setSelectedAnswerSaved } =
   createState<Answer | undefined>(undefined);
 
-const { state: submitButtonIsLoading$, setState: setSubmitButtonIsLoading } =
-  createBooleanState(false);
+const {
+  useCurrentValue: useSubmitButtonIsLoading,
+  setState: setSubmitButtonIsLoading,
+} = createBooleanState(false);
 
 const {
-  state: alertOnAnswerClickIsOpen$,
+  useCurrentValue: useAlertOnAnswerClickIsOpen,
   setTrue: openAlertOnAnswerClick,
   setFalse: closeAlertOnAnswerClick,
 } = createBooleanState(false);
 
 const {
-  state: answerBeingEditedSectionState$,
+  useCurrentValue: useAnswerBeingEditedSectionState,
+  getSnapshot: getAnswerBeingEditedSectionStateSnapshot,
   setState: setAnswerBeingEditedSectionState_,
 } = createState<'creating' | 'editing' | 'hidden'>('hidden');
 
 const {
+  useCurrentValue: useAnswerBeingEdited,
   state: answerBeingEdited$,
+  getSnapshot: getAnswerBeingEditedSnapshot,
   setState: setAnswerBeingEdited,
   updateState: updateAnswerBeingEdited,
 } = createState(answerDefaultValue);
@@ -55,7 +60,7 @@ const setAnswerBeingEditedSectionState = (
 
   // 回答追加開始時にデフォルトで「回答を保護する」を有効にする
   if (nextState === 'creating') {
-    const user = Auth.fireAuthUser$.snapshot.value;
+    const user = Auth.getFireAuthUserSnapshot();
 
     updateAnswerBeingEdited((ans) =>
       Obj.set(
@@ -71,7 +76,8 @@ const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =
   createVoidEventEmitter();
 
 const {
-  state: checkboxesState$,
+  getSnapshot: getCheckboxesStateSnapshot,
+  useCurrentValue: useCheckboxesState,
   setState: setCheckboxesState,
   updateState: updateCheckboxesState,
   resetState: resetCheckboxesState,
@@ -83,8 +89,10 @@ const {
   ),
 );
 
-const { state: batchInputFieldIsOpen$, toggle: toggleBatchInputField_ } =
-  createBooleanState(false);
+const {
+  useCurrentValue: useBatchInputFieldIsOpen,
+  toggle: toggleBatchInputField_,
+} = createBooleanState(false);
 
 const toggleBatchInputField = (): void => {
   toggleBatchInputField_();
@@ -93,7 +101,7 @@ const toggleBatchInputField = (): void => {
 
 /* mapped values */
 
-const selectedAnswerUserName$ = selectedAnswerSaved$.chain(
+const selectedAnswerUserName$ = selectedAnswerSavedState$.chain(
   map((selectedAnswerSaved) => selectedAnswerSaved?.user.name),
 );
 
@@ -157,7 +165,7 @@ const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combine([
 
 const submitButtonIsDisabled$: InitializedObservable<boolean> = combine([
   answerBeingEdited$,
-  selectedAnswerSaved$,
+  selectedAnswerSavedState$,
   theNameIsAlreadyUsed$,
 ]).chain(
   map(
@@ -262,13 +270,13 @@ const onAddAnswerButtonClickImpl = (user: FireAuthUser | undefined): void => {
 const onSubmitAnswerImpl = async (
   eventId: string | undefined,
   answerBeingEdited: Answer,
-  answerBeingEditedSectionState: 'creating' | 'editing' | 'hidden',
+  answerBeingEditedSection: 'creating' | 'editing' | 'hidden',
 ): Promise<void> => {
   if (eventId === undefined) return;
 
   setSubmitButtonIsLoading(true);
 
-  switch (answerBeingEditedSectionState) {
+  switch (answerBeingEditedSection) {
     case 'creating':
       await api.answers
         .add(eventId, Obj.set(answerBeingEdited, 'createdAt', DateUtils.now()))
@@ -426,53 +434,53 @@ const toggleProtectedSectionImpl = (user: FireAuthUser | undefined): void => {
 
 /* subscriptions */
 
-combine([emptyAnswerSelection$, resetAnswerBeingEditedAction$] as const)
+combine([emptyAnswerSelection$, resetAnswerBeingEditedAction$])
   .chain(map(([x, _]) => x))
   .subscribe(setAnswerBeingEdited);
 
 /* callbacks using subscribed values */
 
 const onAnswerClick = (answer: Answer): void => {
-  onAnswerClickImpl(answer, Auth.fireAuthUser$.snapshot.value);
+  onAnswerClickImpl(answer, Auth.getFireAuthUserSnapshot());
 };
 
 const onAddAnswerButtonClick = (): void => {
-  onAddAnswerButtonClickImpl(Auth.fireAuthUser$.snapshot.value);
+  onAddAnswerButtonClickImpl(Auth.getFireAuthUserSnapshot());
 };
 
 const onEditButtonClick = (): void => {
-  onEditButtonClickImpl(Router.eventId$.snapshot.value);
+  onEditButtonClickImpl(Router.eventId$.getSnapshot().value);
 };
 
 const onSubmitAnswerClickPromise = (): Promise<void> =>
   onSubmitAnswerImpl(
-    Router.eventId$.snapshot.value,
-    answerBeingEdited$.snapshot.value,
-    answerBeingEditedSectionState$.snapshot.value,
+    Router.eventId$.getSnapshot().value,
+    getAnswerBeingEditedSnapshot(),
+    getAnswerBeingEditedSectionStateSnapshot(),
   );
 
 const onSubmitAnswerClick = (): void => {
   onSubmitAnswerImpl(
-    Router.eventId$.snapshot.value,
-    answerBeingEdited$.snapshot.value,
-    answerBeingEditedSectionState$.snapshot.value,
+    Router.eventId$.getSnapshot().value,
+    getAnswerBeingEditedSnapshot(),
+    getAnswerBeingEditedSectionStateSnapshot(),
   ).catch(noop);
 };
 
 const onSubmitEmptyAnswerClick = (): Promise<void> =>
   onSubmitEmptyAnswerImpl(
-    Router.eventId$.snapshot.value,
-    Auth.fireAuthUser$.snapshot.value,
+    Router.eventId$.getSnapshot().value,
+    Auth.getFireAuthUserSnapshot(),
   );
 
 const onDeleteAnswerClick = (): Promise<void> =>
   onDeleteAnswerImpl(
-    Router.eventId$.snapshot.value,
-    answerBeingEdited$.snapshot.value,
+    Router.eventId$.getSnapshot().value,
+    getAnswerBeingEditedSnapshot(),
   );
 
 const toggleProtectedSection = (): void => {
-  toggleProtectedSectionImpl(Auth.fireAuthUser$.snapshot.value);
+  toggleProtectedSectionImpl(Auth.getFireAuthUserSnapshot());
 };
 
 const applyBatchInput = ({
@@ -489,7 +497,7 @@ const applyBatchInput = ({
     comment,
     selectedIconId,
     point,
-    checkboxState: checkboxesState$.snapshot.value,
+    checkboxState: getCheckboxesStateSnapshot(),
   });
 };
 
@@ -633,7 +641,7 @@ const answerBeingEditedList$: InitializedObservable<
 );
 
 const onCheckAll = (checked: boolean): void => {
-  const dates = eventSchedule$.snapshot.value?.datetimeRangeList ?? [];
+  const dates = eventSchedule$.getSnapshot().value?.datetimeRangeList ?? [];
 
   if (checked) {
     setCheckboxesState(
@@ -658,10 +666,10 @@ const hasUnanswered$: InitializedObservable<boolean> =
   );
 
 export const AnswerPageStore = {
-  alertOnAnswerClickIsOpen$,
-  answerBeingEdited$,
+  useAlertOnAnswerClickIsOpen,
+  useAnswerBeingEdited,
   answerBeingEditedList$,
-  answerBeingEditedSectionState$,
+  useAnswerBeingEditedSectionState,
   hasUnanswered$,
   iconHeader$,
   requiredParticipantsExist$,
@@ -669,10 +677,10 @@ export const AnswerPageStore = {
   selectedDates$,
   setYearMonth$,
   submitButtonIsDisabled$,
-  submitButtonIsLoading$,
+  useSubmitButtonIsLoading,
   theNameIsAlreadyUsed$,
-  checkboxesState$,
-  batchInputFieldIsOpen$,
+  useCheckboxesState,
+  useBatchInputFieldIsOpen,
   closeAlertOnAnswerClick,
   onAddAnswerButtonClick,
   onAnswerClick,
