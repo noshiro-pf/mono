@@ -18,7 +18,13 @@ export type Type<A> = Readonly<{
   cast: (a: unknown) => A;
   fill: (a: unknown) => A;
   validate: (a: unknown) => Result<A, readonly string[]>;
+
+  /** Used in record type */
   optional?: true;
 }>;
 
 export type TypeOf<A extends Type<unknown>> = A['defaultValue'];
+
+export type OptionalType<A> = MergeIntersection<
+  Type<A> & Readonly<{ optional: true }>
+>;

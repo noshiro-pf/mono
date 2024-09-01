@@ -1,4 +1,4 @@
-import { ISet, isRecord, Result, tp } from '@noshiro/ts-utils';
+import { isRecord, Result, tp } from '@noshiro/ts-utils';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -7,35 +7,27 @@ import {
   validationErrorMessage,
 } from '../utils/index.mjs';
 
-export const record = <
-  const A extends Record<string, Type<unknown>>,
-  const OptionalKeyList extends readonly (keyof A)[] = [],
->(
-  recordType: A,
+export const record = <const R extends Record<string, Type<unknown>>>(
+  source: R,
   options?: Partial<
     Readonly<{
       typeName: string;
-      optionalKeys: OptionalKeyList;
     }>
   >,
-): Type<RecordResultType<A, OptionalKeyList>> => {
-  type T = RecordResultType<A, OptionalKeyList>;
+): Type<RecordTypeValue<R>> => {
+  type T = RecordTypeValue<R>;
 
   const typeNameFilled: string =
     options?.typeName ??
-    `{ ${Object.entries(recordType)
+    `{ ${Object.entries(source)
       .map(([k, v]) => `${k}: ${v.typeName}`)
       .join(', ')} }`;
 
-  const defaultValue =
+  const defaultValue: Type<T>['defaultValue'] =
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Object.fromEntries(
-      Object.entries(recordType).map(([key, value]) =>
-        tp(key, value.defaultValue),
-      ),
+      Object.entries(source).map(([key, value]) => tp(key, value.defaultValue)),
     ) as T;
-
-  const optionalKeys = ISet.new(options?.optionalKeys ?? []);
 
   const validate: Type<T>['validate'] = (a) => {
     if (!isRecord(a)) {
@@ -44,9 +36,9 @@ export const record = <
       ]);
     }
 
-    for (const [k, valueType] of Object.entries(recordType)) {
+    for (const [k, valueType] of Object.entries(source)) {
       if (!Object.hasOwn(a, k)) {
-        if (optionalKeys.has(k) || recordType[k]?.optional === true) continue;
+        if (source[k]?.optional === true) continue;
 
         return Result.err([`The record is expected to have the key "${k}".`]);
       }
@@ -72,7 +64,7 @@ export const record = <
     isRecord(a)
       ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (Object.fromEntries(
-          Object.entries(recordType).map(([k, v]) =>
+          Object.entries(source).map(([k, v]) =>
             tp(k, Object.hasOwn(a, k) ? v.fill(a[k]) : v.defaultValue),
           ),
         ) as T)
@@ -89,25 +81,25 @@ export const record = <
   };
 };
 
-type RecordResultType<
-  A extends Record<string, Type<unknown>>,
-  OptionalKeyList extends readonly (keyof A)[],
-> = RecordResultTypeImpl<
-  A,
-  ArrayElement<OptionalKeyList> | OptionalTypeKeys<A>
->;
+type RecordTypeValue<R extends Record<string, Type<unknown>>> =
+  IoTsInternal.RecordTypeValueImpl<R>;
 
-type RecordResultTypeImpl<
-  A extends Record<string, Type<unknown>>,
-  OptionalKeys extends keyof A,
-> = Readonly<
-  {
-    [key in OptionalKeys]?: TypeOf<A[key]>;
-  } & {
-    [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]>;
-  }
->;
+namespace IoTsInternal {
+  export type RecordTypeValueImpl<R extends Record<string, Type<unknown>>> =
+    RecordTypeValueImplSub<R, OptionalTypeKeys<R>>;
 
-type OptionalTypeKeys<A extends Record<string, Type<unknown>>> = {
-  [K in keyof A]: A[K] extends { optional: true } ? K : never;
-}[keyof A];
+  type RecordTypeValueImplSub<
+    A extends Record<string, Type<unknown>>,
+    OptionalKeys extends keyof A,
+  > = Readonly<
+    {
+      [key in OptionalKeys]?: TypeOf<A[key]>;
+    } & {
+      [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]>;
+    }
+  >;
+
+  type OptionalTypeKeys<A extends Record<string, Type<unknown>>> = {
+    [K in keyof A]: A[K] extends { optional: true } ? K : never;
+  }[keyof A];
+}
