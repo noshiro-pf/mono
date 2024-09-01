@@ -69,7 +69,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@fontsource/roboto": "^5.0.13",
-    "@mui/icons-material": "^5.15.21",
+    "@mui/icons-material": "^6.0.1",
     "@mui/material": "^5.15.14",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
