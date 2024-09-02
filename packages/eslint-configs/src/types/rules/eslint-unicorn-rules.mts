@@ -1324,7 +1324,7 @@ namespace NoUnnecessaryPolyfills {
    * ```
    */
   export type Options = {
-    readonly targets: Record<string, unknown> | string | readonly unknown[];
+    readonly targets: UnknownRecord | string | readonly unknown[];
   };
 
   export type RuleEntry =

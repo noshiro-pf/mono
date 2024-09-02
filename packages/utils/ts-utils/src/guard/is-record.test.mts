@@ -7,11 +7,11 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    expectType<typeof obj, Record<string, unknown>>('<=');
+    expectType<typeof obj, UnknownRecord>('<=');
     expectType<typeof res, boolean>('=');
 
     if (res) {
-      expectType<typeof unk, Record<string, unknown>>('=');
+      expectType<typeof unk, UnknownRecord>('=');
     }
 
     expect(res).toBe(true);
@@ -22,11 +22,11 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    expectType<typeof obj, Record<string, unknown>>('<=');
+    expectType<typeof obj, UnknownRecord>('<=');
     expectType<typeof res, boolean>('=');
 
     if (res) {
-      expectType<typeof unk, Record<string, unknown>>('=');
+      expectType<typeof unk, UnknownRecord>('=');
     }
 
     expect(res).toBe(true);
@@ -37,7 +37,7 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    expectType<typeof obj, Record<string, unknown>>('!=');
+    expectType<typeof obj, UnknownRecord>('!=');
     expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
@@ -48,7 +48,7 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    expectType<typeof obj, Record<string, unknown>>('!=');
+    expectType<typeof obj, UnknownRecord>('!=');
     expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
@@ -59,7 +59,7 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    expectType<typeof obj, Record<string, unknown>>('!=');
+    expectType<typeof obj, UnknownRecord>('!=');
     expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
@@ -70,7 +70,7 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    expectType<typeof obj, Record<string, unknown>>('!=');
+    expectType<typeof obj, UnknownRecord>('!=');
     expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
@@ -81,7 +81,7 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    expectType<typeof obj, Record<string, unknown>>('!=');
+    expectType<typeof obj, UnknownRecord>('!=');
     expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
@@ -92,7 +92,7 @@ describe('isRecord', () => {
   //   const unk: unknown = obj;
   //   const res = isRecord(unk);
 
-  //   assertNotType<typeof obj, Record<string, unknown>>("<=");
+  //   assertNotType<typeof obj, UnknownRecord>("<=");
   //   expectType<typeof res, boolean>("=");
 
   //   expect(res).toBe(false);
@@ -103,7 +103,7 @@ describe('isRecord', () => {
   //   const unk: unknown = obj;
   //   const res = isRecord(unk);
 
-  //   assertNotType<typeof obj, Record<string, unknown>>("<=");
+  //   assertNotType<typeof obj, UnknownRecord>("<=");
   //   expectType<typeof res, boolean>("=");
 
   //   expect(res).toBe(false);

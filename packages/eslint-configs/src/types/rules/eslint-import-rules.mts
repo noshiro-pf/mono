@@ -1067,7 +1067,7 @@ namespace NoUnusedModules {
       }
     | {
         readonly unusedExports: true;
-        readonly src?: Record<string, unknown>;
+        readonly src?: UnknownRecord;
         readonly [k: string]: unknown;
       }
   );
@@ -1606,7 +1606,7 @@ namespace Order {
     readonly distinctGroup?: boolean;
     readonly pathGroups?: readonly {
       readonly pattern: string;
-      readonly patternOptions?: Record<string, unknown>;
+      readonly patternOptions?: UnknownRecord;
       readonly group:
         | 'builtin'
         | 'external'

@@ -2789,7 +2789,7 @@ namespace JsxPropsNoSpreading {
    * ]
    * ```
    */
-  export type Options = Record<string, unknown> & {
+  export type Options = UnknownRecord & {
     readonly html?: 'enforce' | 'ignore';
     readonly custom?: 'enforce' | 'ignore';
     readonly exceptions?: readonly string[];

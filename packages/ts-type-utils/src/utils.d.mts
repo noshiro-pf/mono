@@ -194,7 +194,7 @@ type ArrayAtLeastLen<N extends number, Elm> = readonly [
 //       readonly [unknown, ...C]
 //     >;
 
-type MergeIntersection<R extends Record<string, unknown>> = {
+type MergeIntersection<R extends UnknownRecord> = {
   [K in keyof R]: R[K];
 };
 

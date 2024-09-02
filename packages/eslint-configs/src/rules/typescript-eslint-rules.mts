@@ -19,8 +19,8 @@ export const banTypes: TypeScriptEslintRulesOption['@typescript-eslint/no-restri
       message: 'Use `Json` from @noshiro/ts-utils instead.',
     },
     object: {
-      message: 'Use `Record<string, unknown>` instead.',
-      fixWith: 'Record<string, unknown>',
+      message: 'Use `UnknownRecord` instead.',
+      fixWith: 'UnknownRecord',
     },
   } as const;
 
