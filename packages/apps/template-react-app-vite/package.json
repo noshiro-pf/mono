@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.5",
+    "@emotion/styled": "^11.13.0",
     "@noshiro/io-ts": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
