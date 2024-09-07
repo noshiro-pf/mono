@@ -37,7 +37,7 @@
     "zz:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
-    "@emotion/styled": "^11.11.5",
+    "@emotion/styled": "^11.13.0",
     "@noshiro/react-utils": "*",
     "@noshiro/resize-observer-react-hooks": "*",
     "@noshiro/ts-utils": "*",
