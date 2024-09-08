@@ -265,3 +265,23 @@ type PartiallyRequired<T, K extends keyof T> = MergeIntersection<
     [P in Exclude<keyof T, K>]: T[P];
   }
 >;
+
+type Intersection<Types extends readonly unknown[]> =
+  TSTypeUtilsInternals.Intersection<Types>;
+
+declare namespace TSTypeUtilsInternals {
+  export type Intersection<Types extends readonly unknown[]> = MergeIfRecords<
+    IntersectionImpl<Types>
+  >;
+
+  type IntersectionImpl<Types extends readonly unknown[]> =
+    Types extends readonly []
+      ? unknown
+      : Types extends readonly [infer Head, ...infer Tail]
+        ? Head & IntersectionImpl<Tail>
+        : never;
+
+  type MergeIfRecords<R> = [R] extends [UnknownRecord]
+    ? MergeIntersection<R>
+    : R;
+}
