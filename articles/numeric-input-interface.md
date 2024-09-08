@@ -100,7 +100,7 @@ https://goshacmd.com/controlled-vs-uncontrolled-inputs-react/
 
     const onChange = React.useCallback(
       (ev: React.ChangeEvent<HTMLInputElement>) => {
--       setNum(ev.target.valueAsNumber);
+-       setStr(ev.target.value);
 +       setNum(ev.target.valueAsNumber);
       },
       []
