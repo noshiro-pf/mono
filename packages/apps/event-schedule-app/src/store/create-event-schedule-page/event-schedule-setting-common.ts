@@ -197,9 +197,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
             notificationSettings:
               notificationSettingsWithEmail === undefined
                 ? 'none'
-                : Obj.removeProperties(notificationSettingsWithEmail, [
-                    'email',
-                  ]),
+                : Obj.omit(notificationSettingsWithEmail, ['email']),
             timezoneOffsetMinutes:
               eventScheduleDefaultValue.timezoneOffsetMinutes,
             author: {

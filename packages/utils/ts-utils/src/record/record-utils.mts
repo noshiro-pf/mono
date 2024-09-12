@@ -102,15 +102,28 @@ const updateIn = <const R extends UnknownRecord, const Path extends Paths<R>>(
     updater as (prev: unknown) => unknown,
   ) as R;
 
-const removeProperties = <
+const pick = <
   const R extends UnknownRecord,
-  const K extends keyof R,
+  const Keys extends readonly (keyof R)[],
 >(
   record: R,
-  keys: readonly K[],
-): Readonly<{
-  [Key in Exclude<keyof R, K>]: R[Key];
-}> => {
+  keys: Keys,
+): Pick<R, ArrayElement<Keys>> => {
+  // eslint-disable-next-line no-restricted-globals
+  const keysSet = new Set<keyof R>(keys);
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  return Object.fromEntries(
+    Object.entries(record).filter(([k, _v]) => keysSet.has(k)),
+  ) as never;
+};
+
+const omit = <
+  const R extends UnknownRecord,
+  const Keys extends readonly (keyof R)[],
+>(
+  record: R,
+  keys: Keys,
+): Omit<R, ArrayElement<Keys>> => {
   // eslint-disable-next-line no-restricted-globals
   const keysSet = new Set<keyof R>(keys);
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -181,7 +194,8 @@ export const RecordUtils = {
   getIn,
   setIn,
   updateIn,
-  removeProperties,
+  pick,
+  omit,
   merge,
   hasKeyValue,
 } as const;

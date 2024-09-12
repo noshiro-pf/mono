@@ -40,7 +40,7 @@ describe('RecordUtils', () => {
 
   describe('set', () => {
     {
-      const result = RecordUtils.set(rcd, 'x', { a: 0, b: 0 } as const);
+      const result = RecordUtils.set(rcd, 'x', { a: 0, b: 0 });
 
       expectType<typeof result, R0>('=');
 
@@ -69,11 +69,10 @@ describe('RecordUtils', () => {
 
   describe('update', () => {
     {
-      const result = RecordUtils.update(
-        rcd,
-        'x',
-        (curr) => ({ a: curr.a + 1, b: curr.b + 2 }) as const,
-      );
+      const result = RecordUtils.update(rcd, 'x', (curr) => ({
+        a: curr.a + 1,
+        b: curr.b + 2,
+      }));
 
       expectType<typeof result, R0>('=');
 
@@ -104,7 +103,7 @@ describe('RecordUtils', () => {
 
   describe('getIn', () => {
     {
-      const result = RecordUtils.getIn(rcd, [] as const);
+      const result = RecordUtils.getIn(rcd, []);
 
       expectType<typeof result, R0>('=');
 
@@ -117,7 +116,7 @@ describe('RecordUtils', () => {
       });
     }
     {
-      const result = RecordUtils.getIn(rcd, ['y', 'c', 'd'] as const);
+      const result = RecordUtils.getIn(rcd, ['y', 'c', 'd']);
 
       expectType<typeof result, number>('=');
 
@@ -188,7 +187,7 @@ describe('RecordUtils', () => {
 
   describe('updateIn', () => {
     {
-      const result = RecordUtils.updateIn(rcd, [] as const, (curr) => curr);
+      const result = RecordUtils.updateIn(rcd, [], (curr) => curr);
 
       expectType<typeof result, R0>('=');
 
@@ -199,7 +198,7 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.updateIn(
         rcd,
-        ['y', 'c', 'd'] as const,
+        ['y', 'c', 'd'],
         (curr) => curr + 1000,
       );
 
@@ -214,7 +213,7 @@ describe('RecordUtils', () => {
       });
     }
     {
-      const result = RecordUtils.updateIn(rcd, ['y', 'c'] as const, (curr) => ({
+      const result = RecordUtils.updateIn(rcd, ['y', 'c'], (curr) => ({
         d: curr.d + 1000,
         '4': curr[4] + 2000,
       }));
@@ -231,17 +230,26 @@ describe('RecordUtils', () => {
     }
   });
 
-  describe('removeProperties', () => {
+  describe('pick', () => {
     {
-      const result = RecordUtils.removeProperties(rcd, ['x'] as const);
+      const result = RecordUtils.pick(rcd, ['x', 'y']);
 
-      expectType<
-        typeof result,
-        DeepReadonly<{
-          y: { c: { d: number; 4: number } };
-          z: [number, number, number];
-        }>
-      >('=');
+      expectType<typeof result, Pick<R0, 'x' | 'y'>>('=');
+
+      test('case 1', () => {
+        expect(result).toStrictEqual({
+          x: { a: 1, b: 2 },
+          y: { c: { d: 3, 4: 5 } },
+        });
+      });
+    }
+  });
+
+  describe('omit', () => {
+    {
+      const result = RecordUtils.omit(rcd, ['x']);
+
+      expectType<typeof result, Omit<R0, 'x'>>('=');
 
       test('case 1', () => {
         expect(result).toStrictEqual({
@@ -251,7 +259,7 @@ describe('RecordUtils', () => {
       });
     }
     {
-      const result = RecordUtils.removeProperties(rcd, ['y', 'z'] as const);
+      const result = RecordUtils.omit(rcd, ['y', 'z']);
 
       expectType<
         typeof result,
@@ -270,7 +278,7 @@ describe('RecordUtils', () => {
 
   describe('merge', () => {
     {
-      const result = RecordUtils.merge(rcd, { a: 1, b: 2 } as const);
+      const result = RecordUtils.merge(rcd, { a: 1, b: 2 });
 
       expectType<
         typeof result,
@@ -298,7 +306,7 @@ describe('RecordUtils', () => {
         x: 1,
         y: { p: '3', q: '4' },
         a: 1,
-      } as const);
+      });
 
       expectType<
         typeof result,
@@ -356,7 +364,7 @@ describe('RecordUtils', () => {
       ['y', 2],
       ['z', 3],
       [4, 3],
-    ] as const;
+    ];
 
     const obj0 = Object.fromEntries(entries);
 
