@@ -77,7 +77,7 @@
   },
   "devDependencies": {
     "@noshiro/mono-scripts": "*",
-    "json-schema-to-typescript": "^14.0.4"
+    "json-schema-to-typescript": "^15.0.2"
   },
   "wireit": {
     "gen-rules-type": {
