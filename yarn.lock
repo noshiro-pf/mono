@@ -14433,10 +14433,10 @@ pixi.js@5.3.12:
     "@pixi/ticker" "5.3.12"
     "@pixi/utils" "5.3.12"
 
-pixi.js@^8.0.5:
-  version "8.0.5"
-  resolved "https://registry.yarnpkg.com/pixi.js/-/pixi.js-8.0.5.tgz#4bfc2aef87577663e8e3d4b666bc9ec86af7b11f"
-  integrity sha512-4v88YaMNg0/APoTnje0MFDQt5S7nRM6/yvrZkIxIgqgjs7zMIaxpOl2UDDUDXj/XwdD5lKJAz/H7rVukOepwyQ==
+pixi.js@^8.4.1:
+  version "8.4.1"
+  resolved "https://registry.yarnpkg.com/pixi.js/-/pixi.js-8.4.1.tgz#138c930ede851e3056f32ec08d6a1539caf187b7"
+  integrity sha512-3ZbEIkLYYi602UB5wuN7kPz3VsGHoJa6nxD8ustvMLRySxHAR9Z8tCAYY8ISgNplpPbaDw03B0yTD4/k9f6cAQ==
   dependencies:
     "@pixi/colord" "^2.9.6"
     "@types/css-font-loading-module" "^0.0.12"
