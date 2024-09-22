@@ -30,7 +30,7 @@ type Exclude<T, U extends T> = T extends U ? never : T;
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 /** Extract from T those types that are assignable to U */
-type Extract<T, U> = T extends U ? T : never;
+type Extract<T, U extends T> = T extends U ? T : never;
 
 /** Construct a type with a set of properties K of type T */
 type Record<K extends keyof never, T> = {
