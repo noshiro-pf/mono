@@ -7,7 +7,7 @@ export type BboxPoint = Readonly<{
   position: Point;
 }>;
 
-export type BboxPoints = Readonly<{ [key in Direction]: Point }>;
+export type BboxPoints = Readonly<{ [_key in Direction]: Point }>;
 
 /*
  *     x0    x1    x2
