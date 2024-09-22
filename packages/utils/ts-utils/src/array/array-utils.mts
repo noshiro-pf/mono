@@ -742,6 +742,19 @@ const sortedNumSetDifference = <T extends number>(
   return mut_result;
 };
 
+const chunk = <T,>(
+  array: readonly T[],
+  chunkSize: NumberType.ArraySizeArgPositive,
+): readonly (readonly T[])[] => {
+  const mut_chunk: (readonly T[])[] = [];
+
+  for (let mut_i = 0; mut_i < array.length; mut_i += chunkSize) {
+    mut_chunk.push(array.slice(toUint32(mut_i), toUint32(mut_i + chunkSize)));
+  }
+
+  return mut_chunk;
+};
+
 export const ArrayUtils = {
   isEmpty,
   isNonEmpty,
@@ -812,6 +825,7 @@ export const ArrayUtils = {
   maxBy,
   uniq,
   uniqBy,
+  chunk,
 } as const;
 
 export const Arr = ArrayUtils; // alias
