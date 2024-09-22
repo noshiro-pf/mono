@@ -1,19 +1,24 @@
 import { expectType, Result, toInt } from '@noshiro/ts-utils';
 import { array } from './array/index.mjs';
 import { int } from './branded/index.mjs';
+import { uintRange } from './enum/index.mjs';
 import { number } from './primitives/index.mjs';
-import { record } from './record/index.mjs';
+import { optional, pick, record } from './record/index.mjs';
 import { type TypeOf } from './type.mjs';
-import { uintRange } from './uint-range/index.mjs';
 import { unknown } from './unknown.mjs';
 
 describe('nested record', () => {
   const nestedRecord = record({
     xs: array(int(toInt(2))),
-    rec: record({
-      a: uintRange({ start: 0, end: 11, defaultValue: 0 }),
-      b: uintRange({ start: 0, end: 11, defaultValue: 0 }),
-    }),
+    rec: pick(
+      record({
+        a: uintRange({ start: 0, end: 11, defaultValue: 0 }),
+        b: uintRange({ start: 0, end: 11, defaultValue: 0 }),
+        c: optional(uintRange({ start: 3, end: 6, defaultValue: 3 })),
+        d: unknown(),
+      }),
+      ['a', 'b', 'c'],
+    ),
     meta: number(100),
     u: unknown(),
   });
@@ -27,6 +32,7 @@ describe('nested record', () => {
       rec: Readonly<{
         a: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
         b: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+        c?: 3 | 4 | 5;
       }>;
       meta: number;
       u: unknown;
@@ -42,6 +48,7 @@ describe('nested record', () => {
         rec: {
           a: 1,
           b: 2,
+          c: 3,
         },
         meta: 3,
         u: undefined,
@@ -62,6 +69,7 @@ describe('nested record', () => {
         rec: {
           a: 123,
           b: 234,
+          c: 3,
         },
         meta: 345,
         u: undefined,
@@ -84,6 +92,7 @@ describe('nested record', () => {
         rec: {
           a: 123,
           b: 234,
+          c: 3,
         },
         meta: 345,
         u: undefined,
@@ -106,6 +115,7 @@ describe('nested record', () => {
         rec: {
           a: 0,
           b: 0,
+          c: 3,
         },
         meta: 100,
         u: undefined,
@@ -118,6 +128,7 @@ describe('nested record', () => {
         rec: {
           a: 123,
           b: 234,
+          c: 3,
         },
         meta: 345,
         u: undefined,
@@ -128,6 +139,7 @@ describe('nested record', () => {
         rec: {
           a: 0,
           b: 0,
+          c: 3,
         },
         meta: 345,
         u: undefined,
@@ -147,6 +159,7 @@ describe('nested record', () => {
         rec: {
           a: 3,
           b: 0,
+          c: 3,
         },
         meta: 100,
         u: undefined,
@@ -158,7 +171,7 @@ describe('nested record', () => {
         xs: [11, 22],
         rec: {
           a: 3,
-          c: 9988,
+          d: 9988,
         },
         u: undefined,
         aaaaa: [9999],
@@ -169,6 +182,7 @@ describe('nested record', () => {
         rec: {
           a: 3,
           b: 0,
+          c: 3,
         },
         meta: 100,
         u: undefined,

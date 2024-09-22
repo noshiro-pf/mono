@@ -5,8 +5,5 @@ https://github.com/gcanti/io-ts/blob/master/index.md#implemented-types--combinat
 -   void
 -   function type
 -   UnknownRecord
--   partial
--   intersection
-    -   mergeRecord も必要かも（key 重複時の挙動定義のため）
--   keyof
+-   mergeRecord も必要かも（key 重複時の挙動を定義した intersection）
 -   recursion
