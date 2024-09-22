@@ -89,12 +89,11 @@ function getNameFromMember(
   return sourceCode.text.slice(...member.key.range);
 }
 
-type ExcludeKeys<
-  TObj extends Record<string, unknown>,
-  TKeys extends keyof TObj,
-> = { [k in Exclude<keyof TObj, TKeys>]: TObj[k] };
+type ExcludeKeys<TObj extends UnknownRecord, TKeys extends keyof TObj> = {
+  [k in Exclude<keyof TObj, TKeys>]: TObj[k];
+};
 type RequireKeys<
-  TObj extends Record<string, unknown>,
+  TObj extends UnknownRecord,
   TKeys extends keyof TObj,
 > = ExcludeKeys<TObj, TKeys> & { [k in TKeys]-?: Exclude<TObj[k], undefined> };
 

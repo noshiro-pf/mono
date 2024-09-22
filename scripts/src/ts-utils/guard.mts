@@ -1,4 +1,4 @@
-export const isRecord = (a: unknown): a is Record<string, unknown> =>
+export const isRecord = (a: unknown): a is UnknownRecord =>
   typeof a === 'object' && a !== null && !Array.isArray(a);
 
 export const isNotUndefined = <T,>(a: T): a is RelaxedExclude<T, undefined> =>

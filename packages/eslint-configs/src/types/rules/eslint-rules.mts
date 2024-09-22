@@ -5639,7 +5639,7 @@ namespace NoConstructorReturn {
    * {}
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity

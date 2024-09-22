@@ -62,7 +62,7 @@ namespace StrictDependencies {
 
   export type Options1 = {
     readonly resolveRelativeImport?: boolean;
-    readonly pathIndexMap?: Record<string, unknown>;
+    readonly pathIndexMap?: UnknownRecord;
     readonly [k: string]: unknown;
   };
 

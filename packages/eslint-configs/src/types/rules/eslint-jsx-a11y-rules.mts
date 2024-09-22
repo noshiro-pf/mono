@@ -288,7 +288,7 @@ namespace AriaActivedescendantHasTabindex {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -318,7 +318,7 @@ namespace AriaProps {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -348,7 +348,7 @@ namespace AriaProptypes {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -426,7 +426,7 @@ namespace AriaUnsupportedElements {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -499,7 +499,7 @@ namespace ClickEventsHaveKeyEvents {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -647,7 +647,7 @@ namespace HtmlHasLang {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -677,7 +677,7 @@ namespace IframeHasTitle {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -1046,7 +1046,7 @@ namespace Lang {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -1194,7 +1194,7 @@ namespace NoAccessKey {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -1224,7 +1224,7 @@ namespace NoAriaHiddenOnFocusable {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -1617,7 +1617,7 @@ namespace PreferTagOverRole {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -1648,7 +1648,7 @@ namespace RoleHasRequiredAriaProps {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -1679,7 +1679,7 @@ namespace RoleSupportsAriaProps {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -1709,7 +1709,7 @@ namespace Scope {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -1739,7 +1739,7 @@ namespace TabindexNoPositive {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, unknown>>;
+  export type Options = UnknownRecord;
 
   export type RuleEntry =
     | Linter.RuleSeverity
