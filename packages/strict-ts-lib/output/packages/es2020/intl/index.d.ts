@@ -252,7 +252,26 @@ declare namespace Intl {
     ): UnicodeBCP47LocaleIdentifier[];
   };
 
+  interface NumberFormatOptionsStyleRegistry {
+    readonly unit: never;
+  }
+
+  interface NumberFormatOptionsCurrencyDisplayRegistry {
+    readonly narrowSymbol: never;
+  }
+
+  interface NumberFormatOptionsSignDisplayRegistry {
+    readonly auto: never;
+    readonly never: never;
+    readonly always: never;
+    readonly exceptZero: never;
+  }
+
+  type NumberFormatOptionsSignDisplay =
+    keyof NumberFormatOptionsSignDisplayRegistry;
+
   interface NumberFormatOptions {
+    readonly numberingSystem?: string | undefined;
     readonly compactDisplay?: 'short' | 'long' | undefined;
     readonly notation?:
       | 'standard'
@@ -260,26 +279,28 @@ declare namespace Intl {
       | 'engineering'
       | 'compact'
       | undefined;
-    readonly signDisplay?:
-      | 'auto'
-      | 'never'
-      | 'always'
-      | 'exceptZero'
-      | undefined;
+    readonly signDisplay?: NumberFormatOptionsSignDisplay | undefined;
     readonly unit?: string | undefined;
     readonly unitDisplay?: 'short' | 'long' | 'narrow' | undefined;
-    readonly currencyDisplay?: string | undefined;
-    readonly currencySign?: string | undefined;
+    readonly currencySign?: 'standard' | 'accounting' | undefined;
   }
 
   interface ResolvedNumberFormatOptions {
     readonly compactDisplay?: 'short' | 'long';
-    readonly notation?: 'standard' | 'scientific' | 'engineering' | 'compact';
-    readonly signDisplay?: 'auto' | 'never' | 'always' | 'exceptZero';
+    readonly notation: 'standard' | 'scientific' | 'engineering' | 'compact';
+    readonly signDisplay: NumberFormatOptionsSignDisplay;
     readonly unit?: string;
     readonly unitDisplay?: 'short' | 'long' | 'narrow';
-    readonly currencyDisplay?: string;
-    readonly currencySign?: string;
+    readonly currencySign?: 'standard' | 'accounting';
+  }
+
+  interface NumberFormatPartTypeRegistry {
+    readonly compact: never;
+    readonly exponentInteger: never;
+    readonly exponentMinusSign: never;
+    readonly exponentSeparator: never;
+    readonly unit: never;
+    readonly unknown: never;
   }
 
   interface DateTimeFormatOptions {

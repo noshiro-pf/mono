@@ -88,7 +88,7 @@ const tupleMap = <T extends readonly unknown[], B>(
   tpl: T,
   mapFn: (a: T[number]) => B,
 ): { readonly [K in keyof T]: B } =>
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   tpl.map(mapFn as (a: unknown) => B) as {
     readonly [K in keyof T]: B;
   };

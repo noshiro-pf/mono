@@ -298,8 +298,8 @@
 +  ): this;
  
    /** Yields index, value pairs for every entry in the array. */
--  entries(): IterableIterator<[number, bigint]>;
-+  entries(): IterableIterator<readonly [NumberType.TypedArraySize, BigInt64]>;
+-  entries(): ArrayIterator<[number, bigint]>;
++  entries(): ArrayIterator<readonly [NumberType.TypedArraySize, BigInt64]>;
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
@@ -423,8 +423,8 @@
    join(separator?: string): string;
  
    /** Yields each index in the array. */
--  keys(): IterableIterator<number>;
-+  keys(): IterableIterator<NumberType.TypedArraySize>;
+-  keys(): ArrayIterator<number>;
++  keys(): ArrayIterator<NumberType.TypedArraySize>;
  
    /**
     * Returns the index of the last occurrence of a value in an array.
@@ -561,7 +561,7 @@
  
    /**
     * Gets a new BigInt64Array view of the ArrayBuffer store for this array,
-@@ -604,7 +536,10 @@ interface BigInt64Array {
+@@ -604,11 +536,14 @@ interface BigInt64Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -572,16 +572,21 @@
 +  ): BigInt64Array;
  
    /** Converts the array to a string by using the current locale. */
-   toLocaleString(): string;
-@@ -616,34 +551,34 @@ interface BigInt64Array {
+   toLocaleString(
+-    locales?: string | string[],
++    locales?: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
+   ): string;
+ 
+@@ -619,34 +554,34 @@ interface BigInt64Array {
    valueOf(): BigInt64Array;
  
    /** Yields each value in the array. */
--  values(): IterableIterator<bigint>;
-+  values(): IterableIterator<BigInt64>;
+-  values(): ArrayIterator<bigint>;
++  values(): ArrayIterator<BigInt64>;
  
--  [Symbol.iterator](): IterableIterator<bigint>;
-+  [Symbol.iterator](): IterableIterator<BigInt64>;
+-  [Symbol.iterator](): ArrayIterator<bigint>;
++  [Symbol.iterator](): ArrayIterator<BigInt64>;
  
    readonly [Symbol.toStringTag]: 'BigInt64Array';
  
@@ -617,7 +622,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -652,15 +587,15 @@ interface BigInt64ArrayConstructor {
+@@ -655,15 +590,15 @@ interface BigInt64ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -637,7 +642,7 @@
  
  /**
   * A typed array of 64-bit unsigned integer values. The contents are initialized
-@@ -669,16 +604,16 @@ declare var BigInt64Array: BigInt64ArrayConstructor;
+@@ -672,16 +607,16 @@ declare var BigInt64Array: BigInt64ArrayConstructor;
   */
  interface BigUint64Array {
    /** The size in bytes of each element in the array. */
@@ -657,7 +662,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -691,10 +626,14 @@ interface BigUint64Array {
+@@ -694,10 +629,14 @@ interface BigUint64Array {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -669,12 +674,12 @@
 +  ): this;
  
    /** Yields index, value pairs for every entry in the array. */
--  entries(): IterableIterator<[number, bigint]>;
-+  entries(): IterableIterator<readonly [NumberType.TypedArraySize, BigUint64]>;
+-  entries(): ArrayIterator<[number, bigint]>;
++  entries(): ArrayIterator<readonly [NumberType.TypedArraySize, BigUint64]>;
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -707,8 +646,12 @@ interface BigUint64Array {
+@@ -710,8 +649,12 @@ interface BigUint64Array {
     *   value.
     */
    every(
@@ -689,7 +694,7 @@
    ): boolean;
  
    /**
-@@ -721,7 +664,11 @@ interface BigUint64Array {
+@@ -724,7 +667,11 @@ interface BigUint64Array {
     * @param end Index to stop filling the array at. If end is negative, it is
     *   treated as length+end.
     */
@@ -702,7 +707,7 @@
  
    /**
     * Returns the elements of an array that meet the condition specified in a
-@@ -735,8 +682,12 @@ interface BigUint64Array {
+@@ -738,8 +685,12 @@ interface BigUint64Array {
     *   value.
     */
    filter(
@@ -717,7 +722,7 @@
    ): BigUint64Array;
  
    /**
-@@ -752,9 +703,13 @@ interface BigUint64Array {
+@@ -755,9 +706,13 @@ interface BigUint64Array {
     *   instead.
     */
    find(
@@ -734,7 +739,7 @@
  
    /**
     * Returns the index of the first element in the array where predicate is
-@@ -769,9 +724,13 @@ interface BigUint64Array {
+@@ -772,9 +727,13 @@ interface BigUint64Array {
     *   instead.
     */
    findIndex(
@@ -751,7 +756,7 @@
  
    /**
     * Performs the specified action for each element in an array.
-@@ -783,8 +742,12 @@ interface BigUint64Array {
+@@ -786,8 +745,12 @@ interface BigUint64Array {
     *   value.
     */
    forEach(
@@ -766,7 +771,7 @@
    ): void;
  
    /**
-@@ -795,7 +758,10 @@ interface BigUint64Array {
+@@ -798,7 +761,10 @@ interface BigUint64Array {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -778,7 +783,7 @@
  
    /**
     * Returns the index of the first occurrence of a value in an array.
-@@ -804,7 +770,10 @@ interface BigUint64Array {
+@@ -807,7 +773,10 @@ interface BigUint64Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -790,16 +795,16 @@
  
    /**
     * Adds all the elements of an array separated by the specified separator
-@@ -817,7 +786,7 @@ interface BigUint64Array {
+@@ -820,7 +789,7 @@ interface BigUint64Array {
    join(separator?: string): string;
  
    /** Yields each index in the array. */
--  keys(): IterableIterator<number>;
-+  keys(): IterableIterator<NumberType.TypedArraySize>;
+-  keys(): ArrayIterator<number>;
++  keys(): ArrayIterator<NumberType.TypedArraySize>;
  
    /**
     * Returns the index of the last occurrence of a value in an array.
-@@ -826,7 +795,10 @@ interface BigUint64Array {
+@@ -829,7 +798,10 @@ interface BigUint64Array {
     * @param fromIndex The array index at which to begin the search. If fromIndex
     *   is omitted, the search starts at index 0.
     */
@@ -811,7 +816,7 @@
  
    /** The length of the array. */
    readonly length: number;
-@@ -843,8 +815,12 @@ interface BigUint64Array {
+@@ -846,8 +818,12 @@ interface BigUint64Array {
     *   value.
     */
    map(
@@ -826,7 +831,7 @@
    ): BigUint64Array;
  
    /**
-@@ -861,12 +837,12 @@ interface BigUint64Array {
+@@ -864,12 +840,12 @@ interface BigUint64Array {
     */
    reduce(
      callbackfn: (
@@ -844,7 +849,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array. The
-@@ -883,8 +859,8 @@ interface BigUint64Array {
+@@ -886,8 +862,8 @@ interface BigUint64Array {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -855,7 +860,7 @@
        array: BigUint64Array,
      ) => U,
      initialValue: U,
-@@ -905,12 +881,12 @@ interface BigUint64Array {
+@@ -908,12 +884,12 @@ interface BigUint64Array {
     */
    reduceRight(
      callbackfn: (
@@ -873,7 +878,7 @@
  
    /**
     * Calls the specified callback function for all the elements in an array, in
-@@ -928,8 +904,8 @@ interface BigUint64Array {
+@@ -931,8 +907,8 @@ interface BigUint64Array {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -884,7 +889,7 @@
        array: BigUint64Array,
      ) => U,
      initialValue: U,
-@@ -945,7 +921,10 @@ interface BigUint64Array {
+@@ -948,7 +924,10 @@ interface BigUint64Array {
     * @param offset The index in the current array at which the values are to be
     *   written.
     */
@@ -896,7 +901,7 @@
  
    /**
     * Returns a section of an array.
-@@ -953,7 +932,10 @@ interface BigUint64Array {
+@@ -956,7 +935,10 @@ interface BigUint64Array {
     * @param start The beginning of the specified portion of the array.
     * @param end The end of the specified portion of the array.
     */
@@ -908,7 +913,7 @@
  
    /**
     * Determines whether the specified callback function returns true for any
-@@ -967,8 +949,12 @@ interface BigUint64Array {
+@@ -970,8 +952,12 @@ interface BigUint64Array {
     *   value.
     */
    some(
@@ -923,7 +928,7 @@
    ): boolean;
  
    /**
-@@ -977,7 +963,7 @@ interface BigUint64Array {
+@@ -980,7 +966,7 @@ interface BigUint64Array {
     * @param compareFn The function used to determine the order of the elements.
     *   If omitted, the elements are sorted in ascending order.
     */
@@ -932,7 +937,7 @@
  
    /**
     * Gets a new BigUint64Array view of the ArrayBuffer store for this array,
-@@ -986,7 +972,10 @@ interface BigUint64Array {
+@@ -989,11 +975,14 @@ interface BigUint64Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -943,16 +948,21 @@
 +  ): BigUint64Array;
  
    /** Converts the array to a string by using the current locale. */
-   toLocaleString(): string;
-@@ -998,34 +987,34 @@ interface BigUint64Array {
+   toLocaleString(
+-    locales?: string | string[],
++    locales?: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
+   ): string;
+ 
+@@ -1004,34 +993,34 @@ interface BigUint64Array {
    valueOf(): BigUint64Array;
  
    /** Yields each value in the array. */
--  values(): IterableIterator<bigint>;
-+  values(): IterableIterator<BigUint64>;
+-  values(): ArrayIterator<bigint>;
++  values(): ArrayIterator<BigUint64>;
  
--  [Symbol.iterator](): IterableIterator<bigint>;
-+  [Symbol.iterator](): IterableIterator<BigUint64>;
+-  [Symbol.iterator](): ArrayIterator<bigint>;
++  [Symbol.iterator](): ArrayIterator<BigUint64>;
  
    readonly [Symbol.toStringTag]: 'BigUint64Array';
  
@@ -988,7 +998,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -1034,15 +1023,15 @@ interface BigUint64ArrayConstructor {
+@@ -1040,15 +1029,15 @@ interface BigUint64ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -1008,7 +1018,7 @@
  
  interface DataView {
    /**
-@@ -1055,7 +1044,10 @@ interface DataView {
+@@ -1061,7 +1050,10 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   read.
     */
@@ -1020,7 +1030,7 @@
  
    /**
     * Gets the BigUint64 value at the specified byte offset from the start of the
-@@ -1067,7 +1059,10 @@ interface DataView {
+@@ -1073,7 +1065,10 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   read.
     */
@@ -1032,7 +1042,7 @@
  
    /**
     * Stores a BigInt64 value at the specified byte offset from the start of the
-@@ -1078,7 +1073,11 @@ interface DataView {
+@@ -1084,7 +1079,11 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   written.
     */
@@ -1045,7 +1055,7 @@
  
    /**
     * Stores a BigUint64 value at the specified byte offset from the start of the
-@@ -1089,7 +1088,11 @@ interface DataView {
+@@ -1095,7 +1094,11 @@ interface DataView {
     * @param littleEndian If false or undefined, a big-endian value should be
     *   written.
     */

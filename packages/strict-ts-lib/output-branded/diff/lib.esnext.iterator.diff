@@ -1,0 +1,195 @@
+@@ -1,21 +1,7 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils" />
+ 
+-/// <reference lib="es2015.iterable" />
++/// <reference path="./lib.es2015.iterable.d.ts" />
+ 
+ // NOTE: This is specified as what is essentially an unreachable module. All actual global declarations can be found
+ //       in the `declare global` section, below. This is necessary as there is currently no way to declare an `abstract`
+@@ -25,7 +11,6 @@ export {};
+ 
+ // Abstract type that allows us to mark `next` as `abstract`
+ declare abstract class Iterator<T, TResult = undefined, TNext = unknown> {
+-  // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
+   abstract next(value?: TNext): IteratorResult<T, TResult>;
+ }
+ 
+@@ -50,7 +35,7 @@ declare global {
+      *   to transform values from the underlying iterator.
+      */
+     map<U>(
+-      callbackfn: (value: T, index: number) => U,
++      callbackfn: (value: T, index: NumberType.ArraySizeArgNonNegative) => U,
+     ): IteratorObject<U, undefined, unknown>;
+ 
+     /**
+@@ -61,7 +46,10 @@ declare global {
+      *   to test values from the underlying iterator.
+      */
+     filter<S extends T>(
+-      predicate: (value: T, index: number) => value is S,
++      predicate: (
++        value: T,
++        index: NumberType.ArraySizeArgNonNegative,
++      ) => value is S,
+     ): IteratorObject<S, undefined, unknown>;
+ 
+     /**
+@@ -72,7 +60,10 @@ declare global {
+      *   to test values from the underlying iterator.
+      */
+     filter(
+-      predicate: (value: T, index: number) => unknown,
++      predicate: (
++        value: T,
++        index: NumberType.ArraySizeArgNonNegative,
++      ) => unknown,
+     ): IteratorObject<T, undefined, unknown>;
+ 
+     /**
+@@ -81,7 +72,9 @@ declare global {
+      *
+      * @param limit The maximum number of values to yield.
+      */
+-    take(limit: number): IteratorObject<T, undefined, unknown>;
++    take(
++      limit: NumberType.ArraySizeArgNonNegative,
++    ): IteratorObject<T, undefined, unknown>;
+ 
+     /**
+      * Creates an iterator whose values are the values from this iterator after
+@@ -89,7 +82,9 @@ declare global {
+      *
+      * @param count The number of values to drop.
+      */
+-    drop(count: number): IteratorObject<T, undefined, unknown>;
++    drop(
++      limit: NumberType.ArraySizeArgNonNegative,
++    ): IteratorObject<T, undefined, unknown>;
+ 
+     /**
+      * Creates an iterator whose values are the result of applying the callback
+@@ -103,7 +98,7 @@ declare global {
+     flatMap<U>(
+       callback: (
+         value: T,
+-        index: number,
++        index: NumberType.ArraySizeArgNonNegative,
+       ) => Iterator<U, unknown, undefined> | Iterable<U, unknown, undefined>,
+     ): IteratorObject<U, undefined, unknown>;
+ 
+@@ -125,14 +120,14 @@ declare global {
+       callbackfn: (
+         previousValue: T,
+         currentValue: T,
+-        currentIndex: number,
++        currentIndex: NumberType.ArraySizeArgNonNegative,
+       ) => T,
+     ): T;
+     reduce(
+       callbackfn: (
+         previousValue: T,
+         currentValue: T,
+-        currentIndex: number,
++        currentIndex: NumberType.ArraySizeArgNonNegative,
+       ) => T,
+       initialValue: T,
+     ): T;
+@@ -155,13 +150,13 @@ declare global {
+       callbackfn: (
+         previousValue: U,
+         currentValue: T,
+-        currentIndex: number,
++        currentIndex: NumberType.ArraySizeArgNonNegative,
+       ) => U,
+       initialValue: U,
+     ): U;
+ 
+     /** Creates a new array from the values yielded by this iterator. */
+-    toArray(): T[];
++    toArray(): readonly T[];
+ 
+     /**
+      * Performs the specified action for each element in the iterator.
+@@ -170,7 +165,9 @@ declare global {
+      *   calls the callbackfn function one time for each element in the
+      *   iterator.
+      */
+-    forEach(callbackfn: (value: T, index: number) => void): void;
++    forEach(
++      callbackfn: (value: T, index: NumberType.ArraySizeArgNonNegative) => void,
++    ): void;
+ 
+     /**
+      * Determines whether the specified callback function returns true for any
+@@ -181,7 +178,12 @@ declare global {
+      *   until the predicate returns a value true, or until the end of the
+      *   iterator.
+      */
+-    some(predicate: (value: T, index: number) => unknown): boolean;
++    some(
++      predicate: (
++        value: T,
++        index: NumberType.ArraySizeArgNonNegative,
++      ) => unknown,
++    ): boolean;
+ 
+     /**
+      * Determines whether all the members of this iterator satisfy the specified
+@@ -191,7 +193,12 @@ declare global {
+      *   method calls the predicate function for each element in this iterator
+      *   until the predicate returns false, or until the end of this iterator.
+      */
+-    every(predicate: (value: T, index: number) => unknown): boolean;
++    every(
++      predicate: (
++        value: T,
++        index: NumberType.ArraySizeArgNonNegative,
++      ) => unknown,
++    ): boolean;
+ 
+     /**
+      * Returns the value of the first element in this iterator where predicate
+@@ -203,9 +210,17 @@ declare global {
+      *   Otherwise, find returns undefined.
+      */
+     find<S extends T>(
+-      predicate: (value: T, index: number) => value is S,
++      predicate: (
++        value: T,
++        index: NumberType.ArraySizeArgNonNegative,
++      ) => value is S,
+     ): S | undefined;
+-    find(predicate: (value: T, index: number) => unknown): T | undefined;
++    find(
++      predicate: (
++        value: T,
++        index: NumberType.ArraySizeArgNonNegative,
++      ) => unknown,
++    ): T | undefined;
+ 
+     readonly [Symbol.toStringTag]: string;
+   }
+@@ -224,5 +239,5 @@ declare global {
+     ): IteratorObject<T, undefined, unknown>;
+   }
+ 
+-  var Iterator: IteratorConstructor;
++  const Iterator: IteratorConstructor;
+ }

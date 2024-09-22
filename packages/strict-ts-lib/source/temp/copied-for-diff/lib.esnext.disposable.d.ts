@@ -16,6 +16,8 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 
 /// <reference lib="es2015.symbol" />
+/// <reference lib="es2015.iterable" />
+/// <reference lib="es2018.asynciterable" />
 
 interface SymbolConstructor {
   /**
@@ -189,3 +191,7 @@ interface AsyncDisposableStackConstructor {
   readonly prototype: AsyncDisposableStack;
 }
 declare var AsyncDisposableStack: AsyncDisposableStackConstructor;
+
+interface IteratorObject<T, TReturn, TNext> extends Disposable {}
+
+interface AsyncIteratorObject<T, TReturn, TNext> extends AsyncDisposable {}

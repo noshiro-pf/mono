@@ -59,7 +59,7 @@
    }
  
    interface PluralRules {
-@@ -57,8 +43,8 @@ declare namespace Intl {
+@@ -57,35 +43,35 @@ declare namespace Intl {
      ): PluralRules;
      supportedLocalesOf(
        locales: string | readonly string[],
@@ -70,8 +70,35 @@
    }
  
    const PluralRules: PluralRulesConstructor;
-@@ -92,11 +78,11 @@ declare namespace Intl {
-     | ES2020NumberFormatPartType;
+ 
+   interface NumberFormatPartTypeRegistry {
+-    literal: never;
+-    nan: never;
+-    infinity: never;
+-    percent: never;
+-    integer: never;
+-    group: never;
+-    decimal: never;
+-    fraction: never;
+-    plusSign: never;
+-    minusSign: never;
+-    percentSign: never;
+-    currency: never;
++    readonly literal: never;
++    readonly nan: never;
++    readonly infinity: never;
++    readonly percent: never;
++    readonly integer: never;
++    readonly group: never;
++    readonly decimal: never;
++    readonly fraction: never;
++    readonly plusSign: never;
++    readonly minusSign: never;
++    readonly percentSign: never;
++    readonly currency: never;
+   }
+ 
+   type NumberFormatPartTypes = keyof NumberFormatPartTypeRegistry;
  
    interface NumberFormatPart {
 -    type: NumberFormatPartTypes;

@@ -17,8 +17,8 @@
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
--/// <reference lib="es2015.iterable" />
-+/// <reference path="./lib.es2015.iterable.d.ts" />
+-/// <reference lib="es2020.symbol.wellknown" />
++/// <reference path="./lib.es2020.symbol.wellknown.d.ts" />
  
  interface String {
    /**

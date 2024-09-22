@@ -22,12 +22,12 @@ export const convertLibEs2015Iterable = ({
       endRegexp: closeBraceRegexp,
       mapFn: composeMonoTypeFns(
         replaceWithNoMatchCheck(
-          `IterableIterator<readonly [number, T]>`,
-          `IterableIterator<readonly [${brandedNumber.ArraySize}, T]>`,
+          `ArrayIterator<readonly [number, T]>`,
+          `ArrayIterator<readonly [${brandedNumber.ArraySize}, T]>`,
         ),
         replaceWithNoMatchCheck(
-          `IterableIterator<number>`,
-          `IterableIterator<${brandedNumber.ArraySize}>`,
+          `ArrayIterator<number>`,
+          `ArrayIterator<${brandedNumber.ArraySize}>`,
         ),
       ),
     }),
@@ -56,12 +56,12 @@ export const convertLibEs2015Iterable = ({
       endRegexp: closeBraceRegexp,
       mapFn: composeMonoTypeFns(
         replaceWithNoMatchCheck(
-          `IterableIterator<readonly [number, T]>`,
-          `IterableIterator<readonly [${brandedNumber.ArraySize}, T]>`,
+          `ArrayIterator<readonly [number, T]>`,
+          `ArrayIterator<readonly [${brandedNumber.ArraySize}, T]>`,
         ),
         replaceWithNoMatchCheck(
-          `IterableIterator<number>`,
-          `IterableIterator<${brandedNumber.ArraySize}>`,
+          `ArrayIterator<number>`,
+          `ArrayIterator<${brandedNumber.ArraySize}>`,
         ),
       ),
     }),
@@ -95,21 +95,6 @@ export const convertLibEs2015Iterable = ({
 
     ...(
       [
-        '[Symbol.iterator](): IterableIterator<T>;',
-        'entries(): IterableIterator<readonly [number, number]>;',
-        'entries(): IterableIterator<readonly [T, T]>;',
-        'keys(): IterableIterator<number>;',
-      ] as const
-    ).flatMap(
-      // normalize newlines
-      (line) => [
-        replaceWithNoMatchCheck(`${line}\n`, `${line}\n\n`),
-        replaceWithNoMatchCheck(`${line}\n\n\n`, `${line}\n\n`),
-      ],
-    ),
-
-    ...(
-      [
         ['Int8Array', enumType.Int8],
         ['Uint8Array', enumType.Uint8],
         ['Uint8ClampedArray', enumType.Uint8],
@@ -126,20 +111,20 @@ export const convertLibEs2015Iterable = ({
         endRegexp: closeBraceRegexp,
         mapFn: composeMonoTypeFns(
           replaceWithNoMatchCheck(
-            `[Symbol.iterator](): IterableIterator<number>;`,
-            `[Symbol.iterator](): IterableIterator<${elementType}>;`,
+            `[Symbol.iterator](): ArrayIterator<number>;`,
+            `[Symbol.iterator](): ArrayIterator<${elementType}>;`,
           ),
           replaceWithNoMatchCheck(
-            `entries(): IterableIterator<readonly [number, number]>;`,
-            `entries(): IterableIterator<readonly [${brandedNumber.TypedArraySize}, ${elementType}]>;`,
+            `entries(): ArrayIterator<readonly [number, number]>;`,
+            `entries(): ArrayIterator<readonly [${brandedNumber.TypedArraySize}, ${elementType}]>;`,
           ),
           replaceWithNoMatchCheck(
-            `keys(): IterableIterator<number>;`,
-            `keys(): IterableIterator<${brandedNumber.TypedArraySize}>;`,
+            `keys(): ArrayIterator<number>;`,
+            `keys(): ArrayIterator<${brandedNumber.TypedArraySize}>;`,
           ),
           replaceWithNoMatchCheck(
-            `values(): IterableIterator<number>`,
-            `values(): IterableIterator<${elementType}>`,
+            `values(): ArrayIterator<number>`,
+            `values(): ArrayIterator<${elementType}>`,
           ),
         ),
       }),

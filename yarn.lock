@@ -5092,82 +5092,82 @@
     eslint-visitor-keys "^3.4.3"
 
 "@typescript/lib-decorators@file:packages/strict-ts-lib/output-branded/packages/decorators":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-dom@file:packages/strict-ts-lib/output-branded/packages/dom":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2015@file:packages/strict-ts-lib/output-branded/packages/es2015":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2016@file:packages/strict-ts-lib/output-branded/packages/es2016":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2017@file:packages/strict-ts-lib/output-branded/packages/es2017":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2018@file:packages/strict-ts-lib/output-branded/packages/es2018":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2019@file:packages/strict-ts-lib/output-branded/packages/es2019":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2020@file:packages/strict-ts-lib/output-branded/packages/es2020":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2021@file:packages/strict-ts-lib/output-branded/packages/es2021":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2022@file:packages/strict-ts-lib/output-branded/packages/es2022":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2023@file:packages/strict-ts-lib/output-branded/packages/es2023":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es5@file:packages/strict-ts-lib/output-branded/packages/es5":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es6@file:packages/strict-ts-lib/output-branded/packages/es6":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-esnext@file:packages/strict-ts-lib/output-branded/packages/esnext":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-scripthost@file:packages/strict-ts-lib/output-branded/packages/scripthost":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-webworker@file:packages/strict-ts-lib/output-branded/packages/webworker":
-  version "5.4.3"
+  version "5.6.2"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
@@ -16279,7 +16279,7 @@ string-length@^4.0.1:
     char-regex "^1.0.2"
     strip-ansi "^6.0.0"
 
-"string-width-cjs@npm:string-width@^4.2.0":
+"string-width-cjs@npm:string-width@^4.2.0", string-width@^4.0.0, string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.2, string-width@^4.2.3:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -16296,15 +16296,6 @@ string-width@^3.0.0, string-width@^3.1.0:
     emoji-regex "^7.0.1"
     is-fullwidth-code-point "^2.0.0"
     strip-ansi "^5.1.0"
-
-string-width@^4.0.0, string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.2, string-width@^4.2.3:
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
-  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
-  dependencies:
-    emoji-regex "^8.0.0"
-    is-fullwidth-code-point "^3.0.0"
-    strip-ansi "^6.0.1"
 
 string-width@^5.0.1, string-width@^5.1.2:
   version "5.1.2"
@@ -16435,7 +16426,7 @@ stringify-entities@^4.0.0:
     character-entities-html4 "^2.0.0"
     character-entities-legacy "^3.0.0"
 
-"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -16448,13 +16439,6 @@ strip-ansi@^5.0.0, strip-ansi@^5.1.0, strip-ansi@^5.2.0:
   integrity sha512-DuRs1gKbBqsMKIZlrffwlug8MHkcnpjs5VPmL1PAh+mA30U0DTotfDZ0d2UUsXpPmPmMMJ6W773MaA3J+lbiWA==
   dependencies:
     ansi-regex "^4.1.0"
-
-strip-ansi@^6.0.0, strip-ansi@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
-  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
-  dependencies:
-    ansi-regex "^5.0.1"
 
 strip-ansi@^7.0.1, strip-ansi@^7.1.0:
   version "7.1.0"
@@ -17193,10 +17177,10 @@ typescript-json-schema@^0.63.0:
     typescript "~5.1.0"
     yargs "^17.1.1"
 
-typescript@5.4.3:
-  version "5.4.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.3.tgz#5c6fedd4c87bee01cd7a528a30145521f8e0feff"
-  integrity sha512-KrPd3PKaCLr78MalgiwJnA25Nm8HAmdwN3mYUYZgG/wizIo9EainNVQI9/yDavtVFRN2h3k8uf3GLHuhDMgEHg==
+typescript@5.6.2:
+  version "5.6.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.6.2.tgz#d1de67b6bef77c41823f822df8f0b3bcff60a5a0"
+  integrity sha512-NW8ByodCSNCwZeghjN3o+JX5OFH0Ojg6sadjEKY4huZ52TqbJTJnDo5+Tw98lSy63NZvi4n+ez5m2u5d4PkZyw==
 
 typescript@~5.1.0:
   version "5.1.6"
@@ -17975,7 +17959,7 @@ wordwrapjs@^5.1.0:
   resolved "https://registry.yarnpkg.com/wordwrapjs/-/wordwrapjs-5.1.0.tgz#4c4d20446dcc670b14fa115ef4f8fd9947af2b3a"
   integrity sha512-JNjcULU2e4KJwUNv6CHgI46UvDGitb6dGryHajXTDiLgg1/RiGoPSDw4kZfYnwGtEXf2ZMeIewDQgFGzkCB2Sg==
 
-"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
+"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
@@ -17997,15 +17981,6 @@ wrap-ansi@^6.0.1, wrap-ansi@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-6.2.0.tgz#e9393ba07102e6c91a3b221478f0257cd2856e53"
   integrity sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==
-  dependencies:
-    ansi-styles "^4.0.0"
-    string-width "^4.1.0"
-    strip-ansi "^6.0.0"
-
-wrap-ansi@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
-  integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
   dependencies:
     ansi-styles "^4.0.0"
     string-width "^4.1.0"

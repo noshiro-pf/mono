@@ -33,6 +33,7 @@ import { convertLibEs2022Object } from './lib.es2022.object.mjs';
 import { convertLibEs2022Sharedmemory } from './lib.es2022.sharedmemory.mjs';
 import { convertLibEs2023Array } from './lib.es2023.array.mjs';
 import { convertLibEs5 } from './lib.es5.mjs';
+import { convertLibEsNextIterator } from './lib.esnext.iterator.mjs';
 
 export const convert = (
   filename: string,
@@ -317,6 +318,9 @@ export const convert = (
               `keySelector: (item: T, index: ${options.brandedNumber.ArraySizeArgNonNegative}) => K`,
             ),
           );
+
+        case 'lib.esnext.iterator.d.ts':
+          return convertLibEsNextIterator(options);
 
         default:
           return idFn;

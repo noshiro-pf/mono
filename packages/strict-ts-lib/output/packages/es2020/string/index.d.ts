@@ -1,7 +1,7 @@
 /// <reference no-default-lib="true"/>
 /// <reference types="@noshiro/ts-type-utils" />
 
-/// <reference lib="es2015.iterable" />
+/// <reference lib="es2020.symbol.wellknown" />
 
 interface String {
   /**
@@ -11,7 +11,7 @@ interface String {
    * @param regexp A variable name or string literal containing the regular
    *   expression pattern and flags.
    */
-  matchAll(regexp: RegExp): IterableIterator<RegExpExecArray>;
+  matchAll(regexp: RegExp): RegExpStringIterator<RegExpExecArray>;
 
   /**
    * Converts all alphabetic characters to lowercase, taking into account the

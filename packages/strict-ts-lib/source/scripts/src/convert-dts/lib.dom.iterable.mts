@@ -9,11 +9,11 @@ export const convertLibDomIterable = ({
 }: ConverterOptions): MonoTypeFunction<string> =>
   composeMonoTypeFns(
     replaceWithNoMatchCheck(
-      'entries(): IterableIterator<readonly [number,',
-      `entries(): IterableIterator<readonly [${brandedNumber.ArraySize},`,
+      'entries(): ArrayIterator<readonly [number,',
+      `entries(): ArrayIterator<readonly [${brandedNumber.ArraySize},`,
     ),
     replaceWithNoMatchCheck(
-      'keys(): IterableIterator<number>;',
-      `keys(): IterableIterator<${brandedNumber.ArraySize}>;`,
+      'keys(): ArrayIterator<number>;',
+      `keys(): ArrayIterator<${brandedNumber.ArraySize}>;`,
     ),
   );

@@ -41,8 +41,8 @@
 +    readonly granularity: 'grapheme' | 'word' | 'sentence';
    }
  
-   interface Segments {
-@@ -68,25 +54,25 @@ declare namespace Intl {
+   interface SegmentIterator<T>
+@@ -73,25 +59,25 @@ declare namespace Intl {
  
    interface SegmentData {
      /** A string containing the segment extracted from the original input string. */
@@ -73,7 +73,7 @@
  
      /**
       * Creates a new `Intl.Segmenter` object.
-@@ -125,7 +111,7 @@ declare namespace Intl {
+@@ -130,7 +116,7 @@ declare namespace Intl {
      supportedLocalesOf(
        locales: LocalesArgument,
        options?: Pick<SegmenterOptions, 'localeMatcher'>,
@@ -82,7 +82,7 @@
    };
  
    /**
-@@ -144,5 +130,5 @@ declare namespace Intl {
+@@ -149,5 +135,5 @@ declare namespace Intl {
        | 'numberingSystem'
        | 'timeZone'
        | 'unit',

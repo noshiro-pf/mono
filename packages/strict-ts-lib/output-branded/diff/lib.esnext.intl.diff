@@ -1,4 +1,4 @@
-@@ -1,23 +1,9 @@
+@@ -1,19 +1,5 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -18,17 +18,4 @@
 +/// <reference types="@noshiro/ts-type-utils" />
  
  declare namespace Intl {
-   interface NumberRangeFormatPart extends NumberFormatPart {
--    source: 'startRange' | 'endRange' | 'shared';
-+    readonly source: 'startRange' | 'endRange' | 'shared';
-   }
- 
-   interface NumberFormat {
-@@ -25,6 +11,6 @@ declare namespace Intl {
-     formatRangeToParts(
-       start: number | bigint,
-       end: number | bigint,
--    ): NumberRangeFormatPart[];
-+    ): readonly NumberRangeFormatPart[];
-   }
- }
+   // Empty

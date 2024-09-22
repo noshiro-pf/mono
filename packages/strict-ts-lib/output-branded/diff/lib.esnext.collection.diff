@@ -19,7 +19,7 @@
  
  interface MapConstructor {
    /**
-@@ -25,6 +11,6 @@ interface MapConstructor {
+@@ -25,8 +11,8 @@ interface MapConstructor {
     */
    groupBy<K, T>(
      items: Iterable<T>,
@@ -28,3 +28,59 @@
 +    keySelector: (item: T, index: NumberType.ArraySizeArgNonNegative) => K,
 +  ): ReadonlyMap<K, readonly T[]>;
  }
+ 
+ interface ReadonlySetLike<T> {
+@@ -46,22 +32,22 @@ interface Set<T> {
+    * @returns A new Set containing all the elements in this Set and also all the
+    *   elements in the argument.
+    */
+-  union<U>(other: ReadonlySetLike<U>): Set<T | U>;
++  union<U>(other: ReadonlySetLike<U>): ReadonlySet<T | U>;
+   /**
+    * @returns A new Set containing all the elements which are both in this Set
+    *   and in the argument.
+    */
+-  intersection<U>(other: ReadonlySetLike<U>): Set<T & U>;
++  intersection<U>(other: ReadonlySetLike<U>): ReadonlySet<T & U>;
+   /**
+    * @returns A new Set containing all the elements in this Set which are not
+    *   also in the argument.
+    */
+-  difference<U>(other: ReadonlySetLike<U>): Set<T>;
++  difference<U>(other: ReadonlySetLike<U>): ReadonlySet<T>;
+   /**
+    * @returns A new Set containing all the elements which are in either this Set
+    *   or in the argument, but not in both.
+    */
+-  symmetricDifference<U>(other: ReadonlySetLike<U>): Set<T | U>;
++  symmetricDifference<U>(other: ReadonlySetLike<U>): ReadonlySet<T | U>;
+   /**
+    * @returns A boolean indicating whether all the elements in this Set are also
+    *   in the argument.
+@@ -84,22 +70,22 @@ interface ReadonlySet<T> {
+    * @returns A new Set containing all the elements in this Set and also all the
+    *   elements in the argument.
+    */
+-  union<U>(other: ReadonlySetLike<U>): Set<T | U>;
++  union<U>(other: ReadonlySetLike<U>): ReadonlySet<T | U>;
+   /**
+    * @returns A new Set containing all the elements which are both in this Set
+    *   and in the argument.
+    */
+-  intersection<U>(other: ReadonlySetLike<U>): Set<T & U>;
++  intersection<U>(other: ReadonlySetLike<U>): ReadonlySet<T & U>;
+   /**
+    * @returns A new Set containing all the elements in this Set which are not
+    *   also in the argument.
+    */
+-  difference<U>(other: ReadonlySetLike<U>): Set<T>;
++  difference<U>(other: ReadonlySetLike<U>): ReadonlySet<T>;
+   /**
+    * @returns A new Set containing all the elements which are in either this Set
+    *   or in the argument, but not in both.
+    */
+-  symmetricDifference<U>(other: ReadonlySetLike<U>): Set<T | U>;
++  symmetricDifference<U>(other: ReadonlySetLike<U>): ReadonlySet<T | U>;
+   /**
+    * @returns A boolean indicating whether all the elements in this Set are also
+    *   in the argument.

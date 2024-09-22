@@ -903,8 +903,8 @@
 -  getUTCMilliseconds(): number;
 +  getUTCMilliseconds(): MillisecondsEnum;
    /**
-    * Gets the difference in minutes between the time on the local computer and
-    * Universal Coordinated Time (UTC).
+    * Gets the difference in minutes between Universal Coordinated Time (UTC) and
+    * the time on the local computer.
     */
 -  getTimezoneOffset(): number;
 +  getTimezoneOffset(): SafeInt;
@@ -5684,7 +5684,7 @@
    }
  
    interface Collator {
-@@ -6166,40 +6793,43 @@ declare namespace Intl {
+@@ -6166,28 +6793,31 @@ declare namespace Intl {
    }
  
    interface CollatorConstructor {
@@ -5706,22 +5706,46 @@
 -  var Collator: CollatorConstructor;
 +  const Collator: CollatorConstructor;
  
+   interface NumberFormatOptionsStyleRegistry {
+-    decimal: never;
+-    percent: never;
+-    currency: never;
++    readonly decimal: never;
++    readonly percent: never;
++    readonly currency: never;
+   }
+ 
+   type NumberFormatOptionsStyle = keyof NumberFormatOptionsStyleRegistry;
+ 
+   interface NumberFormatOptionsCurrencyDisplayRegistry {
+-    code: never;
+-    symbol: never;
+-    name: never;
++    readonly code: never;
++    readonly symbol: never;
++    readonly name: never;
+   }
+ 
+   type NumberFormatOptionsCurrencyDisplay =
+@@ -6209,30 +6839,30 @@ declare namespace Intl {
+       : keyof NumberFormatOptionsUseGroupingRegistry | false;
+ 
    interface NumberFormatOptions {
--    localeMatcher?: string | undefined;
--    style?: string | undefined;
+-    localeMatcher?: 'lookup' | 'best fit' | undefined;
+-    style?: NumberFormatOptionsStyle | undefined;
 -    currency?: string | undefined;
--    currencySign?: string | undefined;
--    useGrouping?: boolean | undefined;
+-    currencyDisplay?: NumberFormatOptionsCurrencyDisplay | undefined;
+-    useGrouping?: NumberFormatOptionsUseGrouping | undefined;
 -    minimumIntegerDigits?: number | undefined;
 -    minimumFractionDigits?: number | undefined;
 -    maximumFractionDigits?: number | undefined;
 -    minimumSignificantDigits?: number | undefined;
 -    maximumSignificantDigits?: number | undefined;
-+    readonly localeMatcher?: string | undefined;
-+    readonly style?: string | undefined;
++    readonly localeMatcher?: 'lookup' | 'best fit' | undefined;
++    readonly style?: NumberFormatOptionsStyle | undefined;
 +    readonly currency?: string | undefined;
-+    readonly currencySign?: string | undefined;
-+    readonly useGrouping?: boolean | undefined;
++    readonly currencyDisplay?: NumberFormatOptionsCurrencyDisplay | undefined;
++    readonly useGrouping?: NumberFormatOptionsUseGrouping | undefined;
 +    readonly minimumIntegerDigits?: UintRange<1, 22> | undefined;
 +    readonly minimumFractionDigits?: UintRange<0, 21> | undefined;
 +    readonly maximumFractionDigits?: UintRange<0, 21> | undefined;
@@ -5732,28 +5756,30 @@
    interface ResolvedNumberFormatOptions {
 -    locale: string;
 -    numberingSystem: string;
--    style: string;
+-    style: NumberFormatOptionsStyle;
 -    currency?: string;
+-    currencyDisplay?: NumberFormatOptionsCurrencyDisplay;
 -    minimumIntegerDigits: number;
--    minimumFractionDigits: number;
--    maximumFractionDigits: number;
+-    minimumFractionDigits?: number;
+-    maximumFractionDigits?: number;
 -    minimumSignificantDigits?: number;
 -    maximumSignificantDigits?: number;
--    useGrouping: boolean;
+-    useGrouping: ResolvedNumberFormatOptionsUseGrouping;
 +    readonly locale: string;
 +    readonly numberingSystem: string;
-+    readonly style: string;
++    readonly style: NumberFormatOptionsStyle;
 +    readonly currency?: string;
++    readonly currencyDisplay?: NumberFormatOptionsCurrencyDisplay;
 +    readonly minimumIntegerDigits: UintRange<1, 22>;
-+    readonly minimumFractionDigits: UintRange<0, 21>;
-+    readonly maximumFractionDigits: UintRange<0, 21>;
++    readonly minimumFractionDigits?: UintRange<0, 21>;
++    readonly maximumFractionDigits?: UintRange<0, 21>;
 +    readonly minimumSignificantDigits?: UintRange<1, 22>;
 +    readonly maximumSignificantDigits?: UintRange<1, 22>;
-+    readonly useGrouping: boolean;
++    readonly useGrouping: ResolvedNumberFormatOptionsUseGrouping;
    }
  
    interface NumberFormat {
-@@ -6209,30 +6839,39 @@ declare namespace Intl {
+@@ -6242,30 +6872,39 @@ declare namespace Intl {
  
    interface NumberFormatConstructor {
      new (
@@ -5808,7 +5834,7 @@
        | 'short'
        | 'long'
        | 'shortOffset'
-@@ -6240,26 +6879,26 @@ declare namespace Intl {
+@@ -6273,26 +6912,26 @@ declare namespace Intl {
        | 'shortGeneric'
        | 'longGeneric'
        | undefined;
@@ -5852,7 +5878,7 @@
    }
  
    interface DateTimeFormat {
-@@ -6269,21 +6908,21 @@ declare namespace Intl {
+@@ -6302,21 +6941,21 @@ declare namespace Intl {
  
    interface DateTimeFormatConstructor {
      new (
@@ -5879,7 +5905,7 @@
  }
  
  interface String {
-@@ -6303,7 +6942,7 @@ interface String {
+@@ -6336,7 +6975,7 @@ interface String {
     */
    localeCompare(
      that: string,
@@ -5888,7 +5914,7 @@
      options?: Intl.CollatorOptions,
    ): number;
  }
-@@ -6321,7 +6960,7 @@ interface Number {
+@@ -6354,7 +6993,7 @@ interface Number {
     *   comparison options.
     */
    toLocaleString(
@@ -5897,7 +5923,7 @@
      options?: Intl.NumberFormatOptions,
    ): string;
  }
-@@ -6340,7 +6979,7 @@ interface Date {
+@@ -6373,7 +7012,7 @@ interface Date {
     *   comparison options.
     */
    toLocaleString(
@@ -5906,7 +5932,7 @@
      options?: Intl.DateTimeFormatOptions,
    ): string;
    /**
-@@ -6355,7 +6994,7 @@ interface Date {
+@@ -6388,7 +7027,7 @@ interface Date {
     *   comparison options.
     */
    toLocaleDateString(
@@ -5915,7 +5941,7 @@
      options?: Intl.DateTimeFormatOptions,
    ): string;
  
-@@ -6371,7 +7010,50 @@ interface Date {
+@@ -6404,7 +7043,50 @@ interface Date {
     *   comparison options.
     */
    toLocaleTimeString(

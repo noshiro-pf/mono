@@ -23,17 +23,23 @@ interface SymbolConstructor {
   readonly asyncIterator: unique symbol;
 }
 
-interface AsyncIterator<T, TReturn = unknown, TNext = undefined> {
+interface AsyncIterator<T, TReturn = unknown, TNext = unknown> {
   // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
-  next(...args: readonly [] | readonly [TNext]): Promise<IteratorResult<T, TReturn>>;
+  next(...[value]: readonly [] | readonly [TNext]): Promise<IteratorResult<T, TReturn>>;
   return?(value?: TReturn | PromiseLike<TReturn>): Promise<IteratorResult<T, TReturn>>;
   throw?(e?: unknown): Promise<IteratorResult<T, TReturn>>;
 }
 
-interface AsyncIterable<T> {
-  [Symbol.asyncIterator](): AsyncIterator<T>;
+interface AsyncIterable<T, TReturn = unknown, TNext = unknown> {
+  [Symbol.asyncIterator](): AsyncIterator<T, TReturn, TNext>;
 }
 
-interface AsyncIterableIterator<T> extends AsyncIterator<T> {
-  [Symbol.asyncIterator](): AsyncIterableIterator<T>;
+/** Describes a user-defined {@link AsyncIterator} that is also async iterable. */
+interface AsyncIterableIterator<T, TReturn = unknown, TNext = unknown> extends AsyncIterator<T, TReturn, TNext> {
+  [Symbol.asyncIterator](): AsyncIterableIterator<T, TReturn, TNext>;
+}
+
+/** Describes an {@link AsyncIterator} produced by the runtime that inherits from the intrinsic `AsyncIterator.prototype`. */
+interface AsyncIteratorObject<T, TReturn = unknown, TNext = unknown> extends AsyncIterator<T, TReturn, TNext> {
+  [Symbol.asyncIterator](): AsyncIteratorObject<T, TReturn, TNext>;
 }

@@ -4,9 +4,9 @@
 /// <reference path="./lib.es2015.iterable.d.ts" />
 
 interface Generator<T = unknown, TReturn = any, TNext = unknown>
-  extends Iterator<T, TReturn, TNext> {
+  extends IteratorObject<T, TReturn, TNext> {
   // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
-  next(...args: readonly [] | readonly [TNext]): IteratorResult<T, TReturn>;
+  next(...[value]: readonly [] | readonly [TNext]): IteratorResult<T, TReturn>;
   return(value: TReturn): IteratorResult<T, TReturn>;
   throw(e: unknown): IteratorResult<T, TReturn>;
   [Symbol.iterator](): Generator<T, TReturn, TNext>;

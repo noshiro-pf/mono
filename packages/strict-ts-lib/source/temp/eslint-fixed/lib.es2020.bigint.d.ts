@@ -154,7 +154,7 @@ interface BigInt64Array {
   copyWithin(target: number, start: number, end?: number): this;
 
   /** Yields index, value pairs for every entry in the array. */
-  entries(): IterableIterator<readonly [number, bigint]>;
+  entries(): ArrayIterator<readonly [number, bigint]>;
 
   /**
    * Determines whether all the members of an array satisfy the specified test.
@@ -229,7 +229,7 @@ interface BigInt64Array {
   join(separator?: string): string;
 
   /** Yields each index in the array. */
-  keys(): IterableIterator<number>;
+  keys(): ArrayIterator<number>;
 
   /**
    * Returns the index of the last occurrence of a value in an array.
@@ -325,7 +325,7 @@ interface BigInt64Array {
   subarray(begin?: number, end?: number): BigInt64Array;
 
   /** Converts the array to a string by using the current locale. */
-  toLocaleString(): string;
+  toLocaleString(locales?: string | readonly string[], options?: Intl.NumberFormatOptions): string;
 
   /** Returns a string representation of the array. */
   toString(): string;
@@ -334,9 +334,9 @@ interface BigInt64Array {
   valueOf(): BigInt64Array;
 
   /** Yields each value in the array. */
-  values(): IterableIterator<bigint>;
+  values(): ArrayIterator<bigint>;
 
-  [Symbol.iterator](): IterableIterator<bigint>;
+  [Symbol.iterator](): ArrayIterator<bigint>;
 
   readonly [Symbol.toStringTag]: 'BigInt64Array';
 
@@ -396,7 +396,7 @@ interface BigUint64Array {
   copyWithin(target: number, start: number, end?: number): this;
 
   /** Yields index, value pairs for every entry in the array. */
-  entries(): IterableIterator<readonly [number, bigint]>;
+  entries(): ArrayIterator<readonly [number, bigint]>;
 
   /**
    * Determines whether all the members of an array satisfy the specified test.
@@ -471,7 +471,7 @@ interface BigUint64Array {
   join(separator?: string): string;
 
   /** Yields each index in the array. */
-  keys(): IterableIterator<number>;
+  keys(): ArrayIterator<number>;
 
   /**
    * Returns the index of the last occurrence of a value in an array.
@@ -567,7 +567,7 @@ interface BigUint64Array {
   subarray(begin?: number, end?: number): BigUint64Array;
 
   /** Converts the array to a string by using the current locale. */
-  toLocaleString(): string;
+  toLocaleString(locales?: string | readonly string[], options?: Intl.NumberFormatOptions): string;
 
   /** Returns a string representation of the array. */
   toString(): string;
@@ -576,9 +576,9 @@ interface BigUint64Array {
   valueOf(): BigUint64Array;
 
   /** Yields each value in the array. */
-  values(): IterableIterator<bigint>;
+  values(): ArrayIterator<bigint>;
 
-  [Symbol.iterator](): IterableIterator<bigint>;
+  [Symbol.iterator](): ArrayIterator<bigint>;
 
   readonly [Symbol.toStringTag]: 'BigUint64Array';
 
@@ -653,6 +653,5 @@ interface DataView {
 declare namespace Intl {
   interface NumberFormat {
     format(value: number | bigint): string;
-    resolvedOptions(): ResolvedNumberFormatOptions;
   }
 }

@@ -165,13 +165,4 @@ export const convertLibEs2023Array = ({
       'Copies and sorts the array.',
       'Returns a copy of an array with its elements sorted.', // use the same description with Array
     ),
-    replaceWithNoMatchCheckBetweenRegexp({
-      startRegexp: markers.Int8,
-      endRegexp: closeBraceRegexp,
-      mapFn: replaceWithNoMatchCheck(
-        //
-        'Uint8Array',
-        'Int8Array',
-      ),
-    }),
   );

@@ -4,10 +4,10 @@
 /// <reference lib="es2018.asynciterable" />
 
 interface AsyncGenerator<T = unknown, TReturn = any, TNext = unknown>
-  extends AsyncIterator<T, TReturn, TNext> {
+  extends AsyncIteratorObject<T, TReturn, TNext> {
   // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
   next(
-    ...args: readonly [] | readonly [TNext]
+    ...[value]: readonly [] | readonly [TNext]
   ): Promise<IteratorResult<T, TReturn>>;
   return(
     value: TReturn | PromiseLike<TReturn>,
