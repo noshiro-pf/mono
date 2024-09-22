@@ -5,11 +5,11 @@ export const useKeyEventListener = (
   onKeyUp: (ev: KeyboardEvent) => void,
 ): void => {
   useEffect(() => {
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
+    globalThis.addEventListener('keydown', onKeyDown);
+    globalThis.addEventListener('keyup', onKeyUp);
     return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
+      globalThis.removeEventListener('keydown', onKeyDown);
+      globalThis.removeEventListener('keyup', onKeyUp);
     };
   }, [onKeyDown, onKeyUp]);
 };

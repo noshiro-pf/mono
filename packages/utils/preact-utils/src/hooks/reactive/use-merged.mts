@@ -5,13 +5,13 @@ export function useMerged<T1, T2, T3, T4, T5, T6, T7, T8, T9>(
   init: T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9,
   value1: T1 | undefined,
   value2: T2 | undefined,
-  value3?: T3 | undefined,
-  value4?: T4 | undefined,
-  value5?: T5 | undefined,
-  value6?: T6 | undefined,
-  value7?: T7 | undefined,
-  value8?: T8 | undefined,
-  value9?: T9 | undefined,
+  value3?: T3,
+  value4?: T4,
+  value5?: T5,
+  value6?: T6,
+  value7?: T7,
+  value8?: T8,
+  value9?: T9,
 ): T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 {
   const { state: merged, setState: set } = useState<
     T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9

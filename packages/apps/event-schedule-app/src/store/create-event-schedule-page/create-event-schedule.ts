@@ -183,15 +183,18 @@ const onCreateEventClick = (): void => {
 
 const onClipboardButtonClick = (): void => {
   const url = getUrlSnapshot();
+  // eslint-disable-next-line unicorn/prefer-global-this
+  const clipboard = window.navigator.clipboard;
 
   // https://stackoverflow.com/questions/51805395/navigator-clipboard-is-undefined
   if (
-    isNotUndefined(window.navigator.clipboard) &&
+    isNotUndefined(clipboard) &&
+    // eslint-disable-next-line unicorn/prefer-global-this
     window.isSecureContext &&
     isNotUndefined(url)
   ) {
     // TODO: use toast
-    window.navigator.clipboard.writeText(url).catch(console.error);
+    clipboard.writeText(url).catch(console.error);
   }
 };
 

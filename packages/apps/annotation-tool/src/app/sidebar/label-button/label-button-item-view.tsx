@@ -88,7 +88,7 @@ export const LabelButtonItemView = memoNamed<Props>(
           >
             <Icon
               icon={props.isVisible ? 'eye-open' : 'eye-off'}
-              iconSize={IconSize.LARGE}
+              size={IconSize.LARGE}
             />
           </div>
         </LabelButtonItemBodyComponentConditional>

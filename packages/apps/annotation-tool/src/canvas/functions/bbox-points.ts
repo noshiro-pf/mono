@@ -7,7 +7,7 @@ export type BboxPoint = Readonly<{
   position: Point;
 }>;
 
-export type BboxPoints = Readonly<{ [key in Direction]: Point }>;
+export type BboxPoints = Record<Direction, Point>;
 
 /*
  *     x0    x1    x2
@@ -40,7 +40,7 @@ export const bboxPointsFromRect = (rect: Rect): BboxPoints => {
 };
 
 export const foreachBboxPoints = <A>(
-  bboxPoints: { readonly [key in Direction]: A },
+  bboxPoints: Record<Direction, A>,
   fn: (direction: Direction, p: A) => void,
 ): void => {
   fn('nw', bboxPoints.nw);
@@ -54,9 +54,9 @@ export const foreachBboxPoints = <A>(
 };
 
 export const mapBboxPoints = <A, B>(
-  bboxPoints: { readonly [key in Direction]: A },
+  bboxPoints: Record<Direction, A>,
   fn: (direction: Direction, p: A) => B,
-): { [key in Direction]: B } => ({
+): Record<Direction, B> => ({
   nw: fn('nw', bboxPoints.nw),
   n_: fn('n_', bboxPoints.n_),
   ne: fn('ne', bboxPoints.ne),

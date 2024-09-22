@@ -167,18 +167,14 @@ export const problem2String = (
 
 export const aka2Normal = (
   tile: TileName,
-): Exclude<TileName, 'AkaManzu5' | 'AkaPinzu5' | 'AkaSozu5'> => {
-  switch (tile) {
-    case 'AkaManzu5':
-      return 'Manzu5';
-    case 'AkaPinzu5':
-      return 'Pinzu5';
-    case 'AkaSozu5':
-      return 'Sozu5';
-    default:
-      return tile;
-  }
-};
+): Exclude<TileName, 'AkaManzu5' | 'AkaPinzu5' | 'AkaSozu5'> =>
+  tile === 'AkaManzu5'
+    ? 'Manzu5'
+    : tile === 'AkaPinzu5'
+      ? 'Pinzu5'
+      : tile === 'AkaSozu5'
+        ? 'Sozu5'
+        : tile;
 
 export const shanten2String = (
   shanten: Shanten,

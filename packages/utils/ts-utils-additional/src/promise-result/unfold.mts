@@ -6,7 +6,8 @@ export const unfold = <S, P = undefined, E = unknown>(
   switch (result.status) {
     case 'success':
       return result.value;
-    default:
+    case 'error':
+    case 'pending':
       return undefined;
   }
 };

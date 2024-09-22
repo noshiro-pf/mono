@@ -30,6 +30,7 @@ export const onPointerMove = (
         pixiApp.temporaryRect.style.borderColor,
       );
       break;
+
     case 'bbox-face':
       moveBbox(
         mut_state.grabbingObject.pixiBbox,
@@ -38,6 +39,7 @@ export const onPointerMove = (
         mut_state.dragEndPoint,
       );
       break;
+
     case 'bbox-point':
       resizeBbox(
         mut_state.grabbingObject.pixiBbox,
@@ -47,7 +49,9 @@ export const onPointerMove = (
         mut_state.dragEndPoint,
       );
       break;
-    default:
+
+    case 'bbox-edge':
+    case undefined:
       break;
   }
 };

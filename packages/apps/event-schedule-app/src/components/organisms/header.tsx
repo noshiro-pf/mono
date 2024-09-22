@@ -18,7 +18,7 @@ export const Header = memoNamed<Props>('Header', ({ title }) => (
       `}
     >
       <Title>
-        <Icon icon={'timeline-events'} iconSize={28} />
+        <Icon icon={'timeline-events'} size={28} />
         <div>{title}</div>
       </Title>
     </div>

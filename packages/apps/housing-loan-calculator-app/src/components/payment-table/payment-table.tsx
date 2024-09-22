@@ -56,7 +56,7 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
   );
 
   return (
-    <HTMLTable bordered={true} condensed={true} striped={true}>
+    <HTMLTable bordered={true} compact={true} striped={true}>
       <thead>
         <tr>
           <th style={headerCellStyle}>{dict.numPayments}</th>

@@ -56,8 +56,20 @@ export const generateEsLintConfig = async (
         : '',
     '',
 
-    "{ rules: { '@typescript-eslint/no-restricted-imports': [ 'error', ...restrictedImports ] } },",
+    '    {',
+    '      rules: {',
+    "        '@typescript-eslint/no-restricted-imports': [",
+    "          'error',",
+    '          ...restrictedImports,',
+    '        ],',
+    packageName === 'syncflow'
+      ? "        'functional/no-class-inheritance': 'off',"
+      : '',
+    '      },',
+    '    },',
 
+    '  ];',
+    '',
     packageName === 'annotation-tool'
       ? "  return [...configs, { rules: { '@typescript-eslint/prefer-readonly-parameter-types': 'off' } }]"
       : packageName === 'blueprintjs-playground'

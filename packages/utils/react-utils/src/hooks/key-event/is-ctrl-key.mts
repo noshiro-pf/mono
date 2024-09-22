@@ -11,7 +11,7 @@ export const isCtrlKey = <T = Element,>(
       return keyEvent.metaKey;
     case 'windows':
       return keyEvent.ctrlKey;
-    default:
+    case 'other':
       return keyEvent.ctrlKey;
   }
 };

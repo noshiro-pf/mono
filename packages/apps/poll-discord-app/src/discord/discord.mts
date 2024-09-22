@@ -65,47 +65,55 @@ export const initDiscordClient = async (): Promise<
 };
 
 export const startDiscordListener = (discordClient: DiscordClient): void => {
-  discordClient.on('messageReactionAdd', async (reaction, user) => {
-    const reactionFilled: DiscordMessageReaction = reaction.partial
-      ? await reaction.fetch()
-      : reaction;
+  discordClient.on('messageReactionAdd', (reaction, user) => {
+    (async () => {
+      const reactionFilled: DiscordMessageReaction = reaction.partial
+        ? await reaction.fetch()
+        : reaction;
 
-    const result = await onMessageReactionAdd(reactionFilled, user);
+      const result = await onMessageReactionAdd(reactionFilled, user);
 
-    if (Result.isErr(result)) {
-      console.error('on messageReactionAdd error:', result);
-    }
+      if (Result.isErr(result)) {
+        console.error('on messageReactionAdd error:', result);
+      }
+    })().catch(() => {});
   });
 
-  discordClient.on('messageReactionRemove', async (reaction, user) => {
-    const reactionFilled: DiscordMessageReaction = reaction.partial
-      ? await reaction.fetch()
-      : reaction;
+  discordClient.on('messageReactionRemove', (reaction, user) => {
+    (async () => {
+      const reactionFilled: DiscordMessageReaction = reaction.partial
+        ? await reaction.fetch()
+        : reaction;
 
-    const result = await onMessageReactionRemove(reactionFilled, user);
+      const result = await onMessageReactionRemove(reactionFilled, user);
 
-    if (Result.isErr(result)) {
-      console.error('on messageReactionRemove error:', result);
-    }
+      if (Result.isErr(result)) {
+        console.error('on messageReactionRemove error:', result);
+      }
+    })().catch(() => {});
   });
 
-  discordClient.on('messageUpdate', async (_oldMessage, newMessage) => {
-    const newMessageFilled: DiscordMessage<boolean> = newMessage.partial
-      ? await newMessage.fetch()
-      : newMessage;
+  discordClient.on('messageUpdate', (_oldMessage, newMessage) => {
+    (async () => {
+      const newMessageFilled: DiscordMessage<boolean> = newMessage.partial
+        ? await newMessage.fetch()
+        : newMessage;
 
-    const result = await updatePollTitle(newMessageFilled);
+      const result = await updatePollTitle(newMessageFilled);
 
-    if (Result.isErr(result)) {
-      console.error('on message error:', result);
-    }
+      if (Result.isErr(result)) {
+        console.error('on message error:', result);
+      }
+    })().catch(() => {});
   });
 
-  discordClient.on('messageCreate', async (message) => {
-    const result = await sendMessageMain(message);
+  discordClient.on('messageCreate', (message) => {
+    (async () => {
+      const result = await sendMessageMain(message);
 
-    if (Result.isErr(result)) {
-      console.error('on message error:', result);
-    }
+      if (Result.isErr(result)) {
+        console.error('on message error:', result);
+      }
+    })().catch(() => {});
   });
 };
