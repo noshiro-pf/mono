@@ -12,10 +12,16 @@
     "clean:build": "rimraf esm",
     "clean:src": "rimraf src/*.mts",
     "clean:wireit": "rimraf .wireit/**",
+    "dump-keys": "wireit",
+    "dump-keys-message": "node ./dist/dump-keys-message.mjs",
+    "dump-keys-message-sub-array-keys": "node ./dist/dump-keys-message-sub-array-keys.mjs",
+    "dump-keys-message-sub-keys": "node ./dist/dump-keys-message-sub-keys.mjs",
     "fmt": "yarn zz:prettier .",
     "lint": "yarn zz:eslint:src",
     "lint:fix": "yarn zz:eslint:src --fix",
     "main": "wireit",
+    "recursive-download": "wireit",
+    "run-validator": "wireit",
     "test": "yarn zz:vitest run",
     "testw": "yarn zz:vitest watch",
     "tsc": "yarn type-check",
@@ -43,11 +49,29 @@
       ],
       "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
     },
+    "run-validator": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "node ./dist/run-validator.mjs"
+    },
+    "recursive-download": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "node ./dist/recursive-download.mjs"
+    },
     "main": {
       "dependencies": [
         "build"
       ],
       "command": "node ./dist/main.mjs"
+    },
+    "dump-keys": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "run-p dump-keys-*"
     }
   }
 }
