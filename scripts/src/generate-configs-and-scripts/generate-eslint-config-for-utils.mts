@@ -23,12 +23,12 @@ export const generateEsLintConfig = async (
     '',
     'import {',
     '  eslintFlatConfigForTypeScript,',
-    '  eslintFlatConfigForVitest',
-    '  eslintFlatConfigForPreact', // maybe removed by prettier
-    '  eslintFlatConfigForReact', // maybe removed by prettier
+    '  eslintFlatConfigForVitest,',
+    '  eslintFlatConfigForPreact,', // maybe removed by prettier
+    '  eslintFlatConfigForReact,', // maybe removed by prettier
     '  genEsLintRestrictedImportsDefFromDevDependencies,',
     "} from '@noshiro/eslint-configs';",
-    "import { toThisDir } from '@noshiro/mono-scripts",
+    "import { toThisDir } from '@noshiro/mono-scripts';",
     "import * as nodePath from 'node:path';",
     "import packageJson from './package.json' assert { type: 'json' };",
     '',
