@@ -54,8 +54,8 @@ const UNSAFE_updateIn_impl = (
       ? obj.map((v, i): unknown =>
           i === keyPath[index]
             ? UNSAFE_updateIn_impl(
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, total-functions/no-unsafe-type-assertion
-                obj[keyPath[index]!] as UnknownRecord,
+                // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+                obj[keyPath[index]] as UnknownRecord,
                 keyPath,
                 Uint32.add(index, 1),
                 updater,

@@ -72,10 +72,7 @@ describe('Array.find', () => {
     const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
     const result = xs.find((x) => x.v === 1);
 
-    expectType<
-      typeof result,
-      Readonly<{ v: 1 }> | Readonly<{ v: 2 }> | Readonly<{ v: 3 }> | undefined
-    >('=');
+    expectType<typeof result, Readonly<{ v: 1 }> | undefined>('=');
 
     test('case 1', () => {
       expect(result).toStrictEqual({ v: 1 });
