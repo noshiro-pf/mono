@@ -1,6 +1,5 @@
 // This file is created to avoid circular reference between RN and operators.
 
-export * from './RN';
 export * from './operators/auditTime';
 export * from './operators/debounce';
 export * from './operators/delay';
@@ -20,3 +19,4 @@ export * from './operators/throttle';
 export * from './operators/withDefault';
 export * from './operators/withInitialValue';
 export * from './operators/withLatest';
+export * from './RN';
