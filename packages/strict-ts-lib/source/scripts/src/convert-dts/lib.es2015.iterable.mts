@@ -148,7 +148,14 @@ export const convertLibEs2015Iterable = ({
         ),
       }),
     ]),
-
+    replaceWithNoMatchCheckBetweenRegexp({
+      startRegexp: 'interface Iterator<',
+      endRegexp: closeBraceRegexp,
+      mapFn: replaceWithNoMatchCheck(
+        `next(...[value]: readonly [] | readonly [TNext]): IteratorResult<T, TReturn>;`,
+        `next(...[value]: [] | [TNext]): IteratorResult<T, TReturn>;`,
+      ),
+    }),
     returnType === 'readonly'
       ? idFn
       : replaceWithNoMatchCheckBetweenRegexp({
