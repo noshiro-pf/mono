@@ -324,10 +324,6 @@ interface ImageEncodeOptions {
   type?: string;
 }
 
-interface ImportMeta {
-  url: string;
-}
-
 interface JsonWebKey {
   alg?: string;
   crv?: string;
@@ -396,6 +392,10 @@ interface MediaDecodingConfiguration extends MediaConfiguration {
 
 interface MediaEncodingConfiguration extends MediaConfiguration {
   type: MediaEncodingType;
+}
+
+interface MediaStreamTrackProcessorInit {
+  maxBufferSize?: number;
 }
 
 interface MessageEventInit<T = unknown> extends EventInit {
@@ -542,6 +542,21 @@ interface ReadableStreamGetReaderOptions {
   mode?: ReadableStreamReaderMode;
 }
 
+interface ReadableStreamIteratorOptions {
+  /**
+   * Asynchronously iterates over the chunks in the stream's internal queue.
+   *
+   * Asynchronously iterating over the stream will lock it, preventing any other
+   * consumer from acquiring a reader. The lock will be released if the async
+   * iterator's return() method is called, e.g. by breaking out of the loop.
+   *
+   * By default, calling the async iterator's return() method will also cancel
+   * the stream. To prevent this, use the stream's values() method, passing true
+   * for the preventCancel option.
+   */
+  preventCancel?: boolean;
+}
+
 interface ReadableStreamReadDoneResult<T> {
   done: true;
   value?: T;
@@ -666,16 +681,16 @@ interface RsaPssParams extends Algorithm {
 interface SecurityPolicyViolationEventInit extends EventInit {
   blockedURI?: string;
   columnNumber?: number;
-  disposition: SecurityPolicyViolationEventDisposition;
-  documentURI: string;
-  effectiveDirective: string;
+  disposition?: SecurityPolicyViolationEventDisposition;
+  documentURI?: string;
+  effectiveDirective?: string;
   lineNumber?: number;
-  originalPolicy: string;
+  originalPolicy?: string;
   referrer?: string;
   sample?: string;
   sourceFile?: string;
-  statusCode: number;
-  violatedDirective: string;
+  statusCode?: number;
+  violatedDirective?: string;
 }
 
 interface StorageEstimate {
@@ -1071,6 +1086,11 @@ declare const AbortSignal: {
    * Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static)
    */
   abort(reason?: unknown): AbortSignal;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static)
+   */
+  any(signals: readonly AbortSignal[]): AbortSignal;
   /**
    * [MDN
    * Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/timeout_static)
@@ -2242,6 +2262,11 @@ interface CanvasShadowStyles {
 interface CanvasState {
   /**
    * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/isContextLost)
+   */
+  isContextLost(): boolean;
+  /**
+   * [MDN
    * Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/reset)
    */
   reset(): void;
@@ -2721,20 +2746,12 @@ interface DOMMatrix extends DOMMatrixReadOnly {
   ): DOMMatrix;
   rotateFromVectorSelf(x?: number, y?: number): DOMMatrix;
   rotateSelf(rotX?: number, rotY?: number, rotZ?: number): DOMMatrix;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrix/scale3dSelf)
-   */
   scale3dSelf(
     scale?: number,
     originX?: number,
     originY?: number,
     originZ?: number,
   ): DOMMatrix;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrix/scaleSelf)
-   */
   scaleSelf(
     scaleX?: number,
     scaleY?: number,
@@ -2758,165 +2775,45 @@ declare const DOMMatrix: {
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly) */
 interface DOMMatrixReadOnly {
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/a)
-   */
   readonly a: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/b)
-   */
   readonly b: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/c)
-   */
   readonly c: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/d)
-   */
   readonly d: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/e)
-   */
   readonly e: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/f)
-   */
   readonly f: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/is2D)
-   */
   readonly is2D: boolean;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/isIdentity)
-   */
   readonly isIdentity: boolean;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m11)
-   */
   readonly m11: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m12)
-   */
   readonly m12: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m13)
-   */
   readonly m13: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m14)
-   */
   readonly m14: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m21)
-   */
   readonly m21: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m22)
-   */
   readonly m22: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m23)
-   */
   readonly m23: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m24)
-   */
   readonly m24: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m31)
-   */
   readonly m31: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m32)
-   */
   readonly m32: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m33)
-   */
   readonly m33: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m34)
-   */
   readonly m34: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m41)
-   */
   readonly m41: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m42)
-   */
   readonly m42: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m43)
-   */
   readonly m43: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/m44)
-   */
   readonly m44: number;
   /**
    * [MDN
    * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/flipX)
    */
   flipX(): DOMMatrix;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/flipY)
-   */
   flipY(): DOMMatrix;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/inverse)
-   */
   inverse(): DOMMatrix;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/multiply)
-   */
   multiply(other?: DOMMatrixInit): DOMMatrix;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/rotate)
-   */
   rotate(rotX?: number, rotY?: number, rotZ?: number): DOMMatrix;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/rotateAxisAngle)
-   */
   rotateAxisAngle(
     x?: number,
     y?: number,
     z?: number,
     angle?: number,
   ): DOMMatrix;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/rotateFromVector)
-   */
   rotateFromVector(x?: number, y?: number): DOMMatrix;
   /**
    * [MDN
@@ -2930,48 +2827,19 @@ interface DOMMatrixReadOnly {
     originY?: number,
     originZ?: number,
   ): DOMMatrix;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/scale3d)
-   */
   scale3d(
     scale?: number,
     originX?: number,
     originY?: number,
     originZ?: number,
   ): DOMMatrix;
-  /**
-   * @deprecated
-   *
-   *   [MDN
-   *   Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/scaleNonUniform)
-   */
+  /** @deprecated */
   scaleNonUniform(scaleX?: number, scaleY?: number): DOMMatrix;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/skewX)
-   */
   skewX(sx?: number): DOMMatrix;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/skewY)
-   */
   skewY(sy?: number): DOMMatrix;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/toFloat32Array)
-   */
   toFloat32Array(): Float32Array;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/toFloat64Array)
-   */
   toFloat64Array(): Float64Array;
   toJSON(): unknown;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/transformPoint)
-   */
   transformPoint(point?: DOMPointInit): DOMPoint;
   /**
    * [MDN
@@ -3032,10 +2900,6 @@ interface DOMPointReadOnly {
    * Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/z)
    */
   readonly z: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/matrixTransform)
-   */
   matrixTransform(matrix?: DOMMatrixInit): DOMPoint;
   /**
    * [MDN
@@ -3056,18 +2920,10 @@ declare const DOMPointReadOnly: {
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad) */
 interface DOMQuad {
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad/p1) */
   readonly p1: DOMPoint;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad/p2) */
   readonly p2: DOMPoint;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad/p3) */
   readonly p3: DOMPoint;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad/p4) */
   readonly p4: DOMPoint;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad/getBounds)
-   */
   getBounds(): DOMRect;
   toJSON(): unknown;
 }
@@ -3095,6 +2951,10 @@ interface DOMRect extends DOMRectReadOnly {
 declare const DOMRect: {
   prototype: DOMRect;
   new (x?: number, y?: number, width?: number, height?: number): DOMRect;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/DOMRect/fromRect_static)
+   */
   fromRect(other?: DOMRectInit): DOMRect;
 };
 
@@ -3439,30 +3299,10 @@ declare const EncodedVideoChunk: {
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent)
  */
 interface ErrorEvent extends Event {
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/colno)
-   */
   readonly colno: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/error)
-   */
   readonly error: unknown;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/filename)
-   */
   readonly filename: string;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/lineno)
-   */
   readonly lineno: number;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/message)
-   */
   readonly message: string;
 }
 
@@ -5481,7 +5321,7 @@ interface IDBTransaction extends EventTarget {
    * For an upgrade transaction this is all object stores in the database.
    *
    * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/IDBTransaction/objectStoreNames)
+   * Reference](https://developer.mozilla.org/docs/Web/API/IDBTransaction/ObjectStoreNames)
    */
   readonly objectStoreNames: DOMStringList;
   /**
@@ -5676,6 +5516,11 @@ declare const ImageData: {
   ): ImageData;
 };
 
+interface ImportMeta {
+  url: string;
+  resolve(specifier: string): string;
+}
+
 /**
  * [MDN
  * Reference](https://developer.mozilla.org/docs/Web/API/KHR_parallel_shader_compile)
@@ -5752,6 +5597,31 @@ declare const MediaCapabilities: {
   new (): MediaCapabilities;
 };
 
+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/MediaSourceHandle) */
+interface MediaSourceHandle {}
+
+declare const MediaSourceHandle: {
+  prototype: MediaSourceHandle;
+  new (): MediaSourceHandle;
+};
+
+/**
+ * [MDN
+ * Reference](https://developer.mozilla.org/docs/Web/API/MediaStreamTrackProcessor)
+ */
+interface MediaStreamTrackProcessor {
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/MediaStreamTrackProcessor/readable)
+   */
+  readonly readable: ReadableStream;
+}
+
+declare const MediaStreamTrackProcessor: {
+  prototype: MediaStreamTrackProcessor;
+  new (init: MediaStreamTrackProcessorInit): MediaStreamTrackProcessor;
+};
+
 /**
  * This Channel Messaging API interface allows us to create a new message
  * channel and send data through it via its two MessagePort properties.
@@ -5825,12 +5695,7 @@ interface MessageEvent<T = unknown> extends Event {
    * Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/source)
    */
   readonly source: MessageEventSource | null;
-  /**
-   * @deprecated
-   *
-   *   [MDN
-   *   Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/initMessageEvent)
-   */
+  /** @deprecated */
   initMessageEvent(
     type: string,
     bubbles?: boolean,
@@ -6394,7 +6259,15 @@ interface OffscreenCanvas extends EventTarget {
    * Reference](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas/height)
    */
   height: number;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas/contextlost_event)
+   */
   oncontextlost: ((this: OffscreenCanvas, ev: Event) => unknown) | null;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas/contextrestored_event)
+   */
   oncontextrestored: ((this: OffscreenCanvas, ev: Event) => unknown) | null;
   /**
    * These attributes return the dimensions of the OffscreenCanvas object's
@@ -6522,11 +6395,6 @@ interface OffscreenCanvasRenderingContext2D
     CanvasTextDrawingStyles,
     CanvasTransform {
   readonly canvas: OffscreenCanvas;
-  /**
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/OffscreenCanvasRenderingContext2D/commit)
-   */
-  commit(): void;
 }
 
 declare const OffscreenCanvasRenderingContext2D: {
@@ -7582,6 +7450,10 @@ declare const Report: {
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReportBody) */
 interface ReportBody {
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/ReportBody/toJSON)
+   */
   toJSON(): unknown;
 }
 
@@ -7668,9 +7540,6 @@ interface Request extends Body {
   /**
    * Returns a boolean indicating whether or not request can outlive the global
    * in which it was created.
-   *
-   * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/Request/keepalive)
    */
   readonly keepalive: boolean;
   /**
@@ -8050,7 +7919,7 @@ interface ServiceWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
 
 /**
  * This ServiceWorker API interface represents the global execution context of a
- * service worker.
+ * service worker. Available only in secure contexts.
  *
  * [MDN
  * Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope)
@@ -8944,12 +8813,17 @@ declare const URL: {
    * [MDN
    * Reference](https://developer.mozilla.org/docs/Web/API/URL/canParse_static)
    */
-  canParse(url: string | URL, base?: string): boolean;
+  canParse(url: string | URL, base?: string | URL): boolean;
   /**
    * [MDN
    * Reference](https://developer.mozilla.org/docs/Web/API/URL/createObjectURL_static)
    */
   createObjectURL(obj: Blob): string;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/URL/parse_static)
+   */
+  parse(url: string | URL, base?: string | URL): URL | null;
   /**
    * [MDN
    * Reference](https://developer.mozilla.org/docs/Web/API/URL/revokeObjectURL_static)
@@ -9084,6 +8958,10 @@ interface VideoDecoder extends EventTarget {
    * Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder/decodeQueueSize)
    */
   readonly decodeQueueSize: number;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder/dequeue_event)
+   */
   ondequeue: ((this: VideoDecoder, ev: Event) => unknown) | null;
   /**
    * [MDN
@@ -9140,6 +9018,10 @@ interface VideoDecoder extends EventTarget {
 declare const VideoDecoder: {
   prototype: VideoDecoder;
   new (init: VideoDecoderInit): VideoDecoder;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder/isConfigSupported_static)
+   */
   isConfigSupported(config: VideoDecoderConfig): Promise<VideoDecoderSupport>;
 };
 
@@ -9158,6 +9040,10 @@ interface VideoEncoder extends EventTarget {
    * Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/encodeQueueSize)
    */
   readonly encodeQueueSize: number;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/dequeue_event)
+   */
   ondequeue: ((this: VideoEncoder, ev: Event) => unknown) | null;
   /**
    * [MDN
@@ -9179,6 +9065,10 @@ interface VideoEncoder extends EventTarget {
    * Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/encode)
    */
   encode(frame: VideoFrame, options?: VideoEncoderEncodeOptions): void;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/flush)
+   */
   flush(): Promise<void>;
   /**
    * [MDN
@@ -9210,6 +9100,10 @@ interface VideoEncoder extends EventTarget {
 declare const VideoEncoder: {
   prototype: VideoEncoder;
   new (init: VideoEncoderInit): VideoEncoder;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/isConfigSupported_static)
+   */
   isConfigSupported(config: VideoEncoderConfig): Promise<VideoEncoderSupport>;
 };
 
@@ -9280,6 +9174,10 @@ interface VideoFrame {
    * Reference](https://developer.mozilla.org/docs/Web/API/VideoFrame/close)
    */
   close(): void;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/VideoFrame/copyTo)
+   */
   copyTo(
     destination: AllowSharedBufferSource,
     options?: VideoFrameCopyToOptions,
@@ -10245,7 +10143,7 @@ interface WebGL2RenderingContextBase {
   clientWaitSync(sync: WebGLSync, flags: GLbitfield, timeout: GLuint64): GLenum;
   /**
    * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/compressedTexImage3D)
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/compressedTexImage2D)
    */
   compressedTexImage3D(
     target: GLenum,
@@ -11974,6 +11872,10 @@ declare const WebGLRenderingContext: {
 };
 
 interface WebGLRenderingContextBase {
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/drawingBufferColorSpace)
+   */
   drawingBufferColorSpace: PredefinedColorSpace;
   /**
    * [MDN
@@ -13364,7 +13266,7 @@ declare const WebGLVertexArrayObject: {
 
 /**
  * [MDN
- * Reference](https://developer.mozilla.org/docs/Web/API/WebGLVertexArrayObjectOES)
+ * Reference](https://developer.mozilla.org/docs/Web/API/WebGLVertexArrayObject)
  */
 interface WebGLVertexArrayObjectOES {}
 
@@ -13698,30 +13600,36 @@ interface WindowOrWorkerGlobalScope {
   /**
    * Available only in secure contexts.
    *
-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/caches)
+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/caches)
    */
   readonly caches: CacheStorage;
   /**
    * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/crossOriginIsolated)
+   * Reference](https://developer.mozilla.org/docs/Web/API/Window/crossOriginIsolated)
    */
   readonly crossOriginIsolated: boolean;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/crypto_property) */
+  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/crypto) */
   readonly crypto: Crypto;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/indexedDB) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/Window/indexedDB)
+   */
   readonly indexedDB: IDBFactory;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/isSecureContext) */
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/Window/isSecureContext)
+   */
   readonly isSecureContext: boolean;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/origin) */
+  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/origin) */
   readonly origin: string;
   /**
    * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/performance_property)
+   * Reference](https://developer.mozilla.org/docs/Web/API/Window/performance)
    */
   readonly performance: Performance;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/atob) */
+  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
   atob(data: string): string;
-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/btoa) */
+  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
   btoa(data: string): string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/clearInterval) */
   clearInterval(id: number | undefined): void;
@@ -13892,9 +13800,17 @@ interface WorkerGlobalScope
    * Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/online_event)
    */
   ononline: ((this: WorkerGlobalScope, ev: Event) => unknown) | null;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/rejectionhandled_event)
+   */
   onrejectionhandled:
     | ((this: WorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
     | null;
+  /**
+   * [MDN
+   * Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/unhandledrejection_event)
+   */
   onunhandledrejection:
     | ((this: WorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
     | null;
@@ -14491,7 +14407,7 @@ interface Console {
   count(label?: string): void;
   /**
    * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/console/countReset_static)
+   * Reference](https://developer.mozilla.org/docs/Web/API/console/countreset_static)
    */
   countReset(label?: string): void;
   /**
@@ -14521,12 +14437,12 @@ interface Console {
   group(...data: readonly unknown[]): void;
   /**
    * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/console/groupCollapsed_static)
+   * Reference](https://developer.mozilla.org/docs/Web/API/console/groupcollapsed_static)
    */
   groupCollapsed(...data: readonly unknown[]): void;
   /**
    * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/console/groupEnd_static)
+   * Reference](https://developer.mozilla.org/docs/Web/API/console/groupend_static)
    */
   groupEnd(): void;
   /**
@@ -14551,12 +14467,12 @@ interface Console {
   time(label?: string): void;
   /**
    * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/console/timeEnd_static)
+   * Reference](https://developer.mozilla.org/docs/Web/API/console/timeend_static)
    */
   timeEnd(label?: string): void;
   /**
    * [MDN
-   * Reference](https://developer.mozilla.org/docs/Web/API/console/timeLog_static)
+   * Reference](https://developer.mozilla.org/docs/Web/API/console/timelog_static)
    */
   timeLog(label?: string, ...data: readonly unknown[]): void;
   timeStamp(label?: string): void;
@@ -14588,15 +14504,7 @@ declare namespace WebAssembly {
    * Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Global)
    */
   interface Global<T extends ValueType = ValueType> {
-    /**
-     * [MDN
-     * Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Global/value)
-     */
     value: ValueTypeMap[T];
-    /**
-     * [MDN
-     * Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Global/valueOf)
-     */
     valueOf(): ValueTypeMap[T];
   }
 
@@ -15006,9 +14914,17 @@ declare const onoffline:
 declare const ononline:
   | ((this: DedicatedWorkerGlobalScope, ev: Event) => unknown)
   | null;
+/**
+ * [MDN
+ * Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/rejectionhandled_event)
+ */
 declare const onrejectionhandled:
   | ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
   | null;
+/**
+ * [MDN
+ * Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/unhandledrejection_event)
+ */
 declare const onunhandledrejection:
   | ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
   | null;
@@ -15041,30 +14957,33 @@ declare const fonts: FontFaceSet;
 /**
  * Available only in secure contexts.
  *
- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/caches)
+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/caches)
  */
 declare const caches: CacheStorage;
 /**
  * [MDN
- * Reference](https://developer.mozilla.org/docs/Web/API/crossOriginIsolated)
+ * Reference](https://developer.mozilla.org/docs/Web/API/Window/crossOriginIsolated)
  */
 declare const crossOriginIsolated: boolean;
-/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/crypto_property) */
+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/crypto) */
 declare const crypto: Crypto;
-/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/indexedDB) */
+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/indexedDB) */
 declare const indexedDB: IDBFactory;
-/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/isSecureContext) */
+/**
+ * [MDN
+ * Reference](https://developer.mozilla.org/docs/Web/API/Window/isSecureContext)
+ */
 declare const isSecureContext: boolean;
-/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/origin) */
+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/origin) */
 declare const origin: string;
 /**
  * [MDN
- * Reference](https://developer.mozilla.org/docs/Web/API/performance_property)
+ * Reference](https://developer.mozilla.org/docs/Web/API/Window/performance)
  */
 declare const performance: Performance;
-/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/atob) */
+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
 declare function atob(data: string): string;
-/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/btoa) */
+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
 declare function btoa(data: string): string;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/clearInterval) */
 declare function clearInterval(id: number | undefined): void;
@@ -15219,6 +15138,7 @@ type Transferable =
   | OffscreenCanvas
   | ImageBitmap
   | MessagePort
+  | MediaSourceHandle
   | ReadableStream
   | WritableStream
   | TransformStream

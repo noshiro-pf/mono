@@ -1,4 +1,4 @@
-@@ -1,21 +1,7 @@
+@@ -1,23 +1,9 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -18,11 +18,15 @@
 +/// <reference types="@noshiro/ts-type-utils" />
  
 -/// <reference lib="es2015.symbol" />
+-/// <reference lib="es2015.iterable" />
+-/// <reference lib="es2018.asynciterable" />
 +/// <reference path="./lib.es2015.symbol.d.ts" />
++/// <reference path="./lib.es2015.iterable.d.ts" />
++/// <reference path="./lib.es2018.asynciterable.d.ts" />
  
  interface SymbolConstructor {
    /**
-@@ -40,16 +26,16 @@ interface AsyncDisposable {
+@@ -42,16 +28,16 @@ interface AsyncDisposable {
  }
  
  interface SuppressedError extends Error {
@@ -44,7 +48,7 @@
  
  interface DisposableStack {
    /** Returns a value indicating whether this stack has been disposed. */
-@@ -118,7 +104,7 @@ interface DisposableStackConstructor {
+@@ -120,7 +106,7 @@ interface DisposableStackConstructor {
    new (): DisposableStack;
    readonly prototype: DisposableStack;
  }
@@ -53,9 +57,12 @@
  
  interface AsyncDisposableStack {
    /** Returns a value indicating whether this stack has been disposed. */
-@@ -188,4 +174,4 @@ interface AsyncDisposableStackConstructor {
+@@ -190,7 +176,7 @@ interface AsyncDisposableStackConstructor {
    new (): AsyncDisposableStack;
    readonly prototype: AsyncDisposableStack;
  }
 -declare var AsyncDisposableStack: AsyncDisposableStackConstructor;
 +declare const AsyncDisposableStack: AsyncDisposableStackConstructor;
+ 
+ interface IteratorObject<T, TReturn, TNext> extends Disposable {}
+ 

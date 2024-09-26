@@ -197,7 +197,7 @@ interface BigInt64Array {
   ): this;
 
   /** Yields index, value pairs for every entry in the array. */
-  entries(): IterableIterator<readonly [NumberType.TypedArraySize, BigInt64]>;
+  entries(): ArrayIterator<readonly [NumberType.TypedArraySize, BigInt64]>;
 
   /**
    * Determines whether all the members of an array satisfy the specified test.
@@ -350,7 +350,7 @@ interface BigInt64Array {
   join(separator?: string): string;
 
   /** Yields each index in the array. */
-  keys(): IterableIterator<NumberType.TypedArraySize>;
+  keys(): ArrayIterator<NumberType.TypedArraySize>;
 
   /**
    * Returns the index of the last occurrence of a value in an array.
@@ -542,7 +542,10 @@ interface BigInt64Array {
   ): BigInt64Array;
 
   /** Converts the array to a string by using the current locale. */
-  toLocaleString(): string;
+  toLocaleString(
+    locales?: string | readonly string[],
+    options?: Intl.NumberFormatOptions,
+  ): string;
 
   /** Returns a string representation of the array. */
   toString(): string;
@@ -551,9 +554,9 @@ interface BigInt64Array {
   valueOf(): BigInt64Array;
 
   /** Yields each value in the array. */
-  values(): IterableIterator<BigInt64>;
+  values(): ArrayIterator<BigInt64>;
 
-  [Symbol.iterator](): IterableIterator<BigInt64>;
+  [Symbol.iterator](): ArrayIterator<BigInt64>;
 
   readonly [Symbol.toStringTag]: 'BigInt64Array';
 
@@ -633,7 +636,7 @@ interface BigUint64Array {
   ): this;
 
   /** Yields index, value pairs for every entry in the array. */
-  entries(): IterableIterator<readonly [NumberType.TypedArraySize, BigUint64]>;
+  entries(): ArrayIterator<readonly [NumberType.TypedArraySize, BigUint64]>;
 
   /**
    * Determines whether all the members of an array satisfy the specified test.
@@ -786,7 +789,7 @@ interface BigUint64Array {
   join(separator?: string): string;
 
   /** Yields each index in the array. */
-  keys(): IterableIterator<NumberType.TypedArraySize>;
+  keys(): ArrayIterator<NumberType.TypedArraySize>;
 
   /**
    * Returns the index of the last occurrence of a value in an array.
@@ -978,7 +981,10 @@ interface BigUint64Array {
   ): BigUint64Array;
 
   /** Converts the array to a string by using the current locale. */
-  toLocaleString(): string;
+  toLocaleString(
+    locales?: string | readonly string[],
+    options?: Intl.NumberFormatOptions,
+  ): string;
 
   /** Returns a string representation of the array. */
   toString(): string;
@@ -987,9 +993,9 @@ interface BigUint64Array {
   valueOf(): BigUint64Array;
 
   /** Yields each value in the array. */
-  values(): IterableIterator<BigUint64>;
+  values(): ArrayIterator<BigUint64>;
 
-  [Symbol.iterator](): IterableIterator<BigUint64>;
+  [Symbol.iterator](): ArrayIterator<BigUint64>;
 
   readonly [Symbol.toStringTag]: 'BigUint64Array';
 
@@ -1098,6 +1104,5 @@ interface DataView {
 declare namespace Intl {
   interface NumberFormat {
     format(value: number | bigint): string;
-    resolvedOptions(): ResolvedNumberFormatOptions;
   }
 }

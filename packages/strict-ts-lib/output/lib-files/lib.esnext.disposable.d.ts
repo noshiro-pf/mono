@@ -2,6 +2,8 @@
 /// <reference types="@noshiro/ts-type-utils" />
 
 /// <reference path="./lib.es2015.symbol.d.ts" />
+/// <reference path="./lib.es2015.iterable.d.ts" />
+/// <reference path="./lib.es2018.asynciterable.d.ts" />
 
 interface SymbolConstructor {
   /**
@@ -175,3 +177,7 @@ interface AsyncDisposableStackConstructor {
   readonly prototype: AsyncDisposableStack;
 }
 declare const AsyncDisposableStack: AsyncDisposableStackConstructor;
+
+interface IteratorObject<T, TReturn, TNext> extends Disposable {}
+
+interface AsyncIteratorObject<T, TReturn, TNext> extends AsyncDisposable {}

@@ -279,8 +279,8 @@
    copyWithin(target: number, start: number, end?: number): this;
  
    /** Yields index, value pairs for every entry in the array. */
--  entries(): IterableIterator<[number, bigint]>;
-+  entries(): IterableIterator<readonly [number, bigint]>;
+-  entries(): ArrayIterator<[number, bigint]>;
++  entries(): ArrayIterator<readonly [number, bigint]>;
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
@@ -349,7 +349,16 @@
    ): boolean;
  
    /**
-@@ -636,14 +517,14 @@ interface BigInt64ArrayConstructor {
+@@ -608,7 +489,7 @@ interface BigInt64Array {
+ 
+   /** Converts the array to a string by using the current locale. */
+   toLocaleString(
+-    locales?: string | string[],
++    locales?: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
+   ): string;
+ 
+@@ -639,14 +520,14 @@ interface BigInt64ArrayConstructor {
    ): BigInt64Array;
  
    /** The size in bytes of each element in the array. */
@@ -366,7 +375,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -656,11 +537,11 @@ interface BigInt64ArrayConstructor {
+@@ -659,11 +540,11 @@ interface BigInt64ArrayConstructor {
    from<U>(
      arrayLike: ArrayLike<U>,
      mapfn: (v: U, k: number) => bigint,
@@ -380,7 +389,7 @@
  
  /**
   * A typed array of 64-bit unsigned integer values. The contents are initialized
-@@ -669,7 +550,7 @@ declare var BigInt64Array: BigInt64ArrayConstructor;
+@@ -672,7 +553,7 @@ declare var BigInt64Array: BigInt64ArrayConstructor;
   */
  interface BigUint64Array {
    /** The size in bytes of each element in the array. */
@@ -389,16 +398,16 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: ArrayBufferLike;
-@@ -694,7 +575,7 @@ interface BigUint64Array {
+@@ -697,7 +578,7 @@ interface BigUint64Array {
    copyWithin(target: number, start: number, end?: number): this;
  
    /** Yields index, value pairs for every entry in the array. */
--  entries(): IterableIterator<[number, bigint]>;
-+  entries(): IterableIterator<readonly [number, bigint]>;
+-  entries(): ArrayIterator<[number, bigint]>;
++  entries(): ArrayIterator<readonly [number, bigint]>;
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -708,7 +589,7 @@ interface BigUint64Array {
+@@ -711,7 +592,7 @@ interface BigUint64Array {
     */
    every(
      predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
@@ -407,7 +416,7 @@
    ): boolean;
  
    /**
-@@ -735,8 +616,8 @@ interface BigUint64Array {
+@@ -738,8 +619,8 @@ interface BigUint64Array {
     *   value.
     */
    filter(
@@ -418,7 +427,7 @@
    ): BigUint64Array;
  
    /**
-@@ -753,7 +634,7 @@ interface BigUint64Array {
+@@ -756,7 +637,7 @@ interface BigUint64Array {
     */
    find(
      predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
@@ -427,7 +436,7 @@
    ): bigint | undefined;
  
    /**
-@@ -770,7 +651,7 @@ interface BigUint64Array {
+@@ -773,7 +654,7 @@ interface BigUint64Array {
     */
    findIndex(
      predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
@@ -436,7 +445,7 @@
    ): number;
  
    /**
-@@ -784,7 +665,7 @@ interface BigUint64Array {
+@@ -787,7 +668,7 @@ interface BigUint64Array {
     */
    forEach(
      callbackfn: (value: bigint, index: number, array: BigUint64Array) => void,
@@ -445,7 +454,7 @@
    ): void;
  
    /**
-@@ -844,7 +725,7 @@ interface BigUint64Array {
+@@ -847,7 +728,7 @@ interface BigUint64Array {
     */
    map(
      callbackfn: (value: bigint, index: number, array: BigUint64Array) => bigint,
@@ -454,7 +463,7 @@
    ): BigUint64Array;
  
    /**
-@@ -968,7 +849,7 @@ interface BigUint64Array {
+@@ -971,7 +852,7 @@ interface BigUint64Array {
     */
    some(
      predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
@@ -463,7 +472,16 @@
    ): boolean;
  
    /**
-@@ -1018,14 +899,14 @@ interface BigUint64ArrayConstructor {
+@@ -993,7 +874,7 @@ interface BigUint64Array {
+ 
+   /** Converts the array to a string by using the current locale. */
+   toLocaleString(
+-    locales?: string | string[],
++    locales?: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
+   ): string;
+ 
+@@ -1024,14 +905,14 @@ interface BigUint64ArrayConstructor {
    ): BigUint64Array;
  
    /** The size in bytes of each element in the array. */
@@ -480,7 +498,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -1038,11 +919,11 @@ interface BigUint64ArrayConstructor {
+@@ -1044,11 +925,11 @@ interface BigUint64ArrayConstructor {
    from<U>(
      arrayLike: ArrayLike<U>,
      mapfn: (v: U, k: number) => bigint,

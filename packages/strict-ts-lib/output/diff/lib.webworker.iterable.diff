@@ -19,68 +19,66 @@
  
  /////////////////////////////
  /// Worker Iterable APIs
-@@ -21,21 +7,21 @@ and limitations under the License.
+@@ -29,21 +15,21 @@ interface AbortSignal {
  
  interface CSSNumericArray {
-   [Symbol.iterator](): IterableIterator<CSSNumericValue>;
--  entries(): IterableIterator<[number, CSSNumericValue]>;
-+  entries(): IterableIterator<readonly [number, CSSNumericValue]>;
-   keys(): IterableIterator<number>;
-   values(): IterableIterator<CSSNumericValue>;
+   [Symbol.iterator](): ArrayIterator<CSSNumericValue>;
+-  entries(): ArrayIterator<[number, CSSNumericValue]>;
++  entries(): ArrayIterator<readonly [number, CSSNumericValue]>;
+   keys(): ArrayIterator<number>;
+   values(): ArrayIterator<CSSNumericValue>;
  }
  
  interface CSSTransformValue {
-   [Symbol.iterator](): IterableIterator<CSSTransformComponent>;
--  entries(): IterableIterator<[number, CSSTransformComponent]>;
-+  entries(): IterableIterator<readonly [number, CSSTransformComponent]>;
-   keys(): IterableIterator<number>;
-   values(): IterableIterator<CSSTransformComponent>;
+   [Symbol.iterator](): ArrayIterator<CSSTransformComponent>;
+-  entries(): ArrayIterator<[number, CSSTransformComponent]>;
++  entries(): ArrayIterator<readonly [number, CSSTransformComponent]>;
+   keys(): ArrayIterator<number>;
+   values(): ArrayIterator<CSSTransformComponent>;
  }
  
  interface CSSUnparsedValue {
-   [Symbol.iterator](): IterableIterator<CSSUnparsedSegment>;
--  entries(): IterableIterator<[number, CSSUnparsedSegment]>;
-+  entries(): IterableIterator<readonly [number, CSSUnparsedSegment]>;
-   keys(): IterableIterator<number>;
-   values(): IterableIterator<CSSUnparsedSegment>;
+   [Symbol.iterator](): ArrayIterator<CSSUnparsedSegment>;
+-  entries(): ArrayIterator<[number, CSSUnparsedSegment]>;
++  entries(): ArrayIterator<readonly [number, CSSUnparsedSegment]>;
+   keys(): ArrayIterator<number>;
+   values(): ArrayIterator<CSSUnparsedSegment>;
  }
-@@ -78,9 +64,9 @@ interface FileList {
- interface FontFaceSet extends Set<FontFace> {}
+@@ -91,9 +77,9 @@ interface FormDataIterator<T>
+ }
  
  interface FormData {
--  [Symbol.iterator](): IterableIterator<[string, FormDataEntryValue]>;
-+  [Symbol.iterator](): IterableIterator<readonly [string, FormDataEntryValue]>;
+-  [Symbol.iterator](): FormDataIterator<[string, FormDataEntryValue]>;
++  [Symbol.iterator](): FormDataIterator<readonly [string, FormDataEntryValue]>;
    /** Returns an array of key, value pairs for every entry in the list. */
--  entries(): IterableIterator<[string, FormDataEntryValue]>;
-+  entries(): IterableIterator<readonly [string, FormDataEntryValue]>;
+-  entries(): FormDataIterator<[string, FormDataEntryValue]>;
++  entries(): FormDataIterator<readonly [string, FormDataEntryValue]>;
    /** Returns a list of keys in the list. */
-   keys(): IterableIterator<string>;
+   keys(): FormDataIterator<string>;
    /** Returns a list of values in the list. */
-@@ -88,12 +74,12 @@ interface FormData {
+@@ -106,12 +92,12 @@ interface HeadersIterator<T>
  }
  
  interface Headers {
--  [Symbol.iterator](): IterableIterator<[string, string]>;
-+  [Symbol.iterator](): IterableIterator<readonly [string, string]>;
+-  [Symbol.iterator](): HeadersIterator<[string, string]>;
++  [Symbol.iterator](): HeadersIterator<readonly [string, string]>;
    /**
     * Returns an iterator allowing to go through all key/value pairs contained in
     * this object.
     */
--  entries(): IterableIterator<[string, string]>;
-+  entries(): IterableIterator<readonly [string, string]>;
+-  entries(): HeadersIterator<[string, string]>;
++  entries(): HeadersIterator<readonly [string, string]>;
    /**
     * Returns an iterator allowing to go through all keys of the key/value pairs
     * contained in this object.
-@@ -141,7 +127,7 @@ interface IDBObjectStore {
+@@ -159,13 +145,13 @@ interface IDBObjectStore {
    ): IDBIndex;
  }
  
 -interface MessageEvent<T = any> {
 +interface MessageEvent<T = unknown> {
-   /**
-    * @deprecated
-    *
-@@ -152,7 +138,7 @@ interface MessageEvent<T = any> {
+   /** @deprecated */
+   initMessageEvent(
      type: string,
      bubbles?: boolean,
      cancelable?: boolean,
@@ -89,32 +87,32 @@
      origin?: string,
      lastEventId?: string,
      source?: MessageEventSource | null,
-@@ -161,8 +147,10 @@ interface MessageEvent<T = any> {
- }
+@@ -180,10 +166,10 @@ interface StylePropertyMapReadOnlyIterator<T>
  
  interface StylePropertyMapReadOnly {
--  [Symbol.iterator](): IterableIterator<[string, Iterable<CSSStyleValue>]>;
--  entries(): IterableIterator<[string, Iterable<CSSStyleValue>]>;
-+  [Symbol.iterator](): IterableIterator<
+   [Symbol.iterator](): StylePropertyMapReadOnlyIterator<
+-    [string, Iterable<CSSStyleValue>]
 +    readonly [string, Iterable<CSSStyleValue>]
-+  >;
-+  entries(): IterableIterator<readonly [string, Iterable<CSSStyleValue>]>;
-   keys(): IterableIterator<string>;
-   values(): IterableIterator<Iterable<CSSStyleValue>>;
- }
-@@ -266,9 +254,9 @@ interface SubtleCrypto {
+   >;
+   entries(): StylePropertyMapReadOnlyIterator<
+-    [string, Iterable<CSSStyleValue>]
++    readonly [string, Iterable<CSSStyleValue>]
+   >;
+   keys(): StylePropertyMapReadOnlyIterator<string>;
+   values(): StylePropertyMapReadOnlyIterator<Iterable<CSSStyleValue>>;
+@@ -293,9 +279,9 @@ interface URLSearchParamsIterator<T>
  }
  
  interface URLSearchParams {
--  [Symbol.iterator](): IterableIterator<[string, string]>;
-+  [Symbol.iterator](): IterableIterator<readonly [string, string]>;
+-  [Symbol.iterator](): URLSearchParamsIterator<[string, string]>;
++  [Symbol.iterator](): URLSearchParamsIterator<readonly [string, string]>;
    /** Returns an array of key, value pairs for every entry in the search params. */
--  entries(): IterableIterator<[string, string]>;
-+  entries(): IterableIterator<readonly [string, string]>;
+-  entries(): URLSearchParamsIterator<[string, string]>;
++  entries(): URLSearchParamsIterator<readonly [string, string]>;
    /** Returns a list of keys in the search params. */
-   keys(): IterableIterator<string>;
+   keys(): URLSearchParamsIterator<string>;
    /** Returns a list of values in the search params. */
-@@ -384,7 +372,7 @@ interface WebGL2RenderingContextBase {
+@@ -411,7 +397,7 @@ interface WebGL2RenderingContextBase {
      program: WebGLProgram,
      uniformIndices: Iterable<GLuint>,
      pname: GLenum,

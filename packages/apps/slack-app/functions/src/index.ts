@@ -58,7 +58,10 @@ export const makeUppercase = firestore
             mut_data.push(chunk);
           })
           .on('end', () => {
-            const events = Buffer.concat(mut_data);
+            const events: Buffer = Buffer.concat(
+              // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+              mut_data as unknown as Uint8Array[],
+            );
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any
             const r = Json.parse(events.toString()) as any;
 

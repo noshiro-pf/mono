@@ -74,7 +74,7 @@
  
    /**
     * Returns the this object after copying a section of the array identified by
-@@ -77,7 +79,11 @@ interface Array<T> {
+@@ -77,10 +79,14 @@ interface Array<T> {
     * @param end If not specified, length of the this object is used as its
     *   default value.
     */
@@ -84,10 +84,14 @@
 +    start: NumberType.ArraySizeArg,
 +    end?: NumberType.ArraySizeArg,
 +  ): this;
- }
  
- interface ArrayConstructor {
-@@ -86,7 +92,7 @@ interface ArrayConstructor {
+   toLocaleString(
+-    locales: string | string[],
++    locales: string | readonly string[],
+     options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions,
+   ): string;
+ }
+@@ -91,7 +97,7 @@ interface ArrayConstructor {
     *
     * @param arrayLike An array-like object to convert to an array.
     */
@@ -96,7 +100,7 @@
  
    /**
     * Creates an array from an iterable object.
-@@ -97,16 +103,16 @@ interface ArrayConstructor {
+@@ -102,16 +108,16 @@ interface ArrayConstructor {
     */
    from<T, U>(
      arrayLike: ArrayLike<T>,
@@ -117,7 +121,7 @@
  }
  
  interface DateConstructor {
-@@ -128,7 +134,7 @@ interface Math {
+@@ -133,7 +139,7 @@ interface Math {
     *
     * @param x A numeric expression.
     */
@@ -126,7 +130,7 @@
  
    /**
     * Returns the result of 32-bit multiplication of two numbers.
-@@ -136,7 +142,7 @@ interface Math {
+@@ -141,7 +147,7 @@ interface Math {
     * @param x First number
     * @param y Second number
     */
@@ -135,7 +139,7 @@
  
    /**
     * Returns the sign of the x, indicating whether x is positive, negative or
-@@ -144,7 +150,7 @@ interface Math {
+@@ -149,7 +155,7 @@ interface Math {
     *
     * @param x The numeric expression to test
     */
@@ -144,7 +148,7 @@
  
    /**
     * Returns the base 10 logarithm of a number.
-@@ -181,7 +187,7 @@ interface Math {
+@@ -186,7 +192,7 @@ interface Math {
     *
     * @param x A numeric expression that contains an angle measured in radians.
     */
@@ -153,7 +157,7 @@
  
    /**
     * Returns the hyperbolic sine of a number.
-@@ -202,7 +208,7 @@ interface Math {
+@@ -207,7 +213,7 @@ interface Math {
     *
     * @param x A numeric expression that contains an angle measured in radians.
     */
@@ -162,7 +166,7 @@
  
    /**
     * Returns the inverse hyperbolic sine of a number.
-@@ -227,7 +233,7 @@ interface Math {
+@@ -232,7 +238,7 @@ interface Math {
     *   is +Infinity. If any argument is NaN, the result is NaN. If all arguments
     *   are either +0 or −0, the result is +0.
     */
@@ -171,7 +175,7 @@
  
    /**
     * Returns the integral part of the a numeric expression, x, removing any
-@@ -235,14 +241,14 @@ interface Math {
+@@ -240,14 +246,14 @@ interface Math {
     *
     * @param x A numeric expression.
     */
@@ -188,7 +192,7 @@
  
    /**
     * Returns an implementation-dependent approximation to the cube root of
-@@ -259,7 +265,7 @@ interface NumberConstructor {
+@@ -264,7 +270,7 @@ interface NumberConstructor {
     * value greater than 1 that is representable as a Number value, which is
     * approximately: 2.2204460492503130808472633361816 x 10‍−‍16.
     */
@@ -197,7 +201,7 @@
  
    /**
     * Returns true if passed value is finite. Unlike the global isFinite,
-@@ -268,14 +274,14 @@ interface NumberConstructor {
+@@ -273,14 +279,14 @@ interface NumberConstructor {
     *
     * @param number A numeric value.
     */
@@ -214,7 +218,7 @@
  
    /**
     * Returns a Boolean value that indicates whether a value is the reserved
-@@ -285,35 +291,35 @@ interface NumberConstructor {
+@@ -290,35 +296,35 @@ interface NumberConstructor {
     *
     * @param number A numeric value.
     */
@@ -255,7 +259,7 @@
  
    /**
     * Converts A string to an integer.
-@@ -324,7 +330,7 @@ interface NumberConstructor {
+@@ -329,7 +335,7 @@ interface NumberConstructor {
     *   '0x' are considered hexadecimal. All other strings are considered
     *   decimal.
     */
@@ -264,7 +268,7 @@
  }
  
  interface ObjectConstructor {
-@@ -370,14 +376,14 @@ interface ObjectConstructor {
+@@ -375,14 +381,14 @@ interface ObjectConstructor {
     * @param target The target object to copy to.
     * @param sources One or more source objects from which to copy properties
     */
@@ -281,7 +285,7 @@
  
    /**
     * Returns the names of the enumerable string properties and methods of an
-@@ -387,7 +393,7 @@ interface ObjectConstructor {
+@@ -392,7 +398,7 @@ interface ObjectConstructor {
     *   object that you created or an existing Document Object Model (DOM)
     *   object.
     */
@@ -290,7 +294,7 @@
  
    /**
     * Returns true if the values are the same value, false otherwise.
-@@ -395,7 +401,7 @@ interface ObjectConstructor {
+@@ -400,7 +406,7 @@ interface ObjectConstructor {
     * @param value1 The first value.
     * @param value2 The second value.
     */
@@ -299,7 +303,7 @@
  
    /**
     * Sets the prototype of a specified object o to object proto or null. Returns
-@@ -404,7 +410,7 @@ interface ObjectConstructor {
+@@ -409,7 +415,7 @@ interface ObjectConstructor {
     * @param o The object to change its prototype.
     * @param proto The value of the new prototype or null.
     */
@@ -308,7 +312,7 @@
  }
  
  interface ReadonlyArray<T> {
-@@ -421,12 +427,20 @@ interface ReadonlyArray<T> {
+@@ -426,12 +432,20 @@ interface ReadonlyArray<T> {
     *   instead.
     */
    find<S extends T>(
@@ -333,7 +337,7 @@
    ): T | undefined;
  
    /**
-@@ -442,9 +456,13 @@ interface ReadonlyArray<T> {
+@@ -447,12 +461,16 @@ interface ReadonlyArray<T> {
     *   instead.
     */
    findIndex(
@@ -347,10 +351,14 @@
 +    ) => boolean,
 +    thisArg?: unknown,
 +  ): NumberType.ArraySearchResult;
- }
  
- interface RegExp {
-@@ -490,7 +508,7 @@ interface String {
+   toLocaleString(
+-    locales: string | string[],
++    locales: string | readonly string[],
+     options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions,
+   ): string;
+ }
+@@ -500,7 +518,7 @@ interface String {
     * undefined. If a valid UTF-16 surrogate pair does not begin at pos, the
     * result is the code unit at pos.
     */
@@ -359,7 +367,7 @@
  
    /**
     * Returns true if searchString appears as a substring of the result of
-@@ -501,7 +519,10 @@ interface String {
+@@ -511,7 +529,10 @@ interface String {
     * @param position If position is undefined, 0 is assumed, so as to search all
     *   of the String.
     */
@@ -371,7 +379,7 @@
  
    /**
     * Returns true if the sequence of elements of searchString converted to a
-@@ -509,7 +530,10 @@ interface String {
+@@ -519,7 +540,10 @@ interface String {
     * to a String) starting at endPosition – length(this). Otherwise returns
     * false.
     */
@@ -383,7 +391,7 @@
  
    /**
     * Returns the String value result of normalizing the string into the
-@@ -537,14 +561,17 @@ interface String {
+@@ -547,14 +571,17 @@ interface String {
     *
     * @param count Number of copies to append
     */
@@ -403,7 +411,7 @@
  
    /**
     * Returns an `<a>` HTML anchor element and sets the name attribute to the
-@@ -652,7 +679,7 @@ interface StringConstructor {
+@@ -662,7 +689,7 @@ interface StringConstructor {
     * Return the String value whose elements are, in order, the elements in the
     * List elements. If length is 0, the empty string is returned.
     */
@@ -412,7 +420,7 @@
  
    /**
     * String.raw is usually used as a tag function of a Tagged Template String.
-@@ -666,7 +693,7 @@ interface StringConstructor {
+@@ -676,70 +703,70 @@ interface StringConstructor {
     * @param substitutions A set of substitution values.
     */
    raw(
@@ -420,5 +428,77 @@
 -    ...substitutions: any[]
 +    template: { readonly raw: readonly string[] | ArrayLike<string> },
 +    ...substitutions: readonly unknown[]
+   ): string;
+ }
+ 
+ interface Int8Array {
+   toLocaleString(
+-    locales: string | string[],
++    locales: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
+   ): string;
+ }
+ 
+ interface Uint8Array {
+   toLocaleString(
+-    locales: string | string[],
++    locales: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
+   ): string;
+ }
+ 
+ interface Uint8ClampedArray {
+   toLocaleString(
+-    locales: string | string[],
++    locales: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
+   ): string;
+ }
+ 
+ interface Int16Array {
+   toLocaleString(
+-    locales: string | string[],
++    locales: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
+   ): string;
+ }
+ 
+ interface Uint16Array {
+   toLocaleString(
+-    locales: string | string[],
++    locales: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
+   ): string;
+ }
+ 
+ interface Int32Array {
+   toLocaleString(
+-    locales: string | string[],
++    locales: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
+   ): string;
+ }
+ 
+ interface Uint32Array {
+   toLocaleString(
+-    locales: string | string[],
++    locales: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
+   ): string;
+ }
+ 
+ interface Float32Array {
+   toLocaleString(
+-    locales: string | string[],
++    locales: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
+   ): string;
+ }
+ 
+ interface Float64Array {
+   toLocaleString(
+-    locales: string | string[],
++    locales: string | readonly string[],
+     options?: Intl.NumberFormatOptions,
    ): string;
  }

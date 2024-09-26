@@ -3,6 +3,6 @@
 
 declare namespace Intl {
   interface DateTimeFormatPartTypesRegistry {
-    readonly unknown: unknown;
+    readonly unknown: never;
   }
 }

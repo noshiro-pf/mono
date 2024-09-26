@@ -19,25 +19,30 @@ and limitations under the License.
 /// Worker Iterable APIs
 /////////////////////////////
 
+interface AbortSignal {
+  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static) */
+  any(signals: Iterable<AbortSignal>): AbortSignal;
+}
+
 interface CSSNumericArray {
-  [Symbol.iterator](): IterableIterator<CSSNumericValue>;
-  entries(): IterableIterator<readonly [number, CSSNumericValue]>;
-  keys(): IterableIterator<number>;
-  values(): IterableIterator<CSSNumericValue>;
+  [Symbol.iterator](): ArrayIterator<CSSNumericValue>;
+  entries(): ArrayIterator<readonly [number, CSSNumericValue]>;
+  keys(): ArrayIterator<number>;
+  values(): ArrayIterator<CSSNumericValue>;
 }
 
 interface CSSTransformValue {
-  [Symbol.iterator](): IterableIterator<CSSTransformComponent>;
-  entries(): IterableIterator<readonly [number, CSSTransformComponent]>;
-  keys(): IterableIterator<number>;
-  values(): IterableIterator<CSSTransformComponent>;
+  [Symbol.iterator](): ArrayIterator<CSSTransformComponent>;
+  entries(): ArrayIterator<readonly [number, CSSTransformComponent]>;
+  keys(): ArrayIterator<number>;
+  values(): ArrayIterator<CSSTransformComponent>;
 }
 
 interface CSSUnparsedValue {
-  [Symbol.iterator](): IterableIterator<CSSUnparsedSegment>;
-  entries(): IterableIterator<readonly [number, CSSUnparsedSegment]>;
-  keys(): IterableIterator<number>;
-  values(): IterableIterator<CSSUnparsedSegment>;
+  [Symbol.iterator](): ArrayIterator<CSSUnparsedSegment>;
+  entries(): ArrayIterator<readonly [number, CSSUnparsedSegment]>;
+  keys(): ArrayIterator<number>;
+  values(): ArrayIterator<CSSUnparsedSegment>;
 }
 
 interface Cache {
@@ -56,33 +61,41 @@ interface CanvasPathDrawingStyles {
 }
 
 interface DOMStringList {
-  [Symbol.iterator](): IterableIterator<string>;
+  [Symbol.iterator](): ArrayIterator<string>;
 }
 
 interface FileList {
-  [Symbol.iterator](): IterableIterator<File>;
+  [Symbol.iterator](): ArrayIterator<File>;
 }
 
 interface FontFaceSet extends Set<FontFace> {}
 
+interface FormDataIterator<T> extends IteratorObject<T, BuiltinIteratorReturn, unknown> {
+  [Symbol.iterator](): FormDataIterator<T>;
+}
+
 interface FormData {
-  [Symbol.iterator](): IterableIterator<readonly [string, FormDataEntryValue]>;
+  [Symbol.iterator](): FormDataIterator<readonly [string, FormDataEntryValue]>;
   /** Returns an array of key, value pairs for every entry in the list. */
-  entries(): IterableIterator<readonly [string, FormDataEntryValue]>;
+  entries(): FormDataIterator<readonly [string, FormDataEntryValue]>;
   /** Returns a list of keys in the list. */
-  keys(): IterableIterator<string>;
+  keys(): FormDataIterator<string>;
   /** Returns a list of values in the list. */
-  values(): IterableIterator<FormDataEntryValue>;
+  values(): FormDataIterator<FormDataEntryValue>;
+}
+
+interface HeadersIterator<T> extends IteratorObject<T, BuiltinIteratorReturn, unknown> {
+  [Symbol.iterator](): HeadersIterator<T>;
 }
 
 interface Headers {
-  [Symbol.iterator](): IterableIterator<readonly [string, string]>;
+  [Symbol.iterator](): HeadersIterator<readonly [string, string]>;
   /** Returns an iterator allowing to go through all key/value pairs contained in this object. */
-  entries(): IterableIterator<readonly [string, string]>;
+  entries(): HeadersIterator<readonly [string, string]>;
   /** Returns an iterator allowing to go through all keys of the key/value pairs contained in this object. */
-  keys(): IterableIterator<string>;
+  keys(): HeadersIterator<string>;
   /** Returns an iterator allowing to go through all values of the key/value pairs contained in this object. */
-  values(): IterableIterator<string>;
+  values(): HeadersIterator<string>;
 }
 
 interface IDBDatabase {
@@ -106,19 +119,19 @@ interface IDBObjectStore {
 }
 
 interface MessageEvent<T = unknown> {
-  /**
-   * @deprecated
-   *
-   *   [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/initMessageEvent)
-   */
+  /** @deprecated */
   initMessageEvent(type: string, bubbles?: boolean, cancelable?: boolean, data?: unknown, origin?: string, lastEventId?: string, source?: MessageEventSource | null, ports?: Iterable<MessagePort>): void;
 }
 
+interface StylePropertyMapReadOnlyIterator<T> extends IteratorObject<T, BuiltinIteratorReturn, unknown> {
+  [Symbol.iterator](): StylePropertyMapReadOnlyIterator<T>;
+}
+
 interface StylePropertyMapReadOnly {
-  [Symbol.iterator](): IterableIterator<readonly [string, Iterable<CSSStyleValue>]>;
-  entries(): IterableIterator<readonly [string, Iterable<CSSStyleValue>]>;
-  keys(): IterableIterator<string>;
-  values(): IterableIterator<Iterable<CSSStyleValue>>;
+  [Symbol.iterator](): StylePropertyMapReadOnlyIterator<readonly [string, Iterable<CSSStyleValue>]>;
+  entries(): StylePropertyMapReadOnlyIterator<readonly [string, Iterable<CSSStyleValue>]>;
+  keys(): StylePropertyMapReadOnlyIterator<string>;
+  values(): StylePropertyMapReadOnlyIterator<Iterable<CSSStyleValue>>;
 }
 
 interface SubtleCrypto {
@@ -144,14 +157,18 @@ interface SubtleCrypto {
   ): Promise<CryptoKey>;
 }
 
+interface URLSearchParamsIterator<T> extends IteratorObject<T, BuiltinIteratorReturn, unknown> {
+  [Symbol.iterator](): URLSearchParamsIterator<T>;
+}
+
 interface URLSearchParams {
-  [Symbol.iterator](): IterableIterator<readonly [string, string]>;
+  [Symbol.iterator](): URLSearchParamsIterator<readonly [string, string]>;
   /** Returns an array of key, value pairs for every entry in the search params. */
-  entries(): IterableIterator<readonly [string, string]>;
+  entries(): URLSearchParamsIterator<readonly [string, string]>;
   /** Returns a list of keys in the search params. */
-  keys(): IterableIterator<string>;
+  keys(): URLSearchParamsIterator<string>;
   /** Returns a list of values in the search params. */
-  values(): IterableIterator<string>;
+  values(): URLSearchParamsIterator<string>;
 }
 
 interface WEBGL_draw_buffers {

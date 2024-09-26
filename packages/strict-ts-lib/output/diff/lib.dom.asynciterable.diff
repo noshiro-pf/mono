@@ -1,4 +1,4 @@
-@@ -1,27 +1,15 @@
+@@ -1,19 +1,5 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -19,15 +19,26 @@
  
  /////////////////////////////
  /// Window Async Iterable APIs
- /////////////////////////////
+@@ -26,9 +12,11 @@ interface FileSystemDirectoryHandleAsyncIterator<T>
  
  interface FileSystemDirectoryHandle {
--  [Symbol.asyncIterator](): AsyncIterableIterator<[string, FileSystemHandle]>;
--  entries(): AsyncIterableIterator<[string, FileSystemHandle]>;
-+  [Symbol.asyncIterator](): AsyncIterableIterator<
+   [Symbol.asyncIterator](): FileSystemDirectoryHandleAsyncIterator<
+-    [string, FileSystemHandle]
 +    readonly [string, FileSystemHandle]
 +  >;
-+  entries(): AsyncIterableIterator<readonly [string, FileSystemHandle]>;
-   keys(): AsyncIterableIterator<string>;
-   values(): AsyncIterableIterator<FileSystemHandle>;
++  entries(): FileSystemDirectoryHandleAsyncIterator<
++    readonly [string, FileSystemHandle]
+   >;
+-  entries(): FileSystemDirectoryHandleAsyncIterator<[string, FileSystemHandle]>;
+   keys(): FileSystemDirectoryHandleAsyncIterator<string>;
+   values(): FileSystemDirectoryHandleAsyncIterator<FileSystemHandle>;
  }
+@@ -38,7 +26,7 @@ interface ReadableStreamAsyncIterator<T>
+   [Symbol.asyncIterator](): ReadableStreamAsyncIterator<T>;
+ }
+ 
+-interface ReadableStream<R = any> {
++interface ReadableStream<R = unknown> {
+   [Symbol.asyncIterator](
+     options?: ReadableStreamIteratorOptions,
+   ): ReadableStreamAsyncIterator<R>;

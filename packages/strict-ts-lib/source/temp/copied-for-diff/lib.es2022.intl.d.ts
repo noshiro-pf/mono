@@ -51,6 +51,11 @@ declare namespace Intl {
     granularity: 'grapheme' | 'word' | 'sentence';
   }
 
+  interface SegmentIterator<T>
+    extends IteratorObject<T, BuiltinIteratorReturn, unknown> {
+    [Symbol.iterator](): SegmentIterator<T>;
+  }
+
   interface Segments {
     /**
      * Returns an object describing the segment in the original string that
@@ -63,7 +68,7 @@ declare namespace Intl {
     containing(codeUnitIndex?: number): SegmentData;
 
     /** Returns an iterator to iterate over the segments. */
-    [Symbol.iterator](): IterableIterator<SegmentData>;
+    [Symbol.iterator](): SegmentIterator<SegmentData>;
   }
 
   interface SegmentData {

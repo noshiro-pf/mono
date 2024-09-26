@@ -80,8 +80,8 @@ export const convertLibEs2020Bigint = (
       `): ${config.brandedNumber.TypedArraySearchResult};`,
     ),
     replaceWithNoMatchCheck(
-      'keys(): IterableIterator<number>;',
-      `keys(): IterableIterator<${config.brandedNumber.TypedArraySize}>;`,
+      'keys(): ArrayIterator<number>;',
+      `keys(): ArrayIterator<${config.brandedNumber.TypedArraySize}>;`,
     ),
     replaceWithNoMatchCheck(
       'fill(value: bigint, start?: number, end?: number): this;',

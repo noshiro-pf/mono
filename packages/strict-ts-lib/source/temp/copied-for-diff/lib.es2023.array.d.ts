@@ -246,7 +246,7 @@ interface Int8Array {
   ): number;
 
   /** Copies the array and returns the copy with the elements in reverse order. */
-  toReversed(): Uint8Array;
+  toReversed(): Int8Array;
 
   /**
    * Copies and sorts the array.
@@ -257,11 +257,11 @@ interface Int8Array {
    *   otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
-   *   const myNums = Uint8Array.from([11, 2, 22, 1]);
-   *   myNums.toSorted((a, b) => a - b); // Uint8Array(4) [1, 2, 11, 22]
+   *   const myNums = Int8Array.from([11, 2, 22, 1]);
+   *   myNums.toSorted((a, b) => a - b); // Int8Array(4) [1, 2, 11, 22]
    *   ```
    */
-  toSorted(compareFn?: (a: number, b: number) => number): Uint8Array;
+  toSorted(compareFn?: (a: number, b: number) => number): Int8Array;
 
   /**
    * Copies the array and inserts the given number at the provided index.
@@ -271,7 +271,7 @@ interface Int8Array {
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
-  with(index: number, value: number): Uint8Array;
+  with(index: number, value: number): Int8Array;
 }
 
 interface Uint8Array {

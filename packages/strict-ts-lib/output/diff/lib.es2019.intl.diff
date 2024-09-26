@@ -19,7 +19,7 @@
  
  declare namespace Intl {
    interface DateTimeFormatPartTypesRegistry {
--    unknown: any;
-+    readonly unknown: unknown;
+-    unknown: never;
++    readonly unknown: never;
    }
  }

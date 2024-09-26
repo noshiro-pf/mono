@@ -861,7 +861,7 @@ interface Date {
   getMilliseconds(): number;
   /** Gets the milliseconds of a Date object using Universal Coordinated Time (UTC). */
   getUTCMilliseconds(): number;
-  /** Gets the difference in minutes between the time on the local computer and Universal Coordinated Time (UTC). */
+  /** Gets the difference in minutes between Universal Coordinated Time (UTC) and the time on the local computer. */
   getTimezoneOffset(): number;
   /**
    * Sets the date and time value in the Date object.
@@ -3980,12 +3980,33 @@ declare namespace Intl {
 
   var Collator: CollatorConstructor;
 
+  interface NumberFormatOptionsStyleRegistry {
+    readonly decimal: never;
+    readonly percent: never;
+    readonly currency: never;
+  }
+
+  type NumberFormatOptionsStyle = keyof NumberFormatOptionsStyleRegistry;
+
+  interface NumberFormatOptionsCurrencyDisplayRegistry {
+    readonly code: never;
+    readonly symbol: never;
+    readonly name: never;
+  }
+
+  type NumberFormatOptionsCurrencyDisplay = keyof NumberFormatOptionsCurrencyDisplayRegistry;
+
+  interface NumberFormatOptionsUseGroupingRegistry {}
+
+  type NumberFormatOptionsUseGrouping = {} extends NumberFormatOptionsUseGroupingRegistry ? boolean : keyof NumberFormatOptionsUseGroupingRegistry | 'true' | 'false' | boolean;
+  type ResolvedNumberFormatOptionsUseGrouping = {} extends NumberFormatOptionsUseGroupingRegistry ? boolean : keyof NumberFormatOptionsUseGroupingRegistry | false;
+
   interface NumberFormatOptions {
-    readonly localeMatcher?: string | undefined;
-    readonly style?: string | undefined;
+    readonly localeMatcher?: 'lookup' | 'best fit' | undefined;
+    readonly style?: NumberFormatOptionsStyle | undefined;
     readonly currency?: string | undefined;
-    readonly currencySign?: string | undefined;
-    readonly useGrouping?: boolean | undefined;
+    readonly currencyDisplay?: NumberFormatOptionsCurrencyDisplay | undefined;
+    readonly useGrouping?: NumberFormatOptionsUseGrouping | undefined;
     readonly minimumIntegerDigits?: number | undefined;
     readonly minimumFractionDigits?: number | undefined;
     readonly maximumFractionDigits?: number | undefined;
@@ -3996,14 +4017,15 @@ declare namespace Intl {
   interface ResolvedNumberFormatOptions {
     readonly locale: string;
     readonly numberingSystem: string;
-    readonly style: string;
+    readonly style: NumberFormatOptionsStyle;
     readonly currency?: string;
+    readonly currencyDisplay?: NumberFormatOptionsCurrencyDisplay;
     readonly minimumIntegerDigits: number;
-    readonly minimumFractionDigits: number;
-    readonly maximumFractionDigits: number;
+    readonly minimumFractionDigits?: number;
+    readonly maximumFractionDigits?: number;
     readonly minimumSignificantDigits?: number;
     readonly maximumSignificantDigits?: number;
-    readonly useGrouping: boolean;
+    readonly useGrouping: ResolvedNumberFormatOptionsUseGrouping;
   }
 
   interface NumberFormat {

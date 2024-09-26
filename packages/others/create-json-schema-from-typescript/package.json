@@ -11,6 +11,6 @@
     "setup": "tsc"
   },
   "devDependencies": {
-    "typescript-json-schema": "^0.63.0"
+    "typescript-json-schema": "^0.65.1"
   }
 }

@@ -102,14 +102,14 @@ function getEnumNames<T extends string>(myEnum: Record<T, unknown>): T[] {
 }
 
 export {
+  arraysAreEqual,
   Equal,
   ExcludeKeys,
-  RequireKeys,
-  arraysAreEqual,
   findFirstResult,
   getEnumNames,
   getNameFromIndexSignature,
   getNameFromMember,
   isDefinitionFile,
+  RequireKeys,
   upperCaseFirst,
 };

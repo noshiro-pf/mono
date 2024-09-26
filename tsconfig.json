@@ -3,7 +3,8 @@
   // for VSCode
   "compilerOptions": {
     "jsxFactory": "h",
-    "typeRoots": ["node_modules/@types", "packages/**/node_modules/@types"]
+    "typeRoots": ["node_modules/@types", "packages/**/node_modules/@types"],
+    "types": ["node"]
   },
   "include": [
     "./packages/**/eslint.config.js",

@@ -80,7 +80,7 @@
  
      /**
       * Provides access to the locale and options computed during initialization
-@@ -263,42 +249,47 @@ declare namespace Intl {
+@@ -263,68 +249,68 @@ declare namespace Intl {
      supportedLocalesOf(
        locales?: LocalesArgument,
        options?: RelativeTimeFormatOptions,
@@ -88,9 +88,35 @@
 +    ): readonly UnicodeBCP47LocaleIdentifier[];
    };
  
+   interface NumberFormatOptionsStyleRegistry {
+-    unit: never;
++    readonly unit: never;
+   }
+ 
+   interface NumberFormatOptionsCurrencyDisplayRegistry {
+-    narrowSymbol: never;
++    readonly narrowSymbol: never;
+   }
+ 
+   interface NumberFormatOptionsSignDisplayRegistry {
+-    auto: never;
+-    never: never;
+-    always: never;
+-    exceptZero: never;
++    readonly auto: never;
++    readonly never: never;
++    readonly always: never;
++    readonly exceptZero: never;
+   }
+ 
+   type NumberFormatOptionsSignDisplay =
+     keyof NumberFormatOptionsSignDisplayRegistry;
+ 
    interface NumberFormatOptions {
+-    numberingSystem?: string | undefined;
 -    compactDisplay?: 'short' | 'long' | undefined;
 -    notation?:
++    readonly numberingSystem?: string | undefined;
 +    readonly compactDisplay?: 'short' | 'long' | undefined;
 +    readonly notation?:
        | 'standard'
@@ -98,38 +124,44 @@
        | 'engineering'
        | 'compact'
        | undefined;
--    signDisplay?: 'auto' | 'never' | 'always' | 'exceptZero' | undefined;
+-    signDisplay?: NumberFormatOptionsSignDisplay | undefined;
 -    unit?: string | undefined;
 -    unitDisplay?: 'short' | 'long' | 'narrow' | undefined;
--    currencyDisplay?: string | undefined;
--    currencySign?: string | undefined;
-+    readonly signDisplay?:
-+      | 'auto'
-+      | 'never'
-+      | 'always'
-+      | 'exceptZero'
-+      | undefined;
+-    currencySign?: 'standard' | 'accounting' | undefined;
++    readonly signDisplay?: NumberFormatOptionsSignDisplay | undefined;
 +    readonly unit?: string | undefined;
 +    readonly unitDisplay?: 'short' | 'long' | 'narrow' | undefined;
-+    readonly currencyDisplay?: string | undefined;
-+    readonly currencySign?: string | undefined;
++    readonly currencySign?: 'standard' | 'accounting' | undefined;
    }
  
    interface ResolvedNumberFormatOptions {
 -    compactDisplay?: 'short' | 'long';
--    notation?: 'standard' | 'scientific' | 'engineering' | 'compact';
--    signDisplay?: 'auto' | 'never' | 'always' | 'exceptZero';
+-    notation: 'standard' | 'scientific' | 'engineering' | 'compact';
+-    signDisplay: NumberFormatOptionsSignDisplay;
 -    unit?: string;
 -    unitDisplay?: 'short' | 'long' | 'narrow';
--    currencyDisplay?: string;
--    currencySign?: string;
+-    currencySign?: 'standard' | 'accounting';
 +    readonly compactDisplay?: 'short' | 'long';
-+    readonly notation?: 'standard' | 'scientific' | 'engineering' | 'compact';
-+    readonly signDisplay?: 'auto' | 'never' | 'always' | 'exceptZero';
++    readonly notation: 'standard' | 'scientific' | 'engineering' | 'compact';
++    readonly signDisplay: NumberFormatOptionsSignDisplay;
 +    readonly unit?: string;
 +    readonly unitDisplay?: 'short' | 'long' | 'narrow';
-+    readonly currencyDisplay?: string;
-+    readonly currencySign?: string;
++    readonly currencySign?: 'standard' | 'accounting';
+   }
+ 
+   interface NumberFormatPartTypeRegistry {
+-    compact: never;
+-    exponentInteger: never;
+-    exponentMinusSign: never;
+-    exponentSeparator: never;
+-    unit: never;
+-    unknown: never;
++    readonly compact: never;
++    readonly exponentInteger: never;
++    readonly exponentMinusSign: never;
++    readonly exponentSeparator: never;
++    readonly unit: never;
++    readonly unknown: never;
    }
  
    interface DateTimeFormatOptions {
@@ -149,7 +181,7 @@
    }
  
    type LocaleHourCycleKey = 'h12' | 'h23' | 'h11' | 'h24';
-@@ -306,44 +297,44 @@ declare namespace Intl {
+@@ -332,44 +318,44 @@ declare namespace Intl {
  
    interface LocaleOptions {
      /** A string containing the language, and the script and region if available. */
@@ -206,7 +238,7 @@
      /**
       * Gets the most likely values for the language, script, and region of the
       * locale based on existing values.
-@@ -396,19 +387,19 @@ declare namespace Intl {
+@@ -422,19 +408,19 @@ declare namespace Intl {
    type DisplayNamesLanguageDisplay = 'dialect' | 'standard';
  
    interface DisplayNamesOptions {
@@ -236,7 +268,7 @@
    }
  
    interface DisplayNames {
-@@ -459,7 +450,7 @@ declare namespace Intl {
+@@ -485,7 +471,7 @@ declare namespace Intl {
     * [Compatibility](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames#browser_compatibility).
     */
    const DisplayNames: {
@@ -245,7 +277,7 @@
  
      /**
       * @param locales A string with a BCP 47 language tag, or an array of such
-@@ -492,8 +483,8 @@ declare namespace Intl {
+@@ -518,8 +504,8 @@ declare namespace Intl {
       */
      supportedLocalesOf(
        locales?: LocalesArgument,
@@ -256,7 +288,7 @@
    };
  
    interface CollatorConstructor {
-@@ -502,7 +493,7 @@ declare namespace Intl {
+@@ -528,7 +514,7 @@ declare namespace Intl {
      supportedLocalesOf(
        locales: LocalesArgument,
        options?: CollatorOptions,
@@ -265,7 +297,7 @@
    }
  
    interface DateTimeFormatConstructor {
-@@ -517,7 +508,7 @@ declare namespace Intl {
+@@ -543,7 +529,7 @@ declare namespace Intl {
      supportedLocalesOf(
        locales: LocalesArgument,
        options?: DateTimeFormatOptions,
@@ -274,7 +306,7 @@
    }
  
    interface NumberFormatConstructor {
-@@ -529,7 +520,7 @@ declare namespace Intl {
+@@ -555,7 +541,7 @@ declare namespace Intl {
      supportedLocalesOf(
        locales: LocalesArgument,
        options?: NumberFormatOptions,
@@ -283,7 +315,7 @@
    }
  
    interface PluralRulesConstructor {
-@@ -538,7 +529,7 @@ declare namespace Intl {
+@@ -564,7 +550,7 @@ declare namespace Intl {
  
      supportedLocalesOf(
        locales: LocalesArgument,
