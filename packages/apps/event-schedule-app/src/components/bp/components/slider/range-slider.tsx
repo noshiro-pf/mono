@@ -52,6 +52,11 @@ export const BpRangeSlider = memoNamed<Props>(
 
     const trackElementRef = useRef<HTMLDivElement>(null);
 
+    const handleTrackClick: React.MouseEventHandler<HTMLDivElement> =
+      useCallback((ev) => {
+        console.log('TODO', ev.clientX);
+      }, []);
+
     const leftHandle = useSliderHandleStateManager({
       trackElementRef,
       disabled,
@@ -80,6 +85,7 @@ export const BpRangeSlider = memoNamed<Props>(
       <RangeSliderView
         customLabelValues={customLabelValues}
         disabled={disabled}
+        handleTrackClick={handleTrackClick}
         labelFractionDigits={labelFractionDigits}
         leftHandle={leftHandle}
         max={max}

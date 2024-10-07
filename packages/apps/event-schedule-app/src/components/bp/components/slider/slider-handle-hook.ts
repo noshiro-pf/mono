@@ -82,30 +82,27 @@ export const useSliderHandleStateManager = ({
 
   /** Convert client pixel to value between min and max. */
   const clientToValue = useCallback((clientPixel: number): number => {
-    if (handleElementRef.current === null) {
-      return valueRef.current;
-    }
+    const _value = valueRef.current;
+    const _tickSize = tickSizeRef.current;
+    const _stepSize = stepSizeRef.current;
+    const _handleElement = handleElementRef.current;
+
+    if (_handleElement === null) return _value;
 
     // #1769: this logic doesn't work perfectly when the tick size is
     // smaller than the handle size; it may be off by a tick or two.
-    const handleCenterPixel = getHandleElementCenterPixel(
-      handleElementRef.current,
-    );
+    const handleCenterPixel = getHandleElementCenterPixel(_handleElement);
     const pixelDelta = clientPixel - handleCenterPixel;
 
-    if (Number.isNaN(pixelDelta)) {
-      return valueRef.current;
-    }
+    if (Number.isNaN(pixelDelta)) return _value;
+
     // convert pixels to range value in increments of `stepSize`
     return (
-      valueRef.current +
+      _value +
       Math.round(
-        Num.div(
-          pixelDelta,
-          toNonZeroFiniteNumber(tickSizeRef.current * stepSizeRef.current),
-        ),
+        Num.div(pixelDelta / toNonZeroFiniteNumber(_tickSize * _stepSize)),
       ) *
-        stepSizeRef.current
+        _stepSize
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -123,6 +120,9 @@ export const useSliderHandleStateManager = ({
   const handleHandleMovement = useCallback(
     (ev: MouseEvent) => {
       handleMovedTo(mouseEventClientOffset(ev));
+
+      // this key event has been handled! prevent browser scroll on up/down
+      ev.preventDefault();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -131,6 +131,9 @@ export const useSliderHandleStateManager = ({
   const handleHandleTouchMovement = useCallback(
     (ev: TouchEvent) => {
       handleMovedTo(touchEventClientOffset(ev));
+
+      // this key event has been handled! prevent browser scroll on up/down
+      ev.preventDefault();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -176,8 +179,12 @@ export const useSliderHandleStateManager = ({
   const beginHandleMovement: React.MouseEventHandler<HTMLSpanElement> =
     useCallback(
       (ev) => {
-        document.addEventListener('mousemove', handleHandleMovement);
-        document.addEventListener('mouseup', endHandleMovement);
+        document.addEventListener('mousemove', handleHandleMovement, {
+          passive: false,
+        });
+        document.addEventListener('mouseup', endHandleMovement, {
+          passive: false,
+        });
         setIsMovingRef.current(true);
         changeValue(clientToValue(mouseEventClientOffset(ev)));
       },
@@ -188,9 +195,15 @@ export const useSliderHandleStateManager = ({
   const beginHandleTouchMovement: React.TouchEventHandler<HTMLSpanElement> =
     useCallback(
       (ev) => {
-        document.addEventListener('touchmove', handleHandleTouchMovement);
-        document.addEventListener('touchend', endHandleTouchMovement);
-        document.addEventListener('touchcancel', endHandleTouchMovement);
+        document.addEventListener('touchmove', handleHandleTouchMovement, {
+          passive: false,
+        });
+        document.addEventListener('touchend', endHandleTouchMovement, {
+          passive: false,
+        });
+        document.addEventListener('touchcancel', endHandleTouchMovement, {
+          passive: false,
+        });
         setIsMovingRef.current(true);
         changeValue(clientToValue(touchEventClientOffset(ev)));
       },
