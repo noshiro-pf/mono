@@ -13,6 +13,7 @@ import { useRangeSliderRatios } from './to-ratio-hook';
 
 type Props = Readonly<{
   trackElementRef: React.RefObject<HTMLDivElement>;
+  handleTrackClick: React.MouseEventHandler<HTMLDivElement>;
   disabled: boolean;
   min: number;
   max: number;
@@ -28,6 +29,7 @@ export const RangeSliderView = memoNamed<Props>(
   'RangeSliderView',
   ({
     trackElementRef,
+    handleTrackClick,
     disabled,
     min,
     max,
@@ -61,8 +63,11 @@ export const RangeSliderView = memoNamed<Props>(
     } = useRangeSliderInlineStyles(leftRatio, rightRatio);
 
     return (
-      // eslint-disable-next-line react/forbid-component-props
-      <Root className={toClassName({ disabled })}>
+      <Root
+        // eslint-disable-next-line react/forbid-component-props
+        className={toClassName({ disabled })}
+        onMouseDown={handleTrackClick}
+      >
         <SliderTrackStyled ref={trackElementRef}>
           <SliderProgressStyled style={progressStartStyle} />
           <SliderProgressStyled
