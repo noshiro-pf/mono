@@ -2,12 +2,12 @@
 # yarn lockfile v1
 
 
-"@rescript/react@^0.10.3":
-  version "0.10.3"
-  resolved "https://registry.yarnpkg.com/@rescript/react/-/react-0.10.3.tgz#a2a8bed6b017940ec26c2154764b350f50348889"
-  integrity sha512-Lf9rzrR3bQPKJjOK3PBRa/B3xrJ7CqQ1HYr9VHPVxJidarIJJFZBhj0Dg1uZURX+Wg/xiP0PHFxXmdj2bK8Vxw==
+"@rescript/react@^0.12.2":
+  version "0.12.2"
+  resolved "https://registry.yarnpkg.com/@rescript/react/-/react-0.12.2.tgz#a4a216cb317723005387be297008daca106540ff"
+  integrity sha512-EOF19dLTG4Y9K59JqMjG5yfvIsrMZqfxGC2J/oe9gGgrMiUrzZh3KH9khTcR1Z3Ih0lRViSh0/iYnJz20gGoag==
 
-rescript@^9.1.4:
-  version "9.1.4"
-  resolved "https://registry.yarnpkg.com/rescript/-/rescript-9.1.4.tgz#1eb126f98d6c16942c0bf0df67c050198e580515"
-  integrity sha512-aXANK4IqecJzdnDpJUsU6pxMViCR5ogAxzuqS0mOr8TloMnzAjJFu63fjD6LCkWrKAhlMkFFzQvVQYaAaVkFXw==
+rescript@^11.1.1:
+  version "11.1.1"
+  resolved "https://registry.yarnpkg.com/rescript/-/rescript-11.1.1.tgz#3e3b59751e5d7472156615e13d957c70d5342c5c"
+  integrity sha512-FMELeoiR1n3LzBdBt+k7U4l0vsz5Xh0HBSHf+0NhyhzZkMRLkEKEDNrcqZc6RIux9bxmxoO+zEa9qFM01VOXAw==
