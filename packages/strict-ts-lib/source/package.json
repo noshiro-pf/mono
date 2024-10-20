@@ -52,7 +52,7 @@
     "@noshiro/ts-type-utils": "*",
     "@types/eslint": "9.6.0",
     "@typescript-eslint/eslint-plugin": "8.1.0",
-    "@typescript-eslint/parser": "8.2.0",
+    "@typescript-eslint/parser": "8.10.0",
     "eslint": "8.57.0",
     "eslint-plugin-functional": "7.0.2"
   },
