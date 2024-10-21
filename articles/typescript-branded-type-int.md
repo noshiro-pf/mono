@@ -51,12 +51,20 @@ Type branding とは、対象となる型（この例では `string`）に `{ ta
 
 ## Branded Type の様々な実装
 
-ちなみに Branded Type の具体的な実装はライブラリによっても結構まちまちのようです。
+ちなみに Branded Type の具体的な実装はライブラリによっても結構まちまちのようです（2024/10/21 追記： io-ts の方の型定義コード例が）。
 
-[io-ts](https://github.com/gcanti/io-ts/blob/master/index.md#branded-types--refinements)
+[io-ts](https://github.com/gcanti/io-ts/blob/master/index.md#branded-types--refinements)[^io-ts]
+
+[^io-ts]: io-tsでは、`Brand` という方により unique symbol をキーに持つオブジェクト型にネストさせることで、カスタム実装した型定義や他のライブラリ製の branded type との衝突を防ぐ仕組みになっています。本記事の Branded Type 定義では分かりやすさのためこのような実装はせずに説明しました。
 
 ```ts
-type Int = number & { readonly Int: unique symbol };
+declare const _brand: unique symbol;
+
+interface Brand<B> {
+  readonly [_brand]: B;
+}
+
+type Int = number & Brand<{ readonly Int: unique symbol }>;
 ```
 
 [ts-brand](https://github.com/kourge/ts-brand)
