@@ -41,7 +41,7 @@ console.log(f()); // undefined
 
 ### 補足1： void 型の性質
 
-`void` は `undefined` のエイリアスではありません。より具体的には、`void` は `undefined` の上位型です（＝`undefined` は `void` の部分型）。
+`void` は `undefined` のエイリアスではありません。より具体的には、`void` は `undefined` の上位型です（・・・ `undefined` は `void` の部分型）。
 
 ```ts
 const v: void = undefined; // OK
@@ -150,8 +150,8 @@ https://typescript-eslint.io/rules/no-invalid-void-type
 
 ## 結論
 
-- 明示的な戻り値を持たない関数は後方互換性を保つ変更をしやすくするために `undefined` ではなく `void` で型注釈しておいた方が良い
-- 明示的な戻り値を持つ関数は `void` ではなく `undefined` との union で型注釈すべき
+- 明示的な戻り値を持たない関数は、後方互換性を保つ変更をしやすくするために `undefined` ではなく `void` で型注釈しておいた方が良い
+- 明示的な戻り値を持つ関数には `void` 型は使うべきでない（適宜 `undefined` との union などで型注釈すべき）
 
 ## おまけ： void 型周りで便利な eslint ルール
 
