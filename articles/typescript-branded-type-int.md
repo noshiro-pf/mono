@@ -55,7 +55,7 @@ Type branding とは、対象となる型（この例では `string`）に `{ ta
 
 [io-ts](https://github.com/gcanti/io-ts/blob/master/index.md#branded-types--refinements)[^io-ts]
 
-[^io-ts]: `Brand` という型にラップされているのは、ライブラリ外の定義とのコンフリクトを避け確実に区別するための措置と思われます。
+[^io-ts]: io-tsでは、`Brand` という方により unique symbol をキーに持つオブジェクト型にネストさせることで、カスタム実装した型定義や他のライブラリ製の branded type との衝突を防ぐ仕組みになっています。本記事の Branded Type 定義では分かりやすさのためこのような実装はせずに説明しました。
 
 ```ts
 declare const _brand: unique symbol;
