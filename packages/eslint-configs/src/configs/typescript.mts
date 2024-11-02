@@ -1,12 +1,12 @@
 import {
   eslintArrayFuncRules,
-  eslintDeprecationRules,
   eslintFunctionalRules,
   eslintImportsRules,
   eslintPromiseRules,
   eslintRules,
   eslintSecurityRules,
   eslintTotalFunctionsRules,
+  eslintTreeShakableRules,
   eslintUnicornRules,
   typescriptEslintRules,
 } from '../rules/index.mjs';
@@ -30,7 +30,6 @@ export const eslintFlatConfigForTypeScript = ({
     files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
     rules: {
       ...eslintArrayFuncRules,
-      ...eslintDeprecationRules,
       ...eslintFunctionalRules,
       ...eslintTotalFunctionsRules,
       ...eslintImportsRules,
@@ -39,6 +38,7 @@ export const eslintFlatConfigForTypeScript = ({
       ...eslintSecurityRules,
       ...eslintUnicornRules,
       ...typescriptEslintRules,
+      ...eslintTreeShakableRules,
 
       'import/no-extraneous-dependencies': [
         'error',
@@ -67,9 +67,14 @@ export const eslintFlatConfigForTypeScript = ({
       '**/eslint.config.js',
       '**/eslint.config.*.mjs',
       '**/vite.config.ts',
+      '**/vite.config.mts',
       '**/vitest.config.ts',
+      '**/vitest.config.mts',
+      '**/jest.config.js',
+      '**/jest.config.mjs',
       '**/jest.config*.mjs',
       '**/cypress.config.ts',
+      '**/cypress.config.mts',
     ],
     rules: {
       '@typescript-eslint/no-restricted-imports': 'off',

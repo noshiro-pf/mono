@@ -7,7 +7,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
 /**
  * Ensure imports point to a file/module that can be resolved.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-unresolved.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-unresolved.md
  *
  *  ```md
  *  | key      | value           |
@@ -74,7 +74,7 @@ namespace NoUnresolved {
 /**
  * Ensure named imports correspond to a named export in the remote file.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/named.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/named.md
  *
  *  ```md
  *  | key      | value           |
@@ -113,7 +113,7 @@ namespace Named {
 /**
  * Ensure a default export is present, given a default import.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/default.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/default.md
  *
  *  ```md
  *  | key      | value           |
@@ -130,7 +130,7 @@ namespace Default {
  * Ensure imported namespaces contain dereferenced properties as they are
  * dereferenced.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/namespace.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/namespace.md
  *
  *  ```md
  *  | key      | value           |
@@ -175,7 +175,7 @@ namespace Namespace {
 /**
  * Forbid namespace (a.k.a. "wildcard" `*`) imports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-namespace.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-namespace.md
  *
  *  ```md
  *  | key      | value       |
@@ -219,7 +219,7 @@ namespace NoNamespace {
 /**
  * Forbid any invalid exports, i.e. re-export of the same name.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/export.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/export.md
  *
  *  ```md
  *  | key      | value            |
@@ -235,7 +235,7 @@ namespace Export {
 /**
  * Forbid the use of mutable exports with `var` or `let`.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-mutable-exports.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-mutable-exports.md
  *
  *  ```md
  *  | key      | value            |
@@ -251,7 +251,7 @@ namespace NoMutableExports {
 /**
  * Ensure consistent use of file extension within the import path.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/extensions.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/extensions.md
  *
  *  ```md
  *  | key      | value       |
@@ -293,6 +293,9 @@ namespace Extensions {
    *                 }
    *               }
    *             },
+   *             "checkTypeImports": {
+   *               "type": "boolean"
+   *             },
    *             "ignorePackages": {
    *               "type": "boolean"
    *             }
@@ -314,6 +317,9 @@ namespace Extensions {
    *                   "enum": ["always", "ignorePackages", "never"]
    *                 }
    *               }
+   *             },
+   *             "checkTypeImports": {
+   *               "type": "boolean"
    *             },
    *             "ignorePackages": {
    *               "type": "boolean"
@@ -366,6 +372,7 @@ namespace Extensions {
             string,
             'always' | 'ignorePackages' | 'never'
           >;
+          readonly checkTypeImports?: boolean;
           readonly ignorePackages?: boolean;
           readonly [k: string]: unknown;
         },
@@ -380,6 +387,7 @@ namespace Extensions {
             string,
             'always' | 'ignorePackages' | 'never'
           >;
+          readonly checkTypeImports?: boolean;
           readonly ignorePackages?: boolean;
           readonly [k: string]: unknown;
         },
@@ -396,7 +404,7 @@ namespace Extensions {
 /**
  * Enforce which files can be imported in a given folder.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-restricted-paths.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-restricted-paths.md
  *
  *  ```md
  *  | key      | value           |
@@ -500,7 +508,7 @@ namespace NoRestrictedPaths {
 /**
  * Forbid importing the submodules of other modules.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-internal-modules.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-internal-modules.md
  *
  *  ```md
  *  | key      | value           |
@@ -562,7 +570,7 @@ namespace NoInternalModules {
 /**
  * Prefer named exports to be grouped together in a single export declaration
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/group-exports.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/group-exports.md
  *
  *  ```md
  *  | key      | value       |
@@ -578,7 +586,7 @@ namespace GroupExports {
 /**
  * Forbid importing packages through relative paths.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-relative-packages.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-relative-packages.md
  *
  *  ```md
  *  | key      | value           |
@@ -636,7 +644,7 @@ namespace NoRelativePackages {
 /**
  * Forbid importing modules from parent directories.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-relative-parent-imports.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-relative-parent-imports.md
  *
  *  ```md
  *  | key      | value           |
@@ -693,7 +701,7 @@ namespace NoRelativeParentImports {
 /**
  * Enforce or ban the use of inline type-only markers for named imports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/consistent-type-specifier-style.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/consistent-type-specifier-style.md
  *
  *  ```md
  *  | key      | value       |
@@ -730,7 +738,7 @@ namespace ConsistentTypeSpecifierStyle {
 /**
  * Forbid a module from importing itself.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-self-import.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-self-import.md
  *
  *  ```md
  *  | key         | value           |
@@ -748,7 +756,7 @@ namespace NoSelfImport {
  * Forbid a module from importing a module with a dependency path back to
  * itself.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-cycle.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-cycle.md
  *
  *  ```md
  *  | key      | value           |
@@ -807,6 +815,11 @@ namespace NoCycle {
    *         "description": "Allow cyclic dependency if there is at least one dynamic import in the chain",
    *         "type": "boolean",
    *         "default": false
+   *       },
+   *       "disableScc": {
+   *         "description": "When true, don't calculate a strongly-connected-components graph. SCC is used to reduce the time-complexity of cycle detection, but adds overhead.",
+   *         "type": "boolean",
+   *         "default": false
    *       }
    *     },
    *     "additionalProperties": false
@@ -828,6 +841,12 @@ namespace NoCycle {
      * chain
      */
     readonly allowUnsafeDynamicCyclicDependency?: boolean;
+    /**
+     * When true, don't calculate a strongly-connected-components graph. SCC is
+     * used to reduce the time-complexity of cycle detection, but adds
+     * overhead.
+     */
+    readonly disableScc?: boolean;
   };
 
   export type RuleEntry =
@@ -838,7 +857,7 @@ namespace NoCycle {
 /**
  * Forbid named default exports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-named-default.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-named-default.md
  *
  *  ```md
  *  | key      | value       |
@@ -854,7 +873,7 @@ namespace NoNamedDefault {
 /**
  * Forbid use of exported name as identifier of default export.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-named-as-default.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-named-as-default.md
  *
  *  ```md
  *  | key      | value            |
@@ -870,7 +889,7 @@ namespace NoNamedAsDefault {
 /**
  * Forbid use of exported name as property of default export.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-named-as-default-member.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-named-as-default-member.md
  *
  *  ```md
  *  | key      | value            |
@@ -886,7 +905,7 @@ namespace NoNamedAsDefaultMember {
 /**
  * Forbid anonymous values as default exports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-anonymous-default-export.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-anonymous-default-export.md
  *
  *  ```md
  *  | key      | value       |
@@ -970,7 +989,7 @@ namespace NoAnonymousDefaultExport {
  * Forbid modules without exports, or exports without matching import in another
  * module.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-unused-modules.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-unused-modules.md
  *
  *  ```md
  *  | key      | value            |
@@ -1011,6 +1030,10 @@ namespace NoUnusedModules {
    *       },
    *       "unusedExports": {
    *         "description": "report exports without any usage",
+   *         "type": "boolean"
+   *       },
+   *       "ignoreUnusedTypeExports": {
+   *         "description": "ignore type exports without any usage",
    *         "type": "boolean"
    *       }
    *     },
@@ -1059,6 +1082,8 @@ namespace NoUnusedModules {
     readonly missingExports?: boolean;
     /** Report exports without any usage */
     readonly unusedExports?: boolean;
+    /** Ignore type exports without any usage */
+    readonly ignoreUnusedTypeExports?: boolean;
     readonly [k: string]: unknown;
   } & (
     | {
@@ -1080,7 +1105,7 @@ namespace NoUnusedModules {
 /**
  * Forbid CommonJS `require` calls and `module.exports` or `exports.*`.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-commonjs.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-commonjs.md
  *
  *  ```md
  *  | key      | value          |
@@ -1149,7 +1174,7 @@ namespace NoCommonjs {
 /**
  * Forbid AMD `require` and `define` calls.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-amd.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-amd.md
  *
  *  ```md
  *  | key      | value          |
@@ -1165,7 +1190,7 @@ namespace NoAmd {
 /**
  * Forbid repeated import of the same module in multiple places.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-duplicates.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-duplicates.md
  *
  *  ```md
  *  | key      | value       |
@@ -1209,7 +1234,7 @@ namespace NoDuplicates {
 /**
  * Ensure all imports appear before other statements.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/first.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/first.md
  *
  *  ```md
  *  | key      | value       |
@@ -1245,7 +1270,7 @@ namespace First {
 /**
  * Enforce the maximum number of dependencies a module can have.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/max-dependencies.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/max-dependencies.md
  *
  *  ```md
  *  | key      | value       |
@@ -1288,7 +1313,7 @@ namespace MaxDependencies {
 /**
  * Forbid the use of extraneous packages.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-extraneous-dependencies.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-extraneous-dependencies.md
  *
  *  ```md
  *  | key      | value            |
@@ -1370,7 +1395,7 @@ namespace NoExtraneousDependencies {
 /**
  * Forbid import of modules using absolute paths.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-absolute-path.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-absolute-path.md
  *
  *  ```md
  *  | key      | value           |
@@ -1428,7 +1453,7 @@ namespace NoAbsolutePath {
 /**
  * Forbid Node.js builtin modules.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-nodejs-modules.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-nodejs-modules.md
  *
  *  ```md
  *  | key      | value          |
@@ -1471,7 +1496,7 @@ namespace NoNodejsModules {
 /**
  * Forbid webpack loader syntax in imports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-webpack-loader-syntax.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-webpack-loader-syntax.md
  *
  *  ```md
  *  | key      | value           |
@@ -1487,7 +1512,7 @@ namespace NoWebpackLoaderSyntax {
 /**
  * Enforce a convention in module import order.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/order.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/order.md
  *
  *  ```md
  *  | key      | value       |
@@ -1564,6 +1589,43 @@ namespace Order {
    *           "never"
    *         ]
    *       },
+   *       "named": {
+   *         "default": false,
+   *         "oneOf": [
+   *           {
+   *             "type": "boolean"
+   *           },
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "enabled": {
+   *                 "type": "boolean"
+   *               },
+   *               "import": {
+   *                 "type": "boolean"
+   *               },
+   *               "export": {
+   *                 "type": "boolean"
+   *               },
+   *               "require": {
+   *                 "type": "boolean"
+   *               },
+   *               "cjsExports": {
+   *                 "type": "boolean"
+   *               },
+   *               "types": {
+   *                 "type": "string",
+   *                 "enum": [
+   *                   "mixed",
+   *                   "types-first",
+   *                   "types-last"
+   *                 ]
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ]
+   *       },
    *       "alphabetize": {
    *         "type": "object",
    *         "properties": {
@@ -1624,6 +1686,16 @@ namespace Order {
       | 'always'
       | 'ignore'
       | 'never';
+    readonly named?:
+      | boolean
+      | {
+          readonly enabled?: boolean;
+          readonly import?: boolean;
+          readonly export?: boolean;
+          readonly require?: boolean;
+          readonly cjsExports?: boolean;
+          readonly types?: 'mixed' | 'types-first' | 'types-last';
+        };
     readonly alphabetize?: {
       readonly caseInsensitive?: boolean;
       readonly order?: 'asc' | 'desc' | 'ignore';
@@ -1640,7 +1712,7 @@ namespace Order {
 /**
  * Enforce a newline after import statements.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/newline-after-import.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/newline-after-import.md
  *
  *  ```md
  *  | key      | value       |
@@ -1689,7 +1761,7 @@ namespace NewlineAfterImport {
 /**
  * Prefer a default export if module exports a single name or multiple names.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/prefer-default-export.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/prefer-default-export.md
  *
  *  ```md
  *  | key      | value       |
@@ -1733,7 +1805,7 @@ namespace PreferDefaultExport {
 /**
  * Forbid default exports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-default-export.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-default-export.md
  *
  *  ```md
  *  | key      | value       |
@@ -1749,7 +1821,7 @@ namespace NoDefaultExport {
 /**
  * Forbid named exports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-named-export.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-named-export.md
  *
  *  ```md
  *  | key      | value       |
@@ -1765,7 +1837,7 @@ namespace NoNamedExport {
 /**
  * Forbid `require()` calls with expressions.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-dynamic-require.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-dynamic-require.md
  *
  *  ```md
  *  | key      | value           |
@@ -1804,7 +1876,7 @@ namespace NoDynamicRequire {
 /**
  * Forbid potentially ambiguous parse goal (`script` vs. `module`).
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/unambiguous.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/unambiguous.md
  *
  *  ```md
  *  | key      | value          |
@@ -1820,7 +1892,7 @@ namespace Unambiguous {
 /**
  * Forbid unassigned imports
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-unassigned-import.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-unassigned-import.md
  *
  *  ```md
  *  | key      | value       |
@@ -1883,7 +1955,7 @@ namespace NoUnassignedImport {
 /**
  * Forbid unnecessary path segments in import and require statements.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-useless-path-segments.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-useless-path-segments.md
  *
  *  ```md
  *  | key      | value           |
@@ -1927,13 +1999,14 @@ namespace NoUselessPathSegments {
 /**
  * Enforce a leading comment with the webpackChunkName for dynamic imports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/dynamic-import-chunkname.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/dynamic-import-chunkname.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | category | Style guide |
+ *  | key            | value       |
+ *  | :------------- | :---------- |
+ *  | type           | suggestion  |
+ *  | hasSuggestions | true        |
+ *  | category       | Style guide |
  *  ```
  */
 namespace DynamicImportChunkname {
@@ -1952,6 +2025,9 @@ namespace DynamicImportChunkname {
    *           "type": "string"
    *         }
    *       },
+   *       "allowEmpty": {
+   *         "type": "boolean"
+   *       },
    *       "webpackChunknameFormat": {
    *         "type": "string"
    *       }
@@ -1962,6 +2038,7 @@ namespace DynamicImportChunkname {
    */
   export type Options = {
     readonly importFunctions?: readonly string[];
+    readonly allowEmpty?: boolean;
     readonly webpackChunknameFormat?: string;
     readonly [k: string]: unknown;
   };
@@ -2013,7 +2090,7 @@ namespace NoImportModuleExports {
 /**
  * Forbid empty named import blocks.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-empty-named-blocks.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-empty-named-blocks.md
  *
  *  ```md
  *  | key            | value            |
@@ -2031,7 +2108,7 @@ namespace NoEmptyNamedBlocks {
 /**
  * Ensure all exports appear after other statements.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/exports-last.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/exports-last.md
  *
  *  ```md
  *  | key      | value       |
@@ -2047,7 +2124,7 @@ namespace ExportsLast {
 /**
  * Forbid imported names marked with `@deprecated` documentation tag.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-deprecated.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-deprecated.md
  *
  *  ```md
  *  | key      | value            |

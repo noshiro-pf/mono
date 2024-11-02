@@ -3,7 +3,7 @@ import {
   type EslintFunctionalRulesOption,
 } from '../types/index.mjs';
 
-export const ignorePattern = [
+export const ignoredMutablePattern = [
   '^draft', // allow immer.js draft object
   '^mut_',
   '^_mut_',
@@ -14,9 +14,17 @@ export const immutableDataOptions: EslintFunctionalRulesOption['functional/immut
   {
     ignoreClasses: true,
     ignoreImmediateMutation: true,
-    ignoreIdentifierPattern: [...ignorePattern, 'window.location.href'],
+    ignoreIdentifierPattern: [
+      ...ignoredMutablePattern,
+      'this',
+      'super',
+      'window.location.href',
+    ],
     ignoreNonConstDeclarations: false,
     ignoreAccessorPattern: [
+      '**.mut_**',
+      'this.**',
+      'super.**',
       '**.current.**', // allow React Ref object
       '**.displayName', // allow React component displayName
       '**.scrollTop', // allow modifying scrollTop
@@ -26,9 +34,8 @@ export const immutableDataOptions: EslintFunctionalRulesOption['functional/immut
 export const noLetOptions: EslintFunctionalRulesOption['functional/no-let'] = {
   allowInForLoopInit: false,
   allowInFunctions: false,
-  ignoreIdentifierPattern: ignorePattern.filter((p) => p !== '^draft'),
-};
-
+  ignoreIdentifierPattern: ignoredMutablePattern.filter((p) => p !== '^draft'),
+} as const;
 // const noExpressionStatementOptions:NoExpressionStatementOptions = {
 //   ignoreVoid: true,
 //   ignorePattern: [
@@ -134,6 +141,8 @@ export const eslintFunctionalRules: EslintFunctionalRules = {
   //   },
   // ],
 
+  'functional/no-class-inheritance': 'error',
+
   // deprecated
   'functional/prefer-readonly-type': 0,
-};
+} as const;

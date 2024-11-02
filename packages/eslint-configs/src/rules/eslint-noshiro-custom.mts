@@ -15,4 +15,4 @@ export const eslintNoshiroCustomRules: LinterRulesRecord = {
       ],
     },
   ],
-};
+} as const;

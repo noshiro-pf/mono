@@ -46,7 +46,6 @@ export const restrictedSyntax = [
 export const restrictedGlobals = [
   'eval',
   'Function',
-  'globalThis',
   {
     name: 'Infinity',
     message: "use 'Number.Infinity' instead.",
@@ -477,4 +476,4 @@ export const eslintRules: EslintRules = {
   'multiline-comment-style': 0, // disabled
   'require-jsdoc': 0,
   'valid-jsdoc': 0,
-};
+} as const;

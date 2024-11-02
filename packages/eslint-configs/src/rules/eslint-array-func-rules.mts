@@ -7,4 +7,4 @@ export const eslintArrayFuncRules: EslintArrayFuncRules = {
   'array-func/avoid-reverse': 'error',
   'array-func/prefer-flat-map': 'error',
   'array-func/prefer-flat': 'error',
-};
+} as const;

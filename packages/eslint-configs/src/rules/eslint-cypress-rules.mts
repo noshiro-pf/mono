@@ -11,4 +11,4 @@ export const eslintCypressRules: EslintCypressRules = {
   'cypress/unsafe-to-chain-command': 'error',
   'cypress/no-async-before': 'error',
   'cypress/no-debug': 'error',
-};
+} as const;

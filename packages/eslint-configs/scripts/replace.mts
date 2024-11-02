@@ -26,6 +26,26 @@ export const replaceRulesType = (src: string, typeName: string): string =>
             }),
           ).value;
 
+        case eslintPlugins.TypeScriptEslintRules.typeName:
+          return pipe(content).chain(
+            replaceWithNoMatchCheckBetweenRegexp({
+              startRegexp: 'namespace ReturnAwait {',
+              endRegexp: closeBraceRegexp,
+              mapFn: composeMonoTypeFns(
+                replaceWithNoMatchCheck(
+                  [
+                    '  export type Options = string &',
+                    "    ('always' | 'error-handling-correctness-only' | 'in-try-catch' | 'never');",
+                  ].join('\n'),
+                  [
+                    '  export type Options = ',
+                    "    'always' | 'error-handling-correctness-only' | 'in-try-catch' | 'never'",
+                  ].join('\n'),
+                ),
+              ),
+            }),
+          ).value;
+
         case eslintPlugins.EslintVitestRules.typeName:
           return pipe(content).chain(
             replaceWithNoMatchCheckBetweenRegexp({

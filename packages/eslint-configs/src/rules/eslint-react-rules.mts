@@ -98,7 +98,12 @@ export const eslintReactRules: EslintReactRules = {
   'react/no-find-dom-node': 'error',
   'react/no-invalid-html-attribute': 'error',
   'react/no-is-mounted': 'error',
-  'react/no-multi-comp': 'error',
+  'react/no-multi-comp': [
+    'error',
+    {
+      ignoreStateless: true,
+    },
+  ],
   'react/no-namespace': 'error',
   'react/no-redundant-should-component-update': 'error',
   'react/no-render-return-value': 'error',
@@ -146,8 +151,9 @@ export const eslintReactRules: EslintReactRules = {
   ],
   'react/checked-requires-onchange-or-readonly': 'error',
   'react/jsx-props-no-spread-multi': 'error',
+  'react/forward-ref-uses-ref': 'error',
 
   // deprecated
   'react/jsx-sort-default-props': 0,
   'react/jsx-space-before-closing': 0,
-};
+} as const;
