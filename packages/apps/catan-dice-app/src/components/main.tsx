@@ -13,7 +13,7 @@ const [undo$, undo] = createVoidEventEmitter();
 const [redo$, redo] = createVoidEventEmitter();
 
 const history$ =
-  // eslint-disable-next-line deprecation/deprecation
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   merge([
     rollDices$.chain(mapTo('roll-dices' as const)),
     undo$.chain(mapTo('undo' as const)),
@@ -40,7 +40,7 @@ const sumCount$: InitializedObservable<ArrayOfLength<11, SafeUint>> = history$
 
 const opacity$: InitializedObservable<number> = rollDices$
   .chain(
-    // eslint-disable-next-line deprecation/deprecation
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     switchMap(() =>
       interval(50)
         .chain(take(11))

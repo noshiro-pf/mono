@@ -13,7 +13,7 @@ const tenYearsLater = pipe(DateUtils.today())
   .chain(DateUtils.setLocaleMonth(12))
   .chain(DateUtils.toDate).value;
 
-// eslint-disable-next-line deprecation/deprecation
+// eslint-disable-next-line @typescript-eslint/no-deprecated
 type DateInputPropsOriginal = React.ComponentProps<typeof DateInput>;
 
 export type BpDatetimePickerProps = Omit<
@@ -76,7 +76,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
     );
 
     return (
-      // eslint-disable-next-line deprecation/deprecation
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       <DateInput
         canClearSelection={canClearSelection}
         formatDate={formatDate}

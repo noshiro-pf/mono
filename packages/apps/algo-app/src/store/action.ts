@@ -14,7 +14,7 @@ const gameStateDispatcher = (action: GameStateAction): void => {
 };
 
 export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
-  // eslint-disable-next-line deprecation/deprecation
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   merge([
     localGameStateActionSource$.chain(
       map((a) => ({ type: 'local', value: a }) as const),
@@ -321,7 +321,7 @@ const actionsToAutoPlayStream = (
     fromArray(actions),
   ] as const).chain(map(([, action]) => action));
 
-// eslint-disable-next-line deprecation/deprecation
+// eslint-disable-next-line @typescript-eslint/no-deprecated
 const autoPlay = merge([
   actionsToAutoPlayStream(actionsToAutoPlay[0], 0),
   actionsToAutoPlayStream(
