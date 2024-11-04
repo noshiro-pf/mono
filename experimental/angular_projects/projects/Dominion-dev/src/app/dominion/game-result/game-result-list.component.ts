@@ -14,7 +14,7 @@ import { GameResult } from '../types/game-result';
     <ng-container
       *ngIf="{
         GRlistFiltered: GRlistFiltered$ | async,
-        table: table$ | async
+        table: table$ | async,
       } as data"
     >
       <div class="body-with-padding">

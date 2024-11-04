@@ -9,7 +9,7 @@ import { utils } from '../../../../mylib/utilities';
     <ng-container
       *ngIf="{
         number: number$ | async,
-        indice: indice$ | async
+        indice: indice$ | async,
       } as data"
     >
       <div class="vcoins" *ngIf="data.number > 0">

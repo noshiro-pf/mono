@@ -10,7 +10,7 @@ import { RN, fromObservable } from 'rnjs';
         <ng-container
           *ngIf="{
             pdfurl: rulebook.pdfurl$ | async,
-            imgurl: rulebook.imgurl$ | async
+            imgurl: rulebook.imgurl$ | async,
           } as data"
         >
           <a

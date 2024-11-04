@@ -5,7 +5,7 @@
     datalist: data$ | async,
     itemsPerPage: itemsPerPage$ | async,
     selectedPageIndex: selectedPageIndex$ | async,
-    columnSettings: columnSettings$ | async
+    columnSettings: columnSettings$ | async,
   } as dat"
 >
   <app-waiting-spinner [done]="!!dat.datalist"></app-waiting-spinner>

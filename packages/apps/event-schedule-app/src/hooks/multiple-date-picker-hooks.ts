@@ -91,7 +91,7 @@ export const useMultipleDatePickerState = (
             selected: selectedDatesSet.has(ymd),
             outside: ymd.month !== calendarCurrentPage.month,
             dayType:
-              holidaysJpDefinition?.has(ymd) ?? false
+              (holidaysJpDefinition?.has(ymd) ?? false)
                 ? 'holiday'
                 : dayValue === 0
                   ? 'Sunday'

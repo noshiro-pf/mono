@@ -7,7 +7,7 @@ import { manual } from 'rnjs';
     <ng-container
       *ngIf="{
         options: options$ | async,
-        itemsPerPage: itemsPerPage$ | async
+        itemsPerPage: itemsPerPage$ | async,
       } as data"
     >
       <mat-form-field class="items-per-page">

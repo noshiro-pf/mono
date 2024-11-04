@@ -14,7 +14,7 @@ export const BpButton = memoNamed<BpButtonProps>(
       () => ({
         ...props.style,
         outline: 'none',
-        whiteSpace: nowrap ?? false ? 'nowrap' : 'inherit',
+        whiteSpace: (nowrap ?? false) ? 'nowrap' : 'inherit',
       }),
       [props.style, nowrap],
     );

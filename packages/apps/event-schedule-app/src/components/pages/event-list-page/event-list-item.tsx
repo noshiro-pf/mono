@@ -43,9 +43,9 @@ export const EventListItemComponent = memoNamed<Props>(
       () =>
         fireAuthUser === undefined
           ? false
-          : answers
+          : (answers
               .find(({ user }) => user.id === fireAuthUser.uid)
-              ?.selection.some((a) => a.iconId === 'none') ?? false,
+              ?.selection.some((a) => a.iconId === 'none') ?? false),
       [answers, fireAuthUser],
     );
 
