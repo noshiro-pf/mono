@@ -38,9 +38,9 @@ const defineConfig = async () => {
       },
     },
     {
-      files: ['src/index.mts'],
+      files: ['src/syncflow.mts'],
       rules: {
-        'import/export': 'off',
+        'deprecation/deprecation': 'off',
       },
     },
   ];

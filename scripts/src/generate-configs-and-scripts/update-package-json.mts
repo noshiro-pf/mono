@@ -280,6 +280,10 @@ const updatePackageJsonImpl = (
                   'clean:build',
                   ...(generateFlag.gi === false ? [] : ['gi']),
                   'type-check',
+                  ...(packageName === 'syncflow-preact-hooks' ||
+                  packageName === 'syncflow-react-hooks'
+                    ? ['gen:re-export']
+                    : []),
                 ],
                 command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript`,
               };
@@ -359,6 +363,35 @@ const updatePackageJsonImpl = (
           mut_scripts['pub'] = 'yarn zz:publish';
           mut_scripts['zz:publish'] =
             'yarn publish --no-git-tag-version --access=public';
+        }
+
+        if (
+          packageName === 'syncflow-preact-hooks' ||
+          packageName === 'syncflow-react-hooks'
+        ) {
+          mut_scripts['build:script'] =
+            'tsc -p ./configs/tsconfig.scripts.json';
+
+          mut_scripts['gen:re-export'] = 'wireit';
+          mut_scripts['gen:re-export:fmt'] =
+            'yarn zz:prettier src/syncflow.mts';
+          mut_scripts['gen:re-export:script'] =
+            'node ./scripts/generate-re-export-script.mjs';
+
+          // "build": {
+          //   "dependencies": [
+          //     "clean:build",
+          //     "gi",
+          //     "type-check",
+          //     "gen:re-export"
+          //   ],
+          //   "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
+          // },
+
+          mut_wireit['gen:re-export'] = {
+            command:
+              'run-s build:script gen:re-export:script gen:re-export:fmt',
+          };
         }
 
         if (cfg.useVite === true) {

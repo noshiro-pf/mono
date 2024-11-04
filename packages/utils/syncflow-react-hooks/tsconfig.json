@@ -4,5 +4,5 @@
     "../../../configs/tsconfig/tsconfig.react.json",
     "../../../configs/tsconfig/tsconfig.vite.json"
   ],
-  "include": ["./src", "./configs"]
+  "include": ["./src", "./configs", "./scripts"]
 }

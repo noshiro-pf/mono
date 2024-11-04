@@ -62,9 +62,9 @@ export const generateEsLintConfig = async (
     packageName === 'syncflow-react-hooks'
       ? JSON.stringify(
           {
-            files: ['src/index.mts'],
+            files: ['src/syncflow.mts'],
             rules: {
-              'import/export': 'off',
+              'deprecation/deprecation': 'off',
             },
           },
           undefined,
