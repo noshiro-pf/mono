@@ -7,6 +7,7 @@
 $  yarn add --dev -W  \
         sort-package-json@latest                 \
         prettier@latest                          \
+        prettier-plugin-jsdoc@latest  \
         prettier-plugin-organize-imports@latest  \
         prettier-plugin-packagejson@latest
 ```
