@@ -20,6 +20,7 @@ eslint を使う際、 `eslint:recommended`, `plugin:@typescript-eslint/eslint-r
 今回は、私が特に有用だと思っているルールをいくつか紹介します。サンプルコードは各ルールのリンク先を見た方が分かりやすいので、記事の長さの都合上一部省きました。
 
 [^no-cycle]: https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-cycle.md
+
 [^no-unused-modules]: https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-unused-modules.md
 
 ## （余談）筆者の個人開発環境の場合
@@ -96,6 +97,7 @@ eslint config （Flat Config 以前の形式）の記述には JavaScript, YAML,
 私も個人開発環境では Flat Config 対応を2023年11月現在まさに進めているところですが、一旦今回はまだ本記事執筆時点で使用している＆慣れている人が多いと思われる旧形式での設定例を紹介します。
 
 [^eslintrc-file-formats]: https://eslint.org/docs/latest/use/configure/configuration-files#configuration-file-formats
+
 [^old-eslintrc-is-deprecated]: https://eslint.org/docs/latest/use/configure/configuration-files
 
 :::details .eslintrc.cjs
@@ -339,7 +341,9 @@ const s = ''.concat(...ss);
 こうすることで可読性が向上するだけでなく、 大きな `n` に対してパフォーマンスが低下することも避けられる可能性があります（JavaScript の文字列連結のエンジン実装やパフォーマンス評価は結構複雑な話のようなのでここでは詳細は省きますが、 `+`,`+=` や template literal で2個の文字列連結を繰り返す一つ目・二つ目のようなやり方は、連続するメモリ領域の再確保が何度も走りパフォーマンスが低下する場合があります[^perf-string-concat1][^perf-string-concat2][^perf-string-concat3]。ただ、ウェブフロントエンド実装では `n` が巨大になることが稀であったり、 JavaScript エンジン実装の工夫のおかげであまり気にしなくて良い可能性もありそうです。JSのパフォーマンスについては C/C++ などの経験で単純に類推すると間違えることが多々あるので、適度にパフォーマンスは気にしつつ可読性を重視しておくのが程良いバランスかなと思っています）。
 
 [^perf-string-concat1]: https://stackoverflow.com/questions/16696632/most-efficient-way-to-concatenate-strings-in-javascript
+
 [^perf-string-concat2]: https://medium.com/@zhongdongy/the-performance-of-javascript-string-concat-e52466ca2b3a
+
 [^perf-string-concat3]: https://docs.google.com/document/d/1o-MJPAddpfBfDZCkIHNKbMiM86iDFld7idGbNQLuKIQ/preview#heading=h.6kknmf22ixwc
 
 このパターンは長いメッセージを書くときも可読性向上に役に立ちます。
@@ -793,4 +797,5 @@ JSX に直接コールバック関数を書くのを禁止します。 render �
 ```
 
 [^javascript_class_in_google]: https://www.yunabe.jp/docs/javascript_class_in_google.html
+
 [^function_style]: https://typescriptbook.jp/reference/functions/function-expression-vs-arrow-functions

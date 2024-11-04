@@ -49,12 +49,12 @@ export const mergeRecords = <
   const fill: Type<T>['fill'] = (a) =>
     is(a)
       ? a
-      : options?.defaultType?.fill(a) ??
+      : (options?.defaultType?.fill(a) ??
         mergeRecordValues(
           isRecord(a)
             ? [...types.map((t) => t.fill(a)), a]
             : types.map((t) => t.fill(a)),
-        );
+        ));
 
   const defaultValue: Type<T>['defaultValue'] =
     options?.defaultType?.defaultValue ??

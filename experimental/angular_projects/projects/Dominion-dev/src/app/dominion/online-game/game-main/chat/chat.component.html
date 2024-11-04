@@ -4,7 +4,7 @@
       <ng-container
         *ngIf="{
           myName: myName$ | async,
-          chatList: chatList$ | async
+          chatList: chatList$ | async,
         } as data"
       >
         <ng-container *ngIf="data.myName && data.chatList">

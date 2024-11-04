@@ -2,7 +2,7 @@
   *ngIf="{
     scEvent: scEvent$ | async,
     answerDeadlineExpired: answerDeadlineExpired$ | async,
-    spreadSheet: spreadSheet$ | async
+    spreadSheet: spreadSheet$ | async,
   } as data"
 >
   <div *ngIf="!!data.scEvent && !!data.spreadSheet">

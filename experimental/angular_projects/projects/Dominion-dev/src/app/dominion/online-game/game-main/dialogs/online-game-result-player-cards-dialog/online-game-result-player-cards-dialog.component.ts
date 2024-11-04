@@ -25,7 +25,7 @@ export class OnlineGamePlayerCardsDialogComponent implements OnInit {
     <ng-container
       *ngIf="{
         cardSizeRatio: cardSizeRatio$ | async,
-        dcards: playerCardsForView$ | async
+        dcards: playerCardsForView$ | async,
       } as data"
     >
       <div *ngIf="data.cardSizeRatio && data.dcards">

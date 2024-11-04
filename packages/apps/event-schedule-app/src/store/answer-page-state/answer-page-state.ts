@@ -426,7 +426,7 @@ const toggleProtectedSectionImpl = (user: FireAuthUser | undefined): void => {
       ans,
       'user',
       Obj.update(ans.user, 'id', (uid) =>
-        uid === null ? mapOptional(user?.uid, toUserId) ?? null : null,
+        uid === null ? (mapOptional(user?.uid, toUserId) ?? null) : null,
       ),
     ),
   );

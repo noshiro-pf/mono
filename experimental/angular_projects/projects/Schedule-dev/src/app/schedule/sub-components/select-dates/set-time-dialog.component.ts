@@ -29,7 +29,7 @@ import { utils } from '../../../mylib/utilities';
           [mat-dialog-close]="{
             clicked: 'ok',
             hours: selectedHours,
-            minutes: selectedMinutes
+            minutes: selectedMinutes,
           }"
           color="primary"
         >

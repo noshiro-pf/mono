@@ -9,7 +9,7 @@ import { MyGameRoomService } from '../../services/my-game-room.service';
     <ng-container
       *ngIf="{
         thinkingState: thinkingState$ | async,
-        playersNameShuffled: playersNameShuffled$ | async
+        playersNameShuffled: playersNameShuffled$ | async,
       } as data"
     >
       <ng-container *ngIf="!!data.thinkingState">

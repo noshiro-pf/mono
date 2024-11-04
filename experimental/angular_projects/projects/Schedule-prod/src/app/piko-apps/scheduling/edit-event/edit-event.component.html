@@ -1,6 +1,6 @@
 <ng-container
   *ngIf="{
-    scEventId: scEventId$ | async
+    scEventId: scEventId$ | async,
   } as data"
 >
   <app-waiting-spinner [done]="!!data.scEventId"></app-waiting-spinner>
