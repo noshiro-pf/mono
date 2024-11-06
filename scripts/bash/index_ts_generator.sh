@@ -15,6 +15,7 @@ min_recursion_depth=0
 max_recursion_depth=10
 ignore=""
 ext=".ts"
+ext_input=""
 
 while [[ $# -gt 0 ]]
 do
@@ -41,6 +42,7 @@ do
             shift # past argument
         ;;
         --ext)
+            ext_input="$2"
             ext="$2"
             shift # past argument
             shift # past argument
@@ -59,9 +61,8 @@ echo ext: "${ext}"
 
 # move to target directory
 cd "${target_directory}" || exit
-echo -n "target_directory: "
-pwd
-echo
+PWD=$(pwd)
+echo "target_directory: ${PWD}"
 
 index_ts_files=()
 
@@ -76,7 +77,7 @@ for directory in $(find . -mindepth "${min_recursion_depth}" -maxdepth "${max_re
         fi
     fi
 
-    index_ts="${directory}/index${ext}"
+    index_ts=$(readlink -f "${PWD}/${directory}/index${ext}")
 
     if "${clear}"; then
         rm "${index_ts}"
@@ -104,7 +105,11 @@ for directory in $(find . -mindepth "${min_recursion_depth}" -maxdepth "${max_re
                         if [ "${ext}" = ".mts" ] && [ "${extension}" = "tsx" ]; then
                             result+="export * from './${filename_without_ext}.js';"
                         else
-                            result+="export * from './${filename_without_ext}';"
+                            if [ "${ext_input}" = "" ]; then
+                                result+="export * from './${filename_without_ext}';"
+                            else
+                                result+="export * from './${filename_without_ext}.js';"
+                            fi
                         fi
                     fi
                 fi
@@ -130,7 +135,11 @@ for directory in $(find . -mindepth "${min_recursion_depth}" -maxdepth "${max_re
                     elif [ "${ext}" = ".cts" ]; then
                     result+="export * from './${sub_directory_basename}/index.cjs';"
                 else
-                    result+="export * from './${sub_directory_basename}';"
+                    if [ "${ext_input}" = "" ]; then
+                        result+="export * from './${sub_directory_basename}';"
+                    else
+                        result+="export * from './${sub_directory_basename}/index.js';"
+                    fi
                 fi
             done
 
@@ -149,6 +158,17 @@ for directory in $(find . -mindepth "${min_recursion_depth}" -maxdepth "${max_re
     echo "${directory}" "done"
 
 done
+
+
+
+echo
+echo "--- eslint fix ---"
+
+if [ -n "${index_ts_files}" ]; then
+    npx eslint --fix ${index_ts_files}
+fi
+echo "Done."
+
 
 echo
 echo "--- prettier ---"
