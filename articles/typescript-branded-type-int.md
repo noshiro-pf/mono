@@ -51,11 +51,11 @@ Type branding とは、対象となる型（この例では `string`）に `{ ta
 
 ## Branded Type の様々な実装
 
-ちなみに Branded Type の具体的な実装はライブラリによっても結構まちまちのようです（2024/10/21 追記： io-ts の方の型定義コード例が）。
+ちなみに Branded Type の具体的な実装はライブラリによっても結構まちまちのようです（2024/12/31 追記： io-ts の方の型定義のコードが間違っていたので修正しました）。
 
 [io-ts](https://github.com/gcanti/io-ts/blob/master/index.md#branded-types--refinements)[^io-ts]
 
-[^io-ts]: io-tsでは、`Brand` という方により unique symbol をキーに持つオブジェクト型にネストさせることで、カスタム実装した型定義や他のライブラリ製の branded type との衝突を防ぐ仕組みになっています。本記事の Branded Type 定義では分かりやすさのためこのような実装はせずに説明しました。
+[^io-ts]: io-tsでは、`Brand` という型により unique symbol をキーに持つオブジェクト型にネストさせることで、カスタム実装した型定義や他のライブラリ製の branded type との衝突を防ぐ仕組みになっています。本記事の Branded Type 定義では分かりやすさのためこのような実装はせずに説明しました。
 
 ```ts
 declare const _brand: unique symbol;
@@ -76,9 +76,9 @@ type Int = number & { __type__: 'Int' } & { __witness__: number };
 どちらの方法も型を区別するという要件は満たせますが、 tag object の key 部に型 ID を置く前者のやり方の方が、以下のように `&` で意味のある交差型を作ることができる点で便利そうです（後者の方法では `never` に潰れてしまいます）。
 
 ```ts
-type Int = number & { Int: never };
-type Positive = number & { Positive: never };
-type PositiveInt = Positive & Int; // number & { Positive: never } & { Int: never }
+type Int = number & { Int: unique symbol };
+type Positive = number & { Positive: unique symbol };
+type PositiveInt = Positive & Int; // number & { Positive: unique symbol } & { Int: unique symbol }
 ```
 
 また、後者の tag の value 部に型 ID を書く方法は、 `__type__` などのタグ名を予約するというルールが増えてしまうのも少し気になります。
@@ -101,9 +101,11 @@ function numberToString(n: number, radix?: Int): string {
 numberToString(12345, r);
 ```
 
-これを多少改善するために、 Branded Type 定義と共にガード関数と生成関数をセットで用意する方法が考えられます。 `as` を使ったキャストは不正確になりやすいですが、以下のようにすると型名に合う値であることを保証しやすくなります。
+これを多少改善するために、 Branded Type 定義と共にガード関数と生成関数をセットで用意する方法が考えられます。 `as` を使ったキャストは unsafe ですが、以下のようにすると型名に合う値であることを保証しやすくなります。
 
 ```ts
+// types/int.ts
+
 type Int = number & { Int: never };
 
 function isInt(a: number): a is Int {
@@ -117,6 +119,8 @@ function toInt(a: number): Int {
   return a as Int;
 }
 
+// main.ts
+
 const r: Int = toInt(0.1); // ここで早期にエラーで気づける
 
 function numberToString(n: number, radix?: Int): string {
@@ -126,7 +130,7 @@ function numberToString(n: number, radix?: Int): string {
 numberToString(12345, r);
 ```
 
-[io-ts](https://github.com/gcanti/io-ts/blob/master/index.md#branded-types--refinements) や [zod](https://github.com/colinhacks/zod#brand) のようなツールを使うと、型定義と同時にこのような型ガード関数を生成できるのでさらに便利になります。この `Int` 型程度であれば簡単ですが、複雑な型を定義するときには型ガード関数が型定義と整合していないチェックをしてしまっているミスも発生しやすくなるため、より安全にもなります。
+[io-ts](https://github.com/gcanti/io-ts/blob/master/index.md#branded-types--refinements) や [zod](https://github.com/colinhacks/zod#brand) のようなツールを使うと、型定義と同時にこのような型ガード関数を生成できるのでさらに便利になります。この `Int` 型程度であれば簡単なのであまり問題になりませんが、複雑な型を定義するときには型ガード関数が型定義と整合していないチェックをしてしまうミスも発生しやすくなるため、型定義を型ガード関数から自動生成できるとより安全にもなります。
 
 [zod](https://github.com/colinhacks/zod#brand) の使用例：
 
@@ -148,7 +152,9 @@ export const isInt = (a: number): a is Int => Int.safeParse(a).success;
 export const toInt = (a: number): Int => Int.parse(a);
 ```
 
-[io-ts](https://github.com/gcanti/io-ts/blob/master/index.md#branded-types--refinements) の使用例：
+[io-ts](https://github.com/gcanti/io-ts/blob/master/index.md#branded-types--refinements) の使用例：[^io-ts-int]
+
+[^io-ts-int]: io-ts には Int 型は標準で提供されているので本来は自前でこのように定義する必要はありません。
 
 ```ts
 import * as E from 'fp-ts/Either';
@@ -175,7 +181,7 @@ export const toInt = (a: number): Int => {
 };
 ```
 
-もちろん、これだけでは `toInt` や `isInt` などのユーティリティを使わず `as Int` と書いてしまうことを禁止できているわけではないので、ESLint によりチェックするとさらに良さそうです。
+もちろん、これだけでは `toInt` や `isInt` などのユーティリティを使わず `as Int` と書いてしまうことを禁止できているわけではないので、さらに ESLint によりチェックすると良さそうです。
 
 以下のように設定することでこれをチェックできます。
 
@@ -395,7 +401,7 @@ if (isInt(x) && isNonNegativeNumber(x)) {
 
 ## ［発展］Branded Number Type の Union 型を改善する
 
-以上の実装で唯一難点があるのが、 union 型の結果に余計なプロパティが生えてしまうことです。例として以下の型を考えてみます。
+前節の実装で唯一難点なのが、 union 型の結果に余計なプロパティが生えてしまうことです。例として以下の型を考えてみます。
 
 ```ts
 type MaybeNonZeroNumber = NegativeNumber | PositiveNumber;
@@ -435,26 +441,27 @@ type PositiveNumber = number & {
 ```ts
 number & {
   readonly NaN: false;
-  readonly NonNegative: boolean; // <- true | false
+  readonly NonNegative: boolean; // = true | false
   readonly Zero: false;
 };
 ```
 
 という型になってしまいます。
 
-`Brand` 型の定義を工夫することで解決できれば理想的なのですが、元々 `number` 型を「割る」ときにプロパティを新たに「足す」ということをしているので union を取ったときに対消滅させるような仕組みにするのは単純な方法では上手くいかず、他に良い方法が思い付かなかったので、 union 型から `boolean` になってしまったキーを取り除くユーティリティだけ用意してみることにしました。
+`Brand` 型の定義を工夫することで解決できれば理想的なのですが、元々 `number` 型を「割る」ときにプロパティを新たに「足す」ということをしているので、普通に union 型を作ったときに対消滅させるような仕組みにするのは単純な方法では上手くいかなさそうなので、作った branded type の union 型から `boolean` になってしまったキーを取り除いて正規化するユーティリティだけ用意してみることにしました。
 
 ```ts
 NormalizeBrandUnion<NegativeNumber | PositiveNumber>;
 /* 
-number & {
+= number & {
   readonly NaN: false;
   readonly Zero: false;
-};
+}
+となってほしい
 */
 ```
 
-TypeScript の型レベルプログラミングテクニックが少し必要で本記事では説明を省きますが（[TypeScript の型初級](https://qiita.com/uhyo/items/da21e2b3c10c8a03952f#conditional-type%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8Bunion-distribution) などの記事が参考になりそうです）、以下の実装で所望の `NormalizeBrandUnion` を得ることができます。
+TypeScript の型レベルプログラミングテクニックが少し必要で本記事では説明を省きますが（[TypeScript の型初級](https://qiita.com/uhyo/items/da21e2b3c10c8a03952f#conditional-type%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8Bunion-distribution) などの記事が参考になります）、以下の実装で所望の `NormalizeBrandUnion` を得ることができます。
 
 ```ts
 type TypeEq<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
