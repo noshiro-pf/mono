@@ -24,33 +24,16 @@ export const replaceWithNoMatchCheck =
           onNoChange?: 'off';
         }
       | {
-          onNotFound: 'throw';
-          onNoChange?: 'off' | 'throw' | 'warn';
-        }
-      | {
           onNotFound: 'warn';
           onNoChange?: 'off' | 'warn';
+        }
+      | {
+          onNotFound: 'throw';
+          onNoChange?: 'off' | 'throw' | 'warn';
         }
     >,
   ): ((target: string) => string) =>
   (target) => {
-    if (searchValue === replaceValue) {
-      const msg = `searchValue is equal to replaceValue: "${replaceValue}".`;
-
-      switch (options?.onNoChange) {
-        case 'throw':
-          throw new Error(msg);
-
-        case 'warn':
-          console.warn(msg);
-          return target;
-
-        case undefined:
-        case 'off':
-          return target;
-      }
-    }
-
     if (
       typeof searchValue === 'string'
         ? !target.includes(searchValue)
@@ -74,12 +57,18 @@ export const replaceWithNoMatchCheck =
       }
     }
 
-    const result = target.replaceAll(searchValue, replaceValue);
+    const result =
+      searchValue === replaceValue
+        ? target
+        : target.replaceAll(searchValue, replaceValue);
 
     if (target === result) {
-      const msg = `Replacing had no effect. (searchValue = "${chopIfLong(searchValue)}"; target = "${chopIfLong(
-        target,
-      )}".`;
+      const msg =
+        searchValue === replaceValue
+          ? `searchValue is equal to replaceValue: "${replaceValue}".`
+          : `Replacing had no effect. (searchValue = "${chopIfLong(searchValue)}"; target = "${chopIfLong(
+              target,
+            )}".`;
 
       switch (options?.onNoChange) {
         case 'throw':
