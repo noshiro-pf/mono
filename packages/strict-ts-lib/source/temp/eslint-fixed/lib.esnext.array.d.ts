@@ -30,5 +30,5 @@ interface ArrayConstructor {
    * @param mapfn A mapping function to call on every element of itarableOrArrayLike. Each return value is awaited before being added to result array.
    * @param thisArg Value of 'this' used when executing mapfn.
    */
-  fromAsync<T, U>(iterableOrArrayLike: AsyncIterable<T> | Iterable<T> | ArrayLike<T>, mapFn: (value: Awaited<T>) => U, thisArg?: unknown): Promise<readonly Awaited<U>[]>;
+  fromAsync<T, U>(iterableOrArrayLike: AsyncIterable<T> | Iterable<T> | ArrayLike<T>, mapFn: (value: Awaited<T>, index: number) => U, thisArg?: unknown): Promise<readonly Awaited<U>[]>;
 }

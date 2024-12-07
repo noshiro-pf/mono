@@ -103,7 +103,9 @@ interface ObjectConstructor {
    * そうでない場合、 `K` が union 型の場合、`entries` がそのすべてを網羅しているとは限らないため、
    * `fromEntries` の返り値型がその union 要素すべてを含む型になってしまわないように `Partial` を付けている。
    */
-  fromEntries<Entries extends readonly (readonly [PropertyKey, unknown])[]>(
+  fromEntries<
+    const Entries extends readonly (readonly [PropertyKey, unknown])[],
+  >(
     entries: Entries,
   ): IsFixedLengthList<Entries> extends true
     ? StrictLibInternals.EntriesToObject<Entries>

@@ -1,16 +1,17 @@
 import {
-  composeMonoTypeFns,
+  pipe,
   replaceWithNoMatchCheck,
   replaceWithNoMatchCheckBetweenRegexp,
 } from '@noshiro/mono-scripts';
 import { closeBraceRegexp, type ConverterOptions } from './common.mjs';
 
-export const convertLibEs5_deprecated = ({
-  config: { commentOutDeprecated },
-  brandedNumber,
-}: ConverterOptions): MonoTypeFunction<string> =>
-  composeMonoTypeFns(
-    composeMonoTypeFns(
+export const convertLibEs5_deprecated =
+  ({
+    config: { commentOutDeprecated },
+    brandedNumber,
+  }: ConverterOptions): MonoTypeFunction<string> =>
+  (src) =>
+    pipe(src).chainMonoTypeFns(
       // add @deprecated
       replaceWithNoMatchCheck(
         [
@@ -76,40 +77,39 @@ export const convertLibEs5_deprecated = ({
           `  ${commentOutDeprecated ? '// ' : ''}concat(...strings: readonly string[]): string;`,
         ].join('\n'),
       ),
-    ),
 
-    ...(!commentOutDeprecated
-      ? []
-      : [
-          'declare function escape(string: string): string;',
-          'declare function unescape(string: string): string;',
-          'declare function eval(x: string): unknown;',
-          'declare function isNaN(number: number): boolean;',
-          'declare function isFinite(number: number): boolean;',
-          'substr(from: number, length?: number): string;',
-          'compile(pattern: string, flags?: string): this;',
-          `charAt(pos: number): string;`,
-          'concat(...strings: readonly string[]): string;',
-        ].map((line) =>
-          // comment out deprecated functions
-          replaceWithNoMatchCheck(
-            //
-            line,
-            `// ${line}`,
-          ),
-        )),
-
-    ...(!commentOutDeprecated
-      ? []
-      : [
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: 'interface RegExpConstructor {',
-            endRegexp: closeBraceRegexp,
-            mapFn: replaceWithNoMatchCheck(
+      ...(!commentOutDeprecated
+        ? []
+        : [
+            'declare function escape(string: string): string;',
+            'declare function unescape(string: string): string;',
+            'declare function eval(x: string): unknown;',
+            'declare function isNaN(number: number): boolean;',
+            'declare function isFinite(number: number): boolean;',
+            'substr(from: number, length?: number): string;',
+            'compile(pattern: string, flags?: string): this;',
+            `charAt(pos: number): string;`,
+            'concat(...strings: readonly string[]): string;',
+          ].map((line) =>
+            // comment out deprecated functions
+            replaceWithNoMatchCheck(
               //
-              'readonly',
-              '// readonly',
+              line,
+              `// ${line}`,
             ),
-          }),
-        ]),
-  );
+          )),
+
+      ...(!commentOutDeprecated
+        ? []
+        : [
+            replaceWithNoMatchCheckBetweenRegexp({
+              startRegexp: 'interface RegExpConstructor {',
+              endRegexp: closeBraceRegexp,
+              mapFn: replaceWithNoMatchCheck(
+                //
+                'readonly',
+                '// readonly',
+              ),
+            }),
+          ]),
+    ).value;

@@ -78,4 +78,4 @@ interface PromiseConstructor {
   resolve<T>(value: T | PromiseLike<T>): Promise<Awaited<T>>;
 }
 
-declare let Promise: PromiseConstructor;
+declare var Promise: PromiseConstructor;

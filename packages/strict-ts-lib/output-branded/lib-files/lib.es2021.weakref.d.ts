@@ -1,6 +1,8 @@
 /// <reference no-default-lib="true"/>
 /// <reference types="@noshiro/ts-type-utils" />
 
+/// <reference path="./lib.es2015.symbol.wellknown.d.ts" />
+
 interface WeakRef<T extends WeakKey> {
   readonly [Symbol.toStringTag]: 'WeakRef';
 

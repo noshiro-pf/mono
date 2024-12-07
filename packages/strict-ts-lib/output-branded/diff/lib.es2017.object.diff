@@ -1,4 +1,4 @@
-@@ -1,19 +1,33 @@
+@@ -1,19 +1,35 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -13,15 +13,15 @@
 -MERCHANTABLITY OR NON-INFRINGEMENT.
 +declare namespace StrictLibInternals {
 +  /** @internal */
-+  type ToObjectKeysValue<A> = A extends string
-+    ? A
-+    : A extends number
-+      ? `${A}`
-+      : never;
++  type ToObjectKeys<R extends UnknownRecord> = ToStr<keyof R> | (string & {});
  
 -See the Apache Version 2.0 License for specific language governing permissions
 -and limitations under the License.
 -***************************************************************************** */
++  /** @internal */
++  type ToStr<A> = A extends string ? A : A extends number ? `${A}` : never;
+ 
+-/// <reference no-default-lib="true"/>
 +  /** @internal */
 +  type PickByValue<R, V> = Pick<
 +    R,
@@ -29,23 +29,25 @@
 +      [K in keyof R]: R[K] extends V ? K : never;
 +    }[keyof R]
 +  >;
- 
--/// <reference no-default-lib="true"/>
++
 +  /** @internal */
-+  export type ToObjectEntries<R extends UnknownRecord> = R extends R
-+    ? readonly {
-+        readonly [K in keyof R]: readonly [
-+          ToObjectKeysValue<keyof PickByValue<R, R[K]>>,
-+          R[K],
-+        ];
-+        // eslint-disable-next-line @typescript-eslint/no-restricted-types
-+      }[RelaxedExclude<keyof R, symbol>][]
++  type ToObjectEntries<R extends UnknownRecord> = R extends R
++    ? readonly (
++        | readonly [string, ValueOf<R>]
++        | {
++            readonly [K in keyof R]: readonly [
++              ToStr<keyof PickByValue<R, R[K]>>,
++              R[K],
++            ];
++            // eslint-disable-next-line @typescript-eslint/no-restricted-types
++          }[RelaxedExclude<keyof R, symbol>]
++      )[]
 +    : never;
 +}
  
  interface ObjectConstructor {
    /**
-@@ -23,7 +37,7 @@ interface ObjectConstructor {
+@@ -23,7 +39,7 @@ interface ObjectConstructor {
     *   object that you created or an existing Document Object Model (DOM)
     *   object.
     */
@@ -54,19 +56,20 @@
  
    /**
     * Returns an array of values of the enumerable own properties of an object
-@@ -32,7 +46,7 @@ interface ObjectConstructor {
+@@ -32,7 +48,30 @@ interface ObjectConstructor {
     *   object that you created or an existing Document Object Model (DOM)
     *   object.
     */
 -  values(o: {}): any[];
 +  values(o: {}): readonly unknown[];
- 
-   /**
-    * Returns an array of key/values of the enumerable own properties of an
-@@ -41,8 +55,21 @@ interface ObjectConstructor {
-    * @param o Object that contains the properties and methods. This can be an
-    *   object that you created or an existing Document Object Model (DOM)
-    *   object.
++
++  /**
++   * Returns an array of key/values of the enumerable own properties of an
++   * object
++   *
++   * @param o Object that contains the properties and methods. This can be an
++   *   object that you created or an existing Document Object Model (DOM)
++   *   object.
 +   *
 +   *   ```ts
 +   *   const obj = {
@@ -76,17 +79,27 @@
 +   *     3: 4,
 +   *   } as const;
 +   *
-+   *   const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]
++   *   const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2] | [string, unknown])[]
 +   *   ```
-    */
--  entries<T>(o: { [s: string]: T } | ArrayLike<T>): [string, T][];
-+  entries<R extends UnknownRecord>(
++   */
++  entries<const R extends UnknownRecord>(
 +    object: R,
 +  ): StrictLibInternals.ToObjectEntries<R>;
  
    /**
     * Returns an array of key/values of the enumerable own properties of an
-@@ -52,7 +79,7 @@ interface ObjectConstructor {
+@@ -42,7 +81,9 @@ interface ObjectConstructor {
+    *   object that you created or an existing Document Object Model (DOM)
+    *   object.
+    */
+-  entries<T>(o: { [s: string]: T } | ArrayLike<T>): [string, T][];
++  entries<T>(
++    o: { readonly [s: string]: T } | ArrayLike<T>,
++  ): readonly (readonly [string, T])[];
+ 
+   /**
+    * Returns an array of key/values of the enumerable own properties of an
+@@ -52,7 +93,7 @@ interface ObjectConstructor {
     *   object that you created or an existing Document Object Model (DOM)
     *   object.
     */
@@ -95,7 +108,7 @@
  
    /**
     * Returns an object containing all own property descriptors of an object
-@@ -62,8 +89,8 @@ interface ObjectConstructor {
+@@ -62,8 +103,8 @@ interface ObjectConstructor {
     *   object.
     */
    getOwnPropertyDescriptors<T>(o: T): {

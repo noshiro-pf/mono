@@ -79,7 +79,7 @@ interface TextStreamReader extends TextStreamBase {
   readonly AtEndOfStream: boolean;
 }
 
-declare let WScript: {
+declare var WScript: {
   /** Outputs text to either a message box (under WScript.exe) or the command console window followed by a newline (under CScript.exe). */
   Echo(s: unknown): void;
 
@@ -152,7 +152,7 @@ declare let WScript: {
 };
 
 /** WSH is an alias for WScript under Windows Script Host */
-declare let WSH: typeof WScript;
+declare var WSH: typeof WScript;
 
 /** Represents an Automation SAFEARRAY */
 declare class SafeArray<T = unknown> {

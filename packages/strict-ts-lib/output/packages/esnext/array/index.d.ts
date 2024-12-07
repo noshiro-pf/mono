@@ -27,7 +27,7 @@ interface ArrayConstructor {
    */
   fromAsync<T, U>(
     iterableOrArrayLike: AsyncIterable<T> | Iterable<T> | ArrayLike<T>,
-    mapFn: (value: Awaited<T>) => U,
+    mapFn: (value: Awaited<T>, index: number) => U,
     thisArg?: unknown,
   ): Promise<readonly Awaited<U>[]>;
 }

@@ -1,6 +1,8 @@
 /// <reference no-default-lib="true"/>
 /// <reference types="@noshiro/ts-type-utils" />
 
+/// <reference path="./lib.es2020.bigint.d.ts" />
+
 interface Atomics {
   /**
    * Adds a value to the value at the given position in the array, returning the
@@ -138,7 +140,7 @@ interface Atomics {
    * (returning `"ok"`); otherwise, returns `"not-equal"`.
    */
   wait(
-    typedArray: BigInt64Array,
+    typedArray: BigInt64Array<ArrayBufferLike>,
     index: NumberType.TypedArraySizeArg,
     value: BigInt64,
     timeout?: number,
@@ -154,7 +156,7 @@ interface Atomics {
    *   +Infinity.
    */
   notify(
-    typedArray: BigInt64Array,
+    typedArray: BigInt64Array<ArrayBufferLike>,
     index: NumberType.TypedArraySizeArg,
     count?: SafeUint,
   ): SafeUint;

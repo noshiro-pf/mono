@@ -2361,7 +2361,7 @@ interface ArrayBuffer {
   readonly byteLength: number;
 
   /** Returns a section of an ArrayBuffer. */
-  slice(begin: number, end?: number): ArrayBuffer;
+  slice(begin?: number, end?: number): ArrayBuffer;
 }
 
 /**
@@ -2380,19 +2380,21 @@ interface ArrayBufferConstructor {
 }
 declare var ArrayBuffer: ArrayBufferConstructor;
 
-interface ArrayBufferView {
+interface ArrayBufferView<
+  TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
+> {
   /** The ArrayBuffer instance referenced by the array. */
-  buffer: ArrayBufferLike;
+  readonly buffer: TArrayBuffer;
 
   /** The length in bytes of the array. */
-  byteLength: number;
+  readonly byteLength: number;
 
   /** The offset in bytes of the array. */
-  byteOffset: number;
+  readonly byteOffset: number;
 }
 
-interface DataView {
-  readonly buffer: ArrayBuffer;
+interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+  readonly buffer: TArrayBuffer;
   readonly byteLength: number;
   readonly byteOffset: number;
   /**
@@ -2570,14 +2572,13 @@ interface DataView {
    */
   setUint32(byteOffset: number, value: number, littleEndian?: boolean): void;
 }
-
 interface DataViewConstructor {
-  readonly prototype: DataView;
-  new (
-    buffer: ArrayBufferLike & { BYTES_PER_ELEMENT?: never },
+  readonly prototype: DataView<ArrayBufferLike>;
+  new <TArrayBuffer extends ArrayBufferLike & { BYTES_PER_ELEMENT?: never }>(
+    buffer: TArrayBuffer,
     byteOffset?: number,
     byteLength?: number,
-  ): DataView;
+  ): DataView<TArrayBuffer>;
 }
 declare var DataView: DataViewConstructor;
 
@@ -2585,12 +2586,12 @@ declare var DataView: DataViewConstructor;
  * A typed array of 8-bit integer values. The contents are initialized to 0. If
  * the requested number of bytes could not be allocated an exception is raised.
  */
-interface Int8Array {
+interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
 
   /** The ArrayBuffer instance referenced by the array. */
-  readonly buffer: ArrayBufferLike;
+  readonly buffer: TArrayBuffer;
 
   /** The length in bytes of the array. */
   readonly byteLength: number;
@@ -2623,7 +2624,7 @@ interface Int8Array {
    *   value.
    */
   every(
-    predicate: (value: number, index: number, array: Int8Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -2651,9 +2652,9 @@ interface Int8Array {
    *   value.
    */
   filter(
-    predicate: (value: number, index: number, array: Int8Array) => any,
+    predicate: (value: number, index: number, array: this) => any,
     thisArg?: any,
-  ): Int8Array;
+  ): Int8Array<ArrayBuffer>;
 
   /**
    * Returns the value of the first element in the array where predicate is
@@ -2668,7 +2669,7 @@ interface Int8Array {
    *   instead.
    */
   find(
-    predicate: (value: number, index: number, obj: Int8Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number | undefined;
 
@@ -2685,7 +2686,7 @@ interface Int8Array {
    *   instead.
    */
   findIndex(
-    predicate: (value: number, index: number, obj: Int8Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number;
 
@@ -2699,7 +2700,7 @@ interface Int8Array {
    *   value.
    */
   forEach(
-    callbackfn: (value: number, index: number, array: Int8Array) => void,
+    callbackfn: (value: number, index: number, array: this) => void,
     thisArg?: any,
   ): void;
 
@@ -2746,9 +2747,9 @@ interface Int8Array {
    *   value.
    */
   map(
-    callbackfn: (value: number, index: number, array: Int8Array) => number,
+    callbackfn: (value: number, index: number, array: this) => number,
     thisArg?: any,
-  ): Int8Array;
+  ): Int8Array<ArrayBuffer>;
 
   /**
    * Calls the specified callback function for all the elements in an array. The
@@ -2767,7 +2768,7 @@ interface Int8Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int8Array,
+      array: this,
     ) => number,
   ): number;
   reduce(
@@ -2775,7 +2776,7 @@ interface Int8Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int8Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -2797,7 +2798,7 @@ interface Int8Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Int8Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
@@ -2820,7 +2821,7 @@ interface Int8Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int8Array,
+      array: this,
     ) => number,
   ): number;
   reduceRight(
@@ -2828,7 +2829,7 @@ interface Int8Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int8Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -2851,13 +2852,13 @@ interface Int8Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Int8Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
 
   /** Reverses the elements in an Array. */
-  reverse(): Int8Array;
+  reverse(): this;
 
   /**
    * Sets a value or an array of values.
@@ -2875,7 +2876,7 @@ interface Int8Array {
    * @param end The end of the specified portion of the array. This is exclusive
    *   of the element at the index 'end'.
    */
-  slice(start?: number, end?: number): Int8Array;
+  slice(start?: number, end?: number): Int8Array<ArrayBuffer>;
 
   /**
    * Determines whether the specified callback function returns true for any
@@ -2890,7 +2891,7 @@ interface Int8Array {
    *   value.
    */
   some(
-    predicate: (value: number, index: number, array: Int8Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -2915,7 +2916,7 @@ interface Int8Array {
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
    */
-  subarray(begin?: number, end?: number): Int8Array;
+  subarray(begin?: number, end?: number): Int8Array<TArrayBuffer>;
 
   /** Converts a number to a string by using the current locale. */
   toLocaleString(): string;
@@ -2924,19 +2925,20 @@ interface Int8Array {
   toString(): string;
 
   /** Returns the primitive value of the specified object. */
-  valueOf(): Int8Array;
+  valueOf(): this;
 
   [index: number]: number;
 }
 interface Int8ArrayConstructor {
-  readonly prototype: Int8Array;
-  new (length: number): Int8Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Int8Array;
-  new (
-    buffer: ArrayBufferLike,
+  readonly prototype: Int8Array<ArrayBufferLike>;
+  new (length: number): Int8Array<ArrayBuffer>;
+  new (array: ArrayLike<number>): Int8Array<ArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
+    buffer: TArrayBuffer,
     byteOffset?: number,
     length?: number,
-  ): Int8Array;
+  ): Int8Array<TArrayBuffer>;
+  new (array: ArrayLike<number> | ArrayBuffer): Int8Array<ArrayBuffer>;
 
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
@@ -2946,14 +2948,14 @@ interface Int8ArrayConstructor {
    *
    * @param items A set of elements to include in the new array object.
    */
-  of(...items: number[]): Int8Array;
+  of(...items: number[]): Int8Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
    *
    * @param arrayLike An array-like or iterable object to convert to an array.
    */
-  from(arrayLike: ArrayLike<number>): Int8Array;
+  from(arrayLike: ArrayLike<number>): Int8Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -2966,7 +2968,7 @@ interface Int8ArrayConstructor {
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
     thisArg?: any,
-  ): Int8Array;
+  ): Int8Array<ArrayBuffer>;
 }
 declare var Int8Array: Int8ArrayConstructor;
 
@@ -2975,12 +2977,12 @@ declare var Int8Array: Int8ArrayConstructor;
  * to 0. If the requested number of bytes could not be allocated an exception is
  * raised.
  */
-interface Uint8Array {
+interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
 
   /** The ArrayBuffer instance referenced by the array. */
-  readonly buffer: ArrayBufferLike;
+  readonly buffer: TArrayBuffer;
 
   /** The length in bytes of the array. */
   readonly byteLength: number;
@@ -3013,7 +3015,7 @@ interface Uint8Array {
    *   value.
    */
   every(
-    predicate: (value: number, index: number, array: Uint8Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -3041,9 +3043,9 @@ interface Uint8Array {
    *   value.
    */
   filter(
-    predicate: (value: number, index: number, array: Uint8Array) => any,
+    predicate: (value: number, index: number, array: this) => any,
     thisArg?: any,
-  ): Uint8Array;
+  ): Uint8Array<ArrayBuffer>;
 
   /**
    * Returns the value of the first element in the array where predicate is
@@ -3058,7 +3060,7 @@ interface Uint8Array {
    *   instead.
    */
   find(
-    predicate: (value: number, index: number, obj: Uint8Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number | undefined;
 
@@ -3075,7 +3077,7 @@ interface Uint8Array {
    *   instead.
    */
   findIndex(
-    predicate: (value: number, index: number, obj: Uint8Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number;
 
@@ -3089,7 +3091,7 @@ interface Uint8Array {
    *   value.
    */
   forEach(
-    callbackfn: (value: number, index: number, array: Uint8Array) => void,
+    callbackfn: (value: number, index: number, array: this) => void,
     thisArg?: any,
   ): void;
 
@@ -3136,9 +3138,9 @@ interface Uint8Array {
    *   value.
    */
   map(
-    callbackfn: (value: number, index: number, array: Uint8Array) => number,
+    callbackfn: (value: number, index: number, array: this) => number,
     thisArg?: any,
-  ): Uint8Array;
+  ): Uint8Array<ArrayBuffer>;
 
   /**
    * Calls the specified callback function for all the elements in an array. The
@@ -3157,7 +3159,7 @@ interface Uint8Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8Array,
+      array: this,
     ) => number,
   ): number;
   reduce(
@@ -3165,7 +3167,7 @@ interface Uint8Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -3187,7 +3189,7 @@ interface Uint8Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint8Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
@@ -3210,7 +3212,7 @@ interface Uint8Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8Array,
+      array: this,
     ) => number,
   ): number;
   reduceRight(
@@ -3218,7 +3220,7 @@ interface Uint8Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -3241,13 +3243,13 @@ interface Uint8Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint8Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
 
   /** Reverses the elements in an Array. */
-  reverse(): Uint8Array;
+  reverse(): this;
 
   /**
    * Sets a value or an array of values.
@@ -3265,7 +3267,7 @@ interface Uint8Array {
    * @param end The end of the specified portion of the array. This is exclusive
    *   of the element at the index 'end'.
    */
-  slice(start?: number, end?: number): Uint8Array;
+  slice(start?: number, end?: number): Uint8Array<ArrayBuffer>;
 
   /**
    * Determines whether the specified callback function returns true for any
@@ -3280,7 +3282,7 @@ interface Uint8Array {
    *   value.
    */
   some(
-    predicate: (value: number, index: number, array: Uint8Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -3305,7 +3307,7 @@ interface Uint8Array {
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
    */
-  subarray(begin?: number, end?: number): Uint8Array;
+  subarray(begin?: number, end?: number): Uint8Array<TArrayBuffer>;
 
   /** Converts a number to a string by using the current locale. */
   toLocaleString(): string;
@@ -3314,20 +3316,20 @@ interface Uint8Array {
   toString(): string;
 
   /** Returns the primitive value of the specified object. */
-  valueOf(): Uint8Array;
+  valueOf(): this;
 
   [index: number]: number;
 }
-
 interface Uint8ArrayConstructor {
-  readonly prototype: Uint8Array;
-  new (length: number): Uint8Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Uint8Array;
-  new (
-    buffer: ArrayBufferLike,
+  readonly prototype: Uint8Array<ArrayBufferLike>;
+  new (length: number): Uint8Array<ArrayBuffer>;
+  new (array: ArrayLike<number>): Uint8Array<ArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
+    buffer: TArrayBuffer,
     byteOffset?: number,
     length?: number,
-  ): Uint8Array;
+  ): Uint8Array<TArrayBuffer>;
+  new (array: ArrayLike<number> | ArrayBuffer): Uint8Array<ArrayBuffer>;
 
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
@@ -3337,14 +3339,14 @@ interface Uint8ArrayConstructor {
    *
    * @param items A set of elements to include in the new array object.
    */
-  of(...items: number[]): Uint8Array;
+  of(...items: number[]): Uint8Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
    *
    * @param arrayLike An array-like or iterable object to convert to an array.
    */
-  from(arrayLike: ArrayLike<number>): Uint8Array;
+  from(arrayLike: ArrayLike<number>): Uint8Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -3357,7 +3359,7 @@ interface Uint8ArrayConstructor {
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
     thisArg?: any,
-  ): Uint8Array;
+  ): Uint8Array<ArrayBuffer>;
 }
 declare var Uint8Array: Uint8ArrayConstructor;
 
@@ -3366,12 +3368,14 @@ declare var Uint8Array: Uint8ArrayConstructor;
  * initialized to 0. If the requested number of bytes could not be allocated an
  * exception is raised.
  */
-interface Uint8ClampedArray {
+interface Uint8ClampedArray<
+  TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
+> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
 
   /** The ArrayBuffer instance referenced by the array. */
-  readonly buffer: ArrayBufferLike;
+  readonly buffer: TArrayBuffer;
 
   /** The length in bytes of the array. */
   readonly byteLength: number;
@@ -3404,11 +3408,7 @@ interface Uint8ClampedArray {
    *   value.
    */
   every(
-    predicate: (
-      value: number,
-      index: number,
-      array: Uint8ClampedArray,
-    ) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -3436,9 +3436,9 @@ interface Uint8ClampedArray {
    *   value.
    */
   filter(
-    predicate: (value: number, index: number, array: Uint8ClampedArray) => any,
+    predicate: (value: number, index: number, array: this) => any,
     thisArg?: any,
-  ): Uint8ClampedArray;
+  ): Uint8ClampedArray<ArrayBuffer>;
 
   /**
    * Returns the value of the first element in the array where predicate is
@@ -3453,11 +3453,7 @@ interface Uint8ClampedArray {
    *   instead.
    */
   find(
-    predicate: (
-      value: number,
-      index: number,
-      obj: Uint8ClampedArray,
-    ) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number | undefined;
 
@@ -3474,11 +3470,7 @@ interface Uint8ClampedArray {
    *   instead.
    */
   findIndex(
-    predicate: (
-      value: number,
-      index: number,
-      obj: Uint8ClampedArray,
-    ) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number;
 
@@ -3492,11 +3484,7 @@ interface Uint8ClampedArray {
    *   value.
    */
   forEach(
-    callbackfn: (
-      value: number,
-      index: number,
-      array: Uint8ClampedArray,
-    ) => void,
+    callbackfn: (value: number, index: number, array: this) => void,
     thisArg?: any,
   ): void;
 
@@ -3543,13 +3531,9 @@ interface Uint8ClampedArray {
    *   value.
    */
   map(
-    callbackfn: (
-      value: number,
-      index: number,
-      array: Uint8ClampedArray,
-    ) => number,
+    callbackfn: (value: number, index: number, array: this) => number,
     thisArg?: any,
-  ): Uint8ClampedArray;
+  ): Uint8ClampedArray<ArrayBuffer>;
 
   /**
    * Calls the specified callback function for all the elements in an array. The
@@ -3568,7 +3552,7 @@ interface Uint8ClampedArray {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8ClampedArray,
+      array: this,
     ) => number,
   ): number;
   reduce(
@@ -3576,7 +3560,7 @@ interface Uint8ClampedArray {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8ClampedArray,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -3598,7 +3582,7 @@ interface Uint8ClampedArray {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint8ClampedArray,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
@@ -3621,7 +3605,7 @@ interface Uint8ClampedArray {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8ClampedArray,
+      array: this,
     ) => number,
   ): number;
   reduceRight(
@@ -3629,7 +3613,7 @@ interface Uint8ClampedArray {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8ClampedArray,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -3652,13 +3636,13 @@ interface Uint8ClampedArray {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint8ClampedArray,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
 
   /** Reverses the elements in an Array. */
-  reverse(): Uint8ClampedArray;
+  reverse(): this;
 
   /**
    * Sets a value or an array of values.
@@ -3676,7 +3660,7 @@ interface Uint8ClampedArray {
    * @param end The end of the specified portion of the array. This is exclusive
    *   of the element at the index 'end'.
    */
-  slice(start?: number, end?: number): Uint8ClampedArray;
+  slice(start?: number, end?: number): Uint8ClampedArray<ArrayBuffer>;
 
   /**
    * Determines whether the specified callback function returns true for any
@@ -3691,11 +3675,7 @@ interface Uint8ClampedArray {
    *   value.
    */
   some(
-    predicate: (
-      value: number,
-      index: number,
-      array: Uint8ClampedArray,
-    ) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -3720,7 +3700,7 @@ interface Uint8ClampedArray {
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
    */
-  subarray(begin?: number, end?: number): Uint8ClampedArray;
+  subarray(begin?: number, end?: number): Uint8ClampedArray<TArrayBuffer>;
 
   /** Converts a number to a string by using the current locale. */
   toLocaleString(): string;
@@ -3729,20 +3709,20 @@ interface Uint8ClampedArray {
   toString(): string;
 
   /** Returns the primitive value of the specified object. */
-  valueOf(): Uint8ClampedArray;
+  valueOf(): this;
 
   [index: number]: number;
 }
-
 interface Uint8ClampedArrayConstructor {
-  readonly prototype: Uint8ClampedArray;
-  new (length: number): Uint8ClampedArray;
-  new (array: ArrayLike<number> | ArrayBufferLike): Uint8ClampedArray;
-  new (
-    buffer: ArrayBufferLike,
+  readonly prototype: Uint8ClampedArray<ArrayBufferLike>;
+  new (length: number): Uint8ClampedArray<ArrayBuffer>;
+  new (array: ArrayLike<number>): Uint8ClampedArray<ArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
+    buffer: TArrayBuffer,
     byteOffset?: number,
     length?: number,
-  ): Uint8ClampedArray;
+  ): Uint8ClampedArray<TArrayBuffer>;
+  new (array: ArrayLike<number> | ArrayBuffer): Uint8ClampedArray<ArrayBuffer>;
 
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
@@ -3752,14 +3732,14 @@ interface Uint8ClampedArrayConstructor {
    *
    * @param items A set of elements to include in the new array object.
    */
-  of(...items: number[]): Uint8ClampedArray;
+  of(...items: number[]): Uint8ClampedArray<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
    *
    * @param arrayLike An array-like or iterable object to convert to an array.
    */
-  from(arrayLike: ArrayLike<number>): Uint8ClampedArray;
+  from(arrayLike: ArrayLike<number>): Uint8ClampedArray<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -3772,7 +3752,7 @@ interface Uint8ClampedArrayConstructor {
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
     thisArg?: any,
-  ): Uint8ClampedArray;
+  ): Uint8ClampedArray<ArrayBuffer>;
 }
 declare var Uint8ClampedArray: Uint8ClampedArrayConstructor;
 
@@ -3781,12 +3761,12 @@ declare var Uint8ClampedArray: Uint8ClampedArrayConstructor;
  * to 0. If the requested number of bytes could not be allocated an exception is
  * raised.
  */
-interface Int16Array {
+interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
 
   /** The ArrayBuffer instance referenced by the array. */
-  readonly buffer: ArrayBufferLike;
+  readonly buffer: TArrayBuffer;
 
   /** The length in bytes of the array. */
   readonly byteLength: number;
@@ -3819,7 +3799,7 @@ interface Int16Array {
    *   value.
    */
   every(
-    predicate: (value: number, index: number, array: Int16Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -3847,9 +3827,9 @@ interface Int16Array {
    *   value.
    */
   filter(
-    predicate: (value: number, index: number, array: Int16Array) => any,
+    predicate: (value: number, index: number, array: this) => any,
     thisArg?: any,
-  ): Int16Array;
+  ): Int16Array<ArrayBuffer>;
 
   /**
    * Returns the value of the first element in the array where predicate is
@@ -3864,7 +3844,7 @@ interface Int16Array {
    *   instead.
    */
   find(
-    predicate: (value: number, index: number, obj: Int16Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number | undefined;
 
@@ -3881,7 +3861,7 @@ interface Int16Array {
    *   instead.
    */
   findIndex(
-    predicate: (value: number, index: number, obj: Int16Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number;
 
@@ -3895,7 +3875,7 @@ interface Int16Array {
    *   value.
    */
   forEach(
-    callbackfn: (value: number, index: number, array: Int16Array) => void,
+    callbackfn: (value: number, index: number, array: this) => void,
     thisArg?: any,
   ): void;
   /**
@@ -3941,9 +3921,9 @@ interface Int16Array {
    *   value.
    */
   map(
-    callbackfn: (value: number, index: number, array: Int16Array) => number,
+    callbackfn: (value: number, index: number, array: this) => number,
     thisArg?: any,
-  ): Int16Array;
+  ): Int16Array<ArrayBuffer>;
 
   /**
    * Calls the specified callback function for all the elements in an array. The
@@ -3962,7 +3942,7 @@ interface Int16Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int16Array,
+      array: this,
     ) => number,
   ): number;
   reduce(
@@ -3970,7 +3950,7 @@ interface Int16Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int16Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -3992,7 +3972,7 @@ interface Int16Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Int16Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
@@ -4015,7 +3995,7 @@ interface Int16Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int16Array,
+      array: this,
     ) => number,
   ): number;
   reduceRight(
@@ -4023,7 +4003,7 @@ interface Int16Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int16Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -4046,13 +4026,13 @@ interface Int16Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Int16Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
 
   /** Reverses the elements in an Array. */
-  reverse(): Int16Array;
+  reverse(): this;
 
   /**
    * Sets a value or an array of values.
@@ -4070,7 +4050,7 @@ interface Int16Array {
    * @param end The end of the specified portion of the array. This is exclusive
    *   of the element at the index 'end'.
    */
-  slice(start?: number, end?: number): Int16Array;
+  slice(start?: number, end?: number): Int16Array<ArrayBuffer>;
 
   /**
    * Determines whether the specified callback function returns true for any
@@ -4085,7 +4065,7 @@ interface Int16Array {
    *   value.
    */
   some(
-    predicate: (value: number, index: number, array: Int16Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -4110,7 +4090,7 @@ interface Int16Array {
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
    */
-  subarray(begin?: number, end?: number): Int16Array;
+  subarray(begin?: number, end?: number): Int16Array<TArrayBuffer>;
 
   /** Converts a number to a string by using the current locale. */
   toLocaleString(): string;
@@ -4119,20 +4099,20 @@ interface Int16Array {
   toString(): string;
 
   /** Returns the primitive value of the specified object. */
-  valueOf(): Int16Array;
+  valueOf(): this;
 
   [index: number]: number;
 }
-
 interface Int16ArrayConstructor {
-  readonly prototype: Int16Array;
-  new (length: number): Int16Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Int16Array;
-  new (
-    buffer: ArrayBufferLike,
+  readonly prototype: Int16Array<ArrayBufferLike>;
+  new (length: number): Int16Array<ArrayBuffer>;
+  new (array: ArrayLike<number>): Int16Array<ArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
+    buffer: TArrayBuffer,
     byteOffset?: number,
     length?: number,
-  ): Int16Array;
+  ): Int16Array<TArrayBuffer>;
+  new (array: ArrayLike<number> | ArrayBuffer): Int16Array<ArrayBuffer>;
 
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
@@ -4142,14 +4122,14 @@ interface Int16ArrayConstructor {
    *
    * @param items A set of elements to include in the new array object.
    */
-  of(...items: number[]): Int16Array;
+  of(...items: number[]): Int16Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
    *
    * @param arrayLike An array-like or iterable object to convert to an array.
    */
-  from(arrayLike: ArrayLike<number>): Int16Array;
+  from(arrayLike: ArrayLike<number>): Int16Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -4162,7 +4142,7 @@ interface Int16ArrayConstructor {
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
     thisArg?: any,
-  ): Int16Array;
+  ): Int16Array<ArrayBuffer>;
 }
 declare var Int16Array: Int16ArrayConstructor;
 
@@ -4171,12 +4151,12 @@ declare var Int16Array: Int16ArrayConstructor;
  * to 0. If the requested number of bytes could not be allocated an exception is
  * raised.
  */
-interface Uint16Array {
+interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
 
   /** The ArrayBuffer instance referenced by the array. */
-  readonly buffer: ArrayBufferLike;
+  readonly buffer: TArrayBuffer;
 
   /** The length in bytes of the array. */
   readonly byteLength: number;
@@ -4209,7 +4189,7 @@ interface Uint16Array {
    *   value.
    */
   every(
-    predicate: (value: number, index: number, array: Uint16Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -4237,9 +4217,9 @@ interface Uint16Array {
    *   value.
    */
   filter(
-    predicate: (value: number, index: number, array: Uint16Array) => any,
+    predicate: (value: number, index: number, array: this) => any,
     thisArg?: any,
-  ): Uint16Array;
+  ): Uint16Array<ArrayBuffer>;
 
   /**
    * Returns the value of the first element in the array where predicate is
@@ -4254,7 +4234,7 @@ interface Uint16Array {
    *   instead.
    */
   find(
-    predicate: (value: number, index: number, obj: Uint16Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number | undefined;
 
@@ -4271,7 +4251,7 @@ interface Uint16Array {
    *   instead.
    */
   findIndex(
-    predicate: (value: number, index: number, obj: Uint16Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number;
 
@@ -4285,7 +4265,7 @@ interface Uint16Array {
    *   value.
    */
   forEach(
-    callbackfn: (value: number, index: number, array: Uint16Array) => void,
+    callbackfn: (value: number, index: number, array: this) => void,
     thisArg?: any,
   ): void;
 
@@ -4332,9 +4312,9 @@ interface Uint16Array {
    *   value.
    */
   map(
-    callbackfn: (value: number, index: number, array: Uint16Array) => number,
+    callbackfn: (value: number, index: number, array: this) => number,
     thisArg?: any,
-  ): Uint16Array;
+  ): Uint16Array<ArrayBuffer>;
 
   /**
    * Calls the specified callback function for all the elements in an array. The
@@ -4353,7 +4333,7 @@ interface Uint16Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint16Array,
+      array: this,
     ) => number,
   ): number;
   reduce(
@@ -4361,7 +4341,7 @@ interface Uint16Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint16Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -4383,7 +4363,7 @@ interface Uint16Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint16Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
@@ -4406,7 +4386,7 @@ interface Uint16Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint16Array,
+      array: this,
     ) => number,
   ): number;
   reduceRight(
@@ -4414,7 +4394,7 @@ interface Uint16Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint16Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -4437,13 +4417,13 @@ interface Uint16Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint16Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
 
   /** Reverses the elements in an Array. */
-  reverse(): Uint16Array;
+  reverse(): this;
 
   /**
    * Sets a value or an array of values.
@@ -4461,7 +4441,7 @@ interface Uint16Array {
    * @param end The end of the specified portion of the array. This is exclusive
    *   of the element at the index 'end'.
    */
-  slice(start?: number, end?: number): Uint16Array;
+  slice(start?: number, end?: number): Uint16Array<ArrayBuffer>;
 
   /**
    * Determines whether the specified callback function returns true for any
@@ -4476,7 +4456,7 @@ interface Uint16Array {
    *   value.
    */
   some(
-    predicate: (value: number, index: number, array: Uint16Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -4501,7 +4481,7 @@ interface Uint16Array {
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
    */
-  subarray(begin?: number, end?: number): Uint16Array;
+  subarray(begin?: number, end?: number): Uint16Array<TArrayBuffer>;
 
   /** Converts a number to a string by using the current locale. */
   toLocaleString(): string;
@@ -4510,20 +4490,20 @@ interface Uint16Array {
   toString(): string;
 
   /** Returns the primitive value of the specified object. */
-  valueOf(): Uint16Array;
+  valueOf(): this;
 
   [index: number]: number;
 }
-
 interface Uint16ArrayConstructor {
-  readonly prototype: Uint16Array;
-  new (length: number): Uint16Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Uint16Array;
-  new (
-    buffer: ArrayBufferLike,
+  readonly prototype: Uint16Array<ArrayBufferLike>;
+  new (length: number): Uint16Array<ArrayBuffer>;
+  new (array: ArrayLike<number>): Uint16Array<ArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
+    buffer: TArrayBuffer,
     byteOffset?: number,
     length?: number,
-  ): Uint16Array;
+  ): Uint16Array<TArrayBuffer>;
+  new (array: ArrayLike<number> | ArrayBuffer): Uint16Array<ArrayBuffer>;
 
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
@@ -4533,14 +4513,14 @@ interface Uint16ArrayConstructor {
    *
    * @param items A set of elements to include in the new array object.
    */
-  of(...items: number[]): Uint16Array;
+  of(...items: number[]): Uint16Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
    *
    * @param arrayLike An array-like or iterable object to convert to an array.
    */
-  from(arrayLike: ArrayLike<number>): Uint16Array;
+  from(arrayLike: ArrayLike<number>): Uint16Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -4553,7 +4533,7 @@ interface Uint16ArrayConstructor {
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
     thisArg?: any,
-  ): Uint16Array;
+  ): Uint16Array<ArrayBuffer>;
 }
 declare var Uint16Array: Uint16ArrayConstructor;
 /**
@@ -4561,12 +4541,12 @@ declare var Uint16Array: Uint16ArrayConstructor;
  * to 0. If the requested number of bytes could not be allocated an exception is
  * raised.
  */
-interface Int32Array {
+interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
 
   /** The ArrayBuffer instance referenced by the array. */
-  readonly buffer: ArrayBufferLike;
+  readonly buffer: TArrayBuffer;
 
   /** The length in bytes of the array. */
   readonly byteLength: number;
@@ -4599,7 +4579,7 @@ interface Int32Array {
    *   value.
    */
   every(
-    predicate: (value: number, index: number, array: Int32Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -4627,9 +4607,9 @@ interface Int32Array {
    *   value.
    */
   filter(
-    predicate: (value: number, index: number, array: Int32Array) => any,
+    predicate: (value: number, index: number, array: this) => any,
     thisArg?: any,
-  ): Int32Array;
+  ): Int32Array<ArrayBuffer>;
 
   /**
    * Returns the value of the first element in the array where predicate is
@@ -4644,7 +4624,7 @@ interface Int32Array {
    *   instead.
    */
   find(
-    predicate: (value: number, index: number, obj: Int32Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number | undefined;
 
@@ -4661,7 +4641,7 @@ interface Int32Array {
    *   instead.
    */
   findIndex(
-    predicate: (value: number, index: number, obj: Int32Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number;
 
@@ -4675,7 +4655,7 @@ interface Int32Array {
    *   value.
    */
   forEach(
-    callbackfn: (value: number, index: number, array: Int32Array) => void,
+    callbackfn: (value: number, index: number, array: this) => void,
     thisArg?: any,
   ): void;
 
@@ -4722,9 +4702,9 @@ interface Int32Array {
    *   value.
    */
   map(
-    callbackfn: (value: number, index: number, array: Int32Array) => number,
+    callbackfn: (value: number, index: number, array: this) => number,
     thisArg?: any,
-  ): Int32Array;
+  ): Int32Array<ArrayBuffer>;
 
   /**
    * Calls the specified callback function for all the elements in an array. The
@@ -4743,7 +4723,7 @@ interface Int32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int32Array,
+      array: this,
     ) => number,
   ): number;
   reduce(
@@ -4751,7 +4731,7 @@ interface Int32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int32Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -4773,7 +4753,7 @@ interface Int32Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Int32Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
@@ -4796,7 +4776,7 @@ interface Int32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int32Array,
+      array: this,
     ) => number,
   ): number;
   reduceRight(
@@ -4804,7 +4784,7 @@ interface Int32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int32Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -4827,13 +4807,13 @@ interface Int32Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Int32Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
 
   /** Reverses the elements in an Array. */
-  reverse(): Int32Array;
+  reverse(): this;
 
   /**
    * Sets a value or an array of values.
@@ -4851,7 +4831,7 @@ interface Int32Array {
    * @param end The end of the specified portion of the array. This is exclusive
    *   of the element at the index 'end'.
    */
-  slice(start?: number, end?: number): Int32Array;
+  slice(start?: number, end?: number): Int32Array<ArrayBuffer>;
 
   /**
    * Determines whether the specified callback function returns true for any
@@ -4866,7 +4846,7 @@ interface Int32Array {
    *   value.
    */
   some(
-    predicate: (value: number, index: number, array: Int32Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -4891,7 +4871,7 @@ interface Int32Array {
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
    */
-  subarray(begin?: number, end?: number): Int32Array;
+  subarray(begin?: number, end?: number): Int32Array<TArrayBuffer>;
 
   /** Converts a number to a string by using the current locale. */
   toLocaleString(): string;
@@ -4900,20 +4880,20 @@ interface Int32Array {
   toString(): string;
 
   /** Returns the primitive value of the specified object. */
-  valueOf(): Int32Array;
+  valueOf(): this;
 
   [index: number]: number;
 }
-
 interface Int32ArrayConstructor {
-  readonly prototype: Int32Array;
-  new (length: number): Int32Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Int32Array;
-  new (
-    buffer: ArrayBufferLike,
+  readonly prototype: Int32Array<ArrayBufferLike>;
+  new (length: number): Int32Array<ArrayBuffer>;
+  new (array: ArrayLike<number>): Int32Array<ArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
+    buffer: TArrayBuffer,
     byteOffset?: number,
     length?: number,
-  ): Int32Array;
+  ): Int32Array<TArrayBuffer>;
+  new (array: ArrayLike<number> | ArrayBuffer): Int32Array<ArrayBuffer>;
 
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
@@ -4923,14 +4903,14 @@ interface Int32ArrayConstructor {
    *
    * @param items A set of elements to include in the new array object.
    */
-  of(...items: number[]): Int32Array;
+  of(...items: number[]): Int32Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
    *
    * @param arrayLike An array-like or iterable object to convert to an array.
    */
-  from(arrayLike: ArrayLike<number>): Int32Array;
+  from(arrayLike: ArrayLike<number>): Int32Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -4943,7 +4923,7 @@ interface Int32ArrayConstructor {
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
     thisArg?: any,
-  ): Int32Array;
+  ): Int32Array<ArrayBuffer>;
 }
 declare var Int32Array: Int32ArrayConstructor;
 
@@ -4952,12 +4932,12 @@ declare var Int32Array: Int32ArrayConstructor;
  * to 0. If the requested number of bytes could not be allocated an exception is
  * raised.
  */
-interface Uint32Array {
+interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
 
   /** The ArrayBuffer instance referenced by the array. */
-  readonly buffer: ArrayBufferLike;
+  readonly buffer: TArrayBuffer;
 
   /** The length in bytes of the array. */
   readonly byteLength: number;
@@ -4990,7 +4970,7 @@ interface Uint32Array {
    *   value.
    */
   every(
-    predicate: (value: number, index: number, array: Uint32Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -5018,9 +4998,9 @@ interface Uint32Array {
    *   value.
    */
   filter(
-    predicate: (value: number, index: number, array: Uint32Array) => any,
+    predicate: (value: number, index: number, array: this) => any,
     thisArg?: any,
-  ): Uint32Array;
+  ): Uint32Array<ArrayBuffer>;
 
   /**
    * Returns the value of the first element in the array where predicate is
@@ -5035,7 +5015,7 @@ interface Uint32Array {
    *   instead.
    */
   find(
-    predicate: (value: number, index: number, obj: Uint32Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number | undefined;
 
@@ -5052,7 +5032,7 @@ interface Uint32Array {
    *   instead.
    */
   findIndex(
-    predicate: (value: number, index: number, obj: Uint32Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number;
 
@@ -5066,7 +5046,7 @@ interface Uint32Array {
    *   value.
    */
   forEach(
-    callbackfn: (value: number, index: number, array: Uint32Array) => void,
+    callbackfn: (value: number, index: number, array: this) => void,
     thisArg?: any,
   ): void;
   /**
@@ -5112,9 +5092,9 @@ interface Uint32Array {
    *   value.
    */
   map(
-    callbackfn: (value: number, index: number, array: Uint32Array) => number,
+    callbackfn: (value: number, index: number, array: this) => number,
     thisArg?: any,
-  ): Uint32Array;
+  ): Uint32Array<ArrayBuffer>;
 
   /**
    * Calls the specified callback function for all the elements in an array. The
@@ -5133,7 +5113,7 @@ interface Uint32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint32Array,
+      array: this,
     ) => number,
   ): number;
   reduce(
@@ -5141,7 +5121,7 @@ interface Uint32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint32Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -5163,7 +5143,7 @@ interface Uint32Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint32Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
@@ -5186,7 +5166,7 @@ interface Uint32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint32Array,
+      array: this,
     ) => number,
   ): number;
   reduceRight(
@@ -5194,7 +5174,7 @@ interface Uint32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint32Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -5217,13 +5197,13 @@ interface Uint32Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint32Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
 
   /** Reverses the elements in an Array. */
-  reverse(): Uint32Array;
+  reverse(): this;
 
   /**
    * Sets a value or an array of values.
@@ -5241,7 +5221,7 @@ interface Uint32Array {
    * @param end The end of the specified portion of the array. This is exclusive
    *   of the element at the index 'end'.
    */
-  slice(start?: number, end?: number): Uint32Array;
+  slice(start?: number, end?: number): Uint32Array<ArrayBuffer>;
 
   /**
    * Determines whether the specified callback function returns true for any
@@ -5256,7 +5236,7 @@ interface Uint32Array {
    *   value.
    */
   some(
-    predicate: (value: number, index: number, array: Uint32Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -5281,7 +5261,7 @@ interface Uint32Array {
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
    */
-  subarray(begin?: number, end?: number): Uint32Array;
+  subarray(begin?: number, end?: number): Uint32Array<TArrayBuffer>;
 
   /** Converts a number to a string by using the current locale. */
   toLocaleString(): string;
@@ -5290,20 +5270,20 @@ interface Uint32Array {
   toString(): string;
 
   /** Returns the primitive value of the specified object. */
-  valueOf(): Uint32Array;
+  valueOf(): this;
 
   [index: number]: number;
 }
-
 interface Uint32ArrayConstructor {
-  readonly prototype: Uint32Array;
-  new (length: number): Uint32Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Uint32Array;
-  new (
-    buffer: ArrayBufferLike,
+  readonly prototype: Uint32Array<ArrayBufferLike>;
+  new (length: number): Uint32Array<ArrayBuffer>;
+  new (array: ArrayLike<number>): Uint32Array<ArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
+    buffer: TArrayBuffer,
     byteOffset?: number,
     length?: number,
-  ): Uint32Array;
+  ): Uint32Array<TArrayBuffer>;
+  new (array: ArrayLike<number> | ArrayBuffer): Uint32Array<ArrayBuffer>;
 
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
@@ -5313,14 +5293,14 @@ interface Uint32ArrayConstructor {
    *
    * @param items A set of elements to include in the new array object.
    */
-  of(...items: number[]): Uint32Array;
+  of(...items: number[]): Uint32Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
    *
    * @param arrayLike An array-like or iterable object to convert to an array.
    */
-  from(arrayLike: ArrayLike<number>): Uint32Array;
+  from(arrayLike: ArrayLike<number>): Uint32Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -5333,7 +5313,7 @@ interface Uint32ArrayConstructor {
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
     thisArg?: any,
-  ): Uint32Array;
+  ): Uint32Array<ArrayBuffer>;
 }
 declare var Uint32Array: Uint32ArrayConstructor;
 
@@ -5341,12 +5321,12 @@ declare var Uint32Array: Uint32ArrayConstructor;
  * A typed array of 32-bit float values. The contents are initialized to 0. If
  * the requested number of bytes could not be allocated an exception is raised.
  */
-interface Float32Array {
+interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
 
   /** The ArrayBuffer instance referenced by the array. */
-  readonly buffer: ArrayBufferLike;
+  readonly buffer: TArrayBuffer;
 
   /** The length in bytes of the array. */
   readonly byteLength: number;
@@ -5379,7 +5359,7 @@ interface Float32Array {
    *   value.
    */
   every(
-    predicate: (value: number, index: number, array: Float32Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -5407,9 +5387,9 @@ interface Float32Array {
    *   value.
    */
   filter(
-    predicate: (value: number, index: number, array: Float32Array) => any,
+    predicate: (value: number, index: number, array: this) => any,
     thisArg?: any,
-  ): Float32Array;
+  ): Float32Array<ArrayBuffer>;
 
   /**
    * Returns the value of the first element in the array where predicate is
@@ -5424,7 +5404,7 @@ interface Float32Array {
    *   instead.
    */
   find(
-    predicate: (value: number, index: number, obj: Float32Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number | undefined;
 
@@ -5441,7 +5421,7 @@ interface Float32Array {
    *   instead.
    */
   findIndex(
-    predicate: (value: number, index: number, obj: Float32Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number;
 
@@ -5455,7 +5435,7 @@ interface Float32Array {
    *   value.
    */
   forEach(
-    callbackfn: (value: number, index: number, array: Float32Array) => void,
+    callbackfn: (value: number, index: number, array: this) => void,
     thisArg?: any,
   ): void;
 
@@ -5502,9 +5482,9 @@ interface Float32Array {
    *   value.
    */
   map(
-    callbackfn: (value: number, index: number, array: Float32Array) => number,
+    callbackfn: (value: number, index: number, array: this) => number,
     thisArg?: any,
-  ): Float32Array;
+  ): Float32Array<ArrayBuffer>;
 
   /**
    * Calls the specified callback function for all the elements in an array. The
@@ -5523,7 +5503,7 @@ interface Float32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float32Array,
+      array: this,
     ) => number,
   ): number;
   reduce(
@@ -5531,7 +5511,7 @@ interface Float32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float32Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -5553,7 +5533,7 @@ interface Float32Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Float32Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
@@ -5576,7 +5556,7 @@ interface Float32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float32Array,
+      array: this,
     ) => number,
   ): number;
   reduceRight(
@@ -5584,7 +5564,7 @@ interface Float32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float32Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -5607,13 +5587,13 @@ interface Float32Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Float32Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
 
   /** Reverses the elements in an Array. */
-  reverse(): Float32Array;
+  reverse(): this;
 
   /**
    * Sets a value or an array of values.
@@ -5631,7 +5611,7 @@ interface Float32Array {
    * @param end The end of the specified portion of the array. This is exclusive
    *   of the element at the index 'end'.
    */
-  slice(start?: number, end?: number): Float32Array;
+  slice(start?: number, end?: number): Float32Array<ArrayBuffer>;
 
   /**
    * Determines whether the specified callback function returns true for any
@@ -5646,7 +5626,7 @@ interface Float32Array {
    *   value.
    */
   some(
-    predicate: (value: number, index: number, array: Float32Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -5671,7 +5651,7 @@ interface Float32Array {
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
    */
-  subarray(begin?: number, end?: number): Float32Array;
+  subarray(begin?: number, end?: number): Float32Array<TArrayBuffer>;
 
   /** Converts a number to a string by using the current locale. */
   toLocaleString(): string;
@@ -5680,20 +5660,20 @@ interface Float32Array {
   toString(): string;
 
   /** Returns the primitive value of the specified object. */
-  valueOf(): Float32Array;
+  valueOf(): this;
 
   [index: number]: number;
 }
-
 interface Float32ArrayConstructor {
-  readonly prototype: Float32Array;
-  new (length: number): Float32Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Float32Array;
-  new (
-    buffer: ArrayBufferLike,
+  readonly prototype: Float32Array<ArrayBufferLike>;
+  new (length: number): Float32Array<ArrayBuffer>;
+  new (array: ArrayLike<number>): Float32Array<ArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
+    buffer: TArrayBuffer,
     byteOffset?: number,
     length?: number,
-  ): Float32Array;
+  ): Float32Array<TArrayBuffer>;
+  new (array: ArrayLike<number> | ArrayBuffer): Float32Array<ArrayBuffer>;
 
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
@@ -5703,14 +5683,14 @@ interface Float32ArrayConstructor {
    *
    * @param items A set of elements to include in the new array object.
    */
-  of(...items: number[]): Float32Array;
+  of(...items: number[]): Float32Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
    *
    * @param arrayLike An array-like or iterable object to convert to an array.
    */
-  from(arrayLike: ArrayLike<number>): Float32Array;
+  from(arrayLike: ArrayLike<number>): Float32Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -5723,7 +5703,7 @@ interface Float32ArrayConstructor {
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
     thisArg?: any,
-  ): Float32Array;
+  ): Float32Array<ArrayBuffer>;
 }
 declare var Float32Array: Float32ArrayConstructor;
 
@@ -5731,12 +5711,12 @@ declare var Float32Array: Float32ArrayConstructor;
  * A typed array of 64-bit float values. The contents are initialized to 0. If
  * the requested number of bytes could not be allocated an exception is raised.
  */
-interface Float64Array {
+interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
 
   /** The ArrayBuffer instance referenced by the array. */
-  readonly buffer: ArrayBufferLike;
+  readonly buffer: TArrayBuffer;
 
   /** The length in bytes of the array. */
   readonly byteLength: number;
@@ -5769,7 +5749,7 @@ interface Float64Array {
    *   value.
    */
   every(
-    predicate: (value: number, index: number, array: Float64Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -5797,9 +5777,9 @@ interface Float64Array {
    *   value.
    */
   filter(
-    predicate: (value: number, index: number, array: Float64Array) => any,
+    predicate: (value: number, index: number, array: this) => any,
     thisArg?: any,
-  ): Float64Array;
+  ): Float64Array<ArrayBuffer>;
 
   /**
    * Returns the value of the first element in the array where predicate is
@@ -5814,7 +5794,7 @@ interface Float64Array {
    *   instead.
    */
   find(
-    predicate: (value: number, index: number, obj: Float64Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number | undefined;
 
@@ -5831,7 +5811,7 @@ interface Float64Array {
    *   instead.
    */
   findIndex(
-    predicate: (value: number, index: number, obj: Float64Array) => boolean,
+    predicate: (value: number, index: number, obj: this) => boolean,
     thisArg?: any,
   ): number;
 
@@ -5845,7 +5825,7 @@ interface Float64Array {
    *   value.
    */
   forEach(
-    callbackfn: (value: number, index: number, array: Float64Array) => void,
+    callbackfn: (value: number, index: number, array: this) => void,
     thisArg?: any,
   ): void;
 
@@ -5892,9 +5872,9 @@ interface Float64Array {
    *   value.
    */
   map(
-    callbackfn: (value: number, index: number, array: Float64Array) => number,
+    callbackfn: (value: number, index: number, array: this) => number,
     thisArg?: any,
-  ): Float64Array;
+  ): Float64Array<ArrayBuffer>;
 
   /**
    * Calls the specified callback function for all the elements in an array. The
@@ -5913,7 +5893,7 @@ interface Float64Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float64Array,
+      array: this,
     ) => number,
   ): number;
   reduce(
@@ -5921,7 +5901,7 @@ interface Float64Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float64Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -5943,7 +5923,7 @@ interface Float64Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Float64Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
@@ -5966,7 +5946,7 @@ interface Float64Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float64Array,
+      array: this,
     ) => number,
   ): number;
   reduceRight(
@@ -5974,7 +5954,7 @@ interface Float64Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float64Array,
+      array: this,
     ) => number,
     initialValue: number,
   ): number;
@@ -5997,13 +5977,13 @@ interface Float64Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Float64Array,
+      array: this,
     ) => U,
     initialValue: U,
   ): U;
 
   /** Reverses the elements in an Array. */
-  reverse(): Float64Array;
+  reverse(): this;
 
   /**
    * Sets a value or an array of values.
@@ -6021,7 +6001,7 @@ interface Float64Array {
    * @param end The end of the specified portion of the array. This is exclusive
    *   of the element at the index 'end'.
    */
-  slice(start?: number, end?: number): Float64Array;
+  slice(start?: number, end?: number): Float64Array<ArrayBuffer>;
 
   /**
    * Determines whether the specified callback function returns true for any
@@ -6036,7 +6016,7 @@ interface Float64Array {
    *   value.
    */
   some(
-    predicate: (value: number, index: number, array: Float64Array) => unknown,
+    predicate: (value: number, index: number, array: this) => unknown,
     thisArg?: any,
   ): boolean;
 
@@ -6061,7 +6041,7 @@ interface Float64Array {
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
    */
-  subarray(begin?: number, end?: number): Float64Array;
+  subarray(begin?: number, end?: number): Float64Array<TArrayBuffer>;
 
   /** Converts a number to a string by using the current locale. */
   toLocaleString(): string;
@@ -6070,20 +6050,20 @@ interface Float64Array {
   toString(): string;
 
   /** Returns the primitive value of the specified object. */
-  valueOf(): Float64Array;
+  valueOf(): this;
 
   [index: number]: number;
 }
-
 interface Float64ArrayConstructor {
-  readonly prototype: Float64Array;
-  new (length: number): Float64Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Float64Array;
-  new (
-    buffer: ArrayBufferLike,
+  readonly prototype: Float64Array<ArrayBufferLike>;
+  new (length: number): Float64Array<ArrayBuffer>;
+  new (array: ArrayLike<number>): Float64Array<ArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
+    buffer: TArrayBuffer,
     byteOffset?: number,
     length?: number,
-  ): Float64Array;
+  ): Float64Array<TArrayBuffer>;
+  new (array: ArrayLike<number> | ArrayBuffer): Float64Array<ArrayBuffer>;
 
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: number;
@@ -6093,14 +6073,14 @@ interface Float64ArrayConstructor {
    *
    * @param items A set of elements to include in the new array object.
    */
-  of(...items: number[]): Float64Array;
+  of(...items: number[]): Float64Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
    *
    * @param arrayLike An array-like or iterable object to convert to an array.
    */
-  from(arrayLike: ArrayLike<number>): Float64Array;
+  from(arrayLike: ArrayLike<number>): Float64Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -6113,7 +6093,7 @@ interface Float64ArrayConstructor {
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
     thisArg?: any,
-  ): Float64Array;
+  ): Float64Array<ArrayBuffer>;
 }
 declare var Float64Array: Float64ArrayConstructor;
 

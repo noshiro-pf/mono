@@ -42,8 +42,8 @@
 +  ): searchElement is T;
  }
  
- interface Int8Array {
-@@ -48,7 +40,10 @@ interface Int8Array {
+ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -48,7 +40,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -54,8 +54,8 @@
 +  ): boolean;
  }
  
- interface Uint8Array {
-@@ -60,7 +55,10 @@ interface Uint8Array {
+ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -60,7 +55,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -66,8 +66,8 @@
 +  ): boolean;
  }
  
- interface Uint8ClampedArray {
-@@ -72,7 +70,10 @@ interface Uint8ClampedArray {
+ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+@@ -72,7 +70,10 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -78,8 +78,8 @@
 +  ): boolean;
  }
  
- interface Int16Array {
-@@ -84,7 +85,10 @@ interface Int16Array {
+ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -84,7 +85,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -90,8 +90,8 @@
 +  ): boolean;
  }
  
- interface Uint16Array {
-@@ -96,7 +100,10 @@ interface Uint16Array {
+ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -96,7 +100,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -102,8 +102,8 @@
 +  ): boolean;
  }
  
- interface Int32Array {
-@@ -108,7 +115,10 @@ interface Int32Array {
+ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -108,7 +115,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -114,8 +114,8 @@
 +  ): boolean;
  }
  
- interface Uint32Array {
-@@ -120,7 +130,10 @@ interface Uint32Array {
+ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -120,7 +130,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -126,8 +126,8 @@
 +  ): boolean;
  }
  
- interface Float32Array {
-@@ -132,7 +145,10 @@ interface Float32Array {
+ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -132,7 +145,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -138,8 +138,8 @@
 +  ): boolean;
  }
  
- interface Float64Array {
-@@ -144,5 +160,8 @@ interface Float64Array {
+ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -144,5 +160,8 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */

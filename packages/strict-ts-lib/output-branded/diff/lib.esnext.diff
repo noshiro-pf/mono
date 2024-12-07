@@ -1,4 +1,4 @@
-@@ -1,28 +1,14 @@
+@@ -1,24 +1,10 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -16,27 +16,19 @@
 -
  /// <reference no-default-lib="true"/>
 -
--/// <reference lib="es2023" />
+-/// <reference lib="es2024" />
 -/// <reference lib="esnext.intl" />
 -/// <reference lib="esnext.decorators" />
 -/// <reference lib="esnext.disposable" />
--/// <reference lib="esnext.promise" />
--/// <reference lib="esnext.object" />
 -/// <reference lib="esnext.collection" />
 -/// <reference lib="esnext.array" />
--/// <reference lib="esnext.regexp" />
--/// <reference lib="esnext.string" />
 -/// <reference lib="esnext.iterator" />
 +/// <reference types="@noshiro/ts-type-utils" />
 +
-+/// <reference path="./lib.es2023.d.ts" />
++/// <reference path="./lib.es2024.d.ts" />
 +/// <reference path="./lib.esnext.intl.d.ts" />
 +/// <reference path="./lib.esnext.decorators.d.ts" />
 +/// <reference path="./lib.esnext.disposable.d.ts" />
-+/// <reference path="./lib.esnext.promise.d.ts" />
-+/// <reference path="./lib.esnext.object.d.ts" />
 +/// <reference path="./lib.esnext.collection.d.ts" />
 +/// <reference path="./lib.esnext.array.d.ts" />
-+/// <reference path="./lib.esnext.regexp.d.ts" />
-+/// <reference path="./lib.esnext.string.d.ts" />
 +/// <reference path="./lib.esnext.iterator.d.ts" />

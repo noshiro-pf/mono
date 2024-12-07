@@ -1,6 +1,8 @@
 /// <reference no-default-lib="true"/>
 /// <reference types="@noshiro/ts-type-utils" />
 
+/// <reference lib="es2015.iterable" />
+/// <reference lib="es2020.intl" />
 /// <reference lib="es2020.symbol.wellknown" />
 
 interface String {

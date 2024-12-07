@@ -138,4 +138,4 @@ interface ProxyConstructor {
    */
   new <T extends object>(target: T, handler: ProxyHandler<T>): T;
 }
-declare let Proxy: ProxyConstructor;
+declare var Proxy: ProxyConstructor;
