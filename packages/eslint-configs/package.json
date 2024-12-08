@@ -42,11 +42,11 @@
     "type-check": "tsc --noEmit",
     "update-deps": "./scripts/update-dependencies.sh",
     "watch": "yarn build:src --watch",
-    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
+    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint --config eslint.config.js",
     "zz:eslint:print-config": "yarn zz:eslint --print-config src/index.mts",
-    "zz:eslint:scripts": "yarn zz:eslint --config eslint.config.js \"./scripts/**/*\"",
-    "zz:eslint:src": "yarn zz:eslint --config eslint.config.js './src/**/*'",
-    "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../.prettierignore --write"
+    "zz:eslint:scripts": "yarn zz:eslint \"./scripts/**/*\"",
+    "zz:eslint:src": "yarn zz:eslint './src/**/*'",
+    "zz:prettier": "prettier --ignore-path ../../.prettierignore --ignore-unknown --no-error-on-unmatched-pattern --write"
   },
   "dependencies": {
     "@types/eslint": "9.6.1",

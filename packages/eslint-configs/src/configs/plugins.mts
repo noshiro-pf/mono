@@ -83,7 +83,6 @@ export const plugins: Record<
   functional: eslintPluginFunctional,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   import: eslintPluginImport,
-
   jest: eslintPluginJest,
   vitest: eslintPluginVitest,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -102,7 +101,6 @@ export const plugins: Record<
   security: eslintPluginSecurity,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'strict-dependencies': eslintPluginStrictDependencies,
-
   'testing-library': eslintPluginTestingLibrary,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'total-functions': eslintPluginTotalFunctions,
