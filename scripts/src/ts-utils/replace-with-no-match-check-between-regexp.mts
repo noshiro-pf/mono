@@ -24,12 +24,12 @@ export const replaceWithNoMatchCheckBetweenRegexp =
           onNoChange: 'off';
         }
       | {
-          onNotFound: 'throw';
-          onNoChange: 'off' | 'throw' | 'warn';
-        }
-      | {
           onNotFound: 'warn';
           onNoChange: 'off' | 'warn';
+        }
+      | {
+          onNotFound: 'throw';
+          onNoChange: 'off' | 'throw' | 'warn';
         }
     >;
   }>) =>
