@@ -25,7 +25,7 @@ interface PromiseConstructor {
    */
   allSettled<T extends readonly unknown[] | readonly []>(
     values: T,
-  ): Promise<{ -readonly [P in keyof T]: PromiseSettledResult<Awaited<T[P]>> }>;
+  ): Promise<{ readonly [P in keyof T]: PromiseSettledResult<Awaited<T[P]>> }>;
 
   /**
    * Creates a Promise that is resolved with an array of results when all of the

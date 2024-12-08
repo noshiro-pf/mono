@@ -11,6 +11,10 @@ export const notificationSettingsTypeDef = t.record({
   notify28daysBeforeAnswerDeadline: t.boolean(false),
 });
 
+export const isKeyofNotificationSettings = t.keyof(
+  notificationSettingsTypeDef,
+).is;
+
 export type NotificationSettings = t.TypeOf<typeof notificationSettingsTypeDef>;
 
 export const notificationSettingsDefaultValue =

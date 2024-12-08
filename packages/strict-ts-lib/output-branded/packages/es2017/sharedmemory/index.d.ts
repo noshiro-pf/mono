@@ -10,7 +10,7 @@ interface SharedArrayBuffer {
 
   /** Returns a section of an SharedArrayBuffer. */
   slice(
-    begin: NumberType.TypedArraySizeArg,
+    begin?: NumberType.TypedArraySizeArg,
     end?: NumberType.TypedArraySizeArg,
   ): SharedArrayBuffer;
   readonly [Symbol.species]: SharedArrayBuffer;
@@ -19,7 +19,7 @@ interface SharedArrayBuffer {
 
 interface SharedArrayBufferConstructor {
   readonly prototype: SharedArrayBuffer;
-  new (byteLength: NumberType.TypedArraySizeArgNonNegative): SharedArrayBuffer;
+  new (byteLength?: NumberType.TypedArraySizeArgNonNegative): SharedArrayBuffer;
 }
 declare const SharedArrayBuffer: SharedArrayBufferConstructor;
 
@@ -313,7 +313,7 @@ interface Atomics {
    * (returning `"ok"`); otherwise, returns `"not-equal"`.
    */
   wait(
-    typedArray: Int32Array,
+    typedArray: Int32Array<ArrayBufferLike>,
     index: NumberType.TypedArraySizeArg,
     value: Int32,
     timeout?: number,
@@ -323,13 +323,13 @@ interface Atomics {
    * Wakes up sleeping agents that are waiting on the given index of the array,
    * returning the number of agents that were awoken.
    *
-   * @param typedArray A shared Int32Array.
+   * @param typedArray A shared Int32Array<ArrayBufferLike>.
    * @param index The position in the typedArray to wake up on.
    * @param count The number of sleeping agents to notify. Defaults to
    *   +Infinity.
    */
   notify(
-    typedArray: Int32Array,
+    typedArray: Int32Array<ArrayBufferLike>,
     index: NumberType.TypedArraySizeArg,
     count?: SafeUint,
   ): SafeUint;

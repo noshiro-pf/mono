@@ -42,8 +42,8 @@
 +  ): searchElement is T;
  }
  
- interface Int8Array {
-@@ -48,7 +40,7 @@ interface Int8Array {
+ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -48,7 +40,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -51,8 +51,8 @@
 +  includes(searchElement: Int8, fromIndex?: number): boolean;
  }
  
- interface Uint8Array {
-@@ -60,7 +52,7 @@ interface Uint8Array {
+ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -60,7 +52,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -60,8 +60,8 @@
 +  includes(searchElement: Uint8, fromIndex?: number): boolean;
  }
  
- interface Uint8ClampedArray {
-@@ -72,7 +64,7 @@ interface Uint8ClampedArray {
+ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+@@ -72,7 +64,7 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
     * @param fromIndex The position in this array at which to begin searching for
     *   searchElement.
     */
@@ -69,4 +69,4 @@
 +  includes(searchElement: Uint8, fromIndex?: number): boolean;
  }
  
- interface Int16Array {
+ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {

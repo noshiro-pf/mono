@@ -28,9 +28,9 @@
 +  readonly byteLength: NumberType.TypedArraySize;
  
    /** Returns a section of an SharedArrayBuffer. */
--  slice(begin: number, end?: number): SharedArrayBuffer;
+-  slice(begin?: number, end?: number): SharedArrayBuffer;
 +  slice(
-+    begin: NumberType.TypedArraySizeArg,
++    begin?: NumberType.TypedArraySizeArg,
 +    end?: NumberType.TypedArraySizeArg,
 +  ): SharedArrayBuffer;
    readonly [Symbol.species]: SharedArrayBuffer;
@@ -39,8 +39,8 @@
  
  interface SharedArrayBufferConstructor {
    readonly prototype: SharedArrayBuffer;
--  new (byteLength: number): SharedArrayBuffer;
-+  new (byteLength: NumberType.TypedArraySizeArgNonNegative): SharedArrayBuffer;
+-  new (byteLength?: number): SharedArrayBuffer;
++  new (byteLength?: NumberType.TypedArraySizeArgNonNegative): SharedArrayBuffer;
  }
 -declare var SharedArrayBuffer: SharedArrayBufferConstructor;
 +declare const SharedArrayBuffer: SharedArrayBufferConstructor;
@@ -56,12 +56,12 @@
     */
    add(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 -    index: number,
 -    value: number,
 -  ): number;
@@ -102,12 +102,12 @@
     */
    and(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 -    index: number,
 -    value: number,
 -  ): number;
@@ -148,12 +148,12 @@
     */
    compareExchange(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 -    index: number,
 -    expectedValue: number,
 -    replacementValue: number,
@@ -201,12 +201,12 @@
     */
    exchange(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 -    index: number,
 -    value: number,
 -  ): number;
@@ -255,12 +255,12 @@
     */
 -  load(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 -    index: number,
 -  ): number;
 +  load(typedArray: Int8Array, index: NumberType.TypedArraySizeArg): Int8;
@@ -277,12 +277,12 @@
     */
    or(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 -    index: number,
 -    value: number,
 -  ): number;
@@ -323,12 +323,12 @@
     */
    store(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 -    index: number,
 -    value: number,
 -  ): number;
@@ -369,12 +369,12 @@
     */
    sub(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 -    index: number,
 -    value: number,
 -  ): number;
@@ -413,7 +413,7 @@
 @@ -191,8 +314,8 @@ interface Atomics {
     */
    wait(
-     typedArray: Int32Array,
+     typedArray: Int32Array<ArrayBufferLike>,
 -    index: number,
 -    value: number,
 +    index: NumberType.TypedArraySizeArg,
@@ -421,30 +421,30 @@
      timeout?: number,
    ): 'ok' | 'not-equal' | 'timed-out';
  
-@@ -205,7 +328,11 @@ interface Atomics {
-    * @param count The number of sleeping agents to notify. Defaults to
-    *   +Infinity.
+@@ -207,9 +330,9 @@ interface Atomics {
     */
--  notify(typedArray: Int32Array, index: number, count?: number): number;
-+  notify(
-+    typedArray: Int32Array,
+   notify(
+     typedArray: Int32Array<ArrayBufferLike>,
+-    index: number,
+-    count?: number,
+-  ): number;
 +    index: NumberType.TypedArraySizeArg,
 +    count?: SafeUint,
 +  ): SafeUint;
  
    /**
     * Stores the bitwise XOR of a value with the value at the given position in
-@@ -213,18 +340,37 @@ interface Atomics {
+@@ -217,18 +340,37 @@ interface Atomics {
     * completes, any other read or write operation against the array will block.
     */
    xor(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 -    index: number,
 -    value: number,
 -  ): number;

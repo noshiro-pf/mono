@@ -26,7 +26,7 @@
    /** Read-only. The length of the ArrayBuffer (in bytes). */
 @@ -32,10 +18,10 @@ interface SharedArrayBufferConstructor {
    readonly prototype: SharedArrayBuffer;
-   new (byteLength: number): SharedArrayBuffer;
+   new (byteLength?: number): SharedArrayBuffer;
  }
 -declare var SharedArrayBuffer: SharedArrayBufferConstructor;
 +declare const SharedArrayBuffer: SharedArrayBufferConstructor;
@@ -45,12 +45,12 @@
 +  add(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
    add(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 +    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
      index: number,
      value: number,
@@ -63,12 +63,12 @@
 +  and(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
    and(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 +    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
      index: number,
      value: number,
@@ -78,12 +78,12 @@
     */
    compareExchange(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 +    typedArray: Int8Array,
 +    index: number,
 +    expectedValue: Int8,
@@ -108,12 +108,12 @@
 +  exchange(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
    exchange(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 +    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
      index: number,
      value: number,
@@ -126,12 +126,12 @@
 +  load(typedArray: Uint8Array, index: number): Uint8;
    load(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 +    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
      index: number,
    ): number;
@@ -144,12 +144,12 @@
 +  or(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
    or(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 +    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
      index: number,
      value: number,
@@ -162,12 +162,12 @@
 +  store(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
    store(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 +    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
      index: number,
      value: number,
@@ -180,17 +180,17 @@
 +  sub(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
    sub(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 +    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
      index: number,
      value: number,
    ): number;
-@@ -212,14 +176,10 @@ interface Atomics {
+@@ -216,14 +180,10 @@ interface Atomics {
     * the array, returning the original value. Until this atomic operation
     * completes, any other read or write operation against the array will block.
     */
@@ -198,17 +198,17 @@
 +  xor(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
    xor(
 -    typedArray:
--      | Int8Array
--      | Uint8Array
--      | Int16Array
--      | Uint16Array
--      | Int32Array
--      | Uint32Array,
+-      | Int8Array<ArrayBufferLike>
+-      | Uint8Array<ArrayBufferLike>
+-      | Int16Array<ArrayBufferLike>
+-      | Uint16Array<ArrayBufferLike>
+-      | Int32Array<ArrayBufferLike>
+-      | Uint32Array<ArrayBufferLike>,
 +    typedArray: Int16Array | Uint16Array | Int32Array | Uint32Array,
      index: number,
      value: number,
    ): number;
-@@ -227,4 +187,4 @@ interface Atomics {
+@@ -231,4 +191,4 @@ interface Atomics {
    readonly [Symbol.toStringTag]: 'Atomics';
  }
  

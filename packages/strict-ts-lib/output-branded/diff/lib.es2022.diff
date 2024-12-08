@@ -1,4 +1,4 @@
-@@ -1,25 +1,11 @@
+@@ -1,24 +1,10 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -21,9 +21,8 @@
 -/// <reference lib="es2022.error" />
 -/// <reference lib="es2022.intl" />
 -/// <reference lib="es2022.object" />
--/// <reference lib="es2022.sharedmemory" />
--/// <reference lib="es2022.string" />
 -/// <reference lib="es2022.regexp" />
+-/// <reference lib="es2022.string" />
 +/// <reference types="@noshiro/ts-type-utils" />
 +
 +/// <reference path="./lib.es2021.d.ts" />
@@ -31,6 +30,5 @@
 +/// <reference path="./lib.es2022.error.d.ts" />
 +/// <reference path="./lib.es2022.intl.d.ts" />
 +/// <reference path="./lib.es2022.object.d.ts" />
-+/// <reference path="./lib.es2022.sharedmemory.d.ts" />
-+/// <reference path="./lib.es2022.string.d.ts" />
 +/// <reference path="./lib.es2022.regexp.d.ts" />
++/// <reference path="./lib.es2022.string.d.ts" />

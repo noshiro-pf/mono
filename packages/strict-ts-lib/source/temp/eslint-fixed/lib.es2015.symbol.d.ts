@@ -41,4 +41,4 @@ interface SymbolConstructor {
   keyFor(sym: symbol): string | undefined;
 }
 
-declare let Symbol: SymbolConstructor;
+declare var Symbol: SymbolConstructor;

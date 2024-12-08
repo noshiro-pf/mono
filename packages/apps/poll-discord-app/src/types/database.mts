@@ -3,6 +3,9 @@ import {
   commandMessageIdType,
   dateOptionIdType,
   pollIdType,
+  toCommandMessageId,
+  toDateOptionId,
+  toPollId,
   type CommandMessageId,
   type DateOptionId,
   type PollId,
@@ -39,13 +42,19 @@ export const databaseFromJson = (o?: unknown): Database =>
     .chain(databaseJsonType.fill)
     .chain((p) => ({
       polls: IMap.new<PollId, Poll>(
-        Object.entries(p.polls).map(([k, v]) => tp(k, pollFromJson(v))),
+        Object.entries(p.polls).map(([k, v]) => [toPollId(k), pollFromJson(v)]),
       ),
       dateToPollIdMap: IMap.new<DateOptionId, PollId>(
-        Object.entries(p.dateToPollIdMap),
+        Object.entries(p.dateToPollIdMap).map(([k, v]) => [
+          toDateOptionId(k),
+          v,
+        ]),
       ),
       commandMessageIdToPollIdMap: IMap.new<CommandMessageId, PollId>(
-        Object.entries(p.commandMessageIdToPollIdMap),
+        Object.entries(p.commandMessageIdToPollIdMap).map(([k, v]) => [
+          toCommandMessageId(k),
+          v,
+        ]),
       ),
     })).value;
 

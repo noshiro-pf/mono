@@ -19,5 +19,13 @@ for filename in $(gh api --method GET --jq '.[].name' /repos/microsoft/TypeScrip
 done
 
 echo "formatting..."
+
 yarn zz:prettier "${COPIED_DIR}"
-yarn zz:prettier "${COPIED_DIR}"
+
+for _ in $(seq 0 1); do
+  yarn zz:prettier \
+    "${COPIED_DIR}/lib.es2017.object.d.ts" \
+    "${COPIED_DIR}/lib.dom.d.ts" \
+    "${COPIED_DIR}/lib.es2021.intl.d.ts" \
+    "${COPIED_DIR}/lib.es5.d.ts";
+done

@@ -28,12 +28,14 @@
  
    /**
     * Creates an array from an async iterator or iterable object.
-@@ -42,6 +28,6 @@ interface ArrayConstructor {
+@@ -41,7 +27,7 @@ interface ArrayConstructor {
+    */
    fromAsync<T, U>(
      iterableOrArrayLike: AsyncIterable<T> | Iterable<T> | ArrayLike<T>,
-     mapFn: (value: Awaited<T>) => U,
+-    mapFn: (value: Awaited<T>, index: number) => U,
 -    thisArg?: any,
 -  ): Promise<Awaited<U>[]>;
++    mapFn: (value: Awaited<T>, index: NumberType.ArraySize) => U,
 +    thisArg?: unknown,
 +  ): Promise<readonly Awaited<U>[]>;
  }

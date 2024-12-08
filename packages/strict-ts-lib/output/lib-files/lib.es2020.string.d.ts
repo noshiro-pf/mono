@@ -1,6 +1,8 @@
 /// <reference no-default-lib="true"/>
 /// <reference types="@noshiro/ts-type-utils" />
 
+/// <reference path="./lib.es2015.iterable.d.ts" />
+/// <reference path="./lib.es2020.intl.d.ts" />
 /// <reference path="./lib.es2020.symbol.wellknown.d.ts" />
 
 interface String {

@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/strict-typescript-lib",
-  "version": "1.0.0",
+  "version": "5.7.2",
   "private": false,
   "description": "Strict TypeScript lib",
   "repository": {

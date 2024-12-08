@@ -1,4 +1,4 @@
-@@ -1,21 +1,7 @@
+@@ -1,23 +1,9 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -17,7 +17,11 @@
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
+-/// <reference lib="es2015.iterable" />
+-/// <reference lib="es2020.intl" />
 -/// <reference lib="es2020.symbol.wellknown" />
++/// <reference path="./lib.es2015.iterable.d.ts" />
++/// <reference path="./lib.es2020.intl.d.ts" />
 +/// <reference path="./lib.es2020.symbol.wellknown.d.ts" />
  
  interface String {

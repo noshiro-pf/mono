@@ -333,7 +333,7 @@ describe('RecordUtils', () => {
     test('case 1', () => {
       const keys = Object.keys({ x: 1, y: 2 });
 
-      expectType<typeof keys, readonly ('x' | 'y')[]>('=');
+      expectType<typeof keys, readonly ('x' | 'y' | (string & {}))[]>('=');
 
       expect(keys).toStrictEqual(['x', 'y']);
     });
@@ -342,7 +342,10 @@ describe('RecordUtils', () => {
       const symb = Symbol();
       const keys = Object.keys({ x: 1, y: 2, z: '3', 3: 4, [symb]: 5 });
 
-      expectType<typeof keys, readonly ('3' | 'x' | 'y' | 'z')[]>('=');
+      expectType<
+        typeof keys,
+        readonly ('3' | 'x' | 'y' | 'z' | (string & {}))[]
+      >('=');
 
       expect(keys).toStrictEqual(['3', 'x', 'y', 'z']);
     });

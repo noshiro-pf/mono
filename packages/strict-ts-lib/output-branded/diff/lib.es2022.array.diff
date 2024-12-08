@@ -36,8 +36,8 @@
 +  at(index: NumberType.ArraySizeArg): T | undefined;
  }
  
- interface Int8Array {
-@@ -42,7 +28,7 @@ interface Int8Array {
+ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -42,7 +28,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
     * @param index The zero-based index of the desired code unit. A negative
     *   index will count back from the last item.
     */
@@ -45,8 +45,8 @@
 +  at(index: NumberType.TypedArraySizeArg): Int8 | undefined;
  }
  
- interface Uint8Array {
-@@ -52,7 +38,7 @@ interface Uint8Array {
+ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -52,7 +38,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
     * @param index The zero-based index of the desired code unit. A negative
     *   index will count back from the last item.
     */
@@ -54,8 +54,8 @@
 +  at(index: NumberType.TypedArraySizeArg): Uint8 | undefined;
  }
  
- interface Uint8ClampedArray {
-@@ -62,7 +48,7 @@ interface Uint8ClampedArray {
+ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+@@ -62,7 +48,7 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
     * @param index The zero-based index of the desired code unit. A negative
     *   index will count back from the last item.
     */
@@ -63,8 +63,8 @@
 +  at(index: NumberType.TypedArraySizeArg): Uint8 | undefined;
  }
  
- interface Int16Array {
-@@ -72,7 +58,7 @@ interface Int16Array {
+ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -72,7 +58,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
     * @param index The zero-based index of the desired code unit. A negative
     *   index will count back from the last item.
     */
@@ -72,8 +72,8 @@
 +  at(index: NumberType.TypedArraySizeArg): Int16 | undefined;
  }
  
- interface Uint16Array {
-@@ -82,7 +68,7 @@ interface Uint16Array {
+ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -82,7 +68,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
     * @param index The zero-based index of the desired code unit. A negative
     *   index will count back from the last item.
     */
@@ -81,8 +81,8 @@
 +  at(index: NumberType.TypedArraySizeArg): Uint16 | undefined;
  }
  
- interface Int32Array {
-@@ -92,7 +78,7 @@ interface Int32Array {
+ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -92,7 +78,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
     * @param index The zero-based index of the desired code unit. A negative
     *   index will count back from the last item.
     */
@@ -90,8 +90,8 @@
 +  at(index: NumberType.TypedArraySizeArg): Int32 | undefined;
  }
  
- interface Uint32Array {
-@@ -102,7 +88,7 @@ interface Uint32Array {
+ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -102,7 +88,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
     * @param index The zero-based index of the desired code unit. A negative
     *   index will count back from the last item.
     */
@@ -99,8 +99,8 @@
 +  at(index: NumberType.TypedArraySizeArg): Uint32 | undefined;
  }
  
- interface Float32Array {
-@@ -112,7 +98,7 @@ interface Float32Array {
+ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -112,7 +98,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
     * @param index The zero-based index of the desired code unit. A negative
     *   index will count back from the last item.
     */
@@ -108,8 +108,8 @@
 +  at(index: NumberType.TypedArraySizeArg): Float32 | undefined;
  }
  
- interface Float64Array {
-@@ -122,7 +108,7 @@ interface Float64Array {
+ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -122,7 +108,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
     * @param index The zero-based index of the desired code unit. A negative
     *   index will count back from the last item.
     */
@@ -117,8 +117,8 @@
 +  at(index: NumberType.TypedArraySizeArg): Float64 | undefined;
  }
  
- interface BigInt64Array {
-@@ -132,7 +118,7 @@ interface BigInt64Array {
+ interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -132,7 +118,7 @@ interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
     * @param index The zero-based index of the desired code unit. A negative
     *   index will count back from the last item.
     */
@@ -126,8 +126,8 @@
 +  at(index: NumberType.TypedArraySizeArg): BigInt64 | undefined;
  }
  
- interface BigUint64Array {
-@@ -142,5 +128,5 @@ interface BigUint64Array {
+ interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -142,5 +128,5 @@ interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
     * @param index The zero-based index of the desired code unit. A negative
     *   index will count back from the last item.
     */

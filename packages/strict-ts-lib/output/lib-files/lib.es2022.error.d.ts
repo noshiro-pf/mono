@@ -1,6 +1,8 @@
 /// <reference no-default-lib="true"/>
 /// <reference types="@noshiro/ts-type-utils" />
 
+/// <reference path="./lib.es2021.promise.d.ts" />
+
 interface ErrorOptions {
   readonly cause?: unknown;
 }

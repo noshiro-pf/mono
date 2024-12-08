@@ -1,11 +1,14 @@
 import { isRecord, toThisDir } from '@noshiro/mono-scripts';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
+import { getSrcFileList, type ConverterConfig } from './convert-dts/common.mjs';
 import {
-  getSrcFileList,
+  configs,
+  libName,
+  license,
+  repo,
   typeUtilsName,
-  type ConverterConfig,
-} from './convert-dts/common.mjs';
+} from './convert-dts/constants.mjs';
 import { convert } from './convert-dts/convert-main.mjs';
 
 const thisDir = toThisDir(import.meta.url);
@@ -22,37 +25,16 @@ const sourcePackageJsonDir = path.resolve(
   'source/package.json',
 );
 
-// eslint-disable-next-line no-restricted-syntax
-const useLocalPath = true as boolean;
-
 const srcDir = path.resolve(strictTsLibDir, 'source/temp/eslint-fixed');
 
 const srcFileList = await getSrcFileList(srcDir);
 
-const libName = '@noshiro/strict-typescript-lib';
-
-const repo = 'https://github.com/noshiro-pf/mono.git';
-const license = 'MIT';
-
 const main = async (): Promise<void> => {
-  const configs = [
-    {
-      useBrandedNumber: false,
-      commentOutDeprecated: false,
-      returnType: 'mutable',
-      forNpmPackage: true,
-    },
-    {
-      useBrandedNumber: true,
-      commentOutDeprecated: false,
-      returnType: 'readonly',
-      forNpmPackage: true,
-    },
-  ] as const satisfies ConverterConfig[];
+  const configs2 = configs.map((c) => ({ ...c, forNpmPackage: true }));
 
   await Promise.all([
-    ...configs.map(createPackages),
-    ...configs.map(createLib),
+    ...configs2.map(createPackages),
+    ...configs2.map(createLib),
   ]);
 };
 
@@ -75,7 +57,6 @@ const getVersion = async (): Promise<string | undefined> => {
     encoding: 'utf8',
   });
 
-  // eslint-disable-next-line no-restricted-globals
   const packageJson = JSON.parse(packageJsonStr);
 
   return isRecord(packageJson) && Object.hasOwn(packageJson, 'version')
@@ -94,7 +75,6 @@ const getTsTypeUtilsVersion = async (): Promise<string | undefined> => {
     encoding: 'utf8',
   });
 
-  // eslint-disable-next-line no-restricted-globals
   const packageJson = JSON.parse(packageJsonStr);
 
   return isRecord(packageJson) && Object.hasOwn(packageJson, 'version')
@@ -131,16 +111,16 @@ const createLib = async (config: ConverterConfig): Promise<void> => {
   {
     const outputFile = `${outDir}/package.json`;
 
-    const prefix = useLocalPath
+    const prefix = config.useLocalPath
       ? 'file:../packages/'
-      : `npm:${libName}${config.useBrandedNumber ? '-branded' : ''}`;
+      : `npm:${libName}${config.useBrandedNumber ? '-branded' : ''}-`;
 
-    const suffix = useLocalPath ? '' : `@${version}`;
+    const suffix = config.useLocalPath ? '' : `@${version}`;
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(
       outputFile,
-      // eslint-disable-next-line no-restricted-globals
+
       JSON.stringify({
         name: `${libName}${config.useBrandedNumber ? '-branded' : ''}`,
         version,
@@ -188,6 +168,12 @@ const createLib = async (config: ConverterConfig): Promise<void> => {
 };
 
 const createPackages = async (config: ConverterConfig): Promise<void> => {
+  const version = await getVersion();
+
+  if (version === undefined) {
+    throw new Error('version is undefined');
+  }
+
   const outDir = path.resolve(
     strictTsLibDir,
     `output${config.useBrandedNumber ? '-branded' : ''}/packages`,
@@ -199,8 +185,19 @@ const createPackages = async (config: ConverterConfig): Promise<void> => {
     throw new Error('typescriptVersion is undefined');
   }
 
+  if (!version.startsWith(typescriptVersion)) {
+    throw new Error(
+      `version should starts with typescriptVersion "${typescriptVersion}"`,
+    );
+  }
+
+  const results = srcFileList.map(
+    ({ content, filename }) =>
+      [convert(filename, config)(content), filename] as const,
+  );
+
   await Promise.all(
-    srcFileList.map(async ({ content, filename }) => {
+    results.map(async ([result, filename]) => {
       if (filename === 'lib.d.ts') return;
 
       // eslint-disable-next-line no-restricted-syntax
@@ -222,7 +219,7 @@ const createPackages = async (config: ConverterConfig): Promise<void> => {
         const outputFile = `${outputDir}/index.d.ts`;
 
         // eslint-disable-next-line security/detect-non-literal-fs-filename
-        await fs.writeFile(outputFile, convert(filename, config)(content));
+        await fs.writeFile(outputFile, result);
 
         console.log(`${outputFile} generated.`);
       }
@@ -235,10 +232,9 @@ const createPackages = async (config: ConverterConfig): Promise<void> => {
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(
           outputFile,
-          // eslint-disable-next-line no-restricted-globals
           JSON.stringify({
             name: `${libName}${config.useBrandedNumber ? '-branded' : ''}-${suffix.join('-')}`,
-            version: typescriptVersion,
+            version,
             private: false,
             description: 'Strict TypeScript lib',
             repository: {
@@ -265,4 +261,4 @@ const createPackages = async (config: ConverterConfig): Promise<void> => {
   );
 };
 
-main().catch(console.error);
+await main();

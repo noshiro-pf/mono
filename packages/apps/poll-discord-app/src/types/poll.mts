@@ -10,6 +10,7 @@ import {
   pollIdType,
   timestampType,
   titleMessageIdType,
+  toDateOptionId,
   type DateOptionId,
   type PollId,
   type Timestamp,
@@ -48,7 +49,10 @@ export const pollFromJson = (p?: unknown): Poll =>
       updatedAt: a.updatedAt,
       dateOptions: a.dateOptions,
       answers: IMap.new<DateOptionId, AnswerOfDate>(
-        Object.entries(a.answers).map(([k, v]) => [k, answerOfDateFromJson(v)]),
+        Object.entries(a.answers).map(([k, v]) => [
+          toDateOptionId(k),
+          answerOfDateFromJson(v),
+        ]),
       ),
       titleMessageId: a.titleMessageId,
     })).value;

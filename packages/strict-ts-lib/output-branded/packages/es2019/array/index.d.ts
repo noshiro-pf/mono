@@ -6,7 +6,7 @@ type FlatArray<Arr, Depth extends number> = {
   readonly recur: Arr extends ReadonlyArray<infer InnerArr>
     ? FlatArray<
         InnerArr,
-        [
+        (readonly [
           -1,
           0,
           1,
@@ -29,7 +29,7 @@ type FlatArray<Arr, Depth extends number> = {
           18,
           19,
           20,
-        ][Depth]
+        ])[Depth]
       >
     : Arr;
 }[Depth extends -1 ? 'done' : 'recur'];

@@ -39,7 +39,7 @@ interface ReadonlyArray<T> {
   includes(searchElement: T, fromIndex?: number): boolean;
 }
 
-interface Int8Array {
+interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or
    * false as appropriate.
@@ -51,7 +51,7 @@ interface Int8Array {
   includes(searchElement: number, fromIndex?: number): boolean;
 }
 
-interface Uint8Array {
+interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or
    * false as appropriate.
@@ -63,7 +63,7 @@ interface Uint8Array {
   includes(searchElement: number, fromIndex?: number): boolean;
 }
 
-interface Uint8ClampedArray {
+interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or
    * false as appropriate.
@@ -75,7 +75,7 @@ interface Uint8ClampedArray {
   includes(searchElement: number, fromIndex?: number): boolean;
 }
 
-interface Int16Array {
+interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or
    * false as appropriate.
@@ -87,7 +87,7 @@ interface Int16Array {
   includes(searchElement: number, fromIndex?: number): boolean;
 }
 
-interface Uint16Array {
+interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or
    * false as appropriate.
@@ -99,7 +99,7 @@ interface Uint16Array {
   includes(searchElement: number, fromIndex?: number): boolean;
 }
 
-interface Int32Array {
+interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or
    * false as appropriate.
@@ -111,7 +111,7 @@ interface Int32Array {
   includes(searchElement: number, fromIndex?: number): boolean;
 }
 
-interface Uint32Array {
+interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or
    * false as appropriate.
@@ -123,7 +123,7 @@ interface Uint32Array {
   includes(searchElement: number, fromIndex?: number): boolean;
 }
 
-interface Float32Array {
+interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or
    * false as appropriate.
@@ -135,7 +135,7 @@ interface Float32Array {
   includes(searchElement: number, fromIndex?: number): boolean;
 }
 
-interface Float64Array {
+interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or
    * false as appropriate.

@@ -91,7 +91,11 @@ const onMessageReactCommon = async (
     );
   }
 
-  const [updateMessageReactionResult, updatePollUpdatedAtResult, messages]: [
+  const [
+    updateMessageReactionResult,
+    updatePollUpdatedAtResult,
+    messages,
+  ]: readonly [
     Result<void, string>,
     Result<void, string>,
     Discord.Collection<string, Discord.Message>,

@@ -9,6 +9,7 @@ export type ConverterConfig = Readonly<{
   returnType: 'mutable' | 'readonly';
   useBrandedNumber: boolean;
   forNpmPackage: boolean;
+  useLocalPath: boolean;
 }>;
 
 export type ConverterOptions = Readonly<{
@@ -18,8 +19,6 @@ export type ConverterOptions = Readonly<{
 }>;
 
 export const closeBraceRegexp = /\n\}\n/gu;
-
-export const typeUtilsName = '@noshiro/ts-type-utils';
 
 export const enumType = generateKeyValueRecordFromKeys([
   'Int8',
@@ -93,7 +92,6 @@ const tupleMap = <T extends readonly unknown[], B>(
     readonly [K in keyof T]: B;
   };
 
-// eslint-disable-next-line no-restricted-globals
 const set = new Set(brandedNumberFromTypeUtils);
 
 export const createBrandedNumber = (

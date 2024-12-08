@@ -310,13 +310,14 @@ export const generateRulesType = async (
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, import/dynamic-import-chunkname
   const pluginPackage = await import(pluginName);
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const rules: DeepReadonly<[string, Rule.RuleModule][]> =
     pluginName === 'eslint'
       ? // eslint-disable-next-line deprecation/deprecation
         deepCopy(Array.from(builtinRules.entries()))
-      : // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        Object.entries(pluginPackage.default.rules);
+      : Object.entries(
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-member-access
+          pluginPackage.default.rules as Record<string, Rule.RuleModule>,
+        );
 
   const schemaList: DeepReadonly<
     {

@@ -21,7 +21,7 @@ interface ReadonlyArray<T> {
   at(index: number): T | undefined;
 }
 
-interface Int8Array {
+interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Returns the item located at the specified index.
    *
@@ -31,7 +31,7 @@ interface Int8Array {
   at(index: number): Int8 | undefined;
 }
 
-interface Uint8Array {
+interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Returns the item located at the specified index.
    *
@@ -41,7 +41,7 @@ interface Uint8Array {
   at(index: number): Uint8 | undefined;
 }
 
-interface Uint8ClampedArray {
+interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Returns the item located at the specified index.
    *
@@ -51,7 +51,7 @@ interface Uint8ClampedArray {
   at(index: number): Uint8 | undefined;
 }
 
-interface Int16Array {
+interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Returns the item located at the specified index.
    *
@@ -61,7 +61,7 @@ interface Int16Array {
   at(index: number): number | undefined;
 }
 
-interface Uint16Array {
+interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Returns the item located at the specified index.
    *
@@ -71,7 +71,7 @@ interface Uint16Array {
   at(index: number): number | undefined;
 }
 
-interface Int32Array {
+interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Returns the item located at the specified index.
    *
@@ -81,7 +81,7 @@ interface Int32Array {
   at(index: number): number | undefined;
 }
 
-interface Uint32Array {
+interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Returns the item located at the specified index.
    *
@@ -91,7 +91,7 @@ interface Uint32Array {
   at(index: number): number | undefined;
 }
 
-interface Float32Array {
+interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Returns the item located at the specified index.
    *
@@ -101,7 +101,7 @@ interface Float32Array {
   at(index: number): number | undefined;
 }
 
-interface Float64Array {
+interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Returns the item located at the specified index.
    *
@@ -111,7 +111,7 @@ interface Float64Array {
   at(index: number): number | undefined;
 }
 
-interface BigInt64Array {
+interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Returns the item located at the specified index.
    *
@@ -121,7 +121,7 @@ interface BigInt64Array {
   at(index: number): bigint | undefined;
 }
 
-interface BigUint64Array {
+interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Returns the item located at the specified index.
    *

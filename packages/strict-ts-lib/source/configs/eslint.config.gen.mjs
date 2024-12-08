@@ -39,7 +39,7 @@ const defineConfig = () => [
     files: ['temp/eslint-fixed/**/*.d.ts'],
 
     rules: {
-      'no-var': 'error',
+      // 'no-var': 'error',
       'prefer-const': 'error',
       '@typescript-eslint/no-explicit-any': [
         'error',

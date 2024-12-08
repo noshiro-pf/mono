@@ -33,15 +33,18 @@
      ) => void,
    ): Promise<T>;
  
-@@ -41,7 +27,7 @@ interface PromiseConstructor {
+@@ -41,9 +27,9 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
 -  all<T extends readonly unknown[] | []>(
 +  all<T extends readonly unknown[] | readonly []>(
      values: T,
-   ): Promise<{ -readonly [P in keyof T]: Awaited<T[P]> }>;
+-  ): Promise<{ -readonly [P in keyof T]: Awaited<T[P]> }>;
++  ): Promise<{ readonly [P in keyof T]: Awaited<T[P]> }>;
  
+   // see: lib.es2015.iterable.d.ts
+   // all<T>(values: Iterable<T | PromiseLike<T>>): Promise<Awaited<T>[]>;
 @@ -55,7 +41,7 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.

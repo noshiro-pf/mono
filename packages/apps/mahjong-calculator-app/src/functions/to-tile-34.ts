@@ -1,5 +1,5 @@
 import { tileDef } from '../constants';
-import { type NumTiles, type TileName } from '../types';
+import { castToTileName, type NumTiles, type TileName } from '../types';
 import { aka2Normal } from './hand-to-string';
 
 export const toTiles34 = (
@@ -15,7 +15,7 @@ export const toTiles34 = (
     }
   } else {
     for (const [tileName, num] of Object.entries(tiles)) {
-      mut_tiles34[tileDef[aka2Normal(tileName)].no] += num;
+      mut_tiles34[tileDef[aka2Normal(castToTileName(tileName))].no] += num;
     }
   }
 

@@ -1,39 +1,39 @@
 import {
-  composeMonoTypeFns,
   expectType,
+  pipe,
   replaceWithNoMatchCheck,
 } from '@noshiro/mono-scripts';
 import { enumType, type ConverterOptions } from './common.mjs';
 
-export const convertTypedArrayCommon = ({
-  brandedNumber,
-}: ConverterOptions): MonoTypeFunction<string> =>
-  composeMonoTypeFns(
-    replaceWithNoMatchCheck(
-      'copyWithin(target: number, start: number, end?: number): this;',
-      `copyWithin(target: ${brandedNumber.TypedArraySizeArg}, start: ${brandedNumber.TypedArraySizeArg}, end?: ${brandedNumber.TypedArraySizeArg}): this;`,
-    ),
-    replaceWithNoMatchCheck(
-      'subarray(begin?: number, end?: number)',
-      `subarray(begin?: ${brandedNumber.TypedArraySizeArg}, end?: ${brandedNumber.TypedArraySizeArg})`,
-    ),
-    replaceWithNoMatchCheck(
-      'slice(start?: number, end?: number)',
-      `slice(start?: ${brandedNumber.TypedArraySizeArg}, end?: ${brandedNumber.TypedArraySizeArg})`,
-    ),
-    replaceWithNoMatchCheck(
-      'offset?: number',
-      `offset?: ${brandedNumber.TypedArraySizeArgNonNegative}`,
-    ),
-    replaceWithNoMatchCheck(
-      `fromIndex?: number`,
-      `fromIndex?: ${brandedNumber.TypedArraySizeArg}`,
-    ),
-    replaceWithNoMatchCheck(
-      'currentIndex: number',
-      `currentIndex: ${brandedNumber.TypedArraySize}`,
-    ),
-  );
+export const convertTypedArrayCommon =
+  ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>
+  (src) =>
+    pipe(src).chainMonoTypeFns(
+      replaceWithNoMatchCheck(
+        'copyWithin(target: number, start: number, end?: number): this;',
+        `copyWithin(target: ${brandedNumber.TypedArraySizeArg}, start: ${brandedNumber.TypedArraySizeArg}, end?: ${brandedNumber.TypedArraySizeArg}): this;`,
+      ),
+      replaceWithNoMatchCheck(
+        'subarray(begin?: number, end?: number)',
+        `subarray(begin?: ${brandedNumber.TypedArraySizeArg}, end?: ${brandedNumber.TypedArraySizeArg})`,
+      ),
+      replaceWithNoMatchCheck(
+        'slice(start?: number, end?: number)',
+        `slice(start?: ${brandedNumber.TypedArraySizeArg}, end?: ${brandedNumber.TypedArraySizeArg})`,
+      ),
+      replaceWithNoMatchCheck(
+        'offset?: number',
+        `offset?: ${brandedNumber.TypedArraySizeArgNonNegative}`,
+      ),
+      replaceWithNoMatchCheck(
+        `fromIndex?: number`,
+        `fromIndex?: ${brandedNumber.TypedArraySizeArg}`,
+      ),
+      replaceWithNoMatchCheck(
+        'currentIndex: number',
+        `currentIndex: ${brandedNumber.TypedArraySize}`,
+      ),
+    ).value;
 
 export type TypedArrayNumberElemType =
   | 'Float32'

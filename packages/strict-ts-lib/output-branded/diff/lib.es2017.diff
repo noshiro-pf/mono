@@ -1,4 +1,4 @@
-@@ -1,24 +1,10 @@
+@@ -1,25 +1,11 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -17,18 +17,20 @@
  /// <reference no-default-lib="true"/>
 -
 -/// <reference lib="es2016" />
+-/// <reference lib="es2017.arraybuffer" />
+-/// <reference lib="es2017.date" />
+-/// <reference lib="es2017.intl" />
 -/// <reference lib="es2017.object" />
 -/// <reference lib="es2017.sharedmemory" />
 -/// <reference lib="es2017.string" />
--/// <reference lib="es2017.intl" />
 -/// <reference lib="es2017.typedarrays" />
--/// <reference lib="es2017.date" />
 +/// <reference types="@noshiro/ts-type-utils" />
 +
 +/// <reference path="./lib.es2016.d.ts" />
++/// <reference path="./lib.es2017.arraybuffer.d.ts" />
++/// <reference path="./lib.es2017.date.d.ts" />
++/// <reference path="./lib.es2017.intl.d.ts" />
 +/// <reference path="./lib.es2017.object.d.ts" />
 +/// <reference path="./lib.es2017.sharedmemory.d.ts" />
 +/// <reference path="./lib.es2017.string.d.ts" />
-+/// <reference path="./lib.es2017.intl.d.ts" />
 +/// <reference path="./lib.es2017.typedarrays.d.ts" />
-+/// <reference path="./lib.es2017.date.d.ts" />

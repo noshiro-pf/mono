@@ -35,7 +35,7 @@ declare global {
      *   to transform values from the underlying iterator.
      */
     map<U>(
-      callbackfn: (value: T, index: NumberType.ArraySizeArgNonNegative) => U,
+      callbackfn: (value: T, index: NumberType.ArraySize) => U,
     ): IteratorObject<U, undefined, unknown>;
 
     /**
@@ -46,10 +46,7 @@ declare global {
      *   to test values from the underlying iterator.
      */
     filter<S extends T>(
-      predicate: (
-        value: T,
-        index: NumberType.ArraySizeArgNonNegative,
-      ) => value is S,
+      predicate: (value: T, index: NumberType.ArraySize) => value is S,
     ): IteratorObject<S, undefined, unknown>;
 
     /**
@@ -60,10 +57,7 @@ declare global {
      *   to test values from the underlying iterator.
      */
     filter(
-      predicate: (
-        value: T,
-        index: NumberType.ArraySizeArgNonNegative,
-      ) => unknown,
+      predicate: (value: T, index: NumberType.ArraySize) => unknown,
     ): IteratorObject<T, undefined, unknown>;
 
     /**
@@ -98,7 +92,7 @@ declare global {
     flatMap<U>(
       callback: (
         value: T,
-        index: NumberType.ArraySizeArgNonNegative,
+        index: NumberType.ArraySize,
       ) => Iterator<U, unknown, undefined> | Iterable<U, unknown, undefined>,
     ): IteratorObject<U, undefined, unknown>;
 
@@ -120,14 +114,14 @@ declare global {
       callbackfn: (
         previousValue: T,
         currentValue: T,
-        currentIndex: NumberType.ArraySizeArgNonNegative,
+        currentIndex: NumberType.ArraySize,
       ) => T,
     ): T;
     reduce(
       callbackfn: (
         previousValue: T,
         currentValue: T,
-        currentIndex: NumberType.ArraySizeArgNonNegative,
+        currentIndex: NumberType.ArraySize,
       ) => T,
       initialValue: T,
     ): T;
@@ -150,7 +144,7 @@ declare global {
       callbackfn: (
         previousValue: U,
         currentValue: T,
-        currentIndex: NumberType.ArraySizeArgNonNegative,
+        currentIndex: NumberType.ArraySize,
       ) => U,
       initialValue: U,
     ): U;
@@ -165,9 +159,7 @@ declare global {
      *   calls the callbackfn function one time for each element in the
      *   iterator.
      */
-    forEach(
-      callbackfn: (value: T, index: NumberType.ArraySizeArgNonNegative) => void,
-    ): void;
+    forEach(callbackfn: (value: T, index: NumberType.ArraySize) => void): void;
 
     /**
      * Determines whether the specified callback function returns true for any
@@ -179,10 +171,7 @@ declare global {
      *   iterator.
      */
     some(
-      predicate: (
-        value: T,
-        index: NumberType.ArraySizeArgNonNegative,
-      ) => unknown,
+      predicate: (value: T, index: NumberType.ArraySize) => unknown,
     ): boolean;
 
     /**
@@ -194,10 +183,7 @@ declare global {
      *   until the predicate returns false, or until the end of this iterator.
      */
     every(
-      predicate: (
-        value: T,
-        index: NumberType.ArraySizeArgNonNegative,
-      ) => unknown,
+      predicate: (value: T, index: NumberType.ArraySize) => unknown,
     ): boolean;
 
     /**
@@ -210,16 +196,10 @@ declare global {
      *   Otherwise, find returns undefined.
      */
     find<S extends T>(
-      predicate: (
-        value: T,
-        index: NumberType.ArraySizeArgNonNegative,
-      ) => value is S,
+      predicate: (value: T, index: NumberType.ArraySize) => value is S,
     ): S | undefined;
     find(
-      predicate: (
-        value: T,
-        index: NumberType.ArraySizeArgNonNegative,
-      ) => unknown,
+      predicate: (value: T, index: NumberType.ArraySize) => unknown,
     ): T | undefined;
 
     readonly [Symbol.toStringTag]: string;

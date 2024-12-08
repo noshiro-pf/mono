@@ -1,3 +1,5 @@
+import * as t from '@noshiro/io-ts';
+
 export type Bakaze = 'Nan' | 'Ton';
 
 export type Jikaze = 'Nan' | 'Pei' | 'Sha' | 'Ton';
@@ -14,44 +16,49 @@ export type DoraIndicatorPosition = UintRange<0, 5>;
 
 export type NumTiles = UintRange<0, 5>;
 
-export type TileName =
-  | 'Manzu1'
-  | 'Manzu2'
-  | 'Manzu3'
-  | 'Manzu4'
-  | 'Manzu5'
-  | 'Manzu6'
-  | 'Manzu7'
-  | 'Manzu8'
-  | 'Manzu9'
-  | 'Pinzu1'
-  | 'Pinzu2'
-  | 'Pinzu3'
-  | 'Pinzu4'
-  | 'Pinzu5'
-  | 'Pinzu6'
-  | 'Pinzu7'
-  | 'Pinzu8'
-  | 'Pinzu9'
-  | 'Sozu1'
-  | 'Sozu2'
-  | 'Sozu3'
-  | 'Sozu4'
-  | 'Sozu5'
-  | 'Sozu6'
-  | 'Sozu7'
-  | 'Sozu8'
-  | 'Sozu9'
-  | 'Ton'
-  | 'Nan'
-  | 'Sha'
-  | 'Pei'
-  | 'Haku'
-  | 'Hatsu'
-  | 'Chun'
-  | 'AkaManzu5'
-  | 'AkaPinzu5'
-  | 'AkaSozu5';
+const TileName = t.enumType([
+  'Manzu1',
+  'Manzu2',
+  'Manzu3',
+  'Manzu4',
+  'Manzu5',
+  'Manzu6',
+  'Manzu7',
+  'Manzu8',
+  'Manzu9',
+  'Pinzu1',
+  'Pinzu2',
+  'Pinzu3',
+  'Pinzu4',
+  'Pinzu5',
+  'Pinzu6',
+  'Pinzu7',
+  'Pinzu8',
+  'Pinzu9',
+  'Sozu1',
+  'Sozu2',
+  'Sozu3',
+  'Sozu4',
+  'Sozu5',
+  'Sozu6',
+  'Sozu7',
+  'Sozu8',
+  'Sozu9',
+  'Ton',
+  'Nan',
+  'Sha',
+  'Pei',
+  'Haku',
+  'Hatsu',
+  'Chun',
+  'AkaManzu5',
+  'AkaPinzu5',
+  'AkaSozu5',
+]);
+
+export type TileName = t.TypeOf<typeof TileName>;
+
+export const castToTileName = TileName.cast as (a: string) => TileName;
 
 export type RevealedBlockType = 'Ankan' | 'Chi-' | 'Kakan' | 'Minkan' | 'Pon';
 

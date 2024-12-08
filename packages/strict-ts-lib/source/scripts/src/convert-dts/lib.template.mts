@@ -1,7 +1,4 @@
-import {
-  composeMonoTypeFns,
-  replaceWithNoMatchCheck,
-} from '@noshiro/mono-scripts';
+import { pipe, replaceWithNoMatchCheck } from '@noshiro/mono-scripts';
 
-export const convertTemplate = (): MonoTypeFunction<string> =>
-  composeMonoTypeFns(replaceWithNoMatchCheck('@@@', '@@@'));
+export const convertTemplate: MonoTypeFunction<string> = (src) =>
+  pipe(src).chainMonoTypeFns(replaceWithNoMatchCheck('@@@', '@@@')).value;

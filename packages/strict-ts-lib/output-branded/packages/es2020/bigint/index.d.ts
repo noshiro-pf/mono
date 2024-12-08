@@ -7,7 +7,7 @@ interface BigIntToLocaleStringOptions {
   /**
    * The locale matching algorithm to use.The default is "best fit". For
    * information about this option, see the
-   * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation Intl page}.
+   * {@link https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation Intl page}.
    */
   readonly localeMatcher?: string;
   /** The formatting style to use , the default is "decimal". */
@@ -166,12 +166,14 @@ declare const BigInt: BigIntConstructor;
  * to 0. If the requested number of bytes could not be allocated, an exception
  * is raised.
  */
-interface BigInt64Array {
+interface BigInt64Array<
+  TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
+> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: 8;
 
   /** The ArrayBuffer instance referenced by the array. */
-  readonly buffer: ArrayBufferLike;
+  readonly buffer: TArrayBuffer;
 
   /** The length in bytes of the array. */
   readonly byteLength: NumberType.TypedArraySize;
@@ -213,7 +215,7 @@ interface BigInt64Array {
     predicate: (
       value: BigInt64,
       index: NumberType.TypedArraySize,
-      array: BigInt64Array,
+      array: BigInt64Array<TArrayBuffer>,
     ) => boolean,
     thisArg?: unknown,
   ): boolean;
@@ -249,10 +251,10 @@ interface BigInt64Array {
     predicate: (
       value: BigInt64,
       index: NumberType.TypedArraySize,
-      array: BigInt64Array,
+      array: BigInt64Array<TArrayBuffer>,
     ) => boolean,
     thisArg?: unknown,
-  ): BigInt64Array;
+  ): BigInt64Array<ArrayBuffer>;
 
   /**
    * Returns the value of the first element in the array where predicate is
@@ -270,7 +272,7 @@ interface BigInt64Array {
     predicate: (
       value: BigInt64,
       index: NumberType.TypedArraySize,
-      array: BigInt64Array,
+      array: BigInt64Array<TArrayBuffer>,
     ) => boolean,
     thisArg?: unknown,
   ): BigInt64 | undefined;
@@ -291,7 +293,7 @@ interface BigInt64Array {
     predicate: (
       value: BigInt64,
       index: NumberType.TypedArraySize,
-      array: BigInt64Array,
+      array: BigInt64Array<TArrayBuffer>,
     ) => boolean,
     thisArg?: unknown,
   ): NumberType.TypedArraySearchResult;
@@ -309,7 +311,7 @@ interface BigInt64Array {
     callbackfn: (
       value: BigInt64,
       index: NumberType.TypedArraySize,
-      array: BigInt64Array,
+      array: BigInt64Array<TArrayBuffer>,
     ) => void,
     thisArg?: unknown,
   ): void;
@@ -382,10 +384,10 @@ interface BigInt64Array {
     callbackfn: (
       value: BigInt64,
       index: NumberType.TypedArraySize,
-      array: BigInt64Array,
+      array: BigInt64Array<TArrayBuffer>,
     ) => BigInt64,
     thisArg?: unknown,
-  ): BigInt64Array;
+  ): BigInt64Array<ArrayBuffer>;
 
   /**
    * Calls the specified callback function for all the elements in an array. The
@@ -404,7 +406,7 @@ interface BigInt64Array {
       previousValue: BigInt64,
       currentValue: BigInt64,
       currentIndex: NumberType.TypedArraySize,
-      array: BigInt64Array,
+      array: BigInt64Array<TArrayBuffer>,
     ) => BigInt64,
   ): BigInt64;
 
@@ -425,7 +427,7 @@ interface BigInt64Array {
       previousValue: U,
       currentValue: BigInt64,
       currentIndex: NumberType.TypedArraySize,
-      array: BigInt64Array,
+      array: BigInt64Array<TArrayBuffer>,
     ) => U,
     initialValue: U,
   ): U;
@@ -448,7 +450,7 @@ interface BigInt64Array {
       previousValue: BigInt64,
       currentValue: BigInt64,
       currentIndex: NumberType.TypedArraySize,
-      array: BigInt64Array,
+      array: BigInt64Array<TArrayBuffer>,
     ) => BigInt64,
   ): BigInt64;
 
@@ -470,7 +472,7 @@ interface BigInt64Array {
       previousValue: U,
       currentValue: BigInt64,
       currentIndex: NumberType.TypedArraySize,
-      array: BigInt64Array,
+      array: BigInt64Array<TArrayBuffer>,
     ) => U,
     initialValue: U,
   ): U;
@@ -499,7 +501,7 @@ interface BigInt64Array {
   slice(
     start?: NumberType.TypedArraySizeArg,
     end?: NumberType.TypedArraySizeArg,
-  ): BigInt64Array;
+  ): BigInt64Array<ArrayBuffer>;
 
   /**
    * Determines whether the specified callback function returns true for any
@@ -516,7 +518,7 @@ interface BigInt64Array {
     predicate: (
       value: BigInt64,
       index: NumberType.TypedArraySize,
-      array: BigInt64Array,
+      array: BigInt64Array<TArrayBuffer>,
     ) => boolean,
     thisArg?: unknown,
   ): boolean;
@@ -539,7 +541,7 @@ interface BigInt64Array {
   subarray(
     begin?: NumberType.TypedArraySizeArg,
     end?: NumberType.TypedArraySizeArg,
-  ): BigInt64Array;
+  ): BigInt64Array<TArrayBuffer>;
 
   /** Converts the array to a string by using the current locale. */
   toLocaleString(
@@ -551,7 +553,7 @@ interface BigInt64Array {
   toString(): string;
 
   /** Returns the primitive value of the specified object. */
-  valueOf(): BigInt64Array;
+  valueOf(): BigInt64Array<TArrayBuffer>;
 
   /** Yields each value in the array. */
   values(): ArrayIterator<BigInt64>;
@@ -562,16 +564,18 @@ interface BigInt64Array {
 
   [index: number]: BigInt64;
 }
-
 interface BigInt64ArrayConstructor {
-  readonly prototype: BigInt64Array;
-  new (length?: NumberType.TypedArraySize): BigInt64Array;
-  new (array: Iterable<BigInt64>): BigInt64Array;
+  readonly prototype: BigInt64Array<ArrayBufferLike>;
+  new (length?: NumberType.TypedArraySize): BigInt64Array<ArrayBuffer>;
   new (
-    buffer: ArrayBufferLike,
+    array: ArrayLike<BigInt64> | Iterable<BigInt64>,
+  ): BigInt64Array<ArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
+    buffer: TArrayBuffer,
     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
     length?: NumberType.TypedArraySize,
-  ): BigInt64Array;
+  ): BigInt64Array<TArrayBuffer>;
+  new (array: ArrayLike<BigInt64> | ArrayBuffer): BigInt64Array<ArrayBuffer>;
 
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: 8;
@@ -581,7 +585,7 @@ interface BigInt64ArrayConstructor {
    *
    * @param items A set of elements to include in the new array object.
    */
-  of(...items: readonly BigInt64[]): BigInt64Array;
+  of(...items: readonly BigInt64[]): BigInt64Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -590,14 +594,20 @@ interface BigInt64ArrayConstructor {
    * @param mapfn A mapping function to call on every element of the array.
    * @param thisArg Value of 'this' used to invoke the mapfn.
    */
-  from(arrayLike: ArrayLike<BigInt64>): BigInt64Array;
+  from(arrayLike: ArrayLike<BigInt64>): BigInt64Array<ArrayBuffer>;
+  /**
+   * Creates an array from an array-like or iterable object.
+   *
+   * @param arrayLike An array-like or iterable object to convert to an array.
+   * @param mapfn A mapping function to call on every element of the array.
+   * @param thisArg Value of 'this' used to invoke the mapfn.
+   */
   from<U>(
     arrayLike: ArrayLike<U>,
     mapfn: (v: U, k: NumberType.TypedArraySize) => BigInt64,
     thisArg?: unknown,
-  ): BigInt64Array;
+  ): BigInt64Array<ArrayBuffer>;
 }
-
 declare const BigInt64Array: BigInt64ArrayConstructor;
 
 /**
@@ -605,12 +615,14 @@ declare const BigInt64Array: BigInt64ArrayConstructor;
  * to 0. If the requested number of bytes could not be allocated, an exception
  * is raised.
  */
-interface BigUint64Array {
+interface BigUint64Array<
+  TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
+> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: 8;
 
   /** The ArrayBuffer instance referenced by the array. */
-  readonly buffer: ArrayBufferLike;
+  readonly buffer: TArrayBuffer;
 
   /** The length in bytes of the array. */
   readonly byteLength: NumberType.TypedArraySize;
@@ -652,7 +664,7 @@ interface BigUint64Array {
     predicate: (
       value: BigUint64,
       index: NumberType.TypedArraySize,
-      array: BigUint64Array,
+      array: BigUint64Array<TArrayBuffer>,
     ) => boolean,
     thisArg?: unknown,
   ): boolean;
@@ -688,10 +700,10 @@ interface BigUint64Array {
     predicate: (
       value: BigUint64,
       index: NumberType.TypedArraySize,
-      array: BigUint64Array,
+      array: BigUint64Array<TArrayBuffer>,
     ) => boolean,
     thisArg?: unknown,
-  ): BigUint64Array;
+  ): BigUint64Array<ArrayBuffer>;
 
   /**
    * Returns the value of the first element in the array where predicate is
@@ -709,7 +721,7 @@ interface BigUint64Array {
     predicate: (
       value: BigUint64,
       index: NumberType.TypedArraySize,
-      array: BigUint64Array,
+      array: BigUint64Array<TArrayBuffer>,
     ) => boolean,
     thisArg?: unknown,
   ): BigUint64 | undefined;
@@ -730,7 +742,7 @@ interface BigUint64Array {
     predicate: (
       value: BigUint64,
       index: NumberType.TypedArraySize,
-      array: BigUint64Array,
+      array: BigUint64Array<TArrayBuffer>,
     ) => boolean,
     thisArg?: unknown,
   ): NumberType.TypedArraySearchResult;
@@ -748,7 +760,7 @@ interface BigUint64Array {
     callbackfn: (
       value: BigUint64,
       index: NumberType.TypedArraySize,
-      array: BigUint64Array,
+      array: BigUint64Array<TArrayBuffer>,
     ) => void,
     thisArg?: unknown,
   ): void;
@@ -821,10 +833,10 @@ interface BigUint64Array {
     callbackfn: (
       value: BigUint64,
       index: NumberType.TypedArraySize,
-      array: BigUint64Array,
+      array: BigUint64Array<TArrayBuffer>,
     ) => BigUint64,
     thisArg?: unknown,
-  ): BigUint64Array;
+  ): BigUint64Array<ArrayBuffer>;
 
   /**
    * Calls the specified callback function for all the elements in an array. The
@@ -843,7 +855,7 @@ interface BigUint64Array {
       previousValue: BigUint64,
       currentValue: BigUint64,
       currentIndex: NumberType.TypedArraySize,
-      array: BigUint64Array,
+      array: BigUint64Array<TArrayBuffer>,
     ) => BigUint64,
   ): BigUint64;
 
@@ -864,7 +876,7 @@ interface BigUint64Array {
       previousValue: U,
       currentValue: BigUint64,
       currentIndex: NumberType.TypedArraySize,
-      array: BigUint64Array,
+      array: BigUint64Array<TArrayBuffer>,
     ) => U,
     initialValue: U,
   ): U;
@@ -887,7 +899,7 @@ interface BigUint64Array {
       previousValue: BigUint64,
       currentValue: BigUint64,
       currentIndex: NumberType.TypedArraySize,
-      array: BigUint64Array,
+      array: BigUint64Array<TArrayBuffer>,
     ) => BigUint64,
   ): BigUint64;
 
@@ -909,7 +921,7 @@ interface BigUint64Array {
       previousValue: U,
       currentValue: BigUint64,
       currentIndex: NumberType.TypedArraySize,
-      array: BigUint64Array,
+      array: BigUint64Array<TArrayBuffer>,
     ) => U,
     initialValue: U,
   ): U;
@@ -938,7 +950,7 @@ interface BigUint64Array {
   slice(
     start?: NumberType.TypedArraySizeArg,
     end?: NumberType.TypedArraySizeArg,
-  ): BigUint64Array;
+  ): BigUint64Array<ArrayBuffer>;
 
   /**
    * Determines whether the specified callback function returns true for any
@@ -955,7 +967,7 @@ interface BigUint64Array {
     predicate: (
       value: BigUint64,
       index: NumberType.TypedArraySize,
-      array: BigUint64Array,
+      array: BigUint64Array<TArrayBuffer>,
     ) => boolean,
     thisArg?: unknown,
   ): boolean;
@@ -978,7 +990,7 @@ interface BigUint64Array {
   subarray(
     begin?: NumberType.TypedArraySizeArg,
     end?: NumberType.TypedArraySizeArg,
-  ): BigUint64Array;
+  ): BigUint64Array<TArrayBuffer>;
 
   /** Converts the array to a string by using the current locale. */
   toLocaleString(
@@ -990,7 +1002,7 @@ interface BigUint64Array {
   toString(): string;
 
   /** Returns the primitive value of the specified object. */
-  valueOf(): BigUint64Array;
+  valueOf(): BigUint64Array<TArrayBuffer>;
 
   /** Yields each value in the array. */
   values(): ArrayIterator<BigUint64>;
@@ -1001,16 +1013,18 @@ interface BigUint64Array {
 
   [index: number]: BigUint64;
 }
-
 interface BigUint64ArrayConstructor {
-  readonly prototype: BigUint64Array;
-  new (length?: NumberType.TypedArraySize): BigUint64Array;
-  new (array: Iterable<BigUint64>): BigUint64Array;
+  readonly prototype: BigUint64Array<ArrayBufferLike>;
+  new (length?: NumberType.TypedArraySize): BigUint64Array<ArrayBuffer>;
   new (
-    buffer: ArrayBufferLike,
+    array: ArrayLike<BigUint64> | Iterable<BigUint64>,
+  ): BigUint64Array<ArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
+    buffer: TArrayBuffer,
     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
     length?: NumberType.TypedArraySize,
-  ): BigUint64Array;
+  ): BigUint64Array<TArrayBuffer>;
+  new (array: ArrayLike<BigUint64> | ArrayBuffer): BigUint64Array<ArrayBuffer>;
 
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: 8;
@@ -1020,7 +1034,7 @@ interface BigUint64ArrayConstructor {
    *
    * @param items A set of elements to include in the new array object.
    */
-  of(...items: readonly BigUint64[]): BigUint64Array;
+  of(...items: readonly BigUint64[]): BigUint64Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -1036,10 +1050,9 @@ interface BigUint64ArrayConstructor {
     thisArg?: unknown,
   ): BigUint64Array;
 }
-
 declare const BigUint64Array: BigUint64ArrayConstructor;
 
-interface DataView {
+interface DataView<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Gets the BigInt64 value at the specified byte offset from the start of the
    * view. There is no alignment constraint; multi-byte values may be fetched

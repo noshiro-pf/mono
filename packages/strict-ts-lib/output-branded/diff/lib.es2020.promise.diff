@@ -32,15 +32,18 @@
  }
  
  type PromiseSettledResult<T> =
-@@ -37,7 +23,7 @@ interface PromiseConstructor {
+@@ -37,9 +23,9 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
 -  allSettled<T extends readonly unknown[] | []>(
 +  allSettled<T extends readonly unknown[] | readonly []>(
      values: T,
-   ): Promise<{ -readonly [P in keyof T]: PromiseSettledResult<Awaited<T[P]>> }>;
+-  ): Promise<{ -readonly [P in keyof T]: PromiseSettledResult<Awaited<T[P]>> }>;
++  ): Promise<{ readonly [P in keyof T]: PromiseSettledResult<Awaited<T[P]>> }>;
  
+   /**
+    * Creates a Promise that is resolved with an array of results when all of the
 @@ -50,5 +36,5 @@ interface PromiseConstructor {
     */
    allSettled<T>(

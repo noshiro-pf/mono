@@ -38,7 +38,7 @@
  
    /**
 @@ -129,10 +115,10 @@ declare namespace Intl {
-    * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/resolvedOptions#Description).
+    * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/resolvedOptions#Description).
     */
    interface ResolvedRelativeTimeFormatOptions {
 -    locale: UnicodeBCP47LocaleIdentifier;
@@ -269,7 +269,7 @@
  
    interface DisplayNames {
 @@ -485,7 +471,7 @@ declare namespace Intl {
-    * [Compatibility](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames#browser_compatibility).
+    * [Compatibility](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames#browser_compatibility).
     */
    const DisplayNames: {
 -    prototype: DisplayNames;
