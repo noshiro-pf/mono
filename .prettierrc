@@ -17,6 +17,12 @@
           "prettier-plugin-packagejson"
         ]
       }
+    },
+    {
+      "files": ["**/*.md", "**/*.mdx"],
+      "options": {
+        "tabWidth": 4
+      }
     }
   ]
 }
