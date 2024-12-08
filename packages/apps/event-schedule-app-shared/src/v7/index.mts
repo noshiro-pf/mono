@@ -62,6 +62,7 @@ export {
   isEventListItem,
   isEventSchedule,
   isHoursMinutes,
+  isKeyofNotificationSettings,
   isNotificationSettings,
   isTimeRange,
   isUser,

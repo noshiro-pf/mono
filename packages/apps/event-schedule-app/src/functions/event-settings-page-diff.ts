@@ -1,3 +1,4 @@
+import { isKeyofNotificationSettings } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { hm2str, ymd2str, ymdhm2str } from '../constants';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from './map-key';
@@ -122,19 +123,21 @@ const notificationSettingsDiff = (
 
   const collectedDiff = Arr.concat(
     emailPrev === emailCurr ? [] : [map(emailPrev ?? '', emailCurr ?? '')],
-    Object.keys(a).reduce<readonly string[]>(
-      (acc, key) =>
-        a[key] === b[key]
-          ? acc
-          : Arr.pushed(
-              acc,
-              `${notificationSettings[key]}${dict.common.colon} ${map(
-                a[key] ? ndc.on : ndc.off,
-                b[key] ? ndc.on : ndc.off,
-              )}`,
-            ),
-      [],
-    ),
+    Object.keys(a)
+      .filter(isKeyofNotificationSettings)
+      .reduce<readonly string[]>(
+        (acc, key) =>
+          a[key] === b[key]
+            ? acc
+            : Arr.pushed(
+                acc,
+                `${notificationSettings[key]}${dict.common.colon} ${map(
+                  a[key] ? ndc.on : ndc.off,
+                  b[key] ? ndc.on : ndc.off,
+                )}`,
+              ),
+        [],
+      ),
   );
 
   return collectedDiff;

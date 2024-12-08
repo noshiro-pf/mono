@@ -10,7 +10,7 @@ export const genGlobalImportDefsFromDevDependencies = async (
   );
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const globalImportDefPackages: Record<
+  const globalImportDefPackages: readonly Record<
     string,
     Record<string, readonly [string, string]>
   >[] = await Promise.all(

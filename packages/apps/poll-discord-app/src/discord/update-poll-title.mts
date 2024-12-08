@@ -54,7 +54,7 @@ export const updatePollTitle = async (
     );
   }
 
-  const [userIdToDisplayNameResult, messages]: [
+  const [userIdToDisplayNameResult, messages]: readonly [
     Result<IMap<UserId, string>, string>,
     Discord.Collection<string, Discord.Message>,
   ] = await Promise.all([
