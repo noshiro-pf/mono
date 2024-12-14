@@ -43,7 +43,7 @@
     "zz:setup": "run-s clean:src zz:gen zz:fmt-src type-check"
   },
   "dependencies": {
-    "@emotion/styled": "^11.13.0",
+    "@emotion/styled": "^11.14.0",
     "@noshiro/ts-utils": "*"
   },
   "devDependencies": {
