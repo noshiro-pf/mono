@@ -16,10 +16,8 @@ cd "${STRICT_TS_LIB_SOURCE_DIR}" || exit
 yarn add -D \
   @types/eslint@latest \
   @typescript-eslint/eslint-plugin@latest \
-  @typescript-eslint/parser@latest
-  # TODO: enable this line after eslint v9 is supported in all plugins
-  # eslint-plugin-functional@latest \
-  # eslint@latest
+  @typescript-eslint/parser@latest \
+  eslint@latest
 
 node "${ESLINT_DIR}/scripts/update-dependencies.mjs" "${STRICT_TS_LIB_SOURCE_DIR}/package.json" "devDependencies"
 
@@ -54,10 +52,8 @@ yarn add \
   @types/eslint@latest \
   globals@latest \
   eslint-plugin-playwright@latest \
-  typescript-eslint@latest
-  # TODO: enable this line after eslint v9 is supported in all plugins
-  # eslint-plugin-functional@latest \
-  # eslint@latest
+  typescript-eslint@latest \
+  eslint@latest
 
 node "${ESLINT_DIR}/scripts/update-dependencies.mjs" "${ESLINT_DIR}/package.json" "dependencies"
 

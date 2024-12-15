@@ -30,13 +30,15 @@
     "fmt": "yarn zz:prettier .",
     "gen-rules-type": "wireit",
     "gen-rules-type:command": "node ./scripts/main.mjs",
-    "gi": "bash ../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
+    "gi": "bash ../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts --ignore plugins",
     "lint": "run-p lint:scripts lint:src",
     "lint:fix": "run-p lint:fix:scripts lint:fix:src",
     "lint:fix:scripts": "yarn zz:eslint:scripts --fix",
     "lint:fix:src": "yarn zz:eslint:src --fix",
     "lint:scripts": "yarn zz:eslint:scripts",
     "lint:src": "yarn zz:eslint:src",
+    "test": "yarn zz:vitest run",
+    "testw": "yarn zz:vitest watch",
     "tsc": "yarn type-check",
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit",
@@ -46,14 +48,16 @@
     "zz:eslint:print-config": "yarn zz:eslint --print-config src/index.mts",
     "zz:eslint:scripts": "yarn zz:eslint \"./scripts/**/*\"",
     "zz:eslint:src": "yarn zz:eslint './src/**/*'",
-    "zz:prettier": "prettier --ignore-path ../../.prettierignore --ignore-unknown --no-error-on-unmatched-pattern --write"
+    "zz:prettier": "prettier --ignore-path ../../.prettierignore --ignore-unknown --no-error-on-unmatched-pattern --write",
+    "zz:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
     "@types/eslint": "9.6.1",
-    "@typescript-eslint/eslint-plugin": "8.20.0",
-    "@typescript-eslint/parser": "8.20.0",
-    "@typescript-eslint/utils": "8.20.0",
-    "eslint": "8.57.0",
+    "@typescript-eslint/eslint-plugin": "8.21.0",
+    "@typescript-eslint/parser": "8.21.0",
+    "@typescript-eslint/type-utils": "8.21.0",
+    "@typescript-eslint/utils": "8.21.0",
+    "eslint": "9.18.0",
     "eslint-import-resolver-typescript": "3.7.0",
     "eslint-plugin-array-func": "5.0.2",
     "eslint-plugin-cypress": "4.1.0",
@@ -62,7 +66,7 @@
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jest": "28.11.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
-    "eslint-plugin-playwright": "^2.1.0",
+    "eslint-plugin-playwright": "2.2.0",
     "eslint-plugin-prefer-arrow-functions": "3.6.2",
     "eslint-plugin-promise": "7.2.1",
     "eslint-plugin-react": "7.37.4",
@@ -76,10 +80,13 @@
     "eslint-plugin-unicorn": "56.0.1",
     "eslint-plugin-vitest": "0.5.4",
     "globals": "15.14.0",
-    "typescript-eslint": "8.20.0"
+    "is-immutable-type": "1.2.9",
+    "tsutils": "3.21.0",
+    "typescript-eslint": "8.21.0"
   },
   "devDependencies": {
     "@noshiro/mono-utils": "*",
+    "@typescript-eslint/rule-tester": "^8.21.0",
     "json-schema-to-typescript": "^15.0.4"
   },
   "wireit": {

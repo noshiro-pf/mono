@@ -321,7 +321,6 @@ export namespace RefinedNumberUtils {
       min: ElementTypeWithSmallInt,
       max: ElementTypeWithSmallInt,
     ): ElementType => {
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         const r = randomImpl(min, max);
         if (Num.isNonZero(r)) return clampOrCastFn(r);
@@ -444,7 +443,6 @@ export namespace RefinedNumberUtils {
       clampOrCastFn(min + (Math.max(max, min) - min) * Math.random());
 
     const randomNonZero = (min: ElementType, max: ElementType): ElementType => {
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         const r = random(min, max);
         if (isNonZero(r)) return r;
