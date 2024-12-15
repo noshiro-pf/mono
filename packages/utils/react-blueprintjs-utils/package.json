@@ -40,7 +40,7 @@
     "@blueprintjs/core": "^4.20.1",
     "@blueprintjs/datetime": "^4.4.13",
     "@blueprintjs/icons": "^5.11.0",
-    "@emotion/styled": "^11.13.0",
+    "@emotion/styled": "^11.14.0",
     "@noshiro/react-utils": "*",
     "@noshiro/react-utils-styled": "*",
     "@noshiro/ts-utils": "*",
