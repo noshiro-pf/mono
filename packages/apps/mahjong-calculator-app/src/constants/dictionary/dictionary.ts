@@ -36,4 +36,4 @@ export const dict = {
     exp: maximizeTargetDef.exp.displayName,
     winProb: maximizeTargetDef.winProb.displayName,
   },
-};
+} as const;
