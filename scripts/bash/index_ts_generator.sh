@@ -160,16 +160,6 @@ for directory in $(find . -mindepth "${min_recursion_depth}" -maxdepth "${max_re
 done
 
 
-
-echo
-echo "--- eslint fix ---"
-
-if [ -n "${index_ts_files}" ]; then
-    npx eslint --fix ${index_ts_files}
-fi
-echo "Done."
-
-
 echo
 echo "--- prettier ---"
 
