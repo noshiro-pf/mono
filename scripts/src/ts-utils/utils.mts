@@ -15,3 +15,10 @@ export const toPositiveSafeInt = (n: number): PositiveSafeInt =>
 export const toUint32 = (v: number): Uint32 =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   v as Uint32;
+
+export const castMutable = <T,>(mutable: T): Mutable<T> =>
+  mutable as Mutable<T>;
+
+export const castDeepMutable = <T,>(mutable: T): DeepMutable<T> =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  mutable as DeepMutable<T>;
