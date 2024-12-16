@@ -3,7 +3,7 @@ import { toThisDir } from '@noshiro/mono-scripts';
 import preact from '@preact/preset-vite';
 import legacy from '@vitejs/plugin-legacy';
 import * as nodePath from 'node:path';
-import { defineConfig } from 'vite';
+import { defineConfig, PluginOption } from 'vite';
 import { createInjectDef } from './inject-def';
 
 const thisDir: string = toThisDir(import.meta.url);
@@ -14,7 +14,7 @@ export default defineConfig(async () => {
 
   return {
     plugins: [
-      mdx({ jsxImportSource: 'preact' }),
+      mdx({ jsxImportSource: 'preact' }) as PluginOption,
       preact(),
       injectDef,
       legacy(),

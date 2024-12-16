@@ -28,7 +28,7 @@ export const generateViteConfig = async (
         : '',
     `import legacy from '@vitejs/plugin-legacy';`,
     `import * as nodePath from 'node:path';`,
-    `import { defineConfig } from 'vite';`,
+    `import { defineConfig, PluginOption } from 'vite';`,
     `import { createInjectDef } from './inject-def';`,
     ``,
     `const thisDir: string = toThisDir(import.meta.url);`,
@@ -41,7 +41,7 @@ export const generateViteConfig = async (
     `    plugins: [
       ${
         packageName === 'my-portfolio-app-preact'
-          ? `mdx({ jsxImportSource: 'preact' }),`
+          ? `mdx({ jsxImportSource: 'preact' }) as PluginOption,`
           : ''
       }
       ${
