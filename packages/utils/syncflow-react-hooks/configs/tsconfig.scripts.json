@@ -1,0 +1,10 @@
+{
+  "extends": [
+    "../../../../configs/tsconfig/tsconfig.build.json",
+    "../../../../configs/tsconfig/tsconfig.dom.json"
+  ],
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["../scripts/**/*.mts"]
+}

@@ -16,10 +16,14 @@
   },
   "scripts": {
     "build": "wireit",
+    "build:script": "tsc -p ./configs/tsconfig.scripts.json",
     "clean": "run-p clean:**",
     "clean:build": "rimraf esm",
     "clean:wireit": "rimraf .wireit/**",
     "fmt": "yarn zz:prettier .",
+    "gen:re-export": "wireit",
+    "gen:re-export:fmt": "yarn zz:prettier src/syncflow.mts",
+    "gen:re-export:script": "node ./scripts/generate-re-export-script.mjs",
     "gi": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
     "lint": "yarn zz:eslint:src",
     "lint:fix": "yarn zz:eslint:src --fix",
@@ -55,9 +59,13 @@
       "dependencies": [
         "clean:build",
         "gi",
-        "type-check"
+        "type-check",
+        "gen:re-export"
       ],
       "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
+    },
+    "gen:re-export": {
+      "command": "run-s build:script gen:re-export:script gen:re-export:fmt"
     }
   }
 }

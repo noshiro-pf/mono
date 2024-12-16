@@ -199,11 +199,13 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
     tsType: 'preact',
     gi: 0,
     passWithNoTests: true,
+    hasScripts: true,
   }),
   'syncflow-react-hooks': fillDefaultsForUtil({
     tsType: 'react',
     gi: 0,
     passWithNoTests: true,
+    hasScripts: true,
   }),
 
   'tiny-router-preact-hooks': fillDefaultsForUtil({
