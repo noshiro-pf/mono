@@ -7,7 +7,8 @@ export const isPrimitive = (a: unknown): boolean => {
     case 'symbol':
     case 'bigint':
       return true;
-    default:
+    case 'function':
+    case 'object':
       return false;
   }
 };

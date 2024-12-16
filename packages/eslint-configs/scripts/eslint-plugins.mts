@@ -47,6 +47,12 @@ export const eslintPlugins = {
     rulePrefix: 'strict-dependencies/',
     outputFileName: 'eslint-strict-dependencies-rules.mts',
   },
+  EslintTreeShakable: {
+    typeName: 'EslintTreeShakableRules',
+    pluginName: 'eslint-plugin-tree-shakable',
+    rulePrefix: 'tree-shakable/',
+    outputFileName: 'eslint-tree-shakable-rules.mts',
+  },
   EslintPromiseRules: {
     typeName: 'EslintPromiseRules',
     pluginName: 'eslint-plugin-promise',
@@ -58,12 +64,6 @@ export const eslintPlugins = {
     pluginName: 'eslint-plugin-security',
     rulePrefix: 'security/',
     outputFileName: 'eslint-security-rules.mts',
-  },
-  EslintDeprecationRules: {
-    typeName: 'EslintDeprecationRules',
-    pluginName: 'eslint-plugin-deprecation',
-    rulePrefix: 'deprecation/',
-    outputFileName: 'eslint-deprecation-rules.mts',
   },
   EslintUnicornRules: {
     typeName: 'EslintUnicornRules',
@@ -118,6 +118,12 @@ export const eslintPlugins = {
     pluginName: '@typescript-eslint/eslint-plugin',
     rulePrefix: '@typescript-eslint/',
     outputFileName: 'typescript-eslint-rules.mts',
+  },
+  EslintPluginRules: {
+    typeName: 'EslintPluginRules',
+    pluginName: 'eslint-plugin-eslint-plugin',
+    rulePrefix: 'eslint-plugin/',
+    outputFileName: 'eslint-plugin-rules.mts',
   },
 } as const satisfies Record<
   string,

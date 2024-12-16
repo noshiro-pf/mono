@@ -47,7 +47,7 @@ const createBboxPoints = (
   rect: Rect,
   pointWidthPx: number,
   color: Rgba,
-): { [key in Direction]: Graphics } => {
+): Record<Direction, Graphics> => {
   const pointWidthPxHalf = Num.roundToInt(pointWidthPx / 2);
   return mapBboxPoints(bboxPointsFromRect(rect), (direction, p) =>
     createBboxPoint(direction, pointWidthPxHalf, p.x, p.y, color),
@@ -72,7 +72,7 @@ export const createBbox = (
   borderWidthPx: number,
   pointWidthPx: number,
   borderColor: Rgba,
-): [Graphics, { [key in Direction]: Graphics }] => [
+): readonly [Graphics, Record<Direction, Graphics>] => [
   createBboxRect(rect, borderWidthPx, borderColor),
   createBboxPoints(rect, pointWidthPx, borderColor),
 ];

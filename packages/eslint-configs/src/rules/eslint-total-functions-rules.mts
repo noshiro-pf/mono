@@ -2,6 +2,8 @@ import { type EslintTotalFunctionsRules } from '../types/index.mjs';
 
 export const eslintTotalFunctionsRules: EslintTotalFunctionsRules = {
   'total-functions/require-strict-mode': 'error',
+
+  // @typescript-eslint/no-unsafe-type-assertion より厳しくチェックできることが分かったのでこちらを優先
   'total-functions/no-unsafe-type-assertion': 'error',
 
   // 動作が重いのと偽陽性があるためオフ
@@ -17,4 +19,4 @@ export const eslintTotalFunctionsRules: EslintTotalFunctionsRules = {
 
   'total-functions/no-nested-fp-ts-effects': 'off',
   'total-functions/no-hidden-type-assertions': 'off',
-};
+} as const;

@@ -6,7 +6,7 @@ const formatDate = (date: RawDateType): string => date.toLocaleDateString();
 const parseDate = (str: string): RawDateType =>
   pipe(DateUtils.from(str)).chain(DateUtils.toDate).value;
 
-// eslint-disable-next-line deprecation/deprecation
+// eslint-disable-next-line @typescript-eslint/no-deprecated
 type DateRangeInputPropsOriginal = React.ComponentProps<typeof DateRangeInput>;
 
 type Props = DeepReadonly<{
@@ -115,7 +115,7 @@ export const BpDateRangeInput = memoNamed<Props>(
     );
 
     return (
-      // eslint-disable-next-line deprecation/deprecation
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       <DateRangeInput
         disabled={disabled}
         formatDate={formatDate}

@@ -5,9 +5,10 @@ export type LookUp<
   Kind extends R['kind'],
 > = R extends R ? (R['kind'] extends Kind ? R : never) : never;
 
-type LookUp2<R extends { kind: string }, Kind extends R['kind']> = {
-  [K in Kind]: R extends { kind: Kind } ? R : never;
-}[Kind];
+type LookUp2<R extends { kind: string }, Kind extends R['kind']> = Record<
+  Kind,
+  R extends { kind: Kind } ? R : never
+>[Kind];
 
 type Cat = {
   kind: 'cat';

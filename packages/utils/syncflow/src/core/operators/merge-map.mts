@@ -25,7 +25,7 @@ export const mergeMap =
  *   instead of `mergeMap`, and subscribe to `parentObservable` and call
  *   `setState` within it.
  */
-// eslint-disable-next-line deprecation/deprecation
+// eslint-disable-next-line @typescript-eslint/no-deprecated
 export const flatMap = mergeMap;
 
 class MergeMapObservableClass<A, B>

@@ -339,6 +339,13 @@ namespace ForbidComponentProps {
    *                     "type": "string"
    *                   }
    *                 },
+   *                 "allowedForPatterns": {
+   *                   "type": "array",
+   *                   "uniqueItems": true,
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
    *                 "message": {
    *                   "type": "string"
    *                 }
@@ -359,12 +366,29 @@ namespace ForbidComponentProps {
    *                     "type": "string"
    *                   }
    *                 },
+   *                 "disallowedForPatterns": {
+   *                   "type": "array",
+   *                   "uniqueItems": true,
+   *                   "minItems": 1,
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
    *                 "message": {
    *                   "type": "string"
    *                 }
    *               },
-   *               "required": [
-   *                 "disallowedFor"
+   *               "anyOf": [
+   *                 {
+   *                   "required": [
+   *                     "disallowedFor"
+   *                   ]
+   *                 },
+   *                 {
+   *                   "required": [
+   *                     "disallowedForPatterns"
+   *                   ]
+   *                 }
    *               ],
    *               "additionalProperties": false
    *             },
@@ -375,6 +399,13 @@ namespace ForbidComponentProps {
    *                   "type": "string"
    *                 },
    *                 "allowedFor": {
+   *                   "type": "array",
+   *                   "uniqueItems": true,
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "allowedForPatterns": {
    *                   "type": "array",
    *                   "uniqueItems": true,
    *                   "items": {
@@ -401,12 +432,29 @@ namespace ForbidComponentProps {
    *                     "type": "string"
    *                   }
    *                 },
+   *                 "disallowedForPatterns": {
+   *                   "type": "array",
+   *                   "uniqueItems": true,
+   *                   "minItems": 1,
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
    *                 "message": {
    *                   "type": "string"
    *                 }
    *               },
-   *               "required": [
-   *                 "disallowedFor"
+   *               "anyOf": [
+   *                 {
+   *                   "required": [
+   *                     "disallowedFor"
+   *                   ]
+   *                 },
+   *                 {
+   *                   "required": [
+   *                     "disallowedForPatterns"
+   *                   ]
+   *                 }
    *               ],
    *               "additionalProperties": false
    *             }
@@ -420,27 +468,18 @@ namespace ForbidComponentProps {
    */
   export type Options = {
     readonly forbid?: readonly (
+      | UnknownRecord
       | string
       | {
           readonly propName?: string;
-          /** @minItems 1 */
-          readonly disallowedFor: readonly [string, ...(readonly string[])];
-          readonly message?: string;
-        }
-      | {
-          readonly propName?: string;
           readonly allowedFor?: readonly string[];
-          readonly message?: string;
-        }
-      | {
-          readonly propNamePattern?: string;
-          /** @minItems 1 */
-          readonly disallowedFor: readonly [string, ...(readonly string[])];
+          readonly allowedForPatterns?: readonly string[];
           readonly message?: string;
         }
       | {
           readonly propNamePattern?: string;
           readonly allowedFor?: readonly string[];
+          readonly allowedForPatterns?: readonly string[];
           readonly message?: string;
         }
     )[];
@@ -681,6 +720,24 @@ namespace ForbidPropTypes {
   export type RuleEntry =
     | Linter.RuleSeverity
     | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+}
+
+/**
+ * Require all forwardRef components include a ref parameter
+ *
+ * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forward-ref-uses-ref.md
+ *
+ *  ```md
+ *  | key            | value           |
+ *  | :------------- | :-------------- |
+ *  | type           | suggestion      |
+ *  | hasSuggestions | true            |
+ *  | category       | Possible Errors |
+ *  | recommended    | false           |
+ *  ```
+ */
+namespace ForwardRefUsesRef {
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -2202,6 +2259,35 @@ namespace JsxNoLiterals {
    *   {
    *     "type": "object",
    *     "properties": {
+   *       "elementOverrides": {
+   *         "type": "object",
+   *         "patternProperties": {
+   *           "^[A-Z][\\w.]*$": {
+   *             "type": "object",
+   *             "properties": {
+   *               "applyToNestedElements": {
+   *                 "type": "boolean"
+   *               },
+   *               "noStrings": {
+   *                 "type": "boolean"
+   *               },
+   *               "allowedStrings": {
+   *                 "type": "array",
+   *                 "uniqueItems": true,
+   *                 "items": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "ignoreProps": {
+   *                 "type": "boolean"
+   *               },
+   *               "noAttributeStrings": {
+   *                 "type": "boolean"
+   *               }
+   *             }
+   *           }
+   *         }
+   *       },
    *       "noStrings": {
    *         "type": "boolean"
    *       },
@@ -2225,6 +2311,17 @@ namespace JsxNoLiterals {
    * ```
    */
   export type Options = {
+    readonly elementOverrides?: Record<
+      string,
+      {
+        readonly applyToNestedElements?: boolean;
+        readonly noStrings?: boolean;
+        readonly allowedStrings?: readonly string[];
+        readonly ignoreProps?: boolean;
+        readonly noAttributeStrings?: boolean;
+        readonly [k: string]: unknown;
+      }
+    >;
     readonly noStrings?: boolean;
     readonly allowedStrings?: readonly string[];
     readonly ignoreProps?: boolean;
@@ -2749,6 +2846,12 @@ namespace JsxPropsNoSpreading {
    *               "ignore"
    *             ]
    *           },
+   *           "explicitSpread": {
+   *             "enum": [
+   *               "enforce",
+   *               "ignore"
+   *             ]
+   *           },
    *           "exceptions": {
    *             "type": "array",
    *             "items": {
@@ -2792,6 +2895,7 @@ namespace JsxPropsNoSpreading {
   export type Options = UnknownRecord & {
     readonly html?: 'enforce' | 'ignore';
     readonly custom?: 'enforce' | 'ignore';
+    readonly explicitSpread?: 'enforce' | 'ignore';
     readonly exceptions?: readonly string[];
     readonly [k: string]: unknown;
   };
@@ -3748,10 +3852,11 @@ namespace NoTypos {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unescaped-entities.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key            | value           |
+ *  | :------------- | :-------------- |
+ *  | hasSuggestions | true            |
+ *  | category       | Possible Errors |
+ *  | recommended    | true            |
  *  ```
  */
 namespace NoUnescapedEntities {
@@ -3927,6 +4032,9 @@ namespace NoUnstableNestedComponents {
    *       },
    *       "allowAsProps": {
    *         "type": "boolean"
+   *       },
+   *       "propNamePattern": {
+   *         "type": "string"
    *       }
    *     },
    *     "additionalProperties": false
@@ -3937,6 +4045,7 @@ namespace NoUnstableNestedComponents {
   export type Options = {
     readonly customValidators?: readonly string[];
     readonly allowAsProps?: boolean;
+    readonly propNamePattern?: string;
   };
 
   export type RuleEntry =
@@ -4790,6 +4899,7 @@ export type EslintReactRules = {
   readonly 'react/forbid-elements': ForbidElements.RuleEntry;
   readonly 'react/forbid-foreign-prop-types': ForbidForeignPropTypes.RuleEntry;
   readonly 'react/forbid-prop-types': ForbidPropTypes.RuleEntry;
+  readonly 'react/forward-ref-uses-ref': ForwardRefUsesRef.RuleEntry;
   readonly 'react/function-component-definition': FunctionComponentDefinition.RuleEntry;
   readonly 'react/hook-use-state': HookUseState.RuleEntry;
   readonly 'react/iframe-missing-sandbox': IframeMissingSandbox.RuleEntry;

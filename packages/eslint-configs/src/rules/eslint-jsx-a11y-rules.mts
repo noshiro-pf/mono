@@ -175,4 +175,4 @@ export const eslintJsxA11yRules: EslintJsxA11yRules = {
   'jsx-a11y/accessible-emoji': 0,
   'jsx-a11y/label-has-for': 0,
   'jsx-a11y/no-onchange': 0,
-};
+} as const;

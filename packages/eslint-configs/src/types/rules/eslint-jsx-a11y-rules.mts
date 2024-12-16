@@ -5,7 +5,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
   T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
 
 /**
- * Enforce emojis are wrapped in `<span>` and provide screenreader access.
+ * Enforce emojis are wrapped in `<span>` and provide screen reader access.
  *
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/accessible-emoji.md
  *
@@ -1172,7 +1172,7 @@ namespace MouseEventsHaveKeyEvents {
 
 /**
  * Enforce that the `accessKey` prop is not used on any element to avoid
- * complications with keyboard commands used by a screenreader.
+ * complications with keyboard commands used by a screen reader.
  *
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-access-key.md
  *

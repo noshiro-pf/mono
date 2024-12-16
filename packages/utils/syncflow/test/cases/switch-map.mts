@@ -31,7 +31,7 @@ const createStreams = (
   const counter$ = interval$.chain(take(10));
 
   const switchMap$ = counter$.chain(take(7)).chain(
-    // eslint-disable-next-line deprecation/deprecation
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     switchMap((i) =>
       interval(tick * 2)
         .chain(take(5))

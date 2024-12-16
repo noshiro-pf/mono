@@ -40,6 +40,7 @@ namespace ArrayType {
    * ```json
    * [
    *   {
+   *     "type": "object",
    *     "$defs": {
    *       "arrayOption": {
    *         "type": "string",
@@ -60,8 +61,7 @@ namespace ArrayType {
    *         "$ref": "#/items/0/$defs/arrayOption",
    *         "description": "The array type expected for readonly cases. If omitted, the value for `default` will be used."
    *       }
-   *     },
-   *     "type": "object"
+   *     }
    *   }
    * ]
    * ```
@@ -119,6 +119,7 @@ namespace BanTsComment {
    * ```json
    * [
    *   {
+   *     "type": "object",
    *     "$defs": {
    *       "directiveConfigSchema": {
    *         "oneOf": [
@@ -144,7 +145,16 @@ namespace BanTsComment {
    *         ]
    *       }
    *     },
+   *     "additionalProperties": false,
    *     "properties": {
+   *       "minimumDescriptionLength": {
+   *         "type": "number",
+   *         "default": 3,
+   *         "description": "A minimum character length for descriptions when `allow-with-description` is enabled."
+   *       },
+   *       "ts-check": {
+   *         "$ref": "#/items/0/$defs/directiveConfigSchema"
+   *       },
    *       "ts-expect-error": {
    *         "$ref": "#/items/0/$defs/directiveConfigSchema"
    *       },
@@ -153,17 +163,8 @@ namespace BanTsComment {
    *       },
    *       "ts-nocheck": {
    *         "$ref": "#/items/0/$defs/directiveConfigSchema"
-   *       },
-   *       "ts-check": {
-   *         "$ref": "#/items/0/$defs/directiveConfigSchema"
-   *       },
-   *       "minimumDescriptionLength": {
-   *         "type": "number",
-   *         "default": 3
    *       }
-   *     },
-   *     "type": "object",
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -176,11 +177,15 @@ namespace BanTsComment {
       };
 
   export type Options = {
+    /**
+     * A minimum character length for descriptions when `allow-with-description`
+     * is enabled.
+     */
+    readonly minimumDescriptionLength?: number;
+    readonly 'ts-check'?: DirectiveConfigSchema;
     readonly 'ts-expect-error'?: DirectiveConfigSchema;
     readonly 'ts-ignore'?: DirectiveConfigSchema;
     readonly 'ts-nocheck'?: DirectiveConfigSchema;
-    readonly 'ts-check'?: DirectiveConfigSchema;
-    readonly minimumDescriptionLength?: number;
   };
 
   export type RuleEntry =
@@ -226,6 +231,7 @@ namespace ClassLiteralPropertyStyle {
    * [
    *   {
    *     "type": "string",
+   *     "description": "Which literal class member syntax to prefer.",
    *     "enum": [
    *       "fields",
    *       "getters"
@@ -234,6 +240,7 @@ namespace ClassLiteralPropertyStyle {
    * ]
    * ```
    */
+  /** Which literal class member syntax to prefer. */
   export type Options = 'fields' | 'getters';
 
   export type RuleEntry =
@@ -261,24 +268,22 @@ namespace ClassMethodsUseThis {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
+   *       "enforceForClassFields": {
+   *         "type": "boolean",
+   *         "default": true,
+   *         "description": "Enforces that functions used as instance field initializers utilize `this`."
+   *       },
    *       "exceptMethods": {
    *         "type": "array",
-   *         "description": "Allows specified method names to be ignored with this rule",
+   *         "description": "Allows specified method names to be ignored with this rule.",
    *         "items": {
    *           "type": "string"
    *         }
    *       },
-   *       "enforceForClassFields": {
-   *         "type": "boolean",
-   *         "description": "Enforces that functions used as instance field initializers utilize `this`",
-   *         "default": true
-   *       },
-   *       "ignoreOverrideMethods": {
-   *         "type": "boolean",
-   *         "description": "Ignore members marked with the `override` modifier"
-   *       },
    *       "ignoreClassesThatImplementAnInterface": {
+   *         "description": "Makes the rule ignore class members that are defined within a class that `implements` a type",
    *         "oneOf": [
    *           {
    *             "type": "boolean",
@@ -286,32 +291,37 @@ namespace ClassMethodsUseThis {
    *           },
    *           {
    *             "type": "string",
+   *             "description": "Ignore only the public fields of classes that implement an interface",
    *             "enum": [
    *               "public-fields"
-   *             ],
-   *             "description": "Ignore only the public fields of classes that implement an interface"
+   *             ]
    *           }
-   *         ],
-   *         "description": "Ignore classes that specifically implement some interface"
+   *         ]
+   *       },
+   *       "ignoreOverrideMethods": {
+   *         "type": "boolean",
+   *         "description": "Ignore members marked with the `override` modifier"
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
-    /** Allows specified method names to be ignored with this rule */
-    readonly exceptMethods?: readonly string[];
     /**
      * Enforces that functions used as instance field initializers utilize
-     * `this`
+     * `this`.
      */
     readonly enforceForClassFields?: boolean;
+    /** Allows specified method names to be ignored with this rule. */
+    readonly exceptMethods?: readonly string[];
+    /**
+     * Makes the rule ignore class members that are defined within a class that
+     * `implements` a type
+     */
+    readonly ignoreClassesThatImplementAnInterface?: boolean | 'public-fields';
     /** Ignore members marked with the `override` modifier */
     readonly ignoreOverrideMethods?: boolean;
-    /** Ignore classes that specifically implement some interface */
-    readonly ignoreClassesThatImplementAnInterface?: boolean | 'public-fields';
   };
 
   export type RuleEntry =
@@ -341,6 +351,7 @@ namespace ConsistentGenericConstructors {
    * [
    *   {
    *     "type": "string",
+   *     "description": "Which constructor call syntax to prefer.",
    *     "enum": [
    *       "type-annotation",
    *       "constructor"
@@ -349,6 +360,7 @@ namespace ConsistentGenericConstructors {
    * ]
    * ```
    */
+  /** Which constructor call syntax to prefer. */
   export type Options = 'constructor' | 'type-annotation';
 
   export type RuleEntry =
@@ -377,6 +389,7 @@ namespace ConsistentIndexedObjectStyle {
    * [
    *   {
    *     "type": "string",
+   *     "description": "Which indexed object syntax to prefer.",
    *     "enum": [
    *       "record",
    *       "index-signature"
@@ -385,6 +398,7 @@ namespace ConsistentIndexedObjectStyle {
    * ]
    * ```
    */
+  /** Which indexed object syntax to prefer. */
   export type Options = 'index-signature' | 'record';
 
   export type RuleEntry =
@@ -414,8 +428,7 @@ namespace ConsistentReturn {
    *     "type": "object",
    *     "properties": {
    *       "treatUndefinedAsUnspecified": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -456,24 +469,27 @@ namespace ConsistentTypeAssertions {
    *     "oneOf": [
    *       {
    *         "type": "object",
+   *         "additionalProperties": false,
    *         "properties": {
    *           "assertionStyle": {
    *             "type": "string",
+   *             "description": "The expected assertion style to enforce.",
    *             "enum": [
    *               "never"
    *             ]
    *           }
    *         },
-   *         "additionalProperties": false,
    *         "required": [
    *           "assertionStyle"
    *         ]
    *       },
    *       {
    *         "type": "object",
+   *         "additionalProperties": false,
    *         "properties": {
    *           "assertionStyle": {
    *             "type": "string",
+   *             "description": "The expected assertion style to enforce.",
    *             "enum": [
    *               "as",
    *               "angle-bracket"
@@ -481,6 +497,7 @@ namespace ConsistentTypeAssertions {
    *           },
    *           "objectLiteralTypeAssertions": {
    *             "type": "string",
+   *             "description": "Whether to always prefer type declarations for object literals used as variable initializers, rather than type assertions.",
    *             "enum": [
    *               "allow",
    *               "allow-as-parameter",
@@ -488,7 +505,6 @@ namespace ConsistentTypeAssertions {
    *             ]
    *           }
    *         },
-   *         "additionalProperties": false,
    *         "required": [
    *           "assertionStyle"
    *         ]
@@ -500,13 +516,19 @@ namespace ConsistentTypeAssertions {
    */
   export type Options =
     | {
+        /** The expected assertion style to enforce. */
         readonly assertionStyle: 'angle-bracket' | 'as';
+        /**
+         * Whether to always prefer type declarations for object literals used
+         * as variable initializers, rather than type assertions.
+         */
         readonly objectLiteralTypeAssertions?:
           | 'allow-as-parameter'
           | 'allow'
           | 'never';
       }
     | {
+        /** The expected assertion style to enforce. */
         readonly assertionStyle: 'never';
       };
 
@@ -536,6 +558,7 @@ namespace ConsistentTypeDefinitions {
    * [
    *   {
    *     "type": "string",
+   *     "description": "Which type definition syntax to prefer.",
    *     "enum": [
    *       "interface",
    *       "type"
@@ -544,6 +567,7 @@ namespace ConsistentTypeDefinitions {
    * ]
    * ```
    */
+  /** Which type definition syntax to prefer. */
   export type Options = 'interface' | 'type';
 
   export type RuleEntry =
@@ -572,17 +596,22 @@ namespace ConsistentTypeExports {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "fixMixedExportsWithInlineTypeSpecifier": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether the rule will autofix \"mixed\" export cases using TS inline type specifiers."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /**
+     * Whether the rule will autofix "mixed" export cases using TS inline type
+     * specifiers.
+     */
     readonly fixMixedExportsWithInlineTypeSpecifier?: boolean;
   };
 
@@ -611,12 +640,15 @@ namespace ConsistentTypeImports {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "disallowTypeAnnotations": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to disallow type imports in type annotations (`import()`)."
    *       },
    *       "fixStyle": {
    *         "type": "string",
+   *         "description": "The expected type modifier to be added when an import is detected as used only in the type position.",
    *         "enum": [
    *           "separate-type-imports",
    *           "inline-type-imports"
@@ -624,20 +656,26 @@ namespace ConsistentTypeImports {
    *       },
    *       "prefer": {
    *         "type": "string",
+   *         "description": "The expected import kind for type-only imports.",
    *         "enum": [
    *           "type-imports",
    *           "no-type-imports"
    *         ]
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /** Whether to disallow type imports in type annotations (`import()`). */
     readonly disallowTypeAnnotations?: boolean;
+    /**
+     * The expected type modifier to be added when an import is detected as used
+     * only in the type position.
+     */
     readonly fixStyle?: 'inline-type-imports' | 'separate-type-imports';
+    /** The expected import kind for type-only imports. */
     readonly prefer?: 'no-type-imports' | 'type-imports';
   };
 
@@ -683,39 +721,58 @@ namespace DotNotation {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
+   *       "allowIndexSignaturePropertyAccess": {
+   *         "type": "boolean",
+   *         "default": false,
+   *         "description": "Whether to allow accessing properties matching an index signature with array notation."
+   *       },
    *       "allowKeywords": {
    *         "type": "boolean",
-   *         "default": true
+   *         "default": true,
+   *         "description": "Whether to allow keywords such as [\"class\"]`."
    *       },
    *       "allowPattern": {
    *         "type": "string",
-   *         "default": ""
+   *         "default": "",
+   *         "description": "Regular expression of names to allow."
    *       },
    *       "allowPrivateClassPropertyAccess": {
    *         "type": "boolean",
-   *         "default": false
+   *         "default": false,
+   *         "description": "Whether to allow accessing class members marked as `private` with array notation."
    *       },
    *       "allowProtectedClassPropertyAccess": {
    *         "type": "boolean",
-   *         "default": false
-   *       },
-   *       "allowIndexSignaturePropertyAccess": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "default": false,
+   *         "description": "Whether to allow accessing class members marked as `protected` with array notation."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
-    readonly allowKeywords?: boolean;
-    readonly allowPattern?: string;
-    readonly allowPrivateClassPropertyAccess?: boolean;
-    readonly allowProtectedClassPropertyAccess?: boolean;
+    /**
+     * Whether to allow accessing properties matching an index signature with
+     * array notation.
+     */
     readonly allowIndexSignaturePropertyAccess?: boolean;
+    /** Whether to allow keywords such as ["class"]`. */
+    readonly allowKeywords?: boolean;
+    /** Regular expression of names to allow. */
+    readonly allowPattern?: string;
+    /**
+     * Whether to allow accessing class members marked as `private` with array
+     * notation.
+     */
+    readonly allowPrivateClassPropertyAccess?: boolean;
+    /**
+     * Whether to allow accessing class members marked as `protected` with array
+     * notation.
+     */
+    readonly allowProtectedClassPropertyAccess?: boolean;
   };
 
   export type RuleEntry =
@@ -742,44 +799,44 @@ namespace ExplicitFunctionReturnType {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allowConciseArrowFunctionExpressionsStartingWithVoid": {
-   *         "description": "Whether to allow arrow functions that start with the `void` keyword.",
-   *         "type": "boolean"
-   *       },
-   *       "allowExpressions": {
-   *         "description": "Whether to ignore function expressions (functions which are not part of a declaration).",
-   *         "type": "boolean"
-   *       },
-   *       "allowHigherOrderFunctions": {
-   *         "description": "Whether to ignore functions immediately returning another function expression.",
-   *         "type": "boolean"
-   *       },
-   *       "allowTypedFunctionExpressions": {
-   *         "description": "Whether to ignore type annotations on the variable of function expressions.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow arrow functions that start with the `void` keyword."
    *       },
    *       "allowDirectConstAssertionInArrowFunctions": {
-   *         "description": "Whether to ignore arrow functions immediately returning a `as const` value.",
-   *         "type": "boolean"
-   *       },
-   *       "allowFunctionsWithoutTypeParameters": {
-   *         "description": "Whether to ignore functions that don't have generic type parameters.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore arrow functions immediately returning a `as const` value."
    *       },
    *       "allowedNames": {
+   *         "type": "array",
    *         "description": "An array of function/method names that will not have their arguments or return values checked.",
    *         "items": {
    *           "type": "string"
-   *         },
-   *         "type": "array"
+   *         }
+   *       },
+   *       "allowExpressions": {
+   *         "type": "boolean",
+   *         "description": "Whether to ignore function expressions (functions which are not part of a declaration)."
+   *       },
+   *       "allowFunctionsWithoutTypeParameters": {
+   *         "type": "boolean",
+   *         "description": "Whether to ignore functions that don't have generic type parameters."
+   *       },
+   *       "allowHigherOrderFunctions": {
+   *         "type": "boolean",
+   *         "description": "Whether to ignore functions immediately returning another function expression."
    *       },
    *       "allowIIFEs": {
-   *         "description": "Whether to ignore immediately invoked function expressions (IIFEs).",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore immediately invoked function expressions (IIFEs)."
+   *       },
+   *       "allowTypedFunctionExpressions": {
+   *         "type": "boolean",
+   *         "description": "Whether to ignore type annotations on the variable of function expressions."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -788,34 +845,34 @@ namespace ExplicitFunctionReturnType {
     /** Whether to allow arrow functions that start with the `void` keyword. */
     readonly allowConciseArrowFunctionExpressionsStartingWithVoid?: boolean;
     /**
-     * Whether to ignore function expressions (functions which are not part of a
-     * declaration).
-     */
-    readonly allowExpressions?: boolean;
-    /**
-     * Whether to ignore functions immediately returning another function
-     * expression.
-     */
-    readonly allowHigherOrderFunctions?: boolean;
-    /**
-     * Whether to ignore type annotations on the variable of function
-     * expressions.
-     */
-    readonly allowTypedFunctionExpressions?: boolean;
-    /**
      * Whether to ignore arrow functions immediately returning a `as const`
      * value.
      */
     readonly allowDirectConstAssertionInArrowFunctions?: boolean;
-    /** Whether to ignore functions that don't have generic type parameters. */
-    readonly allowFunctionsWithoutTypeParameters?: boolean;
     /**
      * An array of function/method names that will not have their arguments or
      * return values checked.
      */
     readonly allowedNames?: readonly string[];
+    /**
+     * Whether to ignore function expressions (functions which are not part of a
+     * declaration).
+     */
+    readonly allowExpressions?: boolean;
+    /** Whether to ignore functions that don't have generic type parameters. */
+    readonly allowFunctionsWithoutTypeParameters?: boolean;
+    /**
+     * Whether to ignore functions immediately returning another function
+     * expression.
+     */
+    readonly allowHigherOrderFunctions?: boolean;
     /** Whether to ignore immediately invoked function expressions (IIFEs). */
     readonly allowIIFEs?: boolean;
+    /**
+     * Whether to ignore type annotations on the variable of function
+     * expressions.
+     */
+    readonly allowTypedFunctionExpressions?: boolean;
   };
 
   export type RuleEntry =
@@ -843,40 +900,51 @@ namespace ExplicitMemberAccessibility {
    * ```json
    * [
    *   {
+   *     "type": "object",
    *     "$defs": {
    *       "accessibilityLevel": {
    *         "oneOf": [
    *           {
    *             "type": "string",
+   *             "description": "Always require an accessor.",
    *             "enum": [
    *               "explicit"
-   *             ],
-   *             "description": "Always require an accessor."
+   *             ]
    *           },
    *           {
    *             "type": "string",
+   *             "description": "Require an accessor except when public.",
    *             "enum": [
    *               "no-public"
-   *             ],
-   *             "description": "Require an accessor except when public."
+   *             ]
    *           },
    *           {
    *             "type": "string",
+   *             "description": "Never check whether there is an accessor.",
    *             "enum": [
    *               "off"
-   *             ],
-   *             "description": "Never check whether there is an accessor."
+   *             ]
    *           }
    *         ]
    *       }
    *     },
-   *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "accessibility": {
-   *         "$ref": "#/items/0/$defs/accessibilityLevel"
+   *         "$ref": "#/items/0/$defs/accessibilityLevel",
+   *         "description": "Which accessibility modifier is required to exist or not exist."
+   *       },
+   *       "ignoredMethodNames": {
+   *         "type": "array",
+   *         "description": "Specific method names that may be ignored.",
+   *         "items": {
+   *           "type": "string"
+   *         }
    *       },
    *       "overrides": {
    *         "type": "object",
+   *         "additionalProperties": false,
+   *         "description": "Changes to required accessibility modifiers for specific kinds of class members.",
    *         "properties": {
    *           "accessors": {
    *             "$ref": "#/items/0/$defs/accessibilityLevel"
@@ -887,23 +955,15 @@ namespace ExplicitMemberAccessibility {
    *           "methods": {
    *             "$ref": "#/items/0/$defs/accessibilityLevel"
    *           },
-   *           "properties": {
-   *             "$ref": "#/items/0/$defs/accessibilityLevel"
-   *           },
    *           "parameterProperties": {
    *             "$ref": "#/items/0/$defs/accessibilityLevel"
+   *           },
+   *           "properties": {
+   *             "$ref": "#/items/0/$defs/accessibilityLevel"
    *           }
-   *         },
-   *         "additionalProperties": false
-   *       },
-   *       "ignoredMethodNames": {
-   *         "type": "array",
-   *         "items": {
-   *           "type": "string"
    *         }
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -911,15 +971,21 @@ namespace ExplicitMemberAccessibility {
   export type AccessibilityLevel = 'explicit' | 'no-public' | 'off';
 
   export type Options = {
-    readonly accessibility?: AccessibilityLevel;
+    /** Which accessibility modifier is required to exist or not exist. */
+    readonly accessibility?: 'explicit' | 'no-public' | 'off';
+    /** Specific method names that may be ignored. */
+    readonly ignoredMethodNames?: readonly string[];
+    /**
+     * Changes to required accessibility modifiers for specific kinds of class
+     * members.
+     */
     readonly overrides?: {
       readonly accessors?: AccessibilityLevel;
       readonly constructors?: AccessibilityLevel;
       readonly methods?: AccessibilityLevel;
-      readonly properties?: AccessibilityLevel;
       readonly parameterProperties?: AccessibilityLevel;
+      readonly properties?: AccessibilityLevel;
     };
-    readonly ignoredMethodNames?: readonly string[];
   };
 
   export type RuleEntry =
@@ -947,32 +1013,32 @@ namespace ExplicitModuleBoundaryTypes {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allowArgumentsExplicitlyTypedAsAny": {
-   *         "description": "Whether to ignore arguments that are explicitly typed as `any`.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore arguments that are explicitly typed as `any`."
    *       },
    *       "allowDirectConstAssertionInArrowFunctions": {
-   *         "description": "Whether to ignore return type annotations on body-less arrow functions that return an `as const` type assertion.\nYou must still type the parameters of the function.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore return type annotations on body-less arrow functions that return an `as const` type assertion.\nYou must still type the parameters of the function."
    *       },
    *       "allowedNames": {
+   *         "type": "array",
    *         "description": "An array of function/method names that will not have their arguments or return values checked.",
    *         "items": {
    *           "type": "string"
-   *         },
-   *         "type": "array"
+   *         }
    *       },
    *       "allowHigherOrderFunctions": {
-   *         "description": "Whether to ignore return type annotations on functions immediately returning another function expression.\nYou must still type the parameters of the function.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore return type annotations on functions immediately returning another function expression.\nYou must still type the parameters of the function."
    *       },
    *       "allowTypedFunctionExpressions": {
-   *         "description": "Whether to ignore type annotations on the variable of a function expression.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore type annotations on the variable of a function expression."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -1095,28 +1161,34 @@ namespace MaxParams {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
-   *       "maximum": {
-   *         "type": "integer",
-   *         "minimum": 0
+   *       "countVoidThis": {
+   *         "type": "boolean",
+   *         "description": "Whether to count a `this` declaration when the type is `void`."
    *       },
    *       "max": {
    *         "type": "integer",
+   *         "description": "A maximum number of parameters in function definitions.",
    *         "minimum": 0
    *       },
-   *       "countVoidThis": {
-   *         "type": "boolean"
+   *       "maximum": {
+   *         "type": "integer",
+   *         "description": "(deprecated) A maximum number of parameters in function definitions.",
+   *         "minimum": 0
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
-    readonly maximum?: number;
-    readonly max?: number;
+    /** Whether to count a `this` declaration when the type is `void`. */
     readonly countVoidThis?: boolean;
+    /** A maximum number of parameters in function definitions. */
+    readonly max?: number;
+    /** (deprecated) A maximum number of parameters in function definitions. */
+    readonly maximum?: number;
   };
 
   export type RuleEntry =
@@ -1142,24 +1214,8 @@ namespace MemberOrdering {
    * ```json
    * [
    *   {
+   *     "type": "object",
    *     "$defs": {
-   *       "orderOptions": {
-   *         "type": "string",
-   *         "enum": [
-   *           "alphabetically",
-   *           "alphabetically-case-insensitive",
-   *           "as-written",
-   *           "natural",
-   *           "natural-case-insensitive"
-   *         ]
-   *       },
-   *       "optionalityOrderOptions": {
-   *         "type": "string",
-   *         "enum": [
-   *           "optional-first",
-   *           "required-first"
-   *         ]
-   *       },
    *       "allItems": {
    *         "type": "string",
    *         "enum": [
@@ -1318,6 +1374,23 @@ namespace MemberOrdering {
    *           "#private-instance-static-initialization"
    *         ]
    *       },
+   *       "optionalityOrderOptions": {
+   *         "type": "string",
+   *         "enum": [
+   *           "optional-first",
+   *           "required-first"
+   *         ]
+   *       },
+   *       "orderOptions": {
+   *         "type": "string",
+   *         "enum": [
+   *           "alphabetically",
+   *           "alphabetically-case-insensitive",
+   *           "as-written",
+   *           "natural",
+   *           "natural-case-insensitive"
+   *         ]
+   *       },
    *       "typeItems": {
    *         "type": "string",
    *         "enum": [
@@ -1355,6 +1428,7 @@ namespace MemberOrdering {
    *           },
    *           {
    *             "type": "object",
+   *             "additionalProperties": false,
    *             "properties": {
    *               "memberTypes": {
    *                 "oneOf": [
@@ -1382,14 +1456,13 @@ namespace MemberOrdering {
    *                   }
    *                 ]
    *               },
-   *               "order": {
-   *                 "$ref": "#/items/0/$defs/orderOptions"
-   *               },
    *               "optionalityOrder": {
    *                 "$ref": "#/items/0/$defs/optionalityOrderOptions"
+   *               },
+   *               "order": {
+   *                 "$ref": "#/items/0/$defs/orderOptions"
    *               }
-   *             },
-   *             "additionalProperties": false
+   *             }
    *           }
    *         ]
    *       },
@@ -1419,6 +1492,7 @@ namespace MemberOrdering {
    *           },
    *           {
    *             "type": "object",
+   *             "additionalProperties": false,
    *             "properties": {
    *               "memberTypes": {
    *                 "oneOf": [
@@ -1446,27 +1520,26 @@ namespace MemberOrdering {
    *                   }
    *                 ]
    *               },
-   *               "order": {
-   *                 "$ref": "#/items/0/$defs/orderOptions"
-   *               },
    *               "optionalityOrder": {
    *                 "$ref": "#/items/0/$defs/optionalityOrderOptions"
+   *               },
+   *               "order": {
+   *                 "$ref": "#/items/0/$defs/orderOptions"
    *               }
-   *             },
-   *             "additionalProperties": false
+   *             }
    *           }
    *         ]
    *       }
    *     },
-   *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
-   *       "default": {
-   *         "$ref": "#/items/0/$defs/baseConfig"
-   *       },
    *       "classes": {
    *         "$ref": "#/items/0/$defs/baseConfig"
    *       },
    *       "classExpressions": {
+   *         "$ref": "#/items/0/$defs/baseConfig"
+   *       },
+   *       "default": {
    *         "$ref": "#/items/0/$defs/baseConfig"
    *       },
    *       "interfaces": {
@@ -1475,8 +1548,7 @@ namespace MemberOrdering {
    *       "typeLiterals": {
    *         "$ref": "#/items/0/$defs/typesConfig"
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -1488,8 +1560,8 @@ namespace MemberOrdering {
         readonly memberTypes?:
           | readonly (AllItems | readonly AllItems[])[]
           | 'never';
-        readonly order?: OrderOptions;
         readonly optionalityOrder?: OptionalityOrderOptions;
+        readonly order?: OrderOptions;
       };
   export type AllItems =
     | '#private-accessor'
@@ -1645,13 +1717,13 @@ namespace MemberOrdering {
     | 'static-readonly-field'
     | 'static-set'
     | 'static-static-initialization';
+  export type OptionalityOrderOptions = 'optional-first' | 'required-first';
   export type OrderOptions =
     | 'alphabetically-case-insensitive'
     | 'alphabetically'
     | 'as-written'
     | 'natural-case-insensitive'
     | 'natural';
-  export type OptionalityOrderOptions = 'optional-first' | 'required-first';
   export type TypesConfig =
     | readonly (TypeItems | readonly TypeItems[])[]
     | 'never'
@@ -1659,8 +1731,8 @@ namespace MemberOrdering {
         readonly memberTypes?:
           | readonly (TypeItems | readonly TypeItems[])[]
           | 'never';
-        readonly order?: OrderOptions;
         readonly optionalityOrder?: OptionalityOrderOptions;
+        readonly order?: OrderOptions;
       };
   export type TypeItems =
     | 'constructor'
@@ -1671,9 +1743,9 @@ namespace MemberOrdering {
     | 'signature';
 
   export type Options = {
-    readonly default?: BaseConfig;
     readonly classes?: BaseConfig;
     readonly classExpressions?: BaseConfig;
+    readonly default?: BaseConfig;
     readonly interfaces?: TypesConfig;
     readonly typeLiterals?: TypesConfig;
   };
@@ -1737,19 +1809,7 @@ namespace NamingConvention {
    * ```json
    * {
    *   "$defs": {
-   *     "underscoreOptions": {
-   *       "type": "string",
-   *       "enum": [
-   *         "forbid",
-   *         "allow",
-   *         "require",
-   *         "requireDouble",
-   *         "allowDouble",
-   *         "allowSingleOrDouble"
-   *       ]
-   *     },
    *     "predefinedFormats": {
-   *       "type": "string",
    *       "enum": [
    *         "camelCase",
    *         "strictCamelCase",
@@ -1757,22 +1817,39 @@ namespace NamingConvention {
    *         "StrictPascalCase",
    *         "snake_case",
    *         "UPPER_CASE"
-   *       ]
+   *       ],
+   *       "type": "string"
    *     },
    *     "typeModifiers": {
-   *       "type": "string",
-   *       "enum": ["boolean", "string", "number", "function", "array"]
+   *       "enum": ["boolean", "string", "number", "function", "array"],
+   *       "type": "string"
    *     },
-   *     "prefixSuffixConfig": {
-   *       "type": "array",
-   *       "items": {
-   *         "type": "string",
-   *         "minLength": 1
-   *       },
-   *       "additionalItems": false
+   *     "underscoreOptions": {
+   *       "enum": [
+   *         "forbid",
+   *         "allow",
+   *         "require",
+   *         "requireDouble",
+   *         "allowDouble",
+   *         "allowSingleOrDouble"
+   *       ],
+   *       "type": "string"
+   *     },
+   *     "formatOptionsConfig": {
+   *       "oneOf": [
+   *         {
+   *           "additionalItems": false,
+   *           "items": {
+   *             "$ref": "#/$defs/predefinedFormats"
+   *           },
+   *           "type": "array"
+   *         },
+   *         {
+   *           "type": "null"
+   *         }
+   *       ]
    *     },
    *     "matchRegexConfig": {
-   *       "type": "object",
    *       "additionalProperties": false,
    *       "properties": {
    *         "match": {
@@ -1782,40 +1859,35 @@ namespace NamingConvention {
    *           "type": "string"
    *         }
    *       },
-   *       "required": ["match", "regex"]
+   *       "required": ["match", "regex"],
+   *       "type": "object"
    *     },
-   *     "formatOptionsConfig": {
-   *       "oneOf": [
-   *         {
-   *           "type": "array",
-   *           "items": {
-   *             "$ref": "#/$defs/predefinedFormats"
-   *           },
-   *           "additionalItems": false
-   *         },
-   *         {
-   *           "type": "null"
-   *         }
-   *       ]
+   *     "prefixSuffixConfig": {
+   *       "additionalItems": false,
+   *       "items": {
+   *         "minLength": 1,
+   *         "type": "string"
+   *       },
+   *       "type": "array"
    *     }
    *   },
-   *   "type": "array",
+   *   "additionalItems": false,
    *   "items": {
    *     "oneOf": [
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Multiple selectors in one config",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -1824,24 +1896,49 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
    *               }
    *             ]
    *           },
-   *           "selector": {
-   *             "type": "array",
+   *           "modifiers": {
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
+   *               "enum": [
+   *                 "const",
+   *                 "readonly",
+   *                 "static",
+   *                 "public",
+   *                 "protected",
+   *                 "private",
+   *                 "#private",
+   *                 "abstract",
+   *                 "destructured",
+   *                 "global",
+   *                 "exported",
+   *                 "unused",
+   *                 "requiresQuotes",
+   *                 "override",
+   *                 "async",
+   *                 "default",
+   *                 "namespace"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "type": "array"
+   *           },
+   *           "selector": {
+   *             "additionalItems": false,
+   *             "items": {
    *               "enum": [
    *                 "default",
    *                 "variableLike",
@@ -1869,61 +1966,36 @@ namespace NamingConvention {
    *                 "enum",
    *                 "typeParameter",
    *                 "import"
-   *               ]
+   *               ],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
-   *           },
-   *           "modifiers": {
-   *             "type": "array",
-   *             "items": {
-   *               "type": "string",
-   *               "enum": [
-   *                 "const",
-   *                 "readonly",
-   *                 "static",
-   *                 "public",
-   *                 "protected",
-   *                 "private",
-   *                 "#private",
-   *                 "abstract",
-   *                 "destructured",
-   *                 "global",
-   *                 "exported",
-   *                 "unused",
-   *                 "requiresQuotes",
-   *                 "override",
-   *                 "async",
-   *                 "default",
-   *                 "namespace"
-   *               ]
-   *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           },
    *           "types": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
    *               "$ref": "#/$defs/typeModifiers"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'default'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -1932,14 +2004,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -1947,13 +2019,12 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["default"]
+   *             "enum": ["default"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
    *               "enum": [
    *                 "const",
    *                 "readonly",
@@ -1972,28 +2043,29 @@ namespace NamingConvention {
    *                 "async",
    *                 "default",
    *                 "namespace"
-   *               ]
+   *               ],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'variableLike'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2002,14 +2074,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2017,35 +2089,35 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["variableLike"]
+   *             "enum": ["variableLike"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["unused", "async"]
+   *               "enum": ["unused", "async"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'variable'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2054,14 +2126,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2069,13 +2141,12 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["variable"]
+   *             "enum": ["variable"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
    *               "enum": [
    *                 "const",
    *                 "destructured",
@@ -2083,35 +2154,36 @@ namespace NamingConvention {
    *                 "global",
    *                 "unused",
    *                 "async"
-   *               ]
+   *               ],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           },
    *           "types": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
    *               "$ref": "#/$defs/typeModifiers"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'function'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2120,14 +2192,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2135,35 +2207,35 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["function"]
+   *             "enum": ["function"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["exported", "global", "unused", "async"]
+   *               "enum": ["exported", "global", "unused", "async"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'parameter'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2172,14 +2244,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2187,42 +2259,42 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["parameter"]
+   *             "enum": ["parameter"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["destructured", "unused"]
+   *               "enum": ["destructured", "unused"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           },
    *           "types": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
    *               "$ref": "#/$defs/typeModifiers"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'memberLike'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2231,14 +2303,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2246,13 +2318,12 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["memberLike"]
+   *             "enum": ["memberLike"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
    *               "enum": [
    *                 "abstract",
    *                 "private",
@@ -2264,28 +2335,29 @@ namespace NamingConvention {
    *                 "static",
    *                 "override",
    *                 "async"
-   *               ]
+   *               ],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'classProperty'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2294,14 +2366,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2309,13 +2381,12 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["classProperty"]
+   *             "enum": ["classProperty"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
    *               "enum": [
    *                 "abstract",
    *                 "private",
@@ -2326,35 +2397,36 @@ namespace NamingConvention {
    *                 "requiresQuotes",
    *                 "static",
    *                 "override"
-   *               ]
+   *               ],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           },
    *           "types": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
    *               "$ref": "#/$defs/typeModifiers"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'objectLiteralProperty'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2363,14 +2435,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2378,42 +2450,42 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["objectLiteralProperty"]
+   *             "enum": ["objectLiteralProperty"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["public", "requiresQuotes"]
+   *               "enum": ["public", "requiresQuotes"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           },
    *           "types": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
    *               "$ref": "#/$defs/typeModifiers"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'typeProperty'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2422,14 +2494,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2437,42 +2509,42 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["typeProperty"]
+   *             "enum": ["typeProperty"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["public", "readonly", "requiresQuotes"]
+   *               "enum": ["public", "readonly", "requiresQuotes"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           },
    *           "types": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
    *               "$ref": "#/$defs/typeModifiers"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'parameterProperty'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2481,14 +2553,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2496,42 +2568,42 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["parameterProperty"]
+   *             "enum": ["parameterProperty"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["private", "protected", "public", "readonly"]
+   *               "enum": ["private", "protected", "public", "readonly"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           },
    *           "types": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
    *               "$ref": "#/$defs/typeModifiers"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'property'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2540,14 +2612,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2555,13 +2627,12 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["property"]
+   *             "enum": ["property"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
    *               "enum": [
    *                 "abstract",
    *                 "private",
@@ -2573,35 +2644,36 @@ namespace NamingConvention {
    *                 "static",
    *                 "override",
    *                 "async"
-   *               ]
+   *               ],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           },
    *           "types": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
    *               "$ref": "#/$defs/typeModifiers"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'classMethod'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2610,14 +2682,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2625,13 +2697,12 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["classMethod"]
+   *             "enum": ["classMethod"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
    *               "enum": [
    *                 "abstract",
    *                 "private",
@@ -2642,28 +2713,29 @@ namespace NamingConvention {
    *                 "static",
    *                 "override",
    *                 "async"
-   *               ]
+   *               ],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'objectLiteralMethod'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2672,14 +2744,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2687,35 +2759,35 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["objectLiteralMethod"]
+   *             "enum": ["objectLiteralMethod"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["public", "requiresQuotes", "async"]
+   *               "enum": ["public", "requiresQuotes", "async"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'typeMethod'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2724,14 +2796,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2739,35 +2811,35 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["typeMethod"]
+   *             "enum": ["typeMethod"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["public", "requiresQuotes"]
+   *               "enum": ["public", "requiresQuotes"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'method'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2776,14 +2848,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2791,13 +2863,12 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["method"]
+   *             "enum": ["method"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
    *               "enum": [
    *                 "abstract",
    *                 "private",
@@ -2808,28 +2879,29 @@ namespace NamingConvention {
    *                 "static",
    *                 "override",
    *                 "async"
-   *               ]
+   *               ],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'classicAccessor'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2838,14 +2910,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2853,13 +2925,12 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["classicAccessor"]
+   *             "enum": ["classicAccessor"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
    *               "enum": [
    *                 "abstract",
    *                 "private",
@@ -2868,35 +2939,36 @@ namespace NamingConvention {
    *                 "requiresQuotes",
    *                 "static",
    *                 "override"
-   *               ]
+   *               ],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           },
    *           "types": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
    *               "$ref": "#/$defs/typeModifiers"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'autoAccessor'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2905,14 +2977,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2920,13 +2992,12 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["autoAccessor"]
+   *             "enum": ["autoAccessor"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
    *               "enum": [
    *                 "abstract",
    *                 "private",
@@ -2935,35 +3006,36 @@ namespace NamingConvention {
    *                 "requiresQuotes",
    *                 "static",
    *                 "override"
-   *               ]
+   *               ],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           },
    *           "types": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
    *               "$ref": "#/$defs/typeModifiers"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'accessor'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -2972,14 +3044,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -2987,13 +3059,12 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["accessor"]
+   *             "enum": ["accessor"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
    *               "enum": [
    *                 "abstract",
    *                 "private",
@@ -3002,35 +3073,36 @@ namespace NamingConvention {
    *                 "requiresQuotes",
    *                 "static",
    *                 "override"
-   *               ]
+   *               ],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           },
    *           "types": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
    *               "$ref": "#/$defs/typeModifiers"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'enumMember'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -3039,14 +3111,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -3054,35 +3126,35 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["enumMember"]
+   *             "enum": ["enumMember"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["requiresQuotes"]
+   *               "enum": ["requiresQuotes"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'typeLike'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -3091,14 +3163,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -3106,35 +3178,35 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["typeLike"]
+   *             "enum": ["typeLike"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["abstract", "exported", "unused"]
+   *               "enum": ["abstract", "exported", "unused"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'class'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -3143,14 +3215,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -3158,35 +3230,35 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["class"]
+   *             "enum": ["class"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["abstract", "exported", "unused"]
+   *               "enum": ["abstract", "exported", "unused"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'interface'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -3195,14 +3267,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -3210,35 +3282,35 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["interface"]
+   *             "enum": ["interface"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["exported", "unused"]
+   *               "enum": ["exported", "unused"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'typeAlias'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -3247,14 +3319,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -3262,35 +3334,35 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["typeAlias"]
+   *             "enum": ["typeAlias"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["exported", "unused"]
+   *               "enum": ["exported", "unused"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'enum'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -3299,14 +3371,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -3314,35 +3386,35 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["enum"]
+   *             "enum": ["enum"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["exported", "unused"]
+   *               "enum": ["exported", "unused"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'typeParameter'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -3351,14 +3423,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -3366,35 +3438,35 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["typeParameter"]
+   *             "enum": ["typeParameter"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["unused"]
+   *               "enum": ["unused"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       },
    *       {
-   *         "type": "object",
+   *         "additionalProperties": false,
    *         "description": "Selector 'import'",
    *         "properties": {
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
    *           "custom": {
    *             "$ref": "#/$defs/matchRegexConfig"
    *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
+   *           "failureMessage": {
+   *             "type": "string"
    *           },
-   *           "trailingUnderscore": {
+   *           "format": {
+   *             "$ref": "#/$defs/formatOptionsConfig"
+   *           },
+   *           "leadingUnderscore": {
    *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "prefix": {
@@ -3403,14 +3475,14 @@ namespace NamingConvention {
    *           "suffix": {
    *             "$ref": "#/$defs/prefixSuffixConfig"
    *           },
-   *           "failureMessage": {
-   *             "type": "string"
+   *           "trailingUnderscore": {
+   *             "$ref": "#/$defs/underscoreOptions"
    *           },
    *           "filter": {
    *             "oneOf": [
    *               {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *                 "minLength": 1,
+   *                 "type": "string"
    *               },
    *               {
    *                 "$ref": "#/$defs/matchRegexConfig"
@@ -3418,24 +3490,24 @@ namespace NamingConvention {
    *             ]
    *           },
    *           "selector": {
-   *             "type": "string",
-   *             "enum": ["import"]
+   *             "enum": ["import"],
+   *             "type": "string"
    *           },
    *           "modifiers": {
-   *             "type": "array",
+   *             "additionalItems": false,
    *             "items": {
-   *               "type": "string",
-   *               "enum": ["default", "namespace"]
+   *               "enum": ["default", "namespace"],
+   *               "type": "string"
    *             },
-   *             "additionalItems": false
+   *             "type": "array"
    *           }
    *         },
    *         "required": ["selector", "format"],
-   *         "additionalProperties": false
+   *         "type": "object"
    *       }
    *     ]
    *   },
-   *   "additionalItems": false
+   *   "type": "array"
    * }
    * ```
    */
@@ -3463,135 +3535,14 @@ namespace NamingConvention {
     | 'string';
   export type Options = readonly (
     | {
-        readonly format: FormatOptionsConfig;
         readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
         readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
         readonly prefix?: PrefixSuffixConfig;
         readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'accessor';
-        readonly modifiers?: readonly (
-          | 'abstract'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
         readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
         readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'autoAccessor';
-        readonly modifiers?: readonly (
-          | 'abstract'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'class';
-        readonly modifiers?: readonly ('abstract' | 'exported' | 'unused')[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'classicAccessor';
-        readonly modifiers?: readonly (
-          | 'abstract'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'classMethod';
-        readonly modifiers?: readonly (
-          | '#private'
-          | 'abstract'
-          | 'async'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'classProperty';
-        readonly modifiers?: readonly (
-          | '#private'
-          | 'abstract'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'readonly'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'default';
         readonly modifiers?: readonly (
           | '#private'
           | 'abstract'
@@ -3611,303 +3562,6 @@ namespace NamingConvention {
           | 'static'
           | 'unused'
         )[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'enum';
-        readonly modifiers?: readonly ('exported' | 'unused')[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'enumMember';
-        readonly modifiers?: readonly 'requiresQuotes'[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'function';
-        readonly modifiers?: readonly (
-          | 'async'
-          | 'exported'
-          | 'global'
-          | 'unused'
-        )[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'import';
-        readonly modifiers?: readonly ('default' | 'namespace')[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'interface';
-        readonly modifiers?: readonly ('exported' | 'unused')[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'memberLike';
-        readonly modifiers?: readonly (
-          | '#private'
-          | 'abstract'
-          | 'async'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'readonly'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'method';
-        readonly modifiers?: readonly (
-          | '#private'
-          | 'abstract'
-          | 'async'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'objectLiteralMethod';
-        readonly modifiers?: readonly ('async' | 'public' | 'requiresQuotes')[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'objectLiteralProperty';
-        readonly modifiers?: readonly ('public' | 'requiresQuotes')[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'parameter';
-        readonly modifiers?: readonly ('destructured' | 'unused')[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'parameterProperty';
-        readonly modifiers?: readonly (
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'readonly'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'property';
-        readonly modifiers?: readonly (
-          | '#private'
-          | 'abstract'
-          | 'async'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'readonly'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'typeAlias';
-        readonly modifiers?: readonly ('exported' | 'unused')[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'typeLike';
-        readonly modifiers?: readonly ('abstract' | 'exported' | 'unused')[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'typeMethod';
-        readonly modifiers?: readonly ('public' | 'requiresQuotes')[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'typeParameter';
-        readonly modifiers?: readonly 'unused'[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'typeProperty';
-        readonly modifiers?: readonly (
-          | 'public'
-          | 'readonly'
-          | 'requiresQuotes'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'variable';
-        readonly modifiers?: readonly (
-          | 'async'
-          | 'const'
-          | 'destructured'
-          | 'exported'
-          | 'global'
-          | 'unused'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'variableLike';
-        readonly modifiers?: readonly ('async' | 'unused')[];
-      }
-    | {
-        readonly format: FormatOptionsConfig;
-        readonly custom?: MatchRegexConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly failureMessage?: string;
-        readonly filter?: MatchRegexConfig | string;
         readonly selector: readonly (
           | 'accessor'
           | 'autoAccessor'
@@ -3936,6 +3590,138 @@ namespace NamingConvention {
           | 'variable'
           | 'variableLike'
         )[];
+        readonly types?: readonly TypeModifiers[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'accessor';
+        readonly modifiers?: readonly (
+          | 'abstract'
+          | 'override'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'requiresQuotes'
+          | 'static'
+        )[];
+        readonly types?: readonly TypeModifiers[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'autoAccessor';
+        readonly modifiers?: readonly (
+          | 'abstract'
+          | 'override'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'requiresQuotes'
+          | 'static'
+        )[];
+        readonly types?: readonly TypeModifiers[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'class';
+        readonly modifiers?: readonly ('abstract' | 'exported' | 'unused')[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'classicAccessor';
+        readonly modifiers?: readonly (
+          | 'abstract'
+          | 'override'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'requiresQuotes'
+          | 'static'
+        )[];
+        readonly types?: readonly TypeModifiers[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'classMethod';
+        readonly modifiers?: readonly (
+          | '#private'
+          | 'abstract'
+          | 'async'
+          | 'override'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'requiresQuotes'
+          | 'static'
+        )[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'classProperty';
+        readonly modifiers?: readonly (
+          | '#private'
+          | 'abstract'
+          | 'override'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'readonly'
+          | 'requiresQuotes'
+          | 'static'
+        )[];
+        readonly types?: readonly TypeModifiers[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'default';
         readonly modifiers?: readonly (
           | '#private'
           | 'abstract'
@@ -3955,7 +3741,293 @@ namespace NamingConvention {
           | 'static'
           | 'unused'
         )[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'enum';
+        readonly modifiers?: readonly ('exported' | 'unused')[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'enumMember';
+        readonly modifiers?: readonly 'requiresQuotes'[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'function';
+        readonly modifiers?: readonly (
+          | 'async'
+          | 'exported'
+          | 'global'
+          | 'unused'
+        )[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'import';
+        readonly modifiers?: readonly ('default' | 'namespace')[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'interface';
+        readonly modifiers?: readonly ('exported' | 'unused')[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'memberLike';
+        readonly modifiers?: readonly (
+          | '#private'
+          | 'abstract'
+          | 'async'
+          | 'override'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'readonly'
+          | 'requiresQuotes'
+          | 'static'
+        )[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'method';
+        readonly modifiers?: readonly (
+          | '#private'
+          | 'abstract'
+          | 'async'
+          | 'override'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'requiresQuotes'
+          | 'static'
+        )[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'objectLiteralMethod';
+        readonly modifiers?: readonly ('async' | 'public' | 'requiresQuotes')[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'objectLiteralProperty';
+        readonly modifiers?: readonly ('public' | 'requiresQuotes')[];
         readonly types?: readonly TypeModifiers[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'parameter';
+        readonly modifiers?: readonly ('destructured' | 'unused')[];
+        readonly types?: readonly TypeModifiers[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'parameterProperty';
+        readonly modifiers?: readonly (
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'readonly'
+        )[];
+        readonly types?: readonly TypeModifiers[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'property';
+        readonly modifiers?: readonly (
+          | '#private'
+          | 'abstract'
+          | 'async'
+          | 'override'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'readonly'
+          | 'requiresQuotes'
+          | 'static'
+        )[];
+        readonly types?: readonly TypeModifiers[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'typeAlias';
+        readonly modifiers?: readonly ('exported' | 'unused')[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'typeLike';
+        readonly modifiers?: readonly ('abstract' | 'exported' | 'unused')[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'typeMethod';
+        readonly modifiers?: readonly ('public' | 'requiresQuotes')[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'typeParameter';
+        readonly modifiers?: readonly 'unused'[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'typeProperty';
+        readonly modifiers?: readonly (
+          | 'public'
+          | 'readonly'
+          | 'requiresQuotes'
+        )[];
+        readonly types?: readonly TypeModifiers[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'variable';
+        readonly modifiers?: readonly (
+          | 'async'
+          | 'const'
+          | 'destructured'
+          | 'exported'
+          | 'global'
+          | 'unused'
+        )[];
+        readonly types?: readonly TypeModifiers[];
+      }
+    | {
+        readonly custom?: MatchRegexConfig;
+        readonly failureMessage?: string;
+        readonly format: FormatOptionsConfig;
+        readonly leadingUnderscore?: UnderscoreOptions;
+        readonly prefix?: PrefixSuffixConfig;
+        readonly suffix?: PrefixSuffixConfig;
+        readonly trailingUnderscore?: UnderscoreOptions;
+        readonly filter?: MatchRegexConfig | string;
+        readonly selector: 'variableLike';
+        readonly modifiers?: readonly ('async' | 'unused')[];
       }
   )[];
 
@@ -4005,8 +4077,8 @@ namespace NoArrayDelete {
 }
 
 /**
- * Require `.toString()` to only be called on objects which provide useful
- * information when stringified
+ * Require `.toString()` and `.toLocaleString()` to only be called on objects
+ * which provide useful information when stringified
  *
  * @link https://typescript-eslint.io/rules/no-base-to-string
  *
@@ -4026,20 +4098,22 @@ namespace NoBaseToString {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "ignoredTypeNames": {
    *         "type": "array",
+   *         "description": "Stringified regular expressions of type names to ignore.",
    *         "items": {
    *           "type": "string"
    *         }
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /** Stringified regular expressions of type names to ignore. */
     readonly ignoredTypeNames?: readonly string[];
   };
 
@@ -4088,27 +4162,60 @@ namespace NoConfusingVoidExpression {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "ignoreArrowShorthand": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore \"shorthand\" `() =>` arrow functions: those without `{ ... }` braces."
    *       },
    *       "ignoreVoidOperator": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore returns that start with the `void` operator."
+   *       },
+   *       "ignoreVoidReturningFunctions": {
+   *         "type": "boolean",
+   *         "description": "Whether to ignore returns from functions with explicit `void` return types and functions with contextual `void` return types."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /**
+     * Whether to ignore "shorthand" `() =>` arrow functions: those without `{
+     * ... }` braces.
+     */
     readonly ignoreArrowShorthand?: boolean;
+    /** Whether to ignore returns that start with the `void` operator. */
     readonly ignoreVoidOperator?: boolean;
+    /**
+     * Whether to ignore returns from functions with explicit `void` return
+     * types and functions with contextual `void` return types.
+     */
+    readonly ignoreVoidReturningFunctions?: boolean;
   };
 
   export type RuleEntry =
     | Linter.RuleSeverity
     | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+}
+
+/**
+ * Disallow using code marked as `@deprecated`
+ *
+ * @link https://typescript-eslint.io/rules/no-deprecated
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | recommended          | strict  |
+ *  | requiresTypeChecking | true    |
+ *  ```
+ */
+namespace NoDeprecated {
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -4164,14 +4271,16 @@ namespace NoDuplicateTypeConstituents {
    * ```json
    * [
    *   {
-   *     "additionalProperties": false,
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "ignoreIntersections": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore `&` intersections."
    *       },
    *       "ignoreUnions": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore `|` unions."
    *       }
    *     }
    *   }
@@ -4179,7 +4288,9 @@ namespace NoDuplicateTypeConstituents {
    * ```
    */
   export type Options = {
+    /** Whether to ignore `&` intersections. */
     readonly ignoreIntersections?: boolean;
+    /** Whether to ignore `|` unions. */
     readonly ignoreUnions?: boolean;
   };
 
@@ -4247,7 +4358,8 @@ namespace NoEmptyFunction {
    *           ],
    *           "type": "string"
    *         },
-   *         "uniqueItems": true
+   *         "uniqueItems": true,
+   *         "description": "Locations and kinds of functions that are allowed to be empty."
    *       }
    *     },
    *     "additionalProperties": false
@@ -4256,6 +4368,7 @@ namespace NoEmptyFunction {
    * ```
    */
   export type Options = {
+    /** Locations and kinds of functions that are allowed to be empty. */
     readonly allow?: readonly (
       | 'arrowFunctions'
       | 'asyncFunctions'
@@ -4304,7 +4417,8 @@ namespace NoEmptyInterface {
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowSingleExtends": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow empty interfaces that extend a single other interface."
    *       }
    *     }
    *   }
@@ -4338,22 +4452,25 @@ namespace NoEmptyObjectType {
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowInterfaces": {
+   *         "type": "string",
+   *         "description": "Whether to allow empty interfaces.",
    *         "enum": [
    *           "always",
    *           "never",
    *           "with-single-extends"
-   *         ],
-   *         "type": "string"
+   *         ]
    *       },
    *       "allowObjectTypes": {
+   *         "type": "string",
+   *         "description": "Whether to allow empty object type literals.",
    *         "enum": [
    *           "always",
    *           "never"
-   *         ],
-   *         "type": "string"
+   *         ]
    *       },
    *       "allowWithName": {
-   *         "type": "string"
+   *         "type": "string",
+   *         "description": "A stringified regular expression to allow interfaces and object type aliases with the configured name."
    *       }
    *     }
    *   }
@@ -4361,8 +4478,14 @@ namespace NoEmptyObjectType {
    * ```
    */
   export type Options = {
+    /** Whether to allow empty interfaces. */
     readonly allowInterfaces?: 'always' | 'never' | 'with-single-extends';
+    /** Whether to allow empty object type literals. */
     readonly allowObjectTypes?: 'always' | 'never';
+    /**
+     * A stringified regular expression to allow interfaces and object type
+     * aliases with the configured name.
+     */
     readonly allowWithName?: string;
   };
 
@@ -4396,12 +4519,12 @@ namespace NoExplicitAny {
    *     "additionalProperties": false,
    *     "properties": {
    *       "fixToUnknown": {
-   *         "description": "Whether to enable auto-fixing in which the `any` type is converted to the `unknown` type.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to enable auto-fixing in which the `any` type is converted to the `unknown` type."
    *       },
    *       "ignoreRestArgs": {
-   *         "description": "Whether to ignore rest parameter arrays.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore rest parameter arrays."
    *       }
    *     }
    *   }
@@ -4463,20 +4586,20 @@ namespace NoExtraneousClass {
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowConstructorOnly": {
-   *         "description": "Whether to allow extraneous classes that contain only a constructor.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow extraneous classes that contain only a constructor."
    *       },
    *       "allowEmpty": {
-   *         "description": "Whether to allow extraneous classes that have no body (i.e. are empty).",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow extraneous classes that have no body (i.e. are empty)."
    *       },
    *       "allowStaticOnly": {
-   *         "description": "Whether to allow extraneous classes that only contain static members.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow extraneous classes that only contain static members."
    *       },
    *       "allowWithDecorator": {
-   *         "description": "Whether to allow extraneous classes that include a decorator.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow extraneous classes that include a decorator."
    *       }
    *     }
    *   }
@@ -4521,133 +4644,22 @@ namespace NoFloatingPromises {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
-   *       "allowForKnownSafePromises": {
-   *         "type": "array",
-   *         "items": {
-   *           "oneOf": [
-   *             {
-   *               "type": "string"
-   *             },
-   *             {
-   *               "type": "object",
-   *               "additionalProperties": false,
-   *               "properties": {
-   *                 "from": {
-   *                   "type": "string",
-   *                   "enum": [
-   *                     "file"
-   *                   ]
-   *                 },
-   *                 "name": {
-   *                   "oneOf": [
-   *                     {
-   *                       "type": "string"
-   *                     },
-   *                     {
-   *                       "type": "array",
-   *                       "minItems": 1,
-   *                       "uniqueItems": true,
-   *                       "items": {
-   *                         "type": "string"
-   *                       }
-   *                     }
-   *                   ]
-   *                 },
-   *                 "path": {
-   *                   "type": "string"
-   *                 }
-   *               },
-   *               "required": [
-   *                 "from",
-   *                 "name"
-   *               ]
-   *             },
-   *             {
-   *               "type": "object",
-   *               "additionalProperties": false,
-   *               "properties": {
-   *                 "from": {
-   *                   "type": "string",
-   *                   "enum": [
-   *                     "lib"
-   *                   ]
-   *                 },
-   *                 "name": {
-   *                   "oneOf": [
-   *                     {
-   *                       "type": "string"
-   *                     },
-   *                     {
-   *                       "type": "array",
-   *                       "minItems": 1,
-   *                       "uniqueItems": true,
-   *                       "items": {
-   *                         "type": "string"
-   *                       }
-   *                     }
-   *                   ]
-   *                 }
-   *               },
-   *               "required": [
-   *                 "from",
-   *                 "name"
-   *               ]
-   *             },
-   *             {
-   *               "type": "object",
-   *               "additionalProperties": false,
-   *               "properties": {
-   *                 "from": {
-   *                   "type": "string",
-   *                   "enum": [
-   *                     "package"
-   *                   ]
-   *                 },
-   *                 "name": {
-   *                   "oneOf": [
-   *                     {
-   *                       "type": "string"
-   *                     },
-   *                     {
-   *                       "type": "array",
-   *                       "minItems": 1,
-   *                       "uniqueItems": true,
-   *                       "items": {
-   *                         "type": "string"
-   *                       }
-   *                     }
-   *                   ]
-   *                 },
-   *                 "package": {
-   *                   "type": "string"
-   *                 }
-   *               },
-   *               "required": [
-   *                 "from",
-   *                 "name",
-   *                 "package"
-   *               ]
-   *             }
-   *           ]
-   *         }
-   *       },
    *       "allowForKnownSafeCalls": {
-   *         "type": "array",
    *         "items": {
    *           "oneOf": [
    *             {
    *               "type": "string"
    *             },
    *             {
-   *               "type": "object",
    *               "additionalProperties": false,
    *               "properties": {
    *                 "from": {
-   *                   "type": "string",
    *                   "enum": [
    *                     "file"
-   *                   ]
+   *                   ],
+   *                   "type": "string"
    *                 },
    *                 "name": {
    *                   "oneOf": [
@@ -4655,12 +4667,12 @@ namespace NoFloatingPromises {
    *                       "type": "string"
    *                     },
    *                     {
-   *                       "type": "array",
-   *                       "minItems": 1,
-   *                       "uniqueItems": true,
    *                       "items": {
    *                         "type": "string"
-   *                       }
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
    *                     }
    *                   ]
    *                 },
@@ -4671,17 +4683,17 @@ namespace NoFloatingPromises {
    *               "required": [
    *                 "from",
    *                 "name"
-   *               ]
+   *               ],
+   *               "type": "object"
    *             },
    *             {
-   *               "type": "object",
    *               "additionalProperties": false,
    *               "properties": {
    *                 "from": {
-   *                   "type": "string",
    *                   "enum": [
    *                     "lib"
-   *                   ]
+   *                   ],
+   *                   "type": "string"
    *                 },
    *                 "name": {
    *                   "oneOf": [
@@ -4689,12 +4701,12 @@ namespace NoFloatingPromises {
    *                       "type": "string"
    *                     },
    *                     {
-   *                       "type": "array",
-   *                       "minItems": 1,
-   *                       "uniqueItems": true,
    *                       "items": {
    *                         "type": "string"
-   *                       }
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
    *                     }
    *                   ]
    *                 }
@@ -4702,17 +4714,17 @@ namespace NoFloatingPromises {
    *               "required": [
    *                 "from",
    *                 "name"
-   *               ]
+   *               ],
+   *               "type": "object"
    *             },
    *             {
-   *               "type": "object",
    *               "additionalProperties": false,
    *               "properties": {
    *                 "from": {
-   *                   "type": "string",
    *                   "enum": [
    *                     "package"
-   *                   ]
+   *                   ],
+   *                   "type": "string"
    *                 },
    *                 "name": {
    *                   "oneOf": [
@@ -4720,12 +4732,12 @@ namespace NoFloatingPromises {
    *                       "type": "string"
    *                     },
    *                     {
-   *                       "type": "array",
-   *                       "minItems": 1,
-   *                       "uniqueItems": true,
    *                       "items": {
    *                         "type": "string"
-   *                       }
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
    *                     }
    *                   ]
    *                 },
@@ -4737,31 +4749,145 @@ namespace NoFloatingPromises {
    *                 "from",
    *                 "name",
    *                 "package"
-   *               ]
+   *               ],
+   *               "type": "object"
    *             }
    *           ]
-   *         }
+   *         },
+   *         "type": "array",
+   *         "description": "Type specifiers of functions whose calls are safe to float."
+   *       },
+   *       "allowForKnownSafePromises": {
+   *         "items": {
+   *           "oneOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "file"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 },
+   *                 "path": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ],
+   *               "type": "object"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "lib"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ],
+   *               "type": "object"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "package"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 },
+   *                 "package": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name",
+   *                 "package"
+   *               ],
+   *               "type": "object"
+   *             }
+   *           ]
+   *         },
+   *         "type": "array",
+   *         "description": "Type specifiers that are known to be safe to float."
    *       },
    *       "checkThenables": {
-   *         "description": "Whether to check all \"Thenable\"s, not just the built-in Promise type.",
-   *         "type": "boolean"
-   *       },
-   *       "ignoreVoid": {
-   *         "description": "Whether to ignore `void` expressions.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check all \"Thenable\"s, not just the built-in Promise type."
    *       },
    *       "ignoreIIFE": {
-   *         "description": "Whether to ignore async IIFEs (Immediately Invoked Function Expressions).",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore async IIFEs (Immediately Invoked Function Expressions)."
+   *       },
+   *       "ignoreVoid": {
+   *         "type": "boolean",
+   *         "description": "Whether to ignore `void` expressions."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
-    readonly allowForKnownSafePromises?: readonly (
+    /** Type specifiers of functions whose calls are safe to float. */
+    readonly allowForKnownSafeCalls?: readonly (
       | string
       | {
           readonly from: 'file';
@@ -4778,7 +4904,8 @@ namespace NoFloatingPromises {
           readonly package: string;
         }
     )[];
-    readonly allowForKnownSafeCalls?: readonly (
+    /** Type specifiers that are known to be safe to float. */
+    readonly allowForKnownSafePromises?: readonly (
       | string
       | {
           readonly from: 'file';
@@ -4797,10 +4924,10 @@ namespace NoFloatingPromises {
     )[];
     /** Whether to check all "Thenable"s, not just the built-in Promise type. */
     readonly checkThenables?: boolean;
-    /** Whether to ignore `void` expressions. */
-    readonly ignoreVoid?: boolean;
     /** Whether to ignore async IIFEs (Immediately Invoked Function Expressions). */
     readonly ignoreIIFE?: boolean;
+    /** Whether to ignore `void` expressions. */
+    readonly ignoreVoid?: boolean;
   };
 
   export type RuleEntry =
@@ -4881,21 +5008,25 @@ namespace NoInferrableTypes {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "ignoreParameters": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore function parameters."
    *       },
    *       "ignoreProperties": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore class properties."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /** Whether to ignore function parameters. */
     readonly ignoreParameters?: boolean;
+    /** Whether to ignore class properties. */
     readonly ignoreProperties?: boolean;
   };
 
@@ -4925,8 +5056,7 @@ namespace NoInvalidThis {
    *     "type": "object",
    *     "properties": {
    *       "capIsConstructor": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -4963,35 +5093,41 @@ namespace NoInvalidVoidType {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
+   *       "allowAsThisParameter": {
+   *         "type": "boolean",
+   *         "description": "Whether a `this` parameter of a function may be `void`."
+   *       },
    *       "allowInGenericTypeArguments": {
+   *         "description": "Whether `void` can be used as a valid value for generic type parameters.",
    *         "oneOf": [
    *           {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether `void` can be used as a valid value for all generic type parameters."
    *           },
    *           {
    *             "type": "array",
+   *             "description": "Allowlist of types that may accept `void` as a generic type parameter.",
    *             "items": {
    *               "type": "string"
    *             },
    *             "minItems": 1
    *           }
    *         ]
-   *       },
-   *       "allowAsThisParameter": {
-   *         "type": "boolean"
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /** Whether a `this` parameter of a function may be `void`. */
+    readonly allowAsThisParameter?: boolean;
+    /** Whether `void` can be used as a valid value for generic type parameters. */
     readonly allowInGenericTypeArguments?:
       | boolean
       | readonly [string, ...(readonly string[])];
-    readonly allowAsThisParameter?: boolean;
   };
 
   export type RuleEntry =
@@ -5086,17 +5222,21 @@ namespace NoMagicNumbers {
    *         "type": "boolean",
    *         "default": false
    *       },
-   *       "ignoreNumericLiteralTypes": {
-   *         "type": "boolean"
-   *       },
    *       "ignoreEnums": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether enums used in TypeScript are considered okay."
+   *       },
+   *       "ignoreNumericLiteralTypes": {
+   *         "type": "boolean",
+   *         "description": "Whether numbers used in TypeScript numeric literal types are considered okay."
    *       },
    *       "ignoreReadonlyClassProperties": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether `readonly` class properties are considered okay."
    *       },
    *       "ignoreTypeIndexes": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether numbers used to index types are okay."
    *       }
    *     },
    *     "additionalProperties": false
@@ -5111,9 +5251,16 @@ namespace NoMagicNumbers {
     readonly ignoreArrayIndexes?: boolean;
     readonly ignoreDefaultValues?: boolean;
     readonly ignoreClassFieldInitialValues?: boolean;
-    readonly ignoreNumericLiteralTypes?: boolean;
+    /** Whether enums used in TypeScript are considered okay. */
     readonly ignoreEnums?: boolean;
+    /**
+     * Whether numbers used in TypeScript numeric literal types are considered
+     * okay.
+     */
+    readonly ignoreNumericLiteralTypes?: boolean;
+    /** Whether `readonly` class properties are considered okay. */
     readonly ignoreReadonlyClassProperties?: boolean;
+    /** Whether numbers used to index types are okay. */
     readonly ignoreTypeIndexes?: boolean;
   };
 
@@ -5145,18 +5292,20 @@ namespace NoMeaninglessVoidOperator {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "checkNever": {
    *         "type": "boolean",
-   *         "default": false
+   *         "default": false,
+   *         "description": "Whether to suggest removing `void` when the argument has type `never`."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /** Whether to suggest removing `void` when the argument has type `never`. */
     readonly checkNever?: boolean;
   };
 
@@ -5205,41 +5354,52 @@ namespace NoMisusedPromises {
    *     "additionalProperties": false,
    *     "properties": {
    *       "checksConditionals": {
-   *         "type": "boolean"
-   *       },
-   *       "checksVoidReturn": {
-   *         "oneOf": [
-   *           {
-   *             "type": "boolean"
-   *           },
-   *           {
-   *             "additionalProperties": false,
-   *             "properties": {
-   *               "arguments": {
-   *                 "type": "boolean"
-   *               },
-   *               "attributes": {
-   *                 "type": "boolean"
-   *               },
-   *               "inheritedMethods": {
-   *                 "type": "boolean"
-   *               },
-   *               "properties": {
-   *                 "type": "boolean"
-   *               },
-   *               "returns": {
-   *                 "type": "boolean"
-   *               },
-   *               "variables": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "type": "object"
-   *           }
-   *         ]
+   *         "type": "boolean",
+   *         "description": "Whether to warn when a Promise is provided to conditional statements."
    *       },
    *       "checksSpreads": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to warn when `...` spreading a `Promise`."
+   *       },
+   *       "checksVoidReturn": {
+   *         "description": "Whether to warn when a Promise is returned from a function typed as returning `void`.",
+   *         "oneOf": [
+   *           {
+   *             "type": "boolean",
+   *             "description": "Whether to disable checking all asynchronous functions."
+   *           },
+   *           {
+   *             "type": "object",
+   *             "additionalProperties": false,
+   *             "description": "Which forms of functions may have checking disabled.",
+   *             "properties": {
+   *               "arguments": {
+   *                 "type": "boolean",
+   *                 "description": "Disables checking an asynchronous function passed as argument where the parameter type expects a function that returns `void`."
+   *               },
+   *               "attributes": {
+   *                 "type": "boolean",
+   *                 "description": "Disables checking an asynchronous function passed as a JSX attribute expected to be a function that returns `void`."
+   *               },
+   *               "inheritedMethods": {
+   *                 "type": "boolean",
+   *                 "description": "Disables checking an asynchronous method in a type that extends or implements another type expecting that method to return `void`."
+   *               },
+   *               "properties": {
+   *                 "type": "boolean",
+   *                 "description": "Disables checking an asynchronous function passed as an object property expected to be a function that returns `void`."
+   *               },
+   *               "returns": {
+   *                 "type": "boolean",
+   *                 "description": "Disables checking an asynchronous function returned in a function whose return type is a function that returns `void`."
+   *               },
+   *               "variables": {
+   *                 "type": "boolean",
+   *                 "description": "Disables checking an asynchronous function used as a variable whose return type is a function that returns `void`."
+   *               }
+   *             }
+   *           }
+   *         ]
    *       }
    *     }
    *   }
@@ -5247,18 +5407,48 @@ namespace NoMisusedPromises {
    * ```
    */
   export type Options = {
+    /** Whether to warn when a Promise is provided to conditional statements. */
     readonly checksConditionals?: boolean;
+    /** Whether to warn when `...` spreading a `Promise`. */
+    readonly checksSpreads?: boolean;
+    /**
+     * Whether to warn when a Promise is returned from a function typed as
+     * returning `void`.
+     */
     readonly checksVoidReturn?:
       | boolean
       | {
+          /**
+           * Disables checking an asynchronous function passed as argument where
+           * the parameter type expects a function that returns `void`.
+           */
           readonly arguments?: boolean;
+          /**
+           * Disables checking an asynchronous function passed as a JSX
+           * attribute expected to be a function that returns `void`.
+           */
           readonly attributes?: boolean;
+          /**
+           * Disables checking an asynchronous method in a type that extends or
+           * implements another type expecting that method to return `void`.
+           */
           readonly inheritedMethods?: boolean;
+          /**
+           * Disables checking an asynchronous function passed as an object
+           * property expected to be a function that returns `void`.
+           */
           readonly properties?: boolean;
+          /**
+           * Disables checking an asynchronous function returned in a function
+           * whose return type is a function that returns `void`.
+           */
           readonly returns?: boolean;
+          /**
+           * Disables checking an asynchronous function used as a variable whose
+           * return type is a function that returns `void`.
+           */
           readonly variables?: boolean;
         };
-    readonly checksSpreads?: boolean;
   };
 
   export type RuleEntry =
@@ -5303,17 +5493,17 @@ namespace NoNamespace {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allowDeclarations": {
-   *         "description": "Whether to allow `declare` with custom TypeScript namespaces.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `declare` with custom TypeScript namespaces."
    *       },
    *       "allowDefinitionFiles": {
-   *         "description": "Whether to allow `declare` with custom TypeScript namespaces inside definition files.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `declare` with custom TypeScript namespaces inside definition files."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -5404,21 +5594,28 @@ namespace NoRedeclare {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "builtinGlobals": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to report shadowing of built-in global variables."
    *       },
    *       "ignoreDeclarationMerge": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore declaration merges between certain TypeScript declaration types."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /** Whether to report shadowing of built-in global variables. */
     readonly builtinGlobals?: boolean;
+    /**
+     * Whether to ignore declaration merges between certain TypeScript
+     * declaration types.
+     */
     readonly ignoreDeclarationMerge?: boolean;
   };
 
@@ -5465,20 +5662,20 @@ namespace NoRequireImports {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allow": {
    *         "type": "array",
+   *         "description": "Patterns of import paths to allow requiring from.",
    *         "items": {
    *           "type": "string"
-   *         },
-   *         "description": "Patterns of import paths to allow requiring from."
+   *         }
    *       },
    *       "allowAsImport": {
    *         "type": "boolean",
    *         "description": "Allows `require` statements in import declarations."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -5537,9 +5734,15 @@ namespace NoRestrictedImports {
    *                   "type": "string"
    *                 }
    *               },
+   *               "allowImportNames": {
+   *                 "type": "array",
+   *                 "items": {
+   *                   "type": "string"
+   *                 }
+   *               },
    *               "allowTypeImports": {
    *                 "type": "boolean",
-   *                 "description": "Disallow value imports, but allow type-only imports."
+   *                 "description": "Whether to allow type-only imports for a path."
    *               }
    *             },
    *             "required": ["name"]
@@ -5550,9 +5753,11 @@ namespace NoRestrictedImports {
    *     },
    *     {
    *       "type": "array",
+   *       "additionalItems": false,
    *       "items": [
    *         {
    *           "type": "object",
+   *           "additionalProperties": false,
    *           "properties": {
    *             "paths": {
    *               "type": "array",
@@ -5578,9 +5783,15 @@ namespace NoRestrictedImports {
    *                           "type": "string"
    *                         }
    *                       },
+   *                       "allowImportNames": {
+   *                         "type": "array",
+   *                         "items": {
+   *                           "type": "string"
+   *                         }
+   *                       },
    *                       "allowTypeImports": {
    *                         "type": "boolean",
-   *                         "description": "Disallow value imports, but allow type-only imports."
+   *                         "description": "Whether to allow type-only imports for a path."
    *                       }
    *                     },
    *                     "required": ["name"]
@@ -5612,6 +5823,14 @@ namespace NoRestrictedImports {
    *                         "minItems": 1,
    *                         "uniqueItems": true
    *                       },
+   *                       "allowImportNames": {
+   *                         "type": "array",
+   *                         "items": {
+   *                           "type": "string"
+   *                         },
+   *                         "minItems": 1,
+   *                         "uniqueItems": true
+   *                       },
    *                       "group": {
    *                         "type": "array",
    *                         "items": {
@@ -5620,7 +5839,13 @@ namespace NoRestrictedImports {
    *                         "minItems": 1,
    *                         "uniqueItems": true
    *                       },
+   *                       "regex": {
+   *                         "type": "string"
+   *                       },
    *                       "importNamePattern": {
+   *                         "type": "string"
+   *                       },
+   *                       "allowImportNamePattern": {
    *                         "type": "string"
    *                       },
    *                       "message": {
@@ -5632,20 +5857,17 @@ namespace NoRestrictedImports {
    *                       },
    *                       "allowTypeImports": {
    *                         "type": "boolean",
-   *                         "description": "Disallow value imports, but allow type-only imports."
+   *                         "description": "Whether to allow type-only imports for a path."
    *                       }
-   *                     },
-   *                     "required": ["group"]
+   *                     }
    *                   },
    *                   "uniqueItems": true
    *                 }
    *               ]
    *             }
-   *           },
-   *           "additionalProperties": false
+   *           }
    *         }
-   *       ],
-   *       "additionalItems": false
+   *       ]
    *     }
    *   ]
    * }
@@ -5658,7 +5880,8 @@ namespace NoRestrictedImports {
             readonly name: string;
             readonly message?: string;
             readonly importNames?: readonly string[];
-            /** Disallow value imports, but allow type-only imports. */
+            readonly allowImportNames?: readonly string[];
+            /** Whether to allow type-only imports for a path. */
             readonly allowTypeImports?: boolean;
           }
       )[]
@@ -5670,7 +5893,8 @@ namespace NoRestrictedImports {
                 readonly name: string;
                 readonly message?: string;
                 readonly importNames?: readonly string[];
-                /** Disallow value imports, but allow type-only imports. */
+                readonly allowImportNames?: readonly string[];
+                /** Whether to allow type-only imports for a path. */
                 readonly allowTypeImports?: boolean;
               }
           )[];
@@ -5682,11 +5906,18 @@ namespace NoRestrictedImports {
                   ...(readonly string[]),
                 ];
                 /** @minItems 1 */
-                readonly group: readonly [string, ...(readonly string[])];
+                readonly allowImportNames?: readonly [
+                  string,
+                  ...(readonly string[]),
+                ];
+                /** @minItems 1 */
+                readonly group?: readonly [string, ...(readonly string[])];
+                readonly regex?: string;
                 readonly importNamePattern?: string;
+                readonly allowImportNamePattern?: string;
                 readonly message?: string;
                 readonly caseSensitive?: boolean;
-                /** Disallow value imports, but allow type-only imports. */
+                /** Whether to allow type-only imports for a path. */
                 readonly allowTypeImports?: boolean;
               }[]
             | readonly string[];
@@ -5719,55 +5950,56 @@ namespace NoRestrictedTypes {
    * ```json
    * [
    *   {
+   *     "type": "object",
    *     "$defs": {
    *       "banConfig": {
    *         "oneOf": [
    *           {
    *             "type": "boolean",
+   *             "description": "Bans the type with the default message.",
    *             "enum": [
    *               true
-   *             ],
-   *             "description": "Bans the type with the default message"
+   *             ]
    *           },
    *           {
    *             "type": "string",
-   *             "description": "Bans the type with a custom message"
+   *             "description": "Bans the type with a custom message."
    *           },
    *           {
    *             "type": "object",
-   *             "description": "Bans a type",
+   *             "additionalProperties": false,
+   *             "description": "Bans a type.",
    *             "properties": {
-   *               "message": {
-   *                 "type": "string",
-   *                 "description": "Custom error message"
-   *               },
    *               "fixWith": {
    *                 "type": "string",
    *                 "description": "Type to autofix replace with. Note that autofixers can be applied automatically - so you need to be careful with this option."
    *               },
+   *               "message": {
+   *                 "type": "string",
+   *                 "description": "Custom error message."
+   *               },
    *               "suggest": {
    *                 "type": "array",
+   *                 "description": "Types to suggest replacing with.",
    *                 "items": {
    *                   "type": "string"
-   *                 },
-   *                 "description": "Types to suggest replacing with."
+   *                 }
    *               }
-   *             },
-   *             "additionalProperties": false
+   *             }
    *           }
    *         ]
    *       }
    *     },
-   *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "types": {
    *         "type": "object",
    *         "additionalProperties": {
    *           "$ref": "#/items/0/$defs/banConfig"
-   *         }
+   *         },
+   *         "description": "An object whose keys are the types you want to ban, and the values are error messages."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -5776,18 +6008,22 @@ namespace NoRestrictedTypes {
     | string
     | true
     | {
-        /** Custom error message */
-        readonly message?: string;
         /**
          * Type to autofix replace with. Note that autofixers can be applied
          * automatically - so you need to be careful with this option.
          */
         readonly fixWith?: string;
+        /** Custom error message. */
+        readonly message?: string;
         /** Types to suggest replacing with. */
         readonly suggest?: readonly string[];
       };
 
   export type Options = {
+    /**
+     * An object whose keys are the types you want to ban, and the values are
+     * error messages.
+     */
     readonly types?: Record<string, BanConfig>;
   };
 
@@ -5816,46 +6052,64 @@ namespace NoShadow {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
+   *       "allow": {
+   *         "type": "array",
+   *         "description": "Identifier names for which shadowing is allowed.",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
    *       "builtinGlobals": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to report shadowing of built-in global variables."
    *       },
    *       "hoist": {
    *         "type": "string",
+   *         "description": "Whether to report shadowing before outer functions or variables are defined.",
    *         "enum": [
    *           "all",
    *           "functions",
    *           "never"
    *         ]
    *       },
-   *       "allow": {
-   *         "type": "array",
-   *         "items": {
-   *           "type": "string"
-   *         }
+   *       "ignoreFunctionTypeParameterNameValueShadow": {
+   *         "type": "boolean",
+   *         "description": "Whether to ignore function parameters named the same as a variable."
    *       },
    *       "ignoreOnInitialization": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore the variable initializers when the shadowed variable is presumably still unitialized."
    *       },
    *       "ignoreTypeValueShadow": {
-   *         "type": "boolean"
-   *       },
-   *       "ignoreFunctionTypeParameterNameValueShadow": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore types named the same as a variable."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
-    readonly builtinGlobals?: boolean;
-    readonly hoist?: 'all' | 'functions' | 'never';
+    /** Identifier names for which shadowing is allowed. */
     readonly allow?: readonly string[];
-    readonly ignoreOnInitialization?: boolean;
-    readonly ignoreTypeValueShadow?: boolean;
+    /** Whether to report shadowing of built-in global variables. */
+    readonly builtinGlobals?: boolean;
+    /**
+     * Whether to report shadowing before outer functions or variables are
+     * defined.
+     */
+    readonly hoist?: 'all' | 'functions' | 'never';
+    /** Whether to ignore function parameters named the same as a variable. */
     readonly ignoreFunctionTypeParameterNameValueShadow?: boolean;
+    /**
+     * Whether to ignore the variable initializers when the shadowed variable is
+     * presumably still unitialized.
+     */
+    readonly ignoreOnInitialization?: boolean;
+    /** Whether to ignore types named the same as a variable. */
+    readonly ignoreTypeValueShadow?: boolean;
   };
 
   export type RuleEntry =
@@ -5886,12 +6140,12 @@ namespace NoThisAlias {
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowDestructuring": {
-   *         "description": "Whether to ignore destructurings, such as `const { props, state } = this`.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore destructurings, such as `const { props, state } = this`."
    *       },
    *       "allowedNames": {
-   *         "description": "Names to ignore, such as [\"self\"] for `const self = this;`.",
    *         "type": "array",
+   *         "description": "Names to ignore, such as [\"self\"] for `const self = this;`.",
    *         "items": {
    *           "type": "string"
    *         }
@@ -5935,6 +6189,7 @@ namespace NoTypeAlias {
    * ```json
    * [
    *   {
+   *     "type": "object",
    *     "$defs": {
    *       "expandedOptions": {
    *         "type": "string",
@@ -5954,42 +6209,41 @@ namespace NoTypeAlias {
    *         ]
    *       }
    *     },
-   *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allowAliases": {
-   *         "description": "Whether to allow direct one-to-one type aliases.",
-   *         "$ref": "#/items/0/$defs/expandedOptions"
+   *         "$ref": "#/items/0/$defs/expandedOptions",
+   *         "description": "Whether to allow direct one-to-one type aliases."
    *       },
    *       "allowCallbacks": {
-   *         "description": "Whether to allow type aliases for callbacks.",
-   *         "$ref": "#/items/0/$defs/simpleOptions"
+   *         "$ref": "#/items/0/$defs/simpleOptions",
+   *         "description": "Whether to allow type aliases for callbacks."
    *       },
    *       "allowConditionalTypes": {
-   *         "description": "Whether to allow type aliases for conditional types.",
-   *         "$ref": "#/items/0/$defs/simpleOptions"
+   *         "$ref": "#/items/0/$defs/simpleOptions",
+   *         "description": "Whether to allow type aliases for conditional types."
    *       },
    *       "allowConstructors": {
-   *         "description": "Whether to allow type aliases with constructors.",
-   *         "$ref": "#/items/0/$defs/simpleOptions"
-   *       },
-   *       "allowLiterals": {
-   *         "description": "Whether to allow type aliases with object literal types.",
-   *         "$ref": "#/items/0/$defs/expandedOptions"
-   *       },
-   *       "allowMappedTypes": {
-   *         "description": "Whether to allow type aliases with mapped types.",
-   *         "$ref": "#/items/0/$defs/expandedOptions"
-   *       },
-   *       "allowTupleTypes": {
-   *         "description": "Whether to allow type aliases with tuple types.",
-   *         "$ref": "#/items/0/$defs/expandedOptions"
+   *         "$ref": "#/items/0/$defs/simpleOptions",
+   *         "description": "Whether to allow type aliases with constructors."
    *       },
    *       "allowGenerics": {
-   *         "description": "Whether to allow type aliases with generic types.",
-   *         "$ref": "#/items/0/$defs/simpleOptions"
+   *         "$ref": "#/items/0/$defs/simpleOptions",
+   *         "description": "Whether to allow type aliases with generic types."
+   *       },
+   *       "allowLiterals": {
+   *         "$ref": "#/items/0/$defs/expandedOptions",
+   *         "description": "Whether to allow type aliases with object literal types."
+   *       },
+   *       "allowMappedTypes": {
+   *         "$ref": "#/items/0/$defs/expandedOptions",
+   *         "description": "Whether to allow type aliases with mapped types."
+   *       },
+   *       "allowTupleTypes": {
+   *         "$ref": "#/items/0/$defs/expandedOptions",
+   *         "description": "Whether to allow type aliases with tuple types."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -6019,17 +6273,17 @@ namespace NoUnnecessaryBooleanLiteralCompare {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
-   *       "allowComparingNullableBooleansToTrue": {
-   *         "description": "Whether to allow comparisons between nullable boolean variables and `true`.",
-   *         "type": "boolean"
-   *       },
    *       "allowComparingNullableBooleansToFalse": {
-   *         "description": "Whether to allow comparisons between nullable boolean variables and `false`.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow comparisons between nullable boolean variables and `false`."
+   *       },
+   *       "allowComparingNullableBooleansToTrue": {
+   *         "type": "boolean",
+   *         "description": "Whether to allow comparisons between nullable boolean variables and `true`."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -6037,14 +6291,14 @@ namespace NoUnnecessaryBooleanLiteralCompare {
   export type Options = {
     /**
      * Whether to allow comparisons between nullable boolean variables and
-     * `true`.
-     */
-    readonly allowComparingNullableBooleansToTrue?: boolean;
-    /**
-     * Whether to allow comparisons between nullable boolean variables and
      * `false`.
      */
     readonly allowComparingNullableBooleansToFalse?: boolean;
+    /**
+     * Whether to allow comparisons between nullable boolean variables and
+     * `true`.
+     */
+    readonly allowComparingNullableBooleansToTrue?: boolean;
   };
 
   export type RuleEntry =
@@ -6074,17 +6328,21 @@ namespace NoUnnecessaryCondition {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allowConstantLoopConditions": {
-   *         "description": "Whether to ignore constant loop conditions, such as `while (true)`.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore constant loop conditions, such as `while (true)`."
    *       },
    *       "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
-   *         "description": "Whether to not error when running with a tsconfig that has strictNullChecks turned.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to not error when running with a tsconfig that has strictNullChecks turned."
+   *       },
+   *       "checkTypePredicates": {
+   *         "type": "boolean",
+   *         "description": "Whether to check the asserted argument of a type predicate function for unnecessary conditions"
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -6097,6 +6355,11 @@ namespace NoUnnecessaryCondition {
      * strictNullChecks turned.
      */
     readonly allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
+    /**
+     * Whether to check the asserted argument of a type predicate function for
+     * unnecessary conditions
+     */
+    readonly checkTypePredicates?: boolean;
   };
 
   export type RuleEntry =
@@ -6197,8 +6460,8 @@ namespace NoUnnecessaryTypeAssertion {
    *     "additionalProperties": false,
    *     "properties": {
    *       "typesToIgnore": {
-   *         "description": "A list of type names to ignore.",
    *         "type": "array",
+   *         "description": "A list of type names to ignore.",
    *         "items": {
    *           "type": "string"
    *         }
@@ -6244,6 +6507,7 @@ namespace NoUnnecessaryTypeConstraint {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | hasSuggestions       | true    |
  *  | recommended          | strict  |
  *  | requiresTypeChecking | true    |
  *  ```
@@ -6390,6 +6654,22 @@ namespace NoUnsafeReturn {
 }
 
 /**
+ * Disallow type assertions that narrow a type
+ *
+ * @link https://typescript-eslint.io/rules/no-unsafe-type-assertion
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | requiresTypeChecking | true    |
+ *  ```
+ */
+namespace NoUnsafeTypeAssertion {
+  export type RuleEntry = Linter.RuleSeverity;
+}
+
+/**
  * Require unary negation to take a number
  *
  * @link https://typescript-eslint.io/rules/no-unsafe-unary-minus
@@ -6428,20 +6708,16 @@ namespace NoUnusedExpressions {
    *     "type": "object",
    *     "properties": {
    *       "allowShortCircuit": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowTernary": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowTaggedTemplates": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "enforceForJSX": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -6490,52 +6766,62 @@ namespace NoUnusedVars {
    *       },
    *       {
    *         "type": "object",
+   *         "additionalProperties": false,
    *         "properties": {
-   *           "vars": {
-   *             "type": "string",
-   *             "enum": [
-   *               "all",
-   *               "local"
-   *             ]
-   *           },
-   *           "varsIgnorePattern": {
-   *             "type": "string"
-   *           },
    *           "args": {
    *             "type": "string",
+   *             "description": "Whether to check all, some, or no arguments.",
    *             "enum": [
    *               "all",
    *               "after-used",
    *               "none"
    *             ]
    *           },
-   *           "ignoreRestSiblings": {
-   *             "type": "boolean"
-   *           },
    *           "argsIgnorePattern": {
-   *             "type": "string"
+   *             "type": "string",
+   *             "description": "Regular expressions of argument names to not check for usage."
    *           },
    *           "caughtErrors": {
    *             "type": "string",
+   *             "description": "Whether to check catch block arguments.",
    *             "enum": [
    *               "all",
    *               "none"
    *             ]
    *           },
    *           "caughtErrorsIgnorePattern": {
-   *             "type": "string"
+   *             "type": "string",
+   *             "description": "Regular expressions of catch block argument names to not check for usage."
    *           },
    *           "destructuredArrayIgnorePattern": {
-   *             "type": "string"
+   *             "type": "string",
+   *             "description": "Regular expressions of destructured array variable names to not check for usage."
    *           },
    *           "ignoreClassWithStaticInitBlock": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to ignore classes with at least one static initialization block."
+   *           },
+   *           "ignoreRestSiblings": {
+   *             "type": "boolean",
+   *             "description": "Whether to ignore sibling properties in `...` destructurings."
    *           },
    *           "reportUsedIgnorePattern": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to report variables that match any of the valid ignore pattern options if they have been used."
+   *           },
+   *           "vars": {
+   *             "type": "string",
+   *             "description": "Whether to check all variables or only locally-declared variables.",
+   *             "enum": [
+   *               "all",
+   *               "local"
+   *             ]
+   *           },
+   *           "varsIgnorePattern": {
+   *             "type": "string",
+   *             "description": "Regular expressions of variable names to not check for usage."
    *           }
-   *         },
-   *         "additionalProperties": false
+   *         }
    *       }
    *     ]
    *   }
@@ -6546,16 +6832,38 @@ namespace NoUnusedVars {
     | 'all'
     | 'local'
     | {
-        readonly vars?: 'all' | 'local';
-        readonly varsIgnorePattern?: string;
+        /** Whether to check all, some, or no arguments. */
         readonly args?: 'after-used' | 'all' | 'none';
-        readonly ignoreRestSiblings?: boolean;
+        /** Regular expressions of argument names to not check for usage. */
         readonly argsIgnorePattern?: string;
+        /** Whether to check catch block arguments. */
         readonly caughtErrors?: 'all' | 'none';
+        /**
+         * Regular expressions of catch block argument names to not check for
+         * usage.
+         */
         readonly caughtErrorsIgnorePattern?: string;
+        /**
+         * Regular expressions of destructured array variable names to not check
+         * for usage.
+         */
         readonly destructuredArrayIgnorePattern?: string;
+        /**
+         * Whether to ignore classes with at least one static initialization
+         * block.
+         */
         readonly ignoreClassWithStaticInitBlock?: boolean;
+        /** Whether to ignore sibling properties in `...` destructurings. */
+        readonly ignoreRestSiblings?: boolean;
+        /**
+         * Whether to report variables that match any of the valid ignore
+         * pattern options if they have been used.
+         */
         readonly reportUsedIgnorePattern?: boolean;
+        /** Whether to check all variables or only locally-declared variables. */
+        readonly vars?: 'all' | 'local';
+        /** Regular expressions of variable names to not check for usage. */
+        readonly varsIgnorePattern?: string;
       };
 
   export type RuleEntry =
@@ -6590,30 +6898,37 @@ namespace NoUseBeforeDefine {
    *       },
    *       {
    *         "type": "object",
+   *         "additionalProperties": false,
    *         "properties": {
-   *           "functions": {
-   *             "type": "boolean"
+   *           "allowNamedExports": {
+   *             "type": "boolean",
+   *             "description": "Whether to ignore named exports."
    *           },
    *           "classes": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to ignore references to class declarations."
    *           },
    *           "enums": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to check references to enums."
    *           },
-   *           "variables": {
-   *             "type": "boolean"
-   *           },
-   *           "typedefs": {
-   *             "type": "boolean"
+   *           "functions": {
+   *             "type": "boolean",
+   *             "description": "Whether to ignore references to function declarations."
    *           },
    *           "ignoreTypeReferences": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to ignore type references, such as in type annotations and assertions."
    *           },
-   *           "allowNamedExports": {
-   *             "type": "boolean"
+   *           "typedefs": {
+   *             "type": "boolean",
+   *             "description": "Whether to check references to types."
+   *           },
+   *           "variables": {
+   *             "type": "boolean",
+   *             "description": "Whether to ignore references to variables."
    *           }
-   *         },
-   *         "additionalProperties": false
+   *         }
    *       }
    *     ]
    *   }
@@ -6623,13 +6938,23 @@ namespace NoUseBeforeDefine {
   export type Options =
     | 'nofunc'
     | {
-        readonly functions?: boolean;
-        readonly classes?: boolean;
-        readonly enums?: boolean;
-        readonly variables?: boolean;
-        readonly typedefs?: boolean;
-        readonly ignoreTypeReferences?: boolean;
+        /** Whether to ignore named exports. */
         readonly allowNamedExports?: boolean;
+        /** Whether to ignore references to class declarations. */
+        readonly classes?: boolean;
+        /** Whether to check references to enums. */
+        readonly enums?: boolean;
+        /** Whether to ignore references to function declarations. */
+        readonly functions?: boolean;
+        /**
+         * Whether to ignore type references, such as in type annotations and
+         * assertions.
+         */
+        readonly ignoreTypeReferences?: boolean;
+        /** Whether to check references to types. */
+        readonly typedefs?: boolean;
+        /** Whether to ignore references to variables. */
+        readonly variables?: boolean;
       };
 
   export type RuleEntry =
@@ -6643,10 +6968,11 @@ namespace NoUseBeforeDefine {
  * @link https://typescript-eslint.io/rules/no-useless-constructor
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | strict  |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | hasSuggestions | true    |
+ *  | recommended    | strict  |
  *  ```
  */
 namespace NoUselessConstructor {
@@ -6690,16 +7016,16 @@ namespace NoVarRequires {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allow": {
    *         "type": "array",
+   *         "description": "Patterns of import paths to allow requiring from.",
    *         "items": {
    *           "type": "string"
-   *         },
-   *         "description": "Patterns of import paths to allow requiring from."
+   *         }
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -6763,21 +7089,154 @@ namespace OnlyThrowError {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
+   *       "allow": {
+   *         "items": {
+   *           "oneOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "file"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 },
+   *                 "path": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ],
+   *               "type": "object"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "lib"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ],
+   *               "type": "object"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "package"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 },
+   *                 "package": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name",
+   *                 "package"
+   *               ],
+   *               "type": "object"
+   *             }
+   *           ]
+   *         },
+   *         "type": "array",
+   *         "description": "Type specifiers that can be thrown."
+   *       },
    *       "allowThrowingAny": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to always allow throwing values typed as `any`."
    *       },
    *       "allowThrowingUnknown": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to always allow throwing values typed as `unknown`."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /** Type specifiers that can be thrown. */
+    readonly allow?: readonly (
+      | string
+      | {
+          readonly from: 'file';
+          readonly name: string | readonly [string, ...(readonly string[])];
+          readonly path?: string;
+        }
+      | {
+          readonly from: 'lib';
+          readonly name: string | readonly [string, ...(readonly string[])];
+        }
+      | {
+          readonly from: 'package';
+          readonly name: string | readonly [string, ...(readonly string[])];
+          readonly package: string;
+        }
+    )[];
+    /** Whether to always allow throwing values typed as `any`. */
     readonly allowThrowingAny?: boolean;
+    /** Whether to always allow throwing values typed as `unknown`. */
     readonly allowThrowingUnknown?: boolean;
   };
 
@@ -6804,6 +7263,7 @@ namespace ParameterProperties {
    * ```json
    * [
    *   {
+   *     "type": "object",
    *     "$defs": {
    *       "modifier": {
    *         "type": "string",
@@ -6818,23 +7278,24 @@ namespace ParameterProperties {
    *         ]
    *       }
    *     },
-   *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allow": {
    *         "type": "array",
+   *         "description": "Whether to allow certain kinds of properties to be ignored.",
    *         "items": {
    *           "$ref": "#/items/0/$defs/modifier"
    *         }
    *       },
    *       "prefer": {
    *         "type": "string",
+   *         "description": "Whether to prefer class properties or parameter properties.",
    *         "enum": [
    *           "class-property",
    *           "parameter-property"
    *         ]
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -6849,7 +7310,9 @@ namespace ParameterProperties {
     | 'readonly';
 
   export type Options = {
+    /** Whether to allow certain kinds of properties to be ignored. */
     readonly allow?: readonly Modifier[];
+    /** Whether to prefer class properties or parameter properties. */
     readonly prefer?: 'class-property' | 'parameter-property';
   };
 
@@ -6899,21 +7362,11 @@ namespace PreferDestructuring {
    *     "oneOf": [
    *       {
    *         "type": "object",
+   *         "additionalProperties": false,
    *         "properties": {
-   *           "VariableDeclarator": {
-   *             "type": "object",
-   *             "properties": {
-   *               "array": {
-   *                 "type": "boolean"
-   *               },
-   *               "object": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           },
    *           "AssignmentExpression": {
    *             "type": "object",
+   *             "additionalProperties": false,
    *             "properties": {
    *               "array": {
    *                 "type": "boolean"
@@ -6921,14 +7374,25 @@ namespace PreferDestructuring {
    *               "object": {
    *                 "type": "boolean"
    *               }
-   *             },
-   *             "additionalProperties": false
+   *             }
+   *           },
+   *           "VariableDeclarator": {
+   *             "type": "object",
+   *             "additionalProperties": false,
+   *             "properties": {
+   *               "array": {
+   *                 "type": "boolean"
+   *               },
+   *               "object": {
+   *                 "type": "boolean"
+   *               }
+   *             }
    *           }
-   *         },
-   *         "additionalProperties": false
+   *         }
    *       },
    *       {
    *         "type": "object",
+   *         "additionalProperties": false,
    *         "properties": {
    *           "array": {
    *             "type": "boolean"
@@ -6936,19 +7400,20 @@ namespace PreferDestructuring {
    *           "object": {
    *             "type": "boolean"
    *           }
-   *         },
-   *         "additionalProperties": false
+   *         }
    *       }
    *     ]
    *   },
    *   {
    *     "type": "object",
    *     "properties": {
-   *       "enforceForRenamedProperties": {
-   *         "type": "boolean"
-   *       },
    *       "enforceForDeclarationWithTypeAnnotation": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to enforce destructuring on variable declarations with type annotations."
+   *       },
+   *       "enforceForRenamedProperties": {
+   *         "type": "boolean",
+   *         "description": "Whether to enforce destructuring that use a different variable name than the property name."
    *       }
    *     }
    *   }
@@ -6961,19 +7426,27 @@ namespace PreferDestructuring {
         readonly object?: boolean;
       }
     | {
-        readonly VariableDeclarator?: {
+        readonly AssignmentExpression?: {
           readonly array?: boolean;
           readonly object?: boolean;
         };
-        readonly AssignmentExpression?: {
+        readonly VariableDeclarator?: {
           readonly array?: boolean;
           readonly object?: boolean;
         };
       };
 
   export type Options1 = {
-    readonly enforceForRenamedProperties?: boolean;
+    /**
+     * Whether to enforce destructuring on variable declarations with type
+     * annotations.
+     */
     readonly enforceForDeclarationWithTypeAnnotation?: boolean;
+    /**
+     * Whether to enforce destructuring that use a different variable name than
+     * the property name.
+     */
+    readonly enforceForRenamedProperties?: boolean;
     readonly [k: string]: unknown;
   };
 
@@ -7090,17 +7563,19 @@ namespace PreferLiteralEnumMember {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allowBitwiseExpressions": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow using bitwise expressions in enum initializers."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /** Whether to allow using bitwise expressions in enum initializers. */
     readonly allowBitwiseExpressions?: boolean;
   };
 
@@ -7150,37 +7625,52 @@ namespace PreferNullishCoalescing {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Unless this is set to `true`, the rule will error on every file whose `tsconfig.json` does _not_ have the `strictNullChecks` compiler option (or `strict`) set to `true`."
+   *       },
+   *       "ignoreBooleanCoercion": {
+   *         "type": "boolean",
+   *         "description": "Whether to ignore arguments to the `Boolean` constructor"
    *       },
    *       "ignoreConditionalTests": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore cases that are located within a conditional test."
    *       },
    *       "ignoreMixedLogicalExpressions": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore any logical or expressions that are part of a mixed logical expression (with `&&`)."
    *       },
    *       "ignorePrimitives": {
+   *         "description": "Whether to ignore all (`true`) or some (an object with properties) primitive types.",
    *         "oneOf": [
    *           {
    *             "type": "object",
+   *             "description": "Which primitives types may be ignored.",
    *             "properties": {
    *               "bigint": {
-   *                 "type": "boolean"
+   *                 "type": "boolean",
+   *                 "description": "Ignore bigint primitive types."
    *               },
    *               "boolean": {
-   *                 "type": "boolean"
+   *                 "type": "boolean",
+   *                 "description": "Ignore boolean primitive types."
    *               },
    *               "number": {
-   *                 "type": "boolean"
+   *                 "type": "boolean",
+   *                 "description": "Ignore number primitive types."
    *               },
    *               "string": {
-   *                 "type": "boolean"
+   *                 "type": "boolean",
+   *                 "description": "Ignore string primitive types."
    *               }
    *             }
    *           },
    *           {
    *             "type": "boolean",
+   *             "description": "Ignore all primitive types.",
    *             "enum": [
    *               true
    *             ]
@@ -7188,27 +7678,51 @@ namespace PreferNullishCoalescing {
    *         ]
    *       },
    *       "ignoreTernaryTests": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore any ternary expressions that could be simplified by using the nullish coalescing operator."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /**
+     * Unless this is set to `true`, the rule will error on every file whose
+     * `tsconfig.json` does _not_ have the `strictNullChecks` compiler option
+     * (or `strict`) set to `true`.
+     */
     readonly allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
+    /** Whether to ignore arguments to the `Boolean` constructor */
+    readonly ignoreBooleanCoercion?: boolean;
+    /** Whether to ignore cases that are located within a conditional test. */
     readonly ignoreConditionalTests?: boolean;
+    /**
+     * Whether to ignore any logical or expressions that are part of a mixed
+     * logical expression (with `&&`).
+     */
     readonly ignoreMixedLogicalExpressions?: boolean;
+    /**
+     * Whether to ignore all (`true`) or some (an object with properties)
+     * primitive types.
+     */
     readonly ignorePrimitives?:
       | true
       | {
+          /** Ignore bigint primitive types. */
           readonly bigint?: boolean;
+          /** Ignore boolean primitive types. */
           readonly boolean?: boolean;
+          /** Ignore number primitive types. */
           readonly number?: boolean;
+          /** Ignore string primitive types. */
           readonly string?: boolean;
           readonly [k: string]: unknown;
         };
+    /**
+     * Whether to ignore any ternary expressions that could be simplified by
+     * using the nullish coalescing operator.
+     */
     readonly ignoreTernaryTests?: boolean;
   };
 
@@ -7243,37 +7757,37 @@ namespace PreferOptionalChain {
    *     "type": "object",
    *     "additionalProperties": false,
    *     "properties": {
+   *       "allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": {
+   *         "type": "boolean",
+   *         "description": "Allow autofixers that will change the return type of the expression. This option is considered unsafe as it may break the build."
+   *       },
    *       "checkAny": {
    *         "type": "boolean",
    *         "description": "Check operands that are typed as `any` when inspecting \"loose boolean\" operands."
-   *       },
-   *       "checkUnknown": {
-   *         "type": "boolean",
-   *         "description": "Check operands that are typed as `unknown` when inspecting \"loose boolean\" operands."
-   *       },
-   *       "checkString": {
-   *         "type": "boolean",
-   *         "description": "Check operands that are typed as `string` when inspecting \"loose boolean\" operands."
-   *       },
-   *       "checkNumber": {
-   *         "type": "boolean",
-   *         "description": "Check operands that are typed as `number` when inspecting \"loose boolean\" operands."
-   *       },
-   *       "checkBoolean": {
-   *         "type": "boolean",
-   *         "description": "Check operands that are typed as `boolean` when inspecting \"loose boolean\" operands."
    *       },
    *       "checkBigInt": {
    *         "type": "boolean",
    *         "description": "Check operands that are typed as `bigint` when inspecting \"loose boolean\" operands."
    *       },
+   *       "checkBoolean": {
+   *         "type": "boolean",
+   *         "description": "Check operands that are typed as `boolean` when inspecting \"loose boolean\" operands."
+   *       },
+   *       "checkNumber": {
+   *         "type": "boolean",
+   *         "description": "Check operands that are typed as `number` when inspecting \"loose boolean\" operands."
+   *       },
+   *       "checkString": {
+   *         "type": "boolean",
+   *         "description": "Check operands that are typed as `string` when inspecting \"loose boolean\" operands."
+   *       },
+   *       "checkUnknown": {
+   *         "type": "boolean",
+   *         "description": "Check operands that are typed as `unknown` when inspecting \"loose boolean\" operands."
+   *       },
    *       "requireNullish": {
    *         "type": "boolean",
    *         "description": "Skip operands that are not typed with `null` and/or `undefined` when inspecting \"loose boolean\" operands."
-   *       },
-   *       "allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": {
-   *         "type": "boolean",
-   *         "description": "Allow autofixers that will change the return type of the expression. This option is considered unsafe as it may break the build."
    *       }
    *     }
    *   }
@@ -7282,45 +7796,45 @@ namespace PreferOptionalChain {
    */
   export type Options = {
     /**
+     * Allow autofixers that will change the return type of the expression. This
+     * option is considered unsafe as it may break the build.
+     */
+    readonly allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing?: boolean;
+    /**
      * Check operands that are typed as `any` when inspecting "loose boolean"
      * operands.
      */
     readonly checkAny?: boolean;
-    /**
-     * Check operands that are typed as `unknown` when inspecting "loose
-     * boolean" operands.
-     */
-    readonly checkUnknown?: boolean;
-    /**
-     * Check operands that are typed as `string` when inspecting "loose boolean"
-     * operands.
-     */
-    readonly checkString?: boolean;
-    /**
-     * Check operands that are typed as `number` when inspecting "loose boolean"
-     * operands.
-     */
-    readonly checkNumber?: boolean;
-    /**
-     * Check operands that are typed as `boolean` when inspecting "loose
-     * boolean" operands.
-     */
-    readonly checkBoolean?: boolean;
     /**
      * Check operands that are typed as `bigint` when inspecting "loose boolean"
      * operands.
      */
     readonly checkBigInt?: boolean;
     /**
+     * Check operands that are typed as `boolean` when inspecting "loose
+     * boolean" operands.
+     */
+    readonly checkBoolean?: boolean;
+    /**
+     * Check operands that are typed as `number` when inspecting "loose boolean"
+     * operands.
+     */
+    readonly checkNumber?: boolean;
+    /**
+     * Check operands that are typed as `string` when inspecting "loose boolean"
+     * operands.
+     */
+    readonly checkString?: boolean;
+    /**
+     * Check operands that are typed as `unknown` when inspecting "loose
+     * boolean" operands.
+     */
+    readonly checkUnknown?: boolean;
+    /**
      * Skip operands that are not typed with `null` and/or `undefined` when
      * inspecting "loose boolean" operands.
      */
     readonly requireNullish?: boolean;
-    /**
-     * Allow autofixers that will change the return type of the expression. This
-     * option is considered unsafe as it may break the build.
-     */
-    readonly allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing?: boolean;
   };
 
   export type RuleEntry =
@@ -7349,18 +7863,32 @@ namespace PreferPromiseRejectErrors {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allowEmptyReject": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow calls to `Promise.reject()` with no arguments."
+   *       },
+   *       "allowThrowingAny": {
+   *         "type": "boolean",
+   *         "description": "Whether to always allow throwing values typed as `any`."
+   *       },
+   *       "allowThrowingUnknown": {
+   *         "type": "boolean",
+   *         "description": "Whether to always allow throwing values typed as `unknown`."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /** Whether to allow calls to `Promise.reject()` with no arguments. */
     readonly allowEmptyReject?: boolean;
+    /** Whether to always allow throwing values typed as `any`. */
+    readonly allowThrowingAny?: boolean;
+    /** Whether to always allow throwing values typed as `unknown`. */
+    readonly allowThrowingUnknown?: boolean;
   };
 
   export type RuleEntry =
@@ -7389,18 +7917,23 @@ namespace PreferReadonly {
    * ```json
    * [
    *   {
+   *     "type": "object",
    *     "additionalProperties": false,
    *     "properties": {
    *       "onlyInlineLambdas": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to restrict checking only to members immediately assigned a lambda value."
    *       }
-   *     },
-   *     "type": "object"
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /**
+     * Whether to restrict checking only to members immediately assigned a
+     * lambda value.
+     */
     readonly onlyInlineLambdas?: boolean;
   };
 
@@ -7433,21 +7966,19 @@ namespace PreferReadonlyParameterTypes {
    *     "additionalProperties": false,
    *     "properties": {
    *       "allow": {
-   *         "type": "array",
    *         "items": {
    *           "oneOf": [
    *             {
    *               "type": "string"
    *             },
    *             {
-   *               "type": "object",
    *               "additionalProperties": false,
    *               "properties": {
    *                 "from": {
-   *                   "type": "string",
    *                   "enum": [
    *                     "file"
-   *                   ]
+   *                   ],
+   *                   "type": "string"
    *                 },
    *                 "name": {
    *                   "oneOf": [
@@ -7455,12 +7986,12 @@ namespace PreferReadonlyParameterTypes {
    *                       "type": "string"
    *                     },
    *                     {
-   *                       "type": "array",
-   *                       "minItems": 1,
-   *                       "uniqueItems": true,
    *                       "items": {
    *                         "type": "string"
-   *                       }
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
    *                     }
    *                   ]
    *                 },
@@ -7471,17 +8002,17 @@ namespace PreferReadonlyParameterTypes {
    *               "required": [
    *                 "from",
    *                 "name"
-   *               ]
+   *               ],
+   *               "type": "object"
    *             },
    *             {
-   *               "type": "object",
    *               "additionalProperties": false,
    *               "properties": {
    *                 "from": {
-   *                   "type": "string",
    *                   "enum": [
    *                     "lib"
-   *                   ]
+   *                   ],
+   *                   "type": "string"
    *                 },
    *                 "name": {
    *                   "oneOf": [
@@ -7489,12 +8020,12 @@ namespace PreferReadonlyParameterTypes {
    *                       "type": "string"
    *                     },
    *                     {
-   *                       "type": "array",
-   *                       "minItems": 1,
-   *                       "uniqueItems": true,
    *                       "items": {
    *                         "type": "string"
-   *                       }
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
    *                     }
    *                   ]
    *                 }
@@ -7502,17 +8033,17 @@ namespace PreferReadonlyParameterTypes {
    *               "required": [
    *                 "from",
    *                 "name"
-   *               ]
+   *               ],
+   *               "type": "object"
    *             },
    *             {
-   *               "type": "object",
    *               "additionalProperties": false,
    *               "properties": {
    *                 "from": {
-   *                   "type": "string",
    *                   "enum": [
    *                     "package"
-   *                   ]
+   *                   ],
+   *                   "type": "string"
    *                 },
    *                 "name": {
    *                   "oneOf": [
@@ -7520,12 +8051,12 @@ namespace PreferReadonlyParameterTypes {
    *                       "type": "string"
    *                     },
    *                     {
-   *                       "type": "array",
-   *                       "minItems": 1,
-   *                       "uniqueItems": true,
    *                       "items": {
    *                         "type": "string"
-   *                       }
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
    *                     }
    *                   ]
    *                 },
@@ -7537,19 +8068,25 @@ namespace PreferReadonlyParameterTypes {
    *                 "from",
    *                 "name",
    *                 "package"
-   *               ]
+   *               ],
+   *               "type": "object"
    *             }
    *           ]
-   *         }
+   *         },
+   *         "type": "array",
+   *         "description": "An array of type specifiers to ignore."
    *       },
    *       "checkParameterProperties": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check class parameter properties."
    *       },
    *       "ignoreInferredTypes": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore parameters which don't explicitly specify a type."
    *       },
    *       "treatMethodsAsReadonly": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to treat all mutable methods as though they are readonly."
    *       }
    *     }
    *   }
@@ -7557,6 +8094,7 @@ namespace PreferReadonlyParameterTypes {
    * ```
    */
   export type Options = {
+    /** An array of type specifiers to ignore. */
     readonly allow?: readonly (
       | string
       | {
@@ -7574,8 +8112,11 @@ namespace PreferReadonlyParameterTypes {
           readonly package: string;
         }
     )[];
+    /** Whether to check class parameter properties. */
     readonly checkParameterProperties?: boolean;
+    /** Whether to ignore parameters which don't explicitly specify a type. */
     readonly ignoreInferredTypes?: boolean;
+    /** Whether to treat all mutable methods as though they are readonly. */
     readonly treatMethodsAsReadonly?: boolean;
   };
 
@@ -7660,18 +8201,18 @@ namespace PreferStringStartsEndsWith {
    * ```json
    * [
    *   {
+   *     "type": "object",
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowSingleElementEquality": {
+   *         "type": "string",
    *         "description": "Whether to allow equality checks against the first or last element of a string.",
    *         "enum": [
    *           "always",
    *           "never"
-   *         ],
-   *         "type": "string"
+   *         ]
    *       }
-   *     },
-   *     "type": "object"
+   *     }
    *   }
    * ]
    * ```
@@ -7727,32 +8268,36 @@ namespace PromiseFunctionAsync {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allowAny": {
-   *         "description": "Whether to consider `any` and `unknown` to be Promises.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to consider `any` and `unknown` to be Promises."
    *       },
    *       "allowedPromiseNames": {
-   *         "description": "Any extra names of classes or interfaces to be considered Promises.",
    *         "type": "array",
+   *         "description": "Any extra names of classes or interfaces to be considered Promises.",
    *         "items": {
    *           "type": "string"
    *         }
    *       },
    *       "checkArrowFunctions": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check arrow functions."
    *       },
    *       "checkFunctionDeclarations": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check standalone function declarations."
    *       },
    *       "checkFunctionExpressions": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check inline function expressions"
    *       },
    *       "checkMethodDeclarations": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check methods on classes and object literals."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -7762,15 +8307,37 @@ namespace PromiseFunctionAsync {
     readonly allowAny?: boolean;
     /** Any extra names of classes or interfaces to be considered Promises. */
     readonly allowedPromiseNames?: readonly string[];
+    /** Whether to check arrow functions. */
     readonly checkArrowFunctions?: boolean;
+    /** Whether to check standalone function declarations. */
     readonly checkFunctionDeclarations?: boolean;
+    /** Whether to check inline function expressions */
     readonly checkFunctionExpressions?: boolean;
+    /** Whether to check methods on classes and object literals. */
     readonly checkMethodDeclarations?: boolean;
   };
 
   export type RuleEntry =
     | Linter.RuleSeverity
     | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+}
+
+/**
+ * Enforce that `get()` types should be assignable to their equivalent `set()`
+ * type
+ *
+ * @link https://typescript-eslint.io/rules/related-getter-setter-pairs
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | recommended          | strict  |
+ *  | requiresTypeChecking | true    |
+ *  ```
+ */
+namespace RelatedGetterSetterPairs {
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -7797,8 +8364,8 @@ namespace RequireArraySortCompare {
    *     "additionalProperties": false,
    *     "properties": {
    *       "ignoreStringArrays": {
-   *         "description": "Whether to ignore arrays in which all elements are strings.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore arrays in which all elements are strings."
    *       }
    *     }
    *   }
@@ -7825,6 +8392,7 @@ namespace RequireArraySortCompare {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | hasSuggestions       | true        |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -7858,28 +8426,28 @@ namespace RestrictPlusOperands {
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowAny": {
-   *         "description": "Whether to allow `any` typed values.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `any` typed values."
    *       },
    *       "allowBoolean": {
-   *         "description": "Whether to allow `boolean` typed values.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `boolean` typed values."
    *       },
    *       "allowNullish": {
-   *         "description": "Whether to allow potentially `null` or `undefined` typed values.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow potentially `null` or `undefined` typed values."
    *       },
    *       "allowNumberAndString": {
-   *         "description": "Whether to allow `bigint`/`number` typed values and `string` typed values to be added together.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `bigint`/`number` typed values and `string` typed values to be added together."
    *       },
    *       "allowRegExp": {
-   *         "description": "Whether to allow `regexp` typed values.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `regexp` typed values."
    *       },
    *       "skipCompoundAssignments": {
-   *         "description": "Whether to skip compound assignments such as `+=`.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to skip compound assignments such as `+=`."
    *       }
    *     }
    *   }
@@ -7933,32 +8501,143 @@ namespace RestrictTemplateExpressions {
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowAny": {
-   *         "description": "Whether to allow `any` typed values in template expressions.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `any` typed values in template expressions."
    *       },
    *       "allowArray": {
-   *         "description": "Whether to allow `array` typed values in template expressions.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `array` typed values in template expressions."
    *       },
    *       "allowBoolean": {
-   *         "description": "Whether to allow `boolean` typed values in template expressions.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `boolean` typed values in template expressions."
    *       },
    *       "allowNullish": {
-   *         "description": "Whether to allow `nullish` typed values in template expressions.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `nullish` typed values in template expressions."
    *       },
    *       "allowNumber": {
-   *         "description": "Whether to allow `number` typed values in template expressions.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `number` typed values in template expressions."
    *       },
    *       "allowRegExp": {
-   *         "description": "Whether to allow `regexp` typed values in template expressions.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `regexp` typed values in template expressions."
    *       },
    *       "allowNever": {
-   *         "description": "Whether to allow `never` typed values in template expressions.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow `never` typed values in template expressions."
+   *       },
+   *       "allow": {
+   *         "description": "Types to allow in template expressions.",
+   *         "items": {
+   *           "oneOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "file"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 },
+   *                 "path": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ],
+   *               "type": "object"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "lib"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ],
+   *               "type": "object"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "package"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 },
+   *                 "package": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name",
+   *                 "package"
+   *               ],
+   *               "type": "object"
+   *             }
+   *           ]
+   *         },
+   *         "type": "array"
    *       }
    *     }
    *   }
@@ -7980,6 +8659,24 @@ namespace RestrictTemplateExpressions {
     readonly allowRegExp?: boolean;
     /** Whether to allow `never` typed values in template expressions. */
     readonly allowNever?: boolean;
+    /** Types to allow in template expressions. */
+    readonly allow?: readonly (
+      | string
+      | {
+          readonly from: 'file';
+          readonly name: string | readonly [string, ...(readonly string[])];
+          readonly path?: string;
+        }
+      | {
+          readonly from: 'lib';
+          readonly name: string | readonly [string, ...(readonly string[])];
+        }
+      | {
+          readonly from: 'package';
+          readonly name: string | readonly [string, ...(readonly string[])];
+          readonly package: string;
+        }
+    )[];
   };
 
   export type RuleEntry =
@@ -8010,11 +8707,35 @@ namespace ReturnAwait {
    * [
    *   {
    *     "type": "string",
-   *     "enum": [
-   *       "in-try-catch",
-   *       "always",
-   *       "never",
-   *       "error-handling-correctness-only"
+   *     "oneOf": [
+   *       {
+   *         "type": "string",
+   *         "description": "Requires that all returned promises be awaited.",
+   *         "enum": [
+   *           "always"
+   *         ]
+   *       },
+   *       {
+   *         "type": "string",
+   *         "description": "In error-handling contexts, the rule enforces that returned promises must be awaited. In ordinary contexts, the rule does not enforce any particular behavior around whether returned promises are awaited.",
+   *         "enum": [
+   *           "error-handling-correctness-only"
+   *         ]
+   *       },
+   *       {
+   *         "type": "string",
+   *         "description": "In error-handling contexts, the rule enforces that returned promises must be awaited. In ordinary contexts, the rule enforces that returned promises _must not_ be awaited.",
+   *         "enum": [
+   *           "in-try-catch"
+   *         ]
+   *       },
+   *       {
+   *         "type": "string",
+   *         "description": "Disallows awaiting any returned promises.",
+   *         "enum": [
+   *           "never"
+   *         ]
+   *       }
    *     ]
    *   }
    * ]
@@ -8055,21 +8776,21 @@ namespace SortTypeConstituents {
    *     "type": "object",
    *     "additionalProperties": false,
    *     "properties": {
+   *       "caseSensitive": {
+   *         "type": "boolean",
+   *         "description": "Whether to sort using case sensitive string comparisons."
+   *       },
    *       "checkIntersections": {
-   *         "description": "Whether to check intersection types.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check intersection types (`&`)."
    *       },
    *       "checkUnions": {
-   *         "description": "Whether to check union types.",
-   *         "type": "boolean"
-   *       },
-   *       "caseSensitive": {
-   *         "description": "Whether to sort using case sensitive sorting.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check union types (`|`)."
    *       },
    *       "groupOrder": {
-   *         "description": "Ordering of the groups.",
    *         "type": "array",
+   *         "description": "Ordering of the groups.",
    *         "items": {
    *           "type": "string",
    *           "enum": [
@@ -8118,50 +8839,75 @@ namespace StrictBooleanExpressions {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
-   *       "allowString": {
-   *         "type": "boolean"
-   *       },
-   *       "allowNumber": {
-   *         "type": "boolean"
-   *       },
-   *       "allowNullableObject": {
-   *         "type": "boolean"
+   *       "allowAny": {
+   *         "type": "boolean",
+   *         "description": "Whether to allow `any`s in a boolean context."
    *       },
    *       "allowNullableBoolean": {
-   *         "type": "boolean"
-   *       },
-   *       "allowNullableString": {
-   *         "type": "boolean"
-   *       },
-   *       "allowNullableNumber": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow nullable `boolean`s in a boolean context."
    *       },
    *       "allowNullableEnum": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow nullable `enum`s in a boolean context."
    *       },
-   *       "allowAny": {
-   *         "type": "boolean"
+   *       "allowNullableNumber": {
+   *         "type": "boolean",
+   *         "description": "Whether to allow nullable `number`s in a boolean context."
+   *       },
+   *       "allowNullableObject": {
+   *         "type": "boolean",
+   *         "description": "Whether to allow nullable `object`s, `symbol`s, and functions in a boolean context."
+   *       },
+   *       "allowNullableString": {
+   *         "type": "boolean",
+   *         "description": "Whether to allow nullable `string`s in a boolean context."
+   *       },
+   *       "allowNumber": {
+   *         "type": "boolean",
+   *         "description": "Whether to allow `number`s in a boolean context."
    *       },
    *       "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Unless this is set to `true`, the rule will error on every file whose `tsconfig.json` does _not_ have the `strictNullChecks` compiler option (or `strict`) set to `true`."
+   *       },
+   *       "allowString": {
+   *         "type": "boolean",
+   *         "description": "Whether to allow `string`s in a boolean context."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
-    readonly allowString?: boolean;
-    readonly allowNumber?: boolean;
-    readonly allowNullableObject?: boolean;
-    readonly allowNullableBoolean?: boolean;
-    readonly allowNullableString?: boolean;
-    readonly allowNullableNumber?: boolean;
-    readonly allowNullableEnum?: boolean;
+    /** Whether to allow `any`s in a boolean context. */
     readonly allowAny?: boolean;
+    /** Whether to allow nullable `boolean`s in a boolean context. */
+    readonly allowNullableBoolean?: boolean;
+    /** Whether to allow nullable `enum`s in a boolean context. */
+    readonly allowNullableEnum?: boolean;
+    /** Whether to allow nullable `number`s in a boolean context. */
+    readonly allowNullableNumber?: boolean;
+    /**
+     * Whether to allow nullable `object`s, `symbol`s, and functions in a
+     * boolean context.
+     */
+    readonly allowNullableObject?: boolean;
+    /** Whether to allow nullable `string`s in a boolean context. */
+    readonly allowNullableString?: boolean;
+    /** Whether to allow `number`s in a boolean context. */
+    readonly allowNumber?: boolean;
+    /**
+     * Unless this is set to `true`, the rule will error on every file whose
+     * `tsconfig.json` does _not_ have the `strictNullChecks` compiler option
+     * (or `strict`) set to `true`.
+     */
     readonly allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
+    /** Whether to allow `string`s in a boolean context. */
+    readonly allowString?: boolean;
   };
 
   export type RuleEntry =
@@ -8190,17 +8936,25 @@ namespace SwitchExhaustivenessCheck {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "allowDefaultCaseForExhaustiveSwitch": {
-   *         "description": "If 'true', allow 'default' cases on switch statements with exhaustive cases.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "If 'true', allow 'default' cases on switch statements with exhaustive cases."
+   *       },
+   *       "considerDefaultExhaustiveForUnions": {
+   *         "type": "boolean",
+   *         "description": "If 'true', the 'default' clause is used to determine whether the switch statement is exhaustive for union type"
+   *       },
+   *       "defaultCaseCommentPattern": {
+   *         "type": "string",
+   *         "description": "Regular expression for a comment that can indicate an intentionally omitted default case."
    *       },
    *       "requireDefaultForNonUnion": {
-   *         "description": "If 'true', require a 'default' clause for switches on non-union types.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "If 'true', require a 'default' clause for switches on non-union types."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -8211,6 +8965,16 @@ namespace SwitchExhaustivenessCheck {
      * cases.
      */
     readonly allowDefaultCaseForExhaustiveSwitch?: boolean;
+    /**
+     * If 'true', the 'default' clause is used to determine whether the switch
+     * statement is exhaustive for union type
+     */
+    readonly considerDefaultExhaustiveForUnions?: boolean;
+    /**
+     * Regular expression for a comment that can indicate an intentionally
+     * omitted default case.
+     */
+    readonly defaultCaseCommentPattern?: string;
     /** If 'true', require a 'default' clause for switches on non-union types. */
     readonly requireDefaultForNonUnion?: boolean;
   };
@@ -8241,9 +9005,11 @@ namespace TripleSlashReference {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "lib": {
    *         "type": "string",
+   *         "description": "What to enforce for `/// <reference lib=\"...\" />` references.",
    *         "enum": [
    *           "always",
    *           "never"
@@ -8251,6 +9017,7 @@ namespace TripleSlashReference {
    *       },
    *       "path": {
    *         "type": "string",
+   *         "description": "What to enforce for `/// <reference path=\"...\" />` references.",
    *         "enum": [
    *           "always",
    *           "never"
@@ -8258,21 +9025,24 @@ namespace TripleSlashReference {
    *       },
    *       "types": {
    *         "type": "string",
+   *         "description": "What to enforce for `/// <reference types=\"...\" />` references.",
    *         "enum": [
    *           "always",
    *           "never",
    *           "prefer-import"
    *         ]
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
    */
   export type Options = {
+    /** What to enforce for `/// <reference lib="..." />` references. */
     readonly lib?: 'always' | 'never';
+    /** What to enforce for `/// <reference path="..." />` references. */
     readonly path?: 'always' | 'never';
+    /** What to enforce for `/// <reference types="..." />` references. */
     readonly types?: 'always' | 'never' | 'prefer-import';
   };
 
@@ -8303,28 +9073,36 @@ namespace Typedef {
    *     "additionalProperties": false,
    *     "properties": {
    *       "arrayDestructuring": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to enforce type annotations on variables declared using array destructuring."
    *       },
    *       "arrowParameter": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to enforce type annotations for parameters of arrow functions."
    *       },
    *       "memberVariableDeclaration": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to enforce type annotations on member variables of classes."
    *       },
    *       "objectDestructuring": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to enforce type annotations on variables declared using object destructuring."
    *       },
    *       "parameter": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to enforce type annotations for parameters of functions and methods."
    *       },
    *       "propertyDeclaration": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to enforce type annotations for properties of interfaces and types."
    *       },
    *       "variableDeclaration": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to enforce type annotations for variable declarations, excluding array and object destructuring."
    *       },
    *       "variableDeclarationIgnoreFunction": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore variable declarations for non-arrow and arrow functions."
    *       }
    *     }
    *   }
@@ -8332,13 +9110,39 @@ namespace Typedef {
    * ```
    */
   export type Options = {
+    /**
+     * Whether to enforce type annotations on variables declared using array
+     * destructuring.
+     */
     readonly arrayDestructuring?: boolean;
+    /** Whether to enforce type annotations for parameters of arrow functions. */
     readonly arrowParameter?: boolean;
+    /** Whether to enforce type annotations on member variables of classes. */
     readonly memberVariableDeclaration?: boolean;
+    /**
+     * Whether to enforce type annotations on variables declared using object
+     * destructuring.
+     */
     readonly objectDestructuring?: boolean;
+    /**
+     * Whether to enforce type annotations for parameters of functions and
+     * methods.
+     */
     readonly parameter?: boolean;
+    /**
+     * Whether to enforce type annotations for properties of interfaces and
+     * types.
+     */
     readonly propertyDeclaration?: boolean;
+    /**
+     * Whether to enforce type annotations for variable declarations, excluding
+     * array and object destructuring.
+     */
     readonly variableDeclaration?: boolean;
+    /**
+     * Whether to ignore variable declarations for non-arrow and arrow
+     * functions.
+     */
     readonly variableDeclarationIgnoreFunction?: boolean;
   };
 
@@ -8368,13 +9172,13 @@ namespace UnboundMethod {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "ignoreStatic": {
-   *         "description": "Whether to skip checking whether `static` methods are correctly bound.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to skip checking whether `static` methods are correctly bound."
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```
@@ -8409,14 +9213,14 @@ namespace UnifiedSignatures {
    * ```json
    * [
    *   {
+   *     "type": "object",
    *     "additionalProperties": false,
    *     "properties": {
    *       "ignoreDifferentlyNamedParameters": {
-   *         "description": "Whether two parameters with different names at the same index should be considered different even if their types are the same.",
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether two parameters with different names at the same index should be considered different even if their types are the same."
    *       }
-   *     },
-   *     "type": "object"
+   *     }
    *   }
    * ]
    * ```
@@ -8435,7 +9239,7 @@ namespace UnifiedSignatures {
 }
 
 /**
- * Enforce typing arguments in `.catch()` callbacks as `unknown`
+ * Enforce typing arguments in Promise rejection callbacks as `unknown`
  *
  * @link https://typescript-eslint.io/rules/use-unknown-in-catch-callback-variable
  *
@@ -8483,6 +9287,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-base-to-string': NoBaseToString.RuleEntry;
   readonly '@typescript-eslint/no-confusing-non-null-assertion': NoConfusingNonNullAssertion.RuleEntry;
   readonly '@typescript-eslint/no-confusing-void-expression': NoConfusingVoidExpression.RuleEntry;
+  readonly '@typescript-eslint/no-deprecated': NoDeprecated.RuleEntry;
   readonly '@typescript-eslint/no-dupe-class-members': NoDupeClassMembers.RuleEntry;
   readonly '@typescript-eslint/no-duplicate-enum-values': NoDuplicateEnumValues.RuleEntry;
   readonly '@typescript-eslint/no-duplicate-type-constituents': NoDuplicateTypeConstituents.RuleEntry;
@@ -8533,6 +9338,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-unsafe-function-type': NoUnsafeFunctionType.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-member-access': NoUnsafeMemberAccess.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-return': NoUnsafeReturn.RuleEntry;
+  readonly '@typescript-eslint/no-unsafe-type-assertion': NoUnsafeTypeAssertion.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-unary-minus': NoUnsafeUnaryMinus.RuleEntry;
   readonly '@typescript-eslint/no-unused-expressions': NoUnusedExpressions.RuleEntry;
   readonly '@typescript-eslint/no-unused-vars': NoUnusedVars.RuleEntry;
@@ -8562,6 +9368,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/prefer-return-this-type': PreferReturnThisType.RuleEntry;
   readonly '@typescript-eslint/prefer-string-starts-ends-with': PreferStringStartsEndsWith.RuleEntry;
   readonly '@typescript-eslint/promise-function-async': PromiseFunctionAsync.RuleEntry;
+  readonly '@typescript-eslint/related-getter-setter-pairs': RelatedGetterSetterPairs.RuleEntry;
   readonly '@typescript-eslint/require-array-sort-compare': RequireArraySortCompare.RuleEntry;
   readonly '@typescript-eslint/require-await': RequireAwait.RuleEntry;
   readonly '@typescript-eslint/restrict-plus-operands': RestrictPlusOperands.RuleEntry;

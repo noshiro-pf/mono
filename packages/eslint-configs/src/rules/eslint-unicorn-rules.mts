@@ -185,6 +185,9 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/prefer-structured-clone': 'error',
   'unicorn/no-length-as-slice-end': 'error',
   'unicorn/no-negation-in-equality-check': 'error',
+  'unicorn/consistent-existence-index-check': 'error',
+  'unicorn/prefer-global-this': 'error',
+  'unicorn/prefer-math-min-max': 'error',
 
   // deprecated rules
   'unicorn/import-index': 0,
@@ -203,4 +206,4 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/prefer-text-content': 0,
   'unicorn/prefer-trim-start-end': 0,
   'unicorn/regex-shorthand': 0,
-};
+} as const;

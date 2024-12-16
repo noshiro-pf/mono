@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-global-this */
 import {
   createState,
   map,
@@ -42,7 +43,7 @@ export type Router = Readonly<{
 
   redirect: (nextUrl: string) => void;
 
-  go: (delta?: number | undefined) => void;
+  go: (delta?: number) => void;
 
   forward: () => void;
 
@@ -137,7 +138,7 @@ export const createRouter = (): Router => {
     updateState();
   };
 
-  const go = (delta?: number | undefined): void => {
+  const go = (delta?: number): void => {
     window.history.go(delta);
     updateState();
   };
@@ -153,7 +154,7 @@ export const createRouter = (): Router => {
   };
 
   // initialize
-  window.addEventListener('popstate', updateState);
+  globalThis.addEventListener('popstate', updateState);
 
   return {
     state,
@@ -164,7 +165,7 @@ export const createRouter = (): Router => {
     back,
     updateQueryParams,
     removeListener: () => {
-      window.removeEventListener('popstate', updateState);
+      globalThis.removeEventListener('popstate', updateState);
     },
     utils: { splitToPathSegments, withSlash },
   };

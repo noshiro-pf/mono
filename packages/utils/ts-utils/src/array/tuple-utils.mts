@@ -31,7 +31,7 @@ const findIndex = <const T extends readonly unknown[]>(
 const indexOf = <const T extends readonly unknown[]>(
   tpl: T,
   searchElement: T[number],
-  fromIndex?: IndexOfTupleRefined<T> | undefined,
+  fromIndex?: IndexOfTupleRefined<T>,
 ): IndexOfTupleRefined<T> | -1 =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   tpl.indexOf(searchElement, fromIndex) as
@@ -41,7 +41,7 @@ const indexOf = <const T extends readonly unknown[]>(
 const lastIndexOf = <const T extends readonly unknown[]>(
   tpl: T,
   searchElement: T[number],
-  fromIndex?: IndexOfTupleRefined<T> | undefined,
+  fromIndex?: IndexOfTupleRefined<T>,
 ): IndexOfTupleRefined<T> | -1 =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   tpl.lastIndexOf(searchElement, fromIndex) as IndexOfTupleRefined<T>;

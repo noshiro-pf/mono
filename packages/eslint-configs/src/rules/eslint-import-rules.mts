@@ -48,7 +48,7 @@ export const eslintImportsRules: EslintImportsRules = {
   'import/no-named-as-default': 'error',
   'import/no-named-as-default-member': 'error',
 
-  // prefer eslint-plugin-deprecation
+  // prefer @typescript-eslint/no-deprecated
   // https://github.com/import-js/eslint-plugin-import/issues/1532
   'import/no-deprecated': 'off',
 
@@ -114,4 +114,4 @@ export const eslintImportsRules: EslintImportsRules = {
 
   // deprecated rules
   'import/imports-first': 0,
-};
+} as const;

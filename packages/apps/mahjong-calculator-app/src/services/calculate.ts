@@ -128,6 +128,7 @@ export const calculate = (): void => {
   const requestBodyString: string = Result.unwrapThrow(Json.stringify(payload));
 
   const url =
+    // eslint-disable-next-line unicorn/prefer-global-this
     window.location.hostname === 'localhost'
       ? 'http://localhost:8888'
       : '/apps/mahjong-nanikiru-simulator/post.py';

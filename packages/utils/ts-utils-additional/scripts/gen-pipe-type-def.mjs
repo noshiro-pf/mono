@@ -66,7 +66,7 @@ const input = () => {
   }
 
   /** @type {number} */
-  // eslint-disable-next-line deprecation/deprecation
+
   const len = Number(args[0]);
 
   /** @type {string | undefined} */
@@ -91,7 +91,7 @@ const input = () => {
 const main = async () => {
   const [len, path] = input();
   const result = createPipeTypeDef(len);
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
+
   await fs.writeFile(path, result, { flag: 'w' });
 };
 

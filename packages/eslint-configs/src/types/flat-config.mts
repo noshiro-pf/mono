@@ -2,6 +2,4 @@ import { type FlatConfig as FlatConfig_ } from '@typescript-eslint/utils/ts-esli
 
 export type FlatConfig = DeepReadonly<FlatConfig_.Config>;
 
-// import { type Linter } from 'eslint';
-
-// export type FlatConfig = DeepReadonly<Linter.FlatConfig>;
+export type Plugin = DeepReadonly<FlatConfig_.Plugin>;

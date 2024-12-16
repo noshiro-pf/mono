@@ -33,6 +33,7 @@ const defineConfig = async () => {
           'error',
           ...restrictedImports,
         ],
+        'functional/no-class-inheritance': 'off',
       },
     },
   ];

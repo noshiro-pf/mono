@@ -1,2 +1,3 @@
 *.mjs
 !eslint.config.gen.mjs
+!update-dependencies.mjs

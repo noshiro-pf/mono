@@ -32,7 +32,7 @@ const createStreams = (
   const counter$ = interval$.chain(take(7));
 
   const mergeMap$ = counter$.chain(take(5)).chain(
-    // eslint-disable-next-line deprecation/deprecation
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     mergeMap((i) =>
       interval(tick * 2)
         .chain(take(5))

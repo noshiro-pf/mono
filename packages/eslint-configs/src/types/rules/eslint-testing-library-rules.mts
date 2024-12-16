@@ -10,11 +10,10 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/await-async-events.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | fixable     | code    |
- *  | recommended | false   |
+ *  | key     | value   |
+ *  | :------ | :------ |
+ *  | type    | problem |
+ *  | fixable | code    |
  *  ```
  */
 namespace AwaitAsyncEvents {
@@ -32,21 +31,21 @@ namespace AwaitAsyncEvents {
    *         "default": "userEvent",
    *         "oneOf": [
    *           {
-   *             "type": "string",
    *             "enum": [
    *               "fireEvent",
    *               "userEvent"
-   *             ]
+   *             ],
+   *             "type": "string"
    *           },
    *           {
-   *             "type": "array",
    *             "items": {
    *               "type": "string",
    *               "enum": [
    *                 "fireEvent",
    *                 "userEvent"
    *               ]
-   *             }
+   *             },
+   *             "type": "array"
    *           }
    *         ]
    *       }
@@ -73,10 +72,9 @@ namespace AwaitAsyncEvents {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/await-async-queries.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace AwaitAsyncQueries {
@@ -89,10 +87,9 @@ namespace AwaitAsyncQueries {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/await-async-utils.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace AwaitAsyncUtils {
@@ -105,10 +102,9 @@ namespace AwaitAsyncUtils {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/consistent-data-testid.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key  | value      |
+ *  | :--- | :--------- |
+ *  | type | suggestion |
  *  ```
  */
 namespace ConsistentDataTestid {
@@ -167,10 +163,9 @@ namespace ConsistentDataTestid {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-await-sync-events.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace NoAwaitSyncEvents {
@@ -221,10 +216,9 @@ namespace NoAwaitSyncEvents {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-await-sync-queries.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace NoAwaitSyncQueries {
@@ -237,10 +231,9 @@ namespace NoAwaitSyncQueries {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-container.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace NoContainer {
@@ -253,10 +246,9 @@ namespace NoContainer {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-debugging-utils.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace NoDebuggingUtils {
@@ -320,11 +312,10 @@ namespace NoDebuggingUtils {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-dom-import.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | fixable     | code    |
- *  | recommended | false   |
+ *  | key     | value   |
+ *  | :------ | :------ |
+ *  | type    | problem |
+ *  | fixable | code    |
  *  ```
  */
 namespace NoDomImport {
@@ -352,11 +343,10 @@ namespace NoDomImport {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-global-regexp-flag-in-query.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | fixable     | code       |
- *  | recommended | false      |
+ *  | key     | value      |
+ *  | :------ | :--------- |
+ *  | type    | suggestion |
+ *  | fixable | code       |
  *  ```
  */
 namespace NoGlobalRegexpFlagInQuery {
@@ -369,10 +359,9 @@ namespace NoGlobalRegexpFlagInQuery {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-manual-cleanup.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace NoManualCleanup {
@@ -385,10 +374,9 @@ namespace NoManualCleanup {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-node-access.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace NoNodeAccess {
@@ -424,10 +412,9 @@ namespace NoNodeAccess {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-promise-in-fire-event.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace NoPromiseInFireEvent {
@@ -440,10 +427,9 @@ namespace NoPromiseInFireEvent {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-render-in-lifecycle.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace NoRenderInLifecycle {
@@ -459,7 +445,8 @@ namespace NoRenderInLifecycle {
    *         "enum": [
    *           "beforeEach",
    *           "beforeAll"
-   *         ]
+   *         ],
+   *         "type": "string"
    *       }
    *     }
    *   }
@@ -482,10 +469,9 @@ namespace NoRenderInLifecycle {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-unnecessary-act.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace NoUnnecessaryAct {
@@ -521,10 +507,9 @@ namespace NoUnnecessaryAct {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-wait-for-multiple-assertions.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key  | value      |
+ *  | :--- | :--------- |
+ *  | type | suggestion |
  *  ```
  */
 namespace NoWaitForMultipleAssertions {
@@ -537,10 +522,9 @@ namespace NoWaitForMultipleAssertions {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-wait-for-side-effects.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key  | value      |
+ *  | :--- | :--------- |
+ *  | type | suggestion |
  *  ```
  */
 namespace NoWaitForSideEffects {
@@ -553,10 +537,9 @@ namespace NoWaitForSideEffects {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-wait-for-snapshot.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace NoWaitForSnapshot {
@@ -569,10 +552,9 @@ namespace NoWaitForSnapshot {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-explicit-assert.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key  | value      |
+ *  | :--- | :--------- |
+ *  | type | suggestion |
  *  ```
  */
 namespace PreferExplicitAssert {
@@ -623,11 +605,10 @@ namespace PreferExplicitAssert {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-find-by.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | fixable     | code       |
- *  | recommended | false      |
+ *  | key     | value      |
+ *  | :------ | :--------- |
+ *  | type    | suggestion |
+ *  | fixable | code       |
  *  ```
  */
 namespace PreferFindBy {
@@ -640,10 +621,9 @@ namespace PreferFindBy {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-implicit-assert.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key  | value      |
+ *  | :--- | :--------- |
+ *  | type | suggestion |
  *  ```
  */
 namespace PreferImplicitAssert {
@@ -657,10 +637,9 @@ namespace PreferImplicitAssert {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-presence-queries.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key  | value      |
+ *  | :--- | :--------- |
+ *  | type | suggestion |
  *  ```
  */
 namespace PreferPresenceQueries {
@@ -700,10 +679,9 @@ namespace PreferPresenceQueries {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-query-by-disappearance.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | false   |
+ *  | key  | value   |
+ *  | :--- | :------ |
+ *  | type | problem |
  *  ```
  */
 namespace PreferQueryByDisappearance {
@@ -717,10 +695,9 @@ namespace PreferQueryByDisappearance {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-query-matchers.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key  | value      |
+ *  | :--- | :--------- |
+ *  | type | suggestion |
  *  ```
  */
 namespace PreferQueryMatchers {
@@ -775,10 +752,9 @@ namespace PreferQueryMatchers {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-screen-queries.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key  | value      |
+ *  | :--- | :--------- |
+ *  | type | suggestion |
  *  ```
  */
 namespace PreferScreenQueries {
@@ -791,10 +767,9 @@ namespace PreferScreenQueries {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-user-event.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key  | value      |
+ *  | :--- | :--------- |
+ *  | type | suggestion |
  *  ```
  */
 namespace PreferUserEvent {
@@ -830,10 +805,9 @@ namespace PreferUserEvent {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/render-result-naming-convention.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key  | value      |
+ *  | :--- | :--------- |
+ *  | type | suggestion |
  *  ```
  */
 namespace RenderResultNamingConvention {

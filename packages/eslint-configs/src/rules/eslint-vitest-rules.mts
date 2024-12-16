@@ -76,4 +76,4 @@ export const eslintVitestRules: EslintVitestRules = {
 
   // deprecated
   'vitest/no-done-callback': 0,
-};
+} as const;

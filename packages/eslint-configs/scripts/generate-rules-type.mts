@@ -28,7 +28,8 @@ const compilerConfig = {
 const normalizeToSchemaArray = (
   schema: DeepReadonly<JSONSchema4 | JSONSchema4[]> | undefined,
 ): DeepReadonly<JSONSchema4[]> =>
-  schema === undefined ? [] : isArray(schema) ? schema : [schema];
+  // schema が JSONSchema4 | JSONSchema4[] | undefined 型を満たしていない plugin があったためその問題を吸収する対応。
+  typeof schema !== 'object' ? [] : isArray(schema) ? schema : [schema];
 
 const removeMultiLineCommentCharacter = (str: string): string =>
   str.replace('/*', ' ').replace('*/', ' ');
@@ -53,7 +54,7 @@ const metaToString = (meta: Meta | undefined): string => {
       'requiresTypeChecking',
       // eslint-disable-next-line no-restricted-syntax
       'requiresTypeChecking' in docs
-        ? // eslint-disable-next-line unicorn/consistent-destructuring, deprecation/deprecation
+        ? // eslint-disable-next-line unicorn/consistent-destructuring, @typescript-eslint/no-deprecated
           Boolean(docs.requiresTypeChecking)
         : undefined,
     ],
@@ -172,7 +173,7 @@ const createResult = async (
 
           const sc = schema[0];
           if (sc === undefined) {
-            throw new Error("schema shouldn't be undefined here");
+            throw new Error("schema can't be undefined here");
           }
 
           /* e.g. "export type Options = { ... };" */
@@ -312,7 +313,7 @@ export const generateRulesType = async (
 
   const rules: DeepReadonly<[string, Rule.RuleModule][]> =
     pluginName === 'eslint'
-      ? // eslint-disable-next-line deprecation/deprecation
+      ? // eslint-disable-next-line @typescript-eslint/no-deprecated
         deepCopy(Array.from(builtinRules.entries()))
       : Object.entries(
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-member-access

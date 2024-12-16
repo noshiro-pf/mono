@@ -56,21 +56,17 @@ export const generateEsLintConfig = async (
         : '',
     '',
 
-    "{ rules: { '@typescript-eslint/no-restricted-imports': [ 'error', ...restrictedImports ] } },",
-
-    packageName === 'syncflow-preact-hooks' ||
-    packageName === 'syncflow-react-hooks'
-      ? JSON.stringify(
-          {
-            files: ['src/syncflow.mts'],
-            rules: {
-              'deprecation/deprecation': 'off',
-            },
-          },
-          undefined,
-          2,
-        )
+    '    {',
+    '      rules: {',
+    "        '@typescript-eslint/no-restricted-imports': [",
+    "          'error',",
+    '          ...restrictedImports,',
+    '        ],',
+    packageName === 'syncflow'
+      ? "        'functional/no-class-inheritance': 'off',"
       : '',
+    '      },',
+    '    },',
 
     '  ];',
     '',

@@ -55,8 +55,7 @@ export const restrictedImportsOption: RestrictedImportsOption = {
         'import hooks from preact/hooks or use memoNamed from @noshiro/preact-utils instead.',
     },
   ],
-};
-
+} as const;
 export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/adjacent-overload-signatures': 'error',
   '@typescript-eslint/array-type': [
@@ -95,7 +94,7 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     },
   ],
   '@typescript-eslint/consistent-type-exports': [
-    'error',
+    'off',
     { fixMixedExportsWithInlineTypeSpecifier: true },
   ],
   '@typescript-eslint/default-param-last': 'error',
@@ -464,6 +463,12 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
 
   '@typescript-eslint/no-unsafe-function-type': 'error',
   '@typescript-eslint/no-wrapper-object-types': 'error',
+  '@typescript-eslint/no-deprecated': 'error',
+
+  // total-functions/no-unsafe-type-assertion の方が厳格なチェックができるようなのでこちらはオフ
+  '@typescript-eslint/no-unsafe-type-assertion': 'off',
+
+  '@typescript-eslint/related-getter-setter-pairs': 'error',
 
   // deprecated
   '@typescript-eslint/no-type-alias': 0,
@@ -472,4 +477,4 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-var-requires': 0,
   '@typescript-eslint/no-empty-interface': 0,
   '@typescript-eslint/no-loss-of-precision': 0,
-};
+} as const;

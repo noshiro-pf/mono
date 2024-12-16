@@ -8,7 +8,7 @@ export const calculatedValues$ = calcAllSources$
   .chain(debounceTime(500))
   .chain(map(calcAll));
 
-// eslint-disable-next-line deprecation/deprecation
+// eslint-disable-next-line @typescript-eslint/no-deprecated
 export const isCalculating$: InitializedObservable<boolean> = merge([
   calcAllSources$.chain(mapTo(true)),
   calculatedValues$.chain(mapTo(false)),

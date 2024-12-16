@@ -20,6 +20,7 @@ import { isProduction } from '../env';
 import { createToaster, showToast } from '../functions';
 
 if (isProduction) {
+  // eslint-disable-next-line unicorn/prefer-global-this
   (window.onerror as Mutable<typeof window.onerror>) = (e: unknown) => {
     const errorString = Result.unwrapThrow(Json.stringify(e));
     console.error(errorString);
@@ -42,7 +43,7 @@ type Props = Readonly<{
   children?: React.ReactNode;
 }>;
 
-// eslint-disable-next-line react/require-optimization
+// eslint-disable-next-line react/require-optimization, functional/no-class-inheritance
 export class ErrorBoundary extends Component<Props, State> {
   static getDerivedStateFromError(error: unknown): State {
     // Update state so the next render will show the fallback UI.

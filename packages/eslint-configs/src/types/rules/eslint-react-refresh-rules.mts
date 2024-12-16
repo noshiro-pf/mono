@@ -13,17 +13,23 @@ namespace OnlyExportComponents {
    *   {
    *     "type": "object",
    *     "properties": {
-   *       "allowConstantExport": {
-   *         "type": "boolean"
-   *       },
-   *       "checkJS": {
-   *         "type": "boolean"
-   *       },
    *       "allowExportNames": {
    *         "type": "array",
    *         "items": {
    *           "type": "string"
    *         }
+   *       },
+   *       "allowConstantExport": {
+   *         "type": "boolean"
+   *       },
+   *       "customHOCs": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
+   *       "checkJS": {
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -32,9 +38,10 @@ namespace OnlyExportComponents {
    * ```
    */
   export type Options = {
-    readonly allowConstantExport?: boolean;
-    readonly checkJS?: boolean;
     readonly allowExportNames?: readonly string[];
+    readonly allowConstantExport?: boolean;
+    readonly customHOCs?: readonly string[];
+    readonly checkJS?: boolean;
   };
 
   export type RuleEntry =

@@ -55,7 +55,7 @@ if (import.meta.vitest !== undefined) {
   const r1 = fromArray([1, 2, 3]);
   const r2 = fromArray(['a', 'b', 'c']);
 
-  // eslint-disable-next-line deprecation/deprecation
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   const _m = merge([r1, r2] as const);
 
   expectType<typeof _m, SyncChildObservable<number | string>>('<=');

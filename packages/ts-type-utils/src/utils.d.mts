@@ -120,6 +120,7 @@ type DeepPartial<T> = T extends Primitive
 
 type RecordKeyType = keyof never;
 
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 type MutableRecord<K extends RecordKeyType, V> = {
   [P in K]: V;
 };

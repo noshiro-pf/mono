@@ -7,7 +7,7 @@ export const isCtrlKey = (keyEvent: KeyboardEvent): boolean => {
       return keyEvent.metaKey;
     case 'windows':
       return keyEvent.ctrlKey;
-    default:
+    case 'other':
       return keyEvent.ctrlKey;
   }
 };

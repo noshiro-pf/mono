@@ -33,7 +33,7 @@ const createStreams = (
 
   const filtered$ = counter$.chain(filter((n) => emitValues.has(n)));
   const throttleTime$ = filtered$.chain(throttleTime(tick * 5));
-  // eslint-disable-next-line deprecation/deprecation
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   const merged$ = merge([filtered$, throttleTime$] as const);
 
   return {

@@ -80,4 +80,4 @@ export const eslintJestRules: EslintJestRules = {
   'jest/padding-around-expect-groups': 'error',
   'jest/padding-around-test-blocks': 'error',
   'jest/prefer-jest-mocked': 'error',
-};
+} as const;

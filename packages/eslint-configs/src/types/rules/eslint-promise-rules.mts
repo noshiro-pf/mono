@@ -108,6 +108,14 @@ namespace AlwaysReturn {
    *     "properties": {
    *       "ignoreLastCallback": {
    *         "type": "boolean"
+   *       },
+   *       "ignoreAssignmentVariable": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string",
+   *           "pattern": "^[\\w$]+$"
+   *         },
+   *         "uniqueItems": true
    *       }
    *     },
    *     "additionalProperties": false
@@ -117,6 +125,7 @@ namespace AlwaysReturn {
    */
   export type Options = {
     readonly ignoreLastCallback?: boolean;
+    readonly ignoreAssignmentVariable?: readonly string[];
   };
 
   export type RuleEntry =
@@ -150,6 +159,9 @@ namespace CatchOrReturn {
    *       "allowThen": {
    *         "type": "boolean"
    *       },
+   *       "allowThenStrict": {
+   *         "type": "boolean"
+   *       },
    *       "terminationMethod": {
    *         "oneOf": [
    *           {
@@ -172,6 +184,7 @@ namespace CatchOrReturn {
   export type Options = {
     readonly allowFinally?: boolean;
     readonly allowThen?: boolean;
+    readonly allowThenStrict?: boolean;
     readonly terminationMethod?: string | readonly string[];
   };
 
@@ -234,6 +247,22 @@ namespace PreferAwaitToThen {
 }
 
 /**
+ * Prefer `catch` to `then(a, b)`/`then(null, b)` for handling errors.
+ *
+ * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-catch.md
+ *
+ *  ```md
+ *  | key     | value      |
+ *  | :------ | :--------- |
+ *  | type    | suggestion |
+ *  | fixable | code       |
+ *  ```
+ */
+namespace PreferCatch {
+  export type RuleEntry = Linter.RuleSeverity;
+}
+
+/**
  * Require creating a `Promise` constructor before using it in an ES5
  * environment.
  *
@@ -275,6 +304,9 @@ namespace NoCallbackInPromise {
    *         "items": {
    *           "type": "string"
    *         }
+   *       },
+   *       "timeoutsErr": {
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -284,6 +316,7 @@ namespace NoCallbackInPromise {
    */
   export type Options = {
     readonly exceptions?: readonly string[];
+    readonly timeoutsErr?: boolean;
   };
 
   export type RuleEntry =
@@ -380,7 +413,33 @@ namespace NoReturnInFinally {
  *  ```
  */
 namespace ValidParams {
-  export type RuleEntry = Linter.RuleSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "exclude": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly exclude?: readonly string[];
+  };
+
+  export type RuleEntry =
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -446,6 +505,7 @@ export type EslintPromiseRules = {
   readonly 'promise/catch-or-return': CatchOrReturn.RuleEntry;
   readonly 'promise/prefer-await-to-callbacks': PreferAwaitToCallbacks.RuleEntry;
   readonly 'promise/prefer-await-to-then': PreferAwaitToThen.RuleEntry;
+  readonly 'promise/prefer-catch': PreferCatch.RuleEntry;
   readonly 'promise/no-native': NoNative.RuleEntry;
   readonly 'promise/no-callback-in-promise': NoCallbackInPromise.RuleEntry;
   readonly 'promise/no-promise-in-callback': NoPromiseInCallback.RuleEntry;
@@ -465,5 +525,6 @@ export type EslintPromiseRulesOption = {
   readonly 'promise/catch-or-return': CatchOrReturn.Options;
   readonly 'promise/prefer-await-to-then': PreferAwaitToThen.Options;
   readonly 'promise/no-callback-in-promise': NoCallbackInPromise.Options;
+  readonly 'promise/valid-params': ValidParams.Options;
   readonly 'promise/spec-only': SpecOnly.Options;
 };

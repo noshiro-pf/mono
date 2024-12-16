@@ -283,8 +283,8 @@ export const AnswerBeingEdited = memoNamed<Props>(
         <WidthRestrictedInputWrapper>
           <FormGroup label={dc.comments}>
             <BpTextArea
+              autoResize={true}
               fill={true}
-              growVertically={true}
               value={answerBeingEdited.comment}
               onValueChange={AnswerPageStore.onCommentChange}
             />

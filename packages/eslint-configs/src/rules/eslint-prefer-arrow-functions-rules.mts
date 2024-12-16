@@ -11,4 +11,4 @@ export const eslintPreferArrowFunctionRules: EslintPreferArrowFunctionRules = {
       singleReturnOnly: false,
     },
   ],
-};
+} as const;

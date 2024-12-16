@@ -31,7 +31,7 @@ const createStreams = (
   const odd$ = counter$
     .chain(filter((n) => n % 2 === 1))
     .chain(map((a) => a.toString()));
-  // eslint-disable-next-line deprecation/deprecation
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   const merged$ = merge([even$, odd$] as const);
 
   return {
