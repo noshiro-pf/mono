@@ -76,7 +76,7 @@
     "@noshiro/strict-typescript-lib-branded": "*",
     "@preact/preset-vite": "^2.9.2",
     "@rollup/plugin-inject": "^5.0.5",
-    "@rollup/plugin-replace": "^5.0.7",
+    "@rollup/plugin-replace": "^6.0.2",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/argparse": "^2.0.16",
     "@types/google-apps-script": "^1.0.83",
