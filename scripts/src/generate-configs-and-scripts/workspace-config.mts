@@ -139,6 +139,9 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
     passWithNoTests: true,
   }),
   'ts-utils': fillDefaultsForUtil(),
+  'numeric-input-utils': fillDefaultsForUtil({
+    passWithNoTests: true,
+  }),
   'tiny-router-observable': fillDefaultsForUtil({
     passWithNoTests: true,
     tsType: 'dom',
