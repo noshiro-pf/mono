@@ -37,12 +37,15 @@
     "zz:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
-    "@blueprintjs/core": "^4.20.1",
-    "@blueprintjs/datetime": "^4.4.13",
+    "@blueprintjs/core": "^5.0.1",
+    "@blueprintjs/datetime": "^5.0.1",
     "@blueprintjs/icons": "^5.11.0",
+    "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.14.0",
+    "@noshiro/io-ts-types": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/react-utils-styled": "*",
+    "@noshiro/syncflow-react-hooks": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
     "react": "^18.2.0"
