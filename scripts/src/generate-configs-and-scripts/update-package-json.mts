@@ -265,7 +265,13 @@ const updatePackageJsonImpl = (
 
           if (cfg.useVite === true) {
             mut_wireit['build'] = {
-              dependencies: ['clean:build', 'type-check'],
+              dependencies: [
+                ...(packageName === 'my-portfolio-app-preact'
+                  ? ['get-zenn-articles']
+                  : []),
+                'clean:build',
+                'type-check',
+              ],
               command: 'yarn zz:vite build',
             };
           } else {
@@ -525,6 +531,10 @@ const updatePackageJsonImpl = (
           mut_scripts['zz:vitest:stream'] =
             'vitest --config ./configs/vitest.config.stream.ts';
         }
+
+        if (packageName === 'my-portfolio-app-preact')
+          mut_scripts['get-zenn-articles'] =
+            'node ./scripts/get-zenn-articles.mjs';
       }
     }
   }

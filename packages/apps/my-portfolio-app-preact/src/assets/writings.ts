@@ -1,4 +1,9 @@
 import { type WritingsInfo } from '../types';
+import { default as zennArticles } from './zenn-articles.json';
+
+export const zennArticleTitle = IMap.new(
+  zennArticles.articles.map((a) => [a.slug, a.title] as const),
+);
 
 export const writings: readonly WritingsInfo[] = [
   {
@@ -20,7 +25,7 @@ export const writings: readonly WritingsInfo[] = [
   {
     id: 'take-full-advantage-of-typescript-eslint',
     link: 'https://zenn.dev/noshiro_piko/articles/take-full-advantage-of-typescript-eslint',
-    title: '★ ESLint を使い倒す方法まとめ',
+    title: `★ ${zennArticleTitle.get('take-full-advantage-of-typescript-eslint') ?? 'ESLint を使い倒す（おすすめルール紹介）'}`,
     subtitle: '',
     body: 'eslint:recommended などの config には含まれないが有用な ESLint ルールなどを紹介しています。',
   },
@@ -41,28 +46,28 @@ export const writings: readonly WritingsInfo[] = [
   {
     id: 'numeric-input-interface',
     link: 'https://zenn.dev/noshiro_piko/articles/numeric-input-interface',
-    title: 'numeric input の React コンポーネントのインターフェース考察',
+    title: `★ ${zennArticleTitle.get('numeric-input-interface') ?? 'numeric input の React コンポーネントのインターフェース設計考察'}`,
     subtitle: '',
     body: 'ウェブUIにおける一般的な数値入力欄をReactコンポーネントとして定義する際のインターフェース・状態管理方法について考えまとめました。',
   },
   {
     id: 'typescript-type-branding',
     link: 'https://zenn.dev/noshiro_piko/articles/typescript-branded-type-int',
-    title: '★ TypeScript の Type Branding をより便利に活用する方法のまとめ',
+    title: `★ ${zennArticleTitle.get('typescript-branded-type-int') ?? 'TypeScript の Type Branding をより便利に活用する方法のまとめ'}`,
     subtitle: '',
     body: 'TypeScript で用いられることのある Type Branding というハックをより便利に活用する方法をまとめました。',
   },
   {
     id: 'typescript-type-utilities-min-max',
     link: 'https://zenn.dev/noshiro_piko/articles/typescript-type-utilities',
-    title: 'TypeScript 型ユーティリティ集',
+    title: `★ ${zennArticleTitle.get('typescript-type-utilities') ?? 'TypeScript 型ユーティリティ集'}`,
     subtitle: '',
     body: '私が自作してライブラリやアプリの開発などにも使っている TypeScript の型ユーティリティをまとめました。',
   },
   {
     id: 'typescript-type-utilities',
     link: 'https://zenn.dev/noshiro_piko/articles/typescript-type-level-min',
-    title: 'TypeScript の型ユーティリティ Min, Max の実装',
+    title: `★ ${zennArticleTitle.get('typescript-type-level-min') ?? 'TypeScript の型ユーティリティ Min, Max の実装'}`,
     subtitle: 'TypeScript の型ユーティリティ Min, Max の実装と解説',
     body: '',
   },
@@ -72,6 +77,33 @@ export const writings: readonly WritingsInfo[] = [
     title: '★ type challenges の紹介',
     subtitle: '',
     body: 'TypeScriptの型パズル集から、個人的に役に立った知識が多く詰まった問題を1問選んで解説してみました。',
+  },
+  {
+    id: 'typescript-void-type',
+    link: 'https://zenn.dev/noshiro_piko/articles/typescript-void-type',
+    title:
+      zennArticleTitle.get('typescript-void-type') ??
+      'TypeScript で関数の戻り値型を undefined とすべきか void とすべきか',
+    subtitle: '',
+    body: '',
+  },
+  {
+    id: 'notes-on-type-guard-functions',
+    link: 'https://zenn.dev/noshiro_piko/articles/notes-on-type-guard-functions',
+    title:
+      zennArticleTitle.get('notes-on-type-guard-functions') ??
+      'TypeScriptの型ガード関数を定義する際に避けるべきパターン覚書',
+    subtitle: '',
+    body: '',
+  },
+  {
+    id: 'javascript-to-number',
+    link: 'https://zenn.dev/noshiro_piko/articles/javascript-to-number',
+    title:
+      zennArticleTitle.get('javascript-to-number') ??
+      'JavaScript で文字列を数値に変換する方法まとめ（加筆予定）',
+    subtitle: '',
+    body: '',
   },
   {
     id: 'tatekae',
@@ -143,4 +175,4 @@ export const writings: readonly WritingsInfo[] = [
     subtitle: '社内輪読会資料',
     body: 'reveal.jsを用いて作成．',
   },
-];
+] as const;
