@@ -1,7 +1,7 @@
+import { useNumericInputState } from '@noshiro/numeric-input-utils';
 import * as React from 'react';
-import { useNumericInputState } from './numeric-input-state';
 import { NumericInputView } from './numeric-input-view';
-import { ScoreType } from './score';
+import { ScoreType } from './score-type';
 
 type Props = Readonly<{
   score: ScoreType;
@@ -29,7 +29,7 @@ export const ScoreNumericInput = React.memo<Props>((props) => {
       step={step}
       value={valueAsStr}
       onBlur={submit}
-      onChange={onValueAsStrChange}
+      onValueChange={onValueAsStrChange}
     />
   );
 });

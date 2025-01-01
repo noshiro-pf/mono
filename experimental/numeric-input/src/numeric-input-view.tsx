@@ -2,34 +2,35 @@ import * as React from 'react';
 
 type Props = Readonly<{
   value: string;
-  disabled: boolean;
-  min: number;
-  max: number;
-  step: number;
-  onChange: (value: string) => void;
-  onBlur: () => void;
+  onValueChange: (next: string) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+  disabled?: boolean;
+  onBlur?: () => void;
 }>;
 
 export const NumericInputView = React.memo<Props>((props) => {
-  const { value, disabled, max, min, step, onChange, onBlur } = props;
+  const { onValueChange, value, min, max, step, disabled, onBlur } = props;
 
-  const handleChange = React.useCallback(
+  const onChange = React.useCallback(
     (ev: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(ev.target.value);
+      onValueChange(ev.target.value);
     },
-    [onChange],
+    [onValueChange],
   );
 
   return (
     <input
-      disabled={disabled}
-      max={max}
-      min={min}
-      step={step}
       type='number'
+      className='numeric-input'
+      disabled={disabled}
       value={value}
+      min={min}
+      max={max}
+      step={step}
+      onChange={onChange}
       onBlur={onBlur}
-      onChange={handleChange}
     />
   );
 });

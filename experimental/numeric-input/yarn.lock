@@ -189,6 +189,11 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@noshiro/numeric-input-utils@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@noshiro/numeric-input-utils/-/numeric-input-utils-1.0.0.tgz#5723205efde98e9bb7b25b18eaec3ba4baa7df47"
+  integrity sha512-gtSsQGNMICV6kWvLU3YBnPP8WyfpQqMFN/AX1tBs/VU9yo8uZQ1BVo8IKeKSLGfcC76jt7RAj5lLmg9lIxIoGA==
+
 "@swc/core-darwin-arm64@1.3.82":
   version "1.3.82"
   resolved "https://registry.yarnpkg.com/@swc/core-darwin-arm64/-/core-darwin-arm64-1.3.82.tgz#bbf9874747b51053d8a59ea26c3e235c326f24a3"
