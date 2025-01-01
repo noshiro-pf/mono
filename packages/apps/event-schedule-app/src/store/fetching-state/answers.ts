@@ -1,6 +1,7 @@
 import { api } from '../../api';
 import { fetchThrottleTime } from '../../constants';
 import { Router } from '../router';
+import { EventScheduleStore } from './event-schedule';
 
 const [fetchAnswers$, fetchAnswers] = createVoidEventEmitter();
 
@@ -26,6 +27,7 @@ const {
 } = createBooleanState(false);
 
 const refreshAnswers = (): void => {
+  EventScheduleStore.fetchEventSchedule();
   fetchAnswers();
   setRefreshButtonIsLoading(true);
 };
