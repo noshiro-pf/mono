@@ -1,16 +1,16 @@
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import * as React from 'react';
 
-export const useNumericInputState = <T extends number>({
-  decode,
-  encode,
-  onValueChange,
+export const useNumericInputState = <N extends number>({
   valueFromProps,
+  onValueChange,
+  encode,
+  decode,
 }: Readonly<{
-  valueFromProps: T;
-  onValueChange: (value: T) => void;
-  encode: (s: T) => string;
-  decode: (s: string) => T;
+  valueFromProps: N;
+  onValueChange: (value: N) => void;
+  encode: (s: N) => string;
+  decode: (s: string) => N;
 }>): Readonly<{
   valueAsStr: string;
   onValueAsStrChange: (value: string) => void;
