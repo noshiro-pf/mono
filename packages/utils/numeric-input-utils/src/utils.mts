@@ -1,13 +1,13 @@
-export type NumericTypeProperties<T extends number> = Readonly<{
-  min: T;
-  max: T;
+export type NumericTypeProperties<N extends number> = Readonly<{
+  min: N;
+  max: N;
   digit: number;
-  defaultValue: T;
+  defaultValue: N;
 }>;
 
-export const clampAndRound =
-  <T extends number>(p: NumericTypeProperties<T>) =>
-  (x: number): T =>
+export const clampAndRoundFn =
+  <N extends number>(p: NumericTypeProperties<N>) =>
+  (x: number): N =>
     !Number.isFinite(x)
       ? p.defaultValue
       : x < p.min
@@ -15,31 +15,32 @@ export const clampAndRound =
         : p.max < x
           ? p.max
           : // eslint-disable-next-line total-functions/no-unsafe-type-assertion, total-functions/no-partial-division
-            ((Math.round(x * 10 ** p.digit) / 10 ** p.digit) as T);
+            ((Math.round(x * 10 ** p.digit) / 10 ** p.digit) as N);
 
-export const createNumberType = <T extends number>({
+export const createNumberType = <N extends number>({
   min,
   max,
   digit,
   defaultValue,
-}: NumericTypeProperties<T>): Readonly<{
+}: NumericTypeProperties<N>): Readonly<{
   step: number;
-  encode: (s: T) => string;
-  decode: (s: string) => T;
+  encode: (s: N) => string;
+  decode: (s: string) => N;
+  clampAndRound: (value: number) => N;
 }> &
-  NumericTypeProperties<T> => {
+  NumericTypeProperties<N> => {
   const step = 10 ** -digit;
 
-  const clampAndRoundScore = clampAndRound<T>({
+  const clampAndRound = clampAndRoundFn<N>({
     defaultValue,
     digit,
     max,
     min,
   });
 
-  const encode = (s: T): string => s.toString();
+  const encode = (s: N): string => s.toString();
 
-  const decode = (s: string): T => clampAndRoundScore(Number(s));
+  const decode = (s: string): N => clampAndRound(Number(s));
 
   return {
     min,
@@ -49,5 +50,6 @@ export const createNumberType = <T extends number>({
     step,
     encode,
     decode,
+    clampAndRound,
   };
 };

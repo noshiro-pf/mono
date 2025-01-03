@@ -13,5 +13,6 @@ export default defineConfig({
     typecheck: {
       tsconfig: nodePath.resolve(thisDir, 'tsconfig.test.json'),
     },
+    passWithNoTests: true,
   },
 });
