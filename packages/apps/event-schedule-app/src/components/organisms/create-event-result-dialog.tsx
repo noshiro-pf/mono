@@ -41,7 +41,6 @@ export const CreateEventResultDialog = memoNamed<Props>(
     return (
       <DialogWithMaxWidth
         canEscapeKeyClose={false}
-        hasBackdrop={false}
         icon={'timeline-events'}
         isCloseButtonShown={false}
         isOpen={isOpen}

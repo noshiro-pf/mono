@@ -1,5 +1,6 @@
 import { type HTMLInputProps, type InputGroupProps } from '@blueprintjs/core';
-import { DateInput, type DatePickerShortcut } from '@blueprintjs/datetime';
+import { type DatePickerShortcut } from '@blueprintjs/datetime';
+import { DateInput3 } from '@blueprintjs/datetime2';
 import { type YearMonthDate } from '@noshiro/io-ts-types';
 import { memoNamed } from '@noshiro/react-utils';
 import {
@@ -21,8 +22,7 @@ export type BpDatePickerProps = Omit<
     shortcuts?: boolean | readonly DatePickerShortcut[];
   }>;
 
-// eslint-disable-next-line @typescript-eslint/no-deprecated
-type DateInputPropsOriginal = React.ComponentProps<typeof DateInput>;
+type DateInputPropsOriginal = React.ComponentProps<typeof DateInput3>;
 
 export const BpDatePicker = memoNamed<BpDatePickerProps>(
   'BpDatePicker',
@@ -65,8 +65,7 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
     );
 
     return (
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      <DateInput
+      <DateInput3
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
         canClearSelection={canClearSelection}
