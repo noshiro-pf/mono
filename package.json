@@ -132,7 +132,7 @@
     "tslib": "^2.4.0",
     "typescript": "^5.7.2",
     "unplugin-auto-import": "^0.17.5",
-    "vite": "^6.0.3",
+    "vite": "^6.0.7",
     "vite-plugin-markdown": "^2.2.0",
     "vitest": "^2.1.8",
     "wireit": "^0.14.9",
