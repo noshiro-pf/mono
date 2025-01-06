@@ -1,5 +1,5 @@
+import { SwitchWithoutLabelStyled } from '@noshiro/react-blueprintjs-utils';
 import { Description } from '../atoms';
-import { SwitchWithoutLabelStyled } from '../bp';
 
 type Props = Readonly<{
   title: string;

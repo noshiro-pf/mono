@@ -1,11 +1,11 @@
 import { Button } from '@blueprintjs/core';
+import { HTMLTableBorderedStyled2 } from '@noshiro/react-blueprintjs-utils';
 import {
   AnswerFilterAndSortStore,
   AnswerPageStore,
   AnswerTableStore,
 } from '../../../store';
 import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
-import { HTMLTableBorderedStyled2 } from '../../bp';
 import { CommentButton } from './comment-button';
 import { DatetimeRangeCell } from './datetime-range-cell';
 import { FilterByIconPopover } from './filter-by-icon-popover';

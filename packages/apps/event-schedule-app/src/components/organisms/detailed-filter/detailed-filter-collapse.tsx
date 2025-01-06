@@ -1,6 +1,6 @@
 import { Collapse } from '@blueprintjs/core';
+import { CheckboxView } from '@noshiro/react-blueprintjs-utils';
 import { AnswerFilterAndSortStore } from '../../../store';
-import { CheckboxView } from '../../bp';
 import { DetailedFilterDateRange } from './detailed-filter-date-range';
 import { DetailedFilterDayOfWeek } from './detailed-filter-day-of-week';
 import { DetailedFilterFilledDateOnly } from './detailed-filter-filled-date-only';

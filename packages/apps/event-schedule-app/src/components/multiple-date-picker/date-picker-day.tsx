@@ -12,7 +12,7 @@ import {
   DatePickerDaySelectedStyled,
   DatePickerDayStyled,
   DatePickerDayWrapperStyled,
-} from '../bp';
+} from '@noshiro/react-blueprintjs-utils';
 
 type Props = Readonly<{
   ymd: YearMonthDate;

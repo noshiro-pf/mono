@@ -1,7 +1,7 @@
 import { Button, FormGroup } from '@blueprintjs/core';
+import { BpInput } from '@noshiro/react-blueprintjs-utils';
 import { ResetPasswordPageStore } from '../../store';
 import { Label } from '../atoms';
-import { BpInput } from '../bp';
 import { SignInStyled } from '../styled';
 
 const dc = dict.register;

@@ -1,10 +1,10 @@
-import { daysOfWeekList } from '@noshiro/ts-utils-additional';
 import {
   DatePickerWeekdayReadonlyStyled,
   DatePickerWeekdaysRowStyled,
   DatePickerWeekdaysStyled,
   DatePickerWeekdayStyled,
-} from '../bp';
+} from '@noshiro/react-blueprintjs-utils';
+import { daysOfWeekList } from '@noshiro/ts-utils-additional';
 
 type Props = Readonly<{
   onClick?: (w: DayOfWeekIndex) => void;

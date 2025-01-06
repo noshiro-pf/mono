@@ -1,7 +1,7 @@
 import { Button } from '@blueprintjs/core';
+import { AlertWithMaxWidth } from '@noshiro/react-blueprintjs-utils';
 import { eventListItemTextColor } from '../../../constants';
 import { Description } from '../../atoms';
-import { AlertWithMaxWidth } from '../../bp';
 
 const dc = dict.eventListPage;
 
@@ -31,9 +31,9 @@ export const ArchiveEventButton = memoNamed<Props>(
 
     const onCancel = useCallback(
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      (ev: React.SyntheticEvent<HTMLElement, Event>) => {
-        ev.preventDefault();
-        ev.stopPropagation();
+      (ev?: React.SyntheticEvent<HTMLElement, Event>) => {
+        ev?.preventDefault();
+        ev?.stopPropagation();
         handleClose();
       },
       [handleClose],
@@ -41,9 +41,9 @@ export const ArchiveEventButton = memoNamed<Props>(
 
     const onConfirmHandler = useCallback(
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      (ev: React.SyntheticEvent<HTMLElement, Event>) => {
-        ev.preventDefault();
-        ev.stopPropagation();
+      (ev?: React.SyntheticEvent<HTMLElement, Event>) => {
+        ev?.preventDefault();
+        ev?.stopPropagation();
 
         handleClose();
         onConfirm();

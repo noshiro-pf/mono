@@ -1,6 +1,6 @@
+import { CheckboxView } from '@noshiro/react-blueprintjs-utils';
 import { type DetailedFilterIcon } from '../../../types';
 import { CustomIcon } from '../../atoms';
-import { CheckboxView } from '../../bp';
 import { IconCountNumericInput } from '../../molecules';
 import {
   CheckboxWrapper,
@@ -12,13 +12,13 @@ import {
 
 type Props = Readonly<{
   icon: DetailedFilterIcon;
-  upperLimit: number;
+  upperLimit: SafeUint;
   enabled: boolean;
-  min: number;
-  max: number;
+  min: SafeUint;
+  max: SafeUint;
   setEnabled: (value: boolean) => void;
-  onMinChange: (value: number) => void;
-  onMaxChange: (value: number) => void;
+  onMinChange: (value: SafeUint) => void;
+  onMaxChange: (value: SafeUint) => void;
 }>;
 
 export const DetailedFilterNumIcon = memoNamed<Props>(

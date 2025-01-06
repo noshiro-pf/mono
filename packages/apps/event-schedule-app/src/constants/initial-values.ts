@@ -1,7 +1,7 @@
 import {
-  answerDeadlineRemainingDaysDefaultValue,
-  notificationSettingsDefaultValue,
-  toUserName,
+  defaultAnswerDeadlineRemainingDays,
+  NotificationSettings,
+  UserName,
 } from '@noshiro/event-schedule-app-shared';
 import { TimeRange, YmdhmFromDate } from '@noshiro/io-ts-types';
 import { defaultIconPoint } from './default-icon-point';
@@ -41,7 +41,7 @@ export const answerDeadlineInitialValue: Ymdhm = pipe(DateUtils.today())
   .chain(
     DateUtils.updateLocaleDate(
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      (a) => (a + answerDeadlineRemainingDaysDefaultValue) as DateEnum,
+      (a) => (a + defaultAnswerDeadlineRemainingDays) as DateEnum,
     ),
   )
   .chain(DateUtils.setLocaleHours(23))
@@ -50,7 +50,7 @@ export const answerDeadlineInitialValue: Ymdhm = pipe(DateUtils.today())
   .chain(YmdhmFromDate).value;
 
 export const notificationSettingsInitialValue: NotificationSettings = pipe(
-  notificationSettingsDefaultValue,
+  NotificationSettings.defaultValue,
 ).chain((o) => Obj.set(o, 'notifyOnAnswerChange', true)).value;
 
 export const datetimeSpecificationInitialValue: DatetimeSpecificationEnumType =
@@ -67,7 +67,7 @@ export const eventScheduleInitialValue: EventSchedule = {
   timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
   author: {
     id: null,
-    name: toUserName(''),
+    name: UserName.cast(''),
   },
   archivedBy: [],
 };

@@ -1,6 +1,6 @@
+import { CheckboxView } from '@noshiro/react-blueprintjs-utils';
 import { AnswerFilterAndSortStore } from '../../../store';
 import { type AnswerRank } from '../../../types';
-import { CheckboxView } from '../../bp';
 import { RankNumericInput } from '../../molecules';
 import { CheckboxWrapper, FilterItem } from './styled';
 

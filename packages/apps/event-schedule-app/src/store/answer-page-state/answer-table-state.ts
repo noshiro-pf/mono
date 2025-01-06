@@ -1,4 +1,4 @@
-import { toUserName } from '@noshiro/event-schedule-app-shared';
+import { UserName } from '@noshiro/event-schedule-app-shared';
 import { compareYearMonthDate } from '@noshiro/io-ts-types';
 import { answerTableColor, datetimeRange2str } from '../../constants';
 import {
@@ -337,7 +337,7 @@ const tableBodyValuesFiltered$ = combine([
         answerTableRow.every(
           (cell, index: number) =>
             !falseKeys.has([
-              answers?.[index]?.user.name ?? toUserName(''),
+              answers?.[index]?.user.name ?? UserName.cast(''),
               cell.iconId,
             ]),
         ) &&

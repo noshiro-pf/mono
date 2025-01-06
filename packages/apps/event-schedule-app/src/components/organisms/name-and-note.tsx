@@ -1,6 +1,6 @@
 import { FormGroup } from '@blueprintjs/core';
+import { BpInput, BpTextArea } from '@noshiro/react-blueprintjs-utils';
 import { useFormError } from '../../hooks';
-import { BpInput, BpTextArea } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';
 
 const dc = dict.eventSettingsPage.section1;

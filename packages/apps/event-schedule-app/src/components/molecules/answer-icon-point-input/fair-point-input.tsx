@@ -1,8 +1,11 @@
 import {
+  NumericInputView,
+  useNumericInputState,
+} from '@noshiro/react-blueprintjs-utils';
+import {
   answerIconPointConfig,
   clampAndRoundAnswerFairIconPoint,
 } from '../../../constants';
-import { NumericInputView, useNumericInputState } from '../../bp';
 
 type Props = Readonly<{
   value: AnswerIconPoint;
@@ -12,7 +15,7 @@ type Props = Readonly<{
 
 const {
   step,
-  fair: { defaultValue, max, min },
+  fair: { max, min },
 } = answerIconPointConfig;
 
 export const AnswerIconFairPointInput = memoNamed<Props>(
@@ -20,15 +23,16 @@ export const AnswerIconFairPointInput = memoNamed<Props>(
   ({ value: valueFromProps, onValueChange, disabled }) => {
     const {
       valueAsStr,
-      setValueStr,
+      setValueAsStr,
       onDecrementMouseDown,
       onIncrementMouseDown,
-      onInputBlur,
+      submit,
       onKeyDown,
-    } = useNumericInputState({
+    } = useNumericInputState<AnswerIconPoint>({
       onValueChange,
-      defaultValue,
-      normalizeValue: clampAndRoundAnswerFairIconPoint,
+      normalize: clampAndRoundAnswerFairIconPoint,
+      decode: (s) => clampAndRoundAnswerFairIconPoint(Number(s)),
+      encode: (s) => s.toString(),
       valueFromProps,
       step,
     });
@@ -52,8 +56,8 @@ export const AnswerIconFairPointInput = memoNamed<Props>(
         valueAsStr={valueAsStr}
         onDecrementMouseDown={onDecrementMouseDown}
         onIncrementMouseDown={onIncrementMouseDown}
-        onInputBlur={onInputBlur}
-        onInputStringChange={setValueStr}
+        onInputBlur={submit}
+        onInputStringChange={setValueAsStr}
       />
     );
   },

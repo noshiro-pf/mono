@@ -88,6 +88,8 @@
     "@noshiro/fast-deep-equal": "*",
     "@noshiro/io-ts": "*",
     "@noshiro/io-ts-types": "*",
+    "@noshiro/numeric-input-utils": "*",
+    "@noshiro/react-blueprintjs-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/syncflow-react-hooks": "*",

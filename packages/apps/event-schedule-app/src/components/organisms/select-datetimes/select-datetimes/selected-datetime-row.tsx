@@ -1,5 +1,5 @@
 import { Button } from '@blueprintjs/core';
-import { BpDatePicker } from '../../../bp';
+import { BpDatePicker } from '@noshiro/react-blueprintjs-utils';
 import { TimeRangeView } from '../../../molecules';
 
 type Props = Readonly<{

@@ -1,6 +1,6 @@
 import {
   ANSWER_KEY_CREATED_AT,
-  fillAnswer,
+  Answer,
   firestorePaths,
 } from '@noshiro/event-schedule-app-shared';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
@@ -22,7 +22,7 @@ export const fetchAnswers = (
     Result.fold(
       a,
       (querySnapshot) =>
-        querySnapshot.docs.map((d) => fillAnswer({ ...d.data(), id: d.id })),
+        querySnapshot.docs.map((d) => Answer.fill({ ...d.data(), id: d.id })),
       (message) => ({ type: 'others', message: Str.from(message) }) as const,
     ),
   );

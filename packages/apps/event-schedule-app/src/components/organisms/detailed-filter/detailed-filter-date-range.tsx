@@ -1,6 +1,9 @@
+import {
+  BpDateRangeInput,
+  CheckboxView,
+} from '@noshiro/react-blueprintjs-utils';
 import { type AnswerFilterState } from '../../../functions';
 import { AnswerFilterAndSortStore } from '../../../store';
-import { BpDateRangeInput, CheckboxView } from '../../bp';
 import { CheckboxWrapper, FilterItem, FilterItemContent } from './styled';
 
 const dc = dict.answerPage.detailedFilter;

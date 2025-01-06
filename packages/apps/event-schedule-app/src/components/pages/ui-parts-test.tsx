@@ -1,4 +1,10 @@
 import { Button, TextArea } from '@blueprintjs/core';
+import {
+  BpInput,
+  BpSelect,
+  BpSwitch,
+  BpTimePicker,
+} from '@noshiro/react-blueprintjs-utils';
 import { clog } from '../../utils';
 import {
   CalendarIcon,
@@ -9,7 +15,6 @@ import {
   EditIcon,
   TriangleIcon,
 } from '../atoms';
-import { BpInput, BpSelect, BpSwitch, BpTimePicker } from '../bp';
 
 const size: React.CSSProperties = { width: '32px', height: '32px' };
 

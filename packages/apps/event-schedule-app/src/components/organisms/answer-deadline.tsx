@@ -1,7 +1,7 @@
 import { FormGroup } from '@blueprintjs/core';
+import { BpDatetimePicker } from '@noshiro/react-blueprintjs-utils';
 import { answerDeadlineShortcuts } from '../../constants';
 import { useIsMobile } from '../../store';
-import { BpDatetimePicker } from '../bp';
 
 type Props = Readonly<{
   useAnswerDeadline: boolean;

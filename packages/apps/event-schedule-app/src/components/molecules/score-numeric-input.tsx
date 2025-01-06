@@ -1,29 +1,31 @@
 import {
+  NumericInputView,
+  useNumericInputState,
+} from '@noshiro/react-blueprintjs-utils';
+import {
   answersScoreNumericInputConfig,
   clampAndRoundAnswersScore,
 } from '../../constants';
 import { type AnswersScore } from '../../types';
-import { NumericInputView, useNumericInputState } from '../bp';
 
 type Props = Readonly<{
-  value: AnswersScore;
+  score: AnswersScore;
+  onScoreChange: (value: AnswersScore) => void;
   disabled?: boolean;
   min?: AnswersScore;
   max?: AnswersScore;
-  onValueChange: (value: AnswersScore) => void;
 }>;
 
-const step = answersScoreNumericInputConfig.majorStep;
-const defaultValue = answersScoreNumericInputConfig.defaultValue;
+const { majorStep: step } = answersScoreNumericInputConfig;
 
 export const ScoreNumericInput = memoNamed<Props>(
   'ScoreNumericInput',
   ({
-    value: valueFromProps,
+    score: valueFromProps,
     disabled = false,
     min = answersScoreNumericInputConfig.min,
     max = answersScoreNumericInputConfig.max,
-    onValueChange,
+    onScoreChange: onValueChange,
   }) => {
     const normalizeValue = useCallback(
       (value: number) =>
@@ -33,15 +35,16 @@ export const ScoreNumericInput = memoNamed<Props>(
 
     const {
       valueAsStr,
-      setValueStr,
+      setValueAsStr,
       onDecrementMouseDown,
       onIncrementMouseDown,
-      onInputBlur,
+      submit,
       onKeyDown,
     } = useNumericInputState({
       onValueChange,
-      defaultValue,
-      normalizeValue,
+      normalize: normalizeValue,
+      decode: (s) => clampAndRoundAnswersScore(Number(s)),
+      encode: (s) => s.toString(),
       valueFromProps,
       step,
     });
@@ -60,8 +63,8 @@ export const ScoreNumericInput = memoNamed<Props>(
         valueAsStr={valueAsStr}
         onDecrementMouseDown={onDecrementMouseDown}
         onIncrementMouseDown={onIncrementMouseDown}
-        onInputBlur={onInputBlur}
-        onInputStringChange={setValueStr}
+        onInputBlur={submit}
+        onInputStringChange={setValueAsStr}
       />
     );
   },

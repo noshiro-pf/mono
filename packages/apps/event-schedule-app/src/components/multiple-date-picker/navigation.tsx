@@ -1,6 +1,6 @@
 import { Button } from '@blueprintjs/core';
+import { BpSelect } from '@noshiro/react-blueprintjs-utils';
 import { monthsList } from '@noshiro/ts-utils-additional';
-import { BpSelect } from '../bp';
 
 const thisYear = toSafeUint(DateUtils.getLocaleYear(DateUtils.today()));
 const thisMonth = DateUtils.getLocaleMonth(DateUtils.today());

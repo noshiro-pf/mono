@@ -1,5 +1,5 @@
+import { ButtonNowrapStyled } from '@noshiro/react-blueprintjs-utils';
 import { AnswerPageStore } from '../../../store';
-import { ButtonNowrapStyled } from '../../bp';
 import { ButtonWithConfirm } from './button-with-confirm';
 
 const dc = dict.answerPage.answerBeingEdited;

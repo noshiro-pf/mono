@@ -1,4 +1,4 @@
-import { toUserName } from '@noshiro/event-schedule-app-shared';
+import { UserName } from '@noshiro/event-schedule-app-shared';
 import { compareYearMonthDate } from '@noshiro/io-ts-types';
 import { type AnswerRank, type AnswersScore } from '../../types';
 import {
@@ -102,7 +102,7 @@ const initialState: AnswerFilterState = {
       [],
       ([username, iconId]: UserNameAndIconId) => `${username}--${iconId}`,
       (key) => [
-        toUserName(key.slice(0, -6)),
+        UserName.cast(key.slice(0, -6)),
         key.endsWith(`--good`)
           ? 'good'
           : key.endsWith(`--fair`)
@@ -205,11 +205,17 @@ export type AnswerFilterStateAction = DeepReadonly<
       type: 'setFromUrlQueryParams';
       values: {
         iconState: {
-          good: { min: number | undefined; max: number | undefined };
-          fair: { min: number | undefined; max: number | undefined };
-          poor: { min: number | undefined; max: number | undefined };
-          goodPlusFair: { min: number | undefined; max: number | undefined };
-          fairPlusPoor: { min: number | undefined; max: number | undefined };
+          good: { min: SafeUint | undefined; max: SafeUint | undefined };
+          fair: { min: SafeUint | undefined; max: SafeUint | undefined };
+          poor: { min: SafeUint | undefined; max: SafeUint | undefined };
+          goodPlusFair: {
+            min: SafeUint | undefined;
+            max: SafeUint | undefined;
+          };
+          fairPlusPoor: {
+            min: SafeUint | undefined;
+            max: SafeUint | undefined;
+          };
         };
         filledDateOnly: boolean | undefined;
         rank: AnswerRank | undefined;

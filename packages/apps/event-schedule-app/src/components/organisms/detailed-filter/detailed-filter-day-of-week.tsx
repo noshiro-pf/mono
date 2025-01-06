@@ -1,6 +1,6 @@
+import { CheckboxView } from '@noshiro/react-blueprintjs-utils';
 import { type AnswerFilterState } from '../../../functions';
 import { AnswerFilterAndSortStore } from '../../../store';
-import { CheckboxView } from '../../bp';
 import {
   CheckboxWithBottomLabel,
   CheckboxWrapper,

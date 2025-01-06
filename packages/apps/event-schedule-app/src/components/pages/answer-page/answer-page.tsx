@@ -5,6 +5,7 @@ import {
   TagInput,
   type TagProps,
 } from '@blueprintjs/core';
+import { AlertWithMaxWidth, BpSwitch } from '@noshiro/react-blueprintjs-utils';
 import html2canvas from 'html2canvas';
 import { eventIsAfterDeadline } from '../../../functions';
 import {
@@ -22,7 +23,6 @@ import {
 } from '../../../store';
 import { toClassName } from '../../../utils';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
-import { AlertWithMaxWidth, BpSwitch } from '../../bp';
 import { CustomScrollbarWrapper, Section } from '../../molecules';
 import { MultipleDatePicker } from '../../multiple-date-picker';
 import {

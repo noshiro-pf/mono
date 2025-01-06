@@ -1,7 +1,7 @@
 import { Button } from '@blueprintjs/core';
 import { TimeRange } from '@noshiro/io-ts-types';
+import { CheckboxView } from '@noshiro/react-blueprintjs-utils';
 import { timeRangeReducer } from '../../../../functions';
-import { CheckboxView } from '../../../bp';
 import { TimeRangeView } from '../../../molecules';
 import { ButtonsWrapperAlignEnd } from '../../../styled';
 import {

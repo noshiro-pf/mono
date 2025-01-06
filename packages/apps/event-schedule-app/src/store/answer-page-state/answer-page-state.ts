@@ -1,8 +1,4 @@
-import {
-  answerDefaultValue,
-  toUserId,
-  toUserName,
-} from '@noshiro/event-schedule-app-shared';
+import { Answer, UserId, UserName } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { api } from '../../api';
 import { Routes, datetimeRange2str } from '../../constants';
@@ -51,7 +47,7 @@ const {
   getSnapshot: getAnswerBeingEditedSnapshot,
   setState: setAnswerBeingEdited,
   updateState: updateAnswerBeingEdited,
-} = createState(answerDefaultValue);
+} = createState(Answer.defaultValue);
 
 const setAnswerBeingEditedSectionState = (
   nextState: 'creating' | 'editing' | 'hidden',
@@ -66,7 +62,7 @@ const setAnswerBeingEditedSectionState = (
       Obj.set(
         ans,
         'user',
-        Obj.set(ans.user, 'id', mapOptional(user?.uid, toUserId) ?? null),
+        Obj.set(ans.user, 'id', mapOptional(user?.uid, UserId.cast) ?? null),
       ),
     );
   }
@@ -132,7 +128,7 @@ const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
   .chain(
     map((e) =>
       Obj.set(
-        answerDefaultValue,
+        Answer.defaultValue,
         'selection',
         e.datetimeRangeList.map(
           (d) =>
@@ -147,7 +143,7 @@ const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
     ),
   )
   .chain(skipIfNoChange(deepEqual))
-  .chain(setInitialValue(answerDefaultValue));
+  .chain(setInitialValue(Answer.defaultValue));
 
 const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combine([
   AnswersStore.answers$,
@@ -262,7 +258,7 @@ const onAddAnswerButtonClickImpl = (user: FireAuthUser | undefined): void => {
   setAnswerBeingEditedSectionState('creating');
   // automatically set username with user.displayName
   updateAnswerBeingEdited((prev) =>
-    Obj.setIn(prev, ['user', 'name'], toUserName(user?.displayName ?? '')),
+    Obj.setIn(prev, ['user', 'name'], UserName.cast(user?.displayName ?? '')),
   );
 };
 
@@ -339,12 +335,12 @@ const onSubmitEmptyAnswerImpl = async (
   await api.answers
     .add(
       eventId,
-      pipe(answerDefaultValue)
+      pipe(Answer.defaultValue)
         .chain((a) => Obj.set(a, 'createdAt', DateUtils.now()))
         .chain((a) =>
           Obj.set(a, 'user', {
-            id: toUserId(fireAuthUser.uid),
-            name: toUserName(fireAuthUser.displayName ?? ''),
+            id: UserId.cast(fireAuthUser.uid),
+            name: UserName.cast(fireAuthUser.displayName ?? ''),
           }),
         ).value,
     )
@@ -426,7 +422,7 @@ const toggleProtectedSectionImpl = (user: FireAuthUser | undefined): void => {
       ans,
       'user',
       Obj.update(ans.user, 'id', (uid) =>
-        uid === null ? (mapOptional(user?.uid, toUserId) ?? null) : null,
+        uid === null ? (mapOptional(user?.uid, UserId.cast) ?? null) : null,
       ),
     ),
   );

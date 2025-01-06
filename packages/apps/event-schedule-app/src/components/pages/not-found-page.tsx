@@ -1,7 +1,7 @@
 import { Icon, NonIdealState } from '@blueprintjs/core';
+import { Anchor } from '@noshiro/react-blueprintjs-utils';
 import { Routes } from '../../constants';
 import { Router } from '../../store';
-import { Anchor } from '../bp';
 
 export const NotFoundPage = memoNamed('NotFoundPage', () => {
   const onClick = useRouterLinkClick({

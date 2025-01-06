@@ -9,13 +9,13 @@ import {
   NonIdealState,
   Pre,
 } from '@blueprintjs/core';
-import { Component } from 'react';
-import { api } from '../api';
 import {
   BpTextArea,
-  ButtonsWrapperAlignEnd,
   DialogWithMaxWidth,
-} from '../components';
+} from '@noshiro/react-blueprintjs-utils';
+import { Component } from 'react';
+import { api } from '../api';
+import { ButtonsWrapperAlignEnd } from '../components';
 import { isProduction } from '../env';
 import { createToaster, showToast } from '../functions';
 

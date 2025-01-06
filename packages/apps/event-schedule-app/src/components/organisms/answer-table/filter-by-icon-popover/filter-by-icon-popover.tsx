@@ -1,6 +1,6 @@
 import { Popover } from '@blueprintjs/core';
 import { AnswerFilterAndSortStore } from '../../../../store';
-import { CustomIconButton } from '../../../bp';
+import { CustomIconButton } from '../../../molecules';
 import { FilterByIconPopoverContent } from './filter-by-icon-popover-content';
 
 const dc = dict.answerPage.answers;
@@ -33,14 +33,14 @@ export const FilterByIconPopover = memoNamed<Props>(
     const upperLimit = filterState.iconState.upperLimit;
 
     const onMinChange = useCallback(
-      (value: number) => {
+      (value: SafeUint) => {
         AnswerFilterAndSortStore.setMinCountOfIcon(answerIconId, value);
       },
       [answerIconId],
     );
 
     const onMaxChange = useCallback(
-      (value: number) => {
+      (value: SafeUint) => {
         AnswerFilterAndSortStore.setMaxCountOfIcon(answerIconId, value);
       },
       [answerIconId],

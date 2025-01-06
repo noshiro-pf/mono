@@ -67,7 +67,10 @@ const enableFilteringByIcon = (iconId: DetailedFilterIcon): void => {
   );
 };
 
-const setMinCountOfIcon = (iconId: DetailedFilterIcon, value: number): void => {
+const setMinCountOfIcon = (
+  iconId: DetailedFilterIcon,
+  value: SafeUint,
+): void => {
   AnswerFilterQueryParam.saveFilterStateToQueryParams(
     filterStateDispatch({
       type: 'icon',
@@ -80,7 +83,10 @@ const setMinCountOfIcon = (iconId: DetailedFilterIcon, value: number): void => {
   );
 };
 
-const setMaxCountOfIcon = (iconId: DetailedFilterIcon, value: number): void => {
+const setMaxCountOfIcon = (
+  iconId: DetailedFilterIcon,
+  value: SafeUint,
+): void => {
   AnswerFilterQueryParam.saveFilterStateToQueryParams(
     filterStateDispatch({
       type: 'icon',
@@ -93,35 +99,35 @@ const setMaxCountOfIcon = (iconId: DetailedFilterIcon, value: number): void => {
   );
 };
 
-const setMinCountOfGoodIcon = (value: number): void => {
+const setMinCountOfGoodIcon = (value: SafeUint): void => {
   setMinCountOfIcon('good', value);
 };
-const setMinCountOfFairIcon = (value: number): void => {
+const setMinCountOfFairIcon = (value: SafeUint): void => {
   setMinCountOfIcon('fair', value);
 };
-const setMinCountOfPoorIcon = (value: number): void => {
+const setMinCountOfPoorIcon = (value: SafeUint): void => {
   setMinCountOfIcon('poor', value);
 };
-const setGoodPlusFairMin = (value: number): void => {
+const setGoodPlusFairMin = (value: SafeUint): void => {
   setMinCountOfIcon('goodPlusFair', value);
 };
-const setFairPlusPoorMin = (value: number): void => {
+const setFairPlusPoorMin = (value: SafeUint): void => {
   setMinCountOfIcon('fairPlusPoor', value);
 };
 
-const setMaxCountOfGoodIcon = (value: number): void => {
+const setMaxCountOfGoodIcon = (value: SafeUint): void => {
   setMaxCountOfIcon('good', value);
 };
-const setMaxCountOfFairIcon = (value: number): void => {
+const setMaxCountOfFairIcon = (value: SafeUint): void => {
   setMaxCountOfIcon('fair', value);
 };
-const setMaxCountOfPoorIcon = (value: number): void => {
+const setMaxCountOfPoorIcon = (value: SafeUint): void => {
   setMaxCountOfIcon('poor', value);
 };
-const setGoodPlusFairMax = (value: number): void => {
+const setGoodPlusFairMax = (value: SafeUint): void => {
   setMaxCountOfIcon('goodPlusFair', value);
 };
-const setFairPlusPoorMax = (value: number): void => {
+const setFairPlusPoorMax = (value: SafeUint): void => {
   setMaxCountOfIcon('fairPlusPoor', value);
 };
 
@@ -162,7 +168,7 @@ const setEnabledFilteringByFairPlusPoor = (value: boolean): void => {
 };
 
 const displayOnlyCandidateDatesWithZeroPoorIcon = (): void => {
-  setMaxCountOfPoorIcon(0);
+  setMaxCountOfPoorIcon(toSafeUint(0));
   setEnabledFilteringByPoorIcon(true);
 };
 
@@ -692,7 +698,7 @@ answersFiltered$
       type: 'icon',
       action: {
         type: 'setUpperLimit',
-        upperLimit: numAnswers,
+        upperLimit: toSafeUint(numAnswers),
       },
     });
   });

@@ -1,7 +1,7 @@
 import { Button, Classes, FormGroup } from '@blueprintjs/core';
+import { BpInput, DialogWithMaxWidth } from '@noshiro/react-blueprintjs-utils';
 import { useKeyEventListener } from '@noshiro/react-utils';
 import { Auth, ConfirmEmailDialogStore } from '../../store';
-import { BpInput, DialogWithMaxWidth } from '../bp';
 import { ButtonsWrapperAlignEnd } from '../styled';
 
 const dc = dict.answerPage.eventInfo.verifyEmailDialog;

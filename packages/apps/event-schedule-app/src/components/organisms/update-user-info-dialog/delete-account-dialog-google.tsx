@@ -1,10 +1,10 @@
 import { Button, FormGroup } from '@blueprintjs/core';
+import { BpInput } from '@noshiro/react-blueprintjs-utils';
 import {
   DeleteAccountCreatedWithGoogleStore,
   UpdateUserInfoDialogStore,
 } from '../../../store';
 import { Label } from '../../atoms';
-import { BpInput } from '../../bp';
 import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template';
 
 const dc = dict.accountSettings;
