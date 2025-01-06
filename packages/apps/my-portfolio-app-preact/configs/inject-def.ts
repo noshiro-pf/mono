@@ -11,8 +11,6 @@ export const createInjectDef = async (): Promise<PluginOption> => {
     packageJson.devDependencies,
   );
 
-  // FIXME
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return inject({
     modules: castDeepMutable({
       ...injectionRules,

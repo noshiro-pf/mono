@@ -30,8 +30,6 @@ export const generateInjectDef = async (
     `    packageJson.devDependencies,`,
     `  );`,
     ``,
-    `  // FIXME`,
-    `  // eslint-disable-next-line total-functions/no-unsafe-type-assertion`,
     `  return inject({`,
     `    modules: castDeepMutable({`,
     `      ...injectionRules,`,
