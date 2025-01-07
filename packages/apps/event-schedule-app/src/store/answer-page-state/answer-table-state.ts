@@ -1,4 +1,5 @@
-import { compareYmd, toUserName } from '@noshiro/event-schedule-app-shared';
+import { toUserName } from '@noshiro/event-schedule-app-shared';
+import { compareYearMonthDate } from '@noshiro/io-ts-types';
 import { answerTableColor, datetimeRange2str } from '../../constants';
 import {
   createAnswerSelectionMapFromAnswers,
@@ -357,8 +358,9 @@ const tableBodyValuesFiltered$ = combine([
         }) &&
         // 日程範囲で絞り込み
         (dateStart === undefined ||
-          compareYmd(dateStart, datetimeRange.ymd) <= 0) &&
-        (dateEnd === undefined || compareYmd(datetimeRange.ymd, dateEnd) <= 0)
+          compareYearMonthDate(dateStart, datetimeRange.ymd) <= 0) &&
+        (dateEnd === undefined ||
+          compareYearMonthDate(datetimeRange.ymd, dateEnd) <= 0)
       );
     });
 

@@ -1,5 +1,5 @@
 import { DateRangeInput, type DateRange } from '@blueprintjs/datetime';
-import { ymdFromDate, ymdhm2Date } from '@noshiro/event-schedule-app-shared';
+import { YearMonthDateFromDate, Ymdhm2Date } from '@noshiro/io-ts-types';
 
 const formatDate = (date: RawDateType): string => date.toLocaleDateString();
 
@@ -50,7 +50,7 @@ export const BpDateRangeInput = memoNamed<Props>(
           tp(
             pipe(dateRange.start).chainOptional((d) =>
               DateUtils.toDate(
-                ymdhm2Date({
+                Ymdhm2Date({
                   ...d,
                   hours: 0,
                   minutes: 0,
@@ -60,7 +60,7 @@ export const BpDateRangeInput = memoNamed<Props>(
 
             pipe(dateRange.end).chainOptional((d) =>
               DateUtils.toDate(
-                ymdhm2Date({
+                Ymdhm2Date({
                   ...d,
                   hours: 0,
                   minutes: 0,
@@ -77,7 +77,7 @@ export const BpDateRangeInput = memoNamed<Props>(
         castMutable(
           pipe(_minDate).chainOptional((d) =>
             DateUtils.toDate(
-              ymdhm2Date({
+              Ymdhm2Date({
                 ...d,
                 hours: 0,
                 minutes: 0,
@@ -93,7 +93,7 @@ export const BpDateRangeInput = memoNamed<Props>(
         castMutable(
           pipe(_maxDate).chainOptional((d) =>
             DateUtils.toDate(
-              ymdhm2Date({
+              Ymdhm2Date({
                 ...d,
                 hours: 0,
                 minutes: 0,
@@ -107,8 +107,10 @@ export const BpDateRangeInput = memoNamed<Props>(
     const onChange = useCallback(
       ([start, end]: Readonly<DateRange>) => {
         onDateRangeChange({
-          start: pipe(start).chainOptional(ymdFromDate).value ?? undefined,
-          end: pipe(end).chainOptional(ymdFromDate).value ?? undefined,
+          start:
+            pipe(start).chainOptional(YearMonthDateFromDate).value ?? undefined,
+          end:
+            pipe(end).chainOptional(YearMonthDateFromDate).value ?? undefined,
         });
       },
       [onDateRangeChange],

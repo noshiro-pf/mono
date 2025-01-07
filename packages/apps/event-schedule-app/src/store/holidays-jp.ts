@@ -1,4 +1,4 @@
-import { ymdFromDate } from '@noshiro/event-schedule-app-shared';
+import { YearMonthDateFromDate } from '@noshiro/io-ts-types';
 import { fetchHolidaysJson, ymdFromKey, ymdToKey } from '../functions';
 
 export const holidaysJpDefinition$: InitializedObservable<
@@ -10,7 +10,7 @@ export const holidaysJpDefinition$: InitializedObservable<
     map((record) =>
       IMapMapped.new(
         Object.entries(record).map(([key, value]) => [
-          ymdFromDate(DateUtils.from(key)),
+          YearMonthDateFromDate(DateUtils.from(key)),
           value,
         ]),
         ymdToKey,

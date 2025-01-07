@@ -1,11 +1,10 @@
 import {
-  compareDatetimeRange,
   type Answer,
   type AnswerIconIdWithNone,
   type AnswerIconPoint,
-  type DatetimeRange,
   type DatetimeSpecificationEnumType,
 } from '@noshiro/event-schedule-app-shared';
+import { compareDatetimeRange, type DatetimeRange } from '@noshiro/io-ts-types';
 import { IMapMapped, ISetMapped, tp } from '@noshiro/ts-utils';
 import {
   datetimeRange2str,

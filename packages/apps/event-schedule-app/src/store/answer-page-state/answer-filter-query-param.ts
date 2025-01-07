@@ -1,4 +1,4 @@
-import { isYearMonthDate } from '@noshiro/event-schedule-app-shared';
+import { YearMonthDate } from '@noshiro/io-ts-types';
 import { Routes } from '../../constants';
 import {
   type AnswerFilterState,
@@ -53,7 +53,7 @@ const ymdFromStr = (ymdStr: string): YearMonthDate | undefined => {
     date: Num.from(res[2]),
   };
 
-  return isYearMonthDate(ret) ? ret : undefined;
+  return YearMonthDate.is(ret) ? ret : undefined;
 };
 
 const dayOfWeekToStr = (

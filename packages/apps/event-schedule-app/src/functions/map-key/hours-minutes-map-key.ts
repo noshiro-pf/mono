@@ -1,4 +1,4 @@
-import { fillHoursMinutes } from '@noshiro/event-schedule-app-shared';
+import { HoursMinutes } from '@noshiro/io-ts-types';
 
 export type HoursMinutesMapKey = Brand<string, 'HoursMinutesMapKey'>;
 
@@ -9,4 +9,4 @@ export const timeRangeToMapKey = (
   Result.unwrapThrow(Json.stringify(timeRange)) as HoursMinutesMapKey;
 
 export const timeRangeFromMapKey = (key: HoursMinutesMapKey): HoursMinutes =>
-  fillHoursMinutes(Result.unwrapThrow(Json.parse(key)));
+  HoursMinutes.fill(Result.unwrapThrow(Json.parse(key)));

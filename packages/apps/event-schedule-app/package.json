@@ -86,6 +86,7 @@
     "@noshiro/event-schedule-app-shared": "*",
     "@noshiro/fast-deep-equal": "*",
     "@noshiro/io-ts": "*",
+    "@noshiro/io-ts-types": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/syncflow-react-hooks": "*",

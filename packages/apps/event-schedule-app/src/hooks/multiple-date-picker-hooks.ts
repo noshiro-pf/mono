@@ -1,4 +1,4 @@
-import { compareYmd } from '@noshiro/event-schedule-app-shared';
+import { compareYearMonthDate } from '@noshiro/io-ts-types';
 import { fromArray } from '@noshiro/syncflow';
 import { yearMonthDateInitialValue } from '../constants';
 import {
@@ -135,7 +135,7 @@ export const useMultipleDatePickerState = (
           f(
             Array.from(
               selectedDatesReducer(selectedDatesSet, action).values(),
-            ).toSorted(compareYmd),
+            ).toSorted(compareYearMonthDate),
           );
         },
       ),

@@ -1,4 +1,4 @@
-import { compareHm } from '@noshiro/event-schedule-app-shared';
+import { compareHm } from '@noshiro/io-ts-types';
 
 type Action = Readonly<
   | {

@@ -1,7 +1,4 @@
-import {
-  type YearMonthDate,
-  type Ymdhm,
-} from '@noshiro/event-schedule-app-shared';
+import { type YearMonthDate, type Ymdhm } from '@noshiro/io-ts-types';
 import { DateUtils, pipe, type DateType } from '@noshiro/ts-utils';
 
 const todayDate = (): DateType => {

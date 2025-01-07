@@ -1,4 +1,4 @@
-import { fillDatetimeRange } from '@noshiro/event-schedule-app-shared';
+import { DatetimeRange } from '@noshiro/io-ts-types';
 
 export type AnswerSelectionMapKey = Brand<string, 'AnswerSelectionMapKey'>;
 
@@ -24,6 +24,6 @@ export const answerSelectionFromMapKey = (
     };
   return {
     answerId: parsed.answerId,
-    datetimeRange: fillDatetimeRange(parsed.datetimeRange),
+    datetimeRange: DatetimeRange.fill(parsed.datetimeRange),
   };
 };

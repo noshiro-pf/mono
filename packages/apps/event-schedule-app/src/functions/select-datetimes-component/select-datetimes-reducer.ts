@@ -1,7 +1,4 @@
-import {
-  compareDatetimeRange,
-  timeRangeDefaultValue,
-} from '@noshiro/event-schedule-app-shared';
+import { compareDatetimeRange, TimeRange } from '@noshiro/io-ts-types';
 import { datetimeRangeInitialValue } from '../../constants';
 import { ymdFromKey, ymdToKey } from '../map-key';
 import { ymdToDayInWeek } from '../ymd-to-day-in-week';
@@ -53,7 +50,7 @@ export const datetimeListReducer: Reducer<
             list,
             added
               .toArray()
-              .map((ymd) => ({ ymd, timeRange: timeRangeDefaultValue })),
+              .map((ymd) => ({ ymd, timeRange: TimeRange.defaultValue })),
           ),
         )
         .chain((list) => list.toSorted(compareDatetimeRange)).value;
