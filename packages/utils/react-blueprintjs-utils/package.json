@@ -37,7 +37,7 @@
     "zz:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
-    "@blueprintjs/core": "^5.0.1",
+    "@blueprintjs/core": "^5.16.2",
     "@blueprintjs/datetime": "^5.0.1",
     "@blueprintjs/icons": "^5.11.0",
     "@emotion/react": "^11.11.1",
