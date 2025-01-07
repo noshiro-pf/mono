@@ -25,6 +25,7 @@
     "fb:login": "firebase login",
     "fb:login:ci": "firebase login:ci",
     "fmt": "yarn zz:prettier .",
+    "get-zenn-articles": "node ./scripts/get-zenn-articles.mjs",
     "gi": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 1 --ignore assets",
     "lint": "run-p lint:src lint:cy",
     "lint:cy": "yarn zz:eslint:cy",
@@ -68,6 +69,7 @@
   },
   "dependencies": {
     "@noshiro/goober": "*",
+    "@noshiro/io-ts": "*",
     "@noshiro/preact-utils": "*",
     "@noshiro/resize-observer-preact-hooks": "*",
     "@noshiro/syncflow": "*",
@@ -101,6 +103,7 @@
     },
     "build": {
       "dependencies": [
+        "get-zenn-articles",
         "clean:build",
         "type-check"
       ],
