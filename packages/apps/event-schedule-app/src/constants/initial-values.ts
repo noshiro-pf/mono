@@ -1,10 +1,9 @@
 import {
   answerDeadlineRemainingDaysDefaultValue,
   notificationSettingsDefaultValue,
-  timeRangeDefaultValue,
   toUserName,
-  ymdhmFromDate,
 } from '@noshiro/event-schedule-app-shared';
+import { TimeRange, YmdhmFromDate } from '@noshiro/io-ts-types';
 import { defaultIconPoint } from './default-icon-point';
 import { dict } from './dictionary';
 
@@ -16,7 +15,7 @@ export const yearMonthDateInitialValue: YearMonthDate = {
 
 export const datetimeRangeInitialValue: DatetimeRange = {
   ymd: yearMonthDateInitialValue,
-  timeRange: timeRangeDefaultValue,
+  timeRange: TimeRange.defaultValue,
 };
 
 export const datetimeRangeListInitialValue: NonEmptyArray<DatetimeRange> = [
@@ -48,7 +47,7 @@ export const answerDeadlineInitialValue: Ymdhm = pipe(DateUtils.today())
   .chain(DateUtils.setLocaleHours(23))
   .chain(DateUtils.setLocaleMinutes(59))
   .chain(DateUtils.toDate)
-  .chain(ymdhmFromDate).value;
+  .chain(YmdhmFromDate).value;
 
 export const notificationSettingsInitialValue: NotificationSettings = pipe(
   notificationSettingsDefaultValue,

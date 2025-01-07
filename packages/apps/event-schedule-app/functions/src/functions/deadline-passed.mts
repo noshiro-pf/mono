@@ -1,4 +1,4 @@
-import { type Ymdhm } from '@noshiro/event-schedule-app-shared';
+import { type Ymdhm } from '@noshiro/io-ts-types';
 import { DateUtils, SafeInt, type DateType } from '@noshiro/ts-utils';
 import { now } from '../utils/index.mjs';
 

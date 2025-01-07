@@ -1,4 +1,4 @@
-import { compareDatetimeRange } from '@noshiro/event-schedule-app-shared';
+import { compareDatetimeRange } from '@noshiro/io-ts-types';
 import { datetimeRange2str } from '../constants';
 
 export const normalizeEventSchedule = (

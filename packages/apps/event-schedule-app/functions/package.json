@@ -44,6 +44,7 @@
     "@noshiro/event-schedule-app-shared": "*",
     "@noshiro/fast-deep-equal": "*",
     "@noshiro/io-ts": "*",
+    "@noshiro/io-ts-types": "*",
     "@noshiro/ts-utils": "*",
     "firebase-admin": "^12.0.0",
     "firebase-functions": "^4.5.0",

@@ -1,11 +1,11 @@
 import {
-  compareYmd,
   eventListItemDefaultValue,
   fillAnswer,
   fillEventSchedule,
   firestorePaths,
   type EventListItem,
 } from '@noshiro/event-schedule-app-shared';
+import { compareYearMonthDate } from '@noshiro/io-ts-types';
 import { Arr, IMap, Tpl, pipe, tp } from '@noshiro/ts-utils';
 import { type firestore } from 'firebase-admin';
 import { https } from 'firebase-functions';
@@ -78,7 +78,7 @@ export const fetchEventListOfUserImpl = async (
         const t = today();
         if (
           !eventSchedule.datetimeRangeList.some(
-            (datetimeRange) => compareYmd(datetimeRange.ymd, t) >= 0,
+            (datetimeRange) => compareYearMonthDate(datetimeRange.ymd, t) >= 0,
           )
         ) {
           return false;

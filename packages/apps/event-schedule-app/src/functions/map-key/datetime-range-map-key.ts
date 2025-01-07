@@ -1,4 +1,4 @@
-import { fillDatetimeRange } from '@noshiro/event-schedule-app-shared';
+import { DatetimeRange } from '@noshiro/io-ts-types';
 
 export type DatetimeRangeMapKey = Brand<string, 'DatetimeRangeMapKey'>;
 
@@ -10,4 +10,4 @@ export const datetimeRangeToMapKey = (
 
 export const datetimeRangeFromMapKey = (
   key: DatetimeRangeMapKey,
-): DatetimeRange => fillDatetimeRange(Result.unwrapThrow(Json.parse(key)));
+): DatetimeRange => DatetimeRange.fill(Result.unwrapThrow(Json.parse(key)));

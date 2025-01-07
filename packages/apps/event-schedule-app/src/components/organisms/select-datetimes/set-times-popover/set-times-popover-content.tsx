@@ -1,5 +1,5 @@
 import { Button } from '@blueprintjs/core';
-import { timeRangeDefaultValue } from '@noshiro/event-schedule-app-shared';
+import { TimeRange } from '@noshiro/io-ts-types';
 import { timeRangeReducer } from '../../../../functions';
 import { CheckboxView } from '../../../bp';
 import { TimeRangeView } from '../../../molecules';
@@ -178,7 +178,7 @@ export const SetTimesPopoverContent = memoNamed<Props>(
 
 const { useCurrentValue: useTimeRange, dispatch } = createReducer(
   timeRangeReducer,
-  timeRangeDefaultValue,
+  TimeRange.defaultValue,
 );
 
 const onRangeStartChange = (hm: HoursMinutes): void => {

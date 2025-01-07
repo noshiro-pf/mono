@@ -1,4 +1,5 @@
-import { compareYmdhm, type Answer } from '@noshiro/event-schedule-app-shared';
+import { type Answer } from '@noshiro/event-schedule-app-shared';
+import { compareYmdhm } from '@noshiro/io-ts-types';
 import { type firestore } from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import {

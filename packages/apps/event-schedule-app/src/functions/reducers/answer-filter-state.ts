@@ -1,4 +1,5 @@
-import { compareYmd, toUserName } from '@noshiro/event-schedule-app-shared';
+import { toUserName } from '@noshiro/event-schedule-app-shared';
+import { compareYearMonthDate } from '@noshiro/io-ts-types';
 import { type AnswerRank, type AnswersScore } from '../../types';
 import {
   AnswerIconFilterState,
@@ -351,8 +352,8 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
             // 現在のdateRangeが日程候補の範囲外の値になっていたらリセット
             isUndefined(currStart) ||
               isUndefined(currEnd) ||
-              compareYmd(currStart, action.range.start) < 0 ||
-              compareYmd(action.range.end, currEnd) < 0
+              compareYearMonthDate(currStart, action.range.start) < 0 ||
+              compareYearMonthDate(action.range.end, currEnd) < 0
               ? {
                   defaultValue: action.range,
                   enabled: false,
@@ -502,7 +503,7 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
       Obj.updateIn(state, ['dateRange', 'value'] as const, ({ start, end }) =>
         isNotUndefined(start) &&
         isNotUndefined(end) &&
-        compareYmd(start, end) > 0
+        compareYearMonthDate(start, end) > 0
           ? { start, end: start }
           : { start, end },
       ),

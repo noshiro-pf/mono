@@ -28,20 +28,22 @@ import {
   type AnswerId as AnswerId_,
   type AnswerSelection as AnswerSelection_,
   type Answer as Answer_,
-  type DatetimeRange as DatetimeRange_,
   type DatetimeSpecificationEnumType as DatetimeSpecificationEnumType_,
-  type DayType as DayType_,
   type EventSchedule as EventSchedule_,
-  type HoursMinutes as HoursMinutes_,
   type NotificationSettings as NotificationSettings_,
-  type TimeRange as TimeRange_,
   type UserId as UserId_,
   type UserName as UserName_,
   type User as User_,
   type Weight as Weight_,
+} from '@noshiro/event-schedule-app-shared';
+import {
+  type DatetimeRange as DatetimeRange_,
+  type DayType as DayType_,
+  type HoursMinutes as HoursMinutes_,
+  type TimeRange as TimeRange_,
   type YearMonthDate as YearMonthDate_,
   type Ymdhm as Ymdhm_,
-} from '@noshiro/event-schedule-app-shared';
+} from '@noshiro/io-ts-types';
 import { type dict as dict_ } from './constants';
 import {
   type AnswerSelectionMapKey as AnswerSelectionMapKey_,
@@ -72,6 +74,14 @@ declare global {
     ArrayElement<Exclude<DateInputProps['shortcuts'], boolean | undefined>>
   >;
 
+  /* @noshiro/io-ts-types */
+  type DatetimeRange = DatetimeRange_;
+  type YearMonthDate = YearMonthDate_;
+  type Ymdhm = Ymdhm_;
+  type DayType = DayType_;
+  type HoursMinutes = HoursMinutes_;
+  type TimeRange = TimeRange_;
+
   /* @noshiro/event-schedule-app-shared */
   type Answer = Answer_;
   type AnswerIconId = AnswerIconId_;
@@ -81,19 +91,13 @@ declare global {
   type AnswerIconSettings = AnswerIconSettings_;
   type AnswerId = AnswerId_;
   type AnswerSelection = AnswerSelection_;
-  type DatetimeRange = DatetimeRange_;
   type DatetimeSpecificationEnumType = DatetimeSpecificationEnumType_;
-  type DayType = DayType_;
   type EventSchedule = EventSchedule_;
-  type HoursMinutes = HoursMinutes_;
   type NotificationSettings = NotificationSettings_;
-  type TimeRange = TimeRange_;
   type User = User_;
   type UserId = UserId_;
   type UserName = UserName_;
   type Weight = Weight_;
-  type YearMonthDate = YearMonthDate_;
-  type Ymdhm = Ymdhm_;
 
   /* others */
   const dict: typeof dict_;

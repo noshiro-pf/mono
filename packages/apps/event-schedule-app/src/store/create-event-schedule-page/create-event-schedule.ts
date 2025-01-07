@@ -1,10 +1,10 @@
 import {
-  compareYmd,
   fillNotificationSettings,
   toUserId,
   toUserName,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
+import { compareYearMonthDate } from '@noshiro/io-ts-types';
 import { toAbsolutePath } from '@noshiro/ts-utils-additional';
 import { api } from '../../api';
 import { Routes, eventScheduleInitialValue } from '../../constants';
@@ -50,7 +50,9 @@ const restoreFromLocalStorage = (): void => {
     commonStateHandlers.setDatetimeSpecification(ev.datetimeSpecification);
     // 過去日（今日含む）は復元しない
     commonStateHandlers.setDatetimeRangeList(
-      ev.datetimeRangeList.filter((d) => compareYmd(d.ymd, now()) > 0),
+      ev.datetimeRangeList.filter(
+        (d) => compareYearMonthDate(d.ymd, now()) > 0,
+      ),
     );
     commonStateHandlers.setAnswerIcons(ev.answerIcons);
 
