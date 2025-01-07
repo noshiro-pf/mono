@@ -70,32 +70,30 @@ numeric input の設計を考える上で、まず React の **controlled compon
 ![text-input](https://github.com/noshiro-pf/mono/blob/develop/articles/numeric-input-interface/text-input.png?raw=true)
 
 controlled component による実装では form の最新の値は state に常に反映されるため、その値を使った処理は単にその state 変数を使うだけですが、 uncontrolled component による実装では form の値は DOM に保持されており、必要なとき（上の例では submit を押したとき）に ref を介して最新の値を "pull" する必要があります。
-`<input />` 要素の場合、 `value` プロパティの方を使って state を常に入力欄に反映し onChange で変更を即 state に反映する実装方式は controlled mode、 `defaultValue` プロパティの方を使って初期値のみ設定し、以後は ref を経由して DOM に保持されている値を取り出したり（pull）、更新したりする実装方式は uncontrolled mode と言えます。
+`<input />` 要素の場合、 controlled mode とは `value` プロパティの方を使って state を常に入力欄に反映し onChange で変更を即 state に反映する実装方式、 uncontrolled mode とは `defaultValue` プロパティの方を使って初期値のみ設定し、以後は ref を経由して DOM に保持されている値を取り出したり（pull）、更新したりする実装方式となります。
 
 実装例： https://playcode.io/2136118
 
-React 公式ドキュメントには以下のように書かれています。
+React 公式ドキュメントには、これら 2 パターンの実装方法について以下のように使い分け方が書かれています。
 
 > ほとんどの場合では、フォームの実装には制御されたコンポーネント (controlled component) を使用することをお勧めしています。制御されたコンポーネントでは、フォームのデータは React コンポーネントが扱います。非制御コンポーネント (uncontrolled component) はその代替となるものであり、フォームデータを DOM 自身が扱います。
 
 https://ja.legacy.reactjs.org/docs/uncontrolled-components.html
 
-https://ja.react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components
-
 https://goshacmd.com/controlled-vs-uncontrolled-inputs-react/
 
-React などを用いてフロントエンドを実装する一番のメリットは、従来のように画面状態を DOM に直接持たせるのではなく、JavaScript の変数として持ち、画面状態がその像になっている（`view = f(state)` を満たす）ように実装しやすい点にあります。
-コンポーネントを uncontrolled mode で実装してしまうと React のメリットを手放すことになってしまうので、 input 等のフォーム要素も controlled mode として実装するのが基本と言えます。
+React などを用いてフロントエンドを実装する一番のメリットは、従来のように画面状態を DOM に直接持たせるのではなく、JavaScript の変数として持ち、画面状態がその像になっている（`view = f(state)` を満たす）ように実装しやすい（＝状態を JavaScript 側に一元管理しやすい）点にあります。
+input 要素も uncontrolled mode で実装してしまうと React のメリットを手放すことになってしまうので、基本的に controlled mode として実装するのが良いと言えます。
 
 ## numeric input の場合の難しさ
 
-ところが、 numeric input には、**数値型データをやり取りするインターフェースの controlled な component として実装することができない**、という厄介な特徴があります。これは、ユーザーが入力途中の文字列は数値として有効であるとは限らないため、状態を `number` 型の変数で保持し controlled な作りにしてしまうと、 数値に対応させられない文字列が即座に `NaN` に潰れてしまい入力を邪魔してしまう、という問題があるためです。
+ところが、 **numeric input は、数値型データをやり取りするインターフェースの controlled な component として実装することができない**、という厄介な特徴があります。これは、ユーザーが入力途中の文字列は数値として有効であるとは限らないため、状態を `number` 型の変数で保持し controlled な作りにしてしまうと、 数値に対応させられない文字列が即座に `NaN` に潰れてしまい入力を邪魔してしまう、という問題があるためです。
 
-どういうことか説明するために、先ほどの例を `type="number"` とした例を考えます。
+先ほどの例を `type="number"` とした例を考えます。
 
 ```diff
 - const InputControlled = () => {
-+ const BadNumericInputControlled = () => {
++ const NumericInputControlledBad = () => {
 -   const [str, setStr] = React.useState("");
 +   const [num, setNum] = React.useState(0);
 
@@ -121,11 +119,16 @@ React などを用いてフロントエンドを実装する一番のメリッ�
   };
 ```
 
-`<input type='number' />` とするとその input はモダンブラウザでは["有効な浮動小数点数"](https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#valid-floating-point-number) （`0-9`, `-`, `.`, `e`, `E`, `+` からなる並び順に一定の制約のある文字列）のみを受け付けるようにはなりますが、入力途中の状態も認める必要があるため、 有効な数値文字列になっているとは限りません。
+`<input type='number' />` とするとその input はモダンブラウザでは["有効な浮動小数点数"](https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#valid-floating-point-number) （`0-9`, `-`, `.`, `e`, `E`, `+` からなる並び順に一定の制約のある文字列）のみを受け付けるようになりますが、入力途中の状態も認める必要があるため、 有効な数値文字列になっているとは限りません。
 
-`BadNumericInputControlled` では、例えば `"-1"` や `"3.4e+1"` という値を入力しようとすると `"-"` や `"3.4e"` などの**入力途中の文字列を有効な数値に対応させることができず `NaN` に変換されてしまう**ので、 input の内容は `""` に潰されてしまい入力が阻害されてしまいます。
+`NumericInputControlledBad` の方では、例えば `"-1"` や `"3.4e+1"` という値を入力しようとすると `"-"` や `"3.4e"` などの**入力途中の文字列を有効な数値に対応させることができず `NaN` に変換されてしまう**ので、 numeric input の内容は `""` に潰されてしまい入力が阻害されてしまいます。
 
 これが numeric input を数値型データをやり取りするインターフェースの controlled な component として実装することができない理由です。
+
+:::message
+良くない実装例（`Numeric input controlled mode (Bad implementation example)` の部分）
+https://playcode.io/2136118
+:::
 
 ## CSS コンポーネントライブラリ Blueprint.js の見解
 
@@ -192,26 +195,38 @@ const App = () => {
 };
 ```
 
-UI状態の管理をシンプルにしたくて controlled numeric input にしたのに、その目的のためにすべての numeric input に紐づく数値の state を `string` 型で持たなければならなくなるのでは、これはこれで状態管理が複雑になり本末転倒な感があります。やはり `string` で数値情報をやりとりするのは受け入れがたいと思われます。
+UI状態の管理をシンプルにしたくて controlled numeric input にしたのに、その目的のためにすべての numeric input に紐づく数値の state を `string` 型で持たなければならなくなるのでは、却って状態管理が複雑になり本末転倒な感があります。やはり `string` 型をインターフェースにするのは受け入れがたいでしょう。
 
-したがって、 numeric input は `number` 型データをやりとりするステートフルなコンポーネントとして実装する方が多くの状況では便利で周辺コードのメンテナビリティの観点でも優れると私も考えます。
+したがって、 numeric input は `number` 型データをやりとりする uncontrolled でステートフルなコンポーネントとして実装する方が多くの状況では便利で、周辺コードのメンテナビリティの観点でも優れると思われます。
 
 ### ステートフルな numeric input コンポーネントの悩み
 
-`number` 型をインターフェースにすることを優先し、NumericInput をステートフルなコンポーネントとして実装すると多くの単純なユースケースで便利ですが、特殊な使い方が必要になるときにはその内部に状態があることが邪魔になることも少なくないです。
+`number` 型をインターフェースにすることを優先し、NumericInput をステートフルなコンポーネントとして実装すると多くの単純なユースケースでは便利ですが、少し込み入った使い方が必要になるときにその内部に状態があることが邪魔になることも少なくないです。
 
 例えば、スライダーのような要素と数値入力欄を同期させたいユースケースがあるとします。
 
 ![slider-input](https://github.com/noshiro-pf/mono/blob/develop/articles/numeric-input-interface/numeric-input-with-slider.png?raw=true)
 
-このとき、数値データの state は本来これらを束ねる親コンポーネントに一つだけ持てばよいはずですが、 numeric input が内部に state を持っていると状態の二重管理が発生し、親子間で状態を同期するための処理が発生します。ステートフルなコンポーネントを親子に組み合わせデータを同期させようとすると、下手な実装をするとすぐ親子間の無限ループが起こってしまうという悩みがあります[^infinite_loop]。
+このとき、数値データの state は本来これらを束ねる親コンポーネントに一つだけ持てばよいはずですが、 numeric input が内部に state を持っていると状態の二重管理が発生し、親子間で状態を同期するための処理が発生します。ステートフルなコンポーネントを親子に組み合わせデータを同期させようとすると、状態管理が複雑になってしまい、下手な実装をすると親子間の状態更新で無限ループが起こってしまう危険もあります[^infinite_loop]。
 
 [^infinite_loop]: `number` 型データを `value` と `onChange` props でやりとりするステートフルなコンポーネントは、 `value` の変更を内部 state に反映するための副作用を `useEffect` 等で書く必要が生じます。すると、この `useEffect` の書き方が悪かったり、親コンポーネントの状態管理の仕方がまずかったりで、「親コンポーネントの状態更新 → 子の useEffect が発火 → onChange を通して親に変更を通知 → 親コンポーネントの状態が更新 …」という無限ループが起きてしまうことがあります（こういう無限ループが起きないように、 props に依存する `useEffect` を書くときは十分注意して実装する必要があります）。
 
-このようなケースでは numeric input は `string` インターフェースでステートレスな controlled コンポーネントとして配置した方が、状態管理がはるかにシンプルになるので嬉しいです。
-そもそも、このケースでは有限の数値の値しか取らないスライダーと、数値でない値まで取り得る numeric input の文字列状態を同期させる方法（スライダー側で無効になる値をどのようなデフォルト値にマップするかとそのタイミング）を定義するのは親コンポーネントの責務であるため、どのように parse 結果を数値に対応させるかは numeric input コンポーネント内部で定義すべきではないと言えます。
+:::message
+良くない実装例（`Numeric input with slider (Bad implementation example)` の部分）
+https://playcode.io/2136118
+:::
 
-React の実装例： https://playcode.io/2136118
+このようなケースでは numeric input は `string` インターフェースでステートレスな controlled コンポーネントとして配置した方が、状態管理がはるかにシンプルになります。
+そもそも、このケースでは有限の数値の値しか取らないスライダーと、数値でない値まで取り得る numeric input の文字列状態を同期させる方法（スライダー側で無効になる値をどのようにマップするかとそのタイミング）を定義するのは親コンポーネントの責務であるため、input 文字列と parse 結果の数値との対応関係は numeric input コンポーネント内部で定義すべきではないと言えます。
+
+:::message
+良い実装例（`Numeric input with slider (Good implementation example)` の部分）
+https://playcode.io/2136118
+
+> スライダー側で無効になる値をどのようにマップするかとそのタイミング
+
+については、 input からフォーカスが外れたタイミング＝`onBlur` で $[min, max]$ に収まる値に丸めて range に反映しています。
+:::
 
 他には、 controlled numeric input の入出力である `number` 型データをそのまま持ち回るのではなく、入力文字列を state に反映する前の段階で
 
@@ -224,14 +239,14 @@ React の実装例： https://playcode.io/2136118
 
 こういうときに、
 
-- インターフェースを `number` 型にするための状態管理を行う numeric input （子）コンポーネント
-- インターフェースを整数にするための状態管理を行う numeric input （親）コンポーネント
+- ［子コンポーネント］：インターフェースを `number` 型にするための状態管理を行う numeric input
+- ［親コンポーネント］：インターフェースを整数にするための状態管理を行う numeric input
 
-を組み合わせるような実装になってしまうと、先ほどのスライダーの例と同様に無駄な `number` 型中間 state が挟まり、ステートフルなコンポーネントを密に組み合わせることとなりバグの元です。この場合も、「子」コンポーネントの方はステートレスなものを使い、「親」の方で直接整数と文字列の対応方法を定義し入出力も行う方が安全です。
+を組み合わせるような実装になってしまうと、先ほどのスライダーの例と同様に無駄な state が一つ増えてしまい、ステートフルなコンポーネントを密に組み合わせることになるので予期せぬ挙動が発生しやすくなります。この場合も、「子」コンポーネントの方はステートレスなものを使い、「親」の方で直接整数と文字列の対応方法を定義し入出力も行う方が安全です。
 
 ## ではどうするか？（numeric input コンポーネント設計の筆者の結論）
 
-前節までの議論を踏まえて、私は `NumericInput` コンポーネントとして以下の設計が良いだろうと考えています。所謂 Container/Presentational Component パターンと呼ばれるものに近い設計だと思います。
+前節までの議論を踏まえて、私は `NumericInput` コンポーネントとして以下の設計（所謂 Container/Presentational Component パターンと呼ばれるものに近い設計）が良いだろうと考えています。
 
 - numeric input のスタイリングのみを担当するステートレスな presentational コンポーネント（`NumericInputView`）を作る。
   - このコンポーネントのインターフェースは `string` の `value` と `onChange` 関数（と `disabled` などの各種ネイティヴ input 要素の属性）とする。
@@ -245,15 +260,17 @@ React の実装例： https://playcode.io/2136118
 このような二段構えの実装設計には主に以下の二つのメリットがあります。
 
 一つは、`NumericInputView`というスタイリングだけを担当する完全にステートレスなコンポーネントが提供されるという点です。
-Material UI のような UI コンポーネントライブラリを使っていると、その見た目だけは拝借したいが挙動は気に食わないということがよくあるのですが、ステートレスコンポーネント `NumericInputView` が提供されていると自前で状態管理するという選択肢があるのは大きなメリットです。
-Blueprint.js の `NumericInput` コンポーネントは `string` 型を使って controlled mode で細かい制御を行う、という脱出ハッチも用意しているのでかなり理想に近いですが、 同じコンポーネントに渡す props で uncontrolled/controlled mode を切り替えるような使い方であり、ステートレスに使いたい場合に無駄な状態管理が中で走っていて効率が悪いという点で若干不満はあります。
-やはり、世の中の UI ライブラリは多くのユースケースに対応できるステートフルなパーツを提供すると共に、ステートレスなパーツもそれ単体で提供するようにしてほしいと私は思います。
+[Material UI](https://mui.com/material-ui/) や [Blueprint.js](https://blueprintjs.com/) のような UI コンポーネントライブラリを使っていると、そのスタイリング（CSS）だけは採用したいがステートフルであるがために JavaScript の挙動がユースケースに合わない、ということがたまにあります。 `NumericInput` はまさにその一例で、もしこういうときにライブラリがステートレスコンポーネント `NumericInputView` も提供していれば、自前で状態管理するという選択肢が生まれて問題を解決しやすくなります。[^about-ui-library]
+
+[^about-ui-library]: 世の中の UI ライブラリは、多くのユースケースに対応できる便利でステートフルなコンポーネントも提供すると共に、自前の状態管理をするためのステートレスな同じ見た目のコンポーネントもそれ単体で提供するようになっていたら良いのにと思います。[^NumericInput-MaterialUI] [^NumericInput-Blueprintjs]
+
+[^NumericInput-MaterialUI]: Material UI の場合、 Numeric Input は [Base UI](https://mui.com/base-ui/react-number-input/) というところで提供されていますが、 `value` は `number` 型で受け取る API となっており、今回求めていたものではなさそうです。
+
+[^NumericInput-Blueprintjs]: [Blueprint.js](https://blueprintjs.com/docs/#core/components/numeric-input) の `NumericInput` コンポーネントの場合、 `value` に `string` 型を渡すこともできる API となっており、こちらは controlled mode でより細かい制御を行うために意図的に用意されていてかなり理想に近いです（こういうところを見比べても、 Blueprint.js は Material UI より API が洗練されているように感じます）。ただ、同じ `NumericInput` コンポーネントに渡す props の型（`string` or `number`）で controlled/uncontrolled mode を切り替えるような使い方であり、ステートレスに使いたい場合にも無駄な状態管理が中で走っていて効率が悪いという点で若干不満はあります。
 
 もう一つは、ただの `number` 型より狭いカスタム数値型（例えば [実装例 A](#実装例A) における`ScoreType`）に対応する numeric input を使った実装が綺麗になる点です。型の制約に合う値だけをグローバルな state に反映するためにユーザー入力結果の文字列を数値に変換する処理を numeric input のレイヤーで行うことができるので、 `NumericInput` を使う側の実装がシンプルになります 。
 複数のカスタム数値型があってそれぞれに対応する numeric input を UI に配置したいが見た目は同じで良い、という場合、`NumericInputView` を使ってそれぞれの数値型ごとに `NumericInput` を個別に実装して使う、というやり方を上の設計は意識しています（`NumericInputView` という一つのスタイル実装を使いまわし `NumericInput` は複数実装するというイメージ）。
-`number` 型より狭い数値型としては、 union 型で定義された有限集合（例： 0以上10以下の整数 `0|1|2|3|4|5|6|7|8|9|10` など）や、 Branded Type[^1] （例： io-ts の `Int` 型）などが考えられます。いずれにせよ、`NumericInput`としては大きな差は無くほぼ同じ手順で実装することができます。
-
-<!-- 一つ対策として、 `onKeyDown` で特定のキーの入力イベントを無視する処理を挟むことで避けたい数値文字列をブロックする、という方法を思いつくかもしれません（例えば `固定小数点表記にする` という要件に対して `"e"` という文字の入力をブロックする、など）。しかし、この方法は負数を含む数値型の場合には同様に文字種だけでは例えば `"0-2-3"` というフォーム状態を弾くことはできないようなので、万能な方法とは言えなさそうです。（【TODO: ブラウザの numeric input の仕様のリンク】）。 -->
+`number` 型より狭い数値型としては、 union 型で定義された有限集合（例： 0以上10以下の整数 `0|1|2|3|4|5|6|7|8|9|10` など）や、 Branded Type[^1] （例： io-ts の `Int` 型）などが考えられます。いずれにせよ、`NumericInput`としては同様の手順で実装することができます。
 
 [^1]: 参考： [TypeScript の Type Branding をより便利に活用する方法のまとめ](https://zenn.dev/noshiro_piko/articles/typescript-branded-type-int)
 
@@ -261,30 +278,39 @@ Blueprint.js の `NumericInput` コンポーネントは `string` 型を使っ�
 
 ### 実装例 A
 
-- App.tsx
+- score-type.ts
 
-  ```tsx
-  import * as React from 'react';
-  import { ScoreType } from './score';
-  import { ScoreNumericInput } from './score-input';
+  ```ts
+  import { createNumberType } from './create-number-type';
 
-  export const App = () => {
-    const [score, onScoreChange] = React.useState<ScoreType>(0);
+  export type ScoreType =
+    | 0
+    | 0.1
+    | 0.2
+    | 0.3
+    | 0.4
+    | 0.5
+    | 0.6
+    | 0.7
+    | 0.8
+    | 0.9
+    | 1;
 
-    return (
-      <div>
-        <ScoreNumericInput score={score} onScoreChange={onScoreChange} />
-      </div>
-    );
-  };
+  export const ScoreType = createNumberType<ScoreType>({
+    min: 0,
+    max: 1,
+    digit: 1,
+    defaultValue: 0,
+  });
   ```
 
 - score-input.tsx
 
   ```tsx
-  import { useNumericInputState } from './numeric-input-state';
+  import * as React from 'react';
+  import { useNumericInputState } from './use-numeric-input-state';
   import { NumericInputView } from './numeric-input-view';
-  import { ScoreType } from './score';
+  import { type ScoreType } from './score-type';
 
   type Props = Readonly<{
     score: ScoreType;
@@ -294,11 +320,9 @@ Blueprint.js の `NumericInput` コンポーネントは `string` 型を使っ�
 
   const { step, min, max } = ScoreType;
 
-  export const ScoreNumericInput = ({
-    score,
-    disabled = false,
-    onScoreChange,
-  }: Props): JSX.Element => {
+  export const ScoreNumericInput = React.memo<Props>((props) => {
+    const { score, disabled = false, onScoreChange } = props;
+
     const { valueAsStr, onValueAsStrChange, submit } = useNumericInputState({
       valueFromProps: score,
       onValueChange: onScoreChange,
@@ -314,8 +338,28 @@ Blueprint.js の `NumericInput` コンポーネントは `string` 型を使っ�
         step={step}
         value={valueAsStr}
         onBlur={submit}
-        onChange={onValueAsStrChange}
+        onValueChange={onValueAsStrChange}
       />
+    );
+  });
+  ```
+
+- score-input-example.tsx
+
+  ```tsx
+  import * as React from 'react';
+  import { type ScoreType } from './score-type';
+  import { ScoreNumericInput } from './score-input';
+
+  export const ScoreInputExample = () => {
+    const [score, setScore] = React.useState<ScoreType>(0);
+
+    console.log({ score });
+
+    return (
+      <div>
+        <ScoreNumericInput score={score} onScoreChange={setScore} />
+      </div>
     );
   };
   ```
@@ -327,82 +371,41 @@ Blueprint.js の `NumericInput` コンポーネントは `string` 型を使っ�
 
   type Props = Readonly<{
     value: string;
-    disabled: boolean;
-    min: number;
-    max: number;
-    step: number;
-    onChange: (value: string) => void;
-    onBlur: () => void;
+    onValueChange: (next: string) => void;
+    min?: number;
+    max?: number;
+    step?: number;
+    disabled?: boolean;
+    onBlur?: () => void;
   }>;
 
   export const NumericInputView = React.memo<Props>((props) => {
-    const { value, disabled, max, min, step, onChange, onBlur } = props;
+    const { onValueChange, value, min, max, step, disabled, onBlur } = props;
 
-    const handleChange = React.useCallback(
+    const onChange = React.useCallback(
       (ev: React.ChangeEvent<HTMLInputElement>) => {
-        onChange(ev.target.value);
+        onValueChange(ev.target.value);
       },
-      [onChange],
+      [onValueChange],
     );
 
     return (
       <input
-        disabled={disabled}
-        max={max}
-        min={min}
-        step={step}
         type='number'
+        className='numeric-input'
+        disabled={disabled}
         value={value}
+        min={min}
+        max={max}
+        step={step}
+        onChange={onChange}
         onBlur={onBlur}
-        onChange={handleChange}
       />
     );
   });
-
-  NumericInputView.displayName = 'NumericInputView';
   ```
 
-- score.ts
-
-  ```ts
-  import { clampAndRound } from './numeric-type-utils';
-
-  export type ScoreType =
-    | 0
-    | 0.1
-    | 0.2
-    | 0.3
-    | 0.4
-    | 0.5
-    | 0.6
-    | 0.7
-    | 0.8
-    | 0.9
-    | 1;
-
-  export namespace ScoreType {
-    export const min = 0 satisfies ScoreType;
-    export const max = 1 satisfies ScoreType;
-    export const defaultValue = 0 satisfies ScoreType;
-    export const digit = 1;
-    export const step = 0.1;
-
-    const clampAndRoundScore = clampAndRound<ScoreType>({
-      defaultValue,
-      digit,
-      max,
-      min,
-      step,
-    });
-
-    export const encode = (s: ScoreType): string => s.toString();
-
-    export const decode = (s: string): ScoreType =>
-      clampAndRoundScore(Number.parseFloat(s));
-  }
-  ```
-
-- numeric-input-state.ts
+- use-numeric-input-state.ts
 
   ```ts
   import * as React from 'react';
@@ -422,15 +425,19 @@ Blueprint.js の `NumericInput` コンポーネントは `string` 型を使っ�
     onValueAsStrChange: (value: string) => void;
     submit: () => void;
   }> => {
-    const [valueAsStr, setValueAsStr] = React.useState(encode(valueFromProps));
+    const [valueAsStr, setValueAsStr] = React.useState<string>(
+      encode(valueFromProps),
+    );
 
     React.useEffect(() => {
       setValueAsStr(encode(valueFromProps));
-    }, [valueFromProps, setValueAsStr, encode]);
+    }, [valueFromProps, encode]);
 
     const submit = React.useCallback(() => {
-      onValueChange(decode(valueAsStr));
-    }, [decode, onValueChange, valueAsStr]);
+      const decoded = decode(valueAsStr);
+      onValueChange(decoded);
+      setValueAsStr(encode(decoded));
+    }, [decode, encode, onValueChange, valueAsStr]);
 
     return {
       onValueAsStrChange: setValueAsStr,
@@ -448,7 +455,6 @@ Blueprint.js の `NumericInput` コンポーネントは `string` 型を使っ�
     max: T;
     digit: number;
     defaultValue: T;
-    step?: number;
   }>;
 
   export const clampAndRound =
@@ -461,8 +467,55 @@ Blueprint.js の `NumericInput` コンポーネントは `string` 型を使っ�
           : p.max < x
             ? p.max
             : ((Math.round(x * 10 ** p.digit) / 10 ** p.digit) as T);
+
+  export const createNumberType = <T extends number>({
+    min,
+    max,
+    digit,
+    defaultValue,
+  }: NumericTypeProperties<T>): Readonly<{
+    step: number;
+    encode: (s: T) => string;
+    decode: (s: string) => T;
+  }> &
+    NumericTypeProperties<T> => {
+    const step = 10 ** -digit;
+
+    const clampAndRoundScore = clampAndRound<T>({
+      defaultValue,
+      digit,
+      max,
+      min,
+    });
+
+    const encode = (s: T): string => s.toString();
+
+    const decode = (s: string): T => clampAndRoundScore(Number(s));
+
+    return {
+      min,
+      max,
+      digit,
+      defaultValue,
+      step,
+      encode,
+      decode,
+    };
+  };
   ```
 
-動くコード
+動くコード： https://playcode.io/2208737
 
-https://github.com/noshiro-pf/mono/blob/develop/experimental/numeric-input
+## npm package
+
+今回紹介した numeric input の実装のためのユーティリティを npm package として publish しました。
+
+https://www.npmjs.com/package/@noshiro/numeric-input-utils
+
+提供しているものは [実装例 A](#実装例A) における以下の型・関数です。
+
+- `useNumericInputState`
+- 数値型作成のための補助ユーティリティ
+  - `createNumberType`
+  - `NumericTypeProperties`
+  - `clampAndRound`

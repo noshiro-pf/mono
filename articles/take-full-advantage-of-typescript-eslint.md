@@ -258,7 +258,11 @@ if (obj.value) {
 {
   "@typescript-eslint/strict-boolean-expressions": [
     "warn",
-    { "allowString": false, "allowNumber": false, "allowNullableObject": false }
+    {
+      "allowString": false,
+      "allowNumber": false,
+      "allowNullableObject": false
+    }
   ]
 }
 ```

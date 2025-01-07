@@ -23,6 +23,16 @@
       "options": {
         "tabWidth": 4
       }
+    },
+    {
+      "files": ["articles/**/*"],
+      "options": {
+        "plugins": [
+          "prettier-plugin-organize-imports",
+          "prettier-plugin-packagejson"
+        ],
+        "tabWidth": 2
+      }
     }
   ]
 }
