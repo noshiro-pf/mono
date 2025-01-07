@@ -147,6 +147,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
     tsType: 'dom',
   }),
   'io-ts': fillDefaultsForUtil(),
+  'io-ts-types': fillDefaultsForUtil(),
   'lambda-calculus-interpreter-core': fillDefaultsForUtil(),
 
   'ts-utils-additional': fillDefaultsForUtil({
