@@ -1,5 +1,5 @@
+import { CheckboxView } from '@noshiro/react-blueprintjs-utils';
 import { AnswerFilterAndSortStore } from '../../../store';
-import { CheckboxView } from '../../bp';
 import { CheckboxWrapper, FilterItem } from './styled';
 
 const dc = dict.answerPage.detailedFilter;

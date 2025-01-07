@@ -1,4 +1,4 @@
-import { BpTimePicker } from '../bp';
+import { BpTimePicker } from '@noshiro/react-blueprintjs-utils';
 
 type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;

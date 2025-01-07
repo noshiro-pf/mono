@@ -1,7 +1,7 @@
 import { Button, FormGroup } from '@blueprintjs/core';
+import { BpInput } from '@noshiro/react-blueprintjs-utils';
 import { GoogleSignInStore, SignInPageStore } from '../../store';
 import { GoogleIcon, Label } from '../atoms';
-import { BpInput } from '../bp';
 import { LockButton } from '../molecules';
 import { NavBar } from '../organisms';
 import { SignInStyled } from '../styled';

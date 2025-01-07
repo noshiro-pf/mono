@@ -1,20 +1,20 @@
 import { FormGroup } from '@blueprintjs/core';
-import { theNameIsAlreadyUsedFn } from '../../../functions';
-import { useFormError } from '../../../hooks';
-import { AnswerPageStore, Auth } from '../../../store';
-import { Description } from '../../atoms';
 import {
   BpInput,
   BpTextArea,
   ButtonNowrapStyled,
   CheckboxView,
-  CustomIconButton,
   HTMLTableBorderedStyled2,
-} from '../../bp';
+} from '@noshiro/react-blueprintjs-utils';
+import { theNameIsAlreadyUsedFn } from '../../../functions';
+import { useFormError } from '../../../hooks';
+import { AnswerPageStore, Auth } from '../../../store';
+import { Description } from '../../atoms';
 import {
   AnswerIconFairPointInput,
   AnswerIconGoodPoint,
   AnswerIconPoorPoint,
+  CustomIconButton,
   CustomScrollbarWrapper,
 } from '../../molecules';
 import {

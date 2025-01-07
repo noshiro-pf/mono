@@ -1,36 +1,41 @@
-import { clampAndRoundNumIcons } from '../../constants';
-import { NumericInputView, useNumericInputState } from '../bp';
+import {
+  NumericInputView,
+  useNumericInputState,
+} from '@noshiro/react-blueprintjs-utils';
+import {
+  clampAndRoundNumIcons,
+  iconFilterNumericInputConfig,
+} from '../../constants';
 
 type Props = Readonly<{
-  count: number;
-  max: number;
+  count: SafeUint;
+  onCountChange: (value: SafeUint) => void;
   disabled?: boolean;
-  onCountChange: (value: number) => void;
+  max: SafeUint;
 }>;
-
-const defaultValue = 0;
 
 export const IconCountNumericInput = memoNamed<Props>(
   'IconCountNumericInput',
   ({ count: valueFromProps, max, disabled = false, onCountChange }) => {
     const normalizeValue = useCallback(
-      (value: number): number => clampAndRoundNumIcons(value, max),
+      (value: number): SafeUint => clampAndRoundNumIcons(value, max),
       [max],
     );
 
     const {
       valueAsStr,
-      setValueStr,
+      setValueAsStr,
       onDecrementMouseDown,
       onIncrementMouseDown,
-      onInputBlur,
+      submit,
       onKeyDown,
-    } = useNumericInputState({
+    } = useNumericInputState<SafeUint>({
       onValueChange: onCountChange,
-      defaultValue,
-      normalizeValue,
+      normalize: normalizeValue,
+      decode: (s) => normalizeValue(Number(s)),
+      encode: (s) => s.toString(),
       valueFromProps,
-      step: 1,
+      step: iconFilterNumericInputConfig.step,
     });
 
     const inputProps = useMemo(
@@ -47,8 +52,8 @@ export const IconCountNumericInput = memoNamed<Props>(
         valueAsStr={valueAsStr}
         onDecrementMouseDown={onDecrementMouseDown}
         onIncrementMouseDown={onIncrementMouseDown}
-        onInputBlur={onInputBlur}
-        onInputStringChange={setValueStr}
+        onInputBlur={submit}
+        onInputStringChange={setValueAsStr}
       />
     );
   },

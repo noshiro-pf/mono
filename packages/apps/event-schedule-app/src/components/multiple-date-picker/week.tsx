@@ -1,4 +1,4 @@
-import { DatePickerWeekStyled } from '../bp';
+import { DatePickerWeekStyled } from '@noshiro/react-blueprintjs-utils';
 import { DatePickerDate } from './date-picker-day';
 
 type Props = Readonly<{

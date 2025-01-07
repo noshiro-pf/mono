@@ -2,13 +2,13 @@ import { Button } from '@blueprintjs/core';
 import {
   BpTextArea,
   ButtonNowrapStyled,
-  CustomIconButton,
   HTMLTableBorderedStyled2,
-} from '../bp';
+} from '@noshiro/react-blueprintjs-utils';
 import {
   AnswerIconFairPointInput,
   AnswerIconGoodPoint,
   AnswerIconPoorPoint,
+  CustomIconButton,
 } from '../molecules';
 import { ButtonsWrapper } from '../styled';
 

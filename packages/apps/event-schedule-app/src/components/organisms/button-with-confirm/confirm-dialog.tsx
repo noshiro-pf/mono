@@ -1,5 +1,5 @@
+import { AlertWithMaxWidth } from '@noshiro/react-blueprintjs-utils';
 import { Description } from '../../atoms';
-import { AlertWithMaxWidth } from '../../bp';
 
 type Props = Readonly<{
   isOpen: boolean;

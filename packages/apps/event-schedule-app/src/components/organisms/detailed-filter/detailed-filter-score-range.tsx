@@ -1,10 +1,10 @@
+import { BpRangeSlider, CheckboxView } from '@noshiro/react-blueprintjs-utils';
 import {
   answersScoreNumericInputConfig,
   clampAndRoundAnswersScore,
 } from '../../../constants';
 import { AnswerFilterAndSortStore } from '../../../store';
 import { type AnswersScore } from '../../../types';
-import { BpRangeSlider, CheckboxView } from '../../bp';
 import { ScoreNumericInput } from '../../molecules';
 import {
   CheckboxWrapper,
@@ -61,14 +61,14 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
             <ScoreNumericInput
               disabled={!enabled}
               max={range.max}
-              value={range.min}
-              onValueChange={AnswerFilterAndSortStore.setScoreRangeMin}
+              score={range.min}
+              onScoreChange={AnswerFilterAndSortStore.setScoreRangeMin}
             />
             <ScoreNumericInput
               disabled={!enabled}
               min={range.min}
-              value={range.max}
-              onValueChange={AnswerFilterAndSortStore.setScoreRangeMax}
+              score={range.max}
+              onScoreChange={AnswerFilterAndSortStore.setScoreRangeMax}
             />
           </div>
           <RangeSliderWrapper>

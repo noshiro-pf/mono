@@ -1,8 +1,11 @@
 import {
+  NumericInputView,
+  useNumericInputState,
+} from '@noshiro/react-blueprintjs-utils';
+import {
   clampAndRoundAnswerWeight,
   weightNumericInputConfig,
 } from '../../constants';
-import { NumericInputView, useNumericInputState } from '../bp';
 
 type Props = Readonly<{
   weight: Weight;
@@ -10,7 +13,7 @@ type Props = Readonly<{
   disabled?: boolean;
 }>;
 
-const { step, defaultValue, min, max } = weightNumericInputConfig;
+const { step, min, max } = weightNumericInputConfig;
 
 export const WeightNumericInput = memoNamed<Props>(
   'WeightNumericInput',
@@ -21,15 +24,16 @@ export const WeightNumericInput = memoNamed<Props>(
   }) => {
     const {
       valueAsStr,
-      setValueStr,
+      setValueAsStr,
       onDecrementMouseDown,
       onIncrementMouseDown,
-      onInputBlur,
+      submit,
       onKeyDown,
-    } = useNumericInputState({
+    } = useNumericInputState<Weight>({
       onValueChange,
-      defaultValue,
-      normalizeValue: clampAndRoundAnswerWeight,
+      normalize: clampAndRoundAnswerWeight,
+      decode: (s) => clampAndRoundAnswerWeight(Number(s)),
+      encode: (s) => s.toString(),
       valueFromProps,
       step,
     });
@@ -48,8 +52,8 @@ export const WeightNumericInput = memoNamed<Props>(
         valueAsStr={valueAsStr}
         onDecrementMouseDown={onDecrementMouseDown}
         onIncrementMouseDown={onIncrementMouseDown}
-        onInputBlur={onInputBlur}
-        onInputStringChange={setValueStr}
+        onInputBlur={submit}
+        onInputStringChange={setValueAsStr}
       />
     );
   },

@@ -1,9 +1,8 @@
 import {
-  eventListItemDefaultValue,
-  fillAnswer,
-  fillEventSchedule,
+  Answer,
+  EventListItem,
+  EventSchedule,
   firestorePaths,
-  type EventListItem,
 } from '@noshiro/event-schedule-app-shared';
 import { compareYearMonthDate } from '@noshiro/io-ts-types';
 import { Arr, IMap, Tpl, pipe, tp } from '@noshiro/ts-utils';
@@ -48,7 +47,7 @@ export const fetchEventListOfUserImpl = async (
     EventListItem,
     'eventSchedule' | 'eventScheduleMetadata'
   >[] = eventsSnapshot.docs.map((d) => ({
-    eventSchedule: fillEventSchedule(d.data()),
+    eventSchedule: EventSchedule.fill(d.data()),
     eventScheduleMetadata: {
       id: d.id,
       createdAt: d.createTime.toDate().toISOString(),
@@ -103,7 +102,7 @@ export const fetchEventListOfUserImpl = async (
           .get()
           .then((answersSnapshot) => ({
             eventId,
-            answers: answersSnapshot.docs.map((d) => fillAnswer(d.data())),
+            answers: answersSnapshot.docs.map((d) => Answer.fill(d.data())),
             answersMetadata: {
               lastUpdate: pipe(answersSnapshot.docs)
                 .chain((ds) => Arr.maxBy(ds, (d) => d.updateTime.toMillis()))
@@ -136,7 +135,7 @@ export const fetchEventListOfUserImpl = async (
         eventScheduleMetadata,
         answers: ans?.answers ?? [],
         answersMetadata:
-          ans?.answersMetadata ?? eventListItemDefaultValue.answersMetadata,
+          ans?.answersMetadata ?? EventListItem.defaultValue.answersMetadata,
       };
     });
 

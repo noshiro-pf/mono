@@ -1,4 +1,4 @@
-import { fillEventSchedule } from '@noshiro/event-schedule-app-shared';
+import { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { doc, getDoc } from 'firebase/firestore';
 import { firestoreEvents } from '../../initialize-firebase';
 
@@ -57,7 +57,7 @@ export const fetchEventSchedule = async (
         message: `event of id "${id}" not-found`,
       });
     }
-    return Result.ok(fillEventSchedule(res.data()));
+    return Result.ok(EventSchedule.fill(res.data()));
   } catch (error: unknown) {
     return Result.err({ type: 'others' as const, message: Str.from(error) });
   }

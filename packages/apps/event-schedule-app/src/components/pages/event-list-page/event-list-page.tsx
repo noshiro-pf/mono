@@ -1,5 +1,6 @@
 import { Button, ControlGroup, HTMLSelect, Spinner } from '@blueprintjs/core';
-import { toUserId, toUserName } from '@noshiro/event-schedule-app-shared';
+import { UserId, UserName } from '@noshiro/event-schedule-app-shared';
+import { BpCheckbox, BpInput } from '@noshiro/react-blueprintjs-utils';
 import { api } from '../../../api';
 import { createToaster, showToast } from '../../../functions';
 import {
@@ -8,7 +9,6 @@ import {
   EventListStore,
   eventList$,
 } from '../../../store';
-import { BpCheckbox, BpInput } from '../../bp';
 import { Header } from '../../organisms';
 import { EventListItemComponent } from './event-list-item';
 
@@ -31,15 +31,15 @@ export const EventListPage = memoNamed('EventListPage', () => {
           () => {
             if (fireAuthUser === undefined) return;
             archiveEventScheduleHandler(e.eventScheduleMetadata.id, {
-              id: toUserId(fireAuthUser.uid),
-              name: toUserName(fireAuthUser.displayName ?? ''),
+              id: UserId.cast(fireAuthUser.uid),
+              name: UserName.cast(fireAuthUser.displayName ?? ''),
             }).catch(noop);
           },
           () => {
             if (fireAuthUser === undefined) return;
             unarchiveEventScheduleHandler(e.eventScheduleMetadata.id, {
-              id: toUserId(fireAuthUser.uid),
-              name: toUserName(fireAuthUser.displayName ?? ''),
+              id: UserId.cast(fireAuthUser.uid),
+              name: UserName.cast(fireAuthUser.displayName ?? ''),
             }).catch(noop);
           },
         ),

@@ -1,8 +1,8 @@
 import { FormGroup } from '@blueprintjs/core';
+import { BpCheckbox, BpInput } from '@noshiro/react-blueprintjs-utils';
 import { isEmailString } from '@noshiro/ts-utils-additional';
 import { type NotificationSettingsWithEmail } from '../../types';
 import { now, ymdhmDateDiff } from '../../utils';
-import { BpCheckbox, BpInput } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';
 
 const dc = dict.eventSettingsPage.section3;

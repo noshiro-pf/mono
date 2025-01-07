@@ -3,9 +3,9 @@ import { DetailedFilterNumIcon } from './detailed-filter-num-icon';
 
 type Props = Readonly<{
   enabled: boolean;
-  min: number;
-  max: number;
-  upperLimit: number;
+  min: SafeUint;
+  max: SafeUint;
+  upperLimit: SafeUint;
 }>;
 
 export const DetailedFilterNumPoorIcon = memoNamed<Props>(

@@ -1,7 +1,4 @@
-import {
-  isEventListItem,
-  type EventListItem,
-} from '@noshiro/event-schedule-app-shared';
+import { EventListItem } from '@noshiro/event-schedule-app-shared';
 import { httpsCallable } from 'firebase/functions';
 import { fbFunctions } from '../../initialize-firebase';
 
@@ -43,7 +40,7 @@ export const fetchEventListOfUser = ({
 
     const response = result.value.data;
 
-    if (!Array.isArray(response) || !response.every(isEventListItem)) {
+    if (!Array.isArray(response) || !response.every(EventListItem.is)) {
       return Result.err({
         type: 'wrong-type-response' as const,
         message: `response should be an array of EventListItem.`,

@@ -1,5 +1,5 @@
 import { Button, Classes } from '@blueprintjs/core';
-import { DialogWithMaxWidth } from '../../bp';
+import { DialogWithMaxWidth } from '@noshiro/react-blueprintjs-utils';
 import { ButtonsWrapperAlignEnd } from '../../styled';
 
 type Props = Readonly<{

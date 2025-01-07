@@ -299,8 +299,8 @@ const restoreFromQueryParams = (
         good: pipe(queryParams.get(keyDef.good))
           .chainOptional(rangeFromStr)
           .chainOptional((range) => ({
-            min: Num.mapNaN2Undefined(Number.parseInt(range.a, 10)),
-            max: Num.mapNaN2Undefined(Number.parseInt(range.b, 10)),
+            min: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.a, 10))),
+            max: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.b, 10))),
           })).value ?? {
           min: undefined,
           max: undefined,
@@ -308,8 +308,8 @@ const restoreFromQueryParams = (
         fair: pipe(queryParams.get(keyDef.fair))
           .chainOptional(rangeFromStr)
           .chainOptional((range) => ({
-            min: Num.mapNaN2Undefined(Number.parseInt(range.a, 10)),
-            max: Num.mapNaN2Undefined(Number.parseInt(range.b, 10)),
+            min: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.a, 10))),
+            max: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.b, 10))),
           })).value ?? {
           min: undefined,
           max: undefined,
@@ -317,8 +317,8 @@ const restoreFromQueryParams = (
         poor: pipe(queryParams.get(keyDef.poor))
           .chainOptional(rangeFromStr)
           .chainOptional((range) => ({
-            min: Num.mapNaN2Undefined(Number.parseInt(range.a, 10)),
-            max: Num.mapNaN2Undefined(Number.parseInt(range.b, 10)),
+            min: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.a, 10))),
+            max: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.b, 10))),
           })).value ?? {
           min: undefined,
           max: undefined,
@@ -326,8 +326,8 @@ const restoreFromQueryParams = (
         goodPlusFair: pipe(queryParams.get(keyDef.goodPlusFair))
           .chainOptional(rangeFromStr)
           .chainOptional((range) => ({
-            min: Num.mapNaN2Undefined(Number.parseInt(range.a, 10)),
-            max: Num.mapNaN2Undefined(Number.parseInt(range.b, 10)),
+            min: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.a, 10))),
+            max: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.b, 10))),
           })).value ?? {
           min: undefined,
           max: undefined,
@@ -335,8 +335,8 @@ const restoreFromQueryParams = (
         fairPlusPoor: pipe(queryParams.get(keyDef.fairPlusPoor))
           .chainOptional(rangeFromStr)
           .chainOptional((range) => ({
-            min: Num.mapNaN2Undefined(Number.parseInt(range.a, 10)),
-            max: Num.mapNaN2Undefined(Number.parseInt(range.b, 10)),
+            min: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.a, 10))),
+            max: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.b, 10))),
           })).value ?? {
           min: undefined,
           max: undefined,

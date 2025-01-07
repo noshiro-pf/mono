@@ -1,5 +1,5 @@
+import { BpInput } from '@noshiro/react-blueprintjs-utils';
 import { CustomIcon } from '../../atoms';
-import { BpInput } from '../../bp';
 import {
   AnswerIconFairPointInput,
   AnswerIconGoodPoint,

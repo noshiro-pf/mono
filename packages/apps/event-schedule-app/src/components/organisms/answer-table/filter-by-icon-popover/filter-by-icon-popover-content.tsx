@@ -1,15 +1,15 @@
 import { Button } from '@blueprintjs/core';
+import { SwitchWithoutLabelStyled } from '@noshiro/react-blueprintjs-utils';
 import { type NumIconFilterState } from '../../../../types';
-import { SwitchWithoutLabelStyled } from '../../../bp';
 import { IconCountNumericInput } from '../../../molecules';
 
 const dc = dict.answerPage.answers.iconHeaderFilter;
 
 type Props = Readonly<{
   state: NumIconFilterState;
-  upperLimit: number;
-  onMinChange: (value: number) => void;
-  onMaxChange: (value: number) => void;
+  upperLimit: SafeUint;
+  onMinChange: (value: SafeUint) => void;
+  onMaxChange: (value: SafeUint) => void;
   enableFiltering: () => void;
   disableFiltering: () => void;
   onClose: () => void;

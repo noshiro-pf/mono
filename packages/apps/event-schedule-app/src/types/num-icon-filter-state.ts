@@ -1,5 +1,5 @@
 export type NumIconFilterState = Readonly<{
   enabled: boolean;
-  min: number;
-  max: number;
+  min: SafeUint;
+  max: SafeUint;
 }>;

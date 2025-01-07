@@ -1,6 +1,6 @@
+import { AlertWithMaxWidth } from '@noshiro/react-blueprintjs-utils';
 import { introductionUrl, Routes } from '../../../constants';
 import { Router } from '../../../store';
-import { AlertWithMaxWidth } from '../../bp';
 
 const dc = dict.forNonLoggedInUser;
 

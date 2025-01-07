@@ -5,8 +5,8 @@ import {
   Spinner,
   Tooltip,
 } from '@blueprintjs/core';
+import { DialogWithMaxWidth } from '@noshiro/react-blueprintjs-utils';
 import { CreateEventScheduleStore } from '../../store';
-import { DialogWithMaxWidth } from '../bp';
 import { ButtonsWrapperAlignEnd } from '../styled';
 
 const dc = dict.createEventResultDialog;

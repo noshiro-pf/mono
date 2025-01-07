@@ -1,9 +1,4 @@
-import {
-  fillAnswer,
-  fillEventSchedule,
-  type Answer,
-  type EventSchedule,
-} from '@noshiro/event-schedule-app-shared';
+import { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { Str, isString } from '@noshiro/ts-utils';
 import { logger } from 'firebase-functions';
@@ -17,7 +12,7 @@ export const toStringWithCheck = (value: unknown): string => {
 export const fillAnswerWithCheck = (
   value: DeepReadonly<FirebaseFirestore.DocumentData>,
 ): Answer => {
-  const filled = fillAnswer(value);
+  const filled = Answer.fill(value);
   if (!deepEqual(filled, value)) {
     logger.warn(`There is a difference with the result of fillAnswer`);
   }
@@ -27,7 +22,7 @@ export const fillAnswerWithCheck = (
 export const fillEventScheduleWithCheck = (
   value: DeepReadonly<FirebaseFirestore.DocumentData>,
 ): EventSchedule => {
-  const filled = fillEventSchedule(value);
+  const filled = EventSchedule.fill(value);
   if (!deepEqual(filled, value)) {
     logger.warn(`There is a difference with the result of fillEventSchedule`);
   }

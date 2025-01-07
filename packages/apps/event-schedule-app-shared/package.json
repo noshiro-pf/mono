@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/event-schedule-app-shared",
-  "version": "8.0.0",
+  "version": "9.0.0",
   "private": false,
   "license": "MIT",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
@@ -60,6 +60,12 @@
         "types": "./esm/v8/index.d.mts",
         "default": "./esm/v8/index.mjs"
       }
+    },
+    "./v9": {
+      "import": {
+        "types": "./esm/v9/index.d.mts",
+        "default": "./esm/v9/index.mjs"
+      }
     }
   },
   "scripts": {
@@ -86,6 +92,7 @@
   },
   "dependencies": {
     "@noshiro/io-ts": "*",
+    "@noshiro/io-ts-types": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*"
   },

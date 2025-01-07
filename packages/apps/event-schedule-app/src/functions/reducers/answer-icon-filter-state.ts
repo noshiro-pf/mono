@@ -6,36 +6,36 @@ export type AnswerIconFilterState = DeepReadonly<{
   poor: NumIconFilterState;
   goodPlusFair: NumIconFilterState;
   fairPlusPoor: NumIconFilterState;
-  upperLimit: number;
+  upperLimit: SafeUint;
 }>;
 
 const initialState: AnswerIconFilterState = {
   good: {
     enabled: false,
-    min: 0,
-    max: Number.POSITIVE_INFINITY,
+    min: toSafeUint(0),
+    max: SafeUint.MAX_VALUE,
   },
   fair: {
     enabled: false,
-    min: 0,
-    max: Number.POSITIVE_INFINITY,
+    min: toSafeUint(0),
+    max: SafeUint.MAX_VALUE,
   },
   poor: {
     enabled: false,
-    min: 0,
-    max: Number.POSITIVE_INFINITY,
+    min: toSafeUint(0),
+    max: SafeUint.MAX_VALUE,
   },
   goodPlusFair: {
     enabled: false,
-    min: 0,
-    max: Number.POSITIVE_INFINITY,
+    min: toSafeUint(0),
+    max: SafeUint.MAX_VALUE,
   },
   fairPlusPoor: {
     enabled: false,
-    min: 0,
-    max: Number.POSITIVE_INFINITY,
+    min: toSafeUint(0),
+    max: SafeUint.MAX_VALUE,
   },
-  upperLimit: Number.POSITIVE_INFINITY,
+  upperLimit: SafeUint.MAX_VALUE,
 };
 
 export type AnswerIconFilterStateAction = DeepReadonly<
@@ -53,26 +53,26 @@ export type AnswerIconFilterStateAction = DeepReadonly<
   | {
       type: 'setFromUrlQueryParams';
       values: {
-        good: { min: number | undefined; max: number | undefined };
-        fair: { min: number | undefined; max: number | undefined };
-        poor: { min: number | undefined; max: number | undefined };
-        goodPlusFair: { min: number | undefined; max: number | undefined };
-        fairPlusPoor: { min: number | undefined; max: number | undefined };
+        good: { min: SafeUint | undefined; max: SafeUint | undefined };
+        fair: { min: SafeUint | undefined; max: SafeUint | undefined };
+        poor: { min: SafeUint | undefined; max: SafeUint | undefined };
+        goodPlusFair: { min: SafeUint | undefined; max: SafeUint | undefined };
+        fairPlusPoor: { min: SafeUint | undefined; max: SafeUint | undefined };
       };
     }
   | {
       type: 'setMax';
       iconId: DetailedFilterIcon;
-      value: number;
+      value: SafeUint;
     }
   | {
       type: 'setMin';
       iconId: DetailedFilterIcon;
-      value: number;
+      value: SafeUint;
     }
   | {
       type: 'setUpperLimit';
-      upperLimit: number;
+      upperLimit: SafeUint;
     }
 >;
 
@@ -84,14 +84,14 @@ const normalizeState = ({
   fairPlusPoor,
   upperLimit,
 }: AnswerIconFilterState): AnswerIconFilterState => {
-  const clamp = Num.clamp(0, upperLimit);
+  const clamp = Num.clamp<SafeUint>(toSafeUint(0), upperLimit);
 
   const helperFn = (
     s: AnswerIconFilterState['good'],
   ): AnswerIconFilterState['good'] => ({
     enabled: s.enabled,
     min: clamp(s.min),
-    max: clamp(Math.max(s.min, s.max)),
+    max: clamp(SafeUint.max(s.min, s.max)),
   });
 
   return {
@@ -116,27 +116,27 @@ const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
           const nextState: AnswerIconFilterState = {
             good: {
               enabled: false,
-              min: 0,
+              min: toSafeUint(0),
               max: upperLimit,
             },
             fair: {
               enabled: false,
-              min: 0,
+              min: toSafeUint(0),
               max: upperLimit,
             },
             poor: {
               enabled: false,
-              min: 0,
+              min: toSafeUint(0),
               max: upperLimit,
             },
             goodPlusFair: {
               enabled: false,
-              min: 0,
+              min: toSafeUint(0),
               max: upperLimit,
             },
             fairPlusPoor: {
               enabled: false,
-              min: 0,
+              min: toSafeUint(0),
               max: upperLimit,
             },
             upperLimit,
@@ -152,31 +152,31 @@ const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
           const nextState: AnswerIconFilterState = {
             good: {
               enabled: good.min !== undefined || good.max !== undefined,
-              min: good.min ?? 0,
+              min: good.min ?? toSafeUint(0),
               max: good.max ?? upperLimit,
             },
             fair: {
               enabled: fair.min !== undefined || fair.max !== undefined,
-              min: fair.min ?? 0,
+              min: fair.min ?? toSafeUint(0),
               max: fair.max ?? upperLimit,
             },
             poor: {
               enabled: poor.min !== undefined || poor.max !== undefined,
-              min: poor.min ?? 0,
+              min: poor.min ?? toSafeUint(0),
               max: poor.max ?? upperLimit,
             },
             goodPlusFair: {
               enabled:
                 goodPlusFair.min !== undefined ||
                 goodPlusFair.max !== undefined,
-              min: goodPlusFair.min ?? 0,
+              min: goodPlusFair.min ?? toSafeUint(0),
               max: goodPlusFair.max ?? upperLimit,
             },
             fairPlusPoor: {
               enabled:
                 fairPlusPoor.min !== undefined ||
                 fairPlusPoor.max !== undefined,
-              min: fairPlusPoor.min ?? 0,
+              min: fairPlusPoor.min ?? toSafeUint(0),
               max: fairPlusPoor.max ?? upperLimit,
             },
 
@@ -193,12 +193,12 @@ const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
         case 'disableFiltering':
           return Obj.set(state, action.iconId, {
             enabled: false,
-            min: 0,
+            min: toSafeUint(0),
             max: state.upperLimit,
           });
 
         case 'setMin': {
-          const next = Num.clamp(0, state.upperLimit)(action.value);
+          const next = Num.clamp(toSafeUint(0), state.upperLimit)(action.value);
 
           return Obj.update(
             state,
@@ -207,13 +207,17 @@ const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
               pipe(a)
                 .chain((v) => Obj.set(v, 'min', next))
                 .chain((v) =>
-                  Obj.set(v, 'max', Math.max(next, state[action.iconId].max)),
+                  Obj.set(
+                    v,
+                    'max',
+                    SafeUint.max(next, state[action.iconId].max),
+                  ),
                 ).value,
           );
         }
 
         case 'setMax': {
-          const next = Num.clamp(0, state.upperLimit)(action.value);
+          const next = Num.clamp(toSafeUint(0), state.upperLimit)(action.value);
           return Obj.update(
             state,
             action.iconId,
@@ -221,7 +225,11 @@ const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
               pipe(a)
                 .chain((v) => Obj.set(v, 'max', next))
                 .chain((v) =>
-                  Obj.set(v, 'min', Math.min(next, state[action.iconId].min)),
+                  Obj.set(
+                    v,
+                    'min',
+                    SafeUint.min(next, state[action.iconId].min),
+                  ),
                 ).value,
           );
         }
@@ -231,18 +239,18 @@ const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
           const helperFn: MonoTypeFunction<
             Readonly<{
               enabled: boolean;
-              min: number;
-              max: number;
+              min: SafeUint;
+              max: SafeUint;
             }>
           > = (st) =>
             !st.enabled
               ? Obj.set(st, 'max', upperLimit) // フィルタがoffのときはデフォルト値で更新
               : pipe(st)
                   .chain((a) =>
-                    Obj.update(a, 'min', (m) => Math.min(upperLimit, m)),
+                    Obj.update(a, 'min', (m) => SafeUint.min(upperLimit, m)),
                   )
                   .chain((a) =>
-                    Obj.update(a, 'max', (m) => Math.min(upperLimit, m)),
+                    Obj.update(a, 'max', (m) => SafeUint.min(upperLimit, m)),
                   ).value; // 回答が減ったとき
 
           return pipe(state)

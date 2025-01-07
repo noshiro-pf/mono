@@ -1,43 +1,44 @@
 import {
+  NumericInputView,
+  useNumericInputState,
+} from '@noshiro/react-blueprintjs-utils';
+import {
   answerRankNumericInputConfig,
   clampAndRoundAnswerRank,
 } from '../../constants';
 import { type AnswerRank } from '../../types';
-import { NumericInputView, useNumericInputState } from '../bp';
 
 type Props = Readonly<{
   value: AnswerRank;
-  disabled?: boolean;
   onValueChange: (value: AnswerRank) => void;
+  disabled?: boolean;
 }>;
 
-const step = answerRankNumericInputConfig.majorStep;
-const defaultValue = answerRankNumericInputConfig.defaultValue;
-
-const normalizeValue = clampAndRoundAnswerRank;
+const { majorStep: step, min, max } = answerRankNumericInputConfig;
 
 export const RankNumericInput = memoNamed<Props>(
   'RankNumericInput',
   ({ value: valueFromProps, disabled = false, onValueChange }) => {
     const {
       valueAsStr,
-      setValueStr,
+      setValueAsStr,
       onDecrementMouseDown,
       onIncrementMouseDown,
-      onInputBlur,
+      submit,
       onKeyDown,
     } = useNumericInputState({
       onValueChange,
-      defaultValue,
-      normalizeValue,
+      normalize: clampAndRoundAnswerRank,
+      decode: (s) => clampAndRoundAnswerRank(Number(s)),
+      encode: (s) => s.toString(),
       valueFromProps,
       step,
     });
 
     const inputProps = useMemo(
       () => ({
-        min: answerRankNumericInputConfig.min,
-        max: answerRankNumericInputConfig.max,
+        min,
+        max,
         step,
         onKeyDown,
       }),
@@ -53,8 +54,8 @@ export const RankNumericInput = memoNamed<Props>(
         valueAsStr={valueAsStr}
         onDecrementMouseDown={onDecrementMouseDown}
         onIncrementMouseDown={onIncrementMouseDown}
-        onInputBlur={onInputBlur}
-        onInputStringChange={setValueStr}
+        onInputBlur={submit}
+        onInputStringChange={setValueAsStr}
       />
     );
   },

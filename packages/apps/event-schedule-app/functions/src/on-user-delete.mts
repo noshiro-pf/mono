@@ -1,9 +1,7 @@
 import {
-  fillAnswer,
-  fillEventSchedule,
+  Answer,
+  EventSchedule,
   firestorePaths,
-  type Answer,
-  type EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import { Obj } from '@noshiro/ts-utils';
 import { type firestore } from 'firebase-admin';
@@ -42,7 +40,7 @@ export const onUserDelete = async (
     writeBatch.set(
       documentRef,
       removeAuthorIdFromEventSchedule(
-        fillEventSchedule(doc.data()),
+        EventSchedule.fill(doc.data()),
         userIdToBeRemoved,
       ),
     );
@@ -59,7 +57,7 @@ export const onUserDelete = async (
 
       writeBatch.set(
         documentRefForAnswers,
-        removeUserIdFromAnswer(fillAnswer(ans.data()), userIdToBeRemoved),
+        removeUserIdFromAnswer(Answer.fill(ans.data()), userIdToBeRemoved),
       );
     }
   }

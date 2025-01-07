@@ -1,4 +1,4 @@
-import { fillEventSchedule } from '@noshiro/event-schedule-app-shared';
+import { EventSchedule } from '@noshiro/event-schedule-app-shared';
 
 type EventSchedulePicked = Pick<
   EventSchedule,
@@ -45,7 +45,7 @@ const restoreCreateEventPageTemp = (): Result<
   const obj = Json.parse(fromDb);
   return Result.isErr(obj)
     ? Result.err(obj.value)
-    : Result.ok(fillEventSchedule(obj.value));
+    : Result.ok(EventSchedule.fill(obj.value));
 };
 
 const saveCreateEventPageTemp = (

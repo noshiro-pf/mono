@@ -1,8 +1,8 @@
 import { Button } from '@blueprintjs/core';
+import { BpSelect } from '@noshiro/react-blueprintjs-utils';
 import { selectorOptions } from '../../../../functions';
 import { useSelectDatetimesHooks } from '../../../../hooks';
 import { AnswerPageStore, holidaysJpDefinition$ } from '../../../../store';
-import { BpSelect } from '../../../bp';
 import { AddElementButton } from '../../../molecules';
 import { MultipleDatePicker } from '../../../multiple-date-picker';
 import { ButtonsWrapper } from '../../../styled';

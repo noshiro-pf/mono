@@ -1,7 +1,7 @@
 import {
-  fillNotificationSettings,
-  toUserId,
-  toUserName,
+  NotificationSettings,
+  UserId,
+  UserName,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { compareYearMonthDate } from '@noshiro/io-ts-types';
@@ -86,7 +86,7 @@ const saveToLocalStorage = (
     notes: commonState.notes,
     notificationSettings:
       pipe(commonState.notificationSettingsWithEmail).chainOptional(
-        fillNotificationSettings,
+        NotificationSettings.fill,
       ).value ?? 'none',
     title: commonState.title,
   });
@@ -133,8 +133,8 @@ const createEvent = async (): Promise<Result<undefined, string>> => {
 
   const res = await api.event.add(
     Obj.set(eventScheduleNormalized, 'author', {
-      id: mapOptional(fireAuthUser?.uid, toUserId) ?? null,
-      name: toUserName(fireAuthUser?.displayName ?? ''),
+      id: mapOptional(fireAuthUser?.uid, UserId.cast) ?? null,
+      name: UserName.cast(fireAuthUser?.displayName ?? ''),
     }),
   );
 

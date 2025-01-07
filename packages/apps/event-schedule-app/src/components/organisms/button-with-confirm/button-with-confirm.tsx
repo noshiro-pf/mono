@@ -1,5 +1,5 @@
+import { ButtonNowrapStyled } from '@noshiro/react-blueprintjs-utils';
 import { createToaster, showToast } from '../../../functions';
-import { ButtonNowrapStyled } from '../../bp';
 import { ConfirmDialog } from './confirm-dialog';
 
 type Props = DeepReadonly<{
