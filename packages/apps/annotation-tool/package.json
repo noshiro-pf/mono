@@ -67,8 +67,8 @@
     ]
   },
   "dependencies": {
-    "@blueprintjs/core": "^4.20.1",
-    "@blueprintjs/icons": "^5.11.0",
+    "@blueprintjs/core": "^5.16.2",
+    "@blueprintjs/icons": "^5.16.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.14.0",
     "@noshiro/io-ts": "*",

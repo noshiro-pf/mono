@@ -1,4 +1,5 @@
-import { DateRangeInput, type DateRange } from '@blueprintjs/datetime';
+import { type DateRange } from '@blueprintjs/datetime';
+import { DateRangeInput3 } from '@blueprintjs/datetime2';
 import {
   Ymdhm2Date,
   YmdhmFromDate,
@@ -34,8 +35,7 @@ export type BpDateRangeInputProps = DeepReadonly<{
     | 'value'
   >;
 
-// eslint-disable-next-line @typescript-eslint/no-deprecated
-type DateRangeInputPropsOriginal = React.ComponentProps<typeof DateRangeInput>;
+type DateRangeInputPropsOriginal = React.ComponentProps<typeof DateRangeInput3>;
 
 export const BpDateRangeInput = memoNamed<BpDateRangeInputProps>(
   'BpDateRangeInput',
@@ -118,8 +118,7 @@ export const BpDateRangeInput = memoNamed<BpDateRangeInputProps>(
     );
 
     return (
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      <DateRangeInput
+      <DateRangeInput3
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
         disabled={disabled}

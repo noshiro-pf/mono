@@ -45,7 +45,6 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
       <DialogWithMaxWidth
         canEscapeKeyClose={false}
         canOutsideClickClose={false}
-        hasBackdrop={false}
         icon='key'
         isCloseButtonShown={false}
         isOpen={isOpen}
