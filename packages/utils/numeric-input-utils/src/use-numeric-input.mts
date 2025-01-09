@@ -9,11 +9,11 @@ export const useNumericInputState = <N extends number>({
 }: Readonly<{
   valueFromProps: N;
   onValueChange: (value: N) => void;
-  encode: (s: N) => string;
+  encode: (value: N) => string;
   decode: (s: string) => N;
 }>): Readonly<{
   valueAsStr: string;
-  onValueAsStrChange: (value: string) => void;
+  setValueAsStr: (value: string) => void;
   submit: () => void;
 }> => {
   const [valueAsStr, setValueAsStr] = React.useState<string>(
@@ -21,8 +21,11 @@ export const useNumericInputState = <N extends number>({
   );
 
   React.useEffect(() => {
-    setValueAsStr(encode(valueFromProps));
-  }, [valueFromProps, encode]);
+    const nextValue = encode(valueFromProps);
+    if (nextValue !== valueAsStr) {
+      setValueAsStr(nextValue);
+    }
+  }, [valueFromProps, encode, valueAsStr]);
 
   const submit = React.useCallback(() => {
     const decoded = decode(valueAsStr);
@@ -31,8 +34,8 @@ export const useNumericInputState = <N extends number>({
   }, [decode, encode, onValueChange, valueAsStr]);
 
   return {
-    onValueAsStrChange: setValueAsStr,
-    submit,
     valueAsStr,
+    setValueAsStr,
+    submit,
   };
 };
