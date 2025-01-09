@@ -1,7 +1,5 @@
-import {
-  NumericInputView,
-  useNumericInputState,
-} from '@noshiro/react-blueprintjs-utils';
+import { useNumericInputWithStepState } from '@noshiro/numeric-input-utils';
+import { NumericInputView } from '@noshiro/react-blueprintjs-utils';
 import {
   answerRankNumericInputConfig,
   clampAndRoundAnswerRank,
@@ -20,13 +18,13 @@ export const RankNumericInput = memoNamed<Props>(
   'RankNumericInput',
   ({ value: valueFromProps, disabled = false, onValueChange }) => {
     const {
-      valueAsStr,
-      setValueAsStr,
+      state,
+      setState,
       onDecrementMouseDown,
       onIncrementMouseDown,
       submit,
       onKeyDown,
-    } = useNumericInputState({
+    } = useNumericInputWithStepState({
       onValueChange,
       normalize: clampAndRoundAnswerRank,
       decode: (s) => clampAndRoundAnswerRank(Number(s)),
@@ -51,11 +49,11 @@ export const RankNumericInput = memoNamed<Props>(
         fillSpace={true}
         inputProps={inputProps}
         selectOnFocus={true}
-        valueAsStr={valueAsStr}
+        valueAsStr={state}
         onDecrementMouseDown={onDecrementMouseDown}
         onIncrementMouseDown={onIncrementMouseDown}
         onInputBlur={submit}
-        onInputStringChange={setValueAsStr}
+        onInputStringChange={setState}
       />
     );
   },
