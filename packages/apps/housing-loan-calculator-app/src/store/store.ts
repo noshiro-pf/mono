@@ -1,13 +1,6 @@
 import { defaultValues, queryParamKey } from '../constants';
 import { Router } from '../router';
-import {
-  toPercentFloat,
-  toYen,
-  type PercentFloat,
-  type RepaymentType,
-  type Store,
-  type Yen,
-} from '../types';
+import { PercentFloat, Yen, type RepaymentType, type Store } from '../types';
 import { uriWithQueryParams } from '../utils';
 
 const [userInput$, nextUserInput] = createVoidEventEmitter();
@@ -111,17 +104,17 @@ Router.state.subscribe(({ searchParams: query }) => {
     setRepaymentType_(paramsAsStr.repaymentType);
   }
   if (paramsAsNumber.downPayment !== undefined) {
-    setDownPaymentManYen_(toYen(paramsAsNumber.downPayment));
+    setDownPaymentManYen_(Yen.cast(paramsAsNumber.downPayment));
   }
   if (paramsAsNumber.propertyPrice !== undefined) {
-    setPropertyPriceManYen_(toYen(paramsAsNumber.propertyPrice));
+    setPropertyPriceManYen_(Yen.cast(paramsAsNumber.propertyPrice));
   }
   if (paramsAsNumber.borrowingPeriodMonth !== undefined) {
     setBorrowingPeriodYear_(toUint32(paramsAsNumber.borrowingPeriodMonth));
   }
   if (paramsAsNumber.interestRatePerMonth !== undefined) {
     setInterestRatePercentPerYear_(
-      toPercentFloat(paramsAsNumber.interestRatePerMonth),
+      PercentFloat.cast(paramsAsNumber.interestRatePerMonth),
     );
   }
 });

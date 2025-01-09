@@ -1,9 +1,4 @@
-import {
-  toPercentFloat,
-  toYen,
-  type CalculatedValues,
-  type Store,
-} from '../types';
+import { PercentFloat, Yen, type CalculatedValues, type Store } from '../types';
 import { calcPrincipalAndInterestEqualPayment } from './calc-principal-and-interest-equal-repayment';
 import { calcPrincipalEqualPayment } from './calc-principal-equal-payment';
 
@@ -18,14 +13,14 @@ export const calcAll = ({
    * - 1 -> 元金均等返済
    * - 2 -> 元利均等返済
    */
-  const downPaymentYen = toYen(downPaymentManYen * 10_000);
-  const propertyPriceYen = toYen(propertyPriceManYen * 10_000);
+  const downPaymentYen = Yen.cast(downPaymentManYen * 10_000);
+  const propertyPriceYen = Yen.cast(propertyPriceManYen * 10_000);
   const borrowingPeriodMonth = Uint32.mul(borrowingPeriodYear, 12);
-  const interestRatePerMonth = toPercentFloat(
+  const interestRatePerMonth = PercentFloat.cast(
     interestRatePercentPerYear / 1200,
   );
 
-  const borrowingTotalYen = toYen(propertyPriceYen - downPaymentYen); // 借入金額
+  const borrowingTotalYen = Yen.cast(propertyPriceYen - downPaymentYen); // 借入金額
 
   const {
     fixedPrincipalYenPerMonth,
@@ -57,7 +52,7 @@ export const calcAll = ({
   const interestYen =
     repaymentType === 'principal-equal-payment' ? interestYen1 : interestYen2;
 
-  const interestSumManYen = toYen(Arr.sum(interestYen) / 10_000);
+  const interestSumManYen = Yen.cast(Arr.sum(interestYen) / 10_000);
 
   return {
     borrowingBalanceYen,
