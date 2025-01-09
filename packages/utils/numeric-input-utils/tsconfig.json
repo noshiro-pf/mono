@@ -1,6 +1,7 @@
 {
   "extends": [
     "../../../configs/tsconfig/tsconfig.lib.type-check.json",
+    "../../../configs/tsconfig/tsconfig.dom.json",
     "../../../configs/tsconfig/tsconfig.vite.json"
   ],
   "include": ["./src", "./configs"]

@@ -1,6 +1,7 @@
 /** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */
 
 import {
+  eslintFlatConfigForReact,
   eslintFlatConfigForTypeScript,
   eslintFlatConfigForVitest,
   genEsLintRestrictedImportsDefFromDevDependencies,
@@ -26,6 +27,7 @@ const defineConfig = async () => {
       packageDirs: [nodePath.resolve(thisDir, '../../..'), thisDir],
     }),
     eslintFlatConfigForVitest(),
+    ...eslintFlatConfigForReact(),
 
     {
       rules: {
