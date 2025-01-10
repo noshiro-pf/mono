@@ -263,9 +263,7 @@ https://playcode.io/2136118
 [Material UI](https://mui.com/material-ui/) や [Blueprint.js](https://blueprintjs.com/) のような UI コンポーネントライブラリを使っていると、そのスタイリング（CSS）だけは採用したいがステートフルであるがために JavaScript の挙動がユースケースに合わない、ということがたまにあります。 `NumericInput` はまさにその一例で、もしこういうときにライブラリがステートレスコンポーネント `NumericInputView` も提供していれば、自前で状態管理するという選択肢が生まれて問題を解決しやすくなります。[^about-ui-library]
 
 [^about-ui-library]: 世の中の UI ライブラリは、多くのユースケースに対応できる便利でステートフルなコンポーネントも提供すると共に、自前の状態管理をするためのステートレスな同じ見た目のコンポーネントもそれ単体で提供するようになっていたら良いのにと思います。[^NumericInput-MaterialUI] [^NumericInput-Blueprintjs]
-
 [^NumericInput-MaterialUI]: Material UI の場合、 Numeric Input は [Base UI](https://mui.com/base-ui/react-number-input/) というところで提供されていますが、 `value` は `number` 型で受け取る API となっており、今回求めていたものではなさそうです。
-
 [^NumericInput-Blueprintjs]: [Blueprint.js](https://blueprintjs.com/docs/#core/components/numeric-input) の `NumericInput` コンポーネントの場合、 `value` に `string` 型を渡すこともできる API となっており、こちらは controlled mode でより細かい制御を行うために意図的に用意されていてかなり理想に近いです（こういうところを見比べても、 Blueprint.js は Material UI より API が洗練されているように感じます）。ただ、同じ `NumericInput` コンポーネントに渡す props の型（`string` or `number`）で controlled/uncontrolled mode を切り替えるような使い方であり、ステートレスに使いたい場合にも無駄な状態管理が中で走っていて効率が悪いという点で若干不満はあります。
 
 もう一つは、ただの `number` 型より狭いカスタム数値型（例えば [実装例 A](#実装例A) における`ScoreType`）に対応する numeric input を使った実装が綺麗になる点です。型の制約に合う値だけをグローバルな state に反映するためにユーザー入力結果の文字列を数値に変換する処理を numeric input のレイヤーで行うことができるので、 `NumericInput` を使う側の実装がシンプルになります 。
@@ -280,55 +278,53 @@ https://playcode.io/2136118
 
 - score-type.ts
 
-  ```ts
-  import { createNumberType } from './create-number-type';
+  - `digit` は $10^{digit}$ 刻みの数値を定義するためのもので、この例では整数なので `0` になっています（後述する `@noshiro/numeric-input-utils` で提供している utility の API と合わせるため）。
 
-  export type ScoreType =
-    | 0
-    | 0.1
-    | 0.2
-    | 0.3
-    | 0.4
-    | 0.5
-    | 0.6
-    | 0.7
-    | 0.8
-    | 0.9
-    | 1;
+  ```ts
+  import { createNumberType } from './numeric-type-utils';
+
+  export type ScoreType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
   export const ScoreType = createNumberType<ScoreType>({
     min: 0,
-    max: 1,
-    digit: 1,
+    max: 10,
+    digit: 0,
     defaultValue: 0,
   });
   ```
 
 - score-input.tsx
 
+  - `dirty` は、 `string` の内部状態がまだ確定しておらず `ScoreType` 型数値の状態と乖離があるかどうかを示すフラグです。OKボタンの押下をブロックするために用意しています。
+
   ```tsx
   import * as React from 'react';
   import { useNumericInputState } from './use-numeric-input-state';
   import { NumericInputView } from './numeric-input-view';
-  import { type ScoreType } from './score-type';
+  import { ScoreType } from './score-type';
 
   type Props = Readonly<{
     score: ScoreType;
     onScoreChange: (value: ScoreType) => void;
+    onDirtyChange: (dirty: boolean) => void;
     disabled?: boolean;
   }>;
 
   const { step, min, max } = ScoreType;
 
   export const ScoreNumericInput = React.memo<Props>((props) => {
-    const { score, disabled = false, onScoreChange } = props;
+    const { score, disabled = false, onScoreChange, onDirtyChange } = props;
 
-    const { valueAsStr, onValueAsStrChange, submit } = useNumericInputState({
+    const { state, dirty, setState, submit } = useNumericInputState({
       valueFromProps: score,
       onValueChange: onScoreChange,
       decode: ScoreType.decode,
       encode: ScoreType.encode,
     });
+
+    React.useEffect(() => {
+      onDirtyChange(dirty);
+    }, [dirty]);
 
     return (
       <NumericInputView
@@ -336,9 +332,9 @@ https://playcode.io/2136118
         min={min}
         max={max}
         step={step}
-        value={valueAsStr}
+        value={state}
         onBlur={submit}
-        onValueChange={onValueAsStrChange}
+        onValueChange={setState}
       />
     );
   });
@@ -353,12 +349,19 @@ https://playcode.io/2136118
 
   export const ScoreInputExample = () => {
     const [score, setScore] = React.useState<ScoreType>(0);
+    const [dirty, setDirty] = React.useState<boolean>(false);
 
-    console.log({ score });
+    console.log({ score, dirty });
 
     return (
       <div>
-        <ScoreNumericInput score={score} onScoreChange={setScore} />
+        <ScoreNumericInput
+          score={score}
+          onScoreChange={setScore}
+          onDirtyChange={setDirty}
+        />
+        <div>{score}</div>
+        <button disabled={dirty}>{'OK'}</button>
       </div>
     );
   };
@@ -410,39 +413,61 @@ https://playcode.io/2136118
   ```ts
   import * as React from 'react';
 
-  export const useNumericInputState = <T extends number>({
-    decode,
-    encode,
-    onValueChange,
+  export const useNumericInputState = <N extends number>({
     valueFromProps,
+    onValueChange,
+    encode,
+    decode,
   }: Readonly<{
-    valueFromProps: T;
-    onValueChange: (value: T) => void;
-    encode: (s: T) => string;
-    decode: (s: string) => T;
+    valueFromProps: N;
+    onValueChange: (value: N) => void;
+    encode: (value: N) => string;
+    decode: (s: string) => N;
   }>): Readonly<{
-    valueAsStr: string;
-    onValueAsStrChange: (value: string) => void;
+    state: string;
+    dirty: boolean;
+    setState: (value: string) => void;
     submit: () => void;
   }> => {
-    const [valueAsStr, setValueAsStr] = React.useState<string>(
-      encode(valueFromProps),
+    // 値の変化を追わない関数等を deps から省くための ref
+    const constants = React.useRef({
+      onValueChange,
+      encode,
+      decode,
+    });
+
+    // input の入力文字列に1対1対応する状態
+    const [state, setState] = React.useState<string>(encode(valueFromProps));
+
+    // まだ submit していない state 変更があれば true、なければ false となるフラグ
+    const dirty = React.useMemo(
+      () => state !== constants.current.encode(valueFromProps),
+      [state, valueFromProps],
     );
 
+    // 親からの value を state に反映
     React.useEffect(() => {
-      setValueAsStr(encode(valueFromProps));
-    }, [valueFromProps, encode]);
+      setState(constants.current.encode(valueFromProps));
+    }, [valueFromProps]);
 
     const submit = React.useCallback(() => {
-      const decoded = decode(valueAsStr);
-      onValueChange(decoded);
-      setValueAsStr(encode(decoded));
-    }, [decode, encode, onValueChange, valueAsStr]);
+      const decoded = constants.current.decode(state);
+
+      const nextNumericState = decoded;
+      const nextStringState = constants.current.encode(nextNumericState);
+
+      setState(nextStringState);
+
+      if (valueFromProps !== nextNumericState) {
+        constants.current.onValueChange(nextNumericState);
+      }
+    }, [state, valueFromProps]);
 
     return {
-      onValueAsStrChange: setValueAsStr,
+      state,
+      dirty,
+      setState,
       submit,
-      valueAsStr,
     };
   };
   ```
