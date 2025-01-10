@@ -2,9 +2,13 @@
 title: 'TypeScript の Type Branding をより便利に活用する方法のまとめ'
 emoji: '🐈'
 type: 'tech'
-topics: ['typescript', 'brand']
+topics: ['typescript', 'brand', 'branding']
 published: true
 ---
+
+## 更新履歴
+
+- （2025/01/11） 「Branded Type を使用したときの弊害」を追記
 
 ## 概要
 
@@ -200,6 +204,62 @@ export const toInt = (a: number): Int => {
   }
 }
 ```
+
+## Branded Type を使用したときの弊害
+
+Branding は TypeScript でのコーディングにおいて便利な道具ですが、あくまでユーザー側で慣例的に行われている「ハック」であり[^type-branding-is-hack]、TypeScriptに公式にサポートされている実装パターンというわけではないことに注意が必要です。
+
+[^type-branding-is-hack]: https://github.com/microsoft/TypeScript/issues/53923 で質問しTypeScript開発者の Ryan Cavanaugh 氏に回答していただいた内容です。
+
+具体的には、例えば以下のようなコードで好ましくない挙動に遭遇します。
+
+```ts
+type SafeUint = number & { readonly SafeUint: never };
+
+const findIndex = (xs: readonly number[], x: number): number => xs.indexOf(x);
+
+const fn1 = (): 0 | 1 | undefined => {
+  const i: number = findIndex([], 1);
+  if (i === 0 || i === 1) {
+    // number 型 `i` は `0 | 1` 型に絞られる
+    return i satisfies 0 | 1;
+  }
+  return undefined;
+};
+
+const findIndexBranded = (xs: readonly number[], x: number): SafeUint | -1 =>
+  xs.indexOf(x) as SafeUint | -1;
+
+const fn2 = (): 0 | 1 | undefined => {
+  const i: SafeUint | -1 = findIndexBranded([], 1);
+  if (i === 0 || i === 1) {
+    // `i` は `0 | 1` 型に絞られず SafeUint のまま！（`-1` だけは除去される）
+    return i satisfies SafeUint;
+    // ~~~~~
+    // Type Error
+  }
+  return undefined;
+};
+```
+
+このコードにおいて、普通の `number` 型を使っている一つ目の例 `fn1` ではうまく型の絞り込みができますが、二つ目の例の `fn2` のようにbrand 化した `number` 型である `SafeUint` 型は `number` のサブタイプであるため、即値 `0`, `1` との比較による絞り込みができないという悩みが生じます。
+
+この絞り込みに失敗するのは、 `number` 型は型 `0` や型 `1` の上位型であるのに対し、 brand 型 `SafeUint` は型 `0` や型 `1` の上位型ではないことが理由です。条件部で `SafeUint & 0` 型の即値との比較などができれば `SafeUint` の部分型であるため絞り込みができそうですが、行いたい処理の割にコードが複雑化・コード量が増えるのがネックです。
+
+ちなみにこの例のようなケースは、部分的に `i` を `SafeUint` から `number` 型に広げてから即値との比較を行うという手はあります。関数内のローカル変数 `i` の型から `SafeUint` 型という情報が落ちるくらいは許容できそうです。
+
+```ts
+const fn2_2 = (): 0 | 1 | undefined => {
+  const i: number = findIndexBranded([], 1);
+  if (i === 0 || i === 1) {
+    // `i` は `0 | 1` 型に絞られる
+    return i satisfies 0 | 1;
+  }
+  return undefined;
+};
+```
+
+[コード例（TypeScript Playground）](https://www.typescriptlang.org/play/?#code/C4TwDgpgBAyghgMwgVQJYDthQLxXQVwFsAjCAJygDIoBvKMiOAEwHt0AbEWRFDYALjwQAbuSgBfANwAoaQGM2AZywIMTAJLomEAB44oACh2LBDZm054ipMgG0AugBooOwQRLkAlG+tjsAPhdFADo1XQB5BCNPGXklFTVNbR0AITI4LQgmfSMTekZWDi53GwdnVysPMm9uJDRMKAAfKABaAEYcQONQzJ1I6Kg4RVreBub22IB6SagAUR04QjB2aDafKqhQSCg5DKhSPDgyMhYAdyyoVlP0TZYoAAMABiaoNvu49GUoBHQO3AMas9mh1mvhMqp0BcArRpFA4Tt4lBUOsbPoIRpegYyq8YrD4agEIZUDhsLggc1iaTcG1PDD4fSoNMHqh7kjhugjidztkrjdgHcni83oMEMAxPcCay5AALCByADWwTxDPywHwZBuxMUcGAqEUqggwyBrxk9PEytV6puYO0EKyMiksiZ80Wy2gACZ2oJ4HU+DsMugWFgDhzjmcLrzbg9jW8Pl8fu6coChS8bRA7dloTQLQpPlhkSN6lhxn9volemkMtomFinDjTfjCQZKaSoOSkSTqbTsyq4UyJay9VAAFSB4DDw5h7mXM58gUx1mIMUUCUIKWyhVK3uWjUd7W6-WoQ2FvgNuHm+kMNW7tMZh1TGYupYrKCe90osS7dBj-bQUNciNZyjQVgXeXN43Qd0AH1E3+ZNgVTcEMChQIe3hcD8w-ChcHRJJdErTIa2xGkzyRJsWzJJoKU7HE6V7fsWTZScAJ5ID+WjIVF1FcVJR2DdFQtS8IGvTUoH3PUDSNIVSIveErytKBb2Qph7ydR8FmfaAAGZBDBeVA2uTZwGgL9f2Y8NWMM9iQNeMDER+LSk0EGNENtZTOjouEMKRXT0H0oCyVIgkiRo9sKNotCVQYwd2U5CyZys+dOJFZdmTXPi5QE7d5N3LUdQko8pOBGSLRy60kMhFTpEdaRnQ0t0oB0oRRAoLYTIDIMzP-eLI2shc4xUdAABYnLbFNQQqlDPIRPMfOavwxqGeayCC8jQqojsqQiwT4Wi-JCDgDBhnuSEWq41LV3XTKt17Mq93yw9j1O8gSqEkTFMmqqpCAA)
 
 ## ［応用］ Branded Type で数値型を細分化
 
