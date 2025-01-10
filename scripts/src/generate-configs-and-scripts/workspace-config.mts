@@ -141,6 +141,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
   'ts-utils': fillDefaultsForUtil(),
   'numeric-input-utils': fillDefaultsForUtil({
     passWithNoTests: true,
+    tsType: 'react',
   }),
   'tiny-router-observable': fillDefaultsForUtil({
     passWithNoTests: true,

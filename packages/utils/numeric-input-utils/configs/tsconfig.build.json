@@ -1,7 +1,7 @@
 {
   "extends": [
     "../../../../configs/tsconfig/tsconfig.lib.build.json",
-    "../../../../configs/tsconfig/tsconfig.dom.json",
+    "../../../../configs/tsconfig/tsconfig.react.json",
     "../../../../configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
@@ -10,5 +10,5 @@
     "rootDir": "../src"
   },
   "include": ["../src"],
-  "exclude": ["../src/**/*.test.mts"]
+  "exclude": ["../src/**/*.test.{mts,tsx}"]
 }

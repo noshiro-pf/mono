@@ -19,62 +19,75 @@ export const useNumericInputWithStepState = <N extends number>({
   normalize: (value: number) => N;
   step: number;
 }>): Readonly<{
-  valueAsStr: string;
-  setValueAsStr: (value: string) => void;
+  state: string;
+  dirty: boolean;
+  setState: (value: string) => void;
   submit: () => void;
   onIncrementMouseDown: () => void;
   onDecrementMouseDown: () => void;
   onKeyDown: React.KeyboardEventHandler<HTMLDivElement>;
 }> => {
-  const [valueAsStr, setValueAsStr] = React.useState<string>(
-    encode(valueFromProps),
+  const constants = React.useRef({
+    onValueChange,
+    encode,
+    decode,
+    normalize,
+    step,
+  });
+
+  const [state, setState] = React.useState<string>(
+    constants.current.encode(valueFromProps),
   );
 
   React.useEffect(() => {
-    const nextValue = encode(valueFromProps);
-    if (nextValue !== valueAsStr) {
-      setValueAsStr(nextValue);
-    }
-  }, [valueFromProps, encode, valueAsStr]);
+    setState(constants.current.encode(valueFromProps));
+  }, [valueFromProps]);
 
   const updateStateFn = React.useCallback(
-    (action: 'increment' | 'decrement' | 'normalize') =>
-      (state: string): string => {
-        const decoded = decode(state);
-        switch (action) {
-          case 'normalize':
-            return encode(normalize(decoded));
+    (n: number, action: 'increment' | 'decrement' | 'normalize'): number => {
+      switch (action) {
+        case 'normalize':
+          return n;
 
-          case 'increment':
-            return encode(normalize(decoded + step));
+        case 'increment':
+          return n + constants.current.step;
 
-          case 'decrement':
-            return encode(normalize(decoded - step));
-        }
-      },
-    [decode, encode, normalize, step],
+        case 'decrement':
+          return n - constants.current.step;
+      }
+    },
+    [],
   );
 
   const commonCallbackFn = React.useCallback(
-    (updater: MonoTypeFunction<string>) => {
-      const nextState = updater(valueAsStr);
-      onValueChange(decode(nextState));
-      setValueAsStr(updater);
+    (action: 'increment' | 'decrement' | 'normalize') => {
+      const decoded = constants.current.decode(state);
+
+      const nextNumericState = constants.current.normalize(
+        updateStateFn(decoded, action),
+      );
+      const nextStringState = constants.current.encode(nextNumericState);
+
+      setState(nextStringState);
+
+      if (valueFromProps !== nextNumericState) {
+        constants.current.onValueChange(nextNumericState);
+      }
     },
-    [decode, onValueChange, valueAsStr],
+    [state, updateStateFn, valueFromProps],
   );
 
   const submit = React.useCallback(() => {
-    commonCallbackFn(updateStateFn('normalize'));
-  }, [updateStateFn, commonCallbackFn]);
+    commonCallbackFn('normalize');
+  }, [commonCallbackFn]);
 
   const increment = React.useCallback(() => {
-    commonCallbackFn(updateStateFn('increment'));
-  }, [updateStateFn, commonCallbackFn]);
+    commonCallbackFn('increment');
+  }, [commonCallbackFn]);
 
   const decrement = React.useCallback(() => {
-    commonCallbackFn(updateStateFn('decrement'));
-  }, [updateStateFn, commonCallbackFn]);
+    commonCallbackFn('decrement');
+  }, [commonCallbackFn]);
 
   const delayTimerRef = React.useRef<TimerId | undefined>(undefined);
   const intervalTimerRef = React.useRef<TimerId | undefined>(undefined);
@@ -143,9 +156,15 @@ export const useNumericInputWithStepState = <N extends number>({
     [startLoop, increment, decrement],
   );
 
+  const dirty = React.useMemo(
+    () => state !== constants.current.encode(valueFromProps),
+    [state, valueFromProps],
+  );
+
   return {
-    valueAsStr,
-    setValueAsStr,
+    state,
+    dirty,
+    setState,
     submit,
     onIncrementMouseDown,
     onDecrementMouseDown,
