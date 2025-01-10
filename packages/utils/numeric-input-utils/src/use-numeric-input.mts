@@ -12,30 +12,45 @@ export const useNumericInputState = <N extends number>({
   encode: (value: N) => string;
   decode: (s: string) => N;
 }>): Readonly<{
-  valueAsStr: string;
-  setValueAsStr: (value: string) => void;
+  state: string;
+  dirty: boolean;
+  setState: (value: string) => void;
   submit: () => void;
 }> => {
-  const [valueAsStr, setValueAsStr] = React.useState<string>(
-    encode(valueFromProps),
+  const constants = React.useRef({
+    onValueChange,
+    encode,
+    decode,
+  });
+
+  const [state, setState] = React.useState<string>(encode(valueFromProps));
+
+  const dirty = React.useMemo(
+    () => state !== constants.current.encode(valueFromProps),
+    [state, valueFromProps],
   );
 
   React.useEffect(() => {
-    const nextValue = encode(valueFromProps);
-    if (nextValue !== valueAsStr) {
-      setValueAsStr(nextValue);
-    }
-  }, [valueFromProps, encode, valueAsStr]);
+    setState(constants.current.encode(valueFromProps));
+  }, [valueFromProps]);
 
   const submit = React.useCallback(() => {
-    const decoded = decode(valueAsStr);
-    onValueChange(decoded);
-    setValueAsStr(encode(decoded));
-  }, [decode, encode, onValueChange, valueAsStr]);
+    const decoded = constants.current.decode(state);
+
+    const nextNumericState = decoded;
+    const nextStringState = constants.current.encode(nextNumericState);
+
+    setState(nextStringState);
+
+    if (valueFromProps !== nextNumericState) {
+      constants.current.onValueChange(nextNumericState);
+    }
+  }, [state, valueFromProps]);
 
   return {
-    valueAsStr,
-    setValueAsStr,
+    state,
+    dirty,
+    setState,
     submit,
   };
 };
