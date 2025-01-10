@@ -263,7 +263,9 @@ https://playcode.io/2136118
 [Material UI](https://mui.com/material-ui/) や [Blueprint.js](https://blueprintjs.com/) のような UI コンポーネントライブラリを使っていると、そのスタイリング（CSS）だけは採用したいがステートフルであるがために JavaScript の挙動がユースケースに合わない、ということがたまにあります。 `NumericInput` はまさにその一例で、もしこういうときにライブラリがステートレスコンポーネント `NumericInputView` も提供していれば、自前で状態管理するという選択肢が生まれて問題を解決しやすくなります。[^about-ui-library]
 
 [^about-ui-library]: 世の中の UI ライブラリは、多くのユースケースに対応できる便利でステートフルなコンポーネントも提供すると共に、自前の状態管理をするためのステートレスな同じ見た目のコンポーネントもそれ単体で提供するようになっていたら良いのにと思います。[^NumericInput-MaterialUI] [^NumericInput-Blueprintjs]
+
 [^NumericInput-MaterialUI]: Material UI の場合、 Numeric Input は [Base UI](https://mui.com/base-ui/react-number-input/) というところで提供されていますが、 `value` は `number` 型で受け取る API となっており、今回求めていたものではなさそうです。
+
 [^NumericInput-Blueprintjs]: [Blueprint.js](https://blueprintjs.com/docs/#core/components/numeric-input) の `NumericInput` コンポーネントの場合、 `value` に `string` 型を渡すこともできる API となっており、こちらは controlled mode でより細かい制御を行うために意図的に用意されていてかなり理想に近いです（こういうところを見比べても、 Blueprint.js は Material UI より API が洗練されているように感じます）。ただ、同じ `NumericInput` コンポーネントに渡す props の型（`string` or `number`）で controlled/uncontrolled mode を切り替えるような使い方であり、ステートレスに使いたい場合にも無駄な状態管理が中で走っていて効率が悪いという点で若干不満はあります。
 
 もう一つは、ただの `number` 型より狭いカスタム数値型（例えば [実装例 A](#実装例A) における`ScoreType`）に対応する numeric input を使った実装が綺麗になる点です。型の制約に合う値だけをグローバルな state に反映するためにユーザー入力結果の文字列を数値に変換する処理を numeric input のレイヤーで行うことができるので、 `NumericInput` を使う側の実装がシンプルになります 。
