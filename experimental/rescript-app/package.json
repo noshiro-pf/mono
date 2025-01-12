@@ -1,15 +1,28 @@
 {
-  "name": "@noshiro/rescript-app",
-  "version": "1.0.0",
-  "private": false,
-  "license": "MIT",
-  "main": "index.js",
+  "name": "rescript-app",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "re:build": "rescript",
-    "re:start": "rescript build -w"
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "res:build": "rescript",
+    "res:clean": "rescript clean",
+    "res:dev": "rescript -w"
+  },
+  "dependencies": {
+    "@rescript/core": "1.6.1",
+    "@rescript/react": "^0.12.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rescript": "11.1.4"
   },
   "devDependencies": {
-    "@rescript/react": "^0.10.3",
-    "rescript": "^9.1.4"
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.15",
+    "postcss": "^8.4.28",
+    "tailwindcss": "^3.3.3",
+    "vite": "^5.0.6"
   }
 }
