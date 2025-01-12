@@ -1,4 +1,4 @@
-import { pipe, replaceWithNoMatchCheck } from '@noshiro/mono-scripts';
+import { pipe, replaceWithNoMatchCheck } from '@noshiro/node-utils';
 import { type ConverterOptions } from './common.mjs';
 import { typeUtilsName } from './constants.mjs';
 

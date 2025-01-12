@@ -1,4 +1,4 @@
-import { castMutable, isRecord } from '@noshiro/mono-scripts';
+import { castMutable, isRecord } from '@noshiro/node-utils';
 import * as fs from 'node:fs/promises';
 
 /**

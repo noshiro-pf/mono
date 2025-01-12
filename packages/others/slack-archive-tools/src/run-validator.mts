@@ -1,4 +1,4 @@
-import { toThisDir } from '@noshiro/mono-scripts';
+import { toThisDir } from '@noshiro/node-utils';
 import { Json, Result } from '@noshiro/ts-utils';
 import type * as fsType from 'node:fs';
 import * as fs from 'node:fs/promises';

@@ -1,4 +1,4 @@
-import { pipe, replaceWithNoMatchCheck } from '@noshiro/mono-scripts';
+import { pipe, replaceWithNoMatchCheck } from '@noshiro/node-utils';
 
 export const convertReturnTypeToUintRange: MonoTypeFunction<string> = (src) =>
   pipe(src).chainMonoTypeFns(

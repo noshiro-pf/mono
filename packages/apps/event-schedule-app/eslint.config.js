@@ -7,7 +7,7 @@ import {
   eslintFlatConfigForVitest,
   genEsLintRestrictedImportsDefFromDevDependencies,
 } from '@noshiro/eslint-configs';
-import { toThisDir } from '@noshiro/mono-scripts';
+import { toThisDir } from '@noshiro/node-utils';
 import * as nodePath from 'node:path';
 import packageJson from './package.json' assert { type: 'json' };
 

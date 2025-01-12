@@ -4,7 +4,7 @@ import {
   eslintFlatConfigForTypeScript,
   restrictedSyntax,
 } from '@noshiro/eslint-configs';
-import { toThisDir } from '@noshiro/mono-scripts';
+import { toThisDir } from '@noshiro/node-utils';
 import * as nodePath from 'node:path';
 
 const thisDir = toThisDir(import.meta.url);

@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@noshiro/eslint-configs": "*",
-    "@noshiro/mono-scripts": "*",
+    "@noshiro/node-utils": "*",
     "@noshiro/ts-type-utils": "*"
   },
   "wireit": {

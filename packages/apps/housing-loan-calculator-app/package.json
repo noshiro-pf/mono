@@ -92,7 +92,7 @@
     "@noshiro/global-tiny-router-observable": "*",
     "@noshiro/global-tiny-router-react-hooks": "*",
     "@noshiro/global-ts-utils": "*",
-    "@noshiro/mono-scripts": "*",
+    "@noshiro/node-utils": "*",
     "@noshiro/ts-type-utils": "*",
     "@noshiro/ts-utils": "*"
   },

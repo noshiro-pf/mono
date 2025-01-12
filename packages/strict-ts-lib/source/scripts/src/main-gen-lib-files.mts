@@ -1,4 +1,4 @@
-import { toThisDir } from '@noshiro/mono-scripts';
+import { toThisDir } from '@noshiro/node-utils';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { getSrcFileList, type ConverterConfig } from './convert-dts/common.mjs';

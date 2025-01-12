@@ -78,7 +78,7 @@
     "typescript-eslint": "8.18.0"
   },
   "devDependencies": {
-    "@noshiro/mono-scripts": "*",
+    "@noshiro/node-utils": "*",
     "json-schema-to-typescript": "^15.0.3"
   },
   "wireit": {

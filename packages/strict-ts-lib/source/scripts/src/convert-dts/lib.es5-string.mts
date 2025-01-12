@@ -3,7 +3,7 @@ import {
   pipe,
   replaceWithNoMatchCheck,
   replaceWithNoMatchCheckBetweenRegexp,
-} from '@noshiro/mono-scripts';
+} from '@noshiro/node-utils';
 import { closeBraceRegexp, type ConverterOptions } from './common.mjs';
 
 export const convertLibEs5_String =

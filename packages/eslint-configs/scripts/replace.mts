@@ -3,7 +3,7 @@ import {
   pipe,
   replaceWithNoMatchCheck,
   replaceWithNoMatchCheckBetweenRegexp,
-} from '@noshiro/mono-scripts';
+} from '@noshiro/node-utils';
 import { eslintPlugins } from './eslint-plugins.mjs';
 import { closeBraceRegexp } from './utils.mjs';
 

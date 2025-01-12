@@ -18,7 +18,7 @@
     "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write"
   },
   "devDependencies": {
-    "@noshiro/mono-scripts": "*",
+    "@noshiro/node-utils": "*",
     "normalize.css": "^8.0.1"
   },
   "peerDependencies": {

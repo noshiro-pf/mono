@@ -10,7 +10,7 @@
     "scripts"
   ],
   "scripts": {
-    "build:mono-scripts": "yarn workspace @noshiro/mono-scripts build",
+    "build:mono-scripts": "yarn workspace @noshiro/node-utils build",
     "ci": "run-s setup zz:check:no-diff fmt:all zz:check:no-diff ws:gi zz:check:no-diff ws:build zz:check:no-diff ci:lint-and-test zz:check:no-diff",
     "ci:clean-build-and-cache": "run-s clean:build-and-cache ci",
     "ci:clean-gitignored": "run-s clean:gitignored ci:install ci",

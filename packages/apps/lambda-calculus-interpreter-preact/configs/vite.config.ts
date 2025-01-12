@@ -1,4 +1,4 @@
-import { toThisDir } from '@noshiro/mono-scripts';
+import { toThisDir } from '@noshiro/node-utils';
 import preact from '@preact/preset-vite';
 import legacy from '@vitejs/plugin-legacy';
 import * as nodePath from 'node:path';

@@ -1,4 +1,4 @@
-import { execAsync, toThisDir } from '@noshiro/mono-scripts';
+import { execAsync, toThisDir } from '@noshiro/node-utils';
 import {
   Arr,
   ISet,

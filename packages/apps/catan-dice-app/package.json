@@ -86,7 +86,7 @@
     "@noshiro/global-syncflow": "*",
     "@noshiro/global-syncflow-react-hooks": "*",
     "@noshiro/global-ts-utils": "*",
-    "@noshiro/mono-scripts": "*",
+    "@noshiro/node-utils": "*",
     "@noshiro/ts-type-utils": "*",
     "@noshiro/ts-utils": "*"
   },

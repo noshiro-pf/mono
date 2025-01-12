@@ -1,6 +1,6 @@
 /** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */
 
-import { toThisDir } from '@noshiro/mono-scripts';
+import { toThisDir } from '@noshiro/node-utils';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import typescriptEslintParser from '@typescript-eslint/parser';
 import functional from 'eslint-plugin-functional';
