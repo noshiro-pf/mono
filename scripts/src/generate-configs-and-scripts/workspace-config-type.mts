@@ -1,4 +1,5 @@
 export type WorkspaceConfig = DeepReadonly<{
+  utilOrApp: 'utils' | 'app';
   tsType: 'dom' | 'mts' | 'preact' | 'react-emotion' | 'react' | undefined;
   useVite: boolean | 'vitest-only';
   srcDirs: string[];

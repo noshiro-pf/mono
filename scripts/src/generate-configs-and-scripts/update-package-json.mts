@@ -37,7 +37,6 @@ export const updatePackageJson = async (
 
   updatePackageJsonImpl(
     workspace,
-
     mut_packageJson as MutableRecord<string, MutableJsonValue | undefined>,
     packageName,
     pathPrefixToRoot,
@@ -119,6 +118,19 @@ const updatePackageJsonImpl = (
       mut_packageJson['exports']['./inject-modules-def'] = {
         import: './esm/inject-modules-def.mjs',
       };
+    }
+  }
+
+  {
+    // files
+    delete mut_packageJson['files'];
+
+    if (
+      cfg.utilOrApp === 'utils' &&
+      packageName !== 'ts-type-utils' &&
+      packageName !== 'strict-ts-lib'
+    ) {
+      mut_packageJson['files'] = ['src', 'esm'];
     }
   }
 

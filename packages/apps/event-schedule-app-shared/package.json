@@ -68,6 +68,10 @@
       }
     }
   },
+  "files": [
+    "src",
+    "esm"
+  ],
   "scripts": {
     "build": "wireit",
     "clean": "run-p clean:**",

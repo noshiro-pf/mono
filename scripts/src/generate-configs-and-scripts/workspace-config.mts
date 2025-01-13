@@ -7,6 +7,7 @@ import {
 import { type WorkspaceConfig } from './workspace-config-type.mjs';
 
 const workspaceConfigGlobalUtil: WorkspaceConfig = {
+  utilOrApp: 'utils',
   gen: {
     typeCheck: true,
     build: true,
@@ -26,6 +27,7 @@ const workspaceConfigGlobalUtil: WorkspaceConfig = {
 };
 
 const defaultsForUtil: WorkspaceConfig = {
+  utilOrApp: 'utils',
   gen: {
     typeCheck: true,
     build: true,
@@ -44,27 +46,18 @@ const defaultsForUtil: WorkspaceConfig = {
   },
 };
 
-const defaultsForApp: WorkspaceConfig = {
+const defaultsForApp: Pick<
+  WorkspaceConfig,
+  'utilOrApp' | 'gen' | 'typeCheckIncludes'
+> = {
+  utilOrApp: 'app',
   gen: {
     typeCheck: true,
     build: true,
     lint: true,
     test: true,
   },
-  // eslint-disable-next-line unicorn/no-unused-properties
-  useVite: true,
-  // eslint-disable-next-line unicorn/no-unused-properties
-  tsType: 'mts',
-  // eslint-disable-next-line unicorn/no-unused-properties
-  srcDirs: ['src'],
   typeCheckIncludes: ['src', workspaceConfigsDirName],
-  // eslint-disable-next-line unicorn/no-unused-properties
-  packageJson: {
-    scripts: {
-      gi: 0,
-      publish: false,
-    },
-  },
 };
 
 const fillDefaultsForUtil = (
@@ -75,6 +68,7 @@ const fillDefaultsForUtil = (
     hasScripts?: boolean;
   }>,
 ): WorkspaceConfig => ({
+  utilOrApp: defaultsForUtil.utilOrApp,
   gen: defaultsForUtil.gen,
   tsType: options?.tsType ?? defaultsForUtil.tsType,
   useVite: defaultsForUtil.useVite,
@@ -94,15 +88,16 @@ const fillDefaultsForUtil = (
 
 const fillDefaultsForApp = (
   options: Readonly<{
-    tsType?: WorkspaceConfig['tsType'];
+    tsType: WorkspaceConfig['tsType'];
     gi?: WorkspaceConfig['packageJson']['scripts']['gi'];
     giIgnore?: WorkspaceConfig['packageJson']['scripts']['giIgnore'];
     passWithNoTests?: WorkspaceConfig['packageJson']['scripts']['passWithNoTests'];
     hasScripts?: boolean;
   }>,
 ): WorkspaceConfig => ({
+  utilOrApp: defaultsForApp.utilOrApp,
   gen: defaultsForApp.gen,
-  tsType: options.tsType ?? 'mts',
+  tsType: options.tsType,
   useVite: true,
   srcDirs: ['src'],
   typeCheckIncludes: [

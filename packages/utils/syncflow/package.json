@@ -16,7 +16,7 @@
     }
   },
   "files": [
-    "package.json",
+    "src",
     "esm"
   ],
   "scripts": {
