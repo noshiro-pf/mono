@@ -1,6 +1,6 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { calculatedValues$, store$ } from '../../store';
-import { toYen, type Yen } from '../../types';
+import { Yen } from '../../types';
 
 const headerCellStyle = {
   textAlign: 'center',
@@ -48,9 +48,9 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
     () =>
       Arr.seq(numRows).map((i) => [
         i.toString(),
-        formatYenValue(borrowingBalanceYen[i] ?? toYen(0)),
-        formatYenValue(interestYen[i] ?? toYen(0)),
-        formatYenValue(monthlyPayment[i] ?? toYen(0)),
+        formatYenValue(borrowingBalanceYen[i] ?? Yen.cast(0)),
+        formatYenValue(interestYen[i] ?? Yen.cast(0)),
+        formatYenValue(monthlyPayment[i] ?? Yen.cast(0)),
       ]),
     [numRows, borrowingBalanceYen, interestYen, monthlyPayment],
   );

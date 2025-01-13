@@ -1,4 +1,4 @@
-import { toYen, type PercentFloat, type Yen } from '../types';
+import { type PercentFloat, Yen } from '../types';
 import { ithBorrowingBalanceInPIER, monthlyPaymentsInPIER } from './financial';
 
 export const calcPrincipalAndInterestEqualPayment = ({
@@ -15,7 +15,7 @@ export const calcPrincipalAndInterestEqualPayment = ({
   monthlyPrincipalPaymentYen: readonly Yen[];
   fixedMonthlyPaymentsYen: Yen;
 }> => {
-  const fixedMonthlyPaymentsYen = toYen(
+  const fixedMonthlyPaymentsYen = Yen.cast(
     monthlyPaymentsInPIER({
       total: borrowingTotalYen,
       numPayments,
@@ -24,7 +24,7 @@ export const calcPrincipalAndInterestEqualPayment = ({
   );
 
   const borrowingBalanceYen = Arr.seq(Uint32.add(numPayments, 1)).map((ith) =>
-    toYen(
+    Yen.cast(
       ithBorrowingBalanceInPIER({
         total: borrowingTotalYen,
         numPayments,
@@ -34,10 +34,12 @@ export const calcPrincipalAndInterestEqualPayment = ({
     ),
   );
 
-  const interestYen = borrowingBalanceYen.map((b) => toYen(interestRate * b));
+  const interestYen = borrowingBalanceYen.map((b) =>
+    Yen.cast(interestRate * b),
+  );
 
   const monthlyPrincipalPaymentYen = interestYen.map((v) =>
-    toYen(fixedMonthlyPaymentsYen - v),
+    Yen.cast(fixedMonthlyPaymentsYen - v),
   );
 
   return {

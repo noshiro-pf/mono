@@ -1,3 +1,4 @@
+import { Label } from '@blueprintjs/core';
 import {
   setBorrowingPeriodYear,
   setDownPaymentManYen,
@@ -6,7 +7,11 @@ import {
   setRepaymentType,
   store$,
 } from '../../store';
-import { BpNumericInputWithLabel } from '../blueprint-wrapper';
+import {
+  PercentFloatNumericInput,
+  YearNumericInput,
+  YenNumericInput,
+} from '../numeric-input';
 import { RepaymentTypeRadioGroup } from './repayment-type-radio-group';
 
 export const ConfigSection = memoNamed('ConfigSection', () => {
@@ -22,53 +27,49 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
     <>
       <SectionTitle>{dict.settings}</SectionTitle>
       <ConfigElement>
-        <BpNumericInputWithLabel
-          cyId={'numericInput-downPaymentManYen'}
-          label={dict.downPaymentManYen}
-          min={0}
-          value={downPaymentManYen}
-          onValueChange={
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            setDownPaymentManYen as (a: number) => void
-          }
-        />
+        <Label>
+          {dict.downPaymentManYen}
+          <YenNumericInput
+            cyId={'numericInput-downPaymentManYen'}
+            min={0}
+            value={downPaymentManYen}
+            onValueChange={setDownPaymentManYen}
+          />
+        </Label>
       </ConfigElement>
       <ConfigElement>
-        <BpNumericInputWithLabel
-          cyId={'numericInput-propertyPriceManYen'}
-          label={dict.propertyPriceManYen}
-          min={0}
-          value={propertyPriceManYen}
-          onValueChange={
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            setPropertyPriceManYen as (a: number) => void
-          }
-        />
+        <Label>
+          {dict.propertyPriceManYen}
+          <YenNumericInput
+            cyId={'numericInput-propertyPriceManYen'}
+            min={0}
+            value={propertyPriceManYen}
+            onValueChange={setPropertyPriceManYen}
+          />
+        </Label>
       </ConfigElement>
       <ConfigElement>
-        <BpNumericInputWithLabel
-          cyId={'numericInput-borrowingPeriodYear'}
-          label={dict.borrowingPeriodYear}
-          min={1}
-          value={borrowingPeriodYear}
-          onValueChange={
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            setBorrowingPeriodYear as (a: number) => void
-          }
-        />
+        <Label>
+          {dict.borrowingPeriodYear}
+          <YearNumericInput
+            cyId={'numericInput-borrowingPeriodYear'}
+            min={1}
+            value={borrowingPeriodYear}
+            onValueChange={setBorrowingPeriodYear}
+          />
+        </Label>
       </ConfigElement>
       <ConfigElement>
-        <BpNumericInputWithLabel
-          cyId={'numericInput-interestRatePerYear'}
-          label={dict.interestRatePerYear}
-          max={100}
-          min={0}
-          value={interestRatePercentPerYear}
-          onValueChange={
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            setInterestRatePercentPerYear as (a: number) => void
-          }
-        />
+        <Label>
+          {dict.interestRatePerYear}
+          <PercentFloatNumericInput
+            cyId={'numericInput-interestRatePerYear'}
+            max={100}
+            min={0}
+            value={interestRatePercentPerYear}
+            onValueChange={setInterestRatePercentPerYear}
+          />
+        </Label>
       </ConfigElement>
       <ConfigElement data-cy={'repaymentTypeRadioGroup'}>
         <RepaymentTypeRadioGroup

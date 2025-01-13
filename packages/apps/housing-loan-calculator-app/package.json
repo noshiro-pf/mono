@@ -72,6 +72,8 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.14.0",
     "@noshiro/io-ts": "*",
+    "@noshiro/numeric-input-utils": "*",
+    "@noshiro/react-blueprintjs-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/syncflow-react-hooks": "*",

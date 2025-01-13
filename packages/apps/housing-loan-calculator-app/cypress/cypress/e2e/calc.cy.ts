@@ -42,13 +42,13 @@ describe('main', { testIsolation: false }, () => {
     );
 
     cy.get(e('interestSumTitle')).should('have.text', '利息合計額');
-    cy.get(e('interestSumDescription')).should('have.text', '2262.88万円');
+    cy.get(e('interestSumDescription')).should('have.text', '226.29万円');
 
     cy.get(e('paymentsSumTitle')).should(
       'have.text',
       '合計支払い額（＝頭金＋借入金額＋利息）',
     );
-    cy.get(e('paymentsSumDescription')).should('have.text', '5042.88万円');
+    cy.get(e('paymentsSumDescription')).should('have.text', '3006.29万円');
   });
 
   it('config 2', () => {
@@ -83,17 +83,17 @@ describe('main', { testIsolation: false }, () => {
     );
     cy.get(e('fixedMonthlyPaymentsYenDescription')).should(
       'have.text',
-      '140303円',
+      '72165円',
     );
 
     cy.get(e('interestSumTitle')).should('have.text', '利息合計額');
-    cy.get(e('interestSumDescription')).should('have.text', '3112.73万円');
+    cy.get(e('interestSumDescription')).should('have.text', '250.92万円');
 
     cy.get(e('paymentsSumTitle')).should(
       'have.text',
       '合計支払い額（＝頭金＋借入金額＋利息）',
     );
-    cy.get(e('paymentsSumDescription')).should('have.text', '5892.73万円');
+    cy.get(e('paymentsSumDescription')).should('have.text', '3030.92万円');
   });
 });
 
