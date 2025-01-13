@@ -56,7 +56,7 @@
       "dependencies": [
         "pre-build"
       ],
-      "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
+      "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript --configImportAttributesKey with"
     }
   }
 }
