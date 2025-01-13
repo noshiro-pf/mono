@@ -4,7 +4,7 @@ import { genGlobalImportDefsFromDevDependencies } from '@noshiro/mono-scripts';
 import { castDeepMutable, tp } from '@noshiro/ts-utils';
 import inject from '@rollup/plugin-inject';
 import { type PluginOption } from 'vite';
-import packageJson from '../package.json' assert { type: 'json' };
+import packageJson from '../package.json' with { type: 'json' };
 
 export const createInjectDef = async (): Promise<PluginOption> => {
   const injectionRules = await genGlobalImportDefsFromDevDependencies(

@@ -3,7 +3,7 @@ import {
   connectFirestoreEmulator,
   initializeFirestore,
 } from 'firebase/firestore';
-import firebaseJson from '../../firebase.json' assert { type: 'json' };
+import firebaseJson from '../../firebase.json' with { type: 'json' };
 import { isDev, useEmulators } from '../env.mjs';
 import { firebaseConfig } from './config.mjs';
 
