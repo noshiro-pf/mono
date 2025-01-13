@@ -42,7 +42,7 @@
     "type-check": "tsc --noEmit",
     "update-deps": "./scripts/update-dependencies.sh",
     "watch": "yarn build:src --watch",
-    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint --config eslint.config.js",
+    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true TIMING=1  eslint --config eslint.config.js",
     "zz:eslint:print-config": "yarn zz:eslint --print-config src/index.mts",
     "zz:eslint:scripts": "yarn zz:eslint \"./scripts/**/*\"",
     "zz:eslint:src": "yarn zz:eslint './src/**/*'",

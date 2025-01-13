@@ -39,7 +39,7 @@
     "type-check": "tsc --noEmit",
     "z:gen:packages": "wireit",
     "z:rename-lib": "mv ../output/lib/package.json ../output/lib/package.json_bk",
-    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true eslint",
+    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint",
     "zz:eslint:scripts": "yarn zz:eslint --config eslint.config.js scripts/**/*.mts",
     "zz:prettier": "prettier --ignore-path ../.prettierignore --write --log-level warn"
   },
