@@ -10,7 +10,7 @@
     "scripts"
   ],
   "scripts": {
-    "build:mono-scripts": "yarn workspace @noshiro/mono-scripts build",
+    "build:mono-utils": "yarn workspace @noshiro/mono-utils build",
     "ci": "run-s setup zz:check:no-diff fmt:all zz:check:no-diff ws:gi zz:check:no-diff ws:build zz:check:no-diff ci:lint-and-test zz:check:no-diff",
     "ci:clean-build-and-cache": "run-s clean:build-and-cache ci",
     "ci:clean-gitignored": "run-s clean:gitignored ci:install ci",
@@ -34,7 +34,7 @@
     "generate-configs": "wireit",
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "pub:all": "scripts/bash/publish.sh",
-    "setup": "run-s build:mono-scripts generate-configs ws:build:utils",
+    "setup": "run-s build:mono-utils generate-configs ws:build:utils",
     "type-check-eslint-configs": "tsc --noEmit",
     "type-check-eslint-configs:watch": "tsc --noEmit --watch",
     "ws:build": "yarn zz:wsrun-stages build",
@@ -146,61 +146,61 @@
   "wireit": {
     "generate-configs": {
       "dependencies": [
-        "build:mono-scripts"
+        "build:mono-utils"
       ],
       "command": "node scripts/commands/generate-configs-and-scripts-main.mjs"
     },
     "ws:type-check:apps": {
       "dependencies": [
-        "build:mono-scripts"
+        "build:mono-utils"
       ],
       "command": "node scripts/commands/type-check-apps.mjs"
     },
     "ws:type-check:utils": {
       "dependencies": [
-        "build:mono-scripts"
+        "build:mono-utils"
       ],
       "command": "node scripts/commands/type-check-utils.mjs"
     },
     "ws:type-check:non-utils": {
       "dependencies": [
-        "build:mono-scripts"
+        "build:mono-utils"
       ],
       "command": "node scripts/commands/type-check-non-utils.mjs"
     },
     "ws:build:apps": {
       "dependencies": [
-        "build:mono-scripts"
+        "build:mono-utils"
       ],
       "command": "node scripts/commands/build-apps.mjs"
     },
     "ws:build:utils": {
       "dependencies": [
-        "build:mono-scripts"
+        "build:mono-utils"
       ],
       "command": "node scripts/commands/build-utils.mjs"
     },
     "ws:build:non-utils": {
       "dependencies": [
-        "build:mono-scripts"
+        "build:mono-utils"
       ],
       "command": "node scripts/commands/build-non-utils.mjs"
     },
     "ws:lint:apps": {
       "dependencies": [
-        "build:mono-scripts"
+        "build:mono-utils"
       ],
       "command": "node scripts/commands/lint-apps.mjs"
     },
     "ws:lint:utils": {
       "dependencies": [
-        "build:mono-scripts"
+        "build:mono-utils"
       ],
       "command": "node scripts/commands/lint-utils.mjs"
     },
     "ws:test:utils": {
       "dependencies": [
-        "build:mono-scripts"
+        "build:mono-utils"
       ],
       "command": "node scripts/commands/test-utils.mjs"
     }

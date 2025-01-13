@@ -2,7 +2,7 @@ import {
   composeMonoTypeFns,
   pipe,
   replaceWithNoMatchCheck,
-} from '@noshiro/mono-scripts';
+} from '@noshiro/mono-utils';
 import { idFn, type ConverterOptions } from './common.mjs';
 
 export const convertLibEs2017Object =

@@ -1,4 +1,4 @@
-import { execAsync, toThisDir } from '@noshiro/mono-scripts';
+import { execAsync, toThisDir } from '@noshiro/mono-utils';
 import * as fs from 'node:fs/promises';
 import * as nodePath from 'node:path';
 import { eslintPlugins } from './eslint-plugins.mjs';

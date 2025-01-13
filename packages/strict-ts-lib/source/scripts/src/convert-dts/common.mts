@@ -1,7 +1,7 @@
 import {
   expectType,
   generateKeyValueRecordFromKeys,
-} from '@noshiro/mono-scripts';
+} from '@noshiro/mono-utils';
 import * as fs from 'node:fs/promises';
 
 export type ConverterConfig = Readonly<{

@@ -23,7 +23,7 @@ export const generateRollupConfigForUtils = async (
     '/* eslint-disable import/no-default-export */',
     '/* eslint-disable import/no-internal-modules */',
     '',
-    "import { toThisDir } from '@noshiro/mono-scripts';",
+    "import { toThisDir } from '@noshiro/mono-utils';",
     `import { defineRollupConfig } from '${pathPrefixToRoot}/../configs/define-rollup-config.mjs';`,
     "import tsconfig from './tsconfig.build.json' with { type: 'json' };",
     '',

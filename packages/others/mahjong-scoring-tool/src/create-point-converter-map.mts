@@ -1,4 +1,4 @@
-import { toUint32 } from '@noshiro/mono-scripts';
+import { toUint32 } from '@noshiro/mono-utils';
 import { type ArrayOfLength4 } from './types.mjs';
 import { average, count, sum } from './utils.mjs';
 

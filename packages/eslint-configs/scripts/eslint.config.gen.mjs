@@ -4,7 +4,7 @@
 
 /** @typedef {import('../src/types/flat-config.mjs').FlatConfig} FlatConfig */
 
-import { toThisDir } from '@noshiro/mono-scripts';
+import { toThisDir } from '@noshiro/mono-utils';
 import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin';
 import typescriptEslintParser from '@typescript-eslint/parser';
 import functional from 'eslint-plugin-functional';

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-restricted-imports */
 
-import { genGlobalImportDefsFromDevDependencies } from '@noshiro/mono-scripts';
+import { genGlobalImportDefsFromDevDependencies } from '@noshiro/mono-utils';
 import { castDeepMutable, tp } from '@noshiro/ts-utils';
 import inject from '@rollup/plugin-inject';
 import { type PluginOption } from 'vite';

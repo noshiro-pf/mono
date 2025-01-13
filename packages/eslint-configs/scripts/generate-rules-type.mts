@@ -1,4 +1,4 @@
-import { toSafeUint, toUint32 } from '@noshiro/mono-scripts';
+import { toSafeUint, toUint32 } from '@noshiro/mono-utils';
 import { type Rule } from 'eslint';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { type JSONSchema4 } from 'json-schema';

@@ -3,7 +3,7 @@ import {
   pipe,
   replaceWithNoMatchCheck,
   replaceWithNoMatchCheckBetweenRegexp,
-} from '@noshiro/mono-scripts';
+} from '@noshiro/mono-utils';
 import { closeBraceRegexp, idFn, type ConverterOptions } from './common.mjs';
 
 const markers = {

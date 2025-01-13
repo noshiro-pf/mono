@@ -1,8 +1,4 @@
-import {
-  expectType,
-  pipe,
-  replaceWithNoMatchCheck,
-} from '@noshiro/mono-scripts';
+import { expectType, pipe, replaceWithNoMatchCheck } from '@noshiro/mono-utils';
 import { enumType, type ConverterOptions } from './common.mjs';
 
 export const convertTypedArrayCommon =

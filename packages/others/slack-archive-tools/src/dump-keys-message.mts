@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import { toThisDir } from '@noshiro/mono-scripts';
+import { toThisDir } from '@noshiro/mono-utils';
 import { ISet } from '@noshiro/ts-utils';
 import type * as fsType from 'node:fs';
 import * as fs from 'node:fs/promises';

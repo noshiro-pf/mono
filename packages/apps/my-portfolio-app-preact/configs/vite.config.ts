@@ -1,5 +1,5 @@
 import mdx from '@mdx-js/rollup';
-import { toThisDir } from '@noshiro/mono-scripts';
+import { toThisDir } from '@noshiro/mono-utils';
 import preact from '@preact/preset-vite';
 import legacy from '@vitejs/plugin-legacy';
 import * as nodePath from 'node:path';

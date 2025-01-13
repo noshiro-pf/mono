@@ -1,4 +1,4 @@
-import { pipe, replaceWithNoMatchCheck } from '@noshiro/mono-scripts';
+import { pipe, replaceWithNoMatchCheck } from '@noshiro/mono-utils';
 import { idFn, type ConverterOptions } from './common.mjs';
 
 export const convertLibEs2020Sharedmemory =

@@ -4,7 +4,7 @@ import {
   eslintFlatConfigForCypress,
   eslintFlatConfigForTypeScript,
 } from '@noshiro/eslint-configs';
-import { toThisDir } from '@noshiro/mono-scripts';
+import { toThisDir } from '@noshiro/mono-utils';
 import * as nodePath from 'node:path';
 
 /** @type {string} */

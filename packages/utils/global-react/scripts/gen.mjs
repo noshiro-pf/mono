@@ -1,4 +1,4 @@
-import { generateAllGlobalDefs, toThisDir } from '@noshiro/mono-scripts';
+import { generateAllGlobalDefs, toThisDir } from '@noshiro/mono-utils';
 import * as nodePath from 'node:path';
 
 await generateAllGlobalDefs({
