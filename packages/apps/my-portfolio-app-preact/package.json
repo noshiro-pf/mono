@@ -101,11 +101,12 @@
       ],
       "command": "tsc --noEmit"
     },
+    "pre-build": {
+      "command": "run-s get-zenn-articles clean:build type-check"
+    },
     "build": {
       "dependencies": [
-        "get-zenn-articles",
-        "clean:build",
-        "type-check"
+        "pre-build"
       ],
       "command": "yarn zz:vite build"
     },

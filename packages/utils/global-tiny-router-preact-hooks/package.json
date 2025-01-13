@@ -52,10 +52,12 @@
     "@noshiro/ts-type-utils": "*"
   },
   "wireit": {
+    "pre-build": {
+      "command": "run-s clean:build zz:setup"
+    },
     "build": {
       "dependencies": [
-        "clean:build",
-        "zz:setup"
+        "pre-build"
       ],
       "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
     }

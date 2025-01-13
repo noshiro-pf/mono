@@ -99,10 +99,12 @@
       ],
       "command": "tsc --noEmit"
     },
+    "pre-build": {
+      "command": "run-s clean:build type-check"
+    },
     "build": {
       "dependencies": [
-        "clean:build",
-        "type-check"
+        "pre-build"
       ],
       "command": "yarn zz:vite build"
     },
