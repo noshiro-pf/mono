@@ -1,7 +1,5 @@
-import {
-  NumericInputView,
-  useNumericInputState,
-} from '@noshiro/react-blueprintjs-utils';
+import { useNumericInputWithStepState } from '@noshiro/numeric-input-utils';
+import { NumericInputView } from '@noshiro/react-blueprintjs-utils';
 import {
   answerIconPointConfig,
   clampAndRoundAnswerFairIconPoint,
@@ -22,13 +20,13 @@ export const AnswerIconFairPointInput = memoNamed<Props>(
   'AnswerIconFairPointInput',
   ({ value: valueFromProps, onValueChange, disabled }) => {
     const {
-      valueAsStr,
-      setValueAsStr,
+      state,
+      setState,
       onDecrementMouseDown,
       onIncrementMouseDown,
       submit,
       onKeyDown,
-    } = useNumericInputState<AnswerIconPoint>({
+    } = useNumericInputWithStepState<AnswerIconPoint>({
       onValueChange,
       normalize: clampAndRoundAnswerFairIconPoint,
       decode: (s) => clampAndRoundAnswerFairIconPoint(Number(s)),
@@ -53,11 +51,11 @@ export const AnswerIconFairPointInput = memoNamed<Props>(
         fillSpace={true}
         inputProps={inputProps}
         selectOnFocus={true}
-        valueAsStr={valueAsStr}
+        valueAsStr={state}
         onDecrementMouseDown={onDecrementMouseDown}
         onIncrementMouseDown={onIncrementMouseDown}
         onInputBlur={submit}
-        onInputStringChange={setValueAsStr}
+        onInputStringChange={setState}
       />
     );
   },
