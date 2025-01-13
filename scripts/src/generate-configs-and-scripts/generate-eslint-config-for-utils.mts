@@ -28,7 +28,7 @@ export const generateEsLintConfig = async (
     '  eslintFlatConfigForReact,', // maybe removed by prettier
     '  genEsLintRestrictedImportsDefFromDevDependencies,',
     "} from '@noshiro/eslint-configs';",
-    "import { toThisDir } from '@noshiro/mono-scripts';",
+    "import { toThisDir } from '@noshiro/mono-utils';",
     "import * as nodePath from 'node:path';",
     "import packageJson from './package.json' with { type: 'json' };",
     '',

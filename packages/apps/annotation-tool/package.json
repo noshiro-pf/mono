@@ -94,7 +94,7 @@
     "@noshiro/global-syncflow-react-hooks": "*",
     "@noshiro/global-tiny-router-react-hooks": "*",
     "@noshiro/global-ts-utils": "*",
-    "@noshiro/mono-scripts": "*",
+    "@noshiro/mono-utils": "*",
     "@noshiro/ts-type-utils": "*",
     "@noshiro/ts-utils": "*"
   },

@@ -1,4 +1,4 @@
-import { generateAllGlobalDefs, toThisDir } from '@noshiro/mono-scripts';
+import { generateAllGlobalDefs, toThisDir } from '@noshiro/mono-utils';
 import * as nodePath from 'node:path';
 import packageJson from '../package.json' with { type: 'json' };
 

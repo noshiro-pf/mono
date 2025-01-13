@@ -20,7 +20,7 @@ export const generateViteConfig = async (
       ? `import mdx from '@mdx-js/rollup';`
       : '',
 
-    `import { toThisDir } from '@noshiro/mono-scripts';`,
+    `import { toThisDir } from '@noshiro/mono-utils';`,
     cfg.tsType === 'react-emotion' || cfg.tsType === 'react'
       ? `import react from '@vitejs/plugin-react-swc';`
       : cfg.tsType === 'preact'
