@@ -296,7 +296,7 @@ const updatePackageJsonImpl = (
               };
               mut_wireit['build'] = {
                 dependencies: ['pre-build'],
-                command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript`,
+                command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript --configImportAttributesKey with`,
               };
             } else {
               mut_wireit['pre-build'] = {
@@ -312,7 +312,7 @@ const updatePackageJsonImpl = (
               };
               mut_wireit['build'] = {
                 dependencies: ['pre-build'],
-                command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript`,
+                command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript --configImportAttributesKey with`,
               };
             }
           }

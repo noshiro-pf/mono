@@ -63,7 +63,7 @@
       "dependencies": [
         "pre-build"
       ],
-      "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
+      "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript --configImportAttributesKey with"
     },
     "gen:re-export": {
       "command": "run-s build:script gen:re-export:script gen:re-export:fmt"
