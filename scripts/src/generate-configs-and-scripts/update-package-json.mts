@@ -264,25 +264,31 @@ const updatePackageJsonImpl = (
             cfg.useVite === true ? 'rimraf build' : 'rimraf esm';
 
           if (cfg.useVite === true) {
-            mut_wireit['build'] = {
-              dependencies: [
+            mut_wireit['pre-build'] = {
+              command: `run-s ${[
                 ...(packageName === 'my-portfolio-app-preact'
                   ? ['get-zenn-articles']
                   : []),
                 'clean:build',
                 'type-check',
-              ],
+              ].join(' ')}`,
+            };
+            mut_wireit['build'] = {
+              dependencies: ['pre-build'],
               command: 'yarn zz:vite build',
             };
           } else {
             if (packageName.startsWith('global-')) {
+              mut_wireit['pre-build'] = {
+                command: 'run-s clean:build zz:setup',
+              };
               mut_wireit['build'] = {
-                dependencies: ['clean:build', 'zz:setup'],
+                dependencies: ['pre-build'],
                 command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript`,
               };
             } else {
-              mut_wireit['build'] = {
-                dependencies: [
+              mut_wireit['pre-build'] = {
+                command: `run-s ${[
                   'clean:build',
                   ...(generateFlag.gi === false ? [] : ['gi']),
                   'type-check',
@@ -290,7 +296,10 @@ const updatePackageJsonImpl = (
                   packageName === 'syncflow-react-hooks'
                     ? ['gen:re-export']
                     : []),
-                ],
+                ].join(' ')}`,
+              };
+              mut_wireit['build'] = {
+                dependencies: ['pre-build'],
                 command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript`,
               };
             }
@@ -383,16 +392,6 @@ const updatePackageJsonImpl = (
             'yarn zz:prettier src/syncflow.mts';
           mut_scripts['gen:re-export:script'] =
             'node ./scripts/generate-re-export-script.mjs';
-
-          // "build": {
-          //   "dependencies": [
-          //     "clean:build",
-          //     "gi",
-          //     "type-check",
-          //     "gen:re-export"
-          //   ],
-          //   "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
-          // },
 
           mut_wireit['gen:re-export'] = {
             command:

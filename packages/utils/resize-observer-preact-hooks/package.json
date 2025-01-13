@@ -47,10 +47,12 @@
     "@noshiro/ts-type-utils": "*"
   },
   "wireit": {
+    "pre-build": {
+      "command": "run-s clean:build type-check"
+    },
     "build": {
       "dependencies": [
-        "clean:build",
-        "type-check"
+        "pre-build"
       ],
       "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
     }

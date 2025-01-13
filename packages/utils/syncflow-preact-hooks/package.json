@@ -52,12 +52,12 @@
     "@noshiro/ts-type-utils": "*"
   },
   "wireit": {
+    "pre-build": {
+      "command": "run-s clean:build gi type-check gen:re-export"
+    },
     "build": {
       "dependencies": [
-        "clean:build",
-        "gi",
-        "type-check",
-        "gen:re-export"
+        "pre-build"
       ],
       "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
     },
