@@ -15,8 +15,8 @@
     }
   },
   "files": [
-    "./src/**/*.mts",
-    "./esm"
+    "src",
+    "esm"
   ],
   "scripts": {
     "build": "yarn build:src",

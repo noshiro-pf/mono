@@ -15,8 +15,8 @@
     }
   },
   "files": [
-    "./src",
-    "./esm"
+    "src",
+    "esm"
   ],
   "scripts": {
     "build": "wireit",
