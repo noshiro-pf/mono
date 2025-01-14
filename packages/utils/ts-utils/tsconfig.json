@@ -3,5 +3,6 @@
     "../../../configs/tsconfig/tsconfig.lib.type-check.json",
     "../../../configs/tsconfig/tsconfig.vite.json"
   ],
-  "include": ["./src", "./configs"]
+  "include": ["./src", "./configs"],
+  "exclude": ["*.res.mjs"]
 }
