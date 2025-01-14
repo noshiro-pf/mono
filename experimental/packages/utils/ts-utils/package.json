@@ -28,6 +28,9 @@
     "lint": "pnpm run zz:eslint:src",
     "lint:fix": "pnpm run zz:eslint:src --fix",
     "pub": "pnpm run zz:publish",
+    "res:build": "rescript",
+    "res:clean": "rescript clean",
+    "res:dev": "rescript -w",
     "test": "pnpm run zz:vitest run",
     "testw": "pnpm run zz:vitest watch",
     "tsc": "pnpm run type-check",
@@ -39,6 +42,10 @@
     "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
     "zz:publish": "pnpm publish --access public --no-git-checks",
     "zz:vitest": "vitest --config ./configs/vitest.config.ts"
+  },
+  "dependencies": {
+    "@rescript/core": "1.6.1",
+    "rescript": "11.1.4"
   },
   "devDependencies": {
     "@noshiro/eslint-configs": "*",
