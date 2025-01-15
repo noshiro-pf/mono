@@ -24,7 +24,7 @@ export const PlayerName = memoNamed<Props>(
     windowSize,
     onBoundingClientRectChange,
   }) => {
-    const rotateStyle = useMemo<preact.JSX.CSSProperties>(
+    const rotateStyle = useMemo(
       () =>
         match(rotate, {
           0: {
@@ -53,15 +53,16 @@ export const PlayerName = memoNamed<Props>(
             width: `${playerNameRectSize.height - 2 * playerNameRectPadding}px`,
             height: `${playerNameRectSize.width - 2 * playerNameRectPadding}px`,
           },
-        }),
+        }) satisfies preact.JSX.CSSProperties,
       [rotate],
     );
 
-    const styleMerged = useMemo<preact.JSX.CSSProperties>(
-      () => ({
-        ...rotateStyle,
-        backgroundColor: isInTurn ? inTurnColor : undefined,
-      }),
+    const styleMerged = useMemo(
+      () =>
+        ({
+          ...rotateStyle,
+          backgroundColor: isInTurn ? inTurnColor : undefined,
+        }) as const satisfies preact.JSX.CSSProperties,
       [isInTurn, rotateStyle],
     );
 

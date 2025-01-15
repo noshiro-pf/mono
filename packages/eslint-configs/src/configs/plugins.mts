@@ -28,7 +28,6 @@ import eslintPluginTestingLibrary from 'eslint-plugin-testing-library';
 // @ts-expect-error no type definition
 import eslintPluginCypress from 'eslint-plugin-cypress';
 
-// @ts-expect-error no type definition
 import eslintPluginPreferArrowFunctions from 'eslint-plugin-prefer-arrow-functions';
 
 // @ts-expect-error no type definition
@@ -87,7 +86,6 @@ export const plugins: Record<
   vitest: eslintPluginVitest,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'jsx-a11y': eslintPluginJsxA11y,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'prefer-arrow-functions': eslintPluginPreferArrowFunctions,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   promise: eslintPluginPromise,
