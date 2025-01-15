@@ -45,7 +45,7 @@ export const AnswerLaterButtonWithConfirmation = memoNamed<Props>(
     ) : (
       <>
         <ButtonNowrapStyled
-          data-cy={'button-with-confirmation'}
+          data-e2e={'button-with-confirmation'}
           icon={buttonConfig.icon}
           intent={buttonConfig.intent}
           loading={loading}

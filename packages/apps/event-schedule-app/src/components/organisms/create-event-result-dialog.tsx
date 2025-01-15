@@ -48,7 +48,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
       >
         <div
           className={Classes.DIALOG_BODY}
-          data-cy={'create-event-result-dialog-body'}
+          data-e2e={'create-event-result-dialog-body'}
         >
           {isLoading ? (
             <Spinner />
@@ -61,7 +61,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
                   align-items: center;
                   flex-wrap: nowrap;
                 `}
-                data-cy={'url-wrapper'}
+                data-e2e={'url-wrapper'}
               >
                 <div>{'URL: '}</div>
                 <div
@@ -89,7 +89,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
                 <div>
                   <Tooltip content={dc.clipboardButton}>
                     <Button
-                      data-cy={'clipboard-button'}
+                      data-e2e={'clipboard-button'}
                       icon={'clipboard'}
                       minimal={true}
                       onClick={onClipboardButtonClick}
@@ -103,11 +103,11 @@ export const CreateEventResultDialog = memoNamed<Props>(
 
         <div
           className={Classes.DIALOG_FOOTER}
-          data-cy={'create-event-result-dialog-footer'}
+          data-e2e={'create-event-result-dialog-footer'}
         >
           <ButtonsWrapperAlignEnd>
             <Button
-              data-cy={'back-button'}
+              data-e2e={'back-button'}
               disabled={isLoading || !linkIsUsed}
               intent={'none'}
               title={
@@ -119,7 +119,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
             </Button>
 
             <AnchorButton
-              data-cy={'open-answer-page-button'}
+              data-e2e={'open-answer-page-button'}
               href={url}
               intent={'primary'}
               loading={isLoading}

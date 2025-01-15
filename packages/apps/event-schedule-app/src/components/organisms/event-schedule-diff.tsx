@@ -41,7 +41,7 @@ export const EventScheduleDiff = memoNamed<Props>(
         >
           {dc.title}
         </div>
-        <ul data-cy={'diff-ul'}>
+        <ul data-e2e={'diff-ul'}>
           {list1.map((li) =>
             mapOptional(diff[li], (s) => (
               <li key={li}>

@@ -58,7 +58,7 @@ export const AnswerIconRow = memoNamed<Props>(
           good: <AnswerIconGoodPoint />,
           poor: <AnswerIconPoorPoint />,
           fair: (
-            <div data-cy={'fair-point-input'}>
+            <div data-e2e={'fair-point-input'}>
               <AnswerIconFairPointInput
                 disabled={false}
                 value={answerIcon.point}

@@ -168,7 +168,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   return errorType !== undefined && errorType.type.type === 'not-found' ? (
     <NotFoundPage />
   ) : (
-    <div data-cy={'answer-page'}>
+    <div data-e2e={'answer-page'}>
       <Header title={dc.title} />
 
       {errorType !== undefined ? (
@@ -191,7 +191,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             <AnswerPageEventInfo eventSchedule={eventSchedule} />
             <ButtonsWrapperAlignEnd>
               <Button
-                data-cy={'edit-event-settings'}
+                data-e2e={'edit-event-settings'}
                 icon={'cog'}
                 intent={'none'}
                 onClick={AnswerPageStore.onEditButtonClick}
@@ -213,7 +213,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             <ButtonsWrapperNowrapPadChanged>
               {afterDeadline ? undefined : (
                 <Button
-                  data-cy={'refresh-answers'}
+                  data-e2e={'refresh-answers'}
                   disabled={refreshButtonIsDisabled}
                   icon={'refresh'}
                   intent={'none'}
@@ -367,36 +367,18 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               ) : undefined}
               <table>
                 <tbody>
-                  <tr>
-                    <th>
-                      <AlignCenter>
-                        <CustomIcon iconName={'good'} />
-                      </AlignCenter>
-                    </th>
-                    <td>{dc.point(eventSchedule.answerIcons.good.point)}</td>
-                    <td>{dict.common.colon}</td>
-                    <td>{eventSchedule.answerIcons.good.description}</td>
-                  </tr>
-                  <tr>
-                    <th>
-                      <AlignCenter>
-                        <CustomIcon iconName={'fair'} />
-                      </AlignCenter>
-                    </th>
-                    <td>{dc.point(eventSchedule.answerIcons.fair.point)}</td>
-                    <td>{dict.common.colon}</td>
-                    <td>{eventSchedule.answerIcons.fair.description}</td>
-                  </tr>
-                  <tr>
-                    <th>
-                      <AlignCenter>
-                        <CustomIcon iconName={'poor'} />
-                      </AlignCenter>
-                    </th>
-                    <td>{dc.point(eventSchedule.answerIcons.poor.point)}</td>
-                    <td>{dict.common.colon}</td>
-                    <td>{eventSchedule.answerIcons.poor.description}</td>
-                  </tr>
+                  <IconDescriptionRow
+                    answerIcons={eventSchedule.answerIcons}
+                    iconName={'good'}
+                  />
+                  <IconDescriptionRow
+                    answerIcons={eventSchedule.answerIcons}
+                    iconName={'fair'}
+                  />
+                  <IconDescriptionRow
+                    answerIcons={eventSchedule.answerIcons}
+                    iconName={'poor'}
+                  />
                 </tbody>
               </table>
               <NoteForPointOfFair>
@@ -411,7 +393,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             {answerBeingEditedSectionState === 'hidden' && !afterDeadline ? (
               <ButtonsWrapperAlignEnd>
                 <Button
-                  data-cy={'add-answer-button'}
+                  data-e2e={'add-answer-button'}
                   icon='add'
                   intent='primary'
                   text={dc.answers.addAnswer}
@@ -421,7 +403,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             ) : undefined}
           </Section>
 
-          <div ref={answerSectionRef} data-cy={'answer-being-edited-section'}>
+          <div ref={answerSectionRef} data-e2e={'answer-being-edited-section'}>
             {answerBeingEditedSectionState === 'hidden' ||
             afterDeadline ? undefined : (
               <Section
@@ -449,6 +431,26 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     </div>
   );
 });
+
+const IconDescriptionRow = memoNamed<
+  Readonly<{
+    iconName: AnswerIconId;
+    answerIcons: AnswerIconSettings;
+  }>
+>('IconDescriptionRow', ({ iconName, answerIcons }) => (
+  <tr>
+    <th>
+      <AlignCenter>
+        <CustomIcon iconName={iconName} />
+      </AlignCenter>
+    </th>
+    <td data-e2e={`icon-description-row--${iconName}`}>
+      {dc.point(answerIcons[iconName].point)}
+    </td>
+    <td>{dict.common.colon}</td>
+    <td>{answerIcons[iconName].description}</td>
+  </tr>
+));
 
 const CalendarWrapper = styled.div`
   margin: 10px;

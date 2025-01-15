@@ -69,7 +69,7 @@ const SubmitAnswerButton = memoNamed<Omit<Props, 'hasUnanswered'>>(
   'SubmitAnswerButton',
   ({ loading, disabled, mode }) => (
     <ButtonNowrapStyled
-      data-cy={'submit-answer-button'}
+      data-e2e={'submit-answer-button'}
       disabled={disabled}
       icon={'tick'}
       intent={'primary'}

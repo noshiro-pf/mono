@@ -67,7 +67,7 @@ export const EditEventScheduleEmailVerified = memoNamed<Props>(
             disabled={editButtonIsLoading || hasNoChanges}
             onConfirmClick={resetState}
           />
-          <div data-cy={'submit-button'}>
+          <div data-e2e={'submit-button'}>
             <SubmitEditingEventButton
               disabled={
                 !eventScheduleValidationOk ||

@@ -20,12 +20,6 @@ clog('firebase.initializeApp done.');
 
 const firestore = initializeFirestore(fbApp, {
   ignoreUndefinedProperties: true,
-  // https://zenn.dev/cauchye/articles/20210816_yutaro-elk
-  experimentalForceLongPolling: Object.hasOwn(
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion, unicorn/prefer-global-this
-    window as unknown as UnknownRecord,
-    'Cypress',
-  ),
 });
 // if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
 //   const host = 'localhost';

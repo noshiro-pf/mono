@@ -86,7 +86,7 @@ export const ButtonWithConfirm = memoNamed<Props>(
       <>
         <ButtonNowrapStyled
           color={buttonConfig.color}
-          data-cy={'button-with-confirmation'}
+          data-e2e={'button-with-confirmation'}
           disabled={disabled}
           icon={buttonConfig.icon}
           intent={buttonConfig.intent ?? 'none'}
