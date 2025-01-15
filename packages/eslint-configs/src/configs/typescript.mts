@@ -75,6 +75,8 @@ export const eslintFlatConfigForTypeScript = ({
       '**/jest.config*.mjs',
       '**/cypress.config.ts',
       '**/cypress.config.mts',
+      '**/playwright.config.ts',
+      '**/playwright.config.mts',
     ],
     rules: {
       '@typescript-eslint/no-restricted-imports': 'off',

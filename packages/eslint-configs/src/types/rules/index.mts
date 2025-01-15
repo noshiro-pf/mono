@@ -4,6 +4,7 @@ export * from './eslint-functional-rules.mjs';
 export * from './eslint-import-rules.mjs';
 export * from './eslint-jest-rules.mjs';
 export * from './eslint-jsx-a11y-rules.mjs';
+export * from './eslint-playwright-rules.mjs';
 export * from './eslint-plugin-rules.mjs';
 export * from './eslint-prefer-arrow-functions-rules.mjs';
 export * from './eslint-promise-rules.mjs';
