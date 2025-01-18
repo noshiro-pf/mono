@@ -4,6 +4,7 @@ export * from './expect-type.mjs';
 export * from './generate-key-value-record-from-keys.mjs';
 export * from './guard.mjs';
 export * from './pipe.mjs';
+export * from './range.mjs';
 export * from './replace-with-no-match-check-between-regexp.mjs';
 export * from './replace-with-no-match-check.mjs';
 export * from './slice-by-match.mjs';
