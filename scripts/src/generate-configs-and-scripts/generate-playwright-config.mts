@@ -1,13 +1,9 @@
 import path from 'node:path';
-import {
-  rollupConfigName,
-  tsconfigBuildJsonName,
-  workspaceConfigsDirName,
-} from './constants.mjs';
+import { playwrightConfigName, workspaceConfigsDirName } from './constants.mjs';
 import { workspaceConfig } from './workspace-config.mjs';
 import { writeDirAndFileAndPrintDone } from './write-dir-and-file-and-print-done.mjs';
 
-export const generateRollupConfigForUtils = async (
+export const generatePlaywrightConfig = async (
   workspaceLocation: string,
   packageName: string,
 ): Promise<void> => {
@@ -17,29 +13,34 @@ export const generateRollupConfigForUtils = async (
     throw new Error(`workspaceConfig for package "${packageName}" not found.`);
   }
 
-  if (!cfg.gen.build) return;
+  if (cfg.utilOrApp !== 'app' || cfg.gen.e2e !== 'playwright') return;
 
   const depth = workspaceLocation.split('/').length + 1;
 
   const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
 
   const content = [
-    '/* eslint-disable import/no-default-export */',
-    '/* eslint-disable import/no-internal-modules */',
-    '',
     "import { toThisDir } from '@noshiro/mono-utils';",
-    `import { defineRollupConfig } from '${pathPrefixToRoot}/configs/define-rollup-config.mjs';`,
-    `import tsconfig from './${tsconfigBuildJsonName}' with { type: 'json' };`,
+    "import path from 'node:path';",
+    `import { definePlaywrightConfig } from '${pathPrefixToRoot}/configs/define-playwright-config.mjs';`,
     '',
-    'export default defineRollupConfig({',
-    '  configDir: toThisDir(import.meta.url),',
-    '  outDirRelative: tsconfig.compilerOptions.outDir,',
+    'const thisDir = toThisDir(import.meta.url);',
+    '',
+    'export default definePlaywrightConfig({',
+    "  baseURL: 'http://localhost:5180',",
+    "  testDir: path.resolve(thisDir, '..', 'e2e'),",
+    '  webServer: [',
+    '    {',
+    "      url: 'http://localhost:5180',",
+    "      command: 'yarn start:dev-server',",
+    '    },',
+    '  ],',
     '});',
   ].join('\n');
 
   await writeDirAndFileAndPrintDone(
     path.resolve(workspaceLocation, workspaceConfigsDirName),
-    rollupConfigName,
+    playwrightConfigName,
     content,
     packageName,
   );

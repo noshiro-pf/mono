@@ -4,6 +4,7 @@ import {
   generateEsLintConfig,
   generateEsLintConfigForGlobalUtils,
   generateInjectDef,
+  generatePlaywrightConfig,
   generateRollupConfigForUtils,
   generateTsConfigForBuild,
   generateTsConfigForTest,
@@ -14,7 +15,7 @@ import {
   updatePackageJson,
 } from '../esm/index.mjs';
 
-/** For test */
+/** Flags to filter execution */
 const executeFlag = {
   typeCheck: true,
   build: true,
@@ -24,7 +25,7 @@ const executeFlag = {
   rollupConfig: true,
   viteConfig: true,
   vitestConfig: true,
-  cypress: true,
+  e2e: true,
 };
 
 /**
@@ -117,11 +118,17 @@ const main = async () => {
         executeFlag.packageJson
           ? updatePackageJson(workspace, packageName)
           : undefined,
+
+        // event-schedule-app の eslint config だけカスタマイズが多いため自動生成対象から除外
         executeFlag.eslintConfig && packageName !== 'event-schedule-app'
           ? generateEsLintConfig(workspace.location, packageName)
           : undefined,
-        executeFlag.cypress
+
+        executeFlag.e2e
           ? generateCypressDirectory(workspace.location, packageName)
+          : undefined,
+        executeFlag.e2e && packageName !== 'event-schedule-app'
+          ? generatePlaywrightConfig(workspace.location, packageName)
           : undefined,
       ]);
     }

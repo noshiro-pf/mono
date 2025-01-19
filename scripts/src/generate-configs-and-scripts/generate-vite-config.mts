@@ -1,5 +1,9 @@
 import path from 'node:path';
-import { workspaceConfigsDirName } from './constants.mjs';
+import {
+  tsconfigTestJsonName,
+  viteConfigName,
+  workspaceConfigsDirName,
+} from './constants.mjs';
 import { workspaceConfig } from './workspace-config.mjs';
 import { writeDirAndFileAndPrintDone } from './write-dir-and-file-and-print-done.mjs';
 
@@ -67,7 +71,7 @@ export const generateViteConfig = async (
     `      globals: true,`,
     `      environment: 'happy-dom',`,
     `      typecheck: {`,
-    `        tsconfig: nodePath.resolve(thisDir, 'tsconfig.test.json'),`,
+    `        tsconfig: nodePath.resolve(thisDir, '${tsconfigTestJsonName}'),`,
     `      },`,
     `    } satisfies UserConfig,`,
     `  };`,
@@ -76,7 +80,7 @@ export const generateViteConfig = async (
 
   await writeDirAndFileAndPrintDone(
     path.resolve(workspaceLocation, workspaceConfigsDirName),
-    'vite.config.ts',
+    viteConfigName,
     content,
     packageName,
   );

@@ -1,5 +1,9 @@
 import path from 'node:path';
-import { workspaceConfigsDirName } from './constants.mjs';
+import {
+  tsconfigTestJsonName,
+  vitestConfigName,
+  workspaceConfigsDirName,
+} from './constants.mjs';
 import { workspaceConfig } from './workspace-config.mjs';
 import { writeDirAndFileAndPrintDone } from './write-dir-and-file-and-print-done.mjs';
 
@@ -29,7 +33,7 @@ export const generateVitestConfigForUtils = async (
     "    dir: nodePath.resolve(thisDir, '../src'),",
     "    includeSource: [nodePath.resolve(thisDir, '../src/**/*.mts')],",
     '    typecheck: {',
-    "      tsconfig: nodePath.resolve(thisDir, 'tsconfig.test.json'),",
+    `      tsconfig: nodePath.resolve(thisDir, '${tsconfigTestJsonName}'),`,
     '    },',
     cfg.packageJson.scripts.passWithNoTests ? '    passWithNoTests: true,' : '',
     '  },',
@@ -38,7 +42,7 @@ export const generateVitestConfigForUtils = async (
 
   await writeDirAndFileAndPrintDone(
     path.resolve(workspaceLocation, workspaceConfigsDirName),
-    'vitest.config.ts',
+    vitestConfigName,
     content,
     packageName,
   );
