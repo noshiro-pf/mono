@@ -5,15 +5,17 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
   T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
 
 /**
- * Prefer arrow functions
+ * Auto-fix plain Functions into Arrow Functions, in all cases where conversion
+ * would result in the same behaviour
  *
- * ```md
- * | key         | value       |
- * | :---------- | :---------- |
- * | fixable     | code        |
- * | category    | ecmascript6 |
- * | recommended | false       |
- * ```
+ * @link https://github.com/JamieMason/prefer-arrow-functions
+ *
+ *  ```md
+ *  | key     | value      |
+ *  | :------ | :--------- |
+ *  | type    | suggestion |
+ *  | fixable | code       |
+ *  ```
  */
 namespace PreferArrowFunctions {
   /**
@@ -24,13 +26,27 @@ namespace PreferArrowFunctions {
    *   {
    *     "additionalProperties": false,
    *     "properties": {
+   *       "allowedNames": {
+   *         "default": [],
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "type": "array"
+   *       },
    *       "allowNamedFunctions": {
+   *         "default": false,
+   *         "type": "boolean"
+   *       },
+   *       "allowObjectProperties": {
+   *         "default": false,
    *         "type": "boolean"
    *       },
    *       "classPropertiesAllowed": {
+   *         "default": false,
    *         "type": "boolean"
    *       },
    *       "disallowPrototype": {
+   *         "default": false,
    *         "type": "boolean"
    *       },
    *       "returnStyle": {
@@ -39,6 +55,7 @@ namespace PreferArrowFunctions {
    *         "type": "string"
    *       },
    *       "singleReturnOnly": {
+   *         "default": false,
    *         "type": "boolean"
    *       }
    *     },
@@ -48,7 +65,9 @@ namespace PreferArrowFunctions {
    * ```
    */
   export type Options = {
+    readonly allowedNames?: readonly string[];
     readonly allowNamedFunctions?: boolean;
+    readonly allowObjectProperties?: boolean;
     readonly classPropertiesAllowed?: boolean;
     readonly disallowPrototype?: boolean;
     readonly returnStyle?: 'explicit' | 'implicit' | 'unchanged'; // modified

@@ -156,6 +156,23 @@ namespace NoIdenticalTests {
 }
 
 /**
+ * Disallow rules `meta.schema` properties to include defaults
+ *
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-meta-schema-default.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | category    | Rules      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoMetaSchemaDefault {
+  export type RuleEntry = Linter.RuleSeverity;
+}
+
+/**
  * Disallow `messageId`s that are missing from `meta.messages`
  *
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-missing-message-ids.md
@@ -432,6 +449,24 @@ namespace ReportMessageFormat {
 }
 
 /**
+ * Require only rules with options to implement a `meta.defaultOptions` property
+ *
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-default-options.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | fixable     | code       |
+ *  | category    | Rules      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireMetaDefaultOptions {
+  export type RuleEntry = Linter.RuleSeverity;
+}
+
+/**
  * Require rules to implement a `meta.docs.description` property with the
  * correct format
  *
@@ -484,11 +519,12 @@ namespace RequireMetaDocsDescription {
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-docs-recommended.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | category    | Rules      |
- *  | recommended | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | hasSuggestions | true       |
+ *  | category       | Rules      |
+ *  | recommended    | false      |
  *  ```
  */
 namespace RequireMetaDocsRecommended {
@@ -807,6 +843,7 @@ export type EslintPluginRules = {
   readonly 'eslint-plugin/no-deprecated-context-methods': NoDeprecatedContextMethods.RuleEntry;
   readonly 'eslint-plugin/no-deprecated-report-api': NoDeprecatedReportApi.RuleEntry;
   readonly 'eslint-plugin/no-identical-tests': NoIdenticalTests.RuleEntry;
+  readonly 'eslint-plugin/no-meta-schema-default': NoMetaSchemaDefault.RuleEntry;
   readonly 'eslint-plugin/no-missing-message-ids': NoMissingMessageIds.RuleEntry;
   readonly 'eslint-plugin/no-missing-placeholders': NoMissingPlaceholders.RuleEntry;
   readonly 'eslint-plugin/no-only-tests': NoOnlyTests.RuleEntry;
@@ -820,6 +857,7 @@ export type EslintPluginRules = {
   readonly 'eslint-plugin/prefer-placeholders': PreferPlaceholders.RuleEntry;
   readonly 'eslint-plugin/prefer-replace-text': PreferReplaceText.RuleEntry;
   readonly 'eslint-plugin/report-message-format': ReportMessageFormat.RuleEntry;
+  readonly 'eslint-plugin/require-meta-default-options': RequireMetaDefaultOptions.RuleEntry;
   readonly 'eslint-plugin/require-meta-docs-description': RequireMetaDocsDescription.RuleEntry;
   readonly 'eslint-plugin/require-meta-docs-recommended': RequireMetaDocsRecommended.RuleEntry;
   readonly 'eslint-plugin/require-meta-docs-url': RequireMetaDocsUrl.RuleEntry;

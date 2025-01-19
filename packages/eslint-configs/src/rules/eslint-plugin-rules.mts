@@ -30,4 +30,6 @@ export const eslintPluginRules: EslintPluginRules = {
   'eslint-plugin/require-meta-type': 'error',
   'eslint-plugin/test-case-property-ordering': 'error',
   'eslint-plugin/test-case-shorthand-strings': 'error',
+  'eslint-plugin/no-meta-schema-default': 'error',
+  'eslint-plugin/require-meta-default-options': 'error',
 } as const;

@@ -470,6 +470,8 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
 
   '@typescript-eslint/related-getter-setter-pairs': 'error',
 
+  '@typescript-eslint/no-misused-spread': 'error',
+
   // deprecated
   '@typescript-eslint/no-type-alias': 0,
   '@typescript-eslint/prefer-ts-expect-error': 0,

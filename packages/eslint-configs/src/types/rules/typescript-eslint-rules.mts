@@ -374,11 +374,12 @@ namespace ConsistentGenericConstructors {
  * @link https://typescript-eslint.io/rules/consistent-indexed-object-style
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | fixable     | code       |
- *  | recommended | stylistic  |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  | recommended    | stylistic  |
  *  ```
  */
 namespace ConsistentIndexedObjectStyle {
@@ -428,7 +429,8 @@ namespace ConsistentReturn {
    *     "type": "object",
    *     "properties": {
    *       "treatUndefinedAsUnspecified": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "default": false
    *       }
    *     },
    *     "additionalProperties": false
@@ -487,6 +489,15 @@ namespace ConsistentTypeAssertions {
    *         "type": "object",
    *         "additionalProperties": false,
    *         "properties": {
+   *           "arrayLiteralTypeAssertions": {
+   *             "type": "string",
+   *             "description": "Whether to always prefer type declarations for array literals used as variable initializers, rather than type assertions.",
+   *             "enum": [
+   *               "allow",
+   *               "allow-as-parameter",
+   *               "never"
+   *             ]
+   *           },
    *           "assertionStyle": {
    *             "type": "string",
    *             "description": "The expected assertion style to enforce.",
@@ -504,10 +515,7 @@ namespace ConsistentTypeAssertions {
    *               "never"
    *             ]
    *           }
-   *         },
-   *         "required": [
-   *           "assertionStyle"
-   *         ]
+   *         }
    *       }
    *     ]
    *   }
@@ -516,8 +524,16 @@ namespace ConsistentTypeAssertions {
    */
   export type Options =
     | {
+        /**
+         * Whether to always prefer type declarations for array literals used as
+         * variable initializers, rather than type assertions.
+         */
+        readonly arrayLiteralTypeAssertions?:
+          | 'allow-as-parameter'
+          | 'allow'
+          | 'never';
         /** The expected assertion style to enforce. */
-        readonly assertionStyle: 'angle-bracket' | 'as';
+        readonly assertionStyle?: 'angle-bracket' | 'as';
         /**
          * Whether to always prefer type declarations for object literals used
          * as variable initializers, rather than type assertions.
@@ -4215,7 +4231,155 @@ namespace NoConfusingVoidExpression {
  *  ```
  */
 namespace NoDeprecated {
-  export type RuleEntry = Linter.RuleSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "allow": {
+   *         "items": {
+   *           "oneOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "file"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 },
+   *                 "path": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ],
+   *               "type": "object"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "lib"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ],
+   *               "type": "object"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "package"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 },
+   *                 "package": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name",
+   *                 "package"
+   *               ],
+   *               "type": "object"
+   *             }
+   *           ]
+   *         },
+   *         "type": "array",
+   *         "description": "Type specifiers that can be allowed."
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    /** Type specifiers that can be allowed. */
+    readonly allow?: readonly (
+      | string
+      | {
+          readonly from: 'file';
+          readonly name: string | readonly [string, ...(readonly string[])];
+          readonly path?: string;
+        }
+      | {
+          readonly from: 'lib';
+          readonly name: string | readonly [string, ...(readonly string[])];
+        }
+      | {
+          readonly from: 'package';
+          readonly name: string | readonly [string, ...(readonly string[])];
+          readonly package: string;
+        }
+    )[];
+  };
+
+  export type RuleEntry =
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -5056,7 +5220,8 @@ namespace NoInvalidThis {
    *     "type": "object",
    *     "properties": {
    *       "capIsConstructor": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "default": true
    *       }
    *     },
    *     "additionalProperties": false
@@ -5457,6 +5622,171 @@ namespace NoMisusedPromises {
 }
 
 /**
+ * Disallow using the spread operator when it might cause unexpected behavior
+ *
+ * @link https://typescript-eslint.io/rules/no-misused-spread
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | recommended          | strict  |
+ *  | requiresTypeChecking | true    |
+ *  ```
+ */
+namespace NoMisusedSpread {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "allow": {
+   *         "items": {
+   *           "oneOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "file"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 },
+   *                 "path": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ],
+   *               "type": "object"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "lib"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name"
+   *               ],
+   *               "type": "object"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "from": {
+   *                   "enum": [
+   *                     "package"
+   *                   ],
+   *                   "type": "string"
+   *                 },
+   *                 "name": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "items": {
+   *                         "type": "string"
+   *                       },
+   *                       "minItems": 1,
+   *                       "type": "array",
+   *                       "uniqueItems": true
+   *                     }
+   *                   ]
+   *                 },
+   *                 "package": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "from",
+   *                 "name",
+   *                 "package"
+   *               ],
+   *               "type": "object"
+   *             }
+   *           ]
+   *         },
+   *         "type": "array",
+   *         "description": "An array of type specifiers that are known to be safe to spread."
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    /** An array of type specifiers that are known to be safe to spread. */
+    readonly allow?: readonly (
+      | string
+      | {
+          readonly from: 'file';
+          readonly name: string | readonly [string, ...(readonly string[])];
+          readonly path?: string;
+        }
+      | {
+          readonly from: 'lib';
+          readonly name: string | readonly [string, ...(readonly string[])];
+        }
+      | {
+          readonly from: 'package';
+          readonly name: string | readonly [string, ...(readonly string[])];
+          readonly package: string;
+        }
+    )[];
+  };
+
+  export type RuleEntry =
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+}
+
+/**
  * Disallow enums from having both number and string members
  *
  * @link https://typescript-eslint.io/rules/no-mixed-enums
@@ -5734,12 +6064,6 @@ namespace NoRestrictedImports {
    *                   "type": "string"
    *                 }
    *               },
-   *               "allowImportNames": {
-   *                 "type": "array",
-   *                 "items": {
-   *                   "type": "string"
-   *                 }
-   *               },
    *               "allowTypeImports": {
    *                 "type": "boolean",
    *                 "description": "Whether to allow type-only imports for a path."
@@ -5783,12 +6107,6 @@ namespace NoRestrictedImports {
    *                           "type": "string"
    *                         }
    *                       },
-   *                       "allowImportNames": {
-   *                         "type": "array",
-   *                         "items": {
-   *                           "type": "string"
-   *                         }
-   *                       },
    *                       "allowTypeImports": {
    *                         "type": "boolean",
    *                         "description": "Whether to allow type-only imports for a path."
@@ -5823,14 +6141,6 @@ namespace NoRestrictedImports {
    *                         "minItems": 1,
    *                         "uniqueItems": true
    *                       },
-   *                       "allowImportNames": {
-   *                         "type": "array",
-   *                         "items": {
-   *                           "type": "string"
-   *                         },
-   *                         "minItems": 1,
-   *                         "uniqueItems": true
-   *                       },
    *                       "group": {
    *                         "type": "array",
    *                         "items": {
@@ -5839,13 +6149,7 @@ namespace NoRestrictedImports {
    *                         "minItems": 1,
    *                         "uniqueItems": true
    *                       },
-   *                       "regex": {
-   *                         "type": "string"
-   *                       },
    *                       "importNamePattern": {
-   *                         "type": "string"
-   *                       },
-   *                       "allowImportNamePattern": {
    *                         "type": "string"
    *                       },
    *                       "message": {
@@ -5859,7 +6163,8 @@ namespace NoRestrictedImports {
    *                         "type": "boolean",
    *                         "description": "Whether to allow type-only imports for a path."
    *                       }
-   *                     }
+   *                     },
+   *                     "required": ["group"]
    *                   },
    *                   "uniqueItems": true
    *                 }
@@ -5880,7 +6185,6 @@ namespace NoRestrictedImports {
             readonly name: string;
             readonly message?: string;
             readonly importNames?: readonly string[];
-            readonly allowImportNames?: readonly string[];
             /** Whether to allow type-only imports for a path. */
             readonly allowTypeImports?: boolean;
           }
@@ -5893,7 +6197,6 @@ namespace NoRestrictedImports {
                 readonly name: string;
                 readonly message?: string;
                 readonly importNames?: readonly string[];
-                readonly allowImportNames?: readonly string[];
                 /** Whether to allow type-only imports for a path. */
                 readonly allowTypeImports?: boolean;
               }
@@ -5906,15 +6209,8 @@ namespace NoRestrictedImports {
                   ...(readonly string[]),
                 ];
                 /** @minItems 1 */
-                readonly allowImportNames?: readonly [
-                  string,
-                  ...(readonly string[]),
-                ];
-                /** @minItems 1 */
-                readonly group?: readonly [string, ...(readonly string[])];
-                readonly regex?: string;
+                readonly group: readonly [string, ...(readonly string[])];
                 readonly importNamePattern?: string;
-                readonly allowImportNamePattern?: string;
                 readonly message?: string;
                 readonly caseSensitive?: boolean;
                 /** Whether to allow type-only imports for a path. */
@@ -6071,7 +6367,9 @@ namespace NoShadow {
    *         "enum": [
    *           "all",
    *           "functions",
-   *           "never"
+   *           "functions-and-types",
+   *           "never",
+   *           "types"
    *         ]
    *       },
    *       "ignoreFunctionTypeParameterNameValueShadow": {
@@ -6100,7 +6398,12 @@ namespace NoShadow {
      * Whether to report shadowing before outer functions or variables are
      * defined.
      */
-    readonly hoist?: 'all' | 'functions' | 'never';
+    readonly hoist?:
+      | 'all'
+      | 'functions-and-types'
+      | 'functions'
+      | 'never'
+      | 'types';
     /** Whether to ignore function parameters named the same as a variable. */
     readonly ignoreFunctionTypeParameterNameValueShadow?: boolean;
     /**
@@ -6708,16 +7011,20 @@ namespace NoUnusedExpressions {
    *     "type": "object",
    *     "properties": {
    *       "allowShortCircuit": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "default": false
    *       },
    *       "allowTernary": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "default": false
    *       },
    *       "allowTaggedTemplates": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "default": false
    *       },
    *       "enforceForJSX": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "default": false
    *       }
    *     },
    *     "additionalProperties": false
@@ -6968,11 +7275,10 @@ namespace NoUseBeforeDefine {
  * @link https://typescript-eslint.io/rules/no-useless-constructor
  *
  *  ```md
- *  | key            | value   |
- *  | :------------- | :------ |
- *  | type           | problem |
- *  | hasSuggestions | true    |
- *  | recommended    | strict  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | recommended | strict  |
  *  ```
  */
 namespace NoUselessConstructor {
@@ -7051,7 +7357,7 @@ namespace NoWrapperObjectTypes {
 }
 
 /**
- * Enforce non-null assertions over explicit type casts
+ * Enforce non-null assertions over explicit type assertions
  *
  * @link https://typescript-eslint.io/rules/non-nullable-type-assertion-style
  *
@@ -8126,7 +8432,8 @@ namespace PreferReadonlyParameterTypes {
 }
 
 /**
- * Enforce using type parameter when calling `Array#reduce` instead of casting
+ * Enforce using type parameter when calling `Array#reduce` instead of using a
+ * type assertion
  *
  * @link https://typescript-eslint.io/rules/prefer-reduce-type-parameter
  *
@@ -8826,7 +9133,6 @@ namespace SortTypeConstituents {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
- *  | fixable              | code       |
  *  | hasSuggestions       | true       |
  *  | requiresTypeChecking | true       |
  *  ```
@@ -9309,6 +9615,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-meaningless-void-operator': NoMeaninglessVoidOperator.RuleEntry;
   readonly '@typescript-eslint/no-misused-new': NoMisusedNew.RuleEntry;
   readonly '@typescript-eslint/no-misused-promises': NoMisusedPromises.RuleEntry;
+  readonly '@typescript-eslint/no-misused-spread': NoMisusedSpread.RuleEntry;
   readonly '@typescript-eslint/no-mixed-enums': NoMixedEnums.RuleEntry;
   readonly '@typescript-eslint/no-namespace': NoNamespace.RuleEntry;
   readonly '@typescript-eslint/no-non-null-asserted-nullish-coalescing': NoNonNullAssertedNullishCoalescing.RuleEntry;
@@ -9414,6 +9721,7 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/naming-convention': NamingConvention.Options;
   readonly '@typescript-eslint/no-base-to-string': NoBaseToString.Options;
   readonly '@typescript-eslint/no-confusing-void-expression': NoConfusingVoidExpression.Options;
+  readonly '@typescript-eslint/no-deprecated': NoDeprecated.Options;
   readonly '@typescript-eslint/no-duplicate-type-constituents': NoDuplicateTypeConstituents.Options;
   readonly '@typescript-eslint/no-empty-function': NoEmptyFunction.Options;
   readonly '@typescript-eslint/no-empty-object-type': NoEmptyObjectType.Options;
@@ -9426,6 +9734,7 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/no-magic-numbers': NoMagicNumbers.Options;
   readonly '@typescript-eslint/no-meaningless-void-operator': NoMeaninglessVoidOperator.Options;
   readonly '@typescript-eslint/no-misused-promises': NoMisusedPromises.Options;
+  readonly '@typescript-eslint/no-misused-spread': NoMisusedSpread.Options;
   readonly '@typescript-eslint/no-namespace': NoNamespace.Options;
   readonly '@typescript-eslint/no-redeclare': NoRedeclare.Options;
   readonly '@typescript-eslint/no-require-imports': NoRequireImports.Options;
