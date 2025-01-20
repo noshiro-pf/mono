@@ -20,7 +20,7 @@ export const merge = <const OS extends NonEmptyArray<Observable<unknown>>>(
   parents: OS,
 ): MergeObservableRefined<OS> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  new MergeObservableClass(parents) as never;
+  new MergeObservableClass(parents) as MergeObservableRefined<OS>;
 
 class MergeObservableClass<const P extends NonEmptyUnknownList>
   extends SyncChildObservableClass<ArrayElement<P>, P>

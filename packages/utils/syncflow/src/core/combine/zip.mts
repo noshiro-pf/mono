@@ -19,7 +19,7 @@ export const zip = <const OS extends NonEmptyArray<Observable<unknown>>>(
   parents: OS,
 ): ZipObservableRefined<OS> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  new ZipObservableClass(parents) as never;
+  new ZipObservableClass(parents) as unknown as ZipObservableRefined<OS>;
 
 class ZipObservableClass<const A extends NonEmptyUnknownList>
   extends SyncChildObservableClass<A, A>
