@@ -17,14 +17,17 @@ export const eslintFlatConfigForTypeScript = ({
   tsconfigFileName,
   tsconfigRootDir,
   packageDirs,
+  files,
 }: Readonly<{
   tsconfigFileName: string;
   tsconfigRootDir: string;
   packageDirs: readonly string[];
+  files?: readonly string[];
 }>): readonly FlatConfig[] => [
   ...eslintFlatConfigForTypeScriptWithoutRules({
     tsconfigFileName,
     tsconfigRootDir,
+    files,
   }),
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],

@@ -2,8 +2,11 @@
 import { eslintVitestRules } from '../rules/index.mjs';
 import { type FlatConfig } from '../types/index.mjs';
 
-export const eslintFlatConfigForVitest = (): FlatConfig =>
+export const eslintFlatConfigForVitest = (
+  files?: readonly string[],
+): FlatConfig =>
   ({
+    ...(files === undefined ? {} : { files }),
     languageOptions: {
       // https://github.com/sindresorhus/globals/blob/main/globals.json
       globals: {

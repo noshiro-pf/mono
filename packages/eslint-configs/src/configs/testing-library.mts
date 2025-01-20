@@ -2,8 +2,11 @@ import globals from 'globals';
 import { eslintTestingLibraryRules } from '../rules/index.mjs';
 import { type FlatConfig } from '../types/index.mjs';
 
-export const eslintFlatConfigForTestingLibrary = (): FlatConfig =>
+export const eslintFlatConfigForTestingLibrary = (
+  files?: readonly string[],
+): FlatConfig =>
   ({
+    ...(files === undefined ? {} : { files }),
     languageOptions: {
       // https://github.com/sindresorhus/globals/blob/main/globals.json
       globals: {
