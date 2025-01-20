@@ -8,7 +8,7 @@
   "type": "module",
   "main": "build/index.mjs",
   "scripts": {
-    "build": "run-s clean:build type-check build:deps build:impl",
+    "build": "run-s clean:build build:deps type-check build:impl",
     "build:deps": "wireit",
     "build:impl": "tsc --project tsconfig.json",
     "clean": "run-p clean:**",
