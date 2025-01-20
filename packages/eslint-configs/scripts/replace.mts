@@ -46,6 +46,51 @@ export const replaceRulesType = (src: string, typeName: string): string =>
             }),
           ).value;
 
+        case eslintPlugins.EslintPlaywrightRules.typeName:
+          return pipe(content).chain(
+            replaceWithNoMatchCheckBetweenRegexp({
+              startRegexp: 'namespace ValidTitle {',
+              endRegexp: closeBraceRegexp,
+              mapFn: replaceWithNoMatchCheck(
+                [
+                  'export type Options = {',
+                  '  readonly disallowedWords?: readonly string[];',
+                  '  readonly ignoreSpaces?: boolean;',
+                  '  readonly ignoreTypeOfDescribeName?: boolean;',
+                  '  readonly ignoreTypeOfStepName?: boolean;',
+                  '  readonly ignoreTypeOfTestName?: boolean;',
+                  '  /**',
+                  "   * This interface was referenced by `Options`'s JSON-Schema definition via",
+                  '   * the `patternProperty` "^must(?:Not)?Match$".',
+                  '   */',
+                  '  readonly [k: string]:',
+                  '    | Record<string, string | readonly [string, string] | readonly [string]>',
+                  '    | string',
+                  '    | readonly [string, string]',
+                  '    | readonly [string];',
+                  '};',
+                ].join('\n'),
+
+                [
+                  '/* modified */',
+                  'export type Options = {',
+                  '  readonly disallowedWords?: readonly string[];',
+                  '  readonly ignoreSpaces?: boolean;',
+                  '  readonly ignoreTypeOfDescribeName?: boolean;',
+                  '  readonly ignoreTypeOfStepName?: boolean;',
+                  '  readonly ignoreTypeOfTestName?: boolean;',
+                  '  readonly mustNotMatch?: MustMatchType | string;',
+                  '  readonly mustMatch?: MustMatchType | string;',
+                  '};',
+                  '',
+                  'type MustMatchType = Readonly<',
+                  "  Partial<Record<'describe' | 'it' | 'test', string>>",
+                  '>;',
+                ].join('\n'),
+              ),
+            }),
+          ).value;
+
         case eslintPlugins.EslintVitestRules.typeName:
           return pipe(content).chain(
             replaceWithNoMatchCheckBetweenRegexp({

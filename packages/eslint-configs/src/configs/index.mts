@@ -1,5 +1,6 @@
 export * from './cypress.mjs';
 export * from './jest.mjs';
+export * from './playwright.mjs';
 export * from './plugins.mjs';
 export * from './preact.mjs';
 export * from './react-base.mjs';

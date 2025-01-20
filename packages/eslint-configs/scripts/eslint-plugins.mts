@@ -29,6 +29,12 @@ export const eslintPlugins = {
     rulePrefix: 'cypress/',
     outputFileName: 'eslint-cypress-rules.mts',
   },
+  EslintPlaywrightRules: {
+    typeName: 'EslintPlaywrightRules',
+    pluginName: 'eslint-plugin-playwright',
+    rulePrefix: 'playwright/',
+    outputFileName: 'eslint-playwright-rules.mts',
+  },
   EslintFunctionalRules: {
     typeName: 'EslintFunctionalRules',
     pluginName: 'eslint-plugin-functional',

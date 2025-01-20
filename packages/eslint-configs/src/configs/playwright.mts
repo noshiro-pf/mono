@@ -1,8 +1,8 @@
 import globals from 'globals';
-import { eslintCypressRules } from '../rules/index.mjs';
+import { eslintPlaywrightRules } from '../rules/eslint-playwright-rules.mjs';
 import { type FlatConfig } from '../types/index.mjs';
 
-export const eslintFlatConfigForCypress = (): FlatConfig =>
+export const eslintFlatConfigForPlaywright = (): FlatConfig =>
   ({
     languageOptions: {
       // https://github.com/sindresorhus/globals/blob/main/globals.json
@@ -13,12 +13,13 @@ export const eslintFlatConfigForCypress = (): FlatConfig =>
       },
     },
     rules: {
-      ...eslintCypressRules,
+      ...eslintPlaywrightRules,
       'jest/consistent-test-it': 'off',
       'vitest/consistent-test-it': 'off',
       'jest/expect-expect': 'off',
       'vitest/expect-expect': 'off',
       'jest/valid-describe-callback': 'off',
       'vitest/valid-describe-callback': 'off',
+      'vitest/consistent-test-filename': 'off',
     },
   }) as const;

@@ -53,6 +53,7 @@ yarn add \
   eslint-plugin-vitest@latest \
   @types/eslint@latest \
   globals@latest \
+  eslint-plugin-playwright@latest \
   typescript-eslint@latest
   # TODO: enable this line after eslint v9 is supported in all plugins
   # eslint-plugin-functional@latest \

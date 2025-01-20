@@ -25,6 +25,8 @@ import eslintPluginVitest from 'eslint-plugin-vitest';
 
 import eslintPluginTestingLibrary from 'eslint-plugin-testing-library';
 
+import eslintPluginPlaywright from 'eslint-plugin-playwright';
+
 // @ts-expect-error no type definition
 import eslintPluginCypress from 'eslint-plugin-cypress';
 
@@ -55,6 +57,7 @@ export const plugins: Record<
   | '@typescript-eslint'
   | 'array-func'
   | 'cypress'
+  | 'playwright'
   | 'functional'
   | 'import'
   | 'jest'
@@ -79,6 +82,7 @@ export const plugins: Record<
   'array-func': eslintPluginArrayFunc,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   cypress: eslintPluginCypress,
+  playwright: eslintPluginPlaywright,
   functional: eslintPluginFunctional,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   import: eslintPluginImport,
