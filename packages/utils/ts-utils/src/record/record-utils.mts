@@ -114,7 +114,7 @@ const pick = <
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return Object.fromEntries(
     Object.entries(record).filter(([k, _v]) => keysSet.has(k)),
-  ) as never;
+  ) as Pick<R, ArrayElement<Keys>>;
 };
 
 const omit = <
@@ -129,7 +129,7 @@ const omit = <
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return Object.fromEntries(
     Object.entries(record).filter(([k, _v]) => !keysSet.has(k)),
-  ) as never;
+  ) as Omit<R, ArrayElement<Keys>>;
 };
 
 /**
@@ -148,8 +148,8 @@ const merge = <const R1 extends UnknownRecord, const R2 extends UnknownRecord>(
       ? R1[Key]
       : never;
 }> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/consistent-type-assertions
-  ({ ...record1, ...record2 }) as never;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
+  ({ ...record1, ...record2 }) as any;
 
 function hasKeyValue<
   const R extends UnknownRecord,

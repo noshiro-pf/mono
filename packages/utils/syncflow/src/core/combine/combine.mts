@@ -18,7 +18,9 @@ export const combine = <const OS extends NonEmptyArray<Observable<unknown>>>(
   parents: OS,
 ): CombineObservableRefined<OS> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  new CombineObservableClass(parents) as never;
+  new CombineObservableClass(
+    parents,
+  ) as unknown as CombineObservableRefined<OS>;
 
 export const combineLatest = combine; // alias
 

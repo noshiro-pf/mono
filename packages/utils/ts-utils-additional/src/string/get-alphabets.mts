@@ -3,9 +3,9 @@ import { Arr, Uint32 } from '@noshiro/ts-utils';
 export const getAlphabets = <Case extends 'lower' | 'upper'>(
   charCase: Case,
 ): [Case] extends ['lower']
-  ? LowerAlphabet[]
+  ? readonly LowerAlphabet[]
   : [Case] extends ['upper']
-    ? UpperAlphabet[]
+    ? readonly UpperAlphabet[]
     : never => {
   const code =
     charCase === 'lower'
@@ -17,9 +17,9 @@ export const getAlphabets = <Case extends 'lower' | 'upper'>(
   const ret = Arr.seq(26).map((i) => String.fromCodePoint(Uint32.add(code, i)));
 
   type Ret = [Case] extends ['lower']
-    ? LowerAlphabet[]
+    ? readonly LowerAlphabet[]
     : [Case] extends ['upper']
-      ? UpperAlphabet[]
+      ? readonly UpperAlphabet[]
       : never;
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
