@@ -9,6 +9,8 @@ published: true
 ## 更新履歴
 
 - （2025/01/11） 「Branded Type を使用したときの弊害」を追記
+- （2025/01/20）コード例の一部で tag 部分に `never` 型を用いていたのを `unknown` 型に修正
+  - 参考： [誤解されがちなnever型の危険性: 「存在しない」について](https://qiita.com/uhyo/items/97941f855b2df0a99c60?utm_campaign=post_article&utm_medium=twitter&utm_source=twitter_share)
 
 ## 概要
 
@@ -37,8 +39,8 @@ findProject(userId);
 Type branding を用いると、以下のようにしてそれぞれの id 型を区別させることができます。
 
 ```ts
-type UserId = string & { UserId: never };
-type ProjectId = string & { ProjectId: never };
+type UserId = string & { UserId: unknown };
+type ProjectId = string & { ProjectId: unknown };
 type Project = { id: ProjectId; name: string };
 
 declare function findProject(id: ProjectId): Promise<Project>;
@@ -51,7 +53,7 @@ findProject(userId);
 userId.slice(); // userId は通常の string でもある
 ```
 
-Type branding とは、対象となる型（この例では `string`）に `{ tagName: never }` という実際の値とは無関係のダミーのオブジェクト型を交差型として付け加えることで、構造上の互換性を破るテクニックです。こうすることで作られた型（Branded Type） `userId` はただの string 型とは異なる型になり、この例における `findProject` を呼び出してしまうようなミスを防ぐことができるようになります。
+Type branding とは、対象となる型（この例では `string`）に `{ tagName: unknown }` という実際の値とは無関係のダミーのオブジェクト型を交差型として付け加えることで、構造上の互換性を破るテクニックです。こうすることで作られた型（Branded Type） `userId` はただの string 型とは異なる型になり、この例における `findProject` を呼び出してしまうようなミスを防ぐことができるようになります。
 
 ## Branded Type の様々な実装
 
@@ -94,7 +96,7 @@ type PositiveInt = Positive & Int; // number & { Positive: unique symbol } & { I
 Branded Type で変数に型注釈を付けるときには一つ不安要素があります。それは `as` によるキャストが嘘である可能性があることです。
 
 ```ts
-type Int = number & { Int: never };
+type Int = number & { Int: unknown };
 
 const r: Int = 0.1 as Int; // 嘘！！！
 
@@ -110,7 +112,7 @@ numberToString(12345, r);
 ```ts
 // types/int.ts
 
-type Int = number & { Int: never };
+type Int = number & { Int: unknown };
 
 function isInt(a: number): a is Int {
   return Number.isInteger(a);
@@ -214,7 +216,7 @@ Branding は TypeScript でのコーディングにおいて便利な道具で�
 具体的には、例えば以下のようなコードで好ましくない挙動に遭遇します。
 
 ```ts
-type SafeUint = number & { readonly SafeUint: never };
+type SafeUint = number & { readonly SafeUint: unknown };
 
 const findIndex = (xs: readonly number[], x: number): number => xs.indexOf(x);
 
@@ -315,15 +317,15 @@ interface Array<T> {
 これらに単にそれぞれ名前を付けて前節までの方法で Branded Type にするという愚直な方法はもちろんありますが、例えば `NegativeNumber & PositiveNumber` は意味的には空集合なので `never` になってほしいという要請を満たす工夫をしたいと考えました。
 
 ```ts
-type PositiveNumber = number & { Positive: never };
-type NegativeNumber = number & { Negative: never };
+type PositiveNumber = number & { Positive: unknown };
+type NegativeNumber = number & { Negative: unknown };
 
 type PositiveNegativeNumber = PositiveNumber & NegativeNumber;
-// これは `number & { Positive: never } & { Negative: never }` 型になるが、
+// これは `number & { Positive: unknown } & { Negative: unknown }` 型になるが、
 // できれば never になってほしい。
 ```
 
-そこで、以下のように **Branded Type の tag 部の value に `never` ではなく `true/false` を持たせる**という工夫を考えてみました。
+そこで、以下のように **Branded Type の tag 部の value に `unknown` ではなく `true/false` を持たせる**という工夫を考えてみました。
 
 ```ts
 type PositiveNumber = number & { Positive: true };
