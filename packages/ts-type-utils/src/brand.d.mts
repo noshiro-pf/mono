@@ -11,7 +11,7 @@ declare namespace TSTypeUtilsInternals {
    * @internal
    */
   type BrandUniqueKey = Readonly<{
-    'TSTypeUtilsInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': never;
+    'TSTypeUtilsInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
   }>;
 
   export type ExtractTrueKeys<B, K extends keyof B> = K extends K
