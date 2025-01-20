@@ -8,8 +8,11 @@ import {
 } from '../rules/index.mjs';
 import { type EslintRules, type FlatConfig } from '../types/index.mjs';
 
-export const eslintFlatConfigForReactBase = (): FlatConfig =>
+export const eslintFlatConfigForReactBase = (
+  files?: readonly string[],
+): FlatConfig =>
   ({
+    ...(files === undefined ? {} : { files }),
     languageOptions: {
       parserOptions: {
         ecmaFeatures: {

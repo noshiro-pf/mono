@@ -2,8 +2,11 @@ import globals from 'globals';
 import { eslintPlaywrightRules } from '../rules/eslint-playwright-rules.mjs';
 import { type FlatConfig } from '../types/index.mjs';
 
-export const eslintFlatConfigForPlaywright = (): FlatConfig =>
+export const eslintFlatConfigForPlaywright = (
+  files?: readonly string[],
+): FlatConfig =>
   ({
+    ...(files === undefined ? {} : { files }),
     languageOptions: {
       // https://github.com/sindresorhus/globals/blob/main/globals.json
       globals: {
