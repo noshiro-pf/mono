@@ -3,6 +3,7 @@ import preact from '@preact/preset-vite';
 import legacy from '@vitejs/plugin-legacy';
 import * as nodePath from 'node:path';
 import { defineConfig } from 'vite';
+import { type UserConfig } from 'vitest/node';
 import { createInjectDef } from './inject-def';
 
 const thisDir: string = toThisDir(import.meta.url);
@@ -22,11 +23,12 @@ export default defineConfig(async () => {
       ],
     },
     test: {
+      include: ['src/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
       globals: true,
       environment: 'happy-dom',
       typecheck: {
         tsconfig: nodePath.resolve(thisDir, 'tsconfig.test.json'),
       },
-    },
+    } satisfies UserConfig,
   };
 });
