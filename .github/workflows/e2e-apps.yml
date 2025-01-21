@@ -95,12 +95,9 @@ jobs:
           # determine the unique run id necessary to re-run the checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  cypress-run-event-schedule-app:
+  e2e-event-schedule-app:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
-    container:
-      image: cypress/browsers:node-20.14.0-chrome-126.0.6478.114-1-ff-127.0.1-edge-126.0.2592.61-1
-      options: --user 1001
-
     steps:
       - uses: actions/checkout@v4.1.7
 
@@ -117,13 +114,11 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: yarn.lock
 
-      # Set up GitHub Actions caching for Wireit.
-      # - uses: google/wireit@setup-github-actions-caching/v1.0.2
-
-      # - run: echo '${{ toJSON(steps.setup_node_id.outputs) }}'
-      # - if: ${{ steps.setup_node_id.outputs.cache-hit != 'true' }}
       - name: yarn install
         run: yarn --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: yarn playwright install --with-deps
 
       - name: Build dependencies
         run: yarn zz:wsrun-stages --recursive -p @noshiro/event-schedule-app -c build
@@ -134,26 +129,12 @@ jobs:
       # - name: create runtimeconfig
       #   run: yarn workspace @noshiro/event-schedule-app z:setup:fb:emulators:gen-dummy-runtimeconfig
 
-      - name: Cypress run on Chrome
-        uses: cypress-io/github-action@v6.7.1
+      - name: Run Playwright tests
+        run: yarn workspace @noshiro/event-schedule-app e2e
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
         with:
-          # group: 'UI - Chrome'
-          browser: chrome
-          install: false
-          working-directory: packages/apps/event-schedule-app/cypress
-          # spec: cypress/e2e/**/*.cy.ts
-          spec: cypress/e2e/display-create-event-page.cy.ts
-          start: |
-            yarn start:emulators:e2e
-            yarn start:dev-server
-          # wait-on: 'http://localhost:8080, http://localhost:8081, http://localhost:5001'
-          wait-on: 'http://[::1]:5180'
-          wait-on-timeout: 120
-          # headless: true
-          # record: true
-          # parallel: true
-        env:
-          # CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY_FOR_EVENT_SCHEDULE_APP }}
-          # Recommended: pass the GitHub token lets this action correctly
-          # determine the unique run id necessary to re-run the checks
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: playwright-report
+          path: packages/apps/event-schedule-app/playwright-report/
+          retention-days: 30

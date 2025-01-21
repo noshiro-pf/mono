@@ -4,6 +4,8 @@ import { type Workspace } from '../index.mjs';
 import { isNotUndefined, isRecord } from '../ts-utils/index.mjs';
 import {
   eslintConfigName,
+  playwrightConfigName,
+  rollupConfigName,
   viteConfigName,
   vitestConfigName,
   workspaceConfigsDirName,
@@ -220,12 +222,28 @@ const updatePackageJsonImpl = (
           mut_scripts['tscw'] = 'tsc --noEmit --watch';
 
           if (cfg.useVite === true) {
-            mut_scripts['type-check'] = 'run-p type-check:src type-check:cy';
-            mut_scripts['type-check:cy'] =
-              'tsc --noEmit -p ./cypress/tsconfig.json';
-            mut_scripts['type-check:src'] = 'wireit';
+            switch (cfg.packageJson.scripts.e2e) {
+              case 'cypress':
+                mut_scripts['type-check'] =
+                  'run-p type-check:src type-check:e2e';
+                mut_scripts['type-check:e2e'] =
+                  'tsc --noEmit -p ./cypress/tsconfig.json';
+                mut_scripts['type-check:src'] = 'wireit';
+                break;
 
-            mut_wireit['type-check:src'] = {
+              case 'playwright':
+                mut_scripts['type-check'] = 'wireit';
+                break;
+
+              case undefined:
+                break;
+            }
+
+            mut_wireit[
+              cfg.packageJson.scripts.e2e === 'playwright'
+                ? 'type-check'
+                : 'type-check:src'
+            ] = {
               dependencies:
                 packageName === 'event-schedule-app'
                   ? [
@@ -296,7 +314,7 @@ const updatePackageJsonImpl = (
               };
               mut_wireit['build'] = {
                 dependencies: ['pre-build'],
-                command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript --configImportAttributesKey with`,
+                command: `rollup --config ./${workspaceConfigsDirName}/${rollupConfigName} --configPlugin typescript --configImportAttributesKey with`,
               };
             } else {
               mut_wireit['pre-build'] = {
@@ -312,7 +330,7 @@ const updatePackageJsonImpl = (
               };
               mut_wireit['build'] = {
                 dependencies: ['pre-build'],
-                command: `rollup --config ./${workspaceConfigsDirName}/rollup.config.ts --configPlugin typescript --configImportAttributesKey with`,
+                command: `rollup --config ./${workspaceConfigsDirName}/${rollupConfigName} --configPlugin typescript --configImportAttributesKey with`,
               };
             }
           }
@@ -332,19 +350,19 @@ const updatePackageJsonImpl = (
 
         if (generateFlag.lint) {
           if (cfg.useVite === true) {
-            mut_scripts['lint'] = 'run-p lint:src lint:cy';
+            mut_scripts['lint'] = 'run-p lint:src lint:e2e';
             mut_scripts['lint:src'] =
               packageName === 'syncflow'
                 ? 'yarn zz:eslint:src-and-test'
                 : 'yarn zz:eslint:src';
-            mut_scripts['lint:cy'] = 'yarn zz:eslint:cy';
+            mut_scripts['lint:e2e'] = 'yarn zz:eslint:e2e';
 
-            mut_scripts['lint:fix'] = 'run-p lint:fix:src lint:fix:cy';
+            mut_scripts['lint:fix'] = 'run-p lint:fix:src lint:fix:e2e';
             mut_scripts['lint:fix:src'] =
               packageName === 'syncflow'
                 ? 'yarn zz:eslint:src-and-test --fix'
                 : 'yarn zz:eslint:src --fix';
-            mut_scripts['lint:fix:cy'] = 'yarn zz:eslint:cy --fix';
+            mut_scripts['lint:fix:e2e'] = 'yarn zz:eslint:e2e --fix';
           } else {
             mut_scripts['lint'] =
               packageName === 'syncflow'
@@ -379,10 +397,24 @@ const updatePackageJsonImpl = (
           ].join(' ');
 
           if (cfg.useVite === true) {
-            mut_scripts['zz:eslint:cy'] = [
-              `yarn zz:eslint --config ./cypress/${eslintConfigName}`,
-              "'./cypress/**/*.ts'",
-            ].join(' ');
+            switch (cfg.packageJson.scripts.e2e) {
+              case 'cypress':
+                mut_scripts['zz:eslint:e2e'] = [
+                  `yarn zz:eslint --config ./cypress/${eslintConfigName}`,
+                  "'./cypress/**/*.ts'",
+                ].join(' ');
+                break;
+
+              case 'playwright':
+                mut_scripts['zz:eslint:e2e'] = [
+                  `yarn zz:eslint --config ${eslintConfigName}`,
+                  "'./e2e/**/*.ts'",
+                ].join(' ');
+                break;
+
+              case undefined:
+                break;
+            }
           }
         }
 
@@ -397,7 +429,7 @@ const updatePackageJsonImpl = (
           packageName === 'syncflow-react-hooks'
         ) {
           mut_scripts['build:script'] =
-            'tsc -p ./configs/tsconfig.scripts.json';
+            `tsc -p ./${workspaceConfigsDirName}/tsconfig.scripts.json`;
 
           mut_scripts['gen:re-export'] = 'wireit';
           mut_scripts['gen:re-export:fmt'] =
@@ -415,15 +447,27 @@ const updatePackageJsonImpl = (
           mut_scripts['build:no-minify'] = 'yarn build --minify false';
           mut_scripts['clean:firebase'] = 'rimraf .firebase';
 
-          // workspace.name
-          mut_scripts['cy:open'] =
-            `yarn workspace ${workspace.name}-cypress cy:open`;
-          mut_scripts['cy:record'] =
-            `yarn workspace ${workspace.name}-cypress cy:record`;
-          mut_scripts['cy:run:chrome'] =
-            `yarn workspace ${workspace.name}-cypress cy:run:chrome`;
-          mut_scripts['cy:run:firefox'] =
-            `yarn workspace ${workspace.name}-cypress cy:run:firefox`;
+          switch (cfg.packageJson.scripts.e2e) {
+            case 'cypress':
+              mut_scripts['cy:open'] =
+                `yarn workspace ${workspace.name}-cypress cy:open`;
+              mut_scripts['cy:record'] =
+                `yarn workspace ${workspace.name}-cypress cy:record`;
+              mut_scripts['cy:run:chrome'] =
+                `yarn workspace ${workspace.name}-cypress cy:run:chrome`;
+              mut_scripts['cy:run:firefox'] =
+                `yarn workspace ${workspace.name}-cypress cy:run:firefox`;
+              break;
+
+            case 'playwright':
+              mut_scripts['e2e'] =
+                `playwright test --config ${workspaceConfigsDirName}/${playwrightConfigName}`;
+              mut_scripts['e2e:ui'] = 'yarn e2e --ui';
+              break;
+
+            case undefined:
+              break;
+          }
 
           mut_scripts['fb'] = 'firebase';
           mut_scripts['fb:deploy'] = 'wireit';
@@ -452,27 +496,9 @@ const updatePackageJsonImpl = (
           mut_scripts['z:setup:gen-global-dts'] =
             'node ./scripts/gen-global-dts.mjs';
 
-          mut_scripts['zz:vite'] = 'vite --config configs/vite.config.ts';
+          mut_scripts['zz:vite'] =
+            `vite --config ${workspaceConfigsDirName}/${viteConfigName}`;
           mut_scripts['zz:vite:preview'] = 'yarn zz:vite preview';
-
-          if (
-            packageName === 'lambda-calculus-interpreter-preact' ||
-            packageName === 'lambda-calculus-interpreter-react' ||
-            packageName === 'event-schedule-app'
-          ) {
-            mut_scripts['z:setup'] =
-              'run-p z:setup:build-deps z:setup:gen-global-dts';
-
-            mut_scripts['z:setup:build-deps'] = 'wireit';
-
-            mut_wireit['z:setup:build-deps'] = {
-              dependencies:
-                packageName === 'event-schedule-app'
-                  ? ['../event-schedule-app-shared:build']
-                  : ['../lambda-calculus-interpreter-core:build'],
-              command: "echo 'build deps'",
-            };
-          }
 
           if (
             packageName === 'event-schedule-app' ||
@@ -496,6 +522,25 @@ const updatePackageJsonImpl = (
             };
           }
 
+          if (
+            packageName === 'lambda-calculus-interpreter-preact' ||
+            packageName === 'lambda-calculus-interpreter-react' ||
+            packageName === 'event-schedule-app'
+          ) {
+            mut_scripts['z:setup'] =
+              'run-p z:setup:build-deps z:setup:gen-global-dts';
+
+            mut_scripts['z:setup:build-deps'] = 'wireit';
+
+            mut_wireit['z:setup:build-deps'] = {
+              dependencies:
+                packageName === 'event-schedule-app'
+                  ? ['../event-schedule-app-shared:build']
+                  : ['../lambda-calculus-interpreter-core:build'],
+              command: "echo 'build deps'",
+            };
+          }
+
           if (packageName === 'event-schedule-app') {
             mut_scripts['fb:export'] =
               'node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --cache --cache-strategy content --write ./scripts/firestore_backup.json';
@@ -505,8 +550,10 @@ const updatePackageJsonImpl = (
 
             mut_scripts['fb:write'] = 'node ./scripts/write_firestore';
 
-            mut_scripts['start:emulators:e2e'] =
-              'firebase emulators:start --only functions,firestore --import firebase-emulator-exports --export-on-exit';
+            if (cfg.packageJson.scripts.e2e === 'cypress') {
+              mut_scripts['start:emulators:e2e'] =
+                'firebase emulators:start --only functions,firestore --import firebase-emulator-exports --export-on-exit';
+            }
 
             mut_scripts['start'] =
               'run-p start:build-functions start:dev-server start:emulators';
@@ -540,7 +587,7 @@ const updatePackageJsonImpl = (
           mut_scripts['start'] = 'node esm/test/preview-main.js';
           mut_scripts['test:stream'] = 'yarn zz:vitest:stream run';
           mut_scripts['zz:vitest:stream'] =
-            'vitest --config ./configs/vitest.config.stream.ts';
+            `vitest --config ./${workspaceConfigsDirName}/vitest.config.stream.ts`;
         }
 
         if (packageName === 'my-portfolio-app-preact')

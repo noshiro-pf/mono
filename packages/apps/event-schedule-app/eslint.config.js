@@ -2,6 +2,7 @@
 
 import {
   banTypes,
+  eslintFlatConfigForPlaywright,
   eslintFlatConfigForReact,
   eslintFlatConfigForTypeScript,
   eslintFlatConfigForVitest,
@@ -73,8 +74,9 @@ const defineConfig = async () => {
       tsconfigFileName: './tsconfig.json',
       packageDirs: [nodePath.resolve(thisDir, '../../..'), thisDir],
     }),
-    eslintFlatConfigForVitest(),
-    ...eslintFlatConfigForReact(),
+    eslintFlatConfigForVitest(['src/**/*']),
+    ...eslintFlatConfigForReact(['src/**/*']),
+    eslintFlatConfigForPlaywright(['e2e/**/*']),
     {
       rules: {
         '@typescript-eslint/no-restricted-imports': [

@@ -38,7 +38,7 @@ export const NameAndNotes = memoNamed<Props>(
           labelInfo={dc.eventNameInfo}
         >
           <BpInput
-            data-cy={'title'}
+            data-e2e={'title'}
             placeholder={dc.eventNamePlaceholder}
             value={title}
             onBlur={onBlur}
@@ -48,7 +48,7 @@ export const NameAndNotes = memoNamed<Props>(
         <FormGroup intent={'primary'} label={dc.notes}>
           <BpTextArea
             autoResize={true}
-            data-cy={'note'}
+            data-e2e={'note'}
             fill={true}
             placeholder={dc.notesPlaceholder}
             value={notes}

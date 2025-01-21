@@ -61,7 +61,7 @@ export const AnswerIconSettingsComponent = memoNamed<Props>(
             margin-bottom: 5px;
           }
         `}
-        data-cy={'icon-settings'}
+        data-e2e={'icon-settings'}
       >
         <div>{dc.title}</div>
         <Description text={dc.description} />

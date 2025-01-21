@@ -105,3 +105,10 @@ build/Release
 *.sw?
 
 rollup.config-*.mjs
+
+# playwright
+
+**/test-results/
+**/playwright-report/
+**/blob-report/
+**/playwright/.cache/

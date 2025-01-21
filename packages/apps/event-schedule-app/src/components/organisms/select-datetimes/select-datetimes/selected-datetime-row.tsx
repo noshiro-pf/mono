@@ -31,7 +31,7 @@ export const SelectedDatetimeRow = memoNamed<Props>(
         margin-bottom: 5px;
         justify-content: space-between;
       `}
-      data-cy={'selected-datetime-row'}
+      data-e2e={'selected-datetime-row'}
     >
       <div
         css={css`

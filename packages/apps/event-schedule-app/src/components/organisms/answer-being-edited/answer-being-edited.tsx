@@ -110,7 +110,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
             <BpInput
               // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus={true}
-              data-cy={'username'}
+              data-e2e={'username'}
               intent={showUserNameError ? 'danger' : 'primary'}
               value={answerBeingEdited.user.name}
               onBlur={onUserNameBlur}
@@ -150,7 +150,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                   <th />
                   <th>
                     <CustomIconButton
-                      data-cy={'col-good-button'}
+                      data-e2e={'col-good-button'}
                       iconName={'good'}
                       title={a.good.iconDescription}
                       onClick={a.good.onClick}
@@ -158,7 +158,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                   </th>
                   <th>
                     <CustomIconButton
-                      data-cy={'col-fair-button'}
+                      data-e2e={'col-fair-button'}
                       iconName={'fair'}
                       title={a.fair.iconDescription}
                       onClick={a.fair.onClick}
@@ -166,7 +166,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                   </th>
                   <th>
                     <CustomIconButton
-                      data-cy={'col-poor-button'}
+                      data-e2e={'col-poor-button'}
                       iconName={'poor'}
                       title={a.poor.iconDescription}
                       onClick={a.poor.onClick}
@@ -349,7 +349,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
           )}
         </Paragraph>
 
-        <ButtonsWrapperAlignEnd data-cy={'buttons'}>
+        <ButtonsWrapperAlignEnd data-e2e={'buttons'}>
           <ButtonNowrapStyled
             disabled={submitButtonIsLoading}
             intent='none'

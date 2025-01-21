@@ -27,7 +27,7 @@ export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
   );
 
   return (
-    <div data-cy={'create-page'}>
+    <div data-e2e={'create-page'}>
       <Header title={dc.title} />
       <EventScheduleSettingCommon
         handlers={CreateEventScheduleStore.commonStateHandlers}
@@ -39,7 +39,7 @@ export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
           onConfirmClick={CreateEventScheduleStore.resetAllState}
         />
         <Button
-          data-cy={'create-button'}
+          data-e2e={'create-button'}
           disabled={!eventScheduleValidationOk}
           intent={'primary'}
           loading={createButtonIsLoading}

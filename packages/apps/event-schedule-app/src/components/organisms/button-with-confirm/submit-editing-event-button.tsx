@@ -34,6 +34,7 @@ export const SubmitEditingEventButton = memoNamed<Props>(
     showConfirmationDialog ? (
       <ButtonWithConfirm
         buttonConfig={buttonConfig}
+        data-e2e={'update-event-settings-with-confirm'}
         dialogConfig={dialogConfig}
         disabled={disabled}
         loading={loading}
@@ -42,6 +43,7 @@ export const SubmitEditingEventButton = memoNamed<Props>(
       />
     ) : (
       <Button
+        data-e2e={'update-event-settings'}
         disabled={disabled}
         intent={'primary'}
         loading={loading}

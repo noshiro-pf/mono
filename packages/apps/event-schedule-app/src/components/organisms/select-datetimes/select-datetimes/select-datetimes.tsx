@@ -69,7 +69,7 @@ export const SelectDatetimes = memoNamed<Props>(
             css={css`
               margin-bottom: 10px;
             `}
-            data-cy={'datetime-list'}
+            data-e2e={'datetime-list'}
           >
             {datetimeListWithHandler.map(
               ({

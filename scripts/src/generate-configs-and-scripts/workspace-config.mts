@@ -1,7 +1,9 @@
 import { produce } from 'immer';
 import { isNotUndefined } from '../ts-utils/index.mjs';
 import {
+  playwrightConfigName,
   workspaceConfigsDirName,
+  workspaceE2eDirName,
   workspaceScriptsDirName,
 } from './constants.mjs';
 import { type WorkspaceConfig } from './workspace-config-type.mjs';
@@ -46,19 +48,20 @@ const defaultsForUtil: WorkspaceConfig = {
   },
 };
 
-const defaultsForApp: Pick<
-  WorkspaceConfig,
-  'utilOrApp' | 'gen' | 'typeCheckIncludes'
-> = {
+const defaultsForApp = {
   utilOrApp: 'app',
   gen: {
     typeCheck: true,
     build: true,
     lint: true,
     test: true,
+    e2e: 'cypress' as 'cypress' | 'playwright',
   },
   typeCheckIncludes: ['src', workspaceConfigsDirName],
-};
+} as const satisfies Pick<
+  WorkspaceConfig,
+  'utilOrApp' | 'gen' | 'typeCheckIncludes'
+>;
 
 const fillDefaultsForUtil = (
   options?: Readonly<{
@@ -93,16 +96,24 @@ const fillDefaultsForApp = (
     giIgnore?: WorkspaceConfig['packageJson']['scripts']['giIgnore'];
     passWithNoTests?: WorkspaceConfig['packageJson']['scripts']['passWithNoTests'];
     hasScripts?: boolean;
+    playwright?: boolean;
   }>,
 ): WorkspaceConfig => ({
   utilOrApp: defaultsForApp.utilOrApp,
-  gen: defaultsForApp.gen,
+  gen: produce(defaultsForApp.gen, (draft) => {
+    if (options.playwright === true) {
+      draft.e2e = 'playwright';
+    }
+  }),
   tsType: options.tsType,
   useVite: true,
   srcDirs: ['src'],
   typeCheckIncludes: [
     ...defaultsForApp.typeCheckIncludes,
     options.hasScripts === false ? undefined : workspaceScriptsDirName,
+    ...(options.playwright === true
+      ? [workspaceE2eDirName, playwrightConfigName]
+      : []),
   ].filter(isNotUndefined),
   packageJson: {
     scripts: {
@@ -110,6 +121,7 @@ const fillDefaultsForApp = (
       giIgnore: options.giIgnore ?? ['assets'],
       publish: false,
       passWithNoTests: options.passWithNoTests ?? true,
+      e2e: options.playwright === true ? 'playwright' : 'cypress',
     },
   },
 });
@@ -327,6 +339,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
   'event-schedule-app': produce(
     fillDefaultsForApp({
       tsType: 'react-emotion',
+      playwright: true,
     }),
     (draft) => {
       draft.typeCheckIncludes.push('functions/src');
