@@ -38,7 +38,6 @@ export const updatePackageJson = async (
   if (!isRecord(mut_packageJson)) return;
 
   updatePackageJsonImpl(
-    workspace,
     mut_packageJson as MutableRecord<string, MutableJsonValue | undefined>,
     packageName,
     pathPrefixToRoot,
@@ -57,7 +56,6 @@ export const updatePackageJson = async (
 };
 
 const updatePackageJsonImpl = (
-  workspace: Workspace,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_packageJson: MutableRecord<string, MutableJsonValue | undefined>,
   packageName: string,
@@ -222,21 +220,8 @@ const updatePackageJsonImpl = (
           mut_scripts['tscw'] = 'tsc --noEmit --watch';
 
           if (cfg.useVite === true) {
-            switch (cfg.packageJson.scripts.e2e) {
-              case 'cypress':
-                mut_scripts['type-check'] =
-                  'run-p type-check:src type-check:e2e';
-                mut_scripts['type-check:e2e'] =
-                  'tsc --noEmit -p ./cypress/tsconfig.json';
-                mut_scripts['type-check:src'] = 'wireit';
-                break;
-
-              case 'playwright':
-                mut_scripts['type-check'] = 'wireit';
-                break;
-
-              case undefined:
-                break;
+            if (cfg.packageJson.scripts.e2e === 'playwright') {
+              mut_scripts['type-check'] = 'wireit';
             }
 
             mut_wireit[
@@ -396,25 +381,14 @@ const updatePackageJsonImpl = (
             `'./${srcDirStr}/**/*'`,
           ].join(' ');
 
-          if (cfg.useVite === true) {
-            switch (cfg.packageJson.scripts.e2e) {
-              case 'cypress':
-                mut_scripts['zz:eslint:e2e'] = [
-                  `yarn zz:eslint --config ./cypress/${eslintConfigName}`,
-                  "'./cypress/**/*.ts'",
-                ].join(' ');
-                break;
-
-              case 'playwright':
-                mut_scripts['zz:eslint:e2e'] = [
-                  `yarn zz:eslint --config ${eslintConfigName}`,
-                  "'./e2e/**/*.ts'",
-                ].join(' ');
-                break;
-
-              case undefined:
-                break;
-            }
+          if (
+            cfg.useVite === true &&
+            cfg.packageJson.scripts.e2e === 'playwright'
+          ) {
+            mut_scripts['zz:eslint:e2e'] = [
+              `yarn zz:eslint --config ${eslintConfigName}`,
+              "'./e2e/**/*.ts'",
+            ].join(' ');
           }
         }
 
@@ -447,26 +421,10 @@ const updatePackageJsonImpl = (
           mut_scripts['build:no-minify'] = 'yarn build --minify false';
           mut_scripts['clean:firebase'] = 'rimraf .firebase';
 
-          switch (cfg.packageJson.scripts.e2e) {
-            case 'cypress':
-              mut_scripts['cy:open'] =
-                `yarn workspace ${workspace.name}-cypress cy:open`;
-              mut_scripts['cy:record'] =
-                `yarn workspace ${workspace.name}-cypress cy:record`;
-              mut_scripts['cy:run:chrome'] =
-                `yarn workspace ${workspace.name}-cypress cy:run:chrome`;
-              mut_scripts['cy:run:firefox'] =
-                `yarn workspace ${workspace.name}-cypress cy:run:firefox`;
-              break;
-
-            case 'playwright':
-              mut_scripts['e2e'] =
-                `playwright test --config ${workspaceConfigsDirName}/${playwrightConfigName}`;
-              mut_scripts['e2e:ui'] = 'yarn e2e --ui';
-              break;
-
-            case undefined:
-              break;
+          if (cfg.packageJson.scripts.e2e === 'playwright') {
+            mut_scripts['e2e'] =
+              `playwright test --config ${workspaceConfigsDirName}/${playwrightConfigName}`;
+            mut_scripts['e2e:ui'] = 'yarn e2e --ui';
           }
 
           mut_scripts['fb'] = 'firebase';
@@ -549,11 +507,6 @@ const updatePackageJsonImpl = (
               'yarn workspace @noshiro/event-schedule-app-functions build';
 
             mut_scripts['fb:write'] = 'node ./scripts/write_firestore';
-
-            if (cfg.packageJson.scripts.e2e === 'cypress') {
-              mut_scripts['start:emulators:e2e'] =
-                'firebase emulators:start --only functions,firestore --import firebase-emulator-exports --export-on-exit';
-            }
 
             mut_scripts['start'] =
               'run-p start:build-functions start:dev-server start:emulators';

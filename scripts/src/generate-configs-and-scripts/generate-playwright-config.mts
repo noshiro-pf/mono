@@ -13,7 +13,7 @@ export const generatePlaywrightConfig = async (
     throw new Error(`workspaceConfig for package "${packageName}" not found.`);
   }
 
-  if (cfg.utilOrApp !== 'app' || cfg.gen.e2e !== 'playwright') return;
+  if (cfg.utilOrApp !== 'app') return;
 
   const depth = workspaceLocation.split('/').length + 1;
 

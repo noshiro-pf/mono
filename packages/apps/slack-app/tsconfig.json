@@ -5,5 +5,12 @@
     "../../../configs/tsconfig/tsconfig.vite.json",
     "../../../configs/tsconfig/tsconfig.absolute-path.json"
   ],
-  "include": ["./src", "./configs", "./scripts", "./functions/src"]
+  "include": [
+    "./src",
+    "./configs",
+    "./scripts",
+    "./e2e",
+    "./playwright.config.ts",
+    "./functions/src"
+  ]
 }

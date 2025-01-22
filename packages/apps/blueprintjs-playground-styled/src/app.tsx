@@ -6,7 +6,7 @@ export const App = memoNamed('App', () => (
       min-height: 100vh;
       padding: 20px;
     `}
-    data-cy={'root'}
+    data-e2e={'root'}
   >
     <h1>{'Blueprint.js Playground (styled in scratch)'}</h1>
 

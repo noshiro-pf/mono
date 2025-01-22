@@ -69,7 +69,7 @@ export const App = memoNamed('App', () => {
   }, [pathname, tabIndex]);
 
   return (
-    <Root data-cy={'root'}>
+    <Root data-e2e={'root'}>
       <AppBarFlex>
         <IconButtons>
           <IconButton title={'ねこかわいい'}>
@@ -77,7 +77,7 @@ export const App = memoNamed('App', () => {
           </IconButton>
         </IconButtons>
 
-        <div data-cy={'tabs'}>
+        <div data-e2e={'tabs'}>
           <MuiTabs
             labels={labelList}
             scrollable={true}

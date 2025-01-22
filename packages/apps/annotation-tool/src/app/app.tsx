@@ -25,7 +25,7 @@ export const App = memoNamed('App', () => {
         height: 100vh;
         display: flex;
       `}
-      data-cy={'root'}
+      data-e2e={'root'}
     >
       <div
         css={css`

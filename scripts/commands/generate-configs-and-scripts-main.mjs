@@ -1,6 +1,5 @@
 import {
   execAsync,
-  generateCypressDirectory,
   generateEsLintConfig,
   generateEsLintConfigForGlobalUtils,
   generateInjectDef,
@@ -86,10 +85,7 @@ const main = async () => {
             : generateEsLintConfig(workspace.location, packageName)
           : undefined,
       ]);
-    } else if (
-      workspace.location.startsWith('packages/apps') &&
-      !workspace.location.endsWith('/cypress')
-    ) {
+    } else if (workspace.location.startsWith('packages/apps')) {
       // apps
 
       if (
@@ -124,9 +120,6 @@ const main = async () => {
           ? generateEsLintConfig(workspace.location, packageName)
           : undefined,
 
-        executeFlag.e2e
-          ? generateCypressDirectory(workspace.location, packageName)
-          : undefined,
         executeFlag.e2e && packageName !== 'event-schedule-app'
           ? generatePlaywrightConfig(workspace.location, packageName)
           : undefined,

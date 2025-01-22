@@ -30,7 +30,7 @@ export const CodeArea = memoNamed(
 
     return (
       <TextArea
-        data-cy={cyId}
+        data-e2e={cyId}
         style={style}
         value={value}
         onChange={onChange}

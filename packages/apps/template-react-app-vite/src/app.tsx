@@ -23,7 +23,7 @@ export const App = memoNamed('App', () => {
       <h1>{'Vite + React'}</h1>
       <div className='card'>
         <button
-          data-cy='increment-button'
+          data-e2e='increment-button'
           type='button'
           onClick={increment}
         >{`count is ${count}`}</button>

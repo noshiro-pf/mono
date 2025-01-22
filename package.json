@@ -99,7 +99,6 @@
     "cross-env": "^7.0.3",
     "cspell": "^8.14.2",
     "css-loader": "^6.2.0",
-    "cypress": "^13.10.0",
     "dotenv": "^16.0.3",
     "esbuild": "^0.20.2",
     "file-loader": "^6.2.0",

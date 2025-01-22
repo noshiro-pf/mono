@@ -1,1 +1,3 @@
-export const App = memoNamed('App', () => <div data-cy={'root'}>{'root'}</div>);
+export const App = memoNamed('App', () => (
+  <div data-e2e={'root'}>{'root'}</div>
+));

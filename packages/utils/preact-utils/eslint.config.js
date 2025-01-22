@@ -26,8 +26,8 @@ const defineConfig = async () => {
       tsconfigFileName: './tsconfig.json',
       packageDirs: [nodePath.resolve(thisDir, '../../..'), thisDir],
     }),
-    eslintFlatConfigForVitest(),
-    ...eslintFlatConfigForPreact(),
+    eslintFlatConfigForVitest(['src/**/*']),
+    ...eslintFlatConfigForPreact(['src/**/*']),
 
     {
       rules: {

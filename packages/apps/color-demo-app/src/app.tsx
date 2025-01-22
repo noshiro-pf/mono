@@ -20,7 +20,7 @@ export const App = memoNamed('App', () => {
         css={css`
           color: white;
         `}
-        data-cy={'title'}
+        data-e2e={'title'}
       >
         {'Color demo'}
       </h1>

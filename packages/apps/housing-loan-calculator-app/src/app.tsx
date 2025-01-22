@@ -11,7 +11,7 @@ export const App = memoNamed('App', () => {
         min-height: 100vh;
         padding: 10px;
       `}
-      data-cy={'root'}
+      data-e2e={'root'}
     >
       <div
         css={css`
