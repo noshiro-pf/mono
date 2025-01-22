@@ -49,7 +49,7 @@ export const Root = memoNamed('Root', () => {
   });
 
   return (
-    <div ref={ref} data-cy={'root'} style={rootStyle}>
+    <div ref={ref} data-e2e={'root'} style={rootStyle}>
       {/* simple routing */}
       {showMain ? (
         <CreateRoomPage />

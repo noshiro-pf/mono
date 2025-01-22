@@ -23,7 +23,7 @@ export type WorkspaceConfig = DeepReadonly<
           build: boolean;
           test: boolean;
           lint: boolean;
-          e2e: 'playwright' | 'cypress';
+          e2e: 'playwright';
         };
       }
   ) & {
@@ -53,7 +53,7 @@ export type WorkspaceConfig = DeepReadonly<
         publish: boolean;
         passWithNoTests?: true;
         lint?: false;
-        e2e?: 'playwright' | 'cypress';
+        e2e?: 'playwright';
       };
     };
   }

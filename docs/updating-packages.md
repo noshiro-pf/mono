@@ -29,7 +29,6 @@ $  yarn add --dev -W     \
 ```sh
 $  yarn add --dev -W     \
         eslint-plugin-jest@latest     \
-        cypress@latest                \
         jest@latest                   \
         jest-environment-jsdom@latest \
         jest-fetch-mock@latest        \

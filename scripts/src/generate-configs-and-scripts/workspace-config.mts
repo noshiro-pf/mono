@@ -55,7 +55,7 @@ const defaultsForApp = {
     build: true,
     lint: true,
     test: true,
-    e2e: 'cypress' as 'cypress' | 'playwright',
+    e2e: 'playwright',
   },
   typeCheckIncludes: ['src', workspaceConfigsDirName],
 } as const satisfies Pick<
@@ -89,39 +89,42 @@ const fillDefaultsForUtil = (
   },
 });
 
-const fillDefaultsForApp = (
-  options: Readonly<{
-    tsType: WorkspaceConfig['tsType'];
-    gi?: WorkspaceConfig['packageJson']['scripts']['gi'];
-    giIgnore?: WorkspaceConfig['packageJson']['scripts']['giIgnore'];
-    passWithNoTests?: WorkspaceConfig['packageJson']['scripts']['passWithNoTests'];
-    hasScripts?: boolean;
-    playwright?: boolean;
-  }>,
-): WorkspaceConfig => ({
+const fillDefaultsForApp = ({
+  tsType,
+  gi,
+  giIgnore,
+  hasScripts,
+  passWithNoTests,
+  playwright = true,
+}: Readonly<{
+  tsType: WorkspaceConfig['tsType'];
+  gi?: WorkspaceConfig['packageJson']['scripts']['gi'];
+  giIgnore?: WorkspaceConfig['packageJson']['scripts']['giIgnore'];
+  passWithNoTests?: WorkspaceConfig['packageJson']['scripts']['passWithNoTests'];
+  hasScripts?: boolean;
+  playwright?: boolean;
+}>): WorkspaceConfig => ({
   utilOrApp: defaultsForApp.utilOrApp,
   gen: produce(defaultsForApp.gen, (draft) => {
-    if (options.playwright === true) {
+    if (playwright) {
       draft.e2e = 'playwright';
     }
   }),
-  tsType: options.tsType,
+  tsType,
   useVite: true,
   srcDirs: ['src'],
   typeCheckIncludes: [
     ...defaultsForApp.typeCheckIncludes,
-    options.hasScripts === false ? undefined : workspaceScriptsDirName,
-    ...(options.playwright === true
-      ? [workspaceE2eDirName, playwrightConfigName]
-      : []),
+    hasScripts === false ? undefined : workspaceScriptsDirName,
+    ...(playwright ? [workspaceE2eDirName, playwrightConfigName] : []),
   ].filter(isNotUndefined),
   packageJson: {
     scripts: {
-      gi: options.gi ?? 1,
-      giIgnore: options.giIgnore ?? ['assets'],
+      gi: gi ?? 1,
+      giIgnore: giIgnore ?? ['assets'],
       publish: false,
-      passWithNoTests: options.passWithNoTests ?? true,
-      e2e: options.playwright === true ? 'playwright' : 'cypress',
+      passWithNoTests: passWithNoTests ?? true,
+      e2e: playwright ? 'playwright' : undefined,
     },
   },
 });
@@ -339,7 +342,6 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
   'event-schedule-app': produce(
     fillDefaultsForApp({
       tsType: 'react-emotion',
-      playwright: true,
     }),
     (draft) => {
       draft.typeCheckIncludes.push('functions/src');

@@ -150,7 +150,7 @@ const Tab = memoNamed<{
     <div ref={ref}>
       <TabStyled
         aria-selected={selected}
-        data-cy={cyId}
+        data-e2e={cyId}
         role='tab'
         style={style}
         type='button'

@@ -71,7 +71,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
           />
         </Label>
       </ConfigElement>
-      <ConfigElement data-cy={'repaymentTypeRadioGroup'}>
+      <ConfigElement data-e2e={'repaymentTypeRadioGroup'}>
         <RepaymentTypeRadioGroup
           repaymentType={repaymentType}
           onRepaymentTypeChange={setRepaymentType}

@@ -57,7 +57,6 @@ yarn add \
   typescript-eslint@latest
   # TODO: enable this line after eslint v9 is supported in all plugins
   # eslint-plugin-functional@latest \
-  # eslint-plugin-cypress@latest \
   # eslint@latest
 
 node "${ESLINT_DIR}/scripts/update-dependencies.mjs" "${ESLINT_DIR}/package.json" "dependencies"

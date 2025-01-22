@@ -40,7 +40,7 @@ export const YearNumericInput = memoNamed<Props>(
     });
 
     const inputProps = useMemo(
-      () => ({ min, max, step, onKeyDown, 'data-cy': cyId }),
+      () => ({ min, max, step, onKeyDown, 'data-e2e': cyId }),
       [max, min, step, onKeyDown, cyId],
     );
 

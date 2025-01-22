@@ -1,6 +1,7 @@
 /** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */
 
 import {
+  eslintFlatConfigForPlaywright,
   eslintFlatConfigForPreact,
   eslintFlatConfigForTypeScript,
   eslintFlatConfigForVitest,
@@ -26,8 +27,9 @@ const defineConfig = async () => {
       tsconfigFileName: './tsconfig.json',
       packageDirs: [nodePath.resolve(thisDir, '../../..'), thisDir],
     }),
-    eslintFlatConfigForVitest(),
-    ...eslintFlatConfigForPreact(),
+    eslintFlatConfigForVitest(['src/**/*']),
+    ...eslintFlatConfigForPreact(['src/**/*']),
+    eslintFlatConfigForPlaywright(['e2e/**/*']),
 
     {
       rules: {

@@ -43,7 +43,7 @@ export const eslintPlaywrightRules: EslintPlaywrightRules = {
   'playwright/no-get-by-title': 'error',
   'playwright/no-nested-step': 'error',
   'playwright/no-networkidle': 'error',
-  'playwright/no-nth-methods': 'error',
+  'playwright/no-nth-methods': 'off',
   'playwright/no-page-pause': 'error',
   'playwright/no-raw-locators': 'error',
   'playwright/no-skipped-test': 'error',

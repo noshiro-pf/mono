@@ -59,7 +59,7 @@ export const ProbabilityTable = memoNamed<Props>(
         <tr>
           <Th colSpan={3}>
             <BpInput
-              data-cy={'filter-input'}
+              data-e2e={'filter-input'}
               leftIcon={'filter-list'}
               placeholder={`"${separator}" 区切りで数字を入力`}
               value={filterByString}
@@ -87,7 +87,7 @@ export const ProbabilityTable = memoNamed<Props>(
           <Th />
         </tr>
       </thead>
-      <tbody data-cy={'table-body'}>
+      <tbody data-e2e={'table-body'}>
         {filtered.map((r) => (
           <tr key={r.id}>
             <Td>{r.selected[0]}</Td>

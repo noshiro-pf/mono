@@ -1,4 +1,0 @@
-{
-  "extends": "../../../../configs/tsconfig/tsconfig.type-check.json",
-  "include": ["./cypress.config.ts", "./cypress"]
-}

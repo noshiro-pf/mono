@@ -1,7 +1,7 @@
 import { Calculator } from './components';
 
 export const App = memoNamed('App', () => (
-  <Root data-cy={'root'}>
+  <Root data-e2e={'root'}>
     <Calculator />
   </Root>
 ));

@@ -13,7 +13,7 @@ export const DataItem = memoNamed<Props>(
         css={css`
           padding: 5px;
         `}
-        data-cy={cyIdForTitle}
+        data-e2e={cyIdForTitle}
       >
         {title}
       </dt>
@@ -21,7 +21,7 @@ export const DataItem = memoNamed<Props>(
         css={css`
           padding: 5px;
         `}
-        data-cy={cyIdForDescription}
+        data-e2e={cyIdForDescription}
       >
         {description}
       </dd>

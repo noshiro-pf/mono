@@ -85,7 +85,7 @@ export const MainView = memoNamed<Props>(
           <div css={buttonWithMarginStyle}>
             <Button
               color={'primary'}
-              data-cy={'roll-dice-button'}
+              data-e2e={'roll-dice-button'}
               variant='contained'
               onClick={rollDices}
             >
@@ -95,7 +95,7 @@ export const MainView = memoNamed<Props>(
           <div css={buttonWithMarginStyle}>
             <Button
               color={'secondary'}
-              data-cy={'undo-button'}
+              data-e2e={'undo-button'}
               disabled={!undoable}
               variant='contained'
               onClick={undo}
@@ -106,7 +106,7 @@ export const MainView = memoNamed<Props>(
           <div css={buttonWithMarginStyle}>
             <Button
               color={'secondary'}
-              data-cy={'redo-button'}
+              data-e2e={'redo-button'}
               disabled={!redoable}
               variant='contained'
               onClick={redo}
