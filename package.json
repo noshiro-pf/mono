@@ -65,7 +65,7 @@
     "zz:wsrun-stages": "yarn zz:wsrun --stages"
   },
   "dependencies": {
-    "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^15.0.7",
     "@testing-library/user-event": "^14.4.3",
     "caniuse-lite": "^1.0.30001639"
