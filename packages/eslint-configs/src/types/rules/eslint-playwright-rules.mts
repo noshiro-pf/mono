@@ -569,6 +569,48 @@ namespace NoSkippedTest {
 }
 
 /**
+ * Prevent usage of the `.slow()` slow test annotation.
+ *
+ * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-slowed-test.md
+ *
+ *  ```md
+ *  | key            | value          |
+ *  | :------------- | :------------- |
+ *  | type           | suggestion     |
+ *  | hasSuggestions | true           |
+ *  | category       | Best Practices |
+ *  | recommended    | true           |
+ *  ```
+ */
+namespace NoSlowedTest {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "allowConditional": {
+   *         "default": false,
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "type": "object"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly allowConditional?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+}
+
+/**
  * Disallow using `expect` outside of `test` blocks
  *
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-standalone-expect.md
@@ -679,7 +721,7 @@ namespace NoWaitForTimeout {
 /**
  * Suggest using the built-in comparison matchers
  *
- * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-comparision-matcher.md
+ * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-comparison-matcher.md
  *
  *  ```md
  *  | key         | value          |
@@ -1268,6 +1310,7 @@ namespace ValidTitle {
    * ]
    * ```
    */
+  /* modified */
   export type Options = {
     readonly disallowedWords?: readonly string[];
     readonly ignoreSpaces?: boolean;
@@ -1309,6 +1352,7 @@ export type EslintPlaywrightRules = {
   readonly 'playwright/no-raw-locators': NoRawLocators.RuleEntry;
   readonly 'playwright/no-restricted-matchers': NoRestrictedMatchers.RuleEntry;
   readonly 'playwright/no-skipped-test': NoSkippedTest.RuleEntry;
+  readonly 'playwright/no-slowed-test': NoSlowedTest.RuleEntry;
   readonly 'playwright/no-standalone-expect': NoStandaloneExpect.RuleEntry;
   readonly 'playwright/no-unsafe-references': NoUnsafeReferences.RuleEntry;
   readonly 'playwright/no-useless-await': NoUselessAwait.RuleEntry;
@@ -1347,6 +1391,7 @@ export type EslintPlaywrightRulesOption = {
   readonly 'playwright/no-raw-locators': NoRawLocators.Options;
   readonly 'playwright/no-restricted-matchers': NoRestrictedMatchers.Options;
   readonly 'playwright/no-skipped-test': NoSkippedTest.Options;
+  readonly 'playwright/no-slowed-test': NoSlowedTest.Options;
   readonly 'playwright/prefer-lowercase-title': PreferLowercaseTitle.Options;
   readonly 'playwright/prefer-native-locators': PreferNativeLocators.Options;
   readonly 'playwright/require-hook': RequireHook.Options;

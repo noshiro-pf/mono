@@ -26,16 +26,13 @@ namespace AccessorPairs {
    *     "type": "object",
    *     "properties": {
    *       "getWithoutSet": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "setWithoutGet": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "enforceForClassMembers": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -177,16 +174,13 @@ namespace ArrayCallbackReturn {
    *     "type": "object",
    *     "properties": {
    *       "allowImplicit": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "checkForEach": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowVoid": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -572,16 +566,13 @@ namespace Camelcase {
    *     "type": "object",
    *     "properties": {
    *       "ignoreDestructuring": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreImports": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreGlobals": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "properties": {
    *         "enum": [
@@ -591,11 +582,9 @@ namespace Camelcase {
    *       },
    *       "allow": {
    *         "type": "array",
-   *         "items": [
-   *           {
-   *             "type": "string"
-   *           }
-   *         ],
+   *         "items": {
+   *           "type": "string"
+   *         },
    *         "minItems": 0,
    *         "uniqueItems": true
    *       }
@@ -611,7 +600,7 @@ namespace Camelcase {
     readonly ignoreGlobals?: boolean;
     readonly properties?: 'always' | 'never';
     /** @minItems 0 */
-    readonly allow?: readonly [] | readonly [string];
+    readonly allow?: readonly string[];
   };
 
   export type RuleEntry =
@@ -757,8 +746,7 @@ namespace ClassMethodsUseThis {
    *         }
    *       },
    *       "enforceForClassFields": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -966,6 +954,12 @@ namespace Complexity {
    *           "max": {
    *             "type": "integer",
    *             "minimum": 0
+   *           },
+   *           "variant": {
+   *             "enum": [
+   *               "classic",
+   *               "modified"
+   *             ]
    *           }
    *         },
    *         "additionalProperties": false
@@ -980,6 +974,7 @@ namespace Complexity {
     | {
         readonly maximum?: number;
         readonly max?: number;
+        readonly variant?: 'classic' | 'modified';
       };
 
   export type RuleEntry =
@@ -1051,8 +1046,7 @@ namespace ConsistentReturn {
    *     "type": "object",
    *     "properties": {
    *       "treatUndefinedAsUnspecified": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -1217,7 +1211,7 @@ namespace DefaultCase {
 }
 
 /**
- * Enforce default clauses in switch statements to be last
+ * Enforce `default` clauses in `switch` statements to be last
  *
  * @link https://eslint.org/docs/latest/rules/default-case-last
  *
@@ -1303,12 +1297,10 @@ namespace DotNotation {
    *     "type": "object",
    *     "properties": {
    *       "allowKeywords": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "allowPattern": {
-   *         "type": "string",
-   *         "default": ""
+   *         "type": "string"
    *       }
    *     },
    *     "additionalProperties": false
@@ -1428,7 +1420,7 @@ namespace Eqeqeq {
 }
 
 /**
- * Enforce "for" loop update clause moving the counter in the right direction
+ * Enforce `for` loop update clause moving the counter in the right direction
  *
  * @link https://eslint.org/docs/latest/rules/for-direction
  *
@@ -1644,6 +1636,7 @@ namespace FuncNames {
 
 /**
  * Enforce the consistent use of either `function` declarations or expressions
+ * assigned to variables
  *
  * @link https://eslint.org/docs/latest/rules/func-style
  *
@@ -1670,8 +1663,20 @@ namespace FuncStyle {
    *     "type": "object",
    *     "properties": {
    *       "allowArrowFunctions": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
+   *       },
+   *       "overrides": {
+   *         "type": "object",
+   *         "properties": {
+   *           "namedExports": {
+   *             "enum": [
+   *               "declaration",
+   *               "expression",
+   *               "ignore"
+   *             ]
+   *           }
+   *         },
+   *         "additionalProperties": false
    *       }
    *     },
    *     "additionalProperties": false
@@ -1683,6 +1688,9 @@ namespace FuncStyle {
 
   export type Options1 = {
     readonly allowArrowFunctions?: boolean;
+    readonly overrides?: {
+      readonly namedExports?: 'declaration' | 'expression' | 'ignore';
+    };
   };
 
   export type RuleEntry =
@@ -1917,8 +1925,7 @@ namespace GetterReturn {
    *     "type": "object",
    *     "properties": {
    *       "allowImplicit": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -2116,8 +2123,7 @@ namespace IdLength {
    *     "type": "object",
    *     "properties": {
    *       "min": {
-   *         "type": "integer",
-   *         "default": 2
+   *         "type": "integer"
    *       },
    *       "max": {
    *         "type": "integer"
@@ -2186,20 +2192,16 @@ namespace IdMatch {
    *     "type": "object",
    *     "properties": {
    *       "properties": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "classFields": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "onlyDeclarations": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreDestructuring": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -3904,6 +3906,7 @@ namespace KeywordSpacing {
  *  | key         | value  |
  *  | :---------- | :----- |
  *  | type        | layout |
+ *  | deprecated  | true   |
  *  | recommended | false  |
  *  ```
  */
@@ -3947,19 +3950,7 @@ namespace LineCommentPosition {
    * ]
    * ```
    */
-  export type Options =
-    | 'above'
-    | 'beside'
-    | {
-        readonly position?: 'above' | 'beside';
-        readonly ignorePattern?: string;
-        readonly applyDefaultPatterns?: boolean;
-        readonly applyDefaultIgnorePatterns?: boolean;
-      };
-
-  export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -4904,6 +4895,7 @@ namespace MaxStatementsPerLine {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | true       |
  *  | fixable     | whitespace |
  *  | recommended | false      |
  *  ```
@@ -4946,20 +4938,7 @@ namespace MultilineCommentStyle {
    * }
    * ```
    */
-  export type Options =
-    | readonly [
-        'separate-lines',
-        {
-          readonly checkJSDoc?: boolean;
-        },
-      ]
-    | readonly ['bare-block' | 'starred-block']
-    | readonly ['separate-lines']
-    | readonly [];
-
-  export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -5017,12 +4996,10 @@ namespace NewCap {
    *     "type": "object",
    *     "properties": {
    *       "newIsCap": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "capIsNew": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "newIsCapExceptions": {
    *         "type": "array",
@@ -5043,8 +5020,7 @@ namespace NewCap {
    *         "type": "string"
    *       },
    *       "properties": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -5295,8 +5271,7 @@ namespace NoBitwise {
    *         "uniqueItems": true
    *       },
    *       "int32Hint": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -5367,10 +5342,11 @@ namespace NoCaller {
  * @link https://eslint.org/docs/latest/rules/no-case-declarations
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | true       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  *  ```
  */
 namespace NoCaseDeclarations {
@@ -5412,7 +5388,7 @@ namespace NoClassAssign {
 }
 
 /**
- * Disallow comparing against -0
+ * Disallow comparing against `-0`
  *
  * @link https://eslint.org/docs/latest/rules/no-compare-neg-zero
  *
@@ -5572,7 +5548,7 @@ namespace NoConstAssign {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
- *  | recommended | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoConstantBinaryExpression {
@@ -5601,8 +5577,13 @@ namespace NoConstantCondition {
    *     "type": "object",
    *     "properties": {
    *       "checkLoops": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "enum": [
+   *           "all",
+   *           "allExceptWhileTrue",
+   *           "none",
+   *           true,
+   *           false
+   *         ]
    *       }
    *     },
    *     "additionalProperties": false
@@ -5611,7 +5592,7 @@ namespace NoConstantCondition {
    * ```
    */
   export type Options = {
-    readonly checkLoops?: boolean;
+    readonly checkLoops?: 'all' | 'allExceptWhileTrue' | 'none' | false | true;
   };
 
   export type RuleEntry =
@@ -5632,18 +5613,7 @@ namespace NoConstantCondition {
  *  ```
  */
 namespace NoConstructorReturn {
-  /**
-   * ### schema
-   *
-   * ```json
-   * {}
-   * ```
-   */
-  export type Options = UnknownRecord;
-
-  export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -5829,8 +5799,7 @@ namespace NoDuplicateImports {
    *     "type": "object",
    *     "properties": {
    *       "includeExports": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -5870,8 +5839,7 @@ namespace NoElseReturn {
    *     "type": "object",
    *     "properties": {
    *       "allowElseIf": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -5911,8 +5879,7 @@ namespace NoEmpty {
    *     "type": "object",
    *     "properties": {
    *       "allowEmptyCatch": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -6032,8 +5999,7 @@ namespace NoEmptyPattern {
    *     "type": "object",
    *     "properties": {
    *       "allowObjectPatternsAsParameters": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -6059,7 +6025,7 @@ namespace NoEmptyPattern {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
- *  | recommended | false      |
+ *  | recommended | true       |
  *  ```
  */
 namespace NoEmptyStaticBlock {
@@ -6104,8 +6070,7 @@ namespace NoEval {
    *     "type": "object",
    *     "properties": {
    *       "allowIndirect": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -6218,21 +6183,37 @@ namespace NoExtraBooleanCast {
    * ```json
    * [
    *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "enforceForLogicalOperands": {
-   *         "type": "boolean",
-   *         "default": false
+   *     "anyOf": [
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "enforceForInnerExpressions": {
+   *             "type": "boolean"
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       },
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "enforceForLogicalOperands": {
+   *             "type": "boolean"
+   *           }
+   *         },
+   *         "additionalProperties": false
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     ]
    *   }
    * ]
    * ```
    */
-  export type Options = {
-    readonly enforceForLogicalOperands?: boolean;
-  };
+  export type Options =
+    | {
+        readonly enforceForInnerExpressions?: boolean;
+      }
+    | {
+        readonly enforceForLogicalOperands?: boolean;
+      };
 
   export type RuleEntry =
     | Linter.RuleSeverity
@@ -6351,7 +6332,7 @@ namespace NoExtraParens {
  *  | type        | suggestion |
  *  | deprecated  | true       |
  *  | fixable     | code       |
- *  | recommended | true       |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoExtraSemi {
@@ -6380,12 +6361,13 @@ namespace NoFallthrough {
    *     "type": "object",
    *     "properties": {
    *       "commentPattern": {
-   *         "type": "string",
-   *         "default": ""
+   *         "type": "string"
    *       },
    *       "allowEmptyCase": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
+   *       },
+   *       "reportUnusedFallthroughComment": {
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -6396,6 +6378,7 @@ namespace NoFallthrough {
   export type Options = {
     readonly commentPattern?: string;
     readonly allowEmptyCase?: boolean;
+    readonly reportUnusedFallthroughComment?: boolean;
   };
 
   export type RuleEntry =
@@ -6486,11 +6469,12 @@ namespace NoGlobalAssign {
  * @link https://eslint.org/docs/latest/rules/no-implicit-coercion
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | fixable     | code       |
- *  | recommended | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace NoImplicitCoercion {
@@ -6503,20 +6487,16 @@ namespace NoImplicitCoercion {
    *     "type": "object",
    *     "properties": {
    *       "boolean": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "number": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "string": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "disallowTemplateShorthand": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allow": {
    *         "type": "array",
@@ -6525,6 +6505,8 @@ namespace NoImplicitCoercion {
    *             "~",
    *             "!!",
    *             "+",
+   *             "- -",
+   *             "-",
    *             "*"
    *           ]
    *         },
@@ -6541,7 +6523,7 @@ namespace NoImplicitCoercion {
     readonly number?: boolean;
     readonly string?: boolean;
     readonly disallowTemplateShorthand?: boolean;
-    readonly allow?: readonly ('!!' | '*' | '+' | '~')[];
+    readonly allow?: readonly ('- -' | '-' | '!!' | '*' | '+' | '~')[];
   };
 
   export type RuleEntry =
@@ -6571,8 +6553,7 @@ namespace NoImplicitGlobals {
    *     "type": "object",
    *     "properties": {
    *       "lexicalBindings": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -6669,7 +6650,7 @@ namespace NoInlineComments {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
- *  | recommended | true    |
+ *  | recommended | false   |
  *  ```
  */
 namespace NoInnerDeclarations {
@@ -6683,15 +6664,32 @@ namespace NoInnerDeclarations {
    *       "functions",
    *       "both"
    *     ]
+   *   },
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "blockScopedFunctions": {
+   *         "enum": [
+   *           "allow",
+   *           "disallow"
+   *         ]
+   *       }
+   *     },
+   *     "additionalProperties": false
    *   }
    * ]
    * ```
    */
-  export type Options = 'both' | 'functions';
+  export type Options0 = 'both' | 'functions';
+
+  export type Options1 = {
+    readonly blockScopedFunctions?: 'allow' | 'disallow';
+  };
 
   export type RuleEntry =
     | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | readonly [Linter.RuleSeverity, Options0, Options1]
+    | readonly [Linter.RuleSeverity, Options0];
 }
 
 /**
@@ -6758,8 +6756,7 @@ namespace NoInvalidThis {
    *     "type": "object",
    *     "properties": {
    *       "capIsConstructor": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -6798,24 +6795,19 @@ namespace NoIrregularWhitespace {
    *     "type": "object",
    *     "properties": {
    *       "skipComments": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "skipStrings": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "skipTemplates": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "skipRegExps": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "skipJSXText": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -6890,12 +6882,10 @@ namespace NoLabels {
    *     "type": "object",
    *     "properties": {
    *       "allowLoop": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowSwitch": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -7070,7 +7060,31 @@ namespace NoMagicNumbers {
  *  ```
  */
 namespace NoMisleadingCharacterClass {
-  export type RuleEntry = Linter.RuleSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowEscape": {
+   *         "type": "boolean",
+   *         "default": false
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly allowEscape?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -7202,7 +7216,7 @@ namespace NoMixedRequires {
  *  | :---------- | :----- |
  *  | type        | layout |
  *  | deprecated  | true   |
- *  | recommended | true   |
+ *  | recommended | false  |
  *  ```
  */
 namespace NoMixedSpacesAndTabs {
@@ -7246,8 +7260,7 @@ namespace NoMultiAssign {
    *     "type": "object",
    *     "properties": {
    *       "ignoreNonDeclaration": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -7500,7 +7513,7 @@ namespace NoNewFunc {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
- *  | recommended | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoNewNativeNonconstructor {
@@ -7550,11 +7563,12 @@ namespace NoNewRequire {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
- *  | recommended | true    |
+ *  | deprecated  | true    |
+ *  | recommended | false   |
  *  ```
  */
 namespace NoNewSymbol {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -7656,7 +7670,7 @@ namespace NoOctalEscape {
 }
 
 /**
- * Disallow reassigning `function` parameters
+ * Disallow reassigning function parameters
  *
  * @link https://eslint.org/docs/latest/rules/no-param-reassign
  *
@@ -7770,8 +7784,7 @@ namespace NoPlusplus {
    *     "type": "object",
    *     "properties": {
    *       "allowForLoopAfterthoughts": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -7845,8 +7858,7 @@ namespace NoPromiseExecutorReturn {
    *     "type": "object",
    *     "properties": {
    *       "allowVoid": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -7918,8 +7930,7 @@ namespace NoRedeclare {
    *     "type": "object",
    *     "properties": {
    *       "builtinGlobals": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -7982,6 +7993,9 @@ namespace NoRestrictedExports {
    *               "type": "string"
    *             },
    *             "uniqueItems": true
+   *           },
+   *           "restrictedNamedExportsPattern": {
+   *             "type": "string"
    *           }
    *         },
    *         "additionalProperties": false
@@ -7996,6 +8010,9 @@ namespace NoRestrictedExports {
    *               "pattern": "^(?!default$)"
    *             },
    *             "uniqueItems": true
+   *           },
+   *           "restrictedNamedExportsPattern": {
+   *             "type": "string"
    *           },
    *           "restrictDefaultExports": {
    *             "type": "object",
@@ -8029,6 +8046,7 @@ namespace NoRestrictedExports {
   export type Options =
     | {
         readonly restrictedNamedExports?: readonly string[];
+        readonly restrictedNamedExportsPattern?: string;
         readonly restrictDefaultExports?: {
           readonly direct?: boolean;
           readonly named?: boolean;
@@ -8039,6 +8057,7 @@ namespace NoRestrictedExports {
       }
     | {
         readonly restrictedNamedExports?: readonly string[];
+        readonly restrictedNamedExportsPattern?: string;
       };
 
   export type RuleEntry =
@@ -8145,10 +8164,19 @@ namespace NoRestrictedImports {
    *                 "items": {
    *                   "type": "string"
    *                 }
+   *               },
+   *               "allowImportNames": {
+   *                 "type": "array",
+   *                 "items": {
+   *                   "type": "string"
+   *                 }
    *               }
    *             },
    *             "additionalProperties": false,
-   *             "required": ["name"]
+   *             "required": ["name"],
+   *             "not": {
+   *               "required": ["importNames", "allowImportNames"]
+   *             }
    *           }
    *         ]
    *       },
@@ -8182,10 +8210,19 @@ namespace NoRestrictedImports {
    *                         "items": {
    *                           "type": "string"
    *                         }
+   *                       },
+   *                       "allowImportNames": {
+   *                         "type": "array",
+   *                         "items": {
+   *                           "type": "string"
+   *                         }
    *                       }
    *                     },
    *                     "additionalProperties": false,
-   *                     "required": ["name"]
+   *                     "required": ["name"],
+   *                     "not": {
+   *                       "required": ["importNames", "allowImportNames"]
+   *                     }
    *                   }
    *                 ]
    *               },
@@ -8213,6 +8250,14 @@ namespace NoRestrictedImports {
    *                         "minItems": 1,
    *                         "uniqueItems": true
    *                       },
+   *                       "allowImportNames": {
+   *                         "type": "array",
+   *                         "items": {
+   *                           "type": "string"
+   *                         },
+   *                         "minItems": 1,
+   *                         "uniqueItems": true
+   *                       },
    *                       "group": {
    *                         "type": "array",
    *                         "items": {
@@ -8221,7 +8266,13 @@ namespace NoRestrictedImports {
    *                         "minItems": 1,
    *                         "uniqueItems": true
    *                       },
+   *                       "regex": {
+   *                         "type": "string"
+   *                       },
    *                       "importNamePattern": {
+   *                         "type": "string"
+   *                       },
+   *                       "allowImportNamePattern": {
    *                         "type": "string"
    *                       },
    *                       "message": {
@@ -8233,7 +8284,48 @@ namespace NoRestrictedImports {
    *                       }
    *                     },
    *                     "additionalProperties": false,
-   *                     "required": ["group"]
+   *                     "not": {
+   *                       "anyOf": [
+   *                         {
+   *                           "required": [
+   *                             "importNames",
+   *                             "allowImportNames"
+   *                           ]
+   *                         },
+   *                         {
+   *                           "required": [
+   *                             "importNamePattern",
+   *                             "allowImportNamePattern"
+   *                           ]
+   *                         },
+   *                         {
+   *                           "required": [
+   *                             "importNames",
+   *                             "allowImportNamePattern"
+   *                           ]
+   *                         },
+   *                         {
+   *                           "required": [
+   *                             "importNamePattern",
+   *                             "allowImportNames"
+   *                           ]
+   *                         },
+   *                         {
+   *                           "required": [
+   *                             "allowImportNames",
+   *                             "allowImportNamePattern"
+   *                           ]
+   *                         }
+   *                       ]
+   *                     },
+   *                     "oneOf": [
+   *                       {
+   *                         "required": ["group"]
+   *                       },
+   *                       {
+   *                         "required": ["regex"]
+   *                       }
+   *                     ]
    *                   },
    *                   "uniqueItems": true
    *                 }
@@ -8256,6 +8348,7 @@ namespace NoRestrictedImports {
             readonly name: string;
             readonly message?: string;
             readonly importNames?: readonly string[];
+            readonly allowImportNames?: readonly string[];
           }
       )[]
     | readonly [
@@ -8266,22 +8359,10 @@ namespace NoRestrictedImports {
                 readonly name: string;
                 readonly message?: string;
                 readonly importNames?: readonly string[];
+                readonly allowImportNames?: readonly string[];
               }
           )[];
-          readonly patterns?:
-            | readonly {
-                /** @minItems 1 */
-                readonly importNames?: readonly [
-                  string,
-                  ...(readonly string[]),
-                ];
-                /** @minItems 1 */
-                readonly group: readonly [string, ...(readonly string[])];
-                readonly importNamePattern?: string;
-                readonly message?: string;
-                readonly caseSensitive?: boolean;
-              }[]
-            | readonly string[];
+          readonly patterns?: readonly UnknownRecord[] | readonly string[];
         },
       ]
     | readonly [];
@@ -8573,7 +8654,7 @@ namespace NoReturnAwait {
 }
 
 /**
- * Disallow `javascript:` urls
+ * Disallow `javascript:` URLs
  *
  * @link https://eslint.org/docs/latest/rules/no-script-url
  *
@@ -8610,8 +8691,7 @@ namespace NoSelfAssign {
    *     "type": "object",
    *     "properties": {
    *       "props": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -8663,10 +8743,10 @@ namespace NoSequences {
    * ```json
    * [
    *   {
+   *     "type": "object",
    *     "properties": {
    *       "allowInParentheses": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -8722,16 +8802,14 @@ namespace NoShadow {
    *     "type": "object",
    *     "properties": {
    *       "builtinGlobals": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "hoist": {
    *         "enum": [
    *           "all",
    *           "functions",
    *           "never"
-   *         ],
-   *         "default": "functions"
+   *         ]
    *       },
    *       "allow": {
    *         "type": "array",
@@ -8740,8 +8818,7 @@ namespace NoShadow {
    *         }
    *       },
    *       "ignoreOnInitialization": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -9009,8 +9086,7 @@ namespace NoUndef {
    *     "type": "object",
    *     "properties": {
    *       "typeof": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -9088,36 +9164,28 @@ namespace NoUnderscoreDangle {
    *         }
    *       },
    *       "allowAfterThis": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowAfterSuper": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowAfterThisConstructor": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "enforceInMethodNames": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowFunctionParams": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "enforceInClassFields": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowInArrayDestructuring": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "allowInObjectDestructuring": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -9197,8 +9265,7 @@ namespace NoUnneededTernary {
    *     "type": "object",
    *     "properties": {
    *       "defaultAssignment": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -9326,8 +9393,7 @@ namespace NoUnsafeNegation {
    *     "type": "object",
    *     "properties": {
    *       "enforceForOrderingRelations": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -9367,8 +9433,7 @@ namespace NoUnsafeOptionalChaining {
    *     "type": "object",
    *     "properties": {
    *       "disallowArithmeticOperators": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -9407,20 +9472,16 @@ namespace NoUnusedExpressions {
    *     "type": "object",
    *     "properties": {
    *       "allowShortCircuit": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowTernary": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowTaggedTemplates": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "enforceForJSX": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -9466,7 +9527,7 @@ namespace NoUnusedLabels {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
- *  | recommended | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoUnusedPrivateClassMembers {
@@ -9479,10 +9540,11 @@ namespace NoUnusedPrivateClassMembers {
  * @link https://eslint.org/docs/latest/rules/no-unused-vars
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | true    |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
  *  ```
  */
 namespace NoUnusedVars {
@@ -9535,6 +9597,12 @@ namespace NoUnusedVars {
    *           },
    *           "destructuredArrayIgnorePattern": {
    *             "type": "string"
+   *           },
+   *           "ignoreClassWithStaticInitBlock": {
+   *             "type": "boolean"
+   *           },
+   *           "reportUsedIgnorePattern": {
+   *             "type": "boolean"
    *           }
    *         },
    *         "additionalProperties": false
@@ -9556,6 +9624,8 @@ namespace NoUnusedVars {
         readonly caughtErrors?: 'all' | 'none';
         readonly caughtErrorsIgnorePattern?: string;
         readonly destructuredArrayIgnorePattern?: string;
+        readonly ignoreClassWithStaticInitBlock?: boolean;
+        readonly reportUsedIgnorePattern?: boolean;
       };
 
   export type RuleEntry =
@@ -9623,6 +9693,22 @@ namespace NoUseBeforeDefine {
   export type RuleEntry =
     | Linter.RuleSeverity
     | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+}
+
+/**
+ * Disallow variable assignments when the value is not used
+ *
+ * @link https://eslint.org/docs/latest/rules/no-useless-assignment
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace NoUselessAssignment {
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -9696,8 +9782,7 @@ namespace NoUselessComputedKey {
    *     "type": "object",
    *     "properties": {
    *       "enforceForClassMembers": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -9736,10 +9821,11 @@ namespace NoUselessConcat {
  * @link https://eslint.org/docs/latest/rules/no-useless-constructor
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace NoUselessConstructor {
@@ -9787,16 +9873,13 @@ namespace NoUselessRename {
    *     "type": "object",
    *     "properties": {
    *       "ignoreDestructuring": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreImport": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreExport": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -9871,8 +9954,7 @@ namespace NoVoid {
    *     "type": "object",
    *     "properties": {
    *       "allowAsStatement": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -10893,12 +10975,10 @@ namespace PreferArrowCallback {
    *     "type": "object",
    *     "properties": {
    *       "allowNamedFunctions": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowUnboundThis": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -10943,12 +11023,10 @@ namespace PreferConst {
    *         "enum": [
    *           "any",
    *           "all"
-   *         ],
-   *         "default": "any"
+   *         ]
    *       },
    *       "ignoreReadBeforeAssign": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -11140,8 +11218,8 @@ namespace PreferObjectHasOwn {
 }
 
 /**
- * Disallow using Object.assign with an object literal as the first argument and
- * prefer the use of object spread instead
+ * Disallow using `Object.assign` with an object literal as the first argument
+ * and prefer the use of object spread instead
  *
  * @link https://eslint.org/docs/latest/rules/prefer-object-spread
  *
@@ -11179,8 +11257,7 @@ namespace PreferPromiseRejectErrors {
    *     "type": "object",
    *     "properties": {
    *       "allowEmptyReject": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -11270,8 +11347,7 @@ namespace PreferRegexLiterals {
    *     "type": "object",
    *     "properties": {
    *       "disallowRedundantWrapping": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -11522,8 +11598,7 @@ namespace RequireAtomicUpdates {
    *     "type": "object",
    *     "properties": {
    *       "allowProperties": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -11546,10 +11621,11 @@ namespace RequireAtomicUpdates {
  * @link https://eslint.org/docs/latest/rules/require-await
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace RequireAwait {
@@ -11557,65 +11633,7 @@ namespace RequireAwait {
 }
 
 /**
- * Require JSDoc comments
- *
- * @link https://eslint.org/docs/latest/rules/require-jsdoc
- *
- *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | deprecated  | true       |
- *  | recommended | false      |
- *  ```
- */
-namespace RequireJsdoc {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "require": {
-   *         "type": "object",
-   *         "properties": {
-   *           "ClassDeclaration": {
-   *             "type": "boolean",
-   *             "default": false
-   *           },
-   *           "MethodDefinition": {
-   *             "type": "boolean",
-   *             "default": false
-   *           },
-   *           "FunctionDeclaration": {
-   *             "type": "boolean",
-   *             "default": true
-   *           },
-   *           "ArrowFunctionExpression": {
-   *             "type": "boolean",
-   *             "default": false
-   *           },
-   *           "FunctionExpression": {
-   *             "type": "boolean",
-   *             "default": false
-   *           }
-   *         },
-   *         "additionalProperties": false,
-   *         "default": {}
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
-}
-
-/**
- * Enforce the use of `u` or `v` flag on RegExp
+ * Enforce the use of `u` or `v` flag on regular expressions
  *
  * @link https://eslint.org/docs/latest/rules/require-unicode-regexp
  *
@@ -11628,7 +11646,33 @@ namespace RequireJsdoc {
  *  ```
  */
 namespace RequireUnicodeRegexp {
-  export type RuleEntry = Linter.RuleSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "requireFlag": {
+   *         "enum": [
+   *           "u",
+   *           "v"
+   *         ]
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly requireFlag?: 'u' | 'v';
+  };
+
+  export type RuleEntry =
+    | Linter.RuleSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
 }
 
 /**
@@ -11821,7 +11865,7 @@ namespace SemiStyle {
 }
 
 /**
- * Enforce sorted import declarations within modules
+ * Enforce sorted `import` declarations within modules
  *
  * @link https://eslint.org/docs/latest/rules/sort-imports
  *
@@ -11843,8 +11887,7 @@ namespace SortImports {
    *     "type": "object",
    *     "properties": {
    *       "ignoreCase": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "memberSyntaxSortOrder": {
    *         "type": "array",
@@ -11861,16 +11904,13 @@ namespace SortImports {
    *         "maxItems": 4
    *       },
    *       "ignoreDeclarationSort": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreMemberSort": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowSeparatedGroups": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -11928,21 +11968,20 @@ namespace SortKeys {
    *     "type": "object",
    *     "properties": {
    *       "caseSensitive": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "natural": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "minKeys": {
    *         "type": "integer",
-   *         "minimum": 2,
-   *         "default": 2
+   *         "minimum": 2
    *       },
    *       "allowLineSeparatedGroups": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
+   *       },
+   *       "ignoreComputedKeys": {
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -11957,6 +11996,7 @@ namespace SortKeys {
     readonly natural?: boolean;
     readonly minKeys?: number;
     readonly allowLineSeparatedGroups?: boolean;
+    readonly ignoreComputedKeys?: boolean;
   };
 
   export type RuleEntry =
@@ -11988,8 +12028,7 @@ namespace SortVars {
    *     "type": "object",
    *     "properties": {
    *       "ignoreCase": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -12552,10 +12591,11 @@ namespace UnicodeBom {
  * @link https://eslint.org/docs/latest/rules/use-isnan
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | true    |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
  *  ```
  */
 namespace UseIsnan {
@@ -12568,12 +12608,10 @@ namespace UseIsnan {
    *     "type": "object",
    *     "properties": {
    *       "enforceForSwitchCase": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "enforceForIndexOf": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -12589,73 +12627,6 @@ namespace UseIsnan {
   export type RuleEntry =
     | Linter.RuleSeverity
     | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
-}
-
-/**
- * Enforce valid JSDoc comments
- *
- * @link https://eslint.org/docs/latest/rules/valid-jsdoc
- *
- *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | deprecated  | true       |
- *  | fixable     | code       |
- *  | recommended | false      |
- *  ```
- */
-namespace ValidJsdoc {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "prefer": {
-   *         "type": "object",
-   *         "additionalProperties": {
-   *           "type": "string"
-   *         }
-   *       },
-   *       "preferType": {
-   *         "type": "object",
-   *         "additionalProperties": {
-   *           "type": "string"
-   *         }
-   *       },
-   *       "requireReturn": {
-   *         "type": "boolean",
-   *         "default": true
-   *       },
-   *       "requireParamDescription": {
-   *         "type": "boolean",
-   *         "default": true
-   *       },
-   *       "requireReturnDescription": {
-   *         "type": "boolean",
-   *         "default": true
-   *       },
-   *       "matchDescription": {
-   *         "type": "string"
-   *       },
-   *       "requireReturnType": {
-   *         "type": "boolean",
-   *         "default": true
-   *       },
-   *       "requireParamType": {
-   *         "type": "boolean",
-   *         "default": true
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type RuleEntry = 0;
 }
 
 /**
@@ -12681,8 +12652,7 @@ namespace ValidTypeof {
    *     "type": "object",
    *     "properties": {
    *       "requireStringLiterals": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -12855,12 +12825,10 @@ namespace Yoda {
    *     "type": "object",
    *     "properties": {
    *       "exceptRange": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "onlyEquality": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -12910,7 +12878,6 @@ export type EslintRules = {
   readonly 'id-length': IdLength.RuleEntry;
   readonly 'id-match': IdMatch.RuleEntry;
   readonly 'init-declarations': InitDeclarations.RuleEntry;
-  readonly 'line-comment-position': LineCommentPosition.RuleEntry;
   readonly 'logical-assignment-operators': LogicalAssignmentOperators.RuleEntry;
   readonly 'max-classes-per-file': MaxClassesPerFile.RuleEntry;
   readonly 'max-depth': MaxDepth.RuleEntry;
@@ -12919,7 +12886,6 @@ export type EslintRules = {
   readonly 'max-nested-callbacks': MaxNestedCallbacks.RuleEntry;
   readonly 'max-params': MaxParams.RuleEntry;
   readonly 'max-statements': MaxStatements.RuleEntry;
-  readonly 'multiline-comment-style': MultilineCommentStyle.RuleEntry;
   readonly 'new-cap': NewCap.RuleEntry;
   readonly 'no-alert': NoAlert.RuleEntry;
   readonly 'no-array-constructor': NoArrayConstructor.RuleEntry;
@@ -12988,7 +12954,6 @@ export type EslintRules = {
   readonly 'no-new': NoNew.RuleEntry;
   readonly 'no-new-func': NoNewFunc.RuleEntry;
   readonly 'no-new-native-nonconstructor': NoNewNativeNonconstructor.RuleEntry;
-  readonly 'no-new-symbol': NoNewSymbol.RuleEntry;
   readonly 'no-new-wrappers': NoNewWrappers.RuleEntry;
   readonly 'no-nonoctal-decimal-escape': NoNonoctalDecimalEscape.RuleEntry;
   readonly 'no-obj-calls': NoObjCalls.RuleEntry;
@@ -13037,6 +13002,7 @@ export type EslintRules = {
   readonly 'no-unused-private-class-members': NoUnusedPrivateClassMembers.RuleEntry;
   readonly 'no-unused-vars': NoUnusedVars.RuleEntry;
   readonly 'no-use-before-define': NoUseBeforeDefine.RuleEntry;
+  readonly 'no-useless-assignment': NoUselessAssignment.RuleEntry;
   readonly 'no-useless-backreference': NoUselessBackreference.RuleEntry;
   readonly 'no-useless-call': NoUselessCall.RuleEntry;
   readonly 'no-useless-catch': NoUselessCatch.RuleEntry;
@@ -13110,12 +13076,14 @@ export type EslintRules = {
   readonly 'jsx-quotes': JsxQuotes.RuleEntry;
   readonly 'key-spacing': KeySpacing.RuleEntry;
   readonly 'keyword-spacing': KeywordSpacing.RuleEntry;
+  readonly 'line-comment-position': LineCommentPosition.RuleEntry;
   readonly 'linebreak-style': LinebreakStyle.RuleEntry;
   readonly 'lines-around-comment': LinesAroundComment.RuleEntry;
   readonly 'lines-around-directive': LinesAroundDirective.RuleEntry;
   readonly 'lines-between-class-members': LinesBetweenClassMembers.RuleEntry;
   readonly 'max-len': MaxLen.RuleEntry;
   readonly 'max-statements-per-line': MaxStatementsPerLine.RuleEntry;
+  readonly 'multiline-comment-style': MultilineCommentStyle.RuleEntry;
   readonly 'multiline-ternary': MultilineTernary.RuleEntry;
   readonly 'new-parens': NewParens.RuleEntry;
   readonly 'newline-after-var': NewlineAfterVar.RuleEntry;
@@ -13136,6 +13104,7 @@ export type EslintRules = {
   readonly 'no-negated-in-lhs': NoNegatedInLhs.RuleEntry;
   readonly 'no-new-object': NoNewObject.RuleEntry;
   readonly 'no-new-require': NoNewRequire.RuleEntry;
+  readonly 'no-new-symbol': NoNewSymbol.RuleEntry;
   readonly 'no-path-concat': NoPathConcat.RuleEntry;
   readonly 'no-process-env': NoProcessEnv.RuleEntry;
   readonly 'no-process-exit': NoProcessExit.RuleEntry;
@@ -13157,7 +13126,6 @@ export type EslintRules = {
   readonly 'prefer-reflect': PreferReflect.RuleEntry;
   readonly 'quote-props': QuoteProps.RuleEntry;
   readonly quotes: Quotes.RuleEntry;
-  readonly 'require-jsdoc': RequireJsdoc.RuleEntry;
   readonly 'rest-spread-spacing': RestSpreadSpacing.RuleEntry;
   readonly semi: Semi.RuleEntry;
   readonly 'semi-spacing': SemiSpacing.RuleEntry;
@@ -13171,7 +13139,6 @@ export type EslintRules = {
   readonly 'switch-colon-spacing': SwitchColonSpacing.RuleEntry;
   readonly 'template-curly-spacing': TemplateCurlySpacing.RuleEntry;
   readonly 'template-tag-spacing': TemplateTagSpacing.RuleEntry;
-  readonly 'valid-jsdoc': ValidJsdoc.RuleEntry;
   readonly 'wrap-iife': WrapIife.RuleEntry;
   readonly 'wrap-regex': WrapRegex.RuleEntry;
   readonly 'yield-star-spacing': YieldStarSpacing.RuleEntry;
@@ -13203,7 +13170,6 @@ export type EslintRulesOption = {
   readonly 'id-length': IdLength.Options;
   readonly 'id-match': readonly [IdMatch.Options0, IdMatch.Options1];
   readonly 'init-declarations': InitDeclarations.Options;
-  readonly 'line-comment-position': LineCommentPosition.Options;
   readonly 'logical-assignment-operators': LogicalAssignmentOperators.Options;
   readonly 'max-classes-per-file': MaxClassesPerFile.Options;
   readonly 'max-depth': MaxDepth.Options;
@@ -13215,13 +13181,11 @@ export type EslintRulesOption = {
     MaxStatements.Options0,
     MaxStatements.Options1,
   ];
-  readonly 'multiline-comment-style': MultilineCommentStyle.Options;
   readonly 'new-cap': NewCap.Options;
   readonly 'no-bitwise': NoBitwise.Options;
   readonly 'no-cond-assign': NoCondAssign.Options;
   readonly 'no-console': NoConsole.Options;
   readonly 'no-constant-condition': NoConstantCondition.Options;
-  readonly 'no-constructor-return': NoConstructorReturn.Options;
   readonly 'no-duplicate-imports': NoDuplicateImports.Options;
   readonly 'no-else-return': NoElseReturn.Options;
   readonly 'no-empty': NoEmpty.Options;
@@ -13235,12 +13199,16 @@ export type EslintRulesOption = {
   readonly 'no-implicit-coercion': NoImplicitCoercion.Options;
   readonly 'no-implicit-globals': NoImplicitGlobals.Options;
   readonly 'no-inline-comments': NoInlineComments.Options;
-  readonly 'no-inner-declarations': NoInnerDeclarations.Options;
+  readonly 'no-inner-declarations': readonly [
+    NoInnerDeclarations.Options0,
+    NoInnerDeclarations.Options1,
+  ];
   readonly 'no-invalid-regexp': NoInvalidRegexp.Options;
   readonly 'no-invalid-this': NoInvalidThis.Options;
   readonly 'no-irregular-whitespace': NoIrregularWhitespace.Options;
   readonly 'no-labels': NoLabels.Options;
   readonly 'no-magic-numbers': NoMagicNumbers.Options;
+  readonly 'no-misleading-character-class': NoMisleadingCharacterClass.Options;
   readonly 'no-multi-assign': NoMultiAssign.Options;
   readonly 'no-param-reassign': NoParamReassign.Options;
   readonly 'no-plusplus': NoPlusplus.Options;
@@ -13281,6 +13249,7 @@ export type EslintRulesOption = {
   readonly 'prefer-regex-literals': PreferRegexLiterals.Options;
   readonly radix: Radix.Options;
   readonly 'require-atomic-updates': RequireAtomicUpdates.Options;
+  readonly 'require-unicode-regexp': RequireUnicodeRegexp.Options;
   readonly 'sort-imports': SortImports.Options;
   readonly 'sort-keys': readonly [SortKeys.Options0, SortKeys.Options1];
   readonly 'sort-vars': SortVars.Options;

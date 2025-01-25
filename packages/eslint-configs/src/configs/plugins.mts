@@ -6,9 +6,6 @@ import eslintPluginArrayFunc from 'eslint-plugin-array-func';
 import eslintPluginFunctional from 'eslint-plugin-functional';
 
 // @ts-expect-error no type definition
-import eslintPluginTotalFunctions from 'eslint-plugin-total-functions';
-
-// @ts-expect-error no type definition
 import eslintPluginSecurity from 'eslint-plugin-security';
 
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
@@ -46,10 +43,13 @@ import eslintPluginReactRefresh from 'eslint-plugin-react-refresh';
 import eslintPluginJsxA11y from 'eslint-plugin-jsx-a11y';
 
 // @ts-expect-error no type definition
-import eslintPluginTreeShakable from 'eslint-plugin-tree-shakable';
-
-// @ts-expect-error no type definition
 import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
+
+// import eslintPluginTotalFunctions from 'eslint-plugin-total-functions';
+import { eslintPluginTotalFunctions } from '../plugins/total-functions/index.mjs';
+
+// import eslintPluginTreeShakable from 'eslint-plugin-tree-shakable';
+import { eslintPluginTreeShakable } from '../plugins/tree-shakable/index.mjs';
 
 import { type FlatConfig, type Plugin } from '../types/index.mjs';
 
@@ -104,10 +104,8 @@ export const plugins: Record<
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'strict-dependencies': eslintPluginStrictDependencies,
   'testing-library': eslintPluginTestingLibrary,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'total-functions': eslintPluginTotalFunctions,
   unicorn: eslintPluginUnicorn,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'tree-shakable': eslintPluginTreeShakable,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'eslint-plugin': eslintPluginEslintPlugin,

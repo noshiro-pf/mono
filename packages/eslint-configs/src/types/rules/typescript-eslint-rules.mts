@@ -429,8 +429,7 @@ namespace ConsistentReturn {
    *     "type": "object",
    *     "properties": {
    *       "treatUndefinedAsUnspecified": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -5220,8 +5219,7 @@ namespace NoInvalidThis {
    *     "type": "object",
    *     "properties": {
    *       "capIsConstructor": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -6064,6 +6062,12 @@ namespace NoRestrictedImports {
    *                   "type": "string"
    *                 }
    *               },
+   *               "allowImportNames": {
+   *                 "type": "array",
+   *                 "items": {
+   *                   "type": "string"
+   *                 }
+   *               },
    *               "allowTypeImports": {
    *                 "type": "boolean",
    *                 "description": "Whether to allow type-only imports for a path."
@@ -6107,6 +6111,12 @@ namespace NoRestrictedImports {
    *                           "type": "string"
    *                         }
    *                       },
+   *                       "allowImportNames": {
+   *                         "type": "array",
+   *                         "items": {
+   *                           "type": "string"
+   *                         }
+   *                       },
    *                       "allowTypeImports": {
    *                         "type": "boolean",
    *                         "description": "Whether to allow type-only imports for a path."
@@ -6141,6 +6151,14 @@ namespace NoRestrictedImports {
    *                         "minItems": 1,
    *                         "uniqueItems": true
    *                       },
+   *                       "allowImportNames": {
+   *                         "type": "array",
+   *                         "items": {
+   *                           "type": "string"
+   *                         },
+   *                         "minItems": 1,
+   *                         "uniqueItems": true
+   *                       },
    *                       "group": {
    *                         "type": "array",
    *                         "items": {
@@ -6149,7 +6167,13 @@ namespace NoRestrictedImports {
    *                         "minItems": 1,
    *                         "uniqueItems": true
    *                       },
+   *                       "regex": {
+   *                         "type": "string"
+   *                       },
    *                       "importNamePattern": {
+   *                         "type": "string"
+   *                       },
+   *                       "allowImportNamePattern": {
    *                         "type": "string"
    *                       },
    *                       "message": {
@@ -6163,8 +6187,7 @@ namespace NoRestrictedImports {
    *                         "type": "boolean",
    *                         "description": "Whether to allow type-only imports for a path."
    *                       }
-   *                     },
-   *                     "required": ["group"]
+   *                     }
    *                   },
    *                   "uniqueItems": true
    *                 }
@@ -6185,6 +6208,7 @@ namespace NoRestrictedImports {
             readonly name: string;
             readonly message?: string;
             readonly importNames?: readonly string[];
+            readonly allowImportNames?: readonly string[];
             /** Whether to allow type-only imports for a path. */
             readonly allowTypeImports?: boolean;
           }
@@ -6197,6 +6221,7 @@ namespace NoRestrictedImports {
                 readonly name: string;
                 readonly message?: string;
                 readonly importNames?: readonly string[];
+                readonly allowImportNames?: readonly string[];
                 /** Whether to allow type-only imports for a path. */
                 readonly allowTypeImports?: boolean;
               }
@@ -6209,8 +6234,15 @@ namespace NoRestrictedImports {
                   ...(readonly string[]),
                 ];
                 /** @minItems 1 */
-                readonly group: readonly [string, ...(readonly string[])];
+                readonly allowImportNames?: readonly [
+                  string,
+                  ...(readonly string[]),
+                ];
+                /** @minItems 1 */
+                readonly group?: readonly [string, ...(readonly string[])];
+                readonly regex?: string;
                 readonly importNamePattern?: string;
+                readonly allowImportNamePattern?: string;
                 readonly message?: string;
                 readonly caseSensitive?: boolean;
                 /** Whether to allow type-only imports for a path. */
@@ -7011,20 +7043,16 @@ namespace NoUnusedExpressions {
    *     "type": "object",
    *     "properties": {
    *       "allowShortCircuit": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowTernary": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowTaggedTemplates": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "enforceForJSX": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -7275,10 +7303,11 @@ namespace NoUseBeforeDefine {
  * @link https://typescript-eslint.io/rules/no-useless-constructor
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | strict  |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | hasSuggestions | true    |
+ *  | recommended    | strict  |
  *  ```
  */
 namespace NoUselessConstructor {

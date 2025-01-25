@@ -47,6 +47,7 @@ export const eslintPlaywrightRules: EslintPlaywrightRules = {
   'playwright/no-page-pause': 'error',
   'playwright/no-raw-locators': 'error',
   'playwright/no-skipped-test': 'error',
+  'playwright/no-slowed-test': 'error',
   'playwright/no-unsafe-references': 'error',
   'playwright/no-useless-await': 'error',
   'playwright/no-useless-not': 'error',

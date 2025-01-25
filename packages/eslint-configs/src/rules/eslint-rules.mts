@@ -377,8 +377,7 @@ export const eslintRules: EslintRules = {
   'vars-on-top': 'error',
   yoda: 'off', // disabled
 
-  // TODO: enable after updating to v9
-  // 'no-useless-assignment': 'error',
+  'no-useless-assignment': 'error',
 
   // deprecated
   'lines-around-comment': 0,
@@ -474,6 +473,4 @@ export const eslintRules: EslintRules = {
   'no-new-symbol': 0, // ts(2588)
   'line-comment-position': 0, // disabled
   'multiline-comment-style': 0, // disabled
-  'require-jsdoc': 0,
-  'valid-jsdoc': 0,
 } as const;

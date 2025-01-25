@@ -21,6 +21,7 @@ const config = [
     rules: {
       'no-restricted-globals': 'off',
       'import/no-internal-modules': 'off',
+      '@typescript-eslint/prefer-readonly-parameter-types': 'off',
     },
   },
   {
