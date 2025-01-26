@@ -1,0 +1,10 @@
+{
+  // https://www.typescriptlang.org/ja/tsconfig
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "sourceMap": true,
+    "target": "es2017"
+  }
+}

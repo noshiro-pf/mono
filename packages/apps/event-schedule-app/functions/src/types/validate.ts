@@ -10,7 +10,7 @@ export const toStringWithCheck = (value: unknown): string => {
 };
 
 export const fillAnswerWithCheck = (
-  value: DeepReadonly<FirebaseFirestore.DocumentData>,
+  value: DeepReadonly<FirebaseFirestore.DocumentData> | undefined,
 ): Answer => {
   const filled = Answer.fill(value);
   if (!deepEqual(filled, value)) {

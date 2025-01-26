@@ -2,7 +2,7 @@ import {
   type Answer,
   type DatetimeSpecificationEnumType,
 } from '@noshiro/event-schedule-app-shared';
-import { answerDiffAsString } from './answer-diff.mjs';
+import { answerDiffAsString } from './answer-diff.js';
 
 const urlPrefix = 'https://event-schedule-app.web.app/event';
 

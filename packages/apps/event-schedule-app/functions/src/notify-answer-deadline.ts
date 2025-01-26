@@ -10,11 +10,11 @@ import {
   createMailBodyForAnswerResult,
   deadlinePassed,
   todayIsNDaysBeforeDeadline,
-} from './functions/index.mjs';
-import { getEmail } from './get-event-item.mjs';
-import { createMailOptions, sendEmail } from './setup-mailer.mjs';
-import { fillEventScheduleWithCheck } from './types/index.mjs';
-import { pad2 } from './utils/index.mjs';
+} from './functions/index.js';
+import { getEmail } from './get-event-item.js';
+import { createMailOptions, sendEmail } from './setup-mailer.js';
+import { fillEventScheduleWithCheck } from './types/index.js';
+import { pad2 } from './utils/index.js';
 
 const keys = {
   notificationSettings: 'notificationSettings',

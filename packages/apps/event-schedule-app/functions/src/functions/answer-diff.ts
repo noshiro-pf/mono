@@ -11,7 +11,7 @@ import {
   datetimeRangeFromMapKey,
   datetimeRangeToMapKey,
   iconId2str,
-} from '../utils/index.mjs';
+} from '../utils/index.js';
 
 const answerDiffRowStr = ({
   datetimeRange,

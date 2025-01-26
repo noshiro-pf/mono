@@ -4,7 +4,7 @@ import {
 } from '@noshiro/event-schedule-app-shared';
 import { mapOptional } from '@noshiro/ts-utils';
 import { type firestore } from 'firebase-admin';
-import { fillEventScheduleWithCheck, isEmailData } from './types/index.mjs';
+import { fillEventScheduleWithCheck, isEmailData } from './types/index.js';
 
 export const getEventItem = async (
   db: firestore.Firestore,

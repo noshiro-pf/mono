@@ -4,8 +4,8 @@ import {
   firestorePaths,
 } from '@noshiro/event-schedule-app-shared';
 import { Obj } from '@noshiro/ts-utils';
-import { type firestore } from 'firebase-admin';
-import { type auth } from 'firebase-functions';
+import { type UserRecord } from 'firebase-admin/auth';
+import { type Firestore } from 'firebase-admin/firestore';
 
 const removeAuthorIdFromEventSchedule = (
   eventSchedule: EventSchedule,
@@ -24,8 +24,8 @@ const removeUserIdFromAnswer = (
   );
 
 export const onUserDelete = async (
-  db: firestore.Firestore,
-  user: DeepReadonly<auth.UserRecord>,
+  db: Firestore,
+  user: DeepReadonly<UserRecord>,
 ): Promise<void> => {
   const userIdToBeRemoved = user.uid;
 

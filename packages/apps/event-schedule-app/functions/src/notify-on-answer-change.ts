@@ -6,10 +6,10 @@ import {
   createMailBodyForAnswerDelete,
   createMailBodyForNewAnswer,
   createMailBodyForUpdatedAnswer,
-} from './functions/index.mjs';
-import { getEmail, getEventItem } from './get-event-item.mjs';
-import { createMailOptions, sendEmail } from './setup-mailer.mjs';
-import { now } from './utils/index.mjs';
+} from './functions/index.js';
+import { getEmail, getEventItem } from './get-event-item.js';
+import { createMailOptions, sendEmail } from './setup-mailer.js';
+import { now } from './utils/index.js';
 
 export const notifyOnAnswerChangeBody = async (
   db: firestore.Firestore,

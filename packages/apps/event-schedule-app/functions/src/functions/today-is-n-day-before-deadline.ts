@@ -6,7 +6,7 @@ import {
   toPositiveSafeInt,
   type DateType,
 } from '@noshiro/ts-utils';
-import { today } from '../utils/index.mjs';
+import { today } from '../utils/index.js';
 
 const ymd2DateObject = (ymd: YearMonthDate): DateType =>
   DateUtils.create(ymd.year, ymd.month, ymd.date);

@@ -154,7 +154,7 @@
     },
     "start:emulators": {
       "dependencies": [
-        "./functions:build:no-clean"
+        "./functions:build:impl"
       ],
       "service": true,
       "command": "firebase emulators:start --only functions,firestore,pubsub --import functions/firebase-emulator-exports --export-on-exit"

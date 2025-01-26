@@ -1,5 +1,5 @@
 {
-  "extends": "../../../../configs/tsconfig/tsconfig.build.json",
+  "extends": "../../../../configs/tsconfig/tsconfig.build.cloud-function.json",
   "compilerOptions": {
     "outDir": "build"
   },
