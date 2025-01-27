@@ -26,6 +26,7 @@
     "create:react-app:vite": "scripts/bash/create_new_react_app_vite.sh",
     "create:slides": "scripts/bash/create_new_slides.sh",
     "create:util": "scripts/bash/create_new_util.sh",
+    "fmt": "yarn fmt:diff:from-main",
     "fmt:all": "yarn zz:prettier:cache . > /dev/null",
     "fmt:all:no-cache": "yarn zz:prettier . > /dev/null",
     "fmt:all:print": "yarn zz:prettier:cache .",
