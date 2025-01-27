@@ -29,6 +29,7 @@ export const eslintImportsRules: EslintImportsRules = {
         'resize-observer/lib/ResizeObserverEntry',
         'vitest/config',
         '*/index.mjs',
+        '*/index.js',
       ],
     },
   ],
