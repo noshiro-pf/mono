@@ -5,14 +5,14 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { getTypeImmutability, Immutability } from 'is-immutable-type';
-import { type Type, type TypeChecker } from 'typescript';
+import { type Program, type Type } from 'typescript';
 
 export type MessageId = 'errorStringGeneric';
 
 export const createNoUnsafeAssignmentRule =
   (
     isUnsafeAssignment: (
-      checker: TypeChecker,
+      checker: Program,
       destinationType: Type,
       sourceType: Type,
       sourceNode: TSESTree.Expression | undefined,
@@ -22,6 +22,7 @@ export const createNoUnsafeAssignmentRule =
     context: Readonly<TSESLint.RuleContext<MessageId, readonly unknown[]>>,
   ): TSESLint.RuleListener => {
     const parserServices = ESLintUtils.getParserServices(context);
+    const program = parserServices.program;
     const checker = parserServices.program.getTypeChecker();
 
     // Special handling for array methods that return mutable arrays but that
@@ -71,7 +72,7 @@ export const createNoUnsafeAssignmentRule =
         ? // and the types within the source and destination array are themselves safe to assign
           // (avoid this issue: https://github.com/danielnixon/eslint-plugin-total-functions/issues/730)
           isUnsafeAssignment(
-            checker,
+            program,
             destinationIndexType,
             sourceIndexType,
             undefined,
@@ -118,7 +119,7 @@ export const createNoUnsafeAssignmentRule =
           if (
             arrayMethodCallSafety === 'unsafe' ||
             isUnsafeAssignment(
-              checker,
+              program,
               destinationType,
               sourceType,
               declaration.init,
@@ -131,9 +132,9 @@ export const createNoUnsafeAssignmentRule =
                 sourceType: checker.typeToString(sourceType),
                 destinationType: checker.typeToString(destinationType),
                 sourceImmutability:
-                  Immutability[getTypeImmutability(checker, sourceType)],
+                  Immutability[getTypeImmutability(program, sourceType)],
                 destinationImmutability:
-                  Immutability[getTypeImmutability(checker, destinationType)],
+                  Immutability[getTypeImmutability(program, destinationType)],
               },
             } as const);
           }
@@ -162,7 +163,7 @@ export const createNoUnsafeAssignmentRule =
         if (
           arrayMethodCallSafety === 'unsafe' ||
           isUnsafeAssignment(
-            checker,
+            program,
             destinationType,
             sourceType,
             node.right,
@@ -175,9 +176,9 @@ export const createNoUnsafeAssignmentRule =
               sourceType: checker.typeToString(sourceType),
               destinationType: checker.typeToString(destinationType),
               sourceImmutability:
-                Immutability[getTypeImmutability(checker, sourceType)],
+                Immutability[getTypeImmutability(program, sourceType)],
               destinationImmutability:
-                Immutability[getTypeImmutability(checker, destinationType)],
+                Immutability[getTypeImmutability(program, destinationType)],
             },
           } as const);
         }
@@ -215,7 +216,7 @@ export const createNoUnsafeAssignmentRule =
         if (
           arrayMethodCallSafety === 'unsafe' ||
           isUnsafeAssignment(
-            checker,
+            program,
             destinationType,
             sourceType,
             node.argument,
@@ -228,9 +229,9 @@ export const createNoUnsafeAssignmentRule =
               sourceType: checker.typeToString(sourceType),
               destinationType: checker.typeToString(destinationType),
               sourceImmutability:
-                Immutability[getTypeImmutability(checker, sourceType)],
+                Immutability[getTypeImmutability(program, sourceType)],
               destinationImmutability:
-                Immutability[getTypeImmutability(checker, destinationType)],
+                Immutability[getTypeImmutability(program, destinationType)],
             },
           } as const);
         }
@@ -269,7 +270,7 @@ export const createNoUnsafeAssignmentRule =
         if (
           arrayMethodCallSafety === 'unsafe' ||
           isUnsafeAssignment(
-            checker,
+            program,
             destinationType,
             sourceType,
             node.argument,
@@ -282,9 +283,9 @@ export const createNoUnsafeAssignmentRule =
               sourceType: checker.typeToString(sourceType),
               destinationType: checker.typeToString(destinationType),
               sourceImmutability:
-                Immutability[getTypeImmutability(checker, sourceType)],
+                Immutability[getTypeImmutability(program, sourceType)],
               destinationImmutability:
-                Immutability[getTypeImmutability(checker, destinationType)],
+                Immutability[getTypeImmutability(program, destinationType)],
             },
           } as const);
         }
@@ -319,7 +320,7 @@ export const createNoUnsafeAssignmentRule =
         if (
           arrayMethodCallSafety === 'unsafe' ||
           isUnsafeAssignment(
-            checker,
+            program,
             destinationType,
             sourceType,
             node.body.type !== AST_NODE_TYPES.BlockStatement
@@ -334,9 +335,9 @@ export const createNoUnsafeAssignmentRule =
               sourceType: checker.typeToString(sourceType),
               destinationType: checker.typeToString(destinationType),
               sourceImmutability:
-                Immutability[getTypeImmutability(checker, sourceType)],
+                Immutability[getTypeImmutability(program, sourceType)],
               destinationImmutability:
-                Immutability[getTypeImmutability(checker, destinationType)],
+                Immutability[getTypeImmutability(program, destinationType)],
             },
           } as const);
         }
@@ -376,7 +377,7 @@ export const createNoUnsafeAssignmentRule =
           if (
             arrayMethodCallSafety === 'unsafe' ||
             isUnsafeAssignment(
-              checker,
+              program,
               destinationType,
               sourceType,
               argument,
@@ -389,9 +390,9 @@ export const createNoUnsafeAssignmentRule =
                 sourceType: checker.typeToString(sourceType),
                 destinationType: checker.typeToString(destinationType),
                 sourceImmutability:
-                  Immutability[getTypeImmutability(checker, sourceType)],
+                  Immutability[getTypeImmutability(program, sourceType)],
                 destinationImmutability:
-                  Immutability[getTypeImmutability(checker, destinationType)],
+                  Immutability[getTypeImmutability(program, destinationType)],
               },
             } as const);
           }
