@@ -23,7 +23,7 @@ export const createNoUnsafeAssignmentRule =
   ): TSESLint.RuleListener => {
     const parserServices = ESLintUtils.getParserServices(context);
     const program = parserServices.program;
-    const checker = parserServices.program.getTypeChecker();
+    const checker = program.getTypeChecker();
 
     // Special handling for array methods that return mutable arrays but that
     // we know are shallow copies and therefore safe to have their result
