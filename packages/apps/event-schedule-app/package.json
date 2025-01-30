@@ -154,7 +154,7 @@
         "./functions:build"
       ],
       "service": true,
-      "command": "firebase emulators:start --only functions,firestore,pubsub --import firebase-emulator-exports --export-on-exit"
+      "command": "firebase emulators:start --only functions,firestore,pubsub --import functions/firebase-emulator-exports --export-on-exit"
     },
     "z:setup:build-deps": {
       "dependencies": [

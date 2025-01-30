@@ -476,7 +476,7 @@ const updatePackageJsonImpl = (
               dependencies: ['./functions:build'],
               service: true,
               command:
-                'firebase emulators:start --only functions,firestore,pubsub --import firebase-emulator-exports --export-on-exit',
+                'firebase emulators:start --only functions,firestore,pubsub --import functions/firebase-emulator-exports --export-on-exit',
             };
           }
 
