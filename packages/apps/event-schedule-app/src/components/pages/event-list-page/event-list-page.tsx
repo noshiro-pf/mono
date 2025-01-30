@@ -137,15 +137,26 @@ export const EventListPage = memoNamed('EventListPage', () => {
             `}
           >
             <div>{dc.itemCount(Arr.length(eventListWithHandler))}</div>
-            <Button
-              disabled={refreshButtonIsDisabled}
-              icon={'refresh'}
-              intent={'none'}
-              loading={refreshButtonIsLoading}
-              onClick={EventListStore.refreshEventList}
-            >
-              {dc.refresh}
-            </Button>
+            <div>
+              <Button
+                disabled={refreshButtonIsDisabled}
+                icon={'refresh'}
+                intent={'none'}
+                loading={refreshButtonIsLoading}
+                onClick={EventListStore.refreshEventList}
+              >
+                {dc.refresh}
+              </Button>
+              <Button
+                disabled={refreshButtonIsDisabled}
+                icon={'refresh'}
+                intent={'none'}
+                loading={refreshButtonIsLoading}
+                onClick={EventListStore.refreshEventList}
+              >
+                {dc.refresh}
+              </Button>
+            </div>
           </FilterByArea>
 
           <div
