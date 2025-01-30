@@ -7,7 +7,9 @@ export const EventListItem = t.record({
   eventScheduleMetadata: t.record({
     id: t.string(''),
     createdAt: t.string(''),
+    createdAtMillis: t.number(0),
     updatedAt: t.string(''),
+    updatedAtMillis: t.number(0),
   }),
 
   answers: t.array(Answer),
