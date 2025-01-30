@@ -51,7 +51,9 @@ export const fetchEventListOfUserImpl = async (
     eventScheduleMetadata: {
       id: d.id,
       createdAt: d.createTime.toDate().toISOString(),
+      createdAtMillis: d.createTime.toMillis(),
       updatedAt: d.updateTime.toDate().toISOString(),
+      updatedAtMillis: d.updateTime.toMillis(),
     },
   }));
 
@@ -126,6 +128,7 @@ export const fetchEventListOfUserImpl = async (
     .filter(({ eventScheduleMetadata }) => {
       const ans = answersOfEventMap.get(eventScheduleMetadata.id);
 
+      // 自分が回答しているかどうか
       return ans?.answers.some(({ user }) => user.id === uid) ?? false;
     })
     .map(({ eventSchedule, eventScheduleMetadata }): EventListItem => {
@@ -139,9 +142,18 @@ export const fetchEventListOfUserImpl = async (
       };
     });
 
-  return eventListItems.filter(
-    ({ eventSchedule, answers }) =>
-      eventSchedule.author.id === uid ||
-      answers.some(({ user }) => user.id === uid),
-  );
+  return eventListItems
+    .filter(
+      ({ eventSchedule, answers }) =>
+        eventSchedule.author.id === uid ||
+        answers.some(({ user }) => user.id === uid),
+    )
+    .toSorted(
+      (a, b) =>
+        // 作成日時降順でソート
+        -(
+          a.eventScheduleMetadata.createdAtMillis -
+          b.eventScheduleMetadata.createdAtMillis
+        ),
+    );
 };
