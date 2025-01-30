@@ -432,7 +432,10 @@ const updatePackageJsonImpl = (
           mut_scripts['fb:deploy:hosting'] = 'wireit';
 
           mut_wireit['fb:deploy'] = {
-            dependencies: ['build'],
+            dependencies:
+              cfg.packageJson.scripts.hasFirebaseFunction === true
+                ? ['build', './functions:build']
+                : ['build'],
             command: 'firebase deploy',
           };
 
@@ -473,7 +476,7 @@ const updatePackageJsonImpl = (
             mut_scripts['start:emulators'] = 'wireit';
 
             mut_wireit['start:emulators'] = {
-              dependencies: ['./functions:build'],
+              dependencies: ['./functions:build:no-clean'],
               service: true,
               command:
                 'firebase emulators:start --only functions,firestore,pubsub --import firebase-emulator-exports --export-on-exit',

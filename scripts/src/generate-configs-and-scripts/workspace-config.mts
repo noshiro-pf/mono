@@ -345,6 +345,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
     }),
     (draft) => {
       draft.typeCheckIncludes.push('functions/src');
+      draft.packageJson.scripts.hasFirebaseFunction = true;
     },
   ),
   'housing-loan-calculator-app': fillDefaultsForApp({
@@ -371,6 +372,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
     }),
     (draft) => {
       draft.typeCheckIncludes.push('functions/src');
+      draft.packageJson.scripts.hasFirebaseFunction = true;
     },
   ),
 

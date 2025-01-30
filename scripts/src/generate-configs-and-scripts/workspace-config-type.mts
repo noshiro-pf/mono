@@ -54,6 +54,7 @@ export type WorkspaceConfig = DeepReadonly<
         passWithNoTests?: true;
         lint?: false;
         e2e?: 'playwright';
+        hasFirebaseFunction?: boolean;
       };
     };
   }

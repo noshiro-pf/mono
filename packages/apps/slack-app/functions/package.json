@@ -6,7 +6,9 @@
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "type": "module",
   "scripts": {
-    "build": "wireit",
+    "build": "run-s clean:build type-check build:impl",
+    "build:impl": "tsc --project tsconfig.json",
+    "build:no-clean": "run-s type-check build:impl",
     "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
     "clean:firebase": "rimraf .firebase",
@@ -22,8 +24,6 @@
     "gi": "bash ../../../../scripts/bash/index_ts_generator.sh ./src --min-depth 1",
     "lint": "yarn zz:eslint:src",
     "lint:fix": "yarn zz:eslint:src --fix",
-    "start:emulators": "firebase emulators:start --only functions",
-    "start:shell": "yarn shell",
     "tsc": "yarn z:type-check:wireit",
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit --project tsconfig.json",
@@ -50,13 +50,6 @@
     "node": ">=16"
   },
   "wireit": {
-    "build": {
-      "dependencies": [
-        "clean:build",
-        "type-check"
-      ],
-      "command": "tsc --project tsconfig.json"
-    },
     "z:fb:deploy": {
       "dependencies": [
         "build"
