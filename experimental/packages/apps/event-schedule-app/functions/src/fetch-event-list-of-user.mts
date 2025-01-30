@@ -151,9 +151,9 @@ export const fetchEventListOfUserImpl = async (
     .toSorted(
       (a, b) =>
         // 作成日時降順でソート
-        (b.eventScheduleMetadata.createdAtMillis ??
-          Date.parse(b.eventScheduleMetadata.createdAt)) -
-        (a.eventScheduleMetadata.createdAtMillis ??
-          Date.parse(a.eventScheduleMetadata.createdAt)),
+        -(
+          a.eventScheduleMetadata.createdAtMillis -
+          b.eventScheduleMetadata.createdAtMillis
+        ),
     );
 };

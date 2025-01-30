@@ -1,3 +1,11 @@
+# v9.1
+
+-   `EventListItem` 型に `createdAtMillis`, `updatedAtMillis` プロパティを追加
+
+# v9
+
+-   `fill*` 関数などを export するのをやめ、 io-ts 型定義を export しその `fill` 関数等を使ってもらうように変更。
+
 # v8
 
 -   日時関係の汎用型を `io-ts-types` パッケージに移動し削除
