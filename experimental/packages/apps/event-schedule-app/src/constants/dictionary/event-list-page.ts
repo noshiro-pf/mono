@@ -12,6 +12,7 @@ export const eventListPageDictionary = {
     createdAt: '作成日',
     lastUpdate: '最終更新',
   },
+  archiveAll: '古い日程調整をすべてアーカイブする',
   refresh: '更新',
   search: '検索',
   itemCount: (n: SafeUint) => `${n}件`,
