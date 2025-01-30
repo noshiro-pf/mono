@@ -11,7 +11,9 @@ describe('EventListItem', () => {
       eventScheduleMetadata: Readonly<{
         id: string;
         createdAt: string;
+        createdAtMillis?: number;
         updatedAt: string;
+        updatedAtMillis?: number;
       }>;
 
       answers: readonly Answer[];
@@ -27,7 +29,9 @@ describe('EventListItem', () => {
       eventScheduleMetadata: {
         id: '',
         createdAt: '',
+        createdAtMillis: 0,
         updatedAt: '',
+        updatedAtMillis: 0,
       },
       answers: [],
       answersMetadata: {
