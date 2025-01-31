@@ -23,6 +23,10 @@ export const EventSchedule = t.record({
   timezoneOffsetMinutes: t.number(DateUtils.today().getTimezoneOffset()),
   author: User,
   archivedBy: t.array(User),
+  /** Unix time (milliseconds) */
+  createdAt: t.number(0),
+  /** Unix time (milliseconds) */
+  updatedAt: t.number(0),
 });
 
 export type EventSchedule = t.TypeOf<typeof EventSchedule>;
