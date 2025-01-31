@@ -16,4 +16,8 @@ export const normalizeEventSchedule = (
   timezoneOffsetMinutes: eventSchedule.timezoneOffsetMinutes,
   author: eventSchedule.author,
   archivedBy: eventSchedule.archivedBy,
+
+  // TODO: fix createdAt and updatedAt value
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
 });
