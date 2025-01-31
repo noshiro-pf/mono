@@ -23,6 +23,8 @@ describe('EventSchedule', () => {
       timezoneOffsetMinutes: number;
       author: User;
       archivedBy: readonly User[];
+      createdAt: number;
+      updatedAt: number;
     }>
   >('=');
 
@@ -42,6 +44,8 @@ describe('EventSchedule', () => {
       timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
       author: User.defaultValue,
       archivedBy: [],
+      createdAt: 0,
+      updatedAt: 0,
     };
 
     expect(EventSchedule.defaultValue).toStrictEqual(defaultValue);
