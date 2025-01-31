@@ -133,7 +133,8 @@
     },
     "fb:deploy": {
       "dependencies": [
-        "build"
+        "build",
+        "./functions:build"
       ],
       "command": "firebase deploy"
     },
@@ -151,7 +152,7 @@
     },
     "start:emulators": {
       "dependencies": [
-        "./functions:build"
+        "./functions:build:no-clean"
       ],
       "service": true,
       "command": "firebase emulators:start --only functions,firestore,pubsub --import functions/firebase-emulator-exports --export-on-exit"
