@@ -1,12 +1,10 @@
 ---
-title: 'TypeScript で連番の配列に詳しい型を付ける'
+title: '［型パズル］TypeScript で連番の配列に詳しい型を付ける'
 emoji: '🐈'
 type: 'tech' # tech: 技術記事 / idea: アイデア
-topics: ['typescript']
-published: false
+topics: ['typescript', 'type-challenges']
+published: true
 ---
-
-[TypeScript Playground WIP](https://www.typescriptlang.org/play?#code/C4TwDgpgBAqglgO2ADigXigSQQEwgDwB4AmAVgDYA+AbgChaAzAVwQGNg4B7BKAJwEMEAcwgBBXgJCEAylALAIuAM6xEKADRQAonPwLlqpMkoAKWlChLg-XsABcUaevNzcDrc4tWIYAPwOARloASgcAJUERABk4KxlNLRp6ZjYObj5IsQl+EDMva1sHBCYAWwAjCF5PVxwi0oqql28-OvLKkIdeCH4cbgAbEChitt4AbQBdOkYWdi4eAWEsyTzLAvsh+srqxVqNkerm1ob0KCDQvm7ehAG9homoAG8XLuAmXh5xSQA6Bl5OEpMCxEJisNmAmh2mmawWCdAAvskZmkEAAqDKLFagwq3LYuHZHXH5HwE3gnM4OADiikq-GAnF4hGGDU0ADdOHAcJoWABrBCcADuCEojxcDHpUBMfQgwCgcBJJyxwGoqx8UGFAAYoL5ZVBCDUoA44GqasqjQBqDDQkUWCwgOAQPo4WV0CwIhG0VjcKwXJRMPrAAKdS79QajAKaYiaADMmgALOMTkCljkTOGoKRYVAAPRZqCcbker2cKVfPqcISAiC+-0BTM5qBhiPRuPjeiehDelQYYhQfgqAJQAA+UB7w6jdHb3ugGHIvZUpCHUFnw4A7BOvTKutXgMQgz0QxKB8PR1Ao4vY4uF8PyMF7hgk58U0oIbDCx3ixBS+XK9viHXc6MkannGmikK29BZmioCQLKJRgFKJSKNYyJQCiWb0NB0ARIsMRxLI8g7Co8BGAkuj6DgRFqMYJwAEKcMWADyDIuHRjEMpgSgAHIQCylQyJQmgcdxvEMokAnZrmTjaFAgB2DIAIgyAFoMgAxDIA0gyADIMUCaoAgZGAAS+MlQCwcyyYALBqABAqLH0X0TGEBxMAIHM-GCUodkOWJFj1lJOjycp6lqmgPa6fphnpDJZm0MKBEGMAvBMBALjal0+7XIMWj4KwfRMHghBRFoACKoxaOMmg5flACyiD8eMlD3PWwU8IA1gyAH-agDqDIAZgyOBAACOUCAOYMgDR6oAEFGAOnegCaDIA0QyABYMgCADIACr6ADnmamAMbWzWAPIMgBWDHJMk9VNgC6DDJgB7aoA-gkyYA+gyAIEMLgONI3JwGA8QdZ1hBiVMtCYVArFWQyohkYRUBlJZ3QIJoNE-QY-0foIwoYKMogJpFFENgw-B9EoECthY2qjDRcN6L9oxIyjaPxVABOo5dUDRbF5OUxAUxvUJPF8QAKlDDZMzj5EqKMCCM7wCbajTBok8jqN0+A0C2fZ3CEDArMAPqS3MmBwX0MtJLQkFogAAmolQIMjqHoW9CvOVLCDK-BMuaAA0qDCMwCcssnKMMAc3jPMiejWrC4T5O2-DKg8nygrEwzIlPWlGVZTANuUBFuNRTFcUYz7ZMWA4NPkx7lRizB5UIIQnF25RRjy-nFuq5xmgTOrxvlyrhAuEXAc4o0FhM8XFxJTcQcCggEzhScYd8Zx8ecxTSfE9nvDk0zowAORSsIwAABbz27BiccTc+L4oQir+v5Ny-XltVw26qaF8V-s7X4tQCVJxPBYiVXDcoxF4ghgoOMDjYHgRCj3hLnCWuACCF07kySorM-4EAYgwJmTB4IQEIKVfg3IIAIKQYQXugpNCj1vjBGB+A4GYKlIQDuLcX4Hhwf3KqJwFagOIfAxBUoK7kPVprKAOskB6wNmhV6d8GH-xISwiAbCXAUITgjKhyUDIIF5H3CY1RbYYHQSATgDAoBM0HhgDiAAxOA+AIA4CiHvVeuFgDsM7pnFO-spEqDURorRxM7HjwAAYABIHiQN4HCNx29OCcU2Aya2lAs683CSJLOwTgFYCUAYoxJizErwseQzuMie7yODrQqGLgfGdx3kvfea9+ap2gBnJOsSmaBOCTITunjvHBL8azfC9ioANMQAwSoUBm5tJ8X44mW905DF5rE1B6DSHIKZngiBwSy5oIwaI7ACh3giy+OMxZSDxHt2qA0ziAyOEom1rrVZfRDa0H1ohJQYB+CsGgMfBZkzlm8JRtaCmd8AAicAhBwBlBgTUw4jwjkXGeYcF5hxXiXIuFci5UDDgAJxTAsG9Jm-A4Cq0kePKwvBEBCFZpi36DSvk-OAHCLxnTukwD8d7B2RRRn0GRXfAxvA4gEoMNi3F+L6nkoQF00kVKvGovRew6l2paUjJEki95MFiW-OkNFE4RLvm-L8VKlF6LkEuHbuk4MsiaFKK1T0zusqZTDhNfK0kw554BHVPPRcNqXCs1GIajJoYiout1W-K+Xx2bVGfp60M3rplQCDe6m0XdX6BuvpfaNIbr5hptK6hsQaY0+tTcG0NfqI0HlGCmuNab80ZtjZmj13co0FrzZW4t1afUJv9WW5NNai0Vqbem9Ndbs2yNza2wtbbe39qrbWrNSbu0trHc2idfbB0To7SO6dU6e3zoHU2r24x36TAZboMA9IZRvQ2U8huhrpmGt6Vi6KuKs0AA0dUNv1QmaGXtWYcuEJ3IZNptTT0NQ4U9v157z0NdqS9X6oDMriKPTuFL+UAdgMa5VwALXQf3UshuwahWV3EnO6+GrCCjF9bAcSQbsOXs0DaygVVgOfvDXSyVtB3RvWkF1cBLcfHywY51NhgCIJHK4Sc-WZz+HGzY9so1zHgnVDZdIgNciFGCjvFAJDWCaF4LCazJ+iapOjCNJ-Rxmj2aGm5Y0kYoqtE1JGIQOAwpqM5xcHCWJ11bpMb6WJrRN7I3SeyTXeh9mwDCarhI6oI7WyHOOTw055zBM3R84eiwP6DA+PE656hWTFEJrCIlvVyXZNBcfi4dUDgmYulOA4OW3mOOaDQ+wzQI6AASlxKv5rCFVeEuH0tv1KZqcIC8ikHw3gjIu2oOunA3RhO+tWehpMoVJu9mgPknGnlyybDbnUWEg1AYjLhvWVlvZl2hwRaBe0A+TD5VS0Wq2+ottzd7WbnbaYF4md3hk3fHiOpT+bVuNeJmEANhAwhhOGV9sthBRBJCAA)
 
 ## 目標
 
@@ -19,26 +17,30 @@ function rangeArray<S extends number, E extends number>(
   step: number = 1
 ): /* TODO */;
 
-const result: readonly [1, 2, 3, 4] = range(1, 5); // ok
+const result: readonly [1, 2, 3, 4] = rangeArray(1, 5); // ok
 
 console.log(result); // [1, 2, 3, 4]
 ```
 
-`start` と `end` が（型計算が重くならない）十分小さな非負整数で `start <= end` かつ `step = 1` が満たされる場合には、返り値に `number[]` ではなく `[1, 2, 3, 4]` というより詳しい型を付ける、というのが今回やりたいことです。
+`start` と `end` が（型計算が重くならない）十分小さな非負整数で `step = 1` が満たされる場合には、返り値に `number[]` ではなく `[1, 2, 3, 4]` のようなより詳しい型を付ける、というのが今回やりたいことです。
 
-## 関数本体の実装
+## 完成品
+
+[TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBAqglgO2ADigXigSQQEwgDwB4AmAVgDYA+AbgChaAzAVwQGNg4B7BKAJwEMEAcwgBBXgJCEAylALAIuAM6xEKADRQAonPwLlqpMkoAKWlChLg-XsABcUaevNzcDrc4tWIYAPwOARloASgcAJUERABk4KxlNLRp6ZjYObj5IsQl+EBMrG3soBCYAWwAjCF5NRRwHYvLKzW8-OtKK3lCitsqAbQBdOkYWdi4eAWEsyTzrW1aGqtdarvmmhTA59vQoAM769v6oAG8XXghgJl4ecUkAOgZeThKTcZFpgurcVZ9g4LoAX2SwzSCAAVBkJmYvDNCntGi4ahs4VCfIjeFsgp0AOKKSr8YCcXiEWELABunDgOE0LAA1ghOAB3BCUI4uBgEqAmAA2ZygcFRW3ytmoljWUGZAAYoL5eVBCIsoA44GLFsKlQBqDDNYIsiwWEBwCCcnC8ugWAEA2jHCysbhWPgQJRMTnAAIOU78HDcTkgKA9AKaYiaADMmgALH0ti9JjkTP6oKRflAAPRJqCcakuG0IJScbk3TmcITPB1Ol2JlO+uOBqAhqDh2gAq1QLN2lQYYhQfgqAJQAA+UA7-aDpubtuAci25E7KlIfagU-7AHYRy3x6dHc7iG6IB6vT7Y3PBzW56G57P++RggcMFHrjGlNVfpnbbmIPnC8WN8BiOXUz1q7WoaaKQfQNvQSZgqAkC8iUYDciUijWMCUAgkm9BQdAAAq4AQFoACOhCiJoABCzIYCYhCYaY2poMymG6PoOAqKIUrbAqA7avINQqJR1HoHRDHcVAxEuNKQQWA4xCiVAwC8EwEAuA4DD8JySgQIMq66JA7DYdBGCESRpguAA+qcnJ4qMDi6bhBFEcJzJcQYsnyaxABEaCuexrkAIQeSEDhkhS-FQCweAMIgEA4IMGFQBEEwxHEsiOUxhgaNogkGPARhkbAHCqTcxGcLmADyhIuDAeVKAVRWcqVhAVXA+WYEoAByEAkpUMiUJoDVNa17WdYk3XJqmTjpYAdgyACIMgBaDIAMQyANIMgAyDFAkqAIGRgAEvuNIUIKMUDjYALBqABAq5WVdVJWEr1VXNTAO3cF1PWnddt0IIQQ0jY4CR7TNC3LZQaAdhtW0sLtB3HQ5ehCc5CkWNKWj4KwnJMHghBRFoACKPRaH0mioxjl03AAsogXV9JQBwVsD6SANYMgB-2oA6gyAGYMjgQHhUCAOYMgDR6oAEFGAOnegCaDIA0QyABYMgCADIACr6ADnmi2AMbWdOAPIMgBWDJN41syLgC6DONgB7aoA-gnjYA+gyAIEMilQAlwDSNScBgPEzMEUNgwIPwCFKGA-CsNAl06u9YCnMAHCVAAtHAQh0qcLgxdZ+EGfZ6AuBYFFUSYNECclzGsT2kmcRDyixxyvGJ8F9Ep8JafsT+OfSlDOdKSpamDBYMWFbmLWcMAhEZSlZQ1TuTJbBHtmaFD4OMSole6qxymqdDupWThkd2RPalD5DclTzDMkr1XRQDbwddaQS44NzVdUsUXnevoIJHtyoZ-coIOV94QOdETno-KkXr9rw-xEDyvS9ORvY8K4AOnlAL+mgF4QD-ilD+rEYF1G3pvB+88a6QKvuveS5dQGzwIt-dBqD37ALXnArBkBI64IgVAkehDx4oM3ggBBY94EdR3vQCwBAwD7xkjhLA-VmG8S2D0TCEYi49HocwiMQCXLV0nrvdhnCYpPVGPVHKijuCYFgpyeqPUkhh24aohA6i4JaKgAAaTQTAFRvDOoWLQTA6UEDN5mKLiYzBjdOTN1bg-GAmgTGUEoHQ7esj8AcNsFw6CRMXotXMWoYwWwImGM0S1TQ-QdH124fEjRj8x5RKLsSTwupC5ZxSu6T0CBvTbVpAyBA-QXCWLanwlqlC8GYLEZURBPRXLcmEMAAAFq5YRRSVAtUwZhDpXShC9P6ZvDJRikm+nFJoG4SyhGpL3qE8OnAWrdEJElQZUAAAGAASQ4xI-j7LIjnXZw8DnHMQAwSoUAcl7NOfs1iUSmGVH+OhbhuMthNhKXuX0UTECpWQH0Bw2A8BEEaf8aKejcAEEIE865xIVEIvwAkm4kKCAJKRToh2TsXZuywOihJns5HrPhVC3FyKhKoq2Ni-AxUGCYSYHBCAhACb8GpBAVl7LCA0jpIyTQjTVkKPRcyvl3JKJoIBWUn0gqqkpIZRKllbLuS4qorvcVULJXqogLinOhTrlyvKYqxk-R8kWDMRgHlIBOAMFAbUhlSgABicB8CRSiIoCZPTTb8IIRgwBpi0F2odU64NTi9lHJOdss5mD8aYU2dswgviAnMPTW0xhyx2jar0W6j1XqfW9P9caoSpqFUIEqRa0mMcx7EjQaMzpxa+kSKgBA9iUMvm0HYRAHSOFCCMsIKQYakp+w9n7EeIMJ5TDuVck+WgMUuU8qlRyzCIq0H0owMu3l+rMU7tXZqzQMaWpnPxY7B0RLoAHr3Roz2MUAAiQc4DjgwGOtik65zTv7Kefs555xzkXHOVA-YACceboKYX4I1GVRcrC8EQEIe+aCY1PqEC+v4tyED3LRDAM5rEYDsVaSw3R0F3W8DiGWgw8HEPIaLjGu5Dy8PHKgzBqi+HpSEY+SRtJ0E0MvukLJLYqHn3ADORBrCjUOVGtlTuUpZqq1CuqdjHOtKDD8fHP2DTgm0T9lcgEcUnlx3imdRgHoOdLUWaWTcIRVrfTWfXVABzKmx49Ac4s5ZHmbMud1G5zzTn-PuYC95uzfmbNecc0FqLyyfMWDC5FwLiXwvBYSyFqzSXUuZYi9llLsX7MZZy9F5LRXMt5fi4VgrKWKvFYy2Vkr1WstVaa-V3LLg+g9BagMVhayD7pO5bu9lhqx7rtU2gmjwg7MAA1ZO7nlRUpT15fSgQsDlcbQg0HDODcRzeamUquVcpgybm9yNxEaWgxjuGE1oO07JTBN7BuZMc6xxJw14tScIII7GsBhoOfe5NzQBnKCk0zbwEH3be39sgJy-rq7CALPjK9+HSPNBI9JiYOdC6YrSBZkizd2ycrY7wjSzQ93pXmoQCKvxcLoKE6G48vHKwXBUeKXJwF5Oak5SbHFpUIKw2OqEYqFDxyXkEdOkmrZ8xCBwGZNxkcfxBgQ+ANZGQOOR3JPh1WYMYY0cY+p9AU25tLZZPp7k7Z+TmcqArfNpVoEcoG4tmATF9vLbE9AZoK3KT7YXudq7fXsQzYO7JU2ClvXoLO8d5k0bpvGfDZm-Jyt1blN2bCHHtnimbf5Lo3sj3y3dTSkwpvMIPQADk4zenF4GdczbeeI0gPD6757vFkkAAk5NN+C2EUmEmoCt49LB7PrO5vs6+w+rYxGs8msH+U8zY8LtQH+znazxZZsKcT-0YIbXDubwfd3xvJ8B8r4Twt2tGB9+T8P0tzBOfN5n-LVPn0PRydebn53zBYQb-g+CX2pXA7w8kGSZrjWGGMBKTMkoBCAbOh5E+EAA)
+
+## 解説
+
+以降は実装の解説です。
+
+### 関数本体の実装
 
 型は後で付けるとして本体をまず実装します。
 
-実装方法は色々ありますが、以下のような実装をしておきます。
+実装方法は色々あり得ますが、以下のような実装をしておきます。
 
 ```ts
-function rangeArray(
-  start: number,
-  end: number,
-  step: number = 1,
-): readonly number[] {
-  return Array.from(range(start, end, step)); // [...range(start, end, step)] でも ok
+function rangeArray(start: number, end: number, step: number = 1): number[] {
+  return Array.from(range(start, end, step));
 }
 
 function* range(
@@ -64,9 +66,9 @@ for (const i of range(1, 5)) {
 // 4
 ```
 
-## 型の実装
+### 型の実装
 
-`step = 1` （または省略されたとき）で `start` と `end` が型計算が再帰制限にひっかからない＆重くならない程度に十分小さい場合のみ型を詳細化したいので、以下のように関数をオーバーロードして、引数の型に応じて詳細化した型 `RangeList<S, E>` と条件を満たさない場合の緩い型 `readonly number[]` を出し分けるようにします。
+結果配列が大きすぎる場合、型計算が重くなったりそもそも再帰制限にひっかかって計算できなかったりするので、 `start` と `end` が十分小さい場合のみ型を詳細化することにします。以下のように関数をオーバーロードして、引数の型に応じて return type を詳細化した型 `RangeList<S, E>` にするか `number[]` にするかが決まるようにします。
 
 ```ts
 type Uint8 = Index<256>; // 0 | 1 | 2 | ... | 255
@@ -74,26 +76,15 @@ type Uint8 = Index<256>; // 0 | 1 | 2 | ... | 255
 function rangeArray<S extends Uint8, E extends Uint8>(
   start: S,
   end: E,
-  step?: 1
+  step?: 1,
 ): RangeList<S, E>;
 
-function rangeArray(
-  start: number,
-  end: number,
-  step?: Uint8
-): readonly number[];
-
-function rangeArray(
-  start: number,
-  end: number,
-  step?: Uint8 = 1
-): readonly number[] {
-  return Array.from(range(start, end, step));
+function rangeArray(start: number, end: number, step?: number): number[];
 ```
 
-`Index` 型ユーティリティも今回実装しますが、これに関してはべた書きでも良いかもしれません。
+`Uint8` 型はべた書きでも良いかもしれませんが、 `Index` という型ユーティリティを実装すれば `Index<256>` として実装できます。詳しくは[TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)を参照してください。
 
-なお、 `start: S` と `end: E` には 1 個の非負整数ではなく union 型が渡される可能性もありますが、その場合には結果と厳密一致する型を生成しづらい（※）ため、その場合には `S` の最小値から `E` の最大値までの整数の union を要素とする長さ不定の配列型を返り値とするという要件もここで追加しておきます（※：一応 `S = 1 | 2`, `E = 3 | 4` に対して `[1, 2] | [1, 2, 3] | [2] | [2, 3]` という感じで全パターンの union 型を返すように定義できる可能性はありますが、 $|S| \times |E|$ のサイズの union になり型計算が重くなる上に見づらくなりあまり嬉しくもないのでこれは避けます。）。
+`start: S` や `end: E` には 1 個の非負整数ではなく `Uint8` の部分型の union 型（例： `1 | 2 | 3`）が渡される可能性もありますが、その場合には `S` の最小値から `E` の最大値までの整数の union を要素とする長さ不定の配列型を返り値とするという要件もここで追加しておきます[^union-arg]。
 
 ```ts
 const s = 2 as 1 | 2 | 3;
@@ -102,27 +93,24 @@ const result2: readonly (1 | 2 | 3 | 4 | 5 | 6)[] = rangeArray(s, e);
 console.log(result2); // [2, 3, 4, 5]
 ```
 
-これは以下のように引数にユーザー定義の数値の union 型の変数を渡す場合に、`rangeArray` の結果の型を不必要に広げないためです。
+[^union-arg]: 一応 `S = 1 | 2`, `E = 3 | 4` なら `[1, 2] | [1, 2, 3] | [2] | [2, 3]` という感じで全パターンの union 型を返すように定義できる可能性はありますが、 $|S| \times |E|$ のサイズの union になり型計算が重くなる上に結果の型も見づらくあまり嬉しくなさそうなので、これは実装しないことにします。
+
+これは以下のように引数にユーザー定義の数値の union 型の変数を渡す場合にも対応するためです。
 
 ```ts
-type MonthEnum = Exclude<Index<13>, 0>;
-type DateEnum = Exclude<Index<32>, 0>;
+type MonthEnum = Exclude<Index<13>, 0>; // 1 | 2 | ... | 12
+type DateEnum = Exclude<Index<32>, 0>; // 1 | 2 | ... | 31
+
+const getAllDatesOfMonth = (year: number, month: MonthEnum): DateEnum[] =>
+  rangeArray(
+    1,
+    (getLastDateNumberOfMonth(year, month) + 1) as 29 | 30 | 31 | 32,
+  ) satisfies DateEnum[];
 
 const getLastDateNumberOfMonth = (
   year: number,
   month: MonthEnum,
 ): 28 | 29 | 30 | 31 => new Date(year, month, 0).getDate() as 28 | 29 | 30 | 31;
-
-const getAllDatesOfMonth = (
-  year: number,
-  month: MonthEnum,
-): readonly DateEnum[] =>
-  rangeArray(
-    1,
-    (getLastDateNumberOfMonth(year, month) + 1) as 29 | 30 | 31 | 32,
-  ).map(
-    (date: DateEnum) => new Date(year, month - 1, date).getDate() as DateEnum,
-  );
 
 console.log(getAllDatesOfMonth(2024, 2));
 // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
@@ -130,59 +118,132 @@ console.log(getAllDatesOfMonth(2024, 2));
 
 次節以降で `RangeList<S, E>` 型を実装していきます。
 
-## `RangeList<S, E>` の本体
+#### `RangeList<S, E>`
 
-`RangeList<S, E>` の本体は以下のような実装になります。
+`RangeList<S, E>` の本体は以下の実装になります。
 
 ```ts
 type RangeList<S extends Uint8, E extends Uint8> =
-  BoolOr<
-    BoolOr<IsNever<S>, IsNever<E>>, // S, E のいずれかが 0 要素の union の場合
-    BoolOr<IsUnion<S>, IsUnion<E>> // S, E のいずれかが >=2 要素の union の場合
-  > extends true
-    ? readonly Exclude<LEQ[E], LEQ[Min<S>]>[] // union に対して Seq で型計算すると、結果が正しくないので、その回避のため
-    : Skip<S, Seq<E>>;
+  // S, E のいずれかが 2 要素以上の union の場合
+  BoolOr<IsUnion<S>, IsUnion<E>> extends true
+    ? Exclude<LEQ[E], LEQ[Min<S>]>[] // union に対して Seq で型計算すると、結果が正しくならないので、その回避のため
+    : ListSkip<S, Seq<E>>;
 ```
 
-- `Skip<S, Seq<E>>` の部分は `S` と `E` がちょうど 1 要素の非負整数（0 以上 255 以下）の場合に対応しています
-  - 例： `RangeList<1, 5> = readonly [1, 2, 3, 4]`
-- `readonly Exclude<LEQ[E], LEQ[Min<S>]>[]` の部分はそれ以外の場合に対応しています。
-  - 例： `RangeList<1 | 2 | 3, 5 | 6 | 7> = readonly (1 | 2 | 3 | 4 | 5 | 6)[]`
-- `IsNever<U>` は `U` が 0 要素の union （ = `never`）であるとき `true`、そうでなければ `false` に評価される型を返します。
-- `IsUnion<U>` は `U` が 2 要素以上の union 型であるとき `true`、そうでなければ `false` に評価される型を返します。
-  - 例： `IsUnion<1 | 2> = true`, `IsUnion<1> = false`,
-- `LEQ[U]` は `U` の最大値未満のすべての非負整数を含む union 型を返します。
-  - 例： `LEQ[4 | 5 | 6] = 0 | 1 | 2 | 3 | 4 | 5`
-- `Min<U>` は `U` の最小の非負整数を返します。
-  - 例： `Min<3 | 4 | 5> = 3`
-- これらを組み合わせた `Exclude<LEQ[E], LEQ[Min<S>]>` という部分は、 `S = 1 | 2 | 3`, `E = 5 | 6 | 7` に対して `1 | 2 | 3 | 4 | 5 | 6` となる型です。
-- `Seq<N>` は `N` までの非負整数の連番のタプル型を返します。
-  - 例： `Seq<3> = readonly [0, 1, 2]`
-- `Skip<N, T>` はタプル型 `T` の先頭の `N` 要素を除いた型を返します。
-  - 例： `Skip<2, [1, 2, 3]> = [3]`
+ユニットテスト
 
-以上のような型をそれぞれ実装できれば所望の型 `RangeList<S, E>` が実装できることが確認できると思います。
-使っている型 `BoolOr`, `IsNever`, `IsUnion`, `LEQ`, `Min`, `Skip`, `Seq` という型の実装を次節以降それぞれ説明していきます。
+```ts
+expectType<RangeList<1, 5>, readonly [1, 2, 3, 4]>('=');
+expectType<RangeList<1, 2>, readonly [1]>('=');
+expectType<RangeList<1, 1>, readonly []>('=');
+expectType<RangeList<1, 1 | 3>, readonly (1 | 2)[]>('=');
+expectType<RangeList<1 | 3, 3 | 5>, readonly (1 | 2 | 3 | 4)[]>('=');
+expectType<RangeList<1 | 2 | 3, 5 | 6 | 7>, readonly (1 | 2 | 3 | 4 | 5 | 6)[]>(
+  '=',
+);
+expectType<RangeList<5, 1>, readonly []>('=');
+```
 
-## `Min<U>`, `BoolOr<A, B>`, `IsNever<U>`, `IsUnion<U>` の実装
+`expectType` はここでは `expect<A, B>("=")` が `A` と `B` は等しい型であることを確認する型レベルの assert 文を表しています。型ユニットテスト用ユーティリティ `expectType` の詳細については[TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)を参照してください。
 
-`Min<U>` の実装はこの記事で紹介しています。
-https://zenn.dev/noshiro_piko/articles/typescript-type-level-min
+`ListSkip<S, Seq<E>>` の部分は `S` と `E` がちょうど 1 要素の非負整数（0 以上 255 以下）の場合の型です。
 
-`BoolOr` は型の論理和を取る関数で、[ここ](https://zenn.dev/link/comments/0c6cc10b5889f2)に実装を載せています。
+`ListSkip<N, T>` はタプル型 `T` の先頭 `N` 要素を除いた型を返す型です（例：`ListSkip<2, [1, 2, 3, 4, 5]>` = `[3, 4, 5]`）。
+`Seq<N>` は整数 `N` までの連番配列を返す型です（例： `Seq<5>` = `[0, 1, 2, 3, 4]`。
+これらを組み合わせると `ListSkip<S, Seq<E>>` とすることで `S` 以上 `E` 未満の整数の連番配列を作ることができます（例： `RangeList<1, 5> = [1, 2, 3, 4]`）。よって、 `ListSkip` と `Seq` を作ることができればここは解決します。
 
-`IsNever` は型が `never` かどうか判定する関数で、[ここ](https://zenn.dev/link/comments/914c745a18d71c)に実装を載せています。
-
-`IsUnion` は型が union 型かどうか判定する関数で、[ここ](https://zenn.dev/link/comments/d108fe1394e4f4)に実装を載せています。
-
-## `LEQ` の実装
-
-## `Skip` の実装
-
-## `Seq` の実装
+次に `S` または `E` が union 型の場合の判定ですが、これは `BoolOr` と `IsUnion` という型ユーティリティを実装することで実現できます。実装は [TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)を参照してください。
+そしてそのときの型は、 union 型 `S` の中の最小値 `L` から union 型 `E` の中の最大値 - 1 = `U` までの union 型を要素とする配列 `(L | (L + 1) | ... | (U - 1) | U)[]` とします。これは `LEQ` という配列を作ることで `Exclude<LEQ[E], LEQ[Min<S>]>[]` として実装することができます。
+`LEQ[U]` は `U` の最大値未満のすべての非負整数を含む union 型を返すようにします（例： `LEQ[4 | 5 | 6] = 0 | 1 | 2 | 3 | 4 | 5`）。 `Min` は非負整数の union 型 `U` を受け取り、最小値を返す型です（例： `Min<3 | 4 | 5> = 3`）。`Min` の実装については[TypeScript の型ユーティリティ Min, Max の実装](https://zenn.dev/noshiro_piko/articles/typescript-type-level-min)という記事で解説しているのでそちらを参照してください。あとは `LEQ` を実装できれば OK です。
 
 ---
 
-## 完成品
+#### `ListSkip` の実装
 
-[TypeScript Playground](https://www.typescriptlang.org/play?#code/C4TwDgpgBAqglgO2ADigXigSQQEwgDwB4AmAVgDYA+AbgChaAzAVwQGNg4B7BKAJwEMEAcwgBBXgJCEAylALAIuAM6xEKADRQAonPwLlqpMkoAKWlChLg-XsABcUaevNzcDrc4tWIYAPwOARloASgcAJUERABk4KxlNLRp6ZjYObj5IsQl+EDMva1sHBCYAWwAjCF5PVxwi0oqql28-OvLKkIdeCH4cbgAbEChitt4AbQBdOkYWdi4eAWEsyTzLAvsh+srqxVqNkerm1ob0KCDQvm7ehAG9homoAG8XLuAmXh5xSQA6Bl5OEpMCxEJisNmAmh2mmawWCdAAvskZmkEAAqDKLFagwq3LYuHZHXH5HwE3gnM4OADiikq-GAnF4hGGDU0ADdOHAcJoWABrBCcADuCEojxcDHpUBMfQgwCgcBJJyxwGoqx8UGFAAYoL5ZVBCDUoA44GqasqjQBqDDQkUWCwgOAQPo4WV0CwIhG0VjcKwXJRMPrAAKdS79QajAKaYiaADMmgALOMTkCljkTOGoKRYVAAPRZqCcbker2cKVfPqcISAiC+-0BTM5qBhiPRuPjeiehDelQYYhQfgqAJQAA+UB7w6jdHb3ugGHIvZUpCHUFnw4A7BOvTKutXgMQgz0QxKB8PR1Ao4vY4uF8PyMF7hgk58U0oIbDCx3ixBS+XK9viHXc6MkannGmikK29BZmioCQLKJRgFKJSKNYyJQCiWb0NB0ARIsMRxLI8g7Co8BGAkuj6DgRFqMYJwAEKcMWADyDIuHRjEMpgSgAHIQCylQyJQmgcdxvEMokAnZrmTjaFAgB2DIAIgyAFoMgAxDIA0gyADIMUCaoAgZGAAS+MlQCwcyyYALBqABAqLH0X0TGEBxMAIHM-GCUodkOWJFj1lJOjycp6lqmgPa6fphnpDJZm0MKBEGMAvBMBALjal0+7XIMWj4KwfRMHghBRFoACKoxaOMmg5flACyiD8eMlD3PWwU8IA1gyAH-agDqDIAZgyOBAACOUCAOYMgDR6oAEFGAOnegCaDIA0QyABYMgCADIACr6ADnmamAMbWzWAPIMgBWDHJMk9VNgC6DDJgB7aoA-gkyYA+gyAIEMLgONI3JwGA8QdZ1hBiVMtCYVArFWQyohkYRUBlJZ3QIJoNE-QY-0foIwoYKMogJpFFENgw-B9EoECthY2qjDRcN6L9oxIyjaPxVABOo5dUDRbF5OUxAUxvUJPF8QAKlDDZMzj5EqKMCCM7wCbajTBok8jqN0+A0C2fZ3CEDArMAPqS3MmBwX0MtJLQkFogAAmolQIMjqHoW9CvOVLCDK-BMuaAA0qDCMwCcssnKMMAc3jPMiejWrC4T5O2-DKg8nygrEwzIlPWlGVZTANuUBFuNRTFcUYz7ZMWA4NPkx7lRizB5UIIQnF25RRjy-nFuq5xmgTOrxvlyrhAuEXAc4o0FhM8XFxJTcQcCggEzhScYd8Zx8ecxTSfE9nvDk0zowAORSsIwAABbz27BiccTc+L4oQir+v5Ny-XltVw26qaF8V-s7X4tQCVJxPBYiVXDcoxF4ghgoOMDjYHgRCj3hLnCWuACCF07kySorM-4EAYgwJmTB4IQEIKVfg3IIAIKQYQXugpNCj1vjBGB+A4GYKlIQDuLcX4Hhwf3KqJwFagOIfAxBUoK7kPVprKAOskB6wNmhV6d8GH-xISwiAbCXAUITgjKhyUDIIF5H3CY1RbYYHQSATgDAoBM0HhgDiAAxOA+AIA4CiHvVeuFgDsM7pnFO-spEqDURorRxM7HjwAAYABIHiQN4HCNx29OCcU2Aya2lAs683CSJLOwTgFYCUAYoxJizErwseQzuMie7yODrQqGLgfGdx3kvfea9+ap2gBnJOsSmaBOCTITunjvHBL8azfC9ioANMQAwSoUBm5tJ8X44mW905DF5rE1B6DSHIKZngiBwSy5oIwaI7ACh3giy+OMxZSDxHt2qA0ziAyOEom1rrVZfRDa0H1ohJQYB+CsGgMfBZkzlm8JRtaCmd8AAicAhBwBlBgTUw4jwjkXGeYcF5hxXiXIuFci5UDDgAJxTAsG9Jm-A4Cq0kePKwvBEBCFZpi36DSvk-OAHCLxnTukwD8d7B2RRRn0GRXfAxvA4gEoMNi3F+L6nkoQF00kVKvGovRew6l2paUjJEki95MFiW-OkNFE4RLvm-L8VKlF6LkEuHbuk4MsiaFKK1T0zusqZTDhNfK0kw554BHVPPRcNqXCs1GIajJoYiout1W-K+Xx2bVGfp60M3rplQCDe6m0XdX6BuvpfaNIbr5hptK6hsQaY0+tTcG0NfqI0HlGCmuNab80ZtjZmj13co0FrzZW4t1afUJv9WW5NNai0Vqbem9Ndbs2yNza2wtbbe39qrbWrNSbu0trHc2idfbB0To7SO6dU6e3zoHU2r24x36TAZboMA9IZRvQ2U8huhrpmGt6Vi6KuKs0AA0dUNv1QmaGXtWYcuEJ3IZNptTT0NQ4U9v157z0NdqS9X6oDMriKPTuFL+UAdgMa5VwALXQf3UshuwahWV3EnO6+GrCCjF9bAcSQbsOXs0DaygVVgOfvDXSyVtB3RvWkF1cBLcfHywY51NhgCIJHK4Sc-WZz+HGzY9so1zHgnVDZdIgNciFGCjvFAJDWCaF4LCazJ+iapOjCNJ-Rxmj2aGm5Y0kYoqtE1JGIQOAwpqM5xcHCKYnDuErL4+cwTN0wDCZ-QYHx4mb2Ruk9kg1Fgwg+eoVkxRrZVMuHVA4JmLpTgODltdW6HHNBofYZoEdAAJS4aX81hCqvCXDwWu2lM1OEBeRSD4bwRkXbUpXTgboETBRLd0PMIy81oormSZM5Poc19z4nqgjvC7ErLPQ0mUKk3ezQHyTjTy5RNhtzqLCQagMRlw3rKy3tC7J8YwRaBe0A+TD5VS0Wq2+gt3zd7WbnbaUN4md3hk3fHiOpT+aVt5eJmEANhAwhhOGV9sthBRBJCAA)
+以下の実装になります。
+
+<!-- prettier-ignore -->
+```ts
+type ListSkip<N extends number, T extends readonly unknown[]> =
+  ListSkipImpl<N, T, []>;
+
+type ListSkipImpl<
+  N extends number,
+  T extends readonly unknown[],
+  R extends readonly unknown[],
+> = T extends readonly []
+  ? T
+  : R['length'] extends N
+    ? T
+    : ListSkipImpl<N, Tail<T>, [Head<T>, ...R]>;
+```
+
+`Head<T>` は `T` の先頭要素を取り出す型です。これは `infer` を使って以下で実装できます。
+
+```ts
+type Head<T extends readonly unknown[], D = never> = T extends readonly [
+  infer X,
+  ...(readonly unknown[]),
+]
+  ? X
+  : D;
+```
+
+`Tail<T>` は `T` の先頭要素を除いた残りの配列を返す型です。以下で実装できます。
+
+```ts
+type Tail<A extends readonly unknown[]> = A extends readonly []
+  ? readonly []
+  : A extends readonly [unknown, ...infer R]
+    ? R
+    : A;
+```
+
+`ListSkipImpl<N, T, R>` は、`T` を先頭要素 `H` と残りに分け、 `T` = `Tail<T>`, `R` = `[Head<T>, ...R]` と更新して再帰呼び出しし、 `R` の長さが `N` に到達した時点で `R['length'] extends N` という条件が満たされるので `T` が返される、という動作になっています。
+
+```
+ListSkip<2, [1, 2, 3, 4, 5]>
+-> ListSkipImpl<2, [1, 2, 3, 4, 5], []>
+-> ListSkipImpl<2, [2, 3, 4, 5], [1]>
+-> ListSkipImpl<2, [3, 4, 5], [2, 1]>
+-> [3, 4, 5]
+```
+
+#### `Seq` の実装
+
+```ts
+type Seq<N extends number> = SeqImpl<N, MakeTuple<unknown, N>>;
+
+type SeqImpl<N extends number, T extends readonly unknown[]> = {
+  [i in keyof T]: i extends `${number}` ? ToNumber<i> : never;
+};
+
+type ToNumber<S extends `${number}`> = S extends `${infer N extends number}`
+  ? N
+  : never;
+```
+
+`MakeTuple<E, N>` は`N` 要素の `E` からなるタプルを返す型で、[TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)で実装方法を解説しています。
+`Seq` は、長さ `N` の適当な配列を作り、 `keyof` でその key を取り出すことで連番配列を作っています。このとき `keyof` の結果は文字列リテラル型になってしまうのでこれを数値型にするために `ToNumber` を使っています。
+
+#### `LEQ` の実装
+
+```ts
+type LEQ = {
+  [N in Uint8]: Index<N>;
+};
+// {
+//   0: never;
+//   1: 0;
+//   2: 0 | 1;
+//   3: 0 | 1 | 2;
+//   4: 0 | 1 | 2 | 3;
+//   5: 0 | 1 | 2 | 3 | 4;
+//   6: 0 | 1 | 2 | 3 | 4 | 5;
+//   ...
+// }
+```
+
+で実装できます。
+
+`Index` の実装は[TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)を参照してください。
