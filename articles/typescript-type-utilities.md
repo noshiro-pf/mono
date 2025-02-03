@@ -1,13 +1,12 @@
 ---
-title: 'TypeScript 型ユーティリティ集'
+title: '［型パズル］TypeScript 型ユーティリティ集'
 emoji: '🐈'
 type: 'tech' # tech: 技術記事 / idea: アイデア
-topics: ['typescript']
+topics: ['typescript', 'type-challenges']
 published: true
 ---
 
-ほぼ私のライブラリ [ts-type-utils](https://github.com/noshiro-pf/mono/tree/main/packages/ts-type-utils) からの抜粋です（都合により TypeScript 標準ライブラリ（`lib.es5.d.ts` 等）に依存するかどうかでパッケージを分けています）。
-随時更新していきます。
+ほぼ私のライブラリ [ts-type-utils](https://github.com/noshiro-pf/mono/tree/main/packages/ts-type-utils) からの抜粋です。
 
 ---
 
@@ -15,17 +14,26 @@ published: true
 
 ```ts
 expectType<[1, 2, 3], [1, 2, 3]>('=');
-expectType<[any], [number]>('<=');
 expectType<number, string>('!=');
 expectType<any, 1>('!=');
+
+// @ts-expect-error
+expectType<{ x: 1 } & { y: 2 }, { x: 1; y: 2 }>('=');
+
+expectType<{ x: 1 } & { y: 2 }, { x: 1; y: 2 }>('~=');
+
+expectType<{ x: 1 } & { y: 2 }, { x: 1; y: 2 }>('<=');
+
+expectType<{ x: 1 } & { y: 2 }, { x: 1; y: 2 }>('>=');
 ```
 
 型の等価性や部分型関係をチェックするユーティリティです。
 
-- `expectType<A, B>("=")` は型 `A` と型 `B` が等価であるときに型エラーにならず、そうでないときに型エラーになります。
-- `expectType<A, B>("!=")` は `"="` の逆です。
-- `expectType<A, B>("<=")` は型 `A` が型 `B` の部分型であるとき型エラーにならず、部分型でないときに型エラーになります。
-- `expectType<A, B>("~=")` は `A` が `B` の部分型かつ `B` が `A` の部分型であるときに型エラーにならず、そうでないときに型エラーになります。 `"="` の内部実装の `TypeEq<A, B>` は例えば `{ x: 1 } & { y: 2 }` と `{ x: 1; y: 2 }` を区別してしまう程厳密なものなので、もう少し緩い等価判定を行いたい場合に用意しています。
+- `expectType<A, B>("=")` ： 型 `A` と型 `B` が等しいかどうか
+- `expectType<A, B>("!=")` ： 型 `A` と型 `B` が等しくないかどうか
+- `expectType<A, B>("<=")` ： 型 `A` が型 `B` の部分型であるかどうか
+- `expectType<A, B>("~=")` ： `A` が `B` の部分型かつ `B` が `A` の部分型であるかどうか
+  - `"="` の内部実装の `TypeEq<A, B>` は例えば `{ x: 1 } & { y: 2 }` と `{ x: 1; y: 2 }` を区別してしまう程厳密なものなので、もう少し緩い等価判定を行いたい場合に用意しています。
 
 --- 実装 ---
 
@@ -121,11 +129,11 @@ type BoolAnd<A extends boolean, B extends boolean> =
 `A` や `B` に `true`, `false` の他に `boolean` や `never`, `any` などが入ってくる可能性もあるため、 `TypeEq` で厳密一致するかどうかをチェックする実装にしています。 `true` か `false` になっていなければすべて `never` を返します。
 
 :::details ソースコード（残りの実装）
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/boolean.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/boolean.d.mts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/boolean.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/boolean.mts
 :::
 
 ## `IsNever`
@@ -149,7 +157,7 @@ type IsNever<T> = [T] extends [never] ? true : false;
 :::
 
 :::details テスト
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/is-never.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/is-never.mts
 :::
 
 ## `IsUnion`
@@ -164,22 +172,21 @@ expectType<IsUnion<number | string>, true>('=');
 Type Challenges^[[Type Challenges (IsUnion)](https://github.com/type-challenges/type-challenges/blob/main/questions/01097-medium-isunion/README.md)]にも掲載されています。
 
 ```ts
-type IsUnion<U> = _IsUnionImpl<U, U>;
+type IsUnion<U> = IsUnionImpl<U, U>;
 
-/** @internal */
-type _IsUnionImpl<U, K extends U> =
+type IsUnionImpl<U, K extends U> =
   IsNever<U> extends true ? false : K extends K ? BoolNot<TypeEq<U, K>> : never;
 ```
 
-まず与えられた型 `U` が `never` であれば `false` を返します。
+まず引数の型 `U` が `never` であれば `false` を返します。
 次に union distribution[^1] を用いて `U` の各要素 `K` 取り出し、その `K` と `U` が等しければ、`U` は 1 要素の union ということになるので `false` を返し、そうでない場合は `true` を返す、という仕組みです。なお、最後の `never` に評価されることはありません（union distribution のイディオム）。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/is-union.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/is-union.d.mts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/is-union.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/is-union.mts
 :::
 
 ## `ToNumber`
@@ -189,7 +196,7 @@ expectType<ToNumber<'1000'>, 1000>('=');
 expectType<ToNumber<'8192'>, 8192>('=');
 ```
 
-数値の文字列型を数値型にします。
+数値の文字列型を数値型に変換します。
 
 --- 実装 ---
 
@@ -200,17 +207,17 @@ type ToNumber<S extends `${number}`>
 ```
 
 :::message
-注意： TypeScript 4.8 で実装された機能 に依存しているため、それ以前のバージョンでは tuple 型を経由して "length" プロパティを取り出す大掛かりな実装が必要になります。
+注意： TypeScript 4.8 で実装された機能に依存しているため、それ以前のバージョンでは tuple 型を経由して "length" プロパティを取り出す大掛かりな実装が必要になります。
 
 @[card](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-8.html#improved-inference-for-infer-types-in-template-string-types)
 :::
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/to-number.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/to-number.d.mts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/to-number.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/to-number.mts
 :::
 
 ## `IsFixedLengthList`
@@ -233,11 +240,11 @@ type IsFixedLengthList<T extends readonly unknown[]> =
 可変長配列（ `readonly number[]` など）の`"length"` の型が `number` 型であるのに対して、固定長の配列型（タプル型、 `[1, 2, 3]` など）の `"length"` の型が `number` 型ではなく定数の型（`3`など）になることを利用しています。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/is-fixed-length-list.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/is-fixed-length-list.d.mts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/is-fixed-length-list.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/is-fixed-length-list.mts
 :::
 
 ## `IndexOfTuple`
@@ -248,14 +255,14 @@ expectType<IndexOfTuple<readonly [2, 4, 6, 8, 10]>, 0 | 1 | 2 | 3 | 4>('=');
 expectType<IndexOfTuple<readonly []>, never>('=');
 ```
 
-タプル型のインデックスを返します。
+タプル型のインデックスの union を返します。
 
 --- 実装 ---
 
 ```ts
-type IndexOfTuple<T extends readonly unknown[]> = _IndexOfTupleImpl<T, keyof T>;
+type IndexOfTuple<T extends readonly unknown[]> = IndexOfTupleImpl<T, keyof T>;
 
-type _IndexOfTupleImpl<T extends readonly unknown[], K> =
+type IndexOfTupleImpl<T extends readonly unknown[], K> =
   IsFixedLengthList<T> extends true
     ? K extends keyof T
       ? K extends `${number}`
@@ -269,11 +276,11 @@ type _IndexOfTupleImpl<T extends readonly unknown[], K> =
 `K extends '${number}'`は `K` が `ToNumber` の制約を満たしているというヒントを型システムに与えるために追加していますが、 `IndexOfTuple` からの入力では必ず真になるので実質何もしていない条件部です。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/index-of-tuple.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/index-of-tuple.d.mts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/index-of-tuple.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/index-of-tuple.mts
 :::
 
 ## `MakeTuple`
@@ -287,78 +294,68 @@ expectType<MakeTuple<unknown, 3>, readonly [unknown, unknown, unknown]>('=');
 --- 実装 ---
 
 ```ts
-type MakeTuple<Elm, N extends number> = _MakeTupleInternals.MakeTupleImpl<
-  Elm,
-  `${N}`,
-  []
->;
+type MakeTuple<Elm, N extends number> = MakeTupleImpl<Elm, `${N}`, []>;
 
-namespace _MakeTupleInternals {
-  type Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+type Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
-  type Tail<T extends string> = T extends `${Digit}${infer U}` ? U : never;
+type Tail<T extends string> = T extends `${Digit}${infer U}` ? U : never;
 
-  type First<T extends string> = T extends `${infer U}${Tail<T>}` ? U : never;
+type First<T extends string> = T extends `${infer U}${Tail<T>}` ? U : never;
 
-  type DigitStr = `${Digit}`;
+type DigitStr = `${Digit}`;
 
-  type Tile<
-    T extends readonly unknown[],
-    N extends Digit | DigitStr | '10' | 10,
-  > = [
-    readonly [],
-    readonly [...T],
-    readonly [...T, ...T],
-    readonly [...T, ...T, ...T],
-    readonly [...T, ...T, ...T, ...T],
-    readonly [...T, ...T, ...T, ...T, ...T],
-    readonly [...T, ...T, ...T, ...T, ...T, ...T],
-    readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T],
-    readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
-    readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
-    readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
-  ][N];
+type Tile<
+  T extends readonly unknown[],
+  N extends Digit | DigitStr | '10' | 10,
+> = [
+  readonly [],
+  readonly [...T],
+  readonly [...T, ...T],
+  readonly [...T, ...T, ...T],
+  readonly [...T, ...T, ...T, ...T],
+  readonly [...T, ...T, ...T, ...T, ...T],
+  readonly [...T, ...T, ...T, ...T, ...T, ...T],
+  readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T],
+  readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
+  readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
+  readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
+][N];
 
-  export type MakeTupleImpl<
-    T,
-    N extends string,
-    X extends readonly unknown[],
-  > = string extends N
-    ? never
-    : N extends ''
-      ? X
-      : First<N> extends infer U
-        ? U extends DigitStr
-          ? MakeTupleImpl<
-              T,
-              Tail<N>,
-              readonly [...Tile<[T], U>, ...Tile<X, 10>]
-            >
-          : never
-        : never;
-}
+export type MakeTupleImpl<
+  T,
+  N extends string,
+  X extends readonly unknown[],
+> = string extends N
+  ? never
+  : N extends ''
+    ? X
+    : First<N> extends infer U
+      ? U extends DigitStr
+        ? MakeTupleImpl<T, Tail<N>, readonly [...Tile<[T], U>, ...Tile<X, 10>]>
+        : never
+      : never;
 ```
 
 かなり大がかりですが、巨大な tuple 型を作ろうとしても再帰制限にひっかからないようにするためこのように実装が工夫がされています。以下の記事で紹介されていたものをほぼそのまま利用しました（`ToNumber` の実装だけ TypeScript 4.8 の機能を使い効率化しています）。
 
 参考： https://techracho.bpsinc.jp/yoshi/2020_09_04/97108
 
-以下の単純な再帰を行う実装でも小さな `N` に対しては同様に動きますが、 `N` が大きい場合に再帰回数の制限にひっかかってしまいます。
+以下の単純な再帰を行う実装でも小さな `N` に対しては同様に動きますが、 `N` が大きい場合にすぐ再帰回数の制限にひっかかってしまいます。
 `MakeTupleNaive` の再帰回数は $O(N)$ なのに対し、 `MakeTuple` の再帰回数は $O(\log_{10} N)$ になります。
 
 ```ts
-type MakeTupleNaive<Elm, N extends number> = _MakeTupleNaiveImpl<
+type MakeTupleNaive<Elm, N extends number> = MakeTupleNaiveImpl<
   N,
   Elm,
   readonly []
 >;
 
 /** @internal */
-type _MakeTupleNaiveImpl<Num, Elm, T extends readonly unknown[]> =
+type MakeTupleNaiveImpl<Num, Elm, T extends readonly unknown[]> =
   //
   T extends { length: Num }
     ? T
-    : _MakeTupleNaiveImpl<Num, Elm, readonly [Elm, ...T]>;
+    : MakeTupleNaiveImpl<Num, Elm, readonly [Elm, ...T]>;
 ```
 
 ```ts
@@ -367,11 +364,11 @@ expectType<MakeTupleNaive<0, 1000>, MakeTuple<0, 1000>>('=');
 ```
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/make-tuple.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/make-tuple.d.mts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/make-tuple.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/make-tuple.mts
 :::
 
 ## `Index`
@@ -381,7 +378,7 @@ expectType<Index<3>, 0 | 1 | 2>('=');
 expectType<Index<5>, 0 | 1 | 2 | 3 | 4>('=');
 ```
 
-与えられた整数未満の非負整数すべてからなる union 型を返します。
+整数引数 `N` 未満の非負整数すべてからなる union 型 `0 | 1 | ... | N - 1` を返します。
 
 --- 実装 ---
 
@@ -389,14 +386,14 @@ expectType<Index<5>, 0 | 1 | 2 | 3 | 4>('=');
 type Index<N extends number> = IndexOfTuple<MakeTuple<0, N>>;
 ```
 
-`MakeTuple` を利用して tuple を作った後 `IndexOfTuple` でその index を取り出す、という実装をしています。
+`MakeTuple` を利用して長さ `N` の tuple を作った後、 `IndexOfTuple` でその tuple の index を取り出す、という実装をしています。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/index-type.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/index-type.d.mts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/index-type.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/index-type.mts
 :::
 
 ## `NegativeIndex`
@@ -406,61 +403,56 @@ expectType<NegativeIndex<0>, never>('=');
 expectType<NegativeIndex<5>, -1 | -2 | -3 | -4 | -5>('=');
 ```
 
-与えられた整数以上の負整数すべて（`0` は除く）からなる union 型を返します。
+整数 `N` を受け取り、 `-N` 以上の負整数すべて（`0` は除く）からなる union 型 `-N | -N + 1 | ... | -1` を返します。
 
 --- 実装 ---
 
 ```ts
-type NegativeIndex<N extends number> = _NegativeIndexImpl.MapIdx<
+type NegativeIndex<N extends number> = NegativeIndexImpl.MapIdx<
   RelaxedExclude<Index<N>, 0>
 >;
 
-namespace _NegativeIndexImpl {
-  type ToNumberFromNegative<S extends `-${number}`> =
-    S extends `${infer N extends number}` ? N : never;
+type ToNumberFromNegative<S extends `-${number}`> =
+  S extends `${infer N extends number}` ? N : never;
 
-  export type MapIdx<I extends number> = I extends I
-    ? ToNumberFromNegative<`-${I}`>
-    : never;
-}
+type MapIdx<I extends number> = I extends I
+  ? ToNumberFromNegative<`-${I}`>
+  : never;
 ```
 
 `Index` と同様 tuple 型の index を取り出す実装を使っていますが、負数にするためにその index `I` を `-${I}` で文字列化して数値として取り出すという実装をしています。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/index-type.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/index-type.d.mts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/index-type.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/index-type.mts
 :::
 
 ## Enum types
 
-`Index` 型を実装したので以下の型も定義しておきます。
+`Index` 型を実装したので以下のような型が定義できます。
 
 ```ts
 /** `0 | 1 | ... | 255` */
 type Uint8 = Index<256>;
 
-/** `0 | 1 | ... | 511` */
-type Uint9 = Index<512>;
-
-/** `0 | 1 | ... | 1023` */
-type Uint10 = Index<1024>;
-
 /** `-128 | -127 | ... | -1 | 0 | 1 | ... | 126 | 127` */
 type Int8 = Readonly<Index<128> | NegativeIndex<129>>;
 
-/** `-256 | -255 | ... | -1 | 0 | 1 | ... | 254 | 255` */
-type Int9 = Readonly<Index<256> | NegativeIndex<257>>;
+/** `1 | 2 | ... | 12` */
+type MonthEnum = Exclude<Index<13>, 0>;
 
-/** `-512 | -511 | ... | -1 | 0 | 1 | ... | 510 | 511` */
-type Int10 = Readonly<Index<512> | NegativeIndex<513>>;
+/** `0 | 1 | ... | 59` */
+type SecondsEnum = Sexagesimal;
+
+/** `0 | 1 | ... | 999` */
+type MillisecondsEnum = Index<1000>;
 ```
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/enum.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/enum.d.mts
 :::
 
 ## `UintRange`
@@ -473,6 +465,9 @@ expectType<UintRange<0, 5>, 0 | 1 | 2 | 3 | 4>('=');
 expectType<UintRange<2, 5>, 2 | 3 | 4>('=');
 ```
 
+非負整数 `S`, `E` を受け取り、 `S` 以上 `E` 未満の整数全体の union を返します。
+`Index` と `Exclude` を組み合わせるだけで実装できます。
+
 --- 実装 ---
 
 ```ts
@@ -482,14 +477,12 @@ type UintRange<Start extends number, End extends number> = Exclude<
 >;
 ```
 
-`Index` と `Exclude` を組み合わせるだけで実装できます。
-
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/uint-range.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/uint-range.d.mts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/uint-range.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/uint-range.mts
 :::
 
 ## `Max`, `Min`
@@ -509,15 +502,15 @@ expectType<Min<0 | 1 | 3 | 5 | 6>, 0>('=');
 実装は[この記事](https://zenn.dev/noshiro_piko/articles/typescript-type-level-min)で解説しています。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/max.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/max.d.mts
 
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/min.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/min.d.mts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/max.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/max.mts
 
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/min.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/min.mts
 :::
 
 ## `Seq`
@@ -528,14 +521,14 @@ expectType<Seq<0>, readonly []>('=');
 expectType<Seq<5>, readonly [0, 1, 2, 3, 4]>('=');
 ```
 
-与えられた数値までの連番配列の型を返します。
+整数 `N` を受け取り、 0 から `N - 1` までの連番配列の型 `readonly [0, 1, ..., N - 1]` を返します。
 
 --- 実装 ---
 
 ```ts
-type Seq<N extends number> = _SeqImpl<MakeTuple<unknown, N>>;
+type Seq<N extends number> = SeqImpl<MakeTuple<unknown, N>>;
 
-type _SeqImpl<T extends readonly unknown[]> = {
+type SeqImpl<T extends readonly unknown[]> = {
   readonly [i in keyof T]: i extends `${number}` ? ToNumber<i> : never;
 };
 ```
@@ -543,11 +536,11 @@ type _SeqImpl<T extends readonly unknown[]> = {
 `MakeTuple` で長さ `N` の配列を作った後、その中身を Mapped Type で差し替えています。
 
 :::details ソースコード
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/seq.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/src/seq.d.mts
 :::
 
 :::details 使用例（ユニットテスト）
-https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/seq.ts
+https://github.com/noshiro-pf/mono/blob/develop/packages/ts-type-utils/test/seq.mts
 :::
 
 ---

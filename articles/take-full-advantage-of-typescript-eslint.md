@@ -727,7 +727,7 @@ JavaScript の `Array.prototype.sort` はデフォルトで文字列比較によ
 ```
 
 この ESLint ルールを有効にすると `.sort()` の引数を省略できないようになります。
-文字列の配列に関しては比較関数省略時のデフォルト動作が自然であり採用したい場合が多いので、 `ignoreStringArrays` option も有効にしておくのが有効です。
+文字列の配列に関しては比較関数省略時のデフォルト動作が自然であり採用したい場合が多いので、 `ignoreStringArrays` option も有効にしておくと便利です。
 
 ```json
 {
