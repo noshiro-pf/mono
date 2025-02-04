@@ -1,6 +1,4 @@
-/* eslint-disable import/extensions */
 /* eslint-disable @typescript-eslint/no-restricted-imports */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import { autoImportDef } from '@noshiro/global-ts-utils/auto-imports';
 import { castDeepMutable } from '@noshiro/ts-utils';

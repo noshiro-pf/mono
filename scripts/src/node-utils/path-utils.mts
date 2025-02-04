@@ -1,5 +1,5 @@
-import * as nodePath from 'node:path';
-import * as nodeUrl from 'node:url';
+import * as path from 'node:path';
+import * as url from 'node:url';
 
 export const toThisDir = (importMetaUrl: string): string =>
-  nodePath.dirname(nodeUrl.fileURLToPath(importMetaUrl));
+  path.dirname(url.fileURLToPath(importMetaUrl));

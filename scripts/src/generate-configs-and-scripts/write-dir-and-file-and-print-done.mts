@@ -1,5 +1,4 @@
-import * as fs from 'fs/promises';
-import path from 'node:path';
+import 'zx/globals';
 
 export const writeDirAndFileAndPrintDone = async (
   dir: string,

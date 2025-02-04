@@ -1,5 +1,8 @@
-import * as fs from 'node:fs/promises';
+import { toThisDir } from '@noshiro/mono-utils';
 import * as prettier from 'prettier';
+import 'zx/globals';
+
+const thisDir = toThisDir(import.meta.url);
 
 fetch('https://zenn.dev/api/articles?username=noshiro_piko&order=latest')
   .then((result) => result.text())
@@ -8,7 +11,12 @@ fetch('https://zenn.dev/api/articles?username=noshiro_piko&order=latest')
       parser: 'json',
     }),
   )
-  .then((data) => fs.writeFile('../src/assets/zenn-articles.json', data))
+  .then((data) =>
+    fs.writeFile(
+      path.resolve(thisDir, '../src/assets/zenn-articles.json'),
+      data,
+    ),
+  )
   .catch((error) => {
     console.error(error);
   });

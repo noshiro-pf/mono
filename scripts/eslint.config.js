@@ -4,11 +4,11 @@ import {
   eslintFlatConfigForTypeScript,
   eslintFlatConfigForVitest,
 } from '@noshiro/eslint-configs';
-import * as nodePath from 'node:path';
-import * as nodeUrl from 'node:url';
+import * as path from 'node:path';
+import * as url from 'node:url';
 
 const toThisDir = (importMetaUrl) =>
-  nodePath.dirname(nodeUrl.fileURLToPath(importMetaUrl));
+  path.dirname(url.fileURLToPath(importMetaUrl));
 
 const thisDir = toThisDir(import.meta.url);
 
@@ -20,7 +20,7 @@ const configs = [
   ...eslintFlatConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
-    packageDirs: [nodePath.resolve(thisDir, '..'), thisDir],
+    packageDirs: [path.resolve(thisDir, '..'), thisDir],
   }),
   eslintFlatConfigForVitest(),
   {

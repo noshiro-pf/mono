@@ -1,6 +1,5 @@
 import { toThisDir } from '@noshiro/mono-utils';
-import * as fs from 'node:fs/promises';
-import path from 'node:path';
+import 'zx/globals';
 import { getSrcFileList, type ConverterConfig } from './convert-dts/common.mjs';
 import { configs } from './convert-dts/constants.mjs';
 import { convert } from './convert-dts/convert-main.mjs';
@@ -32,7 +31,6 @@ const createDtsFiles = async (config: ConverterConfig): Promise<void> => {
     results.map(async ([result, filename]) => {
       const outputFile = `${outDir}/${filename}`;
 
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(outputFile, result);
 
       console.log(`${outputFile} generated.`);

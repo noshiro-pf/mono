@@ -27,7 +27,7 @@
     "fmt": "yarn zz:prettier .",
     "gen:re-export": "wireit",
     "gen:re-export:fmt": "yarn zz:prettier src/syncflow.mts",
-    "gen:re-export:script": "node ./scripts/generate-re-export-script.mjs",
+    "gen:re-export:script": "zx ./scripts/generate-re-export-script.mjs",
     "gi": "bash ../../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts",
     "lint": "yarn zz:eslint:src",
     "lint:fix": "yarn zz:eslint:src --fix",

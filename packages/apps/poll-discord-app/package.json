@@ -50,7 +50,7 @@
         "clean:build",
         "type-check"
       ],
-      "command": "node ./scripts/esbuild.mjs"
+      "command": "zx ./scripts/esbuild.mjs"
     },
     "gcloud:scp": {
       "dependencies": [

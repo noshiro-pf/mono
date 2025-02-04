@@ -1,10 +1,9 @@
 import { genGlobalDts, toThisDir } from '@noshiro/mono-utils';
-import * as nodePath from 'node:path';
+import 'zx/globals';
 import packageJson from '../package.json' with { type: 'json' };
 
 const thisDir = toThisDir(import.meta.url);
 
-genGlobalDts(
-  nodePath.resolve(thisDir, '../'),
-  packageJson.devDependencies,
-).catch(console.error);
+genGlobalDts(path.resolve(thisDir, '../'), packageJson.devDependencies).catch(
+  console.error,
+);

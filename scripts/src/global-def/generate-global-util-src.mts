@@ -1,4 +1,4 @@
-import * as fs from 'node:fs/promises';
+import 'zx/globals';
 
 type TypeImports = Readonly<{ name: string; params: readonly string[] }>;
 type Imports = Readonly<{ default: string }> | string;

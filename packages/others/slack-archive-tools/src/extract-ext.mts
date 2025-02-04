@@ -1,5 +1,5 @@
 import { pipe } from '@noshiro/ts-utils';
-import path from 'node:path';
+import 'zx/globals';
 
 /**
  * ".jpg?t=xoxe-1405110841104-7609868321223-7621542667925-4fad30d9a97ce707dc3984a3607d1bdc"

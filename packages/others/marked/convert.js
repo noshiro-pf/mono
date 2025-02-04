@@ -1,7 +1,6 @@
-const marked = require('marked');
-const hljs = require('highlight.js');
-
-const fs = require('fs');
+import hljs from 'highlight.js';
+import marked from 'marked';
+import 'zx/globals';
 
 const inputFileName = 'immutable_utility.md';
 const outputFileName = 'immutable_utility.html';

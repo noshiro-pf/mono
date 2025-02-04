@@ -1,4 +1,4 @@
-import * as nodePath from 'node:path';
+import * as path from 'node:path';
 import { defineConfig } from 'vitest/config';
 import { toThisDir } from '../src/index.mjs';
 
@@ -8,7 +8,7 @@ export default defineConfig({
   test: {
     globals: true,
     typecheck: {
-      tsconfig: nodePath.resolve(thisDir, 'tsconfig.test.json'),
+      tsconfig: path.resolve(thisDir, 'tsconfig.test.json'),
     },
   },
 });

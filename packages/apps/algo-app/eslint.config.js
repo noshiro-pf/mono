@@ -8,7 +8,7 @@ import {
   genEsLintRestrictedImportsDefFromDevDependencies,
 } from '@noshiro/eslint-configs';
 import { toThisDir } from '@noshiro/mono-utils';
-import * as nodePath from 'node:path';
+import * as path from 'node:path';
 import packageJson from './package.json' with { type: 'json' };
 
 const thisDir = toThisDir(import.meta.url);
@@ -25,7 +25,7 @@ const defineConfig = async () => {
     ...eslintFlatConfigForTypeScript({
       tsconfigRootDir: thisDir,
       tsconfigFileName: './tsconfig.json',
-      packageDirs: [nodePath.resolve(thisDir, '../../..'), thisDir],
+      packageDirs: [path.resolve(thisDir, '../../..'), thisDir],
     }),
     eslintFlatConfigForVitest(['src/**/*']),
     ...eslintFlatConfigForPreact(['src/**/*']),

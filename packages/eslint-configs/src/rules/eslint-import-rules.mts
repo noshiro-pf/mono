@@ -30,6 +30,7 @@ export const eslintImportsRules: EslintImportsRules = {
         'vitest/config',
         '*/index.mjs',
         '*/index.js',
+        'zx/globals',
       ],
     },
   ],
@@ -99,7 +100,12 @@ export const eslintImportsRules: EslintImportsRules = {
   'import/no-unassigned-import': [
     'error',
     {
-      allow: ['**/*.css', '@testing-library/jest-dom/**', 'solid-js'],
+      allow: [
+        '**/*.css',
+        '@testing-library/jest-dom/**',
+        'solid-js',
+        'zx/globals',
+      ],
     },
   ],
   'import/no-named-default': 'off',

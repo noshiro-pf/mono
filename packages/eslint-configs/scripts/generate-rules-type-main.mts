@@ -1,19 +1,20 @@
-import { execAsync, toThisDir } from '@noshiro/mono-utils';
-import * as fs from 'node:fs/promises';
-import * as nodePath from 'node:path';
+#!/usr/bin/env zx
+
+import { toThisDir } from '@noshiro/mono-utils';
+import 'zx/globals';
 import { eslintPlugins } from './eslint-plugins.mjs';
 import { generateRulesType } from './generate-rules-type.mjs';
 import { replaceRulesType } from './replace.mjs';
 
 const thisDir = toThisDir(import.meta.url);
 
-const outDir = nodePath.resolve(thisDir, '../src/types/rules');
+const outDir = path.resolve(thisDir, '../src/types/rules');
 
-const prettierrcPath = nodePath.resolve(thisDir, '../../../.prettierrc');
+const prettierrcPath = path.resolve(thisDir, '../../../.prettierrc');
 
-const eslintConfigPath = nodePath.resolve(thisDir, './eslint.config.gen.mjs');
+const eslintConfigPath = path.resolve(thisDir, './eslint.config.gen.mjs');
 
-const main = async (): Promise<void> => {
+export const generateRulesTypeMain = async (): Promise<void> => {
   {
     const result = await generate();
 
@@ -32,6 +33,7 @@ const main = async (): Promise<void> => {
       return;
     }
   }
+
   {
     console.log('formatting code ...');
     const result = await prettier();
@@ -51,6 +53,7 @@ const main = async (): Promise<void> => {
       return;
     }
   }
+
   {
     console.log('formatting code ...');
     const result = await prettier();
@@ -93,9 +96,8 @@ const generate = async (): Promise<
         plugin.rulePrefix,
       );
 
-      const targetFilePath = nodePath.resolve(outDir, plugin.outputFileName);
+      const targetFilePath = path.resolve(outDir, plugin.outputFileName);
 
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(targetFilePath, result);
     } catch (error) {
       return { type: 'error', error };
@@ -108,42 +110,38 @@ const generate = async (): Promise<
 const lintFix = async (): Promise<
   Readonly<{ type: 'error'; error: unknown } | { type: 'ok' }>
 > => {
-  const targetFiles = nodePath.resolve(outDir, './*.mts');
+  const targetFiles: readonly string[] = await glob(`${outDir}/*.mts`);
 
-  const command = [
-    'ESLINT_USE_FLAT_CONFIG=true',
-    'yarn eslint',
+  const result = await $`ESLINT_USE_FLAT_CONFIG=true yarn eslint ${[
     '--no-ignore',
-    `--config ${eslintConfigPath}`,
     '--fix',
-    targetFiles,
-  ].join(' ');
+    '--config',
+    eslintConfigPath,
+  ]} ${targetFiles}`;
 
-  try {
-    await execAsync(command);
-    return { type: 'ok' };
-  } catch (error) {
-    return { type: 'error', error };
+  if (result.exitCode !== 0) {
+    return { type: 'error', error: result.stderr };
   }
+
+  return { type: 'ok' };
 };
 
 const prettier = async (): Promise<
   Readonly<{ type: 'error'; error: unknown } | { type: 'ok' }>
 > => {
-  const command = [
-    'yarn prettier',
+  const result = await $`yarn prettier ${[
     // '--cache --cache-strategy content',
-    `--config ${prettierrcPath}`,
+    `--config`,
+    prettierrcPath,
     '--write',
     outDir,
-  ].join(' ');
+  ]}`;
 
-  try {
-    await execAsync(command);
-    return { type: 'ok' };
-  } catch (error) {
-    return { type: 'error', error };
+  if (result.exitCode !== 0) {
+    return { type: 'error', error: result.stderr };
   }
+
+  return { type: 'ok' };
 };
 
 const runReplace = async (): Promise<
@@ -155,12 +153,10 @@ const runReplace = async (): Promise<
 
       const targetFilePath = `${outDir}/${plugin.outputFileName}`;
 
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const content = await fs.readFile(targetFilePath, { encoding: 'utf8' });
 
       const result = replaceRulesType(content, plugin.typeName);
 
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(targetFilePath, result);
     } catch (error) {
       return { type: 'error', error };
@@ -169,5 +165,3 @@ const runReplace = async (): Promise<
 
   return { type: 'ok' };
 };
-
-main().catch(console.error);

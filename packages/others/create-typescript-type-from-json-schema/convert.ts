@@ -1,6 +1,6 @@
 import type { JSONSchema4 } from 'json-schema';
 import { compile } from 'json-schema-to-typescript';
-import * as fs from 'node:fs/promises';
+import 'zx/globals';
 
 const compilerConfig = {
   bannerComment: '',

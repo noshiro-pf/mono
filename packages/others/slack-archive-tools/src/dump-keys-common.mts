@@ -1,7 +1,6 @@
 import { isRecord, Json, Result } from '@noshiro/ts-utils';
 import type * as fsType from 'node:fs';
-import * as fs from 'node:fs/promises';
-import path from 'node:path';
+import 'zx/globals';
 
 export const fileContentValues = async (
   file: DeepReadonly<fsType.Dirent>,

@@ -1,4 +1,4 @@
-import * as fs from 'node:fs/promises';
+import 'zx/globals';
 
 const funcTypeName = 'FunctionType';
 const functionName = 'pipeF';
