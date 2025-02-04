@@ -70,10 +70,12 @@
     "@noshiro/syncflow": "*",
     "@noshiro/syncflow-preact-hooks": "*",
     "@noshiro/ts-utils": "*",
+    "better-preact-use-state": "*",
     "preact": "^10.23.2"
   },
   "devDependencies": {
     "@noshiro/eslint-configs": "*",
+    "@noshiro/global-better-preact-use-state": "*",
     "@noshiro/global-goober": "*",
     "@noshiro/global-preact": "*",
     "@noshiro/global-preact-utils": "*",

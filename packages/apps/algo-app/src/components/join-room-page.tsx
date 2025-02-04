@@ -13,8 +13,8 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
     roomに自分の名前があればゲーム開始前画面を表示
    */
 
-  const { state: password, setState: setPassword } = useState<string>('');
-  const { state: username, setState: setUsername } = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [username, setUsername] = useState<string>('');
 
   const onPasswordInput: preact.JSX.GenericEventHandler<HTMLInputElement> =
     useCallback(
@@ -34,8 +34,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
 
   const disabled: boolean = username === '';
 
-  const { state: showPasswordError, setState: setShowPasswordError } =
-    useState<boolean>(false);
+  const [showPasswordError, setShowPasswordError] = useState<boolean>(false);
 
   const room = db.useRoom();
 

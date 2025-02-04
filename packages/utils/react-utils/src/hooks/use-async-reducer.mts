@@ -1,5 +1,5 @@
+import { useState } from 'better-react-use-state';
 import { useCallback, useEffect, useRef } from 'react';
-import { useState } from './use-state.mjs';
 
 type AsyncDispatch<S, A> = (action: A) => Promise<S>;
 type UpdateStateFn<S> = (updateFn: (prevState: S) => S) => void;
@@ -53,7 +53,7 @@ export const useAsyncReducer = <S, A>(
   reducer: Reducer<S, A>,
   init: S,
 ): [S, AsyncDispatch<S, A>] => {
-  const { state, updateState } = useState(init);
+  const [state, _, { updateState }] = useState(init);
   const dispatchAsync = useAsyncDispatchFunction(state, reducer, updateState);
   return [state, dispatchAsync];
 };

@@ -40,11 +40,8 @@ export const useCardAttributes = (
   const eyeIconColor =
     color === 'black' ? eyeIconColorDef.light : eyeIconColorDef.dark;
 
-  const {
-    state: isMouseOver,
-    setTrue: onMouseEnter,
-    setFalse: onMouseLeave,
-  } = useBoolState(false);
+  const [isMouseOver, { setTrue: onMouseEnter, setFalse: onMouseLeave }] =
+    useBoolState(false);
 
   const wrapperStyle = useMemo<preact.JSX.CSSProperties>(
     () => ({

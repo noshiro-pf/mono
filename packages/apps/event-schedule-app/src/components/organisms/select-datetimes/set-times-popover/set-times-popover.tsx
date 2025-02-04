@@ -17,11 +17,8 @@ type Props = Readonly<{
 export const SetTimesPopover = memoNamed<Props>(
   'SetTimesPopover',
   ({ datetimeSpecification, initialValue, onSetTimesSubmit }) => {
-    const {
-      state: isOpen,
-      setTrue: handleOpen,
-      setFalse: handleClose,
-    } = useBoolState(false);
+    const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
+      useBoolState(false);
 
     const onOkClick = useCallback(
       (

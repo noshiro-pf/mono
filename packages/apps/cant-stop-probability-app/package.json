@@ -72,11 +72,13 @@
     "@noshiro/syncflow": "*",
     "@noshiro/syncflow-react-hooks": "*",
     "@noshiro/ts-utils": "*",
+    "better-react-use-state": "*",
     "react": "^18.2.0",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@noshiro/eslint-configs": "*",
+    "@noshiro/global-better-react-use-state": "*",
     "@noshiro/global-emotion-react": "*",
     "@noshiro/global-emotion-styled": "*",
     "@noshiro/global-react": "*",

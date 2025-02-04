@@ -1,5 +1,5 @@
-import { useState } from '@noshiro/react-utils';
 import { Arr } from '@noshiro/ts-utils';
+import { useState } from 'better-react-use-state';
 import { useEffect, useMemo, useRef } from 'react';
 import { ResizeObserver as CustomResizeObserver } from 'resize-observer';
 
@@ -44,7 +44,7 @@ export const useResizeObserverRef = <E extends Element = Element>(
 export const useResizeObserver = <E extends Element = Element>(
   defaultSize?: Size,
 ): [Size, React.RefObject<E>] => {
-  const { state: size, setState: setSize } = useState<Size>(
+  const [size, setSize] = useState<Size>(
     defaultSize ?? { width: 0, height: 0, left: 0, top: 0 },
   );
 

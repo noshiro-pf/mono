@@ -1,14 +1,15 @@
+import { useState } from 'better-react-use-state';
 import { useEffect, useRef } from 'react';
-import { useState } from './use-state.mjs';
 
 export const useCanvasContext2d = (): [
   CanvasRenderingContext2D | undefined,
   React.RefObject<HTMLCanvasElement>,
 ] => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { state: ctx, setState: setCtx } = useState<
-    CanvasRenderingContext2D | undefined
-  >(undefined);
+
+  const [ctx, setCtx] = useState<CanvasRenderingContext2D | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     const canvasEl = canvasRef.current;
@@ -18,7 +19,7 @@ export const useCanvasContext2d = (): [
         setCtx(ctx2d);
       }
     }
-  }, [canvasRef, setCtx]);
+  }, [canvasRef]);
 
   return [ctx, canvasRef];
 };

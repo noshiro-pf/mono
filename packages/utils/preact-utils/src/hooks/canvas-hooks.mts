@@ -1,14 +1,14 @@
+import { useState } from 'better-preact-use-state';
 import { useEffect, useRef } from 'preact/hooks';
-import { useState } from './use-state.mjs';
 
 export const useCanvasContext2d = (): [
   CanvasRenderingContext2D | undefined,
   preact.Ref<HTMLCanvasElement | null>,
 ] => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const { state: ctx, setState: setCtx } = useState<
-    CanvasRenderingContext2D | undefined
-  >(undefined);
+  const [ctx, setCtx] = useState<CanvasRenderingContext2D | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     const canvasEl = canvasRef.current;
@@ -18,7 +18,7 @@ export const useCanvasContext2d = (): [
         setCtx(ctx2d);
       }
     }
-  }, [canvasRef, setCtx]);
+  }, [canvasRef]);
 
   return [ctx, canvasRef];
 };

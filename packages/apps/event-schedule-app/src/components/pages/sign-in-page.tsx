@@ -23,11 +23,10 @@ export const SignInPage = memoNamed('SignInPage', () => {
     passwordIsOpen,
   } = useObservableValue(SignInPageStore.state);
 
-  const {
-    state: isPasswordResetForm,
-    setTrue: passwordIsOpenResetForm,
-    setFalse: hidePasswordResetForm,
-  } = useBoolState(false);
+  const [
+    isPasswordResetForm,
+    { setTrue: passwordIsOpenResetForm, setFalse: hidePasswordResetForm },
+  ] = useBoolState(false);
 
   return (
     <SignInStyled.Wrapper>

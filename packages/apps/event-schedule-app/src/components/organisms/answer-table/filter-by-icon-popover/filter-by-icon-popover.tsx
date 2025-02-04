@@ -12,11 +12,8 @@ type Props = Readonly<{
 export const FilterByIconPopover = memoNamed<Props>(
   'FilterByIconPopover',
   ({ answerIconId }) => {
-    const {
-      state: isOpen,
-      setTrue: handleOpen,
-      setFalse: handleClose,
-    } = useBoolState(false);
+    const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
+      useBoolState(false);
 
     const turnOnFilteringEnabled = useCallback(() => {
       AnswerFilterAndSortStore.enableFilteringByIcon(answerIconId);

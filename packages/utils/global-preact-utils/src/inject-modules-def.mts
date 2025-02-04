@@ -4,9 +4,7 @@ export const injectModulesDef = Object.fromEntries(
   [
     'memoNamed',
     'useAlive',
-    'useBoolState',
     'usePromiseValue',
-    'useState',
     'useTinyObservable',
     'useTinyObservableEffect',
     'useTinyObservableValue',

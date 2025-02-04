@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { CircularProgress } from '@mui/material';
-import { memoNamed, useBoolState } from '@noshiro/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { useBoolState } from 'better-react-use-state';
 import { useMemo } from 'react';
 
 type Props = Readonly<{
@@ -11,11 +12,8 @@ type Props = Readonly<{
 export const ImgWithLoadingCircle = memoNamed<Props>(
   'ImgWithLoadingCircle',
   ({ src, alt = '' }: Props) => {
-    const {
-      state: loaded,
-      setTrue: onLoad,
-      setFalse: onLoadStart,
-    } = useBoolState(false);
+    const [loaded, { setTrue: onLoad, setFalse: onLoadStart }] =
+      useBoolState(false);
 
     const imgStyle = useMemo<React.CSSProperties>(
       // dummy comment

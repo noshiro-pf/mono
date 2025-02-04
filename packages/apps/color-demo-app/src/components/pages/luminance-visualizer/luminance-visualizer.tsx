@@ -12,15 +12,13 @@ const divisionNumberInit = 14;
 export const LuminanceVisualizer = memoNamed('LuminanceVisualizer', () => {
   /* states */
 
-  const { state: saturation, setState: setSaturation } =
-    useState<Percent>(saturationInit);
+  const [saturation, setSaturation] = useState<Percent>(saturationInit);
 
-  const { state: lightness, setState: setLightness } =
-    useState<Percent>(lightnessInit);
+  const [lightness, setLightness] = useState<Percent>(lightnessInit);
 
-  const { state: firstHue, setState: setFirstHue } = useState<Hue>(hueInit);
+  const [firstHue, setFirstHue] = useState<Hue>(hueInit);
 
-  const { state: divisionNumber, setState: setDivisionNumber } =
+  const [divisionNumber, setDivisionNumber] =
     useState<DivisionNumber>(divisionNumberInit);
 
   /* values */

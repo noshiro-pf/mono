@@ -48,6 +48,7 @@
     "@noshiro/preact-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/ts-utils": "*",
+    "better-preact-use-state": "*",
     "preact": "^10.23.2"
   },
   "devDependencies": {

@@ -1,4 +1,5 @@
-import { memoNamed, useBoolState } from '@noshiro/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { useBoolState } from 'better-react-use-state';
 import { BpButton } from './bp-button.js';
 import { BpInput, type BpInputProps } from './bp-input.js';
 
@@ -12,7 +13,7 @@ export type BpPasswordInputProps = BpInputProps &
 export const BpPasswordInput = memoNamed<BpPasswordInputProps>(
   'BpPasswordInput',
   ({ disabled, onPasswordChange, password }) => {
-    const { state: passwordIsOpen, toggleState: onToggleVisibilityClick } =
+    const [passwordIsOpen, { toggleState: onToggleVisibilityClick }] =
       useBoolState(false);
 
     return (

@@ -28,11 +28,8 @@ const dialogConfig = {
 export const AnswerLaterButtonWithConfirmation = memoNamed<Props>(
   'AnswerLaterButtonWithConfirmation',
   ({ loading, loggedIn }) => {
-    const {
-      state: isOpen,
-      setTrue: openDialog,
-      setFalse: closeDialog,
-    } = useBoolState(false);
+    const [isOpen, { setTrue: openDialog, setFalse: closeDialog }] =
+      useBoolState(false);
 
     return loggedIn ? (
       <ButtonWithConfirm

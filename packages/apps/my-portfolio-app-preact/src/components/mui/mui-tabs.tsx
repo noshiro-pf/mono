@@ -19,7 +19,7 @@ export const MuiTabs = memoNamed<Props>(
 
     const tabWidthPx = mobile ? tabWidthSmallPx : tabWidthMediumPx;
 
-    const { state: tabWidthList, updateState: updateTabWidthList } = useState<
+    const [tabWidthList, __, { updateState: updateTabWidthList }] = useState<
       readonly number[]
     >([]);
 
@@ -175,6 +175,7 @@ const TabStyled = styled('button')`
   user-select: none;
   border-radius: 0;
   vertical-align: middle;
+  appearance: none;
   -moz-appearance: none;
   justify-content: center;
   text-decoration: none;

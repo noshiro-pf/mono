@@ -74,6 +74,7 @@
     "@noshiro/tiny-router-react-hooks": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
+    "better-react-use-state": "*",
     "pixi.js": "^8.4.1",
     "pixi.js-legacy": "^5.3.12",
     "react": "^18.2.0",
@@ -82,6 +83,7 @@
   },
   "devDependencies": {
     "@noshiro/eslint-configs": "*",
+    "@noshiro/global-better-react-use-state": "*",
     "@noshiro/global-emotion-react": "*",
     "@noshiro/global-emotion-styled": "*",
     "@noshiro/global-react": "*",

@@ -25,9 +25,9 @@ const options: Readonly<HTMLSelectProps['options']> = [
 ];
 
 export const UiPartsTest = memoNamed('UiPartsTest', () => {
-  const { state: inputValue, setState: setInputValue } = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>('');
 
-  const { state: bpSwitchState, toggleState: onBpSwitchChangeHandler } =
+  const [bpSwitchState, { toggleState: onBpSwitchChangeHandler }] =
     useBoolState(false);
 
   return (

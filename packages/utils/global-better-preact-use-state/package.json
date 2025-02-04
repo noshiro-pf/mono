@@ -1,0 +1,70 @@
+{
+  "name": "@noshiro/global-better-preact-use-state",
+  "version": "1.0.0",
+  "private": false,
+  "license": "MIT",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./esm/globals-decl.d.mts"
+      }
+    },
+    "./eslint-no-restricted-imports-def": {
+      "import": "./esm/eslint-no-restricted-imports-def.mjs"
+    },
+    "./auto-imports": {
+      "import": "./esm/auto-import-def.mjs"
+    },
+    "./inject-modules-def": {
+      "import": "./esm/inject-modules-def.mjs"
+    }
+  },
+  "files": [
+    "src",
+    "esm"
+  ],
+  "scripts": {
+    "build": "wireit",
+    "clean": "run-p clean:build clean:wireit",
+    "clean:build": "rimraf esm",
+    "clean:src": "rimraf src/*.mts",
+    "clean:wireit": "rimraf .wireit/**",
+    "fmt": "yarn zz:prettier .",
+    "lint": "yarn zz:eslint:src",
+    "lint:fix": "yarn zz:eslint:src --fix",
+    "tsc": "yarn type-check",
+    "tscw": "tsc --noEmit --watch",
+    "type-check": "tsc --noEmit",
+    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint",
+    "zz:eslint:print-config": "yarn zz:eslint --print-config src/index.mts",
+    "zz:eslint:src": "yarn zz:eslint --config eslint.config.js './src/**/*'",
+    "zz:fmt-src": "yarn zz:prettier ./src",
+    "zz:gen": "node ./scripts/gen.mjs",
+    "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
+    "zz:setup": "run-s clean:src zz:gen zz:fmt-src type-check"
+  },
+  "dependencies": {
+    "@noshiro/preact-utils": "*",
+    "@noshiro/ts-utils": "*",
+    "better-preact-use-state": "*"
+  },
+  "devDependencies": {
+    "@noshiro/eslint-configs": "*",
+    "@noshiro/mono-utils": "*",
+    "@noshiro/ts-type-utils": "*"
+  },
+  "wireit": {
+    "pre-build": {
+      "command": "run-s clean:build zz:setup"
+    },
+    "build": {
+      "dependencies": [
+        "pre-build"
+      ],
+      "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript --configImportAttributesKey with"
+    }
+  }
+}

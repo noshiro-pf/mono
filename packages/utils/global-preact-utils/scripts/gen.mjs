@@ -8,9 +8,7 @@ await generateAllGlobalDefs({
   importsList: [
     'memoNamed',
     'useAlive',
-    'useBoolState',
     'usePromiseValue',
-    'useState',
     'useTinyObservable',
     'useTinyObservableEffect',
     'useTinyObservableValue',

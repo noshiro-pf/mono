@@ -1,3 +1,4 @@
+/// <reference types="@noshiro/global-better-preact-use-state" />
 /// <reference types="@noshiro/global-goober" />
 /// <reference types="@noshiro/global-preact" />
 /// <reference types="@noshiro/global-preact-utils" />

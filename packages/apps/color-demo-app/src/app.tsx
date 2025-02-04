@@ -6,7 +6,8 @@ import { LuminanceVisualizer, TextColorContrastTable } from './components';
 const labels = ['luminance', 'text-color'];
 
 export const App = memoNamed('App', () => {
-  const { state: tabIndex, setState: setTabIndex } = useState(0);
+  const [tabIndex, setTabIndex] = useState(0);
+
   return (
     <div
       css={css`

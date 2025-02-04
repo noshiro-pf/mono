@@ -1,5 +1,6 @@
-import { useState, useValueAsRef } from '@noshiro/react-utils';
+import { useValueAsRef } from '@noshiro/react-utils';
 import { Num, noop, pipe, toNonZeroFiniteNumber } from '@noshiro/ts-utils';
+import { useState } from 'better-react-use-state';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 type Props = Readonly<{
@@ -43,7 +44,7 @@ export const useSliderHandleStateManager = ({
 
   const clamp = useMemo(() => Num.clamp(min, max), [min, max]);
 
-  const { state: isMoving, setState: setIsMoving } = useState<boolean>(false);
+  const [isMoving, setIsMoving] = useState<boolean>(false);
 
   // value as ref
   const removeDocumentEventListenersRef = useRef<() => void>(noop);

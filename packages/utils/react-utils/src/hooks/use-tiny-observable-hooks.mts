@@ -3,8 +3,8 @@ import {
   type TinyObservable,
   type TinyObservableSource,
 } from '@noshiro/ts-utils';
+import { useState } from 'better-react-use-state';
 import { useEffect, useRef } from 'react';
-import { useState } from './use-state.mjs';
 
 export const useTinyObservable = <T,>(): TinyObservableSource<T> => {
   const ref = useRef(createTinyObservable<T>());
@@ -36,11 +36,13 @@ export function useTinyObservableValue<T>(
   observable$: TinyObservable<T>,
   initialValue?: T,
 ): T | undefined {
-  const { state, setState } = useState<{ value: T | undefined }>({
+  const [state, setState] = useState<{ value: T | undefined }>({
     value: initialValue,
   });
+
   useTinyObservableEffect(observable$, (value) => {
     setState({ value });
   });
+
   return state.value ?? initialValue;
 }
