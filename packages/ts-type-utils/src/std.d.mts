@@ -92,6 +92,7 @@ interface String {}
 interface Boolean {}
 interface Object {}
 interface RegExp {}
+// interface Symbol {}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ReadonlySet<T> {}
