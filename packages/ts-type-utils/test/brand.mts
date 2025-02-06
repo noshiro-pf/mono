@@ -1,9 +1,11 @@
 import { expectType } from './expect-type.mjs';
 
 {
-  type A = Brand<number, 'A'>;
+  const _A_Brand: unique symbol = Symbol.for('A_Brand');
 
-  expectType<UnwrapBrandTrueKeys<A>, 'A'>('=');
+  type A = Brand<number, typeof _A_Brand>;
+
+  expectType<UnwrapBrandTrueKeys<A>, typeof _A_Brand>('=');
   expectType<GetBrandValuePart<A>, number>('=');
 
   type AB = Brand<number, 'A' | 'B'>;
