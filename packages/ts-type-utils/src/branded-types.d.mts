@@ -1,48 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-declare const __brandKeyLt2_15__: unique symbol;
-declare const __brandKeyLt2_16__: unique symbol;
-declare const __brandKeyLt2_31__: unique symbol;
-declare const __brandKeyLt2_32__: unique symbol;
-declare const __brandKeyGtMinus2_16__: unique symbol;
-declare const __brandKeyGtMinus2_32__: unique symbol;
-declare const __brandKeyGeMinus2_15__: unique symbol;
-declare const __brandKeyGeMinus2_31__: unique symbol;
-declare const __brandKeyGe0__: unique symbol;
-declare const __brandKeyNe0__: unique symbol;
-declare const __brandKeyFinite__: unique symbol;
-declare const __brandKeyFloat32__: unique symbol;
-declare const __brandKeyFloat64__: unique symbol;
-declare const __brandKeyInt__: unique symbol;
-declare const __brandKeyNaNValue__: unique symbol;
-declare const __brandKeySafeInt__: unique symbol;
-declare const __brandKeyBigInt64__: unique symbol;
-declare const __brandKeyBigUint64__: unique symbol;
-
-type NumberBrandKeys__ = Readonly<{
-  '< 2^15': typeof __brandKeyLt2_15__;
-  '< 2^16': typeof __brandKeyLt2_16__;
-  '< 2^31': typeof __brandKeyLt2_31__;
-  '< 2^32': typeof __brandKeyLt2_32__;
-  '> -2^16': typeof __brandKeyGtMinus2_16__;
-  '> -2^32': typeof __brandKeyGtMinus2_32__;
-  '>= -2^15': typeof __brandKeyGeMinus2_15__;
-  '>= -2^31': typeof __brandKeyGeMinus2_31__;
-  '>=0': typeof __brandKeyGe0__;
-  '!=0': typeof __brandKeyNe0__;
-  Finite: typeof __brandKeyFinite__;
-  Float32: typeof __brandKeyFloat32__;
-  Float64: typeof __brandKeyFloat64__;
-  Int: typeof __brandKeyInt__;
-  NaNValue: typeof __brandKeyNaNValue__;
-  SafeInt: typeof __brandKeySafeInt__;
-  BigInt64: typeof __brandKeyBigInt64__;
-  BigUint64: typeof __brandKeyBigUint64__;
-}>;
-
 /** @internal */
 declare namespace TSTypeUtilsInternals {
-  type IntRangeStringKeys =
+  type IntRangeKeys =
     | '< 2^15'
     | '< 2^16'
     | '< 2^31'
@@ -53,8 +11,8 @@ declare namespace TSTypeUtilsInternals {
     | '>= -2^31'
     | '>=0';
 
-  type StringKeys_ =
-    | IntRangeStringKeys
+  type Keys_ =
+    | IntRangeKeys
     | '!=0'
     | 'Finite'
     | 'Float32'
@@ -62,10 +20,6 @@ declare namespace TSTypeUtilsInternals {
     | 'Int'
     | 'NaNValue'
     | 'SafeInt';
-
-  type IntRangeKeys = NumberBrandKeys__[IntRangeStringKeys];
-
-  type Keys_ = NumberBrandKeys__[StringKeys_];
 
   type BrandedNumberBaseType = Brand<number, never, never>;
 
@@ -75,18 +29,8 @@ declare namespace TSTypeUtilsInternals {
     F extends RelaxedExclude<Keys_, T | UnwrapBrandFalseKeys<B>> = never,
   > = Brand<
     GetBrandValuePart<B>,
-    T | (UnwrapBrandTrueKeys<B> & symbol),
-    F | (UnwrapBrandFalseKeys<B> & symbol)
-  >;
-
-  type ExtendNumberBrandByStringKey<
-    B extends BrandedNumberBaseType,
-    T extends RelaxedExclude<StringKeys_, UnwrapBrandTrueKeys<B>>,
-    F extends RelaxedExclude<StringKeys_, T | UnwrapBrandFalseKeys<B>> = never,
-  > = Brand<
-    GetBrandValuePart<B>,
-    NumberBrandKeys__[T] | (UnwrapBrandTrueKeys<B> & symbol),
-    NumberBrandKeys__[F] | (UnwrapBrandFalseKeys<B> & symbol)
+    T | (UnwrapBrandTrueKeys<B> & string),
+    F | (UnwrapBrandFalseKeys<B> & string)
   >;
 
   type SmallIntIndexMax = 40;
@@ -101,14 +45,14 @@ declare namespace TSTypeUtilsInternals {
 }
 
 /** Numeric brand type for `NaN` */
-type NaNType = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type NaNType = TSTypeUtilsInternals.ExtendNumberBrand<
   TSTypeUtilsInternals.BrandedNumberBaseType,
   '!=0' | 'NaNValue',
-  TSTypeUtilsInternals.IntRangeStringKeys | '>=0' | 'Finite' | 'Int' | 'SafeInt'
+  TSTypeUtilsInternals.IntRangeKeys | '>=0' | 'Finite' | 'Int' | 'SafeInt'
 >;
 
 /** Numeric brand type for numbers except `NaN` */
-type ValidNumber = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type ValidNumber = TSTypeUtilsInternals.ExtendNumberBrand<
   TSTypeUtilsInternals.BrandedNumberBaseType,
   never,
   'NaNValue'
@@ -117,24 +61,21 @@ type ValidNumber = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
 /** Numeric brand type for value after checking with `Number.isFinite(x)` */
 type FiniteNumber = TSTypeUtilsInternals.ExtendNumberBrand<
   ValidNumber,
-  NumberBrandKeys__['Finite']
+  'Finite'
 >;
 
 /** Numeric brand type for `Infinity` */
-type InfiniteNumber = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type InfiniteNumber = TSTypeUtilsInternals.ExtendNumberBrand<
   ValidNumber,
   '!=0',
   'Finite' | 'Int' | 'SafeInt'
 >;
 
 /** Numeric brand type for value after checking with `x != 0` */
-type NonZeroNumber = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
-  ValidNumber,
-  '!=0'
->;
+type NonZeroNumber = TSTypeUtilsInternals.ExtendNumberBrand<ValidNumber, '!=0'>;
 
 /** Numeric brand type for value after checking with `x >= 0` */
-type NonNegativeNumber = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type NonNegativeNumber = TSTypeUtilsInternals.ExtendNumberBrand<
   ValidNumber,
   '> -2^16' | '> -2^32' | '>= -2^15' | '>= -2^31' | '>=0'
 >;
@@ -143,21 +84,21 @@ type NonNegativeNumber = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
 type PositiveNumber = IntersectBrand<NonZeroNumber, NonNegativeNumber>;
 
 /** Numeric brand type for value after checking with `x < 0` */
-type NegativeNumber = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type NegativeNumber = TSTypeUtilsInternals.ExtendNumberBrand<
   NonZeroNumber,
   '< 2^15' | '< 2^16' | '< 2^31' | '< 2^32',
   '>=0'
 >;
 
 /** Numeric brand type for `Number.POSITIVE_INFINITY` */
-type POSITIVE_INFINITY = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type POSITIVE_INFINITY = TSTypeUtilsInternals.ExtendNumberBrand<
   IntersectBrand<InfiniteNumber, PositiveNumber>,
   never,
   '< 2^15' | '< 2^16' | '< 2^31' | '< 2^32'
 >;
 
 /** Numeric brand type for `Number.NEGATIVE_INFINITY` */
-type NEGATIVE_INFINITY = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type NEGATIVE_INFINITY = TSTypeUtilsInternals.ExtendNumberBrand<
   IntersectBrand<InfiniteNumber, NegativeNumber>,
   never,
   '> -2^16' | '> -2^32' | '>= -2^15' | '>= -2^31'
@@ -190,10 +131,7 @@ type NegativeFiniteNumber = IntersectBrand<NegativeNumber, FiniteNumber>;
 // integer types
 
 /** Numeric brand type for value after checking with `Number.isInteger(x)` */
-type Int = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
-  FiniteNumber,
-  'Int'
->;
+type Int = TSTypeUtilsInternals.ExtendNumberBrand<FiniteNumber, 'Int'>;
 
 /**
  * Numeric brand type for value after checking with `Number.isInteger(x)` and
@@ -220,10 +158,7 @@ type NegativeInt = IntersectBrand<Int, NegativeNumber>;
 type NonZeroInt = IntersectBrand<Int, NonZeroNumber>;
 
 /** Numeric brand type for value after checking with `Number.isSafeInteger(x)` */
-type SafeInt = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
-  Int,
-  'SafeInt'
->;
+type SafeInt = TSTypeUtilsInternals.ExtendNumberBrand<Int, 'SafeInt'>;
 
 /**
  * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
@@ -255,7 +190,7 @@ type NonZeroSafeInt = IntersectBrand<SafeInt, NonZeroNumber>;
  * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
  * and `-2^31 <= x <= 2^31 - 1`
  */
-type Int32 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type Int32 = TSTypeUtilsInternals.ExtendNumberBrand<
   SafeInt,
   '< 2^31' | '< 2^32' | '> -2^32' | '>= -2^31'
 >;
@@ -266,7 +201,7 @@ type Int32 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
  * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
  * and `-2^15 <= x <= 2^15 - 1`
  */
-type Int16 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type Int16 = TSTypeUtilsInternals.ExtendNumberBrand<
   Int32,
   '< 2^15' | '< 2^16' | '> -2^16' | '>= -2^15'
 >;
@@ -277,10 +212,7 @@ type Int16 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
  * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
  * and `0 <= x <= 2^32 - 1`
  */
-type Uint32 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
-  SafeUint,
-  '< 2^32'
->;
+type Uint32 = TSTypeUtilsInternals.ExtendNumberBrand<SafeUint, '< 2^32'>;
 
 /**
  * `[0, 2^16 - 1]`
@@ -288,7 +220,7 @@ type Uint32 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
  * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
  * and `0 <= x <= 2^16 - 1`
  */
-type Uint16 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type Uint16 = TSTypeUtilsInternals.ExtendNumberBrand<
   Uint32,
   '< 2^16' | '< 2^31'
 >;
@@ -299,7 +231,7 @@ type Uint16 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
  * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
  * and `-2^32 < x < 0`
  */
-type NegativeInt32 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type NegativeInt32 = TSTypeUtilsInternals.ExtendNumberBrand<
   IntersectBrand<SafeInt, NegativeNumber>,
   '> -2^32'
 >;
@@ -310,34 +242,28 @@ type NegativeInt32 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
  * Numeric brand type for value after checking with `Number.isSafeInteger(x)`
  * and `-2^16 < x < 0`
  */
-type NegativeInt16 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type NegativeInt16 = TSTypeUtilsInternals.ExtendNumberBrand<
   NegativeInt32,
   '> -2^16' | '>= -2^31'
 >;
 
 /** Numeric brand type for `Float32Array` element */
-type Float32 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type Float32 = TSTypeUtilsInternals.ExtendNumberBrand<
   TSTypeUtilsInternals.BrandedNumberBaseType,
   'Float32'
 >;
 
 /** Numeric brand type for `Float64Array` element */
-type Float64 = TSTypeUtilsInternals.ExtendNumberBrandByStringKey<
+type Float64 = TSTypeUtilsInternals.ExtendNumberBrand<
   TSTypeUtilsInternals.BrandedNumberBaseType,
   'Float64'
 >;
 
 /** Numeric brand type for `BigInt64Array` element */
-type BigInt64 = ExtendBrand<
-  ChangeBaseBrand<Int, bigint>,
-  NumberBrandKeys__['BigInt64']
->;
+type BigInt64 = ExtendBrand<ChangeBaseBrand<Int, bigint>, 'BigInt64'>;
 
 /** Numeric brand type for `BigUint64Array` element */
-type BigUint64 = ExtendBrand<
-  ChangeBaseBrand<Int, bigint>,
-  NumberBrandKeys__['BigUint64']
->;
+type BigUint64 = ExtendBrand<ChangeBaseBrand<Int, bigint>, 'BigUint64'>;
 
 /**
  * Small integers union
