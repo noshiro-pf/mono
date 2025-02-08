@@ -2,7 +2,6 @@ export const eslintNoRestrictedImportsDef = {
   name: '@noshiro/ts-utils',
   importNames: [
     'Arr',
-    'ArrayUtils',
     'assertNotUndefined',
     'castDeepMutable',
     'castDeepReadonly',
@@ -103,7 +102,6 @@ export const eslintNoRestrictedImportsDef = {
     'toUint8',
     'tp',
     'Tpl',
-    'TupleUtils',
     'Uint',
     'Uint16',
     'Uint32',

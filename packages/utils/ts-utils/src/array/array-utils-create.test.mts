@@ -2,7 +2,7 @@ import { expectType } from '../expect-type.mjs';
 import { toUint32 } from '../index.mjs';
 import { Arr } from './array-utils.mjs';
 
-describe('ArrayUtils', () => {
+describe('Arr', () => {
   describe('zeros', () => {
     test('fixed length', () => {
       const result = Arr.zeros(3);

@@ -3,7 +3,6 @@ import { tp } from '@noshiro/ts-utils';
 export const injectModulesDef = Object.fromEntries(
   [
     'Arr',
-    'ArrayUtils',
     'assertNotUndefined',
     'castDeepMutable',
     'castDeepReadonly',
@@ -104,7 +103,6 @@ export const injectModulesDef = Object.fromEntries(
     'toUint8',
     'tp',
     'Tpl',
-    'TupleUtils',
     'Uint',
     'Uint16',
     'Uint32',

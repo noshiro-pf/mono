@@ -2,7 +2,7 @@ import { expectType } from '../expect-type.mjs';
 import { toUint32 } from '../index.mjs';
 import { Arr } from './array-utils.mjs';
 
-describe('ArrayUtils', () => {
+describe('Arr', () => {
   describe('set', () => {
     const xs = [1, 2, 3] as const;
     const result = Arr.set(xs, 1, 4 as const);

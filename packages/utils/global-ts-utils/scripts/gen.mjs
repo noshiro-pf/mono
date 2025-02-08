@@ -7,7 +7,6 @@ await generateAllGlobalDefs({
   packageName: packageJson.name.replace(/^@noshiro\/global-/u, '@noshiro/'),
   importsList: [
     'Arr',
-    'ArrayUtils',
     'assertNotUndefined',
     'castDeepMutable',
     'castDeepReadonly',
@@ -108,7 +107,6 @@ await generateAllGlobalDefs({
     'toUint8',
     'tp',
     'Tpl',
-    'TupleUtils',
     'Uint',
     'Uint16',
     'Uint32',

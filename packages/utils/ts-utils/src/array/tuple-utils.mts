@@ -120,7 +120,7 @@ function sortedBy<const T extends readonly unknown[], const B>(
   );
 }
 
-export const TupleUtils = {
+export const Tpl = {
   length,
   reversed,
   findIndex,
@@ -132,5 +132,3 @@ export const TupleUtils = {
   sorted,
   sortedBy,
 } as const;
-
-export const Tpl = TupleUtils; // alias

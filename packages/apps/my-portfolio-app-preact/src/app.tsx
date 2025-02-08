@@ -46,7 +46,7 @@ const pages = {
   [routes.skills]: <SkillsMdx />,
   [routes.products]: <Products />,
   [routes.writings]: <Writings />,
-};
+} as const;
 
 export const App = memoNamed('App', () => {
   const { pathname } = useObservableValue(Router.state);

@@ -2,7 +2,7 @@ import { IMap } from '../collections/index.mjs';
 import { expectType } from '../expect-type.mjs';
 import { Arr } from './array-utils.mjs';
 
-describe('ArrayUtils', () => {
+describe('Arr', () => {
   describe('min', () => {
     {
       const xs = [3, 5, 4] as const;

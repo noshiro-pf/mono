@@ -1,7 +1,6 @@
 export const autoImportDef = {
   '@noshiro/ts-utils': [
     'Arr',
-    'ArrayUtils',
     'assertNotUndefined',
     'castDeepMutable',
     'castDeepReadonly',
@@ -102,7 +101,6 @@ export const autoImportDef = {
     'toUint8',
     'tp',
     'Tpl',
-    'TupleUtils',
     'Uint',
     'Uint16',
     'Uint32',

@@ -1,4 +1,4 @@
-import { Arr, Result, TupleUtils } from '@noshiro/ts-utils';
+import { Arr, Result, Tpl } from '@noshiro/ts-utils';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -19,7 +19,7 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
 
   const { typeName = 'tuple' } = options ?? {};
 
-  const defaultValue = TupleUtils.map(
+  const defaultValue = Tpl.map(
     types,
     (t) => t.defaultValue,
   ) satisfies MapTuple<A>;

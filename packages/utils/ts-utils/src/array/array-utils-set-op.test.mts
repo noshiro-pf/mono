@@ -1,7 +1,7 @@
 import { expectType } from '../expect-type.mjs';
 import { Arr } from './array-utils.mjs';
 
-describe('ArrayUtils', () => {
+describe('Arr', () => {
   describe('isSubset', () => {
     {
       const xs = [1, 2, 3] as const;
