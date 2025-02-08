@@ -21,16 +21,11 @@ export const MuiTabs = memoNamed<Props>(
 
     const { state: tabWidthList, updateState: updateTabWidthList } = useState<
       readonly number[]
-    >([]);
-
-    const tabWidthListWithDefault = useMemo(
-      () => labels.map((_, index) => tabWidthList[index] ?? tabWidthPx),
-      [tabWidthList, tabWidthPx, labels],
-    );
+    >(labels.map(() => tabWidthPx));
 
     const tabWidthAccumulated = useMemo(
-      () => Arr.scan(tabWidthListWithDefault, (acc, curr) => acc + curr, 0),
-      [tabWidthListWithDefault],
+      () => Arr.scan(tabWidthList, (acc, curr) => acc + curr, 0),
+      [tabWidthList],
     );
 
     const labelsWithHandler = useMemo<
@@ -76,7 +71,7 @@ export const MuiTabs = memoNamed<Props>(
           <TabIndicator
             tabIndex={tabIndex}
             tabWidthAccumulated={tabWidthAccumulated}
-            tabWidthList={tabWidthListWithDefault}
+            tabWidthList={tabWidthList}
             tabWidthPx={tabWidthPx}
           />
         </TabsScroller>

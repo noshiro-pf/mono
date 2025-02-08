@@ -11,7 +11,7 @@ describe('Tuple.map', () => {
   });
 });
 
-describe('TupleUtils.set', () => {
+describe('Tpl.set', () => {
   const result = Tpl.set([1, 2, 3], 1, 4);
 
   expectType<typeof result, readonly [1 | 4, 2 | 4, 3 | 4]>('=');
@@ -21,7 +21,7 @@ describe('TupleUtils.set', () => {
   });
 });
 
-describe('TupleUtils.update', () => {
+describe('Tpl.update', () => {
   const result = Tpl.update([1, 2, 3], 1, (x) => x + 2);
 
   expectType<typeof result, readonly [number, number, number]>('=');
@@ -31,7 +31,7 @@ describe('TupleUtils.update', () => {
   });
 });
 
-describe('TupleUtils.reverse', () => {
+describe('Tpl.reverse', () => {
   {
     const result = Tpl.reversed([1, 2, 3]);
 
@@ -43,7 +43,7 @@ describe('TupleUtils.reverse', () => {
   }
 });
 
-describe('TupleUtils.sorted', () => {
+describe('Tpl.sorted', () => {
   {
     // as const 無しでも動くこと
     const result = Tpl.sorted([2, 1, 3]);
@@ -76,7 +76,7 @@ describe('TupleUtils.sorted', () => {
   }
 });
 
-describe('TupleUtils.sortedBy', () => {
+describe('Tpl.sortedBy', () => {
   {
     const sorted = Tpl.sortedBy([{ v: 2 }, { v: 1 }, { v: 3 }], (x) => x.v);
 
@@ -113,7 +113,7 @@ describe('TupleUtils.sortedBy', () => {
   }
 });
 
-describe('TupleUtils.findIndex', () => {
+describe('Tpl.findIndex', () => {
   {
     const result = Tpl.findIndex(
       [{ v: 2 }, { v: 1 }, { v: 3 }],

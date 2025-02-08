@@ -11,7 +11,6 @@ import {
   type TinyObservable as TYPE_TinyObservable,
   type TinyObservableSource as TYPE_TinyObservableSource,
   type Arr as VAR_Arr,
-  type ArrayUtils as VAR_ArrayUtils,
   type assertNotUndefined as VAR_assertNotUndefined,
   type castDeepMutable as VAR_castDeepMutable,
   type castDeepReadonly as VAR_castDeepReadonly,
@@ -112,7 +111,6 @@ import {
   type toUint8 as VAR_toUint8,
   type tp as VAR_tp,
   type Tpl as VAR_Tpl,
-  type TupleUtils as VAR_TupleUtils,
   type Uint as VAR_Uint,
   type Uint16 as VAR_Uint16,
   type Uint32 as VAR_Uint32,
@@ -135,7 +133,6 @@ declare global {
   /* custom types */
 
   const Arr: typeof VAR_Arr;
-  const ArrayUtils: typeof VAR_ArrayUtils;
   const assertNotUndefined: typeof VAR_assertNotUndefined;
   const castDeepMutable: typeof VAR_castDeepMutable;
   const castDeepReadonly: typeof VAR_castDeepReadonly;
@@ -236,7 +233,6 @@ declare global {
   const toUint8: typeof VAR_toUint8;
   const tp: typeof VAR_tp;
   const Tpl: typeof VAR_Tpl;
-  const TupleUtils: typeof VAR_TupleUtils;
   const Uint: typeof VAR_Uint;
   const Uint16: typeof VAR_Uint16;
   const Uint32: typeof VAR_Uint32;

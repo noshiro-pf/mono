@@ -207,6 +207,7 @@ const sliceClamped = <T,>(
     0,
     length(list),
   )(start);
+
   const endClamped = Num.clamp<NumberType.ArraySizeArg>(
     startClamped,
     length(list),
@@ -340,47 +341,41 @@ const set = <A, U>(
   list: readonly A[],
   index: Uint32WithSmallInt,
   newValue: U,
-): readonly (A | U)[] => list.map((a, i) => (i === index ? newValue : a));
+): readonly (A | U)[] => (list as readonly (A | U)[]).with(index, newValue);
 
 const update = <A, U>(
   list: readonly A[],
   index: NumberType.ArraySizeArgNonNegative,
   updater: (prev: A) => U,
-): readonly (A | U)[] => list.map((a, i) => (i === index ? updater(a) : a));
+): readonly (A | U)[] =>
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  (list as readonly (A | U)[]).with(index, updater(list[index]!));
 
 // TODO: improve type
 const inserted = <A,>(
   list: readonly A[],
   index: NumberType.ArraySizeArg,
   newValue: A,
-): readonly A[] => {
-  const mut_temp = asMut(Array.from(list));
-
-  mut_temp.splice(index, 0, newValue);
-
-  return mut_temp;
-};
+): readonly A[] => list.toSpliced(index, 0, newValue);
 
 const removed = <A,>(
   list: readonly A[],
   index: NumberType.ArraySizeArg,
-): readonly A[] => {
-  const mut_temp = asMut(Array.from(list));
-
-  mut_temp.splice(index, 1);
-
-  return mut_temp;
-};
+): readonly A[] => list.toSpliced(index, 1);
 
 const pushed = <T extends readonly unknown[], V = T>(
   list: T,
   value: V,
-): readonly [...T, V] => [...list, value];
+): readonly [...T, V] =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  list.toSpliced(length(list), 0, value) as readonly [...T, V];
 
 const unshifted = <T extends readonly unknown[], V = T>(
   list: T,
   value: V,
-): readonly [V, ...T] => [value, ...list];
+): readonly [V, ...T] =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  list.toSpliced(0, 0, value) as readonly [V, ...T];
 
 const concat = <T1 extends readonly unknown[], T2 extends readonly unknown[]>(
   list1: T1,
@@ -755,7 +750,7 @@ const chunk = <T,>(
   return mut_chunk;
 };
 
-export const ArrayUtils = {
+export const Arr = {
   isEmpty,
   isNonEmpty,
   isArrayOfLength1,
@@ -827,5 +822,3 @@ export const ArrayUtils = {
   uniqBy,
   chunk,
 } as const;
-
-export const Arr = ArrayUtils; // alias

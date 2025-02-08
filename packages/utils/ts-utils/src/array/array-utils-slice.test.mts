@@ -1,6 +1,6 @@
 import { Arr } from './array-utils.mjs';
 
-describe('ArrayUtils', () => {
+describe('Arr', () => {
   describe('slice', () => {
     const list = [0, 1, 2, 3, 4] as const;
 

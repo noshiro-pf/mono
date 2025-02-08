@@ -2,7 +2,7 @@ import { IMap } from '../collections/index.mjs';
 import { expectType } from '../expect-type.mjs';
 import { Arr } from './array-utils.mjs';
 
-describe('ArrayUtils', () => {
+describe('Arr', () => {
   describe('partition', () => {
     const xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 
