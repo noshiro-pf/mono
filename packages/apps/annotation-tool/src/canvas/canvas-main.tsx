@@ -35,9 +35,7 @@ type Props = Readonly<{
 export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { state: pixiApp, setState: setPixiApp } = useState<
-    PixiApp | undefined
-  >(undefined);
+  const [pixiApp, setPixiApp] = useState<PixiApp | undefined>(undefined);
 
   useEffect(() => {
     // should initialize in useEffect to wait for canvasRef.current initialization

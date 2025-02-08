@@ -3,11 +3,7 @@ export const useFormError = <T>(
   valueIsInvalid: (v: T) => boolean,
   onValueChange: (v: T) => void,
 ): [boolean, (v: T) => void, () => void] => {
-  const {
-    state: showError,
-    setTrue: show,
-    setFalse: hide,
-  } = useBoolState(false);
+  const [showError, { setTrue: show, setFalse: hide }] = useBoolState(false);
 
   const onBlur = useCallback(() => {
     if (valueIsInvalid(value)) {

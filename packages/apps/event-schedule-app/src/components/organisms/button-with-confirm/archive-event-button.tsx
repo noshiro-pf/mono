@@ -13,11 +13,8 @@ type Props = Readonly<{
 export const ArchiveEventButton = memoNamed<Props>(
   'ArchiveEventButton',
   ({ archiveOrUnArchive, onConfirm }) => {
-    const {
-      state: isOpen,
-      setTrue: handleOpen,
-      setFalse: handleClose,
-    } = useBoolState(false);
+    const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
+      useBoolState(false);
 
     const archiveIconClick = useCallback(
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

@@ -20,8 +20,7 @@ type Props = Readonly<{
 export const CreateEventResultDialog = memoNamed<Props>(
   'CreateEventResultDialog',
   ({ isLoading, isOpen, url }) => {
-    const { state: linkIsUsed, setState: setLinkIsUsed } =
-      useState<boolean>(false);
+    const [linkIsUsed, setLinkIsUsed] = useState<boolean>(false);
 
     const onClipboardButtonClick = useCallback(() => {
       setLinkIsUsed(true);

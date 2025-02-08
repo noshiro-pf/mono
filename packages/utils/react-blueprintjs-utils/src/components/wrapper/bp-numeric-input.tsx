@@ -1,6 +1,7 @@
 import { NumericInput } from '@blueprintjs/core';
-import { memoNamed, useState } from '@noshiro/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { Num } from '@noshiro/ts-utils';
+import { useState } from 'better-react-use-state';
 import { useCallback, useEffect } from 'react';
 
 export type BpNumericInputProps = Omit<NumericInputPropsOriginal, 'value'> &
@@ -31,7 +32,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
     convertValueOnBlurAndEmit,
     ...props
   }) => {
-    const { state, setState } = useState<string>(value.toString());
+    const [state, setState] = useState<string>(value.toString());
 
     useEffect(() => {
       setState(value.toString());

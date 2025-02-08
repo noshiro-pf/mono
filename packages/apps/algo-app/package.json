@@ -74,12 +74,14 @@
     "@noshiro/tiny-router-preact-hooks": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
+    "better-preact-use-state": "*",
     "firebase": "^10.13.1",
     "immer": "^10.1.1",
     "preact": "^10.23.2"
   },
   "devDependencies": {
     "@noshiro/eslint-configs": "*",
+    "@noshiro/global-better-preact-use-state": "*",
     "@noshiro/global-goober": "*",
     "@noshiro/global-preact": "*",
     "@noshiro/global-preact-utils": "*",

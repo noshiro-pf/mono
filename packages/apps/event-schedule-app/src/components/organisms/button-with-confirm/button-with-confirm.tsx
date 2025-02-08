@@ -36,17 +36,13 @@ export const ButtonWithConfirm = memoNamed<Props>(
     dialogConfig,
     toastConfig,
   }) => {
-    const {
-      state: isOpen,
-      setTrue: handleOpen,
-      setFalse: handleClose,
-    } = useBoolState(false);
+    const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
+      useBoolState(false);
 
-    const {
-      state: loadingLocal,
-      setTrue: setTrueLoadingLocal,
-      setFalse: setFalseLoadingLocal,
-    } = useBoolState(false);
+    const [
+      loadingLocal,
+      { setTrue: setTrueLoadingLocal, setFalse: setFalseLoadingLocal },
+    ] = useBoolState(false);
 
     const alive = useAlive();
     const onConfirm = useCallback(() => {

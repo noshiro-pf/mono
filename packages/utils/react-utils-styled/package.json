@@ -46,6 +46,7 @@
     "@noshiro/resize-observer-react-hooks": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
+    "better-react-use-state": "*",
     "react": "^18.2.0"
   },
   "devDependencies": {

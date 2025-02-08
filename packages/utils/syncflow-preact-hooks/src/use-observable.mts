@@ -1,6 +1,6 @@
-import { useState } from '@noshiro/preact-utils';
 import { type InitializedObservable, type Observable } from '@noshiro/syncflow';
 import { Maybe } from '@noshiro/ts-utils';
+import { useState } from 'better-preact-use-state';
 import { useEffect, useMemo } from 'preact/hooks';
 
 export function useObservable<A>(
@@ -53,7 +53,7 @@ export function useObservableValue<A, B = A>(
   observable$: Observable<A>,
   initialValue?: B,
 ): A | B | undefined {
-  const { state, setState } = useState<{ value: A | B | undefined }>({
+  const [state, setState] = useState<{ value: A | B | undefined }>({
     value: Maybe.unwrap(observable$.getSnapshot()) ?? initialValue,
   });
   useObservableEffect(observable$, (value) => {

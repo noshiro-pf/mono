@@ -48,7 +48,8 @@
   },
   "dependencies": {
     "@noshiro/preact-utils": "*",
-    "@noshiro/ts-utils": "*"
+    "@noshiro/ts-utils": "*",
+    "better-preact-use-state": "*"
   },
   "devDependencies": {
     "@noshiro/eslint-configs": "*",

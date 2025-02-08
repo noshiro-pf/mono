@@ -9,11 +9,8 @@ type Props = Readonly<{
 export const CommentButton = memoNamed<Props>(
   'CommentButton',
   ({ comment, useSmallButton = false }) => {
-    const {
-      state: isOpen,
-      setTrue: handleOpen,
-      setFalse: handleClose,
-    } = useBoolState(false);
+    const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
+      useBoolState(false);
 
     return (
       <Popover

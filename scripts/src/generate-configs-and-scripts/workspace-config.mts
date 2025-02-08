@@ -130,6 +130,8 @@ const fillDefaultsForApp = ({
 });
 
 export const workspaceConfig: Record<string, WorkspaceConfig> = {
+  'global-better-preact-use-state': workspaceConfigGlobalUtil,
+  'global-better-react-use-state': workspaceConfigGlobalUtil,
   'global-emotion-react': workspaceConfigGlobalUtil,
   'global-emotion-styled': workspaceConfigGlobalUtil,
   'global-goober': workspaceConfigGlobalUtil,
@@ -147,6 +149,14 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
 
   template: fillDefaultsForUtil({
     passWithNoTests: true,
+  }),
+  'better-preact-use-state': fillDefaultsForUtil({
+    passWithNoTests: true,
+    tsType: 'preact',
+  }),
+  'better-react-use-state': fillDefaultsForUtil({
+    passWithNoTests: true,
+    tsType: 'react',
   }),
   'ts-utils': fillDefaultsForUtil(),
   'numeric-input-utils': fillDefaultsForUtil({

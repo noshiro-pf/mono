@@ -1,17 +1,20 @@
+import { useState } from 'better-preact-use-state';
 import { useEffect } from 'preact/hooks';
-import { useState } from '../use-state.mjs';
 
 export function useMerged2<T1, T2>(
   init: T1 | T2,
   value1: T1,
   value2: T2,
 ): T1 | T2 {
-  const { state: merged, setState: set } = useState<T1 | T2>(init);
+  const [merged, set] = useState<T1 | T2>(init);
+
   useEffect(() => {
     set(value1);
-  }, [value1, set]);
+  }, [value1]);
+
   useEffect(() => {
     set(value2);
-  }, [value2, set]);
+  }, [value2]);
+
   return merged;
 }

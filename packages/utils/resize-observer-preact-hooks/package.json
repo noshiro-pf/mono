@@ -42,6 +42,7 @@
   "dependencies": {
     "@noshiro/preact-utils": "*",
     "@noshiro/ts-utils": "*",
+    "better-preact-use-state": "*",
     "preact": "^10.23.2",
     "resize-observer": "^1.0.0"
   },

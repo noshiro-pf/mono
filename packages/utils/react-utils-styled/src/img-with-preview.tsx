@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { memoNamed, useBoolState } from '@noshiro/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { useBoolState } from 'better-react-use-state';
 import { useMemo } from 'react';
 
 const RelativeWrapper = styled.div`
@@ -43,11 +44,8 @@ type Props = Readonly<{
 export const ImgWithPreview = memoNamed<Props>(
   'ImgWithPreview',
   ({ previewImgSrc, fullImgSrc, alt = '' }: Props) => {
-    const {
-      state: loaded,
-      setTrue: onLoad,
-      setFalse: onLoadStart,
-    } = useBoolState(false);
+    const [loaded, { setTrue: onLoad, setFalse: onLoadStart }] =
+      useBoolState(false);
 
     const imgStyle = useMemo<React.CSSProperties>(
       () => ({ opacity: loaded ? 1 : 0 }),

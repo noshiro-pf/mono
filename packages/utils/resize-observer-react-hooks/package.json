@@ -42,6 +42,7 @@
   "dependencies": {
     "@noshiro/react-utils": "*",
     "@noshiro/ts-utils": "*",
+    "better-react-use-state": "*",
     "react": "^18.2.0",
     "resize-observer": "^1.0.0"
   },

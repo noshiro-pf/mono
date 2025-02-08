@@ -3,9 +3,7 @@ export const eslintNoRestrictedImportsDef = {
   importNames: [
     'memoNamed',
     'useAlive',
-    'useBoolState',
     'usePromiseValue',
-    'useState',
     'useTinyObservable',
     'useTinyObservableEffect',
     'useTinyObservableValue',

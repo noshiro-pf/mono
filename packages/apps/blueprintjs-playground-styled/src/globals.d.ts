@@ -1,3 +1,4 @@
+/// <reference types="@noshiro/global-better-react-use-state" />
 /// <reference types="@noshiro/global-emotion-react" />
 /// <reference types="@noshiro/global-emotion-styled" />
 /// <reference types="@noshiro/global-react" />

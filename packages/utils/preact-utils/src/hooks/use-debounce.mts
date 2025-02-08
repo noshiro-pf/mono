@@ -1,5 +1,5 @@
+import { useState } from 'better-preact-use-state';
 import { useCallback, useEffect, useRef } from 'preact/hooks';
-import { useState } from './use-state.mjs';
 
 export const useDebounce = <ResultValue,>(
   fn: () => ResultValue,
@@ -8,7 +8,7 @@ export const useDebounce = <ResultValue,>(
 ): ResultValue => {
   const timerId = useRef<TimerId | undefined>(undefined);
 
-  const { state: value, setState: setValue } = useState<ResultValue>(fn());
+  const [value, setValue] = useState<ResultValue>(fn());
 
   const clearTimer = useCallback(() => {
     if (timerId.current !== undefined) {

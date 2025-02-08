@@ -5,8 +5,8 @@ import { ButtonPrimary, Input, Spinner } from './bp';
 const dc = dictionary.createRoom;
 
 export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
-  const { state: password, setState: setPassword } = useState<string>('');
-  const { state: username, setState: setUsername } = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [username, setUsername] = useState<string>('');
 
   const onPasswordInput: preact.JSX.GenericEventHandler<HTMLInputElement> =
     useCallback(

@@ -65,12 +65,12 @@ export const NavBar = memoNamed('NavBar', () => {
         >
           {fireAuthUser === undefined ? (
             <>
-              <ItemAnchor onClick={forNonLoggedInUserDialogState.setTrue}>
+              <ItemAnchor onClick={forNonLoggedInUserDialogState[1].setTrue}>
                 {dc.list}
               </ItemAnchor>
               <ForNonLoggedInUserDialog
-                cancel={forNonLoggedInUserDialogState.setFalse}
-                isOpen={forNonLoggedInUserDialogState.state}
+                cancel={forNonLoggedInUserDialogState[1].setFalse}
+                isOpen={forNonLoggedInUserDialogState[0]}
               />
 
               <ItemAnchor

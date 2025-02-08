@@ -326,11 +326,11 @@ export const AnswerBeingEdited = memoNamed<Props>(
                 hideContentIfToggleIsFalse={false}
                 title={dc.protected.title}
                 toggleState={false}
-                onToggle={forNonLoggedInUserDialogState.setTrue}
+                onToggle={forNonLoggedInUserDialogState[1].setTrue}
               />
               <ForNonLoggedInUserDialog
-                cancel={forNonLoggedInUserDialogState.setFalse}
-                isOpen={forNonLoggedInUserDialogState.state}
+                cancel={forNonLoggedInUserDialogState[1].setFalse}
+                isOpen={forNonLoggedInUserDialogState[0]}
               />
             </>
           ) : (

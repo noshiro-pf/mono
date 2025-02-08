@@ -5,11 +5,8 @@ type Props = Readonly<{
 }>;
 
 export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
-  const {
-    state: isOpen,
-    setTrue: handleOpen,
-    setFalse: handleClose,
-  } = useBoolState(false);
+  const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
+    useBoolState(false);
 
   const onSortAscClick = useCallback(() => {
     onSortChange('asc');
