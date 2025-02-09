@@ -3,80 +3,84 @@ import { expectType } from './expect-type.mjs';
 {
   expectType<
     NaNType,
-    Readonly<{
-      NaNValue: true;
-      Finite: false;
-      Int: false;
-      SafeInt: false;
-      '!=0': true;
-      '< 2^15': false;
-      '< 2^16': false;
-      '< 2^31': false;
-      '< 2^32': false;
-      '> -2^16': false;
-      '> -2^32': false;
-      '>= -2^15': false;
-      '>= -2^31': false;
-      '>=0': false;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: true;
+        Finite: false;
+        Int: false;
+        SafeInt: false;
+        '!=0': true;
+        '< 2^15': false;
+        '< 2^16': false;
+        '< 2^31': false;
+        '< 2^32': false;
+        '> -2^16': false;
+        '> -2^32': false;
+        '>= -2^15': false;
+        '>= -2^31': false;
+        '>=0': false;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     InfiniteNumber,
-    Readonly<{
-      NaNValue: false;
-      Finite: false;
-      '!=0': true;
-      Int: false;
-      SafeInt: false;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: false;
+        '!=0': true;
+        Int: false;
+        SafeInt: false;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     POSITIVE_INFINITY,
-    Readonly<{
-      NaNValue: false;
-      Finite: false;
-      '!=0': true;
-      Int: false;
-      SafeInt: false;
-      '>=0': true;
-      '>= -2^15': true;
-      '> -2^16': true;
-      '>= -2^31': true;
-      '> -2^32': true;
-      '< 2^15': false;
-      '< 2^16': false;
-      '< 2^31': false;
-      '< 2^32': false;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: false;
+        '!=0': true;
+        Int: false;
+        SafeInt: false;
+        '>=0': true;
+        '>= -2^15': true;
+        '> -2^16': true;
+        '>= -2^31': true;
+        '> -2^32': true;
+        '< 2^15': false;
+        '< 2^16': false;
+        '< 2^31': false;
+        '< 2^32': false;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     NEGATIVE_INFINITY,
-    Readonly<{
-      NaNValue: false;
-      Finite: false;
-      '!=0': true;
-      Int: false;
-      SafeInt: false;
-      '>=0': false;
-      '>= -2^15': false;
-      '> -2^16': false;
-      '>= -2^31': false;
-      '> -2^32': false;
-      '< 2^15': true;
-      '< 2^16': true;
-      '< 2^31': true;
-      '< 2^32': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: false;
+        '!=0': true;
+        Int: false;
+        SafeInt: false;
+        '>=0': false;
+        '>= -2^15': false;
+        '> -2^16': false;
+        '>= -2^31': false;
+        '> -2^32': false;
+        '< 2^15': true;
+        '< 2^16': true;
+        '< 2^31': true;
+        '< 2^32': true;
+      }>
+    > &
       number
   >('=');
 
@@ -85,44 +89,47 @@ import { expectType } from './expect-type.mjs';
 
   expectType<
     NonZeroNumber,
-    Readonly<{
-      NaNValue: false;
-      '!=0': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        '!=0': true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     NonNegativeNumber,
-    Readonly<{
-      NaNValue: false;
-      '>=0': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      '>= -2^15': true;
-      '>= -2^31': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        '>=0': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        '>= -2^15': true;
+        '>= -2^31': true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     PositiveNumber,
-    Readonly<{
-      NaNValue: false;
-      '!=0': true;
-      // '< 2^15': true;
-      // '< 2^16': true;
-      // '< 2^31': true;
-      // '< 2^32': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      '>= -2^15': true;
-      '>= -2^31': true;
-      '>=0': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        '!=0': true;
+        // '< 2^15': true;
+        // '< 2^16': true;
+        // '< 2^31': true;
+        // '< 2^32': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        '>= -2^15': true;
+        '>= -2^31': true;
+        '>=0': true;
+      }>
+    > &
       number
   >('=');
 
@@ -131,30 +138,32 @@ import { expectType } from './expect-type.mjs';
 
   expectType<
     NegativeNumber,
-    Readonly<{
-      NaNValue: false;
-      '!=0': true;
-      '< 2^15': true;
-      '< 2^16': true;
-      '< 2^31': true;
-      '< 2^32': true;
-      // '> -2^16': true;
-      // '> -2^32': true;
-      // '>= -2^15': true;
-      // '>= -2^31': true;
-      '>=0': false;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        '!=0': true;
+        '< 2^15': true;
+        '< 2^16': true;
+        '< 2^31': true;
+        '< 2^32': true;
+        // '> -2^16': true;
+        // '> -2^32': true;
+        // '>= -2^15': true;
+        // '>= -2^31': true;
+        '>=0': false;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     FiniteNumber,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+      }>
+    > &
       number
   >('=');
 
@@ -162,352 +171,372 @@ import { expectType } from './expect-type.mjs';
 
   expectType<
     Int,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     Uint,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      // '!=0': true;
-      // '< 2^15': true;
-      // '< 2^16': true;
-      // '< 2^31': true;
-      // '< 2^32': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      '>= -2^15': true;
-      '>= -2^31': true;
-      '>=0': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        // '!=0': true;
+        // '< 2^15': true;
+        // '< 2^16': true;
+        // '< 2^31': true;
+        // '< 2^32': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        '>= -2^15': true;
+        '>= -2^31': true;
+        '>=0': true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     PositiveInt,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      '!=0': true;
-      // '< 2^15': true;
-      // '< 2^16': true;
-      // '< 2^31': true;
-      // '< 2^32': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      '>= -2^15': true;
-      '>= -2^31': true;
-      '>=0': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        '!=0': true;
+        // '< 2^15': true;
+        // '< 2^16': true;
+        // '< 2^31': true;
+        // '< 2^32': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        '>= -2^15': true;
+        '>= -2^31': true;
+        '>=0': true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     NegativeInt,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      '!=0': true;
-      '< 2^15': true;
-      '< 2^16': true;
-      '< 2^31': true;
-      '< 2^32': true;
-      // '> -2^16': true;
-      // '> -2^32': true;
-      // '>= -2^15': true;
-      // '>= -2^31': true;
-      '>=0': false;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        '!=0': true;
+        '< 2^15': true;
+        '< 2^16': true;
+        '< 2^31': true;
+        '< 2^32': true;
+        // '> -2^16': true;
+        // '> -2^32': true;
+        // '>= -2^15': true;
+        // '>= -2^31': true;
+        '>=0': false;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     NonZeroInt,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      '!=0': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        '!=0': true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     SafeInt,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     SafeUint,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-      // '!=0': true;
-      // '< 2^15': true;
-      // '< 2^16': true;
-      // '< 2^31': true;
-      // '< 2^32': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      '>= -2^15': true;
-      '>= -2^31': true;
-      '>=0': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+        // '!=0': true;
+        // '< 2^15': true;
+        // '< 2^16': true;
+        // '< 2^31': true;
+        // '< 2^32': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        '>= -2^15': true;
+        '>= -2^31': true;
+        '>=0': true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     PositiveSafeInt,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-      '!=0': true;
-      // '< 2^15': true;
-      // '< 2^16': true;
-      // '< 2^31': true;
-      // '< 2^32': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      '>= -2^15': true;
-      '>= -2^31': true;
-      '>=0': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+        '!=0': true;
+        // '< 2^15': true;
+        // '< 2^16': true;
+        // '< 2^31': true;
+        // '< 2^32': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        '>= -2^15': true;
+        '>= -2^31': true;
+        '>=0': true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     NegativeSafeInt,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      '!=0': true;
-      SafeInt: true;
-      '< 2^15': true;
-      '< 2^16': true;
-      '< 2^31': true;
-      '< 2^32': true;
-      // '> -2^16': true;
-      // '> -2^32': true;
-      // '>= -2^15': true;
-      // '>= -2^31': true;
-      '>=0': false;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        '!=0': true;
+        SafeInt: true;
+        '< 2^15': true;
+        '< 2^16': true;
+        '< 2^31': true;
+        '< 2^32': true;
+        // '> -2^16': true;
+        // '> -2^32': true;
+        // '>= -2^15': true;
+        // '>= -2^31': true;
+        '>=0': false;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     NonZeroSafeInt,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-      '!=0': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+        '!=0': true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     Int32,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-      // '!=0': true;
-      // '< 2^15': true;
-      // '< 2^16': true;
-      '< 2^31': true;
-      '< 2^32': true;
-      // '> -2^16': true;
-      '> -2^32': true;
-      // '>= -2^15': true;
-      '>= -2^31': true;
-      // '>=0': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+        // '!=0': true;
+        // '< 2^15': true;
+        // '< 2^16': true;
+        '< 2^31': true;
+        '< 2^32': true;
+        // '> -2^16': true;
+        '> -2^32': true;
+        // '>= -2^15': true;
+        '>= -2^31': true;
+        // '>=0': true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     Int16,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-      // '!=0': true;
-      '< 2^15': true;
-      '< 2^16': true;
-      '< 2^31': true;
-      '< 2^32': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      '>= -2^15': true;
-      '>= -2^31': true;
-      // '>=0': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+        // '!=0': true;
+        '< 2^15': true;
+        '< 2^16': true;
+        '< 2^31': true;
+        '< 2^32': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        '>= -2^15': true;
+        '>= -2^31': true;
+        // '>=0': true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     Uint32,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-      // '!=0': true;
-      // '< 2^15': true;
-      // '< 2^16': true;
-      // '< 2^31': true;
-      '< 2^32': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      '>= -2^15': true;
-      '>= -2^31': true;
-      '>=0': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+        // '!=0': true;
+        // '< 2^15': true;
+        // '< 2^16': true;
+        // '< 2^31': true;
+        '< 2^32': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        '>= -2^15': true;
+        '>= -2^31': true;
+        '>=0': true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     Uint16,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-      // '!=0': true;
-      // '< 2^15': true;
-      '< 2^16': true;
-      '< 2^31': true;
-      '< 2^32': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      '>= -2^15': true;
-      '>= -2^31': true;
-      '>=0': true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+        // '!=0': true;
+        // '< 2^15': true;
+        '< 2^16': true;
+        '< 2^31': true;
+        '< 2^32': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        '>= -2^15': true;
+        '>= -2^31': true;
+        '>=0': true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     NegativeInt32,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-      '!=0': true;
-      '< 2^15': true;
-      '< 2^16': true;
-      '< 2^31': true;
-      '< 2^32': true;
-      // '> -2^16': true;
-      '> -2^32': true;
-      // '>= -2^15': true;
-      // '>= -2^31': true;
-      '>=0': false;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+        '!=0': true;
+        '< 2^15': true;
+        '< 2^16': true;
+        '< 2^31': true;
+        '< 2^32': true;
+        // '> -2^16': true;
+        '> -2^32': true;
+        // '>= -2^15': true;
+        // '>= -2^31': true;
+        '>=0': false;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     NegativeInt16,
-    Readonly<{
-      NaNValue: false;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-      '!=0': true;
-      '< 2^15': true;
-      '< 2^16': true;
-      '< 2^31': true;
-      '< 2^32': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      // '>= -2^15': true;
-      '>= -2^31': true;
-      '>=0': false;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+        '!=0': true;
+        '< 2^15': true;
+        '< 2^16': true;
+        '< 2^31': true;
+        '< 2^32': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        // '>= -2^15': true;
+        '>= -2^31': true;
+        '>=0': false;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     Float32,
-    Readonly<{
-      Float32: true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        Float32: true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     Float64,
-    Readonly<{
-      Float64: true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        Float64: true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     BigInt64,
-    Readonly<{
-      Finite: true;
-      Int: true;
-      NaNValue: false;
-      BigInt64: true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        Finite: true;
+        Int: true;
+        NaNValue: false;
+        BigInt64: true;
+      }>
+    > &
       bigint
   >('=');
 
   expectType<
     BigUint64,
-    Readonly<{
-      Finite: true;
-      Int: true;
-      NaNValue: false;
-      BigUint64: true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        Finite: true;
+        Int: true;
+        NaNValue: false;
+        BigUint64: true;
+      }>
+    > &
       bigint
   >('=');
 }

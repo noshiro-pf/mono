@@ -18,8 +18,9 @@ import { expectType } from './expect-type.mjs';
   // <= かつ >= だがなぜか '=' にならない…
   expectType<AB, Readonly<{ T: true; B: boolean; F: false }> & number>('<=');
   expectType<
-    Readonly<{ T: true; B: boolean; F: false }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{ T: true; B: boolean; F: false }>
+    > &
       number,
     AB
   >('<=');
@@ -29,69 +30,73 @@ import { expectType } from './expect-type.mjs';
 
   expectType<
     IntersectBrand<A, B>,
-    Readonly<{
-      B: true;
-      T: true;
-      F: false;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        B: true;
+        T: true;
+        F: false;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     IntersectBrand<PositiveNumber, Uint32>,
-    Readonly<{
-      NaNValue: false;
-      '!=0': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      '>= -2^15': true;
-      '>= -2^31': true;
-      '>=0': true;
-      '< 2^32': true;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        '!=0': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        '>= -2^15': true;
+        '>= -2^31': true;
+        '>=0': true;
+        '< 2^32': true;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     IntersectBrand<PositiveInt, Uint32>,
-    Readonly<{
-      NaNValue: false;
-      '!=0': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      '>= -2^15': true;
-      '>= -2^31': true;
-      '>=0': true;
-      '< 2^32': true;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        '!=0': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        '>= -2^15': true;
+        '>= -2^31': true;
+        '>=0': true;
+        '< 2^32': true;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+      }>
+    > &
       number
   >('=');
 
   expectType<
     PositiveInt & Uint32,
-    Readonly<{
-      NaNValue: false;
-      '!=0': true;
-      '> -2^16': true;
-      '> -2^32': true;
-      '>= -2^15': true;
-      '>= -2^31': true;
-      '>=0': true;
-      '< 2^32': true;
-      Finite: true;
-      Int: true;
-      SafeInt: true;
-    }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<
+      Readonly<{
+        NaNValue: false;
+        '!=0': true;
+        '> -2^16': true;
+        '> -2^32': true;
+        '>= -2^15': true;
+        '>= -2^31': true;
+        '>=0': true;
+        '< 2^32': true;
+        Finite: true;
+        Int: true;
+        SafeInt: true;
+      }>
+    > &
       number
   >('!=');
 
@@ -106,8 +111,7 @@ import { expectType } from './expect-type.mjs';
   );
   expectType<
     NormalizeBrandUnion<AB>,
-    Readonly<{ T: true; F: false }> &
-      TSTypeUtilsInternals.BrandUniqueKey &
+    TSTypeUtilsInternals.BrandEncapsulated<Readonly<{ T: true; F: false }>> &
       number
   >('=');
 }
