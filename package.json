@@ -128,7 +128,7 @@
     "unplugin-auto-import": "^19.0.0",
     "vite": "^6.0.9",
     "vite-plugin-markdown": "^2.2.0",
-    "vitest": "^2.1.8",
+    "vitest": "^2.1.9",
     "wireit": "^0.14.9",
     "wsrun": "^5.2.4",
     "zenn-cli": "^0.1.153"
