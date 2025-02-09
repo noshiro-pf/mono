@@ -1,4 +1,5 @@
 import { type EslintImportsRules } from '../types/index.mjs';
+import { withDefaultOption } from '../types/rule-severity-branded.mjs';
 
 export const eslintImportsRules: EslintImportsRules = {
   // TypeScript を使っている場合このチェックは必要ない。
@@ -6,10 +7,10 @@ export const eslintImportsRules: EslintImportsRules = {
 
   'import/named': 'off',
   'import/default': 'error',
-  'import/namespace': 'error',
+  'import/namespace': withDefaultOption('error'),
   'import/no-restricted-paths': 'off', // TODO
-  'import/no-absolute-path': 'error',
-  'import/no-dynamic-require': 'error',
+  'import/no-absolute-path': withDefaultOption('error'),
+  'import/no-dynamic-require': withDefaultOption('error'),
   'import/no-internal-modules': [
     'error',
     {
@@ -36,14 +37,14 @@ export const eslintImportsRules: EslintImportsRules = {
   ],
   'import/no-webpack-loader-syntax': 'error',
   'import/no-self-import': 'error',
-  'import/no-cycle': 'error',
-  'import/no-useless-path-segments': 'error',
+  'import/no-cycle': withDefaultOption('error'),
+  'import/no-useless-path-segments': withDefaultOption('error'),
   'import/no-relative-parent-imports': 'off',
 
   // relates to @typescript-eslint/consistent-type-imports rule
   'import/consistent-type-specifier-style': ['error', 'prefer-inline'],
 
-  'import/no-relative-packages': 'error',
+  'import/no-relative-packages': withDefaultOption('error'),
 
   // helpfulWarnings
   'import/export': 'error',
@@ -69,7 +70,7 @@ export const eslintImportsRules: EslintImportsRules = {
   // styleGuide
   'import/first': ['error', 'absolute-first'],
   'import/exports-last': 'off',
-  'import/no-duplicates': 'error',
+  'import/no-duplicates': withDefaultOption('error'),
   'import/no-namespace': 'off',
   'import/extensions': [
     'error',
@@ -114,9 +115,9 @@ export const eslintImportsRules: EslintImportsRules = {
   'import/no-default-export': 'error',
 
   'import/no-named-export': 'off',
-  'import/no-anonymous-default-export': 'error',
+  'import/no-anonymous-default-export': withDefaultOption('error'),
   'import/group-exports': 'off',
-  'import/dynamic-import-chunkname': 'error',
+  'import/dynamic-import-chunkname': withDefaultOption('error'),
   'import/no-empty-named-blocks': 'error',
 
   // deprecated rules

@@ -1,4 +1,5 @@
 import { type EslintUnicornRules } from '../types/index.mjs';
+import { withDefaultOption } from '../types/rule-severity-branded.mjs';
 
 export const eslintUnicornRules: EslintUnicornRules = {
   /**
@@ -10,17 +11,17 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/no-nested-ternary': 'off',
   'unicorn/number-literal-case': 'off',
 
-  'unicorn/better-regex': 'error',
-  'unicorn/catch-error-name': 'error',
+  'unicorn/better-regex': withDefaultOption('error'),
+  'unicorn/catch-error-name': withDefaultOption('error'),
 
   /** Props を展開して使うかどうかを統一する。 */
   'unicorn/consistent-destructuring': 'error',
 
-  'unicorn/consistent-function-scoping': 'error',
+  'unicorn/consistent-function-scoping': withDefaultOption('error'),
   'unicorn/custom-error-definition': 'off',
   'unicorn/error-message': 'error',
   'unicorn/escape-case': 'error',
-  'unicorn/expiring-todo-comments': 'error',
+  'unicorn/expiring-todo-comments': withDefaultOption('error'),
   'unicorn/explicit-length-check': 'off',
 
   /** ファイル名の統一 */
@@ -60,7 +61,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/no-array-callback-reference': 'off',
   'unicorn/no-array-for-each': 'error',
   'unicorn/no-array-method-this-argument': 'off', // not compatible with my Arr.map utility
-  'unicorn/no-array-push-push': 'error',
+  'unicorn/no-array-push-push': withDefaultOption('error'),
   'unicorn/no-array-reduce': 'off',
   'unicorn/no-await-expression-member': 'error',
   'unicorn/no-console-spaces': 'off', // turned off to enable aligning output
@@ -81,7 +82,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/no-static-only-class': 'error',
   'unicorn/no-thenable': 'error',
   'unicorn/no-this-assignment': 'error',
-  'unicorn/no-typeof-undefined': 'error',
+  'unicorn/no-typeof-undefined': withDefaultOption('error'),
   'unicorn/no-unnecessary-await': 'error',
   'unicorn/no-unreadable-array-destructuring': 'error',
   'unicorn/no-unsafe-regex': 0, // dup of "security/detect-unsafe-regex"
@@ -92,10 +93,10 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/no-useless-spread': 'error',
   'unicorn/no-useless-undefined': 'off', // this conflicts with @typescript-eslint/init-declarations
   'unicorn/no-zero-fractions': 'error',
-  'unicorn/numeric-separators-style': 'error',
-  'unicorn/prefer-add-event-listener': 'error',
-  'unicorn/prefer-array-find': 'error',
-  'unicorn/prefer-array-flat': 'error',
+  'unicorn/numeric-separators-style': withDefaultOption('error'),
+  'unicorn/prefer-add-event-listener': withDefaultOption('error'),
+  'unicorn/prefer-array-find': withDefaultOption('error'),
+  'unicorn/prefer-array-flat': withDefaultOption('error'),
   'unicorn/prefer-array-flat-map': 'error',
   'unicorn/prefer-array-index-of': 'error',
   'unicorn/prefer-array-some': 'error',
@@ -113,7 +114,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/prefer-dom-node-dataset': 'error',
   'unicorn/prefer-dom-node-remove': 'error',
   'unicorn/prefer-dom-node-text-content': 'error',
-  'unicorn/prefer-export-from': 'error',
+  'unicorn/prefer-export-from': withDefaultOption('error'),
   'unicorn/prefer-includes': 'error',
   'unicorn/prefer-json-parse-buffer': 'off',
   'unicorn/prefer-keyboard-event-key': 'error',
@@ -122,8 +123,8 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/prefer-module': 'error',
   'unicorn/prefer-negative-index': 'error',
   'unicorn/prefer-node-protocol': 'off', // TODO: enable this
-  'unicorn/prefer-number-properties': 'error',
-  'unicorn/prefer-object-from-entries': 'error',
+  'unicorn/prefer-number-properties': withDefaultOption('error'),
+  'unicorn/prefer-object-from-entries': withDefaultOption('error'),
   'unicorn/prefer-optional-catch-binding': 'error',
   'unicorn/prefer-prototype-methods': 'error',
   'unicorn/prefer-query-selector': 'error',
@@ -146,15 +147,15 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/prefer-top-level-await': 'off',
   'unicorn/prefer-type-error': 'error',
   'unicorn/prevent-abbreviations': 'off',
-  'unicorn/relative-url-style': 'error',
+  'unicorn/relative-url-style': withDefaultOption('error'),
   'unicorn/require-array-join-separator': 'error',
   'unicorn/require-number-to-fixed-digits-argument': 'error',
   // Turned off because we can't distinguish `widow.postMessage` and `{Worker,MessagePort,Client,BroadcastChannel}#postMessage()`
   // See #1396
   'unicorn/require-post-message-target-origin': 'off',
-  'unicorn/string-content': 'error',
+  'unicorn/string-content': withDefaultOption('error'),
   'unicorn/switch-case-braces': 'off', // TODO: Enable this
-  'unicorn/template-indent': 'error',
+  'unicorn/template-indent': withDefaultOption('error'),
   'unicorn/text-encoding-identifier-case': 'error',
   'unicorn/throw-new-error': 'error',
   'unicorn/no-unreadable-iife': 'error',
@@ -174,7 +175,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/prefer-event-target': 'error',
   'unicorn/prefer-logical-operator-over-ternary': 'error',
   'unicorn/prefer-blob-reading-methods': 'error',
-  'unicorn/no-unnecessary-polyfills': 'error',
+  'unicorn/no-unnecessary-polyfills': withDefaultOption('error'),
   'unicorn/no-anonymous-default-export': 'error',
   'unicorn/no-await-in-promise-methods': 'error',
   'unicorn/no-single-promise-in-promise-methods': 'error',
@@ -182,7 +183,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/no-invalid-fetch-options': 'error',
   'unicorn/no-magic-array-flat-depth': 'error',
   'unicorn/prefer-string-raw': 'error',
-  'unicorn/prefer-structured-clone': 'error',
+  'unicorn/prefer-structured-clone': withDefaultOption('error'),
   'unicorn/no-length-as-slice-end': 'error',
   'unicorn/no-negation-in-equality-check': 'error',
   'unicorn/consistent-existence-index-check': 'error',
