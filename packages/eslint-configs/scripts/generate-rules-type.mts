@@ -2,7 +2,7 @@ import { toSafeUint, toUint32 } from '@noshiro/mono-utils';
 import { type Rule } from 'eslint';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { type JSONSchema4 } from 'json-schema';
-import { compile } from 'json-schema-to-typescript';
+import { compile, type Options } from 'json-schema-to-typescript';
 import {
   deepCopy,
   deepReplace,
@@ -20,10 +20,23 @@ type Meta = DeepReadonly<
   }>
 >;
 
+const generatorOption: Readonly<{
+  explicitRuleDefaultOption: boolean;
+}> = {
+  explicitRuleDefaultOption: true,
+} as const;
+
+const RuleSeverityWithDefaultOption = 'RuleSeverityWithDefaultOption';
+
+const RuleSeverity = generatorOption.explicitRuleDefaultOption
+  ? 'Linter.StringSeverity'
+  : 'Linter.RuleSeverity';
+
 const compilerConfig = {
   bannerComment: '',
   format: false,
-} as const;
+  unknownAny: true,
+} as const satisfies Partial<Options>;
 
 const normalizeToSchemaArray = (
   schema: DeepReadonly<JSONSchema4 | JSONSchema4[]> | undefined,
@@ -142,11 +155,12 @@ const createResult = async (
   const mut_resultToWrite: string[] = [
     '/* cSpell:disable */',
     "import { type Linter } from 'eslint';",
+    "import { type RuleSeverityWithDefaultOption } from '../rule-severity-branded.mjs';",
     ...(schemaList.some(({ schema }) => schema.length === 1)
       ? [
           '',
-          'type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =',
-          'T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;',
+          `type SpreadOptionsIfIsArray<T extends readonly [${RuleSeverity}, unknown]> =`,
+          `T[1] extends readonly unknown[] ? readonly [${RuleSeverity}, ...T[1]] : T;`,
         ]
       : []),
     '',
@@ -163,9 +177,7 @@ const createResult = async (
     } else {
       switch (schema.length) {
         case 0:
-          mut_resultToWrite.push(
-            '  export type RuleEntry = Linter.RuleSeverity;',
-          );
+          mut_resultToWrite.push(`  export type RuleEntry = ${RuleSeverity};`);
           break;
 
         case 1: {
@@ -189,8 +201,11 @@ const createResult = async (
           mut_resultToWrite.push(
             optionsType,
             '',
-            '  export type RuleEntry = Linter.RuleSeverity',
-            '   | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;',
+            '  export type RuleEntry = ',
+            generatorOption.explicitRuleDefaultOption
+              ? `"off" | ${RuleSeverityWithDefaultOption}`
+              : 'Linter.StringSeverity',
+            `   | SpreadOptionsIfIsArray<readonly [${RuleSeverity}, Options]>;`,
           );
           break;
         }
@@ -219,13 +234,15 @@ const createResult = async (
           mut_resultToWrite.push(
             ...optionsTypeList,
             '',
-            '  export type RuleEntry = Linter.RuleSeverity',
+            '  export type RuleEntry = ',
+            generatorOption.explicitRuleDefaultOption
+              ? `"off" | ${RuleSeverityWithDefaultOption}`
+              : 'Linter.RuleSeverity',
             ...OptionsStrs.map(
               (_, i) =>
-                `   | readonly [Linter.RuleSeverity, ${OptionsStrs.slice(
-                  0,
-                  toUint32(i + 1),
-                ).join(', ')}]`,
+                `   | readonly [${
+                  RuleSeverity
+                }, ${OptionsStrs.slice(0, toUint32(i + 1)).join(', ')}]`,
             ),
           );
           break;
@@ -238,7 +255,7 @@ const createResult = async (
   const deprecatedSchemaList = schemaList.filter((s) => s.deprecated);
 
   mut_resultToWrite.push(
-    `export type ${typeName} = {`,
+    `export type ${typeName} = Readonly<{`,
 
     ...schemaList
       .filter((s) => !s.deprecated)
@@ -262,14 +279,14 @@ const createResult = async (
           ),
         ]),
 
-    '}',
+    '}>',
 
     '',
   );
 
   if (schemaList.some((s) => !s.deprecated && s.schema.length > 0)) {
     mut_resultToWrite.push(
-      `export type ${typeName}Option = {`,
+      `export type ${typeName}Option = Readonly<{`,
 
       ...schemaList
         .filter((s) => !s.deprecated && s.schema.length > 0)
@@ -286,7 +303,7 @@ const createResult = async (
           ].join(''),
         ),
 
-      '}',
+      '}>',
     );
   }
 

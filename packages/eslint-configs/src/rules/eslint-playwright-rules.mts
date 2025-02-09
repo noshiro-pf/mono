@@ -1,15 +1,16 @@
 import { type EslintPlaywrightRules } from '../types/index.mjs';
+import { withDefaultOption } from '../types/rule-severity-branded.mjs';
 
 export const eslintPlaywrightRules: EslintPlaywrightRules = {
   /* vitest と共通のルール（設定値をなるべく合わせる） */
-  'playwright/expect-expect': 'error',
+  'playwright/expect-expect': withDefaultOption('error'),
   'playwright/max-expects': 'off',
-  'playwright/max-nested-describe': 'error',
+  'playwright/max-nested-describe': withDefaultOption('error'),
   'playwright/no-commented-out-tests': 'off',
   'playwright/no-conditional-expect': 'error',
   'playwright/no-conditional-in-test': 'off',
   'playwright/no-duplicate-hooks': 'error',
-  'playwright/no-hooks': 'error',
+  'playwright/no-hooks': withDefaultOption('error'),
   'playwright/no-restricted-matchers': [
     'error',
     {
@@ -30,12 +31,12 @@ export const eslintPlaywrightRules: EslintPlaywrightRules = {
   'playwright/require-to-throw-message': 'error',
   'playwright/require-top-level-describe': 'off',
   'playwright/valid-describe-callback': 'error',
-  'playwright/valid-expect': 'error',
+  'playwright/valid-expect': withDefaultOption('error'),
   'playwright/valid-title': 'off',
 
   /* eslint-plugin-playwright 独自ルール */
 
-  'playwright/missing-playwright-await': 'error',
+  'playwright/missing-playwright-await': withDefaultOption('error'),
   'playwright/no-element-handle': 'error',
   'playwright/no-eval': 'error',
   'playwright/no-focused-test': 'error',
@@ -45,17 +46,17 @@ export const eslintPlaywrightRules: EslintPlaywrightRules = {
   'playwright/no-networkidle': 'error',
   'playwright/no-nth-methods': 'off',
   'playwright/no-page-pause': 'error',
-  'playwright/no-raw-locators': 'error',
-  'playwright/no-skipped-test': 'error',
-  'playwright/no-slowed-test': 'error',
+  'playwright/no-raw-locators': withDefaultOption('error'),
+  'playwright/no-skipped-test': withDefaultOption('error'),
+  'playwright/no-slowed-test': withDefaultOption('error'),
   'playwright/no-unsafe-references': 'error',
   'playwright/no-useless-await': 'error',
   'playwright/no-useless-not': 'error',
   'playwright/no-wait-for-selector': 'error',
   'playwright/no-wait-for-timeout': 'error',
   'playwright/prefer-locator': 'error',
-  'playwright/prefer-lowercase-title': 'error',
-  'playwright/prefer-native-locators': 'error',
+  'playwright/prefer-lowercase-title': withDefaultOption('error'),
+  'playwright/prefer-native-locators': withDefaultOption('error'),
   'playwright/prefer-to-have-count': 'error',
   'playwright/prefer-web-first-assertions': 'error',
   'playwright/require-soft-assertions': 'error',
