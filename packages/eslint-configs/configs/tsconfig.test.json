@@ -1,0 +1,9 @@
+{
+  "extends": [
+    "../../../configs/tsconfig/tsconfig.test.json",
+    "../../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "include": [
+    "../src/plugins/total-functions/rules/no-unsafe-readonly-mutable-assignment.test.mts"
+  ]
+}

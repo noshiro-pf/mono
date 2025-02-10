@@ -9,7 +9,7 @@ import {
   getTypeImmutability,
   Immutability,
 } from 'is-immutable-type';
-import { type Type, type TypeChecker, TypeFlags } from 'typescript';
+import { TypeFlags, type Program, type Type } from 'typescript';
 import { assignableTypePairs, createRule, isLiteral } from './common.mjs';
 import { createNoUnsafeAssignmentRule } from './unsafe-assignment-rule.mjs';
 
@@ -30,7 +30,7 @@ export const noUnsafeMutableReadonlyAssignment = createRule({
   },
   create: createNoUnsafeAssignmentRule(
     (
-      checker: TypeChecker,
+      program: Program,
       rawDestinationType: Type,
       rawSourceType: Type,
       sourceNode: TSESTree.Expression | undefined,
@@ -42,7 +42,7 @@ export const noUnsafeMutableReadonlyAssignment = createRule({
       const typePairs = assignableTypePairs(
         rawDestinationType,
         rawSourceType,
-        checker,
+        program.getTypeChecker(),
       );
 
       // TODO support config
@@ -73,12 +73,12 @@ export const noUnsafeMutableReadonlyAssignment = createRule({
         }
 
         const destinationImmutability = getTypeImmutability(
-          checker,
+          program,
           destinationType,
           overrides,
         );
         const sourceImmutability = getTypeImmutability(
-          checker,
+          program,
           sourceType,
           overrides,
         );
