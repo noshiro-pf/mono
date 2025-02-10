@@ -280,13 +280,7 @@ const updatePackageJsonImpl = (
 
           if (cfg.useVite === true) {
             mut_wireit['pre-build'] = {
-              command: `run-s ${[
-                ...(packageName === 'my-portfolio-app-preact'
-                  ? ['get-zenn-articles']
-                  : []),
-                'clean:build',
-                'type-check',
-              ].join(' ')}`,
+              command: `run-s ${['clean:build', 'type-check'].join(' ')}`,
             };
             mut_wireit['build'] = {
               dependencies: ['pre-build'],
