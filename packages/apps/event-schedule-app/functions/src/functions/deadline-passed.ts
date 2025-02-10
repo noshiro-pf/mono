@@ -1,6 +1,6 @@
 import { type Ymdhm } from '@noshiro/io-ts-types';
 import { DateUtils, SafeInt, type DateType } from '@noshiro/ts-utils';
-import { now } from '../utils/index.mjs';
+import { now } from '../utils/index.js';
 
 const ymdhm2DateObject = (ymdhm: Ymdhm): DateType =>
   DateUtils.create(

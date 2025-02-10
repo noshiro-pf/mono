@@ -112,3 +112,7 @@ rollup.config-*.mjs
 **/playwright-report/
 **/blob-report/
 **/playwright/.cache/
+
+# firebase
+
+.env.default

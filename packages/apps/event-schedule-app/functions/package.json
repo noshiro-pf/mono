@@ -6,7 +6,7 @@
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "sideEffects": true,
   "type": "module",
-  "main": "build/index.mjs",
+  "main": "build/index.js",
   "scripts": {
     "build": "run-s clean:build build:deps type-check build:impl",
     "build:deps": "wireit",
@@ -16,6 +16,7 @@
     "clean:build": "rimraf build",
     "clean:firebase": "rimraf .firebase",
     "clean:wireit": "rimraf .wireit/**",
+    "fb:config:export": "firebase functions:config:export",
     "fb:config:get": "firebase functions:config:get",
     "fb:config:set": "firebase functions:config:set",
     "fb:config:setapikey": "firebase functions:config:set slack.apikey=",
@@ -45,8 +46,8 @@
     "@noshiro/io-ts": "*",
     "@noshiro/io-ts-types": "*",
     "@noshiro/ts-utils": "*",
-    "firebase-admin": "^12.0.0",
-    "firebase-functions": "^4.5.0",
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.3.0",
     "nodemailer": "^6.9.9"
   },
   "engines": {

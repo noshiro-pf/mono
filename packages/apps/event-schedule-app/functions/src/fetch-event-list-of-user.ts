@@ -8,9 +8,8 @@ import { compareYearMonthDate } from '@noshiro/io-ts-types';
 import { Arr, IMap, Tpl, pipe, tp } from '@noshiro/ts-utils';
 import { type firestore } from 'firebase-admin';
 import { https } from 'firebase-functions';
-import { type CallableContext } from 'firebase-functions/v1/https';
-import { type FetchEventListOfUserPayload } from './types/index.mjs';
-import { today } from './utils/index.mjs';
+import { type FetchEventListOfUserPayload } from './types/index.js';
+import { today } from './utils/index.js';
 
 /**
  * `EventSchedule.author.id === uid` であるか、 `answers` に `uid`
@@ -24,18 +23,16 @@ export const fetchEventListOfUserImpl = async (
     showAllPastDaysEvent,
     showOnlyEventSchedulesICreated,
   }: FetchEventListOfUserPayload,
-  context: CallableContext,
+  uid: string | undefined,
 ): Promise<readonly EventListItem[]> => {
   // Checking that the user is authenticated.
-  if (context.auth === undefined) {
+  if (uid === undefined) {
     // Throwing an HttpsError so that the client gets the error details.
     throw new https.HttpsError(
       'failed-precondition',
       'The function must be called while authenticated.',
     );
   }
-
-  const uid = context.auth.uid;
 
   const eventsSnapshot = await pipe(db.collection(firestorePaths.events))
     .chain((ref) =>

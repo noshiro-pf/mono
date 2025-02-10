@@ -1,8 +1,7 @@
 {
-  "extends": "../../../../configs/tsconfig/tsconfig.build.json",
+  "extends": "../../../../configs/tsconfig/tsconfig.build.cloud-function.json",
   "compilerOptions": {
-    "target": "es2017",
-    "outDir": "dist"
+    "outDir": "build"
   },
   "include": ["./src"]
 }

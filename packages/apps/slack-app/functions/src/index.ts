@@ -1,11 +1,9 @@
-import { Json } from '@noshiro/ts-utils';
-import { firestore as admin_firestore, initializeApp } from 'firebase-admin';
-import {
-  config,
-  firestore,
-  https as functions_https,
-  logger,
-} from 'firebase-functions';
+import { initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import { logger } from 'firebase-functions';
+import { defineString } from 'firebase-functions/params';
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
+import { onRequest } from 'firebase-functions/v2/https';
 import { get } from 'https';
 
 /// <reference path="./globals.d.ts" />
@@ -13,19 +11,21 @@ import { get } from 'https';
 // The Firebase Admin SDK to access Cloud Firestore.
 initializeApp();
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-const SLACK_API_KEY: string = config()['slack']?.apikey ?? '';
+const slackApiKeyDef = defineString('SLACK_APIKEY');
 
 // Take the text parameter passed to this HTTP endpoint and insert it into
 // Cloud Firestore under the path /messages/:documentId/original
-export const addMessage = functions_https.onRequest(async (req, res) => {
+
+export const addMessage = onRequest(async (req, res) => {
   // Grab the text parameter.
   const original = req.query['text'];
   // Push the new message into Cloud Firestore using the Firebase Admin SDK.
-  const writeResult = await admin_firestore()
+  const writeResult = await getFirestore()
     .collection('messages')
     .add({ original });
   // Send back a message that we've successfully written the message
+
+  const SLACK_API_KEY: string = slackApiKeyDef.value();
 
   res.json({
     result: `Message with ID: ${writeResult.id} added. (${SLACK_API_KEY.length})`,
@@ -34,17 +34,22 @@ export const addMessage = functions_https.onRequest(async (req, res) => {
 
 // Listens for new messages added to /messages/:documentId/original and creates an
 // uppercase version of the message to /messages/:documentId/uppercase
-export const makeUppercase = firestore
-  .document('/messages/{documentId}')
-  .onCreate(async (snap, context) => {
+
+export const makeUppercase = onDocumentCreated(
+  '/messages/{documentId}',
+  async (event) => {
+    const snap = event.data;
+
     // Grab the current value of what was written to Cloud Firestore.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const original: string = snap.data()['original'];
+    const original: string = snap?.data()['original'];
 
     // Access the parameter `{documentId}` with `context.params`
-    logger.log('Uppercasing', context.params['documentId'], original);
+    logger.log('Uppercasing', event.params['documentId'], original);
 
     const uppercase = original.toUpperCase();
+
+    const SLACK_API_KEY: string = slackApiKeyDef.value();
 
     const searchUrl = `https://slack.com/api/users.list?token=${SLACK_API_KEY}&pretty=1`;
 
@@ -62,16 +67,21 @@ export const makeUppercase = firestore
               // eslint-disable-next-line total-functions/no-unsafe-type-assertion
               mut_data as unknown as Uint8Array[],
             );
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any
-            const r = Json.parse(events.toString()) as any;
+            // eslint-disable-next-line no-restricted-globals, total-functions/no-unsafe-type-assertion
+            const r = JSON.parse(events.toString()) as
+              | DeepReadonly<{
+                  messages?: { matches: NonEmptyArray<{ ts: string }> };
+                  members?: {
+                    name: string;
+                    profile?: { display_name_normalized: string };
+                  }[];
+                }>
+              | undefined;
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             console.log(r?.messages?.matches[0].ts);
             resolve(
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
               r?.members?.find(
                 (a: Readonly<{ name: string }>) => a.name === 'noshiro.pf',
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               )?.profile?.display_name_normalized,
             );
           });
@@ -81,8 +91,9 @@ export const makeUppercase = firestore
     // You must return a Promise when performing asynchronous tasks inside a Functions such as
     // writing to Cloud Firestore.
     // Setting an 'uppercase' field in Cloud Firestore document returns a Promise.
-    return snap.ref.set(
+    return snap?.ref.set(
       { uppercase, display_name_normalized: result },
       { merge: true },
     );
-  });
+  },
+);
