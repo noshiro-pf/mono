@@ -22,10 +22,10 @@
     "clean:caches": "run-p ws:clean:wireit",
     "clean:gitignored": "git clean -xfd",
     "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
-    "create:preact-app:vite": "scripts/bash/create_new_preact_app_vite.sh",
-    "create:react-app:vite": "scripts/bash/create_new_react_app_vite.sh",
-    "create:slides": "scripts/bash/create_new_slides.sh",
-    "create:util": "scripts/bash/create_new_util.sh",
+    "create:preact-app": "zx scripts/commands/create-new-preact-app.mjs",
+    "create:react-app": "zx scripts/commands/create-new-react-app.mjs",
+    "create:slides": "zx scripts/commands/create-new-slides.mjs",
+    "create:util": "zx scripts/commands/create-new-util.mjs",
     "fmt": "yarn fmt:diff:from-main",
     "fmt:all": "yarn zz:prettier:cache . > /dev/null",
     "fmt:all:no-cache": "yarn zz:prettier . > /dev/null",
@@ -34,7 +34,7 @@
     "fmt:diff": "yarn zz:prettier $(git status --short --porcelain | awk -F ' ' '{print $2}')",
     "generate-configs": "wireit",
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
-    "pub:all": "scripts/bash/publish.sh",
+    "pub:all": "zx scripts/commands/publish-packages.mjs",
     "setup": "run-s build:mono-utils generate-configs ws:build:utils",
     "type-check-eslint-configs": "tsc --noEmit",
     "type-check-eslint-configs:watch": "tsc --noEmit --watch",
@@ -131,7 +131,8 @@
     "vitest": "^2.1.9",
     "wireit": "^0.14.9",
     "wsrun": "^5.2.4",
-    "zenn-cli": "^0.1.153"
+    "zenn-cli": "^0.1.153",
+    "zx": "^8.3.2"
   },
   "engines": {
     "node": ">=16.0.0",
@@ -142,61 +143,61 @@
       "dependencies": [
         "build:mono-utils"
       ],
-      "command": "node scripts/commands/generate-configs-and-scripts-main.mjs"
+      "command": "zx scripts/commands/generate-configs-and-scripts-main.mjs"
     },
     "ws:type-check:apps": {
       "dependencies": [
         "build:mono-utils"
       ],
-      "command": "node scripts/commands/type-check-apps.mjs"
+      "command": "zx scripts/commands/type-check-apps.mjs"
     },
     "ws:type-check:utils": {
       "dependencies": [
         "build:mono-utils"
       ],
-      "command": "node scripts/commands/type-check-utils.mjs"
+      "command": "zx scripts/commands/type-check-utils.mjs"
     },
     "ws:type-check:non-utils": {
       "dependencies": [
         "build:mono-utils"
       ],
-      "command": "node scripts/commands/type-check-non-utils.mjs"
+      "command": "zx scripts/commands/type-check-non-utils.mjs"
     },
     "ws:build:apps": {
       "dependencies": [
         "build:mono-utils"
       ],
-      "command": "node scripts/commands/build-apps.mjs"
+      "command": "zx scripts/commands/build-apps.mjs"
     },
     "ws:build:utils": {
       "dependencies": [
         "build:mono-utils"
       ],
-      "command": "node scripts/commands/build-utils.mjs"
+      "command": "zx scripts/commands/build-utils.mjs"
     },
     "ws:build:non-utils": {
       "dependencies": [
         "build:mono-utils"
       ],
-      "command": "node scripts/commands/build-non-utils.mjs"
+      "command": "zx scripts/commands/build-non-utils.mjs"
     },
     "ws:lint:apps": {
       "dependencies": [
         "build:mono-utils"
       ],
-      "command": "node scripts/commands/lint-apps.mjs"
+      "command": "zx scripts/commands/lint-apps.mjs"
     },
     "ws:lint:utils": {
       "dependencies": [
         "build:mono-utils"
       ],
-      "command": "node scripts/commands/lint-utils.mjs"
+      "command": "zx scripts/commands/lint-utils.mjs"
     },
     "ws:test:utils": {
       "dependencies": [
         "build:mono-utils"
       ],
-      "command": "node scripts/commands/test-utils.mjs"
+      "command": "zx scripts/commands/test-utils.mjs"
     }
   }
 }

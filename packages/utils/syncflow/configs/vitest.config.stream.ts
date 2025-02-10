@@ -4,6 +4,7 @@ import { defineConfig } from 'vitest/config';
 
 const thisDir: string = toThisDir(import.meta.url);
 
+// eslint-disable-next-line import/no-default-export
 export default defineConfig({
   test: {
     globals: true,

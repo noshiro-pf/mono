@@ -1,4 +1,4 @@
-import path from 'node:path';
+import 'zx/globals';
 import { tsconfigTestJsonName, workspaceConfigsDirName } from './constants.mjs';
 import { tsConfigExtend } from './ts-config-extend-string.mjs';
 import { workspaceConfig } from './workspace-config.mjs';

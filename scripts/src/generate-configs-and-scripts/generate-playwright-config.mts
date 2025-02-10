@@ -1,4 +1,4 @@
-import path from 'node:path';
+import 'zx/globals';
 import { playwrightConfigName, workspaceConfigsDirName } from './constants.mjs';
 import { workspaceConfig } from './workspace-config.mjs';
 import { writeDirAndFileAndPrintDone } from './write-dir-and-file-and-print-done.mjs';

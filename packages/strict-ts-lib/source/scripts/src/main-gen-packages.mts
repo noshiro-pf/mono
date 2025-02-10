@@ -1,6 +1,5 @@
 import { isRecord, toThisDir } from '@noshiro/mono-utils';
-import * as fs from 'node:fs/promises';
-import path from 'node:path';
+import 'zx/globals';
 import { getSrcFileList, type ConverterConfig } from './convert-dts/common.mjs';
 import {
   configs,
@@ -52,7 +51,6 @@ const getVersion = async (): Promise<string | undefined> => {
   // NOTE(noshiro-pf): import により静的に読み込むことも可能だが、
   // dist に package.json が複製され都合が悪いため動的に読み込む。
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
   const packageJsonStr = await fs.readFile(sourcePackageJsonDir, {
     encoding: 'utf8',
   });
@@ -70,7 +68,6 @@ const getTsTypeUtilsVersion = async (): Promise<string | undefined> => {
   // NOTE(noshiro-pf): import により静的に読み込むことも可能だが、
   // dist に package.json が複製され都合が悪いため動的に読み込む。
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
   const packageJsonStr = await fs.readFile(tsTypeUtilsDir, {
     encoding: 'utf8',
   });
@@ -104,7 +101,6 @@ const createLib = async (config: ConverterConfig): Promise<void> => {
   try {
     await fs.access(outDir);
   } catch {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(outDir, { recursive: true });
   }
 
@@ -117,7 +113,6 @@ const createLib = async (config: ConverterConfig): Promise<void> => {
 
     const suffix = config.useLocalPath ? '' : `@${version}`;
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(
       outputFile,
 
@@ -211,14 +206,12 @@ const createPackages = async (config: ConverterConfig): Promise<void> => {
       try {
         await fs.access(outputDir);
       } catch {
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.mkdir(outputDir, { recursive: true });
       }
 
       {
         const outputFile = `${outputDir}/index.d.ts`;
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(outputFile, result);
 
         console.log(`${outputFile} generated.`);
@@ -229,7 +222,6 @@ const createPackages = async (config: ConverterConfig): Promise<void> => {
 
         const outputFile = `${outputDir}/package.json`;
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(
           outputFile,
           JSON.stringify({

@@ -1,4 +1,4 @@
-import path from 'node:path';
+import 'zx/globals';
 import {
   tsconfigTestJsonName,
   viteConfigName,
@@ -31,7 +31,7 @@ export const generateViteConfig = async (
         ? `import preact from '@preact/preset-vite';`
         : '',
     `import legacy from '@vitejs/plugin-legacy';`,
-    `import * as nodePath from 'node:path';`,
+    `import * as path from 'node:path';`,
     `import { defineConfig, PluginOption } from 'vite';`,
     "import { type UserConfig } from 'vitest/node';",
     `import { createInjectDef } from './inject-def';`,
@@ -63,7 +63,7 @@ export const generateViteConfig = async (
     `    },`,
     `    resolve: {`,
     `      alias: [`,
-    `        { find: '~', replacement: nodePath.resolve(thisDir, '../', 'src') },`,
+    `        { find: '~', replacement: path.resolve(thisDir, '../', 'src') },`,
     `      ],`,
     `    },`,
     `    test: {`,
@@ -71,7 +71,7 @@ export const generateViteConfig = async (
     `      globals: true,`,
     `      environment: 'happy-dom',`,
     `      typecheck: {`,
-    `        tsconfig: nodePath.resolve(thisDir, '${tsconfigTestJsonName}'),`,
+    `        tsconfig: path.resolve(thisDir, '${tsconfigTestJsonName}'),`,
     `      },`,
     `    } satisfies UserConfig,`,
     `  };`,

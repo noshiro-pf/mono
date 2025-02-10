@@ -7,7 +7,7 @@
   "sideEffects": true,
   "type": "module",
   "scripts": {
-    "convert": "node ./convert.js",
+    "convert": "zx ./convert.js",
     "marked": "marked"
   },
   "devDependencies": {

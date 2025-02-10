@@ -13,9 +13,9 @@
     "clean:src": "rimraf src/*.mts",
     "clean:wireit": "rimraf .wireit/**",
     "dump-keys": "wireit",
-    "dump-keys-message": "node ./dist/dump-keys-message.mjs",
-    "dump-keys-message-sub-array-keys": "node ./dist/dump-keys-message-sub-array-keys.mjs",
-    "dump-keys-message-sub-keys": "node ./dist/dump-keys-message-sub-keys.mjs",
+    "dump-keys-message": "zx ./dist/dump-keys-message.mjs",
+    "dump-keys-message-sub-array-keys": "zx ./dist/dump-keys-message-sub-array-keys.mjs",
+    "dump-keys-message-sub-keys": "zx ./dist/dump-keys-message-sub-keys.mjs",
     "fmt": "yarn zz:prettier .",
     "lint": "yarn zz:eslint:src",
     "lint:fix": "yarn zz:eslint:src --fix",
@@ -53,19 +53,19 @@
       "dependencies": [
         "build"
       ],
-      "command": "node ./dist/run-validator.mjs"
+      "command": "zx ./dist/run-validator.mjs"
     },
     "recursive-download": {
       "dependencies": [
         "build"
       ],
-      "command": "node ./dist/recursive-download.mjs"
+      "command": "zx ./dist/recursive-download.mjs"
     },
     "main": {
       "dependencies": [
         "build"
       ],
-      "command": "node ./dist/main.mjs"
+      "command": "zx ./dist/main.mjs"
     },
     "dump-keys": {
       "dependencies": [

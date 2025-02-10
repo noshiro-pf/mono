@@ -2,7 +2,7 @@ import {
   expectType,
   generateKeyValueRecordFromKeys,
 } from '@noshiro/mono-utils';
-import * as fs from 'node:fs/promises';
+import 'zx/globals';
 
 export type ConverterConfig = Readonly<{
   commentOutDeprecated: boolean;
@@ -182,12 +182,10 @@ export const brandedNumberTypeDefString = (): string => {
 export const getSrcFileList = async (
   srcDir: string,
 ): Promise<readonly Readonly<{ filename: string; content: string }>[]> => {
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
   const distFileNameList = await fs.readdir(srcDir);
 
   const distFileContentList = await Promise.all(
     distFileNameList.map((filename) =>
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       fs.readFile(`${srcDir}/${filename}`, 'utf8'),
     ),
   );

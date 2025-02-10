@@ -1,7 +1,7 @@
 /* eslint-disable tree-shakable/import-star */
 import * as syncflow from '@noshiro/syncflow';
 import { ISet } from '@noshiro/ts-utils';
-import * as fs from 'node:fs/promises';
+import 'zx/globals';
 
 const outFile = 'src/syncflow.mts';
 

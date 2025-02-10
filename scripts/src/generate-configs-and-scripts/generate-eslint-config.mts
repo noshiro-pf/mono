@@ -33,7 +33,7 @@ export const generateEsLintConfig = async (
     '  genEsLintRestrictedImportsDefFromDevDependencies,',
     "} from '@noshiro/eslint-configs';",
     "import { toThisDir } from '@noshiro/mono-utils';",
-    "import * as nodePath from 'node:path';",
+    "import * as path from 'node:path';",
     "import packageJson from './package.json' with { type: 'json' };",
     '',
     'const thisDir = toThisDir(import.meta.url);',
@@ -50,7 +50,7 @@ export const generateEsLintConfig = async (
     '    ...eslintFlatConfigForTypeScript({',
     '      tsconfigRootDir: thisDir,',
     "      tsconfigFileName: './tsconfig.json',",
-    `      packageDirs: [nodePath.resolve(thisDir, '${pathPrefixToRoot}'), thisDir],`,
+    `      packageDirs: [path.resolve(thisDir, '${pathPrefixToRoot}'), thisDir],`,
     '    }),',
     `    eslintFlatConfigForVitest(['${srcDirStr}/**/*']),`,
     cfg.tsType === 'preact'

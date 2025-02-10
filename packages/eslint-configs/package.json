@@ -29,7 +29,7 @@
     "clean:wireit": "rimraf .wireit",
     "fmt": "yarn zz:prettier .",
     "gen-rules-type": "wireit",
-    "gen-rules-type:command": "node ./scripts/main.mjs",
+    "gen-rules-type:command": "zx ./scripts/generate-rules-type-main.mjs",
     "gi": "bash ../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts --ignore plugins",
     "lint": "run-p lint:scripts lint:src",
     "lint:fix": "run-p lint:fix:scripts lint:fix:src",
@@ -42,7 +42,7 @@
     "tsc": "yarn type-check",
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit",
-    "update-deps": "./scripts/update-dependencies.sh",
+    "update-deps": "wireit",
     "watch": "yarn build:src --watch",
     "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true TIMING=1  eslint --config eslint.config.js",
     "zz:eslint:print-config": "yarn zz:eslint --print-config src/index.mts",
@@ -94,7 +94,7 @@
       "dependencies": [
         "build:scripts"
       ],
-      "command": "node ./scripts/main.mjs"
+      "command": "yarn gen-rules-type:command"
     },
     "build:scripts": {
       "dependencies": [
@@ -108,6 +108,12 @@
         "gi"
       ],
       "command": "tsc --project ./configs/tsconfig.build.json"
+    },
+    "update-deps": {
+      "dependencies": [
+        "build:scripts"
+      ],
+      "command": "zx ./scripts/update-dependencies.mjs"
     }
   }
 }

@@ -2,8 +2,7 @@
 import { toThisDir } from '@noshiro/mono-utils';
 import { ISet } from '@noshiro/ts-utils';
 import type * as fsType from 'node:fs';
-import * as fs from 'node:fs/promises';
-import path from 'node:path';
+import 'zx/globals';
 import { fileContentValues } from './dump-keys-common.mjs';
 import { getAllJsonFiles } from './get-all-json-files.mjs';
 

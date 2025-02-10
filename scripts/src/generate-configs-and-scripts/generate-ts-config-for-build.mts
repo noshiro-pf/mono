@@ -1,4 +1,4 @@
-import path from 'node:path';
+import 'zx/globals';
 import { pipe } from '../ts-utils/index.mjs';
 import {
   tsconfigBuildJsonName,

@@ -4,7 +4,6 @@ import admin from 'firebase-admin';
 import serviceAccount from './service-account-key.json';
 
 const app = admin.initializeApp({
-  // eslint-disable-next-line no-restricted-syntax
   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
   databaseURL: 'https://event-schedule-app.firebaseio.com',
 });
@@ -39,6 +38,6 @@ const printAllEvents = async (): Promise<boolean> => {
   return true;
 };
 
-const main = (): Promise<readonly boolean[]> => Promise.all([printAllEvents()]);
+const main = async (): Promise<readonly boolean[]> => [await printAllEvents()];
 
 main().catch(console.error);

@@ -1,5 +1,4 @@
-import * as fs from 'fs/promises';
-import path from 'node:path';
+import 'zx/globals';
 import { type Workspace } from '../index.mjs';
 import { isNotUndefined, isRecord } from '../ts-utils/index.mjs';
 import {
@@ -403,7 +402,7 @@ const updatePackageJsonImpl = (
           mut_scripts['gen:re-export:fmt'] =
             'yarn zz:prettier src/syncflow.mts';
           mut_scripts['gen:re-export:script'] =
-            'node ./scripts/generate-re-export-script.mjs';
+            'zx ./scripts/generate-re-export-script.mjs';
 
           mut_wireit['gen:re-export'] = {
             command:
@@ -449,7 +448,7 @@ const updatePackageJsonImpl = (
 
           mut_scripts['z:setup'] = 'run-p z:setup:gen-global-dts';
           mut_scripts['z:setup:gen-global-dts'] =
-            'node ./scripts/gen-global-dts.mjs';
+            'zx ./scripts/gen-global-dts.mjs';
 
           mut_scripts['zz:vite'] =
             `vite --config ${workspaceConfigsDirName}/${viteConfigName}`;
@@ -498,12 +497,12 @@ const updatePackageJsonImpl = (
 
           if (packageName === 'event-schedule-app') {
             mut_scripts['fb:export'] =
-              'node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --cache --cache-strategy content --write ./scripts/firestore_backup.json';
+              'zx ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --cache --cache-strategy content --write ./scripts/firestore_backup.json';
 
             mut_scripts['build:functions'] =
               'yarn workspace @noshiro/event-schedule-app-functions build';
 
-            mut_scripts['fb:write'] = 'node ./scripts/write_firestore';
+            mut_scripts['fb:write'] = 'zx ./scripts/write_firestore';
 
             mut_scripts['start'] =
               'run-p start:build-functions start:dev-server start:emulators';
@@ -528,7 +527,7 @@ const updatePackageJsonImpl = (
 
         if (packageName.startsWith('global-')) {
           mut_scripts['zz:fmt-src'] = 'yarn zz:prettier ./src';
-          mut_scripts['zz:gen'] = `node ./${workspaceScriptsDirName}/gen.mjs`;
+          mut_scripts['zz:gen'] = `zx ./${workspaceScriptsDirName}/gen.mjs`;
           mut_scripts['zz:setup'] =
             'run-s clean:src zz:gen zz:fmt-src type-check';
         }
@@ -542,7 +541,7 @@ const updatePackageJsonImpl = (
 
         if (packageName === 'my-portfolio-app-preact')
           mut_scripts['get-zenn-articles'] =
-            'node ./scripts/get-zenn-articles.mjs';
+            'zx ./scripts/get-zenn-articles.mjs';
       }
     }
   }

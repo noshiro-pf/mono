@@ -7,7 +7,7 @@
   "sideEffects": true,
   "type": "module",
   "scripts": {
-    "convert": "node convert.js Options > dest.ts",
+    "convert": "zx convert.js Options > dest.ts",
     "setup": "tsc"
   },
   "devDependencies": {}

@@ -41,7 +41,7 @@
     "type-check": "wireit",
     "z:setup": "run-p z:setup:build-deps z:setup:gen-global-dts",
     "z:setup:build-deps": "wireit",
-    "z:setup:gen-global-dts": "node ./scripts/gen-global-dts.mjs",
+    "z:setup:gen-global-dts": "zx ./scripts/gen-global-dts.mjs",
     "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint",
     "zz:eslint:e2e": "yarn zz:eslint --config eslint.config.js './e2e/**/*.ts'",
     "zz:eslint:print-config": "yarn zz:eslint --print-config src/main.tsx",

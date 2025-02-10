@@ -1,6 +1,6 @@
 import { ISet } from '@noshiro/ts-utils';
 import type * as fsType from 'node:fs';
-import * as fs from 'node:fs/promises';
+import 'zx/globals';
 
 const excludeList = ISet.new([
   'lists.json',

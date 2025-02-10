@@ -2,7 +2,7 @@
 
 import { eslintFlatConfigForTypeScript } from '@noshiro/eslint-configs';
 import { toThisDir } from '@noshiro/mono-utils';
-import * as nodePath from 'node:path';
+import * as path from 'node:path';
 
 const thisDir = toThisDir(import.meta.url);
 
@@ -10,7 +10,7 @@ const thisDir = toThisDir(import.meta.url);
 const config = eslintFlatConfigForTypeScript({
   tsconfigRootDir: thisDir,
   tsconfigFileName: './tsconfig.json',
-  packageDirs: [nodePath.resolve(thisDir, '../../..'), thisDir],
+  packageDirs: [path.resolve(thisDir, '../../..'), thisDir],
 });
 
 export default config;

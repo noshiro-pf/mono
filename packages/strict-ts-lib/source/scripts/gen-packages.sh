@@ -18,7 +18,7 @@ rm -rf "${PACKAGES_BRANDED_DIR}/**/index.d.ts"
 rm -rf "${PACKAGES_BRANDED_DIR}/**/package.json"
 
 
-node "${THIS_SCRIPT_DIR}/dist/main-gen-packages.mjs"
+zx "${THIS_SCRIPT_DIR}/dist/main-gen-packages.mjs"
 
 
 echo "formatting..."

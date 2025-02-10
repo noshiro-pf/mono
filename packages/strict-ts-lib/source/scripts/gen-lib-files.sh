@@ -13,7 +13,7 @@ rm -rf "${LIB_FILES_DIR}"
 rm -rf "${LIB_FILES_BRANDED_DIR}"
 mkdir -p "${LIB_FILES_DIR}"
 mkdir -p "${LIB_FILES_BRANDED_DIR}"
-node "${THIS_SCRIPT_DIR}/dist/main-gen-lib-files.mjs" || exit
+zx "${THIS_SCRIPT_DIR}/dist/main-gen-lib-files.mjs" || exit
 
 echo "formatting..."
 

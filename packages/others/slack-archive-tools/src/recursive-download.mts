@@ -9,8 +9,7 @@ import {
   toUint32,
 } from '@noshiro/ts-utils';
 import type * as fsType from 'node:fs';
-import * as fs from 'node:fs/promises';
-import path from 'node:path';
+import 'zx/globals';
 import { extractExt } from './extract-ext.mjs';
 import { getAllJsonFiles } from './get-all-json-files.mjs';
 import { validateJsonObject } from './validator.mjs';

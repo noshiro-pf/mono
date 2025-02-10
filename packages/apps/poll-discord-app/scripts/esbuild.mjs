@@ -1,5 +1,5 @@
 import * as esbuild from 'esbuild';
-import { glob } from 'glob';
+import 'zx/globals';
 import { autoImportsDef } from './auto-imports.mjs';
 
 const srcFiles = await glob('./src/**/*.mts', {

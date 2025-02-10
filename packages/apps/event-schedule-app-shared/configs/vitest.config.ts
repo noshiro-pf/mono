@@ -1,5 +1,5 @@
 import { toThisDir } from '@noshiro/mono-utils';
-import * as nodePath from 'node:path';
+import * as path from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 const thisDir: string = toThisDir(import.meta.url);
@@ -8,10 +8,10 @@ const thisDir: string = toThisDir(import.meta.url);
 export default defineConfig({
   test: {
     globals: true,
-    dir: nodePath.resolve(thisDir, '../src'),
-    includeSource: [nodePath.resolve(thisDir, '../src/**/*.mts')],
+    dir: path.resolve(thisDir, '../src'),
+    includeSource: [path.resolve(thisDir, '../src/**/*.mts')],
     typecheck: {
-      tsconfig: nodePath.resolve(thisDir, 'tsconfig.test.json'),
+      tsconfig: path.resolve(thisDir, 'tsconfig.test.json'),
     },
   },
 });
