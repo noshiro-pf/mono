@@ -4,10 +4,12 @@ export const eslintPreferArrowFunctionRules: EslintPreferArrowFunctionRules = {
   'prefer-arrow-functions/prefer-arrow-functions': [
     'error',
     {
+      allowedNames: [],
+      allowObjectProperties: false,
       allowNamedFunctions: false,
       classPropertiesAllowed: false,
-      disallowPrototype: false,
-      returnStyle: 'unchanged',
+      disallowPrototype: true,
+      returnStyle: 'implicit',
       singleReturnOnly: false,
     },
   ],

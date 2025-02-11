@@ -40,10 +40,10 @@ export const eslintReactRules: EslintReactRules = {
     'error',
     { unnamedComponents: 'arrow-function', namedComponents: 'arrow-function' },
   ], // modified
-  'react/hook-use-state': 'off', // disabled
+  'react/hook-use-state': 'off',
   'react/iframe-missing-sandbox': 'error',
   'react/jsx-boolean-value': ['error', 'always'],
-  'react/jsx-curly-brace-presence': 'off', // disabled
+  'react/jsx-curly-brace-presence': ['error', 'always'],
 
   /** ファイル名の統一 */
   'react/jsx-filename-extension': ['error', { extensions: ['.tsx'] }], // modified
