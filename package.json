@@ -26,6 +26,7 @@
     "create:react-app": "zx scripts/commands/create-new-react-app.mjs",
     "create:slides": "zx scripts/commands/create-new-slides.mjs",
     "create:util": "zx scripts/commands/create-new-util.mjs",
+    "create:playground": "zx scripts/commands/create-new-ts-playground.mjs",
     "fmt": "yarn fmt:diff:from-main",
     "fmt:all": "yarn zz:prettier:cache . > /dev/null",
     "fmt:all:no-cache": "yarn zz:prettier . > /dev/null",
