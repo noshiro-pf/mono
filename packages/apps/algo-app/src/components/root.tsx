@@ -1,70 +1,29 @@
-import { useResizeObserver } from '@noshiro/resize-observer-preact-hooks';
-import {
-  dictionary,
-  getParams,
-  getRoomId,
-  isMainPage,
-  routes,
-} from '../constants';
-import { Router } from '../router';
-import { createRoom, db } from '../store';
+import { useResizeObserverRef } from '@noshiro/resize-observer-preact-hooks';
+import { dictionary, minWindowSize, Routes } from '../constants';
+import { ElementSize, router, useShowPage } from '../store';
 import { Button } from './bp';
 import { CreateRoomPage } from './create-room-page';
 import { GameMain } from './game-main';
 import { JoinRoomPage } from './join-room-page';
 
 const goToMain = (): void => {
-  Router.push(routes.main);
+  router.push(Routes.routes.main);
 };
 
 export const Root = memoNamed('Root', () => {
-  const [windowSize, ref] = useResizeObserver<HTMLDivElement>({
-    width: 1280,
-    height: 720,
-    top: 0,
-    left: 0,
-  });
+  const ref = useResizeObserverRef<HTMLDivElement>(ElementSize.setWindowSize);
 
-  const { pathname, searchParams: queryParams } = useObservableValue(
-    Router.state,
-  );
+  const showPage = useShowPage();
 
-  const showMain = useMemo(() => isMainPage(pathname), [pathname]);
-
-  const roomId = useMemo(() => getRoomId(pathname), [pathname]);
-
-  const { playerId, replay, observe } = useMemo(
-    () => getParams(queryParams),
-    [queryParams],
-  );
-
-  useEffect(() => {
-    if (roomId !== undefined) {
-      db.setRoomId(roomId);
-    }
-  }, [roomId]);
-
-  useObservableEffect(createRoom.response$, (res) => {
-    Router.push(`${routes.rooms}/${res.id}`);
-  });
+  const roomId = useObservableValue(router.roomId$);
+  const playerId = useObservableValue(router.playerId$);
 
   return (
     <div ref={ref} data-e2e={'root'} style={rootStyle}>
       {/* simple routing */}
-      {showMain ? (
+      {showPage.mainPage ? (
         <CreateRoomPage />
-      ) : roomId !== undefined ? (
-        playerId === undefined ? (
-          <JoinRoomPage roomId={roomId} />
-        ) : (
-          <GameMain
-            observe={observe}
-            playerId={playerId}
-            replay={replay}
-            windowSize={windowSize}
-          />
-        )
-      ) : (
+      ) : roomId === undefined ? (
         <NotFoundPage>
           <h1>{dictionary.notFoundPage.title}</h1>
           <div>
@@ -73,6 +32,10 @@ export const Root = memoNamed('Root', () => {
             </Button>
           </div>
         </NotFoundPage>
+      ) : playerId === undefined ? (
+        <JoinRoomPage />
+      ) : (
+        <GameMain />
       )}
     </div>
   );
@@ -81,6 +44,9 @@ export const Root = memoNamed('Root', () => {
 const rootStyle = {
   width: '100vw',
   height: '100vh',
+  minWidth: `${minWindowSize.width}px`,
+  minHeight: `${minWindowSize.height}px`,
+  backgroundColor: '#f0f0f0',
 } as const satisfies preact.JSX.CSSProperties;
 
 const NotFoundPage = styled('div')`

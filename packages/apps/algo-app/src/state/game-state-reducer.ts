@@ -1,7 +1,5 @@
-import { produce } from 'immer';
 import { cardEq } from '../functions';
 import { type GameState, type GameStateAction } from '../types';
-import { faceUpCard, goToNextTurn, tossCard } from './draft-modifier';
 import {
   answerSelectedReducer,
   cardChosenToAttackReducer,
@@ -12,6 +10,7 @@ import {
   readonlyReducer,
   selectAnswerBalloonIsOpenReducer,
 } from './reducers';
+import { faceUpCard, goToNextTurn, tossCard } from './update-fn';
 
 export const gameStateReducer: Reducer<
   GameState,
@@ -19,129 +18,146 @@ export const gameStateReducer: Reducer<
 > = (state, actions) => actions.reduce(gameStateReducer1Step, state);
 
 const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
-  state,
+  currentState,
   action,
 ) =>
-  produce(state, (draft) => {
-    draft.answerSelected = answerSelectedReducer(state.answerSelected, action);
-
-    switch (state.phase) {
-      case 'ph010_selectMyCardToToss':
-        draft.cardChosenToToss = cardChosenToTossReducer(
-          state.cardChosenToToss,
+  pipe(currentState)
+    .chain((state) =>
+      Obj.merge<
+        GameState,
+        Pick<
+          GameState,
+          | 'answerSelected'
+          | 'cardChosenToAttack'
+          | 'cardChosenToBeAttacked'
+          | 'cardChosenToToss'
+          | 'confirmTossBalloonIsOpen'
+          | 'decidedAnswerBalloonIsOpen'
+          | 'readonly'
+          | 'selectAnswerBalloonIsOpen'
+        >
+      >(state, {
+        answerSelected: answerSelectedReducer(state.answerSelected, action),
+        cardChosenToBeAttacked: cardChosenToBeAttackedReducer(
+          state.cardChosenToBeAttacked,
           action,
-        );
-        break;
-
-      case 'ph020_firstAnswer':
-      case 'ph030_continuousAnswer':
-        draft.cardChosenToAttack = cardChosenToAttackReducer(
-          state.cardChosenToAttack,
+        ),
+        cardChosenToToss: match(state.phase, {
+          ph010_selectMyCardToToss: cardChosenToTossReducer(
+            state.cardChosenToToss,
+            action,
+          ),
+          ph020_firstAnswer: state.cardChosenToToss,
+          ph030_continuousAnswer: state.cardChosenToToss,
+        }),
+        cardChosenToAttack: match(state.phase, {
+          ph010_selectMyCardToToss: state.cardChosenToAttack,
+          ph020_firstAnswer: cardChosenToAttackReducer(
+            state.cardChosenToAttack,
+            action,
+          ),
+          ph030_continuousAnswer: cardChosenToAttackReducer(
+            state.cardChosenToAttack,
+            action,
+          ),
+        }),
+        confirmTossBalloonIsOpen: confirmTossBalloonIsOpenReducer(
+          state.confirmTossBalloonIsOpen,
           action,
-        );
-        break;
-    }
+        ),
+        selectAnswerBalloonIsOpen: selectAnswerBalloonIsOpenReducer(
+          state.selectAnswerBalloonIsOpen,
+          action,
+        ),
+        decidedAnswerBalloonIsOpen: decidedAnswerBalloonIsOpenReducer(
+          state.decidedAnswerBalloonIsOpen,
+          action,
+        ),
+        readonly: readonlyReducer(state.readonly, action),
+      }),
+    )
+    .chain((state) => {
+      switch (action.type) {
+        case 'selectMyCard':
+        case 'selectOpponentCard':
+        case 'selectAnswer':
+        case 'cancelToss':
+        case 'cancelAnswer':
+          return state;
 
-    draft.cardChosenToBeAttacked = cardChosenToBeAttackedReducer(
-      state.cardChosenToBeAttacked,
-      action,
-    );
+        case 'initializePlayerCards':
+          return Obj.set(state, 'playerCards', action.cards);
 
-    draft.confirmTossBalloonIsOpen = confirmTossBalloonIsOpenReducer(
-      state.confirmTossBalloonIsOpen,
-      action,
-    );
+        case 'submitToss':
+          if (state.cardChosenToToss === undefined) {
+            console.warn(
+              'gameState.cardChosenToToss should not be undefined here.',
+            );
+            return state;
+          }
+          return pipe(state)
+            .chain((st) => tossCard(st, st.cardChosenToToss))
+            .chain((st) => Obj.set(st, 'phase', 'ph020_firstAnswer')).value;
 
-    draft.selectAnswerBalloonIsOpen = selectAnswerBalloonIsOpenReducer(
-      state.selectAnswerBalloonIsOpen,
-      action,
-    );
+        case 'submitAnswer':
+          return Obj.set(state, 'readonly', true);
 
-    draft.decidedAnswerBalloonIsOpen = decidedAnswerBalloonIsOpenReducer(
-      state.decidedAnswerBalloonIsOpen,
-      action,
-    );
+        case 'showJudgeOnDecidedAnswer':
+          if (state.answerSelected === undefined) {
+            console.warn(
+              'gameState.answerSelected should not be undefined here.',
+            );
+            return state;
+          }
+          if (state.cardChosenToBeAttacked === undefined) {
+            console.warn(
+              'gameState.cardChosenToBeAttacked should not be undefined here.',
+            );
+            return state;
+          }
 
-    draft.readonly = readonlyReducer(draft.readonly, action);
+          return pipe(state)
+            .chain((st) =>
+              Obj.set(
+                st,
+                'judgeResult',
+                cardEq(st.answerSelected, st.cardChosenToBeAttacked)
+                  ? 'o'
+                  : 'x',
+              ),
+            )
+            .chain((st) =>
+              st.judgeResult === undefined
+                ? st
+                : match(st.judgeResult, {
+                    o: faceUpCard(st, st.cardChosenToBeAttacked),
+                    x: faceUpCard(st, st.cardChosenToAttack),
+                  }),
+            ).value;
 
-    switch (action.type) {
-      case 'selectMyCard':
-      case 'selectOpponentCard':
-      case 'selectAnswer':
-      case 'cancelToss':
-      case 'cancelAnswer':
-        break;
+        case 'hideDecidedAnswerBalloon':
+          return pipe(state)
+            .chain((st) =>
+              st.judgeResult === undefined
+                ? st
+                : match(st.judgeResult, {
+                    x: pipe(st)
+                      .chain((s) => Obj.set(s, 'cardChosenToAttack', undefined))
+                      .chain(goToNextTurn).value,
+                    o: match(st.phase, {
+                      ph020_firstAnswer: Obj.set(
+                        st,
+                        'phase',
+                        'ph030_continuousAnswer',
+                      ),
+                      ph010_selectMyCardToToss: st,
+                      ph030_continuousAnswer: st,
+                    }),
+                  }),
+            )
+            .chain((st) => Obj.set(st, 'judgeResult', undefined)).value;
 
-      case 'submitToss':
-        if (state.cardChosenToToss === undefined) {
-          console.warn(
-            'gameState.cardChosenToToss should not be undefined here.',
-          );
-          return;
-        }
-        tossCard(draft, state.cardChosenToToss);
-        draft.phase = 'ph020_firstAnswer';
-        break;
-
-      case 'submitAnswer':
-        draft.readonly = true;
-        break;
-
-      case 'showJudgeOnDecidedAnswer':
-        if (draft.answerSelected === undefined) {
-          console.warn(
-            'gameState.answerSelected should not be undefined here.',
-          );
-          return;
-        }
-        if (draft.cardChosenToBeAttacked === undefined) {
-          console.warn(
-            'gameState.cardChosenToBeAttacked should not be undefined here.',
-          );
-          return;
-        }
-
-        draft.judgeResult = cardEq(
-          draft.answerSelected,
-          draft.cardChosenToBeAttacked,
-        )
-          ? 'o'
-          : 'x';
-
-        switch (draft.judgeResult) {
-          case 'o':
-            faceUpCard(draft, draft.cardChosenToBeAttacked);
-            break;
-          case 'x':
-            faceUpCard(draft, draft.cardChosenToAttack);
-            break;
-        }
-        break;
-
-      case 'hideDecidedAnswerBalloon':
-        switch (draft.judgeResult) {
-          case 'x':
-            draft.cardChosenToAttack = undefined;
-            goToNextTurn(draft);
-            break;
-          case 'o':
-            switch (draft.phase) {
-              case 'ph020_firstAnswer':
-                draft.phase = 'ph030_continuousAnswer';
-                break;
-              case 'ph010_selectMyCardToToss':
-              case 'ph030_continuousAnswer':
-                break;
-            }
-            break;
-          case undefined:
-            break;
-        }
-        draft.judgeResult = undefined;
-        break;
-
-      case 'goToNextTurn':
-        goToNextTurn(draft);
-        break;
-    }
-  });
+        case 'goToNextTurn':
+          return goToNextTurn(state);
+      }
+    }).value;
