@@ -10,18 +10,18 @@ declare namespace TSTypeUtilsInternals {
         : MaxImpl<N, [0, ...T]>;
 }
 
-// namespace _MaxImpl {
-//   /**
-//    * LEQ[3 | 5] == 0 | 1 | 2 | 3 | 4 | 5;
-//    */
+// declare namespace TSTypeUtilsInternals {
+//   /** `LEQ[3 | 5] == 0 | 1 | 2 | 3 | 4 | 5;` */
 //   type LEQ = {
 //     [N in Index<64>]: IndexOfTuple<[0, ...MakeTuple<0, N>]>;
 //   };
 
-//   /**
-//    * @returns Y if A == B otherwise N
-//    */
+//   /** @returns Y if A == B otherwise N */
 //   type Eq<A, B, Y, N> = [A] extends [B] ? ([B] extends [A] ? Y : N) : N;
+
+//   type ToLEQ<N extends number> = {
+//     [K in keyof LEQ]: [N] extends [RelaxedExclude<LEQ[K], K>] ? never : K;
+//   }[keyof LEQ];
 
 //   /**
 //    * The former part
@@ -29,13 +29,13 @@ declare namespace TSTypeUtilsInternals {
 //    * ```ts
 //    * type Main<
 //    *   N extends number,
-//    *   U extends number = ToLEQ<Extract<N, keyof LEQ>>
+//    *   U extends number = ToLEQ<Extract<N, keyof LEQ>>,
 //    * > = {
 //    *   [K in keyof LEQ]: Eq<U, LEQ[K], K, never>;
-//    * }
+//    * };
 //    * ```
 //    *
-//    * behaves like this
+//    * Behaves like this
 //    *
 //    * ```ts
 //    * type R = {
@@ -50,21 +50,16 @@ declare namespace TSTypeUtilsInternals {
 //    * }
 //    * ```
 //    */
-//   type Main<
-//     N extends number,
-//     U extends number = LEQ[Extract<N, keyof LEQ>]
-//   > = {
+//   type Main<N extends number, U extends number = ToLEQ<N>> = {
 //     [K in keyof LEQ]: Eq<U, LEQ[K], K, never>;
 //   }[keyof LEQ];
+
+//   // type MaxImpl<N extends Index<64>, T extends readonly unknown[]> = {
+//   //   b: T['length'];
+//   //   r: MaxImpl<N, [0, ...T]>;
+//   // }[[N] extends [Partial<T>['length']] ? 'b' : 'r'];
 // }
 
-// type Max<N extends Uint10> = _MaxImpl.Main<N>;
-
-// type _MaxImpl<N extends Index<64>, T extends readonly unknown[]> = {
-//   b: T['length'];
-//   r: _MaxImpl<N, [0, ...T]>;
-// }[[N] extends [Partial<T>['length']] ? 'b' : 'r'];
-
-// type Max<N extends Index<64>> = _MaxImpl<N, []>;
+// type Max<N extends Uint10> = TSTypeUtilsInternals.Main<N>;
 
 // https://stackoverflow.com/questions/62968955/how-to-implement-a-type-level-max-function-over-a-union-of-literals-in-typescri
