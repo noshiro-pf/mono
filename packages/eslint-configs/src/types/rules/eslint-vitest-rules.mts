@@ -17,6 +17,7 @@ type SpreadOptionsIfIsArray<
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | fixable     | code    |
  *  | recommended | strict  |
  *  ```
@@ -84,6 +85,7 @@ namespace PreferLowercaseTitle {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | strict  |
  *  ```
  */
@@ -124,6 +126,7 @@ namespace MaxNestedDescribe {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | fixable     | code    |
  *  | recommended | strict  |
  *  ```
@@ -141,6 +144,7 @@ namespace NoIdenticalTitle {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | fixable     | code    |
  *  | recommended | strict  |
  *  ```
@@ -183,6 +187,7 @@ namespace NoFocusedTests {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | strict  |
  *  ```
  */
@@ -199,6 +204,7 @@ namespace NoConditionalTests {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -251,6 +257,7 @@ namespace ExpectExpect {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -304,6 +311,7 @@ namespace ConsistentTestIt {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -321,6 +329,7 @@ namespace PreferToBe {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -367,6 +376,7 @@ namespace NoHooks {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -405,6 +415,7 @@ namespace NoRestrictedViMethods {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | recommended          | strict  |
  *  | requiresTypeChecking | false   |
  *  ```
@@ -452,6 +463,7 @@ namespace ConsistentTestFilename {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | false      |
  *  ```
@@ -493,6 +505,7 @@ namespace MaxExpects {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | false      |
@@ -511,6 +524,7 @@ namespace NoAliasMethods {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | false      |
  *  ```
@@ -528,6 +542,7 @@ namespace NoCommentedOutTests {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | recommended          | strict  |
  *  | requiresTypeChecking | false   |
  *  ```
@@ -545,6 +560,7 @@ namespace NoConditionalExpect {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | recommended          | strict  |
  *  | requiresTypeChecking | false   |
  *  ```
@@ -562,6 +578,7 @@ namespace NoConditionalInTest {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -596,6 +613,7 @@ namespace NoDoneCallback {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | false      |
  *  ```
@@ -613,6 +631,7 @@ namespace NoDuplicateHooks {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -664,6 +683,7 @@ namespace NoLargeSnapshots {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | fixable     | code    |
  *  | recommended | strict  |
  *  ```
@@ -681,6 +701,7 @@ namespace NoInterpolationInSnapshots {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */
@@ -697,6 +718,7 @@ namespace NoMocksImport {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -735,6 +757,7 @@ namespace NoRestrictedMatchers {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -777,6 +800,7 @@ namespace NoStandaloneExpect {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -794,6 +818,7 @@ namespace NoTestPrefixes {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | strict  |
  *  ```
  */
@@ -810,6 +835,7 @@ namespace NoTestReturnStatement {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -827,6 +853,7 @@ namespace NoImportNodeTest {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -844,6 +871,7 @@ namespace PreferCalledWith {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -949,6 +977,7 @@ namespace ValidTitle {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -1007,6 +1036,7 @@ namespace ValidExpect {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -1024,6 +1054,7 @@ namespace PreferToBeFalsy {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -1041,6 +1072,7 @@ namespace PreferToBeObject {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -1058,6 +1090,7 @@ namespace PreferToBeTruthy {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -1075,6 +1108,7 @@ namespace PreferToHaveLength {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | recommended    | strict     |
  *  ```
@@ -1092,6 +1126,7 @@ namespace PreferEqualityMatcher {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | recommended    | strict     |
  *  ```
@@ -1109,6 +1144,7 @@ namespace PreferStrictEqual {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -1126,6 +1162,7 @@ namespace PreferExpectResolves {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -1142,6 +1179,7 @@ namespace PreferEach {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -1158,6 +1196,7 @@ namespace PreferHooksOnTop {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -1174,6 +1213,7 @@ namespace PreferHooksInOrder {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | strict  |
  *  ```
  */
@@ -1190,6 +1230,7 @@ namespace RequireLocalTestContextForConcurrentSnapshots {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -1207,6 +1248,7 @@ namespace PreferMockPromiseShorthand {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -1243,6 +1285,7 @@ namespace PreferSnapshotHint {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | strict  |
  *  ```
  */
@@ -1259,6 +1302,7 @@ namespace ValidDescribeCallback {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -1300,6 +1344,7 @@ namespace RequireTopLevelDescribe {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -1316,6 +1361,7 @@ namespace RequireToThrowMessage {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -1359,6 +1405,7 @@ namespace RequireHook {
  *  | key         | value  |
  *  | :---------- | :----- |
  *  | type        | layout |
+ *  | deprecated  | false  |
  *  | fixable     | code   |
  *  | recommended | strict |
  *  ```
@@ -1376,6 +1423,7 @@ namespace PreferTodo {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -1393,6 +1441,7 @@ namespace PreferSpyOn {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -1410,6 +1459,7 @@ namespace PreferComparisonMatcher {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -1427,6 +1477,7 @@ namespace PreferToContain {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | recommended    | strict     |
  *  ```

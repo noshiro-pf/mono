@@ -42,8 +42,9 @@ namespace AccessibleEmoji {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/alt-text.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AltText {
@@ -122,8 +123,9 @@ namespace AltText {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/anchor-ambiguous-text.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AnchorAmbiguousText {
@@ -165,8 +167,9 @@ namespace AnchorAmbiguousText {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/anchor-has-content.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AnchorHasContent {
@@ -208,8 +211,9 @@ namespace AnchorHasContent {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/anchor-is-valid.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AnchorIsValid {
@@ -279,8 +283,9 @@ namespace AnchorIsValid {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-activedescendant-has-tabindex.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AriaActivedescendantHasTabindex {
@@ -310,8 +315,9 @@ namespace AriaActivedescendantHasTabindex {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-props.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AriaProps {
@@ -341,8 +347,9 @@ namespace AriaProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-proptypes.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AriaProptypes {
@@ -373,8 +380,9 @@ namespace AriaProptypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-role.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AriaRole {
@@ -421,8 +429,9 @@ namespace AriaRole {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-unsupported-elements.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AriaUnsupportedElements {
@@ -452,8 +461,9 @@ namespace AriaUnsupportedElements {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/autocomplete-valid.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AutocompleteValid {
@@ -496,8 +506,9 @@ namespace AutocompleteValid {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/click-events-have-key-events.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace ClickEventsHaveKeyEvents {
@@ -527,8 +538,9 @@ namespace ClickEventsHaveKeyEvents {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/control-has-associated-label.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace ControlHasAssociatedLabel {
@@ -604,8 +616,9 @@ namespace ControlHasAssociatedLabel {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/heading-has-content.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace HeadingHasContent {
@@ -647,8 +660,9 @@ namespace HeadingHasContent {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/html-has-lang.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace HtmlHasLang {
@@ -678,8 +692,9 @@ namespace HtmlHasLang {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/iframe-has-title.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace IframeHasTitle {
@@ -710,8 +725,9 @@ namespace IframeHasTitle {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/img-redundant-alt.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace ImgRedundantAlt {
@@ -763,8 +779,9 @@ namespace ImgRedundantAlt {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/interactive-supports-focus.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace InteractiveSupportsFocus {
@@ -879,8 +896,9 @@ namespace InteractiveSupportsFocus {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/label-has-associated-control.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace LabelHasAssociatedControl {
@@ -1051,8 +1069,9 @@ namespace LabelHasFor {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/lang.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace Lang {
@@ -1083,8 +1102,9 @@ namespace Lang {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/media-has-caption.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace MediaHasCaption {
@@ -1145,8 +1165,9 @@ namespace MediaHasCaption {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/mouse-events-have-key-events.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace MouseEventsHaveKeyEvents {
@@ -1202,8 +1223,9 @@ namespace MouseEventsHaveKeyEvents {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-access-key.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoAccessKey {
@@ -1233,8 +1255,9 @@ namespace NoAccessKey {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-aria-hidden-on-focusable.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoAriaHiddenOnFocusable {
@@ -1264,8 +1287,9 @@ namespace NoAriaHiddenOnFocusable {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-autofocus.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoAutofocus {
@@ -1303,8 +1327,9 @@ namespace NoAutofocus {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-distracting-elements.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoDistractingElements {
@@ -1352,8 +1377,9 @@ namespace NoDistractingElements {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-interactive-element-to-noninteractive-role.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoInteractiveElementToNoninteractiveRole {
@@ -1390,8 +1416,9 @@ namespace NoInteractiveElementToNoninteractiveRole {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-noninteractive-element-interactions.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoNoninteractiveElementInteractions {
@@ -1433,8 +1460,9 @@ namespace NoNoninteractiveElementInteractions {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-noninteractive-element-to-interactive-role.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoNoninteractiveElementToInteractiveRole {
@@ -1470,8 +1498,9 @@ namespace NoNoninteractiveElementToInteractiveRole {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-noninteractive-tabindex.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoNoninteractiveTabindex {
@@ -1554,8 +1583,9 @@ namespace NoOnchange {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-redundant-roles.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoRedundantRoles {
@@ -1592,8 +1622,9 @@ namespace NoRedundantRoles {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-static-element-interactions.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoStaticElementInteractions {
@@ -1635,8 +1666,9 @@ namespace NoStaticElementInteractions {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/prefer-tag-over-role.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace PreferTagOverRole {
@@ -1667,8 +1699,9 @@ namespace PreferTagOverRole {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/role-has-required-aria-props.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace RoleHasRequiredAriaProps {
@@ -1699,8 +1732,9 @@ namespace RoleHasRequiredAriaProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/role-supports-aria-props.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace RoleSupportsAriaProps {
@@ -1730,8 +1764,9 @@ namespace RoleSupportsAriaProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/scope.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace Scope {
@@ -1761,8 +1796,9 @@ namespace Scope {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/tabindex-no-positive.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace TabindexNoPositive {

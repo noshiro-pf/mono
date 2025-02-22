@@ -8,6 +8,7 @@ import { type Linter } from 'eslint';
  * | key         | value   |
  * | :---------- | :------ |
  * | type        | problem |
+ * | deprecated  | false   |
  * | recommended | error   |
  * ```
  */

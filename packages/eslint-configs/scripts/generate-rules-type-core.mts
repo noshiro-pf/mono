@@ -1,3 +1,4 @@
+import { type DeprecatedInfo } from '@eslint/core';
 import { toSafeUint, toUint32 } from '@noshiro/mono-utils';
 import { type Rule } from 'eslint';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
@@ -12,13 +13,11 @@ import {
   toStr,
 } from './utils.mjs';
 
-type Meta = DeepReadonly<
-  DeepPartial<{
-    [K in keyof Rule.RuleMetaData]: K extends 'docs'
-      ? Required<Rule.RuleMetaData>['docs'] & { category: string }
-      : Rule.RuleMetaData[K];
-  }>
->;
+const isDeprecated = (
+  deprecated: boolean | DeepReadonly<DeprecatedInfo> | undefined,
+): boolean =>
+  typeof deprecated === 'object' ||
+  (typeof deprecated === 'boolean' && deprecated);
 
 const generatorOption: Readonly<{
   explicitRuleDefaultOption: boolean;
@@ -47,7 +46,7 @@ const normalizeToSchemaArray = (
 const removeMultiLineCommentCharacter = (str: string): string =>
   str.replace('/*', ' ').replace('*/', ' ');
 
-const metaToString = (meta: Meta | undefined): string => {
+const metaToString = (meta: DeepReadonly<Rule.RuleModule['meta']>): string => {
   if (meta === undefined) return '';
 
   const { deprecated, docs, fixable, hasSuggestions, type } = meta;
@@ -58,7 +57,7 @@ const metaToString = (meta: Meta | undefined): string => {
 
   const keyValue: DeepReadonly<[string, boolean | string | undefined][]> = [
     ['type', type],
-    ['deprecated', deprecated],
+    ['deprecated', isDeprecated(deprecated)],
     ['fixable', fixable],
     ['hasSuggestions', hasSuggestions],
     ['category', category],
@@ -144,9 +143,9 @@ const createResult = async (
     {
       ruleName: string;
       docs: string;
-      deprecated: boolean;
+      deprecated: boolean | DeprecatedInfo;
       schema: JSONSchema4[];
-      rawSchema: JSONSchema4 | JSONSchema4[] | undefined;
+      rawSchema: JSONSchema4 | JSONSchema4[];
     }[]
   >,
   typeName: string,
@@ -169,7 +168,7 @@ const createResult = async (
   for (const { ruleName, docs, deprecated, schema, rawSchema } of schemaList) {
     mut_resultToWrite.push(docs, `namespace ${toCapitalCase(ruleName)} {`);
 
-    if (deprecated) {
+    if (isDeprecated(deprecated)) {
       if (schema.length > 0) {
         mut_resultToWrite.push(...rawSchemaToString(rawSchema));
       }
@@ -252,13 +251,15 @@ const createResult = async (
     mut_resultToWrite.push('}', '\n');
   }
 
-  const deprecatedSchemaList = schemaList.filter((s) => s.deprecated);
+  const deprecatedSchemaList = schemaList.filter((s) =>
+    isDeprecated(s.deprecated),
+  );
 
   mut_resultToWrite.push(
     `export type ${typeName} = Readonly<{`,
 
     ...schemaList
-      .filter((s) => !s.deprecated)
+      .filter((s) => !isDeprecated(s.deprecated))
       .map(
         ({ ruleName }) =>
           `'${ruleNamePrefix}${ruleName}': ${toCapitalCase(
@@ -284,12 +285,14 @@ const createResult = async (
     '',
   );
 
-  if (schemaList.some((s) => !s.deprecated && s.schema.length > 0)) {
+  if (
+    schemaList.some((s) => !isDeprecated(s.deprecated) && s.schema.length > 0)
+  ) {
     mut_resultToWrite.push(
       `export type ${typeName}Option = Readonly<{`,
 
       ...schemaList
-        .filter((s) => !s.deprecated && s.schema.length > 0)
+        .filter((s) => !isDeprecated(s.deprecated) && s.schema.length > 0)
         .map(({ ruleName, schema }) =>
           [
             `'${ruleNamePrefix}${ruleName}': `,
@@ -341,7 +344,7 @@ export const generateRulesTypeCore = async (
     {
       ruleName: string;
       docs: string;
-      deprecated: boolean;
+      deprecated: boolean | DeprecatedInfo;
       schema: JSONSchema4[];
       rawSchema: JSONSchema4 | JSONSchema4[];
     }[]

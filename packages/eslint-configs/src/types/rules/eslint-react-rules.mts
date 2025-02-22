@@ -16,6 +16,7 @@ type SpreadOptionsIfIsArray<
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -78,6 +79,7 @@ namespace BooleanPropNaming {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -129,6 +131,7 @@ namespace ButtonHasType {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -170,9 +173,10 @@ namespace CheckedRequiresOnchangeOrReadonly {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/default-props-match-prop-types.md
  *
  *  ```md
- *  | key      | value          |
- *  | :------- | :------------- |
- *  | category | Best Practices |
+ *  | key        | value          |
+ *  | :--------- | :------------- |
+ *  | deprecated | false          |
+ *  | category   | Best Practices |
  *  ```
  */
 namespace DefaultPropsMatchPropTypes {
@@ -213,6 +217,7 @@ namespace DefaultPropsMatchPropTypes {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -272,6 +277,7 @@ namespace DestructuringAssignment {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | true           |
  *  ```
@@ -316,6 +322,7 @@ namespace DisplayName {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -510,6 +517,7 @@ namespace ForbidComponentProps {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -585,6 +593,7 @@ namespace ForbidDomProps {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -653,6 +662,7 @@ namespace ForbidElements {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -693,6 +703,7 @@ namespace ForbidForeignPropTypes {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -746,6 +757,7 @@ namespace ForbidPropTypes {
  *  | key            | value           |
  *  | :------------- | :-------------- |
  *  | type           | suggestion      |
+ *  | deprecated     | false           |
  *  | hasSuggestions | true            |
  *  | category       | Possible Errors |
  *  | recommended    | false           |
@@ -763,6 +775,7 @@ namespace ForwardRefUsesRef {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -857,6 +870,7 @@ namespace FunctionComponentDefinition {
  *  | key            | value          |
  *  | :------------- | :------------- |
  *  | type           | suggestion     |
+ *  | deprecated     | false          |
  *  | hasSuggestions | true           |
  *  | category       | Best Practices |
  *  | recommended    | false          |
@@ -899,6 +913,7 @@ namespace HookUseState {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -915,6 +930,7 @@ namespace IframeMissingSandbox {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -1027,6 +1043,7 @@ namespace JsxBooleanValue {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -1043,6 +1060,7 @@ namespace JsxChildElementSpacing {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -1148,6 +1166,7 @@ namespace JsxClosingBracketLocation {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | whitespace       |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -1206,6 +1225,7 @@ namespace JsxClosingTagLocation {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -1351,6 +1371,7 @@ namespace JsxCurlySpacing {
  *  | key         | value            |
  *  | :---------- | :--------------- |
  *  | type        | layout           |
+ *  | deprecated  | false            |
  *  | fixable     | whitespace       |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -1417,6 +1438,7 @@ namespace JsxCurlyNewline {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -1453,6 +1475,7 @@ namespace JsxEqualsSpacing {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -1507,6 +1530,7 @@ namespace JsxFilenameExtension {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -1551,6 +1575,7 @@ namespace JsxFirstPropNewLine {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -1726,6 +1751,7 @@ namespace JsxHandlerNames {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | whitespace       |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -1786,6 +1812,7 @@ namespace JsxIndent {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -1858,6 +1885,7 @@ namespace JsxIndentProps {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -1909,6 +1937,7 @@ namespace JsxKey {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -1950,6 +1979,7 @@ namespace JsxMaxDepth {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -2031,6 +2061,7 @@ namespace JsxMaxPropsPerLine {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -2095,6 +2126,7 @@ namespace JsxNewline {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -2156,6 +2188,7 @@ namespace JsxNoBind {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -2173,6 +2206,7 @@ namespace JsxNoCommentTextnodes {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -2189,6 +2223,7 @@ namespace JsxNoConstructedContextValues {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -2229,6 +2264,7 @@ namespace JsxNoDuplicateProps {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | fixable     | code            |
  *  | category    | Possible Errors |
  *  | recommended | false           |
@@ -2281,6 +2317,7 @@ namespace JsxNoLeakedRender {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -2377,6 +2414,7 @@ namespace JsxNoLiterals {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -2482,6 +2520,7 @@ namespace JsxNoScriptUrl {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | fixable     | code           |
  *  | category    | Best Practices |
  *  | recommended | true           |
@@ -2545,6 +2584,7 @@ namespace JsxNoTargetBlank {
  *  | key         | value           |
  *  | :---------- | :-------------- |
  *  | type        | suggestion      |
+ *  | deprecated  | false           |
  *  | fixable     | code            |
  *  | category    | Possible Errors |
  *  | recommended | false           |
@@ -2586,6 +2626,7 @@ namespace JsxNoUselessFragment {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | whitespace       |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -2635,6 +2676,7 @@ namespace JsxOneExpressionPerLine {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -2676,6 +2718,7 @@ namespace JsxNoUndef {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -2750,6 +2793,7 @@ namespace JsxCurlyBracePresence {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -2810,6 +2854,7 @@ namespace JsxPascalCase {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -2846,6 +2891,7 @@ namespace JsxFragments {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -2863,6 +2909,7 @@ namespace JsxPropsNoMultiSpaces {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -2958,6 +3005,7 @@ namespace JsxPropsNoSpreading {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -3008,6 +3056,7 @@ namespace JsxSortDefaultProps {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -3118,6 +3167,7 @@ namespace JsxSpaceBeforeClosing {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | whitespace       |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -3204,6 +3254,7 @@ namespace JsxTagSpacing {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | true           |
  *  ```
@@ -3220,6 +3271,7 @@ namespace JsxUsesReact {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | true           |
  *  ```
@@ -3236,6 +3288,7 @@ namespace JsxUsesVars {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -3393,6 +3446,7 @@ namespace JsxWrapMultilines {
  *  | key            | value           |
  *  | :------------- | :-------------- |
  *  | type           | suggestion      |
+ *  | deprecated     | false           |
  *  | hasSuggestions | true            |
  *  | category       | Possible Errors |
  *  ```
@@ -3431,6 +3485,7 @@ namespace NoInvalidHtmlAttribute {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -3447,6 +3502,7 @@ namespace NoAccessStateInSetstate {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -3463,6 +3519,7 @@ namespace NoAdjacentInlineElements {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -3479,6 +3536,7 @@ namespace NoArrayIndexKey {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | fixable     | code           |
  *  | category    | Best Practices |
  *  | recommended | false          |
@@ -3496,6 +3554,7 @@ namespace NoArrowFunctionLifecycle {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | true           |
  *  ```
@@ -3537,6 +3596,7 @@ namespace NoChildrenProp {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -3584,6 +3644,7 @@ namespace NoDanger {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -3600,6 +3661,7 @@ namespace NoDangerWithChildren {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | true           |
  *  ```
@@ -3616,6 +3678,7 @@ namespace NoDeprecated {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -3650,6 +3713,7 @@ namespace NoDidMountSetState {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -3684,6 +3748,7 @@ namespace NoDidUpdateSetState {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -3700,6 +3765,7 @@ namespace NoDirectMutationState {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | true           |
  *  ```
@@ -3716,6 +3782,7 @@ namespace NoFindDomNode {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | true           |
  *  ```
@@ -3732,6 +3799,7 @@ namespace NoIsMounted {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -3773,6 +3841,7 @@ namespace NoMultiComp {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -3789,6 +3858,7 @@ namespace NoNamespace {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -3805,6 +3875,7 @@ namespace NoSetState {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | true           |
  *  ```
@@ -3845,6 +3916,7 @@ namespace NoStringRefs {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -3861,6 +3933,7 @@ namespace NoRedundantShouldComponentUpdate {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | true           |
  *  ```
@@ -3877,6 +3950,7 @@ namespace NoRenderReturnValue {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -3893,6 +3967,7 @@ namespace NoThisInSfc {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -3909,6 +3984,7 @@ namespace NoTypos {
  *  ```md
  *  | key            | value           |
  *  | :------------- | :-------------- |
+ *  | deprecated     | false           |
  *  | hasSuggestions | true            |
  *  | category       | Possible Errors |
  *  | recommended    | true            |
@@ -3979,6 +4055,7 @@ namespace NoUnescapedEntities {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | fixable     | code            |
  *  | category    | Possible Errors |
  *  | recommended | true            |
@@ -4028,6 +4105,7 @@ namespace NoUnknownProperty {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -4069,6 +4147,7 @@ namespace NoUnsafe {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -4120,6 +4199,7 @@ namespace NoUnstableNestedComponents {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -4136,6 +4216,7 @@ namespace NoUnusedClassComponentMethods {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -4191,6 +4272,7 @@ namespace NoUnusedPropTypes {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -4208,6 +4290,7 @@ namespace NoUnusedState {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -4224,6 +4307,7 @@ namespace NoObjectTypeAsDefaultProp {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -4258,6 +4342,7 @@ namespace NoWillUpdateSetState {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -4293,6 +4378,7 @@ namespace PreferEs6Class {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -4309,6 +4395,7 @@ namespace PreferExactProps {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -4326,6 +4413,7 @@ namespace PreferReadOnlyProps {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -4367,6 +4455,7 @@ namespace PreferStatelessFunction {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | true           |
  *  ```
@@ -4421,6 +4510,7 @@ namespace PropTypes {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -4435,9 +4525,10 @@ namespace ReactInJsxScope {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/require-default-props.md
  *
  *  ```md
- *  | key      | value          |
- *  | :------- | :------------- |
- *  | category | Best Practices |
+ *  | key        | value          |
+ *  | :--------- | :------------- |
+ *  | deprecated | false          |
+ *  | category   | Best Practices |
  *  ```
  */
 namespace RequireDefaultProps {
@@ -4495,6 +4586,7 @@ namespace RequireDefaultProps {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```
@@ -4538,6 +4630,7 @@ namespace RequireOptimization {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -4554,6 +4647,7 @@ namespace RequireRenderReturn {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -4601,6 +4695,7 @@ namespace SelfClosingComp {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -4656,6 +4751,7 @@ namespace SortComp {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -4696,6 +4792,7 @@ namespace SortDefaultProps {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
@@ -4757,6 +4854,7 @@ namespace SortPropTypes {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -4792,6 +4890,7 @@ namespace StateInConstructor {
  *  ```md
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | false            |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  *  ```
@@ -4907,6 +5006,7 @@ namespace StaticPropertyPlacement {
  *  ```md
  *  | key         | value           |
  *  | :---------- | :-------------- |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -4952,6 +5052,7 @@ namespace StylePropObject {
  *  ```md
  *  | key         | value          |
  *  | :---------- | :------------- |
+ *  | deprecated  | false          |
  *  | category    | Best Practices |
  *  | recommended | false          |
  *  ```

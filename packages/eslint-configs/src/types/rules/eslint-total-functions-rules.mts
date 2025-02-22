@@ -10,6 +10,7 @@ import { type Linter } from 'eslint';
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */
@@ -26,6 +27,7 @@ namespace RequireStrictMode {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */
@@ -42,6 +44,7 @@ namespace NoUnsafeTypeAssertion {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */
@@ -58,6 +61,7 @@ namespace NoUnsafeReadonlyMutableAssignment {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */
@@ -74,6 +78,7 @@ namespace NoUnsafeMutableReadonlyAssignment {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */
@@ -90,6 +95,7 @@ namespace NoEnums {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */
@@ -106,6 +112,7 @@ namespace NoPartialUrlConstructor {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */
@@ -122,6 +129,7 @@ namespace NoPartialDivision {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */
@@ -138,6 +146,7 @@ namespace NoPartialStringNormalize {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */
@@ -154,6 +163,7 @@ namespace NoPrematureFpTsEffects {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */
@@ -170,6 +180,7 @@ namespace NoNestedFpTsEffects {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */
@@ -186,6 +197,7 @@ namespace NoPartialArrayReduce {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | error   |
  *  ```
  */

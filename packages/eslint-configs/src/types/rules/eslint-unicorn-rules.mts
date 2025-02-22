@@ -17,6 +17,7 @@ type SpreadOptionsIfIsArray<
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | false      |
  *  ```
@@ -59,6 +60,7 @@ namespace BetterRegex {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -105,6 +107,7 @@ namespace CatchErrorName {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | false      |
@@ -123,6 +126,7 @@ namespace ConsistentDestructuring {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -141,6 +145,7 @@ namespace ConsistentEmptyArraySpread {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | fixable     | code    |
  *  | recommended | true    |
  *  ```
@@ -158,6 +163,7 @@ namespace ConsistentExistenceIndexCheck {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
  */
@@ -199,6 +205,7 @@ namespace ConsistentFunctionScoping {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | fixable     | code    |
  *  | recommended | false   |
  *  ```
@@ -216,6 +223,7 @@ namespace CustomErrorDefinition {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | layout     |
+ *  | deprecated  | false      |
  *  | fixable     | whitespace |
  *  | recommended | true       |
  *  ```
@@ -233,6 +241,7 @@ namespace EmptyBraceSpaces {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
  */
@@ -249,6 +258,7 @@ namespace ErrorMessage {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -266,6 +276,7 @@ namespace EscapeCase {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
  */
@@ -329,6 +340,7 @@ namespace ExpiringTodoComments {
  *  | key            | value   |
  *  | :------------- | :------ |
  *  | type           | problem |
+ *  | deprecated     | false   |
  *  | fixable        | code    |
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
@@ -375,6 +387,7 @@ namespace ExplicitLengthCheck {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
  */
@@ -472,6 +485,7 @@ namespace FilenameCase {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
  */
@@ -571,6 +585,7 @@ namespace ImportStyle {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -588,6 +603,7 @@ namespace NewForBuiltins {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
  */
@@ -604,6 +620,7 @@ namespace NoAbusiveEslintDisable {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
  *  ```
@@ -621,6 +638,7 @@ namespace NoAnonymousDefaultExport {
  *  | key            | value   |
  *  | :------------- | :------ |
  *  | type           | problem |
+ *  | deprecated     | false   |
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
@@ -638,6 +656,7 @@ namespace NoArrayCallbackReference {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -656,6 +675,7 @@ namespace NoArrayForEach {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -674,6 +694,7 @@ namespace NoArrayMethodThisArgument {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -717,6 +738,7 @@ namespace NoArrayPushPush {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
  */
@@ -758,6 +780,7 @@ namespace NoArrayReduce {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -775,6 +798,7 @@ namespace NoAwaitExpressionMember {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
  *  ```
@@ -792,6 +816,7 @@ namespace NoAwaitInPromiseMethods {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -809,6 +834,7 @@ namespace NoConsoleSpaces {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
  */
@@ -825,6 +851,7 @@ namespace NoDocumentCookie {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
  */
@@ -841,6 +868,7 @@ namespace NoEmptyFile {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -859,6 +887,7 @@ namespace NoForLoop {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -876,6 +905,7 @@ namespace NoHexEscape {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -893,6 +923,7 @@ namespace NoInstanceofArray {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
  */
@@ -910,6 +941,7 @@ namespace NoInvalidFetchOptions {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
  */
@@ -926,6 +958,7 @@ namespace NoInvalidRemoveEventListener {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
  */
@@ -983,6 +1016,7 @@ namespace NoKeywordPrefix {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1000,6 +1034,7 @@ namespace NoLengthAsSliceEnd {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1017,6 +1052,7 @@ namespace NoLonelyIf {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
  */
@@ -1033,6 +1069,7 @@ namespace NoMagicArrayFlatDepth {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1050,6 +1087,7 @@ namespace NoNegatedCondition {
  *  | key            | value   |
  *  | :------------- | :------ |
  *  | type           | problem |
+ *  | deprecated     | false   |
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
@@ -1067,6 +1105,7 @@ namespace NoNegationInEqualityCheck {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1084,6 +1123,7 @@ namespace NoNestedTernary {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -1103,6 +1143,7 @@ namespace NoNewArray {
  *  | key            | value   |
  *  | :------------- | :------ |
  *  | type           | problem |
+ *  | deprecated     | false   |
  *  | fixable        | code    |
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
@@ -1121,6 +1162,7 @@ namespace NoNewBuffer {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -1164,6 +1206,7 @@ namespace NoNull {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
  */
@@ -1180,6 +1223,7 @@ namespace NoObjectAsDefaultParameter {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
  */
@@ -1196,6 +1240,7 @@ namespace NoProcessExit {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -1214,6 +1259,7 @@ namespace NoSinglePromiseInPromiseMethods {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1231,6 +1277,7 @@ namespace NoStaticOnlyClass {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
  */
@@ -1247,6 +1294,7 @@ namespace NoThenable {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
  */
@@ -1263,6 +1311,7 @@ namespace NoThisAssignment {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -1306,6 +1355,7 @@ namespace NoTypeofUndefined {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1323,6 +1373,7 @@ namespace NoUnnecessaryAwait {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
  */
@@ -1376,6 +1427,7 @@ namespace NoUnnecessaryPolyfills {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1393,6 +1445,7 @@ namespace NoUnreadableArrayDestructuring {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | false      |
  *  | recommended    | true       |
  *  ```
@@ -1410,6 +1463,7 @@ namespace NoUnreadableIife {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
  */
@@ -1426,6 +1480,7 @@ namespace NoUnusedProperties {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1443,6 +1498,7 @@ namespace NoUselessFallbackInSpread {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1461,6 +1517,7 @@ namespace NoUselessLengthCheck {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1478,6 +1535,7 @@ namespace NoUselessPromiseResolveReject {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1495,6 +1553,7 @@ namespace NoUselessSpread {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
  *  ```
@@ -1512,6 +1571,7 @@ namespace NoUselessSwitchCase {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1557,6 +1617,7 @@ namespace NoUselessUndefined {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1574,6 +1635,7 @@ namespace NoZeroFractions {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1591,6 +1653,7 @@ namespace NumberLiteralCase {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1730,6 +1793,7 @@ namespace NumericSeparatorsStyle {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1776,6 +1840,7 @@ namespace PreferAddEventListener {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -1819,6 +1884,7 @@ namespace PreferArrayFind {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1836,6 +1902,7 @@ namespace PreferArrayFlatMap {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -1879,6 +1946,7 @@ namespace PreferArrayFlat {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -1898,6 +1966,7 @@ namespace PreferArrayIndexOf {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -1916,6 +1985,7 @@ namespace PreferArraySome {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -1965,6 +2035,7 @@ namespace PreferAt {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
  */
@@ -1982,6 +2053,7 @@ namespace PreferBlobReadingMethods {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
  *  ```
@@ -1999,6 +2071,7 @@ namespace PreferCodePoint {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2016,6 +2089,7 @@ namespace PreferDateNow {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -2034,6 +2108,7 @@ namespace PreferDefaultParameters {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2051,6 +2126,7 @@ namespace PreferDomNodeAppend {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2068,6 +2144,7 @@ namespace PreferDomNodeDataset {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -2086,6 +2163,7 @@ namespace PreferDomNodeRemove {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
  *  ```
@@ -2103,6 +2181,7 @@ namespace PreferDomNodeTextContent {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
  */
@@ -2119,6 +2198,7 @@ namespace PreferEventTarget {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -2162,6 +2242,7 @@ namespace PreferExportFrom {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | false      |
  *  | recommended    | true       |
@@ -2181,6 +2262,7 @@ namespace PreferGlobalThis {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -2199,6 +2281,7 @@ namespace PreferIncludes {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | false      |
  *  ```
@@ -2216,6 +2299,7 @@ namespace PreferJsonParseBuffer {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2233,6 +2317,7 @@ namespace PreferKeyboardEventKey {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
  *  ```
@@ -2250,6 +2335,7 @@ namespace PreferLogicalOperatorOverTernary {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | fixable     | code    |
  *  | recommended | true    |
  *  ```
@@ -2267,6 +2353,7 @@ namespace PreferMathMinMax {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -2287,6 +2374,7 @@ namespace PreferMathTrunc {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2304,6 +2392,7 @@ namespace PreferModernDomApis {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2321,6 +2410,7 @@ namespace PreferModernMathApis {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -2339,6 +2429,7 @@ namespace PreferModule {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2356,6 +2447,7 @@ namespace PreferNativeCoercionFunctions {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2373,6 +2465,7 @@ namespace PreferNegativeIndex {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2390,6 +2483,7 @@ namespace PreferNodeProtocol {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -2439,6 +2533,7 @@ namespace PreferNumberProperties {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2481,6 +2576,7 @@ namespace PreferObjectFromEntries {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2498,6 +2594,7 @@ namespace PreferOptionalCatchBinding {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2517,6 +2614,7 @@ namespace PreferPrototypeMethods {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2534,6 +2632,7 @@ namespace PreferQuerySelector {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2551,6 +2650,7 @@ namespace PreferReflectApply {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -2570,6 +2670,7 @@ namespace PreferRegexpTest {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -2588,6 +2689,7 @@ namespace PreferSetHas {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2606,6 +2708,7 @@ namespace PreferSetSize {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -2624,6 +2727,7 @@ namespace PreferSpread {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2641,6 +2745,7 @@ namespace PreferStringRaw {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2658,6 +2763,7 @@ namespace PreferStringReplaceAll {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2675,6 +2781,7 @@ namespace PreferStringSlice {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -2694,6 +2801,7 @@ namespace PreferStringStartsEndsWith {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2711,6 +2819,7 @@ namespace PreferStringTrimStartEnd {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
  *  ```
@@ -2753,6 +2862,7 @@ namespace PreferStructuredClone {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2808,6 +2918,7 @@ namespace PreferSwitch {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2845,6 +2956,7 @@ namespace PreferTernary {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
  *  ```
@@ -2862,6 +2974,7 @@ namespace PreferTopLevelAwait {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2879,6 +2992,7 @@ namespace PreferTypeError {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -2999,6 +3113,7 @@ namespace PreventAbbreviations {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -3037,6 +3152,7 @@ namespace RelativeUrlStyle {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -3054,6 +3170,7 @@ namespace RequireArrayJoinSeparator {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -3071,6 +3188,7 @@ namespace RequireNumberToFixedDigitsArgument {
  *  | key            | value   |
  *  | :------------- | :------ |
  *  | type           | problem |
+ *  | deprecated     | false   |
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
@@ -3088,6 +3206,7 @@ namespace RequirePostMessageTargetOrigin {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | false      |
@@ -3163,6 +3282,7 @@ namespace StringContent {
  *  | key         | value  |
  *  | :---------- | :----- |
  *  | type        | layout |
+ *  | deprecated  | false  |
  *  | fixable     | code   |
  *  | recommended | true   |
  *  ```
@@ -3199,6 +3319,7 @@ namespace SwitchCaseBraces {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
@@ -3281,6 +3402,7 @@ namespace TemplateIndent {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -3299,6 +3421,7 @@ namespace TextEncodingIdentifierCase {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```

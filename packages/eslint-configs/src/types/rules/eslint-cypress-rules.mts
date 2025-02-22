@@ -17,6 +17,7 @@ type SpreadOptionsIfIsArray<
  *  | key         | value           |
  *  | :---------- | :-------------- |
  *  | type        | problem         |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -34,6 +35,7 @@ namespace NoAssigningReturnValues {
  *  | key         | value           |
  *  | :---------- | :-------------- |
  *  | type        | problem         |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -81,6 +83,7 @@ namespace UnsafeToChainCommand {
  *  | key         | value           |
  *  | :---------- | :-------------- |
  *  | type        | problem         |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -98,6 +101,7 @@ namespace NoUnnecessaryWaiting {
  *  | key         | value           |
  *  | :---------- | :-------------- |
  *  | type        | problem         |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -115,6 +119,7 @@ namespace NoAsyncBefore {
  *  | key         | value           |
  *  | :---------- | :-------------- |
  *  | type        | problem         |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | true            |
  *  ```
@@ -132,6 +137,7 @@ namespace NoAsyncTests {
  *  | key         | value           |
  *  | :---------- | :-------------- |
  *  | type        | problem         |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -149,6 +155,7 @@ namespace AssertionBeforeScreenshot {
  *  | key         | value           |
  *  | :---------- | :-------------- |
  *  | type        | suggestion      |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -166,6 +173,7 @@ namespace RequireDataSelectors {
  *  | key         | value           |
  *  | :---------- | :-------------- |
  *  | type        | suggestion      |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -183,6 +191,7 @@ namespace NoForce {
  *  | key         | value           |
  *  | :---------- | :-------------- |
  *  | type        | suggestion      |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```
@@ -200,6 +209,7 @@ namespace NoPause {
  *  | key         | value           |
  *  | :---------- | :-------------- |
  *  | type        | suggestion      |
+ *  | deprecated  | false           |
  *  | category    | Possible Errors |
  *  | recommended | false           |
  *  ```

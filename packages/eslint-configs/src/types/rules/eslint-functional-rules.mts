@@ -17,6 +17,7 @@ type SpreadOptionsIfIsArray<
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | category             | Currying    |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
@@ -696,6 +697,7 @@ namespace FunctionalParameters {
  *  | key                  | value        |
  *  | :------------------- | :----------- |
  *  | type                 | suggestion   |
+ *  | deprecated           | false        |
  *  | category             | No Mutations |
  *  | recommended          | recommended  |
  *  | requiresTypeChecking | true         |
@@ -1339,6 +1341,7 @@ namespace ImmutableData {
  *  | key                  | value              |
  *  | :------------------- | :----------------- |
  *  | type                 | suggestion         |
+ *  | deprecated           | false              |
  *  | category             | No Other Paradigms |
  *  | recommended          | recommended        |
  *  | requiresTypeChecking | false              |
@@ -1397,6 +1400,7 @@ namespace NoClasses {
  *  | key                  | value              |
  *  | :------------------- | :----------------- |
  *  | type                 | suggestion         |
+ *  | deprecated           | false              |
  *  | category             | No Other Paradigms |
  *  | recommended          | recommended        |
  *  | requiresTypeChecking | false              |
@@ -1455,6 +1459,7 @@ namespace NoClassInheritance {
  *  | key                  | value         |
  *  | :------------------- | :------------ |
  *  | type                 | suggestion    |
+ *  | deprecated           | false         |
  *  | category             | No Statements |
  *  | recommended          | recommended   |
  *  | requiresTypeChecking | true          |
@@ -1507,6 +1512,7 @@ namespace NoConditionalStatements {
  *  | key                  | value         |
  *  | :------------------- | :------------ |
  *  | type                 | suggestion    |
+ *  | deprecated           | false         |
  *  | category             | No Statements |
  *  | recommended          | recommended   |
  *  | requiresTypeChecking | true          |
@@ -1563,6 +1569,7 @@ namespace NoExpressionStatements {
  *  | key                  | value        |
  *  | :------------------- | :----------- |
  *  | type                 | suggestion   |
+ *  | deprecated           | false        |
  *  | category             | No Mutations |
  *  | recommended          | recommended  |
  *  | requiresTypeChecking | false        |
@@ -1619,6 +1626,7 @@ namespace NoLet {
  *  | key                  | value         |
  *  | :------------------- | :------------ |
  *  | type                 | suggestion    |
+ *  | deprecated           | false         |
  *  | category             | No Statements |
  *  | recommended          | recommended   |
  *  | requiresTypeChecking | false         |
@@ -1637,6 +1645,7 @@ namespace NoLoopStatements {
  *  | key                  | value              |
  *  | :------------------- | :----------------- |
  *  | type                 | suggestion         |
+ *  | deprecated           | false              |
  *  | category             | No Other Paradigms |
  *  | recommended          | recommended        |
  *  | requiresTypeChecking | true               |
@@ -1683,6 +1692,7 @@ namespace NoMixedTypes {
  *  | key                  | value         |
  *  | :------------------- | :------------ |
  *  | type                 | suggestion    |
+ *  | deprecated           | false         |
  *  | category             | No Exceptions |
  *  | recommended          | false         |
  *  | requiresTypeChecking | false         |
@@ -1701,6 +1711,7 @@ namespace NoPromiseReject {
  *  | key                  | value         |
  *  | :------------------- | :------------ |
  *  | type                 | suggestion    |
+ *  | deprecated           | false         |
  *  | category             | No Statements |
  *  | recommended          | recommended   |
  *  | requiresTypeChecking | true          |
@@ -1751,6 +1762,7 @@ namespace NoReturnVoid {
  *  | key                  | value              |
  *  | :------------------- | :----------------- |
  *  | type                 | suggestion         |
+ *  | deprecated           | false              |
  *  | category             | No Other Paradigms |
  *  | recommended          | recommended        |
  *  | requiresTypeChecking | false              |
@@ -1769,6 +1781,7 @@ namespace NoThisExpressions {
  *  | key                  | value         |
  *  | :------------------- | :------------ |
  *  | type                 | suggestion    |
+ *  | deprecated           | false         |
  *  | category             | No Exceptions |
  *  | recommended          | recommended   |
  *  | requiresTypeChecking | false         |
@@ -1811,6 +1824,7 @@ namespace NoThrowStatements {
  *  | key                  | value         |
  *  | :------------------- | :------------ |
  *  | type                 | suggestion    |
+ *  | deprecated           | false         |
  *  | category             | No Exceptions |
  *  | recommended          | recommended   |
  *  | requiresTypeChecking | false         |
@@ -1857,6 +1871,7 @@ namespace NoTryStatements {
  *  | key                  | value        |
  *  | :------------------- | :----------- |
  *  | type                 | suggestion   |
+ *  | deprecated           | false        |
  *  | fixable              | code         |
  *  | hasSuggestions       | true         |
  *  | category             | No Mutations |
@@ -3642,6 +3657,7 @@ namespace PreferImmutableTypes {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | category             | Stylistic   |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
@@ -3756,6 +3772,7 @@ namespace PreferReadonlyType {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | hasSuggestions       | true        |
  *  | category             | Stylistic   |
  *  | recommended          | recommended |
@@ -3799,6 +3816,7 @@ namespace PreferTacit {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | fixable              | code        |
  *  | category             | Stylistic   |
  *  | recommended          | recommended |
@@ -3838,6 +3856,7 @@ namespace ReadonlyType {
  *  | key                  | value        |
  *  | :------------------- | :----------- |
  *  | type                 | suggestion   |
+ *  | deprecated           | false        |
  *  | fixable              | code         |
  *  | hasSuggestions       | true         |
  *  | category             | No Mutations |
