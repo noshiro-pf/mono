@@ -95,6 +95,12 @@ export const eslintPlugins = {
     rulePrefix: 'react-refresh/',
     outputFileName: 'eslint-react-refresh-rules.mts',
   },
+  EslintReactPerf: {
+    typeName: 'EslintReactPerfRules',
+    pluginName: 'eslint-plugin-react-perf',
+    rulePrefix: 'react-perf/',
+    outputFileName: 'eslint-react-perf-rules.mts',
+  },
   EslintJsxA11y: {
     typeName: 'EslintJsxA11yRules',
     pluginName: 'eslint-plugin-jsx-a11y',

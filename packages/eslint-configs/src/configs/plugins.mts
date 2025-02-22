@@ -40,6 +40,9 @@ import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
 import eslintPluginReactRefresh from 'eslint-plugin-react-refresh';
 
 // @ts-expect-error no type definition
+import eslintPluginReactPerf from 'eslint-plugin-react-perf';
+
+// @ts-expect-error no type definition
 import eslintPluginJsxA11y from 'eslint-plugin-jsx-a11y';
 
 // @ts-expect-error no type definition
@@ -68,6 +71,7 @@ export const plugins: Record<
   | 'react'
   | 'react-hooks'
   | 'react-refresh'
+  | 'react-perf'
   | 'security'
   | 'strict-dependencies'
   | 'testing-library'
@@ -99,6 +103,7 @@ export const plugins: Record<
   'react-hooks': eslintPluginReactHooks,
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   'react-refresh': eslintPluginReactRefresh as unknown as Plugin,
+  'react-perf': eslintPluginReactPerf,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   security: eslintPluginSecurity,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -110,24 +115,3 @@ export const plugins: Record<
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'eslint-plugin': eslintPluginEslintPlugin,
 } as const satisfies FlatConfig['plugins'];
-
-// export const pluginsV9Supported = {
-//   '@typescript-eslint': true,
-//   'array-func': true,
-//   cypress: true,
-//   functional: true,
-//   import: false,
-//   jest: true,
-//   vitest: true,
-//   'jsx-a11y': true,
-//   'prefer-arrow-functions': true,
-//   promise: false,
-//   react: false,
-//   'react-hooks': true,
-//   'react-refresh': true,
-//   security: true,
-//   'strict-dependencies': true,
-//   'testing-library': true,
-//   'total-functions': false,
-//   unicorn: true,
-// } as const satisfies { [key in keyof typeof pluginsDef]: boolean };

@@ -297,7 +297,7 @@ namespace ClassMethodsUseThis {
    *         }
    *       },
    *       "ignoreClassesThatImplementAnInterface": {
-   *         "description": "Makes the rule ignore class members that are defined within a class that `implements` a type",
+   *         "description": "Whether to ignore class members that are defined within a class that `implements` a type.",
    *         "oneOf": [
    *           {
    *             "type": "boolean",
@@ -314,7 +314,7 @@ namespace ClassMethodsUseThis {
    *       },
    *       "ignoreOverrideMethods": {
    *         "type": "boolean",
-   *         "description": "Ignore members marked with the `override` modifier"
+   *         "description": "Whether to ignore members marked with the `override` modifier."
    *       }
    *     }
    *   }
@@ -330,11 +330,11 @@ namespace ClassMethodsUseThis {
     /** Allows specified method names to be ignored with this rule. */
     readonly exceptMethods?: readonly string[];
     /**
-     * Makes the rule ignore class members that are defined within a class that
-     * `implements` a type
+     * Whether to ignore class members that are defined within a class that
+     * `implements` a type.
      */
     readonly ignoreClassesThatImplementAnInterface?: boolean | 'public-fields';
-    /** Ignore members marked with the `override` modifier */
+    /** Whether to ignore members marked with the `override` modifier. */
     readonly ignoreOverrideMethods?: boolean;
   };
 
@@ -5190,7 +5190,7 @@ namespace NoForInArray {
 }
 
 /**
- * Disallow the use of `eval()`-like methods
+ * Disallow the use of `eval()`-like functions
  *
  * @link https://typescript-eslint.io/rules/no-implied-eval
  *
@@ -6729,6 +6729,10 @@ namespace NoUnnecessaryBooleanLiteralCompare {
    *       "allowComparingNullableBooleansToTrue": {
    *         "type": "boolean",
    *         "description": "Whether to allow comparisons between nullable boolean variables and `true`."
+   *       },
+   *       "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
+   *         "type": "boolean",
+   *         "description": "Unless this is set to `true`, the rule will error on every file whose `tsconfig.json` does _not_ have the `strictNullChecks` compiler option (or `strict`) set to `true`."
    *       }
    *     }
    *   }
@@ -6746,6 +6750,12 @@ namespace NoUnnecessaryBooleanLiteralCompare {
      * `true`.
      */
     readonly allowComparingNullableBooleansToTrue?: boolean;
+    /**
+     * Unless this is set to `true`, the rule will error on every file whose
+     * `tsconfig.json` does _not_ have the `strictNullChecks` compiler option
+     * (or `strict`) set to `true`.
+     */
+    readonly allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
   };
 
   export type RuleEntry =
@@ -6780,8 +6790,20 @@ namespace NoUnnecessaryCondition {
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowConstantLoopConditions": {
-   *         "type": "boolean",
-   *         "description": "Whether to ignore constant loop conditions, such as `while (true)`."
+   *         "description": "Whether to ignore constant loop conditions, such as `while (true)`.",
+   *         "oneOf": [
+   *           {
+   *             "type": "boolean"
+   *           },
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "always",
+   *               "never",
+   *               "only-allowed-literals"
+   *             ]
+   *           }
+   *         ]
    *       },
    *       "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
    *         "type": "boolean",
@@ -6798,7 +6820,9 @@ namespace NoUnnecessaryCondition {
    */
   export type Options = {
     /** Whether to ignore constant loop conditions, such as `while (true)`. */
-    readonly allowConstantLoopConditions?: boolean;
+    readonly allowConstantLoopConditions?:
+      | boolean
+      | ('always' | 'never' | 'only-allowed-literals');
     /**
      * Whether to not error when running with a tsconfig that has
      * strictNullChecks turned.
