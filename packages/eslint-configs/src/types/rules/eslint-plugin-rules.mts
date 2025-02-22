@@ -17,6 +17,7 @@ type SpreadOptionsIfIsArray<
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | category    | Tests      |
  *  | recommended | false      |
  *  ```
@@ -60,6 +61,7 @@ namespace ConsistentOutput {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
@@ -77,6 +79,7 @@ namespace FixerReturn {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | category    | Rules      |
  *  | recommended | false      |
@@ -116,6 +119,7 @@ namespace MetaPropertyOrdering {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | category    | Rules      |
  *  | recommended | true       |
@@ -134,6 +138,7 @@ namespace NoDeprecatedContextMethods {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | category    | Rules      |
  *  | recommended | true       |
@@ -152,6 +157,7 @@ namespace NoDeprecatedReportApi {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | fixable     | code    |
  *  | category    | Tests   |
  *  | recommended | true    |
@@ -170,6 +176,7 @@ namespace NoIdenticalTests {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
@@ -187,6 +194,7 @@ namespace NoMetaSchemaDefault {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
@@ -204,6 +212,7 @@ namespace NoMissingMessageIds {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
@@ -221,6 +230,7 @@ namespace NoMissingPlaceholders {
  *  | key            | value   |
  *  | :------------- | :------ |
  *  | type           | problem |
+ *  | deprecated     | false   |
  *  | hasSuggestions | true    |
  *  | category       | Tests   |
  *  | recommended    | true    |
@@ -239,6 +249,7 @@ namespace NoOnlyTests {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | category             | Rules      |
  *  | recommended          | false      |
  *  | requiresTypeChecking | true       |
@@ -289,6 +300,7 @@ namespace NoPropertyInNode {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
@@ -306,6 +318,7 @@ namespace NoUnusedMessageIds {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
@@ -324,6 +337,7 @@ namespace NoUnusedPlaceholders {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | category    | Rules      |
  *  | recommended | true       |
@@ -343,6 +357,7 @@ namespace NoUselessTokenRange {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
@@ -360,6 +375,7 @@ namespace PreferMessageIds {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | category    | Rules      |
  *  | recommended | true       |
@@ -378,6 +394,7 @@ namespace PreferObjectRule {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | category    | Tests      |
  *  | recommended | true       |
@@ -396,6 +413,7 @@ namespace PreferOutputNull {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
@@ -413,6 +431,7 @@ namespace PreferPlaceholders {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
@@ -430,6 +449,7 @@ namespace PreferReplaceText {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
@@ -465,6 +485,7 @@ namespace ReportMessageFormat {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | category    | Rules      |
  *  | recommended | false      |
@@ -484,6 +505,7 @@ namespace RequireMetaDefaultOptions {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
@@ -531,6 +553,7 @@ namespace RequireMetaDocsDescription {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | category       | Rules      |
  *  | recommended    | false      |
@@ -576,6 +599,7 @@ namespace RequireMetaDocsRecommended {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | category    | Rules      |
  *  | recommended | false      |
@@ -624,6 +648,7 @@ namespace RequireMetaDocsUrl {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
@@ -673,6 +698,7 @@ namespace RequireMetaFixable {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | fixable     | code    |
  *  | category    | Rules   |
  *  | recommended | true    |
@@ -691,6 +717,7 @@ namespace RequireMetaHasSuggestions {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
@@ -708,6 +735,7 @@ namespace RequireMetaSchemaDescription {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  | category       | Rules      |
  *  | recommended    | true       |
@@ -756,6 +784,7 @@ namespace RequireMetaSchema {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
@@ -773,6 +802,7 @@ namespace RequireMetaType {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | category    | Tests      |
  *  | recommended | false      |
@@ -812,6 +842,7 @@ namespace TestCasePropertyOrdering {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | category    | Tests      |
  *  | recommended | false      |

@@ -17,6 +17,7 @@ type SpreadOptionsIfIsArray<
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | stylistic  |
  *  ```
  */
@@ -33,6 +34,7 @@ namespace AdjacentOverloadSignatures {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | stylistic  |
  *  ```
@@ -95,6 +97,7 @@ namespace ArrayType {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | hasSuggestions       | true        |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
@@ -113,6 +116,7 @@ namespace AwaitThenable {
  *  | key            | value           |
  *  | :------------- | :-------------- |
  *  | type           | problem         |
+ *  | deprecated     | false           |
  *  | hasSuggestions | true            |
  *  | recommended    | [object Object] |
  *  ```
@@ -208,6 +212,7 @@ namespace BanTsComment {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | stylistic  |
  *  ```
@@ -225,6 +230,7 @@ namespace BanTslintComment {
  *  | key            | value     |
  *  | :------------- | :-------- |
  *  | type           | problem   |
+ *  | deprecated     | false     |
  *  | hasSuggestions | true      |
  *  | recommended    | stylistic |
  *  ```
@@ -264,6 +270,7 @@ namespace ClassLiteralPropertyStyle {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | requiresTypeChecking | false      |
  *  ```
  */
@@ -347,6 +354,7 @@ namespace ClassMethodsUseThis {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | stylistic  |
  *  ```
@@ -386,6 +394,7 @@ namespace ConsistentGenericConstructors {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | stylistic  |
@@ -426,6 +435,7 @@ namespace ConsistentIndexedObjectStyle {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | requiresTypeChecking | true       |
  *  ```
  */
@@ -466,6 +476,7 @@ namespace ConsistentReturn {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | stylistic  |
@@ -573,6 +584,7 @@ namespace ConsistentTypeAssertions {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | stylistic  |
  *  ```
@@ -612,6 +624,7 @@ namespace ConsistentTypeDefinitions {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | requiresTypeChecking | true       |
  *  ```
@@ -655,10 +668,11 @@ namespace ConsistentTypeExports {
  * @link https://typescript-eslint.io/rules/consistent-type-imports
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace ConsistentTypeImports {
@@ -720,9 +734,10 @@ namespace ConsistentTypeImports {
  * @link https://typescript-eslint.io/rules/default-param-last
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace DefaultParamLast {
@@ -738,6 +753,7 @@ namespace DefaultParamLast {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | recommended          | stylistic  |
  *  | requiresTypeChecking | true       |
@@ -817,9 +833,10 @@ namespace DotNotation {
  * @link https://typescript-eslint.io/rules/explicit-function-return-type
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace ExplicitFunctionReturnType {
@@ -921,6 +938,7 @@ namespace ExplicitFunctionReturnType {
  *  | key            | value   |
  *  | :------------- | :------ |
  *  | type           | problem |
+ *  | deprecated     | false   |
  *  | fixable        | code    |
  *  | hasSuggestions | true    |
  *  ```
@@ -1033,9 +1051,10 @@ namespace ExplicitMemberAccessibility {
  * @link https://typescript-eslint.io/rules/explicit-module-boundary-types
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace ExplicitModuleBoundaryTypes {
@@ -1115,9 +1134,10 @@ namespace ExplicitModuleBoundaryTypes {
  * @link https://typescript-eslint.io/rules/init-declarations
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace InitDeclarations {
@@ -1183,9 +1203,10 @@ namespace InitDeclarations {
  * @link https://typescript-eslint.io/rules/max-params
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace MaxParams {
@@ -1238,9 +1259,10 @@ namespace MaxParams {
  * @link https://typescript-eslint.io/rules/member-ordering
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace MemberOrdering {
@@ -1798,10 +1820,11 @@ namespace MemberOrdering {
  * @link https://typescript-eslint.io/rules/method-signature-style
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace MethodSignatureStyle {
@@ -1837,6 +1860,7 @@ namespace MethodSignatureStyle {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | requiresTypeChecking | true       |
  *  ```
  */
@@ -4089,6 +4113,7 @@ namespace NamingConvention {
  *  | key         | value       |
  *  | :---------- | :---------- |
  *  | type        | suggestion  |
+ *  | deprecated  | false       |
  *  | fixable     | code        |
  *  | recommended | recommended |
  *  ```
@@ -4106,6 +4131,7 @@ namespace NoArrayConstructor {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | hasSuggestions       | true        |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
@@ -4125,6 +4151,7 @@ namespace NoArrayDelete {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -4171,6 +4198,7 @@ namespace NoBaseToString {
  *  | key            | value     |
  *  | :------------- | :-------- |
  *  | type           | problem   |
+ *  | deprecated     | false     |
  *  | hasSuggestions | true      |
  *  | recommended    | stylistic |
  *  ```
@@ -4188,6 +4216,7 @@ namespace NoConfusingNonNullAssertion {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | fixable              | code    |
  *  | hasSuggestions       | true    |
  *  | recommended          | strict  |
@@ -4251,6 +4280,7 @@ namespace NoConfusingVoidExpression {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | recommended          | strict  |
  *  | requiresTypeChecking | true    |
  *  ```
@@ -4414,9 +4444,10 @@ namespace NoDeprecated {
  * @link https://typescript-eslint.io/rules/no-dupe-class-members
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoDupeClassMembers {
@@ -4432,6 +4463,7 @@ namespace NoDupeClassMembers {
  *  | key            | value       |
  *  | :------------- | :---------- |
  *  | type           | problem     |
+ *  | deprecated     | false       |
  *  | hasSuggestions | false       |
  *  | recommended    | recommended |
  *  ```
@@ -4449,6 +4481,7 @@ namespace NoDuplicateEnumValues {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | fixable              | code        |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
@@ -4499,6 +4532,7 @@ namespace NoDuplicateTypeConstituents {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
@@ -4516,6 +4550,7 @@ namespace NoDynamicDelete {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | stylistic  |
  *  ```
  */
@@ -4629,6 +4664,7 @@ namespace NoEmptyInterface {
  *  | key            | value       |
  *  | :------------- | :---------- |
  *  | type           | suggestion  |
+ *  | deprecated     | false       |
  *  | hasSuggestions | true        |
  *  | recommended    | recommended |
  *  ```
@@ -4696,6 +4732,7 @@ namespace NoEmptyObjectType {
  *  | key            | value       |
  *  | :------------- | :---------- |
  *  | type           | suggestion  |
+ *  | deprecated     | false       |
  *  | fixable        | code        |
  *  | hasSuggestions | true        |
  *  | recommended    | recommended |
@@ -4749,6 +4786,7 @@ namespace NoExplicitAny {
  *  | key         | value       |
  *  | :---------- | :---------- |
  *  | type        | problem     |
+ *  | deprecated  | false       |
  *  | fixable     | code        |
  *  | recommended | recommended |
  *  ```
@@ -4766,6 +4804,7 @@ namespace NoExtraNonNullAssertion {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -4826,6 +4865,7 @@ namespace NoExtraneousClass {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | hasSuggestions       | true        |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
@@ -5140,6 +5180,7 @@ namespace NoFloatingPromises {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -5157,6 +5198,7 @@ namespace NoForInArray {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -5172,10 +5214,11 @@ namespace NoImpliedEval {
  * @link https://typescript-eslint.io/rules/no-import-type-side-effects
  *
  *  ```md
- *  | key     | value   |
- *  | :------ | :------ |
- *  | type    | problem |
- *  | fixable | code    |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
  *  ```
  */
 namespace NoImportTypeSideEffects {
@@ -5192,6 +5235,7 @@ namespace NoImportTypeSideEffects {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | stylistic  |
  *  ```
@@ -5238,9 +5282,10 @@ namespace NoInferrableTypes {
  * @link https://typescript-eslint.io/rules/no-invalid-this
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoInvalidThis {
@@ -5280,6 +5325,7 @@ namespace NoInvalidThis {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | strict  |
  *  ```
  */
@@ -5341,9 +5387,10 @@ namespace NoInvalidVoidType {
  * @link https://typescript-eslint.io/rules/no-loop-func
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoLoopFunc {
@@ -5372,9 +5419,10 @@ namespace NoLossOfPrecision {
  * @link https://typescript-eslint.io/rules/no-magic-numbers
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoMagicNumbers {
@@ -5478,6 +5526,7 @@ namespace NoMagicNumbers {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | hasSuggestions       | true       |
  *  | recommended          | strict     |
@@ -5524,6 +5573,7 @@ namespace NoMeaninglessVoidOperator {
  *  | key         | value       |
  *  | :---------- | :---------- |
  *  | type        | problem     |
+ *  | deprecated  | false       |
  *  | recommended | recommended |
  *  ```
  */
@@ -5540,6 +5590,7 @@ namespace NoMisusedNew {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -5667,6 +5718,7 @@ namespace NoMisusedPromises {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | recommended          | strict  |
  *  | requiresTypeChecking | true    |
  *  ```
@@ -5833,6 +5885,7 @@ namespace NoMisusedSpread {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | recommended          | strict  |
  *  | requiresTypeChecking | true    |
  *  ```
@@ -5850,6 +5903,7 @@ namespace NoMixedEnums {
  *  | key         | value       |
  *  | :---------- | :---------- |
  *  | type        | suggestion  |
+ *  | deprecated  | false       |
  *  | recommended | recommended |
  *  ```
  */
@@ -5902,6 +5956,7 @@ namespace NoNamespace {
  *  | key            | value   |
  *  | :------------- | :------ |
  *  | type           | problem |
+ *  | deprecated     | false   |
  *  | hasSuggestions | true    |
  *  | recommended    | strict  |
  *  ```
@@ -5919,6 +5974,7 @@ namespace NoNonNullAssertedNullishCoalescing {
  *  | key            | value       |
  *  | :------------- | :---------- |
  *  | type           | problem     |
+ *  | deprecated     | false       |
  *  | hasSuggestions | true        |
  *  | recommended    | recommended |
  *  ```
@@ -5936,6 +5992,7 @@ namespace NoNonNullAssertedOptionalChain {
  *  | key            | value   |
  *  | :------------- | :------ |
  *  | type           | problem |
+ *  | deprecated     | false   |
  *  | hasSuggestions | true    |
  *  | recommended    | strict  |
  *  ```
@@ -5950,9 +6007,10 @@ namespace NoNonNullAssertion {
  * @link https://typescript-eslint.io/rules/no-redeclare
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoRedeclare {
@@ -6004,6 +6062,7 @@ namespace NoRedeclare {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -6021,6 +6080,7 @@ namespace NoRedundantTypeConstituents {
  *  | key         | value       |
  *  | :---------- | :---------- |
  *  | type        | problem     |
+ *  | deprecated  | false       |
  *  | recommended | recommended |
  *  ```
  */
@@ -6069,9 +6129,10 @@ namespace NoRequireImports {
  * @link https://typescript-eslint.io/rules/no-restricted-imports
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoRestrictedImports {
@@ -6311,6 +6372,7 @@ namespace NoRestrictedImports {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
@@ -6412,9 +6474,10 @@ namespace NoRestrictedTypes {
  * @link https://typescript-eslint.io/rules/no-shadow
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoShadow {
@@ -6507,6 +6570,7 @@ namespace NoShadow {
  *  | key         | value       |
  *  | :---------- | :---------- |
  *  | type        | suggestion  |
+ *  | deprecated  | false       |
  *  | recommended | recommended |
  *  ```
  */
@@ -6642,6 +6706,7 @@ namespace NoTypeAlias {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
@@ -6698,6 +6763,7 @@ namespace NoUnnecessaryBooleanLiteralCompare {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
@@ -6757,9 +6823,10 @@ namespace NoUnnecessaryCondition {
  * @link https://typescript-eslint.io/rules/no-unnecessary-parameter-property-assignment
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoUnnecessaryParameterPropertyAssignment {
@@ -6775,6 +6842,7 @@ namespace NoUnnecessaryParameterPropertyAssignment {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | requiresTypeChecking | true       |
  *  ```
@@ -6792,6 +6860,7 @@ namespace NoUnnecessaryQualifier {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
@@ -6810,6 +6879,7 @@ namespace NoUnnecessaryTemplateExpression {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
@@ -6828,6 +6898,7 @@ namespace NoUnnecessaryTypeArguments {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | fixable              | code        |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
@@ -6875,6 +6946,7 @@ namespace NoUnnecessaryTypeAssertion {
  *  | key            | value       |
  *  | :------------- | :---------- |
  *  | type           | suggestion  |
+ *  | deprecated     | false       |
  *  | hasSuggestions | true        |
  *  | recommended    | recommended |
  *  ```
@@ -6892,6 +6964,7 @@ namespace NoUnnecessaryTypeConstraint {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | hasSuggestions       | true    |
  *  | recommended          | strict  |
  *  | requiresTypeChecking | true    |
@@ -6910,6 +6983,7 @@ namespace NoUnnecessaryTypeParameters {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -6927,6 +7001,7 @@ namespace NoUnsafeArgument {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -6944,6 +7019,7 @@ namespace NoUnsafeAssignment {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -6961,6 +7037,7 @@ namespace NoUnsafeCall {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | false       |
  *  ```
@@ -6978,6 +7055,7 @@ namespace NoUnsafeDeclarationMerging {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | hasSuggestions       | true        |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
@@ -6996,6 +7074,7 @@ namespace NoUnsafeEnumComparison {
  *  | key         | value       |
  *  | :---------- | :---------- |
  *  | type        | problem     |
+ *  | deprecated  | false       |
  *  | fixable     | code        |
  *  | recommended | recommended |
  *  ```
@@ -7013,6 +7092,7 @@ namespace NoUnsafeFunctionType {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -7030,6 +7110,7 @@ namespace NoUnsafeMemberAccess {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -7047,6 +7128,7 @@ namespace NoUnsafeReturn {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | requiresTypeChecking | true    |
  *  ```
  */
@@ -7063,6 +7145,7 @@ namespace NoUnsafeTypeAssertion {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -7080,6 +7163,7 @@ namespace NoUnsafeUnaryMinus {
  *  | key         | value       |
  *  | :---------- | :---------- |
  *  | type        | suggestion  |
+ *  | deprecated  | false       |
  *  | recommended | recommended |
  *  ```
  */
@@ -7132,6 +7216,7 @@ namespace NoUnusedExpressions {
  *  | key         | value       |
  *  | :---------- | :---------- |
  *  | type        | problem     |
+ *  | deprecated  | false       |
  *  | recommended | recommended |
  *  ```
  */
@@ -7264,9 +7349,10 @@ namespace NoUnusedVars {
  * @link https://typescript-eslint.io/rules/no-use-before-define
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoUseBeforeDefine {
@@ -7359,6 +7445,7 @@ namespace NoUseBeforeDefine {
  *  | key            | value   |
  *  | :------------- | :------ |
  *  | type           | problem |
+ *  | deprecated     | false   |
  *  | hasSuggestions | true    |
  *  | recommended    | strict  |
  *  ```
@@ -7376,6 +7463,7 @@ namespace NoUselessConstructor {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | false      |
  *  ```
@@ -7430,6 +7518,7 @@ namespace NoVarRequires {
  *  | key         | value       |
  *  | :---------- | :---------- |
  *  | type        | problem     |
+ *  | deprecated  | false       |
  *  | fixable     | code        |
  *  | recommended | recommended |
  *  ```
@@ -7447,6 +7536,7 @@ namespace NoWrapperObjectTypes {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | recommended          | stylistic  |
  *  | requiresTypeChecking | true       |
@@ -7465,6 +7555,7 @@ namespace NonNullableTypeAssertionStyle {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -7640,9 +7731,10 @@ namespace OnlyThrowError {
  * @link https://typescript-eslint.io/rules/parameter-properties
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace ParameterProperties {
@@ -7720,6 +7812,7 @@ namespace ParameterProperties {
  *  | key            | value       |
  *  | :------------- | :---------- |
  *  | type           | suggestion  |
+ *  | deprecated     | false       |
  *  | fixable        | code        |
  *  | hasSuggestions | true        |
  *  | recommended    | recommended |
@@ -7738,6 +7831,7 @@ namespace PreferAsConst {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | requiresTypeChecking | true       |
  *  ```
@@ -7856,6 +7950,7 @@ namespace PreferDestructuring {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
  */
@@ -7873,6 +7968,7 @@ namespace PreferEnumInitializers {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | hasSuggestions       | true       |
  *  | recommended          | stylistic  |
  *  | requiresTypeChecking | true       |
@@ -7891,6 +7987,7 @@ namespace PreferFind {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | stylistic  |
  *  ```
  */
@@ -7907,6 +8004,7 @@ namespace PreferForOf {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | stylistic  |
  *  ```
@@ -7924,6 +8022,7 @@ namespace PreferFunctionType {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | recommended          | stylistic  |
  *  | requiresTypeChecking | true       |
@@ -7942,6 +8041,7 @@ namespace PreferIncludes {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | false      |
  *  ```
@@ -7986,6 +8086,7 @@ namespace PreferLiteralEnumMember {
  *  | key         | value       |
  *  | :---------- | :---------- |
  *  | type        | suggestion  |
+ *  | deprecated  | false       |
  *  | fixable     | code        |
  *  | recommended | recommended |
  *  ```
@@ -8004,6 +8105,7 @@ namespace PreferNamespaceKeyword {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | hasSuggestions       | true       |
  *  | recommended          | stylistic  |
  *  | requiresTypeChecking | true       |
@@ -8134,6 +8236,7 @@ namespace PreferNullishCoalescing {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | hasSuggestions       | true       |
  *  | recommended          | stylistic  |
@@ -8245,6 +8348,7 @@ namespace PreferOptionalChain {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -8301,6 +8405,7 @@ namespace PreferPromiseRejectErrors {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | requiresTypeChecking | true       |
  *  ```
@@ -8348,6 +8453,7 @@ namespace PreferReadonly {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | requiresTypeChecking | true       |
  *  ```
  */
@@ -8532,6 +8638,7 @@ namespace PreferReadonlyParameterTypes {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | fixable              | code    |
  *  | recommended          | strict  |
  *  | requiresTypeChecking | true    |
@@ -8550,6 +8657,7 @@ namespace PreferReduceTypeParameter {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | recommended          | stylistic  |
  *  | requiresTypeChecking | true       |
@@ -8568,6 +8676,7 @@ namespace PreferRegexpExec {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
@@ -8587,6 +8696,7 @@ namespace PreferReturnThisType {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | recommended          | stylistic  |
  *  | requiresTypeChecking | true       |
@@ -8655,6 +8765,7 @@ namespace PreferTsExpectError {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | requiresTypeChecking | true       |
  *  ```
@@ -8732,6 +8843,7 @@ namespace PromiseFunctionAsync {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | recommended          | strict  |
  *  | requiresTypeChecking | true    |
  *  ```
@@ -8750,6 +8862,7 @@ namespace RelatedGetterSetterPairs {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | requiresTypeChecking | true    |
  *  ```
  */
@@ -8793,6 +8906,7 @@ namespace RequireArraySortCompare {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | hasSuggestions       | true        |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
@@ -8812,6 +8926,7 @@ namespace RequireAwait {
  *  | key                  | value           |
  *  | :------------------- | :-------------- |
  *  | type                 | problem         |
+ *  | deprecated           | false           |
  *  | recommended          | [object Object] |
  *  | requiresTypeChecking | true            |
  *  ```
@@ -8888,6 +9003,7 @@ namespace RestrictPlusOperands {
  *  | key                  | value           |
  *  | :------------------- | :-------------- |
  *  | type                 | problem         |
+ *  | deprecated           | false           |
  *  | recommended          | [object Object] |
  *  | requiresTypeChecking | true            |
  *  ```
@@ -9096,6 +9212,7 @@ namespace RestrictTemplateExpressions {
  *  | key                  | value           |
  *  | :------------------- | :-------------- |
  *  | type                 | problem         |
+ *  | deprecated           | false           |
  *  | fixable              | code            |
  *  | hasSuggestions       | true            |
  *  | recommended          | [object Object] |
@@ -9230,6 +9347,7 @@ namespace SortTypeConstituents {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | hasSuggestions       | true       |
  *  | requiresTypeChecking | true       |
  *  ```
@@ -9328,6 +9446,7 @@ namespace StrictBooleanExpressions {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | hasSuggestions       | true       |
  *  | requiresTypeChecking | true       |
  *  ```
@@ -9399,6 +9518,7 @@ namespace SwitchExhaustivenessCheck {
  *  | key         | value       |
  *  | :---------- | :---------- |
  *  | type        | suggestion  |
+ *  | deprecated  | false       |
  *  | recommended | recommended |
  *  ```
  */
@@ -9463,9 +9583,10 @@ namespace TripleSlashReference {
  * @link https://typescript-eslint.io/rules/typedef
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace Typedef {
@@ -9567,6 +9688,7 @@ namespace Typedef {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | problem     |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -9611,6 +9733,7 @@ namespace UnboundMethod {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | recommended | strict     |
  *  ```
  */
@@ -9656,6 +9779,7 @@ namespace UnifiedSignatures {
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
+ *  | deprecated           | false      |
  *  | fixable              | code       |
  *  | hasSuggestions       | true       |
  *  | recommended          | strict     |

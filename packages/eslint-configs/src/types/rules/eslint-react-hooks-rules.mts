@@ -17,6 +17,7 @@ type SpreadOptionsIfIsArray<
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
  */
@@ -33,6 +34,7 @@ namespace RulesOfHooks {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |

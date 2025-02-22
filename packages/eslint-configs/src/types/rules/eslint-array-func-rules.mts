@@ -8,6 +8,7 @@ import { type Linter } from 'eslint';
  * | key         | value      |
  * | :---------- | :--------- |
  * | type        | suggestion |
+ * | deprecated  | false      |
  * | fixable     | code       |
  * | recommended | true       |
  * ```
@@ -24,6 +25,7 @@ namespace FromMap {
  * | key         | value      |
  * | :---------- | :--------- |
  * | type        | suggestion |
+ * | deprecated  | false      |
  * | fixable     | code       |
  * | recommended | true       |
  * ```
@@ -40,6 +42,7 @@ namespace NoUnnecessaryThisArg {
  * | key         | value   |
  * | :---------- | :------ |
  * | type        | problem |
+ * | deprecated  | false   |
  * | fixable     | code    |
  * | recommended | true    |
  * ```
@@ -55,6 +58,7 @@ namespace PreferArrayFrom {
  * | key         | value      |
  * | :---------- | :--------- |
  * | type        | suggestion |
+ * | deprecated  | false      |
  * | fixable     | code       |
  * | recommended | true       |
  * ```
@@ -70,6 +74,7 @@ namespace AvoidReverse {
  * | key         | value      |
  * | :---------- | :--------- |
  * | type        | suggestion |
+ * | deprecated  | false      |
  * | fixable     | code       |
  * | recommended | true       |
  * ```
@@ -85,6 +90,7 @@ namespace PreferFlatMap {
  * | key         | value      |
  * | :---------- | :--------- |
  * | type        | suggestion |
+ * | deprecated  | false      |
  * | fixable     | code       |
  * | recommended | true       |
  * ```

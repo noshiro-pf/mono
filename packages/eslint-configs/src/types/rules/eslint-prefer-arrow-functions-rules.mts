@@ -15,10 +15,11 @@ type SpreadOptionsIfIsArray<
  * @link https://github.com/JamieMason/prefer-arrow-functions
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferArrowFunctions {

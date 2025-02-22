@@ -11,6 +11,7 @@ import { type Linter } from 'eslint';
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -29,6 +30,7 @@ namespace DetectUnsafeRegex {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -47,6 +49,7 @@ namespace DetectNonLiteralRegexp {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -65,6 +68,7 @@ namespace DetectNonLiteralRequire {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -83,6 +87,7 @@ namespace DetectNonLiteralFsFilename {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -101,6 +106,7 @@ namespace DetectEvalWithExpression {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -119,6 +125,7 @@ namespace DetectPseudoRandomBytes {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -136,6 +143,7 @@ namespace DetectPossibleTimingAttacks {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -153,6 +161,7 @@ namespace DetectNoCsrfBeforeMethodOverride {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -170,6 +179,7 @@ namespace DetectBufferNoassert {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -188,6 +198,7 @@ namespace DetectChildProcess {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -205,6 +216,7 @@ namespace DetectDisableMustacheEscape {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -223,6 +235,7 @@ namespace DetectObjectInjection {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```
@@ -241,6 +254,7 @@ namespace DetectNewBuffer {
  *  | key         | value                           |
  *  | :---------- | :------------------------------ |
  *  | type        | error                           |
+ *  | deprecated  | false                           |
  *  | category    | Possible Security Vulnerability |
  *  | recommended | true                            |
  *  ```

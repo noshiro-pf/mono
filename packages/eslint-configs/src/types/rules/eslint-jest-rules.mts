@@ -14,10 +14,11 @@ type SpreadOptionsIfIsArray<
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/consistent-test-it.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace ConsistentTestIt {
@@ -66,9 +67,10 @@ namespace ConsistentTestIt {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/expect-expect.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace ExpectExpect {
@@ -115,9 +117,10 @@ namespace ExpectExpect {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/max-expects.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace MaxExpects {
@@ -155,9 +158,10 @@ namespace MaxExpects {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/max-nested-describe.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace MaxNestedDescribe {
@@ -195,10 +199,11 @@ namespace MaxNestedDescribe {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-alias-methods.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoAliasMethods {
@@ -211,9 +216,10 @@ namespace NoAliasMethods {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-commented-out-tests.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoCommentedOutTests {
@@ -226,9 +232,10 @@ namespace NoCommentedOutTests {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-conditional-expect.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoConditionalExpect {
@@ -241,9 +248,10 @@ namespace NoConditionalExpect {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-conditional-in-test.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoConditionalInTest {
@@ -256,9 +264,10 @@ namespace NoConditionalInTest {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-confusing-set-timeout.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoConfusingSetTimeout {
@@ -271,10 +280,11 @@ namespace NoConfusingSetTimeout {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-deprecated-functions.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoDeprecatedFunctions {
@@ -287,9 +297,10 @@ namespace NoDeprecatedFunctions {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-disabled-tests.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoDisabledTests {
@@ -305,6 +316,7 @@ namespace NoDisabledTests {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
  */
@@ -318,9 +330,10 @@ namespace NoDoneCallback {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-duplicate-hooks.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoDuplicateHooks {
@@ -333,9 +346,10 @@ namespace NoDuplicateHooks {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-export.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoExport {
@@ -351,6 +365,7 @@ namespace NoExport {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
  */
@@ -364,9 +379,10 @@ namespace NoFocusedTests {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-hooks.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoHooks {
@@ -409,9 +425,10 @@ namespace NoHooks {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-identical-title.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoIdenticalTitle {
@@ -424,9 +441,10 @@ namespace NoIdenticalTitle {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-interpolation-in-snapshots.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoInterpolationInSnapshots {
@@ -439,10 +457,11 @@ namespace NoInterpolationInSnapshots {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-jasmine-globals.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoJasmineGlobals {
@@ -455,9 +474,10 @@ namespace NoJasmineGlobals {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-large-snapshots.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoLargeSnapshots {
@@ -505,9 +525,10 @@ namespace NoLargeSnapshots {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-mocks-import.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoMocksImport {
@@ -520,9 +541,10 @@ namespace NoMocksImport {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-restricted-jest-methods.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoRestrictedJestMethods {
@@ -557,9 +579,10 @@ namespace NoRestrictedJestMethods {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-restricted-matchers.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoRestrictedMatchers {
@@ -594,9 +617,10 @@ namespace NoRestrictedMatchers {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-standalone-expect.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoStandaloneExpect {
@@ -636,10 +660,11 @@ namespace NoStandaloneExpect {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-test-prefixes.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoTestPrefixes {
@@ -652,9 +677,10 @@ namespace NoTestPrefixes {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-test-return-statement.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoTestReturnStatement {
@@ -667,10 +693,11 @@ namespace NoTestReturnStatement {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/no-untyped-mock-factory.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoUntypedMockFactory {
@@ -819,9 +846,10 @@ namespace PaddingAroundTestBlocks {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-called-with.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferCalledWith {
@@ -834,10 +862,11 @@ namespace PreferCalledWith {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-comparison-matcher.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferComparisonMatcher {
@@ -850,9 +879,10 @@ namespace PreferComparisonMatcher {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-each.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferEach {
@@ -868,6 +898,7 @@ namespace PreferEach {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
  */
@@ -884,6 +915,7 @@ namespace PreferEqualityMatcher {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
  */
@@ -929,10 +961,11 @@ namespace PreferExpectAssertions {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-expect-resolves.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferExpectResolves {
@@ -945,9 +978,10 @@ namespace PreferExpectResolves {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-hooks-in-order.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferHooksInOrder {
@@ -960,9 +994,10 @@ namespace PreferHooksInOrder {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-hooks-on-top.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferHooksOnTop {
@@ -975,10 +1010,11 @@ namespace PreferHooksOnTop {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-importing-jest-globals.md
  *
  *  ```md
- *  | key     | value   |
- *  | :------ | :------ |
- *  | type    | problem |
- *  | fixable | code    |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
  *  ```
  */
 namespace PreferImportingJestGlobals {
@@ -1033,10 +1069,11 @@ namespace PreferImportingJestGlobals {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-jest-mocked.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferJestMocked {
@@ -1049,10 +1086,11 @@ namespace PreferJestMocked {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-lowercase-title.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferLowercaseTitle {
@@ -1111,10 +1149,11 @@ namespace PreferLowercaseTitle {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-mock-promise-shorthand.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferMockPromiseShorthand {
@@ -1127,9 +1166,10 @@ namespace PreferMockPromiseShorthand {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-snapshot-hint.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferSnapshotHint {
@@ -1162,10 +1202,11 @@ namespace PreferSnapshotHint {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-spy-on.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferSpyOn {
@@ -1181,6 +1222,7 @@ namespace PreferSpyOn {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
  */
@@ -1194,10 +1236,11 @@ namespace PreferStrictEqual {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-to-be.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferToBe {
@@ -1210,10 +1253,11 @@ namespace PreferToBe {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-to-contain.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferToContain {
@@ -1226,10 +1270,11 @@ namespace PreferToContain {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-to-have-length.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferToHaveLength {
@@ -1242,10 +1287,11 @@ namespace PreferToHaveLength {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/prefer-todo.md
  *
  *  ```md
- *  | key     | value  |
- *  | :------ | :----- |
- *  | type    | layout |
- *  | fixable | code   |
+ *  | key        | value  |
+ *  | :--------- | :----- |
+ *  | type       | layout |
+ *  | deprecated | false  |
+ *  | fixable    | code   |
  *  ```
  */
 namespace PreferTodo {
@@ -1258,9 +1304,10 @@ namespace PreferTodo {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/require-hook.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace RequireHook {
@@ -1300,9 +1347,10 @@ namespace RequireHook {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/require-to-throw-message.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace RequireToThrowMessage {
@@ -1315,9 +1363,10 @@ namespace RequireToThrowMessage {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/require-top-level-describe.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace RequireTopLevelDescribe {
@@ -1358,6 +1407,7 @@ namespace RequireTopLevelDescribe {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
+ *  | deprecated           | false   |
  *  | requiresTypeChecking | true    |
  *  ```
  */
@@ -1397,9 +1447,10 @@ namespace UnboundMethod {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/valid-describe-callback.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace ValidDescribeCallback {
@@ -1412,9 +1463,10 @@ namespace ValidDescribeCallback {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/valid-expect-in-promise.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace ValidExpectInPromise {
@@ -1427,10 +1479,11 @@ namespace ValidExpectInPromise {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/valid-expect.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace ValidExpect {
@@ -1485,10 +1538,11 @@ namespace ValidExpect {
  * @link https://github.com/jest-community/eslint-plugin-jest/blob/v28.11.0/docs/rules/valid-title.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace ValidTitle {
