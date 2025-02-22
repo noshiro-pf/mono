@@ -96,3 +96,44 @@ export const useRouterLinkClick = ({
     },
     [replaceProp, pushFn, redirectFn],
   );
+
+export const createRouterLinkClickHandler =
+  ({
+    replace: replaceProp,
+    redirectFn,
+    pushFn,
+  }: Readonly<{
+    replace?: boolean;
+    redirectFn: (path: string) => void;
+    pushFn: (path: string) => void;
+  }>): ((ev: MouseEvent) => void) =>
+  (ev) => {
+    const el = ev.target;
+    if (!(el instanceof HTMLAnchorElement)) {
+      console.warn('useRouterLinkClick should be used for HTMLAnchorElement.');
+      return;
+    }
+
+    const href = el.href;
+
+    if (
+      !ev.defaultPrevented &&
+      ev.button === 0 && // Ignore everything but left clicks
+      (el.target === '' || el.target === '_self') && // Let browser handle "target=_blank" etc.
+      !isModifiedEvent(ev) // Ignore clicks with modifier keys
+    ) {
+      ev.preventDefault();
+
+      // If the URL hasn't changed, a regular <a> will do a replace instead of
+      // a push, so do the same here.
+      const replace =
+        // eslint-disable-next-line unicorn/prefer-global-this
+        replaceProp === true || createPath(window.location) === href;
+
+      if (replace) {
+        redirectFn(href);
+      } else {
+        pushFn(href);
+      }
+    }
+  };
