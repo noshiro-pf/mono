@@ -14,11 +14,10 @@ type SpreadOptionsIfIsArray<
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-unresolved.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | problem         |
- *  | deprecated | false           |
- *  | category   | Static analysis |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoUnresolved {
@@ -83,11 +82,10 @@ namespace NoUnresolved {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/named.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | problem         |
- *  | deprecated | false           |
- *  | category   | Static analysis |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace Named {
@@ -124,11 +122,10 @@ namespace Named {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/default.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | problem         |
- *  | deprecated | false           |
- *  | category   | Static analysis |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace Default {
@@ -142,11 +139,10 @@ namespace Default {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/namespace.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | problem         |
- *  | deprecated | false           |
- *  | category   | Static analysis |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace Namespace {
@@ -189,12 +185,11 @@ namespace Namespace {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-namespace.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | fixable    | code        |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoNamespace {
@@ -235,11 +230,10 @@ namespace NoNamespace {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/export.md
  *
  *  ```md
- *  | key        | value            |
- *  | :--------- | :--------------- |
- *  | type       | problem          |
- *  | deprecated | false            |
- *  | category   | Helpful warnings |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace Export {
@@ -252,11 +246,10 @@ namespace Export {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-mutable-exports.md
  *
  *  ```md
- *  | key        | value            |
- *  | :--------- | :--------------- |
- *  | type       | suggestion       |
- *  | deprecated | false            |
- *  | category   | Helpful warnings |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoMutableExports {
@@ -269,11 +262,10 @@ namespace NoMutableExports {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/extensions.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace Extensions {
@@ -424,11 +416,10 @@ namespace Extensions {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-restricted-paths.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | problem         |
- *  | deprecated | false           |
- *  | category   | Static analysis |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoRestrictedPaths {
@@ -530,11 +521,10 @@ namespace NoRestrictedPaths {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-internal-modules.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | suggestion      |
- *  | deprecated | false           |
- *  | category   | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoInternalModules {
@@ -594,11 +584,10 @@ namespace NoInternalModules {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/group-exports.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace GroupExports {
@@ -611,12 +600,11 @@ namespace GroupExports {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-relative-packages.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | suggestion      |
- *  | deprecated | false           |
- *  | fixable    | code            |
- *  | category   | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoRelativePackages {
@@ -671,11 +659,10 @@ namespace NoRelativePackages {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-relative-parent-imports.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | suggestion      |
- *  | deprecated | false           |
- *  | category   | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoRelativeParentImports {
@@ -730,12 +717,11 @@ namespace NoRelativeParentImports {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/consistent-type-specifier-style.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | fixable    | code        |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace ConsistentTypeSpecifierStyle {
@@ -769,12 +755,11 @@ namespace ConsistentTypeSpecifierStyle {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-self-import.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | category    | Static analysis |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoSelfImport {
@@ -788,11 +773,10 @@ namespace NoSelfImport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-cycle.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | suggestion      |
- *  | deprecated | false           |
- *  | category   | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoCycle {
@@ -891,11 +875,10 @@ namespace NoCycle {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-named-default.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoNamedDefault {
@@ -908,11 +891,10 @@ namespace NoNamedDefault {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-named-as-default.md
  *
  *  ```md
- *  | key        | value            |
- *  | :--------- | :--------------- |
- *  | type       | problem          |
- *  | deprecated | false            |
- *  | category   | Helpful warnings |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoNamedAsDefault {
@@ -925,11 +907,10 @@ namespace NoNamedAsDefault {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-named-as-default-member.md
  *
  *  ```md
- *  | key        | value            |
- *  | :--------- | :--------------- |
- *  | type       | suggestion       |
- *  | deprecated | false            |
- *  | category   | Helpful warnings |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoNamedAsDefaultMember {
@@ -942,11 +923,10 @@ namespace NoNamedAsDefaultMember {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-anonymous-default-export.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoAnonymousDefaultExport {
@@ -1028,11 +1008,10 @@ namespace NoAnonymousDefaultExport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-unused-modules.md
  *
  *  ```md
- *  | key        | value            |
- *  | :--------- | :--------------- |
- *  | type       | suggestion       |
- *  | deprecated | false            |
- *  | category   | Helpful warnings |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoUnusedModules {
@@ -1146,11 +1125,10 @@ namespace NoUnusedModules {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-commonjs.md
  *
  *  ```md
- *  | key        | value          |
- *  | :--------- | :------------- |
- *  | type       | suggestion     |
- *  | deprecated | false          |
- *  | category   | Module systems |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoCommonjs {
@@ -1217,11 +1195,10 @@ namespace NoCommonjs {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-amd.md
  *
  *  ```md
- *  | key        | value          |
- *  | :--------- | :------------- |
- *  | type       | suggestion     |
- *  | deprecated | false          |
- *  | category   | Module systems |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoAmd {
@@ -1234,12 +1211,11 @@ namespace NoAmd {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-duplicates.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | problem     |
- *  | deprecated | false       |
- *  | fixable    | code        |
- *  | category   | Style guide |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
  *  ```
  */
 namespace NoDuplicates {
@@ -1280,12 +1256,11 @@ namespace NoDuplicates {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/first.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | fixable    | code        |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace First {
@@ -1318,11 +1293,10 @@ namespace First {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/max-dependencies.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace MaxDependencies {
@@ -1363,11 +1337,10 @@ namespace MaxDependencies {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-extraneous-dependencies.md
  *
  *  ```md
- *  | key        | value            |
- *  | :--------- | :--------------- |
- *  | type       | problem          |
- *  | deprecated | false            |
- *  | category   | Helpful warnings |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoExtraneousDependencies {
@@ -1447,12 +1420,11 @@ namespace NoExtraneousDependencies {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-absolute-path.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | suggestion      |
- *  | deprecated | false           |
- *  | fixable    | code            |
- *  | category   | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoAbsolutePath {
@@ -1507,11 +1479,10 @@ namespace NoAbsolutePath {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-nodejs-modules.md
  *
  *  ```md
- *  | key        | value          |
- *  | :--------- | :------------- |
- *  | type       | suggestion     |
- *  | deprecated | false          |
- *  | category   | Module systems |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoNodejsModules {
@@ -1552,11 +1523,10 @@ namespace NoNodejsModules {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-webpack-loader-syntax.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | problem         |
- *  | deprecated | false           |
- *  | category   | Static analysis |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoWebpackLoaderSyntax {
@@ -1569,12 +1539,11 @@ namespace NoWebpackLoaderSyntax {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/order.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | fixable    | code        |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace Order {
@@ -1771,12 +1740,11 @@ namespace Order {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/newline-after-import.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | layout      |
- *  | deprecated | false       |
- *  | fixable    | whitespace  |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | layout     |
+ *  | deprecated | false      |
+ *  | fixable    | whitespace |
  *  ```
  */
 namespace NewlineAfterImport {
@@ -1822,11 +1790,10 @@ namespace NewlineAfterImport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/prefer-default-export.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferDefaultExport {
@@ -1868,11 +1835,10 @@ namespace PreferDefaultExport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-default-export.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoDefaultExport {
@@ -1885,11 +1851,10 @@ namespace NoDefaultExport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-named-export.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoNamedExport {
@@ -1902,11 +1867,10 @@ namespace NoNamedExport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-dynamic-require.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | suggestion      |
- *  | deprecated | false           |
- *  | category   | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoDynamicRequire {
@@ -1943,11 +1907,10 @@ namespace NoDynamicRequire {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/unambiguous.md
  *
  *  ```md
- *  | key        | value          |
- *  | :--------- | :------------- |
- *  | type       | suggestion     |
- *  | deprecated | false          |
- *  | category   | Module systems |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace Unambiguous {
@@ -1960,11 +1923,10 @@ namespace Unambiguous {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-unassigned-import.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoUnassignedImport {
@@ -2025,12 +1987,11 @@ namespace NoUnassignedImport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-useless-path-segments.md
  *
  *  ```md
- *  | key        | value           |
- *  | :--------- | :-------------- |
- *  | type       | suggestion      |
- *  | deprecated | false           |
- *  | fixable    | code            |
- *  | category   | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoUselessPathSegments {
@@ -2071,12 +2032,11 @@ namespace NoUselessPathSegments {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/dynamic-import-chunkname.md
  *
  *  ```md
- *  | key            | value       |
- *  | :------------- | :---------- |
- *  | type           | suggestion  |
- *  | deprecated     | false       |
- *  | hasSuggestions | true        |
- *  | category       | Style guide |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace DynamicImportChunkname {
@@ -2123,13 +2083,12 @@ namespace DynamicImportChunkname {
  * Forbid import statements with CommonJS module.exports.
  *
  * ```md
- * | key         | value          |
- * | :---------- | :------------- |
- * | type        | problem        |
- * | deprecated  | false          |
- * | fixable     | code           |
- * | category    | Module systems |
- * | recommended | true           |
+ * | key         | value   |
+ * | :---------- | :------ |
+ * | type        | problem |
+ * | deprecated  | false   |
+ * | fixable     | code    |
+ * | recommended | true    |
  * ```
  */
 namespace NoImportModuleExports {
@@ -2166,13 +2125,12 @@ namespace NoImportModuleExports {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-empty-named-blocks.md
  *
  *  ```md
- *  | key            | value            |
- *  | :------------- | :--------------- |
- *  | type           | suggestion       |
- *  | deprecated     | false            |
- *  | fixable        | code             |
- *  | hasSuggestions | true             |
- *  | category       | Helpful warnings |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace NoEmptyNamedBlocks {
@@ -2185,11 +2143,10 @@ namespace NoEmptyNamedBlocks {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/exports-last.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | false       |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace ExportsLast {
@@ -2202,11 +2159,10 @@ namespace ExportsLast {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-deprecated.md
  *
  *  ```md
- *  | key        | value            |
- *  | :--------- | :--------------- |
- *  | type       | suggestion       |
- *  | deprecated | false            |
- *  | category   | Helpful warnings |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoDeprecated {
@@ -2219,12 +2175,11 @@ namespace NoDeprecated {
  * @link https://github.com/import-js/eslint-plugin-import/blob/7b25c1cb95ee18acc1531002fd343e1e6031f9ed/docs/rules/imports-first.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | true        |
- *  | fixable    | code        |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | true       |
+ *  | fixable    | code       |
  *  ```
  */
 namespace ImportsFirst {

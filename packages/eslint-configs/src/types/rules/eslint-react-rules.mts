@@ -14,11 +14,10 @@ type SpreadOptionsIfIsArray<
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/boolean-prop-naming.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace BooleanPropNaming {
@@ -77,11 +76,10 @@ namespace BooleanPropNaming {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/button-has-type.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace ButtonHasType {
@@ -129,11 +127,10 @@ namespace ButtonHasType {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/checked-requires-onchange-or-readonly.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace CheckedRequiresOnchangeOrReadonly {
@@ -173,10 +170,9 @@ namespace CheckedRequiresOnchangeOrReadonly {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/default-props-match-prop-types.md
  *
  *  ```md
- *  | key        | value          |
- *  | :--------- | :------------- |
- *  | deprecated | false          |
- *  | category   | Best Practices |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace DefaultPropsMatchPropTypes {
@@ -215,12 +211,11 @@ namespace DefaultPropsMatchPropTypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/destructuring-assignment.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace DestructuringAssignment {
@@ -275,11 +270,10 @@ namespace DestructuringAssignment {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/display-name.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DisplayName {
@@ -320,11 +314,10 @@ namespace DisplayName {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-component-props.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace ForbidComponentProps {
@@ -515,11 +508,10 @@ namespace ForbidComponentProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-dom-props.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace ForbidDomProps {
@@ -591,11 +583,10 @@ namespace ForbidDomProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-elements.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace ForbidElements {
@@ -660,11 +651,10 @@ namespace ForbidElements {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-foreign-prop-types.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace ForbidForeignPropTypes {
@@ -701,11 +691,10 @@ namespace ForbidForeignPropTypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-prop-types.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace ForbidPropTypes {
@@ -754,13 +743,12 @@ namespace ForbidPropTypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forward-ref-uses-ref.md
  *
  *  ```md
- *  | key            | value           |
- *  | :------------- | :-------------- |
- *  | type           | suggestion      |
- *  | deprecated     | false           |
- *  | hasSuggestions | true            |
- *  | category       | Possible Errors |
- *  | recommended    | false           |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace ForwardRefUsesRef {
@@ -773,12 +761,11 @@ namespace ForwardRefUsesRef {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/function-component-definition.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace FunctionComponentDefinition {
@@ -867,13 +854,12 @@ namespace FunctionComponentDefinition {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/hook-use-state.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | deprecated     | false          |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | false          |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace HookUseState {
@@ -911,11 +897,10 @@ namespace HookUseState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/iframe-missing-sandbox.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace IframeMissingSandbox {
@@ -928,12 +913,11 @@ namespace IframeMissingSandbox {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-boolean-value.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxBooleanValue {
@@ -1041,11 +1025,10 @@ namespace JsxBooleanValue {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-child-element-spacing.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxChildElementSpacing {
@@ -1058,12 +1041,11 @@ namespace JsxChildElementSpacing {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-closing-bracket-location.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxClosingBracketLocation {
@@ -1164,12 +1146,11 @@ namespace JsxClosingBracketLocation {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-closing-tag-location.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | whitespace       |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | deprecated  | false      |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
  *  ```
  */
 namespace JsxClosingTagLocation {
@@ -1223,12 +1204,11 @@ namespace JsxClosingTagLocation {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-curly-spacing.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxCurlySpacing {
@@ -1368,13 +1348,12 @@ namespace JsxCurlySpacing {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-curly-newline.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | type        | layout           |
- *  | deprecated  | false            |
- *  | fixable     | whitespace       |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | layout     |
+ *  | deprecated  | false      |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
  *  ```
  */
 namespace JsxCurlyNewline {
@@ -1436,12 +1415,11 @@ namespace JsxCurlyNewline {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-equals-spacing.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxEqualsSpacing {
@@ -1473,11 +1451,10 @@ namespace JsxEqualsSpacing {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-filename-extension.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxFilenameExtension {
@@ -1528,12 +1505,11 @@ namespace JsxFilenameExtension {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-first-prop-new-line.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxFirstPropNewLine {
@@ -1573,11 +1549,10 @@ namespace JsxFirstPropNewLine {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-handler-names.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxHandlerNames {
@@ -1749,12 +1724,11 @@ namespace JsxHandlerNames {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-indent.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | whitespace       |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | deprecated  | false      |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
  *  ```
  */
 namespace JsxIndent {
@@ -1810,12 +1784,11 @@ namespace JsxIndent {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-indent-props.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxIndentProps {
@@ -1883,11 +1856,10 @@ namespace JsxIndentProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-key.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxKey {
@@ -1935,11 +1907,10 @@ namespace JsxKey {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-max-depth.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxMaxDepth {
@@ -1977,12 +1948,11 @@ namespace JsxMaxDepth {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-max-props-per-line.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxMaxPropsPerLine {
@@ -2059,12 +2029,11 @@ namespace JsxMaxPropsPerLine {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-newline.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxNewline {
@@ -2124,11 +2093,10 @@ namespace JsxNewline {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-bind.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxNoBind {
@@ -2186,11 +2154,10 @@ namespace JsxNoBind {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-comment-textnodes.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxNoCommentTextnodes {
@@ -2204,11 +2171,10 @@ namespace JsxNoCommentTextnodes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-constructed-context-values.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxNoConstructedContextValues {
@@ -2221,11 +2187,10 @@ namespace JsxNoConstructedContextValues {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-duplicate-props.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxNoDuplicateProps {
@@ -2262,12 +2227,11 @@ namespace JsxNoDuplicateProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-leaked-render.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | fixable     | code            |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxNoLeakedRender {
@@ -2315,11 +2279,10 @@ namespace JsxNoLeakedRender {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-literals.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxNoLiterals {
@@ -2412,11 +2375,10 @@ namespace JsxNoLiterals {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-script-url.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxNoScriptUrl {
@@ -2518,12 +2480,11 @@ namespace JsxNoScriptUrl {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-target-blank.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxNoTargetBlank {
@@ -2581,13 +2542,12 @@ namespace JsxNoTargetBlank {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-useless-fragment.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | suggestion      |
- *  | deprecated  | false           |
- *  | fixable     | code            |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace JsxNoUselessFragment {
@@ -2624,12 +2584,11 @@ namespace JsxNoUselessFragment {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-one-expression-per-line.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | whitespace       |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | deprecated  | false      |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
  *  ```
  */
 namespace JsxOneExpressionPerLine {
@@ -2674,11 +2633,10 @@ namespace JsxOneExpressionPerLine {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-undef.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxNoUndef {
@@ -2716,12 +2674,11 @@ namespace JsxNoUndef {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-curly-brace-presence.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxCurlyBracePresence {
@@ -2791,11 +2748,10 @@ namespace JsxCurlyBracePresence {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-pascal-case.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxPascalCase {
@@ -2852,12 +2808,11 @@ namespace JsxPascalCase {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-fragments.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxFragments {
@@ -2889,12 +2844,11 @@ namespace JsxFragments {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-props-no-multi-spaces.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxPropsNoMultiSpaces {
@@ -2907,11 +2861,10 @@ namespace JsxPropsNoMultiSpaces {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-props-no-spreading.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxPropsNoSpreading {
@@ -3003,11 +2956,10 @@ namespace JsxPropsNoSpreading {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-props-no-spread-multi.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxPropsNoSpreadMulti {
@@ -3020,11 +2972,10 @@ namespace JsxPropsNoSpreadMulti {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-sort-default-props.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | true             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | true  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxSortDefaultProps {
@@ -3054,12 +3005,11 @@ namespace JsxSortDefaultProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-sort-props.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxSortProps {
@@ -3133,12 +3083,11 @@ namespace JsxSortProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-space-before-closing.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | true             |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | true  |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxSpaceBeforeClosing {
@@ -3165,12 +3114,11 @@ namespace JsxSpaceBeforeClosing {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-tag-spacing.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | whitespace       |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | deprecated  | false      |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
  *  ```
  */
 namespace JsxTagSpacing {
@@ -3252,11 +3200,10 @@ namespace JsxTagSpacing {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-uses-react.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxUsesReact {
@@ -3269,11 +3216,10 @@ namespace JsxUsesReact {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-uses-vars.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxUsesVars {
@@ -3286,12 +3232,11 @@ namespace JsxUsesVars {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-wrap-multilines.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxWrapMultilines {
@@ -3443,12 +3388,11 @@ namespace JsxWrapMultilines {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-invalid-html-attribute.md
  *
  *  ```md
- *  | key            | value           |
- *  | :------------- | :-------------- |
- *  | type           | suggestion      |
- *  | deprecated     | false           |
- *  | hasSuggestions | true            |
- *  | category       | Possible Errors |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace NoInvalidHtmlAttribute {
@@ -3483,11 +3427,10 @@ namespace NoInvalidHtmlAttribute {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-access-state-in-setstate.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoAccessStateInSetstate {
@@ -3500,11 +3443,10 @@ namespace NoAccessStateInSetstate {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-adjacent-inline-elements.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoAdjacentInlineElements {
@@ -3517,11 +3459,10 @@ namespace NoAdjacentInlineElements {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-array-index-key.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoArrayIndexKey {
@@ -3534,12 +3475,11 @@ namespace NoArrayIndexKey {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-arrow-function-lifecycle.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace NoArrowFunctionLifecycle {
@@ -3552,11 +3492,10 @@ namespace NoArrowFunctionLifecycle {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-children-prop.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoChildrenProp {
@@ -3594,11 +3533,10 @@ namespace NoChildrenProp {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-danger.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoDanger {
@@ -3642,11 +3580,10 @@ namespace NoDanger {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-danger-with-children.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoDangerWithChildren {
@@ -3659,11 +3596,10 @@ namespace NoDangerWithChildren {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-deprecated.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoDeprecated {
@@ -3676,11 +3612,10 @@ namespace NoDeprecated {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-did-mount-set-state.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoDidMountSetState {
@@ -3711,11 +3646,10 @@ namespace NoDidMountSetState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-did-update-set-state.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoDidUpdateSetState {
@@ -3746,11 +3680,10 @@ namespace NoDidUpdateSetState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-direct-mutation-state.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoDirectMutationState {
@@ -3763,11 +3696,10 @@ namespace NoDirectMutationState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-find-dom-node.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoFindDomNode {
@@ -3780,11 +3712,10 @@ namespace NoFindDomNode {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-is-mounted.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoIsMounted {
@@ -3797,11 +3728,10 @@ namespace NoIsMounted {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-multi-comp.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoMultiComp {
@@ -3839,11 +3769,10 @@ namespace NoMultiComp {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-namespace.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoNamespace {
@@ -3856,11 +3785,10 @@ namespace NoNamespace {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-set-state.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoSetState {
@@ -3873,11 +3801,10 @@ namespace NoSetState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-string-refs.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoStringRefs {
@@ -3914,11 +3841,10 @@ namespace NoStringRefs {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-redundant-should-component-update.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoRedundantShouldComponentUpdate {
@@ -3931,11 +3857,10 @@ namespace NoRedundantShouldComponentUpdate {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-render-return-value.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoRenderReturnValue {
@@ -3948,11 +3873,10 @@ namespace NoRenderReturnValue {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-this-in-sfc.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoThisInSfc {
@@ -3965,11 +3889,10 @@ namespace NoThisInSfc {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-typos.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoTypos {
@@ -3982,12 +3905,11 @@ namespace NoTypos {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unescaped-entities.md
  *
  *  ```md
- *  | key            | value           |
- *  | :------------- | :-------------- |
- *  | deprecated     | false           |
- *  | hasSuggestions | true            |
- *  | category       | Possible Errors |
- *  | recommended    | true            |
+ *  | key            | value |
+ *  | :------------- | :---- |
+ *  | deprecated     | false |
+ *  | hasSuggestions | true  |
+ *  | recommended    | true  |
  *  ```
  */
 namespace NoUnescapedEntities {
@@ -4053,12 +3975,11 @@ namespace NoUnescapedEntities {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unknown-property.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | fixable     | code            |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoUnknownProperty {
@@ -4103,11 +4024,10 @@ namespace NoUnknownProperty {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unsafe.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoUnsafe {
@@ -4145,11 +4065,10 @@ namespace NoUnsafe {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unstable-nested-components.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoUnstableNestedComponents {
@@ -4197,11 +4116,10 @@ namespace NoUnstableNestedComponents {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unused-class-component-methods.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoUnusedClassComponentMethods {
@@ -4214,11 +4132,10 @@ namespace NoUnusedClassComponentMethods {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unused-prop-types.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoUnusedPropTypes {
@@ -4270,11 +4187,10 @@ namespace NoUnusedPropTypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unused-state.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoUnusedState {
@@ -4288,11 +4204,10 @@ namespace NoUnusedState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-object-type-as-default-prop.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoObjectTypeAsDefaultProp {
@@ -4305,11 +4220,10 @@ namespace NoObjectTypeAsDefaultProp {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-will-update-set-state.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoWillUpdateSetState {
@@ -4340,11 +4254,10 @@ namespace NoWillUpdateSetState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prefer-es6-class.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace PreferEs6Class {
@@ -4376,11 +4289,10 @@ namespace PreferEs6Class {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prefer-exact-props.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace PreferExactProps {
@@ -4393,12 +4305,11 @@ namespace PreferExactProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prefer-read-only-props.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace PreferReadOnlyProps {
@@ -4411,11 +4322,10 @@ namespace PreferReadOnlyProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prefer-stateless-function.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace PreferStatelessFunction {
@@ -4453,11 +4363,10 @@ namespace PreferStatelessFunction {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prop-types.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace PropTypes {
@@ -4508,11 +4417,10 @@ namespace PropTypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/react-in-jsx-scope.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace ReactInJsxScope {
@@ -4525,10 +4433,9 @@ namespace ReactInJsxScope {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/require-default-props.md
  *
  *  ```md
- *  | key        | value          |
- *  | :--------- | :------------- |
- *  | deprecated | false          |
- *  | category   | Best Practices |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace RequireDefaultProps {
@@ -4584,11 +4491,10 @@ namespace RequireDefaultProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/require-optimization.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace RequireOptimization {
@@ -4628,11 +4534,10 @@ namespace RequireOptimization {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/require-render-return.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace RequireRenderReturn {
@@ -4645,12 +4550,11 @@ namespace RequireRenderReturn {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/self-closing-comp.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace SelfClosingComp {
@@ -4693,11 +4597,10 @@ namespace SelfClosingComp {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/sort-comp.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace SortComp {
@@ -4749,11 +4652,10 @@ namespace SortComp {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/sort-default-props.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace SortDefaultProps {
@@ -4790,12 +4692,11 @@ namespace SortDefaultProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/sort-prop-types.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace SortPropTypes {
@@ -4852,11 +4753,10 @@ namespace SortPropTypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/state-in-constructor.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace StateInConstructor {
@@ -4888,11 +4788,10 @@ namespace StateInConstructor {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/static-property-placement.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | false            |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace StaticPropertyPlacement {
@@ -5004,11 +4903,10 @@ namespace StaticPropertyPlacement {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/style-prop-object.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace StylePropObject {
@@ -5050,11 +4948,10 @@ namespace StylePropObject {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/void-dom-elements-no-children.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace VoidDomElementsNoChildren {

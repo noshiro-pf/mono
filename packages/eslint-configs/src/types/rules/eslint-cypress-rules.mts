@@ -14,12 +14,11 @@ type SpreadOptionsIfIsArray<
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-assigning-return-values.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoAssigningReturnValues {
@@ -32,12 +31,11 @@ namespace NoAssigningReturnValues {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/unsafe-to-chain-command.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace UnsafeToChainCommand {
@@ -80,12 +78,11 @@ namespace UnsafeToChainCommand {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-unnecessary-waiting.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoUnnecessaryWaiting {
@@ -98,12 +95,11 @@ namespace NoUnnecessaryWaiting {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-async-before.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoAsyncBefore {
@@ -116,12 +112,11 @@ namespace NoAsyncBefore {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-async-tests.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoAsyncTests {
@@ -134,12 +129,11 @@ namespace NoAsyncTests {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/assertion-before-screenshot.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
  *  ```
  */
 namespace AssertionBeforeScreenshot {
@@ -152,12 +146,11 @@ namespace AssertionBeforeScreenshot {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/require-data-selectors.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | suggestion      |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace RequireDataSelectors {
@@ -170,12 +163,11 @@ namespace RequireDataSelectors {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-force.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | suggestion      |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoForce {
@@ -188,12 +180,11 @@ namespace NoForce {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-pause.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | suggestion      |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoPause {
@@ -206,12 +197,11 @@ namespace NoPause {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-debug.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | suggestion      |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoDebug {

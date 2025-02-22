@@ -15,7 +15,6 @@ type SpreadOptionsIfIsArray<
  * | key         | value |
  * | :---------- | :---- |
  * | deprecated  | false |
- * | category    |       |
  * | recommended | true  |
  * ```
  */
@@ -66,7 +65,6 @@ namespace JsxNoNewObjectAsProp {
  * | key         | value |
  * | :---------- | :---- |
  * | deprecated  | false |
- * | category    |       |
  * | recommended | true  |
  * ```
  */
@@ -117,7 +115,6 @@ namespace JsxNoNewArrayAsProp {
  * | key         | value |
  * | :---------- | :---- |
  * | deprecated  | false |
- * | category    |       |
  * | recommended | true  |
  * ```
  */
@@ -168,7 +165,6 @@ namespace JsxNoNewFunctionAsProp {
  * | key         | value |
  * | :---------- | :---- |
  * | deprecated  | false |
- * | category    |       |
  * | recommended | true  |
  * ```
  */

@@ -18,7 +18,6 @@ type SpreadOptionsIfIsArray<
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | deprecated  | false      |
- *  | category    | Tests      |
  *  | recommended | false      |
  *  ```
  */
@@ -62,7 +61,6 @@ namespace ConsistentOutput {
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | deprecated  | false   |
- *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
  */
@@ -81,7 +79,6 @@ namespace FixerReturn {
  *  | type        | suggestion |
  *  | deprecated  | false      |
  *  | fixable     | code       |
- *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
  */
@@ -121,7 +118,6 @@ namespace MetaPropertyOrdering {
  *  | type        | suggestion |
  *  | deprecated  | false      |
  *  | fixable     | code       |
- *  | category    | Rules      |
  *  | recommended | true       |
  *  ```
  */
@@ -140,7 +136,6 @@ namespace NoDeprecatedContextMethods {
  *  | type        | suggestion |
  *  | deprecated  | false      |
  *  | fixable     | code       |
- *  | category    | Rules      |
  *  | recommended | true       |
  *  ```
  */
@@ -159,7 +154,6 @@ namespace NoDeprecatedReportApi {
  *  | type        | problem |
  *  | deprecated  | false   |
  *  | fixable     | code    |
- *  | category    | Tests   |
  *  | recommended | true    |
  *  ```
  */
@@ -177,7 +171,6 @@ namespace NoIdenticalTests {
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | deprecated  | false      |
- *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
  */
@@ -195,7 +188,6 @@ namespace NoMetaSchemaDefault {
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | deprecated  | false   |
- *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
  */
@@ -213,7 +205,6 @@ namespace NoMissingMessageIds {
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | deprecated  | false   |
- *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
  */
@@ -232,7 +223,6 @@ namespace NoMissingPlaceholders {
  *  | type           | problem |
  *  | deprecated     | false   |
  *  | hasSuggestions | true    |
- *  | category       | Tests   |
  *  | recommended    | true    |
  *  ```
  */
@@ -250,7 +240,6 @@ namespace NoOnlyTests {
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | deprecated           | false      |
- *  | category             | Rules      |
  *  | recommended          | false      |
  *  | requiresTypeChecking | true       |
  *  ```
@@ -301,7 +290,6 @@ namespace NoPropertyInNode {
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | deprecated  | false   |
- *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
  */
@@ -319,7 +307,6 @@ namespace NoUnusedMessageIds {
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | deprecated  | false   |
- *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
  */
@@ -339,7 +326,6 @@ namespace NoUnusedPlaceholders {
  *  | type        | suggestion |
  *  | deprecated  | false      |
  *  | fixable     | code       |
- *  | category    | Rules      |
  *  | recommended | true       |
  *  ```
  */
@@ -358,7 +344,6 @@ namespace NoUselessTokenRange {
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | deprecated  | false   |
- *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
  */
@@ -377,7 +362,6 @@ namespace PreferMessageIds {
  *  | type        | suggestion |
  *  | deprecated  | false      |
  *  | fixable     | code       |
- *  | category    | Rules      |
  *  | recommended | true       |
  *  ```
  */
@@ -396,7 +380,6 @@ namespace PreferObjectRule {
  *  | type        | suggestion |
  *  | deprecated  | false      |
  *  | fixable     | code       |
- *  | category    | Tests      |
  *  | recommended | true       |
  *  ```
  */
@@ -414,7 +397,6 @@ namespace PreferOutputNull {
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | deprecated  | false      |
- *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
  */
@@ -432,7 +414,6 @@ namespace PreferPlaceholders {
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | deprecated  | false      |
- *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
  */
@@ -450,7 +431,6 @@ namespace PreferReplaceText {
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | deprecated  | false      |
- *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
  */
@@ -487,7 +467,6 @@ namespace ReportMessageFormat {
  *  | type        | suggestion |
  *  | deprecated  | false      |
  *  | fixable     | code       |
- *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
  */
@@ -506,7 +485,6 @@ namespace RequireMetaDefaultOptions {
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | deprecated  | false      |
- *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
  */
@@ -555,7 +533,6 @@ namespace RequireMetaDocsDescription {
  *  | type           | suggestion |
  *  | deprecated     | false      |
  *  | hasSuggestions | true       |
- *  | category       | Rules      |
  *  | recommended    | false      |
  *  ```
  */
@@ -601,7 +578,6 @@ namespace RequireMetaDocsRecommended {
  *  | type        | suggestion |
  *  | deprecated  | false      |
  *  | fixable     | code       |
- *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
  */
@@ -649,7 +625,6 @@ namespace RequireMetaDocsUrl {
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | deprecated  | false   |
- *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
  */
@@ -700,7 +675,6 @@ namespace RequireMetaFixable {
  *  | type        | problem |
  *  | deprecated  | false   |
  *  | fixable     | code    |
- *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
  */
@@ -718,7 +692,6 @@ namespace RequireMetaHasSuggestions {
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | deprecated  | false      |
- *  | category    | Rules      |
  *  | recommended | false      |
  *  ```
  */
@@ -737,7 +710,6 @@ namespace RequireMetaSchemaDescription {
  *  | type           | suggestion |
  *  | deprecated     | false      |
  *  | hasSuggestions | true       |
- *  | category       | Rules      |
  *  | recommended    | true       |
  *  ```
  */
@@ -785,7 +757,6 @@ namespace RequireMetaSchema {
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | deprecated  | false   |
- *  | category    | Rules   |
  *  | recommended | true    |
  *  ```
  */
@@ -804,7 +775,6 @@ namespace RequireMetaType {
  *  | type        | suggestion |
  *  | deprecated  | false      |
  *  | fixable     | code       |
- *  | category    | Tests      |
  *  | recommended | false      |
  *  ```
  */
@@ -844,7 +814,6 @@ namespace TestCasePropertyOrdering {
  *  | type        | suggestion |
  *  | deprecated  | false      |
  *  | fixable     | code       |
- *  | category    | Tests      |
  *  | recommended | false      |
  *  ```
  */

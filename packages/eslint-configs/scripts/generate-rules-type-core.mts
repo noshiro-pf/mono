@@ -53,14 +53,13 @@ const metaToString = (meta: DeepReadonly<Rule.RuleModule['meta']>): string => {
 
   if (docs === undefined) return '';
 
-  const { description, recommended, category, url } = docs;
+  const { description, recommended, url } = docs;
 
   const keyValue: DeepReadonly<[string, boolean | string | undefined][]> = [
     ['type', type],
     ['deprecated', isDeprecated(deprecated)],
     ['fixable', fixable],
     ['hasSuggestions', hasSuggestions],
-    ['category', category],
     ['recommended', recommended],
     [
       'requiresTypeChecking',

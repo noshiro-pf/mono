@@ -18,7 +18,6 @@ type SpreadOptionsIfIsArray<
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
  *  | deprecated           | false       |
- *  | category             | Currying    |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -694,13 +693,12 @@ namespace FunctionalParameters {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/immutable-data.md
  *
  *  ```md
- *  | key                  | value        |
- *  | :------------------- | :----------- |
- *  | type                 | suggestion   |
- *  | deprecated           | false        |
- *  | category             | No Mutations |
- *  | recommended          | recommended  |
- *  | requiresTypeChecking | true         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace ImmutableData {
@@ -1338,13 +1336,12 @@ namespace ImmutableData {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-classes.md
  *
  *  ```md
- *  | key                  | value              |
- *  | :------------------- | :----------------- |
- *  | type                 | suggestion         |
- *  | deprecated           | false              |
- *  | category             | No Other Paradigms |
- *  | recommended          | recommended        |
- *  | requiresTypeChecking | false              |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoClasses {
@@ -1397,13 +1394,12 @@ namespace NoClasses {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-class-inheritance.md
  *
  *  ```md
- *  | key                  | value              |
- *  | :------------------- | :----------------- |
- *  | type                 | suggestion         |
- *  | deprecated           | false              |
- *  | category             | No Other Paradigms |
- *  | recommended          | recommended        |
- *  | requiresTypeChecking | false              |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoClassInheritance {
@@ -1456,13 +1452,12 @@ namespace NoClassInheritance {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-conditional-statements.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | deprecated           | false         |
- *  | category             | No Statements |
- *  | recommended          | recommended   |
- *  | requiresTypeChecking | true          |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace NoConditionalStatements {
@@ -1509,13 +1504,12 @@ namespace NoConditionalStatements {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-expression-statements.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | deprecated           | false         |
- *  | category             | No Statements |
- *  | recommended          | recommended   |
- *  | requiresTypeChecking | true          |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace NoExpressionStatements {
@@ -1566,13 +1560,12 @@ namespace NoExpressionStatements {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-let.md
  *
  *  ```md
- *  | key                  | value        |
- *  | :------------------- | :----------- |
- *  | type                 | suggestion   |
- *  | deprecated           | false        |
- *  | category             | No Mutations |
- *  | recommended          | recommended  |
- *  | requiresTypeChecking | false        |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoLet {
@@ -1623,13 +1616,12 @@ namespace NoLet {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-loop-statements.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | deprecated           | false         |
- *  | category             | No Statements |
- *  | recommended          | recommended   |
- *  | requiresTypeChecking | false         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoLoopStatements {
@@ -1642,13 +1634,12 @@ namespace NoLoopStatements {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-mixed-types.md
  *
  *  ```md
- *  | key                  | value              |
- *  | :------------------- | :----------------- |
- *  | type                 | suggestion         |
- *  | deprecated           | false              |
- *  | category             | No Other Paradigms |
- *  | recommended          | recommended        |
- *  | requiresTypeChecking | true               |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace NoMixedTypes {
@@ -1689,13 +1680,12 @@ namespace NoMixedTypes {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-promise-reject.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | deprecated           | false         |
- *  | category             | No Exceptions |
- *  | recommended          | false         |
- *  | requiresTypeChecking | false         |
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | deprecated           | false      |
+ *  | recommended          | false      |
+ *  | requiresTypeChecking | false      |
  *  ```
  */
 namespace NoPromiseReject {
@@ -1708,13 +1698,12 @@ namespace NoPromiseReject {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-return-void.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | deprecated           | false         |
- *  | category             | No Statements |
- *  | recommended          | recommended   |
- *  | requiresTypeChecking | true          |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace NoReturnVoid {
@@ -1759,13 +1748,12 @@ namespace NoReturnVoid {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-this-expressions.md
  *
  *  ```md
- *  | key                  | value              |
- *  | :------------------- | :----------------- |
- *  | type                 | suggestion         |
- *  | deprecated           | false              |
- *  | category             | No Other Paradigms |
- *  | recommended          | recommended        |
- *  | requiresTypeChecking | false              |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoThisExpressions {
@@ -1778,13 +1766,12 @@ namespace NoThisExpressions {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-throw-statements.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | deprecated           | false         |
- *  | category             | No Exceptions |
- *  | recommended          | recommended   |
- *  | requiresTypeChecking | false         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoThrowStatements {
@@ -1821,13 +1808,12 @@ namespace NoThrowStatements {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-try-statements.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | deprecated           | false         |
- *  | category             | No Exceptions |
- *  | recommended          | recommended   |
- *  | requiresTypeChecking | false         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoTryStatements {
@@ -1868,15 +1854,14 @@ namespace NoTryStatements {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/prefer-immutable-types.md
  *
  *  ```md
- *  | key                  | value        |
- *  | :------------------- | :----------- |
- *  | type                 | suggestion   |
- *  | deprecated           | false        |
- *  | fixable              | code         |
- *  | hasSuggestions       | true         |
- *  | category             | No Mutations |
- *  | recommended          | recommended  |
- *  | requiresTypeChecking | true         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | fixable              | code        |
+ *  | hasSuggestions       | true        |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace PreferImmutableTypes {
@@ -3658,7 +3643,6 @@ namespace PreferImmutableTypes {
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
  *  | deprecated           | false       |
- *  | category             | Stylistic   |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -3698,14 +3682,13 @@ namespace PreferPropertySignatures {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/prefer-readonly-type.md
  *
  *  ```md
- *  | key                  | value        |
- *  | :------------------- | :----------- |
- *  | type                 | suggestion   |
- *  | deprecated           | true         |
- *  | fixable              | code         |
- *  | category             | No Mutations |
- *  | recommended          | recommended  |
- *  | requiresTypeChecking | true         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | true        |
+ *  | fixable              | code        |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace PreferReadonlyType {
@@ -3774,7 +3757,6 @@ namespace PreferReadonlyType {
  *  | type                 | suggestion  |
  *  | deprecated           | false       |
  *  | hasSuggestions       | true        |
- *  | category             | Stylistic   |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -3818,7 +3800,6 @@ namespace PreferTacit {
  *  | type                 | suggestion  |
  *  | deprecated           | false       |
  *  | fixable              | code        |
- *  | category             | Stylistic   |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -3853,15 +3834,14 @@ namespace ReadonlyType {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/type-declaration-immutability.md
  *
  *  ```md
- *  | key                  | value        |
- *  | :------------------- | :----------- |
- *  | type                 | suggestion   |
- *  | deprecated           | false        |
- *  | fixable              | code         |
- *  | hasSuggestions       | true         |
- *  | category             | No Mutations |
- *  | recommended          | recommended  |
- *  | requiresTypeChecking | true         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | fixable              | code        |
+ *  | hasSuggestions       | true        |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace TypeDeclarationImmutability {

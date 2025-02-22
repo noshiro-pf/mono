@@ -238,7 +238,7 @@ export const createNoUnsafeAssignmentRule =
       // TODO fix this copypasta between YieldExpression and ReturnStatement
 
       YieldExpression: (node): void => {
-        if (node.argument === undefined) {
+        if (node.argument === null) {
           return;
         }
 
@@ -257,7 +257,7 @@ export const createNoUnsafeAssignmentRule =
         const sourceType = checker.getTypeAtLocation(tsNode.expression);
 
         const arrayMethodCallSafety = isSafeAssignmentFromArrayMethod(
-          node.argument ?? undefined,
+          node.argument,
           destinationType,
           sourceType,
         );
@@ -272,7 +272,7 @@ export const createNoUnsafeAssignmentRule =
             checker,
             destinationType,
             sourceType,
-            node.argument ?? undefined,
+            node.argument,
           ) === 'unsafe'
         ) {
           context.report({
