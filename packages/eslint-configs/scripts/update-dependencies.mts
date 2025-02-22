@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { castMutable, isRecord, toThisDir } from '@noshiro/mono-utils';
 import 'zx/globals';
-import { generateRulesTypeMain } from './generate-rules-type-main.mjs';
+import { generateRulesType } from './generate-rules-type.mjs';
 
 const thisDir = toThisDir(import.meta.url);
 const monoRootDir = path.resolve(thisDir, '../../..');
@@ -90,7 +90,7 @@ const main = async (): Promise<void> => {
   cd(eslintDir);
 
   echo`${eslintDir}: generating rules type`;
-  await generateRulesTypeMain();
+  await generateRulesType();
 
   cd(strictTsLibSourceDir);
   {
