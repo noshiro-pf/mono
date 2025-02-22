@@ -19,49 +19,66 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
     const { formState, displayNameFormIntent, enterButtonDisabled } =
       useObservableValue(UpdateDisplayNamePageStore.state);
 
+    const body = useMemo(
+      () => (
+        <div
+          css={css`
+            width: 300px;
+            height: 80px;
+          `}
+        >
+          <FormGroup
+            helperText={formState.displayName.error}
+            intent={displayNameFormIntent}
+            label={newDisplayNameInputLabel}
+          >
+            <BpInput
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus={true}
+              disabled={formState.isWaitingResponse}
+              intent={displayNameFormIntent}
+              type={'text'}
+              value={formState.displayName.inputValue}
+              onValueChange={UpdateDisplayNamePageStore.inputDisplayNameHandler}
+            />
+          </FormGroup>
+        </div>
+      ),
+      [
+        displayNameFormIntent,
+        formState.displayName.error,
+        formState.displayName.inputValue,
+        formState.isWaitingResponse,
+      ],
+    );
+
+    const submitButton = useMemo(
+      () => (
+        <Button
+          disabled={enterButtonDisabled}
+          intent={'primary'}
+          loading={formState.isWaitingResponse}
+          onClick={UpdateDisplayNamePageStore.enterClickHandler}
+        >
+          {dc.button.update}
+        </Button>
+      ),
+      [enterButtonDisabled, formState.isWaitingResponse],
+    );
+
     return (
       <UpdateUserInfoDialogTemplate
-        body={
-          <div
-            css={css`
-              width: 300px;
-              height: 80px;
-            `}
-          >
-            <FormGroup
-              helperText={formState.displayName.error}
-              intent={displayNameFormIntent}
-              label={<Label>{dc.updateDisplayName.newDisplayName}</Label>}
-            >
-              <BpInput
-                // eslint-disable-next-line jsx-a11y/no-autofocus
-                autoFocus={true}
-                disabled={formState.isWaitingResponse}
-                intent={displayNameFormIntent}
-                type={'text'}
-                value={formState.displayName.inputValue}
-                onValueChange={
-                  UpdateDisplayNamePageStore.inputDisplayNameHandler
-                }
-              />
-            </FormGroup>
-          </div>
-        }
+        body={body}
         closeDialog={UpdateUserInfoDialogStore.closeDialog}
         dialogIsOpen={dialogIsOpen}
         isWaitingResponse={formState.isWaitingResponse}
-        submitButton={
-          <Button
-            disabled={enterButtonDisabled}
-            intent={'primary'}
-            loading={formState.isWaitingResponse}
-            onClick={UpdateDisplayNamePageStore.enterClickHandler}
-          >
-            {dc.button.update}
-          </Button>
-        }
+        submitButton={submitButton}
         title={dc.updateDisplayName.title}
       />
     );
   },
+);
+
+const newDisplayNameInputLabel = (
+  <Label>{dc.updateDisplayName.newDisplayName}</Label>
 );

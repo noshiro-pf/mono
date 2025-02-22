@@ -32,6 +32,44 @@ export const NavBar = memoNamed('NavBar', () => {
 
   const forNonLoggedInUserDialogState = useBoolState(false);
 
+  const popoverContent = useMemo(
+    () => (
+      <Menu>
+        <MenuItem text={dc.auth.menu.accountSettings}>
+          <MenuItem
+            text={dc.auth.menu.changeDisplayName}
+            onClick={UpdateUserInfoDialogStore.changeUsername}
+          />
+          {passwordProviderIncluded ? (
+            <>
+              <MenuItem
+                text={dc.auth.menu.changeEmail}
+                onClick={UpdateUserInfoDialogStore.changeEmail}
+              />
+              <MenuItem
+                text={dc.auth.menu.changePassword}
+                onClick={UpdateUserInfoDialogStore.changePassword}
+              />
+              <MenuItem
+                intent={'danger'}
+                text={dc.auth.menu.deleteAccount}
+                onClick={UpdateUserInfoDialogStore.deleteAccount}
+              />
+            </>
+          ) : (
+            <MenuItem
+              intent={'danger'}
+              text={dc.auth.menu.deleteAccount}
+              onClick={UpdateUserInfoDialogStore.deleteAccountCreatedWithGoogle}
+            />
+          )}
+        </MenuItem>
+        <MenuItem text={dc.auth.menu.signOut} onClick={Auth.signOutClick} />
+      </Menu>
+    ),
+    [passwordProviderIncluded],
+  );
+
   return (
     <div
       css={css`
@@ -97,45 +135,7 @@ export const NavBar = memoNamed('NavBar', () => {
               <Item>
                 <span>{dc.auth.userName.prefix}</span>
                 <Popover
-                  content={
-                    <Menu>
-                      <MenuItem text={dc.auth.menu.accountSettings}>
-                        <MenuItem
-                          text={dc.auth.menu.changeDisplayName}
-                          onClick={UpdateUserInfoDialogStore.changeUsername}
-                        />
-                        {passwordProviderIncluded ? (
-                          <>
-                            <MenuItem
-                              text={dc.auth.menu.changeEmail}
-                              onClick={UpdateUserInfoDialogStore.changeEmail}
-                            />
-                            <MenuItem
-                              text={dc.auth.menu.changePassword}
-                              onClick={UpdateUserInfoDialogStore.changePassword}
-                            />
-                            <MenuItem
-                              intent={'danger'}
-                              text={dc.auth.menu.deleteAccount}
-                              onClick={UpdateUserInfoDialogStore.deleteAccount}
-                            />
-                          </>
-                        ) : (
-                          <MenuItem
-                            intent={'danger'}
-                            text={dc.auth.menu.deleteAccount}
-                            onClick={
-                              UpdateUserInfoDialogStore.deleteAccountCreatedWithGoogle
-                            }
-                          />
-                        )}
-                      </MenuItem>
-                      <MenuItem
-                        text={dc.auth.menu.signOut}
-                        onClick={Auth.signOutClick}
-                      />
-                    </Menu>
-                  }
+                  content={popoverContent}
                   minimal={true}
                   modifiers={popoverModifiers}
                   position={'bottom-left'}
@@ -177,7 +177,7 @@ export const NavBar = memoNamed('NavBar', () => {
           <Item>
             <AnchorButton
               href={feedbackUrl}
-              icon={<Icon color={'white'} icon={'send-message'} />}
+              icon={sendFeedbackIcon}
               minimal={true}
               rel={'noopener noreferrer'}
               target={'_blank'}
@@ -188,7 +188,7 @@ export const NavBar = memoNamed('NavBar', () => {
           <Item>
             <AnchorButton
               href={aboutThisAppUrl}
-              icon={<Icon color={'white'} icon={'help'} />}
+              icon={helpIcon}
               minimal={true}
               rel={'noopener noreferrer'}
               target={'_blank'}
@@ -240,3 +240,7 @@ const ItemAnchor = styled(Anchor)`
     background-color: rgba(255, 255, 255, 0.15);
   }
 `;
+
+const sendFeedbackIcon = <Icon color={'white'} icon={'send-message'} />;
+
+const helpIcon = <Icon color={'white'} icon={'help'} />;

@@ -33,22 +33,27 @@ export const SetTimesPopover = memoNamed<Props>(
       [onSetTimesSubmit, handleClose],
     );
 
+    const popoverContent = useMemo(
+      () => (
+        <SetTimesPopoverContent
+          datetimeSpecification={datetimeSpecification}
+          initialValue={initialValue}
+          onCancelClick={handleClose}
+          onOkClick={onOkClick}
+        />
+      ),
+      [datetimeSpecification, handleClose, initialValue, onOkClick],
+    );
+
     return (
       <Popover
         canEscapeKeyClose={true}
-        content={
-          <SetTimesPopoverContent
-            datetimeSpecification={datetimeSpecification}
-            initialValue={initialValue}
-            onCancelClick={handleClose}
-            onOkClick={onOkClick}
-          />
-        }
+        content={popoverContent}
         isOpen={isOpen}
         onClose={handleClose}
       >
         <Button
-          intent='success'
+          intent={'success'}
           text={dc.setTimesAtOneTime}
           onClick={handleOpen}
         />

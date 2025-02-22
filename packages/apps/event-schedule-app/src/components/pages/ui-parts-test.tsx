@@ -75,27 +75,31 @@ export const UiPartsTest = memoNamed('UiPartsTest', () => {
         <TextArea fill={true} value={'value'} />
       </PadWrapper>
       <PadWrapper>
-        <Button icon='refresh' rightIcon={'duplicate'}>
+        <Button icon={'refresh'} rightIcon={'duplicate'}>
           {'default'}
         </Button>
       </PadWrapper>
       <PadWrapper>
-        <Button intent='primary'>{'primary'}</Button>
+        <Button intent={'primary'}>{'primary'}</Button>
       </PadWrapper>
       <PadWrapper>
-        <Button intent='success'>{'success'}</Button>
+        <Button intent={'success'}>{'success'}</Button>
       </PadWrapper>
       <PadWrapper>
-        <Button intent='warning'>{'warning'}</Button>
+        <Button intent={'warning'}>{'warning'}</Button>
       </PadWrapper>
       <PadWrapper>
-        <Button intent='danger'>{'danger'}</Button>
+        <Button intent={'danger'}>{'danger'}</Button>
       </PadWrapper>
       <PadWrapper>
-        <Button intent='none'>{'none'}</Button>
+        <Button intent={'none'}>{'none'}</Button>
       </PadWrapper>
       <PadWrapper>
-        <BpTimePicker time={{ hours: 12, minutes: 34 }} onTimeChange={clog} />
+        <BpTimePicker
+          // eslint-disable-next-line react-perf/jsx-no-new-object-as-prop
+          time={{ hours: 12, minutes: 34 }}
+          onTimeChange={clog}
+        />
       </PadWrapper>
       <PadWrapper>
         <BpSelect options={options} onValueChange={noop} />
@@ -103,6 +107,7 @@ export const UiPartsTest = memoNamed('UiPartsTest', () => {
       <PadWrapper>
         <BpSwitch
           checked={bpSwitchState}
+          // eslint-disable-next-line react-perf/jsx-no-jsx-as-prop
           labelElement={<strong>{'switch'}</strong>}
           onToggle={onBpSwitchChangeHandler}
         />

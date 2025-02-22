@@ -1,5 +1,22 @@
 import styled from '@emotion/styled';
 import { memoNamed } from '@noshiro/react-utils';
+import { useMemo } from 'react';
+
+type Props = Readonly<{
+  direction: 'column' | 'row';
+}>;
+
+export const CenteringWrapper = memoNamed<Props>(
+  'CenteringWrapper',
+  (props) => {
+    const style = useMemo(
+      () => ({ flexDirection: props.direction }),
+      [props.direction],
+    );
+
+    return <CenteringWrapperDiv style={style} />;
+  },
+);
 
 const CenteringWrapperDiv = styled.div`
   width: 100%;
@@ -8,12 +25,3 @@ const CenteringWrapperDiv = styled.div`
   align-items: center;
   justify-content: center;
 `;
-
-type Props = Readonly<{
-  direction: 'column' | 'row';
-}>;
-
-export const CenteringWrapper = memoNamed<Props>(
-  'CenteringWrapper',
-  (props) => <CenteringWrapperDiv style={{ flexDirection: props.direction }} />,
-);
