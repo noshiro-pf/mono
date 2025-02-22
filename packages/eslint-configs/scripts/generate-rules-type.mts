@@ -112,7 +112,7 @@ const lintFix = async (): Promise<
 > => {
   const targetFiles: readonly string[] = await glob(`${outDir}/*.mts`);
 
-  const result = await $`ESLINT_USE_FLAT_CONFIG=true yarn eslint ${[
+  const result = await $`TIMING=1 eslint ${[
     '--no-ignore',
     '--fix',
     '--config',
@@ -129,7 +129,7 @@ const lintFix = async (): Promise<
 const prettier = async (): Promise<
   Readonly<{ type: 'error'; error: unknown } | { type: 'ok' }>
 > => {
-  const result = await $`yarn prettier ${[
+  const result = await $`prettier ${[
     // '--cache --cache-strategy content',
     `--config`,
     prettierrcPath,

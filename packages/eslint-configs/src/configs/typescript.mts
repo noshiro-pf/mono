@@ -27,10 +27,9 @@ export const eslintFlatConfigForTypeScript = ({
   ...eslintFlatConfigForTypeScriptWithoutRules({
     tsconfigFileName,
     tsconfigRootDir,
-    files,
   }),
   {
-    files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
+    files: files ?? ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
     rules: {
       ...eslintArrayFuncRules,
       ...eslintFunctionalRules,
