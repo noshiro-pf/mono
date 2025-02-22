@@ -49,7 +49,7 @@
     "@types/eslint": "9.6.1",
     "@typescript-eslint/eslint-plugin": "8.24.1",
     "@typescript-eslint/parser": "8.24.1",
-    "eslint": "9.20.1",
+    "eslint": "9.21.0",
     "eslint-plugin-functional": "7.1.0"
   },
   "wireit": {

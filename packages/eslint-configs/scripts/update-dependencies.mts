@@ -97,7 +97,7 @@ const main = async (): Promise<void> => {
   cd(monoRootDir);
 
   echo`yarn install`;
-  await $`yarn`;
+  await $`yarn install`;
 
   cd(eslintDir);
 
@@ -124,7 +124,7 @@ const main = async (): Promise<void> => {
 
   cd(monoRootDir);
 
-  await $`yarn`;
+  await $`yarn install`;
 
   await $`yarn fmt:diff`;
 };
