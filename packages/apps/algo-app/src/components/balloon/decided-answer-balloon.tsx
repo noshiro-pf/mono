@@ -77,38 +77,44 @@ export const DecidedAnswerBalloon = memoNamed<Props>(
         </Balloon>
 
         <SymbolSvg
-          fill='none'
+          fill={'none'}
           height={symbolSize}
           style={oStyle}
-          viewBox='0 0 100 100'
+          viewBox={'0 0 100 100'}
           width={symbolSize}
-          xmlns='http://www.w3.org/2000/svg'
+          xmlns={'http://www.w3.org/2000/svg'}
         >
-          <circle cx='50' cy='50' r='45.5' stroke='#FF0000' strokeWidth='9' />
+          <circle
+            cx={'50'}
+            cy={'50'}
+            r={'45.5'}
+            stroke={'#FF0000'}
+            strokeWidth={'9'}
+          />
         </SymbolSvg>
 
         <SymbolSvg
-          fill='none'
+          fill={'none'}
           height={symbolSize}
           style={xStyle}
-          viewBox='0 0 104 104'
+          viewBox={'0 0 104 104'}
           width={symbolSize}
-          xmlns='http://www.w3.org/2000/svg'
+          xmlns={'http://www.w3.org/2000/svg'}
         >
           <rect
-            fill='#FF0000'
-            height='9'
-            transform='rotate(-45 0 96.8735)'
-            width='137'
-            y='96.8735'
+            fill={'#FF0000'}
+            height={'9'}
+            transform={'rotate(-45 0 96.8735)'}
+            width={'137'}
+            y={'96.8735'}
           />
           <rect
-            fill='#FF0000'
-            height='9'
-            transform='rotate(-135 96.9924 103.356)'
-            width='137'
-            x='96.9924'
-            y='103.356'
+            fill={'#FF0000'}
+            height={'9'}
+            transform={'rotate(-135 96.9924 103.356)'}
+            width={'137'}
+            x={'96.9924'}
+            y={'103.356'}
           />
         </SymbolSvg>
       </Wrapper>

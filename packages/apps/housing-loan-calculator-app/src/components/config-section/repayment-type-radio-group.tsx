@@ -29,12 +29,12 @@ export const RepaymentTypeRadioGroup = memoNamed<Props>(
         <Radio
           data-e2e={'radio--principal-equal-payment'}
           label={dict.principalEqualPayment}
-          value='principal-equal-payment'
+          value={'principal-equal-payment'}
         />
         <Radio
           data-e2e={'radio--principal-and-interest-equal-repayment'}
           label={dict.principalAndInterestEqualRepayment}
-          value='principal-and-interest-equal-repayment'
+          value={'principal-and-interest-equal-repayment'}
         />
       </RadioGroup>
     );

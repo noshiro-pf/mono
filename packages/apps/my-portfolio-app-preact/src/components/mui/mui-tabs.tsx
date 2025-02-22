@@ -55,7 +55,7 @@ export const MuiTabs = memoNamed<Props>(
     return (
       <Root>
         <TabsScroller scrollable={scrollable}>
-          <FlexContainer role='tablist'>
+          <FlexContainer role={'tablist'}>
             {labelsWithHandler.map(({ index, label, onClick, onResize }) => (
               <Tab
                 key={index}
@@ -146,9 +146,9 @@ const Tab = memoNamed<{
       <TabStyled
         aria-selected={selected}
         data-e2e={cyId}
-        role='tab'
+        role={'tab'}
         style={style}
-        type='button'
+        type={'button'}
         onClick={onClick}
       >
         {label}
@@ -204,14 +204,17 @@ const TabIndicator = memoNamed<
   }>
 >(
   'TabIndicator',
-  ({ tabWidthAccumulated, tabWidthList, tabIndex, tabWidthPx }) => (
-    <TabIndicatorStyled
-      style={{
+  ({ tabWidthAccumulated, tabWidthList, tabIndex, tabWidthPx }) => {
+    const style = useMemo(
+      () => ({
         left: `${tabWidthAccumulated[tabIndex] ?? 0}px`,
         width: `${tabWidthList[tabIndex] ?? tabWidthPx}px`,
-      }}
-    />
-  ),
+      }),
+      [tabIndex, tabWidthAccumulated, tabWidthList, tabWidthPx],
+    );
+
+    return <TabIndicatorStyled style={style} />;
+  },
 );
 
 const TabIndicatorStyled = styled('span')`

@@ -56,7 +56,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
           <Label>{dc.gamePassword.label}</Label>
           <Input
             disabled={loading}
-            type='text'
+            type={'text'}
             value={password}
             onInput={onPasswordInput}
           />
@@ -70,7 +70,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
           <Label>{dc.username.label}</Label>
           <Input
             disabled={loading}
-            type='text'
+            type={'text'}
             value={username}
             onInput={onUsernameInput}
           />
@@ -78,7 +78,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
         <ButtonWrapper>
           <ButtonPrimary
             disabled={disabled || loading}
-            type='button'
+            type={'button'}
             onClick={onJoinRoomButtonClick}
           >
             {loading ? <Spinner size={20} /> : <span>{dc.button}</span>}

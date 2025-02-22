@@ -164,11 +164,13 @@ export class ErrorBoundary extends Component<Props, State> {
       >
         <NonIdealState
           action={
+            // eslint-disable-next-line react-perf/jsx-no-jsx-as-prop
             <Button onClick={this.handleOpenClick}>
               {isOpen ? dc.hideDetails : dc.showDetails}
             </Button>
           }
           description={
+            // eslint-disable-next-line react-perf/jsx-no-jsx-as-prop
             <div>
               <div>{dc.unexpectedError}</div>
               {openedOnce ? <div>{dc.reloadThisPage}</div> : undefined}
@@ -198,7 +200,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <FormGroup
               helperText={dc.sendReport.description.helperText}
               label={dc.sendReport.description.label}
-              labelFor='description-textarea'
+              labelFor={'description-textarea'}
               labelInfo={dc.sendReport.description.labelInfo}
             >
               <BpTextArea

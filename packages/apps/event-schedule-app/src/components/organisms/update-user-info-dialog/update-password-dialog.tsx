@@ -30,109 +30,151 @@ export const UpdatePasswordDialog = memoNamed<Props>(
       newPasswordIsOpen,
     } = useObservableValue(UpdatePasswordPageStore.state);
 
+    const newPasswordLockButton = useMemo(
+      () => (
+        <LockButton
+          disabled={formState.isWaitingResponse}
+          passwordIsOpen={newPasswordIsOpen}
+          onLockClick={UpdatePasswordPageStore.toggleNewPasswordLock}
+        />
+      ),
+      [formState.isWaitingResponse, newPasswordIsOpen],
+    );
+
+    const oldPasswordInputButton = useMemo(
+      () => (
+        <LockButton
+          disabled={formState.isWaitingResponse}
+          passwordIsOpen={oldPasswordIsOpen}
+          onLockClick={UpdatePasswordPageStore.toggleOldPasswordLock}
+        />
+      ),
+      [formState.isWaitingResponse, oldPasswordIsOpen],
+    );
+
+    const body = useMemo(
+      () => (
+        <div
+          css={css`
+            width: 300px;
+            height: 200px;
+          `}
+        >
+          <FormGroup
+            intent={'none'}
+            label={currentEmailInputLabel}
+            style={hideStyle}
+          >
+            <BpInput
+              autoComplete={'current-email'}
+              disabled={false}
+              intent={'none'}
+              type={'email'}
+              value={currentEmail ?? ''}
+              onValueChange={noop}
+            />
+          </FormGroup>
+
+          <FormGroup
+            helperText={formState.oldPassword.error}
+            intent={oldPasswordFormIntent}
+            label={oldPasswordInputLabel}
+          >
+            <BpInput
+              autoComplete={'current-password'}
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus={true}
+              disabled={formState.isWaitingResponse}
+              intent={oldPasswordFormIntent}
+              rightElement={oldPasswordInputButton}
+              type={oldPasswordIsOpen ? 'text' : 'password'}
+              value={formState.oldPassword.inputValue}
+              onValueChange={UpdatePasswordPageStore.inputOldPasswordHandler}
+            />
+          </FormGroup>
+
+          <FormGroup
+            helperText={formState.newPassword.password.error}
+            intent={newPasswordFormIntent}
+            label={newPasswordInputLabel}
+          >
+            <BpInput
+              autoComplete={'new-password'}
+              disabled={formState.isWaitingResponse}
+              intent={newPasswordFormIntent}
+              type={'password'}
+              value={formState.newPassword.password.inputValue}
+              onValueChange={UpdatePasswordPageStore.inputNewPasswordHandler}
+            />
+          </FormGroup>
+
+          <FormGroup
+            helperText={formState.newPassword.passwordConfirmation.error}
+            intent={newPasswordFormIntent}
+            label={verifyNewPasswordInputLabel}
+          >
+            <BpInput
+              autoComplete={'new-password'}
+              disabled={formState.isWaitingResponse}
+              intent={newPasswordFormIntent}
+              rightElement={newPasswordLockButton}
+              type={newPasswordIsOpen ? 'text' : 'password'}
+              value={formState.newPassword.passwordConfirmation.inputValue}
+              onValueChange={
+                UpdatePasswordPageStore.inputNewPasswordConfirmationHandler
+              }
+            />
+          </FormGroup>
+        </div>
+      ),
+      [
+        currentEmail,
+        formState.isWaitingResponse,
+        formState.newPassword.password.error,
+        formState.newPassword.password.inputValue,
+        formState.newPassword.passwordConfirmation.error,
+        formState.newPassword.passwordConfirmation.inputValue,
+        formState.oldPassword.error,
+        formState.oldPassword.inputValue,
+        newPasswordFormIntent,
+        newPasswordIsOpen,
+        newPasswordLockButton,
+        oldPasswordFormIntent,
+        oldPasswordInputButton,
+        oldPasswordIsOpen,
+      ],
+    );
+
+    const submitButton = useMemo(
+      () => (
+        <Button
+          disabled={enterButtonDisabled}
+          intent={'primary'}
+          loading={formState.isWaitingResponse}
+          onClick={UpdatePasswordPageStore.enterClickHandler}
+        >
+          {dc.button.update}
+        </Button>
+      ),
+      [enterButtonDisabled, formState.isWaitingResponse],
+    );
+
     return (
       <UpdateUserInfoDialogTemplate
-        body={
-          <div
-            css={css`
-              width: 300px;
-              height: 200px;
-            `}
-          >
-            <FormGroup
-              intent={'none'}
-              label={<Label>{dc.updatePassword.currentEmail}</Label>}
-              style={hideStyle}
-            >
-              <BpInput
-                autoComplete={'username'}
-                disabled={false}
-                intent={'none'}
-                type={'email'}
-                value={currentEmail ?? ''}
-                onValueChange={noop}
-              />
-            </FormGroup>
-
-            <FormGroup
-              helperText={formState.oldPassword.error}
-              intent={oldPasswordFormIntent}
-              label={<Label>{dc.updatePassword.oldPassword}</Label>}
-            >
-              <BpInput
-                autoComplete={'current-password'}
-                // eslint-disable-next-line jsx-a11y/no-autofocus
-                autoFocus={true}
-                disabled={formState.isWaitingResponse}
-                intent={oldPasswordFormIntent}
-                rightElement={
-                  <LockButton
-                    disabled={formState.isWaitingResponse}
-                    passwordIsOpen={oldPasswordIsOpen}
-                    onLockClick={UpdatePasswordPageStore.toggleOldPasswordLock}
-                  />
-                }
-                type={oldPasswordIsOpen ? 'text' : 'password'}
-                value={formState.oldPassword.inputValue}
-                onValueChange={UpdatePasswordPageStore.inputOldPasswordHandler}
-              />
-            </FormGroup>
-
-            <FormGroup
-              helperText={formState.newPassword.password.error}
-              intent={newPasswordFormIntent}
-              label={<Label>{dc.updatePassword.newPassword}</Label>}
-            >
-              <BpInput
-                autoComplete={'new-password'}
-                disabled={formState.isWaitingResponse}
-                intent={newPasswordFormIntent}
-                type={'password'}
-                value={formState.newPassword.password.inputValue}
-                onValueChange={UpdatePasswordPageStore.inputNewPasswordHandler}
-              />
-            </FormGroup>
-
-            <FormGroup
-              helperText={formState.newPassword.passwordConfirmation.error}
-              intent={newPasswordFormIntent}
-              label={<Label>{dc.updatePassword.verifyNewPassword}</Label>}
-            >
-              <BpInput
-                autoComplete={'new-password'}
-                disabled={formState.isWaitingResponse}
-                intent={newPasswordFormIntent}
-                rightElement={
-                  <LockButton
-                    disabled={formState.isWaitingResponse}
-                    passwordIsOpen={newPasswordIsOpen}
-                    onLockClick={UpdatePasswordPageStore.toggleNewPasswordLock}
-                  />
-                }
-                type={newPasswordIsOpen ? 'text' : 'password'}
-                value={formState.newPassword.passwordConfirmation.inputValue}
-                onValueChange={
-                  UpdatePasswordPageStore.inputNewPasswordConfirmationHandler
-                }
-              />
-            </FormGroup>
-          </div>
-        }
+        body={body}
         closeDialog={UpdateUserInfoDialogStore.closeDialog}
         dialogIsOpen={dialogIsOpen}
         isWaitingResponse={formState.isWaitingResponse}
-        submitButton={
-          <Button
-            disabled={enterButtonDisabled}
-            intent={'primary'}
-            loading={formState.isWaitingResponse}
-            onClick={UpdatePasswordPageStore.enterClickHandler}
-          >
-            {dc.button.update}
-          </Button>
-        }
+        submitButton={submitButton}
         title={dc.updatePassword.title}
       />
     );
   },
+);
+
+const oldPasswordInputLabel = <Label>{dc.updatePassword.oldPassword}</Label>;
+const currentEmailInputLabel = <Label>{dc.updatePassword.currentEmail}</Label>;
+const newPasswordInputLabel = <Label>{dc.updatePassword.newPassword}</Label>;
+const verifyNewPasswordInputLabel = (
+  <Label>{dc.updatePassword.verifyNewPassword}</Label>
 );

@@ -151,7 +151,7 @@ export const SetTimesPopoverContent = memoNamed<Props>(
               </div>
               <Button
                 icon={'automatic-updates'}
-                intent='none'
+                intent={'none'}
                 minimal={true}
                 text={dc.setTimesAtOneTimeForDay.flipAll}
                 onClick={flipAll}
@@ -161,12 +161,12 @@ export const SetTimesPopoverContent = memoNamed<Props>(
         </div>
         <ButtonsWrapperAlignEnd>
           <Button
-            intent='none'
+            intent={'none'}
             text={dict.common.buttonText.cancel}
             onClick={onCancelClick}
           />
           <Button
-            intent='primary'
+            intent={'primary'}
             text={dict.common.buttonText.decide}
             onClick={onOkClickHandler}
           />

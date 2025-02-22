@@ -59,7 +59,7 @@ export const Spinner = memoNamed<Props>('Spinner', ({ size: _size, value }) => {
   // - SPINNER_ANIMATION isolates svg from parent display and is always centered inside root element.
   return (
     // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
-    <Root role='progressbar'>
+    <Root role={'progressbar'}>
       <SpinnerAnimation style={animationStyle}>
         <svg
           height={size}

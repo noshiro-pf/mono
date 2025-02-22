@@ -29,9 +29,9 @@ export const WeekdaysHeader = memoNamed<Props>(
 
     return (
       // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
-      <DatePickerWeekdaysStyled role='rowgroup'>
+      <DatePickerWeekdaysStyled role={'rowgroup'}>
         {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role */}
-        <DatePickerWeekdaysRowStyled role='row'>
+        <DatePickerWeekdaysRowStyled role={'row'}>
           {listWithHandler.map(({ name: title, abbr, onClickHandler }) => (
             <HeaderCell
               key={title}

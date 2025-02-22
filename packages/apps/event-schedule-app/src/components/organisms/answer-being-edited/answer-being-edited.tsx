@@ -85,25 +85,29 @@ export const AnswerBeingEdited = memoNamed<Props>(
 
     const checkboxesState = AnswerPageStore.useCheckboxesState();
 
+    const helperText = useMemo(
+      () =>
+        showUserNameError ? (
+          theNameIsAlreadyUsed ? (
+            dc.theNameIsAlreadyUsed
+          ) : (
+            dc.nameIsRequired
+          )
+        ) : (
+          <div
+            css={css`
+              height: 1rem;
+            `}
+          />
+        ),
+      [showUserNameError, theNameIsAlreadyUsed],
+    );
+
     return (
       <>
         <WidthRestrictedInputWrapper>
           <FormGroup
-            helperText={
-              showUserNameError ? (
-                theNameIsAlreadyUsed ? (
-                  dc.theNameIsAlreadyUsed
-                ) : (
-                  dc.nameIsRequired
-                )
-              ) : (
-                <div
-                  css={css`
-                    height: 1rem;
-                  `}
-                />
-              )
-            }
+            helperText={helperText}
             intent={showUserNameError ? 'danger' : 'primary'}
             label={dc.yourName}
           >
@@ -352,7 +356,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
         <ButtonsWrapperAlignEnd data-e2e={'buttons'}>
           <ButtonNowrapStyled
             disabled={submitButtonIsLoading}
-            intent='none'
+            intent={'none'}
             text={dict.common.buttonText.cancel}
             onClick={AnswerPageStore.onCancelEditingAnswer}
           />

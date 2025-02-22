@@ -51,7 +51,7 @@ export const MultipleDatePicker = memoNamed<Props>(
     return (
       <div>
         <DatePickerStyled>
-          <DayPickerStyled lang='en'>
+          <DayPickerStyled lang={'en'}>
             <div
               css={css`
                 display: flex;
@@ -69,10 +69,10 @@ export const MultipleDatePicker = memoNamed<Props>(
                 onPrevMonthClick={onPrevMonthClick}
                 onYearChange={onYearChange}
               />
-              <DatePickerMonthStyled role='grid'>
+              <DatePickerMonthStyled role={'grid'}>
                 <WeekdaysHeader onClick={onWeekdaysHeaderCellClick} />
                 {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role */}
-                <DatePickerBodyStyled role='rowgroup'>
+                <DatePickerBodyStyled role={'rowgroup'}>
                   {calendarCells.map((week) => (
                     <Week
                       key={week.index}

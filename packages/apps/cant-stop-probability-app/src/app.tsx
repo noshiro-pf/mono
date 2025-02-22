@@ -127,8 +127,8 @@ export const App = memoNamed('App', () => {
       <Navbar>
         <Navbar.Group>
           <Tabs selectedTabId={selectedTabId} onChange={handleTabChange}>
-            <Tab id='table' title='確率表' />
-            <Tab id='deadColumnUI' title='残存列確率' />
+            <Tab id={'table'} title={'確率表'} />
+            <Tab id={'deadColumnUI'} title={'残存列確率'} />
           </Tabs>
         </Navbar.Group>
       </Navbar>

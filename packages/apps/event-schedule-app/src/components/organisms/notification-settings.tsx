@@ -198,7 +198,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
               focus$={focusEmailInput$}
               intent={invalidEmail ? 'danger' : 'primary'}
               placeholder={'sample@gmail.com'}
-              type='email'
+              type={'email'}
               value={notificationSettingsWithEmail.email}
               onValueChange={onEmailChange}
             />

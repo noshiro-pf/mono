@@ -4,5 +4,5 @@ const iconSize = 12;
 
 export const RequiredParticipantIcon = memoNamed(
   'RequiredParticipantIcon',
-  () => <Icon icon='star' intent='primary' size={iconSize} />,
+  () => <Icon icon={'star'} intent={'primary'} size={iconSize} />,
 );

@@ -23,51 +23,68 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
       emailFormIntent,
     } = useObservableValue(DeleteAccountCreatedWithGoogleStore.state);
 
+    const body = useMemo(
+      () => (
+        <div
+          css={css`
+            width: 300px;
+            height: 100px;
+          `}
+        >
+          <FormGroup
+            helperText={formState.error}
+            intent={emailFormIntent}
+            label={verifyEmailInputLabel}
+          >
+            <BpInput
+              // suppress auto complete
+              autoComplete={'new-password'}
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus={true}
+              disabled={isWaitingResponse}
+              intent={emailFormIntent}
+              type={'email'}
+              value={formState.inputValue}
+              onValueChange={
+                DeleteAccountCreatedWithGoogleStore.inputEmailHandler
+              }
+            />
+          </FormGroup>
+        </div>
+      ),
+      [
+        emailFormIntent,
+        formState.error,
+        formState.inputValue,
+        isWaitingResponse,
+      ],
+    );
+
+    const submitButton = useMemo(
+      () => (
+        <Button
+          disabled={enterButtonDisabled}
+          intent={'danger'}
+          loading={isWaitingResponse}
+          onClick={DeleteAccountCreatedWithGoogleStore.enterClickHandler}
+        >
+          {dc.button.deleteAccount}
+        </Button>
+      ),
+      [enterButtonDisabled, isWaitingResponse],
+    );
+
     return (
       <UpdateUserInfoDialogTemplate
-        body={
-          <div
-            css={css`
-              width: 300px;
-              height: 100px;
-            `}
-          >
-            <FormGroup
-              helperText={formState.error}
-              intent={emailFormIntent}
-              label={<Label>{dc.deleteAccount.verifyEmail}</Label>}
-            >
-              <BpInput
-                // suppress auto complete
-                autoComplete={'new-password'}
-                // eslint-disable-next-line jsx-a11y/no-autofocus
-                autoFocus={true}
-                disabled={isWaitingResponse}
-                intent={emailFormIntent}
-                type={'email'}
-                value={formState.inputValue}
-                onValueChange={
-                  DeleteAccountCreatedWithGoogleStore.inputEmailHandler
-                }
-              />
-            </FormGroup>
-          </div>
-        }
+        body={body}
         closeDialog={UpdateUserInfoDialogStore.closeDialog}
         dialogIsOpen={dialogIsOpen}
         isWaitingResponse={isWaitingResponse}
-        submitButton={
-          <Button
-            disabled={enterButtonDisabled}
-            intent={'danger'}
-            loading={isWaitingResponse}
-            onClick={DeleteAccountCreatedWithGoogleStore.enterClickHandler}
-          >
-            {dc.button.deleteAccount}
-          </Button>
-        }
+        submitButton={submitButton}
         title={dc.deleteAccount.title}
       />
     );
   },
 );
+
+const verifyEmailInputLabel = <Label>{dc.deleteAccount.verifyEmail}</Label>;

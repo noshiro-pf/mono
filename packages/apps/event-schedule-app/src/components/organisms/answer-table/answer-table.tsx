@@ -66,7 +66,7 @@ export const AnswerTable = memoNamed<Props>(
       >
         <thead>
           <tr>
-            <th className='sticky horizontal'>
+            <th className={'sticky horizontal'}>
               <TableTopLeftCell>
                 <DatetimeHeaderCell>
                   {tableMinimized || dateStringIsMinimized ? undefined : (
@@ -147,7 +147,7 @@ export const AnswerTable = memoNamed<Props>(
               style,
             }) => (
               <tr key={key} style={style}>
-                <td className='sticky horizontal'>
+                <td className={'sticky horizontal'}>
                   <DatetimeRangeCell
                     datetimeRange={datetimeRange}
                     datetimeSpecification={datetimeSpecification}
@@ -217,7 +217,7 @@ export const AnswerTable = memoNamed<Props>(
 
           {/* コメント行 */}
           <tr>
-            <td className='sticky horizontal'>{dc.comment}</td>
+            <td className={'sticky horizontal'}>{dc.comment}</td>
 
             {/* spacer */}
             <td />

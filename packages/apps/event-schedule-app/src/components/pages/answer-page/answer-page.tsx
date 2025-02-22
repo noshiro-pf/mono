@@ -240,13 +240,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                       addOnBlur={false}
                       addOnPaste={false}
                       leftIcon={'filter-list'}
-                      rightElement={
-                        <Button
-                          icon={'cross'}
-                          minimal={true}
-                          onClick={AnswerFilterAndSortStore.clearTags}
-                        />
-                      }
+                      rightElement={clearTagsButton}
                       tagProps={
                         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
                         tagProps as (
@@ -394,8 +388,8 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               <ButtonsWrapperAlignEnd>
                 <Button
                   data-e2e={'add-answer-button'}
-                  icon='add'
-                  intent='primary'
+                  icon={'add'}
+                  intent={'primary'}
                   text={dc.answers.addAnswer}
                   onClick={AnswerPageStore.onAddAnswerButtonClick}
                 />
@@ -451,6 +445,14 @@ const IconDescriptionRow = memoNamed<
     <td>{answerIcons[iconName].description}</td>
   </tr>
 ));
+
+const clearTagsButton = (
+  <Button
+    icon={'cross'}
+    minimal={true}
+    onClick={AnswerFilterAndSortStore.clearTags}
+  />
+);
 
 const CalendarWrapper = styled.div`
   margin: 10px;

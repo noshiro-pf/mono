@@ -45,7 +45,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
       <DialogWithMaxWidth
         canEscapeKeyClose={false}
         canOutsideClickClose={false}
-        icon='key'
+        icon={'key'}
         isCloseButtonShown={false}
         isOpen={isOpen}
         title={dc.editButtonConfirmDialogTitle}
@@ -62,13 +62,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
                 // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus={true}
                 intent={state.emailFormIntent}
-                rightElement={
-                  <Button
-                    icon={'cross'}
-                    minimal={true}
-                    onClick={ConfirmEmailDialogStore.resetInput}
-                  />
-                }
+                rightElement={resetInputButton}
                 type={'email'}
                 value={state.formState.email.inputValue}
                 onValueChange={ConfirmEmailDialogStore.inputEmailHandler}
@@ -102,3 +96,11 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
 const InputWrapperWithMinHeight = styled('div')`
   min-height: 72px;
 `;
+
+const resetInputButton = (
+  <Button
+    icon={'cross'}
+    minimal={true}
+    onClick={ConfirmEmailDialogStore.resetInput}
+  />
+);

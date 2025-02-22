@@ -3,7 +3,7 @@ import { memoNamed } from '@noshiro/react-utils';
 import { type TinyObservable } from '@noshiro/ts-utils';
 import { isEmailString } from '@noshiro/ts-utils-additional';
 import { useBoolState } from 'better-react-use-state';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { BpInput, type BpInputProps } from './bp-input.js';
 
 export type BpEmailInputProps = BpInputProps &
@@ -58,25 +58,36 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
       [onValueChange, hideErrors],
     );
 
+    const helperText = useMemo(
+      () =>
+        errorsAreHidden || disabled ? undefined : (
+          <div>
+            {isEmailAddressResult ? undefined : (
+              <div>{invalidEmailMessage}</div>
+            )}
+            {otherErrorMessages === undefined
+              ? undefined
+              : showOtherErrorMessages
+                ? otherErrorMessages.map((er, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <div key={index}>{er}</div>
+                  ))
+                : undefined}
+          </div>
+        ),
+      [
+        disabled,
+        errorsAreHidden,
+        invalidEmailMessage,
+        isEmailAddressResult,
+        otherErrorMessages,
+        showOtherErrorMessages,
+      ],
+    );
+
     return (
       <FormGroup
-        helperText={
-          errorsAreHidden || disabled ? undefined : (
-            <div>
-              {isEmailAddressResult ? undefined : (
-                <div>{invalidEmailMessage}</div>
-              )}
-              {otherErrorMessages === undefined
-                ? undefined
-                : showOtherErrorMessages
-                  ? otherErrorMessages.map((er, index) => (
-                      // eslint-disable-next-line react/no-array-index-key
-                      <div key={index}>{er}</div>
-                    ))
-                  : undefined}
-            </div>
-          )
-        }
+        helperText={helperText}
         intent={'danger'}
         label={formGroupLabel}
       >
@@ -88,7 +99,7 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
           disabled={disabled}
           focus$={focus$}
           placeholder={placeholder}
-          type='email'
+          type={'email'}
           value={value}
           onBlur={blurHandler}
           onValueChange={valueChangeHandler}

@@ -52,7 +52,7 @@ export const MainView = memoNamed<Props>(
         <List>
           <ListItem>
             <ListItemAvatar>
-              <Avatar alt='Dice 1' src={DiceIcon} />
+              <Avatar alt={'Dice 1'} src={DiceIcon} />
             </ListItemAvatar>
             <ListItemText>
               <DiceNumber n={diceValue1} opacity={opacity} />
@@ -60,7 +60,7 @@ export const MainView = memoNamed<Props>(
           </ListItem>
           <ListItem>
             <ListItemAvatar>
-              <Avatar alt='Dice 2' src={DiceIcon} />
+              <Avatar alt={'Dice 2'} src={DiceIcon} />
             </ListItemAvatar>
             <ListItemText>
               <DiceNumber n={diceValue2} opacity={opacity} />
@@ -68,7 +68,7 @@ export const MainView = memoNamed<Props>(
           </ListItem>
           <ListItem>
             <ListItemAvatar>
-              <Avatar alt='Sum' src={SumIcon} />
+              <Avatar alt={'Sum'} src={SumIcon} />
             </ListItemAvatar>
             <ListItemText>
               <DiceNumber n={diceValue1 + diceValue2} opacity={opacity} />
@@ -86,7 +86,7 @@ export const MainView = memoNamed<Props>(
             <Button
               color={'primary'}
               data-e2e={'roll-dice-button'}
-              variant='contained'
+              variant={'contained'}
               onClick={rollDices}
             >
               {'Roll dices!!!'}
@@ -97,7 +97,7 @@ export const MainView = memoNamed<Props>(
               color={'secondary'}
               data-e2e={'undo-button'}
               disabled={!undoable}
-              variant='contained'
+              variant={'contained'}
               onClick={undo}
             >
               {'Undo'}
@@ -108,7 +108,7 @@ export const MainView = memoNamed<Props>(
               color={'secondary'}
               data-e2e={'redo-button'}
               disabled={!redoable}
-              variant='contained'
+              variant={'contained'}
               onClick={redo}
             >
               {'Redo'}

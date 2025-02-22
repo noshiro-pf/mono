@@ -37,7 +37,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
         padding: 10px;
       `}
     >
-      <PaperCustomized variant='outlined'>
+      <PaperCustomized variant={'outlined'}>
         <AllSliders
           divisionNumber={props.divisionNumber}
           divisionNumberOnChange={props.divisionNumberOnChange}
@@ -50,7 +50,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
         />
       </PaperCustomized>
 
-      <PaperCustomized variant='outlined'>
+      <PaperCustomized variant={'outlined'}>
         <Title>
           {'1. 彩度・明度を固定し色相を横軸としたときの相対輝度分布'}
         </Title>
@@ -59,7 +59,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
         />
       </PaperCustomized>
 
-      <PaperCustomized variant='outlined'>
+      <PaperCustomized variant={'outlined'}>
         <Title>{'2. 色相環から360/n度ずつ選出した場合'}</Title>
         <ColoredDistributionSelected
           colorResult={props.result1_equallySpaced}
@@ -80,7 +80,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
         </Variance>
       </PaperCustomized>
 
-      <PaperCustomized variant='outlined'>
+      <PaperCustomized variant={'outlined'}>
         <Title>{'3-a. 相対輝度の変化量の絶対値の累積分布'}</Title>
         <ColoredDistribution
           accumulatedDistribution={
@@ -89,7 +89,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
         />
       </PaperCustomized>
 
-      <PaperCustomized variant='outlined'>
+      <PaperCustomized variant={'outlined'}>
         <Title>{'3-b. 3-a.の分布の縦軸をn分割した場合の色相'}</Title>
         <ColoredDistributionSelected colorResult={props.result2_weighted} />
         <ColorList
@@ -106,7 +106,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
         </Variance>
       </PaperCustomized>
 
-      <PaperCustomized variant='outlined'>
+      <PaperCustomized variant={'outlined'}>
         <Title>{'4-a. 相対輝度の変化量の絶対値のlogの累積分布'}</Title>
         <ColoredDistribution
           accumulatedDistribution={
@@ -115,7 +115,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
         />
       </PaperCustomized>
 
-      <PaperCustomized variant='outlined'>
+      <PaperCustomized variant={'outlined'}>
         <Title>{'4-b. 4-a.の分布の縦軸をn分割した場合の色相'}</Title>
         <ColoredDistributionSelected colorResult={props.result3_weighted_log} />
         <ColorList
