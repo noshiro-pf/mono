@@ -3,7 +3,6 @@ import {
   eslintFunctionalRules,
   eslintImportsRules,
   eslintPromiseRules,
-  eslintReactPerfRules,
   eslintRules,
   eslintSecurityRules,
   eslintTotalFunctionsRules,
@@ -43,7 +42,6 @@ export const eslintFlatConfigForTypeScript = ({
       ...eslintUnicornRules,
       ...typescriptEslintRules,
       ...eslintTreeShakableRules,
-      ...eslintReactPerfRules,
 
       'import/no-extraneous-dependencies': [
         'error',
