@@ -1,4 +1,3 @@
-node_modules/
 .yarn
 dist
 build
@@ -21,7 +20,6 @@ yarn.lock
 .firebaserc
 hosting.YnVpbGQ.cache
 LICENSE
-*.log
 dotenv-example
 *.svg
 firestore.rules
@@ -34,8 +32,6 @@ firestore.rules
 .vscodeignore
 *.svelte
 packages/utils/syncflow/docs/**/*.js
-.wireit
-*.tsbuildinfo
 
 packages/strict-ts-lib/source/temp/copied
 packages/strict-ts-lib/source/temp/copied-for-diff
