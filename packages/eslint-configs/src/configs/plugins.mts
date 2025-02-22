@@ -103,6 +103,7 @@ export const plugins: Record<
   'react-hooks': eslintPluginReactHooks,
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   'react-refresh': eslintPluginReactRefresh as unknown as Plugin,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'react-perf': eslintPluginReactPerf,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   security: eslintPluginSecurity,

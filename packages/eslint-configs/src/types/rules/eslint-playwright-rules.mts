@@ -14,12 +14,11 @@ type SpreadOptionsIfIsArray<
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/expect-expect.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace ExpectExpect {
@@ -61,12 +60,11 @@ namespace ExpectExpect {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/max-expects.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace MaxExpects {
@@ -104,12 +102,11 @@ namespace MaxExpects {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/max-nested-describe.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | true       |
  *  ```
  */
 namespace MaxNestedDescribe {
@@ -147,13 +144,12 @@ namespace MaxNestedDescribe {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/missing-playwright-await.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | fixable     | code            |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | true    |
  *  ```
  */
 namespace MissingPlaywrightAwait {
@@ -193,12 +189,11 @@ namespace MissingPlaywrightAwait {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-commented-out-tests.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoCommentedOutTests {
@@ -211,12 +206,11 @@ namespace NoCommentedOutTests {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-conditional-expect.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoConditionalExpect {
@@ -229,12 +223,11 @@ namespace NoConditionalExpect {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-conditional-in-test.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoConditionalInTest {
@@ -247,12 +240,11 @@ namespace NoConditionalInTest {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-duplicate-hooks.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoDuplicateHooks {
@@ -265,13 +257,12 @@ namespace NoDuplicateHooks {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-element-handle.md
  *
  *  ```md
- *  | key            | value           |
- *  | :------------- | :-------------- |
- *  | type           | suggestion      |
- *  | deprecated     | false           |
- *  | hasSuggestions | true            |
- *  | category       | Possible Errors |
- *  | recommended    | true            |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  *  ```
  */
 namespace NoElementHandle {
@@ -285,12 +276,11 @@ namespace NoElementHandle {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-eval.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoEval {
@@ -303,13 +293,12 @@ namespace NoEval {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-focused-test.md
  *
  *  ```md
- *  | key            | value           |
- *  | :------------- | :-------------- |
- *  | type           | problem         |
- *  | deprecated     | false           |
- *  | hasSuggestions | true            |
- *  | category       | Possible Errors |
- *  | recommended    | true            |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
  *  ```
  */
 namespace NoFocusedTest {
@@ -322,12 +311,11 @@ namespace NoFocusedTest {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-force-option.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | true       |
  *  ```
  */
 namespace NoForceOption {
@@ -340,12 +328,11 @@ namespace NoForceOption {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-get-by-title.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoGetByTitle {
@@ -358,12 +345,11 @@ namespace NoGetByTitle {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-hooks.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoHooks {
@@ -406,12 +392,11 @@ namespace NoHooks {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-nested-step.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoNestedStep {
@@ -424,12 +409,11 @@ namespace NoNestedStep {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-networkidle.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoNetworkidle {
@@ -442,12 +426,11 @@ namespace NoNetworkidle {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-nth-methods.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoNthMethods {
@@ -460,12 +443,11 @@ namespace NoNthMethods {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-page-pause.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoPagePause {
@@ -478,12 +460,11 @@ namespace NoPagePause {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-raw-locators.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoRawLocators {
@@ -523,12 +504,11 @@ namespace NoRawLocators {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-restricted-matchers.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoRestrictedMatchers {
@@ -563,13 +543,12 @@ namespace NoRestrictedMatchers {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-skipped-test.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | deprecated     | false          |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | true           |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  *  ```
  */
 namespace NoSkippedTest {
@@ -607,13 +586,12 @@ namespace NoSkippedTest {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-slowed-test.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | deprecated     | false          |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | true           |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  *  ```
  */
 namespace NoSlowedTest {
@@ -651,13 +629,12 @@ namespace NoSlowedTest {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-standalone-expect.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoStandaloneExpect {
@@ -670,13 +647,12 @@ namespace NoStandaloneExpect {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-unsafe-references.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | fixable     | code            |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoUnsafeReferences {
@@ -689,13 +665,12 @@ namespace NoUnsafeReferences {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-useless-await.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | fixable     | code            |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoUselessAwait {
@@ -708,13 +683,12 @@ namespace NoUselessAwait {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-useless-not.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoUselessNot {
@@ -727,13 +701,12 @@ namespace NoUselessNot {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-wait-for-selector.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | deprecated     | false          |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | true           |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  *  ```
  */
 namespace NoWaitForSelector {
@@ -746,13 +719,12 @@ namespace NoWaitForSelector {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-wait-for-timeout.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | deprecated     | false          |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | true           |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  *  ```
  */
 namespace NoWaitForTimeout {
@@ -765,13 +737,12 @@ namespace NoWaitForTimeout {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-comparison-matcher.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferComparisonMatcher {
@@ -784,13 +755,12 @@ namespace PreferComparisonMatcher {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-equality-matcher.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | deprecated     | false          |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | false          |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace PreferEqualityMatcher {
@@ -803,12 +773,11 @@ namespace PreferEqualityMatcher {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-hooks-in-order.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferHooksInOrder {
@@ -821,12 +790,11 @@ namespace PreferHooksInOrder {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-hooks-on-top.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferHooksOnTop {
@@ -839,12 +807,11 @@ namespace PreferHooksOnTop {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-locator.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferLocator {
@@ -857,13 +824,12 @@ namespace PreferLocator {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-lowercase-title.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferLowercaseTitle {
@@ -920,13 +886,12 @@ namespace PreferLowercaseTitle {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-native-locators.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferNativeLocators {
@@ -964,14 +929,13 @@ namespace PreferNativeLocators {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-strict-equal.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | deprecated     | false          |
- *  | fixable        | code           |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | false          |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace PreferStrictEqual {
@@ -984,13 +948,12 @@ namespace PreferStrictEqual {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-to-be.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferToBe {
@@ -1003,13 +966,12 @@ namespace PreferToBe {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-to-contain.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferToContain {
@@ -1022,13 +984,12 @@ namespace PreferToContain {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-to-have-count.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferToHaveCount {
@@ -1041,13 +1002,12 @@ namespace PreferToHaveCount {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-to-have-length.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferToHaveLength {
@@ -1060,13 +1020,12 @@ namespace PreferToHaveLength {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-web-first-assertions.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
  *  ```
  */
 namespace PreferWebFirstAssertions {
@@ -1079,12 +1038,11 @@ namespace PreferWebFirstAssertions {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/require-hook.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace RequireHook {
@@ -1142,12 +1100,11 @@ namespace RequireSoftAssertions {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/require-to-throw-message.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace RequireToThrowMessage {
@@ -1160,12 +1117,11 @@ namespace RequireToThrowMessage {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/require-top-level-describe.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace RequireTopLevelDescribe {
@@ -1203,12 +1159,11 @@ namespace RequireTopLevelDescribe {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/valid-describe-callback.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace ValidDescribeCallback {
@@ -1221,12 +1176,11 @@ namespace ValidDescribeCallback {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/valid-expect.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | deprecated  | false           |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace ValidExpect {
@@ -1269,12 +1223,11 @@ namespace ValidExpect {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/valid-expect-in-promise.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | true       |
  *  ```
  */
 namespace ValidExpectInPromise {
@@ -1287,13 +1240,12 @@ namespace ValidExpectInPromise {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/valid-title.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | deprecated  | false          |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
  *  ```
  */
 namespace ValidTitle {
