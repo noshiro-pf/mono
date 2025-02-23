@@ -1,2 +1,2 @@
-export * from './child-process-async.mjs';
+export * from './exec-async.mjs';
 export * from './path-utils.mjs';
