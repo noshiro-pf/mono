@@ -7,11 +7,10 @@ import { type Linter } from 'eslint';
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace RequireStrictMode {
@@ -24,11 +23,10 @@ namespace RequireStrictMode {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoUnsafeTypeAssertion {
@@ -41,11 +39,10 @@ namespace NoUnsafeTypeAssertion {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoUnsafeReadonlyMutableAssignment {
@@ -58,11 +55,10 @@ namespace NoUnsafeReadonlyMutableAssignment {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoUnsafeMutableReadonlyAssignment {
@@ -75,11 +71,10 @@ namespace NoUnsafeMutableReadonlyAssignment {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoEnums {
@@ -92,11 +87,10 @@ namespace NoEnums {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoPartialUrlConstructor {
@@ -109,11 +103,10 @@ namespace NoPartialUrlConstructor {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoPartialDivision {
@@ -126,11 +119,10 @@ namespace NoPartialDivision {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoPartialStringNormalize {
@@ -143,11 +135,10 @@ namespace NoPartialStringNormalize {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoPrematureFpTsEffects {
@@ -160,11 +151,10 @@ namespace NoPrematureFpTsEffects {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoNestedFpTsEffects {
@@ -177,11 +167,10 @@ namespace NoNestedFpTsEffects {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoPartialArrayReduce {
@@ -194,11 +183,10 @@ namespace NoPartialArrayReduce {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoHiddenTypeAssertions {
