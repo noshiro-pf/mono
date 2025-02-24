@@ -363,11 +363,7 @@ type NegativeNumber = number & {
 直接書いても良いのですが、 Branded Type を作る型ユーティリティも用意してみます。
 
 ```ts
-export type Brand<
-  T,
-  TrueKeys extends string,
-  FalseKeys extends string = never,
-> = T & {
+type Brand<T, TrueKeys extends string, FalseKeys extends string = never> = T & {
   readonly [key in FalseKeys | TrueKeys]: key extends TrueKeys ? true : false;
 };
 ```
@@ -390,51 +386,47 @@ type PostId = Brand<string, 'PostId'>; // string & { readonly PostId: true };
 ```ts
 import { type Brand } from './brand';
 
-export type NaNType = Brand<number, 'NaN', 'Finite' | 'NonNegative' | 'Zero'>;
+type NaNType = Brand<number, 'NaN', 'Finite' | 'NonNegative' | 'Zero'>;
 
-export type FiniteNumber = Brand<number, 'Finite', 'NaN'>;
+type FiniteNumber = Brand<number, 'Finite', 'NaN'>;
 
-export type InfiniteNumber = Brand<number, never, 'Finite' | 'NaN' | 'Zero'>;
+type InfiniteNumber = Brand<number, never, 'Finite' | 'NaN' | 'Zero'>;
 
-export type POSITIVE_INFINITY = Brand<
+type POSITIVE_INFINITY = Brand<
   number,
   'NonNegative',
   'Finite' | 'NaN' | 'Zero'
 >;
 
-export type NEGATIVE_INFINITY = Brand<
+type NEGATIVE_INFINITY = Brand<
   number,
   never,
   'Finite' | 'NaN' | 'NonNegative' | 'Zero'
 >;
 
-export type NonZeroNumber = Brand<number, never, 'NaN' | 'Zero'>;
+type NonZeroNumber = Brand<number, never, 'NaN' | 'Zero'>;
 
-export type NonNegativeNumber = Brand<number, 'NonNegative', 'NaN'>;
+type NonNegativeNumber = Brand<number, 'NonNegative', 'NaN'>;
 
-export type PositiveNumber = Brand<number, 'NonNegative', 'NaN' | 'Zero'>;
+type PositiveNumber = Brand<number, 'NonNegative', 'NaN' | 'Zero'>;
 
-export type NegativeNumber = Brand<
-  number,
-  never,
-  'NaN' | 'NonNegative' | 'Zero'
->;
+type NegativeNumber = Brand<number, never, 'NaN' | 'NonNegative' | 'Zero'>;
 
-export type Int = Brand<number, 'Finite' | 'Int', 'NaN'>;
+type Int = Brand<number, 'Finite' | 'Int', 'NaN'>;
 
-export type Uint = Brand<number, 'Finite' | 'Int' | 'NonNegative', 'NaN'>;
+type Uint = Brand<number, 'Finite' | 'Int' | 'NonNegative', 'NaN'>;
 
-export type NonZeroInt = Brand<number, 'Finite' | 'Int', 'NaN' | 'Zero'>;
+type NonZeroInt = Brand<number, 'Finite' | 'Int', 'NaN' | 'Zero'>;
 
-export type SafeInt = Brand<number, 'Finite' | 'Int' | 'SafeInt', 'NaN'>;
+type SafeInt = Brand<number, 'Finite' | 'Int' | 'SafeInt', 'NaN'>;
 
-export type SafeUint = Brand<
+type SafeUint = Brand<
   number,
   'NonNegative' | 'Finite' | 'Int' | 'SafeInt',
   'NaN'
 >;
 
-export type NonZeroSafeInt = Brand<
+type NonZeroSafeInt = Brand<
   number,
   'Finite' | 'Int' | 'SafeInt',
   'NaN' | 'Zero'

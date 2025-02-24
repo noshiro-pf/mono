@@ -22,7 +22,7 @@ const result: readonly [1, 2, 3, 4] = rangeArray(1, 5); // ok
 console.log(result); // [1, 2, 3, 4]
 ```
 
-`start` と `end` が（型計算が重くならない）十分小さな非負整数で `start <= end` かつ `step = 1` が満たされる場合には、返り値に `number[]` ではなく `[1, 2, 3, 4]` というより詳しい型を付ける、というのが今回やりたいことです。
+`start` と `end` が（型計算が重くならない）十分小さな非負整数で `step = 1` が満たされる場合には、返り値に `number[]` ではなく `[1, 2, 3, 4]` のようなより詳しい型を付ける、というのが今回やりたいことです。
 
 ## 完成品
 
@@ -68,7 +68,7 @@ for (const i of range(1, 5)) {
 
 ### 型の実装
 
-結果配列が大きすぎる場合、型計算の再帰制限にひっかかったり重くなったりするので、 `start` と `end` が十分小さい場合のみ型を詳細化することにします。以下のように関数をオーバーロードして、引数の型に応じて return type を詳細化した型 `RangeList<S, E>` にするか `number[]` にするかが決まるようにします。
+結果配列が大きすぎる場合、型計算が重くなったりそもそも再帰制限にひっかかって計算できなかったりするので、 `start` と `end` が十分小さい場合のみ型を詳細化することにします。以下のように関数をオーバーロードして、引数の型に応じて return type を詳細化した型 `RangeList<S, E>` にするか `number[]` にするかが決まるようにします。
 
 ```ts
 type Uint8 = Index<256>; // 0 | 1 | 2 | ... | 255
@@ -79,12 +79,12 @@ function rangeArray<S extends Uint8, E extends Uint8>(
   step?: 1,
 ): RangeList<S, E>;
 
-function rangeArray(start: number, end: number, step?: Uint8): number[];
+function rangeArray(start: number, end: number, step?: number): number[];
 ```
 
 `Uint8` 型はべた書きでも良いかもしれませんが、 `Index` という型ユーティリティを実装すれば `Index<256>` として実装できます。詳しくは[TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)を参照してください。
 
-`start: S` と `end: E` には 1 個の非負整数ではなく union 型が渡される可能性もありますが、その場合には `S` の最小値から `E` の最大値までの整数の union を要素とする長さ不定の配列型を返り値とするという要件もここで追加しておきます[^union-arg]。
+`start: S` や `end: E` には 1 個の非負整数ではなく `Uint8` の部分型の union 型（例： `1 | 2 | 3`）が渡される可能性もありますが、その場合には `S` の最小値から `E` の最大値までの整数の union を要素とする長さ不定の配列型を返り値とするという要件もここで追加しておきます[^union-arg]。
 
 ```ts
 const s = 2 as 1 | 2 | 3;
@@ -93,9 +93,9 @@ const result2: readonly (1 | 2 | 3 | 4 | 5 | 6)[] = rangeArray(s, e);
 console.log(result2); // [2, 3, 4, 5]
 ```
 
-[^union-arg]: 一応 `S = 1 | 2`, `E = 3 | 4` に対して `[1, 2] | [1, 2, 3] | [2] | [2, 3]` という感じで全パターンの union 型を返すように定義できる可能性はありますが、 $|S| \times |E|$ のサイズの union になり型計算が重くなる上に結果の型も見づらくあまり嬉しくなさそうなので、これは実装しないことにします。
+[^union-arg]: 一応 `S = 1 | 2`, `E = 3 | 4` なら `[1, 2] | [1, 2, 3] | [2] | [2, 3]` という感じで全パターンの union 型を返すように定義できる可能性はありますが、 $|S| \times |E|$ のサイズの union になり型計算が重くなる上に結果の型も見づらくあまり嬉しくなさそうなので、これは実装しないことにします。
 
-これは以下のように引数にユーザー定義の数値の union 型の変数を渡す場合に、`rangeArray` の結果の型を不必要に広げないためです。
+これは以下のように引数にユーザー定義の数値の union 型の変数を渡す場合にも対応するためです。
 
 ```ts
 type MonthEnum = Exclude<Index<13>, 0>; // 1 | 2 | ... | 12
@@ -144,7 +144,7 @@ expectType<RangeList<1 | 2 | 3, 5 | 6 | 7>, readonly (1 | 2 | 3 | 4 | 5 | 6)[]>(
 expectType<RangeList<5, 1>, readonly []>('=');
 ```
 
-型ユニットテスト用ユーティリティ `expectType` については[TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)を参照してください。
+`expectType` はここでは `expect<A, B>("=")` が `A` と `B` は等しい型であることを確認する型レベルの assert 文を表しています。型ユニットテスト用ユーティリティ `expectType` の詳細については[TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)を参照してください。
 
 `ListSkip<S, Seq<E>>` の部分は `S` と `E` がちょうど 1 要素の非負整数（0 以上 255 以下）の場合の型です。
 
@@ -154,7 +154,7 @@ expectType<RangeList<5, 1>, readonly []>('=');
 
 次に `S` または `E` が union 型の場合の判定ですが、これは `BoolOr` と `IsUnion` という型ユーティリティを実装することで実現できます。実装は [TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)を参照してください。
 そしてそのときの型は、 union 型 `S` の中の最小値 `L` から union 型 `E` の中の最大値 - 1 = `U` までの union 型を要素とする配列 `(L | (L + 1) | ... | (U - 1) | U)[]` とします。これは `LEQ` という配列を作ることで `Exclude<LEQ[E], LEQ[Min<S>]>[]` として実装することができます。
-`LEQ[U]` は `U` の最大値未満のすべての非負整数を含む union 型を返すようにします（例： `LEQ[4 | 5 | 6] = 0 | 1 | 2 | 3 | 4 | 5`）。 `Min` は非負整数の union 型 `U` を受け取り、最小値を返す型です（例： `Min<3 | 4 | 5> = 3`）。`Min` については[TypeScript の型ユーティリティ Min, Max の実装](https://zenn.dev/noshiro_piko/articles/typescript-type-level-min)という記事で解説しているのでそちらを参照してください。あとは `LEQ` を実装できれば OK です。
+`LEQ[U]` は `U` の最大値未満のすべての非負整数を含む union 型を返すようにします（例： `LEQ[4 | 5 | 6] = 0 | 1 | 2 | 3 | 4 | 5`）。 `Min` は非負整数の union 型 `U` を受け取り、最小値を返す型です（例： `Min<3 | 4 | 5> = 3`）。`Min` の実装については[TypeScript の型ユーティリティ Min, Max の実装](https://zenn.dev/noshiro_piko/articles/typescript-type-level-min)という記事で解説しているのでそちらを参照してください。あとは `LEQ` を実装できれば OK です。
 
 ---
 
@@ -246,4 +246,4 @@ type LEQ = {
 
 で実装できます。
 
-`Index` は[TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)を参照してください。
+`Index` の実装は[TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)を参照してください。

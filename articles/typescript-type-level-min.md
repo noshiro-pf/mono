@@ -15,8 +15,8 @@ published: true
 type Min<N extends number> = /* TODO */;
 type Max<N extends number> = /* TODO */;
 
-type R1 = Max<1 | 2 | 3>; // 3
-type R2 = Min<1 | 2 | 3>; // 1
+type T1 = Max<1 | 2 | 3>; // 3
+type T2 = Min<1 | 2 | 3>; // 1
 ```
 
 ## Min の実装
@@ -24,7 +24,7 @@ type R2 = Min<1 | 2 | 3>; // 1
 `Min<N>` は以下のコードで実装できます。
 
 ```ts
-export type Min<N extends number> = MinImpl<N, []>;
+type Min<N extends number> = MinImpl<N, []>;
 
 type MinImpl<
   N extends number,

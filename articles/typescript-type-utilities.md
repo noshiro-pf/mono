@@ -49,7 +49,7 @@ expectType<{ x: 1 } & { y: 2 }, { x: 1; y: 2 }>('>=');
  * - `expectType<A, B>("!>=")` passes if `B` doesn't extend `A`.
  * - `expectType<A, B>("!=")` passes if `A` is not equal to `B`.
  */
-export const expectType = <A, B>(
+const expectType = <A, B>(
   _relation: TypeEq<A, B> extends true
     ? '<=' | '=' | '>=' | '~='
     :
@@ -321,7 +321,7 @@ type Tile<
   readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
 ][N];
 
-export type MakeTupleImpl<
+type MakeTupleImpl<
   T,
   N extends string,
   X extends readonly unknown[],
