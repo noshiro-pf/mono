@@ -41,7 +41,7 @@ TypeScript の型レベルプログラミングで非負整数に関する処理
 Min<1 | 2 | 3>
 -> MinImpl<1 | 2 | 3, []>
 -> MinImpl<1 | 2 | 3, [0]> // T["length"] (= 0) extends 1 | 2 | 3 は false なので再帰
--> 1                        // T["length"] (= 1) extends 1 | 2 | 3 は true なので [0]["length"] = 1 を返す
+-> 1                       // T["length"] (= 1) extends 1 | 2 | 3 は true なので [0]["length"] = 1 を返す
 ```
 
 ## Max の実装
@@ -86,7 +86,7 @@ Max<1 | 2 | 3>
 -> MaxImpl<1 | 2 | 3, [0]>        // [1 | 2 | 3] extends [Partial<[]>["length"]] (= [0]) は false なので再帰
 -> MaxImpl<1 | 2 | 3, [0, 0]>     // [1 | 2 | 3] extends [Partial<[0]>["length"]] (= [0 | 1]) は false なので再帰
 -> MaxImpl<1 | 2 | 3, [0, 0, 0]>  // [1 | 2 | 3] extends [Partial<[0, 0]>["length"]] (= [0 | 1 | 2]) は false なので再帰
--> 3                               // [1 | 2 | 3] extends [Partial<[0, 0, 0]>["length"]] (= [0 | 1 | 2 | 3]) は true なので [0, 0, 0]["length"] を返す
+-> 3                              // [1 | 2 | 3] extends [Partial<[0, 0, 0]>["length"]] (= [0 | 1 | 2 | 3]) は true なので [0, 0, 0]["length"] を返す
 ```
 
 補足ですが、 `[N] extends [Partial<T>["length"]]` のところは "union distribution" という挙動を回避するために TypeScript の型レベルプログラミングでたびたび用いられるテクニックが使われています。
