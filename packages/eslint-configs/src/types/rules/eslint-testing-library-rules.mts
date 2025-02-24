@@ -1,8 +1,12 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type RuleSeverityWithDefaultOption } from '../rule-severity-branded.mjs';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
 
 /**
  * Enforce promises from async event methods are handled
@@ -10,10 +14,11 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/await-async-events.md
  *
  *  ```md
- *  | key     | value   |
- *  | :------ | :------ |
- *  | type    | problem |
- *  | fixable | code    |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
  *  ```
  */
 namespace AwaitAsyncEvents {
@@ -62,8 +67,9 @@ namespace AwaitAsyncEvents {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -72,13 +78,14 @@ namespace AwaitAsyncEvents {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/await-async-queries.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace AwaitAsyncQueries {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -87,13 +94,14 @@ namespace AwaitAsyncQueries {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/await-async-utils.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace AwaitAsyncUtils {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -102,9 +110,10 @@ namespace AwaitAsyncUtils {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/consistent-data-testid.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace ConsistentDataTestid {
@@ -153,8 +162,9 @@ namespace ConsistentDataTestid {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -163,9 +173,10 @@ namespace ConsistentDataTestid {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-await-sync-events.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoAwaitSyncEvents {
@@ -206,8 +217,9 @@ namespace NoAwaitSyncEvents {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -216,13 +228,14 @@ namespace NoAwaitSyncEvents {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-await-sync-queries.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoAwaitSyncQueries {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -231,13 +244,14 @@ namespace NoAwaitSyncQueries {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-container.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoContainer {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -246,9 +260,10 @@ namespace NoContainer {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-debugging-utils.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoDebuggingUtils {
@@ -302,8 +317,9 @@ namespace NoDebuggingUtils {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -312,10 +328,11 @@ namespace NoDebuggingUtils {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-dom-import.md
  *
  *  ```md
- *  | key     | value   |
- *  | :------ | :------ |
- *  | type    | problem |
- *  | fixable | code    |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
  *  ```
  */
 namespace NoDomImport {
@@ -333,8 +350,9 @@ namespace NoDomImport {
   export type Options = string;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -343,14 +361,15 @@ namespace NoDomImport {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-global-regexp-flag-in-query.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoGlobalRegexpFlagInQuery {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -359,13 +378,14 @@ namespace NoGlobalRegexpFlagInQuery {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-manual-cleanup.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoManualCleanup {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -374,9 +394,10 @@ namespace NoManualCleanup {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-node-access.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoNodeAccess {
@@ -402,8 +423,9 @@ namespace NoNodeAccess {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -412,13 +434,14 @@ namespace NoNodeAccess {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-promise-in-fire-event.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoPromiseInFireEvent {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -427,9 +450,10 @@ namespace NoPromiseInFireEvent {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-render-in-lifecycle.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoRenderInLifecycle {
@@ -459,8 +483,9 @@ namespace NoRenderInLifecycle {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -469,9 +494,10 @@ namespace NoRenderInLifecycle {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-unnecessary-act.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoUnnecessaryAct {
@@ -497,8 +523,9 @@ namespace NoUnnecessaryAct {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -507,13 +534,14 @@ namespace NoUnnecessaryAct {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-wait-for-multiple-assertions.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoWaitForMultipleAssertions {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -522,13 +550,14 @@ namespace NoWaitForMultipleAssertions {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-wait-for-side-effects.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoWaitForSideEffects {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -537,13 +566,14 @@ namespace NoWaitForSideEffects {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-wait-for-snapshot.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoWaitForSnapshot {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -552,9 +582,10 @@ namespace NoWaitForSnapshot {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-explicit-assert.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferExplicitAssert {
@@ -594,8 +625,9 @@ namespace PreferExplicitAssert {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -605,14 +637,15 @@ namespace PreferExplicitAssert {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-find-by.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferFindBy {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -621,13 +654,14 @@ namespace PreferFindBy {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-implicit-assert.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferImplicitAssert {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -637,9 +671,10 @@ namespace PreferImplicitAssert {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-presence-queries.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferPresenceQueries {
@@ -669,8 +704,9 @@ namespace PreferPresenceQueries {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -679,13 +715,14 @@ namespace PreferPresenceQueries {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-query-by-disappearance.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace PreferQueryByDisappearance {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -695,9 +732,10 @@ namespace PreferQueryByDisappearance {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-query-matchers.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferQueryMatchers {
@@ -742,8 +780,9 @@ namespace PreferQueryMatchers {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -752,13 +791,14 @@ namespace PreferQueryMatchers {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-screen-queries.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferScreenQueries {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -767,9 +807,10 @@ namespace PreferScreenQueries {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-user-event.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferUserEvent {
@@ -795,8 +836,9 @@ namespace PreferUserEvent {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -805,13 +847,14 @@ namespace PreferUserEvent {
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/render-result-naming-convention.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace RenderResultNamingConvention {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 export type EslintTestingLibraryRules = {

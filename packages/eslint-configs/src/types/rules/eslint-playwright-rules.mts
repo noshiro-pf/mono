@@ -1,8 +1,12 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type RuleSeverityWithDefaultOption } from '../rule-severity-branded.mjs';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
 
 /**
  * Enforce assertion to be made in a test body
@@ -10,11 +14,11 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/expect-expect.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace ExpectExpect {
@@ -45,8 +49,9 @@ namespace ExpectExpect {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -55,11 +60,11 @@ namespace ExpectExpect {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/max-expects.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace MaxExpects {
@@ -86,8 +91,9 @@ namespace MaxExpects {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -96,11 +102,11 @@ namespace MaxExpects {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/max-nested-describe.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | true       |
  *  ```
  */
 namespace MaxNestedDescribe {
@@ -127,8 +133,9 @@ namespace MaxNestedDescribe {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -137,12 +144,12 @@ namespace MaxNestedDescribe {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/missing-playwright-await.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | fixable     | code            |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | true    |
  *  ```
  */
 namespace MissingPlaywrightAwait {
@@ -171,8 +178,9 @@ namespace MissingPlaywrightAwait {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -181,15 +189,15 @@ namespace MissingPlaywrightAwait {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-commented-out-tests.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoCommentedOutTests {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -198,15 +206,15 @@ namespace NoCommentedOutTests {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-conditional-expect.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoConditionalExpect {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -215,15 +223,15 @@ namespace NoConditionalExpect {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-conditional-in-test.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoConditionalInTest {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -232,15 +240,15 @@ namespace NoConditionalInTest {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-duplicate-hooks.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoDuplicateHooks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -249,16 +257,16 @@ namespace NoDuplicateHooks {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-element-handle.md
  *
  *  ```md
- *  | key            | value           |
- *  | :------------- | :-------------- |
- *  | type           | suggestion      |
- *  | hasSuggestions | true            |
- *  | category       | Possible Errors |
- *  | recommended    | true            |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  *  ```
  */
 namespace NoElementHandle {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -268,15 +276,15 @@ namespace NoElementHandle {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-eval.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoEval {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -285,16 +293,16 @@ namespace NoEval {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-focused-test.md
  *
  *  ```md
- *  | key            | value           |
- *  | :------------- | :-------------- |
- *  | type           | problem         |
- *  | hasSuggestions | true            |
- *  | category       | Possible Errors |
- *  | recommended    | true            |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
  *  ```
  */
 namespace NoFocusedTest {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -303,15 +311,15 @@ namespace NoFocusedTest {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-force-option.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | true       |
  *  ```
  */
 namespace NoForceOption {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -320,15 +328,15 @@ namespace NoForceOption {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-get-by-title.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoGetByTitle {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -337,11 +345,11 @@ namespace NoGetByTitle {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-hooks.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoHooks {
@@ -373,8 +381,9 @@ namespace NoHooks {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -383,15 +392,15 @@ namespace NoHooks {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-nested-step.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoNestedStep {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -400,15 +409,15 @@ namespace NoNestedStep {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-networkidle.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoNetworkidle {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -417,15 +426,15 @@ namespace NoNetworkidle {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-nth-methods.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoNthMethods {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -434,15 +443,15 @@ namespace NoNthMethods {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-page-pause.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoPagePause {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -451,11 +460,11 @@ namespace NoPagePause {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-raw-locators.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoRawLocators {
@@ -484,8 +493,9 @@ namespace NoRawLocators {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -494,11 +504,11 @@ namespace NoRawLocators {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-restricted-matchers.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoRestrictedMatchers {
@@ -522,8 +532,9 @@ namespace NoRestrictedMatchers {
   export type Options = Readonly<Record<string, string | null>>;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -532,12 +543,12 @@ namespace NoRestrictedMatchers {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-skipped-test.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | true           |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  *  ```
  */
 namespace NoSkippedTest {
@@ -564,8 +575,9 @@ namespace NoSkippedTest {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -574,12 +586,12 @@ namespace NoSkippedTest {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-slowed-test.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | true           |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  *  ```
  */
 namespace NoSlowedTest {
@@ -606,8 +618,9 @@ namespace NoSlowedTest {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -616,16 +629,16 @@ namespace NoSlowedTest {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-standalone-expect.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoStandaloneExpect {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -634,16 +647,16 @@ namespace NoStandaloneExpect {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-unsafe-references.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | fixable     | code            |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoUnsafeReferences {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -652,16 +665,16 @@ namespace NoUnsafeReferences {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-useless-await.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | fixable     | code            |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoUselessAwait {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -670,16 +683,16 @@ namespace NoUselessAwait {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-useless-not.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoUselessNot {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -688,16 +701,16 @@ namespace NoUselessNot {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-wait-for-selector.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | true           |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  *  ```
  */
 namespace NoWaitForSelector {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -706,16 +719,16 @@ namespace NoWaitForSelector {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-wait-for-timeout.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | true           |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  *  ```
  */
 namespace NoWaitForTimeout {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -724,16 +737,16 @@ namespace NoWaitForTimeout {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-comparison-matcher.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferComparisonMatcher {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -742,16 +755,16 @@ namespace PreferComparisonMatcher {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-equality-matcher.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | false          |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace PreferEqualityMatcher {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -760,15 +773,15 @@ namespace PreferEqualityMatcher {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-hooks-in-order.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferHooksInOrder {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -777,15 +790,15 @@ namespace PreferHooksInOrder {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-hooks-on-top.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferHooksOnTop {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -794,15 +807,15 @@ namespace PreferHooksOnTop {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-locator.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferLocator {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -811,12 +824,12 @@ namespace PreferLocator {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-lowercase-title.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferLowercaseTitle {
@@ -862,8 +875,9 @@ namespace PreferLowercaseTitle {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -872,12 +886,12 @@ namespace PreferLowercaseTitle {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-native-locators.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferNativeLocators {
@@ -904,8 +918,9 @@ namespace PreferNativeLocators {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -914,17 +929,17 @@ namespace PreferNativeLocators {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-strict-equal.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | fixable        | code           |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | false          |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace PreferStrictEqual {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -933,16 +948,16 @@ namespace PreferStrictEqual {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-to-be.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferToBe {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -951,16 +966,16 @@ namespace PreferToBe {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-to-contain.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferToContain {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -969,16 +984,16 @@ namespace PreferToContain {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-to-have-count.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferToHaveCount {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -987,16 +1002,16 @@ namespace PreferToHaveCount {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-to-have-length.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferToHaveLength {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1005,16 +1020,16 @@ namespace PreferToHaveLength {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/prefer-web-first-assertions.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
  *  ```
  */
 namespace PreferWebFirstAssertions {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1023,11 +1038,11 @@ namespace PreferWebFirstAssertions {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/require-hook.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace RequireHook {
@@ -1056,8 +1071,9 @@ namespace RequireHook {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1069,12 +1085,13 @@ namespace RequireHook {
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | deprecated  | false      |
  *  | fixable     | code       |
  *  | recommended | false      |
  *  ```
  */
 namespace RequireSoftAssertions {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1083,15 +1100,15 @@ namespace RequireSoftAssertions {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/require-to-throw-message.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace RequireToThrowMessage {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1100,11 +1117,11 @@ namespace RequireToThrowMessage {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/require-top-level-describe.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace RequireTopLevelDescribe {
@@ -1131,8 +1148,9 @@ namespace RequireTopLevelDescribe {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1141,15 +1159,15 @@ namespace RequireTopLevelDescribe {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/valid-describe-callback.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace ValidDescribeCallback {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1158,11 +1176,11 @@ namespace ValidDescribeCallback {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/valid-expect.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace ValidExpect {
@@ -1194,8 +1212,9 @@ namespace ValidExpect {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1204,15 +1223,15 @@ namespace ValidExpect {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/valid-expect-in-promise.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | true       |
  *  ```
  */
 namespace ValidExpectInPromise {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1221,12 +1240,12 @@ namespace ValidExpectInPromise {
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/valid-title.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | suggestion     |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
  *  ```
  */
 namespace ValidTitle {
@@ -1326,8 +1345,9 @@ namespace ValidTitle {
   >;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 export type EslintPlaywrightRules = {

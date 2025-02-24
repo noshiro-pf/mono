@@ -39,7 +39,7 @@ export const ResetPasswordPage = memoNamed<Props>(
               <FormGroup
                 helperText={formState.email.error}
                 intent={emailFormIntent}
-                label={<Label>{dc.email}</Label>}
+                label={emailInputLabel}
               >
                 <BpInput
                   autoComplete={'email'}
@@ -71,6 +71,8 @@ export const ResetPasswordPage = memoNamed<Props>(
     );
   },
 );
+
+const emailInputLabel = <Label>{dc.email}</Label>;
 
 const FormRectWrapper = styled(SignInStyled.FormRectWrapperBase)`
   height: 320px;

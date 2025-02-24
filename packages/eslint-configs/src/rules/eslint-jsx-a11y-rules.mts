@@ -1,25 +1,26 @@
 import { type EslintJsxA11yRules } from '../types/index.mjs';
+import { withDefaultOption } from '../types/rule-severity-branded.mjs';
 
 /** @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/src/index.js */
 export const eslintJsxA11yRules: EslintJsxA11yRules = {
-  'jsx-a11y/alt-text': 'error',
-  'jsx-a11y/anchor-ambiguous-text': 'error',
-  'jsx-a11y/anchor-has-content': 'error',
-  'jsx-a11y/anchor-is-valid': 'error',
-  'jsx-a11y/aria-activedescendant-has-tabindex': 'error',
-  'jsx-a11y/aria-props': 'error',
-  'jsx-a11y/aria-proptypes': 'error',
-  'jsx-a11y/aria-role': 'error',
-  'jsx-a11y/aria-unsupported-elements': 'error',
-  'jsx-a11y/autocomplete-valid': 'error',
-  'jsx-a11y/click-events-have-key-events': 'error',
+  'jsx-a11y/alt-text': withDefaultOption('error'),
+  'jsx-a11y/anchor-ambiguous-text': withDefaultOption('error'),
+  'jsx-a11y/anchor-has-content': withDefaultOption('error'),
+  'jsx-a11y/anchor-is-valid': withDefaultOption('error'),
+  'jsx-a11y/aria-activedescendant-has-tabindex': withDefaultOption('error'),
+  'jsx-a11y/aria-props': withDefaultOption('error'),
+  'jsx-a11y/aria-proptypes': withDefaultOption('error'),
+  'jsx-a11y/aria-role': withDefaultOption('error'),
+  'jsx-a11y/aria-unsupported-elements': withDefaultOption('error'),
+  'jsx-a11y/autocomplete-valid': withDefaultOption('error'),
+  'jsx-a11y/click-events-have-key-events': withDefaultOption('error'),
 
   'jsx-a11y/control-has-associated-label': 'off',
 
-  'jsx-a11y/heading-has-content': 'error',
-  'jsx-a11y/html-has-lang': 'error',
-  'jsx-a11y/iframe-has-title': 'error',
-  'jsx-a11y/img-redundant-alt': 'error',
+  'jsx-a11y/heading-has-content': withDefaultOption('error'),
+  'jsx-a11y/html-has-lang': withDefaultOption('error'),
+  'jsx-a11y/iframe-has-title': withDefaultOption('error'),
+  'jsx-a11y/img-redundant-alt': withDefaultOption('error'),
 
   'jsx-a11y/interactive-supports-focus': [
     'error',
@@ -51,14 +52,14 @@ export const eslintJsxA11yRules: EslintJsxA11yRules = {
     },
   ],
 
-  'jsx-a11y/label-has-associated-control': 'error',
-  'jsx-a11y/lang': 'error',
-  'jsx-a11y/media-has-caption': 'error',
-  'jsx-a11y/mouse-events-have-key-events': 'error',
-  'jsx-a11y/no-access-key': 'error',
-  'jsx-a11y/no-aria-hidden-on-focusable': 'error',
-  'jsx-a11y/no-autofocus': 'error',
-  'jsx-a11y/no-distracting-elements': 'error',
+  'jsx-a11y/label-has-associated-control': withDefaultOption('error'),
+  'jsx-a11y/lang': withDefaultOption('error'),
+  'jsx-a11y/media-has-caption': withDefaultOption('error'),
+  'jsx-a11y/mouse-events-have-key-events': withDefaultOption('error'),
+  'jsx-a11y/no-access-key': withDefaultOption('error'),
+  'jsx-a11y/no-aria-hidden-on-focusable': withDefaultOption('error'),
+  'jsx-a11y/no-autofocus': withDefaultOption('error'),
+  'jsx-a11y/no-distracting-elements': withDefaultOption('error'),
 
   /* recommended */
   // 'jsx-a11y/no-interactive-element-to-noninteractive-role': [
@@ -69,7 +70,8 @@ export const eslintJsxA11yRules: EslintJsxA11yRules = {
   //   },
   // ],
   /* strict */
-  'jsx-a11y/no-interactive-element-to-noninteractive-role': 'error',
+  'jsx-a11y/no-interactive-element-to-noninteractive-role':
+    withDefaultOption('error'),
 
   /* recommended */
   // 'jsx-a11y/no-noninteractive-element-interactions': [
@@ -131,7 +133,8 @@ export const eslintJsxA11yRules: EslintJsxA11yRules = {
   //   },
   // ],
   /* strict */
-  'jsx-a11y/no-noninteractive-element-to-interactive-role': 'error',
+  'jsx-a11y/no-noninteractive-element-to-interactive-role':
+    withDefaultOption('error'),
 
   /* recommended */
   // 'jsx-a11y/no-noninteractive-tabindex': [
@@ -143,9 +146,9 @@ export const eslintJsxA11yRules: EslintJsxA11yRules = {
   //   },
   // ],
   /* strict */
-  'jsx-a11y/no-noninteractive-tabindex': 'error',
+  'jsx-a11y/no-noninteractive-tabindex': withDefaultOption('error'),
 
-  'jsx-a11y/no-redundant-roles': 'error',
+  'jsx-a11y/no-redundant-roles': withDefaultOption('error'),
 
   /* recommended */
   // 'jsx-a11y/no-static-element-interactions': [
@@ -163,13 +166,13 @@ export const eslintJsxA11yRules: EslintJsxA11yRules = {
   //   },
   // ],
   /* strict */
-  'jsx-a11y/no-static-element-interactions': 'error',
+  'jsx-a11y/no-static-element-interactions': withDefaultOption('error'),
 
-  'jsx-a11y/prefer-tag-over-role': 'error',
-  'jsx-a11y/role-has-required-aria-props': 'error',
-  'jsx-a11y/role-supports-aria-props': 'error',
-  'jsx-a11y/scope': 'error',
-  'jsx-a11y/tabindex-no-positive': 'error',
+  'jsx-a11y/prefer-tag-over-role': withDefaultOption('error'),
+  'jsx-a11y/role-has-required-aria-props': withDefaultOption('error'),
+  'jsx-a11y/role-supports-aria-props': withDefaultOption('error'),
+  'jsx-a11y/scope': withDefaultOption('error'),
+  'jsx-a11y/tabindex-no-positive': withDefaultOption('error'),
 
   // deprecated
   'jsx-a11y/accessible-emoji': 0,

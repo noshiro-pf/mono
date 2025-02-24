@@ -1,5 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type RuleSeverityWithDefaultOption } from '../rule-severity-branded.mjs';
 
 namespace StrictDependencies {
   /**
@@ -67,9 +68,10 @@ namespace StrictDependencies {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | readonly [Linter.RuleSeverity, Options0, Options1]
-    | readonly [Linter.RuleSeverity, Options0];
+    | RuleSeverityWithDefaultOption
+    | readonly [Linter.StringSeverity, Options0, Options1]
+    | readonly [Linter.StringSeverity, Options0]
+    | 'off';
 }
 
 export type EslintStrictDependenciesRules = {

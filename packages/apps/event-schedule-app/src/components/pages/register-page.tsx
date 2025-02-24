@@ -23,6 +23,17 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
     passwordIsOpen,
   } = useObservableValue(RegisterPageStore.state);
 
+  const passwordLockButton = useMemo(
+    () => (
+      <LockButton
+        disabled={formState.isWaitingResponse}
+        passwordIsOpen={passwordIsOpen}
+        onLockClick={RegisterPageStore.togglePasswordLock}
+      />
+    ),
+    [formState.isWaitingResponse, passwordIsOpen],
+  );
+
   return (
     <SignInStyled.Wrapper>
       <NavBar />
@@ -34,7 +45,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               <FormGroup
                 helperText={formState.username.error}
                 intent={usernameFormIntent}
-                label={<Label>{dc.username}</Label>}
+                label={usernameInputLabel}
               >
                 <BpInput
                   // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -50,7 +61,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               <FormGroup
                 helperText={formState.email.error}
                 intent={emailFormIntent}
-                label={<Label>{dc.email}</Label>}
+                label={emailInputLabel}
               >
                 <BpInput
                   autoComplete={'username'}
@@ -66,7 +77,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               <FormGroup
                 helperText={formState.password.password.error}
                 intent={passwordFormIntent}
-                label={<Label>{dc.password}</Label>}
+                label={newPasswordInputLabel}
               >
                 <BpInput
                   autoComplete={'new-password'}
@@ -81,18 +92,12 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               <FormGroup
                 helperText={formState.password.passwordConfirmation.error}
                 intent={passwordFormIntent}
-                label={<Label>{dc.verifyPassword}</Label>}
+                label={verifyPasswordInputLabel}
               >
                 <BpInput
                   disabled={formState.isWaitingResponse}
                   intent={passwordFormIntent}
-                  rightElement={
-                    <LockButton
-                      disabled={formState.isWaitingResponse}
-                      passwordIsOpen={passwordIsOpen}
-                      onLockClick={RegisterPageStore.togglePasswordLock}
-                    />
-                  }
+                  rightElement={passwordLockButton}
                   type={passwordIsOpen ? 'text' : 'password'}
                   value={formState.password.passwordConfirmation.inputValue}
                   onValueChange={
@@ -156,3 +161,8 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
 const FormRectWrapper = styled(SignInStyled.FormRectWrapperBase)`
   height: 510px;
 `;
+
+const usernameInputLabel = <Label>{dc.username}</Label>;
+const emailInputLabel = <Label>{dc.email}</Label>;
+const newPasswordInputLabel = <Label>{dc.password}</Label>;
+const verifyPasswordInputLabel = <Label>{dc.verifyPassword}</Label>;

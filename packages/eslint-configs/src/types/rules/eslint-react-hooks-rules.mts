@@ -1,8 +1,12 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type RuleSeverityWithDefaultOption } from '../rule-severity-branded.mjs';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
 
 /**
  * Enforces the Rules of Hooks
@@ -13,11 +17,12 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
  */
 namespace RulesOfHooks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -29,6 +34,7 @@ namespace RulesOfHooks {
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
+ *  | deprecated     | false      |
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
@@ -62,8 +68,9 @@ namespace ExhaustiveDeps {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 export type EslintReactHooksRules = {

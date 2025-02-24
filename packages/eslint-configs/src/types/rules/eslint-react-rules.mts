@@ -1,8 +1,12 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type RuleSeverityWithDefaultOption } from '../rule-severity-branded.mjs';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
 
 /**
  * Enforces consistent naming for boolean props
@@ -10,10 +14,10 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/boolean-prop-naming.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace BooleanPropNaming {
@@ -61,8 +65,9 @@ namespace BooleanPropNaming {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -71,10 +76,10 @@ namespace BooleanPropNaming {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/button-has-type.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace ButtonHasType {
@@ -111,8 +116,9 @@ namespace ButtonHasType {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -121,10 +127,10 @@ namespace ButtonHasType {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/checked-requires-onchange-or-readonly.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace CheckedRequiresOnchangeOrReadonly {
@@ -153,8 +159,9 @@ namespace CheckedRequiresOnchangeOrReadonly {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -163,9 +170,9 @@ namespace CheckedRequiresOnchangeOrReadonly {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/default-props-match-prop-types.md
  *
  *  ```md
- *  | key      | value          |
- *  | :------- | :------------- |
- *  | category | Best Practices |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace DefaultPropsMatchPropTypes {
@@ -192,8 +199,9 @@ namespace DefaultPropsMatchPropTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -203,11 +211,11 @@ namespace DefaultPropsMatchPropTypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/destructuring-assignment.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace DestructuringAssignment {
@@ -250,9 +258,10 @@ namespace DestructuringAssignment {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | readonly [Linter.RuleSeverity, Options0, Options1]
-    | readonly [Linter.RuleSeverity, Options0];
+    | RuleSeverityWithDefaultOption
+    | readonly [Linter.StringSeverity, Options0, Options1]
+    | readonly [Linter.StringSeverity, Options0]
+    | 'off';
 }
 
 /**
@@ -261,10 +270,10 @@ namespace DestructuringAssignment {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/display-name.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DisplayName {
@@ -294,8 +303,9 @@ namespace DisplayName {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -304,10 +314,10 @@ namespace DisplayName {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-component-props.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace ForbidComponentProps {
@@ -487,8 +497,9 @@ namespace ForbidComponentProps {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -497,10 +508,10 @@ namespace ForbidComponentProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-dom-props.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace ForbidDomProps {
@@ -561,8 +572,9 @@ namespace ForbidDomProps {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -571,10 +583,10 @@ namespace ForbidDomProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-elements.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace ForbidElements {
@@ -628,8 +640,9 @@ namespace ForbidElements {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -638,10 +651,10 @@ namespace ForbidElements {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-foreign-prop-types.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace ForbidForeignPropTypes {
@@ -667,8 +680,9 @@ namespace ForbidForeignPropTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -677,10 +691,10 @@ namespace ForbidForeignPropTypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-prop-types.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace ForbidPropTypes {
@@ -718,8 +732,9 @@ namespace ForbidPropTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -728,16 +743,16 @@ namespace ForbidPropTypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forward-ref-uses-ref.md
  *
  *  ```md
- *  | key            | value           |
- *  | :------------- | :-------------- |
- *  | type           | suggestion      |
- *  | hasSuggestions | true            |
- *  | category       | Possible Errors |
- *  | recommended    | false           |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace ForwardRefUsesRef {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -746,11 +761,11 @@ namespace ForwardRefUsesRef {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/function-component-definition.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace FunctionComponentDefinition {
@@ -827,8 +842,9 @@ namespace FunctionComponentDefinition {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -838,12 +854,12 @@ namespace FunctionComponentDefinition {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/hook-use-state.md
  *
  *  ```md
- *  | key            | value          |
- *  | :------------- | :------------- |
- *  | type           | suggestion     |
- *  | hasSuggestions | true           |
- *  | category       | Best Practices |
- *  | recommended    | false          |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace HookUseState {
@@ -870,8 +886,9 @@ namespace HookUseState {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -880,14 +897,14 @@ namespace HookUseState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/iframe-missing-sandbox.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace IframeMissingSandbox {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -896,11 +913,11 @@ namespace IframeMissingSandbox {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-boolean-value.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxBooleanValue {
@@ -996,8 +1013,9 @@ namespace JsxBooleanValue {
     | readonly [];
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1007,14 +1025,14 @@ namespace JsxBooleanValue {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-child-element-spacing.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxChildElementSpacing {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1023,11 +1041,11 @@ namespace JsxChildElementSpacing {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-closing-bracket-location.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxClosingBracketLocation {
@@ -1117,8 +1135,9 @@ namespace JsxClosingBracketLocation {
       };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1127,11 +1146,11 @@ namespace JsxClosingBracketLocation {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-closing-tag-location.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | whitespace       |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | deprecated  | false      |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
  *  ```
  */
 namespace JsxClosingTagLocation {
@@ -1173,8 +1192,9 @@ namespace JsxClosingTagLocation {
       };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1184,11 +1204,11 @@ namespace JsxClosingTagLocation {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-curly-spacing.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxCurlySpacing {
@@ -1316,8 +1336,9 @@ namespace JsxCurlySpacing {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1327,12 +1348,12 @@ namespace JsxCurlySpacing {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-curly-newline.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | type        | layout           |
- *  | fixable     | whitespace       |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | layout     |
+ *  | deprecated  | false      |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
  *  ```
  */
 namespace JsxCurlyNewline {
@@ -1383,8 +1404,9 @@ namespace JsxCurlyNewline {
       };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1393,11 +1415,11 @@ namespace JsxCurlyNewline {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-equals-spacing.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxEqualsSpacing {
@@ -1418,8 +1440,9 @@ namespace JsxEqualsSpacing {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1428,10 +1451,10 @@ namespace JsxEqualsSpacing {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-filename-extension.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxFilenameExtension {
@@ -1471,8 +1494,9 @@ namespace JsxFilenameExtension {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1481,11 +1505,11 @@ namespace JsxFilenameExtension {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-first-prop-new-line.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxFirstPropNewLine {
@@ -1514,8 +1538,9 @@ namespace JsxFirstPropNewLine {
     | 'never';
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1524,10 +1549,10 @@ namespace JsxFirstPropNewLine {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-handler-names.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxHandlerNames {
@@ -1688,8 +1713,9 @@ namespace JsxHandlerNames {
       };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1698,11 +1724,11 @@ namespace JsxHandlerNames {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-indent.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | whitespace       |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | deprecated  | false      |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
  *  ```
  */
 namespace JsxIndent {
@@ -1746,9 +1772,10 @@ namespace JsxIndent {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | readonly [Linter.RuleSeverity, Options0, Options1]
-    | readonly [Linter.RuleSeverity, Options0];
+    | RuleSeverityWithDefaultOption
+    | readonly [Linter.StringSeverity, Options0, Options1]
+    | readonly [Linter.StringSeverity, Options0]
+    | 'off';
 }
 
 /**
@@ -1757,11 +1784,11 @@ namespace JsxIndent {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-indent-props.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxIndentProps {
@@ -1818,8 +1845,9 @@ namespace JsxIndentProps {
       };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1828,10 +1856,10 @@ namespace JsxIndentProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-key.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxKey {
@@ -1868,8 +1896,9 @@ namespace JsxKey {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1878,10 +1907,10 @@ namespace JsxKey {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-max-depth.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxMaxDepth {
@@ -1908,8 +1937,9 @@ namespace JsxMaxDepth {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1918,11 +1948,11 @@ namespace JsxMaxDepth {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-max-props-per-line.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxMaxPropsPerLine {
@@ -1988,8 +2018,9 @@ namespace JsxMaxPropsPerLine {
       };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1998,11 +2029,11 @@ namespace JsxMaxPropsPerLine {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-newline.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxNewline {
@@ -2051,8 +2082,9 @@ namespace JsxNewline {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2061,10 +2093,10 @@ namespace JsxNewline {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-bind.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxNoBind {
@@ -2111,8 +2143,9 @@ namespace JsxNoBind {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2121,14 +2154,14 @@ namespace JsxNoBind {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-comment-textnodes.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxNoCommentTextnodes {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -2138,14 +2171,14 @@ namespace JsxNoCommentTextnodes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-constructed-context-values.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxNoConstructedContextValues {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -2154,10 +2187,10 @@ namespace JsxNoConstructedContextValues {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-duplicate-props.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxNoDuplicateProps {
@@ -2183,8 +2216,9 @@ namespace JsxNoDuplicateProps {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2193,11 +2227,11 @@ namespace JsxNoDuplicateProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-leaked-render.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | fixable     | code            |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxNoLeakedRender {
@@ -2234,8 +2268,9 @@ namespace JsxNoLeakedRender {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2244,10 +2279,10 @@ namespace JsxNoLeakedRender {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-literals.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxNoLiterals {
@@ -2329,8 +2364,9 @@ namespace JsxNoLiterals {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2339,10 +2375,10 @@ namespace JsxNoLiterals {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-script-url.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxNoScriptUrl {
@@ -2433,8 +2469,9 @@ namespace JsxNoScriptUrl {
     | readonly [];
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2443,11 +2480,11 @@ namespace JsxNoScriptUrl {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-target-blank.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxNoTargetBlank {
@@ -2494,8 +2531,9 @@ namespace JsxNoTargetBlank {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2504,12 +2542,12 @@ namespace JsxNoTargetBlank {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-useless-fragment.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | suggestion      |
- *  | fixable     | code            |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace JsxNoUselessFragment {
@@ -2535,8 +2573,9 @@ namespace JsxNoUselessFragment {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2545,11 +2584,11 @@ namespace JsxNoUselessFragment {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-one-expression-per-line.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | whitespace       |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | deprecated  | false      |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
  *  ```
  */
 namespace JsxOneExpressionPerLine {
@@ -2583,8 +2622,9 @@ namespace JsxOneExpressionPerLine {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2593,10 +2633,10 @@ namespace JsxOneExpressionPerLine {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-undef.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxNoUndef {
@@ -2622,8 +2662,9 @@ namespace JsxNoUndef {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2633,11 +2674,11 @@ namespace JsxNoUndef {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-curly-brace-presence.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxCurlyBracePresence {
@@ -2696,8 +2737,9 @@ namespace JsxCurlyBracePresence {
     | ('always' | 'ignore' | 'never');
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2706,10 +2748,10 @@ namespace JsxCurlyBracePresence {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-pascal-case.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxPascalCase {
@@ -2755,8 +2797,9 @@ namespace JsxPascalCase {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2765,11 +2808,11 @@ namespace JsxPascalCase {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-fragments.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxFragments {
@@ -2790,8 +2833,9 @@ namespace JsxFragments {
   export type Options = 'element' | 'syntax';
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2800,15 +2844,15 @@ namespace JsxFragments {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-props-no-multi-spaces.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxPropsNoMultiSpaces {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -2817,10 +2861,10 @@ namespace JsxPropsNoMultiSpaces {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-props-no-spreading.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxPropsNoSpreading {
@@ -2901,8 +2945,9 @@ namespace JsxPropsNoSpreading {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2911,14 +2956,14 @@ namespace JsxPropsNoSpreading {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-props-no-spread-multi.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxPropsNoSpreadMulti {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -2927,11 +2972,10 @@ namespace JsxPropsNoSpreadMulti {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-sort-default-props.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | true             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | true  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxSortDefaultProps {
@@ -2961,11 +3005,11 @@ namespace JsxSortDefaultProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-sort-props.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxSortProps {
@@ -3028,8 +3072,9 @@ namespace JsxSortProps {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3038,12 +3083,11 @@ namespace JsxSortProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-space-before-closing.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | deprecated  | true             |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | true  |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxSpaceBeforeClosing {
@@ -3070,11 +3114,11 @@ namespace JsxSpaceBeforeClosing {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-tag-spacing.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | whitespace       |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | deprecated  | false      |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
  *  ```
  */
 namespace JsxTagSpacing {
@@ -3145,8 +3189,9 @@ namespace JsxTagSpacing {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3155,14 +3200,14 @@ namespace JsxTagSpacing {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-uses-react.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxUsesReact {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3171,14 +3216,14 @@ namespace JsxUsesReact {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-uses-vars.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace JsxUsesVars {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3187,11 +3232,11 @@ namespace JsxUsesVars {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-wrap-multilines.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace JsxWrapMultilines {
@@ -3332,8 +3377,9 @@ namespace JsxWrapMultilines {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3342,11 +3388,11 @@ namespace JsxWrapMultilines {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-invalid-html-attribute.md
  *
  *  ```md
- *  | key            | value           |
- *  | :------------- | :-------------- |
- *  | type           | suggestion      |
- *  | hasSuggestions | true            |
- *  | category       | Possible Errors |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace NoInvalidHtmlAttribute {
@@ -3370,8 +3416,9 @@ namespace NoInvalidHtmlAttribute {
   export type Options = readonly 'rel'[];
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3380,14 +3427,14 @@ namespace NoInvalidHtmlAttribute {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-access-state-in-setstate.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoAccessStateInSetstate {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3396,14 +3443,14 @@ namespace NoAccessStateInSetstate {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-adjacent-inline-elements.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoAdjacentInlineElements {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3412,14 +3459,14 @@ namespace NoAdjacentInlineElements {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-array-index-key.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoArrayIndexKey {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3428,15 +3475,15 @@ namespace NoArrayIndexKey {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-arrow-function-lifecycle.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | fixable     | code           |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace NoArrowFunctionLifecycle {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3445,10 +3492,10 @@ namespace NoArrowFunctionLifecycle {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-children-prop.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoChildrenProp {
@@ -3475,8 +3522,9 @@ namespace NoChildrenProp {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3485,10 +3533,10 @@ namespace NoChildrenProp {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-danger.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoDanger {
@@ -3520,8 +3568,9 @@ namespace NoDanger {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3531,14 +3580,14 @@ namespace NoDanger {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-danger-with-children.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoDangerWithChildren {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3547,14 +3596,14 @@ namespace NoDangerWithChildren {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-deprecated.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoDeprecated {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3563,10 +3612,10 @@ namespace NoDeprecated {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-did-mount-set-state.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoDidMountSetState {
@@ -3586,8 +3635,9 @@ namespace NoDidMountSetState {
   export type Options = 'disallow-in-func';
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3596,10 +3646,10 @@ namespace NoDidMountSetState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-did-update-set-state.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoDidUpdateSetState {
@@ -3619,8 +3669,9 @@ namespace NoDidUpdateSetState {
   export type Options = 'disallow-in-func';
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3629,14 +3680,14 @@ namespace NoDidUpdateSetState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-direct-mutation-state.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoDirectMutationState {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3645,14 +3696,14 @@ namespace NoDirectMutationState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-find-dom-node.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoFindDomNode {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3661,14 +3712,14 @@ namespace NoFindDomNode {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-is-mounted.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoIsMounted {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3677,10 +3728,10 @@ namespace NoIsMounted {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-multi-comp.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoMultiComp {
@@ -3707,8 +3758,9 @@ namespace NoMultiComp {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3717,14 +3769,14 @@ namespace NoMultiComp {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-namespace.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoNamespace {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3733,14 +3785,14 @@ namespace NoNamespace {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-set-state.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoSetState {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3749,10 +3801,10 @@ namespace NoSetState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-string-refs.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoStringRefs {
@@ -3778,8 +3830,9 @@ namespace NoStringRefs {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3788,14 +3841,14 @@ namespace NoStringRefs {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-redundant-should-component-update.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoRedundantShouldComponentUpdate {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3804,14 +3857,14 @@ namespace NoRedundantShouldComponentUpdate {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-render-return-value.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoRenderReturnValue {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3820,14 +3873,14 @@ namespace NoRenderReturnValue {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-this-in-sfc.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoThisInSfc {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3836,14 +3889,14 @@ namespace NoThisInSfc {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-typos.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoTypos {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -3852,11 +3905,11 @@ namespace NoTypos {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unescaped-entities.md
  *
  *  ```md
- *  | key            | value           |
- *  | :------------- | :-------------- |
- *  | hasSuggestions | true            |
- *  | category       | Possible Errors |
- *  | recommended    | true            |
+ *  | key            | value |
+ *  | :------------- | :---- |
+ *  | deprecated     | false |
+ *  | hasSuggestions | true  |
+ *  | recommended    | true  |
  *  ```
  */
 namespace NoUnescapedEntities {
@@ -3911,8 +3964,9 @@ namespace NoUnescapedEntities {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3921,11 +3975,11 @@ namespace NoUnescapedEntities {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unknown-property.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | fixable     | code            |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | true  |
  *  ```
  */
 namespace NoUnknownProperty {
@@ -3959,8 +4013,9 @@ namespace NoUnknownProperty {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3969,10 +4024,10 @@ namespace NoUnknownProperty {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unsafe.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoUnsafe {
@@ -3999,8 +4054,9 @@ namespace NoUnsafe {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4009,10 +4065,10 @@ namespace NoUnsafe {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unstable-nested-components.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoUnstableNestedComponents {
@@ -4049,8 +4105,9 @@ namespace NoUnstableNestedComponents {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4059,14 +4116,14 @@ namespace NoUnstableNestedComponents {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unused-class-component-methods.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoUnusedClassComponentMethods {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -4075,10 +4132,10 @@ namespace NoUnusedClassComponentMethods {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unused-prop-types.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoUnusedPropTypes {
@@ -4119,8 +4176,9 @@ namespace NoUnusedPropTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4129,14 +4187,14 @@ namespace NoUnusedPropTypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unused-state.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoUnusedState {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -4146,14 +4204,14 @@ namespace NoUnusedState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-object-type-as-default-prop.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoObjectTypeAsDefaultProp {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -4162,10 +4220,10 @@ namespace NoObjectTypeAsDefaultProp {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-will-update-set-state.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace NoWillUpdateSetState {
@@ -4185,8 +4243,9 @@ namespace NoWillUpdateSetState {
   export type Options = 'disallow-in-func';
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4195,10 +4254,10 @@ namespace NoWillUpdateSetState {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prefer-es6-class.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace PreferEs6Class {
@@ -4219,8 +4278,9 @@ namespace PreferEs6Class {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4229,14 +4289,14 @@ namespace PreferEs6Class {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prefer-exact-props.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace PreferExactProps {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -4245,15 +4305,15 @@ namespace PreferExactProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prefer-read-only-props.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace PreferReadOnlyProps {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -4262,10 +4322,10 @@ namespace PreferReadOnlyProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prefer-stateless-function.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace PreferStatelessFunction {
@@ -4292,8 +4352,9 @@ namespace PreferStatelessFunction {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4302,10 +4363,10 @@ namespace PreferStatelessFunction {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prop-types.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | true           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace PropTypes {
@@ -4345,8 +4406,9 @@ namespace PropTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4355,14 +4417,14 @@ namespace PropTypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/react-in-jsx-scope.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace ReactInJsxScope {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -4371,9 +4433,9 @@ namespace ReactInJsxScope {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/require-default-props.md
  *
  *  ```md
- *  | key      | value          |
- *  | :------- | :------------- |
- *  | category | Best Practices |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace RequireDefaultProps {
@@ -4418,8 +4480,9 @@ namespace RequireDefaultProps {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4428,10 +4491,10 @@ namespace RequireDefaultProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/require-optimization.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace RequireOptimization {
@@ -4460,8 +4523,9 @@ namespace RequireOptimization {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4470,14 +4534,14 @@ namespace RequireOptimization {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/require-render-return.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace RequireRenderReturn {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -4486,11 +4550,11 @@ namespace RequireRenderReturn {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/self-closing-comp.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace SelfClosingComp {
@@ -4522,8 +4586,9 @@ namespace SelfClosingComp {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4532,10 +4597,10 @@ namespace SelfClosingComp {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/sort-comp.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace SortComp {
@@ -4576,8 +4641,9 @@ namespace SortComp {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4586,10 +4652,10 @@ namespace SortComp {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/sort-default-props.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace SortDefaultProps {
@@ -4615,8 +4681,9 @@ namespace SortDefaultProps {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4625,11 +4692,11 @@ namespace SortDefaultProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/sort-prop-types.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | fixable     | code             |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
  *  ```
  */
 namespace SortPropTypes {
@@ -4675,8 +4742,9 @@ namespace SortPropTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4685,10 +4753,10 @@ namespace SortPropTypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/state-in-constructor.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace StateInConstructor {
@@ -4709,8 +4777,9 @@ namespace StateInConstructor {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4719,10 +4788,10 @@ namespace StateInConstructor {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/static-property-placement.md
  *
  *  ```md
- *  | key         | value            |
- *  | :---------- | :--------------- |
- *  | category    | Stylistic Issues |
- *  | recommended | false            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace StaticPropertyPlacement {
@@ -4822,9 +4891,10 @@ namespace StaticPropertyPlacement {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | readonly [Linter.RuleSeverity, Options0, Options1]
-    | readonly [Linter.RuleSeverity, Options0];
+    | RuleSeverityWithDefaultOption
+    | readonly [Linter.StringSeverity, Options0, Options1]
+    | readonly [Linter.StringSeverity, Options0]
+    | 'off';
 }
 
 /**
@@ -4833,10 +4903,10 @@ namespace StaticPropertyPlacement {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/style-prop-object.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace StylePropObject {
@@ -4867,8 +4937,9 @@ namespace StylePropObject {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -4877,14 +4948,14 @@ namespace StylePropObject {
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/void-dom-elements-no-children.md
  *
  *  ```md
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | false |
  *  ```
  */
 namespace VoidDomElementsNoChildren {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 export type EslintReactRules = {

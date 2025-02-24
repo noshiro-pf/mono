@@ -8,12 +8,13 @@ import { type Linter } from 'eslint';
  * | key         | value      |
  * | :---------- | :--------- |
  * | type        | suggestion |
+ * | deprecated  | false      |
  * | fixable     | code       |
  * | recommended | true       |
  * ```
  */
 namespace FromMap {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -24,12 +25,13 @@ namespace FromMap {
  * | key         | value      |
  * | :---------- | :--------- |
  * | type        | suggestion |
+ * | deprecated  | false      |
  * | fixable     | code       |
  * | recommended | true       |
  * ```
  */
 namespace NoUnnecessaryThisArg {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -40,12 +42,13 @@ namespace NoUnnecessaryThisArg {
  * | key         | value   |
  * | :---------- | :------ |
  * | type        | problem |
+ * | deprecated  | false   |
  * | fixable     | code    |
  * | recommended | true    |
  * ```
  */
 namespace PreferArrayFrom {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -55,12 +58,13 @@ namespace PreferArrayFrom {
  * | key         | value      |
  * | :---------- | :--------- |
  * | type        | suggestion |
+ * | deprecated  | false      |
  * | fixable     | code       |
  * | recommended | true       |
  * ```
  */
 namespace AvoidReverse {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -70,12 +74,13 @@ namespace AvoidReverse {
  * | key         | value      |
  * | :---------- | :--------- |
  * | type        | suggestion |
+ * | deprecated  | false      |
  * | fixable     | code       |
  * | recommended | true       |
  * ```
  */
 namespace PreferFlatMap {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -85,12 +90,13 @@ namespace PreferFlatMap {
  * | key         | value      |
  * | :---------- | :--------- |
  * | type        | suggestion |
+ * | deprecated  | false      |
  * | fixable     | code       |
  * | recommended | true       |
  * ```
  */
 namespace PreferFlat {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 export type EslintArrayFuncRules = {

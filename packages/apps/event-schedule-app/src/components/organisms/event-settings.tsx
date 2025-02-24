@@ -52,6 +52,43 @@ export const EventSettings = memoNamed<Props>(
       }
     }, [useNotification, focusEmailInput$, clickedMoreThanOnce]);
 
+    const answerDeadlineDatepicker = useMemo(
+      () => (
+        <AnswerDeadlineDatepicker
+          answerDeadline={answerDeadline}
+          useAnswerDeadline={useAnswerDeadline}
+          onAnswerDeadlineChange={onAnswerDeadlineChange}
+        />
+      ),
+      [answerDeadline, onAnswerDeadlineChange, useAnswerDeadline],
+    );
+
+    const notificationSettingsComponent = useMemo(
+      () => (
+        <NotificationSettingsComponent
+          answerDeadline={answerDeadline}
+          disabled={!useNotification}
+          focusEmailInput$={focusEmailInput$}
+          notificationSettingsWithEmail={
+            notificationSettingsWithEmail ??
+            notificationSettingsWithEmailDefaultValue
+          }
+          useAnswerDeadline={useAnswerDeadline}
+          onNotificationSettingsWithEmailChange={
+            onNotificationSettingsWithEmailChange
+          }
+        />
+      ),
+      [
+        answerDeadline,
+        focusEmailInput$,
+        notificationSettingsWithEmail,
+        onNotificationSettingsWithEmailChange,
+        useAnswerDeadline,
+        useNotification,
+      ],
+    );
+
     return (
       <div
         css={css`
@@ -63,13 +100,7 @@ export const EventSettings = memoNamed<Props>(
       >
         <ParagraphWithSwitch
           description={dc.answerDeadline.howAnswerDeadlineIsUsed}
-          elementToToggle={
-            <AnswerDeadlineDatepicker
-              answerDeadline={answerDeadline}
-              useAnswerDeadline={useAnswerDeadline}
-              onAnswerDeadlineChange={onAnswerDeadlineChange}
-            />
-          }
+          elementToToggle={answerDeadlineDatepicker}
           hideContentIfToggleIsFalse={false}
           title={dc.answerDeadline.title}
           toggleState={useAnswerDeadline}
@@ -78,21 +109,7 @@ export const EventSettings = memoNamed<Props>(
         <hr />
         <ParagraphWithSwitch
           description={dc.notification.description}
-          elementToToggle={
-            <NotificationSettingsComponent
-              answerDeadline={answerDeadline}
-              disabled={!useNotification}
-              focusEmailInput$={focusEmailInput$}
-              notificationSettingsWithEmail={
-                notificationSettingsWithEmail ??
-                notificationSettingsWithEmailDefaultValue
-              }
-              useAnswerDeadline={useAnswerDeadline}
-              onNotificationSettingsWithEmailChange={
-                onNotificationSettingsWithEmailChange
-              }
-            />
-          }
+          elementToToggle={notificationSettingsComponent}
           hideContentIfToggleIsFalse={false}
           title={dc.notification.useNotification}
           toggleState={useNotification}

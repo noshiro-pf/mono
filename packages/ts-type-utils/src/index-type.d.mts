@@ -1,7 +1,9 @@
 type Index<N extends number> = IndexOfTuple<MakeTuple<0, N>>;
 
+type IndexInclusive<N extends number> = IndexOfTuple<[...MakeTuple<0, N>, 0]>;
+
 type NegativeIndex<N extends number> = TSTypeUtilsInternals.MapIdx<
-  RelaxedExclude<IndexOfTuple<[0, ...MakeTuple<0, N>]>, 0>
+  RelaxedExclude<IndexInclusive<N>, 0>
 >;
 
 /** @internal */

@@ -13,13 +13,11 @@ declare namespace TSTypeUtilsInternals {
       : number;
 }
 
-// type IndexOfTuple<T extends readonly unknown[]> = TypeEq<
-//   T,
-//   readonly []
-// > extends true
-//   ? never
-//   : TypeEq<T, []> extends true
-//   ? never
-//   : IsFixedLengthList<T> extends true
-//   ? Exclude<Partial<ListType.ButLast<T>>['length'], undefined>
-//   : SafeUint;
+// type IndexOfTuple<T extends readonly unknown[]> =
+//   TypeEq<T, readonly []> extends true
+//     ? never
+//     : TypeEq<T, []> extends true
+//       ? never
+//       : IsFixedLengthList<T> extends true
+//         ? Exclude<Partial<ListType.ButLast<T>>['length'], undefined>
+//         : SafeUint;

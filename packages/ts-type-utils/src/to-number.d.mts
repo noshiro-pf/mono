@@ -2,30 +2,36 @@ type ToNumber<S extends `${number}`> = S extends `${infer N extends number}`
   ? N
   : never;
 
+/* TypeScript v4.8 以前では以下の実装が必要 */
+
 // type ToNumber<S extends `${number}`> =
-//   _ToNumberInternals._IsSmallNumber<S> extends true
-//     ? _MakeTupleInternals.MakeTupleImpl<unknown, S>['length']
+//   TSTypeUtilsInternals._IsSmallNumber<S> extends true
+//     ? TSTypeUtilsInternals.MakeTupleInternals.MakeTupleImpl<
+//         unknown,
+//         S,
+//         []
+//       >['length']
 //     : S;
 
-// namespace _ToNumberInternals {
+// declare namespace TSTypeUtilsInternals {
 //   // config
-//   type _DigitUpperLimit = 4;
+//   type DigitUpperLimit = 4;
 
-//   type _IsSmallNumber<S extends `${number}`> = _IsSmallNumberImpl<
+//   type IsSmallNumber<S extends `${number}`> = IsSmallNumberImpl<
 //     S,
-//     MakeTuple<unknown, _DigitUpperLimit>
+//     MakeTuple<unknown, DigitUpperLimit>
 //   >;
 
-//   type _Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+//   type Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
-//   type _Tail<T extends string> = T extends `${_Digit}${infer U}` ? U : never;
+//   type Tail<T extends string> = T extends `${Digit}${infer U}` ? U : never;
 
-//   type _IsSmallNumberImpl<
+//   type IsSmallNumberImpl<
 //     S extends string,
-//     Counter extends readonly unknown[]
+//     Counter extends readonly unknown[],
 //   > = S extends ''
 //     ? true
 //     : TypeEq<Counter, readonly []> extends true
-//     ? false // reached the limit
-//     : _IsSmallNumberImpl<_Tail<S>, Tuple.Tail<Counter>>;
+//       ? false // reached the limit
+//       : IsSmallNumberImpl<Tail<S>, Tuple.Tail<Counter>>;
 // }

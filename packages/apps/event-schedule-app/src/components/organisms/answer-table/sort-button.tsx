@@ -18,19 +18,24 @@ export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
     handleClose();
   }, [onSortChange, handleClose]);
 
+  const popoverContent = useMemo(
+    () => (
+      <ButtonGroup vertical={true}>
+        <Button icon={'sort-asc'} minimal={true} onClick={onSortAscClick}>
+          {dict.answerPage.answers.sortAsc}
+        </Button>
+        <Button icon={'sort-desc'} minimal={true} onClick={onSortDescClick}>
+          {dict.answerPage.answers.sortDesc}
+        </Button>
+      </ButtonGroup>
+    ),
+    [onSortAscClick, onSortDescClick],
+  );
+
   return (
     <Popover
       canEscapeKeyClose={true}
-      content={
-        <ButtonGroup vertical={true}>
-          <Button icon='sort-asc' minimal={true} onClick={onSortAscClick}>
-            {dict.answerPage.answers.sortAsc}
-          </Button>
-          <Button icon='sort-desc' minimal={true} onClick={onSortDescClick}>
-            {dict.answerPage.answers.sortDesc}
-          </Button>
-        </ButtonGroup>
-      }
+      content={popoverContent}
       isOpen={isOpen}
       placement={'bottom'}
       onClose={handleClose}

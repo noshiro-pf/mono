@@ -9,29 +9,31 @@ published: true
 ## 更新履歴
 
 - （2025/01/11） 「Branded Type を使用したときの弊害」を追記
-- （2025/01/20）コード例の一部で tag 部分に `never` 型を用いていたのを `unknown` 型に修正
+- （2025/01/20）コード例の一部でBrand 型のオブジェクト部分に `never` 型を用いていたのを `unknown` 型に修正
   - 参考： [誤解されがちなnever型の危険性: 「存在しない」について](https://qiita.com/uhyo/items/97941f855b2df0a99c60?utm_campaign=post_article&utm_medium=twitter&utm_source=twitter_share)
 
 ## 概要
 
-TypeScript で用いられることのある Type branding というハックと既存のいくつかのライブラリでのその実装例を説明し、次に、より安全かつ便利に Type branding を使うためのユーティリティの実装や ESLint 設定も紹介します。
+TypeScript で用いられることのある Type branding というハックと、既存のいくつかのライブラリでのその実装例を説明し、次に、より安全かつ便利に Type branding を使うためのユーティリティの実装や ESLint 設定も紹介します。
 最後に Type branding の活用例として、数値型を `number` より細かく使い分けられるように Branded Type を定義する実装例を載せています。 Branded Type のよくある実装に、筆者が最近思いついたちょっとした工夫を入れることで数値型の Branded Type を上手く実装できたので紹介してみました。
+
+<!-- :::message 本記事中のサンプルコードでは、コード量を減らすために本来は `readonly` を付けるべき箇所で省略していることがありますが、適宜補完して読んでください。 ::: -->
 
 ## Type branding とは
 
-Structural Typing を採用している TypeScript では、例えば複数の異なる ID 文字列の型 （`UserId`, `ProjectId`, ... ）を区別したいというような状況で、以下のように type alias を作っても、単なる string と同等に扱われてしまい区別できません。
+Structural Typing を採用している TypeScript では、例えば複数の異なる ID 文字列の型 （`UserId`, `PostId`, ... ）を区別したいというような状況で、以下のように type alias を作っても、単なる string と同等に扱われてしまい区別できません。
 
 ```ts
 type UserId = string;
-type ProjectId = string;
-type Project = { id: ProjectId; name: string };
+type PostId = string;
+type Post = { id: PostId; name: string };
 
-declare function findProject(id: ProjectId): Promise<Project>;
+declare function findPost(id: PostId): Promise<Post>;
 
 const userId: UserId = 'user-1';
 
-// userId を使って findProject を呼んでいるがエラーにならない
-findProject(userId);
+// userId を使って findPost を呼んでいるが型エラーにならない
+findPost(userId);
 ```
 
 しかしこのような問題を解決するための手段として **Type branding** というハックが知られています。
@@ -40,20 +42,21 @@ Type branding を用いると、以下のようにしてそれぞれの id 型�
 
 ```ts
 type UserId = string & { UserId: unknown };
-type ProjectId = string & { ProjectId: unknown };
-type Project = { id: ProjectId; name: string };
+type PostId = string & { PostId: unknown };
+type Post = { id: PostId; name: string };
 
-declare function findProject(id: ProjectId): Promise<Project>;
+declare function findPost(id: PostId): Promise<Post>;
 
 const userId: UserId = 'user-1' as UserId;
 
-// Argument of type 'UserId' is not assignable to parameter of type 'ProjectId'.
-findProject(userId);
+findPost(userId);
+//       ~~~~~~
+// Argument of type 'UserId' is not assignable to parameter of type 'PostId'.
 
 userId.slice(); // userId は通常の string でもある
 ```
 
-Type branding とは、対象となる型（この例では `string`）に `{ tagName: unknown }` という実際の値とは無関係のダミーのオブジェクト型を交差型として付け加えることで、構造上の互換性を破るテクニックです。こうすることで作られた型（Branded Type） `userId` はただの string 型とは異なる型になり、この例における `findProject` を呼び出してしまうようなミスを防ぐことができるようになります。
+Type branding とは、このように対象となる型（この例では `string`）に `{ brandTag: unknown }` という実際の値とは無関係のダミーのオブジェクト型を交差型として付け加えることで、構造上の互換性を破るテクニックです。こうすることで作られた型（Branded Type） `userId` はただの string 型とは異なる型になり、この例における `findPost` を呼び出してしまうようなミスを型チェックで防ぐことができるようになります。
 
 ## Branded Type の様々な実装
 
@@ -61,7 +64,7 @@ Type branding とは、対象となる型（この例では `string`）に `{ ta
 
 [io-ts](https://github.com/gcanti/io-ts/blob/master/index.md#branded-types--refinements)[^io-ts]
 
-[^io-ts]: io-tsでは、`Brand` という型により unique symbol をキーに持つオブジェクト型にネストさせることで、カスタム実装した型定義や他のライブラリ製の branded type との衝突を防ぐ仕組みになっています。本記事の Branded Type 定義では分かりやすさのためこのような実装はせずに説明しました。
+[^io-ts]: io-tsでは、`Brand` という型により `unique symbol` をキーに持つオブジェクト型にネストさせることで、カスタム実装した型定義や他のライブラリ製の branded type との衝突を防ぐ仕組みになっています。本記事の Branded Type 定義では分かりやすさのためこのような実装はせずに説明しました。
 
 ```ts
 declare const _brand: unique symbol;
@@ -79,21 +82,23 @@ type Int = number & Brand<{ readonly Int: unique symbol }>;
 type Int = number & { __type__: 'Int' } & { __witness__: number };
 ```
 
-どちらの方法も型を区別するという要件は満たせますが、 tag object の key 部に型 ID を置く前者のやり方の方が、以下のように `&` で意味のある交差型を作ることができる点で便利そうです（後者の方法では `never` に潰れてしまいます）。
+どちらの方法も型を区別するという要件は満たせますが、オブジェクト型の value 部に型 ID を書く ts-brand の方法は、 `__type__` などのタグ名を予約するというルールが増えてしまうのも少し気になりますし、key 部に型 ID を置く io-ts のやり方の方が、以下のように `&` で意味のある交差型を作ることができる点で便利そうです（ts-brandの方法では `never` に潰れてしまいます）。
 
 ```ts
-type Int = number & { Int: unique symbol };
-type Positive = number & { Positive: unique symbol };
-type PositiveInt = Positive & Int; // number & { Positive: unique symbol } & { Int: unique symbol }
+type Int = number & { Int: unknown };
+type Positive = number & { Positive: unknown };
+type PositiveInt = Positive & Int; // number & { Positive: unknown } & { Int: unknown }
 ```
 
-また、後者の tag の value 部に型 ID を書く方法は、 `__type__` などのタグ名を予約するというルールが増えてしまうのも少し気になります。
+また、その場合の value 部の型は `any` や `never` ではなく `unknown` や `unique symbol` にしておくのが良さそうです。こうしておけば、上の `Int` 型で宣言した変数 `a` に対して `a.Int` のようにプロパティアクセスしてしまっても、その結果が `unknown` 型にしかならないため間違ってどこかで使ってしまうリスクが他の型よりは低くなります。
 
-今回は前者の key 部に型 ID を書く方法が都合が良いので以降はこちらを採用します。
+また、これをより安全にするために key 部を `unique symbol` で実装することでそもそものプロパティアクセスもできなくしてしまうという方法があります（[Branded Type ベストプラクティス 検索](https://qiita.com/uhyo/items/de4cb2085fdbdf484b83) でベストプラクティスとされているやり方です）。
+
+なお、本記事の `## ［応用］ Branded Type で数値型を細分化` の実装では `unique symbol` を key にすることも可能ですが、コードが長くなり分かりづらくなってしまうことを避けるため、単に文字列リテラル型を用いたコード例で説明しています。また、 value 部で述語を表現できるようにするため、意図的に `unknown` や `unique symbol` ではなく `boolean` 型を使用しています。
 
 ## より安全に Branded Type を使う方法（型ガード関数の定義、ESLint 設定）
 
-Branded Type で変数に型注釈を付けるときには一つ不安要素があります。それは `as` によるキャストが嘘である可能性があることです。
+Branded Type で変数に型注釈を付けるときには一つ不安要素があります。それは `as` によるキャストが嘘になる可能性があることです。
 
 ```ts
 type Int = number & { Int: unknown };
@@ -104,7 +109,7 @@ function numberToString(n: number, radix?: Int): string {
   return n.toString(radix);
 }
 
-numberToString(12345, r);
+numberToString(12345, r); // Uncaught RangeError: toString() radix argument must be between 2 and 36
 ```
 
 これを多少改善するために、 Branded Type 定義と共にガード関数と生成関数をセットで用意する方法が考えられます。 `as` を使ったキャストは unsafe ですが、以下のようにすると型名に合う値であることを保証しやすくなります。
@@ -118,16 +123,16 @@ function isInt(a: number): a is Int {
   return Number.isInteger(a);
 }
 
-function toInt(a: number): Int {
+function castToInt(a: number): Int {
   if (!isInt(a)) {
-    throw new Error(`a non-integer number "${a}" was passed to "toInt"`);
+    throw new Error(`a non-integer number "${a}" was passed to "castToInt"`);
   }
   return a as Int;
 }
 
 // main.ts
 
-const r: Int = toInt(0.1); // ここで早期にエラーで気づける
+const r: Int = castToInt(0.1); // ここで早期にエラーで気づける
 
 function numberToString(n: number, radix?: Int): string {
   return n.toString();
@@ -155,7 +160,7 @@ export type Int = z.infer<typeof Int>;
 
 export const isInt = (a: number): a is Int => Int.safeParse(a).success;
 
-export const toInt = (a: number): Int => Int.parse(a);
+export const castToInt = (a: number): Int => Int.parse(a);
 ```
 
 [io-ts](https://github.com/gcanti/io-ts/blob/master/index.md#branded-types--refinements) の使用例：[^io-ts-int]
@@ -178,7 +183,7 @@ export type Int = t.TypeOf<typeof Int>;
 
 export const isInt = (a: number): a is Int => E.isRight(Int.decode(a));
 
-export const toInt = (a: number): Int => {
+export const castToInt = (a: number): Int => {
   const ret = Int.decode(a);
   if (E.isLeft(ret)) {
     throw new Error(ret.left.toString());
@@ -187,7 +192,7 @@ export const toInt = (a: number): Int => {
 };
 ```
 
-もちろん、これだけでは `toInt` や `isInt` などのユーティリティを使わず `as Int` と書いてしまうことを禁止できているわけではないので、さらに ESLint によりチェックすると良さそうです。
+もちろん、これだけでは `castToInt` や `isInt` などのユーティリティを使わず `as Int` と書いてしまうことを禁止できているわけではないので、さらに ESLint によりチェックすると良さそうです。
 
 以下のように設定することでこれをチェックできます。
 
@@ -200,14 +205,14 @@ export const toInt = (a: number): Int => {
       "error",
       {
         "selector": "TSAsExpression[typeAnnotation.typeName.name='Int']",
-        "message": "use toInt or isInt instead"
+        "message": "use castToInt or isInt instead"
       }
     ]
   }
 }
 ```
 
-## Branded Type を使用したときの弊害
+## Branded Type を使用したコードの弊害
 
 Branding は TypeScript でのコーディングにおいて便利な道具ですが、あくまでユーザー側で慣例的に行われている「ハック」であり[^type-branding-is-hack]、TypeScriptに公式にサポートされている実装パターンというわけではないことに注意が必要です。
 
@@ -216,7 +221,8 @@ Branding は TypeScript でのコーディングにおいて便利な道具で�
 具体的には、例えば以下のようなコードで好ましくない挙動に遭遇します。
 
 ```ts
-type SafeUint = number & { readonly SafeUint: unknown };
+// 非負整数型
+type Uint = number & { readonly Uint: unknown };
 
 const findIndex = (xs: readonly number[], x: number): number => xs.indexOf(x);
 
@@ -229,26 +235,26 @@ const fn1 = (): 0 | 1 | undefined => {
   return undefined;
 };
 
-const findIndexBranded = (xs: readonly number[], x: number): SafeUint | -1 =>
-  xs.indexOf(x) as SafeUint | -1;
+const findIndexBranded = (xs: readonly number[], x: number): Uint | -1 =>
+  xs.indexOf(x) as Uint | -1;
 
 const fn2 = (): 0 | 1 | undefined => {
-  const i: SafeUint | -1 = findIndexBranded([], 1);
+  const i: Uint | -1 = findIndexBranded([], 1);
   if (i === 0 || i === 1) {
-    // `i` は `0 | 1` 型に絞られず SafeUint のまま！（`-1` だけは除去される）
-    return i satisfies SafeUint;
-    // ~~~~~
+    // `i` は `0 | 1` 型に絞られず Uint のまま！（`-1` だけは除去される）
+    return i satisfies Uint;
+    // ~~~~~~~~~~~~~~~~~~~~
     // Type Error
   }
   return undefined;
 };
 ```
 
-このコードにおいて、普通の `number` 型を使っている一つ目の例 `fn1` ではうまく型の絞り込みができますが、二つ目の例の `fn2` のようにbrand 化した `number` 型である `SafeUint` 型は `number` のサブタイプであるため、即値 `0`, `1` との比較による絞り込みができないという悩みが生じます。
+このコードにおいて、普通の `number` 型を使っている一つ目の例 `fn1` ではうまく型の絞り込みができますが、二つ目の例の `fn2` のようにbrand 化した `number` 型である `Uint` 型は `number` のサブタイプであるため、即値 `0`, `1` との比較による絞り込みができないという悩みが生じます。
 
-この絞り込みに失敗するのは、 `number` 型は型 `0` や型 `1` の上位型であるのに対し、 brand 型 `SafeUint` は型 `0` や型 `1` の上位型ではないことが理由です。条件部で `SafeUint & 0` 型の即値との比較などができれば `SafeUint` の部分型であるため絞り込みができそうですが、行いたい処理の割にコードが複雑化・コード量が増えるのがネックです。
+この絞り込みに失敗するのは、 `number` 型は型 `0` や型 `1` の上位型であるのに対し、 brand 型 `Uint` は型 `0` や型 `1` の上位型ではないことが理由です。条件部で `Uint & 0` 型の即値との比較などができれば `Uint` の部分型であるため絞り込みができそうですが、行いたい処理の割にコードが複雑化・コード量が増えるのがネックです。
 
-ちなみにこの例のようなケースは、部分的に `i` を `SafeUint` から `number` 型に広げてから即値との比較を行うという手はあります。関数内のローカル変数 `i` の型から `SafeUint` 型という情報が落ちるくらいは許容できそうです。
+ちなみにこの例のようなケースは、部分的に `i` を `Uint` から `number` 型に広げてから即値との比較を行うという手はあります。関数内のローカル変数 `i` の型から `Uint` 型という情報が落ちるくらいは許容できそうです。
 
 ```ts
 const fn2_2 = (): 0 | 1 | undefined => {
@@ -297,7 +303,7 @@ interface Array<T> {
 こういった事情もあり、整数を使うべき箇所でもほぼ浮動小数点数 `number` を（諦めて）使っていることがほとんどです。
 また、整数しか入力として想定していないような関数を定義するときも仮引数に `number` 型を使わざるを得ない以上、ちゃんとやるなら `Number.isInteger` などでチェックするバリデーションコードを関数の初めに書くべきではあるのですが、いちいちバリデーションを書くのは手間ですし、どうせすべての箇所で厳密にやるのが現実的にほぼ無理ということで、特に重要な場合以外は省いてしまうことも多そうです。
 そもそも、型を信じることで（TypeScript の型による保証は絶対ではないので、信じられるように注意してコードを書くことで）そういったバリデーションコードをすべての関数に都度書く手間とランタイムコストを省けるのが JavaScript と比較したときの TypeScript の大きなメリットの一つであるはずなので、数値型の制約も型でなるべく保証できている状態が自然に思えます。
-特定の条件を満たす数値型（整数など）だけを受け取る関数では、それを**型で明示してある方が、関数にバリデーションコードを書く手間とランタイムチェックコストを省ける上に関数のインターフェースも分かりやすくなる**メリットがありそうです。
+特定の条件を満たす数値型（整数など）を受け取る関数は、それを型で明示してある方が関数にバリデーションコードを書く手間とランタイムチェックコストを省ける上に関数のインターフェースも分かりやすくなるメリットがありそうです。
 
 そこで、今回は組み込みの `Number` オブジェクトに生えている各種バリデーション関数に対応する Branded number type を実装することにします。
 
@@ -325,7 +331,7 @@ type PositiveNegativeNumber = PositiveNumber & NegativeNumber;
 // できれば never になってほしい。
 ```
 
-そこで、以下のように **Branded Type の tag 部の value に `unknown` ではなく `true/false` を持たせる**という工夫を考えてみました。
+そこで、以下のように **Branded Type のオブジェクト型の value に `unknown` ではなく `true/false` を持たせる**という工夫を考えてみました。
 
 ```ts
 type PositiveNumber = number & { Positive: true };
@@ -334,7 +340,7 @@ type NegativeNumber = number & { Positive: false };
 type PositiveNegativeNumber = PositiveNumber & NegativeNumber; // never
 ```
 
-こうすると、 `true & false` が `never` なので全体も `never` になってくれます。意味的には、 tag が表す述語が真になる場合は `true` 、偽になる場合は `false` を割り当てる、という風にして型を分類しています。
+こうすると、 `true & false` が `never` なので全体も `never` になってくれます。意味的には、オブジェクト型の key が表す述語が真になる場合は `true` 、偽になる場合は `false` を割り当てる、という風にして型を分類しています。
 
 正確には `0` や `NaN` が含まれないようにもしたいため、もう少し意味的に正確な型になるよう修正してみます。
 
@@ -357,11 +363,7 @@ type NegativeNumber = number & {
 直接書いても良いのですが、 Branded Type を作る型ユーティリティも用意してみます。
 
 ```ts
-export type Brand<
-  T,
-  TrueKeys extends string,
-  FalseKeys extends string = never,
-> = T & {
+type Brand<T, TrueKeys extends string, FalseKeys extends string = never> = T & {
   readonly [key in FalseKeys | TrueKeys]: key extends TrueKeys ? true : false;
 };
 ```
@@ -376,7 +378,7 @@ type NegativeNumber = Brand<number, never, 'NonNegative' | 'NaN' | 'Zero'>;
 第 3 引数のデフォルト値を `never` にしているので、冒頭の例のような `false` な key を使う必要の無い普通のケースは 2 引数で書けるようにもしています。
 
 ```ts
-type ProjectId = Brand<string, 'ProjectId'>; // string & { readonly ProjectId: true };
+type PostId = Brand<string, 'PostId'>; // string & { readonly PostId: true };
 ```
 
 これを使うと数値型を以下のように実装できます。
@@ -384,51 +386,47 @@ type ProjectId = Brand<string, 'ProjectId'>; // string & { readonly ProjectId: t
 ```ts
 import { type Brand } from './brand';
 
-export type NaNType = Brand<number, 'NaN', 'Finite' | 'NonNegative' | 'Zero'>;
+type NaNType = Brand<number, 'NaN', 'Finite' | 'NonNegative' | 'Zero'>;
 
-export type FiniteNumber = Brand<number, 'Finite', 'NaN'>;
+type FiniteNumber = Brand<number, 'Finite', 'NaN'>;
 
-export type InfiniteNumber = Brand<number, never, 'Finite' | 'NaN' | 'Zero'>;
+type InfiniteNumber = Brand<number, never, 'Finite' | 'NaN' | 'Zero'>;
 
-export type POSITIVE_INFINITY = Brand<
+type POSITIVE_INFINITY = Brand<
   number,
   'NonNegative',
   'Finite' | 'NaN' | 'Zero'
 >;
 
-export type NEGATIVE_INFINITY = Brand<
+type NEGATIVE_INFINITY = Brand<
   number,
   never,
   'Finite' | 'NaN' | 'NonNegative' | 'Zero'
 >;
 
-export type NonZeroNumber = Brand<number, never, 'NaN' | 'Zero'>;
+type NonZeroNumber = Brand<number, never, 'NaN' | 'Zero'>;
 
-export type NonNegativeNumber = Brand<number, 'NonNegative', 'NaN'>;
+type NonNegativeNumber = Brand<number, 'NonNegative', 'NaN'>;
 
-export type PositiveNumber = Brand<number, 'NonNegative', 'NaN' | 'Zero'>;
+type PositiveNumber = Brand<number, 'NonNegative', 'NaN' | 'Zero'>;
 
-export type NegativeNumber = Brand<
-  number,
-  never,
-  'NaN' | 'NonNegative' | 'Zero'
->;
+type NegativeNumber = Brand<number, never, 'NaN' | 'NonNegative' | 'Zero'>;
 
-export type Int = Brand<number, 'Finite' | 'Int', 'NaN'>;
+type Int = Brand<number, 'Finite' | 'Int', 'NaN'>;
 
-export type Uint = Brand<number, 'Finite' | 'Int' | 'NonNegative', 'NaN'>;
+type Uint = Brand<number, 'Finite' | 'Int' | 'NonNegative', 'NaN'>;
 
-export type NonZeroInt = Brand<number, 'Finite' | 'Int', 'NaN' | 'Zero'>;
+type NonZeroInt = Brand<number, 'Finite' | 'Int', 'NaN' | 'Zero'>;
 
-export type SafeInt = Brand<number, 'Finite' | 'Int' | 'SafeInt', 'NaN'>;
+type SafeInt = Brand<number, 'Finite' | 'Int' | 'SafeInt', 'NaN'>;
 
-export type SafeUint = Brand<
+type SafeUint = Brand<
   number,
   'NonNegative' | 'Finite' | 'Int' | 'SafeInt',
   'NaN'
 >;
 
-export type NonZeroSafeInt = Brand<
+type NonZeroSafeInt = Brand<
   number,
   'Finite' | 'Int' | 'SafeInt',
   'NaN' | 'Zero'

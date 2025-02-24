@@ -8,15 +8,15 @@ import { type Linter } from 'eslint';
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-unsafe-regex.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectUnsafeRegex {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -26,15 +26,15 @@ namespace DetectUnsafeRegex {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-non-literal-regexp.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectNonLiteralRegexp {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -44,15 +44,15 @@ namespace DetectNonLiteralRegexp {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-non-literal-require.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectNonLiteralRequire {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -62,15 +62,15 @@ namespace DetectNonLiteralRequire {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-non-literal-fs-filename.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectNonLiteralFsFilename {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -80,15 +80,15 @@ namespace DetectNonLiteralFsFilename {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-eval-with-expression.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectEvalWithExpression {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -98,15 +98,15 @@ namespace DetectEvalWithExpression {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-pseudoRandomBytes.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectPseudoRandomBytes {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -116,15 +116,15 @@ namespace DetectPseudoRandomBytes {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-possible-timing-attacks.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectPossibleTimingAttacks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -133,15 +133,15 @@ namespace DetectPossibleTimingAttacks {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-no-csrf-before-method-override.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectNoCsrfBeforeMethodOverride {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -150,15 +150,15 @@ namespace DetectNoCsrfBeforeMethodOverride {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-buffer-noassert.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectBufferNoassert {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -167,15 +167,15 @@ namespace DetectBufferNoassert {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-child-process.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectChildProcess {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -185,15 +185,15 @@ namespace DetectChildProcess {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-disable-mustache-escape.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectDisableMustacheEscape {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -202,15 +202,15 @@ namespace DetectDisableMustacheEscape {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-object-injection.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectObjectInjection {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -220,15 +220,15 @@ namespace DetectObjectInjection {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-new-buffer.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectNewBuffer {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -238,15 +238,15 @@ namespace DetectNewBuffer {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-bidi-characters.md
  *
  *  ```md
- *  | key         | value                           |
- *  | :---------- | :------------------------------ |
- *  | type        | error                           |
- *  | category    | Possible Security Vulnerability |
- *  | recommended | true                            |
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | type        | error |
+ *  | deprecated  | false |
+ *  | recommended | true  |
  *  ```
  */
 namespace DetectBidiCharacters {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 export type EslintSecurityRules = {

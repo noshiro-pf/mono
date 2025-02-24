@@ -117,7 +117,7 @@ if (!!maybeUser) {
 このメソッドは、 `Promise<void>` 型を戻り値とするメソッド `signinPopupCallback`, `signinSilentCallback` と `Promise<User>` 型を戻り値とする `signinRedirectCallback` が中で呼び分けられる内部実装になっており、これをそのまま `Promise<User | void>` という戻り値型にしているようでした。
 
 ```ts
-export class UserManager {
+class UserManager {
   // ...
 
   public async signinCallback(

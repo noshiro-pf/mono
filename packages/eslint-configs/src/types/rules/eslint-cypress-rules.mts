@@ -1,8 +1,12 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type RuleSeverityWithDefaultOption } from '../rule-severity-branded.mjs';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
 
 /**
  * Disallow assigning return values of `cy` calls
@@ -10,15 +14,15 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-assigning-return-values.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoAssigningReturnValues {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -27,11 +31,11 @@ namespace NoAssigningReturnValues {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/unsafe-to-chain-command.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace UnsafeToChainCommand {
@@ -63,8 +67,9 @@ namespace UnsafeToChainCommand {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -73,15 +78,15 @@ namespace UnsafeToChainCommand {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-unnecessary-waiting.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoUnnecessaryWaiting {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -90,15 +95,15 @@ namespace NoUnnecessaryWaiting {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-async-before.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoAsyncBefore {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -107,15 +112,15 @@ namespace NoAsyncBefore {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-async-tests.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | category    | Possible Errors |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoAsyncTests {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -124,15 +129,15 @@ namespace NoAsyncTests {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/assertion-before-screenshot.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
  *  ```
  */
 namespace AssertionBeforeScreenshot {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -141,15 +146,15 @@ namespace AssertionBeforeScreenshot {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/require-data-selectors.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | suggestion      |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace RequireDataSelectors {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -158,15 +163,15 @@ namespace RequireDataSelectors {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-force.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | suggestion      |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoForce {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -175,15 +180,15 @@ namespace NoForce {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-pause.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | suggestion      |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoPause {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -192,15 +197,15 @@ namespace NoPause {
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-debug.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | suggestion      |
- *  | category    | Possible Errors |
- *  | recommended | false           |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
  *  ```
  */
 namespace NoDebug {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 export type EslintCypressRules = {

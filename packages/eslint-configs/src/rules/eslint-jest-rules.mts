@@ -1,15 +1,16 @@
 import { type EslintJestRules } from '../types/index.mjs';
+import { withDefaultOption } from '../types/rule-severity-branded.mjs';
 
 export const eslintJestRules: EslintJestRules = {
   /* vitest, playwright と共通のルール（設定値をなるべく合わせる） */
-  'jest/expect-expect': 'error',
+  'jest/expect-expect': withDefaultOption('error'),
   'jest/max-expects': 'off',
-  'jest/max-nested-describe': 'error',
+  'jest/max-nested-describe': withDefaultOption('error'),
   'jest/no-commented-out-tests': 'off',
   'jest/no-conditional-expect': 'error',
   'jest/no-conditional-in-test': 'off',
   'jest/no-duplicate-hooks': 'error',
-  'jest/no-hooks': 'error',
+  'jest/no-hooks': withDefaultOption('error'),
   'jest/no-restricted-matchers': [
     'error',
     {
@@ -17,7 +18,7 @@ export const eslintJestRules: EslintJestRules = {
       toBeFalsy: 'Use `.toBe(false)` instead.',
     },
   ],
-  'jest/no-standalone-expect': 'error',
+  'jest/no-standalone-expect': withDefaultOption('error'),
   'jest/prefer-comparison-matcher': 'error',
   'jest/prefer-equality-matcher': 'error',
   'jest/prefer-hooks-in-order': 'error',
@@ -30,7 +31,7 @@ export const eslintJestRules: EslintJestRules = {
   'jest/require-to-throw-message': 'error',
   'jest/require-top-level-describe': 'off',
   'jest/valid-describe-callback': 'error',
-  'jest/valid-expect': 'error',
+  'jest/valid-expect': withDefaultOption('error'),
   'jest/valid-title': 'off',
 
   /* vitest と共通のルール（設定値をなるべく合わせる） */
@@ -40,7 +41,7 @@ export const eslintJestRules: EslintJestRules = {
   'jest/no-focused-tests': 'error',
   'jest/no-identical-title': 'error',
   'jest/no-interpolation-in-snapshots': 'error',
-  'jest/no-large-snapshots': 'error',
+  'jest/no-large-snapshots': withDefaultOption('error'),
   'jest/no-mocks-import': 'error',
   'jest/no-restricted-jest-methods': [
     'error',
@@ -57,7 +58,7 @@ export const eslintJestRules: EslintJestRules = {
   'jest/prefer-expect-resolves': 'error',
   'jest/prefer-lowercase-title': 'off',
   'jest/prefer-mock-promise-shorthand': 'error',
-  'jest/prefer-snapshot-hint': 'error',
+  'jest/prefer-snapshot-hint': withDefaultOption('error'),
   'jest/prefer-spy-on': 'error',
   'jest/prefer-todo': 'error',
 
@@ -77,8 +78,8 @@ export const eslintJestRules: EslintJestRules = {
   'jest/padding-around-describe-blocks': 'error',
   'jest/padding-around-expect-groups': 'error',
   'jest/padding-around-test-blocks': 'error',
-  'jest/prefer-importing-jest-globals': 'error',
+  'jest/prefer-importing-jest-globals': withDefaultOption('error'),
   'jest/prefer-jest-mocked': 'error',
-  'jest/unbound-method': 'error',
+  'jest/unbound-method': withDefaultOption('error'),
   'jest/valid-expect-in-promise': 'error',
 } as const;
