@@ -64,12 +64,11 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
 
   const fill: Type<T>['fill'] = (a) =>
     isRecord(a)
-      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        (Object.fromEntries(
+      ? Object.fromEntries(
           Object.entries(a).filter(
             ([k, v]) => keyType.is(k) && valueType.is(v),
           ),
-        ) as T)
+        )
       : defaultValue;
 
   return {
