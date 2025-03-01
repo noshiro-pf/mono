@@ -7,10 +7,12 @@
 !output/lib-files
 !output/lib-files/*.d.ts
 !output/packages/**
+output/packages/**/node_modules
 !output/lib
 
 !output-branded
 !output-branded/lib-files
 !output-branded/lib-files/*.d.ts
 !output-branded/packages/**
+output-branded/packages/**/node_modules
 !output-branded/lib

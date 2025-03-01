@@ -34,7 +34,7 @@ export const convertLibEs2017Object =
           '  /** @internal */',
           '  type ToObjectEntries<R extends UnknownRecord> = R extends R',
           `    ? ${readonlyModifier}(`,
-          '        | readonly [string, ValueOf<R>]',
+          '        | readonly [string & {}, WidenLiteral<ValueOf<R>>]',
           '        | {',
           `            ${readonlyModifier}[K in keyof R]: readonly [`,
           '              ToStr<keyof PickByValue<R, R[K]>>,',

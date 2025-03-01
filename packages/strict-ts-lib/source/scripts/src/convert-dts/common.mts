@@ -8,8 +8,6 @@ export type ConverterConfig = Readonly<{
   commentOutDeprecated: boolean;
   returnType: 'mutable' | 'readonly';
   useBrandedNumber: boolean;
-  forNpmPackage: boolean;
-  useLocalPath: boolean;
 }>;
 
 export type ConverterOptions = Readonly<{
@@ -186,7 +184,7 @@ export const getSrcFileList = async (
 
   const distFileContentList = await Promise.all(
     distFileNameList.map((filename) =>
-      fs.readFile(`${srcDir}/${filename}`, 'utf8'),
+      fs.readFile(path.resolve(srcDir, filename), { encoding: 'utf8' }),
     ),
   );
 

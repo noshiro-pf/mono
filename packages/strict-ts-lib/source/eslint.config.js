@@ -5,19 +5,19 @@ import {
   restrictedSyntax,
 } from '@noshiro/eslint-configs';
 import { toThisDir } from '@noshiro/mono-utils';
-import * as nodePath from 'node:path';
+import 'zx/globals';
 
 const thisDir = toThisDir(import.meta.url);
 
 /** @returns {readonly FlatConfig[]} */
 const defineConfig = () => [
   {
-    ignores: ['**/*.d.ts', '**/*.d.mts'],
+    ignores: ['**/*.d.ts', '**/*.d.mts', 'scripts/dist/**/*.mjs'],
   },
   ...eslintFlatConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
-    packageDirs: [nodePath.resolve(thisDir, '../../..'), thisDir],
+    packageDirs: [path.resolve(thisDir, '../../..'), thisDir],
   }),
   {
     rules: {
@@ -34,6 +34,7 @@ const defineConfig = () => [
       'no-restricted-globals': 'off',
       'import/no-internal-modules': 'off',
       '@typescript-eslint/no-empty-function': 'off',
+      'no-await-in-loop': 'off',
     },
   },
 ];
