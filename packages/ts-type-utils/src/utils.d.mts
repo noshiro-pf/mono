@@ -10,14 +10,17 @@ type TypeEq<A, B> =
 
 type TypeExtends<A, B> = A extends B ? true : false;
 
+/** Extract from T those types that are assignable to U */
+type RelaxedExtract<T, U> = T extends U ? T : never;
+
+/** From T, pick a set of properties whose keys are in the union K */
+type RelaxedPick<T, K> = Pick<T, RelaxedExtract<keyof T, K>>;
+
 /** Exclude from T those types that are assignable to U */
 type RelaxedExclude<T, U> = T extends U ? never : T;
 
 /** Construct a type with the properties of T except for those in type K. */
-type RelaxedOmit<T, K extends keyof never> = Pick<
-  T,
-  RelaxedExclude<keyof T, K>
->;
+type RelaxedOmit<T, K> = Pick<T, RelaxedExclude<keyof T, K>>;
 
 /* type constants */
 
@@ -154,40 +157,14 @@ type MutableArrayOfLength<N extends number, Elm> = Mutable<
 
 // https://qiita.com/uhyo/items/80ce7c00f413c1d1be56
 
-type MutableArrayOfLengthOrMore<N extends number, Elm> = MutableArrayAtLeastLen<
-  N,
-  Elm
->;
 type MutableArrayAtLeastLen<N extends number, Elm> = Mutable<
   ArrayAtLeastLen<N, Elm>
 >;
 
-type ArrayOfLengthOrMore<N extends number, Elm> = ArrayAtLeastLen<N, Elm>;
 type ArrayAtLeastLen<N extends number, Elm> = readonly [
   ...MakeTuple<Elm, N>,
   ...Elm[],
 ];
-
-// type ArrayAtLeastLen<N extends number, Elm> = ArrayAtLeastLenRec<
-//   N,
-//   Elm,
-//   Elm[],
-//   []
-// >;
-
-// type ArrayAtLeastLenRec<
-//   Num,
-//   Elm,
-//   T extends readonly unknown[],
-//   C extends readonly unknown[],
-// > = C extends { length: Num }
-//   ? T
-//   : ArrayAtLeastLenRec<
-//       Num,
-//       Elm,
-//       readonly [Elm, ...T],
-//       readonly [unknown, ...C]
-//     >;
 
 type MergeIntersection<R extends UnknownRecord> = {
   [K in keyof R]: R[K];

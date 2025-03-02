@@ -3,8 +3,6 @@ type UintRange<Start extends number, End extends number> = RelaxedExclude<
   Index<Start>
 >;
 
-type IndexInclusive<N extends number> = IndexOfTuple<[...MakeTuple<0, N>, 0]>;
-
 type UintRangeInclusive<
   MinValue extends number,
   MaxValue extends number,

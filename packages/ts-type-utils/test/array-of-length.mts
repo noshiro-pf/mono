@@ -14,6 +14,6 @@ expectType<ArrayOfLength<3, 0>, readonly [0, 0, 0]>('=');
 expectType<ArrayOfLength<4, 1>, readonly [1, 1, 1, 1]>('=');
 expectType<MutableArrayOfLength<4, 1>, [1, 1, 1, 1]>('=');
 
-expectType<ArrayOfLengthOrMore<0, 0>, readonly 0[]>('=');
-expectType<ArrayOfLengthOrMore<3, 0>, readonly [0, 0, 0, ...0[]]>('=');
-expectType<ArrayOfLengthOrMore<4, 1>, readonly [1, 1, 1, 1, ...1[]]>('=');
+expectType<ArrayAtLeastLen<0, 0>, readonly 0[]>('=');
+expectType<ArrayAtLeastLen<3, 0>, readonly [0, 0, 0, ...0[]]>('=');
+expectType<ArrayAtLeastLen<4, 1>, readonly [1, 1, 1, 1, ...1[]]>('=');
