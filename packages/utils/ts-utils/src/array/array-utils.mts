@@ -1,4 +1,5 @@
 import { IMap } from '../collections/index.mjs';
+import { expectType } from '../expect-type.mjs';
 import { range as rangeIterator } from '../iterator/index.mjs';
 import { Num, Uint32, toUint32 } from '../num/index.mjs';
 import { idfn, tp } from '../others/index.mjs';
@@ -167,6 +168,23 @@ type RangeList<S extends SmallUint, E extends SmallUint> =
   BoolOr<IsUnion<S>, IsUnion<E>> extends true
     ? readonly RelaxedExclude<LEQ[E], LEQ[Min<S>]>[] // union に対して Seq で型計算すると、結果が正しくないので、その回避のため
     : ListType.Skip<S, Seq<E>>;
+
+if (import.meta.vitest !== undefined) {
+  expectType<RangeList<1, 5>, readonly [1, 2, 3, 4]>('=');
+  expectType<RangeList<1, 2>, readonly [1]>('=');
+  expectType<RangeList<1, 1>, readonly []>('=');
+  expectType<RangeList<1, 1 | 3>, readonly (1 | 2)[]>('=');
+  expectType<RangeList<1 | 3, 3 | 5>, readonly (1 | 2 | 3 | 4)[]>('=');
+  expectType<
+    RangeList<1 | 2 | 3, 5 | 6 | 7>,
+    readonly (1 | 2 | 3 | 4 | 5 | 6)[]
+  >('=');
+  expectType<RangeList<5, 1>, readonly []>('=');
+
+  test('dummy', () => {
+    expect(0).toBe(0);
+  });
+}
 
 function range<S extends SmallUint, E extends SmallUint>(
   start: S,
