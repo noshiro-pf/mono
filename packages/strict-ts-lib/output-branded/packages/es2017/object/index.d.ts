@@ -19,7 +19,7 @@ declare namespace StrictLibInternals {
   /** @internal */
   type ToObjectEntries<R extends UnknownRecord> = R extends R
     ? readonly (
-        | readonly [string, ValueOf<R>]
+        | readonly [string & {}, WidenLiteral<ValueOf<R>>]
         | {
             readonly [K in keyof R]: readonly [
               ToStr<keyof PickByValue<R, R[K]>>,

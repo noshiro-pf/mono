@@ -1,0 +1,10 @@
+import { exitIfErr } from '../functions/utils/exit-if-err.mjs';
+import { wrapStartEnd } from '../functions/utils/wrap-start-end.mjs';
+import { genSteps, getEndStepIndex, getStartStepIndex } from './gen-steps.mjs';
+
+for (const { name, fn } of genSteps.slice(
+  getStartStepIndex('genLibFiles'),
+  getEndStepIndex('format output/lib-files'),
+)) {
+  await wrapStartEnd(fn, name).then(exitIfErr);
+}

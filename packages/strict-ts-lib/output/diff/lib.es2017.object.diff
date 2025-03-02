@@ -33,7 +33,7 @@
 +  /** @internal */
 +  type ToObjectEntries<R extends UnknownRecord> = R extends R
 +    ? (
-+        | readonly [string, ValueOf<R>]
++        | readonly [string & {}, WidenLiteral<ValueOf<R>>]
 +        | {
 +            [K in keyof R]: readonly [ToStr<keyof PickByValue<R, R[K]>>, R[K]];
 +            // eslint-disable-next-line @typescript-eslint/no-restricted-types
@@ -105,3 +105,16 @@
  
    /**
     * Returns an object containing all own property descriptors of an object
+@@ -61,9 +99,9 @@ interface ObjectConstructor {
+    *   object that you created or an existing Document Object Model (DOM)
+    *   object.
+    */
+-  getOwnPropertyDescriptors<T>(
+-    o: T,
+-  ): { [P in keyof T]: TypedPropertyDescriptor<T[P]> } & {
++  getOwnPropertyDescriptors<T>(o: T): {
++    [P in keyof T]: TypedPropertyDescriptor<T[P]>;
++  } & {
+     [x: string]: PropertyDescriptor;
+   };
+ }

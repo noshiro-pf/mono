@@ -41,7 +41,6 @@ const rewritePackageVersion = async (
 };
 
 const main = async (): Promise<void> => {
-  // @tier4/eslint
   cd(eslintDir);
   {
     echo`${eslintDir}: updating dependencies`;
@@ -93,7 +92,6 @@ const main = async (): Promise<void> => {
   echo`${eslintDir}: generating rules type`;
   await generateRulesTypeMain();
 
-  // @tier4/strict-ts-lib
   cd(strictTsLibSourceDir);
   {
     const packages = [

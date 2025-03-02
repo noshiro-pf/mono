@@ -1,7 +1,7 @@
 import { expectType } from './expect-type.mjs';
 
 {
-  type RecordType = DeepReadonly<{
+  type RecordType1 = DeepReadonly<{
     x: 1;
     y: 2;
     z: 2;
@@ -9,12 +9,12 @@ import { expectType } from './expect-type.mjs';
   }>;
 
   expectType<
-    StrictLibInternals.ToObjectEntries<RecordType>,
+    StrictLibInternals.ToObjectEntries<RecordType1>,
     readonly (
-      | readonly ['3', 4]
       | readonly ['x', 1]
       | readonly ['y' | 'z', 2]
-      | readonly [string, 1 | 2 | 4]
+      | readonly ['3', 4]
+      | readonly [string & {}, number]
     )[]
   >('=');
 }
@@ -27,12 +27,12 @@ import { expectType } from './expect-type.mjs';
     readonly (
       | readonly ['x', 1]
       | readonly ['y', 2]
-      | readonly [string, 1 | 2]
+      | readonly [string & {}, number]
     )[]
   >('=');
 }
 {
-  type RecordType = DeepReadonly<
+  type RecordType2 = DeepReadonly<
     | {
         a: 10;
         b: 20;
@@ -48,18 +48,18 @@ import { expectType } from './expect-type.mjs';
   >;
 
   expectType<
-    StrictLibInternals.ToObjectEntries<RecordType>,
+    StrictLibInternals.ToObjectEntries<RecordType2>,
     | readonly (
         | readonly ['3', 4]
         | readonly ['x', 1]
         | readonly ['y' | 'z', 2]
-        | readonly [string, 1 | 2 | 4]
+        | readonly [string & {}, number]
       )[]
     | readonly (
         | readonly ['9', 40]
         | readonly ['a', 10]
         | readonly ['b' | 'c', 20]
-        | readonly [string, 10 | 20 | 40]
+        | readonly [string & {}, number]
       )[]
   >('=');
 }
@@ -88,7 +88,7 @@ expectType<
       | readonly ['3', 4]
       | readonly ['x', 1]
       | readonly ['y' | 'z', 2]
-      | readonly [string, 1 | 2 | 4 | 5]
+      | readonly [string & {}, number]
     )[]
   >('=');
 }

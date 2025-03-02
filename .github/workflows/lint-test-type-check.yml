@@ -48,9 +48,11 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v4.1.7
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
 
-      - uses: actions/setup-node@v4.0.2
+      - name: Set up Node.js 20.x
+        uses: actions/setup-node@v4.2.0
         id: setup_node_id
         with:
           node-version: 20

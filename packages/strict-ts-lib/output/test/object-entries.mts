@@ -11,10 +11,10 @@ import { expectType } from './expect-type.mjs';
   expectType<
     StrictLibInternals.ToObjectEntries<RecordType1>,
     (
-      | readonly ['3', 4]
       | readonly ['x', 1]
       | readonly ['y' | 'z', 2]
-      | readonly [string, 1 | 2 | 4]
+      | readonly ['3', 4]
+      | readonly [string & {}, number]
     )[]
   >('=');
 }
@@ -24,7 +24,7 @@ import { expectType } from './expect-type.mjs';
   const entries = Object.entries({ x: 1, y: 2 });
   expectType<
     typeof entries,
-    (readonly ['x', 1] | readonly ['y', 2] | readonly [string, 1 | 2])[]
+    (readonly ['x', 1] | readonly ['y', 2] | readonly [string & {}, number])[]
   >('=');
 }
 
@@ -49,13 +49,13 @@ expectType<
       | readonly ['3', 4]
       | readonly ['x', 1]
       | readonly ['y' | 'z', 2]
-      | readonly [string, 1 | 2 | 4]
+      | readonly [string & {}, number]
     )[]
   | (
       | readonly ['9', 40]
       | readonly ['a', 10]
       | readonly ['b' | 'c', 20]
-      | readonly [string, 10 | 20 | 40]
+      | readonly [string & {}, number]
     )[]
 >('=');
 
@@ -83,7 +83,7 @@ expectType<
       | readonly ['3', 4]
       | readonly ['x', 1]
       | readonly ['y' | 'z', 2]
-      | readonly [string, 1 | 2 | 4 | 5]
+      | readonly [string & {}, number]
     )[]
   >('=');
 }

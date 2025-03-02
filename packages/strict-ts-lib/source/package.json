@@ -18,15 +18,12 @@
     "code-diffs:branded": "./scripts/open-diff-in-code.sh branded",
     "code-diffs:normal": "./scripts/open-diff-in-code.sh normal",
     "fmt": "yarn zz:prettier ..",
-    "fmt:finishing": "./scripts/fmt.sh",
-    "gen": "run-s gen:lib-files gen:packages gen:diff:full",
-    "gen:diff": "./scripts/gen-diff.sh",
-    "gen:diff:full": "./scripts/gen-diff.sh full",
-    "gen:eslint-fixed": "./scripts/gen-eslint-fixed.sh",
-    "gen:full": "run-s get:lib-files gen:eslint-fixed gen",
+    "fmt:diff": "wireit",
+    "gen": "wireit",
+    "gen:full": "wireit",
     "gen:lib-files": "wireit",
-    "gen:packages": "run-s z:gen:packages z:rename-lib",
-    "get:lib-files": "./scripts/get-lib-files.sh",
+    "gen:min": "wireit",
+    "gen:packages": "wireit",
     "lint": "yarn zz:eslint:scripts",
     "lint:fix": "yarn zz:eslint:scripts --fix",
     "test": "run-p test:normal test:branded",
@@ -37,9 +34,7 @@
     "tsc": "tsc --noEmit",
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit",
-    "z:gen:packages": "wireit",
-    "z:rename-lib": "mv ../output/lib/package.json ../output/lib/package.json_bk",
-    "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint",
+    "zz:eslint": "TIMING=1 eslint",
     "zz:eslint:scripts": "yarn zz:eslint --config eslint.config.js scripts/**/*.mts",
     "zz:prettier": "prettier --ignore-path ../.prettierignore --write --log-level warn"
   },
@@ -53,23 +48,54 @@
     "eslint-plugin-functional": "7.1.0"
   },
   "wireit": {
+    "build": {
+      "command": "tsc --project ./configs/tsconfig.build.json",
+      "clean": true,
+      "output": [
+        "./scripts/dist/**/*"
+      ]
+    },
+    "fmt:diff": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "zx ./scripts/dist/commands/fmt-diff.mjs"
+    },
+    "gen": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "zx ./scripts/dist/commands/gen.mjs"
+    },
+    "gen:full": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "zx ./scripts/dist/commands/gen-full.mjs"
+    },
+    "gen:min": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "zx ./scripts/dist/commands/gen-min.mjs"
+    },
     "gen:lib-files": {
       "dependencies": [
         "build"
       ],
-      "command": "./scripts/gen-lib-files.sh"
+      "command": "zx ./scripts/dist/commands/gen-lib-files.mjs"
     },
-    "z:gen:packages": {
+    "gen:packages": {
       "dependencies": [
         "build"
       ],
-      "command": "./scripts/gen-packages.sh"
+      "command": "zx ./scripts/dist/commands/gen-packages.mjs"
     },
-    "build": {
+    "publish-packages": {
       "dependencies": [
-        "clean:build"
+        "build"
       ],
-      "command": "tsc --project ./configs/tsconfig.build.json"
+      "command": "zx ./scripts/dist/commands/publish-packages.mjs"
     }
   }
 }

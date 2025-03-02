@@ -47,13 +47,13 @@ export const databaseFromJson = (o?: unknown): Database =>
       dateToPollIdMap: IMap.new<DateOptionId, PollId>(
         Object.entries(p.dateToPollIdMap).map(([k, v]) => [
           toDateOptionId(k),
-          v,
+          toPollId(v satisfies PollId | string),
         ]),
       ),
       commandMessageIdToPollIdMap: IMap.new<CommandMessageId, PollId>(
         Object.entries(p.commandMessageIdToPollIdMap).map(([k, v]) => [
           toCommandMessageId(k),
-          v,
+          toPollId(v satisfies PollId | string),
         ]),
       ),
     })).value;

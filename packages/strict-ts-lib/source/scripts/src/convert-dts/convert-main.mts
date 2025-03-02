@@ -80,15 +80,13 @@ export const convert = (
         },
       ),
 
-      converterConfig.forNpmPackage
-        ? idFn
-        : replaceWithNoMatchCheck(
-            /\/\/\/ <reference lib="(.+)" \/>/gu,
-            '/// <reference path="./lib.$1.d.ts" />',
-            {
-              onNotFound: 'off',
-            },
-          ),
+      replaceWithNoMatchCheck(
+        /\/\/\/ <reference lib="(.+)" \/>/gu,
+        '/// <reference path="./lib.$1.d.ts" />',
+        {
+          onNotFound: 'off',
+        },
+      ),
 
       replaceWithNoMatchCheck(
         //

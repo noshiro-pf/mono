@@ -5074,7 +5074,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -17369,7 +17454,7 @@ interface HTMLLabelElement extends HTMLElement {
+@@ -17369,14 +17454,14 @@ interface HTMLLabelElement extends HTMLElement {
    ): void;
  }
  
@@ -5083,6 +5083,15 @@
    prototype: HTMLLabelElement;
    new (): HTMLLabelElement;
  };
+ 
+ /**
+- * The HTMLLegendElement is an interface allowing to access properties of the
+- * <legend> elements. It inherits properties and methods from the HTMLElement
++ * The HTMLLegendElement is an interface allowing to access properties of
++ * the<legend> elements. It inherits properties and methods from the HTMLElement
+  * interface.
+  *
+  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLLegendElement)
 @@ -17393,7 +17478,7 @@ interface HTMLLegendElement extends HTMLElement {
    readonly form: HTMLFormElement | null;
    addEventListener<K extends keyof HTMLElementEventMap>(
@@ -5659,7 +5668,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -19036,7 +19145,7 @@ interface HTMLQuoteElement extends HTMLElement {
+@@ -19036,15 +19145,15 @@ interface HTMLQuoteElement extends HTMLElement {
    ): void;
  }
  
@@ -5668,6 +5677,16 @@
    prototype: HTMLQuoteElement;
    new (): HTMLQuoteElement;
  };
+ 
+ /**
+  * HTML <script> elements expose the HTMLScriptElement interface, which provides
+- * special properties and methods for manipulating the behavior and execution of
+- * <script> elements (beyond the inherited HTMLElement interface).
++ * special properties and methods for manipulating the behavior and execution
++ * of<script> elements (beyond the inherited HTMLElement interface).
+  *
+  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLScriptElement)
+  */
 @@ -19128,7 +19237,7 @@ interface HTMLScriptElement extends HTMLElement {
    type: string;
    addEventListener<K extends keyof HTMLElementEventMap>(
