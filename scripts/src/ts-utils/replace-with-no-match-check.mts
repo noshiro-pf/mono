@@ -1,4 +1,4 @@
-import { toSafeUint } from './utils.mjs';
+import { toSafeUint } from './cast-brand.mjs';
 
 /**
  * Replace all instances of a substring in a string, using a regular expression
