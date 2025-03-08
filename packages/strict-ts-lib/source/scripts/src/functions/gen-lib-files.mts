@@ -1,32 +1,43 @@
 import 'zx/globals';
-import {
-  getSrcFileList,
-  type ConverterConfig,
-} from '../convert-dts/common.mjs';
+import { getSrcFileList } from '../convert-dts/common.mjs';
 import { convert } from '../convert-dts/convert-main.mjs';
-import { configs, paths } from './constants.mjs';
+import { type ConverterConfig, converterConfigs, paths } from './constants.mjs';
+import { type SemVer } from './types.mjs';
 import { clearDir } from './utils/clear-dir.mjs';
+import { forAllTsVersions } from './utils/for-all-ts-versions.mjs';
+import { toPathSegment } from './utils/ts-path-segment.js';
 
 /** Generate files to `output/lib-files` */
-export const genLibFiles = async (): Promise<'ok' | 'err'> => {
-  {
-    const res = await clearDir(paths.strictTsLib.output.libFiles.$);
+export const genLibFiles = async (
+  tsVersion: SemVer | 'all',
+): Promise<'ok' | 'err'> => forAllTsVersions(tsVersion, genLibFilesImpl);
+
+/** Generate files to `output/lib-files` */
+const genLibFilesImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
+  for (const { numberType } of converterConfigs) {
+    const res = await clearDir(
+      paths.strictTsLib.output(toPathSegment(tsVersion))[numberType].libFiles.$,
+    );
     if (res === 'err') return 'err';
   }
 
-  await Promise.all(configs.map(createDtsFiles));
+  await Promise.all(
+    converterConfigs.map((cfg) => createDtsFiles(tsVersion, cfg)),
+  );
 
   return 'ok';
 };
 
-const createDtsFiles = async (config: ConverterConfig): Promise<void> => {
+const createDtsFiles = async (
+  tsVersion: SemVer,
+  config: ConverterConfig,
+): Promise<void> => {
   const srcFileList = await getSrcFileList(
-    paths.strictTsLib.source.temp.eslintFixed.$,
+    paths.strictTsLib.output(tsVersion).temp.eslintFixed.$,
   );
 
   const outDir =
-    paths.strictTsLib[config.useBrandedNumber ? 'outputBranded' : 'output']
-      .libFiles.$;
+    paths.strictTsLib.output(tsVersion)[config.numberType].libFiles.$;
 
   await Promise.all(
     srcFileList.map(async ({ content, filename }) => {

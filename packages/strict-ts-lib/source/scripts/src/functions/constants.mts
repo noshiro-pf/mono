@@ -1,6 +1,6 @@
 import { pipe, toThisDir } from '@noshiro/mono-utils';
 import 'zx/globals';
-import { type ConverterConfig } from '../convert-dts/common.mjs';
+import { type SemVer } from './types.mjs';
 
 export const libName = '@noshiro/strict-typescript-lib';
 
@@ -29,60 +29,61 @@ export const paths = {
   strictTsLib: pipe(strictTsLibDir).chain((root) => ({
     $: root,
 
-    output: pipe(`${strictTsLibDir}/output` as const).chain((output) => ({
-      $: output,
+    output: (tsVersion: SemVer | '*') =>
+      pipe(`${strictTsLibDir}/output/${tsVersion}` as const).chain(
+        (output) => ({
+          $: output,
 
-      diff: {
-        $: `${output}/diff` as const,
-      },
-      lib: {
-        $: `${output}/lib` as const,
-      },
-      libFiles: {
-        $: `${output}/lib-files` as const,
-      },
-      packages: {
-        $: `${output}/packages` as const,
-      },
-    })).value,
+          temp: pipe(`${output}/temp` as const).chain((temp) => ({
+            $: temp,
 
-    outputBranded: pipe(`${strictTsLibDir}/output-branded` as const).chain(
-      (output) => ({
-        $: output,
+            copied: {
+              $: `${temp}/copied` as const,
+            },
+            copiedForDiff: {
+              $: `${temp}/copied-for-diff` as const,
+            },
+            eslintFixed: {
+              $: `${temp}/eslint-fixed` as const,
+            },
+          })).value,
 
-        diff: {
-          $: `${output}/diff` as const,
-        },
-        lib: {
-          $: `${output}/lib` as const,
-        },
-        libFiles: {
-          $: `${output}/lib-files` as const,
-        },
-        packages: {
-          $: `${output}/packages` as const,
-        },
-      }),
-    ).value,
+          normal: pipe(`${output}/normal` as const).chain((o) => ({
+            diff: {
+              $: `${o}/diff` as const,
+            },
+            lib: {
+              $: `${o}/lib` as const,
+            },
+            libFiles: {
+              $: `${o}/lib-files` as const,
+            },
+            packages: {
+              $: `${o}/packages` as const,
+            },
+          })).value,
+
+          branded: pipe(`${output}/branded` as const).chain((o) => ({
+            diff: {
+              $: `${o}/diff` as const,
+            },
+            lib: {
+              $: `${o}/lib` as const,
+            },
+            libFiles: {
+              $: `${o}/lib-files` as const,
+            },
+            packages: {
+              $: `${o}/packages` as const,
+            },
+          })).value,
+        }),
+      ).value,
 
     source: pipe(`${strictTsLibDir}/source` as const).chain((source) => ({
       $: source,
 
       packageJson: path.resolve(source, 'package.json'),
-
-      temp: pipe(`${source}/temp` as const).chain((temp) => ({
-        $: temp,
-
-        copied: {
-          $: `${temp}/copied` as const,
-        },
-        copiedForDiff: {
-          $: `${temp}/copied-for-diff` as const,
-        },
-        eslintFixed: {
-          $: `${temp}/eslint-fixed` as const,
-        },
-      })).value,
 
       scripts: {
         $: `${source}/scripts` as const,
@@ -91,14 +92,20 @@ export const paths = {
   })).value,
 } as const;
 
-export const configs = [
+export type ConverterConfig = Readonly<{
+  commentOutDeprecated: boolean;
+  returnType: 'mutable' | 'readonly';
+  numberType: 'normal' | 'branded';
+}>;
+
+export const converterConfigs = [
   {
-    useBrandedNumber: true,
+    numberType: 'branded',
     commentOutDeprecated: false,
     returnType: 'readonly',
   },
   {
-    useBrandedNumber: false,
+    numberType: 'normal',
     commentOutDeprecated: false,
     returnType: 'mutable',
   },

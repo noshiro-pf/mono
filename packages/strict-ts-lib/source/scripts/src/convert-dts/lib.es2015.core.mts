@@ -10,7 +10,7 @@ export const convertLibEs2015Core =
   ({
     brandedNumber,
     readonlyModifier,
-    config: { commentOutDeprecated, returnType, useBrandedNumber },
+    config: { commentOutDeprecated, returnType, numberType },
   }: ConverterOptions): MonoTypeFunction<string> =>
   (src) =>
     pipe(src).chainMonoTypeFns(
@@ -83,37 +83,37 @@ export const convertLibEs2015Core =
             'imul(x: number, y: number): number;',
             `imul(x: ${brandedNumber.Int32}, y: ${brandedNumber.Int32}): ${brandedNumber.Int32};`,
           ),
-          !useBrandedNumber
+          numberType === 'normal'
             ? idFn
             : replaceWithNoMatchCheck(
                 'sign(x: number): number;',
                 `sign(x: number): -1 | 0 | -0 | 1 | ${brandedNumber.NaNType};`,
               ),
-          !useBrandedNumber
+          numberType === 'normal'
             ? idFn
             : replaceWithNoMatchCheck(
                 'acosh(x: number): number;',
                 `acosh(x: number): ${brandedNumber.NonNegativeNumber} | ${brandedNumber.NaNType};`,
               ),
-          !useBrandedNumber
+          numberType === 'normal'
             ? idFn
             : replaceWithNoMatchCheck(
                 'cosh(x: number): number;',
                 `cosh(x: number): ${brandedNumber.PositiveNumber} | ${brandedNumber.NaNType};`,
               ),
-          !useBrandedNumber
+          numberType === 'normal'
             ? idFn
             : replaceWithNoMatchCheck(
                 'hypot(...values: readonly number[]): number;',
                 `hypot(...values: readonly number[]): ${brandedNumber.NonNegativeNumber} | ${brandedNumber.NaNType};`,
               ),
-          !useBrandedNumber
+          numberType === 'normal'
             ? idFn
             : replaceWithNoMatchCheck(
                 'trunc(x: number): number;',
                 `trunc(x: number): ${brandedNumber.Int} | ${brandedNumber.InfiniteNumber} | ${brandedNumber.NaNType};`,
               ),
-          !useBrandedNumber
+          numberType === 'normal'
             ? idFn
             : replaceWithNoMatchCheck(
                 'fround(x: number): number;',
@@ -134,19 +134,19 @@ export const convertLibEs2015Core =
           ),
           replaceWithNoMatchCheck(
             'isFinite(number: unknown): boolean;',
-            `isFinite(number: number): ${useBrandedNumber ? `number is ${brandedNumber.FiniteNumber}` : 'boolean'};`,
+            `isFinite(number: number): ${numberType === 'normal' ? 'boolean' : `number is ${brandedNumber.FiniteNumber}`};`,
           ),
           replaceWithNoMatchCheck(
             'isInteger(number: unknown): boolean;',
-            `isInteger(number: number): ${useBrandedNumber ? `number is ${brandedNumber.Int}` : 'boolean'};`,
+            `isInteger(number: number): ${numberType === 'normal' ? 'boolean' : `number is ${brandedNumber.Int}`};`,
           ),
           replaceWithNoMatchCheck(
             'isNaN(number: unknown): boolean;',
-            `isNaN(number: number): ${useBrandedNumber ? `number is ${brandedNumber.NaNType}` : 'boolean'};`,
+            `isNaN(number: number): ${numberType === 'normal' ? 'boolean' : `number is ${brandedNumber.NaNType}`};`,
           ),
           replaceWithNoMatchCheck(
             'isSafeInteger(number: unknown): boolean;',
-            `isSafeInteger(number: number): ${useBrandedNumber ? `number is ${brandedNumber.SafeInt}` : 'boolean'};`,
+            `isSafeInteger(number: number): ${numberType === 'normal' ? 'boolean' : `number is ${brandedNumber.SafeInt}`};`,
           ),
           replaceWithNoMatchCheck(
             'MAX_SAFE_INTEGER: number;',
@@ -156,15 +156,15 @@ export const convertLibEs2015Core =
             'MIN_SAFE_INTEGER: number;',
             `MIN_SAFE_INTEGER: ${brandedNumber.SafeInt};`,
           ),
-          useBrandedNumber
-            ? replaceWithNoMatchCheck(
+          numberType === 'normal'
+            ? idFn
+            : replaceWithNoMatchCheck(
                 'parseFloat(string: string): number',
                 `parseFloat(string: string): number | ${brandedNumber.NaNType}`,
-              )
-            : idFn,
+              ),
           replaceWithNoMatchCheck(
             'parseInt(string: string, radix?: number): number;',
-            `parseInt(string: string, radix?: UintRange<2, 37>): ${useBrandedNumber ? `${brandedNumber.Int} | ${brandedNumber.NaNType}` : 'number'};`,
+            `parseInt(string: string, radix?: UintRange<2, 37>): ${numberType === 'normal' ? 'number' : `${brandedNumber.Int} | ${brandedNumber.NaNType}`};`,
           ),
         ),
       }),

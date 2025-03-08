@@ -3,10 +3,11 @@ import 'zx/globals';
 import { paths } from '../constants.mjs';
 
 export const formatFiles = async (
-  absolutePaths: string,
+  absolutePaths: string | readonly string[],
 ): Promise<'ok' | 'err'> => {
   cd(paths.strictTsLib.source.$);
-  const res = await $`yarn zz:prettier ${absolutePaths}`;
+  const res =
+    await $`yarn zz:prettier ${Array.isArray(absolutePaths) ? absolutePaths.join(' ') : absolutePaths}`;
   if (res.exitCode !== 0) {
     console.error(res);
     return 'err';

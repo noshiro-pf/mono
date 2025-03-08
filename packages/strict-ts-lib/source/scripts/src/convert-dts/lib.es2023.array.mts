@@ -36,7 +36,7 @@ const arrayTypes = ['Array', 'ReadonlyArray'] as const satisfies readonly (
 export const convertLibEs2023Array =
   ({
     brandedNumber,
-    config: { useBrandedNumber },
+    config: { numberType },
   }: ConverterOptions): MonoTypeFunction<string> =>
   (src) =>
     pipe(src).chainMonoTypeFns(
@@ -142,23 +142,23 @@ export const convertLibEs2023Array =
             ),
             replaceWithNoMatchCheck(
               `findLast<S extends ${typedArrayTypeToElemBaseType(elemType)}>(predicate: (value: ${typedArrayTypeToElemBaseType(elemType)}, index: number, array: this) => value is S, thisArg?: unknown): S | undefined;`,
-              `findLast<S extends ${typedArrayTypeToElemType(elemType, useBrandedNumber)}>(predicate: (value: ${typedArrayTypeToElemType(elemType, useBrandedNumber)}, index: ${brandedNumber.TypedArraySize}, array: this) => value is S, thisArg?: unknown): S | undefined;`,
+              `findLast<S extends ${typedArrayTypeToElemType(elemType, numberType)}>(predicate: (value: ${typedArrayTypeToElemType(elemType, numberType)}, index: ${brandedNumber.TypedArraySize}, array: this) => value is S, thisArg?: unknown): S | undefined;`,
             ),
             replaceWithNoMatchCheck(
               `findLast(predicate: (value: ${typedArrayTypeToElemBaseType(elemType)}, index: number, array: this) => unknown, thisArg?: unknown): ${typedArrayTypeToElemBaseType(elemType)} | undefined;`,
-              `findLast(predicate: (value: ${typedArrayTypeToElemType(elemType, useBrandedNumber)}, index: ${brandedNumber.TypedArraySize}, array: this) => boolean, thisArg?: unknown): ${typedArrayTypeToElemType(elemType, useBrandedNumber)} | undefined;`,
+              `findLast(predicate: (value: ${typedArrayTypeToElemType(elemType, numberType)}, index: ${brandedNumber.TypedArraySize}, array: this) => boolean, thisArg?: unknown): ${typedArrayTypeToElemType(elemType, numberType)} | undefined;`,
             ),
             replaceWithNoMatchCheck(
               `findLastIndex(predicate: (value: ${typedArrayTypeToElemBaseType(elemType)}, index: number, array: this) => unknown, thisArg?: unknown): number;`,
-              `findLastIndex(predicate: (value: ${typedArrayTypeToElemType(elemType, useBrandedNumber)}, index: ${brandedNumber.TypedArraySize}, array: this) => boolean, thisArg?: unknown): ${brandedNumber.TypedArraySearchResult};`,
+              `findLastIndex(predicate: (value: ${typedArrayTypeToElemType(elemType, numberType)}, index: ${brandedNumber.TypedArraySize}, array: this) => boolean, thisArg?: unknown): ${brandedNumber.TypedArraySearchResult};`,
             ),
             replaceWithNoMatchCheck(
               `toSorted(compareFn?: (a: ${typedArrayTypeToElemBaseType(elemType)}, b: ${typedArrayTypeToElemBaseType(elemType)}) => number)`,
-              `toSorted(compareFn?: (a: ${typedArrayTypeToElemType(elemType, useBrandedNumber)}, b: ${typedArrayTypeToElemType(elemType, useBrandedNumber)}) => number)`,
+              `toSorted(compareFn?: (a: ${typedArrayTypeToElemType(elemType, numberType)}, b: ${typedArrayTypeToElemType(elemType, numberType)}) => number)`,
             ),
             replaceWithNoMatchCheck(
               `with(index: number, value: ${typedArrayTypeToElemBaseType(elemType)})`,
-              `with(index: ${brandedNumber.TypedArraySizeArg}, value: ${typedArrayTypeToElemType(elemType, useBrandedNumber)})`,
+              `with(index: ${brandedNumber.TypedArraySizeArg}, value: ${typedArrayTypeToElemType(elemType, numberType)})`,
             ),
           ),
         }),

@@ -1,6 +1,7 @@
 import 'zx/globals';
 import { getSrcFileList } from '../convert-dts/common.mjs';
 import { paths } from './constants.mjs';
+import { type SemVer } from './types.mjs';
 
 /** "lib.es2018.asynciterable.d.ts" -> "es2018/asynciterable" */
 export const libFilenameToPath = (libFilename: string): string =>
@@ -10,7 +11,9 @@ export const libFilenameToPath = (libFilename: string): string =>
     .replaceAll('.d.ts', '')
     .replaceAll('.', '/');
 
-export const getPackageDirList = (): Promise<
+export const getPackageDirList = (
+  tsVersion: SemVer,
+): Promise<
   DeepReadonly<
     {
       filename: string;
@@ -18,12 +21,13 @@ export const getPackageDirList = (): Promise<
     }[]
   >
 > =>
-  getSrcFileList(paths.strictTsLib.source.temp.eslintFixed.$).then((list) =>
-    list
-      .map(({ filename }) => filename)
-      .filter((filename) => filename !== 'lib.d.ts')
-      .map((filename) => ({
-        filename,
-        packageRelativePath: libFilenameToPath(filename),
-      })),
+  getSrcFileList(paths.strictTsLib.output(tsVersion).temp.eslintFixed.$).then(
+    (list) =>
+      list
+        .map(({ filename }) => filename)
+        .filter((filename) => filename !== 'lib.d.ts')
+        .map((filename) => ({
+          filename,
+          packageRelativePath: libFilenameToPath(filename),
+        })),
   );

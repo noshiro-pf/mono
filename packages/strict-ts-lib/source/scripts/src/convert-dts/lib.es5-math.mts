@@ -8,7 +8,7 @@ import { closeBraceRegexp, idFn, type ConverterOptions } from './common.mjs';
 
 export const convertLibEs5_Math =
   ({
-    config: { useBrandedNumber },
+    config: { numberType },
     brandedNumber,
   }: ConverterOptions): MonoTypeFunction<string> =>
   (src) =>
@@ -17,7 +17,7 @@ export const convertLibEs5_Math =
         startRegexp: 'interface Math {',
         endRegexp: closeBraceRegexp,
         mapFn: composeMonoTypeFns(
-          ...(!useBrandedNumber
+          ...(numberType === 'normal'
             ? []
             : [
                 'E',
@@ -38,8 +38,8 @@ export const convertLibEs5_Math =
           replaceWithNoMatchCheck(
             'abs(x: number): number;',
             [
-              `abs<N extends ${useBrandedNumber ? 'SmallInt' : 'number'}>(x: N): AbsoluteValue<N>;`,
-              ...(!useBrandedNumber
+              `abs<N extends ${numberType === 'normal' ? 'number' : 'SmallInt'}>(x: N): AbsoluteValue<N>;`,
+              ...(numberType === 'normal'
                 ? ['abs(x: number): number;']
                 : [
                     `abs<N extends ${brandedNumber.FiniteNumber}>(x: N): IntersectBrand<N, ${brandedNumber.NonNegativeNumber}>;`,
@@ -47,7 +47,7 @@ export const convertLibEs5_Math =
                   ]),
             ].join('\n'),
           ),
-          !useBrandedNumber
+          numberType === 'normal'
             ? idFn
             : replaceWithNoMatchCheck(
                 `acos(x: number): number;`,
@@ -56,26 +56,26 @@ export const convertLibEs5_Math =
 
           // The return type is NonNegativeNumber instead of PositiveNumber
           // because Math.exp(Number.NEGATIVE_INFINITY) == 0
-          !useBrandedNumber
+          numberType === 'normal'
             ? idFn
             : replaceWithNoMatchCheck(
                 `exp(x: number): number;`,
                 `exp(x: number): ${brandedNumber.NonNegativeNumber} | ${brandedNumber.NaNType};`,
               ),
-          !useBrandedNumber
+          numberType === 'normal'
             ? idFn
             : replaceWithNoMatchCheck(
                 `sqrt(x: number): number;`,
                 `sqrt(x: number): ${brandedNumber.NonNegativeNumber} | ${brandedNumber.NaNType};`,
               ),
-          !useBrandedNumber
+          numberType === 'normal'
             ? idFn
             : replaceWithNoMatchCheck(
                 `random(): number;`,
                 `random(): ${brandedNumber.NonNegativeNumber};`,
               ),
 
-          ...(!useBrandedNumber
+          ...(numberType === 'normal'
             ? []
             : ['ceil', 'floor', 'round'].map((fn) =>
                 replaceWithNoMatchCheck(
