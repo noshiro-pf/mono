@@ -212,12 +212,9 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
                   ).map(([[iconId, point, comment], weight]) => ({
                     iconId,
                     point,
-                    showPoint: match(iconId, {
-                      good: point !== eventSchedule.answerIcons.good.point,
-                      fair: point !== eventSchedule.answerIcons.fair.point,
-                      poor: point !== eventSchedule.answerIcons.poor.point,
-                      none: false,
-                    }),
+                    showPoint:
+                      iconId === 'fair' &&
+                      point !== eventSchedule.answerIcons.fair.point,
                     weight,
                     comment,
                   })),
