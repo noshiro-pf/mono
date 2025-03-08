@@ -1,8 +1,12 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type RuleSeverityWithDefaultOption } from '../rule-severity-branded.mjs';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
 
 /**
  * Ensure imports point to a file/module that can be resolved.
@@ -10,10 +14,10 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-unresolved.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | problem         |
- *  | category | Static analysis |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoUnresolved {
@@ -67,8 +71,9 @@ namespace NoUnresolved {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -77,10 +82,10 @@ namespace NoUnresolved {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/named.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | problem         |
- *  | category | Static analysis |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace Named {
@@ -106,8 +111,9 @@ namespace Named {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -116,14 +122,14 @@ namespace Named {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/default.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | problem         |
- *  | category | Static analysis |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace Default {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -133,10 +139,10 @@ namespace Default {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/namespace.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | problem         |
- *  | category | Static analysis |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace Namespace {
@@ -168,8 +174,9 @@ namespace Namespace {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -178,11 +185,11 @@ namespace Namespace {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-namespace.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | fixable  | code        |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoNamespace {
@@ -212,8 +219,9 @@ namespace NoNamespace {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -222,14 +230,14 @@ namespace NoNamespace {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/export.md
  *
  *  ```md
- *  | key      | value            |
- *  | :------- | :--------------- |
- *  | type     | problem          |
- *  | category | Helpful warnings |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace Export {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -238,14 +246,14 @@ namespace Export {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-mutable-exports.md
  *
  *  ```md
- *  | key      | value            |
- *  | :------- | :--------------- |
- *  | type     | suggestion       |
- *  | category | Helpful warnings |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoMutableExports {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -254,10 +262,10 @@ namespace NoMutableExports {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/extensions.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace Extensions {
@@ -397,8 +405,9 @@ namespace Extensions {
     | readonly [Record<string, 'always' | 'ignorePackages' | 'never'>];
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -407,10 +416,10 @@ namespace Extensions {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-restricted-paths.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | problem         |
- *  | category | Static analysis |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoRestrictedPaths {
@@ -501,8 +510,9 @@ namespace NoRestrictedPaths {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -511,10 +521,10 @@ namespace NoRestrictedPaths {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-internal-modules.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | suggestion      |
- *  | category | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoInternalModules {
@@ -563,8 +573,9 @@ namespace NoInternalModules {
       };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -573,14 +584,14 @@ namespace NoInternalModules {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/group-exports.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace GroupExports {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -589,11 +600,11 @@ namespace GroupExports {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-relative-packages.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | suggestion      |
- *  | fixable  | code            |
- *  | category | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoRelativePackages {
@@ -637,8 +648,9 @@ namespace NoRelativePackages {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -647,10 +659,10 @@ namespace NoRelativePackages {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-relative-parent-imports.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | suggestion      |
- *  | category | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoRelativeParentImports {
@@ -694,8 +706,9 @@ namespace NoRelativeParentImports {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -704,11 +717,11 @@ namespace NoRelativeParentImports {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/consistent-type-specifier-style.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | fixable  | code        |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace ConsistentTypeSpecifierStyle {
@@ -731,8 +744,9 @@ namespace ConsistentTypeSpecifierStyle {
   export type Options = 'prefer-inline' | 'prefer-top-level';
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -741,15 +755,15 @@ namespace ConsistentTypeSpecifierStyle {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-self-import.md
  *
  *  ```md
- *  | key         | value           |
- *  | :---------- | :-------------- |
- *  | type        | problem         |
- *  | category    | Static analysis |
- *  | recommended | true            |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoSelfImport {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -759,10 +773,10 @@ namespace NoSelfImport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-cycle.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | suggestion      |
- *  | category | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoCycle {
@@ -850,8 +864,9 @@ namespace NoCycle {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -860,14 +875,14 @@ namespace NoCycle {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-named-default.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoNamedDefault {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -876,14 +891,14 @@ namespace NoNamedDefault {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-named-as-default.md
  *
  *  ```md
- *  | key      | value            |
- *  | :------- | :--------------- |
- *  | type     | problem          |
- *  | category | Helpful warnings |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoNamedAsDefault {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -892,14 +907,14 @@ namespace NoNamedAsDefault {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-named-as-default-member.md
  *
  *  ```md
- *  | key      | value            |
- *  | :------- | :--------------- |
- *  | type     | suggestion       |
- *  | category | Helpful warnings |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoNamedAsDefaultMember {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -908,10 +923,10 @@ namespace NoNamedAsDefaultMember {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-anonymous-default-export.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoAnonymousDefaultExport {
@@ -981,8 +996,9 @@ namespace NoAnonymousDefaultExport {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -992,10 +1008,10 @@ namespace NoAnonymousDefaultExport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-unused-modules.md
  *
  *  ```md
- *  | key      | value            |
- *  | :------- | :--------------- |
- *  | type     | suggestion       |
- *  | category | Helpful warnings |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoUnusedModules {
@@ -1098,8 +1114,9 @@ namespace NoUnusedModules {
   );
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1108,10 +1125,10 @@ namespace NoUnusedModules {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-commonjs.md
  *
  *  ```md
- *  | key      | value          |
- *  | :------- | :------------- |
- *  | type     | suggestion     |
- *  | category | Module systems |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoCommonjs {
@@ -1167,8 +1184,9 @@ namespace NoCommonjs {
     | readonly [];
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1177,14 +1195,14 @@ namespace NoCommonjs {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-amd.md
  *
  *  ```md
- *  | key      | value          |
- *  | :------- | :------------- |
- *  | type     | suggestion     |
- *  | category | Module systems |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoAmd {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1193,11 +1211,11 @@ namespace NoAmd {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-duplicates.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | problem     |
- *  | fixable  | code        |
- *  | category | Style guide |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
  *  ```
  */
 namespace NoDuplicates {
@@ -1227,8 +1245,9 @@ namespace NoDuplicates {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1237,11 +1256,11 @@ namespace NoDuplicates {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/first.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | fixable  | code        |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace First {
@@ -1263,8 +1282,9 @@ namespace First {
   export type Options = 'absolute-first' | 'disable-absolute-first';
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1273,10 +1293,10 @@ namespace First {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/max-dependencies.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace MaxDependencies {
@@ -1306,8 +1326,9 @@ namespace MaxDependencies {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1316,10 +1337,10 @@ namespace MaxDependencies {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-extraneous-dependencies.md
  *
  *  ```md
- *  | key      | value            |
- *  | :------- | :--------------- |
- *  | type     | problem          |
- *  | category | Helpful warnings |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoExtraneousDependencies {
@@ -1388,8 +1409,9 @@ namespace NoExtraneousDependencies {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1398,11 +1420,11 @@ namespace NoExtraneousDependencies {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-absolute-path.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | suggestion      |
- *  | fixable  | code            |
- *  | category | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoAbsolutePath {
@@ -1446,8 +1468,9 @@ namespace NoAbsolutePath {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1456,10 +1479,10 @@ namespace NoAbsolutePath {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-nodejs-modules.md
  *
  *  ```md
- *  | key      | value          |
- *  | :------- | :------------- |
- *  | type     | suggestion     |
- *  | category | Module systems |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoNodejsModules {
@@ -1489,8 +1512,9 @@ namespace NoNodejsModules {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1499,14 +1523,14 @@ namespace NoNodejsModules {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-webpack-loader-syntax.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | problem         |
- *  | category | Static analysis |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoWebpackLoaderSyntax {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1515,11 +1539,11 @@ namespace NoWebpackLoaderSyntax {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/order.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | fixable  | code        |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace Order {
@@ -1705,8 +1729,9 @@ namespace Order {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1715,11 +1740,11 @@ namespace Order {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/newline-after-import.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | layout      |
- *  | fixable  | whitespace  |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | layout     |
+ *  | deprecated | false      |
+ *  | fixable    | whitespace |
  *  ```
  */
 namespace NewlineAfterImport {
@@ -1754,8 +1779,9 @@ namespace NewlineAfterImport {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1764,10 +1790,10 @@ namespace NewlineAfterImport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/prefer-default-export.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferDefaultExport {
@@ -1798,8 +1824,9 @@ namespace PreferDefaultExport {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1808,14 +1835,14 @@ namespace PreferDefaultExport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-default-export.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoDefaultExport {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1824,14 +1851,14 @@ namespace NoDefaultExport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-named-export.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoNamedExport {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1840,10 +1867,10 @@ namespace NoNamedExport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-dynamic-require.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | suggestion      |
- *  | category | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoDynamicRequire {
@@ -1869,8 +1896,9 @@ namespace NoDynamicRequire {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1879,14 +1907,14 @@ namespace NoDynamicRequire {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/unambiguous.md
  *
  *  ```md
- *  | key      | value          |
- *  | :------- | :------------- |
- *  | type     | suggestion     |
- *  | category | Module systems |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace Unambiguous {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1895,10 +1923,10 @@ namespace Unambiguous {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-unassigned-import.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoUnassignedImport {
@@ -1948,8 +1976,9 @@ namespace NoUnassignedImport {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1958,11 +1987,11 @@ namespace NoUnassignedImport {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-useless-path-segments.md
  *
  *  ```md
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | type     | suggestion      |
- *  | fixable  | code            |
- *  | category | Static analysis |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoUselessPathSegments {
@@ -1992,8 +2021,9 @@ namespace NoUselessPathSegments {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2002,11 +2032,11 @@ namespace NoUselessPathSegments {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/dynamic-import-chunkname.md
  *
  *  ```md
- *  | key            | value       |
- *  | :------------- | :---------- |
- *  | type           | suggestion  |
- *  | hasSuggestions | true        |
- *  | category       | Style guide |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace DynamicImportChunkname {
@@ -2044,20 +2074,21 @@ namespace DynamicImportChunkname {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
  * Forbid import statements with CommonJS module.exports.
  *
  * ```md
- * | key         | value          |
- * | :---------- | :------------- |
- * | type        | problem        |
- * | fixable     | code           |
- * | category    | Module systems |
- * | recommended | true           |
+ * | key         | value   |
+ * | :---------- | :------ |
+ * | type        | problem |
+ * | deprecated  | false   |
+ * | fixable     | code    |
+ * | recommended | true    |
  * ```
  */
 namespace NoImportModuleExports {
@@ -2083,8 +2114,9 @@ namespace NoImportModuleExports {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -2093,16 +2125,16 @@ namespace NoImportModuleExports {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-empty-named-blocks.md
  *
  *  ```md
- *  | key            | value            |
- *  | :------------- | :--------------- |
- *  | type           | suggestion       |
- *  | fixable        | code             |
- *  | hasSuggestions | true             |
- *  | category       | Helpful warnings |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace NoEmptyNamedBlocks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -2111,14 +2143,14 @@ namespace NoEmptyNamedBlocks {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/exports-last.md
  *
  *  ```md
- *  | key      | value       |
- *  | :------- | :---------- |
- *  | type     | suggestion  |
- *  | category | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace ExportsLast {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -2127,14 +2159,14 @@ namespace ExportsLast {
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.31.0/docs/rules/no-deprecated.md
  *
  *  ```md
- *  | key      | value            |
- *  | :------- | :--------------- |
- *  | type     | suggestion       |
- *  | category | Helpful warnings |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoDeprecated {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -2143,12 +2175,11 @@ namespace NoDeprecated {
  * @link https://github.com/import-js/eslint-plugin-import/blob/7b25c1cb95ee18acc1531002fd343e1e6031f9ed/docs/rules/imports-first.md
  *
  *  ```md
- *  | key        | value       |
- *  | :--------- | :---------- |
- *  | type       | suggestion  |
- *  | deprecated | true        |
- *  | fixable    | code        |
- *  | category   | Style guide |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | true       |
+ *  | fixable    | code       |
  *  ```
  */
 namespace ImportsFirst {

@@ -40,7 +40,7 @@ export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
           <Input
             disabled={loading}
             placeholder={dc.gamePassword.placeholder}
-            type='text'
+            type={'text'}
             value={password}
             onInput={onPasswordInput}
           />
@@ -50,7 +50,7 @@ export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
           <Input
             disabled={loading}
             placeholder={dc.username.placeholder}
-            type='text'
+            type={'text'}
             value={username}
             onInput={onUsernameInput}
           />
@@ -58,7 +58,7 @@ export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
         <ButtonWrapper>
           <ButtonPrimary
             disabled={disabled || loading}
-            type='button'
+            type={'button'}
             onClick={onCreateRoomButtonClick}
           >
             <ButtonContent>

@@ -35,7 +35,7 @@ export const MuiSlider = memoNamed<Props>(
         min={min}
         step={step}
         value={value}
-        valueLabelDisplay='auto'
+        valueLabelDisplay={'auto'}
         onChange={sliderOnChange}
       />
     );

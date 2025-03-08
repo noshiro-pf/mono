@@ -11,7 +11,7 @@ export const WritingsElement = memoNamed<
   <CardStyled>
     <MuiCardContent>
       <MuiTypography variant={'title'}>
-        <a href={link} rel='noopener noreferrer' target='_blank'>
+        <a href={link} rel={'noopener noreferrer'} target={'_blank'}>
           {title}
         </a>
       </MuiTypography>

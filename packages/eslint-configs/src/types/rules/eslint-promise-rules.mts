@@ -1,8 +1,12 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type RuleSeverityWithDefaultOption } from '../rule-severity-branded.mjs';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
 
 /**
  * Enforce consistent param names and ordering when creating new promises.
@@ -10,9 +14,10 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/param-names.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace ParamNames {
@@ -42,8 +47,9 @@ namespace ParamNames {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -53,9 +59,10 @@ namespace ParamNames {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-return-wrap.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoReturnWrap {
@@ -81,8 +88,9 @@ namespace NoReturnWrap {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -92,9 +100,10 @@ namespace NoReturnWrap {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/always-return.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace AlwaysReturn {
@@ -129,8 +138,9 @@ namespace AlwaysReturn {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -139,9 +149,10 @@ namespace AlwaysReturn {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/catch-or-return.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace CatchOrReturn {
@@ -189,8 +200,9 @@ namespace CatchOrReturn {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -199,13 +211,14 @@ namespace CatchOrReturn {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-await-to-callbacks.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferAwaitToCallbacks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -214,9 +227,10 @@ namespace PreferAwaitToCallbacks {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-await-to-then.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace PreferAwaitToThen {
@@ -242,8 +256,9 @@ namespace PreferAwaitToThen {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -252,14 +267,15 @@ namespace PreferAwaitToThen {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-catch.md
  *
  *  ```md
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferCatch {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -269,13 +285,14 @@ namespace PreferCatch {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-native.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoNative {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -285,9 +302,10 @@ namespace NoNative {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-callback-in-promise.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoCallbackInPromise {
@@ -320,8 +338,9 @@ namespace NoCallbackInPromise {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -330,13 +349,14 @@ namespace NoCallbackInPromise {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-promise-in-callback.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoPromiseInCallback {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -345,13 +365,14 @@ namespace NoPromiseInCallback {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-nesting.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace NoNesting {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -361,13 +382,14 @@ namespace NoNesting {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/avoid-new.md
  *
  *  ```md
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  */
 namespace AvoidNew {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -376,14 +398,15 @@ namespace AvoidNew {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-new-statics.md
  *
  *  ```md
- *  | key     | value   |
- *  | :------ | :------ |
- *  | type    | problem |
- *  | fixable | code    |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
  *  ```
  */
 namespace NoNewStatics {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -392,13 +415,14 @@ namespace NoNewStatics {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-return-in-finally.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoReturnInFinally {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -407,9 +431,10 @@ namespace NoReturnInFinally {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/valid-params.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace ValidParams {
@@ -438,8 +463,9 @@ namespace ValidParams {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -448,13 +474,14 @@ namespace ValidParams {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-multiple-resolved.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoMultipleResolved {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -463,9 +490,10 @@ namespace NoMultipleResolved {
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/spec-only.md
  *
  *  ```md
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace SpecOnly {
@@ -494,8 +522,9 @@ namespace SpecOnly {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 export type EslintPromiseRules = {

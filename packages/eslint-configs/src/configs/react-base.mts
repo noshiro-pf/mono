@@ -2,6 +2,7 @@ import globals from 'globals';
 import {
   eslintJsxA11yRules,
   eslintReactHooksRules,
+  eslintReactPerfRules,
   eslintReactRefreshRules,
   eslintReactRules,
   restrictedGlobalsForFrontend,
@@ -30,6 +31,7 @@ export const eslintFlatConfigForReactBase = (
       ...eslintReactHooksRules,
       ...eslintReactRefreshRules,
       ...eslintJsxA11yRules,
+      ...eslintReactPerfRules,
 
       'no-restricted-globals': [
         'error',

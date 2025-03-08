@@ -1,8 +1,12 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type RuleSeverityWithDefaultOption } from '../rule-severity-branded.mjs';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
 
 /**
  * Enforce functional parameters.
@@ -13,7 +17,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
- *  | category             | Currying    |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -678,8 +682,9 @@ namespace FunctionalParameters {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -688,12 +693,12 @@ namespace FunctionalParameters {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/immutable-data.md
  *
  *  ```md
- *  | key                  | value        |
- *  | :------------------- | :----------- |
- *  | type                 | suggestion   |
- *  | category             | No Mutations |
- *  | recommended          | recommended  |
- *  | requiresTypeChecking | true         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace ImmutableData {
@@ -1320,8 +1325,9 @@ namespace ImmutableData {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1330,12 +1336,12 @@ namespace ImmutableData {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-classes.md
  *
  *  ```md
- *  | key                  | value              |
- *  | :------------------- | :----------------- |
- *  | type                 | suggestion         |
- *  | category             | No Other Paradigms |
- *  | recommended          | recommended        |
- *  | requiresTypeChecking | false              |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoClasses {
@@ -1377,8 +1383,9 @@ namespace NoClasses {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1387,12 +1394,12 @@ namespace NoClasses {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-class-inheritance.md
  *
  *  ```md
- *  | key                  | value              |
- *  | :------------------- | :----------------- |
- *  | type                 | suggestion         |
- *  | category             | No Other Paradigms |
- *  | recommended          | recommended        |
- *  | requiresTypeChecking | false              |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoClassInheritance {
@@ -1434,8 +1441,9 @@ namespace NoClassInheritance {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1444,12 +1452,12 @@ namespace NoClassInheritance {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-conditional-statements.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | category             | No Statements |
- *  | recommended          | recommended   |
- *  | requiresTypeChecking | true          |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace NoConditionalStatements {
@@ -1485,8 +1493,9 @@ namespace NoConditionalStatements {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1495,12 +1504,12 @@ namespace NoConditionalStatements {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-expression-statements.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | category             | No Statements |
- *  | recommended          | recommended   |
- *  | requiresTypeChecking | true          |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace NoExpressionStatements {
@@ -1540,8 +1549,9 @@ namespace NoExpressionStatements {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1550,12 +1560,12 @@ namespace NoExpressionStatements {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-let.md
  *
  *  ```md
- *  | key                  | value        |
- *  | :------------------- | :----------- |
- *  | type                 | suggestion   |
- *  | category             | No Mutations |
- *  | recommended          | recommended  |
- *  | requiresTypeChecking | false        |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoLet {
@@ -1595,8 +1605,9 @@ namespace NoLet {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1605,16 +1616,16 @@ namespace NoLet {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-loop-statements.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | category             | No Statements |
- *  | recommended          | recommended   |
- *  | requiresTypeChecking | false         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoLoopStatements {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1623,12 +1634,12 @@ namespace NoLoopStatements {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-mixed-types.md
  *
  *  ```md
- *  | key                  | value              |
- *  | :------------------- | :----------------- |
- *  | type                 | suggestion         |
- *  | category             | No Other Paradigms |
- *  | recommended          | recommended        |
- *  | requiresTypeChecking | true               |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace NoMixedTypes {
@@ -1658,8 +1669,9 @@ namespace NoMixedTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1668,16 +1680,16 @@ namespace NoMixedTypes {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-promise-reject.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | category             | No Exceptions |
- *  | recommended          | false         |
- *  | requiresTypeChecking | false         |
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | deprecated           | false      |
+ *  | recommended          | false      |
+ *  | requiresTypeChecking | false      |
  *  ```
  */
 namespace NoPromiseReject {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1686,12 +1698,12 @@ namespace NoPromiseReject {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-return-void.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | category             | No Statements |
- *  | recommended          | recommended   |
- *  | requiresTypeChecking | true          |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace NoReturnVoid {
@@ -1725,8 +1737,9 @@ namespace NoReturnVoid {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1735,16 +1748,16 @@ namespace NoReturnVoid {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-this-expressions.md
  *
  *  ```md
- *  | key                  | value              |
- *  | :------------------- | :----------------- |
- *  | type                 | suggestion         |
- *  | category             | No Other Paradigms |
- *  | recommended          | recommended        |
- *  | requiresTypeChecking | false              |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoThisExpressions {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1753,12 +1766,12 @@ namespace NoThisExpressions {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-throw-statements.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | category             | No Exceptions |
- *  | recommended          | recommended   |
- *  | requiresTypeChecking | false         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoThrowStatements {
@@ -1784,8 +1797,9 @@ namespace NoThrowStatements {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1794,12 +1808,12 @@ namespace NoThrowStatements {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-try-statements.md
  *
  *  ```md
- *  | key                  | value         |
- *  | :------------------- | :------------ |
- *  | type                 | suggestion    |
- *  | category             | No Exceptions |
- *  | recommended          | recommended   |
- *  | requiresTypeChecking | false         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | false       |
  *  ```
  */
 namespace NoTryStatements {
@@ -1829,8 +1843,9 @@ namespace NoTryStatements {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1839,14 +1854,14 @@ namespace NoTryStatements {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/prefer-immutable-types.md
  *
  *  ```md
- *  | key                  | value        |
- *  | :------------------- | :----------- |
- *  | type                 | suggestion   |
- *  | fixable              | code         |
- *  | hasSuggestions       | true         |
- *  | category             | No Mutations |
- *  | recommended          | recommended  |
- *  | requiresTypeChecking | true         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | fixable              | code        |
+ *  | hasSuggestions       | true        |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace PreferImmutableTypes {
@@ -3613,8 +3628,9 @@ namespace PreferImmutableTypes {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3626,7 +3642,7 @@ namespace PreferImmutableTypes {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
- *  | category             | Stylistic   |
+ *  | deprecated           | false       |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -3655,8 +3671,9 @@ namespace PreferPropertySignatures {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3665,14 +3682,13 @@ namespace PreferPropertySignatures {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/prefer-readonly-type.md
  *
  *  ```md
- *  | key                  | value        |
- *  | :------------------- | :----------- |
- *  | type                 | suggestion   |
- *  | deprecated           | true         |
- *  | fixable              | code         |
- *  | category             | No Mutations |
- *  | recommended          | recommended  |
- *  | requiresTypeChecking | true         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | true        |
+ *  | fixable              | code        |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace PreferReadonlyType {
@@ -3739,8 +3755,8 @@ namespace PreferReadonlyType {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | hasSuggestions       | true        |
- *  | category             | Stylistic   |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -3768,8 +3784,9 @@ namespace PreferTacit {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3781,8 +3798,8 @@ namespace PreferTacit {
  *  | key                  | value       |
  *  | :------------------- | :---------- |
  *  | type                 | suggestion  |
+ *  | deprecated           | false       |
  *  | fixable              | code        |
- *  | category             | Stylistic   |
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
@@ -3806,8 +3823,9 @@ namespace ReadonlyType {
   export type Options = 'generic' | 'keyword';
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -3816,14 +3834,14 @@ namespace ReadonlyType {
  * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/type-declaration-immutability.md
  *
  *  ```md
- *  | key                  | value        |
- *  | :------------------- | :----------- |
- *  | type                 | suggestion   |
- *  | fixable              | code         |
- *  | hasSuggestions       | true         |
- *  | category             | No Mutations |
- *  | recommended          | recommended  |
- *  | requiresTypeChecking | true         |
+ *  | key                  | value       |
+ *  | :------------------- | :---------- |
+ *  | type                 | suggestion  |
+ *  | deprecated           | false       |
+ *  | fixable              | code        |
+ *  | hasSuggestions       | true        |
+ *  | recommended          | recommended |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace TypeDeclarationImmutability {
@@ -4023,8 +4041,9 @@ namespace TypeDeclarationImmutability {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 export type EslintFunctionalRules = {

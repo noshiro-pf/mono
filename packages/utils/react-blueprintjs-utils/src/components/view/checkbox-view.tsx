@@ -37,7 +37,7 @@ export const CheckboxView = ({
         ref={inputRef}
         checked={state === 'checked'}
         disabled={disabled}
-        type='checkbox'
+        type={'checkbox'}
         onChange={onChangeHandler}
       />
       <span />

@@ -68,7 +68,7 @@ export const GameMain = memoNamed<Props>('GameMain', ({ windowSize }) => {
       <EndTurnButtonWrapper>
         <EndTurnButton
           disabled={displayValues.endTurnButtonDisabled}
-          type='button'
+          type={'button'}
           onClick={onTurnEndClick}
         >
           {dictionary.gameMain.endTurnButton}

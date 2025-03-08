@@ -7,14 +7,14 @@ import { type Linter } from 'eslint';
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace RequireStrictMode {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -23,14 +23,14 @@ namespace RequireStrictMode {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoUnsafeTypeAssertion {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -39,14 +39,14 @@ namespace NoUnsafeTypeAssertion {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoUnsafeReadonlyMutableAssignment {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -55,14 +55,14 @@ namespace NoUnsafeReadonlyMutableAssignment {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoUnsafeMutableReadonlyAssignment {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -71,14 +71,14 @@ namespace NoUnsafeMutableReadonlyAssignment {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoEnums {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -87,14 +87,14 @@ namespace NoEnums {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoPartialUrlConstructor {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -103,14 +103,14 @@ namespace NoPartialUrlConstructor {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoPartialDivision {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -119,14 +119,14 @@ namespace NoPartialDivision {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoPartialStringNormalize {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -135,14 +135,14 @@ namespace NoPartialStringNormalize {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoPrematureFpTsEffects {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -151,14 +151,14 @@ namespace NoPrematureFpTsEffects {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoNestedFpTsEffects {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -167,14 +167,14 @@ namespace NoNestedFpTsEffects {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoPartialArrayReduce {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -183,14 +183,14 @@ namespace NoPartialArrayReduce {
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | error   |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoHiddenTypeAssertions {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 export type EslintTotalFunctionsRules = {

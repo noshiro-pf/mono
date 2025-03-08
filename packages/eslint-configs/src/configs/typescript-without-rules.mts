@@ -6,18 +6,15 @@ import { plugins } from './plugins.mjs';
 export const eslintFlatConfigForTypeScriptWithoutRules = ({
   tsconfigFileName,
   tsconfigRootDir,
-  files,
 }: Readonly<{
   tsconfigFileName: string;
   tsconfigRootDir: string;
-  files?: readonly string[];
 }>): readonly FlatConfig[] =>
   [
     {
       ignores: ['eslint.config.js', 'eslint.config.*.mjs'],
     },
     {
-      ...(files === undefined ? {} : { files }),
       languageOptions: {
         ecmaVersion: 'latest',
         parser: typescriptEslintParser,

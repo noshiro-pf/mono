@@ -26,9 +26,114 @@ const SL = Arr.zip(
   indices,
 ) satisfies DeepReadonly<[[Percent, Percent], Uint8][]>;
 
+const hslWithStyle = huesDefault.map((hue, idx) => ({
+  hue,
+  idx,
+  SLStyle: SL.map(([[saturation, lightness], key]) => {
+    const contrastWhite = contrastRatioHsl(whiteHsl, [
+      hue,
+      saturation,
+      lightness,
+    ]);
+    const contrastBlack = contrastRatioHsl(
+      [hue, saturation, lightness],
+      blackHsl,
+    );
+
+    return {
+      key,
+      contrastWhite,
+      contrastBlack,
+      hslStyle: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+      whiteStyle: {
+        backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+        color: 'white',
+      },
+      blackStyle: {
+        backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+        color: 'black',
+      },
+      contrastWhiteDisplayValue: Num.roundAt(contrastWhite, 2),
+      contrastBlackDisplayValue: Num.roundAt(contrastBlack, 2),
+    };
+  }),
+}));
+
 export const TextColorContrastTable = memoNamed(
   'TextColorContrastTable',
-  () => componentElement,
+  () => (
+    <Root>
+      <PaperCustomized variant={'outlined'}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell align={'center'}>{'Saturation（彩度）'}</TableCell>
+              {saturationListWithIndex.map(([sat, i]) => (
+                <Fragment key={i}>
+                  <TableCell align={'center'}>{sat}</TableCell>
+                  <TableCell align={'center'}>{sat}</TableCell>
+                </Fragment>
+              ))}
+            </TableRow>
+            <TableRow>
+              <TableCell align={'center'}>{'Lightness（輝度）'}</TableCell>
+              {lightnessListWithIndex.map(([lightness, i]) => (
+                <Fragment key={i}>
+                  <TableCell align={'center'}>{lightness}</TableCell>
+                  <TableCell align={'center'}>{lightness}</TableCell>
+                </Fragment>
+              ))}
+            </TableRow>
+            <TableRow>
+              <TableCell align={'center'}>{'Hue（色相）'}</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {hslWithStyle.map(({ hue, SLStyle, idx }) => (
+              <TableRow key={hue}>
+                <TableCell align={'center'}>{idx}</TableCell>
+                {SLStyle.map(
+                  ({
+                    contrastWhite,
+                    contrastWhiteDisplayValue,
+                    contrastBlack,
+                    contrastBlackDisplayValue,
+                    whiteStyle,
+                    blackStyle,
+                    hslStyle,
+                    key,
+                  }) => (
+                    <Fragment key={key}>
+                      <TableCell align={'left'} style={whiteStyle}>
+                        <label>
+                          <input
+                            defaultChecked={contrastWhite > contrastBlack}
+                            name={hslStyle}
+                            type={'checkbox'}
+                          />
+                          {contrastWhiteDisplayValue}
+                        </label>
+                      </TableCell>
+                      <TableCell align={'left'} style={blackStyle}>
+                        <label>
+                          <input
+                            defaultChecked={contrastWhite <= contrastBlack}
+                            name={hslStyle}
+                            type={'checkbox'}
+                          />
+                          {contrastBlackDisplayValue}
+                        </label>
+                      </TableCell>
+                    </Fragment>
+                  ),
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </PaperCustomized>
+    </Root>
+  ),
 );
 
 const PaperCustomized = styled(Paper)`
@@ -36,92 +141,9 @@ const PaperCustomized = styled(Paper)`
   padding: 10px;
 `;
 
-const componentElement = (
-  <div
-    css={css`
-      width: 100%;
-      height: 100%;
-      background-color: #c2c2c2;
-      padding: 10px;
-    `}
-  >
-    <PaperCustomized variant='outlined'>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell align='center'>{'Saturation（彩度）'}</TableCell>
-            {saturationListWithIndex.map(([sat, i]) => (
-              <Fragment key={i}>
-                <TableCell align='center'>{sat}</TableCell>
-                <TableCell align='center'>{sat}</TableCell>
-              </Fragment>
-            ))}
-          </TableRow>
-          <TableRow>
-            <TableCell align='center'>{'Lightness（輝度）'}</TableCell>
-            {lightnessListWithIndex.map(([lightness, i]) => (
-              <Fragment key={i}>
-                <TableCell align='center'>{lightness}</TableCell>
-                <TableCell align='center'>{lightness}</TableCell>
-              </Fragment>
-            ))}
-          </TableRow>
-          <TableRow>
-            <TableCell align='center'>{'Hue（色相）'}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {huesDefault.map((hue, idx) => (
-            <TableRow key={hue}>
-              <TableCell align='center'>{idx}</TableCell>
-              {SL.map(([[saturation, lightness], key]) => {
-                const contrastWhite = contrastRatioHsl(whiteHsl, [
-                  hue,
-                  saturation,
-                  lightness,
-                ]);
-                const contrastBlack = contrastRatioHsl(
-                  [hue, saturation, lightness],
-                  blackHsl,
-                );
-
-                const hslStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-
-                return (
-                  <Fragment key={key}>
-                    <TableCell
-                      align='left'
-                      style={{ backgroundColor: hslStyle, color: 'white' }}
-                    >
-                      <label>
-                        <input
-                          defaultChecked={contrastWhite > contrastBlack}
-                          name={hslStyle}
-                          type='checkbox'
-                        />
-                        {Num.roundAt(contrastWhite, 2)}
-                      </label>
-                    </TableCell>
-                    <TableCell
-                      align='left'
-                      style={{ backgroundColor: hslStyle, color: 'black' }}
-                    >
-                      <label>
-                        <input
-                          defaultChecked={contrastWhite <= contrastBlack}
-                          name={hslStyle}
-                          type='checkbox'
-                        />
-                        {Num.roundAt(contrastBlack, 2)}
-                      </label>
-                    </TableCell>
-                  </Fragment>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </PaperCustomized>
-  </div>
-);
+const Root = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: #c2c2c2;
+  padding: 10px;
+`;

@@ -24,9 +24,9 @@ export const MuiTabs = memoNamed<Props>(
 
     return (
       <Tabs
-        indicatorColor='primary'
+        indicatorColor={'primary'}
         scrollButtons={scrollable}
-        textColor='primary'
+        textColor={'primary'}
         value={tabIndex}
         variant={scrollable ? 'scrollable' : 'fullWidth'}
         onChange={onChange}

@@ -7,6 +7,11 @@ type Props = Readonly<{
 export const AddElementButton = memoNamed<Props>(
   'AddElementButton',
   ({ onClick }) => (
-    <Button data-e2e={'add-button'} fill={true} icon='plus' onClick={onClick} />
+    <Button
+      data-e2e={'add-button'}
+      fill={true}
+      icon={'plus'}
+      onClick={onClick}
+    />
   ),
 );

@@ -74,9 +74,9 @@ export const InputView = memoNamed<Props>(
         <InputGroup disabled={disabled} fillSpace={fillSpace}>
           <Input
             ref={inputRef}
-            autoComplete='off'
+            autoComplete={'off'}
             disabled={disabled}
-            type='text'
+            type={'text'}
             value={valueAsStr}
             onBlur={onInputBlur}
             onChange={inputValueChangeHandler}

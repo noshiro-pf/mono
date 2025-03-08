@@ -12,34 +12,39 @@ export const CommentButton = memoNamed<Props>(
     const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
       useBoolState(false);
 
+    const popoverContent = useMemo(
+      () => (
+        <div
+          css={css`
+            padding: 10px;
+            max-width: 250px;
+          `}
+        >
+          <div
+            css={css`
+              margin: 10px;
+              overflow-wrap: anywhere;
+              white-space: pre-line;
+            `}
+          >
+            {comment}
+          </div>
+          <ButtonsWrapperAlignEnd>
+            <Button
+              intent={'none'}
+              text={dict.common.buttonText.close}
+              onClick={handleClose}
+            />
+          </ButtonsWrapperAlignEnd>
+        </div>
+      ),
+      [comment, handleClose],
+    );
+
     return (
       <Popover
         canEscapeKeyClose={true}
-        content={
-          <div
-            css={css`
-              padding: 10px;
-              max-width: 250px;
-            `}
-          >
-            <div
-              css={css`
-                margin: 10px;
-                overflow-wrap: anywhere;
-                white-space: pre-line;
-              `}
-            >
-              {comment}
-            </div>
-            <ButtonsWrapperAlignEnd>
-              <Button
-                intent='none'
-                text={dict.common.buttonText.close}
-                onClick={handleClose}
-              />
-            </ButtonsWrapperAlignEnd>
-          </div>
-        }
+        content={popoverContent}
         isOpen={isOpen}
         minimal={true}
         placement={'top'}
@@ -51,7 +56,7 @@ export const CommentButton = memoNamed<Props>(
               min-height: 16px !important;
               min-width: 16px !important;
             `}
-            icon={<Icon icon={'comment'} size={12} />}
+            icon={icon}
             minimal={true}
             small={true}
             onClick={handleOpen}
@@ -68,3 +73,5 @@ export const CommentButton = memoNamed<Props>(
     );
   },
 );
+
+const icon = <Icon icon={'comment'} size={12} />;

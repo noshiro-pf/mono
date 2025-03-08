@@ -29,7 +29,7 @@ export const InputGroupView = memoNamed<Props>(
         `}
         disabled={disabled}
         placeholder={placeholder}
-        type='text'
+        type={'text'}
         value={value}
         onChange={onChange}
       />

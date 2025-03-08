@@ -1,8 +1,12 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type RuleSeverityWithDefaultOption } from '../rule-severity-branded.mjs';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
 
 /**
  * Enforce emojis are wrapped in `<span>` and provide screen reader access.
@@ -38,8 +42,9 @@ namespace AccessibleEmoji {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/alt-text.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AltText {
@@ -106,8 +111,9 @@ namespace AltText {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -117,8 +123,9 @@ namespace AltText {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/anchor-ambiguous-text.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AnchorAmbiguousText {
@@ -149,8 +156,9 @@ namespace AnchorAmbiguousText {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -159,8 +167,9 @@ namespace AnchorAmbiguousText {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/anchor-has-content.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AnchorHasContent {
@@ -191,8 +200,9 @@ namespace AnchorHasContent {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -201,8 +211,9 @@ namespace AnchorHasContent {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/anchor-is-valid.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AnchorIsValid {
@@ -261,8 +272,9 @@ namespace AnchorIsValid {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -271,8 +283,9 @@ namespace AnchorIsValid {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-activedescendant-has-tabindex.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AriaActivedescendantHasTabindex {
@@ -291,8 +304,9 @@ namespace AriaActivedescendantHasTabindex {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -301,8 +315,9 @@ namespace AriaActivedescendantHasTabindex {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-props.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AriaProps {
@@ -321,8 +336,9 @@ namespace AriaProps {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -331,8 +347,9 @@ namespace AriaProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-proptypes.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AriaProptypes {
@@ -351,8 +368,9 @@ namespace AriaProptypes {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -362,8 +380,9 @@ namespace AriaProptypes {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-role.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AriaRole {
@@ -398,8 +417,9 @@ namespace AriaRole {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -409,8 +429,9 @@ namespace AriaRole {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-unsupported-elements.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AriaUnsupportedElements {
@@ -429,8 +450,9 @@ namespace AriaUnsupportedElements {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -439,8 +461,9 @@ namespace AriaUnsupportedElements {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/autocomplete-valid.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace AutocompleteValid {
@@ -471,8 +494,9 @@ namespace AutocompleteValid {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -482,8 +506,9 @@ namespace AutocompleteValid {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/click-events-have-key-events.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace ClickEventsHaveKeyEvents {
@@ -502,8 +527,9 @@ namespace ClickEventsHaveKeyEvents {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -512,8 +538,9 @@ namespace ClickEventsHaveKeyEvents {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/control-has-associated-label.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace ControlHasAssociatedLabel {
@@ -578,8 +605,9 @@ namespace ControlHasAssociatedLabel {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -588,8 +616,9 @@ namespace ControlHasAssociatedLabel {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/heading-has-content.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace HeadingHasContent {
@@ -620,8 +649,9 @@ namespace HeadingHasContent {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -630,8 +660,9 @@ namespace HeadingHasContent {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/html-has-lang.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace HtmlHasLang {
@@ -650,8 +681,9 @@ namespace HtmlHasLang {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -660,8 +692,9 @@ namespace HtmlHasLang {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/iframe-has-title.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace IframeHasTitle {
@@ -680,8 +713,9 @@ namespace IframeHasTitle {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -691,8 +725,9 @@ namespace IframeHasTitle {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/img-redundant-alt.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace ImgRedundantAlt {
@@ -732,8 +767,9 @@ namespace ImgRedundantAlt {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -743,8 +779,9 @@ namespace ImgRedundantAlt {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/interactive-supports-focus.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace InteractiveSupportsFocus {
@@ -848,8 +885,9 @@ namespace InteractiveSupportsFocus {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -858,8 +896,9 @@ namespace InteractiveSupportsFocus {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/label-has-associated-control.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace LabelHasAssociatedControl {
@@ -927,8 +966,9 @@ namespace LabelHasAssociatedControl {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1029,8 +1069,9 @@ namespace LabelHasFor {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/lang.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace Lang {
@@ -1049,8 +1090,9 @@ namespace Lang {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1060,8 +1102,9 @@ namespace Lang {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/media-has-caption.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace MediaHasCaption {
@@ -1110,8 +1153,9 @@ namespace MediaHasCaption {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1121,8 +1165,9 @@ namespace MediaHasCaption {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/mouse-events-have-key-events.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace MouseEventsHaveKeyEvents {
@@ -1166,8 +1211,9 @@ namespace MouseEventsHaveKeyEvents {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1177,8 +1223,9 @@ namespace MouseEventsHaveKeyEvents {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-access-key.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoAccessKey {
@@ -1197,8 +1244,9 @@ namespace NoAccessKey {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1207,8 +1255,9 @@ namespace NoAccessKey {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-aria-hidden-on-focusable.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoAriaHiddenOnFocusable {
@@ -1227,8 +1276,9 @@ namespace NoAriaHiddenOnFocusable {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1237,8 +1287,9 @@ namespace NoAriaHiddenOnFocusable {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-autofocus.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoAutofocus {
@@ -1265,8 +1316,9 @@ namespace NoAutofocus {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1275,8 +1327,9 @@ namespace NoAutofocus {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-distracting-elements.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoDistractingElements {
@@ -1313,8 +1366,9 @@ namespace NoDistractingElements {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1323,8 +1377,9 @@ namespace NoDistractingElements {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-interactive-element-to-noninteractive-role.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoInteractiveElementToNoninteractiveRole {
@@ -1349,8 +1404,9 @@ namespace NoInteractiveElementToNoninteractiveRole {
   export type Options = Readonly<Record<string, readonly string[]>>;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1360,8 +1416,9 @@ namespace NoInteractiveElementToNoninteractiveRole {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-noninteractive-element-interactions.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoNoninteractiveElementInteractions {
@@ -1392,8 +1449,9 @@ namespace NoNoninteractiveElementInteractions {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1402,8 +1460,9 @@ namespace NoNoninteractiveElementInteractions {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-noninteractive-element-to-interactive-role.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoNoninteractiveElementToInteractiveRole {
@@ -1428,8 +1487,9 @@ namespace NoNoninteractiveElementToInteractiveRole {
   export type Options = Readonly<Record<string, readonly string[]>>;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1438,8 +1498,9 @@ namespace NoNoninteractiveElementToInteractiveRole {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-noninteractive-tabindex.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoNoninteractiveTabindex {
@@ -1483,8 +1544,9 @@ namespace NoNoninteractiveTabindex {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1521,8 +1583,9 @@ namespace NoOnchange {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-redundant-roles.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoRedundantRoles {
@@ -1547,8 +1610,9 @@ namespace NoRedundantRoles {
   export type Options = Readonly<Record<string, readonly string[]>>;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1558,8 +1622,9 @@ namespace NoRedundantRoles {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-static-element-interactions.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace NoStaticElementInteractions {
@@ -1590,8 +1655,9 @@ namespace NoStaticElementInteractions {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1600,8 +1666,9 @@ namespace NoStaticElementInteractions {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/prefer-tag-over-role.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace PreferTagOverRole {
@@ -1620,8 +1687,9 @@ namespace PreferTagOverRole {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1631,8 +1699,9 @@ namespace PreferTagOverRole {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/role-has-required-aria-props.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace RoleHasRequiredAriaProps {
@@ -1651,8 +1720,9 @@ namespace RoleHasRequiredAriaProps {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1662,8 +1732,9 @@ namespace RoleHasRequiredAriaProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/role-supports-aria-props.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace RoleSupportsAriaProps {
@@ -1682,8 +1753,9 @@ namespace RoleSupportsAriaProps {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1692,8 +1764,9 @@ namespace RoleSupportsAriaProps {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/scope.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace Scope {
@@ -1712,8 +1785,9 @@ namespace Scope {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1722,8 +1796,9 @@ namespace Scope {
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/tabindex-no-positive.md
  *
  *  ```md
- *  | key | value |
- *  | :-- | :---- |
+ *  | key        | value |
+ *  | :--------- | :---- |
+ *  | deprecated | false |
  *  ```
  */
 namespace TabindexNoPositive {
@@ -1742,8 +1817,9 @@ namespace TabindexNoPositive {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | RuleSeverityWithDefaultOption
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 export type EslintJsxA11yRules = {

@@ -20,7 +20,7 @@ export const AllSliders = memoNamed<Props>('AllSliders', (props) => (
     <SliderWrapper>
       <div>{'彩度'}</div>
       <MuiSlider
-        ariaLabelledby='saturation'
+        ariaLabelledby={'saturation'}
         max={100}
         min={0}
         step={5}
@@ -34,7 +34,7 @@ export const AllSliders = memoNamed<Props>('AllSliders', (props) => (
     <SliderWrapper>
       <div>{'明度'}</div>
       <MuiSlider
-        ariaLabelledby='lightness'
+        ariaLabelledby={'lightness'}
         max={100}
         min={0}
         step={5}

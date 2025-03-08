@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { castMutable, isRecord, toThisDir } from '@noshiro/mono-utils';
 import 'zx/globals';
-import { generateRulesTypeMain } from './generate-rules-type-main.mjs';
+import { generateRulesType } from './generate-rules-type.mjs';
 
 const thisDir = toThisDir(import.meta.url);
 const monoRootDir = path.resolve(thisDir, '../../..');
@@ -40,40 +40,48 @@ const rewritePackageVersion = async (
   await fs.writeFile(packageJsonPath, JSON.stringify(parsed));
 };
 
+const getEslintPluginNames = async (
+  packageJsonPath: string | undefined,
+): Promise<readonly string[]> => {
+  if (packageJsonPath === undefined) return [];
+
+  const content = await fs.readFile(packageJsonPath, { encoding: 'utf8' });
+
+  const parsed = JSON.parse(content) ?? {};
+
+  if (!isRecord(parsed)) return [];
+
+  if (!Object.hasOwn(parsed, 'dependencies')) return [];
+
+  const mut_targetPath = castMutable(parsed.dependencies);
+
+  if (!isRecord(mut_targetPath)) return [];
+
+  return Object.keys(mut_targetPath)
+    .map((key) => mut_targetPath[key])
+    .filter(
+      (s): s is string =>
+        typeof s === 'string' &&
+        (s.startsWith('eslint-plugin-') || s.startsWith('@typescript-eslint')),
+    );
+};
+
 const main = async (): Promise<void> => {
   cd(eslintDir);
   {
     echo`${eslintDir}: updating dependencies`;
 
-    /** @type {readonly string[]} */
-    const packages = [
-      '@typescript-eslint/eslint-plugin',
-      '@typescript-eslint/parser',
-      '@typescript-eslint/utils',
+    const pluginNames = await getEslintPluginNames(`${eslintDir}/package.json`);
+
+    const packages: readonly string[] = [
+      ...pluginNames,
       'eslint-import-resolver-typescript',
-      'eslint-plugin-array-func',
-      'eslint-plugin-eslint-plugin',
-      'eslint-plugin-import',
-      'eslint-plugin-jest',
-      'eslint-plugin-jsx-a11y',
-      'eslint-plugin-prefer-arrow-functions',
-      'eslint-plugin-promise',
-      'eslint-plugin-react-hooks',
-      'eslint-plugin-react-refresh',
-      'eslint-plugin-react',
-      'eslint-plugin-security',
-      'eslint-plugin-strict-dependencies',
-      'eslint-plugin-testing-library',
-      'eslint-plugin-total-functions',
-      'eslint-plugin-tree-shakable',
-      'eslint-plugin-unicorn',
-      'eslint-plugin-vitest',
       '@types/eslint',
       'globals',
       'eslint-plugin-playwright',
       'typescript-eslint',
       'eslint',
-    ];
+    ] as const;
 
     await $`yarn add ${packages.map((a) => `${a}@latest`)}`;
 
@@ -85,12 +93,12 @@ const main = async (): Promise<void> => {
   cd(monoRootDir);
 
   echo`yarn install`;
-  await $`yarn`;
+  await $`yarn install`;
 
   cd(eslintDir);
 
   echo`${eslintDir}: generating rules type`;
-  await generateRulesTypeMain();
+  await generateRulesType();
 
   cd(strictTsLibSourceDir);
   {
@@ -111,7 +119,7 @@ const main = async (): Promise<void> => {
 
   cd(monoRootDir);
 
-  await $`yarn`;
+  await $`yarn install`;
 
   await $`yarn fmt:diff`;
 };

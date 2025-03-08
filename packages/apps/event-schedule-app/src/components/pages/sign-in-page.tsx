@@ -28,6 +28,17 @@ export const SignInPage = memoNamed('SignInPage', () => {
     { setTrue: passwordIsOpenResetForm, setFalse: hidePasswordResetForm },
   ] = useBoolState(false);
 
+  const lockPasswordButton = useMemo(
+    () => (
+      <LockButton
+        disabled={formState.isWaitingResponse}
+        passwordIsOpen={passwordIsOpen}
+        onLockClick={SignInPageStore.togglePasswordLock}
+      />
+    ),
+    [formState.isWaitingResponse, passwordIsOpen],
+  );
+
   return (
     <SignInStyled.Wrapper>
       <NavBar />
@@ -42,7 +53,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
                 <FormGroup
                   helperText={formState.email.error}
                   intent={emailFormIntent}
-                  label={<Label>{dc.email}</Label>}
+                  label={emailInputLabel}
                 >
                   <BpInput
                     autoComplete={'email'}
@@ -61,20 +72,14 @@ export const SignInPage = memoNamed('SignInPage', () => {
                 <FormGroup
                   helperText={formState.password.error}
                   intent={passwordFormIntent}
-                  label={<Label>{dc.password}</Label>}
+                  label={passwordInputLabel}
                 >
                   <BpInput
                     autoComplete={'current-password'}
                     disabled={formState.isWaitingResponse}
                     fill={true}
                     intent={passwordFormIntent}
-                    rightElement={
-                      <LockButton
-                        disabled={formState.isWaitingResponse}
-                        passwordIsOpen={passwordIsOpen}
-                        onLockClick={SignInPageStore.togglePasswordLock}
-                      />
-                    }
+                    rightElement={lockPasswordButton}
                     type={passwordIsOpen ? 'text' : 'password'}
                     value={formState.password.inputValue}
                     onValueChange={SignInPageStore.inputPasswordHandler}
@@ -139,6 +144,9 @@ export const SignInPage = memoNamed('SignInPage', () => {
     </SignInStyled.Wrapper>
   );
 });
+
+const emailInputLabel = <Label>{dc.email}</Label>;
+const passwordInputLabel = <Label>{dc.password}</Label>;
 
 const FormRectWrapper = styled(SignInStyled.FormRectWrapperBase)`
   height: 420px;

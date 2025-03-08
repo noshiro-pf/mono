@@ -28,7 +28,7 @@ export const createNoUnsafeAssignmentRule =
     // we know are shallow copies and therefore safe to have their result
     // assigned to a readonly array.
     const isSafeAssignmentFromArrayMethod = (
-      sourceExpression: TSESTree.Expression,
+      sourceExpression: TSESTree.Expression | undefined,
       destinationType: Type,
       sourceType: Type,
     ): 'safe' | 'unsafe' | 'unknown' => {
@@ -50,7 +50,7 @@ export const createNoUnsafeAssignmentRule =
         destinationIndexType !== undefined &&
         sourceIndexType !== undefined &&
         // and the assignment is from calling a member (obj.method(...))
-        sourceExpression.type === AST_NODE_TYPES.CallExpression &&
+        sourceExpression?.type === AST_NODE_TYPES.CallExpression &&
         sourceExpression.callee.type === AST_NODE_TYPES.MemberExpression &&
         // and the thing being called is an array
         // (so we can avoid permitting calls to array methods on other types)
@@ -238,7 +238,7 @@ export const createNoUnsafeAssignmentRule =
       // TODO fix this copypasta between YieldExpression and ReturnStatement
 
       YieldExpression: (node): void => {
-        if (node.argument === undefined) {
+        if (node.argument === null) {
           return;
         }
 

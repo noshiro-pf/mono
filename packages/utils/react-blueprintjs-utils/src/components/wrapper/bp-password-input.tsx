@@ -1,5 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { useBoolState } from 'better-react-use-state';
+import { useMemo } from 'react';
 import { BpButton } from './bp-button.js';
 import { BpInput, type BpInputProps } from './bp-input.js';
 
@@ -16,16 +17,21 @@ export const BpPasswordInput = memoNamed<BpPasswordInputProps>(
     const [passwordIsOpen, { toggleState: onToggleVisibilityClick }] =
       useBoolState(false);
 
+    const rightElement = useMemo(
+      () => (
+        <BpButton
+          icon={passwordIsOpen ? 'eye-open' : 'eye-off'}
+          minimal={true}
+          onClick={onToggleVisibilityClick}
+        />
+      ),
+      [onToggleVisibilityClick, passwordIsOpen],
+    );
+
     return (
       <BpInput
         disabled={disabled}
-        rightElement={
-          <BpButton
-            icon={passwordIsOpen ? 'eye-open' : 'eye-off'}
-            minimal={true}
-            onClick={onToggleVisibilityClick}
-          />
-        }
+        rightElement={rightElement}
         type={passwordIsOpen ? 'text' : 'password'}
         value={password}
         onValueChange={onPasswordChange}

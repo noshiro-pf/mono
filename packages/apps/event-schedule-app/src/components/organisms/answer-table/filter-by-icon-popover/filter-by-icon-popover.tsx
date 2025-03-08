@@ -43,20 +43,33 @@ export const FilterByIconPopover = memoNamed<Props>(
       [answerIconId],
     );
 
+    const popoverContent = useMemo(
+      () => (
+        <FilterByIconPopoverContent
+          disableFiltering={turnOffFilteringEnabled}
+          enableFiltering={turnOnFilteringEnabled}
+          state={state}
+          upperLimit={upperLimit}
+          onClose={handleClose}
+          onMaxChange={onMaxChange}
+          onMinChange={onMinChange}
+        />
+      ),
+      [
+        handleClose,
+        onMaxChange,
+        onMinChange,
+        state,
+        turnOffFilteringEnabled,
+        turnOnFilteringEnabled,
+        upperLimit,
+      ],
+    );
+
     return (
       <Popover
         canEscapeKeyClose={true}
-        content={
-          <FilterByIconPopoverContent
-            disableFiltering={turnOffFilteringEnabled}
-            enableFiltering={turnOnFilteringEnabled}
-            state={state}
-            upperLimit={upperLimit}
-            onClose={handleClose}
-            onMaxChange={onMaxChange}
-            onMinChange={onMinChange}
-          />
-        }
+        content={popoverContent}
         isOpen={isOpen}
         minimal={false}
         placement={'bottom'}
