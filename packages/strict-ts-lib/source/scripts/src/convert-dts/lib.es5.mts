@@ -49,9 +49,9 @@ export const convertLibEs5 =
       ),
       replaceWithNoMatchCheck(
         'declare function parseInt(string: string, radix?: number): number;',
-        `declare function parseInt(string: string, radix?: UintRange<2, 37>): ${options.config.useBrandedNumber ? `${options.brandedNumber.Int} | ${options.brandedNumber.NaNType}` : 'number'};`,
+        `declare function parseInt(string: string, radix?: UintRange<2, 37>): ${options.config.numberType ? `${options.brandedNumber.Int} | ${options.brandedNumber.NaNType}` : 'number'};`,
       ),
-      !options.config.useBrandedNumber
+      !options.config.numberType
         ? idFn
         : replaceWithNoMatchCheck(
             'declare function parseFloat(string: string): number;',
@@ -348,6 +348,6 @@ export const convertLibEs5 =
           'type RawDateType = Readonly<RawDateMutType>;',
           'type TimerId = ReturnType<typeof setTimeout>; // NodeJS.Timeout or number',
           '',
-          options.config.useBrandedNumber ? brandedNumberTypeDefString() : '',
+          options.config.numberType ? brandedNumberTypeDefString() : '',
         ].join('\n\n'),
     ).value;

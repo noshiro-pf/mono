@@ -3,12 +3,7 @@ import {
   generateKeyValueRecordFromKeys,
 } from '@noshiro/mono-utils';
 import 'zx/globals';
-
-export type ConverterConfig = Readonly<{
-  commentOutDeprecated: boolean;
-  returnType: 'mutable' | 'readonly';
-  useBrandedNumber: boolean;
-}>;
+import { type ConverterConfig } from '../functions/constants.mjs';
 
 export type ConverterOptions = Readonly<{
   config: ConverterConfig;
@@ -93,7 +88,7 @@ const tupleMap = <T extends readonly unknown[], B>(
 const set = new Set(brandedNumberFromTypeUtils);
 
 export const createBrandedNumber = (
-  useBrandedNumber: boolean,
+  numberType: 'normal' | 'branded',
 ): BrandedNumberTypes =>
   Object.fromEntries(
     tupleMap(
@@ -101,7 +96,7 @@ export const createBrandedNumber = (
       (key) =>
         [
           key,
-          !useBrandedNumber
+          numberType === 'normal'
             ? key === 'BigInt64' || key === 'BigUint64'
               ? 'bigint'
               : 'number'

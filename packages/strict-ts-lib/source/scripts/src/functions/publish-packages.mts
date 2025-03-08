@@ -1,16 +1,21 @@
 import 'zx/globals';
 import { paths } from './constants.mjs';
 import { getPackageDirList } from './get-package-dir-list.mjs';
+import { type SemVer } from './types.mjs';
 
-export const publishPackages = async (): Promise<void> => {
-  const directories: readonly string[] = await getPackageDirList().then(
-    (list) =>
-      list.map((a) =>
-        path.resolve(
-          paths.strictTsLib.output.packages.$,
-          a.packageRelativePath,
-        ),
+export const publishPackages = async (
+  tsVersion: SemVer,
+  numberType: 'normal' | 'branded',
+): Promise<void> => {
+  const directories: readonly string[] = await getPackageDirList(
+    tsVersion,
+  ).then((list) =>
+    list.map((a) =>
+      path.resolve(
+        paths.strictTsLib.output(tsVersion)[numberType].packages.$,
+        a.packageRelativePath,
       ),
+    ),
   );
 
   console.log('target directories:', directories);
@@ -26,8 +31,8 @@ export const publishPackages = async (): Promise<void> => {
     ),
   );
 
-  cd(paths.strictTsLib.output.lib.$);
-  echo(paths.strictTsLib.output.lib.$);
+  cd(paths.strictTsLib.output(tsVersion)[numberType].lib.$);
+  echo(paths.strictTsLib.output(tsVersion)[numberType].lib.$);
   await $`npm publish`;
 
   echo(' ');
