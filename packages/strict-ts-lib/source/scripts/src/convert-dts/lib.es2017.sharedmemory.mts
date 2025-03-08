@@ -3,7 +3,7 @@ import { enumType, type ConverterOptions } from './common.mjs';
 
 export const convertLibEs2017Sharedmemory =
   ({
-    config: { useBrandedNumber },
+    config: { numberType },
     brandedNumber,
   }: ConverterOptions): MonoTypeFunction<string> =>
   (src) =>
@@ -42,7 +42,7 @@ export const convertLibEs2017Sharedmemory =
           ]
             .map((t) => `${t}<ArrayBufferLike>`)
             .join(' | ')}, index: number, value: number): number;`,
-          useBrandedNumber
+          numberType === 'branded'
             ? (
                 [
                   enumType.Int8,
@@ -81,7 +81,7 @@ export const convertLibEs2017Sharedmemory =
           .join(
             ' | ',
           )}, index: number, expectedValue: number, replacementValue: number): number;`,
-        useBrandedNumber
+        numberType === 'branded'
           ? (
               [
                 enumType.Int8,
@@ -117,7 +117,7 @@ export const convertLibEs2017Sharedmemory =
         ]
           .map((t) => `${t}<ArrayBufferLike>`)
           .join(' | ')}, index: number): number;`,
-        useBrandedNumber
+        numberType === 'branded'
           ? (
               [
                 enumType.Int8,

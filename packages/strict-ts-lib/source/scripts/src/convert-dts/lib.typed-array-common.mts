@@ -105,7 +105,7 @@ export const typedArrayTypeToElemBaseType = (
 
 export const typedArrayTypeToElemType = (
   s: TypedArrayElemType,
-  useBrandedNumber: boolean,
+  numberType: 'normal' | 'branded',
 ): Exclude<TypedArrayElemType, 'Uint8Clamped'> | 'bigint' | 'number' => {
   switch (s) {
     case 'Uint8Clamped':
@@ -121,11 +121,11 @@ export const typedArrayTypeToElemType = (
     case 'Uint32':
     case 'Float32':
     case 'Float64':
-      return useBrandedNumber ? s : 'number';
+      return numberType === 'normal' ? 'number' : s;
 
     case 'BigInt64':
     case 'BigUint64':
-      return useBrandedNumber ? s : 'bigint';
+      return numberType === 'normal' ? 'bigint' : s;
   }
 };
 

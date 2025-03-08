@@ -23,13 +23,10 @@ const convertInterfaceTypedArray = (
 ): MonoTypeFunction<string> => {
   const {
     brandedNumber,
-    config: { useBrandedNumber },
+    config: { numberType },
   } = options;
 
-  const elementType = typedArrayTypeToElemType(
-    elementTypeArg,
-    useBrandedNumber,
-  );
+  const elementType = typedArrayTypeToElemType(elementTypeArg, numberType);
 
   return composeMonoTypeFns(
     convertTypedArrayCommon(options),
@@ -155,7 +152,7 @@ export const convertLibEs5_TypedArray =
             ),
             replaceWithNoMatchCheck(
               `new (array: ArrayLike<number>`,
-              `new (array: ArrayLike<${typedArrayTypeToElemType(elemType, options.config.useBrandedNumber)}>`,
+              `new (array: ArrayLike<${typedArrayTypeToElemType(elemType, options.config.numberType)}>`,
             ),
             replaceWithNoMatchCheck(
               //
@@ -169,15 +166,15 @@ export const convertLibEs5_TypedArray =
             ),
             replaceWithNoMatchCheck(
               `mapfn: (v: T, k: number) => number,`,
-              `mapfn: (v: T, k: ${options.brandedNumber.TypedArraySize}) => ${typedArrayTypeToElemType(elemType, options.config.useBrandedNumber)},`,
+              `mapfn: (v: T, k: ${options.brandedNumber.TypedArraySize}) => ${typedArrayTypeToElemType(elemType, options.config.numberType)},`,
             ),
             replaceWithNoMatchCheck(
               `of(...items: readonly number[])`,
-              `of(...items: readonly ${typedArrayTypeToElemType(elemType, options.config.useBrandedNumber)}[])`,
+              `of(...items: readonly ${typedArrayTypeToElemType(elemType, options.config.numberType)}[])`,
             ),
             replaceWithNoMatchCheck(
               `from(arrayLike: ArrayLike<number>)`,
-              `from(arrayLike: ArrayLike<${typedArrayTypeToElemType(elemType, options.config.useBrandedNumber)}>)`,
+              `from(arrayLike: ArrayLike<${typedArrayTypeToElemType(elemType, options.config.numberType)}>)`,
             ),
           ),
         }),
