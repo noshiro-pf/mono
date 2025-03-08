@@ -4,11 +4,11 @@ import {
   replaceWithNoMatchCheck,
   replaceWithNoMatchCheckBetweenRegexp,
 } from '@noshiro/mono-utils';
+import { type ConverterConfig } from '../functions/constants.mjs';
 import {
   closeBraceRegexp,
   createBrandedNumber,
   idFn,
-  type ConverterConfig,
   type ConverterOptions,
 } from './common.mjs';
 import { typeUtilsName } from './constants.mjs';
@@ -45,7 +45,7 @@ export const convert = (
     config: converterConfig,
     readonlyModifier:
       converterConfig.returnType === 'mutable' ? '' : 'readonly ',
-    brandedNumber: createBrandedNumber(converterConfig.useBrandedNumber),
+    brandedNumber: createBrandedNumber(converterConfig.numberType),
   } as const;
 
   return (src) =>

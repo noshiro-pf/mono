@@ -4,11 +4,11 @@ import { idFn, type ConverterOptions } from './common.mjs';
 export const convertLibEs2020Sharedmemory =
   ({
     brandedNumber,
-    config: { useBrandedNumber },
+    config: { numberType },
   }: ConverterOptions): MonoTypeFunction<string> =>
   (src) =>
     pipe(src).chainMonoTypeFns(
-      ...(!useBrandedNumber
+      ...(numberType === 'normal'
         ? []
         : [
             //
@@ -31,7 +31,7 @@ export const convertLibEs2020Sharedmemory =
             ),
           )),
 
-      !useBrandedNumber
+      numberType === 'normal'
         ? idFn
         : replaceWithNoMatchCheck(
             'compareExchange(typedArray: BigInt64Array<ArrayBufferLike> | BigUint64Array<ArrayBufferLike>, index: number, expectedValue: bigint, replacementValue: bigint): bigint;',
@@ -43,7 +43,7 @@ export const convertLibEs2020Sharedmemory =
               .join('\n'),
           ),
 
-      !useBrandedNumber
+      numberType === 'normal'
         ? idFn
         : replaceWithNoMatchCheck(
             'load(typedArray: BigInt64Array<ArrayBufferLike> | BigUint64Array<ArrayBufferLike>, index: number): bigint;',
