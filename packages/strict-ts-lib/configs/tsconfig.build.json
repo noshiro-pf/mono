@@ -2,7 +2,7 @@
   "extends": "../../../../configs/tsconfig/tsconfig.build.json",
   "compilerOptions": {
     "types": ["node"],
-    "outDir": "../scripts/dist"
+    "outDir": "../dist"
   },
-  "include": ["../scripts/src/**/*.mts"]
+  "include": ["../src/**/*.mts"]
 }
