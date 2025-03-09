@@ -10,8 +10,8 @@ import { genEslintFixed } from '../functions/gen-eslint-fixed.mjs';
 import { genLibFiles } from '../functions/gen-lib-files.mjs';
 import { genPackages } from '../functions/gen-packages.mjs';
 import { type SemVer } from '../functions/types.mjs';
+import { typescriptVersions } from '../functions/typescript-versions.mjs';
 import { formatChanged, formatFiles } from '../functions/utils/format.mjs';
-import { toPathSegment } from '../functions/utils/ts-path-segment.js';
 
 export const steps = (tsVersion: SemVer | 'all') =>
   [
@@ -23,7 +23,14 @@ export const steps = (tsVersion: SemVer | 'all') =>
       name: 'format temp/copied',
       fn: () =>
         formatFiles(
-          paths.strictTsLib.output(toPathSegment(tsVersion)).temp.copied.$,
+          tsVersion === 'all'
+            ? typescriptVersions.map((v) =>
+                path.resolve(paths.strictTsLib.output(v).temp.copied.$, '*'),
+              )
+            : path.resolve(
+                paths.strictTsLib.output(tsVersion).temp.copied.$,
+                '*',
+              ),
         ),
     },
     {
@@ -39,18 +46,27 @@ export const steps = (tsVersion: SemVer | 'all') =>
       fn: () => genLibFiles(tsVersion),
     },
     {
-      name: 'format output/lib-files',
+      name: 'format lib-files',
       fn: () =>
         formatFiles(
-          converterConfigs.map(
-            (cfg) =>
-              paths.strictTsLib.output(toPathSegment(tsVersion))[cfg.numberType]
-                .libFiles.$,
+          converterConfigs.flatMap((cfg) =>
+            tsVersion === 'all'
+              ? typescriptVersions.map((v) =>
+                  path.resolve(
+                    paths.strictTsLib.output(v)[cfg.numberType].libFiles.$,
+                    '*',
+                  ),
+                )
+              : path.resolve(
+                  paths.strictTsLib.output(tsVersion)[cfg.numberType].libFiles
+                    .$,
+                  '*',
+                ),
           ),
         ),
     },
     {
-      name: 'format output/lib-files (changed)',
+      name: 'format lib-files (changed)',
       fn: formatChanged,
     },
     {
