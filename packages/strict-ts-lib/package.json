@@ -19,10 +19,10 @@
     "code-diffs:normal": "zx ./dist/open-diff-in-code-normal.mjs",
     "fmt": "yarn zz:prettier .",
     "fmt:diff": "wireit",
-    "gen:all": "wireit",
+    "gen:after-fetch:all": "wireit",
+    "gen:after-fetch:latest": "wireit",
     "gen:full:all": "wireit",
     "gen:full:latest": "wireit",
-    "gen:latest": "wireit",
     "gen:lib-files:all": "wireit",
     "gen:lib-files:latest": "wireit",
     "gen:min:all": "wireit",
@@ -66,17 +66,17 @@
       ],
       "command": "zx ./dist/commands/fmt-diff.mjs"
     },
-    "gen:all": {
+    "gen:after-fetch:all": {
       "dependencies": [
         "build"
       ],
-      "command": "zx ./dist/commands/gen-all.mjs"
+      "command": "zx ./dist/commands/gen-after-fetch-all.mjs"
     },
-    "gen:latest": {
+    "gen:after-fetch:latest": {
       "dependencies": [
         "build"
       ],
-      "command": "zx ./dist/commands/gen-latest.mjs"
+      "command": "zx ./dist/commands/gen-after-fetch-latest.mjs"
     },
     "gen:full:all": {
       "dependencies": [
