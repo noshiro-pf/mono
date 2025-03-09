@@ -17,10 +17,10 @@
     "clean:wireit": "rimraf .wireit/**",
     "code-diffs:branded": "zx ./dist/open-diff-in-code-branded.mjs",
     "code-diffs:normal": "zx ./dist/open-diff-in-code-normal.mjs",
-    "fmt": "yarn zz:prettier .",
-    "fmt:diff": "wireit",
+    "fmt": "wireit",
     "gen:after-fetch:all": "wireit",
     "gen:after-fetch:latest": "wireit",
+    "gen:ci:all": "wireit",
     "gen:full:all": "wireit",
     "gen:full:latest": "wireit",
     "gen:lib-files:all": "wireit",
@@ -40,8 +40,7 @@
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit",
     "zz:eslint": "TIMING=1 eslint",
-    "zz:eslint:src": "yarn zz:eslint --config eslint.config.js src/**/*.mts",
-    "zz:prettier": "prettier --ignore-path ./.prettierignore --write --log-level warn"
+    "zz:eslint:src": "yarn zz:eslint --config eslint.config.js src/**/*.mts"
   },
   "devDependencies": {
     "@noshiro/mono-utils": "*",
@@ -60,11 +59,17 @@
         "./dist/**/*"
       ]
     },
-    "fmt:diff": {
+    "fmt": {
       "dependencies": [
         "build"
       ],
       "command": "zx ./dist/commands/fmt-diff.mjs"
+    },
+    "gen:ci:all": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "zx ./dist/commands/gen-ci.mjs"
     },
     "gen:after-fetch:all": {
       "dependencies": [

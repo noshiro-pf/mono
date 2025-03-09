@@ -43,7 +43,7 @@ jobs:
           yarn zz:wsrun-stages --recursive -p @noshiro/strict-typescript-lib-source -c build
 
       - name: Run "npm run gen"
-        run: yarn workspace @noshiro/strict-typescript-lib-source gen
+        run: yarn workspace @noshiro/strict-typescript-lib-source gen:ci
 
       - name: Check if there is no file diff
         run: yarn zz:check:no-diff
