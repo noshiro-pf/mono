@@ -14,7 +14,7 @@ const defineConfig = () => [
       ecmaVersion: 'latest',
       parser: typescriptEslintParser,
       parserOptions: {
-        project: './tsconfig.eslint.json',
+        project: 'tsconfig.eslint.json',
         tsconfigRootDir: thisDir,
         ecmaVersion: 'latest',
         ecmaFeatures: {
@@ -36,7 +36,7 @@ const defineConfig = () => [
     },
   },
   {
-    files: ['temp/eslint-fixed/**/*.d.ts'],
+    files: ['**/temp/eslint-fixed/**/*.d.ts'],
 
     rules: {
       // 'no-var': 'error',
@@ -51,7 +51,7 @@ const defineConfig = () => [
     },
   },
   {
-    files: ['temp/eslint-fixed/**/!(lib.dom|lib.webworker).d.ts'],
+    files: ['**/temp/eslint-fixed/**/!(lib.dom|lib.webworker).d.ts'],
 
     rules: {
       // https://github.com/jonaskello/eslint-plugin-functional/blob/master/docs/rules/prefer-readonly-type.md

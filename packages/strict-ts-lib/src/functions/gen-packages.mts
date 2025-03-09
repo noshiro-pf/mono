@@ -21,7 +21,7 @@ import { type SemVer } from './types.mjs';
 import { clearDir } from './utils/clear-dir.mjs';
 import { forAllTsVersions } from './utils/for-all-ts-versions.mjs';
 
-/** Generate files to `output/packages` */
+/** Generate files to `output/{tsVersion}/{numberType}/packages` */
 export const genPackages = async (
   tsVersion: SemVer | 'all',
 ): Promise<'ok' | 'err'> => forAllTsVersions(tsVersion, genPackagesImpl);
@@ -41,7 +41,6 @@ const genPackagesImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
   return 'ok';
 };
 
-/** Generate files in `output/packages` */
 const createPackages = async (
   config: ConverterConfig,
   tsVersion: SemVer,
@@ -154,7 +153,7 @@ const createPackages = async (
   return 'ok';
 };
 
-/** Generate files in output/lib */
+/** Generate files in `output/{tsVersion}/{numberType}/lib` */
 const createLib = async (
   tsVersion: SemVer,
   config: ConverterConfig,
@@ -372,10 +371,9 @@ const getStrictLibVersion = async (): Promise<string | undefined> => {
   // NOTE(noshiro-pf): import により静的に読み込むことも可能だが、
   // dist に package.json が複製され都合が悪いため動的に読み込む。
 
-  const packageJsonStr = await fs.readFile(
-    paths.strictTsLib.source.packageJson,
-    { encoding: 'utf8' },
-  );
+  const packageJsonStr = await fs.readFile(paths.strictTsLib.packageJson, {
+    encoding: 'utf8',
+  });
 
   const packageJson = JSON.parse(packageJsonStr);
 

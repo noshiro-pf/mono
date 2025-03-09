@@ -1,36 +1,20 @@
 import 'zx/globals';
 import { paths } from './constants.mjs';
 import { type SemVer } from './types.mjs';
-import { typescriptVersions } from './typescript-versions.mjs';
 import { clearDir } from './utils/clear-dir.mjs';
+import { forAllTsVersions } from './utils/for-all-ts-versions.mjs';
 
 /**
- * Read files in `source/temp/copied` and generate files in
- * `source/temp/eslint-fixed`
+ * Read files in `output/{tsVersion}/{numberType}/temp/copied` and generate
+ * files in `output/{tsVersion}/{numberType}/temp/eslint-fixed`
  */
 export const genEslintFixed = async (
   tsVersion: SemVer | 'all',
-): Promise<'ok' | 'err'> => {
-  if (tsVersion === 'all') {
-    for (const v of typescriptVersions) {
-      echo(`TypeScript version: ${v}.\n`);
-
-      const res = await genEslintFixedImpl(v);
-      if (res === 'err') return 'err';
-    }
-  } else {
-    echo(`TypeScript version: ${tsVersion}.\n`);
-
-    const res = await genEslintFixedImpl(tsVersion);
-    if (res === 'err') return 'err';
-  }
-
-  return 'ok';
-};
+): Promise<'ok' | 'err'> => forAllTsVersions(tsVersion, genEslintFixedImpl);
 
 /**
- * Read files in `source/temp/copied` and generate files in
- * `source/temp/eslint-fixed`
+ * Read files in `output/{tsVersion}/{numberType}/temp/copied` and generate
+ * files in `output/{tsVersion}/{numberType}/temp/eslint-fixed`
  */
 const genEslintFixedImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
   const { copied, eslintFixed } = paths.strictTsLib.output(tsVersion).temp;
@@ -48,7 +32,7 @@ const genEslintFixedImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
     }
   }
 
-  cd(paths.strictTsLib.source.$);
+  cd(paths.strictTsLib.$);
 
   {
     const res =
