@@ -38,7 +38,7 @@ const main = async () => {
 
   for (const workspace of workspaces) {
     if (
-      workspace.location === 'packages/strict-ts-lib/source' ||
+      workspace.location === 'packages/strict-ts-lib' ||
       workspace.location.startsWith('packages/utils') ||
       workspace.location === 'packages/ts-type-utils' ||
       workspace.location === 'packages/eslint-configs' ||
@@ -52,7 +52,7 @@ const main = async () => {
         .replace('packages/eslint-configs', 'eslint-configs')
         .replace('packages/utils/', '')
         .replace('packages/apps/', '')
-        .replace('packages/strict-ts-lib/source', 'strict-ts-lib');
+        .replace('packages/strict-ts-lib', 'strict-ts-lib');
 
       if (packageName === 'blueprint-css') continue;
       if (packageName === 'goober') continue;
