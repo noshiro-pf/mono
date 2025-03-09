@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/strict-typescript-lib-es2016-array-include",
-  "version": "5.7.2",
+  "version": "5.7.2-strict-ts-lib-v1",
   "private": false,
   "description": "Strict TypeScript lib",
   "repository": {
