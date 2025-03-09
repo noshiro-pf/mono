@@ -37,15 +37,12 @@ packages/utils/syncflow/docs/**/*.js
 .wireit
 *.tsbuildinfo
 
-packages/strict-ts-lib/source/temp/copied
-packages/strict-ts-lib/source/temp/copied-for-diff
-packages/strict-ts-lib/source/temp/eslint-fixed
-packages/strict-ts-lib/output/diff
-packages/strict-ts-lib/output/final
-packages/strict-ts-lib/output/packages
-packages/strict-ts-lib/output-branded/diff
-packages/strict-ts-lib/output-branded/final
-packages/strict-ts-lib/output-branded/packages
+packages/strict-ts-lib/output/**/temp/copied
+packages/strict-ts-lib/output/**/temp/copied-for-diff
+packages/strict-ts-lib/output/**/temp/eslint-fixed
+packages/strict-ts-lib/output/**/diff
+packages/strict-ts-lib/output/**/final
+packages/strict-ts-lib/output/**/packages
 
 packages/others/slack-archive-tools/archive
 
