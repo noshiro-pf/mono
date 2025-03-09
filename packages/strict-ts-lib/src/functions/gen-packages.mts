@@ -172,7 +172,7 @@ const createLib = async (
   }
   {
     const res =
-      await $`cp ${path.resolve(paths.strictTsLib.source.scripts.$, 'README.md')} ${paths.strictTsLib.output(tsVersion)[config.numberType].lib.$}`;
+      await $`cp ${path.resolve(paths.strictTsLib.$, 'README.md')} ${paths.strictTsLib.output(tsVersion)[config.numberType].lib.$}`;
 
     if (res.exitCode !== 0) {
       console.error(res.stderr);

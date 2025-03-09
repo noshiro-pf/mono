@@ -12,7 +12,7 @@ export const genLib = false as boolean;
 
 export const packageManagerName = 'yarn';
 
-// /packages/strict-ts-lib/source/scripts/dist/commands/functions/constants.mts
+// /packages/strict-ts-lib/dist/commands/functions/constants.mts
 const thisDir = toThisDir(import.meta.url);
 
 // /packages/strict-ts-lib
@@ -28,6 +28,8 @@ export const paths = {
 
   strictTsLib: pipe(strictTsLibDir).chain((root) => ({
     $: root,
+
+    packageJson: path.resolve(root, 'package.json'),
 
     output: (tsVersion: SemVer | '*') =>
       pipe(`${strictTsLibDir}/output/${tsVersion}` as const).chain(
@@ -79,16 +81,6 @@ export const paths = {
           })).value,
         }),
       ).value,
-
-    source: pipe(`${strictTsLibDir}/source` as const).chain((source) => ({
-      $: source,
-
-      packageJson: path.resolve(source, 'package.json'),
-
-      scripts: {
-        $: `${source}/scripts` as const,
-      },
-    })).value,
   })).value,
 } as const;
 

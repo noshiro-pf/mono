@@ -12,7 +12,7 @@ const thisDir = toThisDir(import.meta.url);
 /** @returns {readonly FlatConfig[]} */
 const defineConfig = () => [
   {
-    ignores: ['**/*.d.ts', '**/*.d.mts', 'scripts/dist/**/*.mjs'],
+    ignores: ['**/*.d.ts', '**/*.d.mts', 'dist/**/*.mjs'],
   },
   ...eslintFlatConfigForTypeScript({
     tsconfigRootDir: thisDir,
