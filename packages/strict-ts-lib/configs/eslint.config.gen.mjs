@@ -14,7 +14,7 @@ const defineConfig = () => [
       ecmaVersion: 'latest',
       parser: typescriptEslintParser,
       parserOptions: {
-        project: './tsconfig.eslint.json',
+        project: 'tsconfig.eslint.json',
         tsconfigRootDir: thisDir,
         ecmaVersion: 'latest',
         ecmaFeatures: {

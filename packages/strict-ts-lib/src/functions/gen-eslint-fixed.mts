@@ -48,7 +48,7 @@ const genEslintFixedImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
     }
   }
 
-  cd(paths.strictTsLib.source.$);
+  cd(paths.strictTsLib.$);
 
   {
     const res =

@@ -5,7 +5,7 @@ import { paths } from '../constants.mjs';
 export const formatFiles = async (
   absolutePaths: string | readonly string[],
 ): Promise<'ok' | 'err'> => {
-  cd(paths.strictTsLib.source.$);
+  cd(paths.strictTsLib.$);
   const res =
     await $`yarn zz:prettier ${Array.isArray(absolutePaths) ? absolutePaths.join(' ') : absolutePaths}`;
   if (res.exitCode !== 0) {

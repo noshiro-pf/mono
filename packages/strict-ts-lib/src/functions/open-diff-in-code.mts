@@ -3,8 +3,10 @@ import { paths } from './constants.mjs';
 import { type SemVer } from './types.mjs';
 import { typescriptVersions } from './typescript-versions.mjs';
 
-export const openDiffInCode = async (): Promise<void> => {
-  await openDiffInCodeImpl(typescriptVersions[0], 'branded');
+export const openDiffInCode = async (
+  numberType: 'normal' | 'branded',
+): Promise<void> => {
+  await openDiffInCodeImpl(typescriptVersions[0], numberType);
 };
 
 const openDiffInCodeImpl = async (

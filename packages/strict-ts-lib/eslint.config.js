@@ -17,7 +17,7 @@ const defineConfig = () => [
   ...eslintFlatConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
-    packageDirs: [path.resolve(thisDir, '../../..'), thisDir],
+    packageDirs: [path.resolve(thisDir, '../..'), thisDir],
   }),
   {
     rules: {

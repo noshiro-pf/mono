@@ -372,10 +372,9 @@ const getStrictLibVersion = async (): Promise<string | undefined> => {
   // NOTE(noshiro-pf): import により静的に読み込むことも可能だが、
   // dist に package.json が複製され都合が悪いため動的に読み込む。
 
-  const packageJsonStr = await fs.readFile(
-    paths.strictTsLib.source.packageJson,
-    { encoding: 'utf8' },
-  );
+  const packageJsonStr = await fs.readFile(paths.strictTsLib.packageJson, {
+    encoding: 'utf8',
+  });
 
   const packageJson = JSON.parse(packageJsonStr);
 
