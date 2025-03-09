@@ -1,5 +1,6 @@
 import { execSync } from 'node:child_process';
 import 'zx/globals';
+import { type TsVersion } from '../typescript-versions.mjs';
 import { paths } from './constants.mjs';
 import { type SemVer } from './types.mjs';
 import { clearDir } from './utils/clear-dir.mjs';
@@ -11,15 +12,17 @@ import { formatFiles } from './utils/format.mjs';
  * `output/{tsVersion}/temp/copied`
  */
 export const fetchLibFiles = async (
-  tsVersion: SemVer | 'all',
+  tsVersion: TsVersion | 'all',
 ): Promise<'ok' | 'err'> => forAllTsVersions(tsVersion, fetchLibFilesImpl);
 
 /**
  * Fetch lib files from TypeScript repo and save them to
  * `output/{tsVersion}/{numberType}/temp/copied`
  */
-const fetchLibFilesImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
-  const copiedDir = paths.strictTsLib.output(tsVersion).temp.copied.$;
+const fetchLibFilesImpl = async (
+  tsVersion: TsVersion,
+): Promise<'ok' | 'err'> => {
+  const copiedDir = paths.strictTsLib.output(tsVersion).temp.copied;
 
   const files = fetchLibFileNameList(tsVersion);
 
@@ -40,10 +43,7 @@ const fetchLibFilesImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
     return 'err';
   }
 
-  {
-    const res = await formatFiles(copiedDir);
-    if (res === 'err') return res;
-  }
+  await glob(`${copiedDir}/*`).then(formatFiles);
 
   return 'ok';
 };

@@ -1,16 +1,46 @@
 import { range } from '@noshiro/mono-utils';
+import * as prettier from 'prettier';
 import 'zx/globals';
 import { paths } from '../constants.mjs';
+import {
+  formatterOptionsDefault,
+  formatterOptionsForCopied,
+  formatWithPrintWidth320,
+  ignoreFormatting,
+} from '../formatter-config.mjs';
+
+// NOTE: prettier CLI で実行するとき file path を複数の glob 文字列で与えることができず、
+// glob で展開した絶対パスを渡しても長すぎてエラーになってしまったため、
+// prettier.format API を直接呼ぶ実装に変更した。
+// これに伴い strict-ts-lib workspace 用の .prettierrc ファイル等は削除した。
 
 export const formatFiles = async (
-  absolutePaths: string | readonly string[],
+  absolutePaths: readonly string[],
 ): Promise<'ok' | 'err'> => {
-  cd(paths.strictTsLib.$);
-  const res =
-    await $`yarn zz:prettier ${Array.isArray(absolutePaths) ? absolutePaths.join(' ') : absolutePaths}`;
-  if (res.exitCode !== 0) {
-    console.error(res);
-    return 'err';
+  for (const filePath of absolutePaths) {
+    const src = await fs.readFile(filePath, { encoding: 'utf8' });
+
+    const options = formatWithPrintWidth320(filePath)
+      ? formatterOptionsForCopied
+      : formatterOptionsDefault;
+
+    const ignored = ignoreFormatting(filePath);
+
+    if (ignored) {
+      console.log(`${filePath} (ignored)'`);
+      continue;
+    }
+
+    const formatted = await prettier.format(src, {
+      ...options,
+      filepath: filePath,
+    });
+
+    console.log(
+      `${filePath} (${src === formatted ? 'unchanged' : 'changed'}) ${options.printWidth === 80 ? '' : `(printWidth=${options.printWidth})`}`,
+    );
+
+    await fs.writeFile(filePath, formatted);
   }
 
   return 'ok';
@@ -19,9 +49,9 @@ export const formatFiles = async (
 export const formatChanged = async (
   times: SafeUintWithSmallInt = 5,
 ): Promise<'ok' | 'err'> => {
-  cd(paths.root);
+  cd(paths.monoRoot);
   for (const i of range(0, times)) {
-    console.log(i);
+    console.log(`format count: ${i}`);
 
     const res = await $`git status ${['--short', '--porcelain']}`;
 
@@ -37,29 +67,19 @@ export const formatChanged = async (
       .filter((s) => s !== '')
       .map((line) => line.split(' ').filter((s) => s !== ''));
 
-    console.log(JSON.stringify(statusParsed, undefined, 2));
+    // console.log(JSON.stringify(statusParsed, undefined, 2));
 
     const files = statusParsed
       .filter(([t]) => t?.includes('D') !== true)
-      .map((line) => line.at(-1));
-
-    console.log('target files:', JSON.stringify(files, undefined, 2));
+      .map((line) => line.at(-1))
+      .filter((s) => s !== undefined)
+      .filter((s) => !ignoreFormatting(s));
 
     if (files.length === 0) {
       return 'ok';
     }
 
-    const result = await $`prettier ${[
-      '--write',
-      '--ignore-path',
-      'packages/strict-ts-lib/.prettierignore',
-      '--ignore-unknown',
-    ]} ${files}`;
-
-    if (result.exitCode !== 0) {
-      console.error(result);
-      return 'err';
-    }
+    await formatFiles(files);
   }
 
   return 'ok';
@@ -68,9 +88,9 @@ export const formatChanged = async (
 export const formatDiffFromMain = async (
   times: SafeUintWithSmallInt = 5,
 ): Promise<'ok' | 'err'> => {
-  cd(paths.root);
+  cd(paths.monoRoot);
   for (const i of range(0, times)) {
-    console.log(i);
+    console.log(`format count: ${i}`);
 
     const res = await $`git diff ${['--name-only', 'main', '--diff-filter=d']}`;
 
@@ -83,26 +103,14 @@ export const formatDiffFromMain = async (
       .text('utf8')
       .split('\n')
       .map((s) => s.trim())
-      .filter((s) => s !== '');
-
-    console.log('target files:', JSON.stringify(files, undefined, 2));
+      .filter((s) => s !== '')
+      .filter((s) => !ignoreFormatting(s));
 
     if (files.length === 0) {
       return 'ok';
     }
-    {
-      const res2 = await $`prettier ${[
-        '--write',
-        '--ignore-path',
-        'packages/strict-ts-lib/.prettierignore',
-        '--ignore-unknown',
-      ]} ${files}`;
 
-      if (res2.exitCode !== 0) {
-        console.error(res2);
-        return 'err';
-      }
-    }
+    await formatFiles(files);
   }
 
   return 'ok';
