@@ -1,6 +1,6 @@
 import { pipe, toThisDir } from '@noshiro/mono-utils';
 import 'zx/globals';
-import { type SemVer } from './types.mjs';
+import { type TsVersion } from '../typescript-versions.mjs';
 
 export const libName = '@noshiro/strict-typescript-lib';
 
@@ -19,66 +19,50 @@ const thisDir = toThisDir(import.meta.url);
 const strictTsLibDir = path.resolve(thisDir, '../..');
 
 export const paths = {
-  root: strictTsLibDir,
+  monoRoot: path.resolve(strictTsLibDir, '../..'),
 
   tsTypeUtilsPackageJsonPath: path.resolve(
     strictTsLibDir,
     '../ts-type-utils/package.json',
   ),
 
-  strictTsLib: pipe(strictTsLibDir).chain((root) => ({
-    $: root,
+  strictTsLib: pipe(strictTsLibDir).chain((lib) => ({
+    $: lib,
 
-    packageJson: path.resolve(root, 'package.json'),
+    packageJson: path.resolve(lib, 'package.json'),
+    prettierrc: path.resolve(lib, '.prettierrc'),
 
-    output: (tsVersion: SemVer) =>
+    output: (tsVersion: TsVersion) =>
       pipe(`${strictTsLibDir}/output/${tsVersion}` as const).chain(
         (output) => ({
-          $: output,
+          temp: pipe(`${output}/temp` as const).chain(
+            (temp) =>
+              ({
+                copied: `${temp}/copied`,
+                copiedForDiff: `${temp}/copied-for-diff`,
+                eslintFixed: `${temp}/eslint-fixed`,
+              }) as const,
+          ).value,
 
-          temp: pipe(`${output}/temp` as const).chain((temp) => ({
-            $: temp,
+          normal: pipe(`${output}/normal` as const).chain(
+            (o) =>
+              ({
+                diff: `${o}/diff`,
+                lib: `${o}/lib`,
+                libFiles: `${o}/lib-files`,
+                packages: `${o}/packages`,
+              }) as const,
+          ).value,
 
-            copied: {
-              $: `${temp}/copied` as const,
-            },
-            copiedForDiff: {
-              $: `${temp}/copied-for-diff` as const,
-            },
-            eslintFixed: {
-              $: `${temp}/eslint-fixed` as const,
-            },
-          })).value,
-
-          normal: pipe(`${output}/normal` as const).chain((o) => ({
-            diff: {
-              $: `${o}/diff` as const,
-            },
-            lib: {
-              $: `${o}/lib` as const,
-            },
-            libFiles: {
-              $: `${o}/lib-files` as const,
-            },
-            packages: {
-              $: `${o}/packages` as const,
-            },
-          })).value,
-
-          branded: pipe(`${output}/branded` as const).chain((o) => ({
-            diff: {
-              $: `${o}/diff` as const,
-            },
-            lib: {
-              $: `${o}/lib` as const,
-            },
-            libFiles: {
-              $: `${o}/lib-files` as const,
-            },
-            packages: {
-              $: `${o}/packages` as const,
-            },
-          })).value,
+          branded: pipe(`${output}/branded` as const).chain(
+            (o) =>
+              ({
+                diff: `${o}/diff`,
+                lib: `${o}/lib`,
+                libFiles: `${o}/lib-files`,
+                packages: `${o}/packages`,
+              }) as const,
+          ).value,
         }),
       ).value,
   })).value,

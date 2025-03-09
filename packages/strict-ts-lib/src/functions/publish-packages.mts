@@ -1,10 +1,10 @@
 import 'zx/globals';
+import { type TsVersion } from '../typescript-versions.mjs';
 import { paths } from './constants.mjs';
 import { getPackageDirList } from './get-package-dir-list.mjs';
-import { type SemVer } from './types.mjs';
 
 export const publishPackages = async (
-  tsVersion: SemVer,
+  tsVersion: TsVersion,
   numberType: 'normal' | 'branded',
 ): Promise<void> => {
   const directories: readonly string[] = await getPackageDirList(
@@ -12,7 +12,7 @@ export const publishPackages = async (
   ).then((list) =>
     list.map((a) =>
       path.resolve(
-        paths.strictTsLib.output(tsVersion)[numberType].packages.$,
+        paths.strictTsLib.output(tsVersion)[numberType].packages,
         a.packageRelativePath,
       ),
     ),
@@ -31,8 +31,8 @@ export const publishPackages = async (
     ),
   );
 
-  cd(paths.strictTsLib.output(tsVersion)[numberType].lib.$);
-  echo(paths.strictTsLib.output(tsVersion)[numberType].lib.$);
+  cd(paths.strictTsLib.output(tsVersion)[numberType].lib);
+  echo(paths.strictTsLib.output(tsVersion)[numberType].lib);
   await $`npm publish`;
 
   echo(' ');
