@@ -54,7 +54,7 @@ jobs:
           yarn workspace @noshiro/eslint-configs build
 
       - name: Run "npm run gen"
-        run: yarn workspace @noshiro/strict-typescript-lib-source gen
+        run: yarn workspace @noshiro/strict-typescript-lib-source gen:ci
 
       - name: Check if there is no file diff
         run: yarn zz:check:no-diff

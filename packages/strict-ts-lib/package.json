@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/strict-typescript-lib-source",
-  "version": "1.0.0",
+  "version": "5.7.2",
   "private": false,
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
     "fmt:diff": "wireit",
     "gen:after-fetch:all": "wireit",
     "gen:after-fetch:latest": "wireit",
+    "gen:ci:all": "wireit",
     "gen:full:all": "wireit",
     "gen:full:latest": "wireit",
     "gen:lib-files:all": "wireit",
@@ -65,6 +66,12 @@
         "build"
       ],
       "command": "zx ./dist/commands/fmt-diff.mjs"
+    },
+    "gen:ci:all": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "zx ./dist/commands/gen-ci.mjs"
     },
     "gen:after-fetch:all": {
       "dependencies": [
