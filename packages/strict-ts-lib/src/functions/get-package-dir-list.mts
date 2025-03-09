@@ -1,7 +1,7 @@
 import 'zx/globals';
 import { getSrcFileList } from '../convert-dts/common.mjs';
+import { type TsVersion } from '../typescript-versions.mjs';
 import { paths } from './constants.mjs';
-import { type SemVer } from './types.mjs';
 
 /** "lib.es2018.asynciterable.d.ts" -> "es2018/asynciterable" */
 export const libFilenameToPath = (libFilename: string): string =>
@@ -12,7 +12,7 @@ export const libFilenameToPath = (libFilename: string): string =>
     .replaceAll('.', '/');
 
 export const getPackageDirList = (
-  tsVersion: SemVer,
+  tsVersion: TsVersion,
 ): Promise<
   DeepReadonly<
     {
@@ -21,7 +21,7 @@ export const getPackageDirList = (
     }[]
   >
 > =>
-  getSrcFileList(paths.strictTsLib.output(tsVersion).temp.eslintFixed.$).then(
+  getSrcFileList(paths.strictTsLib.output(tsVersion).temp.eslintFixed).then(
     (list) =>
       list
         .map(({ filename }) => filename)

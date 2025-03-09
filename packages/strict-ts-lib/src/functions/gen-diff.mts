@@ -1,29 +1,29 @@
 import { exec } from 'node:child_process';
 import 'zx/globals';
+import { type TsVersion } from '../typescript-versions.mjs';
 import { converterConfigs, paths } from './constants.mjs';
-import { type SemVer } from './types.mjs';
 import { clearDir } from './utils/clear-dir.mjs';
 import { forAllTsVersions } from './utils/for-all-ts-versions.mjs';
 import { formatFiles } from './utils/format.mjs';
 import { wrapStartEnd } from './utils/wrap-start-end.mjs';
 
 export const prepareCopiedForDiff = async (
-  tsVersion: SemVer | 'all',
+  tsVersion: TsVersion | 'all',
 ): Promise<'ok' | 'err'> =>
   forAllTsVersions(tsVersion, prepareCopiedForDiffImpl);
 
 const prepareCopiedForDiffImpl = async (
-  tsVersion: SemVer,
+  tsVersion: TsVersion,
 ): Promise<'ok' | 'err'> => {
   const { copied, copiedForDiff } = paths.strictTsLib.output(tsVersion).temp;
 
   {
-    const res = await clearDir(copiedForDiff.$);
+    const res = await clearDir(copiedForDiff);
     if (res === 'err') return res;
   }
 
   {
-    const res = await $`cp ${copied.$}/* ${copiedForDiff.$}/`;
+    const res = await $`cp ${copied}/* ${copiedForDiff}/`;
     if (res.exitCode !== 0) {
       console.error(res.stderr);
       return 'err';
@@ -31,16 +31,16 @@ const prepareCopiedForDiffImpl = async (
   }
 
   return wrapStartEnd(
-    () => formatFiles(copiedForDiff.$),
+    () => glob(`${copiedForDiff}/*`).then(formatFiles),
     'formatFiles("temp/copied-for-diff")',
   );
 };
 
 export const genDiff = async (
-  tsVersion: SemVer | 'all',
+  tsVersion: TsVersion | 'all',
 ): Promise<'ok' | 'err'> => forAllTsVersions(tsVersion, genDiffImpl);
 
-const genDiffImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
+const genDiffImpl = async (tsVersion: TsVersion): Promise<'ok' | 'err'> => {
   for (const { numberType } of converterConfigs) {
     const res = await genDiffImpl2(tsVersion, numberType);
     if (res === 'err') return 'err';
@@ -55,16 +55,16 @@ const genDiffImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
  * `output/{tsVersion}/{numberType}/diff`
  */
 const genDiffImpl2 = async (
-  tsVersion: SemVer,
+  tsVersion: TsVersion,
   numberType: 'normal' | 'branded',
 ): Promise<'ok' | 'err'> => {
   const { copiedForDiff } = paths.strictTsLib.output(tsVersion).temp;
   const { diff, libFiles } = paths.strictTsLib.output(tsVersion)[numberType];
 
-  const files = await glob(copiedForDiff.$);
+  const files = await glob(copiedForDiff);
 
   {
-    const res = await clearDir(diff.$);
+    const res = await clearDir(diff);
     if (res === 'err') return res;
   }
 
@@ -76,14 +76,14 @@ const genDiffImpl2 = async (
 
       const args = [
         '--no-index',
-        `${copiedForDiff.$}/${name}.d.ts`,
-        `${libFiles.$}/${name}.d.ts`,
+        `${copiedForDiff}/${name}.d.ts`,
+        `${libFiles}/${name}.d.ts`,
       ].join(' ');
 
       const output = await execAsync(`git diff ${args}`);
 
       await fs.writeFile(
-        path.resolve(diff.$, `${name}.diff`),
+        path.resolve(diff, `${name}.diff`),
         output.split('\n').slice(4).join('\n'),
       );
     }

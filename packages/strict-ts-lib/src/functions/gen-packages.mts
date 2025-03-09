@@ -6,6 +6,7 @@ import {
 } from '@noshiro/mono-utils';
 import 'zx/globals';
 import { typeUtilsName } from '../convert-dts/constants.mjs';
+import { strictLibVersions, type TsVersion } from '../typescript-versions.mjs';
 import {
   type ConverterConfig,
   converterConfigs,
@@ -17,16 +18,15 @@ import {
 } from './constants.mjs';
 import { fetchLibFileNameList } from './fetch-lib-files.mjs';
 import { getPackageDirList } from './get-package-dir-list.mjs';
-import { type SemVer } from './types.mjs';
 import { clearDir } from './utils/clear-dir.mjs';
 import { forAllTsVersions } from './utils/for-all-ts-versions.mjs';
 
 /** Generate files to `output/{tsVersion}/{numberType}/packages` */
 export const genPackages = async (
-  tsVersion: SemVer | 'all',
+  tsVersion: TsVersion | 'all',
 ): Promise<'ok' | 'err'> => forAllTsVersions(tsVersion, genPackagesImpl);
 
-const genPackagesImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
+const genPackagesImpl = async (tsVersion: TsVersion): Promise<'ok' | 'err'> => {
   // lib ファイル名に基づき package ディレクトリ階層を packages/ に生成し、
   // その直下のディレクトリ名を元に dependencies を生成するために先に実行する
   await Promise.all(
@@ -43,28 +43,23 @@ const genPackagesImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
 
 const createPackages = async (
   config: ConverterConfig,
-  tsVersion: SemVer,
+  tsVersion: TsVersion,
 ): Promise<'err' | 'ok'> => {
   {
     const res = await clearDir(
-      paths.strictTsLib.output(tsVersion)[config.numberType].packages.$,
+      paths.strictTsLib.output(tsVersion)[config.numberType].packages,
     );
     if (res === 'err') return 'err';
   }
 
-  const strictLibVersion = await getStrictLibVersion();
-
-  if (strictLibVersion === undefined) {
-    console.error('tsVersion is undefined');
-    return 'err';
-  }
+  const strictLibVersion = `${tsVersion}-strict-ts-lib-v${strictLibVersions[tsVersion]}`;
 
   const outDir =
-    paths.strictTsLib.output(tsVersion)[config.numberType].packages.$;
+    paths.strictTsLib.output(tsVersion)[config.numberType].packages;
 
   if (!strictLibVersion.startsWith(tsVersion)) {
     console.error(
-      `tsVersion should starts with typescriptVersion "${tsVersion}"`,
+      `strictLibVersion should starts with tsVersion "${tsVersion}"`,
     );
     return 'err';
   }
@@ -91,7 +86,7 @@ const createPackages = async (
 
         const content = await fs.readFile(
           path.resolve(
-            paths.strictTsLib.output(tsVersion)[config.numberType].libFiles.$,
+            paths.strictTsLib.output(tsVersion)[config.numberType].libFiles,
             filename,
           ),
           { encoding: 'utf8' },
@@ -155,12 +150,12 @@ const createPackages = async (
 
 /** Generate files in `output/{tsVersion}/{numberType}/lib` */
 const createLib = async (
-  tsVersion: SemVer,
+  tsVersion: TsVersion,
   config: ConverterConfig,
 ): Promise<'ok' | 'err'> => {
   {
     const res = await clearDir(
-      paths.strictTsLib.output(tsVersion)[config.numberType].lib.$,
+      paths.strictTsLib.output(tsVersion)[config.numberType].lib,
     );
     if (res === 'err') return 'err';
   }
@@ -171,7 +166,7 @@ const createLib = async (
   }
   {
     const res =
-      await $`cp ${path.resolve(paths.strictTsLib.$, 'README.md')} ${paths.strictTsLib.output(tsVersion)[config.numberType].lib.$}`;
+      await $`cp ${path.resolve(paths.strictTsLib.$, 'README.md')} ${paths.strictTsLib.output(tsVersion)[config.numberType].lib}`;
 
     if (res.exitCode !== 0) {
       console.error(res.stderr);
@@ -184,16 +179,16 @@ const createLib = async (
 /** Update root package.json */
 const updateRootPackageJson = async (
   config: ConverterConfig,
-  typescriptVersion: SemVer,
+  tsVersion: TsVersion,
 ): Promise<'ok' | 'err'> => {
-  const tsVersion = await getStrictLibVersion();
+  const strictLibVersion = await getStrictLibVersion();
 
-  if (tsVersion === undefined) {
+  if (strictLibVersion === undefined) {
     console.error('tsVersion is undefined');
     return 'err';
   }
 
-  const rootPackageJson = path.resolve(paths.root, 'package.json');
+  const rootPackageJson = path.resolve(paths.monoRoot, 'package.json');
 
   const packageJsonStr = await fs.readFile(rootPackageJson, {
     encoding: 'utf8',
@@ -214,8 +209,8 @@ const updateRootPackageJson = async (
     }
 
     const tsStrictLibDependencies = await constructTypeScriptLibDependencies(
+      strictLibVersion,
       tsVersion,
-      typescriptVersion,
       config.numberType,
       'local',
     );
@@ -240,7 +235,7 @@ const updateRootPackageJson = async (
 
 const writeLibPackageJson = async (
   numberType: 'normal' | 'branded',
-  tsVersion: SemVer,
+  tsVersion: TsVersion,
 ): Promise<'ok' | 'err'> => {
   const strictLibVersion = await getStrictLibVersion();
 
@@ -256,7 +251,7 @@ const writeLibPackageJson = async (
     return 'err';
   }
 
-  const outDir = paths.strictTsLib.output(tsVersion)[numberType].lib.$;
+  const outDir = paths.strictTsLib.output(tsVersion)[numberType].lib;
 
   try {
     await fs.access(outDir);
@@ -313,12 +308,12 @@ const writeLibPackageJson = async (
 /** Construct `@typescript/lib-*` dependency object */
 const constructTypeScriptLibDependencies = async (
   libVersion: string,
-  tsVersion: SemVer,
+  tsVersion: TsVersion,
   numberType: 'normal' | 'branded',
   type: 'local' | 'global',
 ): Promise<Record<`@typescript/lib-${string}`, string>> => {
   const prefix = {
-    local: `file:./packages/strict-ts-lib/output${numberType === 'branded' ? '-branded' : ''}/packages/`,
+    local: `file:./packages/strict-ts-lib/output/${tsVersion}/${numberType}/packages/`,
     global: `npm:${libName}${numberType === 'branded' ? '-branded' : ''}-`,
   }[type];
 
@@ -354,8 +349,7 @@ const constructTypeScriptLibDependencies = async (
     }
   }
 
-  const packagesDir =
-    paths.strictTsLib.output(tsVersion)[numberType].packages.$;
+  const packagesDir = paths.strictTsLib.output(tsVersion)[numberType].packages;
 
   const dirs = await fs.readdir(packagesDir);
 
