@@ -15,28 +15,33 @@
     "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
     "clean:wireit": "rimraf .wireit/**",
-    "code-diffs:branded": "zx ./dist/open-diff-in-code.mjs branded",
-    "code-diffs:normal": "zx ./dist/open-diff-in-code.mjs normal",
-    "fmt": "yarn zz:prettier ..",
+    "code-diffs:branded": "zx ./dist/open-diff-in-code-branded.mjs",
+    "code-diffs:normal": "zx ./dist/open-diff-in-code-normal.mjs",
+    "fmt": "yarn zz:prettier .",
     "fmt:diff": "wireit",
-    "gen": "wireit",
-    "gen:full": "wireit",
-    "gen:lib-files": "wireit",
-    "gen:min": "wireit",
-    "gen:packages": "wireit",
+    "gen:after-fetch:all": "wireit",
+    "gen:after-fetch:latest": "wireit",
+    "gen:full:all": "wireit",
+    "gen:full:latest": "wireit",
+    "gen:lib-files:all": "wireit",
+    "gen:lib-files:latest": "wireit",
+    "gen:min:all": "wireit",
+    "gen:min:latest": "wireit",
+    "gen:packages:all": "wireit",
+    "gen:packages:latest": "wireit",
     "lint": "yarn zz:eslint:src",
     "lint:fix": "yarn zz:eslint:src --fix",
     "test": "run-p test:normal test:branded",
-    "test:branded": "tsc -p ../output-branded/tsconfig.json",
-    "test:normal": "tsc -p ../output/tsconfig.json",
+    "test:branded": "tsc -p ./output/5.7.2/branded/tsconfig.json",
+    "test:normal": "tsc -p ./output/5.7.2/normal/tsconfig.json",
     "testw:branded": "yarn test-branded --watch",
-    "testw:normal": "yarn test --watch",
+    "testw:normal": "yarn test:normal --watch",
     "tsc": "tsc --noEmit",
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit",
     "zz:eslint": "TIMING=1 eslint",
     "zz:eslint:src": "yarn zz:eslint --config eslint.config.js src/**/*.mts",
-    "zz:prettier": "prettier --ignore-path ../.prettierignore --write --log-level warn"
+    "zz:prettier": "prettier --ignore-path ./.prettierignore --write --log-level warn"
   },
   "devDependencies": {
     "@noshiro/mono-utils": "*",
@@ -61,35 +66,65 @@
       ],
       "command": "zx ./dist/commands/fmt-diff.mjs"
     },
-    "gen": {
+    "gen:after-fetch:all": {
       "dependencies": [
         "build"
       ],
-      "command": "zx ./dist/commands/gen.mjs"
+      "command": "zx ./dist/commands/gen-after-fetch-all.mjs"
     },
-    "gen:full": {
+    "gen:after-fetch:latest": {
       "dependencies": [
         "build"
       ],
-      "command": "zx ./dist/commands/gen-full.mjs"
+      "command": "zx ./dist/commands/gen-after-fetch-latest.mjs"
     },
-    "gen:min": {
+    "gen:full:all": {
       "dependencies": [
         "build"
       ],
-      "command": "zx ./dist/commands/gen-min.mjs"
+      "command": "zx ./dist/commands/gen-full-all.mjs"
     },
-    "gen:lib-files": {
+    "gen:full:latest": {
       "dependencies": [
         "build"
       ],
-      "command": "zx ./dist/commands/gen-lib-files.mjs"
+      "command": "zx ./dist/commands/gen-full-latest.mjs"
     },
-    "gen:packages": {
+    "gen:min:all": {
       "dependencies": [
         "build"
       ],
-      "command": "zx ./dist/commands/gen-packages.mjs"
+      "command": "zx ./dist/commands/gen-min-all.mjs"
+    },
+    "gen:min:latest": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "zx ./dist/commands/gen-min-latest.mjs"
+    },
+    "gen:lib-files:all": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "zx ./dist/commands/gen-lib-files-all.mjs"
+    },
+    "gen:lib-files:latest": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "zx ./dist/commands/gen-lib-files-latest.mjs"
+    },
+    "gen:packages:all": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "zx ./dist/commands/gen-packages-all.mjs"
+    },
+    "gen:packages:latest": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "zx ./dist/commands/gen-packages-latest.mjs"
     },
     "publish-packages": {
       "dependencies": [

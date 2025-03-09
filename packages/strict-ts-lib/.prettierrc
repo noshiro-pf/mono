@@ -10,7 +10,7 @@
   "jsxSingleQuote": true,
   "overrides": [
     {
-      "files": ["source/temp/copied", "source/temp/copied/*.d.ts"],
+      "files": ["output/**/temp/copied", "output/**/temp/copied/*.d.ts"],
       "options": {
         "printWidth": 320
       }

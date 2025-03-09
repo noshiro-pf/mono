@@ -5,19 +5,19 @@ import { type ConverterConfig, converterConfigs, paths } from './constants.mjs';
 import { type SemVer } from './types.mjs';
 import { clearDir } from './utils/clear-dir.mjs';
 import { forAllTsVersions } from './utils/for-all-ts-versions.mjs';
-import { toPathSegment } from './utils/ts-path-segment.js';
 
-/** Generate files to `output/lib-files` */
+/** Generate files to `output/{tsVersion}/{numberType}/lib-files` */
 export const genLibFiles = async (
   tsVersion: SemVer | 'all',
 ): Promise<'ok' | 'err'> => forAllTsVersions(tsVersion, genLibFilesImpl);
 
-/** Generate files to `output/lib-files` */
+/** Generate files to `output/{tsVersion}/{numberType}/lib-files` */
 const genLibFilesImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
   for (const { numberType } of converterConfigs) {
     const res = await clearDir(
-      paths.strictTsLib.output(toPathSegment(tsVersion))[numberType].libFiles.$,
+      paths.strictTsLib.output(tsVersion)[numberType].libFiles.$,
     );
+
     if (res === 'err') return 'err';
   }
 

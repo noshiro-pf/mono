@@ -4,7 +4,7 @@ import { getEndStepIndex, getStartStepIndex, steps } from './gen-steps.mjs';
 
 for (const { name, fn } of steps('all').slice(
   getStartStepIndex('genLibFiles'),
-  getEndStepIndex('format output/lib-files'),
+  getEndStepIndex('format lib-files'),
 )) {
   await wrapStartEnd(fn, name).then(exitIfErr);
 }

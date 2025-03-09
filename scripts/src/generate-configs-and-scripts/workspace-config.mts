@@ -368,11 +368,6 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
       test: false,
       lint: false,
     };
-
-    draft.typeCheckIncludes = [
-      `${workspaceScriptsDirName}/src`,
-      workspaceConfigsDirName,
-    ];
   }),
 
   // apps

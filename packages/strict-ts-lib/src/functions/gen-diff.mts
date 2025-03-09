@@ -2,39 +2,20 @@ import { exec } from 'node:child_process';
 import 'zx/globals';
 import { converterConfigs, paths } from './constants.mjs';
 import { type SemVer } from './types.mjs';
-import { typescriptVersions } from './typescript-versions.mjs';
 import { clearDir } from './utils/clear-dir.mjs';
 import { forAllTsVersions } from './utils/for-all-ts-versions.mjs';
 import { formatFiles } from './utils/format.mjs';
-import { toPathSegment } from './utils/ts-path-segment.js';
 import { wrapStartEnd } from './utils/wrap-start-end.mjs';
 
 export const prepareCopiedForDiff = async (
   tsVersion: SemVer | 'all',
-): Promise<'ok' | 'err'> => {
-  if (tsVersion === 'all') {
-    for (const v of typescriptVersions) {
-      echo(`TypeScript version: ${v}.\n`);
-
-      const res = await prepareCopiedForDiffImpl(v);
-      if (res === 'err') return 'err';
-    }
-  } else {
-    echo(`TypeScript version: ${tsVersion}.\n`);
-
-    const res = await prepareCopiedForDiffImpl(tsVersion);
-    if (res === 'err') return 'err';
-  }
-
-  return 'ok';
-};
+): Promise<'ok' | 'err'> =>
+  forAllTsVersions(tsVersion, prepareCopiedForDiffImpl);
 
 const prepareCopiedForDiffImpl = async (
-  tsVersion: SemVer | 'all',
+  tsVersion: SemVer,
 ): Promise<'ok' | 'err'> => {
-  const { copied, copiedForDiff } = paths.strictTsLib.output(
-    toPathSegment(tsVersion),
-  ).temp;
+  const { copied, copiedForDiff } = paths.strictTsLib.output(tsVersion).temp;
 
   {
     const res = await clearDir(copiedForDiff.$);
@@ -51,7 +32,7 @@ const prepareCopiedForDiffImpl = async (
 
   return wrapStartEnd(
     () => formatFiles(copiedForDiff.$),
-    'formatFiles("source/temp/copied-for-diff")',
+    'formatFiles("temp/copied-for-diff")',
   );
 };
 
@@ -69,8 +50,9 @@ const genDiffImpl = async (tsVersion: SemVer): Promise<'ok' | 'err'> => {
 };
 
 /**
- * Compare `source/temp/copied-for-diff/*` and `output/lib-files/*` and generate
- * `.diff` files to `output/diff`
+ * Compare `output/{tsVersion}/{numberType}/temp/copied-for-diff/*` and
+ * `output/{tsVersion}/{numberType}/lib-files/*` and generate `.diff` files to
+ * `output/{tsVersion}/{numberType}/diff`
  */
 const genDiffImpl2 = async (
   tsVersion: SemVer,
