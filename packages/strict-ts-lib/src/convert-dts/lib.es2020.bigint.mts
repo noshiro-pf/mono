@@ -126,35 +126,35 @@ export const convertLibEs2020Bigint =
               'readonly [index: number]: bigint;',
               '[index: number]: bigint;',
             ),
-            config.config.numberType
-              ? replaceWithNoMatchCheck(
+            config.config.numberType === 'normal'
+              ? idFn
+              : replaceWithNoMatchCheck(
                   `[number, bigint]`,
                   `[${config.brandedNumber.TypedArraySize}, bigint]`,
-                )
-              : idFn,
-            config.config.numberType
-              ? replaceWithNoMatchCheck('bigint', elemType)
-              : idFn,
+                ),
+            config.config.numberType === 'normal'
+              ? idFn
+              : replaceWithNoMatchCheck('bigint', elemType),
             replaceWithNoMatchCheck(
               `index: number,`,
               `index: ${config.brandedNumber.TypedArraySize},`,
             ),
-            config.config.numberType
-              ? replaceWithNoMatchCheck(
+            config.config.numberType === 'normal'
+              ? idFn
+              : replaceWithNoMatchCheck(
                   //
                   `number | ${elemType}`,
                   `number | bigint`,
-                )
-              : idFn,
+                ),
           ),
         }),
         replaceWithNoMatchCheckBetweenRegexp({
           startRegexp: `interface ${elemType}ArrayConstructor {`,
           endRegexp: closeBraceRegexp,
           mapFn: composeMonoTypeFns(
-            config.config.numberType
-              ? replaceWithNoMatchCheck(`bigint`, elemType)
-              : idFn,
+            config.config.numberType === 'normal'
+              ? idFn
+              : replaceWithNoMatchCheck(`bigint`, elemType),
             replaceWithNoMatchCheck(
               `number`,
               config.brandedNumber.TypedArraySize,

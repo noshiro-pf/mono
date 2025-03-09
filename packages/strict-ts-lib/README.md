@@ -27,16 +27,16 @@ Some additional features and type definition changes are listed below:
 -   `Record` 型を readonly にしました。
     -   元の mutable な型が必要な場合は `MutableRecord` をグローバルに使用できます。
 -   `Object.keys` でより詳しい結果の型が得られます。
-    -   [test/object-keys.mts](https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/test/object-keys.mts)
+    -   [test/object-keys.mts](https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/5.7.2/normal/test/object-keys.mts)
 -   `Object.fromEntries` でより詳しい結果の型が得られます。
-    -   [test/object-from-entries.mts](https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/test/object-from-entries.mts)
+    -   [test/object-from-entries.mts](https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/5.7.2/normal/test/object-from-entries.mts)
 -   `Object.entries` でより詳しい結果の型が得られます。
-    -   [test/object-entries.mts](https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/test/object-entries.mts)
+    -   [test/object-entries.mts](https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/5.7.2/normal/test/object-entries.mts)
 -   `Object.hasOwn` により型の絞り込みができるようになります。
-    -   [test/object-has-own.mts](https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/test/object-has-own.mts)
+    -   [test/object-has-own.mts](https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/5.7.2/normal/test/object-has-own.mts)
 -   `Date` のメソッド `getHours` 呼び出し結果が `number` ではなく `0 | 1 | ... | 23` になります。
 -   `Array` メソッド `includes` や `Map`/`Set` メソッド `has` にその collection の型より広い型を渡せるようになります。
-    -   [test/collections.mts](https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/test/collections.mts)
+    -   [test/collections.mts](https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/5.7.2/normal/test/collections.mts)
 
 ## Related works
 
@@ -45,7 +45,7 @@ Some additional features and type definition changes are listed below:
 
 ## Change differences for each lib file
 
-https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/diff
+https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/5.7.2/normal/diff
 
 ## Implementation
 
