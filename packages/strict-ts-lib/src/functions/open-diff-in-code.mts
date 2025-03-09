@@ -1,7 +1,6 @@
 import 'zx/globals';
+import { type TsVersion, typescriptVersions } from '../typescript-versions.mjs';
 import { paths } from './constants.mjs';
-import { type SemVer } from './types.mjs';
-import { typescriptVersions } from './typescript-versions.mjs';
 
 export const openDiffInCode = async (
   numberType: 'normal' | 'branded',
@@ -10,11 +9,11 @@ export const openDiffInCode = async (
 };
 
 const openDiffInCodeImpl = async (
-  tsVersion: SemVer,
+  tsVersion: TsVersion,
   numberType: 'normal' | 'branded',
 ): Promise<void> => {
   const files = await glob(
-    paths.strictTsLib.output(tsVersion).temp.copiedForDiff.$,
+    paths.strictTsLib.output(tsVersion).temp.copiedForDiff,
   );
 
   for (const file of files) {
@@ -25,7 +24,7 @@ const openDiffInCodeImpl = async (
         name,
       )
     ) {
-      await $`code --diff "${paths.strictTsLib.output(tsVersion).temp.copiedForDiff.$}/${name}.d.ts" "${paths.strictTsLib.output(tsVersion)[numberType].lib.$}/${name}.d.ts"`;
+      await $`code --diff "${paths.strictTsLib.output(tsVersion).temp.copiedForDiff}/${name}.d.ts" "${paths.strictTsLib.output(tsVersion)[numberType].lib}/${name}.d.ts"`;
     }
   }
 };

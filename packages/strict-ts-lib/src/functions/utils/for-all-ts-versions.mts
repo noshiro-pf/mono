@@ -1,9 +1,11 @@
-import { type SemVer } from '../types.mjs';
-import { typescriptVersions } from '../typescript-versions.mjs';
+import {
+  type TsVersion,
+  typescriptVersions,
+} from '../../typescript-versions.mjs';
 
 export const forAllTsVersions = async (
-  tsVersion: SemVer | 'all',
-  fn: (v: SemVer) => Promise<'ok' | 'err'>,
+  tsVersion: TsVersion | 'all',
+  fn: (v: TsVersion) => Promise<'ok' | 'err'>,
 ): Promise<'ok' | 'err'> => {
   if (tsVersion === 'all') {
     for (const v of typescriptVersions) {

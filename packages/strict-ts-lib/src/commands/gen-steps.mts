@@ -9,11 +9,10 @@ import { genDiff, prepareCopiedForDiff } from '../functions/gen-diff.mjs';
 import { genEslintFixed } from '../functions/gen-eslint-fixed.mjs';
 import { genLibFiles } from '../functions/gen-lib-files.mjs';
 import { genPackages } from '../functions/gen-packages.mjs';
-import { type SemVer } from '../functions/types.mjs';
-import { typescriptVersions } from '../functions/typescript-versions.mjs';
 import { formatChanged, formatFiles } from '../functions/utils/format.mjs';
+import { type TsVersion, typescriptVersions } from '../typescript-versions.mjs';
 
-export const steps = (tsVersion: SemVer | 'all') =>
+export const steps = (tsVersion: TsVersion | 'all') =>
   [
     {
       name: 'fetchLibFiles',
@@ -21,17 +20,23 @@ export const steps = (tsVersion: SemVer | 'all') =>
     },
     {
       name: 'format temp/copied',
-      fn: () =>
-        formatFiles(
-          tsVersion === 'all'
-            ? typescriptVersions.map((v) =>
-                path.resolve(paths.strictTsLib.output(v).temp.copied.$, '*'),
-              )
-            : path.resolve(
-                paths.strictTsLib.output(tsVersion).temp.copied.$,
-                '*',
-              ),
-        ),
+      fn: async () => {
+        if (tsVersion === 'all') {
+          const files = await Promise.all(
+            typescriptVersions.map((v) =>
+              glob(`${paths.strictTsLib.output(v).temp.copied}/*`),
+            ),
+          );
+
+          return formatFiles(files.flat());
+        } else {
+          const files = await glob(
+            `${paths.strictTsLib.output(tsVersion).temp.copied}/*`,
+          );
+
+          return formatFiles(files);
+        }
+      },
     },
     {
       name: 'format temp/copied (changed)',
@@ -47,23 +52,31 @@ export const steps = (tsVersion: SemVer | 'all') =>
     },
     {
       name: 'format lib-files',
-      fn: () =>
-        formatFiles(
-          converterConfigs.flatMap((cfg) =>
-            tsVersion === 'all'
-              ? typescriptVersions.map((v) =>
-                  path.resolve(
-                    paths.strictTsLib.output(v)[cfg.numberType].libFiles.$,
-                    '*',
-                  ),
-                )
-              : path.resolve(
-                  paths.strictTsLib.output(tsVersion)[cfg.numberType].libFiles
-                    .$,
-                  '*',
+      fn: async () => {
+        if (tsVersion === 'all') {
+          const files = await Promise.all(
+            converterConfigs.flatMap((cfg) =>
+              typescriptVersions.map((v) =>
+                glob(
+                  `${paths.strictTsLib.output(v)[cfg.numberType].libFiles}/*`,
                 ),
-          ),
-        ),
+              ),
+            ) satisfies readonly Promise<readonly string[]>[],
+          );
+
+          return formatFiles(files.flat());
+        } else {
+          const files = await Promise.all(
+            converterConfigs.flatMap((cfg) =>
+              glob(
+                `${paths.strictTsLib.output(tsVersion)[cfg.numberType].libFiles}/*`,
+              ),
+            ),
+          );
+
+          return formatFiles(files.flat());
+        }
+      },
     },
     {
       name: 'format lib-files (changed)',
@@ -88,7 +101,7 @@ export const steps = (tsVersion: SemVer | 'all') =>
     {
       name: `${packageManagerName} install`,
       fn: async () => {
-        cd(paths.root);
+        cd(paths.monoRoot);
         await $`${packageManagerName} install`;
         return 'ok';
       },
