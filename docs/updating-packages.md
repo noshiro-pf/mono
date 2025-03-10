@@ -20,7 +20,6 @@ $  yarn add --dev -W  \
 ```sh
 $  yarn add --dev -W     \
         typescript@latest  \
-        ts-morph@latest    \
         tslib@latest
 ```
 

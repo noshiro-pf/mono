@@ -1,7 +1,7 @@
 import 'zx/globals';
-import { getSrcFileList } from '../convert-dts/common.mjs';
+import { paths } from '../constants.mjs';
+import { getSrcFileListWithContent } from '../convert-dts/index.mjs';
 import { type TsVersion } from '../typescript-versions.mjs';
-import { paths } from './constants.mjs';
 
 /** "lib.es2018.asynciterable.d.ts" -> "es2018/asynciterable" */
 export const libFilenameToPath = (libFilename: string): string =>
@@ -21,13 +21,14 @@ export const getPackageDirList = (
     }[]
   >
 > =>
-  getSrcFileList(paths.strictTsLib.output(tsVersion).temp.eslintFixed).then(
-    (list) =>
-      list
-        .map(({ filename }) => filename)
-        .filter((filename) => filename !== 'lib.d.ts')
-        .map((filename) => ({
-          filename,
-          packageRelativePath: libFilenameToPath(filename),
-        })),
+  getSrcFileListWithContent(
+    paths.strictTsLib.output(tsVersion).temp.eslintFixed,
+  ).then((list) =>
+    list
+      .map(({ filename }) => filename)
+      .filter((filename) => filename !== 'lib.d.ts')
+      .map((filename) => ({
+        filename,
+        packageRelativePath: libFilenameToPath(filename),
+      })),
   );

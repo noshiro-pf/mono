@@ -1,3 +1,3 @@
-import { formatDiffFromMain } from '../functions/utils/format.mjs';
+import { formatDiffFromMain } from '../functions/index.mjs';
 
 await formatDiffFromMain();

@@ -1,10 +1,17 @@
+import { Result } from '@noshiro/mono-utils';
 import 'zx/globals';
-import { getSrcFileList } from '../convert-dts/common.mjs';
-import { convert } from '../convert-dts/convert-main.mjs';
+import {
+  type ConverterConfig,
+  converterConfigs,
+  paths,
+} from '../constants.mjs';
+import {
+  convertWithAst,
+  convertWithGrep,
+  getSrcFileListWithContent,
+} from '../convert-dts/index.mjs';
 import { type TsVersion } from '../typescript-versions.mjs';
-import { type ConverterConfig, converterConfigs, paths } from './constants.mjs';
-import { clearDir } from './utils/clear-dir.mjs';
-import { forAllTsVersions } from './utils/for-all-ts-versions.mjs';
+import { clearDir, forAllTsVersions } from './utils/index.mjs';
 
 /** Generate files to `output/{tsVersion}/{numberType}/lib-files` */
 export const genLibFiles = async (
@@ -32,18 +39,40 @@ const createDtsFiles = async (
   tsVersion: TsVersion,
   config: ConverterConfig,
 ): Promise<void> => {
-  const srcFileList = await getSrcFileList(
-    paths.strictTsLib.output(tsVersion).temp.eslintFixed,
+  const srcFileList = await getSrcFileListWithContent(
+    paths.strictTsLib.output(tsVersion).temp.copied,
   );
 
   const outDir =
     paths.strictTsLib.output(tsVersion)[config.numberType].libFiles;
 
+  const convertedWithAstResults = srcFileList.map(({ content, filename }) =>
+    convertWithAst(content, filename, config),
+  );
+
+  const { oks, errs } = Result.group(convertedWithAstResults);
+
+  if (errs.length > 0) {
+    console.error(errs[0]);
+    return;
+  }
+
+  const convertedResults = oks.map((content, i) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const filename = srcFileList[i]!.filename;
+
+    return {
+      content:
+        Math.PI < 0 ? convertWithGrep(content, filename, config) : content,
+      filename,
+    };
+  });
+
   await Promise.all(
-    srcFileList.map(async ({ content, filename }) => {
+    convertedResults.map(async ({ content, filename }) => {
       const outputFile = path.resolve(outDir, filename);
 
-      await fs.writeFile(outputFile, convert(filename, config)(content));
+      await fs.writeFile(outputFile, content);
 
       console.log(`${outputFile} generated.`);
     }),

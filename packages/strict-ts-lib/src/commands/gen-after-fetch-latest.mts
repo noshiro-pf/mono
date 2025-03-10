@@ -1,5 +1,5 @@
-import { packageManagerName } from '../functions/constants.mjs';
-import { wrapStartEnd } from '../functions/utils/wrap-start-end.mjs';
+import { packageManagerName } from '../constants.mjs';
+import { wrapStartEnd } from '../functions/index.mjs';
 import { typescriptVersions } from '../typescript-versions.mjs';
 import { getEndStepIndex, getStartStepIndex, steps } from './gen-steps.mjs';
 

@@ -32,7 +32,6 @@ const defineConfig = () => [
         },
       ],
       'no-restricted-globals': 'off',
-      'import/no-internal-modules': 'off',
       '@typescript-eslint/no-empty-function': 'off',
       'no-await-in-loop': 'off',
     },

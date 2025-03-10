@@ -1,11 +1,9 @@
 import { execSync } from 'node:child_process';
 import 'zx/globals';
+import { paths } from '../constants.mjs';
 import { type TsVersion } from '../typescript-versions.mjs';
-import { paths } from './constants.mjs';
 import { type SemVer } from './types.mjs';
-import { clearDir } from './utils/clear-dir.mjs';
-import { forAllTsVersions } from './utils/for-all-ts-versions.mjs';
-import { formatFiles } from './utils/format.mjs';
+import { clearDir, forAllTsVersions, formatFiles } from './utils/index.mjs';
 
 /**
  * Fetch lib files from TypeScript repo and save them to

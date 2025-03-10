@@ -1,6 +1,6 @@
 import 'zx/globals';
+import { paths } from '../constants.mjs';
 import { type TsVersion } from '../typescript-versions.mjs';
-import { paths } from './constants.mjs';
 import { getPackageDirList } from './get-package-dir-list.mjs';
 
 export const publishPackages = async (
