@@ -17,12 +17,16 @@ const formatterOptionsCommon = {
 
 export const formatterOptionsDefault = {
   ...formatterOptionsCommon,
-  plugins: ['prettier-plugin-organize-imports', 'prettier-plugin-packagejson'],
+  plugins: [
+    'prettier-plugin-organize-imports',
+    'prettier-plugin-packagejson',
+    'prettier-plugin-jsdoc',
+  ],
   printWidth: 80,
 } as const satisfies prettier.Options;
 
 export const formatterOptionsForCopied = {
   ...formatterOptionsCommon,
-  plugins: [],
+  plugins: ['prettier-plugin-jsdoc'],
   printWidth: 320,
 } as const satisfies prettier.Options;
