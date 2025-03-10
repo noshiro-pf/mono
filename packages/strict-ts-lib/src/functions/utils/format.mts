@@ -1,7 +1,7 @@
 import { range } from '@noshiro/mono-utils';
 import * as prettier from 'prettier';
 import 'zx/globals';
-import { paths } from '../constants.mjs';
+import { paths } from '../../constants.mjs';
 import {
   formatterOptionsDefault,
   formatterOptionsForCopied,
@@ -27,7 +27,7 @@ export const formatFiles = async (
     const ignored = ignoreFormatting(filePath);
 
     if (ignored) {
-      console.log(`${filePath} (ignored)'`);
+      console.log(`${filePath} (ignored)`);
       continue;
     }
 

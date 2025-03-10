@@ -35,21 +35,19 @@ const defineConfig = () => [
       functional,
     },
   },
-  {
-    files: ['**/temp/eslint-fixed/**/*.d.ts'],
+  // {
+  //   files: ['**/temp/eslint-fixed/**/*.d.ts'],
 
-    rules: {
-      // 'no-var': 'error',
-      'prefer-const': 'error',
-      '@typescript-eslint/no-explicit-any': [
-        'error',
-        {
-          fixToUnknown: true,
-          ignoreRestArgs: true,
-        },
-      ],
-    },
-  },
+  //   rules: {
+  //     '@typescript-eslint/no-explicit-any': [
+  //       'error',
+  //       {
+  //         fixToUnknown: true,
+  //         ignoreRestArgs: true,
+  //       },
+  //     ],
+  //   },
+  // },
   {
     files: ['**/temp/eslint-fixed/**/!(lib.dom|lib.webworker).d.ts'],
 

@@ -49,6 +49,8 @@ https://github.com/noshiro-pf/mono/blob/main/packages/strict-ts-lib/output/5.7.2
 
 ## Implementation
 
+本ライブラリでは一旦愚直な文字列置換により lib ファイルを変換しています。
 TypeScript アップデート時に lib ファイルが変わることで正規表現にマッチしなくなり無視されてしまう置換があったら検知できるように、 `replaceWithNoMatchCheck` というユーティリティを用意して使っています。
+同等のチェックは維持しつつ AST 操作を使うように書き換える予定です。
 
-better-typescript-lib は AST 操作で変換していますが、本ライブラリでは愚直な文字列置換により lib ファイルを変換しています。 TypeScript アップデート時のスクリプト更新で置換対象にしていた公式 lib 記述部分が変更されマッチしなくなったときにどこを直せば良いか分かりやすくするためこのようにしています。
+https://astexplorer.net/
