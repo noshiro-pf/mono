@@ -32,35 +32,33 @@
    [Symbol.iterator](): Generator<T, TReturn, TNext>;
  }
  
-@@ -32,13 +18,13 @@ interface GeneratorFunction {
-    *
+@@ -31,12 +17,12 @@ interface GeneratorFunction {
+    * Creates a new Generator object.
     * @param args A list of arguments the function accepts.
     */
 -  new (...args: any[]): Generator;
 +  new (...args: readonly unknown[]): Generator;
    /**
     * Creates a new Generator object.
-    *
     * @param args A list of arguments the function accepts.
     */
 -  (...args: any[]): Generator;
 +  (...args: readonly unknown[]): Generator;
-   /** The length of the arguments. */
-   readonly length: number;
-   /** Returns the name of the function. */
-@@ -53,13 +39,13 @@ interface GeneratorFunctionConstructor {
-    *
+   /**
+    * The length of the arguments.
+    */
+@@ -56,12 +42,12 @@ interface GeneratorFunctionConstructor {
+    * Creates a new Generator function.
     * @param args A list of arguments the function accepts.
     */
 -  new (...args: string[]): GeneratorFunction;
 +  new (...args: readonly string[]): GeneratorFunction;
    /**
     * Creates a new Generator function.
-    *
     * @param args A list of arguments the function accepts.
     */
 -  (...args: string[]): GeneratorFunction;
 +  (...args: readonly string[]): GeneratorFunction;
-   /** The length of the arguments. */
-   readonly length: number;
-   /** Returns the name of the function. */
+   /**
+    * The length of the arguments.
+    */

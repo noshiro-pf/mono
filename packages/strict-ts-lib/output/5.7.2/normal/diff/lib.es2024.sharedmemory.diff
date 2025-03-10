@@ -22,7 +22,7 @@
  
  interface Atomics {
    /**
-@@ -34,8 +20,8 @@ interface Atomics {
+@@ -32,8 +18,8 @@ interface Atomics {
      value: number,
      timeout?: number,
    ):
@@ -32,8 +32,8 @@
 +    | { readonly async: true; readonly value: Promise<'ok' | 'timed-out'> };
  
    /**
-    * A non-blocking, asynchronous version of wait which is usable on the main
-@@ -53,8 +39,8 @@ interface Atomics {
+    * A non-blocking, asynchronous version of wait which is usable on the main thread.
+@@ -49,8 +35,8 @@ interface Atomics {
      value: bigint,
      timeout?: number,
    ):
@@ -44,7 +44,7 @@
  }
  
  interface SharedArrayBuffer {
-@@ -84,6 +70,6 @@ interface SharedArrayBuffer {
+@@ -79,6 +65,6 @@ interface SharedArrayBuffer {
  interface SharedArrayBufferConstructor {
    new (
      byteLength: number,

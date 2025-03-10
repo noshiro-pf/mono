@@ -32,41 +32,43 @@
    [Symbol.iterator](): Generator<T, TReturn, TNext>;
  }
  
-@@ -32,15 +18,15 @@ interface GeneratorFunction {
-    *
+@@ -31,16 +17,16 @@ interface GeneratorFunction {
+    * Creates a new Generator object.
     * @param args A list of arguments the function accepts.
     */
 -  new (...args: any[]): Generator;
 +  new (...args: readonly unknown[]): Generator;
    /**
     * Creates a new Generator object.
-    *
     * @param args A list of arguments the function accepts.
     */
 -  (...args: any[]): Generator;
 +  (...args: readonly unknown[]): Generator;
-   /** The length of the arguments. */
+   /**
+    * The length of the arguments.
+    */
 -  readonly length: number;
 +  readonly length: NumberType.ArraySize;
-   /** Returns the name of the function. */
-   readonly name: string;
-   /** A reference to the prototype. */
-@@ -53,15 +39,15 @@ interface GeneratorFunctionConstructor {
-    *
+   /**
+    * Returns the name of the function.
+    */
+@@ -56,16 +42,16 @@ interface GeneratorFunctionConstructor {
+    * Creates a new Generator function.
     * @param args A list of arguments the function accepts.
     */
 -  new (...args: string[]): GeneratorFunction;
 +  new (...args: readonly string[]): GeneratorFunction;
    /**
     * Creates a new Generator function.
-    *
     * @param args A list of arguments the function accepts.
     */
 -  (...args: string[]): GeneratorFunction;
 +  (...args: readonly string[]): GeneratorFunction;
-   /** The length of the arguments. */
+   /**
+    * The length of the arguments.
+    */
 -  readonly length: number;
 +  readonly length: NumberType.ArraySize;
-   /** Returns the name of the function. */
-   readonly name: string;
-   /** A reference to the prototype. */
+   /**
+    * Returns the name of the function.
+    */

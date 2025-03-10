@@ -17,9 +17,9 @@
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
  
- /** The decorator context types provided to class element decorators. */
- type ClassMemberDecoratorContext =
-@@ -29,7 +15,7 @@ type DecoratorContext = ClassDecoratorContext | ClassMemberDecoratorContext;
+ /**
+  * The decorator context types provided to class element decorators.
+@@ -33,7 +19,7 @@ type DecoratorContext = ClassDecoratorContext | ClassMemberDecoratorContext;
  type DecoratorMetadataObject = Record<PropertyKey, unknown> & object;
  
  type DecoratorMetadata = typeof globalThis extends {
@@ -28,7 +28,7 @@
  }
    ? DecoratorMetadataObject
    : DecoratorMetadataObject | undefined;
-@@ -40,9 +26,9 @@ type DecoratorMetadata = typeof globalThis extends {
+@@ -43,9 +29,9 @@ type DecoratorMetadata = typeof globalThis extends {
   * @template Class The type of the decorated class associated with this context.
   */
  interface ClassDecoratorContext<
