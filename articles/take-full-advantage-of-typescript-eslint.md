@@ -353,27 +353,30 @@ const s = ''.concat(...ss);
 このパターンは長いメッセージを書くときも可読性向上に役に立ちます。
 
 ```ts
-// 🙁
-console.log(
-  `looooooooooooooooooooooooong message 1\nlooooooooooooooooooooooooong message 2`,
-);
+{
+  // 🙁
+  console.log(
+    `looooooooooooooooooooooooong message 1
+looooooooooooooooooooooooong message 2`,
+  );
 
-// 🙁
-console.log(
-  `looooooooooooooooooooooooong message 1\n` +
-    'looooooooooooooooooooooooong message 2',
-);
+  // 🙁
+  console.log(
+    'looooooooooooooooooooooooong message 1\n' +
+      'looooooooooooooooooooooooong message 2',
+  );
 
-// 😊
-console.log(
-  [
-    'looooooooooooooooooooooooong message 1',
-    'looooooooooooooooooooooooong message 2',
-  ].join('\n'),
-);
+  // 😊
+  console.log(
+    [
+      'looooooooooooooooooooooooong message 1',
+      'looooooooooooooooooooooooong message 2',
+    ].join('\n'),
+  );
+}
 ```
 
-また、これに関連するルールとして [`@typescript-eslint/restrict-template-expressions`](https://typescript-eslint.io/rules/restrict-template-expressions/) により template literal に使用できる型も制限することができます。 `allow*` オプションをすべて無効にして文字列のみを許容する最も厳しい設定が自分は好みですが、 `.toString()` などによって文字列化を明示的に書く必要があり面倒ではあるので、プロジェクトによっては `allowNumber`, `allowBoolean` あたりは `true` にしても良いかもしれません。
+また、これに関連するルールとして [`@typescript-eslint/restrict-template-expressions`](https://typescript-eslint.io/rules/restrict-template-expressions/) により template literal に使用できる型も制限することができます。 `allow*` オプションをすべて無効にして文字列のみを許容する最も厳格な設定が自分は好みですが、 `.toString()` などによって文字列化を明示的に書く必要があり面倒ではあるので、 `allowNumber`, `allowBoolean` あたりは `true` にしても良いかもしれません。
 
 ```json
 {
@@ -659,6 +662,29 @@ foo('aaa');
 
 既存ルールに求めているものが見つからなかったら、このルールを使えば（自分で ESLint plugin を自作するよりは）比較的簡単に特定の構文を禁止する設定ができる場合がありそうです。
 禁止したい構文にマッチする selector を調べるには [AST checker](https://typescript-eslint.io/play/#ts=4.7.2&sourceType=module&showAST=es) が便利です。
+
+- `React.useEffect` の deps array （第2引数）を必須にする設定例
+  似たルールとして `react-hooks/exhaustive-deps` がありますが、これは deps に不足している変数があれば検知してくれるもので、第2引数の配列を丸ごと省くこと自体を省略することは防いでくれません。
+
+  ```json
+  {
+    "no-restricted-syntax": [
+      "error",
+      // Restrict import style of React
+      {
+        "selector": "ImportDeclaration[source.value='react'][specifiers.0.type!='ImportNamespaceSpecifier']",
+        "message": "React should be imported as `import * as React from 'react'."
+      },
+      {
+        // Make the second argument of useEffect mandatory
+        "selector": "CallExpression[callee.object.type='Identifier'][callee.object.name='React'][callee.type='MemberExpression'][callee.property.type='Identifier'][callee.property.name='useEffect'][arguments.length!=2]",
+        "message": "The second argument to useEffect is required."
+      }
+    ]
+  }
+  ```
+
+  useEffect の import 方法に応じて適宜修正してください。
 
 - `as` の禁止設定例
   例えば TypeScript の（`as const` や import alias 以外の） `as` を禁止するルールは以下のように書くことができます（※これまでこの設定で経験上問題無さそうであることは確認していますが、完璧な設定である保証はありません）。
