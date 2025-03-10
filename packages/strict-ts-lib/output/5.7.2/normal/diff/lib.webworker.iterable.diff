@@ -19,7 +19,7 @@
  
  /////////////////////////////
  /// Worker Iterable APIs
-@@ -29,21 +15,21 @@ interface AbortSignal {
+@@ -26,21 +12,21 @@ interface AbortSignal {
  
  interface CSSNumericArray {
    [Symbol.iterator](): ArrayIterator<CSSNumericValue>;
@@ -44,7 +44,7 @@
    keys(): ArrayIterator<number>;
    values(): ArrayIterator<CSSUnparsedSegment>;
  }
-@@ -91,9 +77,9 @@ interface FormDataIterator<T>
+@@ -82,9 +68,9 @@ interface FormDataIterator<T>
  }
  
  interface FormData {
@@ -56,22 +56,19 @@
    /** Returns a list of keys in the list. */
    keys(): FormDataIterator<string>;
    /** Returns a list of values in the list. */
-@@ -106,12 +92,12 @@ interface HeadersIterator<T>
+@@ -97,9 +83,9 @@ interface HeadersIterator<T>
  }
  
  interface Headers {
 -  [Symbol.iterator](): HeadersIterator<[string, string]>;
 +  [Symbol.iterator](): HeadersIterator<readonly [string, string]>;
-   /**
-    * Returns an iterator allowing to go through all key/value pairs contained in
-    * this object.
-    */
+   /** Returns an iterator allowing to go through all key/value pairs contained in this object. */
 -  entries(): HeadersIterator<[string, string]>;
 +  entries(): HeadersIterator<readonly [string, string]>;
-   /**
-    * Returns an iterator allowing to go through all keys of the key/value pairs
-    * contained in this object.
-@@ -159,13 +145,13 @@ interface IDBObjectStore {
+   /** Returns an iterator allowing to go through all keys of the key/value pairs contained in this object. */
+   keys(): HeadersIterator<string>;
+   /** Returns an iterator allowing to go through all values of the key/value pairs contained in this object. */
+@@ -134,13 +120,13 @@ interface IDBObjectStore {
    ): IDBIndex;
  }
  
@@ -87,7 +84,7 @@
      origin?: string,
      lastEventId?: string,
      source?: MessageEventSource | null,
-@@ -180,10 +166,10 @@ interface StylePropertyMapReadOnlyIterator<T>
+@@ -155,10 +141,10 @@ interface StylePropertyMapReadOnlyIterator<T>
  
  interface StylePropertyMapReadOnly {
    [Symbol.iterator](): StylePropertyMapReadOnlyIterator<
@@ -100,7 +97,7 @@
    >;
    keys(): StylePropertyMapReadOnlyIterator<string>;
    values(): StylePropertyMapReadOnlyIterator<Iterable<CSSStyleValue>>;
-@@ -293,9 +279,9 @@ interface URLSearchParamsIterator<T>
+@@ -256,9 +242,9 @@ interface URLSearchParamsIterator<T>
  }
  
  interface URLSearchParams {
@@ -112,12 +109,12 @@
    /** Returns a list of keys in the search params. */
    keys(): URLSearchParamsIterator<string>;
    /** Returns a list of values in the search params. */
-@@ -411,7 +397,7 @@ interface WebGL2RenderingContextBase {
+@@ -344,7 +330,7 @@ interface WebGL2RenderingContextBase {
      program: WebGLProgram,
      uniformIndices: Iterable<GLuint>,
      pname: GLenum,
 -  ): any;
 +  ): unknown;
-   /**
-    * [MDN
-    * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getUniformIndices)
+   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getUniformIndices) */
+   getUniformIndices(
+     program: WebGLProgram,

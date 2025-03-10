@@ -31,8 +31,8 @@ interface RegExpIndicesArray extends Array<[number, number]> {
 
 interface RegExp {
   /**
-   * Returns a Boolean value indicating the state of the hasIndices flag (d)
-   * used with a regular expression. Default is false. Read-only.
+   * Returns a Boolean value indicating the state of the hasIndices flag (d) used with a regular expression.
+   * Default is false. Read-only.
    */
   readonly hasIndices: boolean;
 }

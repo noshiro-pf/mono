@@ -30,16 +30,16 @@
    abstract next(value?: TNext): IteratorResult<T, TResult>;
  }
  
-@@ -89,7 +74,7 @@ declare global {
-      *
+@@ -78,7 +63,7 @@ declare global {
+      * Creates an iterator whose values are the values from this iterator after skipping the provided count.
       * @param count The number of values to drop.
       */
 -    drop(count: number): IteratorObject<T, undefined, unknown>;
 +    drop(limit: number): IteratorObject<T, undefined, unknown>;
  
      /**
-      * Creates an iterator whose values are the result of applying the callback
-@@ -224,5 +209,5 @@ declare global {
+      * Creates an iterator whose values are the result of applying the callback to the values from this iterator and then flattening the resulting iterators or iterables.
+@@ -180,5 +165,5 @@ declare global {
      ): IteratorObject<T, undefined, unknown>;
    }
  

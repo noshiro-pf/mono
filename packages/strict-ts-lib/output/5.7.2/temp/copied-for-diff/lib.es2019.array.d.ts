@@ -50,16 +50,14 @@ type FlatArray<Arr, Depth extends number> = {
 
 interface ReadonlyArray<T> {
   /**
-   * Calls a defined callback function on each element of an array. Then,
-   * flattens the result into a new array. This is identical to a map followed
-   * by flat with depth 1.
+   * Calls a defined callback function on each element of an array. Then, flattens the result into
+   * a new array.
+   * This is identical to a map followed by flat with depth 1.
    *
-   * @param callback A function that accepts up to three arguments. The flatMap
-   *   method calls the callback function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callback function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callback A function that accepts up to three arguments. The flatMap method calls the
+   * callback function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callback function. If
+   * thisArg is omitted, undefined is used as the this value.
    */
   flatMap<U, This = undefined>(
     callback: (
@@ -72,8 +70,8 @@ interface ReadonlyArray<T> {
   ): U[];
 
   /**
-   * Returns a new array with all sub-array elements concatenated into it
-   * recursively up to the specified depth.
+   * Returns a new array with all sub-array elements concatenated into it recursively up to the
+   * specified depth.
    *
    * @param depth The maximum recursion depth
    */
@@ -82,16 +80,14 @@ interface ReadonlyArray<T> {
 
 interface Array<T> {
   /**
-   * Calls a defined callback function on each element of an array. Then,
-   * flattens the result into a new array. This is identical to a map followed
-   * by flat with depth 1.
+   * Calls a defined callback function on each element of an array. Then, flattens the result into
+   * a new array.
+   * This is identical to a map followed by flat with depth 1.
    *
-   * @param callback A function that accepts up to three arguments. The flatMap
-   *   method calls the callback function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callback function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callback A function that accepts up to three arguments. The flatMap method calls the
+   * callback function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callback function. If
+   * thisArg is omitted, undefined is used as the this value.
    */
   flatMap<U, This = undefined>(
     callback: (
@@ -104,8 +100,8 @@ interface Array<T> {
   ): U[];
 
   /**
-   * Returns a new array with all sub-array elements concatenated into it
-   * recursively up to the specified depth.
+   * Returns a new array with all sub-array elements concatenated into it recursively up to the
+   * specified depth.
    *
    * @param depth The maximum recursion depth
    */

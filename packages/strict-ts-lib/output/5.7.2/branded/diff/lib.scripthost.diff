@@ -30,27 +30,31 @@
  
  interface ITextWriter {
    Write(s: string): void;
-@@ -32,10 +18,10 @@ interface ITextWriter {
- 
- interface TextStreamBase {
-   /** The column number of the current character position in an input stream. */
+@@ -34,12 +20,12 @@ interface TextStreamBase {
+   /**
+    * The column number of the current character position in an input stream.
+    */
 -  Column: number;
 +  readonly Column: number;
  
-   /** The current line number in an input stream. */
+   /**
+    * The current line number in an input stream.
+    */
 -  Line: number;
 +  readonly Line: number;
  
    /**
-    * Closes a text stream. It is not necessary to close standard streams; they
-@@ -99,70 +85,70 @@ interface TextStreamReader extends TextStreamBase {
-   SkipLine(): void;
- 
-   /** Indicates whether the stream pointer position is at the end of a line. */
+    * Closes a text stream.
+@@ -103,38 +89,38 @@ interface TextStreamReader extends TextStreamBase {
+   /**
+    * Indicates whether the stream pointer position is at the end of a line.
+    */
 -  AtEndOfLine: boolean;
 +  readonly AtEndOfLine: boolean;
  
-   /** Indicates whether the stream pointer position is at the end of a stream. */
+   /**
+    * Indicates whether the stream pointer position is at the end of a stream.
+    */
 -  AtEndOfStream: boolean;
 +  readonly AtEndOfStream: boolean;
  }
@@ -58,95 +62,111 @@
 -declare var WScript: {
 +declare const WScript: {
    /**
-    * Outputs text to either a message box (under WScript.exe) or the command
-    * console window followed by a newline (under CScript.exe).
+    * Outputs text to either a message box (under WScript.exe) or the command console window followed by
+    * a newline (under CScript.exe).
     */
 -  Echo(s: any): void;
 +  Echo(s: unknown): void;
  
    /**
-    * Exposes the write-only error output stream for the current script. Can be
-    * accessed only while using CScript.exe.
+    * Exposes the write-only error output stream for the current script.
+    * Can be accessed only while using CScript.exe.
     */
 -  StdErr: TextStreamWriter;
 +  readonly StdErr: TextStreamWriter;
  
    /**
-    * Exposes the write-only output stream for the current script. Can be
-    * accessed only while using CScript.exe.
+    * Exposes the write-only output stream for the current script.
+    * Can be accessed only while using CScript.exe.
     */
 -  StdOut: TextStreamWriter;
 -  Arguments: { length: number; Item(n: number): string };
 +  readonly StdOut: TextStreamWriter;
 +  readonly Arguments: { readonly length: number; Item(n: number): string };
  
-   /** The full path of the currently running script. */
+   /**
+    *  The full path of the currently running script.
+    */
 -  ScriptFullName: string;
 +  readonly ScriptFullName: string;
  
-   /** Forces the script to stop immediately, with an optional exit code. */
-   Quit(exitCode?: number): number;
- 
-   /** The Windows Script Host build version number. */
+   /**
+    * Forces the script to stop immediately, with an optional exit code.
+@@ -144,60 +130,60 @@ declare var WScript: {
+   /**
+    * The Windows Script Host build version number.
+    */
 -  BuildVersion: number;
 +  readonly BuildVersion: number;
  
-   /** Fully qualified path of the host executable. */
+   /**
+    * Fully qualified path of the host executable.
+    */
 -  FullName: string;
 +  readonly FullName: string;
  
-   /** Gets/sets the script mode - interactive(true) or batch(false). */
+   /**
+    * Gets/sets the script mode - interactive(true) or batch(false).
+    */
 -  Interactive: boolean;
 +  readonly Interactive: boolean;
  
-   /** The name of the host executable (WScript.exe or CScript.exe). */
+   /**
+    * The name of the host executable (WScript.exe or CScript.exe).
+    */
 -  Name: string;
 +  readonly Name: string;
  
-   /** Path of the directory containing the host executable. */
+   /**
+    * Path of the directory containing the host executable.
+    */
 -  Path: string;
 +  readonly Path: string;
  
-   /** The filename of the currently running script. */
+   /**
+    * The filename of the currently running script.
+    */
 -  ScriptName: string;
 +  readonly ScriptName: string;
  
    /**
-    * Exposes the read-only input stream for the current script. Can be accessed
-    * only while using CScript.exe.
+    * Exposes the read-only input stream for the current script.
+    * Can be accessed only while using CScript.exe.
     */
 -  StdIn: TextStreamReader;
 +  readonly StdIn: TextStreamReader;
  
-   /** Windows Script Host version */
+   /**
+    * Windows Script Host version
+    */
 -  Version: string;
 +  readonly Version: string;
  
    /**
-    * Connects a COM object's event sources to functions named with a given
-    * prefix, in the form prefix_event.
+    * Connects a COM object's event sources to functions named with a given prefix, in the form prefix_event.
     */
 -  ConnectObject(objEventSource: any, strPrefix: string): void;
 +  ConnectObject(objEventSource: unknown, strPrefix: string): void;
  
    /**
     * Creates a COM object.
-@@ -171,10 +157,10 @@ declare var WScript: {
-    * @param strPrefix Function names in the form prefix_event will be bound to
-    *   this object's COM events.
+    * @param strProgiID
+    * @param strPrefix Function names in the form prefix_event will be bound to this object's COM events.
     */
 -  CreateObject(strProgID: string, strPrefix?: string): any;
 +  CreateObject(strProgID: string, strPrefix?: string): unknown;
  
-   /** Disconnects a COM object from its event sources. */
+   /**
+    * Disconnects a COM object from its event sources.
+    */
 -  DisconnectObject(obj: any): void;
 +  DisconnectObject(obj: unknown): void;
  
    /**
-    * Retrieves an existing object with the specified ProgID from memory, or
-@@ -186,7 +172,11 @@ declare var WScript: {
-    * @param strPrefix Function names in the form prefix_event will be bound to
-    *   this object's COM events.
+    * Retrieves an existing object with the specified ProgID from memory, or creates a new one from a file.
+@@ -206,7 +192,11 @@ declare var WScript: {
+    * @param strProgID
+    * @param strPrefix Function names in the form prefix_event will be bound to this object's COM events.
     */
 -  GetObject(strPathname: string, strProgID?: string, strPrefix?: string): any;
 +  GetObject(
@@ -156,30 +176,32 @@
 +  ): unknown;
  
    /**
-    * Suspends script execution for a specified length of time, then continues
-@@ -198,10 +188,10 @@ declare var WScript: {
- };
- 
- /** WSH is an alias for WScript under Windows Script Host */
+    * Suspends script execution for a specified length of time, then continues execution.
+@@ -218,12 +208,12 @@ declare var WScript: {
+ /**
+  * WSH is an alias for WScript under Windows Script Host
+  */
 -declare var WSH: typeof WScript;
 +declare const WSH: typeof WScript;
  
- /** Represents an Automation SAFEARRAY */
+ /**
+  * Represents an Automation SAFEARRAY
+  */
 -declare class SafeArray<T = any> {
 +declare class SafeArray<T = unknown> {
    private constructor();
    private SafeArray_typekey: SafeArray<T>;
  }
-@@ -210,7 +200,7 @@ declare class SafeArray<T = any> {
-  * Allows enumerating over a COM collection, which may not have indexed item
-  * access.
+@@ -231,7 +221,7 @@ declare class SafeArray<T = any> {
+ /**
+  * Allows enumerating over a COM collection, which may not have indexed item access.
   */
 -interface Enumerator<T = any> {
 +interface Enumerator<T = unknown> {
    /**
-    * Returns true if the current item is the last one in the collection, or the
-    * collection is empty, or the current item is undefined.
-@@ -235,18 +225,18 @@ interface Enumerator<T = any> {
+    * Returns true if the current item is the last one in the collection, or the collection is empty,
+    * or the current item is undefined.
+@@ -257,17 +247,17 @@ interface Enumerator<T = any> {
  }
  
  interface EnumeratorConstructor {
@@ -195,26 +217,25 @@
 +declare const Enumerator: EnumeratorConstructor;
  
  /**
-  * Enables reading from a COM safe array, which might have an alternate lower
-  * bound, or multiple dimensions.
+  * Enables reading from a COM safe array, which might have an alternate lower bound, or multiple dimensions.
   */
 -interface VBArray<T = any> {
 +interface VBArray<T = unknown> {
-   /** Returns the number of dimensions (1-based). */
-   dimensions(): number;
- 
-@@ -254,7 +244,7 @@ interface VBArray<T = any> {
-    * Takes an index for each dimension in the array, and returns the item at the
-    * corresponding location.
+   /**
+    * Returns the number of dimensions (1-based).
+    */
+@@ -276,7 +266,7 @@ interface VBArray<T = any> {
+   /**
+    * Takes an index for each dimension in the array, and returns the item at the corresponding location.
     */
 -  getItem(dimension1Index: number, ...dimensionNIndexes: number[]): T;
 +  getItem(dimension1Index: number, ...dimensionNIndexes: readonly number[]): T;
  
    /**
     * Returns the smallest available index for a given dimension.
-@@ -275,14 +265,14 @@ interface VBArray<T = any> {
-    * are multiple dimensions, each successive dimension is appended to the end
-    * of the array. Example: [[1,2,3],[4,5,6]] becomes [1,2,3,4,5,6]
+@@ -295,14 +285,14 @@ interface VBArray<T = any> {
+    * each successive dimension is appended to the end of the array.
+    * Example: [[1,2,3],[4,5,6]] becomes [1,2,3,4,5,6]
     */
 -  toArray(): T[];
 +  toArray(): readonly T[];
@@ -228,9 +249,9 @@
 -declare var VBArray: VBArrayConstructor;
 +declare const VBArray: VBArrayConstructor;
  
- /** Automation date (VT_DATE) */
- declare class VarDate {
-@@ -295,5 +285,5 @@ interface DateConstructor {
+ /**
+  * Automation date (VT_DATE)
+@@ -317,5 +307,5 @@ interface DateConstructor {
  }
  
  interface Date {

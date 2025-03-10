@@ -22,7 +22,7 @@
  
  interface Atomics {
    /**
-@@ -30,12 +16,12 @@ interface Atomics {
+@@ -28,12 +14,12 @@ interface Atomics {
     */
    waitAsync(
      typedArray: Int32Array,
@@ -38,8 +38,8 @@
 +    | { readonly async: true; readonly value: Promise<'ok' | 'timed-out'> };
  
    /**
-    * A non-blocking, asynchronous version of wait which is usable on the main
-@@ -49,12 +35,12 @@ interface Atomics {
+    * A non-blocking, asynchronous version of wait which is usable on the main thread.
+@@ -45,12 +31,12 @@ interface Atomics {
     */
    waitAsync(
      typedArray: BigInt64Array,
@@ -56,7 +56,7 @@
  }
  
  interface SharedArrayBuffer {
-@@ -71,19 +57,21 @@ interface SharedArrayBuffer {
+@@ -66,19 +52,21 @@ interface SharedArrayBuffer {
     *
     * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer/maxByteLength)
     */

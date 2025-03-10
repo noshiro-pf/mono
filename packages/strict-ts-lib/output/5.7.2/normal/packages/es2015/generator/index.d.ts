@@ -15,41 +15,49 @@ interface Generator<T = unknown, TReturn = any, TNext = unknown>
 interface GeneratorFunction {
   /**
    * Creates a new Generator object.
-   *
    * @param args A list of arguments the function accepts.
    */
   new (...args: readonly unknown[]): Generator;
   /**
    * Creates a new Generator object.
-   *
    * @param args A list of arguments the function accepts.
    */
   (...args: readonly unknown[]): Generator;
-  /** The length of the arguments. */
+  /**
+   * The length of the arguments.
+   */
   readonly length: number;
-  /** Returns the name of the function. */
+  /**
+   * Returns the name of the function.
+   */
   readonly name: string;
-  /** A reference to the prototype. */
+  /**
+   * A reference to the prototype.
+   */
   readonly prototype: Generator;
 }
 
 interface GeneratorFunctionConstructor {
   /**
    * Creates a new Generator function.
-   *
    * @param args A list of arguments the function accepts.
    */
   new (...args: readonly string[]): GeneratorFunction;
   /**
    * Creates a new Generator function.
-   *
    * @param args A list of arguments the function accepts.
    */
   (...args: readonly string[]): GeneratorFunction;
-  /** The length of the arguments. */
+  /**
+   * The length of the arguments.
+   */
   readonly length: number;
-  /** Returns the name of the function. */
+  /**
+   * Returns the name of the function.
+   */
   readonly name: string;
-  /** A reference to the prototype. */
+  /**
+   * A reference to the prototype.
+   */
   readonly prototype: GeneratorFunction;
 }
