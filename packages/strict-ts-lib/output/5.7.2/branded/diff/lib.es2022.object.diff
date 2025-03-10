@@ -1,4 +1,4 @@
-@@ -1,26 +1,40 @@
+@@ -1,25 +1,39 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -45,7 +45,6 @@
  interface ObjectConstructor {
    /**
     * Determines whether an object has a property with the specified name.
-    *
 -   * @param o An object.
 -   * @param v A property name.
 +   * @param obj An object.

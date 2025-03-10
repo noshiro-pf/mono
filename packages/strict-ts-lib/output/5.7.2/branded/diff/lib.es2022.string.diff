@@ -1,4 +1,4 @@
-@@ -1,19 +1,5 @@
+@@ -1,24 +1,10 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -19,9 +19,8 @@
  
  interface String {
    /**
-@@ -23,5 +9,5 @@ interface String {
-    * @param index The zero-based index of the desired code unit. A negative
-    *   index will count back from the last item.
+    * Returns a new String consisting of the single UTF-16 code unit located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
     */
 -  at(index: number): string | undefined;
 +  at(index: NumberType.StringSizeArg): string | undefined;

@@ -19,7 +19,7 @@
  
  interface MapConstructor {
    /**
-@@ -25,6 +11,6 @@ interface MapConstructor {
+@@ -23,6 +9,6 @@ interface MapConstructor {
     */
    groupBy<K, T>(
      items: Iterable<T>,

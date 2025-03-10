@@ -21,11 +21,11 @@
 +/// <reference path="./lib.es2018.intl.d.ts" />
  declare namespace Intl {
    /**
-    * A string that is a valid [Unicode BCP 47 Locale
-@@ -115,11 +101,11 @@ declare namespace Intl {
-      * see [Intl
-      * page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation).
-      */
+    * A string that is a valid [Unicode BCP 47 Locale Identifier](https://unicode.org/reports/tr35/#Unicode_locale_identifier).
+@@ -108,11 +94,11 @@ declare namespace Intl {
+    */
+   interface RelativeTimeFormatOptions {
+     /** The locale matching algorithm to use. For information about this option, see [Intl page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
 -    localeMatcher?: RelativeTimeFormatLocaleMatcher;
 +    readonly localeMatcher?: RelativeTimeFormatLocaleMatcher;
      /** The format of output message. */
@@ -37,7 +37,7 @@
    }
  
    /**
-@@ -129,10 +115,10 @@ declare namespace Intl {
+@@ -123,10 +109,10 @@ declare namespace Intl {
     * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/resolvedOptions#Description).
     */
    interface ResolvedRelativeTimeFormatOptions {
@@ -52,7 +52,7 @@
    }
  
    /**
-@@ -143,13 +129,13 @@ declare namespace Intl {
+@@ -137,13 +123,13 @@ declare namespace Intl {
     */
    type RelativeTimeFormatPart =
      | {
@@ -71,7 +71,7 @@
        };
  
    interface RelativeTimeFormat {
-@@ -197,7 +183,7 @@ declare namespace Intl {
+@@ -187,7 +173,7 @@ declare namespace Intl {
      formatToParts(
        value: number,
        unit: RelativeTimeFormatUnit,
@@ -79,8 +79,8 @@
 +    ): readonly RelativeTimeFormatPart[];
  
      /**
-      * Provides access to the locale and options computed during initialization
-@@ -263,68 +249,68 @@ declare namespace Intl {
+      * Provides access to the locale and options computed during initialization of this `Intl.RelativeTimeFormat` object.
+@@ -244,68 +230,68 @@ declare namespace Intl {
      supportedLocalesOf(
        locales?: LocalesArgument,
        options?: RelativeTimeFormatOptions,
@@ -181,7 +181,7 @@
    }
  
    type LocaleHourCycleKey = 'h12' | 'h23' | 'h11' | 'h24';
-@@ -332,44 +318,44 @@ declare namespace Intl {
+@@ -313,32 +299,32 @@ declare namespace Intl {
  
    interface LocaleOptions {
      /** A string containing the language, and the script and region if available. */
@@ -190,10 +190,7 @@
      /** The part of the Locale that indicates the locale's calendar era. */
 -    calendar?: string;
 +    readonly calendar?: string;
-     /**
-      * Flag that defines whether case is taken into account for the locale's
-      * collation rules.
-      */
+     /** Flag that defines whether case is taken into account for the locale's collation rules. */
 -    caseFirst?: LocaleCollationCaseFirst;
 +    readonly caseFirst?: LocaleCollationCaseFirst;
      /** The collation type used for sorting */
@@ -208,22 +205,13 @@
      /** The numeral system used by the locale. */
 -    numberingSystem?: string;
 +    readonly numberingSystem?: string;
-     /**
-      * Flag that defines whether the locale has special collation handling for
-      * numeric characters.
-      */
+     /** Flag that defines whether the locale has special collation handling for numeric characters. */
 -    numeric?: boolean;
 +    readonly numeric?: boolean;
-     /**
-      * The region of the world (usually a country) associated with the locale.
-      * Possible values are region codes as defined by ISO 3166-1.
-      */
+     /** The region of the world (usually a country) associated with the locale. Possible values are region codes as defined by ISO 3166-1. */
 -    region?: string;
 +    readonly region?: string;
-     /**
-      * The script used for writing the particular language used in the locale.
-      * Possible values are script codes as defined by ISO 15924.
-      */
+     /** The script used for writing the particular language used in the locale. Possible values are script codes as defined by ISO 15924. */
 -    script?: string;
 +    readonly script?: string;
    }
@@ -235,10 +223,10 @@
      /** The primary language subtag associated with the locale. */
 -    language: string;
 +    readonly language: string;
-     /**
-      * Gets the most likely values for the language, script, and region of the
-      * locale based on existing values.
-@@ -422,19 +408,19 @@ declare namespace Intl {
+     /** Gets the most likely values for the language, script, and region of the locale based on existing values. */
+     maximize(): Locale;
+     /** Attempts to remove information about the locale that would be added by calling `Locale.maximize()`. */
+@@ -381,19 +367,19 @@ declare namespace Intl {
    type DisplayNamesLanguageDisplay = 'dialect' | 'standard';
  
    interface DisplayNamesOptions {
@@ -268,7 +256,7 @@
    }
  
    interface DisplayNames {
-@@ -485,7 +471,7 @@ declare namespace Intl {
+@@ -429,7 +415,7 @@ declare namespace Intl {
     * [Compatibility](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames#browser_compatibility).
     */
    const DisplayNames: {
@@ -276,8 +264,8 @@
 +    readonly prototype: DisplayNames;
  
      /**
-      * @param locales A string with a BCP 47 language tag, or an array of such
-@@ -518,8 +504,8 @@ declare namespace Intl {
+      * @param locales A string with a BCP 47 language tag, or an array of such strings.
+@@ -457,8 +443,8 @@ declare namespace Intl {
       */
      supportedLocalesOf(
        locales?: LocalesArgument,
@@ -288,7 +276,7 @@
    };
  
    interface CollatorConstructor {
-@@ -528,7 +514,7 @@ declare namespace Intl {
+@@ -467,7 +453,7 @@ declare namespace Intl {
      supportedLocalesOf(
        locales: LocalesArgument,
        options?: CollatorOptions,
@@ -297,7 +285,7 @@
    }
  
    interface DateTimeFormatConstructor {
-@@ -543,7 +529,7 @@ declare namespace Intl {
+@@ -482,7 +468,7 @@ declare namespace Intl {
      supportedLocalesOf(
        locales: LocalesArgument,
        options?: DateTimeFormatOptions,
@@ -306,7 +294,7 @@
    }
  
    interface NumberFormatConstructor {
-@@ -555,7 +541,7 @@ declare namespace Intl {
+@@ -494,7 +480,7 @@ declare namespace Intl {
      supportedLocalesOf(
        locales: LocalesArgument,
        options?: NumberFormatOptions,
@@ -315,7 +303,7 @@
    }
  
    interface PluralRulesConstructor {
-@@ -564,7 +550,7 @@ declare namespace Intl {
+@@ -503,7 +489,7 @@ declare namespace Intl {
  
      supportedLocalesOf(
        locales: LocalesArgument,

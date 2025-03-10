@@ -23,7 +23,7 @@
  interface Atomics {
    /**
 @@ -24,12 +10,15 @@ interface Atomics {
-    * write operation against the array will block.
+    * will block.
     */
    add(
 -    typedArray:
@@ -43,9 +43,9 @@
 +  ): BigUint64;
  
    /**
-    * Stores the bitwise AND of a value with the value at the given position in
+    * Stores the bitwise AND of a value with the value at the given position in the array,
 @@ -37,12 +26,15 @@ interface Atomics {
-    * completes, any other read or write operation against the array will block.
+    * write operation against the array will block.
     */
    and(
 -    typedArray:
@@ -65,9 +65,9 @@
 +  ): BigUint64;
  
    /**
-    * Replaces the value at the given position in the array if the original value
-@@ -51,13 +43,17 @@ interface Atomics {
-    * array will block.
+    * Replaces the value at the given position in the array if the original value equals the given
+@@ -50,13 +42,17 @@ interface Atomics {
+    * other read or write operation against the array will block.
     */
    compareExchange(
 -    typedArray:
@@ -90,9 +90,9 @@
 +  ): BigUint64;
  
    /**
-    * Replaces the value at the given position in the array, returning the
-@@ -65,12 +61,15 @@ interface Atomics {
-    * write operation against the array will block.
+    * Replaces the value at the given position in the array, returning the original value. Until
+@@ -64,23 +60,28 @@ interface Atomics {
+    * block.
     */
    exchange(
 -    typedArray:
@@ -112,9 +112,8 @@
 +  ): BigUint64;
  
    /**
-    * Returns the value at the given position in the array. Until this atomic
-@@ -78,11 +77,13 @@ interface Atomics {
-    * will block.
+    * Returns the value at the given position in the array. Until this atomic operation completes,
+    * any other read or write operation against the array will block.
     */
    load(
 -    typedArray:
@@ -131,9 +130,9 @@
 +  ): BigUint64;
  
    /**
-    * Stores the bitwise OR of a value with the value at the given position in
-@@ -90,12 +91,15 @@ interface Atomics {
-    * completes, any other read or write operation against the array will block.
+    * Stores the bitwise OR of a value with the value at the given position in the array,
+@@ -88,24 +89,30 @@ interface Atomics {
+    * operation against the array will block.
     */
    or(
 -    typedArray:
@@ -153,9 +152,8 @@
 +  ): BigUint64;
  
    /**
-    * Stores a value at the given position in the array, returning the new value.
-@@ -103,12 +107,15 @@ interface Atomics {
-    * against the array will block.
+    * Stores a value at the given position in the array, returning the new value. Until this
+    * atomic operation completes, any other read or write operation against the array will block.
     */
    store(
 -    typedArray:
@@ -175,9 +173,9 @@
 +  ): BigUint64;
  
    /**
-    * Subtracts a value from the value at the given position in the array,
-@@ -116,12 +123,15 @@ interface Atomics {
-    * other read or write operation against the array will block.
+    * Subtracts a value from the value at the given position in the array, returning the original
+@@ -113,12 +120,15 @@ interface Atomics {
+    * array will block.
     */
    sub(
 -    typedArray:
@@ -197,8 +195,8 @@
 +  ): BigUint64;
  
    /**
-    * If the value at the given position in the array is equal to the provided
-@@ -131,8 +141,8 @@ interface Atomics {
+    * If the value at the given position in the array is equal to the provided value, the current
+@@ -128,8 +138,8 @@ interface Atomics {
     */
    wait(
      typedArray: BigInt64Array<ArrayBufferLike>,
@@ -209,7 +207,7 @@
      timeout?: number,
    ): 'ok' | 'not-equal' | 'timed-out';
  
-@@ -147,9 +157,9 @@ interface Atomics {
+@@ -142,9 +152,9 @@ interface Atomics {
     */
    notify(
      typedArray: BigInt64Array<ArrayBufferLike>,
@@ -221,9 +219,9 @@
 +  ): SafeUint;
  
    /**
-    * Stores the bitwise XOR of a value with the value at the given position in
-@@ -157,10 +167,13 @@ interface Atomics {
-    * completes, any other read or write operation against the array will block.
+    * Stores the bitwise XOR of a value with the value at the given position in the array,
+@@ -152,10 +162,13 @@ interface Atomics {
+    * operation against the array will block.
     */
    xor(
 -    typedArray:

@@ -23,8 +23,8 @@
 +/// <reference path="./lib.es2015.symbol.wellknown.d.ts" />
  
  interface SharedArrayBuffer {
-   /** Read-only. The length of the ArrayBuffer (in bytes). */
-@@ -32,10 +18,10 @@ interface SharedArrayBufferConstructor {
+   /**
+@@ -36,10 +22,10 @@ interface SharedArrayBufferConstructor {
    readonly prototype: SharedArrayBuffer;
    new (byteLength?: number): SharedArrayBuffer;
  }
@@ -37,9 +37,9 @@
  }
  
  interface Atomics {
-@@ -44,14 +30,10 @@ interface Atomics {
-    * original value. Until this atomic operation completes, any other read or
-    * write operation against the array will block.
+@@ -48,14 +34,10 @@ interface Atomics {
+    * Until this atomic operation completes, any other read or write operation against the array
+    * will block.
     */
 +  add(typedArray: Int8Array, index: number, value: Int8): Int8;
 +  add(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
@@ -55,9 +55,9 @@
      index: number,
      value: number,
    ): number;
-@@ -61,14 +43,10 @@ interface Atomics {
-    * the array, returning the original value. Until this atomic operation
-    * completes, any other read or write operation against the array will block.
+@@ -65,14 +47,10 @@ interface Atomics {
+    * returning the original value. Until this atomic operation completes, any other read or
+    * write operation against the array will block.
     */
 +  and(typedArray: Int8Array, index: number, value: Int8): Int8;
 +  and(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
@@ -73,8 +73,8 @@
      index: number,
      value: number,
    ): number;
-@@ -80,13 +58,19 @@ interface Atomics {
-    * array will block.
+@@ -83,13 +61,19 @@ interface Atomics {
+    * other read or write operation against the array will block.
     */
    compareExchange(
 -    typedArray:
@@ -100,9 +100,9 @@
      index: number,
      expectedValue: number,
      replacementValue: number,
-@@ -97,14 +81,10 @@ interface Atomics {
-    * original value. Until this atomic operation completes, any other read or
-    * write operation against the array will block.
+@@ -100,14 +84,10 @@ interface Atomics {
+    * this atomic operation completes, any other read or write operation against the array will
+    * block.
     */
 +  exchange(typedArray: Int8Array, index: number, value: Int8): Int8;
 +  exchange(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
@@ -118,9 +118,9 @@
      index: number,
      value: number,
    ): number;
-@@ -121,14 +101,10 @@ interface Atomics {
-    * operation completes, any other read or write operation against the array
-    * will block.
+@@ -123,14 +103,10 @@ interface Atomics {
+    * Returns the value at the given position in the array. Until this atomic operation completes,
+    * any other read or write operation against the array will block.
     */
 +  load(typedArray: Int8Array, index: number): Int8;
 +  load(typedArray: Uint8Array, index: number): Uint8;
@@ -136,9 +136,9 @@
      index: number,
    ): number;
  
-@@ -137,14 +113,10 @@ interface Atomics {
-    * the array, returning the original value. Until this atomic operation
-    * completes, any other read or write operation against the array will block.
+@@ -139,14 +115,10 @@ interface Atomics {
+    * returning the original value. Until this atomic operation completes, any other read or write
+    * operation against the array will block.
     */
 +  or(typedArray: Int8Array, index: number, value: Int8): Int8;
 +  or(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
@@ -154,9 +154,9 @@
      index: number,
      value: number,
    ): number;
-@@ -154,14 +126,10 @@ interface Atomics {
-    * Until this atomic operation completes, any other read or write operation
-    * against the array will block.
+@@ -155,14 +127,10 @@ interface Atomics {
+    * Stores a value at the given position in the array, returning the new value. Until this
+    * atomic operation completes, any other read or write operation against the array will block.
     */
 +  store(typedArray: Int8Array, index: number, value: Int8): Int8;
 +  store(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
@@ -172,9 +172,9 @@
      index: number,
      value: number,
    ): number;
-@@ -171,14 +139,10 @@ interface Atomics {
-    * returning the original value. Until this atomic operation completes, any
-    * other read or write operation against the array will block.
+@@ -172,14 +140,10 @@ interface Atomics {
+    * value. Until this atomic operation completes, any other read or write operation against the
+    * array will block.
     */
 +  sub(typedArray: Int8Array, index: number, value: Int8): Int8;
 +  sub(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
@@ -190,9 +190,9 @@
      index: number,
      value: number,
    ): number;
-@@ -216,14 +180,10 @@ interface Atomics {
-    * the array, returning the original value. Until this atomic operation
-    * completes, any other read or write operation against the array will block.
+@@ -215,14 +179,10 @@ interface Atomics {
+    * returning the original value. Until this atomic operation completes, any other read or write
+    * operation against the array will block.
     */
 +  xor(typedArray: Int8Array, index: number, value: Int8): Int8;
 +  xor(typedArray: Uint8Array, index: number, value: Uint8): Uint8;
@@ -208,7 +208,7 @@
      index: number,
      value: number,
    ): number;
-@@ -231,4 +191,4 @@ interface Atomics {
+@@ -230,4 +190,4 @@ interface Atomics {
    readonly [Symbol.toStringTag]: 'Atomics';
  }
  

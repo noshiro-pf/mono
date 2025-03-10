@@ -19,7 +19,7 @@
  
  interface ArrayBuffer {
    /**
-@@ -64,5 +50,8 @@ interface ArrayBuffer {
+@@ -60,5 +46,8 @@ interface ArrayBuffer {
  }
  
  interface ArrayBufferConstructor {

@@ -19,7 +19,7 @@
  
  interface ArrayConstructor {
    /**
-@@ -27,7 +13,7 @@ interface ArrayConstructor {
+@@ -25,7 +11,7 @@ interface ArrayConstructor {
        | AsyncIterable<T>
        | Iterable<T | PromiseLike<T>>
        | ArrayLike<T | PromiseLike<T>>,
@@ -28,7 +28,7 @@
  
    /**
     * Creates an array from an async iterator or iterable object.
-@@ -41,7 +27,7 @@ interface ArrayConstructor {
+@@ -37,7 +23,7 @@ interface ArrayConstructor {
     */
    fromAsync<T, U>(
      iterableOrArrayLike: AsyncIterable<T> | Iterable<T> | ArrayLike<T>,
