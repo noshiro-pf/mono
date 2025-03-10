@@ -1,8 +1,8 @@
 import 'zx/globals';
+import { paths } from '../constants.mjs';
+import { getSrcFileList, replaceWithTsMorph } from '../convert-dts/index.mjs';
 import { type TsVersion } from '../typescript-versions.mjs';
-import { paths } from './constants.mjs';
-import { clearDir } from './utils/clear-dir.mjs';
-import { forAllTsVersions } from './utils/for-all-ts-versions.mjs';
+import { clearDir, forAllTsVersions } from './utils/index.mjs';
 
 /**
  * Read files in `output/{tsVersion}/{numberType}/temp/copied` and generate
@@ -34,16 +34,17 @@ const genEslintFixedImpl = async (
     }
   }
 
-  cd(paths.strictTsLib.$);
+  const srcFileList = await getSrcFileList(eslintFixed);
 
-  {
-    const res =
-      await $`yarn zz:eslint ${eslintFixed} --config ./configs/eslint.config.gen.mjs --fix || true`;
-    if (res.exitCode !== 0) {
-      console.error(res.stderr);
-      return 'err';
-    }
-  }
+  await Promise.all(
+    srcFileList.map(async (filename) => {
+      const outputFile = path.resolve(eslintFixed, filename);
+
+      console.log(`${outputFile} generated.`);
+
+      return replaceWithTsMorph(outputFile);
+    }),
+  );
 
   return 'ok';
 };

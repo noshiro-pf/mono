@@ -1,11 +1,13 @@
 import { exec } from 'node:child_process';
 import 'zx/globals';
+import { converterConfigs, paths } from '../constants.mjs';
 import { type TsVersion } from '../typescript-versions.mjs';
-import { converterConfigs, paths } from './constants.mjs';
-import { clearDir } from './utils/clear-dir.mjs';
-import { forAllTsVersions } from './utils/for-all-ts-versions.mjs';
-import { formatFiles } from './utils/format.mjs';
-import { wrapStartEnd } from './utils/wrap-start-end.mjs';
+import {
+  clearDir,
+  forAllTsVersions,
+  formatFiles,
+  wrapStartEnd,
+} from './utils/index.mjs';
 
 export const prepareCopiedForDiff = async (
   tsVersion: TsVersion | 'all',

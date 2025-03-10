@@ -1,5 +1,5 @@
-import { converterConfigs } from '../functions/constants.mjs';
-import { publishPackages } from '../functions/publish-packages.mjs';
+import { converterConfigs } from '../constants.mjs';
+import { publishPackages } from '../functions/index.mjs';
 import { typescriptVersions } from '../typescript-versions.mjs';
 
 for (const config of converterConfigs) {

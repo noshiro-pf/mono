@@ -52,6 +52,66 @@
     call-me-maybe "^1.0.1"
     js-yaml "^4.1.0"
 
+"@ast-grep/napi-darwin-arm64@0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@ast-grep/napi-darwin-arm64/-/napi-darwin-arm64-0.36.1.tgz#767ac25769479faf626ebf824ba9f5e74f3b327a"
+  integrity sha512-hLceB0+nTMzmp+85ffJdmwUYcH9n+9ca/dj4nBxXjWBEPhcsA4FOlxCn/dltxhIsdb9eVL8ffATyu7yO96Xjcw==
+
+"@ast-grep/napi-darwin-x64@0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@ast-grep/napi-darwin-x64/-/napi-darwin-x64-0.36.1.tgz#9f7512a4705f478ea0f6700c1e00bad424d4a46c"
+  integrity sha512-bt5FZNIRE/FmwD29t1LMMsbWxxqgAGabCOSWxbFKBPWqYPW48sG0FfEP2x3P6vIMmNrNNaEy0YwiwaZVR8M0dQ==
+
+"@ast-grep/napi-linux-arm64-gnu@0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@ast-grep/napi-linux-arm64-gnu/-/napi-linux-arm64-gnu-0.36.1.tgz#95a937d7484e027c9ee3c7b40d5ff591189e64c6"
+  integrity sha512-6xAs1AGqll9cZdinQIdEo8WA6dEgOSKGfk0HLmXO0R6Z9q/i17oRtLdud+iVNUVBjyFxrOrTYUGxzwwbfrh2Mg==
+
+"@ast-grep/napi-linux-arm64-musl@0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@ast-grep/napi-linux-arm64-musl/-/napi-linux-arm64-musl-0.36.1.tgz#925eee7220f0997c213665bd9457139346979939"
+  integrity sha512-qBg0id6C138OkD68zuaa37hrNE01NKJVaV+VZ+7lYIdM7ovwq4D3cgvKsxz1iWUrXsQIX+RPQfU4MoYJdRKYRQ==
+
+"@ast-grep/napi-linux-x64-gnu@0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@ast-grep/napi-linux-x64-gnu/-/napi-linux-x64-gnu-0.36.1.tgz#4326524580957262a14c58efc65db0ad6b60664e"
+  integrity sha512-DJnOF0nETsFCPlwRSPwiddja/Pe6yyQmgvQMZRWR3jBcqNeytL6MwVBs7bLyiGPeRNgB/Fk/V4lfVjPV8OYi6w==
+
+"@ast-grep/napi-linux-x64-musl@0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@ast-grep/napi-linux-x64-musl/-/napi-linux-x64-musl-0.36.1.tgz#00928dda32ecfff3d2bf4efb57e29c7d164b7ffe"
+  integrity sha512-vXrqWq9KZssTrJa47mDv8uPk7+ZLjQZScQjpbzB/icYj+VdhDAMxRC2ZrCTaSP+FQzibtZQdlEe3lGm4DGvuKA==
+
+"@ast-grep/napi-win32-arm64-msvc@0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@ast-grep/napi-win32-arm64-msvc/-/napi-win32-arm64-msvc-0.36.1.tgz#1e1d76f768dfe821ae9ef049056b44e8289a2e11"
+  integrity sha512-y02toJitm47Zv6zeCZnvzU/YyACfim8xcZx7+V9dJr5H8DSd6bJhnCIEhyPqsDJBhgh0i+saRmFr12rb6Fmjtw==
+
+"@ast-grep/napi-win32-ia32-msvc@0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@ast-grep/napi-win32-ia32-msvc/-/napi-win32-ia32-msvc-0.36.1.tgz#66674c5e21f7707ebfc50a8cee8f500bd859d622"
+  integrity sha512-I4oVIFX9dhzEI3fz7GYlj1Khw8w6Kk+2r8cuyqI9Z+U+FUZZFHr3ZWyXhJdrsfuJ9AmUeJLlydu6zAyCUlEvow==
+
+"@ast-grep/napi-win32-x64-msvc@0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@ast-grep/napi-win32-x64-msvc/-/napi-win32-x64-msvc-0.36.1.tgz#6980e802531056881eb5d87b24e1f30c66ecfa73"
+  integrity sha512-ofuHLFdaVMsPoxJsl1cgIlrOUYoh3kF6fiSKSbCbL80PRCpJXo8J+EwxsF033hK7bwMy40FohG4guz5a4B2tYA==
+
+"@ast-grep/napi@^0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@ast-grep/napi/-/napi-0.36.1.tgz#0be3d59b3cd3cc1c94e112118c565fdfbbdadeef"
+  integrity sha512-Ptfwhmlh9Xc5PunM1/X9tcmudxTAOIXxsDdvkSM4h9z/o+OrqL6DYgXOyPxo3mWFln/+oHHIB65jtNQCoo6Niw==
+  optionalDependencies:
+    "@ast-grep/napi-darwin-arm64" "0.36.1"
+    "@ast-grep/napi-darwin-x64" "0.36.1"
+    "@ast-grep/napi-linux-arm64-gnu" "0.36.1"
+    "@ast-grep/napi-linux-arm64-musl" "0.36.1"
+    "@ast-grep/napi-linux-x64-gnu" "0.36.1"
+    "@ast-grep/napi-linux-x64-musl" "0.36.1"
+    "@ast-grep/napi-win32-arm64-msvc" "0.36.1"
+    "@ast-grep/napi-win32-ia32-msvc" "0.36.1"
+    "@ast-grep/napi-win32-x64-msvc" "0.36.1"
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.4", "@babel/code-frame@^7.22.13", "@babel/code-frame@^7.23.5":
   version "7.23.5"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.23.5.tgz#9009b69a8c602293476ad598ff53e4562e15c244"
@@ -4079,14 +4139,13 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/quickjs-emscripten/-/quickjs-emscripten-0.23.0.tgz#db4ecfd499a9765ab24002c3b696d02e6d32a12c"
   integrity sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==
 
-"@ts-morph/common@~0.23.0":
-  version "0.23.0"
-  resolved "https://registry.yarnpkg.com/@ts-morph/common/-/common-0.23.0.tgz#bd4ddbd3f484f29476c8bd985491592ae5fc147e"
-  integrity sha512-m7Lllj9n/S6sOkCkRftpM7L24uvmfXQFedlW/4hENcuJH1HHm9u5EgxZb9uVjQSCGrbBWBkOGgcTxNg36r6ywA==
+"@ts-morph/common@~0.26.0":
+  version "0.26.1"
+  resolved "https://registry.yarnpkg.com/@ts-morph/common/-/common-0.26.1.tgz#a346188e59d2befe4c71f66a7d626d81b1abe2a8"
+  integrity sha512-Sn28TGl/4cFpcM+jwsH1wLncYq3FtN/BIpem+HOygfBWPT5pAeS5dB4VFVzV8FbnOKHpDLZmvAl4AjPEev5idA==
   dependencies:
     fast-glob "^3.3.2"
-    minimatch "^9.0.3"
-    mkdirp "^3.0.1"
+    minimatch "^9.0.4"
     path-browserify "^1.0.1"
 
 "@tsconfig/node10@^1.0.7":
@@ -4969,87 +5028,87 @@
     eslint-visitor-keys "^4.2.0"
 
 "@typescript/lib-decorators@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/decorators":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-dom@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/dom":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2015@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/es2015":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2016@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/es2016":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2017@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/es2017":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2018@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/es2018":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2019@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/es2019":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2020@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/es2020":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2021@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/es2021":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2022@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/es2022":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2023@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/es2023":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es2024@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/es2024":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es5@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/es5":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-es6@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/es6":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-esnext@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/esnext":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-scripthost@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/scripthost":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
 "@typescript/lib-webworker@file:./packages/strict-ts-lib/output/5.7.2/branded/packages/webworker":
-  version "5.7.2"
+  version "5.7.2-strict-ts-lib-v1"
   dependencies:
     "@noshiro/ts-type-utils" "1.1.0"
 
@@ -6507,10 +6566,10 @@ clsx@^2.1.0:
   resolved "https://registry.yarnpkg.com/clsx/-/clsx-2.1.0.tgz#e851283bcb5c80ee7608db18487433f7b23f77cb"
   integrity sha512-m3iNNWpd9rl3jvvcBnu70ylMdrXt8Vlq4HYadnU5fwcOtvkSQWPmj7amUcDT2qYI7risszBjI5AUIUox9D16pg==
 
-code-block-writer@^13.0.1:
-  version "13.0.1"
-  resolved "https://registry.yarnpkg.com/code-block-writer/-/code-block-writer-13.0.1.tgz#52ac60ca6076d8700b88a45bd71e06a577158405"
-  integrity sha512-c5or4P6erEA69TxaxTNcHUNcIn+oyxSRTOWV+pSYF+z4epXqNvwvJ70XPGjPNgue83oAFAPBRQYwpAJ/Hpe/Sg==
+code-block-writer@^13.0.3:
+  version "13.0.3"
+  resolved "https://registry.yarnpkg.com/code-block-writer/-/code-block-writer-13.0.3.tgz#90f8a84763a5012da7af61319dd638655ae90b5b"
+  integrity sha512-Oofo0pq3IKnsFtuHqSF7TqBfr71aeyZDVJ0HpmqB7FBM2qEigL0iPONSCZSO9pE9dZTAxANe5XHG9Uy0YMv8cg==
 
 collapse-white-space@^2.0.0:
   version "2.1.0"
@@ -12739,7 +12798,7 @@ minimatch@^9.0.0:
   dependencies:
     brace-expansion "^2.0.1"
 
-minimatch@^9.0.3, minimatch@^9.0.4:
+minimatch@^9.0.4:
   version "9.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-9.0.4.tgz#8e49c731d1749cbec05050ee5145147b32496a51"
   integrity sha512-KqWh+VchfxcMNRAJjj2tnsSJdNbHsVgnkBhTNrW7AjVo6OvLtxw8zfT9oLw1JSohlFzJ8jCoTgaoXvJ+kHt6fw==
@@ -12842,11 +12901,6 @@ mkdirp@^1.0.3, mkdirp@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
-
-mkdirp@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-3.0.1.tgz#e44e4c5607fb279c168241713cc6e0fea9adcb50"
-  integrity sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg==
 
 mlly@^1.7.3, mlly@^1.7.4:
   version "1.7.4"
@@ -16288,13 +16342,13 @@ ts-mixer@^6.0.3:
   resolved "https://registry.yarnpkg.com/ts-mixer/-/ts-mixer-6.0.3.tgz#69bd50f406ff39daa369885b16c77a6194c7cae6"
   integrity sha512-k43M7uCG1AkTyxgnmI5MPwKoUvS/bRvLvUb7+Pgpdlmok8AoqmUaZxUUw8zKM5B1lqZrt41GjYgnvAi0fppqgQ==
 
-ts-morph@^22.0.0:
-  version "22.0.0"
-  resolved "https://registry.yarnpkg.com/ts-morph/-/ts-morph-22.0.0.tgz#5532c592fb6dddae08846f12c9ab0fc590b1d42e"
-  integrity sha512-M9MqFGZREyeb5fTl6gNHKZLqBQA0TjA1lea+CR48R8EBTDuWrNqW6ccC5QvjNR4s6wDumD3LTCjOFSp9iwlzaw==
+ts-morph@^25.0.1:
+  version "25.0.1"
+  resolved "https://registry.yarnpkg.com/ts-morph/-/ts-morph-25.0.1.tgz#7de0b60fcc6e86955c8766831bcd2c5d87ffbd4f"
+  integrity sha512-QJEiTdnz1YjrB3JFhd626gX4rKHDLSjSVMvGGG4v7ONc3RBwa0Eei98G9AT9uNFDMtV54JyuXsFeC+OH0n6bXQ==
   dependencies:
-    "@ts-morph/common" "~0.23.0"
-    code-block-writer "^13.0.1"
+    "@ts-morph/common" "~0.26.0"
+    code-block-writer "^13.0.3"
 
 ts-node@^10.9.1, ts-node@^10.9.2:
   version "10.9.2"

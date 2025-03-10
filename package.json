@@ -138,7 +138,6 @@
     "sort-package-json": "^2.10.1",
     "style-loader": "^4.0.0",
     "terser": "^5.21.0",
-    "ts-morph": "^22.0.0",
     "ts-node": "^10.9.2",
     "tslib": "^2.4.0",
     "typescript": "^5.7.2",

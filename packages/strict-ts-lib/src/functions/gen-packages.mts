@@ -5,8 +5,6 @@ import {
   replaceWithNoMatchCheck,
 } from '@noshiro/mono-utils';
 import 'zx/globals';
-import { typeUtilsName } from '../convert-dts/constants.mjs';
-import { strictLibVersions, type TsVersion } from '../typescript-versions.mjs';
 import {
   type ConverterConfig,
   converterConfigs,
@@ -15,11 +13,12 @@ import {
   license,
   paths,
   repo,
-} from './constants.mjs';
+  typeUtilsName,
+} from '../constants.mjs';
+import { strictLibVersions, type TsVersion } from '../typescript-versions.mjs';
 import { fetchLibFileNameList } from './fetch-lib-files.mjs';
 import { getPackageDirList } from './get-package-dir-list.mjs';
-import { clearDir } from './utils/clear-dir.mjs';
-import { forAllTsVersions } from './utils/for-all-ts-versions.mjs';
+import { clearDir, forAllTsVersions } from './utils/index.mjs';
 
 /** Generate files to `output/{tsVersion}/{numberType}/packages` */
 export const genPackages = async (
