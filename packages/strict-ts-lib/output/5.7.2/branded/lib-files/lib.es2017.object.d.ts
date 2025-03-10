@@ -34,40 +34,31 @@ declare namespace StrictLibInternals {
 interface ObjectConstructor {
   /**
    * Returns an array of values of the enumerable own properties of an object
-   *
-   * @param o Object that contains the properties and methods. This can be an
-   *   object that you created or an existing Document Object Model (DOM)
-   *   object.
+   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
   values<T>(o: { readonly [s: string]: T } | ArrayLike<T>): readonly T[];
 
   /**
    * Returns an array of values of the enumerable own properties of an object
-   *
-   * @param o Object that contains the properties and methods. This can be an
-   *   object that you created or an existing Document Object Model (DOM)
-   *   object.
+   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
   values(o: {}): readonly unknown[];
 
   /**
-   * Returns an array of key/values of the enumerable own properties of an
-   * object
+   * Returns an array of key/values of the enumerable own properties of an object
+   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    *
-   * @param o Object that contains the properties and methods. This can be an
-   *   object that you created or an existing Document Object Model (DOM)
-   *   object.
+   * ```ts
+   * const obj = {
+   *   x: 1,
+   *   y: 2,
+   *   z: 2,
+   *   3: 4,
+   * } as const;
    *
-   *   ```ts
-   *   const obj = {
-   *     x: 1,
-   *     y: 2,
-   *     z: 2,
-   *     3: 4,
-   *   } as const;
+   * const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2] | [string, unknown])[]
+   * ```
    *
-   *   const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2] | [string, unknown])[]
-   *   ```
    */
   entries<const R extends UnknownRecord>(
     object: R,
@@ -86,21 +77,14 @@ interface ObjectConstructor {
   ): readonly (readonly [string, T])[];
 
   /**
-   * Returns an array of key/values of the enumerable own properties of an
-   * object
-   *
-   * @param o Object that contains the properties and methods. This can be an
-   *   object that you created or an existing Document Object Model (DOM)
-   *   object.
+   * Returns an array of key/values of the enumerable own properties of an object
+   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
   entries(o: {}): readonly (readonly [string, unknown])[];
 
   /**
    * Returns an object containing all own property descriptors of an object
-   *
-   * @param o Object that contains the properties and methods. This can be an
-   *   object that you created or an existing Document Object Model (DOM)
-   *   object.
+   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
   getOwnPropertyDescriptors<T>(o: T): {
     readonly [P in keyof T]: TypedPropertyDescriptor<T[P]>;

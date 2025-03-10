@@ -1,4 +1,4 @@
-@@ -1,41 +1,30 @@
+@@ -1,45 +1,34 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -23,11 +23,15 @@
 +/// <reference path="./lib.es2015.symbol.wellknown.d.ts" />
  
  interface SharedArrayBuffer {
-   /** Read-only. The length of the ArrayBuffer (in bytes). */
+   /**
+    * Read-only. The length of the ArrayBuffer (in bytes).
+    */
 -  readonly byteLength: number;
 +  readonly byteLength: NumberType.TypedArraySize;
  
-   /** Returns a section of an SharedArrayBuffer. */
+   /**
+    * Returns a section of an SharedArrayBuffer.
+    */
 -  slice(begin?: number, end?: number): SharedArrayBuffer;
 +  slice(
 +    begin?: NumberType.TypedArraySizeArg,
@@ -51,8 +55,8 @@
  }
  
  interface Atomics {
-@@ -45,16 +34,35 @@ interface Atomics {
-    * write operation against the array will block.
+@@ -49,16 +38,35 @@ interface Atomics {
+    * will block.
     */
    add(
 -    typedArray:
@@ -96,9 +100,9 @@
 +  ): Uint32;
  
    /**
-    * Stores the bitwise AND of a value with the value at the given position in
-@@ -62,16 +70,35 @@ interface Atomics {
-    * completes, any other read or write operation against the array will block.
+    * Stores the bitwise AND of a value with the value at the given position in the array,
+@@ -66,16 +74,35 @@ interface Atomics {
+    * write operation against the array will block.
     */
    and(
 -    typedArray:
@@ -142,9 +146,9 @@
 +  ): Uint32;
  
    /**
-    * Replaces the value at the given position in the array if the original value
-@@ -80,17 +107,41 @@ interface Atomics {
-    * array will block.
+    * Replaces the value at the given position in the array if the original value equals the given
+@@ -83,17 +110,41 @@ interface Atomics {
+    * other read or write operation against the array will block.
     */
    compareExchange(
 -    typedArray:
@@ -195,9 +199,9 @@
 +  ): Uint32;
  
    /**
-    * Replaces the value at the given position in the array, returning the
-@@ -98,39 +149,54 @@ interface Atomics {
-    * write operation against the array will block.
+    * Replaces the value at the given position in the array, returning the original value. Until
+@@ -101,38 +152,53 @@ interface Atomics {
+    * block.
     */
    exchange(
 -    typedArray:
@@ -241,17 +245,16 @@
 +  ): Uint32;
  
    /**
-    * Returns a value indicating whether high-performance algorithms can use
-    * atomic operations (`true`) or must use locks (`false`) for the given number
-    * of bytes-per-element of a typed array.
+    * Returns a value indicating whether high-performance algorithms can use atomic operations
+    * (`true`) or must use locks (`false`) for the given number of bytes-per-element of a typed
+    * array.
     */
 -  isLockFree(size: number): boolean;
 +  isLockFree(size: NumberType.TypedArraySizeArgPositive): boolean;
  
    /**
-    * Returns the value at the given position in the array. Until this atomic
-    * operation completes, any other read or write operation against the array
-    * will block.
+    * Returns the value at the given position in the array. Until this atomic operation completes,
+    * any other read or write operation against the array will block.
     */
 -  load(
 -    typedArray:
@@ -271,9 +274,9 @@
 +  load(typedArray: Uint32Array, index: NumberType.TypedArraySizeArg): Uint32;
  
    /**
-    * Stores the bitwise OR of a value with the value at the given position in
-@@ -138,16 +204,35 @@ interface Atomics {
-    * completes, any other read or write operation against the array will block.
+    * Stores the bitwise OR of a value with the value at the given position in the array,
+@@ -140,32 +206,70 @@ interface Atomics {
+    * operation against the array will block.
     */
    or(
 -    typedArray:
@@ -317,9 +320,8 @@
 +  ): Uint32;
  
    /**
-    * Stores a value at the given position in the array, returning the new value.
-@@ -155,16 +240,35 @@ interface Atomics {
-    * against the array will block.
+    * Stores a value at the given position in the array, returning the new value. Until this
+    * atomic operation completes, any other read or write operation against the array will block.
     */
    store(
 -    typedArray:
@@ -363,9 +365,9 @@
 +  ): Uint32;
  
    /**
-    * Subtracts a value from the value at the given position in the array,
-@@ -172,16 +276,35 @@ interface Atomics {
-    * other read or write operation against the array will block.
+    * Subtracts a value from the value at the given position in the array, returning the original
+@@ -173,16 +277,35 @@ interface Atomics {
+    * array will block.
     */
    sub(
 -    typedArray:
@@ -409,8 +411,8 @@
 +  ): Uint32;
  
    /**
-    * If the value at the given position in the array is equal to the provided
-@@ -191,8 +314,8 @@ interface Atomics {
+    * If the value at the given position in the array is equal to the provided value, the current
+@@ -192,8 +315,8 @@ interface Atomics {
     */
    wait(
      typedArray: Int32Array<ArrayBufferLike>,
@@ -421,7 +423,7 @@
      timeout?: number,
    ): 'ok' | 'not-equal' | 'timed-out';
  
-@@ -207,9 +330,9 @@ interface Atomics {
+@@ -206,9 +329,9 @@ interface Atomics {
     */
    notify(
      typedArray: Int32Array<ArrayBufferLike>,
@@ -433,9 +435,9 @@
 +  ): SafeUint;
  
    /**
-    * Stores the bitwise XOR of a value with the value at the given position in
-@@ -217,18 +340,37 @@ interface Atomics {
-    * completes, any other read or write operation against the array will block.
+    * Stores the bitwise XOR of a value with the value at the given position in the array,
+@@ -216,18 +339,37 @@ interface Atomics {
+    * operation against the array will block.
     */
    xor(
 -    typedArray:

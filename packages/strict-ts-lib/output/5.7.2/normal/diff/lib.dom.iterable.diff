@@ -19,7 +19,7 @@
  
  /////////////////////////////
  /// Window Iterable APIs
-@@ -67,7 +53,7 @@ interface CSSKeyframesRule {
+@@ -55,7 +41,7 @@ interface CSSKeyframesRule {
  
  interface CSSNumericArray {
    [Symbol.iterator](): ArrayIterator<CSSNumericValue>;
@@ -28,7 +28,7 @@
    keys(): ArrayIterator<number>;
    values(): ArrayIterator<CSSNumericValue>;
  }
-@@ -82,14 +68,14 @@ interface CSSStyleDeclaration {
+@@ -70,14 +56,14 @@ interface CSSStyleDeclaration {
  
  interface CSSTransformValue {
    [Symbol.iterator](): ArrayIterator<CSSTransformComponent>;
@@ -45,7 +45,7 @@
    keys(): ArrayIterator<number>;
    values(): ArrayIterator<CSSUnparsedSegment>;
  }
-@@ -133,7 +119,7 @@ interface DOMStringList {
+@@ -115,7 +101,7 @@ interface DOMStringList {
  
  interface DOMTokenList {
    [Symbol.iterator](): ArrayIterator<string>;
@@ -54,7 +54,7 @@
    keys(): ArrayIterator<number>;
    values(): ArrayIterator<string>;
  }
-@@ -156,9 +142,9 @@ interface FormDataIterator<T>
+@@ -138,9 +124,9 @@ interface FormDataIterator<T>
  }
  
  interface FormData {
@@ -66,22 +66,19 @@
    /** Returns a list of keys in the list. */
    keys(): FormDataIterator<string>;
    /** Returns a list of values in the list. */
-@@ -191,12 +177,12 @@ interface HeadersIterator<T>
+@@ -173,9 +159,9 @@ interface HeadersIterator<T>
  }
  
  interface Headers {
 -  [Symbol.iterator](): HeadersIterator<[string, string]>;
 +  [Symbol.iterator](): HeadersIterator<readonly [string, string]>;
-   /**
-    * Returns an iterator allowing to go through all key/value pairs contained in
-    * this object.
-    */
+   /** Returns an iterator allowing to go through all key/value pairs contained in this object. */
 -  entries(): HeadersIterator<[string, string]>;
 +  entries(): HeadersIterator<readonly [string, string]>;
-   /**
-    * Returns an iterator allowing to go through all keys of the key/value pairs
-    * contained in this object.
-@@ -264,9 +250,9 @@ interface MediaKeyStatusMapIterator<T>
+   /** Returns an iterator allowing to go through all keys of the key/value pairs contained in this object. */
+   keys(): HeadersIterator<string>;
+   /** Returns an iterator allowing to go through all values of the key/value pairs contained in this object. */
+@@ -230,9 +216,9 @@ interface MediaKeyStatusMapIterator<T>
  
  interface MediaKeyStatusMap {
    [Symbol.iterator](): MediaKeyStatusMapIterator<
@@ -93,7 +90,7 @@
    keys(): MediaKeyStatusMapIterator<BufferSource>;
    values(): MediaKeyStatusMapIterator<MediaKeyStatus>;
  }
-@@ -275,13 +261,13 @@ interface MediaList {
+@@ -241,13 +227,13 @@ interface MediaList {
    [Symbol.iterator](): ArrayIterator<string>;
  }
  
@@ -109,7 +106,7 @@
      origin?: string,
      lastEventId?: string,
      source?: MessageEventSource | null,
-@@ -318,7 +304,7 @@ interface Navigator {
+@@ -280,7 +266,7 @@ interface Navigator {
  interface NodeList {
    [Symbol.iterator](): ArrayIterator<Node>;
    /** Returns an array of key, value pairs for every entry in the list. */
@@ -118,7 +115,7 @@
    /** Returns an list of keys in the list. */
    keys(): ArrayIterator<number>;
    /** Returns an list of values in the list. */
-@@ -328,7 +314,7 @@ interface NodeList {
+@@ -290,7 +276,7 @@ interface NodeList {
  interface NodeListOf<TNode extends Node> {
    [Symbol.iterator](): ArrayIterator<TNode>;
    /** Returns an array of key, value pairs for every entry in the list. */
@@ -127,7 +124,7 @@
    /** Returns an list of keys in the list. */
    keys(): ArrayIterator<number>;
    /** Returns an list of values in the list. */
-@@ -351,7 +337,7 @@ interface RTCRtpTransceiver {
+@@ -310,7 +296,7 @@ interface RTCRtpTransceiver {
    setCodecPreferences(codecs: Iterable<RTCRtpCodec>): void;
  }
  
@@ -136,7 +133,7 @@
  
  interface SVGLengthList {
    [Symbol.iterator](): ArrayIterator<SVGLength>;
-@@ -392,10 +378,10 @@ interface StylePropertyMapReadOnlyIterator<T>
+@@ -351,10 +337,10 @@ interface StylePropertyMapReadOnlyIterator<T>
  
  interface StylePropertyMapReadOnly {
    [Symbol.iterator](): StylePropertyMapReadOnlyIterator<
@@ -149,7 +146,7 @@
    >;
    keys(): StylePropertyMapReadOnlyIterator<string>;
    values(): StylePropertyMapReadOnlyIterator<Iterable<CSSStyleValue>>;
-@@ -521,9 +507,9 @@ interface URLSearchParamsIterator<T>
+@@ -468,9 +454,9 @@ interface URLSearchParamsIterator<T>
  }
  
  interface URLSearchParams {
@@ -161,12 +158,12 @@
    /** Returns a list of keys in the search params. */
    keys(): URLSearchParamsIterator<string>;
    /** Returns a list of values in the search params. */
-@@ -639,7 +625,7 @@ interface WebGL2RenderingContextBase {
+@@ -556,7 +542,7 @@ interface WebGL2RenderingContextBase {
      program: WebGLProgram,
      uniformIndices: Iterable<GLuint>,
      pname: GLenum,
 -  ): any;
 +  ): unknown;
-   /**
-    * [MDN
-    * Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getUniformIndices)
+   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getUniformIndices) */
+   getUniformIndices(
+     program: WebGLProgram,

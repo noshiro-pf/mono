@@ -1,4 +1,4 @@
-@@ -1,19 +1,35 @@
+@@ -1,52 +1,94 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -33,7 +33,7 @@
 +  /** @internal */
 +  type ToObjectEntries<R extends UnknownRecord> = R extends R
 +    ? readonly (
-+        | readonly [string, ValueOf<R>]
++        | readonly [string & {}, WidenLiteral<ValueOf<R>>]
 +        | {
 +            readonly [K in keyof R]: readonly [
 +              ToStr<keyof PickByValue<R, R[K]>>,
@@ -47,21 +47,38 @@
  
  interface ObjectConstructor {
    /**
-@@ -23,7 +39,7 @@ interface ObjectConstructor {
-    *   object that you created or an existing Document Object Model (DOM)
-    *   object.
+    * Returns an array of values of the enumerable own properties of an object
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
     */
 -  values<T>(o: { [s: string]: T } | ArrayLike<T>): T[];
 +  values<T>(o: { readonly [s: string]: T } | ArrayLike<T>): readonly T[];
  
    /**
     * Returns an array of values of the enumerable own properties of an object
-@@ -32,7 +48,30 @@ interface ObjectConstructor {
-    *   object that you created or an existing Document Object Model (DOM)
-    *   object.
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
     */
 -  values(o: {}): any[];
 +  values(o: {}): readonly unknown[];
+ 
+   /**
+    * Returns an array of key/values of the enumerable own properties of an object
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
++   *
++   * ```ts
++   * const obj = {
++   *   x: 1,
++   *   y: 2,
++   *   z: 2,
++   *   3: 4,
++   * } as const;
++   *
++   * const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2] | [string, unknown])[]
++   * ```
++   *
++   */
++  entries<const R extends UnknownRecord>(
++    object: R,
++  ): StrictLibInternals.ToObjectEntries<R>;
 +
 +  /**
 +   * Returns an array of key/values of the enumerable own properties of an
@@ -70,27 +87,6 @@
 +   * @param o Object that contains the properties and methods. This can be an
 +   *   object that you created or an existing Document Object Model (DOM)
 +   *   object.
-+   *
-+   *   ```ts
-+   *   const obj = {
-+   *     x: 1,
-+   *     y: 2,
-+   *     z: 2,
-+   *     3: 4,
-+   *   } as const;
-+   *
-+   *   const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2] | [string, unknown])[]
-+   *   ```
-+   */
-+  entries<const R extends UnknownRecord>(
-+    object: R,
-+  ): StrictLibInternals.ToObjectEntries<R>;
- 
-   /**
-    * Returns an array of key/values of the enumerable own properties of an
-@@ -42,7 +81,9 @@ interface ObjectConstructor {
-    *   object that you created or an existing Document Object Model (DOM)
-    *   object.
     */
 -  entries<T>(o: { [s: string]: T } | ArrayLike<T>): [string, T][];
 +  entries<T>(
@@ -98,24 +94,23 @@
 +  ): readonly (readonly [string, T])[];
  
    /**
-    * Returns an array of key/values of the enumerable own properties of an
-@@ -52,7 +93,7 @@ interface ObjectConstructor {
-    *   object that you created or an existing Document Object Model (DOM)
-    *   object.
+    * Returns an array of key/values of the enumerable own properties of an object
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
     */
 -  entries(o: {}): [string, any][];
 +  entries(o: {}): readonly (readonly [string, unknown])[];
  
    /**
     * Returns an object containing all own property descriptors of an object
-@@ -62,8 +103,8 @@ interface ObjectConstructor {
-    *   object.
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
     */
-   getOwnPropertyDescriptors<T>(o: T): {
--    [P in keyof T]: TypedPropertyDescriptor<T[P]>;
-+    readonly [P in keyof T]: TypedPropertyDescriptor<T[P]>;
-   } & {
+-  getOwnPropertyDescriptors<T>(
+-    o: T,
+-  ): { [P in keyof T]: TypedPropertyDescriptor<T[P]> } & {
 -    [x: string]: PropertyDescriptor;
++  getOwnPropertyDescriptors<T>(o: T): {
++    readonly [P in keyof T]: TypedPropertyDescriptor<T[P]>;
++  } & {
 +    readonly [x: string]: PropertyDescriptor;
    };
  }

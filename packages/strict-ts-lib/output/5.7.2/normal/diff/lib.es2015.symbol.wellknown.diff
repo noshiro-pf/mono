@@ -22,8 +22,8 @@
  
  interface SymbolConstructor {
    /**
-@@ -95,7 +81,7 @@ interface Array<T> {
-    * absent when used in a 'with' statement.
+@@ -94,7 +80,7 @@ interface Array<T> {
+    * when they will be absent when used in a 'with' statement.
     */
    readonly [Symbol.unscopables]: {
 -    [K in keyof any[]]?: boolean;
@@ -31,8 +31,8 @@
    };
  }
  
-@@ -105,7 +91,7 @@ interface ReadonlyArray<T> {
-    * absent when used in a 'with' statement.
+@@ -104,7 +90,7 @@ interface ReadonlyArray<T> {
+    * when they will be absent when used in a 'with' statement.
     */
    readonly [Symbol.unscopables]: {
 -    [K in keyof (readonly any[])]?: boolean;
@@ -40,9 +40,9 @@
    };
  }
  
-@@ -157,7 +143,7 @@ interface Function {
-    * A constructor function can control which objects are recognized as its
-    * instances by 'instanceof' by overriding this method.
+@@ -160,7 +146,7 @@ interface Function {
+    * A constructor function can control which objects are recognized as its instances by
+    * 'instanceof' by overriding this method.
     */
 -  [Symbol.hasInstance](value: any): boolean;
 +  [Symbol.hasInstance](value: unknown): boolean;
@@ -58,7 +58,7 @@
    ): string;
  
    /**
-@@ -274,10 +260,10 @@ interface String {
+@@ -265,10 +251,10 @@ interface String {
      searchValue: {
        [Symbol.replace](
          string: string,

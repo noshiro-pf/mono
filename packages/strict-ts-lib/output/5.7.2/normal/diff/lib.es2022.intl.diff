@@ -19,10 +19,10 @@
  
  declare namespace Intl {
    /**
-@@ -28,9 +14,9 @@ declare namespace Intl {
-      * see [Intl
-      * page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation).
-      */
+@@ -23,9 +9,9 @@ declare namespace Intl {
+    */
+   interface SegmenterOptions {
+     /** The locale matching algorithm to use. For information about this option, see [Intl page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
 -    localeMatcher?: 'best fit' | 'lookup' | undefined;
 +    readonly localeMatcher?: 'best fit' | 'lookup' | undefined;
      /** The type of input to be split */
@@ -31,7 +31,7 @@
    }
  
    interface Segmenter {
-@@ -47,8 +33,8 @@ declare namespace Intl {
+@@ -41,8 +27,8 @@ declare namespace Intl {
    }
  
    interface ResolvedSegmenterOptions {
@@ -42,26 +42,21 @@
    }
  
    interface SegmentIterator<T>
-@@ -73,25 +59,25 @@ declare namespace Intl {
+@@ -64,20 +50,20 @@ declare namespace Intl {
  
    interface SegmentData {
      /** A string containing the segment extracted from the original input string. */
 -    segment: string;
 +    readonly segment: string;
-     /**
-      * The code unit index in the original input string at which the segment
-      * begins.
-      */
+     /** The code unit index in the original input string at which the segment begins. */
 -    index: number;
 +    readonly index: number;
      /** The complete input string that was segmented. */
 -    input: string;
 +    readonly input: string;
      /**
-      * A boolean value only if granularity is "word"; otherwise, undefined. If
-      * granularity is "word", then isWordLike is true when the segment is
-      * word-like (i.e., consists of letters/numbers/ideographs/etc.); otherwise,
-      * false.
+      * A boolean value only if granularity is "word"; otherwise, undefined.
+      * If granularity is "word", then isWordLike is true when the segment is word-like (i.e., consists of letters/numbers/ideographs/etc.); otherwise, false.
       */
 -    isWordLike?: boolean;
 +    readonly isWordLike?: boolean;

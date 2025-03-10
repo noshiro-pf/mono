@@ -19,9 +19,9 @@
  
  declare namespace Reflect {
    /**
-@@ -25,16 +11,16 @@ declare namespace Reflect {
-    * @param argumentsList An array of argument values to be passed to the
-    *   function.
+@@ -23,16 +9,16 @@ declare namespace Reflect {
+    * @param thisArgument The object to be used as the this object.
+    * @param argumentsList An array of argument values to be passed to the function.
     */
 -  function apply<T, A extends readonly any[], R>(
 +  function apply<T, A extends readonly unknown[], R>(
@@ -40,8 +40,8 @@
  
    /**
     * Constructs the target with the elements of specified array as the arguments
-@@ -45,16 +31,16 @@ declare namespace Reflect {
-    *   constructor.
+@@ -41,16 +27,16 @@ declare namespace Reflect {
+    * @param argumentsList An array of argument values to be passed to the constructor.
     * @param newTarget The constructor to be used as the `new.target` object.
     */
 -  function construct<A extends readonly any[], R>(
@@ -60,8 +60,8 @@
 +  ): unknown;
  
    /**
-    * Adds a property to an object, or modifies attributes of an existing
-@@ -70,7 +56,7 @@ declare namespace Reflect {
+    * Adds a property to an object, or modifies attributes of an existing property.
+@@ -62,7 +48,7 @@ declare namespace Reflect {
    function defineProperty(
      target: object,
      propertyKey: PropertyKey,
@@ -70,7 +70,7 @@
    ): boolean;
  
    /**
-@@ -97,7 +83,7 @@ declare namespace Reflect {
+@@ -84,7 +70,7 @@ declare namespace Reflect {
      target: T,
      propertyKey: P,
      receiver?: unknown,
@@ -78,8 +78,8 @@
 +  ): P extends keyof T ? T[P] : unknown;
  
    /**
-    * Gets the own property descriptor of the specified object. An own property
-@@ -110,7 +96,7 @@ declare namespace Reflect {
+    * Gets the own property descriptor of the specified object.
+@@ -95,7 +81,7 @@ declare namespace Reflect {
    function getOwnPropertyDescriptor<T extends object, P extends PropertyKey>(
      target: T,
      propertyKey: P,
@@ -88,8 +88,8 @@
  
    /**
     * Returns the prototype of an object.
-@@ -143,7 +129,7 @@ declare namespace Reflect {
-    *
+@@ -121,7 +107,7 @@ declare namespace Reflect {
+    * are those that are defined directly on that object, and are not inherited from the object's prototype.
     * @param target Object that contains the own properties.
     */
 -  function ownKeys(target: object): (string | symbol)[];
@@ -97,7 +97,7 @@
  
    /**
     * Prevents the addition of new properties to an object.
-@@ -166,14 +152,14 @@ declare namespace Reflect {
+@@ -140,14 +126,14 @@ declare namespace Reflect {
    function set<T extends object, P extends PropertyKey>(
      target: T,
      propertyKey: P,

@@ -38,7 +38,7 @@
        >
      : Arr;
  }[Depth extends -1 ? 'done' : 'recur'];
-@@ -66,7 +52,7 @@ interface ReadonlyArray<T> {
+@@ -64,7 +50,7 @@ interface ReadonlyArray<T> {
        this: This,
        value: T,
        index: number,
@@ -47,7 +47,7 @@
      ) => U | ReadonlyArray<U>,
      thisArg?: This,
    ): U[];
-@@ -98,7 +84,7 @@ interface Array<T> {
+@@ -94,7 +80,7 @@ interface Array<T> {
        this: This,
        value: T,
        index: number,

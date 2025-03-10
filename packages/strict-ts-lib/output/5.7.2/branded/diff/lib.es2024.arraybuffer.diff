@@ -19,7 +19,7 @@
  
  interface ArrayBuffer {
    /**
-@@ -22,7 +8,7 @@ interface ArrayBuffer {
+@@ -21,7 +7,7 @@ interface ArrayBuffer {
     *
     * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/maxByteLength)
     */
@@ -28,7 +28,7 @@
  
    /**
     * Returns true if this ArrayBuffer can be resized.
-@@ -36,7 +22,7 @@ interface ArrayBuffer {
+@@ -35,7 +21,7 @@ interface ArrayBuffer {
     *
     * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/resize)
     */
@@ -36,8 +36,8 @@
 +  resize(newByteLength?: NumberType.TypedArraySizeArgNonNegative): void;
  
    /**
-    * Returns a boolean indicating whether or not this buffer has been detached
-@@ -52,7 +38,9 @@ interface ArrayBuffer {
+    * Returns a boolean indicating whether or not this buffer has been detached (transferred).
+@@ -49,16 +35,25 @@ interface ArrayBuffer {
     *
     * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/transfer)
     */
@@ -47,8 +47,7 @@
 +  ): ArrayBuffer;
  
    /**
-    * Creates a new non-resizable ArrayBuffer with the same byte content as this
-@@ -60,9 +48,16 @@ interface ArrayBuffer {
+    * Creates a new non-resizable ArrayBuffer with the same byte content as this buffer, then detaches this buffer.
     *
     * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/transferToFixedLength)
     */

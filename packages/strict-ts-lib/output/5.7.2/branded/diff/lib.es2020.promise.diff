@@ -32,7 +32,7 @@
  }
  
  type PromiseSettledResult<T> =
-@@ -37,9 +23,9 @@ interface PromiseConstructor {
+@@ -36,9 +22,9 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
@@ -43,8 +43,8 @@
 +  ): Promise<{ readonly [P in keyof T]: PromiseSettledResult<Awaited<T[P]>> }>;
  
    /**
-    * Creates a Promise that is resolved with an array of results when all of the
-@@ -50,5 +36,5 @@ interface PromiseConstructor {
+    * Creates a Promise that is resolved with an array of results when all
+@@ -48,5 +34,5 @@ interface PromiseConstructor {
     */
    allSettled<T>(
      values: Iterable<T | PromiseLike<T>>,

@@ -38,7 +38,7 @@
        >
      : Arr;
  }[Depth extends -1 ? 'done' : 'recur'];
-@@ -65,11 +51,11 @@ interface ReadonlyArray<T> {
+@@ -63,11 +49,11 @@ interface ReadonlyArray<T> {
      callback: (
        this: This,
        value: T,
@@ -52,8 +52,8 @@
 +  ): readonly U[];
  
    /**
-    * Returns a new array with all sub-array elements concatenated into it
-@@ -77,7 +63,10 @@ interface ReadonlyArray<T> {
+    * Returns a new array with all sub-array elements concatenated into it recursively up to the
+@@ -75,7 +61,10 @@ interface ReadonlyArray<T> {
     *
     * @param depth The maximum recursion depth
     */
@@ -65,7 +65,7 @@
  }
  
  interface Array<T> {
-@@ -97,11 +86,11 @@ interface Array<T> {
+@@ -93,11 +82,11 @@ interface Array<T> {
      callback: (
        this: This,
        value: T,
@@ -79,8 +79,8 @@
 +  ): readonly U[];
  
    /**
-    * Returns a new array with all sub-array elements concatenated into it
-@@ -109,5 +98,8 @@ interface Array<T> {
+    * Returns a new array with all sub-array elements concatenated into it recursively up to the
+@@ -105,5 +94,8 @@ interface Array<T> {
     *
     * @param depth The maximum recursion depth
     */

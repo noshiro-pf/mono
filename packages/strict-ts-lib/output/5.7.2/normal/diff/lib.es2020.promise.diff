@@ -32,7 +32,7 @@
  }
  
  type PromiseSettledResult<T> =
-@@ -37,7 +23,7 @@ interface PromiseConstructor {
+@@ -36,7 +22,7 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */

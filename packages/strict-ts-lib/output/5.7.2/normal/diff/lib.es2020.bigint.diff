@@ -1,4 +1,4 @@
-@@ -1,21 +1,7 @@
+@@ -1,47 +1,33 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -22,47 +22,39 @@
  
  interface BigIntToLocaleStringOptions {
    /**
-@@ -23,11 +9,11 @@ interface BigIntToLocaleStringOptions {
-    * information about this option, see the
-    * {@link https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation Intl page}.
+    * The locale matching algorithm to use.The default is "best fit". For information about this option, see the {@link https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation Intl page}.
     */
 -  localeMatcher?: string;
 +  readonly localeMatcher?: string;
-   /** The formatting style to use , the default is "decimal". */
+   /**
+    * The formatting style to use , the default is "decimal".
+    */
 -  style?: string;
 +  readonly style?: string;
  
 -  numberingSystem?: string;
 +  readonly numberingSystem?: string;
    /**
-    * The unit to use in unit formatting, Possible values are core unit
-    * identifiers, defined in UTS #35, Part 2, Section 6. A subset of units from
-@@ -35,13 +21,13 @@ interface BigIntToLocaleStringOptions {
-    * be concatenated with "-per-" to make a compound unit. There is no default
-    * value; if the style is "unit", the unit property must be provided.
+    * The unit to use in unit formatting, Possible values are core unit identifiers, defined in UTS #35, Part 2, Section 6. A subset of units from the full list was selected for use in ECMAScript. Pairs of simple units can be concatenated with "-per-" to make a compound unit. There is no default value; if the style is "unit", the unit property must be provided.
     */
 -  unit?: string;
 +  readonly unit?: string;
  
    /**
-    * The unit formatting style to use in unit formatting, the defaults is
-    * "short".
+    * The unit formatting style to use in unit formatting, the defaults is "short".
     */
 -  unitDisplay?: string;
 +  readonly unitDisplay?: string;
  
    /**
-    * The currency to use in currency formatting. Possible values are the ISO
-@@ -51,7 +37,7 @@ interface BigIntToLocaleStringOptions {
-    * property must be provided. It is only used when [[Style]] has the value
-    * "currency".
+    * The currency to use in currency formatting. Possible values are the ISO 4217 currency codes, such as "USD" for the US dollar, "EUR" for the euro, or "CNY" for the Chinese RMB — see the Current currency & funds code list. There is no default value; if the style is "currency", the currency property must be provided. It is only used when [[Style]] has the value "currency".
     */
 -  currency?: string;
 +  readonly currency?: string;
  
    /**
-    * How to display the currency in currency formatting. It is only used when
-@@ -63,40 +49,19 @@ interface BigIntToLocaleStringOptions {
+    * How to display the currency in currency formatting. It is only used when [[Style]] has the value "currency". The default is "symbol".
+@@ -52,142 +38,37 @@ interface BigIntToLocaleStringOptions {
     *
     * "name" to use a localized currency name such as "dollar"
     */
@@ -70,15 +62,13 @@
 +  readonly currencyDisplay?: string;
  
    /**
-    * Whether to use grouping separators, such as thousands separators or
-    * thousand/lakh/crore separators. The default is true.
+    * Whether to use grouping separators, such as thousands separators or thousand/lakh/crore separators. The default is true.
     */
 -  useGrouping?: boolean;
 +  readonly useGrouping?: boolean;
  
    /**
-    * The minimum number of integer digits to use. Possible values are from 1 to
-    * 21; the default is 1.
+    * The minimum number of integer digits to use. Possible values are from 1 to 21; the default is 1.
     */
 -  minimumIntegerDigits?:
 -    | 1
@@ -105,10 +95,7 @@
 +  readonly minimumIntegerDigits?: UintRange<1, 22>;
  
    /**
-    * The minimum number of fraction digits to use. Possible values are from 0 to
-@@ -105,28 +70,7 @@ interface BigIntToLocaleStringOptions {
-    * {@link http://www.currency-iso.org/en/home/tables/table-a1.html ISO 4217 currency codes list}
-    * (2 if the list doesn't provide that information).
+    * The minimum number of fraction digits to use. Possible values are from 0 to 20; the default for plain number and percent formatting is 0; the default for currency formatting is the number of minor unit digits provided by the {@link http://www.currency-iso.org/en/home/tables/table-a1.html ISO 4217 currency codes list} (2 if the list doesn't provide that information).
     */
 -  minimumFractionDigits?:
 -    | 0
@@ -135,10 +122,7 @@
 +  readonly minimumFractionDigits?: UintRange<0, 21>;
  
    /**
-    * The maximum number of fraction digits to use. Possible values are from 0 to
-@@ -138,82 +82,19 @@ interface BigIntToLocaleStringOptions {
-    * (2 if the list doesn't provide that information); the default for percent
-    * formatting is the larger of minimumFractionDigits and 0.
+    * The maximum number of fraction digits to use. Possible values are from 0 to 20; the default for plain number formatting is the larger of minimumFractionDigits and 3; the default for currency formatting is the larger of minimumFractionDigits and the number of minor unit digits provided by the {@link http://www.currency-iso.org/en/home/tables/table-a1.html ISO 4217 currency codes list} (2 if the list doesn't provide that information); the default for percent formatting is the larger of minimumFractionDigits and 0.
     */
 -  maximumFractionDigits?:
 -    | 0
@@ -165,8 +149,7 @@
 +  readonly maximumFractionDigits?: UintRange<0, 21>;
  
    /**
-    * The minimum number of significant digits to use. Possible values are from 1
-    * to 21; the default is 1.
+    * The minimum number of significant digits to use. Possible values are from 1 to 21; the default is 1.
     */
 -  minimumSignificantDigits?:
 -    | 1
@@ -193,8 +176,7 @@
 +  readonly minimumSignificantDigits?: UintRange<1, 22>;
  
    /**
-    * The maximum number of significant digits to use. Possible values are from 1
-    * to 21; the default is 21.
+    * The maximum number of significant digits to use. Possible values are from 1 to 21; the default is 21.
     */
 -  maximumSignificantDigits?:
 -    | 1
@@ -221,39 +203,40 @@
 +  readonly maximumSignificantDigits?: UintRange<1, 22>;
  
    /**
-    * The formatting that should be displayed for the number, the defaults is
-@@ -227,10 +108,10 @@ interface BigIntToLocaleStringOptions {
+    * The formatting that should be displayed for the number, the defaults is "standard"
+@@ -200,12 +81,12 @@ interface BigIntToLocaleStringOptions {
     *
     *     "compact" string representing exponent, defaults is using the "short" form
     */
 -  notation?: string;
 +  readonly notation?: string;
  
-   /** Used only when notation is "compact" */
+   /**
+    * used only when notation is "compact"
+    */
 -  compactDisplay?: string;
 +  readonly compactDisplay?: string;
  }
  
  interface BigInt {
-@@ -239,7 +120,7 @@ interface BigInt {
-    *
+@@ -213,7 +94,7 @@ interface BigInt {
+    * Returns a string representation of an object.
     * @param radix Specifies a radix for converting numeric values to strings.
     */
 -  toString(radix?: number): string;
 +  toString(radix?: UintRange<2, 37>): string;
  
-   /**
-    * Returns a string representation appropriate to the host environment's
-@@ -267,7 +148,7 @@ interface BigIntConstructor {
+   /** Returns a string representation appropriate to the host environment's current locale. */
+   toLocaleString(
+@@ -237,17 +118,17 @@ interface BigIntConstructor {
     * @param bits The number of low bits to use
     * @param int The BigInt whose bits to extract
     */
 -  asIntN(bits: number, int: bigint): bigint;
 +  asIntN(bits: UintRange<0, 65>, int: bigint): bigint;
    /**
-    * Interprets the low bits of a BigInt as an unsigned integer. All higher bits
-    * are discarded.
-@@ -275,10 +156,10 @@ interface BigIntConstructor {
+    * Interprets the low bits of a BigInt as an unsigned integer.
+    * All higher bits are discarded.
     * @param bits The number of low bits to use
     * @param int The BigInt whose bits to extract
     */
@@ -265,8 +248,8 @@
 +declare const BigInt: BigIntConstructor;
  
  /**
-  * A typed array of 64-bit signed integer values. The contents are initialized
-@@ -289,7 +170,7 @@ interface BigInt64Array<
+  * A typed array of 64-bit signed integer values. The contents are initialized to 0. If the
+@@ -257,7 +138,7 @@ interface BigInt64Array<
    TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
  > {
    /** The size in bytes of each element in the array. */
@@ -275,7 +258,7 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: TArrayBuffer;
-@@ -314,7 +195,7 @@ interface BigInt64Array<
+@@ -280,7 +161,7 @@ interface BigInt64Array<
    copyWithin(target: number, start: number, end?: number): this;
  
    /** Yields index, value pairs for every entry in the array. */
@@ -284,7 +267,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -332,7 +213,7 @@ interface BigInt64Array<
+@@ -296,7 +177,7 @@ interface BigInt64Array<
        index: number,
        array: BigInt64Array<TArrayBuffer>,
      ) => boolean,
@@ -293,7 +276,7 @@
    ): boolean;
  
    /**
-@@ -363,8 +244,8 @@ interface BigInt64Array<
+@@ -321,8 +202,8 @@ interface BigInt64Array<
        value: bigint,
        index: number,
        array: BigInt64Array<TArrayBuffer>,
@@ -304,7 +287,7 @@
    ): BigInt64Array<ArrayBuffer>;
  
    /**
-@@ -385,7 +266,7 @@ interface BigInt64Array<
+@@ -340,7 +221,7 @@ interface BigInt64Array<
        index: number,
        array: BigInt64Array<TArrayBuffer>,
      ) => boolean,
@@ -313,7 +296,7 @@
    ): bigint | undefined;
  
    /**
-@@ -406,7 +287,7 @@ interface BigInt64Array<
+@@ -358,7 +239,7 @@ interface BigInt64Array<
        index: number,
        array: BigInt64Array<TArrayBuffer>,
      ) => boolean,
@@ -322,7 +305,7 @@
    ): number;
  
    /**
-@@ -424,7 +305,7 @@ interface BigInt64Array<
+@@ -374,7 +255,7 @@ interface BigInt64Array<
        index: number,
        array: BigInt64Array<TArrayBuffer>,
      ) => void,
@@ -331,7 +314,7 @@
    ): void;
  
    /**
-@@ -488,7 +369,7 @@ interface BigInt64Array<
+@@ -427,7 +308,7 @@ interface BigInt64Array<
        index: number,
        array: BigInt64Array<TArrayBuffer>,
      ) => bigint,
@@ -340,7 +323,7 @@
    ): BigInt64Array<ArrayBuffer>;
  
    /**
-@@ -616,7 +497,7 @@ interface BigInt64Array<
+@@ -539,7 +420,7 @@ interface BigInt64Array<
        index: number,
        array: BigInt64Array<TArrayBuffer>,
      ) => boolean,
@@ -349,7 +332,7 @@
    ): boolean;
  
    /**
-@@ -638,7 +519,7 @@ interface BigInt64Array<
+@@ -558,7 +439,7 @@ interface BigInt64Array<
  
    /** Converts the array to a string by using the current locale. */
    toLocaleString(
@@ -358,7 +341,7 @@
      options?: Intl.NumberFormatOptions,
    ): string;
  
-@@ -669,14 +550,14 @@ interface BigInt64ArrayConstructor {
+@@ -589,13 +470,13 @@ interface BigInt64ArrayConstructor {
    new (array: ArrayLike<bigint> | ArrayBuffer): BigInt64Array<ArrayBuffer>;
  
    /** The size in bytes of each element in the array. */
@@ -367,7 +350,6 @@
  
    /**
     * Returns a new array from a set of elements.
-    *
     * @param items A set of elements to include in the new array object.
     */
 -  of(...items: bigint[]): BigInt64Array<ArrayBuffer>;
@@ -375,7 +357,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -696,10 +577,10 @@ interface BigInt64ArrayConstructor {
+@@ -613,10 +494,10 @@ interface BigInt64ArrayConstructor {
    from<U>(
      arrayLike: ArrayLike<U>,
      mapfn: (v: U, k: number) => bigint,
@@ -387,8 +369,8 @@
 +declare const BigInt64Array: BigInt64ArrayConstructor;
  
  /**
-  * A typed array of 64-bit unsigned integer values. The contents are initialized
-@@ -710,7 +591,7 @@ interface BigUint64Array<
+  * A typed array of 64-bit unsigned integer values. The contents are initialized to 0. If the
+@@ -626,7 +507,7 @@ interface BigUint64Array<
    TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
  > {
    /** The size in bytes of each element in the array. */
@@ -397,7 +379,7 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: TArrayBuffer;
-@@ -735,7 +616,7 @@ interface BigUint64Array<
+@@ -649,7 +530,7 @@ interface BigUint64Array<
    copyWithin(target: number, start: number, end?: number): this;
  
    /** Yields index, value pairs for every entry in the array. */
@@ -406,7 +388,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -753,7 +634,7 @@ interface BigUint64Array<
+@@ -665,7 +546,7 @@ interface BigUint64Array<
        index: number,
        array: BigUint64Array<TArrayBuffer>,
      ) => boolean,
@@ -415,7 +397,7 @@
    ): boolean;
  
    /**
-@@ -784,8 +665,8 @@ interface BigUint64Array<
+@@ -690,8 +571,8 @@ interface BigUint64Array<
        value: bigint,
        index: number,
        array: BigUint64Array<TArrayBuffer>,
@@ -426,7 +408,7 @@
    ): BigUint64Array<ArrayBuffer>;
  
    /**
-@@ -806,7 +687,7 @@ interface BigUint64Array<
+@@ -709,7 +590,7 @@ interface BigUint64Array<
        index: number,
        array: BigUint64Array<TArrayBuffer>,
      ) => boolean,
@@ -435,7 +417,7 @@
    ): bigint | undefined;
  
    /**
-@@ -827,7 +708,7 @@ interface BigUint64Array<
+@@ -727,7 +608,7 @@ interface BigUint64Array<
        index: number,
        array: BigUint64Array<TArrayBuffer>,
      ) => boolean,
@@ -444,7 +426,7 @@
    ): number;
  
    /**
-@@ -845,7 +726,7 @@ interface BigUint64Array<
+@@ -743,7 +624,7 @@ interface BigUint64Array<
        index: number,
        array: BigUint64Array<TArrayBuffer>,
      ) => void,
@@ -453,7 +435,7 @@
    ): void;
  
    /**
-@@ -909,7 +790,7 @@ interface BigUint64Array<
+@@ -796,7 +677,7 @@ interface BigUint64Array<
        index: number,
        array: BigUint64Array<TArrayBuffer>,
      ) => bigint,
@@ -462,7 +444,7 @@
    ): BigUint64Array<ArrayBuffer>;
  
    /**
-@@ -1037,7 +918,7 @@ interface BigUint64Array<
+@@ -908,7 +789,7 @@ interface BigUint64Array<
        index: number,
        array: BigUint64Array<TArrayBuffer>,
      ) => boolean,
@@ -471,7 +453,7 @@
    ): boolean;
  
    /**
-@@ -1059,7 +940,7 @@ interface BigUint64Array<
+@@ -927,7 +808,7 @@ interface BigUint64Array<
  
    /** Converts the array to a string by using the current locale. */
    toLocaleString(
@@ -480,7 +462,7 @@
      options?: Intl.NumberFormatOptions,
    ): string;
  
-@@ -1092,14 +973,14 @@ interface BigUint64ArrayConstructor {
+@@ -960,13 +841,13 @@ interface BigUint64ArrayConstructor {
    new (array: ArrayLike<bigint> | ArrayBuffer): BigUint64Array<ArrayBuffer>;
  
    /** The size in bytes of each element in the array. */
@@ -489,7 +471,6 @@
  
    /**
     * Returns a new array from a set of elements.
-    *
     * @param items A set of elements to include in the new array object.
     */
 -  of(...items: bigint[]): BigUint64Array<ArrayBuffer>;
@@ -497,7 +478,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -1112,10 +993,10 @@ interface BigUint64ArrayConstructor {
+@@ -978,10 +859,10 @@ interface BigUint64ArrayConstructor {
    from<U>(
      arrayLike: ArrayLike<U>,
      mapfn: (v: U, k: number) => bigint,

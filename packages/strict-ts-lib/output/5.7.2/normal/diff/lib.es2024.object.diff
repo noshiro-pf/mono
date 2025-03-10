@@ -19,7 +19,7 @@
  
  interface ObjectConstructor {
    /**
-@@ -26,5 +12,5 @@ interface ObjectConstructor {
+@@ -24,5 +10,5 @@ interface ObjectConstructor {
    groupBy<K extends PropertyKey, T>(
      items: Iterable<T>,
      keySelector: (item: T, index: number) => K,
