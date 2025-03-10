@@ -1,3 +1,3 @@
-import { openDiffInCode } from '../functions/open-diff-in-code.mjs';
+import { openDiffInCode } from '../functions/index.mjs';
 
 await openDiffInCode('branded');

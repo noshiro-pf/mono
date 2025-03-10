@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - packages/strict-ts-lib/**
+      - packages/utils/codemod-lib/**
       - .github/workflows/strict-ts-lib-gen-check.yaml
     branches-ignore:
       - 'develop'

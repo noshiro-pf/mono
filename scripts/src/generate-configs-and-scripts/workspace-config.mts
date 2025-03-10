@@ -354,14 +354,6 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
   }),
 
   'strict-ts-lib': produce(defaultsForUtil, (draft) => {
-    draft.useVite = false;
-
-    if (draft.tsconfig === undefined) {
-      draft.tsconfig = { compilerOptions: { types: ['node'] } };
-    } else {
-      draft.tsconfig.compilerOptions = { types: ['node'] };
-    }
-
     draft.gen = {
       typeCheck: true,
       build: false,
