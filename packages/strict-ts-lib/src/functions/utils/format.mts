@@ -9,7 +9,10 @@ import {
   ignoreFormatting,
 } from '../formatter-config.mjs';
 
-await prettier.clearConfigCache();
+// NOTE: prettier CLI で実行するとき file path を複数の glob 文字列で与えることができず、
+// glob で展開した絶対パスを渡しても長すぎてエラーになってしまったため、
+// prettier.format API を直接呼ぶ実装に変更した。
+// これに伴い strict-ts-lib workspace 用の .prettierrc ファイル等は削除した。
 
 export const formatFiles = async (
   absolutePaths: readonly string[],
