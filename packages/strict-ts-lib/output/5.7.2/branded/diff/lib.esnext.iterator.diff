@@ -30,8 +30,8 @@
    abstract next(value?: TNext): IteratorResult<T, TResult>;
  }
  
-@@ -50,7 +35,7 @@ declare global {
-      *   to transform values from the underlying iterator.
+@@ -49,7 +34,7 @@ declare global {
+      * @param callbackfn A function that accepts up to two arguments to be used to transform values from the underlying iterator.
       */
      map<U>(
 -      callbackfn: (value: T, index: number) => U,
@@ -39,8 +39,8 @@
      ): IteratorObject<U, undefined, unknown>;
  
      /**
-@@ -61,7 +46,7 @@ declare global {
-      *   to test values from the underlying iterator.
+@@ -57,7 +42,7 @@ declare global {
+      * @param predicate A function that accepts up to two arguments to be used to test values from the underlying iterator.
       */
      filter<S extends T>(
 -      predicate: (value: T, index: number) => value is S,
@@ -48,8 +48,8 @@
      ): IteratorObject<S, undefined, unknown>;
  
      /**
-@@ -72,7 +57,7 @@ declare global {
-      *   to test values from the underlying iterator.
+@@ -65,20 +50,24 @@ declare global {
+      * @param predicate A function that accepts up to two arguments to be used to test values from the underlying iterator.
       */
      filter(
 -      predicate: (value: T, index: number) => unknown,
@@ -57,8 +57,7 @@
      ): IteratorObject<T, undefined, unknown>;
  
      /**
-@@ -81,7 +66,9 @@ declare global {
-      *
+      * Creates an iterator whose values are the values from this iterator, stopping once the provided limit is reached.
       * @param limit The maximum number of values to yield.
       */
 -    take(limit: number): IteratorObject<T, undefined, unknown>;
@@ -67,9 +66,7 @@
 +    ): IteratorObject<T, undefined, unknown>;
  
      /**
-      * Creates an iterator whose values are the values from this iterator after
-@@ -89,7 +76,9 @@ declare global {
-      *
+      * Creates an iterator whose values are the values from this iterator after skipping the provided count.
       * @param count The number of values to drop.
       */
 -    drop(count: number): IteratorObject<T, undefined, unknown>;
@@ -78,8 +75,8 @@
 +    ): IteratorObject<T, undefined, unknown>;
  
      /**
-      * Creates an iterator whose values are the result of applying the callback
-@@ -103,7 +92,7 @@ declare global {
+      * Creates an iterator whose values are the result of applying the callback to the values from this iterator and then flattening the resulting iterators or iterables.
+@@ -87,7 +76,7 @@ declare global {
      flatMap<U>(
        callback: (
          value: T,
@@ -88,7 +85,7 @@
        ) => Iterator<U, unknown, undefined> | Iterable<U, unknown, undefined>,
      ): IteratorObject<U, undefined, unknown>;
  
-@@ -125,14 +114,14 @@ declare global {
+@@ -100,14 +89,14 @@ declare global {
        callbackfn: (
          previousValue: T,
          currentValue: T,
@@ -105,7 +102,7 @@
        ) => T,
        initialValue: T,
      ): T;
-@@ -155,13 +144,13 @@ declare global {
+@@ -121,7 +110,7 @@ declare global {
        callbackfn: (
          previousValue: U,
          currentValue: T,
@@ -114,25 +111,25 @@
        ) => U,
        initialValue: U,
      ): U;
- 
-     /** Creates a new array from the values yielded by this iterator. */
+@@ -129,13 +118,13 @@ declare global {
+     /**
+      * Creates a new array from the values yielded by this iterator.
+      */
 -    toArray(): T[];
 +    toArray(): readonly T[];
  
      /**
       * Performs the specified action for each element in the iterator.
-@@ -170,7 +159,7 @@ declare global {
-      *   calls the callbackfn function one time for each element in the
-      *   iterator.
+      * @param callbackfn  A function that accepts up to two arguments. forEach calls the callbackfn function one time for each element in the iterator.
       */
 -    forEach(callbackfn: (value: T, index: number) => void): void;
 +    forEach(callbackfn: (value: T, index: NumberType.ArraySize) => void): void;
  
      /**
-      * Determines whether the specified callback function returns true for any
-@@ -181,7 +170,9 @@ declare global {
-      *   until the predicate returns a value true, or until the end of the
-      *   iterator.
+      * Determines whether the specified callback function returns true for any element of this iterator.
+@@ -143,7 +132,9 @@ declare global {
+      * the predicate function for each element in this iterator until the predicate returns a value
+      * true, or until the end of the iterator.
       */
 -    some(predicate: (value: T, index: number) => unknown): boolean;
 +    some(
@@ -140,10 +137,10 @@
 +    ): boolean;
  
      /**
-      * Determines whether all the members of this iterator satisfy the specified
-@@ -191,7 +182,9 @@ declare global {
-      *   method calls the predicate function for each element in this iterator
-      *   until the predicate returns false, or until the end of this iterator.
+      * Determines whether all the members of this iterator satisfy the specified test.
+@@ -151,7 +142,9 @@ declare global {
+      * the predicate function for each element in this iterator until the predicate returns
+      * false, or until the end of this iterator.
       */
 -    every(predicate: (value: T, index: number) => unknown): boolean;
 +    every(
@@ -151,9 +148,9 @@
 +    ): boolean;
  
      /**
-      * Returns the value of the first element in this iterator where predicate
-@@ -203,9 +196,11 @@ declare global {
-      *   Otherwise, find returns undefined.
+      * Returns the value of the first element in this iterator where predicate is true, and undefined
+@@ -161,9 +154,11 @@ declare global {
+      * immediately returns that element value. Otherwise, find returns undefined.
       */
      find<S extends T>(
 -      predicate: (value: T, index: number) => value is S,
@@ -166,7 +163,7 @@
  
      readonly [Symbol.toStringTag]: string;
    }
-@@ -224,5 +219,5 @@ declare global {
+@@ -180,5 +175,5 @@ declare global {
      ): IteratorObject<T, undefined, unknown>;
    }
  

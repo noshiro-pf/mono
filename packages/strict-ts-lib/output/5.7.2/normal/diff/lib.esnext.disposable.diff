@@ -26,7 +26,7 @@
  
  interface SymbolConstructor {
    /**
-@@ -42,16 +28,16 @@ interface AsyncDisposable {
+@@ -40,16 +26,16 @@ interface AsyncDisposable {
  }
  
  interface SuppressedError extends Error {
@@ -47,8 +47,8 @@
 +declare const SuppressedError: SuppressedErrorConstructor;
  
  interface DisposableStack {
-   /** Returns a value indicating whether this stack has been disposed. */
-@@ -120,7 +106,7 @@ interface DisposableStackConstructor {
+   /**
+@@ -116,7 +102,7 @@ interface DisposableStackConstructor {
    new (): DisposableStack;
    readonly prototype: DisposableStack;
  }
@@ -56,8 +56,8 @@
 +declare const DisposableStack: DisposableStackConstructor;
  
  interface AsyncDisposableStack {
-   /** Returns a value indicating whether this stack has been disposed. */
-@@ -190,7 +176,7 @@ interface AsyncDisposableStackConstructor {
+   /**
+@@ -183,7 +169,7 @@ interface AsyncDisposableStackConstructor {
    new (): AsyncDisposableStack;
    readonly prototype: AsyncDisposableStack;
  }

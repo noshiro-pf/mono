@@ -1,4 +1,4 @@
-@@ -1,23 +1,9 @@
+@@ -1,25 +1,11 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -18,7 +18,9 @@
 +/// <reference types="@noshiro/ts-type-utils" />
  
  interface PromiseConstructor {
-   /** A reference to the prototype. */
+   /**
+    * A reference to the prototype.
+    */
 -  readonly prototype: Promise<any>;
 +  readonly prototype: Promise<unknown>;
  
@@ -33,7 +35,7 @@
      ) => void,
    ): Promise<T>;
  
-@@ -41,7 +27,7 @@ interface PromiseConstructor {
+@@ -40,7 +26,7 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
@@ -42,7 +44,7 @@
      values: T,
    ): Promise<{ -readonly [P in keyof T]: Awaited<T[P]> }>;
  
-@@ -55,7 +41,7 @@ interface PromiseConstructor {
+@@ -53,7 +39,7 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
@@ -51,7 +53,7 @@
      values: T,
    ): Promise<Awaited<T[number]>>;
  
-@@ -68,7 +54,7 @@ interface PromiseConstructor {
+@@ -65,7 +51,7 @@ interface PromiseConstructor {
     * @param reason The reason the promise was rejected.
     * @returns A new rejected Promise.
     */
@@ -60,7 +62,7 @@
  
    /**
     * Creates a new resolved promise.
-@@ -92,4 +78,4 @@ interface PromiseConstructor {
+@@ -86,4 +72,4 @@ interface PromiseConstructor {
    resolve<T>(value: T | PromiseLike<T>): Promise<Awaited<T>>;
  }
  

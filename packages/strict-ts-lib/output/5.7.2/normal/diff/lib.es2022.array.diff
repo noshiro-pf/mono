@@ -19,27 +19,27 @@
  
  interface Array<T> {
    /**
-@@ -42,7 +28,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param index The zero-based index of the desired code unit. A negative
-    *   index will count back from the last item.
+@@ -36,7 +22,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
     */
 -  at(index: number): number | undefined;
 +  at(index: number): Int8 | undefined;
  }
  
  interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -52,7 +38,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param index The zero-based index of the desired code unit. A negative
-    *   index will count back from the last item.
+@@ -44,7 +30,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
     */
 -  at(index: number): number | undefined;
 +  at(index: number): Uint8 | undefined;
  }
  
  interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
-@@ -62,7 +48,7 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
-    * @param index The zero-based index of the desired code unit. A negative
-    *   index will count back from the last item.
+@@ -52,7 +38,7 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
     */
 -  at(index: number): number | undefined;
 +  at(index: number): Uint8 | undefined;

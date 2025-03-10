@@ -20,8 +20,8 @@ and limitations under the License.
 
 interface SymbolConstructor {
   /**
-   * A regular expression method that matches the regular expression against a
-   * string. Called by the String.prototype.matchAll method.
+   * A regular expression method that matches the regular expression against a string. Called
+   * by the String.prototype.matchAll method.
    */
   readonly matchAll: unique symbol;
 }
@@ -33,9 +33,8 @@ interface RegExpStringIterator<T>
 
 interface RegExp {
   /**
-   * Matches a string with this regular expression, and returns an iterable of
-   * matches containing the results of that search.
-   *
+   * Matches a string with this regular expression, and returns an iterable of matches
+   * containing the results of that search.
    * @param string A string to search within.
    */
   [Symbol.matchAll](str: string): RegExpStringIterator<RegExpMatchArray>;

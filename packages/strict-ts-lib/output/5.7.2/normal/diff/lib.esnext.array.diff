@@ -19,7 +19,7 @@
  
  interface ArrayConstructor {
    /**
-@@ -42,6 +28,6 @@ interface ArrayConstructor {
+@@ -38,6 +24,6 @@ interface ArrayConstructor {
    fromAsync<T, U>(
      iterableOrArrayLike: AsyncIterable<T> | Iterable<T> | ArrayLike<T>,
      mapFn: (value: Awaited<T>, index: number) => U,

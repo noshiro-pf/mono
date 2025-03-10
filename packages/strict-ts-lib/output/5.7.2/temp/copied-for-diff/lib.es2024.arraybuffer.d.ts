@@ -17,8 +17,7 @@ and limitations under the License.
 
 interface ArrayBuffer {
   /**
-   * If this ArrayBuffer is resizable, returns the maximum byte length given
-   * during construction; returns the byte length if not.
+   * If this ArrayBuffer is resizable, returns the maximum byte length given during construction; returns the byte length if not.
    *
    * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/maxByteLength)
    */
@@ -39,24 +38,21 @@ interface ArrayBuffer {
   resize(newByteLength?: number): void;
 
   /**
-   * Returns a boolean indicating whether or not this buffer has been detached
-   * (transferred).
+   * Returns a boolean indicating whether or not this buffer has been detached (transferred).
    *
    * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/detached)
    */
   get detached(): boolean;
 
   /**
-   * Creates a new ArrayBuffer with the same byte content as this buffer, then
-   * detaches this buffer.
+   * Creates a new ArrayBuffer with the same byte content as this buffer, then detaches this buffer.
    *
    * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/transfer)
    */
   transfer(newByteLength?: number): ArrayBuffer;
 
   /**
-   * Creates a new non-resizable ArrayBuffer with the same byte content as this
-   * buffer, then detaches this buffer.
+   * Creates a new non-resizable ArrayBuffer with the same byte content as this buffer, then detaches this buffer.
    *
    * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/transferToFixedLength)
    */

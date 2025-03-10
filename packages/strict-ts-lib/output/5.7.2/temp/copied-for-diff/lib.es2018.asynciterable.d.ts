@@ -20,8 +20,8 @@ and limitations under the License.
 
 interface SymbolConstructor {
   /**
-   * A method that returns the default async iterator for an object. Called by
-   * the semantics of the for-await-of statement.
+   * A method that returns the default async iterator for an object. Called by the semantics of
+   * the for-await-of statement.
    */
   readonly asyncIterator: unique symbol;
 }
@@ -39,15 +39,16 @@ interface AsyncIterable<T, TReturn = any, TNext = any> {
   [Symbol.asyncIterator](): AsyncIterator<T, TReturn, TNext>;
 }
 
-/** Describes a user-defined {@link AsyncIterator} that is also async iterable. */
+/**
+ * Describes a user-defined {@link AsyncIterator} that is also async iterable.
+ */
 interface AsyncIterableIterator<T, TReturn = any, TNext = any>
   extends AsyncIterator<T, TReturn, TNext> {
   [Symbol.asyncIterator](): AsyncIterableIterator<T, TReturn, TNext>;
 }
 
 /**
- * Describes an {@link AsyncIterator} produced by the runtime that inherits from
- * the intrinsic `AsyncIterator.prototype`.
+ * Describes an {@link AsyncIterator} produced by the runtime that inherits from the intrinsic `AsyncIterator.prototype`.
  */
 interface AsyncIteratorObject<T, TReturn = unknown, TNext = unknown>
   extends AsyncIterator<T, TReturn, TNext> {
