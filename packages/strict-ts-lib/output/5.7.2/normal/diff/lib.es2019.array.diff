@@ -16,7 +16,7 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  type FlatArray<Arr, Depth extends number> = {
 -  done: Arr;
 -  recur: Arr extends ReadonlyArray<infer InnerArr>
@@ -38,7 +38,7 @@
        >
      : Arr;
  }[Depth extends -1 ? 'done' : 'recur'];
-@@ -60,7 +46,7 @@ interface ReadonlyArray<T> {
+@@ -64,7 +50,7 @@ interface ReadonlyArray<T> {
        this: This,
        value: T,
        index: number,
@@ -47,7 +47,7 @@
      ) => U | ReadonlyArray<U>,
      thisArg?: This,
    ): U[];
-@@ -85,7 +71,7 @@ interface Array<T> {
+@@ -94,7 +80,7 @@ interface Array<T> {
        this: This,
        value: T,
        index: number,

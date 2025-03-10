@@ -1,4 +1,4 @@
-@@ -1,23 +1,9 @@
+@@ -1,25 +1,11 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -16,12 +16,14 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  interface PromiseConstructor {
-   /** A reference to the prototype. */
+   /**
+    * A reference to the prototype.
+    */
 -  readonly prototype: Promise<any>;
 +  readonly prototype: Promise<unknown>;
- 
+
    /**
     * Creates a new Promise.
 @@ -27,7 +13,7 @@ interface PromiseConstructor {
@@ -32,8 +34,8 @@
 +      reject: (reason?: unknown) => void,
      ) => void,
    ): Promise<T>;
- 
-@@ -37,7 +23,7 @@ interface PromiseConstructor {
+
+@@ -40,7 +26,7 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
@@ -41,8 +43,8 @@
 +  all<T extends readonly unknown[] | readonly []>(
      values: T,
    ): Promise<{ -readonly [P in keyof T]: Awaited<T[P]> }>;
- 
-@@ -50,7 +36,7 @@ interface PromiseConstructor {
+
+@@ -53,7 +39,7 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
@@ -50,19 +52,19 @@
 +  race<T extends readonly unknown[] | readonly []>(
      values: T,
    ): Promise<Awaited<T[number]>>;
- 
-@@ -63,7 +49,7 @@ interface PromiseConstructor {
+
+@@ -65,7 +51,7 @@ interface PromiseConstructor {
     * @param reason The reason the promise was rejected.
     * @returns A new rejected Promise.
     */
 -  reject<T = never>(reason?: any): Promise<T>;
 +  reject<T = never>(reason?: unknown): Promise<T>;
- 
+
    /**
     * Creates a new resolved promise.
-@@ -87,4 +73,4 @@ interface PromiseConstructor {
+@@ -86,4 +72,4 @@ interface PromiseConstructor {
    resolve<T>(value: T | PromiseLike<T>): Promise<Awaited<T>>;
  }
- 
+
 -declare var Promise: PromiseConstructor;
 +declare const Promise: PromiseConstructor;

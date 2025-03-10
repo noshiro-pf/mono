@@ -19,9 +19,9 @@
  
  interface Array<T> {
    /**
-@@ -24,7 +10,10 @@ interface Array<T> {
-    * @param fromIndex The position in this array at which to begin searching for
-    *   searchElement.
+@@ -21,7 +7,10 @@ interface Array<T> {
+    * @param searchElement The element to search for.
+    * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
 -  includes(searchElement: T, fromIndex?: number): boolean;
 +  includes(
@@ -31,9 +31,9 @@
  }
  
  interface ReadonlyArray<T> {
-@@ -36,7 +25,10 @@ interface ReadonlyArray<T> {
-    * @param fromIndex The position in this array at which to begin searching for
-    *   searchElement.
+@@ -30,7 +19,10 @@ interface ReadonlyArray<T> {
+    * @param searchElement The element to search for.
+    * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
 -  includes(searchElement: T, fromIndex?: number): boolean;
 +  includes(
@@ -43,9 +43,9 @@
  }
  
  interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -48,7 +40,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param fromIndex The position in this array at which to begin searching for
-    *   searchElement.
+@@ -39,7 +31,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param searchElement The element to search for.
+    * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
 -  includes(searchElement: number, fromIndex?: number): boolean;
 +  includes(
@@ -55,9 +55,9 @@
  }
  
  interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -60,7 +55,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param fromIndex The position in this array at which to begin searching for
-    *   searchElement.
+@@ -48,7 +43,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param searchElement The element to search for.
+    * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
 -  includes(searchElement: number, fromIndex?: number): boolean;
 +  includes(
@@ -67,9 +67,9 @@
  }
  
  interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
-@@ -72,7 +70,10 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
-    * @param fromIndex The position in this array at which to begin searching for
-    *   searchElement.
+@@ -57,7 +55,10 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+    * @param searchElement The element to search for.
+    * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
 -  includes(searchElement: number, fromIndex?: number): boolean;
 +  includes(
@@ -79,9 +79,9 @@
  }
  
  interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -84,7 +85,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param fromIndex The position in this array at which to begin searching for
-    *   searchElement.
+@@ -66,7 +67,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param searchElement The element to search for.
+    * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
 -  includes(searchElement: number, fromIndex?: number): boolean;
 +  includes(
@@ -91,9 +91,9 @@
  }
  
  interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -96,7 +100,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param fromIndex The position in this array at which to begin searching for
-    *   searchElement.
+@@ -75,7 +79,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param searchElement The element to search for.
+    * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
 -  includes(searchElement: number, fromIndex?: number): boolean;
 +  includes(
@@ -103,9 +103,9 @@
  }
  
  interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -108,7 +115,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param fromIndex The position in this array at which to begin searching for
-    *   searchElement.
+@@ -84,7 +91,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param searchElement The element to search for.
+    * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
 -  includes(searchElement: number, fromIndex?: number): boolean;
 +  includes(
@@ -115,9 +115,9 @@
  }
  
  interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -120,7 +130,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param fromIndex The position in this array at which to begin searching for
-    *   searchElement.
+@@ -93,7 +103,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param searchElement The element to search for.
+    * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
 -  includes(searchElement: number, fromIndex?: number): boolean;
 +  includes(
@@ -127,9 +127,9 @@
  }
  
  interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -132,7 +145,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param fromIndex The position in this array at which to begin searching for
-    *   searchElement.
+@@ -102,7 +115,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param searchElement The element to search for.
+    * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
 -  includes(searchElement: number, fromIndex?: number): boolean;
 +  includes(
@@ -139,9 +139,9 @@
  }
  
  interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -144,5 +160,8 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param fromIndex The position in this array at which to begin searching for
-    *   searchElement.
+@@ -111,5 +127,8 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param searchElement The element to search for.
+    * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
 -  includes(searchElement: number, fromIndex?: number): boolean;
 +  includes(

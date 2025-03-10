@@ -16,17 +16,18 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
 -/// <reference lib="es2015.symbol" />
 -/// <reference lib="es2015.iterable" />
 +/// <reference path="./lib.es2015.symbol.d.ts" />
 +/// <reference path="./lib.es2015.iterable.d.ts" />
- 
+
  interface SymbolConstructor {
-   /** A method that returns the default async iterator for an object. Called by the semantics of the for-await-of statement. */
+   /**
+@@ -26,23 +12,25 @@ interface SymbolConstructor {
    readonly asyncIterator: unique symbol;
  }
- 
+
 -interface AsyncIterator<T, TReturn = any, TNext = any> {
 +interface AsyncIterator<T, TReturn = any, TNext = unknown> {
    // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
@@ -40,20 +41,24 @@
 -  throw?(e?: any): Promise<IteratorResult<T, TReturn>>;
 +  throw?(e?: unknown): Promise<IteratorResult<T, TReturn>>;
  }
- 
+
 -interface AsyncIterable<T, TReturn = any, TNext = any> {
 +interface AsyncIterable<T, TReturn = any, TNext = unknown> {
    [Symbol.asyncIterator](): AsyncIterator<T, TReturn, TNext>;
  }
- 
- /** Describes a user-defined {@link AsyncIterator} that is also async iterable. */
+
+ /**
+  * Describes a user-defined {@link AsyncIterator} that is also async iterable.
+  */
 -interface AsyncIterableIterator<T, TReturn = any, TNext = any>
 +interface AsyncIterableIterator<T, TReturn = any, TNext = unknown>
    extends AsyncIterator<T, TReturn, TNext> {
    [Symbol.asyncIterator](): AsyncIterableIterator<T, TReturn, TNext>;
  }
- 
- /** Describes an {@link AsyncIterator} produced by the runtime that inherits from the intrinsic `AsyncIterator.prototype`. */
+@@ -50,7 +38,7 @@ interface AsyncIterableIterator<T, TReturn = any, TNext = any>
+ /**
+  * Describes an {@link AsyncIterator} produced by the runtime that inherits from the intrinsic `AsyncIterator.prototype`.
+  */
 -interface AsyncIteratorObject<T, TReturn = unknown, TNext = unknown>
 +interface AsyncIteratorObject<T, TReturn = any, TNext = unknown>
    extends AsyncIterator<T, TReturn, TNext> {

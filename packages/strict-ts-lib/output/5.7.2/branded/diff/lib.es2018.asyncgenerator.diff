@@ -36,35 +36,33 @@
    [Symbol.asyncIterator](): AsyncGenerator<T, TReturn, TNext>;
  }
  
-@@ -34,13 +22,13 @@ interface AsyncGeneratorFunction {
-    *
+@@ -33,12 +21,12 @@ interface AsyncGeneratorFunction {
+    * Creates a new AsyncGenerator object.
     * @param args A list of arguments the function accepts.
     */
 -  new (...args: any[]): AsyncGenerator;
 +  new (...args: readonly unknown[]): AsyncGenerator;
    /**
     * Creates a new AsyncGenerator object.
-    *
     * @param args A list of arguments the function accepts.
     */
 -  (...args: any[]): AsyncGenerator;
 +  (...args: readonly unknown[]): AsyncGenerator;
-   /** The length of the arguments. */
-   readonly length: number;
-   /** Returns the name of the function. */
-@@ -55,13 +43,13 @@ interface AsyncGeneratorFunctionConstructor {
-    *
+   /**
+    * The length of the arguments.
+    */
+@@ -58,12 +46,12 @@ interface AsyncGeneratorFunctionConstructor {
+    * Creates a new AsyncGenerator function.
     * @param args A list of arguments the function accepts.
     */
 -  new (...args: string[]): AsyncGeneratorFunction;
 +  new (...args: readonly string[]): AsyncGeneratorFunction;
    /**
     * Creates a new AsyncGenerator function.
-    *
     * @param args A list of arguments the function accepts.
     */
 -  (...args: string[]): AsyncGeneratorFunction;
 +  (...args: readonly string[]): AsyncGeneratorFunction;
-   /** The length of the arguments. */
-   readonly length: number;
-   /** Returns the name of the function. */
+   /**
+    * The length of the arguments.
+    */

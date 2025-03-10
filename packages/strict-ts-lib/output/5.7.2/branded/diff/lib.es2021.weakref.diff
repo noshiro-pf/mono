@@ -16,42 +16,42 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
 -/// <reference lib="es2015.symbol.wellknown" />
 +/// <reference path="./lib.es2015.symbol.wellknown.d.ts" />
- 
+
  interface WeakRef<T extends WeakKey> {
    readonly [Symbol.toStringTag]: 'WeakRef';
 @@ -25,7 +11,7 @@ interface WeakRef<T extends WeakKey> {
  }
- 
+
  interface WeakRefConstructor {
 -  readonly prototype: WeakRef<any>;
 +  readonly prototype: WeakRef<object>;
- 
+
    /**
-    * Creates a WeakRef instance for the given target value. In es2023 the value can be either a symbol or an object, in previous versions only object is permissible.
-@@ -35,7 +21,7 @@ interface WeakRefConstructor {
+    * Creates a WeakRef instance for the given target value.
+@@ -39,7 +25,7 @@ interface WeakRefConstructor {
    new <T extends WeakKey>(target: T): WeakRef<T>;
  }
- 
+
 -declare var WeakRef: WeakRefConstructor;
 +declare const WeakRef: WeakRefConstructor;
- 
+
  interface FinalizationRegistry<T> {
    readonly [Symbol.toStringTag]: 'FinalizationRegistry';
-@@ -58,7 +44,7 @@ interface FinalizationRegistry<T> {
+@@ -65,7 +51,7 @@ interface FinalizationRegistry<T> {
  }
- 
+
  interface FinalizationRegistryConstructor {
 -  readonly prototype: FinalizationRegistry<any>;
 +  readonly prototype: FinalizationRegistry<unknown>;
- 
+
    /**
     * Creates a finalization registry with an associated cleanup callback
-@@ -68,4 +54,4 @@ interface FinalizationRegistryConstructor {
+@@ -74,4 +60,4 @@ interface FinalizationRegistryConstructor {
    new <T>(cleanupCallback: (heldValue: T) => void): FinalizationRegistry<T>;
  }
- 
+
 -declare var FinalizationRegistry: FinalizationRegistryConstructor;
 +declare const FinalizationRegistry: FinalizationRegistryConstructor;

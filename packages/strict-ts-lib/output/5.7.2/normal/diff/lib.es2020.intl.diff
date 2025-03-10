@@ -16,13 +16,13 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
 -/// <reference lib="es2018.intl" />
 +/// <reference path="./lib.es2018.intl.d.ts" />
  declare namespace Intl {
    /**
     * A string that is a valid [Unicode BCP 47 Locale Identifier](https://unicode.org/reports/tr35/#Unicode_locale_identifier).
-@@ -103,11 +89,11 @@ declare namespace Intl {
+@@ -108,11 +94,11 @@ declare namespace Intl {
     */
    interface RelativeTimeFormatOptions {
      /** The locale matching algorithm to use. For information about this option, see [Intl page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
@@ -35,9 +35,9 @@
 -    style?: RelativeTimeFormatStyle;
 +    readonly style?: RelativeTimeFormatStyle;
    }
- 
+
    /**
-@@ -116,10 +102,10 @@ declare namespace Intl {
+@@ -123,10 +109,10 @@ declare namespace Intl {
     * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/resolvedOptions#Description).
     */
    interface ResolvedRelativeTimeFormatOptions {
@@ -50,9 +50,9 @@
 +    readonly numeric: RelativeTimeFormatNumeric;
 +    readonly numberingSystem: string;
    }
- 
+
    /**
-@@ -129,13 +115,13 @@ declare namespace Intl {
+@@ -137,13 +123,13 @@ declare namespace Intl {
     */
    type RelativeTimeFormatPart =
      | {
@@ -69,21 +69,21 @@
 +        readonly value: string;
 +        readonly unit: RelativeTimeFormatUnitSingular;
        };
- 
+
    interface RelativeTimeFormat {
-@@ -215,64 +201,64 @@ declare namespace Intl {
+@@ -248,64 +234,64 @@ declare namespace Intl {
    };
- 
+
    interface NumberFormatOptionsStyleRegistry {
 -    unit: never;
 +    readonly unit: never;
    }
- 
+
    interface NumberFormatOptionsCurrencyDisplayRegistry {
 -    narrowSymbol: never;
 +    readonly narrowSymbol: never;
    }
- 
+
    interface NumberFormatOptionsSignDisplayRegistry {
 -    auto: never;
 -    never: never;
@@ -94,10 +94,10 @@
 +    readonly always: never;
 +    readonly exceptZero: never;
    }
- 
+
    type NumberFormatOptionsSignDisplay =
      keyof NumberFormatOptionsSignDisplayRegistry;
- 
+
    interface NumberFormatOptions {
 -    numberingSystem?: string | undefined;
 -    compactDisplay?: 'short' | 'long' | undefined;
@@ -119,7 +119,7 @@
 +    readonly unitDisplay?: 'short' | 'long' | 'narrow' | undefined;
 +    readonly currencySign?: 'standard' | 'accounting' | undefined;
    }
- 
+
    interface ResolvedNumberFormatOptions {
 -    compactDisplay?: 'short' | 'long';
 -    notation: 'standard' | 'scientific' | 'engineering' | 'compact';
@@ -134,7 +134,7 @@
 +    readonly unitDisplay?: 'short' | 'long' | 'narrow';
 +    readonly currencySign?: 'standard' | 'accounting';
    }
- 
+
    interface NumberFormatPartTypeRegistry {
 -    compact: never;
 -    exponentInteger: never;
@@ -149,7 +149,7 @@
 +    readonly unit: never;
 +    readonly unknown: never;
    }
- 
+
    interface DateTimeFormatOptions {
 -    calendar?: string | undefined;
 -    dayPeriod?: 'narrow' | 'short' | 'long' | undefined;
@@ -157,7 +157,7 @@
 +    readonly calendar?: string | undefined;
 +    readonly dayPeriod?: 'narrow' | 'short' | 'long' | undefined;
 +    readonly numberingSystem?: string | undefined;
- 
+
 -    dateStyle?: 'full' | 'long' | 'medium' | 'short' | undefined;
 -    timeStyle?: 'full' | 'long' | 'medium' | 'short' | undefined;
 -    hourCycle?: 'h11' | 'h12' | 'h23' | 'h24' | undefined;
@@ -165,10 +165,10 @@
 +    readonly timeStyle?: 'full' | 'long' | 'medium' | 'short' | undefined;
 +    readonly hourCycle?: 'h11' | 'h12' | 'h23' | 'h24' | undefined;
    }
- 
+
    type LocaleHourCycleKey = 'h12' | 'h23' | 'h11' | 'h24';
-@@ -280,32 +266,32 @@ declare namespace Intl {
- 
+@@ -313,32 +299,32 @@ declare namespace Intl {
+
    interface LocaleOptions {
      /** A string containing the language, and the script and region if available. */
 -    baseName?: string;
@@ -201,7 +201,7 @@
 -    script?: string;
 +    readonly script?: string;
    }
- 
+
    interface Locale extends LocaleOptions {
      /** A string containing the language, and the script and region if available. */
 -    baseName: string;
@@ -212,9 +212,9 @@
      /** Gets the most likely values for the language, script, and region of the locale based on existing values. */
      maximize(): Locale;
      /** Attempts to remove information about the locale that would be added by calling `Locale.maximize()`. */
-@@ -343,19 +329,19 @@ declare namespace Intl {
+@@ -381,19 +367,19 @@ declare namespace Intl {
    type DisplayNamesLanguageDisplay = 'dialect' | 'standard';
- 
+
    interface DisplayNamesOptions {
 -    localeMatcher?: RelativeTimeFormatLocaleMatcher;
 -    style?: RelativeTimeFormatStyle;
@@ -227,7 +227,7 @@
 +    readonly languageDisplay?: DisplayNamesLanguageDisplay;
 +    readonly fallback?: DisplayNamesFallback;
    }
- 
+
    interface ResolvedDisplayNamesOptions {
 -    locale: UnicodeBCP47LocaleIdentifier;
 -    style: RelativeTimeFormatStyle;
@@ -240,18 +240,18 @@
 +    readonly fallback: DisplayNamesFallback;
 +    readonly languageDisplay?: DisplayNamesLanguageDisplay;
    }
- 
+
    interface DisplayNames {
-@@ -387,7 +373,7 @@ declare namespace Intl {
+@@ -429,7 +415,7 @@ declare namespace Intl {
     * [Compatibility](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames#browser_compatibility).
     */
    const DisplayNames: {
 -    prototype: DisplayNames;
 +    readonly prototype: DisplayNames;
- 
+
      /**
-      * @param locales A string with a BCP 47 language tag, or an array of such strings. For the general form and interpretation of the `locales` argument, see the [Intl](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#locale_identification_and_negotiation) page.
-@@ -408,7 +394,7 @@ declare namespace Intl {
+      * @param locales A string with a BCP 47 language tag, or an array of such strings.
+@@ -457,7 +443,7 @@ declare namespace Intl {
       */
      supportedLocalesOf(
        locales?: LocalesArgument,
@@ -259,9 +259,9 @@
 +      options?: { readonly localeMatcher?: RelativeTimeFormatLocaleMatcher },
      ): UnicodeBCP47LocaleIdentifier[];
    };
- 
-@@ -454,7 +440,7 @@ declare namespace Intl {
- 
+
+@@ -503,7 +489,7 @@ declare namespace Intl {
+
      supportedLocalesOf(
        locales: LocalesArgument,
 -      options?: { localeMatcher?: 'lookup' | 'best fit' },

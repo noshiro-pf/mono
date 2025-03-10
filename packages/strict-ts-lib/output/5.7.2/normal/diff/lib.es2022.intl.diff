@@ -16,7 +16,7 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  declare namespace Intl {
    /**
 @@ -23,9 +9,9 @@ declare namespace Intl {
@@ -29,21 +29,21 @@
 -    granularity?: 'grapheme' | 'word' | 'sentence' | undefined;
 +    readonly granularity?: 'grapheme' | 'word' | 'sentence' | undefined;
    }
- 
+
    interface Segmenter {
-@@ -40,8 +26,8 @@ declare namespace Intl {
+@@ -41,8 +27,8 @@ declare namespace Intl {
    }
- 
+
    interface ResolvedSegmenterOptions {
 -    locale: string;
 -    granularity: 'grapheme' | 'word' | 'sentence';
 +    readonly locale: string;
 +    readonly granularity: 'grapheme' | 'word' | 'sentence';
    }
- 
+
    interface SegmentIterator<T>
-@@ -63,17 +49,17 @@ declare namespace Intl {
- 
+@@ -64,20 +50,20 @@ declare namespace Intl {
+
    interface SegmentData {
      /** A string containing the segment extracted from the original input string. */
 -    segment: string;
@@ -54,14 +54,17 @@
      /** The complete input string that was segmented. */
 -    input: string;
 +    readonly input: string;
-     /** A boolean value only if granularity is "word"; otherwise, undefined. If granularity is "word", then isWordLike is true when the segment is word-like (i.e., consists of letters/numbers/ideographs/etc.); otherwise, false. */
+     /**
+      * A boolean value only if granularity is "word"; otherwise, undefined.
+      * If granularity is "word", then isWordLike is true when the segment is word-like (i.e., consists of letters/numbers/ideographs/etc.); otherwise, false.
+      */
 -    isWordLike?: boolean;
 +    readonly isWordLike?: boolean;
    }
- 
+
    const Segmenter: {
 -    prototype: Segmenter;
 +    readonly prototype: Segmenter;
- 
+
      /**
       * Creates a new `Intl.Segmenter` object.

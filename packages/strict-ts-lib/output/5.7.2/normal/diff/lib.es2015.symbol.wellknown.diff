@@ -16,37 +16,38 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
 -/// <reference lib="es2015.symbol" />
 +/// <reference path="./lib.es2015.symbol.d.ts" />
- 
+
  interface SymbolConstructor {
-   /** A method that determines if a constructor object recognizes an object as one of the constructor’s instances. Called by the semantics of the instanceof operator. */
-@@ -59,14 +45,14 @@ interface Symbol {
- interface Array<T> {
-   /** Is an object whose properties have the value 'true' when they will be absent when used in a 'with' statement. */
+   /**
+@@ -94,7 +80,7 @@ interface Array<T> {
+    * when they will be absent when used in a 'with' statement.
+    */
    readonly [Symbol.unscopables]: {
 -    [K in keyof any[]]?: boolean;
 +    readonly [K in keyof (readonly any[])]?: boolean;
    };
  }
- 
- interface ReadonlyArray<T> {
-   /** Is an object whose properties have the value 'true' when they will be absent when used in a 'with' statement. */
+
+@@ -104,7 +90,7 @@ interface ReadonlyArray<T> {
+    * when they will be absent when used in a 'with' statement.
+    */
    readonly [Symbol.unscopables]: {
 -    [K in keyof (readonly any[])]?: boolean;
 +    readonly [K in keyof (readonly any[])]?: boolean;
    };
  }
- 
-@@ -113,7 +99,7 @@ interface Function {
-    *
-    * A constructor function can control which objects are recognized as its instances by 'instanceof' by overriding this method.
+
+@@ -160,7 +146,7 @@ interface Function {
+    * A constructor function can control which objects are recognized as its instances by
+    * 'instanceof' by overriding this method.
     */
 -  [Symbol.hasInstance](value: any): boolean;
 +  [Symbol.hasInstance](value: unknown): boolean;
  }
- 
+
  interface GeneratorFunction {
 @@ -156,7 +142,7 @@ interface RegExp {
     */
@@ -55,9 +56,9 @@
 -    replacer: (substring: string, ...args: any[]) => string,
 +    replacer: (substring: string, ...args: readonly unknown[]) => string,
    ): string;
- 
+
    /**
-@@ -214,10 +200,10 @@ interface String {
+@@ -265,10 +251,10 @@ interface String {
      searchValue: {
        [Symbol.replace](
          string: string,
@@ -68,5 +69,5 @@
 -    replacer: (substring: string, ...args: any[]) => string,
 +    replacer: (substring: string, ...args: readonly unknown[]) => string,
    ): string;
- 
+
    /**

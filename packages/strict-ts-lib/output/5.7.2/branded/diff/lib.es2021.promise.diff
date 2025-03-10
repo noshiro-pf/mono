@@ -16,12 +16,12 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  interface AggregateError extends Error {
 -  errors: any[];
 +  readonly errors: readonly unknown[];
  }
- 
+
  interface AggregateErrorConstructor {
 -  new (errors: Iterable<any>, message?: string): AggregateError;
 -  (errors: Iterable<any>, message?: string): AggregateError;
@@ -29,13 +29,13 @@
 +  (errors: Iterable<unknown>, message?: string): AggregateError;
    readonly prototype: AggregateError;
  }
- 
+
 -declare var AggregateError: AggregateErrorConstructor;
 +declare const AggregateError: AggregateErrorConstructor;
- 
- /** Represents the completion of an asynchronous operation */
- interface PromiseConstructor {
-@@ -35,7 +21,7 @@ interface PromiseConstructor {
+
+ /**
+  * Represents the completion of an asynchronous operation
+@@ -36,7 +22,7 @@ interface PromiseConstructor {
     * @param values An array or iterable of Promises.
     * @returns A new Promise.
     */
@@ -43,4 +43,4 @@
 +  any<T extends readonly unknown[] | readonly []>(
      values: T,
    ): Promise<Awaited<T[number]>>;
- 
+

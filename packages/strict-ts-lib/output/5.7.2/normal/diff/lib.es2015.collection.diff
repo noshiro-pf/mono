@@ -16,12 +16,12 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  interface Map<K, V> {
    clear(): void;
-@@ -21,8 +7,8 @@ interface Map<K, V> {
-   delete(key: K): boolean;
-   /** Executes a provided function once per each key/value pair in the Map, in insertion order. */
+@@ -25,8 +11,8 @@ interface Map<K, V> {
+    * Executes a provided function once per each key/value pair in the Map, in insertion order.
+    */
    forEach(
 -    callbackfn: (value: V, key: K, map: Map<K, V>) => void,
 -    thisArg?: any,
@@ -30,18 +30,20 @@
    ): void;
    /**
     * Returns a specified element from the Map object. If the value that is associated to the provided key is an object, then you will get a reference to that object and any change made to that object will effectively modify it inside the Map.
-@@ -31,7 +17,7 @@ interface Map<K, V> {
+@@ -36,7 +22,7 @@ interface Map<K, V> {
+   /**
+    * @returns boolean indicating whether an element with the specified key exists or not.
     */
    get(key: K): V | undefined;
    /** @returns Boolean indicating whether an element with the specified key exists or not. */
 -  has(key: K): boolean;
 +  has(key: K | (WidenLiteral<K> & {})): key is K;
-   /** Adds a new element with a specified key and value to the Map. If an element with the same key already exists, the element will be updated. */
-   set(key: K, value: V): this;
-   /** @returns The number of elements in the Map. */
-@@ -39,19 +25,19 @@ interface Map<K, V> {
+   /**
+    * Adds a new element with a specified key and value to the Map. If an element with the same key already exists, the element will be updated.
+    */
+@@ -48,19 +34,19 @@ interface Map<K, V> {
  }
- 
+
  interface MapConstructor {
 -  new (): Map<any, any>;
 +  new (): Map<never, never>;
@@ -51,7 +53,7 @@
  }
 -declare var Map: MapConstructor;
 +declare const Map: MapConstructor;
- 
+
  interface ReadonlyMap<K, V> {
    forEach(
      callbackfn: (value: V, key: K, map: ReadonlyMap<K, V>) => void,
@@ -63,19 +65,19 @@
 +  has(key: K | (WidenLiteral<K> & {})): key is K;
    readonly size: number;
  }
- 
-@@ -65,7 +51,7 @@ interface WeakMap<K extends WeakKey, V> {
-   /** @returns A specified element. */
-   get(key: K): V | undefined;
-   /** @returns A boolean indicating whether an element with the specified key exists or not. */
+
+@@ -77,7 +63,7 @@ interface WeakMap<K extends WeakKey, V> {
+   /**
+    * @returns a boolean indicating whether an element with the specified key exists or not.
+    */
 -  has(key: K): boolean;
 +  has(key: K | (WidenLiteral<K> & {})): key is K;
    /**
     * Adds a new element with a specified key and value.
-    *
-@@ -75,12 +61,12 @@ interface WeakMap<K extends WeakKey, V> {
+    * @param key Must be an object or symbol.
+@@ -86,12 +72,12 @@ interface WeakMap<K extends WeakKey, V> {
  }
- 
+
  interface WeakMapConstructor {
 -  new <K extends WeakKey = WeakKey, V = any>(
 +  new <K extends WeakKey = WeakKey, V = unknown>(
@@ -86,25 +88,29 @@
  }
 -declare var WeakMap: WeakMapConstructor;
 +declare const WeakMap: WeakMapConstructor;
- 
+
  interface Set<T> {
-   /** Appends a new element with a specified value to the end of the Set. */
-@@ -95,27 +81,27 @@ interface Set<T> {
-   delete(value: T): boolean;
-   /** Executes a provided function once per each value in the Set object, in insertion order. */
+   /**
+@@ -109,13 +95,13 @@ interface Set<T> {
+    * Executes a provided function once per each value in the Set object, in insertion order.
+    */
    forEach(
 -    callbackfn: (value: T, value2: T, set: Set<T>) => void,
 -    thisArg?: any,
 +    callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void,
 +    thisArg?: unknown,
    ): void;
-   /** @returns A boolean indicating whether an element with the specified value exists in the Set or not. */
+   /**
+    * @returns a boolean indicating whether an element with the specified value exists in the Set or not.
+    */
 -  has(value: T): boolean;
 +  has(value: T | (WidenLiteral<T> & {})): value is T;
-   /** @returns The number of (unique) elements in Set. */
-   readonly size: number;
+   /**
+    * @returns the number of (unique) elements in Set.
+    */
+@@ -123,17 +109,17 @@ interface Set<T> {
  }
- 
+
  interface SetConstructor {
 -  new <T = any>(values?: readonly T[] | null): Set<T>;
 -  readonly prototype: Set<any>;
@@ -113,7 +119,7 @@
  }
 -declare var Set: SetConstructor;
 +declare const Set: SetConstructor;
- 
+
  interface ReadonlySet<T> {
    forEach(
      callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void,
@@ -124,15 +130,15 @@
 +  has(value: T | (WidenLiteral<T> & {})): value is T;
    readonly size: number;
  }
- 
-@@ -129,11 +115,11 @@ interface WeakSet<T extends WeakKey> {
+
+@@ -150,11 +136,11 @@ interface WeakSet<T extends WeakKey> {
+   /**
+    * @returns a boolean indicating whether a value exists in the WeakSet or not.
     */
-   delete(value: T): boolean;
-   /** @returns A boolean indicating whether a value exists in the WeakSet or not. */
 -  has(value: T): boolean;
 +  has(value: T | (WidenLiteral<T> & {})): value is T;
  }
- 
+
  interface WeakSetConstructor {
    new <T extends WeakKey = WeakKey>(values?: readonly T[] | null): WeakSet<T>;
    readonly prototype: WeakSet<WeakKey>;

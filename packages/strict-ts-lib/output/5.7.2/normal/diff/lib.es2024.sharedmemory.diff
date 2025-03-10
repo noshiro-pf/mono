@@ -16,10 +16,10 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
 -/// <reference lib="es2020.bigint" />
 +/// <reference path="./lib.es2020.bigint.d.ts" />
- 
+
  interface Atomics {
    /**
 @@ -32,8 +18,8 @@ interface Atomics {
@@ -30,9 +30,9 @@
 -    | { async: true; value: Promise<'ok' | 'timed-out'> };
 +    | { readonly async: false; readonly value: 'not-equal' | 'timed-out' }
 +    | { readonly async: true; readonly value: Promise<'ok' | 'timed-out'> };
- 
+
    /**
-    * A non-blocking, asynchronous version of wait which is usable on the main thread. Waits asynchronously on a shared memory location and returns a Promise
+    * A non-blocking, asynchronous version of wait which is usable on the main thread.
 @@ -49,8 +35,8 @@ interface Atomics {
      value: bigint,
      timeout?: number,
@@ -42,7 +42,7 @@
 +    | { readonly async: false; readonly value: 'not-equal' | 'timed-out' }
 +    | { readonly async: true; readonly value: Promise<'ok' | 'timed-out'> };
  }
- 
+
  interface SharedArrayBuffer {
 @@ -79,6 +65,6 @@ interface SharedArrayBuffer {
  interface SharedArrayBufferConstructor {

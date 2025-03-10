@@ -16,7 +16,7 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  declare namespace Reflect {
    /**
 @@ -23,16 +9,16 @@ declare namespace Reflect {
@@ -37,9 +37,9 @@
 +    thisArgument: unknown,
 +    argumentsList: ArrayLike<unknown>,
 +  ): unknown;
- 
+
    /**
-    * Constructs the target with the elements of specified array as the arguments and the specified constructor as the `new.target` value.
+    * Constructs the target with the elements of specified array as the arguments
 @@ -41,16 +27,16 @@ declare namespace Reflect {
     * @param argumentsList An array of argument values to be passed to the constructor.
     * @param newTarget The constructor to be used as the `new.target` object.
@@ -58,7 +58,7 @@
      newTarget?: Function,
 -  ): any;
 +  ): unknown;
- 
+
    /**
     * Adds a property to an object, or modifies attributes of an existing property.
 @@ -62,7 +48,7 @@ declare namespace Reflect {
@@ -68,7 +68,7 @@
 -    attributes: PropertyDescriptor & ThisType<any>,
 +    attributes: PropertyDescriptor & ThisType<unknown>,
    ): boolean;
- 
+
    /**
 @@ -84,7 +70,7 @@ declare namespace Reflect {
      target: T,
@@ -76,19 +76,19 @@
      receiver?: unknown,
 -  ): P extends keyof T ? T[P] : any;
 +  ): P extends keyof T ? T[P] : unknown;
- 
+
    /**
-    * Gets the own property descriptor of the specified object. An own property descriptor is one that is defined directly on the object and is not inherited from the object's prototype.
+    * Gets the own property descriptor of the specified object.
 @@ -95,7 +81,7 @@ declare namespace Reflect {
    function getOwnPropertyDescriptor<T extends object, P extends PropertyKey>(
      target: T,
      propertyKey: P,
 -  ): TypedPropertyDescriptor<P extends keyof T ? T[P] : any> | undefined;
 +  ): TypedPropertyDescriptor<P extends keyof T ? T[P] : unknown> | undefined;
- 
+
    /**
     * Returns the prototype of an object.
-@@ -144,14 +130,14 @@ declare namespace Reflect {
+@@ -140,14 +126,14 @@ declare namespace Reflect {
    function set<T extends object, P extends PropertyKey>(
      target: T,
      propertyKey: P,
@@ -105,5 +105,5 @@
 +    value: unknown,
 +    receiver?: unknown,
    ): boolean;
- 
+
    /**

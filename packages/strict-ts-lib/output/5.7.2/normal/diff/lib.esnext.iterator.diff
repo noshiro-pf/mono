@@ -16,33 +16,33 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
 -/// <reference lib="es2015.iterable" />
 +/// <reference path="./lib.es2015.iterable.d.ts" />
- 
+
  // NOTE: This is specified as what is essentially an unreachable module. All actual global declarations can be found
  //       in the `declare global` section, below. This is necessary as there is currently no way to declare an `abstract`
 @@ -25,7 +11,6 @@ export {};
- 
+
  // Abstract type that allows us to mark `next` as `abstract`
  declare abstract class Iterator<T, TResult = undefined, TNext = unknown> {
 -  // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
    abstract next(value?: TNext): IteratorResult<T, TResult>;
  }
- 
-@@ -81,7 +66,7 @@ declare global {
-      *
+
+@@ -78,7 +63,7 @@ declare global {
+      * Creates an iterator whose values are the values from this iterator after skipping the provided count.
       * @param count The number of values to drop.
       */
 -    drop(count: number): IteratorObject<T, undefined, unknown>;
 +    drop(limit: number): IteratorObject<T, undefined, unknown>;
- 
+
      /**
       * Creates an iterator whose values are the result of applying the callback to the values from this iterator and then flattening the resulting iterators or iterables.
-@@ -181,5 +166,5 @@ declare global {
+@@ -180,5 +165,5 @@ declare global {
      ): IteratorObject<T, undefined, unknown>;
    }
- 
+
 -  var Iterator: IteratorConstructor;
 +  const Iterator: IteratorConstructor;
  }

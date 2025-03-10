@@ -24,7 +24,7 @@
  
  interface SymbolConstructor {
    /**
-@@ -26,21 +12,23 @@ interface SymbolConstructor {
+@@ -26,23 +12,25 @@ interface SymbolConstructor {
    readonly asyncIterator: unique symbol;
  }
  
@@ -47,15 +47,17 @@
    [Symbol.asyncIterator](): AsyncIterator<T, TReturn, TNext>;
  }
  
- /** Describes a user-defined {@link AsyncIterator} that is also async iterable. */
+ /**
+  * Describes a user-defined {@link AsyncIterator} that is also async iterable.
+  */
 -interface AsyncIterableIterator<T, TReturn = any, TNext = any>
 +interface AsyncIterableIterator<T, TReturn = any, TNext = unknown>
    extends AsyncIterator<T, TReturn, TNext> {
    [Symbol.asyncIterator](): AsyncIterableIterator<T, TReturn, TNext>;
  }
-@@ -49,7 +37,7 @@ interface AsyncIterableIterator<T, TReturn = any, TNext = any>
-  * Describes an {@link AsyncIterator} produced by the runtime that inherits from
-  * the intrinsic `AsyncIterator.prototype`.
+@@ -50,7 +38,7 @@ interface AsyncIterableIterator<T, TReturn = any, TNext = any>
+ /**
+  * Describes an {@link AsyncIterator} produced by the runtime that inherits from the intrinsic `AsyncIterator.prototype`.
   */
 -interface AsyncIteratorObject<T, TReturn = unknown, TNext = unknown>
 +interface AsyncIteratorObject<T, TReturn = any, TNext = unknown>

@@ -16,13 +16,13 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  declare namespace Intl {
    interface DateTimeFormatPartTypesRegistry {
 -    fractionalSecond: any;
 +    readonly fractionalSecond: unknown;
    }
- 
+
    interface DateTimeFormatOptions {
 -    formatMatcher?: 'basic' | 'best fit' | 'best fit' | undefined;
 -    dateStyle?: 'full' | 'long' | 'medium' | 'short' | undefined;
@@ -35,16 +35,16 @@
 +    readonly dayPeriod?: 'narrow' | 'short' | 'long' | undefined;
 +    readonly fractionalSecondDigits?: 1 | 2 | 3 | undefined;
    }
- 
+
    interface DateTimeRangeFormatPart extends DateTimeFormatPart {
 -    source: 'startRange' | 'endRange' | 'shared';
 +    readonly source: 'startRange' | 'endRange' | 'shared';
    }
- 
+
    interface DateTimeFormat {
 @@ -44,12 +30,12 @@ declare namespace Intl {
    }
- 
+
    interface ResolvedDateTimeFormatOptions {
 -    formatMatcher?: 'basic' | 'best fit' | 'best fit';
 -    dateStyle?: 'full' | 'long' | 'medium' | 'short';
@@ -59,7 +59,7 @@
 +    readonly dayPeriod?: 'narrow' | 'short' | 'long';
 +    readonly fractionalSecondDigits?: 1 | 2 | 3;
    }
- 
+
    /**
 @@ -80,17 +66,17 @@ declare namespace Intl {
     */
@@ -74,7 +74,7 @@
 -    style?: ListFormatStyle | undefined;
 +    readonly style?: ListFormatStyle | undefined;
    }
- 
+
    interface ResolvedListFormatOptions {
 -    locale: string;
 -    style: ListFormatStyle;
@@ -83,14 +83,14 @@
 +    readonly style: ListFormatStyle;
 +    readonly type: ListFormatType;
    }
- 
+
    interface ListFormat {
-@@ -127,7 +113,7 @@ declare namespace Intl {
+@@ -133,7 +119,7 @@ declare namespace Intl {
    }
- 
+
    const ListFormat: {
 -    prototype: ListFormat;
 +    readonly prototype: ListFormat;
- 
+
      /**
-      * Creates [Intl.ListFormat](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat) objects that enable language-sensitive list formatting.
+      * Creates [Intl.ListFormat](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat) objects that

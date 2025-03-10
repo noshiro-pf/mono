@@ -16,10 +16,10 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  interface ObjectConstructor {
    /**
-@@ -25,5 +11,5 @@ interface ObjectConstructor {
+@@ -24,5 +10,5 @@ interface ObjectConstructor {
    groupBy<K extends PropertyKey, T>(
      items: Iterable<T>,
      keySelector: (item: T, index: number) => K,

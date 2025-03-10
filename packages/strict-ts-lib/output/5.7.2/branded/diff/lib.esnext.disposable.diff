@@ -16,26 +16,26 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
 -/// <reference lib="es2015.symbol" />
 -/// <reference lib="es2015.iterable" />
 -/// <reference lib="es2018.asynciterable" />
 +/// <reference path="./lib.es2015.symbol.d.ts" />
 +/// <reference path="./lib.es2015.iterable.d.ts" />
 +/// <reference path="./lib.es2018.asynciterable.d.ts" />
- 
+
  interface SymbolConstructor {
-   /** A method that is used to release resources held by an object. Called by the semantics of the `using` statement. */
-@@ -36,16 +22,16 @@ interface AsyncDisposable {
+   /**
+@@ -40,16 +26,16 @@ interface AsyncDisposable {
  }
- 
+
  interface SuppressedError extends Error {
 -  error: any;
 -  suppressed: any;
 +  readonly error: unknown;
 +  readonly suppressed: unknown;
  }
- 
+
  interface SuppressedErrorConstructor {
 -  new (error: any, suppressed: any, message?: string): SuppressedError;
 -  (error: any, suppressed: any, message?: string): SuppressedError;
@@ -45,24 +45,24 @@
  }
 -declare var SuppressedError: SuppressedErrorConstructor;
 +declare const SuppressedError: SuppressedErrorConstructor;
- 
+
  interface DisposableStack {
-   /** Returns a value indicating whether this stack has been disposed. */
-@@ -108,7 +94,7 @@ interface DisposableStackConstructor {
+   /**
+@@ -116,7 +102,7 @@ interface DisposableStackConstructor {
    new (): DisposableStack;
    readonly prototype: DisposableStack;
  }
 -declare var DisposableStack: DisposableStackConstructor;
 +declare const DisposableStack: DisposableStackConstructor;
- 
+
  interface AsyncDisposableStack {
-   /** Returns a value indicating whether this stack has been disposed. */
-@@ -171,7 +157,7 @@ interface AsyncDisposableStackConstructor {
+   /**
+@@ -183,7 +169,7 @@ interface AsyncDisposableStackConstructor {
    new (): AsyncDisposableStack;
    readonly prototype: AsyncDisposableStack;
  }
 -declare var AsyncDisposableStack: AsyncDisposableStackConstructor;
 +declare const AsyncDisposableStack: AsyncDisposableStackConstructor;
- 
+
  interface IteratorObject<T, TReturn, TNext> extends Disposable {}
- 
+

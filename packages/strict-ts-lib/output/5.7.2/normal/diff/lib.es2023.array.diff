@@ -16,11 +16,11 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  interface Array<T> {
    /**
-@@ -23,12 +9,12 @@ interface Array<T> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -26,12 +12,12 @@ interface Array<T> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLast<S extends T>(
 -    predicate: (value: T, index: number, array: T[]) => value is S,
@@ -34,10 +34,10 @@
 +    predicate: (value: T, index: number, array: readonly T[]) => boolean,
 +    thisArg?: unknown,
    ): T | undefined;
- 
+
    /**
-@@ -38,8 +24,8 @@ interface Array<T> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -44,8 +30,8 @@ interface Array<T> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: T, index: number, array: T[]) => unknown,
@@ -45,15 +45,14 @@
 +    predicate: (value: T, index: number, array: readonly T[]) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
-   /** Returns a copy of an array with its elements reversed. */
-@@ -57,14 +43,14 @@ interface Array<T> {
+
+   /**
+@@ -65,13 +51,13 @@ interface Array<T> {
    toSorted(compareFn?: (a: T, b: T) => number): T[];
- 
+
    /**
 -   * Copies an array and removes elements and, if necessary, inserts new elements in their place. Returns the copied array.
 +   * Copies an array and removes elements while, if necessary, inserting new elements in their place, returning the remaining elements.
-    *
     * @param start The zero-based location in the array from which to start removing elements.
     * @param deleteCount The number of elements to remove.
     * @param items Elements to insert into the copied array in place of the deleted elements.
@@ -62,10 +61,10 @@
     */
 -  toSpliced(start: number, deleteCount: number, ...items: T[]): T[];
 +  toSpliced(start: number, deleteCount: number, ...items: readonly T[]): T[];
- 
+
    /**
     * Copies an array and removes elements while returning the remaining elements.
-@@ -94,11 +80,11 @@ interface ReadonlyArray<T> {
+@@ -105,11 +91,11 @@ interface ReadonlyArray<T> {
     */
    findLast<S extends T>(
      predicate: (value: T, index: number, array: readonly T[]) => value is S,
@@ -78,10 +77,10 @@
 +    predicate: (value: T, index: number, array: readonly T[]) => boolean,
 +    thisArg?: unknown,
    ): T | undefined;
- 
+
    /**
-@@ -108,15 +94,15 @@ interface ReadonlyArray<T> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -122,17 +108,17 @@ interface ReadonlyArray<T> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: T, index: number, array: readonly T[]) => unknown,
@@ -89,30 +88,32 @@
 +    predicate: (value: T, index: number, array: readonly T[]) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
--  /** Copies the array and returns the copied array with all of its elements reversed. */
-+  /** Returns a copy of an array with its elements reversed. */
+
+   /**
+-   * Copies the array and returns the copied array with all of its elements reversed.
++   * Returns a copy of an array with its elements reversed.
+    */
    toReversed(): T[];
- 
+
    /**
 -   * Copies and sorts the array.
 +   * Returns a copy of an array with its elements sorted.
-    *
-    * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
-    *
-@@ -134,7 +120,7 @@ interface ReadonlyArray<T> {
+    * @param compareFn Function used to determine the order of the elements. It is expected to return
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
+@@ -149,7 +135,7 @@ interface ReadonlyArray<T> {
     * @param items Elements to insert into the copied array in place of the deleted elements.
     * @returns A copy of the original array with the remaining elements.
     */
 -  toSpliced(start: number, deleteCount: number, ...items: T[]): T[];
 +  toSpliced(start: number, deleteCount: number, ...items: readonly T[]): T[];
- 
+
    /**
     * Copies an array and removes elements while returning the remaining elements.
-@@ -149,8 +135,8 @@ interface ReadonlyArray<T> {
-    * Copies an array, then overwrites the value at the provided index with the given value. If the index is negative, then it replaces from the end of the array
-    *
-    * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
+@@ -165,8 +151,8 @@ interface ReadonlyArray<T> {
+    * of the array
+    * @param index The index of the value to overwrite. If the index is
+    * negative, then it replaces from the end of the array.
 -   * @param value The value to insert into the copied array.
 -   * @returns A copy of the original array with the inserted value.
 +   * @param value The value to write into the copied array.
@@ -120,9 +121,9 @@
     */
    with(index: number, value: T): T[];
  }
-@@ -162,14 +148,14 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -181,14 +167,14 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param thisArg If provided, it will be used as the this value for each invocation of
+    * predicate. If it is not provided, undefined is used instead.
     */
 -  findLast<S extends number>(
 -    predicate: (value: number, index: number, array: this) => value is S,
@@ -138,11 +139,11 @@
 +    predicate: (value: Int8, index: number, array: this) => boolean,
 +    thisArg?: unknown,
 +  ): Int8 | undefined;
- 
+
    /**
-    * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
-@@ -178,15 +164,15 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+    * Returns the index of the last element in the array where predicate is true, and -1
+@@ -200,17 +186,17 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -150,33 +151,35 @@
 +    predicate: (value: Int8, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
--  /** Copies the array and returns the copy with the elements in reverse order. */
-+  /** Returns a copy of an array with its elements reversed. */
+
+   /**
+-   * Copies the array and returns the copy with the elements in reverse order.
++   * Returns a copy of an array with its elements reversed.
+    */
    toReversed(): Int8Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies and sorts the array.
 +   * Returns a copy of an array with its elements sorted.
-    *
-    * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
-    *
-@@ -195,18 +181,18 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
-    *   myNums.toSorted((a, b) => a - b) // Int8Array<Buffer>(4) [1, 2, 11, 22]
+    * @param compareFn Function used to determine the order of the elements. It is expected to return
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+@@ -219,18 +205,18 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+    * myNums.toSorted((a, b) => a - b) // Int8Array<Buffer>(4) [1, 2, 11, 22]
     * ```
     */
 -  toSorted(
 -    compareFn?: (a: number, b: number) => number,
 -  ): Int8Array<ArrayBuffer>;
 +  toSorted(compareFn?: (a: Int8, b: Int8) => number): Int8Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies the array and inserts the given number at the provided index.
 +   * Copies an array, then overwrites the value at the provided index with the
 +   * given value. If the index is negative, then it replaces from the end
 +   * of the array.
-    *
-    * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
+    * @param index The index of the value to overwrite. If the index is
+    * negative, then it replaces from the end of the array.
 -   * @param value The value to insert into the copied array.
 -   * @returns A copy of the original array with the inserted value.
 +   * @param value The value to write into the copied array.
@@ -185,11 +188,11 @@
 -  with(index: number, value: number): Int8Array<ArrayBuffer>;
 +  with(index: number, value: Int8): Int8Array<ArrayBuffer>;
  }
- 
+
  interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -216,14 +202,14 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -243,14 +229,14 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param thisArg If provided, it will be used as the this value for each invocation of
+    * predicate. If it is not provided, undefined is used instead.
     */
 -  findLast<S extends number>(
 -    predicate: (value: number, index: number, array: this) => value is S,
@@ -205,11 +208,11 @@
 +    predicate: (value: Uint8, index: number, array: this) => boolean,
 +    thisArg?: unknown,
 +  ): Uint8 | undefined;
- 
+
    /**
-    * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
-@@ -232,15 +218,15 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+    * Returns the index of the last element in the array where predicate is true, and -1
+@@ -262,17 +248,17 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -217,33 +220,35 @@
 +    predicate: (value: Uint8, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
--  /** Copies the array and returns the copy with the elements in reverse order. */
-+  /** Returns a copy of an array with its elements reversed. */
+
+   /**
+-   * Copies the array and returns the copy with the elements in reverse order.
++   * Returns a copy of an array with its elements reversed.
+    */
    toReversed(): Uint8Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies and sorts the array.
 +   * Returns a copy of an array with its elements sorted.
-    *
-    * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
-    *
-@@ -249,18 +235,18 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
-    *   myNums.toSorted((a, b) => a - b) // Uint8Array<Buffer>(4) [1, 2, 11, 22]
+    * @param compareFn Function used to determine the order of the elements. It is expected to return
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+@@ -281,18 +267,18 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+    * myNums.toSorted((a, b) => a - b) // Uint8Array<Buffer>(4) [1, 2, 11, 22]
     * ```
     */
 -  toSorted(
 -    compareFn?: (a: number, b: number) => number,
 -  ): Uint8Array<ArrayBuffer>;
 +  toSorted(compareFn?: (a: Uint8, b: Uint8) => number): Uint8Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies the array and inserts the given number at the provided index.
 +   * Copies an array, then overwrites the value at the provided index with the
 +   * given value. If the index is negative, then it replaces from the end
 +   * of the array.
-    *
-    * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
+    * @param index The index of the value to overwrite. If the index is
+    * negative, then it replaces from the end of the array.
 -   * @param value The value to insert into the copied array.
 -   * @returns A copy of the original array with the inserted value.
 +   * @param value The value to write into the copied array.
@@ -252,11 +257,11 @@
 -  with(index: number, value: number): Uint8Array<ArrayBuffer>;
 +  with(index: number, value: Uint8): Uint8Array<ArrayBuffer>;
  }
- 
+
  interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
-@@ -270,14 +256,14 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
-    * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -305,14 +291,14 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+    * @param thisArg If provided, it will be used as the this value for each invocation of
+    * predicate. If it is not provided, undefined is used instead.
     */
 -  findLast<S extends number>(
 -    predicate: (value: number, index: number, array: this) => value is S,
@@ -272,11 +277,11 @@
 +    predicate: (value: Uint8, index: number, array: this) => boolean,
 +    thisArg?: unknown,
 +  ): Uint8 | undefined;
- 
+
    /**
-    * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
-@@ -286,15 +272,15 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+    * Returns the index of the last element in the array where predicate is true, and -1
+@@ -324,17 +310,17 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -284,32 +289,34 @@
 +    predicate: (value: Uint8, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
--  /** Copies the array and returns the copy with the elements in reverse order. */
-+  /** Returns a copy of an array with its elements reversed. */
+
+   /**
+-   * Copies the array and returns the copy with the elements in reverse order.
++   * Returns a copy of an array with its elements reversed.
+    */
    toReversed(): Uint8ClampedArray<ArrayBuffer>;
- 
+
    /**
 -   * Copies and sorts the array.
 +   * Returns a copy of an array with its elements sorted.
-    *
-    * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
-    *
-@@ -304,17 +290,19 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+    * @param compareFn Function used to determine the order of the elements. It is expected to return
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+@@ -344,17 +330,19 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
     * ```
     */
    toSorted(
 -    compareFn?: (a: number, b: number) => number,
 +    compareFn?: (a: Uint8, b: Uint8) => number,
    ): Uint8ClampedArray<ArrayBuffer>;
- 
+
    /**
 -   * Copies the array and inserts the given number at the provided index.
 +   * Copies an array, then overwrites the value at the provided index with the
 +   * given value. If the index is negative, then it replaces from the end
 +   * of the array.
-    *
-    * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
+    * @param index The index of the value to overwrite. If the index is
+    * negative, then it replaces from the end of the array.
 -   * @param value The value to insert into the copied array.
 -   * @returns A copy of the original array with the inserted value.
 +   * @param value The value to write into the copied array.
@@ -318,9 +325,9 @@
 -  with(index: number, value: number): Uint8ClampedArray<ArrayBuffer>;
 +  with(index: number, value: Uint8): Uint8ClampedArray<ArrayBuffer>;
  }
- 
+
  interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -326,11 +314,11 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -369,11 +357,11 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
     */
    findLast<S extends number>(
      predicate: (value: number, index: number, array: this) => value is S,
@@ -333,10 +340,10 @@
 +    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number | undefined;
- 
+
    /**
-@@ -340,15 +328,15 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -386,17 +374,17 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -344,27 +351,29 @@
 +    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
--  /** Copies the array and returns the copy with the elements in reverse order. */
-+  /** Returns a copy of an array with its elements reversed. */
+
+   /**
+-   * Copies the array and returns the copy with the elements in reverse order.
++   * Returns a copy of an array with its elements reversed.
+    */
    toReversed(): Int16Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies and sorts the array.
 +   * Returns a copy of an array with its elements sorted.
-    *
-    * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
-    *
-@@ -362,11 +350,13 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param compareFn Function used to determine the order of the elements. It is expected to return
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+@@ -410,11 +398,13 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
    ): Int16Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies the array and inserts the given number at the provided index.
 +   * Copies an array, then overwrites the value at the provided index with the
 +   * given value. If the index is negative, then it replaces from the end
 +   * of the array.
-    *
-    * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
+    * @param index The index of the value to overwrite. If the index is
+    * negative, then it replaces from the end of the array.
 -   * @param value The value to insert into the copied array.
 -   * @returns A copy of the original array with the inserted value.
 +   * @param value The value to write into the copied array.
@@ -372,7 +381,7 @@
     */
    with(index: number, value: number): Int16Array<ArrayBuffer>;
  }
-@@ -380,11 +370,11 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -431,11 +421,11 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
     */
    findLast<S extends number>(
      predicate: (value: number, index: number, array: this) => value is S,
@@ -385,10 +394,10 @@
 +    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number | undefined;
- 
+
    /**
-@@ -394,15 +384,15 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -448,17 +438,17 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -396,27 +405,29 @@
 +    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
--  /** Copies the array and returns the copy with the elements in reverse order. */
-+  /** Returns a copy of an array with its elements reversed. */
+
+   /**
+-   * Copies the array and returns the copy with the elements in reverse order.
++   * Returns a copy of an array with its elements reversed.
+    */
    toReversed(): Uint16Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies and sorts the array.
 +   * Returns a copy of an array with its elements sorted.
-    *
-    * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
-    *
-@@ -416,11 +406,13 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param compareFn Function used to determine the order of the elements. It is expected to return
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+@@ -472,11 +462,13 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
    ): Uint16Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies the array and inserts the given number at the provided index.
 +   * Copies an array, then overwrites the value at the provided index with the
 +   * given value. If the index is negative, then it replaces from the end
 +   * of the array.
-    *
-    * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
+    * @param index The index of the value to overwrite. If the index is
+    * negative, then it replaces from the end of the array.
 -   * @param value The value to insert into the copied array.
 -   * @returns A copy of the original array with the inserted value.
 +   * @param value The value to write into the copied array.
@@ -424,7 +435,7 @@
     */
    with(index: number, value: number): Uint16Array<ArrayBuffer>;
  }
-@@ -434,11 +426,11 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -493,11 +485,11 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
     */
    findLast<S extends number>(
      predicate: (value: number, index: number, array: this) => value is S,
@@ -437,10 +448,10 @@
 +    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number | undefined;
- 
+
    /**
-@@ -448,15 +440,15 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -510,17 +502,17 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -448,27 +459,29 @@
 +    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
--  /** Copies the array and returns the copy with the elements in reverse order. */
-+  /** Returns a copy of an array with its elements reversed. */
+
+   /**
+-   * Copies the array and returns the copy with the elements in reverse order.
++   * Returns a copy of an array with its elements reversed.
+    */
    toReversed(): Int32Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies and sorts the array.
 +   * Returns a copy of an array with its elements sorted.
-    *
-    * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
-    *
-@@ -470,11 +462,13 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param compareFn Function used to determine the order of the elements. It is expected to return
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+@@ -534,11 +526,13 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
    ): Int32Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies the array and inserts the given number at the provided index.
 +   * Copies an array, then overwrites the value at the provided index with the
 +   * given value. If the index is negative, then it replaces from the end
 +   * of the array.
-    *
-    * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
+    * @param index The index of the value to overwrite. If the index is
+    * negative, then it replaces from the end of the array.
 -   * @param value The value to insert into the copied array.
 -   * @returns A copy of the original array with the inserted value.
 +   * @param value The value to write into the copied array.
@@ -476,7 +489,7 @@
     */
    with(index: number, value: number): Int32Array<ArrayBuffer>;
  }
-@@ -488,11 +482,11 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -555,11 +549,11 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
     */
    findLast<S extends number>(
      predicate: (value: number, index: number, array: this) => value is S,
@@ -489,10 +502,10 @@
 +    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number | undefined;
- 
+
    /**
-@@ -502,15 +496,15 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -572,17 +566,17 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -500,27 +513,29 @@
 +    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
--  /** Copies the array and returns the copy with the elements in reverse order. */
-+  /** Returns a copy of an array with its elements reversed. */
+
+   /**
+-   * Copies the array and returns the copy with the elements in reverse order.
++   * Returns a copy of an array with its elements reversed.
+    */
    toReversed(): Uint32Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies and sorts the array.
 +   * Returns a copy of an array with its elements sorted.
-    *
-    * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
-    *
-@@ -524,11 +518,13 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param compareFn Function used to determine the order of the elements. It is expected to return
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+@@ -596,11 +590,13 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
    ): Uint32Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies the array and inserts the given number at the provided index.
 +   * Copies an array, then overwrites the value at the provided index with the
 +   * given value. If the index is negative, then it replaces from the end
 +   * of the array.
-    *
-    * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
+    * @param index The index of the value to overwrite. If the index is
+    * negative, then it replaces from the end of the array.
 -   * @param value The value to insert into the copied array.
 -   * @returns A copy of the original array with the inserted value.
 +   * @param value The value to write into the copied array.
@@ -528,7 +543,7 @@
     */
    with(index: number, value: number): Uint32Array<ArrayBuffer>;
  }
-@@ -542,11 +538,11 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -617,11 +613,11 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
     */
    findLast<S extends number>(
      predicate: (value: number, index: number, array: this) => value is S,
@@ -541,10 +556,10 @@
 +    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number | undefined;
- 
+
    /**
-@@ -556,15 +552,15 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -634,17 +630,17 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -552,27 +567,29 @@
 +    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
--  /** Copies the array and returns the copy with the elements in reverse order. */
-+  /** Returns a copy of an array with its elements reversed. */
+
+   /**
+-   * Copies the array and returns the copy with the elements in reverse order.
++   * Returns a copy of an array with its elements reversed.
+    */
    toReversed(): Float32Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies and sorts the array.
 +   * Returns a copy of an array with its elements sorted.
-    *
-    * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
-    *
-@@ -578,11 +574,13 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param compareFn Function used to determine the order of the elements. It is expected to return
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+@@ -658,11 +654,13 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
    ): Float32Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies the array and inserts the given number at the provided index.
 +   * Copies an array, then overwrites the value at the provided index with the
 +   * given value. If the index is negative, then it replaces from the end
 +   * of the array.
-    *
-    * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
+    * @param index The index of the value to overwrite. If the index is
+    * negative, then it replaces from the end of the array.
 -   * @param value The value to insert into the copied array.
 -   * @returns A copy of the original array with the inserted value.
 +   * @param value The value to write into the copied array.
@@ -580,7 +597,7 @@
     */
    with(index: number, value: number): Float32Array<ArrayBuffer>;
  }
-@@ -596,11 +594,11 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -679,11 +677,11 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
     */
    findLast<S extends number>(
      predicate: (value: number, index: number, array: this) => value is S,
@@ -593,10 +610,10 @@
 +    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number | undefined;
- 
+
    /**
-@@ -610,15 +608,15 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -696,17 +694,17 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -604,27 +621,29 @@
 +    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
--  /** Copies the array and returns the copy with the elements in reverse order. */
-+  /** Returns a copy of an array with its elements reversed. */
+
+   /**
+-   * Copies the array and returns the copy with the elements in reverse order.
++   * Returns a copy of an array with its elements reversed.
+    */
    toReversed(): Float64Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies and sorts the array.
 +   * Returns a copy of an array with its elements sorted.
-    *
-    * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
-    *
-@@ -632,11 +630,13 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param compareFn Function used to determine the order of the elements. It is expected to return
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+@@ -720,11 +718,13 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
    ): Float64Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies the array and inserts the given number at the provided index.
 +   * Copies an array, then overwrites the value at the provided index with the
 +   * given value. If the index is negative, then it replaces from the end
 +   * of the array.
-    *
-    * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
+    * @param index The index of the value to overwrite. If the index is
+    * negative, then it replaces from the end of the array.
 -   * @param value The value to insert into the copied array.
 -   * @returns A copy of the original array with the inserted value.
 +   * @param value The value to write into the copied array.
@@ -632,7 +651,7 @@
     */
    with(index: number, value: number): Float64Array<ArrayBuffer>;
  }
-@@ -650,11 +650,11 @@ interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -741,11 +741,11 @@ interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
     */
    findLast<S extends bigint>(
      predicate: (value: bigint, index: number, array: this) => value is S,
@@ -645,10 +664,10 @@
 +    predicate: (value: bigint, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): bigint | undefined;
- 
+
    /**
-@@ -664,15 +664,15 @@ interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -758,17 +758,17 @@ interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: bigint, index: number, array: this) => unknown,
@@ -656,27 +675,29 @@
 +    predicate: (value: bigint, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
--  /** Copies the array and returns the copy with the elements in reverse order. */
-+  /** Returns a copy of an array with its elements reversed. */
+
+   /**
+-   * Copies the array and returns the copy with the elements in reverse order.
++   * Returns a copy of an array with its elements reversed.
+    */
    toReversed(): BigInt64Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies and sorts the array.
 +   * Returns a copy of an array with its elements sorted.
-    *
-    * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
-    *
-@@ -686,11 +686,13 @@ interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param compareFn Function used to determine the order of the elements. It is expected to return
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+@@ -782,11 +782,13 @@ interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
    ): BigInt64Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies the array and inserts the given bigint at the provided index.
 +   * Copies an array, then overwrites the value at the provided index with the
 +   * given value. If the index is negative, then it replaces from the end
 +   * of the array.
-    *
-    * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
+    * @param index The index of the value to overwrite. If the index is
+    * negative, then it replaces from the end of the array.
 -   * @param value The value to insert into the copied array.
 -   * @returns A copy of the original array with the inserted value.
 +   * @param value The value to write into the copied array.
@@ -684,7 +705,7 @@
     */
    with(index: number, value: bigint): BigInt64Array<ArrayBuffer>;
  }
-@@ -704,11 +706,11 @@ interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -803,11 +805,11 @@ interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
     */
    findLast<S extends bigint>(
      predicate: (value: bigint, index: number, array: this) => value is S,
@@ -697,10 +718,10 @@
 +    predicate: (value: bigint, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): bigint | undefined;
- 
+
    /**
-@@ -718,15 +720,15 @@ interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
-    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
+@@ -820,17 +822,17 @@ interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
+    * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
 -    predicate: (value: bigint, index: number, array: this) => unknown,
@@ -708,27 +729,29 @@
 +    predicate: (value: bigint, index: number, array: this) => boolean,
 +    thisArg?: unknown,
    ): number;
- 
--  /** Copies the array and returns the copy with the elements in reverse order. */
-+  /** Returns a copy of an array with its elements reversed. */
+
+   /**
+-   * Copies the array and returns the copy with the elements in reverse order.
++   * Returns a copy of an array with its elements reversed.
+    */
    toReversed(): BigUint64Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies and sorts the array.
 +   * Returns a copy of an array with its elements sorted.
-    *
-    * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
-    *
-@@ -740,11 +742,13 @@ interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
+    * @param compareFn Function used to determine the order of the elements. It is expected to return
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+@@ -844,11 +846,13 @@ interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
    ): BigUint64Array<ArrayBuffer>;
- 
+
    /**
 -   * Copies the array and inserts the given bigint at the provided index.
 +   * Copies an array, then overwrites the value at the provided index with the
 +   * given value. If the index is negative, then it replaces from the end
 +   * of the array.
-    *
-    * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
+    * @param index The index of the value to overwrite. If the index is
+    * negative, then it replaces from the end of the array.
 -   * @param value The value to insert into the copied array.
 -   * @returns A copy of the original array with the inserted value.
 +   * @param value The value to write into the copied array.

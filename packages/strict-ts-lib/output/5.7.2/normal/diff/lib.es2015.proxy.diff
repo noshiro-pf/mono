@@ -1,4 +1,4 @@
-@@ -1,19 +1,5 @@
+@@ -1,33 +1,23 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -16,19 +16,17 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  interface ProxyHandler<T extends object> {
    /**
-@@ -21,7 +7,7 @@ interface ProxyHandler<T extends object> {
-    *
+    * A trap method for a function call.
     * @param target The original callable object which is being proxied.
     */
 -  apply?(target: T, thisArg: any, argArray: any[]): any;
 +  apply?(target: T, thisArg: unknown, argArray: readonly unknown[]): unknown;
- 
+
    /**
     * A trap for the `new` operator.
-@@ -29,7 +15,11 @@ interface ProxyHandler<T extends object> {
     * @param target The original object which is being proxied.
     * @param newTarget The constructor that was originally called.
     */
@@ -38,19 +36,19 @@
 +    argArray: readonly unknown[],
 +    newTarget: Function,
 +  ): object;
- 
+
    /**
     * A trap for `Object.defineProperty()`.
-@@ -59,7 +49,7 @@ interface ProxyHandler<T extends object> {
+@@ -54,7 +44,7 @@ interface ProxyHandler<T extends object> {
     * @param p The name or `Symbol` of the property to get.
     * @param receiver The proxy or an object that inherits from the proxy.
     */
 -  get?(target: T, p: string | symbol, receiver: any): any;
 +  get?(target: T, p: string | symbol, receiver: unknown): unknown;
- 
+
    /**
     * A trap for `Object.getOwnPropertyDescriptor()`.
-@@ -116,7 +106,12 @@ interface ProxyHandler<T extends object> {
+@@ -104,7 +94,12 @@ interface ProxyHandler<T extends object> {
     * @param receiver The object to which the assignment was originally directed.
     * @returns A `Boolean` indicating whether or not the property was set.
     */
@@ -61,10 +59,10 @@
 +    newValue: unknown,
 +    receiver: unknown,
 +  ): boolean;
- 
+
    /**
     * A trap for `Object.setPrototypeOf()`.
-@@ -148,4 +143,4 @@ interface ProxyConstructor {
+@@ -134,4 +129,4 @@ interface ProxyConstructor {
     */
    new <T extends object>(target: T, handler: ProxyHandler<T>): T;
  }

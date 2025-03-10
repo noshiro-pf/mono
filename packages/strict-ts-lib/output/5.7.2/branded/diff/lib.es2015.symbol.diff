@@ -16,12 +16,12 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  interface SymbolConstructor {
-   /** A reference to the prototype. */
-@@ -41,4 +27,4 @@ interface SymbolConstructor {
+   /**
+@@ -42,4 +28,4 @@ interface SymbolConstructor {
    keyFor(sym: symbol): string | undefined;
  }
- 
+
 -declare var Symbol: SymbolConstructor;
 +declare const Symbol: SymbolConstructor;

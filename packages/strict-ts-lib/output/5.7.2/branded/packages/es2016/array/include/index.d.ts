@@ -4,7 +4,6 @@
 interface Array<T> {
   /**
    * Determines whether an array includes a certain element, returning true or false as appropriate.
-   *
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
@@ -17,7 +16,6 @@ interface Array<T> {
 interface ReadonlyArray<T> {
   /**
    * Determines whether an array includes a certain element, returning true or false as appropriate.
-   *
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
@@ -30,7 +28,6 @@ interface ReadonlyArray<T> {
 interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or false as appropriate.
-   *
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
@@ -43,7 +40,6 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
 interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or false as appropriate.
-   *
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
@@ -56,7 +52,6 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
 interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or false as appropriate.
-   *
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
@@ -69,7 +64,6 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
 interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or false as appropriate.
-   *
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
@@ -82,7 +76,6 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
 interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or false as appropriate.
-   *
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
@@ -95,7 +88,6 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
 interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or false as appropriate.
-   *
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
@@ -108,7 +100,6 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
 interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or false as appropriate.
-   *
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
@@ -121,7 +112,6 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
 interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or false as appropriate.
-   *
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
@@ -134,7 +124,6 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
 interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Determines whether an array includes a certain element, returning true or false as appropriate.
-   *
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */

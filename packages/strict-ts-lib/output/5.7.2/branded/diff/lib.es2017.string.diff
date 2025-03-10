@@ -19,9 +19,9 @@
  
  interface String {
    /**
-@@ -28,7 +14,10 @@ interface String {
-    *   is too long, it will be truncated and the left-most part will be applied.
-    *   The default value for this parameter is " " (U+0020).
+@@ -27,7 +13,10 @@ interface String {
+    *        If this string is too long, it will be truncated and the left-most part will be applied.
+    *        The default value for this parameter is " " (U+0020).
     */
 -  padStart(maxLength: number, fillString?: string): string;
 +  padStart(
@@ -30,10 +30,10 @@
 +  ): string;
  
    /**
-    * Pads the current string with a given string (possibly repeated) so that the
-@@ -42,5 +31,8 @@ interface String {
-    *   is too long, it will be truncated and the left-most part will be applied.
-    *   The default value for this parameter is " " (U+0020).
+    * Pads the current string with a given string (possibly repeated) so that the resulting string reaches a given length.
+@@ -40,5 +29,8 @@ interface String {
+    *        If this string is too long, it will be truncated and the left-most part will be applied.
+    *        The default value for this parameter is " " (U+0020).
     */
 -  padEnd(maxLength: number, fillString?: string): string;
 +  padEnd(

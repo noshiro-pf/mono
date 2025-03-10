@@ -19,7 +19,7 @@
  
  interface String {
    /**
-@@ -35,6 +21,6 @@ interface String {
+@@ -30,6 +16,6 @@ interface String {
     */
    replaceAll(
      searchValue: string | RegExp,

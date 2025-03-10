@@ -5,10 +5,14 @@
 /// <reference lib="es2015.symbol.wellknown" />
 
 interface SharedArrayBuffer {
-  /** Read-only. The length of the ArrayBuffer (in bytes). */
+  /**
+   * Read-only. The length of the ArrayBuffer (in bytes).
+   */
   readonly byteLength: NumberType.TypedArraySize;
 
-  /** Returns a section of an SharedArrayBuffer. */
+  /**
+   * Returns a section of an SharedArrayBuffer.
+   */
   slice(
     begin?: NumberType.TypedArraySizeArg,
     end?: NumberType.TypedArraySizeArg,
@@ -28,7 +32,11 @@ interface ArrayBufferTypes {
 }
 
 interface Atomics {
-  /** Adds a value to the value at the given position in the array, returning the original value. Until this atomic operation completes, any other read or write operation against the array will block. */
+  /**
+   * Adds a value to the value at the given position in the array, returning the original value.
+   * Until this atomic operation completes, any other read or write operation against the array
+   * will block.
+   */
   add(
     typedArray: Int8Array,
     index: NumberType.TypedArraySizeArg,
@@ -60,7 +68,11 @@ interface Atomics {
     value: Uint32,
   ): Uint32;
 
-  /** Stores the bitwise AND of a value with the value at the given position in the array, returning the original value. Until this atomic operation completes, any other read or write operation against the array will block. */
+  /**
+   * Stores the bitwise AND of a value with the value at the given position in the array,
+   * returning the original value. Until this atomic operation completes, any other read or
+   * write operation against the array will block.
+   */
   and(
     typedArray: Int8Array,
     index: NumberType.TypedArraySizeArg,
@@ -92,7 +104,11 @@ interface Atomics {
     value: Uint32,
   ): Uint32;
 
-  /** Replaces the value at the given position in the array if the original value equals the given expected value, returning the original value. Until this atomic operation completes, any other read or write operation against the array will block. */
+  /**
+   * Replaces the value at the given position in the array if the original value equals the given
+   * expected value, returning the original value. Until this atomic operation completes, any
+   * other read or write operation against the array will block.
+   */
   compareExchange(
     typedArray: Int8Array,
     index: NumberType.TypedArraySizeArg,
@@ -130,7 +146,11 @@ interface Atomics {
     replacementValue: Uint32,
   ): Uint32;
 
-  /** Replaces the value at the given position in the array, returning the original value. Until this atomic operation completes, any other read or write operation against the array will block. */
+  /**
+   * Replaces the value at the given position in the array, returning the original value. Until
+   * this atomic operation completes, any other read or write operation against the array will
+   * block.
+   */
   exchange(
     typedArray: Int8Array,
     index: NumberType.TypedArraySizeArg,
@@ -162,10 +182,17 @@ interface Atomics {
     value: Uint32,
   ): Uint32;
 
-  /** Returns a value indicating whether high-performance algorithms can use atomic operations (`true`) or must use locks (`false`) for the given number of bytes-per-element of a typed array. */
+  /**
+   * Returns a value indicating whether high-performance algorithms can use atomic operations
+   * (`true`) or must use locks (`false`) for the given number of bytes-per-element of a typed
+   * array.
+   */
   isLockFree(size: NumberType.TypedArraySizeArgPositive): boolean;
 
-  /** Returns the value at the given position in the array. Until this atomic operation completes, any other read or write operation against the array will block. */
+  /**
+   * Returns the value at the given position in the array. Until this atomic operation completes,
+   * any other read or write operation against the array will block.
+   */
   load(typedArray: Int8Array, index: NumberType.TypedArraySizeArg): Int8;
   load(typedArray: Uint8Array, index: NumberType.TypedArraySizeArg): Uint8;
   load(typedArray: Int16Array, index: NumberType.TypedArraySizeArg): Int16;
@@ -173,7 +200,11 @@ interface Atomics {
   load(typedArray: Int32Array, index: NumberType.TypedArraySizeArg): Int32;
   load(typedArray: Uint32Array, index: NumberType.TypedArraySizeArg): Uint32;
 
-  /** Stores the bitwise OR of a value with the value at the given position in the array, returning the original value. Until this atomic operation completes, any other read or write operation against the array will block. */
+  /**
+   * Stores the bitwise OR of a value with the value at the given position in the array,
+   * returning the original value. Until this atomic operation completes, any other read or write
+   * operation against the array will block.
+   */
   or(
     typedArray: Int8Array,
     index: NumberType.TypedArraySizeArg,
@@ -205,7 +236,10 @@ interface Atomics {
     value: Uint32,
   ): Uint32;
 
-  /** Stores a value at the given position in the array, returning the new value. Until this atomic operation completes, any other read or write operation against the array will block. */
+  /**
+   * Stores a value at the given position in the array, returning the new value. Until this
+   * atomic operation completes, any other read or write operation against the array will block.
+   */
   store(
     typedArray: Int8Array,
     index: NumberType.TypedArraySizeArg,
@@ -237,7 +271,11 @@ interface Atomics {
     value: Uint32,
   ): Uint32;
 
-  /** Subtracts a value from the value at the given position in the array, returning the original value. Until this atomic operation completes, any other read or write operation against the array will block. */
+  /**
+   * Subtracts a value from the value at the given position in the array, returning the original
+   * value. Until this atomic operation completes, any other read or write operation against the
+   * array will block.
+   */
   sub(
     typedArray: Int8Array,
     index: NumberType.TypedArraySizeArg,
@@ -269,7 +307,12 @@ interface Atomics {
     value: Uint32,
   ): Uint32;
 
-  /** If the value at the given position in the array is equal to the provided value, the current agent is put to sleep causing execution to suspend until the timeout expires (returning `"timed-out"`) or until the agent is awoken (returning `"ok"`); otherwise, returns `"not-equal"`. */
+  /**
+   * If the value at the given position in the array is equal to the provided value, the current
+   * agent is put to sleep causing execution to suspend until the timeout expires (returning
+   * `"timed-out"`) or until the agent is awoken (returning `"ok"`); otherwise, returns
+   * `"not-equal"`.
+   */
   wait(
     typedArray: Int32Array<ArrayBufferLike>,
     index: NumberType.TypedArraySizeArg,
@@ -278,8 +321,8 @@ interface Atomics {
   ): 'ok' | 'not-equal' | 'timed-out';
 
   /**
-   * Wakes up sleeping agents that are waiting on the given index of the array, returning the number of agents that were awoken.
-   *
+   * Wakes up sleeping agents that are waiting on the given index of the array, returning the
+   * number of agents that were awoken.
    * @param typedArray A shared Int32Array<ArrayBufferLike>.
    * @param index The position in the typedArray to wake up on.
    * @param count The number of sleeping agents to notify. Defaults to +Infinity.
@@ -290,7 +333,11 @@ interface Atomics {
     count?: SafeUint,
   ): SafeUint;
 
-  /** Stores the bitwise XOR of a value with the value at the given position in the array, returning the original value. Until this atomic operation completes, any other read or write operation against the array will block. */
+  /**
+   * Stores the bitwise XOR of a value with the value at the given position in the array,
+   * returning the original value. Until this atomic operation completes, any other read or write
+   * operation against the array will block.
+   */
   xor(
     typedArray: Int8Array,
     index: NumberType.TypedArraySizeArg,

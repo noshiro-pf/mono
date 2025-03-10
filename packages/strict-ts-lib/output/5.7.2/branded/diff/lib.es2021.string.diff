@@ -16,10 +16,10 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  interface String {
    /**
-@@ -32,6 +18,6 @@ interface String {
+@@ -30,6 +16,6 @@ interface String {
     */
    replaceAll(
      searchValue: string | RegExp,

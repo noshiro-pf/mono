@@ -16,10 +16,10 @@
 -
  /// <reference no-default-lib="true"/>
 +/// <reference types="@noshiro/ts-type-utils" />
- 
+
  interface DateConstructor {
    /**
-@@ -29,11 +15,11 @@ interface DateConstructor {
+@@ -28,11 +14,11 @@ interface DateConstructor {
     */
    UTC(
      year: number,
