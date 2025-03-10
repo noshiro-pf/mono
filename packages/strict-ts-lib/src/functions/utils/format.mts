@@ -28,7 +28,10 @@ export const formatFiles = async (
       continue;
     }
 
-    const formatted = await prettier.format(src, options);
+    const formatted = await prettier.format(src, {
+      ...options,
+      filepath: filePath,
+    });
 
     console.log(
       `${filePath} (${src === formatted ? 'unchanged' : 'changed'}) ${options.printWidth === 80 ? '' : `(printWidth=${options.printWidth})`}`,

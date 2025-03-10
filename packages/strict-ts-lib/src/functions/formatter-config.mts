@@ -12,7 +12,6 @@ const formatterOptionsCommon = {
   endOfLine: 'lf',
   singleQuote: true,
   jsxSingleQuote: true,
-  parser: 'typescript',
 } as const satisfies prettier.Options;
 
 export const formatterOptionsDefault = {
