@@ -1,11 +1,11 @@
 import type * as prettier from 'prettier';
 
 export const ignoreFormatting = (absoluteFilePath: string): boolean =>
-  absoluteFilePath.includes('/temp/eslint-fixed/') ||
   absoluteFilePath.includes('/diff/');
 
 export const formatWithPrintWidth320 = (absoluteFilePath: string): boolean =>
-  absoluteFilePath.includes('/temp/copied/');
+  absoluteFilePath.includes('/temp/copied/') ||
+  absoluteFilePath.includes('/temp/transformed/');
 
 const formatterOptionsCommon = {
   semi: true,

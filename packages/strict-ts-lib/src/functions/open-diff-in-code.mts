@@ -1,6 +1,6 @@
 import 'zx/globals';
+import { paths } from '../constants.mjs';
 import { type TsVersion, typescriptVersions } from '../typescript-versions.mjs';
-import { paths } from './constants.mjs';
 
 export const openDiffInCode = async (
   numberType: 'normal' | 'branded',

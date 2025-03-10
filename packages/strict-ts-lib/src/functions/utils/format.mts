@@ -1,7 +1,7 @@
 import { range } from '@noshiro/mono-utils';
 import * as prettier from 'prettier';
 import 'zx/globals';
-import { paths } from '../constants.mjs';
+import { paths } from '../../constants.mjs';
 import {
   formatterOptionsDefault,
   formatterOptionsForCopied,
@@ -11,7 +11,7 @@ import {
 
 // NOTE: prettier CLI で実行するとき file path を複数の glob 文字列で与えることができず、
 // glob で展開した絶対パスを渡しても長すぎてエラーになってしまったため、
-// prettier.format API を直接呼ぶ実装に変更した。
+// prettier.format API (https://prettier.io/docs/api) を直接呼ぶ実装に変更した。
 // これに伴い strict-ts-lib workspace 用の .prettierrc ファイル等は削除した。
 
 export const formatFiles = async (
@@ -27,7 +27,7 @@ export const formatFiles = async (
     const ignored = ignoreFormatting(filePath);
 
     if (ignored) {
-      console.log(`${filePath} (ignored)'`);
+      console.log(`${filePath} (ignored)`);
       continue;
     }
 

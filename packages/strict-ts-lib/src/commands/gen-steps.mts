@@ -1,15 +1,15 @@
 import { toUint32 } from '@noshiro/mono-utils';
+import { converterConfigs, packageManagerName, paths } from '../constants.mjs';
 import {
-  converterConfigs,
-  packageManagerName,
-  paths,
-} from '../functions/constants.mjs';
-import { fetchLibFiles } from '../functions/fetch-lib-files.mjs';
-import { genDiff, prepareCopiedForDiff } from '../functions/gen-diff.mjs';
-import { genEslintFixed } from '../functions/gen-eslint-fixed.mjs';
-import { genLibFiles } from '../functions/gen-lib-files.mjs';
-import { genPackages } from '../functions/gen-packages.mjs';
-import { formatChanged, formatFiles } from '../functions/utils/format.mjs';
+  fetchLibFiles,
+  formatChanged,
+  formatFiles,
+  genDiff,
+  genLibFiles,
+  genPackages,
+  genTransformed,
+  prepareCopiedForDiff,
+} from '../functions/index.mjs';
 import { type TsVersion, typescriptVersions } from '../typescript-versions.mjs';
 
 export const steps = (tsVersion: TsVersion | 'all') =>
@@ -43,8 +43,28 @@ export const steps = (tsVersion: TsVersion | 'all') =>
       fn: formatChanged,
     },
     {
-      name: 'genEslintFixed',
-      fn: () => genEslintFixed(tsVersion),
+      name: 'genTransformed',
+      fn: () => genTransformed(tsVersion),
+    },
+    {
+      name: 'format temp/transformed',
+      fn: async () => {
+        if (tsVersion === 'all') {
+          const files = await Promise.all(
+            typescriptVersions.map((v) =>
+              glob(`${paths.strictTsLib.output(v).temp.transformed}/*`),
+            ),
+          );
+
+          return formatFiles(files.flat());
+        } else {
+          const files = await glob(
+            `${paths.strictTsLib.output(tsVersion).temp.transformed}/*`,
+          );
+
+          return formatFiles(files);
+        }
+      },
     },
     {
       name: 'genLibFiles',
