@@ -461,7 +461,7 @@ if (isInt(x) && isNonNegativeNumber(x)) {
 
 ## ［発展］Branded Number Type の Union 型を改善する
 
-前節の実装で唯一難点なのが、 union 型の結果に余計なプロパティが生えてしまうことです。例として以下の型を考えてみます。
+実は、前節の実装だと、 union 型の結果に余計なプロパティが生えてしまうという難点があります。例として以下の型を考えてみます。
 
 ```ts
 type MaybeNonZeroNumber = NegativeNumber | PositiveNumber;
@@ -496,7 +496,7 @@ type PositiveNumber = number & {
 };
 ```
 
-の union を取った結果、
+の union を取った結果は、
 
 ```ts
 number & {
@@ -508,7 +508,8 @@ number & {
 
 という型になってしまいます。
 
-`Brand` 型の定義を工夫することで解決できれば理想的なのですが、元々 `number` 型を「割る」ときにプロパティを新たに「足す」ということをしているので、普通に union 型を作ったときに対消滅させるような仕組みにするのは単純な方法では上手くいかなさそうなので、作った branded type の union 型から `boolean` になってしまったキーを取り除いて正規化するユーティリティだけ用意してみることにしました。
+`Brand` 型の定義を工夫することで解決できれば理想的なのですが、元々 `number` 型を「割る」ときにプロパティを新たに「足す」ということをしているので、普通に union 型を作ったときに対消滅させるような仕組みにするのは単純な方法では上手くいかなさそうです。
+根本的な解決方法は思いつかなかったので、 union により作られた branded type から `boolean` になってしまったキーを取り除いて正規化するユーティリティだけ用意してみることにしました。
 
 ```ts
 NormalizeBrandUnion<NegativeNumber | PositiveNumber>;
