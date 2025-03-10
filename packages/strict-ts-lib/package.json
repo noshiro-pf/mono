@@ -20,7 +20,7 @@
     "fmt": "wireit",
     "gen:after-fetch:all": "wireit",
     "gen:after-fetch:latest": "wireit",
-    "gen:ci:all": "wireit",
+    "gen:ci": "wireit",
     "gen:full:all": "wireit",
     "gen:full:latest": "wireit",
     "gen:lib-files:all": "wireit",
@@ -65,7 +65,7 @@
       ],
       "command": "zx ./dist/commands/fmt-diff.mjs"
     },
-    "gen:ci:all": {
+    "gen:ci": {
       "dependencies": [
         "build"
       ],
