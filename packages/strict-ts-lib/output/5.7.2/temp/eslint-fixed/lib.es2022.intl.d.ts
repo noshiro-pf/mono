@@ -76,7 +76,7 @@ declare namespace Intl {
   }
 
   const Segmenter: {
-    readonly prototype: Segmenter;
+    prototype: Segmenter;
 
     /**
      * Creates a new `Intl.Segmenter` object.

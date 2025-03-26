@@ -24,7 +24,7 @@ interface Map<K, V> {
   /**
    * Executes a provided function once per each key/value pair in the Map, in insertion order.
    */
-  forEach(callbackfn: (value: V, key: K, map: ReadonlyMap<K, V>) => void, thisArg?: unknown): void;
+  forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: unknown): void;
   /**
    * Returns a specified element from the Map object. If the value that is associated to the provided key is an object, then you will get a reference to that object and any change made to that object will effectively modify it inside the Map.
    * @returns Returns the element associated with the specified key. If no element is associated with the specified key, undefined is returned.
@@ -45,9 +45,9 @@ interface Map<K, V> {
 }
 
 interface MapConstructor {
-  new (): ReadonlyMap<unknown, unknown>;
-  new <K, V>(entries?: readonly (readonly [K, V])[] | null): ReadonlyMap<K, V>;
-  readonly prototype: ReadonlyMap<unknown, unknown>;
+  new (): Map<unknown, unknown>;
+  new <K, V>(entries?: readonly (readonly [K, V])[] | null): Map<K, V>;
+  readonly prototype: Map<unknown, unknown>;
 }
 declare var Map: MapConstructor;
 
@@ -100,7 +100,7 @@ interface Set<T> {
   /**
    * Executes a provided function once per each value in the Set object, in insertion order.
    */
-  forEach(callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void, thisArg?: unknown): void;
+  forEach(callbackfn: (value: T, value2: T, set: Set<T>) => void, thisArg?: unknown): void;
   /**
    * @returns a boolean indicating whether an element with the specified value exists in the Set or not.
    */
@@ -112,8 +112,8 @@ interface Set<T> {
 }
 
 interface SetConstructor {
-  new <T = unknown>(values?: readonly T[] | null): ReadonlySet<T>;
-  readonly prototype: ReadonlySet<unknown>;
+  new <T = unknown>(values?: readonly T[] | null): Set<T>;
+  readonly prototype: Set<unknown>;
 }
 declare var Set: SetConstructor;
 

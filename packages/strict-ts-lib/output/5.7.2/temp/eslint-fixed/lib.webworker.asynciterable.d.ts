@@ -24,8 +24,8 @@ interface FileSystemDirectoryHandleAsyncIterator<T> extends AsyncIteratorObject<
 }
 
 interface FileSystemDirectoryHandle {
-  [Symbol.asyncIterator](): FileSystemDirectoryHandleAsyncIterator<readonly [string, FileSystemHandle]>;
-  entries(): FileSystemDirectoryHandleAsyncIterator<readonly [string, FileSystemHandle]>;
+  [Symbol.asyncIterator](): FileSystemDirectoryHandleAsyncIterator<[string, FileSystemHandle]>;
+  entries(): FileSystemDirectoryHandleAsyncIterator<[string, FileSystemHandle]>;
   keys(): FileSystemDirectoryHandleAsyncIterator<string>;
   values(): FileSystemDirectoryHandleAsyncIterator<FileSystemHandle>;
 }

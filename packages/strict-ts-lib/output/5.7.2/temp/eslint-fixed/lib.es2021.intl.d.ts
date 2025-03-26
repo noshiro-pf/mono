@@ -112,7 +112,7 @@ declare namespace Intl {
      *
      * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/formatToParts).
      */
-    formatToParts(list: Iterable<string>): readonly { readonly type: 'element' | 'literal'; readonly value: string }[];
+    formatToParts(list: Iterable<string>): readonly { type: 'element' | 'literal'; value: string }[];
 
     /**
      * Returns a new object with properties reflecting the locale and style
@@ -125,7 +125,7 @@ declare namespace Intl {
   }
 
   const ListFormat: {
-    readonly prototype: ListFormat;
+    prototype: ListFormat;
 
     /**
      * Creates [Intl.ListFormat](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat) objects that

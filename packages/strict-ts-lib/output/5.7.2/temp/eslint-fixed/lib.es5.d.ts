@@ -284,7 +284,7 @@ interface Function {
    * @param thisArg The object to be used as the current object.
    * @param argArray A list of arguments to be passed to the method.
    */
-  call(this: Function, thisArg: unknown, ...argArray: readonly any[]): unknown;
+  call(this: Function, thisArg: unknown, ...argArray: readonly unknown[]): unknown;
 
   /**
    * For a given function, creates a bound function that has the same body as the original function.
@@ -292,7 +292,7 @@ interface Function {
    * @param thisArg An object to which the this keyword can refer inside the new function.
    * @param argArray A list of arguments to be passed to the new function.
    */
-  bind(this: Function, thisArg: unknown, ...argArray: readonly any[]): unknown;
+  bind(this: Function, thisArg: unknown, ...argArray: readonly unknown[]): unknown;
 
   /** Returns a string representation of a function. */
   toString(): string;
@@ -466,7 +466,7 @@ interface String {
    * @param searchValue A string to search for.
    * @param replacer A function that returns the replacement text.
    */
-  replace(searchValue: string | RegExp, replacer: (substring: string, ...args: readonly any[]) => string): string;
+  replace(searchValue: string | RegExp, replacer: (substring: string, ...args: readonly unknown[]) => string): string;
 
   /**
    * Finds the first substring match in a regular expression search.
@@ -1568,15 +1568,15 @@ interface ArrayLike<T> {
 /**
  * Make all properties in T optional
  */
-type Partial<T> = { readonly
-  [P in keyof T]?: T[P];
+type Partial<T> = {
+  readonly [P in keyof T]?: T[P];
 };
 
 /**
  * Make all properties in T required
  */
-type Required<T> = { readonly
-  [P in keyof T]-?: T[P];
+type Required<T> = {
+  readonly [P in keyof T]-?: T[P];
 };
 
 /**
@@ -1589,15 +1589,15 @@ type Readonly<T> = {
 /**
  * From T, pick a set of properties whose keys are in the union K
  */
-type Pick<T, K extends keyof T> = { readonly
-  [P in K]: T[P];
+type Pick<T, K extends keyof T> = {
+  readonly [P in K]: T[P];
 };
 
 /**
  * Construct a type with a set of properties K of type T
  */
-type Record<K extends keyof unknown, T> = { readonly
-  [P in K]: T;
+type Record<K extends keyof unknown, T> = {
+  readonly [P in K]: T;
 };
 
 /**
@@ -1858,7 +1858,7 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
 }
 interface DataViewConstructor {
   readonly prototype: DataView<ArrayBufferLike>;
-  new <TArrayBuffer extends ArrayBufferLike & { readonly BYTES_PER_ELEMENT?: never }>(buffer: TArrayBuffer, byteOffset?: number, byteLength?: number): DataView<TArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike & { BYTES_PER_ELEMENT?: never }>(buffer: TArrayBuffer, byteOffset?: number, byteLength?: number): DataView<TArrayBuffer>;
 }
 declare var DataView: DataViewConstructor;
 

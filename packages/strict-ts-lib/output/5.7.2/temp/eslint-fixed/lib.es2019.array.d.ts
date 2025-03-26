@@ -16,8 +16,8 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 
 type FlatArray<Arr, Depth extends number> = {
-  readonly done: Arr;
-  readonly recur: Arr extends ReadonlyArray<infer InnerArr> ? FlatArray<InnerArr, readonly readonly readonly readonly readonly readonly readonly readonly readonly readonly [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20][Depth]> : Arr;
+  done: Arr;
+  recur: Arr extends ReadonlyArray<infer InnerArr> ? FlatArray<InnerArr, (readonly [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20])[Depth]> : Arr;
 }[Depth extends -1 ? 'done' : 'recur'];
 
 interface ReadonlyArray<T> {

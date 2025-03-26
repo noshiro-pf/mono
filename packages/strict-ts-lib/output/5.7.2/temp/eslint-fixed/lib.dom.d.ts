@@ -6496,7 +6496,7 @@ interface DOMImplementation {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMImplementation/hasFeature)
    */
-  hasFeature(...args: any[]): true;
+  hasFeature(...args: unknown[]): true;
 }
 
 declare var DOMImplementation: {
@@ -26649,9 +26649,9 @@ interface WindowOrWorkerGlobalScope {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/reportError) */
   reportError(e: unknown): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/setInterval) */
-  setInterval(handler: TimerHandler, timeout?: number, ...arguments: any[]): number;
+  setInterval(handler: TimerHandler, timeout?: number, ...arguments: unknown[]): number;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/setTimeout) */
-  setTimeout(handler: TimerHandler, timeout?: number, ...arguments: any[]): number;
+  setTimeout(handler: TimerHandler, timeout?: number, ...arguments: unknown[]): number;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/structuredClone) */
   structuredClone<T = unknown>(value: T, options?: StructuredSerializeOptions): T;
 }
@@ -27138,7 +27138,7 @@ declare var XSLTProcessor: {
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console) */
 interface Console {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/assert_static) */
-  assert(condition?: boolean, ...data: any[]): void;
+  assert(condition?: boolean, ...data: unknown[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/clear_static) */
   clear(): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/count_static) */
@@ -27146,23 +27146,23 @@ interface Console {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/countReset_static) */
   countReset(label?: string): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug_static) */
-  debug(...data: any[]): void;
+  debug(...data: unknown[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dir_static) */
   dir(item?: unknown, options?: unknown): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dirxml_static) */
-  dirxml(...data: any[]): void;
+  dirxml(...data: unknown[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/error_static) */
-  error(...data: any[]): void;
+  error(...data: unknown[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/group_static) */
-  group(...data: any[]): void;
+  group(...data: unknown[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/groupCollapsed_static) */
-  groupCollapsed(...data: any[]): void;
+  groupCollapsed(...data: unknown[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/groupEnd_static) */
   groupEnd(): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static) */
-  info(...data: any[]): void;
+  info(...data: unknown[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/log_static) */
-  log(...data: any[]): void;
+  log(...data: unknown[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/table_static) */
   table(tabularData?: unknown, properties?: string[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static) */
@@ -27170,12 +27170,12 @@ interface Console {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeEnd_static) */
   timeEnd(label?: string): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeLog_static) */
-  timeLog(label?: string, ...data: any[]): void;
+  timeLog(label?: string, ...data: unknown[]): void;
   timeStamp(label?: string): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/trace_static) */
-  trace(...data: any[]): void;
+  trace(...data: unknown[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/warn_static) */
-  warn(...data: any[]): void;
+  warn(...data: unknown[]): void;
 }
 
 declare var console: Console;
@@ -27473,7 +27473,7 @@ interface BlobCallback {
 }
 
 interface CustomElementConstructor {
-  new (...params: any[]): HTMLElement;
+  new (...params: unknown[]): HTMLElement;
 }
 
 interface DecodeErrorCallback {
@@ -28692,9 +28692,9 @@ declare function queueMicrotask(callback: VoidFunction): void;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/reportError) */
 declare function reportError(e: unknown): void;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/setInterval) */
-declare function setInterval(handler: TimerHandler, timeout?: number, ...arguments: any[]): number;
+declare function setInterval(handler: TimerHandler, timeout?: number, ...arguments: unknown[]): number;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/setTimeout) */
-declare function setTimeout(handler: TimerHandler, timeout?: number, ...arguments: any[]): number;
+declare function setTimeout(handler: TimerHandler, timeout?: number, ...arguments: unknown[]): number;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/structuredClone) */
 declare function structuredClone<T = unknown>(value: T, options?: StructuredSerializeOptions): T;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/sessionStorage) */

@@ -122,19 +122,19 @@ declare var WScript: {
    * Exposes the write-only error output stream for the current script.
    * Can be accessed only while using CScript.exe.
    */
-  readonly StdErr: TextStreamWriter;
+  StdErr: TextStreamWriter;
 
   /**
    * Exposes the write-only output stream for the current script.
    * Can be accessed only while using CScript.exe.
    */
-  readonly StdOut: TextStreamWriter;
-  readonly Arguments: { readonly length: number; Item(n: number): string };
+  StdOut: TextStreamWriter;
+  Arguments: { length: number; Item(n: number): string };
 
   /**
    *  The full path of the currently running script.
    */
-  readonly ScriptFullName: string;
+  ScriptFullName: string;
 
   /**
    * Forces the script to stop immediately, with an optional exit code.
@@ -144,43 +144,43 @@ declare var WScript: {
   /**
    * The Windows Script Host build version number.
    */
-  readonly BuildVersion: number;
+  BuildVersion: number;
 
   /**
    * Fully qualified path of the host executable.
    */
-  readonly FullName: string;
+  FullName: string;
 
   /**
    * Gets/sets the script mode - interactive(true) or batch(false).
    */
-  readonly Interactive: boolean;
+  Interactive: boolean;
 
   /**
    * The name of the host executable (WScript.exe or CScript.exe).
    */
-  readonly Name: string;
+  Name: string;
 
   /**
    * Path of the directory containing the host executable.
    */
-  readonly Path: string;
+  Path: string;
 
   /**
    * The filename of the currently running script.
    */
-  readonly ScriptName: string;
+  ScriptName: string;
 
   /**
    * Exposes the read-only input stream for the current script.
    * Can be accessed only while using CScript.exe.
    */
-  readonly StdIn: TextStreamReader;
+  StdIn: TextStreamReader;
 
   /**
    * Windows Script Host version
    */
-  readonly Version: string;
+  Version: string;
 
   /**
    * Connects a COM object's event sources to functions named with a given prefix, in the form prefix_event.

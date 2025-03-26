@@ -28,5 +28,5 @@ interface String {
    * @param searchValue A string to search for.
    * @param replacer A function that returns the replacement text.
    */
-  replaceAll(searchValue: string | RegExp, replacer: (substring: string, ...args: readonly any[]) => string): string;
+  replaceAll(searchValue: string | RegExp, replacer: (substring: string, ...args: readonly unknown[]) => string): string;
 }

@@ -309,7 +309,7 @@ interface ObjectConstructor {
    * @param target The target object to copy to.
    * @param sources One or more source objects from which to copy properties
    */
-  assign(target: object, ...sources: readonly any[]): unknown;
+  assign(target: object, ...sources: readonly unknown[]): unknown;
 
   /**
    * Returns an array of all symbol properties found directly on object o.
@@ -556,7 +556,7 @@ interface StringConstructor {
    * @param template A well-formed template string call site representation.
    * @param substitutions A set of substitution values.
    */
-  raw(template: { readonly raw: readonly string[] | ArrayLike<string> }, ...substitutions: readonly any[]): string;
+  raw(template: { raw: readonly string[] | ArrayLike<string> }, ...substitutions: readonly unknown[]): string;
 }
 
 interface Int8Array<TArrayBuffer extends ArrayBufferLike> {

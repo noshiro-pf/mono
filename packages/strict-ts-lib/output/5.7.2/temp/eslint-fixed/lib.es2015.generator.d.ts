@@ -30,12 +30,12 @@ interface GeneratorFunction {
    * Creates a new Generator object.
    * @param args A list of arguments the function accepts.
    */
-  new (...args: readonly any[]): Generator;
+  new (...args: readonly unknown[]): Generator;
   /**
    * Creates a new Generator object.
    * @param args A list of arguments the function accepts.
    */
-  (...args: readonly any[]): Generator;
+  (...args: readonly unknown[]): Generator;
   /**
    * The length of the arguments.
    */

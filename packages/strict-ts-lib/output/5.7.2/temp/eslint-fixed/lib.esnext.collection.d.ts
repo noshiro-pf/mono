@@ -36,19 +36,19 @@ interface Set<T> {
   /**
    * @returns a new Set containing all the elements in this Set and also all the elements in the argument.
    */
-  union<U>(other: ReadonlySetLike<U>): ReadonlySet<T | U>;
+  union<U>(other: ReadonlySetLike<U>): Set<T | U>;
   /**
    * @returns a new Set containing all the elements which are both in this Set and in the argument.
    */
-  intersection<U>(other: ReadonlySetLike<U>): ReadonlySet<T & U>;
+  intersection<U>(other: ReadonlySetLike<U>): Set<T & U>;
   /**
    * @returns a new Set containing all the elements in this Set which are not also in the argument.
    */
-  difference<U>(other: ReadonlySetLike<U>): ReadonlySet<T>;
+  difference<U>(other: ReadonlySetLike<U>): Set<T>;
   /**
    * @returns a new Set containing all the elements which are in either this Set or in the argument, but not in both.
    */
-  symmetricDifference<U>(other: ReadonlySetLike<U>): ReadonlySet<T | U>;
+  symmetricDifference<U>(other: ReadonlySetLike<U>): Set<T | U>;
   /**
    * @returns a boolean indicating whether all the elements in this Set are also in the argument.
    */
@@ -67,19 +67,19 @@ interface ReadonlySet<T> {
   /**
    * @returns a new Set containing all the elements in this Set and also all the elements in the argument.
    */
-  union<U>(other: ReadonlySetLike<U>): ReadonlySet<T | U>;
+  union<U>(other: ReadonlySetLike<U>): Set<T | U>;
   /**
    * @returns a new Set containing all the elements which are both in this Set and in the argument.
    */
-  intersection<U>(other: ReadonlySetLike<U>): ReadonlySet<T & U>;
+  intersection<U>(other: ReadonlySetLike<U>): Set<T & U>;
   /**
    * @returns a new Set containing all the elements in this Set which are not also in the argument.
    */
-  difference<U>(other: ReadonlySetLike<U>): ReadonlySet<T>;
+  difference<U>(other: ReadonlySetLike<U>): Set<T>;
   /**
    * @returns a new Set containing all the elements which are in either this Set or in the argument, but not in both.
    */
-  symmetricDifference<U>(other: ReadonlySetLike<U>): ReadonlySet<T | U>;
+  symmetricDifference<U>(other: ReadonlySetLike<U>): Set<T | U>;
   /**
    * @returns a boolean indicating whether all the elements in this Set are also in the argument.
    */
