@@ -49,7 +49,7 @@ declare namespace Intl {
   interface PluralRulesConstructor {
     new (locales?: string | readonly string[], options?: PluralRulesOptions): PluralRules;
     (locales?: string | readonly string[], options?: PluralRulesOptions): PluralRules;
-    supportedLocalesOf(locales: string | readonly string[], options?: { readonly localeMatcher?: 'lookup' | 'best fit' }): readonly string[];
+    supportedLocalesOf(locales: string | readonly string[], options?: Readonly<{ localeMatcher?: 'lookup' | 'best fit' }>): readonly string[];
   }
 
   const PluralRules: PluralRulesConstructor;

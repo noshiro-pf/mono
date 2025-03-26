@@ -26,7 +26,7 @@ interface Atomics {
    * @param value The expected value to test.
    * @param [timeout] The expected value to test.
    */
-  waitAsync(typedArray: Int32Array, index: number, value: number, timeout?: number): { readonly async: false; readonly value: 'not-equal' | 'timed-out' } | { readonly async: true; readonly value: Promise<'ok' | 'timed-out'> };
+  waitAsync(typedArray: Int32Array, index: number, value: number, timeout?: number): Readonly<{ async: false; value: 'not-equal' | 'timed-out' }> | Readonly<{ async: true; value: Promise<'ok' | 'timed-out'> }>;
 
   /**
    * A non-blocking, asynchronous version of wait which is usable on the main thread.
@@ -36,7 +36,7 @@ interface Atomics {
    * @param value The expected value to test.
    * @param [timeout] The expected value to test.
    */
-  waitAsync(typedArray: BigInt64Array, index: number, value: bigint, timeout?: number): { readonly async: false; readonly value: 'not-equal' | 'timed-out' } | { readonly async: true; readonly value: Promise<'ok' | 'timed-out'> };
+  waitAsync(typedArray: BigInt64Array, index: number, value: bigint, timeout?: number): Readonly<{ async: false; value: 'not-equal' | 'timed-out' }> | Readonly<{ async: true; value: Promise<'ok' | 'timed-out'> }>;
 }
 
 interface SharedArrayBuffer {
@@ -63,5 +63,5 @@ interface SharedArrayBuffer {
 }
 
 interface SharedArrayBufferConstructor {
-  new (byteLength: number, options?: { readonly maxByteLength?: number }): SharedArrayBuffer;
+  new (byteLength: number, options?: Readonly<{ maxByteLength?: number }>): SharedArrayBuffer;
 }

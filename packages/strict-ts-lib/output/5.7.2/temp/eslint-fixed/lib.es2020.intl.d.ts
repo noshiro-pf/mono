@@ -108,15 +108,15 @@ declare namespace Intl {
    * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/formatToParts#Using_formatToParts).
    */
   type RelativeTimeFormatPart =
-    | {
-        readonly type: 'literal';
-        readonly value: string;
-      }
-    | {
-        readonly type: Exclude<NumberFormatPartTypes, 'literal'>;
-        readonly value: string;
-        readonly unit: RelativeTimeFormatUnitSingular;
-      };
+    | Readonly<{
+        type: 'literal';
+        value: string;
+      }>
+    | Readonly<{
+        type: Exclude<NumberFormatPartTypes, 'literal'>;
+        value: string;
+        unit: RelativeTimeFormatUnitSingular;
+      }>;
 
   interface RelativeTimeFormat {
     /**
@@ -172,7 +172,7 @@ declare namespace Intl {
    *
    * [Compatibility](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat#Browser_compatibility).
    */
-  const RelativeTimeFormat: {
+  const RelativeTimeFormat: Readonly<{
     /**
      * Creates [Intl.RelativeTimeFormat](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RelativeTimeFormat) objects
      *
@@ -207,8 +207,8 @@ declare namespace Intl {
      *
      * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/supportedLocalesOf).
      */
-    supportedLocalesOf(locales?: LocalesArgument, options?: RelativeTimeFormatOptions): readonly UnicodeBCP47LocaleIdentifier[];
-  };
+    supportedLocalesOf(locales?: LocalesArgument, options?: RelativeTimeFormatOptions): UnicodeBCP47LocaleIdentifier[];
+  }>;
 
   interface NumberFormatOptionsStyleRegistry {
     readonly unit: never;
@@ -318,9 +318,9 @@ declare namespace Intl {
    *
    * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale).
    */
-  const Locale: {
+  const Locale: Readonly<{
     new (tag: UnicodeBCP47LocaleIdentifier | Locale, options?: LocaleOptions): Locale;
-  };
+  }>;
 
   type DisplayNamesFallback = 'code' | 'none';
 
@@ -376,8 +376,8 @@ declare namespace Intl {
    *
    * [Compatibility](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames#browser_compatibility).
    */
-  const DisplayNames: {
-    readonly prototype: DisplayNames;
+  const DisplayNames: Readonly<{
+    prototype: DisplayNames;
 
     /**
      * @param locales A string with a BCP 47 language tag, or an array of such strings.
@@ -403,8 +403,8 @@ declare namespace Intl {
      *
      * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames/supportedLocalesOf).
      */
-    supportedLocalesOf(locales?: LocalesArgument, options?: { readonly localeMatcher?: RelativeTimeFormatLocaleMatcher }): readonly UnicodeBCP47LocaleIdentifier[];
-  };
+    supportedLocalesOf(locales?: LocalesArgument, options?: { localeMatcher?: RelativeTimeFormatLocaleMatcher }): UnicodeBCP47LocaleIdentifier[];
+  }>;
 
   interface CollatorConstructor {
     new (locales?: LocalesArgument, options?: CollatorOptions): Collator;
@@ -428,6 +428,6 @@ declare namespace Intl {
     new (locales?: LocalesArgument, options?: PluralRulesOptions): PluralRules;
     (locales?: LocalesArgument, options?: PluralRulesOptions): PluralRules;
 
-    supportedLocalesOf(locales: LocalesArgument, options?: { readonly localeMatcher?: 'lookup' | 'best fit' }): readonly string[];
+    supportedLocalesOf(locales: LocalesArgument, options?: Readonly<{ localeMatcher?: 'lookup' | 'best fit' }>): readonly string[];
   }
 }

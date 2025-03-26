@@ -163,7 +163,7 @@ interface CryptoKeyPair {
   publicKey: CryptoKey;
 }
 
-interface CustomEventInit<T = unknown> extends EventInit {
+interface CustomEventInit<T = any> extends EventInit {
   detail?: T;
 }
 
@@ -258,7 +258,7 @@ interface EncodedVideoChunkMetadata {
 
 interface ErrorEventInit extends EventInit {
   colno?: number;
-  error?: unknown;
+  error?: any;
   filename?: string;
   lineno?: number;
   message?: string;
@@ -281,7 +281,7 @@ interface EventSourceInit {
 interface ExtendableEventInit extends EventInit {}
 
 interface ExtendableMessageEventInit extends ExtendableEventInit {
-  data?: unknown;
+  data?: any;
   lastEventId?: string;
   origin?: string;
   ports?: MessagePort[];
@@ -291,7 +291,7 @@ interface ExtendableMessageEventInit extends ExtendableEventInit {
 interface FetchEventInit extends ExtendableEventInit {
   clientId?: string;
   handled?: Promise<undefined>;
-  preloadResponse?: Promise<unknown>;
+  preloadResponse?: Promise<any>;
   replacesClientId?: string;
   request: Request;
   resultingClientId?: string;
@@ -477,7 +477,7 @@ interface MediaStreamTrackProcessorInit {
   maxBufferSize?: number;
 }
 
-interface MessageEventInit<T = unknown> extends EventInit {
+interface MessageEventInit<T = any> extends EventInit {
   data?: T;
   lastEventId?: string;
   origin?: string;
@@ -502,7 +502,7 @@ interface NotificationEventInit extends ExtendableEventInit {
 interface NotificationOptions {
   badge?: string;
   body?: string;
-  data?: unknown;
+  data?: any;
   dir?: NotificationDirection;
   icon?: string;
   lang?: string;
@@ -527,12 +527,12 @@ interface Pbkdf2Params extends Algorithm {
 }
 
 interface PerformanceMarkOptions {
-  detail?: unknown;
+  detail?: any;
   startTime?: DOMHighResTimeStamp;
 }
 
 interface PerformanceMeasureOptions {
-  detail?: unknown;
+  detail?: any;
   duration?: DOMHighResTimeStamp;
   end?: string | DOMHighResTimeStamp;
   start?: string | DOMHighResTimeStamp;
@@ -560,8 +560,8 @@ interface ProgressEventInit extends EventInit {
 }
 
 interface PromiseRejectionEventInit extends EventInit {
-  promise: Promise<unknown>;
-  reason?: unknown;
+  promise: Promise<any>;
+  reason?: any;
 }
 
 interface PushEventInit extends ExtendableEventInit {
@@ -579,7 +579,7 @@ interface PushSubscriptionOptionsInit {
   userVisibleOnly?: boolean;
 }
 
-interface QueuingStrategy<T = unknown> {
+interface QueuingStrategy<T = any> {
   highWaterMark?: number;
   size?: QueuingStrategySize<T>;
 }
@@ -643,7 +643,7 @@ interface ReadableStreamReadValueResult<T> {
   value: T;
 }
 
-interface ReadableWritablePair<R = unknown, W = unknown> {
+interface ReadableWritablePair<R = any, W = any> {
   readable: ReadableStream<R>;
   /**
    * Provides a convenient, chainable way of piping this readable stream through a transform stream (or any other { writable, readable } pair). It simply pipes the stream into the writable side of the supplied pair, and returns the readable side for further use.
@@ -789,7 +789,7 @@ interface TextEncoderEncodeIntoResult {
   written: number;
 }
 
-interface Transformer<I = unknown, O = unknown> {
+interface Transformer<I = any, O = any> {
   flush?: TransformerFlushCallback<O>;
   readableType?: undefined;
   start?: TransformerStartCallback<O>;
@@ -801,18 +801,18 @@ interface UnderlyingByteSource {
   autoAllocateChunkSize?: number;
   cancel?: UnderlyingSourceCancelCallback;
   pull?: (controller: ReadableByteStreamController) => void | PromiseLike<void>;
-  start?: (controller: ReadableByteStreamController) => unknown;
+  start?: (controller: ReadableByteStreamController) => any;
   type: 'bytes';
 }
 
-interface UnderlyingDefaultSource<R = unknown> {
+interface UnderlyingDefaultSource<R = any> {
   cancel?: UnderlyingSourceCancelCallback;
   pull?: (controller: ReadableStreamDefaultController<R>) => void | PromiseLike<void>;
-  start?: (controller: ReadableStreamDefaultController<R>) => unknown;
+  start?: (controller: ReadableStreamDefaultController<R>) => any;
   type?: undefined;
 }
 
-interface UnderlyingSink<W = unknown> {
+interface UnderlyingSink<W = any> {
   abort?: UnderlyingSinkAbortCallback;
   close?: UnderlyingSinkCloseCallback;
   start?: UnderlyingSinkStartCallback;
@@ -820,7 +820,7 @@ interface UnderlyingSink<W = unknown> {
   write?: UnderlyingSinkWriteCallback<W>;
 }
 
-interface UnderlyingSource<R = unknown> {
+interface UnderlyingSource<R = any> {
   autoAllocateChunkSize?: number;
   cancel?: UnderlyingSourceCancelCallback;
   pull?: UnderlyingSourcePullCallback<R>;
@@ -1022,7 +1022,7 @@ interface AbortController {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortController/abort)
    */
-  abort(reason?: unknown): void;
+  abort(reason?: any): void;
 }
 
 declare var AbortController: {
@@ -1047,14 +1047,14 @@ interface AbortSignal extends EventTarget {
    */
   readonly aborted: boolean;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_event) */
-  onabort: ((this: AbortSignal, ev: Event) => unknown) | null;
+  onabort: ((this: AbortSignal, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/reason) */
-  readonly reason: unknown;
+  readonly reason: any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/throwIfAborted) */
   throwIfAborted(): void;
-  addEventListener<K extends keyof AbortSignalEventMap>(type: K, listener: (this: AbortSignal, ev: AbortSignalEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof AbortSignalEventMap>(type: K, listener: (this: AbortSignal, ev: AbortSignalEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof AbortSignalEventMap>(type: K, listener: (this: AbortSignal, ev: AbortSignalEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof AbortSignalEventMap>(type: K, listener: (this: AbortSignal, ev: AbortSignalEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -1062,7 +1062,7 @@ declare var AbortSignal: {
   prototype: AbortSignal;
   new (): AbortSignal;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static) */
-  abort(reason?: unknown): AbortSignal;
+  abort(reason?: any): AbortSignal;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static) */
   any(signals: AbortSignal[]): AbortSignal;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/timeout_static) */
@@ -1075,10 +1075,10 @@ interface AbstractWorkerEventMap {
 
 interface AbstractWorker {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorker/error_event) */
-  onerror: ((this: AbstractWorker, ev: ErrorEvent) => unknown) | null;
-  addEventListener<K extends keyof AbstractWorkerEventMap>(type: K, listener: (this: AbstractWorker, ev: AbstractWorkerEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  onerror: ((this: AbstractWorker, ev: ErrorEvent) => any) | null;
+  addEventListener<K extends keyof AbstractWorkerEventMap>(type: K, listener: (this: AbstractWorker, ev: AbstractWorkerEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof AbstractWorkerEventMap>(type: K, listener: (this: AbstractWorker, ev: AbstractWorkerEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof AbstractWorkerEventMap>(type: K, listener: (this: AbstractWorker, ev: AbstractWorkerEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -1131,7 +1131,7 @@ interface AudioDecoder extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioDecoder/decodeQueueSize) */
   readonly decodeQueueSize: number;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioDecoder/dequeue_event) */
-  ondequeue: ((this: AudioDecoder, ev: Event) => unknown) | null;
+  ondequeue: ((this: AudioDecoder, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioDecoder/state) */
   readonly state: CodecState;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioDecoder/close) */
@@ -1144,9 +1144,9 @@ interface AudioDecoder extends EventTarget {
   flush(): Promise<void>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioDecoder/reset) */
   reset(): void;
-  addEventListener<K extends keyof AudioDecoderEventMap>(type: K, listener: (this: AudioDecoder, ev: AudioDecoderEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof AudioDecoderEventMap>(type: K, listener: (this: AudioDecoder, ev: AudioDecoderEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof AudioDecoderEventMap>(type: K, listener: (this: AudioDecoder, ev: AudioDecoderEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof AudioDecoderEventMap>(type: K, listener: (this: AudioDecoder, ev: AudioDecoderEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -1170,7 +1170,7 @@ interface AudioEncoder extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioEncoder/encodeQueueSize) */
   readonly encodeQueueSize: number;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioEncoder/dequeue_event) */
-  ondequeue: ((this: AudioEncoder, ev: Event) => unknown) | null;
+  ondequeue: ((this: AudioEncoder, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioEncoder/state) */
   readonly state: CodecState;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioEncoder/close) */
@@ -1183,9 +1183,9 @@ interface AudioEncoder extends EventTarget {
   flush(): Promise<void>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioEncoder/reset) */
   reset(): void;
-  addEventListener<K extends keyof AudioEncoderEventMap>(type: K, listener: (this: AudioEncoder, ev: AudioEncoderEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof AudioEncoderEventMap>(type: K, listener: (this: AudioEncoder, ev: AudioEncoderEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof AudioEncoderEventMap>(type: K, listener: (this: AudioEncoder, ev: AudioEncoderEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof AudioEncoderEventMap>(type: K, listener: (this: AudioEncoder, ev: AudioEncoderEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -1237,7 +1237,7 @@ interface Body {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/formData) */
   formData(): Promise<FormData>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/json) */
-  json(): Promise<unknown>;
+  json(): Promise<any>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/text) */
   text(): Promise<string>;
 }
@@ -1256,9 +1256,9 @@ interface BroadcastChannel extends EventTarget {
    */
   readonly name: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/BroadcastChannel/message_event) */
-  onmessage: ((this: BroadcastChannel, ev: MessageEvent) => unknown) | null;
+  onmessage: ((this: BroadcastChannel, ev: MessageEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/BroadcastChannel/messageerror_event) */
-  onmessageerror: ((this: BroadcastChannel, ev: MessageEvent) => unknown) | null;
+  onmessageerror: ((this: BroadcastChannel, ev: MessageEvent) => any) | null;
   /**
    * Closes the BroadcastChannel object, opening it up to garbage collection.
    *
@@ -1270,10 +1270,10 @@ interface BroadcastChannel extends EventTarget {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BroadcastChannel/postMessage)
    */
-  postMessage(message: unknown): void;
-  addEventListener<K extends keyof BroadcastChannelEventMap>(type: K, listener: (this: BroadcastChannel, ev: BroadcastChannelEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  postMessage(message: any): void;
+  addEventListener<K extends keyof BroadcastChannelEventMap>(type: K, listener: (this: BroadcastChannel, ev: BroadcastChannelEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof BroadcastChannelEventMap>(type: K, listener: (this: BroadcastChannel, ev: BroadcastChannelEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof BroadcastChannelEventMap>(type: K, listener: (this: BroadcastChannel, ev: BroadcastChannelEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -1421,7 +1421,7 @@ declare var CSSMatrixComponent: {
 interface CSSNumericArray {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericArray/length) */
   readonly length: number;
-  forEach(callbackfn: (value: CSSNumericValue, key: number, parent: CSSNumericArray) => void, thisArg?: unknown): void;
+  forEach(callbackfn: (value: CSSNumericValue, key: number, parent: CSSNumericArray) => void, thisArg?: any): void;
   [index: number]: CSSNumericValue;
 }
 
@@ -1570,7 +1570,7 @@ interface CSSTransformValue extends CSSStyleValue {
   readonly length: number;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSTransformValue/toMatrix) */
   toMatrix(): DOMMatrix;
-  forEach(callbackfn: (value: CSSTransformComponent, key: number, parent: CSSTransformValue) => void, thisArg?: unknown): void;
+  forEach(callbackfn: (value: CSSTransformComponent, key: number, parent: CSSTransformValue) => void, thisArg?: any): void;
   [index: number]: CSSTransformComponent;
 }
 
@@ -1611,7 +1611,7 @@ declare var CSSUnitValue: {
 interface CSSUnparsedValue extends CSSStyleValue {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSUnparsedValue/length) */
   readonly length: number;
-  forEach(callbackfn: (value: CSSUnparsedSegment, key: number, parent: CSSUnparsedValue) => void, thisArg?: unknown): void;
+  forEach(callbackfn: (value: CSSUnparsedSegment, key: number, parent: CSSUnparsedValue) => void, thisArg?: any): void;
   [index: number]: CSSUnparsedSegment;
 }
 
@@ -1933,8 +1933,8 @@ interface Client {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Client/url) */
   readonly url: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Client/postMessage) */
-  postMessage(message: unknown, transfer: Transferable[]): void;
-  postMessage(message: unknown, options?: StructuredSerializeOptions): void;
+  postMessage(message: any, transfer: Transferable[]): void;
+  postMessage(message: any, options?: StructuredSerializeOptions): void;
 }
 
 declare var Client: {
@@ -2072,7 +2072,7 @@ declare var CryptoKey: {
 };
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CustomEvent) */
-interface CustomEvent<T = unknown> extends Event {
+interface CustomEvent<T = any> extends Event {
   /**
    * Returns any custom data event was created with. Typically used for synthetic events.
    *
@@ -2297,7 +2297,7 @@ interface DOMMatrixReadOnly {
   skewY(sy?: number): DOMMatrix;
   toFloat32Array(): Float32Array;
   toFloat64Array(): Float64Array;
-  toJSON(): unknown;
+  toJSON(): any;
   transformPoint(point?: DOMPointInit): DOMPoint;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/translate) */
   translate(tx?: number, ty?: number, tz?: number): DOMMatrix;
@@ -2342,7 +2342,7 @@ interface DOMPointReadOnly {
   readonly z: number;
   matrixTransform(matrix?: DOMMatrixInit): DOMPoint;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/toJSON) */
-  toJSON(): unknown;
+  toJSON(): any;
 }
 
 declare var DOMPointReadOnly: {
@@ -2359,7 +2359,7 @@ interface DOMQuad {
   readonly p3: DOMPoint;
   readonly p4: DOMPoint;
   getBounds(): DOMRect;
-  toJSON(): unknown;
+  toJSON(): any;
 }
 
 declare var DOMQuad: {
@@ -2402,7 +2402,7 @@ interface DOMRectReadOnly {
   readonly x: number;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRectReadOnly/y) */
   readonly y: number;
-  toJSON(): unknown;
+  toJSON(): any;
 }
 
 declare var DOMRectReadOnly: {
@@ -2474,11 +2474,11 @@ interface DedicatedWorkerGlobalScope extends WorkerGlobalScope, AnimationFramePr
    */
   readonly name: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/message_event) */
-  onmessage: ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown) | null;
+  onmessage: ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/messageerror_event) */
-  onmessageerror: ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown) | null;
+  onmessageerror: ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/rtctransform_event) */
-  onrtctransform: ((this: DedicatedWorkerGlobalScope, ev: RTCTransformEvent) => unknown) | null;
+  onrtctransform: ((this: DedicatedWorkerGlobalScope, ev: RTCTransformEvent) => any) | null;
   /**
    * Aborts dedicatedWorkerGlobal.
    *
@@ -2490,11 +2490,11 @@ interface DedicatedWorkerGlobalScope extends WorkerGlobalScope, AnimationFramePr
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/postMessage)
    */
-  postMessage(message: unknown, transfer: Transferable[]): void;
-  postMessage(message: unknown, options?: StructuredSerializeOptions): void;
-  addEventListener<K extends keyof DedicatedWorkerGlobalScopeEventMap>(type: K, listener: (this: DedicatedWorkerGlobalScope, ev: DedicatedWorkerGlobalScopeEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  postMessage(message: any, transfer: Transferable[]): void;
+  postMessage(message: any, options?: StructuredSerializeOptions): void;
+  addEventListener<K extends keyof DedicatedWorkerGlobalScopeEventMap>(type: K, listener: (this: DedicatedWorkerGlobalScope, ev: DedicatedWorkerGlobalScopeEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof DedicatedWorkerGlobalScopeEventMap>(type: K, listener: (this: DedicatedWorkerGlobalScope, ev: DedicatedWorkerGlobalScopeEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof DedicatedWorkerGlobalScopeEventMap>(type: K, listener: (this: DedicatedWorkerGlobalScope, ev: DedicatedWorkerGlobalScopeEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -2624,7 +2624,7 @@ declare var EncodedVideoChunk: {
  */
 interface ErrorEvent extends Event {
   readonly colno: number;
-  readonly error: unknown;
+  readonly error: any;
   readonly filename: string;
   readonly lineno: number;
   readonly message: string;
@@ -2781,11 +2781,11 @@ interface EventSourceEventMap {
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventSource) */
 interface EventSource extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventSource/error_event) */
-  onerror: ((this: EventSource, ev: Event) => unknown) | null;
+  onerror: ((this: EventSource, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventSource/message_event) */
-  onmessage: ((this: EventSource, ev: MessageEvent) => unknown) | null;
+  onmessage: ((this: EventSource, ev: MessageEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventSource/open_event) */
-  onopen: ((this: EventSource, ev: Event) => unknown) | null;
+  onopen: ((this: EventSource, ev: Event) => any) | null;
   /**
    * Returns the state of this EventSource object's connection. It can have the values described below.
    *
@@ -2813,11 +2813,11 @@ interface EventSource extends EventTarget {
   readonly CONNECTING: 0;
   readonly OPEN: 1;
   readonly CLOSED: 2;
-  addEventListener<K extends keyof EventSourceEventMap>(type: K, listener: (this: EventSource, ev: EventSourceEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
-  addEventListener(type: string, listener: (this: EventSource, event: MessageEvent) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof EventSourceEventMap>(type: K, listener: (this: EventSource, ev: EventSourceEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+  addEventListener(type: string, listener: (this: EventSource, event: MessageEvent) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof EventSourceEventMap>(type: K, listener: (this: EventSource, ev: EventSourceEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
-  removeEventListener(type: string, listener: (this: EventSource, event: MessageEvent) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof EventSourceEventMap>(type: K, listener: (this: EventSource, ev: EventSourceEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+  removeEventListener(type: string, listener: (this: EventSource, event: MessageEvent) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -2879,7 +2879,7 @@ declare var EventTarget: {
  */
 interface ExtendableEvent extends Event {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ExtendableEvent/waitUntil) */
-  waitUntil(f: Promise<unknown>): void;
+  waitUntil(f: Promise<any>): void;
 }
 
 declare var ExtendableEvent: {
@@ -2894,7 +2894,7 @@ declare var ExtendableEvent: {
  */
 interface ExtendableMessageEvent extends ExtendableEvent {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ExtendableMessageEvent/data) */
-  readonly data: unknown;
+  readonly data: any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ExtendableMessageEvent/lastEventId) */
   readonly lastEventId: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ExtendableMessageEvent/origin) */
@@ -2921,7 +2921,7 @@ interface FetchEvent extends ExtendableEvent {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/handled) */
   readonly handled: Promise<undefined>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/preloadResponse) */
-  readonly preloadResponse: Promise<unknown>;
+  readonly preloadResponse: Promise<any>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/request) */
   readonly request: Request;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/resultingClientId) */
@@ -2990,17 +2990,17 @@ interface FileReader extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/error) */
   readonly error: DOMException | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/abort_event) */
-  onabort: ((this: FileReader, ev: ProgressEvent<FileReader>) => unknown) | null;
+  onabort: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/error_event) */
-  onerror: ((this: FileReader, ev: ProgressEvent<FileReader>) => unknown) | null;
+  onerror: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/load_event) */
-  onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => unknown) | null;
+  onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/loadend_event) */
-  onloadend: ((this: FileReader, ev: ProgressEvent<FileReader>) => unknown) | null;
+  onloadend: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/loadstart_event) */
-  onloadstart: ((this: FileReader, ev: ProgressEvent<FileReader>) => unknown) | null;
+  onloadstart: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/progress_event) */
-  onprogress: ((this: FileReader, ev: ProgressEvent<FileReader>) => unknown) | null;
+  onprogress: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/readyState) */
   readonly readyState: typeof FileReader.EMPTY | typeof FileReader.LOADING | typeof FileReader.DONE;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/result) */
@@ -3022,9 +3022,9 @@ interface FileReader extends EventTarget {
   readonly EMPTY: 0;
   readonly LOADING: 1;
   readonly DONE: 2;
-  addEventListener<K extends keyof FileReaderEventMap>(type: K, listener: (this: FileReader, ev: FileReaderEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof FileReaderEventMap>(type: K, listener: (this: FileReader, ev: FileReaderEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof FileReaderEventMap>(type: K, listener: (this: FileReader, ev: FileReaderEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof FileReaderEventMap>(type: K, listener: (this: FileReader, ev: FileReaderEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -3210,11 +3210,11 @@ interface FontFaceSetEventMap {
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFaceSet) */
 interface FontFaceSet extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFaceSet/loading_event) */
-  onloading: ((this: FontFaceSet, ev: FontFaceSetLoadEvent) => unknown) | null;
+  onloading: ((this: FontFaceSet, ev: FontFaceSetLoadEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFaceSet/loadingdone_event) */
-  onloadingdone: ((this: FontFaceSet, ev: FontFaceSetLoadEvent) => unknown) | null;
+  onloadingdone: ((this: FontFaceSet, ev: FontFaceSetLoadEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFaceSet/loadingerror_event) */
-  onloadingerror: ((this: FontFaceSet, ev: FontFaceSetLoadEvent) => unknown) | null;
+  onloadingerror: ((this: FontFaceSet, ev: FontFaceSetLoadEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFaceSet/ready) */
   readonly ready: Promise<FontFaceSet>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFaceSet/status) */
@@ -3223,10 +3223,10 @@ interface FontFaceSet extends EventTarget {
   check(font: string, text?: string): boolean;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFaceSet/load) */
   load(font: string, text?: string): Promise<FontFace[]>;
-  forEach(callbackfn: (value: FontFace, key: FontFace, parent: FontFaceSet) => void, thisArg?: unknown): void;
-  addEventListener<K extends keyof FontFaceSetEventMap>(type: K, listener: (this: FontFaceSet, ev: FontFaceSetEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  forEach(callbackfn: (value: FontFace, key: FontFace, parent: FontFaceSet) => void, thisArg?: any): void;
+  addEventListener<K extends keyof FontFaceSetEventMap>(type: K, listener: (this: FontFaceSet, ev: FontFaceSetEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof FontFaceSetEventMap>(type: K, listener: (this: FontFaceSet, ev: FontFaceSetEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof FontFaceSetEventMap>(type: K, listener: (this: FontFaceSet, ev: FontFaceSetEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -3273,7 +3273,7 @@ interface FormData {
   set(name: string, value: string | Blob): void;
   set(name: string, value: string): void;
   set(name: string, blobValue: Blob, filename?: string): void;
-  forEach(callbackfn: (value: FormDataEntryValue, key: string, parent: FormData) => void, thisArg?: unknown): void;
+  forEach(callbackfn: (value: FormDataEntryValue, key: string, parent: FormData) => void, thisArg?: any): void;
 }
 
 declare var FormData: {
@@ -3306,7 +3306,7 @@ interface Headers {
   has(name: string): boolean;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/set) */
   set(name: string, value: string): void;
-  forEach(callbackfn: (value: string, key: string, parent: Headers) => void, thisArg?: unknown): void;
+  forEach(callbackfn: (value: string, key: string, parent: Headers) => void, thisArg?: any): void;
 }
 
 declare var Headers: {
@@ -3381,7 +3381,7 @@ interface IDBCursor {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBCursor/update)
    */
-  update(value: unknown): IDBRequest<IDBValidKey>;
+  update(value: any): IDBRequest<IDBValidKey>;
 }
 
 declare var IDBCursor: {
@@ -3400,7 +3400,7 @@ interface IDBCursorWithValue extends IDBCursor {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBCursorWithValue/value)
    */
-  readonly value: unknown;
+  readonly value: any;
 }
 
 declare var IDBCursorWithValue: {
@@ -3433,12 +3433,12 @@ interface IDBDatabase extends EventTarget {
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBDatabase/objectStoreNames)
    */
   readonly objectStoreNames: DOMStringList;
-  onabort: ((this: IDBDatabase, ev: Event) => unknown) | null;
+  onabort: ((this: IDBDatabase, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBDatabase/close_event) */
-  onclose: ((this: IDBDatabase, ev: Event) => unknown) | null;
-  onerror: ((this: IDBDatabase, ev: Event) => unknown) | null;
+  onclose: ((this: IDBDatabase, ev: Event) => any) | null;
+  onerror: ((this: IDBDatabase, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBDatabase/versionchange_event) */
-  onversionchange: ((this: IDBDatabase, ev: IDBVersionChangeEvent) => unknown) | null;
+  onversionchange: ((this: IDBDatabase, ev: IDBVersionChangeEvent) => any) | null;
   /**
    * Returns the version of the database.
    *
@@ -3473,9 +3473,9 @@ interface IDBDatabase extends EventTarget {
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBDatabase/transaction)
    */
   transaction(storeNames: string | string[], mode?: IDBTransactionMode, options?: IDBTransactionOptions): IDBTransaction;
-  addEventListener<K extends keyof IDBDatabaseEventMap>(type: K, listener: (this: IDBDatabase, ev: IDBDatabaseEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof IDBDatabaseEventMap>(type: K, listener: (this: IDBDatabase, ev: IDBDatabaseEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof IDBDatabaseEventMap>(type: K, listener: (this: IDBDatabase, ev: IDBDatabaseEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof IDBDatabaseEventMap>(type: K, listener: (this: IDBDatabase, ev: IDBDatabaseEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -3497,7 +3497,7 @@ interface IDBFactory {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBFactory/cmp)
    */
-  cmp(first: unknown, second: unknown): number;
+  cmp(first: any, second: any): number;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBFactory/databases) */
   databases(): Promise<IDBDatabaseInfo[]>;
   /**
@@ -3558,7 +3558,7 @@ interface IDBIndex {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBIndex/get)
    */
-  get(query: IDBValidKey | IDBKeyRange): IDBRequest<unknown>;
+  get(query: IDBValidKey | IDBKeyRange): IDBRequest<any>;
   /**
    * Retrieves the values of the records matching the given key or key range in query (up to count if given).
    *
@@ -3566,7 +3566,7 @@ interface IDBIndex {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBIndex/getAll)
    */
-  getAll(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<unknown[]>;
+  getAll(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<any[]>;
   /**
    * Retrieves the keys of records matching the given key or key range in query (up to count if given).
    *
@@ -3617,7 +3617,7 @@ interface IDBKeyRange {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/lower)
    */
-  readonly lower: unknown;
+  readonly lower: any;
   /**
    * Returns true if the lower open flag is set, and false otherwise.
    *
@@ -3629,7 +3629,7 @@ interface IDBKeyRange {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/upper)
    */
-  readonly upper: unknown;
+  readonly upper: any;
   /**
    * Returns true if the upper open flag is set, and false otherwise.
    *
@@ -3641,7 +3641,7 @@ interface IDBKeyRange {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/includes)
    */
-  includes(key: unknown): boolean;
+  includes(key: any): boolean;
 }
 
 declare var IDBKeyRange: {
@@ -3652,25 +3652,25 @@ declare var IDBKeyRange: {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/bound_static)
    */
-  bound(lower: unknown, upper: unknown, lowerOpen?: boolean, upperOpen?: boolean): IDBKeyRange;
+  bound(lower: any, upper: any, lowerOpen?: boolean, upperOpen?: boolean): IDBKeyRange;
   /**
    * Returns a new IDBKeyRange starting at key with no upper bound. If open is true, key is not included in the range.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/lowerBound_static)
    */
-  lowerBound(lower: unknown, open?: boolean): IDBKeyRange;
+  lowerBound(lower: any, open?: boolean): IDBKeyRange;
   /**
    * Returns a new IDBKeyRange spanning only key.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/only_static)
    */
-  only(value: unknown): IDBKeyRange;
+  only(value: any): IDBKeyRange;
   /**
    * Returns a new IDBKeyRange with no lower bound and ending at key. If open is true, key is not included in the range.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/upperBound_static)
    */
-  upperBound(upper: unknown, open?: boolean): IDBKeyRange;
+  upperBound(upper: any, open?: boolean): IDBKeyRange;
 };
 
 /**
@@ -3720,7 +3720,7 @@ interface IDBObjectStore {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBObjectStore/add)
    */
-  add(value: unknown, key?: IDBValidKey): IDBRequest<IDBValidKey>;
+  add(value: any, key?: IDBValidKey): IDBRequest<IDBValidKey>;
   /**
    * Deletes all records in store.
    *
@@ -3768,7 +3768,7 @@ interface IDBObjectStore {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBObjectStore/get)
    */
-  get(query: IDBValidKey | IDBKeyRange): IDBRequest<unknown>;
+  get(query: IDBValidKey | IDBKeyRange): IDBRequest<any>;
   /**
    * Retrieves the values of the records matching the given key or key range in query (up to count if given).
    *
@@ -3776,7 +3776,7 @@ interface IDBObjectStore {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBObjectStore/getAll)
    */
-  getAll(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<unknown[]>;
+  getAll(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<any[]>;
   /**
    * Retrieves the keys of records matching the given key or key range in query (up to count if given).
    *
@@ -3822,7 +3822,7 @@ interface IDBObjectStore {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBObjectStore/put)
    */
-  put(value: unknown, key?: IDBValidKey): IDBRequest<IDBValidKey>;
+  put(value: any, key?: IDBValidKey): IDBRequest<IDBValidKey>;
 }
 
 declare var IDBObjectStore: {
@@ -3842,12 +3842,12 @@ interface IDBOpenDBRequestEventMap extends IDBRequestEventMap {
  */
 interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBOpenDBRequest/blocked_event) */
-  onblocked: ((this: IDBOpenDBRequest, ev: IDBVersionChangeEvent) => unknown) | null;
+  onblocked: ((this: IDBOpenDBRequest, ev: IDBVersionChangeEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBOpenDBRequest/upgradeneeded_event) */
-  onupgradeneeded: ((this: IDBOpenDBRequest, ev: IDBVersionChangeEvent) => unknown) | null;
-  addEventListener<K extends keyof IDBOpenDBRequestEventMap>(type: K, listener: (this: IDBOpenDBRequest, ev: IDBOpenDBRequestEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  onupgradeneeded: ((this: IDBOpenDBRequest, ev: IDBVersionChangeEvent) => any) | null;
+  addEventListener<K extends keyof IDBOpenDBRequestEventMap>(type: K, listener: (this: IDBOpenDBRequest, ev: IDBOpenDBRequestEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof IDBOpenDBRequestEventMap>(type: K, listener: (this: IDBOpenDBRequest, ev: IDBOpenDBRequestEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof IDBOpenDBRequestEventMap>(type: K, listener: (this: IDBOpenDBRequest, ev: IDBOpenDBRequestEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -3866,7 +3866,7 @@ interface IDBRequestEventMap {
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBRequest)
  */
-interface IDBRequest<T = unknown> extends EventTarget {
+interface IDBRequest<T = any> extends EventTarget {
   /**
    * When a request is completed, returns the error (a DOMException), or null if the request succeeded. Throws a "InvalidStateError" DOMException if the request is still pending.
    *
@@ -3874,9 +3874,9 @@ interface IDBRequest<T = unknown> extends EventTarget {
    */
   readonly error: DOMException | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBRequest/error_event) */
-  onerror: ((this: IDBRequest<T>, ev: Event) => unknown) | null;
+  onerror: ((this: IDBRequest<T>, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBRequest/success_event) */
-  onsuccess: ((this: IDBRequest<T>, ev: Event) => unknown) | null;
+  onsuccess: ((this: IDBRequest<T>, ev: Event) => any) | null;
   /**
    * Returns "pending" until a request is complete, then returns "done".
    *
@@ -3901,9 +3901,9 @@ interface IDBRequest<T = unknown> extends EventTarget {
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBRequest/transaction)
    */
   readonly transaction: IDBTransaction | null;
-  addEventListener<K extends keyof IDBRequestEventMap>(type: K, listener: (this: IDBRequest<T>, ev: IDBRequestEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof IDBRequestEventMap>(type: K, listener: (this: IDBRequest<T>, ev: IDBRequestEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof IDBRequestEventMap>(type: K, listener: (this: IDBRequest<T>, ev: IDBRequestEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof IDBRequestEventMap>(type: K, listener: (this: IDBRequest<T>, ev: IDBRequestEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -3947,11 +3947,11 @@ interface IDBTransaction extends EventTarget {
    */
   readonly objectStoreNames: DOMStringList;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBTransaction/abort_event) */
-  onabort: ((this: IDBTransaction, ev: Event) => unknown) | null;
+  onabort: ((this: IDBTransaction, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBTransaction/complete_event) */
-  oncomplete: ((this: IDBTransaction, ev: Event) => unknown) | null;
+  oncomplete: ((this: IDBTransaction, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBTransaction/error_event) */
-  onerror: ((this: IDBTransaction, ev: Event) => unknown) | null;
+  onerror: ((this: IDBTransaction, ev: Event) => any) | null;
   /**
    * Aborts the transaction. All pending requests will fail with a "AbortError" DOMException and all changes made to the database will be reverted.
    *
@@ -3966,9 +3966,9 @@ interface IDBTransaction extends EventTarget {
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBTransaction/objectStore)
    */
   objectStore(name: string): IDBObjectStore;
-  addEventListener<K extends keyof IDBTransactionEventMap>(type: K, listener: (this: IDBTransaction, ev: IDBTransactionEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof IDBTransactionEventMap>(type: K, listener: (this: IDBTransaction, ev: IDBTransactionEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof IDBTransactionEventMap>(type: K, listener: (this: IDBTransaction, ev: IDBTransactionEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof IDBTransactionEventMap>(type: K, listener: (this: IDBTransaction, ev: IDBTransactionEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -4106,8 +4106,8 @@ interface LockManager {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/LockManager/query) */
   query(): Promise<LockManagerSnapshot>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/LockManager/request) */
-  request(name: string, callback: LockGrantedCallback): Promise<unknown>;
-  request(name: string, options: LockOptions, callback: LockGrantedCallback): Promise<unknown>;
+  request(name: string, callback: LockGrantedCallback): Promise<any>;
+  request(name: string, options: LockOptions, callback: LockGrantedCallback): Promise<any>;
 }
 
 declare var LockManager: {
@@ -4177,7 +4177,7 @@ declare var MessageChannel: {
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent)
  */
-interface MessageEvent<T = unknown> extends Event {
+interface MessageEvent<T = any> extends Event {
   /**
    * Returns the data of the message.
    *
@@ -4209,7 +4209,7 @@ interface MessageEvent<T = unknown> extends Event {
    */
   readonly source: MessageEventSource | null;
   /** @deprecated */
-  initMessageEvent(type: string, bubbles?: boolean, cancelable?: boolean, data?: unknown, origin?: string, lastEventId?: string, source?: MessageEventSource | null, ports?: MessagePort[]): void;
+  initMessageEvent(type: string, bubbles?: boolean, cancelable?: boolean, data?: any, origin?: string, lastEventId?: string, source?: MessageEventSource | null, ports?: MessagePort[]): void;
 }
 
 declare var MessageEvent: {
@@ -4229,9 +4229,9 @@ interface MessagePortEventMap {
  */
 interface MessagePort extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/message_event) */
-  onmessage: ((this: MessagePort, ev: MessageEvent) => unknown) | null;
+  onmessage: ((this: MessagePort, ev: MessageEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/messageerror_event) */
-  onmessageerror: ((this: MessagePort, ev: MessageEvent) => unknown) | null;
+  onmessageerror: ((this: MessagePort, ev: MessageEvent) => any) | null;
   /**
    * Disconnects the port, so that it is no longer active.
    *
@@ -4245,17 +4245,17 @@ interface MessagePort extends EventTarget {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)
    */
-  postMessage(message: unknown, transfer: Transferable[]): void;
-  postMessage(message: unknown, options?: StructuredSerializeOptions): void;
+  postMessage(message: any, transfer: Transferable[]): void;
+  postMessage(message: any, options?: StructuredSerializeOptions): void;
   /**
    * Begins dispatching messages received on the port.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/start)
    */
   start(): void;
-  addEventListener<K extends keyof MessagePortEventMap>(type: K, listener: (this: MessagePort, ev: MessagePortEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof MessagePortEventMap>(type: K, listener: (this: MessagePort, ev: MessagePortEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof MessagePortEventMap>(type: K, listener: (this: MessagePort, ev: MessagePortEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof MessagePortEventMap>(type: K, listener: (this: MessagePort, ev: MessagePortEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -4375,7 +4375,7 @@ interface Notification extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/body) */
   readonly body: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/data) */
-  readonly data: unknown;
+  readonly data: any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/dir) */
   readonly dir: NotificationDirection;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/icon) */
@@ -4383,13 +4383,13 @@ interface Notification extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/lang) */
   readonly lang: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/click_event) */
-  onclick: ((this: Notification, ev: Event) => unknown) | null;
+  onclick: ((this: Notification, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/close_event) */
-  onclose: ((this: Notification, ev: Event) => unknown) | null;
+  onclose: ((this: Notification, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/error_event) */
-  onerror: ((this: Notification, ev: Event) => unknown) | null;
+  onerror: ((this: Notification, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/show_event) */
-  onshow: ((this: Notification, ev: Event) => unknown) | null;
+  onshow: ((this: Notification, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/requireInteraction) */
   readonly requireInteraction: boolean;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/silent) */
@@ -4400,9 +4400,9 @@ interface Notification extends EventTarget {
   readonly title: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/close) */
   close(): void;
-  addEventListener<K extends keyof NotificationEventMap>(type: K, listener: (this: Notification, ev: NotificationEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof NotificationEventMap>(type: K, listener: (this: Notification, ev: NotificationEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof NotificationEventMap>(type: K, listener: (this: Notification, ev: NotificationEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof NotificationEventMap>(type: K, listener: (this: Notification, ev: NotificationEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -4536,9 +4536,9 @@ interface OffscreenCanvas extends EventTarget {
    */
   height: number;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas/contextlost_event) */
-  oncontextlost: ((this: OffscreenCanvas, ev: Event) => unknown) | null;
+  oncontextlost: ((this: OffscreenCanvas, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas/contextrestored_event) */
-  oncontextrestored: ((this: OffscreenCanvas, ev: Event) => unknown) | null;
+  oncontextrestored: ((this: OffscreenCanvas, ev: Event) => any) | null;
   /**
    * These attributes return the dimensions of the OffscreenCanvas object's bitmap.
    *
@@ -4564,20 +4564,20 @@ interface OffscreenCanvas extends EventTarget {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas/getContext)
    */
-  getContext(contextId: '2d', options?: unknown): OffscreenCanvasRenderingContext2D | null;
-  getContext(contextId: 'bitmaprenderer', options?: unknown): ImageBitmapRenderingContext | null;
-  getContext(contextId: 'webgl', options?: unknown): WebGLRenderingContext | null;
-  getContext(contextId: 'webgl2', options?: unknown): WebGL2RenderingContext | null;
-  getContext(contextId: OffscreenRenderingContextId, options?: unknown): OffscreenRenderingContext | null;
+  getContext(contextId: '2d', options?: any): OffscreenCanvasRenderingContext2D | null;
+  getContext(contextId: 'bitmaprenderer', options?: any): ImageBitmapRenderingContext | null;
+  getContext(contextId: 'webgl', options?: any): WebGLRenderingContext | null;
+  getContext(contextId: 'webgl2', options?: any): WebGL2RenderingContext | null;
+  getContext(contextId: OffscreenRenderingContextId, options?: any): OffscreenRenderingContext | null;
   /**
    * Returns a newly created ImageBitmap object with the image in the OffscreenCanvas object. The image in the OffscreenCanvas object is replaced with a new blank image.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas/transferToImageBitmap)
    */
   transferToImageBitmap(): ImageBitmap;
-  addEventListener<K extends keyof OffscreenCanvasEventMap>(type: K, listener: (this: OffscreenCanvas, ev: OffscreenCanvasEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof OffscreenCanvasEventMap>(type: K, listener: (this: OffscreenCanvas, ev: OffscreenCanvasEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof OffscreenCanvasEventMap>(type: K, listener: (this: OffscreenCanvas, ev: OffscreenCanvasEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof OffscreenCanvasEventMap>(type: K, listener: (this: OffscreenCanvas, ev: OffscreenCanvasEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -4627,7 +4627,7 @@ interface PerformanceEventMap {
  */
 interface Performance extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Performance/resourcetimingbufferfull_event) */
-  onresourcetimingbufferfull: ((this: Performance, ev: Event) => unknown) | null;
+  onresourcetimingbufferfull: ((this: Performance, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Performance/timeOrigin) */
   readonly timeOrigin: DOMHighResTimeStamp;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Performance/clearMarks) */
@@ -4651,10 +4651,10 @@ interface Performance extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Performance/setResourceTimingBufferSize) */
   setResourceTimingBufferSize(maxSize: number): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Performance/toJSON) */
-  toJSON(): unknown;
-  addEventListener<K extends keyof PerformanceEventMap>(type: K, listener: (this: Performance, ev: PerformanceEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  toJSON(): any;
+  addEventListener<K extends keyof PerformanceEventMap>(type: K, listener: (this: Performance, ev: PerformanceEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof PerformanceEventMap>(type: K, listener: (this: Performance, ev: PerformanceEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof PerformanceEventMap>(type: K, listener: (this: Performance, ev: PerformanceEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -4678,7 +4678,7 @@ interface PerformanceEntry {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceEntry/startTime) */
   readonly startTime: DOMHighResTimeStamp;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceEntry/toJSON) */
-  toJSON(): unknown;
+  toJSON(): any;
 }
 
 declare var PerformanceEntry: {
@@ -4693,7 +4693,7 @@ declare var PerformanceEntry: {
  */
 interface PerformanceMark extends PerformanceEntry {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceMark/detail) */
-  readonly detail: unknown;
+  readonly detail: any;
 }
 
 declare var PerformanceMark: {
@@ -4708,7 +4708,7 @@ declare var PerformanceMark: {
  */
 interface PerformanceMeasure extends PerformanceEntry {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceMeasure/detail) */
-  readonly detail: unknown;
+  readonly detail: any;
 }
 
 declare var PerformanceMeasure: {
@@ -4793,7 +4793,7 @@ interface PerformanceResourceTiming extends PerformanceEntry {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceResourceTiming/workerStart) */
   readonly workerStart: DOMHighResTimeStamp;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceResourceTiming/toJSON) */
-  toJSON(): unknown;
+  toJSON(): any;
 }
 
 declare var PerformanceResourceTiming: {
@@ -4810,7 +4810,7 @@ interface PerformanceServerTiming {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceServerTiming/name) */
   readonly name: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceServerTiming/toJSON) */
-  toJSON(): unknown;
+  toJSON(): any;
 }
 
 declare var PerformanceServerTiming: {
@@ -4827,12 +4827,12 @@ interface PermissionStatus extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PermissionStatus/name) */
   readonly name: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PermissionStatus/change_event) */
-  onchange: ((this: PermissionStatus, ev: Event) => unknown) | null;
+  onchange: ((this: PermissionStatus, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PermissionStatus/state) */
   readonly state: PermissionState;
-  addEventListener<K extends keyof PermissionStatusEventMap>(type: K, listener: (this: PermissionStatus, ev: PermissionStatusEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof PermissionStatusEventMap>(type: K, listener: (this: PermissionStatus, ev: PermissionStatusEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof PermissionStatusEventMap>(type: K, listener: (this: PermissionStatus, ev: PermissionStatusEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof PermissionStatusEventMap>(type: K, listener: (this: PermissionStatus, ev: PermissionStatusEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -4875,9 +4875,9 @@ declare var ProgressEvent: {
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PromiseRejectionEvent) */
 interface PromiseRejectionEvent extends Event {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PromiseRejectionEvent/promise) */
-  readonly promise: Promise<unknown>;
+  readonly promise: Promise<any>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PromiseRejectionEvent/reason) */
-  readonly reason: unknown;
+  readonly reason: any;
 }
 
 declare var PromiseRejectionEvent: {
@@ -4937,7 +4937,7 @@ interface PushMessageData {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PushMessageData/bytes) */
   bytes(): Uint8Array;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PushMessageData/json) */
-  json(): unknown;
+  json(): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PushMessageData/text) */
   text(): string;
 }
@@ -5025,7 +5025,7 @@ declare var RTCEncodedVideoFrame: {
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCRtpScriptTransformer) */
 interface RTCRtpScriptTransformer extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCRtpScriptTransformer/options) */
-  readonly options: unknown;
+  readonly options: any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCRtpScriptTransformer/readable) */
   readonly readable: ReadableStream;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCRtpScriptTransformer/writable) */
@@ -5063,7 +5063,7 @@ interface ReadableByteStreamController {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue) */
   enqueue(chunk: ArrayBufferView): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/error) */
-  error(e?: unknown): void;
+  error(e?: any): void;
 }
 
 declare var ReadableByteStreamController: {
@@ -5076,11 +5076,11 @@ declare var ReadableByteStreamController: {
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream)
  */
-interface ReadableStream<R = unknown> {
+interface ReadableStream<R = any> {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/locked) */
   readonly locked: boolean;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/cancel) */
-  cancel(reason?: unknown): Promise<void>;
+  cancel(reason?: any): Promise<void>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader) */
   getReader(options: { mode: 'byob' }): ReadableStreamBYOBReader;
   getReader(): ReadableStreamDefaultReader<R>;
@@ -5096,8 +5096,8 @@ interface ReadableStream<R = unknown> {
 declare var ReadableStream: {
   prototype: ReadableStream;
   new (underlyingSource: UnderlyingByteSource, strategy?: { highWaterMark?: number }): ReadableStream<Uint8Array>;
-  new <R = unknown>(underlyingSource: UnderlyingDefaultSource<R>, strategy?: QueuingStrategy<R>): ReadableStream<R>;
-  new <R = unknown>(underlyingSource?: UnderlyingSource<R>, strategy?: QueuingStrategy<R>): ReadableStream<R>;
+  new <R = any>(underlyingSource: UnderlyingDefaultSource<R>, strategy?: QueuingStrategy<R>): ReadableStream<R>;
+  new <R = any>(underlyingSource?: UnderlyingSource<R>, strategy?: QueuingStrategy<R>): ReadableStream<R>;
 };
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader) */
@@ -5129,7 +5129,7 @@ declare var ReadableStreamBYOBRequest: {
 };
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController) */
-interface ReadableStreamDefaultController<R = unknown> {
+interface ReadableStreamDefaultController<R = any> {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/desiredSize) */
   readonly desiredSize: number | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/close) */
@@ -5137,7 +5137,7 @@ interface ReadableStreamDefaultController<R = unknown> {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/enqueue) */
   enqueue(chunk?: R): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/error) */
-  error(e?: unknown): void;
+  error(e?: any): void;
 }
 
 declare var ReadableStreamDefaultController: {
@@ -5146,7 +5146,7 @@ declare var ReadableStreamDefaultController: {
 };
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader) */
-interface ReadableStreamDefaultReader<R = unknown> extends ReadableStreamGenericReader {
+interface ReadableStreamDefaultReader<R = any> extends ReadableStreamGenericReader {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader/read) */
   read(): Promise<ReadableStreamReadResult<R>>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader/releaseLock) */
@@ -5155,14 +5155,14 @@ interface ReadableStreamDefaultReader<R = unknown> extends ReadableStreamGeneric
 
 declare var ReadableStreamDefaultReader: {
   prototype: ReadableStreamDefaultReader;
-  new <R = unknown>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
+  new <R = any>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
 };
 
 interface ReadableStreamGenericReader {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/closed) */
   readonly closed: Promise<undefined>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/cancel) */
-  cancel(reason?: unknown): Promise<void>;
+  cancel(reason?: any): Promise<void>;
 }
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Report) */
@@ -5173,7 +5173,7 @@ interface Report {
   readonly type: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Report/url) */
   readonly url: string;
-  toJSON(): unknown;
+  toJSON(): any;
 }
 
 declare var Report: {
@@ -5184,7 +5184,7 @@ declare var Report: {
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReportBody) */
 interface ReportBody {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReportBody/toJSON) */
-  toJSON(): unknown;
+  toJSON(): any;
 }
 
 declare var ReportBody: {
@@ -5326,7 +5326,7 @@ declare var Response: {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/error_static) */
   error(): Response;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/json_static) */
-  json(data: unknown, init?: ResponseInit): Response;
+  json(data: any, init?: ResponseInit): Response;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/redirect_static) */
   redirect(url: string | URL, status?: number): Response;
 };
@@ -5380,17 +5380,17 @@ interface ServiceWorkerEventMap extends AbstractWorkerEventMap {
  */
 interface ServiceWorker extends EventTarget, AbstractWorker {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorker/statechange_event) */
-  onstatechange: ((this: ServiceWorker, ev: Event) => unknown) | null;
+  onstatechange: ((this: ServiceWorker, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorker/scriptURL) */
   readonly scriptURL: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorker/state) */
   readonly state: ServiceWorkerState;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorker/postMessage) */
-  postMessage(message: unknown, transfer: Transferable[]): void;
-  postMessage(message: unknown, options?: StructuredSerializeOptions): void;
-  addEventListener<K extends keyof ServiceWorkerEventMap>(type: K, listener: (this: ServiceWorker, ev: ServiceWorkerEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  postMessage(message: any, transfer: Transferable[]): void;
+  postMessage(message: any, options?: StructuredSerializeOptions): void;
+  addEventListener<K extends keyof ServiceWorkerEventMap>(type: K, listener: (this: ServiceWorker, ev: ServiceWorkerEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof ServiceWorkerEventMap>(type: K, listener: (this: ServiceWorker, ev: ServiceWorkerEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof ServiceWorkerEventMap>(type: K, listener: (this: ServiceWorker, ev: ServiceWorkerEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -5415,11 +5415,11 @@ interface ServiceWorkerContainer extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerContainer/controller) */
   readonly controller: ServiceWorker | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerContainer/controllerchange_event) */
-  oncontrollerchange: ((this: ServiceWorkerContainer, ev: Event) => unknown) | null;
+  oncontrollerchange: ((this: ServiceWorkerContainer, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerContainer/message_event) */
-  onmessage: ((this: ServiceWorkerContainer, ev: MessageEvent) => unknown) | null;
+  onmessage: ((this: ServiceWorkerContainer, ev: MessageEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerContainer/messageerror_event) */
-  onmessageerror: ((this: ServiceWorkerContainer, ev: MessageEvent) => unknown) | null;
+  onmessageerror: ((this: ServiceWorkerContainer, ev: MessageEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerContainer/ready) */
   readonly ready: Promise<ServiceWorkerRegistration>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerContainer/getRegistration) */
@@ -5430,9 +5430,9 @@ interface ServiceWorkerContainer extends EventTarget {
   register(scriptURL: string | URL, options?: RegistrationOptions): Promise<ServiceWorkerRegistration>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerContainer/startMessages) */
   startMessages(): void;
-  addEventListener<K extends keyof ServiceWorkerContainerEventMap>(type: K, listener: (this: ServiceWorkerContainer, ev: ServiceWorkerContainerEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof ServiceWorkerContainerEventMap>(type: K, listener: (this: ServiceWorkerContainer, ev: ServiceWorkerContainerEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof ServiceWorkerContainerEventMap>(type: K, listener: (this: ServiceWorkerContainer, ev: ServiceWorkerContainerEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof ServiceWorkerContainerEventMap>(type: K, listener: (this: ServiceWorkerContainer, ev: ServiceWorkerContainerEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -5463,32 +5463,32 @@ interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/clients) */
   readonly clients: Clients;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/activate_event) */
-  onactivate: ((this: ServiceWorkerGlobalScope, ev: ExtendableEvent) => unknown) | null;
+  onactivate: ((this: ServiceWorkerGlobalScope, ev: ExtendableEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/fetch_event) */
-  onfetch: ((this: ServiceWorkerGlobalScope, ev: FetchEvent) => unknown) | null;
+  onfetch: ((this: ServiceWorkerGlobalScope, ev: FetchEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/install_event) */
-  oninstall: ((this: ServiceWorkerGlobalScope, ev: ExtendableEvent) => unknown) | null;
+  oninstall: ((this: ServiceWorkerGlobalScope, ev: ExtendableEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/message_event) */
-  onmessage: ((this: ServiceWorkerGlobalScope, ev: ExtendableMessageEvent) => unknown) | null;
+  onmessage: ((this: ServiceWorkerGlobalScope, ev: ExtendableMessageEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/messageerror_event) */
-  onmessageerror: ((this: ServiceWorkerGlobalScope, ev: MessageEvent) => unknown) | null;
+  onmessageerror: ((this: ServiceWorkerGlobalScope, ev: MessageEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/notificationclick_event) */
-  onnotificationclick: ((this: ServiceWorkerGlobalScope, ev: NotificationEvent) => unknown) | null;
+  onnotificationclick: ((this: ServiceWorkerGlobalScope, ev: NotificationEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/notificationclose_event) */
-  onnotificationclose: ((this: ServiceWorkerGlobalScope, ev: NotificationEvent) => unknown) | null;
+  onnotificationclose: ((this: ServiceWorkerGlobalScope, ev: NotificationEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/push_event) */
-  onpush: ((this: ServiceWorkerGlobalScope, ev: PushEvent) => unknown) | null;
+  onpush: ((this: ServiceWorkerGlobalScope, ev: PushEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/pushsubscriptionchange_event) */
-  onpushsubscriptionchange: ((this: ServiceWorkerGlobalScope, ev: Event) => unknown) | null;
+  onpushsubscriptionchange: ((this: ServiceWorkerGlobalScope, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/registration) */
   readonly registration: ServiceWorkerRegistration;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/serviceWorker) */
   readonly serviceWorker: ServiceWorker;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/skipWaiting) */
   skipWaiting(): Promise<void>;
-  addEventListener<K extends keyof ServiceWorkerGlobalScopeEventMap>(type: K, listener: (this: ServiceWorkerGlobalScope, ev: ServiceWorkerGlobalScopeEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof ServiceWorkerGlobalScopeEventMap>(type: K, listener: (this: ServiceWorkerGlobalScope, ev: ServiceWorkerGlobalScopeEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof ServiceWorkerGlobalScopeEventMap>(type: K, listener: (this: ServiceWorkerGlobalScope, ev: ServiceWorkerGlobalScopeEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof ServiceWorkerGlobalScopeEventMap>(type: K, listener: (this: ServiceWorkerGlobalScope, ev: ServiceWorkerGlobalScopeEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -5515,7 +5515,7 @@ interface ServiceWorkerRegistration extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerRegistration/navigationPreload) */
   readonly navigationPreload: NavigationPreloadManager;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerRegistration/updatefound_event) */
-  onupdatefound: ((this: ServiceWorkerRegistration, ev: Event) => unknown) | null;
+  onupdatefound: ((this: ServiceWorkerRegistration, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerRegistration/pushManager) */
   readonly pushManager: PushManager;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerRegistration/scope) */
@@ -5532,9 +5532,9 @@ interface ServiceWorkerRegistration extends EventTarget {
   unregister(): Promise<boolean>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerRegistration/update) */
   update(): Promise<void>;
-  addEventListener<K extends keyof ServiceWorkerRegistrationEventMap>(type: K, listener: (this: ServiceWorkerRegistration, ev: ServiceWorkerRegistrationEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof ServiceWorkerRegistrationEventMap>(type: K, listener: (this: ServiceWorkerRegistration, ev: ServiceWorkerRegistrationEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof ServiceWorkerRegistrationEventMap>(type: K, listener: (this: ServiceWorkerRegistration, ev: ServiceWorkerRegistrationEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof ServiceWorkerRegistrationEventMap>(type: K, listener: (this: ServiceWorkerRegistration, ev: ServiceWorkerRegistrationEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -5556,16 +5556,16 @@ interface SharedWorkerGlobalScope extends WorkerGlobalScope {
    */
   readonly name: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SharedWorkerGlobalScope/connect_event) */
-  onconnect: ((this: SharedWorkerGlobalScope, ev: MessageEvent) => unknown) | null;
+  onconnect: ((this: SharedWorkerGlobalScope, ev: MessageEvent) => any) | null;
   /**
    * Aborts sharedWorkerGlobal.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SharedWorkerGlobalScope/close)
    */
   close(): void;
-  addEventListener<K extends keyof SharedWorkerGlobalScopeEventMap>(type: K, listener: (this: SharedWorkerGlobalScope, ev: SharedWorkerGlobalScopeEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof SharedWorkerGlobalScopeEventMap>(type: K, listener: (this: SharedWorkerGlobalScope, ev: SharedWorkerGlobalScopeEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof SharedWorkerGlobalScopeEventMap>(type: K, listener: (this: SharedWorkerGlobalScope, ev: SharedWorkerGlobalScopeEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof SharedWorkerGlobalScopeEventMap>(type: K, listener: (this: SharedWorkerGlobalScope, ev: SharedWorkerGlobalScopeEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -5603,7 +5603,7 @@ interface StylePropertyMapReadOnly {
   getAll(property: string): CSSStyleValue[];
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMapReadOnly/has) */
   has(property: string): boolean;
-  forEach(callbackfn: (value: CSSStyleValue[], key: string, parent: StylePropertyMapReadOnly) => void, thisArg?: unknown): void;
+  forEach(callbackfn: (value: CSSStyleValue[], key: string, parent: StylePropertyMapReadOnly) => void, thisArg?: any): void;
 }
 
 declare var StylePropertyMapReadOnly: {
@@ -5855,7 +5855,7 @@ declare var TextMetrics: {
 };
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream) */
-interface TransformStream<I = unknown, O = unknown> {
+interface TransformStream<I = any, O = any> {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream/readable) */
   readonly readable: ReadableStream<O>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream/writable) */
@@ -5864,17 +5864,17 @@ interface TransformStream<I = unknown, O = unknown> {
 
 declare var TransformStream: {
   prototype: TransformStream;
-  new <I = unknown, O = unknown>(transformer?: Transformer<I, O>, writableStrategy?: QueuingStrategy<I>, readableStrategy?: QueuingStrategy<O>): TransformStream<I, O>;
+  new <I = any, O = any>(transformer?: Transformer<I, O>, writableStrategy?: QueuingStrategy<I>, readableStrategy?: QueuingStrategy<O>): TransformStream<I, O>;
 };
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController) */
-interface TransformStreamDefaultController<O = unknown> {
+interface TransformStreamDefaultController<O = any> {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/desiredSize) */
   readonly desiredSize: number | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/enqueue) */
   enqueue(chunk?: O): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/error) */
-  error(reason?: unknown): void;
+  error(reason?: any): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/terminate) */
   terminate(): void;
 }
@@ -5976,7 +5976,7 @@ interface URLSearchParams {
   sort(): void;
   /** Returns a string containing a query string suitable for use in a URL. Does not include the question mark. */
   toString(): string;
-  forEach(callbackfn: (value: string, key: string, parent: URLSearchParams) => void, thisArg?: unknown): void;
+  forEach(callbackfn: (value: string, key: string, parent: URLSearchParams) => void, thisArg?: any): void;
 }
 
 declare var URLSearchParams: {
@@ -6016,7 +6016,7 @@ interface VideoDecoder extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder/decodeQueueSize) */
   readonly decodeQueueSize: number;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder/dequeue_event) */
-  ondequeue: ((this: VideoDecoder, ev: Event) => unknown) | null;
+  ondequeue: ((this: VideoDecoder, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder/state) */
   readonly state: CodecState;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder/close) */
@@ -6029,9 +6029,9 @@ interface VideoDecoder extends EventTarget {
   flush(): Promise<void>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder/reset) */
   reset(): void;
-  addEventListener<K extends keyof VideoDecoderEventMap>(type: K, listener: (this: VideoDecoder, ev: VideoDecoderEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof VideoDecoderEventMap>(type: K, listener: (this: VideoDecoder, ev: VideoDecoderEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof VideoDecoderEventMap>(type: K, listener: (this: VideoDecoder, ev: VideoDecoderEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof VideoDecoderEventMap>(type: K, listener: (this: VideoDecoder, ev: VideoDecoderEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -6055,7 +6055,7 @@ interface VideoEncoder extends EventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/encodeQueueSize) */
   readonly encodeQueueSize: number;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/dequeue_event) */
-  ondequeue: ((this: VideoEncoder, ev: Event) => unknown) | null;
+  ondequeue: ((this: VideoEncoder, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/state) */
   readonly state: CodecState;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/close) */
@@ -6068,9 +6068,9 @@ interface VideoEncoder extends EventTarget {
   flush(): Promise<void>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/reset) */
   reset(): void;
-  addEventListener<K extends keyof VideoEncoderEventMap>(type: K, listener: (this: VideoEncoder, ev: VideoEncoderEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof VideoEncoderEventMap>(type: K, listener: (this: VideoEncoder, ev: VideoEncoderEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof VideoEncoderEventMap>(type: K, listener: (this: VideoEncoder, ev: VideoEncoderEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof VideoEncoderEventMap>(type: K, listener: (this: VideoEncoder, ev: VideoEncoderEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -6933,25 +6933,25 @@ interface WebGL2RenderingContextBase {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getActiveUniformBlockName) */
   getActiveUniformBlockName(program: WebGLProgram, uniformBlockIndex: GLuint): string | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getActiveUniformBlockParameter) */
-  getActiveUniformBlockParameter(program: WebGLProgram, uniformBlockIndex: GLuint, pname: GLenum): unknown;
+  getActiveUniformBlockParameter(program: WebGLProgram, uniformBlockIndex: GLuint, pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getActiveUniforms) */
-  getActiveUniforms(program: WebGLProgram, uniformIndices: GLuint[], pname: GLenum): unknown;
+  getActiveUniforms(program: WebGLProgram, uniformIndices: GLuint[], pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getBufferSubData) */
   getBufferSubData(target: GLenum, srcByteOffset: GLintptr, dstBuffer: ArrayBufferView, dstOffset?: number, length?: GLuint): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getFragDataLocation) */
   getFragDataLocation(program: WebGLProgram, name: string): GLint;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getIndexedParameter) */
-  getIndexedParameter(target: GLenum, index: GLuint): unknown;
+  getIndexedParameter(target: GLenum, index: GLuint): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getInternalformatParameter) */
-  getInternalformatParameter(target: GLenum, internalformat: GLenum, pname: GLenum): unknown;
+  getInternalformatParameter(target: GLenum, internalformat: GLenum, pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getQuery) */
   getQuery(target: GLenum, pname: GLenum): WebGLQuery | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getQueryParameter) */
-  getQueryParameter(query: WebGLQuery, pname: GLenum): unknown;
+  getQueryParameter(query: WebGLQuery, pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getSamplerParameter) */
-  getSamplerParameter(sampler: WebGLSampler, pname: GLenum): unknown;
+  getSamplerParameter(sampler: WebGLSampler, pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getSyncParameter) */
-  getSyncParameter(sync: WebGLSync, pname: GLenum): unknown;
+  getSyncParameter(sync: WebGLSync, pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getTransformFeedbackVarying) */
   getTransformFeedbackVarying(program: WebGLProgram, index: GLuint): WebGLActiveInfo | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getUniformBlockIndex) */
@@ -7876,7 +7876,7 @@ interface WebGLRenderingContextBase {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getAttribLocation) */
   getAttribLocation(program: WebGLProgram, name: string): GLint;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getBufferParameter) */
-  getBufferParameter(target: GLenum, pname: GLenum): unknown;
+  getBufferParameter(target: GLenum, pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getContextAttributes) */
   getContextAttributes(): WebGLContextAttributes | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getError) */
@@ -7916,21 +7916,21 @@ interface WebGLRenderingContextBase {
   getExtension(extensionName: 'WEBGL_draw_buffers'): WEBGL_draw_buffers | null;
   getExtension(extensionName: 'WEBGL_lose_context'): WEBGL_lose_context | null;
   getExtension(extensionName: 'WEBGL_multi_draw'): WEBGL_multi_draw | null;
-  getExtension(name: string): unknown;
+  getExtension(name: string): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getFramebufferAttachmentParameter) */
-  getFramebufferAttachmentParameter(target: GLenum, attachment: GLenum, pname: GLenum): unknown;
+  getFramebufferAttachmentParameter(target: GLenum, attachment: GLenum, pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getParameter) */
-  getParameter(pname: GLenum): unknown;
+  getParameter(pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getProgramInfoLog) */
   getProgramInfoLog(program: WebGLProgram): string | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getProgramParameter) */
-  getProgramParameter(program: WebGLProgram, pname: GLenum): unknown;
+  getProgramParameter(program: WebGLProgram, pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getRenderbufferParameter) */
-  getRenderbufferParameter(target: GLenum, pname: GLenum): unknown;
+  getRenderbufferParameter(target: GLenum, pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getShaderInfoLog) */
   getShaderInfoLog(shader: WebGLShader): string | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getShaderParameter) */
-  getShaderParameter(shader: WebGLShader, pname: GLenum): unknown;
+  getShaderParameter(shader: WebGLShader, pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getShaderPrecisionFormat) */
   getShaderPrecisionFormat(shadertype: GLenum, precisiontype: GLenum): WebGLShaderPrecisionFormat | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getShaderSource) */
@@ -7938,13 +7938,13 @@ interface WebGLRenderingContextBase {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getSupportedExtensions) */
   getSupportedExtensions(): string[] | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getTexParameter) */
-  getTexParameter(target: GLenum, pname: GLenum): unknown;
+  getTexParameter(target: GLenum, pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getUniform) */
-  getUniform(program: WebGLProgram, location: WebGLUniformLocation): unknown;
+  getUniform(program: WebGLProgram, location: WebGLUniformLocation): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getUniformLocation) */
   getUniformLocation(program: WebGLProgram, name: string): WebGLUniformLocation | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getVertexAttrib) */
-  getVertexAttrib(index: GLuint, pname: GLenum): unknown;
+  getVertexAttrib(index: GLuint, pname: GLenum): any;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getVertexAttribOffset) */
   getVertexAttribOffset(index: GLuint, pname: GLenum): GLintptr;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/hint) */
@@ -8503,13 +8503,13 @@ interface WebSocket extends EventTarget {
    */
   readonly extensions: string;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/close_event) */
-  onclose: ((this: WebSocket, ev: CloseEvent) => unknown) | null;
+  onclose: ((this: WebSocket, ev: CloseEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/error_event) */
-  onerror: ((this: WebSocket, ev: Event) => unknown) | null;
+  onerror: ((this: WebSocket, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/message_event) */
-  onmessage: ((this: WebSocket, ev: MessageEvent) => unknown) | null;
+  onmessage: ((this: WebSocket, ev: MessageEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/open_event) */
-  onopen: ((this: WebSocket, ev: Event) => unknown) | null;
+  onopen: ((this: WebSocket, ev: Event) => any) | null;
   /**
    * Returns the subprotocol selected by the server, if any. It can be used in conjunction with the array form of the constructor's second argument to perform subprotocol negotiation.
    *
@@ -8544,9 +8544,9 @@ interface WebSocket extends EventTarget {
   readonly OPEN: 1;
   readonly CLOSING: 2;
   readonly CLOSED: 3;
-  addEventListener<K extends keyof WebSocketEventMap>(type: K, listener: (this: WebSocket, ev: WebSocketEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof WebSocketEventMap>(type: K, listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof WebSocketEventMap>(type: K, listener: (this: WebSocket, ev: WebSocketEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof WebSocketEventMap>(type: K, listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -8705,13 +8705,13 @@ interface WindowOrWorkerGlobalScope {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/queueMicrotask) */
   queueMicrotask(callback: VoidFunction): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/reportError) */
-  reportError(e: unknown): void;
+  reportError(e: any): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/setInterval) */
   setInterval(handler: TimerHandler, timeout?: number, ...arguments: any[]): number;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/setTimeout) */
   setTimeout(handler: TimerHandler, timeout?: number, ...arguments: any[]): number;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/structuredClone) */
-  structuredClone<T = unknown>(value: T, options?: StructuredSerializeOptions): T;
+  structuredClone<T = any>(value: T, options?: StructuredSerializeOptions): T;
 }
 
 interface WorkerEventMap extends AbstractWorkerEventMap {
@@ -8726,25 +8726,25 @@ interface WorkerEventMap extends AbstractWorkerEventMap {
  */
 interface Worker extends EventTarget, AbstractWorker {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Worker/message_event) */
-  onmessage: ((this: Worker, ev: MessageEvent) => unknown) | null;
+  onmessage: ((this: Worker, ev: MessageEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Worker/messageerror_event) */
-  onmessageerror: ((this: Worker, ev: MessageEvent) => unknown) | null;
+  onmessageerror: ((this: Worker, ev: MessageEvent) => any) | null;
   /**
    * Clones message and transmits it to worker's global environment. transfer can be passed as a list of objects that are to be transferred rather than cloned.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Worker/postMessage)
    */
-  postMessage(message: unknown, transfer: Transferable[]): void;
-  postMessage(message: unknown, options?: StructuredSerializeOptions): void;
+  postMessage(message: any, transfer: Transferable[]): void;
+  postMessage(message: any, options?: StructuredSerializeOptions): void;
   /**
    * Aborts worker's associated global environment.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Worker/terminate)
    */
   terminate(): void;
-  addEventListener<K extends keyof WorkerEventMap>(type: K, listener: (this: Worker, ev: WorkerEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof WorkerEventMap>(type: K, listener: (this: Worker, ev: WorkerEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof WorkerEventMap>(type: K, listener: (this: Worker, ev: WorkerEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof WorkerEventMap>(type: K, listener: (this: Worker, ev: WorkerEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -8781,17 +8781,17 @@ interface WorkerGlobalScope extends EventTarget, FontFaceSource, WindowOrWorkerG
    */
   readonly navigator: WorkerNavigator;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/error_event) */
-  onerror: ((this: WorkerGlobalScope, ev: ErrorEvent) => unknown) | null;
+  onerror: ((this: WorkerGlobalScope, ev: ErrorEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/languagechange_event) */
-  onlanguagechange: ((this: WorkerGlobalScope, ev: Event) => unknown) | null;
+  onlanguagechange: ((this: WorkerGlobalScope, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/offline_event) */
-  onoffline: ((this: WorkerGlobalScope, ev: Event) => unknown) | null;
+  onoffline: ((this: WorkerGlobalScope, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/online_event) */
-  ononline: ((this: WorkerGlobalScope, ev: Event) => unknown) | null;
+  ononline: ((this: WorkerGlobalScope, ev: Event) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/rejectionhandled_event) */
-  onrejectionhandled: ((this: WorkerGlobalScope, ev: PromiseRejectionEvent) => unknown) | null;
+  onrejectionhandled: ((this: WorkerGlobalScope, ev: PromiseRejectionEvent) => any) | null;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/unhandledrejection_event) */
-  onunhandledrejection: ((this: WorkerGlobalScope, ev: PromiseRejectionEvent) => unknown) | null;
+  onunhandledrejection: ((this: WorkerGlobalScope, ev: PromiseRejectionEvent) => any) | null;
   /**
    * Returns workerGlobal.
    *
@@ -8804,9 +8804,9 @@ interface WorkerGlobalScope extends EventTarget, FontFaceSource, WindowOrWorkerG
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/importScripts)
    */
   importScripts(...urls: (string | URL)[]): void;
-  addEventListener<K extends keyof WorkerGlobalScopeEventMap>(type: K, listener: (this: WorkerGlobalScope, ev: WorkerGlobalScopeEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof WorkerGlobalScopeEventMap>(type: K, listener: (this: WorkerGlobalScope, ev: WorkerGlobalScopeEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof WorkerGlobalScopeEventMap>(type: K, listener: (this: WorkerGlobalScope, ev: WorkerGlobalScopeEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof WorkerGlobalScopeEventMap>(type: K, listener: (this: WorkerGlobalScope, ev: WorkerGlobalScopeEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -8869,11 +8869,11 @@ declare var WorkerNavigator: {
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream)
  */
-interface WritableStream<W = unknown> {
+interface WritableStream<W = any> {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/locked) */
   readonly locked: boolean;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/abort) */
-  abort(reason?: unknown): Promise<void>;
+  abort(reason?: any): Promise<void>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/close) */
   close(): Promise<void>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/getWriter) */
@@ -8882,7 +8882,7 @@ interface WritableStream<W = unknown> {
 
 declare var WritableStream: {
   prototype: WritableStream;
-  new <W = unknown>(underlyingSink?: UnderlyingSink<W>, strategy?: QueuingStrategy<W>): WritableStream<W>;
+  new <W = any>(underlyingSink?: UnderlyingSink<W>, strategy?: QueuingStrategy<W>): WritableStream<W>;
 };
 
 /**
@@ -8894,7 +8894,7 @@ interface WritableStreamDefaultController {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/signal) */
   readonly signal: AbortSignal;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/error) */
-  error(e?: unknown): void;
+  error(e?: any): void;
 }
 
 declare var WritableStreamDefaultController: {
@@ -8907,7 +8907,7 @@ declare var WritableStreamDefaultController: {
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter)
  */
-interface WritableStreamDefaultWriter<W = unknown> {
+interface WritableStreamDefaultWriter<W = any> {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed) */
   readonly closed: Promise<undefined>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/desiredSize) */
@@ -8915,7 +8915,7 @@ interface WritableStreamDefaultWriter<W = unknown> {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/ready) */
   readonly ready: Promise<undefined>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort) */
-  abort(reason?: unknown): Promise<void>;
+  abort(reason?: any): Promise<void>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/close) */
   close(): Promise<void>;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/releaseLock) */
@@ -8926,7 +8926,7 @@ interface WritableStreamDefaultWriter<W = unknown> {
 
 declare var WritableStreamDefaultWriter: {
   prototype: WritableStreamDefaultWriter;
-  new <W = unknown>(stream: WritableStream<W>): WritableStreamDefaultWriter<W>;
+  new <W = any>(stream: WritableStream<W>): WritableStreamDefaultWriter<W>;
 };
 
 interface XMLHttpRequestEventMap extends XMLHttpRequestEventTargetEventMap {
@@ -8940,7 +8940,7 @@ interface XMLHttpRequestEventMap extends XMLHttpRequestEventTargetEventMap {
  */
 interface XMLHttpRequest extends XMLHttpRequestEventTarget {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/readystatechange_event) */
-  onreadystatechange: ((this: XMLHttpRequest, ev: Event) => unknown) | null;
+  onreadystatechange: ((this: XMLHttpRequest, ev: Event) => any) | null;
   /**
    * Returns client's state.
    *
@@ -8952,7 +8952,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/response)
    */
-  readonly response: unknown;
+  readonly response: any;
   /**
    * Returns response as text.
    *
@@ -9057,9 +9057,9 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
   readonly HEADERS_RECEIVED: 2;
   readonly LOADING: 3;
   readonly DONE: 4;
-  addEventListener<K extends keyof XMLHttpRequestEventMap>(type: K, listener: (this: XMLHttpRequest, ev: XMLHttpRequestEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof XMLHttpRequestEventMap>(type: K, listener: (this: XMLHttpRequest, ev: XMLHttpRequestEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof XMLHttpRequestEventMap>(type: K, listener: (this: XMLHttpRequest, ev: XMLHttpRequestEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof XMLHttpRequestEventMap>(type: K, listener: (this: XMLHttpRequest, ev: XMLHttpRequestEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -9085,16 +9085,16 @@ interface XMLHttpRequestEventTargetEventMap {
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequestEventTarget) */
 interface XMLHttpRequestEventTarget extends EventTarget {
-  onabort: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-  onerror: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-  onload: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-  onloadend: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-  onloadstart: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-  onprogress: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-  ontimeout: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-  addEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(type: K, listener: (this: XMLHttpRequestEventTarget, ev: XMLHttpRequestEventTargetEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  onabort: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null;
+  onerror: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null;
+  onload: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null;
+  onloadend: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null;
+  onloadstart: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null;
+  onprogress: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null;
+  ontimeout: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null;
+  addEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(type: K, listener: (this: XMLHttpRequestEventTarget, ev: XMLHttpRequestEventTargetEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(type: K, listener: (this: XMLHttpRequestEventTarget, ev: XMLHttpRequestEventTargetEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(type: K, listener: (this: XMLHttpRequestEventTarget, ev: XMLHttpRequestEventTargetEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -9105,9 +9105,9 @@ declare var XMLHttpRequestEventTarget: {
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequestUpload) */
 interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
-  addEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(type: K, listener: (this: XMLHttpRequestUpload, ev: XMLHttpRequestEventTargetEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(type: K, listener: (this: XMLHttpRequestUpload, ev: XMLHttpRequestEventTargetEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(type: K, listener: (this: XMLHttpRequestUpload, ev: XMLHttpRequestEventTargetEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(type: K, listener: (this: XMLHttpRequestUpload, ev: XMLHttpRequestEventTargetEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
   removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
@@ -9129,7 +9129,7 @@ interface Console {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug_static) */
   debug(...data: any[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dir_static) */
-  dir(item?: unknown, options?: unknown): void;
+  dir(item?: any, options?: any): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dirxml_static) */
   dirxml(...data: any[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/error_static) */
@@ -9145,7 +9145,7 @@ interface Console {
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/log_static) */
   log(...data: any[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/table_static) */
-  table(tabularData?: unknown, properties?: string[]): void;
+  table(tabularData?: any, properties?: string[]): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static) */
   time(label?: string): void;
   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeEnd_static) */
@@ -9240,16 +9240,16 @@ declare namespace WebAssembly {
     /** [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Table/length) */
     readonly length: number;
     /** [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Table/get) */
-    get(index: number): unknown;
+    get(index: number): any;
     /** [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Table/grow) */
-    grow(delta: number, value?: unknown): number;
+    grow(delta: number, value?: any): number;
     /** [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Table/set) */
-    set(index: number, value?: unknown): void;
+    set(index: number, value?: any): void;
   }
 
   var Table: {
     prototype: Table;
-    new (descriptor: TableDescriptor, value?: unknown): Table;
+    new (descriptor: TableDescriptor, value?: any): Table;
   };
 
   interface GlobalDescriptor<T extends ValueType = ValueType> {
@@ -9282,7 +9282,7 @@ declare namespace WebAssembly {
 
   interface ValueTypeMap {
     anyfunc: Function;
-    externref: unknown;
+    externref: any;
     f32: number;
     f64: number;
     i32: number;
@@ -9333,18 +9333,18 @@ interface FrameRequestCallback {
 }
 
 interface LockGrantedCallback {
-  (lock: Lock | null): unknown;
+  (lock: Lock | null): any;
 }
 
 interface OnErrorEventHandlerNonNull {
-  (event: Event | string, source?: string, lineno?: number, colno?: number, error?: Error): unknown;
+  (event: Event | string, source?: string, lineno?: number, colno?: number, error?: Error): any;
 }
 
 interface PerformanceObserverCallback {
   (entries: PerformanceObserverEntryList, observer: PerformanceObserver): void;
 }
 
-interface QueuingStrategySize<T = unknown> {
+interface QueuingStrategySize<T = any> {
   (chunk: T): number;
 }
 
@@ -9357,7 +9357,7 @@ interface TransformerFlushCallback<O> {
 }
 
 interface TransformerStartCallback<O> {
-  (controller: TransformStreamDefaultController<O>): unknown;
+  (controller: TransformStreamDefaultController<O>): any;
 }
 
 interface TransformerTransformCallback<I, O> {
@@ -9365,7 +9365,7 @@ interface TransformerTransformCallback<I, O> {
 }
 
 interface UnderlyingSinkAbortCallback {
-  (reason?: unknown): void | PromiseLike<void>;
+  (reason?: any): void | PromiseLike<void>;
 }
 
 interface UnderlyingSinkCloseCallback {
@@ -9373,7 +9373,7 @@ interface UnderlyingSinkCloseCallback {
 }
 
 interface UnderlyingSinkStartCallback {
-  (controller: WritableStreamDefaultController): unknown;
+  (controller: WritableStreamDefaultController): any;
 }
 
 interface UnderlyingSinkWriteCallback<W> {
@@ -9381,7 +9381,7 @@ interface UnderlyingSinkWriteCallback<W> {
 }
 
 interface UnderlyingSourceCancelCallback {
-  (reason?: unknown): void | PromiseLike<void>;
+  (reason?: any): void | PromiseLike<void>;
 }
 
 interface UnderlyingSourcePullCallback<R> {
@@ -9389,7 +9389,7 @@ interface UnderlyingSourcePullCallback<R> {
 }
 
 interface UnderlyingSourceStartCallback<R> {
-  (controller: ReadableStreamController<R>): unknown;
+  (controller: ReadableStreamController<R>): any;
 }
 
 interface VideoFrameOutputCallback {
@@ -9411,11 +9411,11 @@ interface WebCodecsErrorCallback {
  */
 declare var name: string;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/message_event) */
-declare var onmessage: ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown) | null;
+declare var onmessage: ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => any) | null;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/messageerror_event) */
-declare var onmessageerror: ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown) | null;
+declare var onmessageerror: ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => any) | null;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/rtctransform_event) */
-declare var onrtctransform: ((this: DedicatedWorkerGlobalScope, ev: RTCTransformEvent) => unknown) | null;
+declare var onrtctransform: ((this: DedicatedWorkerGlobalScope, ev: RTCTransformEvent) => any) | null;
 /**
  * Aborts dedicatedWorkerGlobal.
  *
@@ -9427,8 +9427,8 @@ declare function close(): void;
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/postMessage)
  */
-declare function postMessage(message: unknown, transfer: Transferable[]): void;
-declare function postMessage(message: unknown, options?: StructuredSerializeOptions): void;
+declare function postMessage(message: any, transfer: Transferable[]): void;
+declare function postMessage(message: any, options?: StructuredSerializeOptions): void;
 /**
  * Dispatches a synthetic event event to target and returns true if either event's cancelable attribute value is false or its preventDefault() method was not invoked, and false otherwise.
  *
@@ -9448,17 +9448,17 @@ declare var location: WorkerLocation;
  */
 declare var navigator: WorkerNavigator;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/error_event) */
-declare var onerror: ((this: DedicatedWorkerGlobalScope, ev: ErrorEvent) => unknown) | null;
+declare var onerror: ((this: DedicatedWorkerGlobalScope, ev: ErrorEvent) => any) | null;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/languagechange_event) */
-declare var onlanguagechange: ((this: DedicatedWorkerGlobalScope, ev: Event) => unknown) | null;
+declare var onlanguagechange: ((this: DedicatedWorkerGlobalScope, ev: Event) => any) | null;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/offline_event) */
-declare var onoffline: ((this: DedicatedWorkerGlobalScope, ev: Event) => unknown) | null;
+declare var onoffline: ((this: DedicatedWorkerGlobalScope, ev: Event) => any) | null;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/online_event) */
-declare var ononline: ((this: DedicatedWorkerGlobalScope, ev: Event) => unknown) | null;
+declare var ononline: ((this: DedicatedWorkerGlobalScope, ev: Event) => any) | null;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/rejectionhandled_event) */
-declare var onrejectionhandled: ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => unknown) | null;
+declare var onrejectionhandled: ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => any) | null;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/unhandledrejection_event) */
-declare var onunhandledrejection: ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => unknown) | null;
+declare var onunhandledrejection: ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => any) | null;
 /**
  * Returns workerGlobal.
  *
@@ -9513,20 +9513,20 @@ declare function fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Re
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/queueMicrotask) */
 declare function queueMicrotask(callback: VoidFunction): void;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/reportError) */
-declare function reportError(e: unknown): void;
+declare function reportError(e: any): void;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/setInterval) */
 declare function setInterval(handler: TimerHandler, timeout?: number, ...arguments: any[]): number;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/setTimeout) */
 declare function setTimeout(handler: TimerHandler, timeout?: number, ...arguments: any[]): number;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/structuredClone) */
-declare function structuredClone<T = unknown>(value: T, options?: StructuredSerializeOptions): T;
+declare function structuredClone<T = any>(value: T, options?: StructuredSerializeOptions): T;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/cancelAnimationFrame) */
 declare function cancelAnimationFrame(handle: number): void;
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/requestAnimationFrame) */
 declare function requestAnimationFrame(callback: FrameRequestCallback): number;
-declare function addEventListener<K extends keyof DedicatedWorkerGlobalScopeEventMap>(type: K, listener: (this: DedicatedWorkerGlobalScope, ev: DedicatedWorkerGlobalScopeEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+declare function addEventListener<K extends keyof DedicatedWorkerGlobalScopeEventMap>(type: K, listener: (this: DedicatedWorkerGlobalScope, ev: DedicatedWorkerGlobalScopeEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
 declare function addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-declare function removeEventListener<K extends keyof DedicatedWorkerGlobalScopeEventMap>(type: K, listener: (this: DedicatedWorkerGlobalScope, ev: DedicatedWorkerGlobalScopeEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+declare function removeEventListener<K extends keyof DedicatedWorkerGlobalScopeEventMap>(type: K, listener: (this: DedicatedWorkerGlobalScope, ev: DedicatedWorkerGlobalScopeEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
 declare function removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 type AlgorithmIdentifier = Algorithm | string;
 type AllowSharedBufferSource = ArrayBuffer | ArrayBufferView;

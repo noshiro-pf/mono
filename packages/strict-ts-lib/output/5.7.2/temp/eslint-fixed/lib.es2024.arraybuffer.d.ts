@@ -60,5 +60,5 @@ interface ArrayBuffer {
 }
 
 interface ArrayBufferConstructor {
-  new (byteLength: number, options?: { readonly maxByteLength?: number }): ArrayBuffer;
+  new (byteLength: number, options?: Readonly<{ maxByteLength?: number }>): ArrayBuffer;
 }

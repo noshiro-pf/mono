@@ -75,8 +75,8 @@ declare namespace Intl {
     readonly isWordLike?: boolean;
   }
 
-  const Segmenter: {
-    readonly prototype: Segmenter;
+  const Segmenter: Readonly<{
+    prototype: Segmenter;
 
     /**
      * Creates a new `Intl.Segmenter` object.
@@ -106,8 +106,8 @@ declare namespace Intl {
      *
      * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter/supportedLocalesOf)
      */
-    supportedLocalesOf(locales: LocalesArgument, options?: Pick<SegmenterOptions, 'localeMatcher'>): readonly UnicodeBCP47LocaleIdentifier[];
-  };
+    supportedLocalesOf(locales: LocalesArgument, options?: Pick<SegmenterOptions, 'localeMatcher'>): UnicodeBCP47LocaleIdentifier[];
+  }>;
 
   /**
    * Returns a sorted array of the supported collation, calendar, currency, numbering system, timezones, and units by the implementation.

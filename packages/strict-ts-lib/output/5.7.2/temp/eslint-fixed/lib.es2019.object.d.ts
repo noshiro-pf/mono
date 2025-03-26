@@ -22,7 +22,7 @@ interface ObjectConstructor {
    * Returns an object created by key-value entries for properties and methods
    * @param entries An iterable object that contains key-value entries for properties and methods.
    */
-  fromEntries<T = unknown>(entries: Iterable<readonly [PropertyKey, T]>): { readonly [k: string]: T };
+  fromEntries<T = unknown>(entries: Iterable<readonly [PropertyKey, T]>): Readonly<{ [k: string]: T }>;
 
   /**
    * Returns an object created by key-value entries for properties and methods

@@ -16,15 +16,15 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 
 interface RegExpMatchArray {
-  readonly groups?: {
-    readonly [key: string]: string;
-  };
+  readonly groups?: Readonly<{
+    [key: string]: string;
+  }>;
 }
 
 interface RegExpExecArray {
-  readonly groups?: {
-    readonly [key: string]: string;
-  };
+  readonly groups?: Readonly<{
+    [key: string]: string;
+  }>;
 }
 
 interface RegExp {

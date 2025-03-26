@@ -113,7 +113,7 @@ interface ProxyConstructor {
    * @param target A target object to wrap with Proxy.
    * @param handler An object whose properties define the behavior of Proxy when an operation is attempted on it.
    */
-  revocable<T extends object>(target: T, handler: ProxyHandler<T>): { readonly proxy: T; readonly revoke: () => void };
+  revocable<T extends object>(target: T, handler: ProxyHandler<T>): Readonly<{ proxy: T; revoke: () => void }>;
 
   /**
    * Creates a Proxy object. The Proxy object allows you to create an object that can be used in place of the

@@ -15,10 +15,10 @@ and limitations under the License.
 
 /// <reference no-default-lib="true"/>
 
-type FlatArray<Arr, Depth extends number> = {
-  readonly done: Arr;
-  readonly recur: Arr extends ReadonlyArray<infer InnerArr> ? FlatArray<InnerArr, readonly readonly readonly readonly readonly readonly readonly readonly readonly readonly [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20][Depth]> : Arr;
-}[Depth extends -1 ? 'done' : 'recur'];
+type FlatArray<Arr, Depth extends number> = Readonly<{
+  done: Arr;
+  recur: Arr extends ReadonlyArray<infer InnerArr> ? FlatArray<InnerArr, [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20][Depth]> : Arr;
+}>[Depth extends -1 ? 'done' : 'recur'];
 
 interface ReadonlyArray<T> {
   /**
@@ -31,7 +31,7 @@ interface ReadonlyArray<T> {
    * @param thisArg An object to which the this keyword can refer in the callback function. If
    * thisArg is omitted, undefined is used as the this value.
    */
-  flatMap<U, This = undefined>(callback: (this: This, value: T, index: number, array: readonly T[]) => U | ReadonlyArray<U>, thisArg?: This): readonly U[];
+  flatMap<U, This = undefined>(callback: (this: This, value: T, index: number, array: readonly T[]) => U | readonly U[], thisArg?: This): readonly U[];
 
   /**
    * Returns a new array with all sub-array elements concatenated into it recursively up to the
@@ -53,7 +53,7 @@ interface Array<T> {
    * @param thisArg An object to which the this keyword can refer in the callback function. If
    * thisArg is omitted, undefined is used as the this value.
    */
-  flatMap<U, This = undefined>(callback: (this: This, value: T, index: number, array: readonly T[]) => U | ReadonlyArray<U>, thisArg?: This): readonly U[];
+  flatMap<U, This = undefined>(callback: (this: This, value: T, index: number, array: readonly T[]) => U | readonly U[], thisArg?: This): readonly U[];
 
   /**
    * Returns a new array with all sub-array elements concatenated into it recursively up to the

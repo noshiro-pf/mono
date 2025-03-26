@@ -108,11 +108,11 @@ declare namespace Intl {
      *
      * @throws `TypeError` if `list` includes something other than the possible values.
      *
-     * @returns {{ type: "element" | "literal", value: string; }[]} An Array of components which contains the formatted parts from the list.
+     * @returns {(readonly Readonly<{ type: "element" | "literal", value: string; }>[])} An Array of components which contains the formatted parts from the list.
      *
      * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/formatToParts).
      */
-    formatToParts(list: Iterable<string>): readonly { readonly type: 'element' | 'literal'; readonly value: string }[];
+    formatToParts(list: Iterable<string>): readonly Readonly<{ type: 'element' | 'literal'; value: string }>[];
 
     /**
      * Returns a new object with properties reflecting the locale and style
@@ -124,8 +124,8 @@ declare namespace Intl {
     resolvedOptions(): ResolvedListFormatOptions;
   }
 
-  const ListFormat: {
-    readonly prototype: ListFormat;
+  const ListFormat: Readonly<{
+    prototype: ListFormat;
 
     /**
      * Creates [Intl.ListFormat](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat) objects that
@@ -160,6 +160,6 @@ declare namespace Intl {
      *
      * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/supportedLocalesOf).
      */
-    supportedLocalesOf(locales: LocalesArgument, options?: Pick<ListFormatOptions, 'localeMatcher'>): readonly UnicodeBCP47LocaleIdentifier[];
-  };
+    supportedLocalesOf(locales: LocalesArgument, options?: Pick<ListFormatOptions, 'localeMatcher'>): UnicodeBCP47LocaleIdentifier[];
+  }>;
 }

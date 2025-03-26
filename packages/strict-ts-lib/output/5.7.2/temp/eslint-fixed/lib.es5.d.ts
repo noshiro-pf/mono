@@ -224,7 +224,7 @@ interface ObjectConstructor {
    * Prevents the modification of existing property attributes and values, and prevents the addition of new properties.
    * @param o Object on which to lock the attributes.
    */
-  freeze<T extends { readonly [idx: string]: U | null | undefined | object }, U extends string | bigint | number | boolean | symbol>(o: T): Readonly<T>;
+  freeze<T extends Readonly<{ [idx: string]: U | null | undefined | object }>, U extends string | bigint | number | boolean | symbol>(o: T): Readonly<T>;
 
   /**
    * Prevents the modification of existing property attributes and values, and prevents the addition of new properties.
@@ -284,7 +284,7 @@ interface Function {
    * @param thisArg The object to be used as the current object.
    * @param argArray A list of arguments to be passed to the method.
    */
-  call(this: Function, thisArg: unknown, ...argArray: readonly any[]): unknown;
+  call(this: Function, thisArg: unknown, ...argArray: readonly unknown[]): unknown;
 
   /**
    * For a given function, creates a bound function that has the same body as the original function.
@@ -292,7 +292,7 @@ interface Function {
    * @param thisArg An object to which the this keyword can refer inside the new function.
    * @param argArray A list of arguments to be passed to the new function.
    */
-  bind(this: Function, thisArg: unknown, ...argArray: readonly any[]): unknown;
+  bind(this: Function, thisArg: unknown, ...argArray: readonly unknown[]): unknown;
 
   /** Returns a string representation of a function. */
   toString(): string;
@@ -466,7 +466,7 @@ interface String {
    * @param searchValue A string to search for.
    * @param replacer A function that returns the replacement text.
    */
-  replace(searchValue: string | RegExp, replacer: (substring: string, ...args: readonly any[]) => string): string;
+  replace(searchValue: string | RegExp, replacer: (substring: string, ...args: readonly unknown[]) => string): string;
 
   /**
    * Finds the first substring match in a regular expression search.
@@ -1554,7 +1554,7 @@ interface Promise<T> {
  */
 type Awaited<T> = T extends null | undefined
   ? T // special case for `null | undefined` when not in `--strictNullChecks` mode
-  : T extends object & { then(onfulfilled: infer F, ...args: infer _): unknown } // `await` only unwraps object types with a callable `then`. Non-object types are not unwrapped
+  : T extends object & Readonly<{ then(onfulfilled: infer F, ...args: infer _): unknown }> // `await` only unwraps object types with a callable `then`. Non-object types are not unwrapped
     ? F extends (value: infer V, ...args: infer _) => unknown // if the argument to `then` is callable, extracts the first argument
       ? Awaited<V> // recursively unwrap the value
       : never // the argument to `then` was not callable
@@ -1568,37 +1568,35 @@ interface ArrayLike<T> {
 /**
  * Make all properties in T optional
  */
-type Partial<T> = { readonly
+type Partial<T> = Readonly<{
   [P in keyof T]?: T[P];
-};
+}>;
 
 /**
  * Make all properties in T required
  */
-type Required<T> = { readonly
+type Required<T> = Readonly<{
   [P in keyof T]-?: T[P];
-};
+}>;
 
 /**
  * Make all properties in T readonly
  */
-type Readonly<T> = {
-  readonly [P in keyof T]: T[P];
-};
+type Readonly<T> = Readonly<{ [P in keyof T]: T[P] }>;
 
 /**
  * From T, pick a set of properties whose keys are in the union K
  */
-type Pick<T, K extends keyof T> = { readonly
+type Pick<T, K extends keyof T> = Readonly<{
   [P in K]: T[P];
-};
+}>;
 
 /**
  * Construct a type with a set of properties K of type T
  */
-type Record<K extends keyof unknown, T> = { readonly
+type Record<K extends keyof unknown, T> = Readonly<{
   [P in K]: T;
-};
+}>;
 
 /**
  * Exclude from T those types that are assignable to U
@@ -1618,7 +1616,7 @@ type Omit<T, K extends keyof unknown> = Pick<T, Exclude<keyof T, K>>;
 /**
  * Exclude null and undefined from T
  */
-type NonNullable<T> = T & {};
+type NonNullable<T> = T & Readonly<{}>;
 
 /**
  * Obtain the parameters of a function type in a tuple
@@ -1858,7 +1856,7 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
 }
 interface DataViewConstructor {
   readonly prototype: DataView<ArrayBufferLike>;
-  new <TArrayBuffer extends ArrayBufferLike & { readonly BYTES_PER_ELEMENT?: never }>(buffer: TArrayBuffer, byteOffset?: number, byteLength?: number): DataView<TArrayBuffer>;
+  new <TArrayBuffer extends ArrayBufferLike & Readonly<{ BYTES_PER_ELEMENT?: never }>>(buffer: TArrayBuffer, byteOffset?: number, byteLength?: number): DataView<TArrayBuffer>;
 }
 declare var DataView: DataViewConstructor;
 
@@ -4444,8 +4442,8 @@ declare namespace Intl {
 
   interface NumberFormatOptionsUseGroupingRegistry {}
 
-  type NumberFormatOptionsUseGrouping = {} extends NumberFormatOptionsUseGroupingRegistry ? boolean : keyof NumberFormatOptionsUseGroupingRegistry | 'true' | 'false' | boolean;
-  type ResolvedNumberFormatOptionsUseGrouping = {} extends NumberFormatOptionsUseGroupingRegistry ? boolean : keyof NumberFormatOptionsUseGroupingRegistry | false;
+  type NumberFormatOptionsUseGrouping = Readonly<{}> extends NumberFormatOptionsUseGroupingRegistry ? boolean : keyof NumberFormatOptionsUseGroupingRegistry | 'true' | 'false' | boolean;
+  type ResolvedNumberFormatOptionsUseGrouping = Readonly<{}> extends NumberFormatOptionsUseGroupingRegistry ? boolean : keyof NumberFormatOptionsUseGroupingRegistry | false;
 
   interface NumberFormatOptions {
     readonly localeMatcher?: 'lookup' | 'best fit' | undefined;

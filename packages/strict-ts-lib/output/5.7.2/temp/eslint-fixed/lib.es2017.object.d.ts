@@ -20,29 +20,29 @@ interface ObjectConstructor {
    * Returns an array of values of the enumerable own properties of an object
    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
-  values<T>(o: { readonly [s: string]: T } | ArrayLike<T>): readonly T[];
+  values<T>(o: Readonly<{ [s: string]: T }> | ArrayLike<T>): readonly T[];
 
   /**
    * Returns an array of values of the enumerable own properties of an object
    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
-  values(o: {}): readonly unknown[];
+  values(o: Readonly<{}>): readonly unknown[];
 
   /**
    * Returns an array of key/values of the enumerable own properties of an object
    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
-  entries<T>(o: { readonly [s: string]: T } | ArrayLike<T>): readonly (readonly [string, T])[];
+  entries<T>(o: Readonly<{ [s: string]: T }> | ArrayLike<T>): readonly (readonly [string, T])[];
 
   /**
    * Returns an array of key/values of the enumerable own properties of an object
    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
-  entries(o: {}): readonly (readonly [string, unknown])[];
+  entries(o: Readonly<{}>): readonly (readonly [string, unknown])[];
 
   /**
    * Returns an object containing all own property descriptors of an object
    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    */
-  getOwnPropertyDescriptors<T>(o: T): { readonly [P in keyof T]: TypedPropertyDescriptor<T[P]> } & { readonly [x: string]: PropertyDescriptor };
+  getOwnPropertyDescriptors<T>(o: T): Readonly<{ [P in keyof T]: TypedPropertyDescriptor<T[P]> }> & Readonly<{ [x: string]: PropertyDescriptor }>;
 }

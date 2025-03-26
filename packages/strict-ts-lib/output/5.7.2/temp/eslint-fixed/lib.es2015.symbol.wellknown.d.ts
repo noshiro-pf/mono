@@ -93,9 +93,9 @@ interface Array<T> {
    * Is an object whose properties have the value 'true'
    * when they will be absent when used in a 'with' statement.
    */
-  readonly [Symbol.unscopables]: { readonly
-    [K in keyof readonly unknown[]]?: boolean;
-  };
+  readonly [Symbol.unscopables]: Readonly<{
+    [K in keyof unknown[]]?: boolean;
+  }>;
 }
 
 interface ReadonlyArray<T> {
@@ -103,9 +103,9 @@ interface ReadonlyArray<T> {
    * Is an object whose properties have the value 'true'
    * when they will be absent when used in a 'with' statement.
    */
-  readonly [Symbol.unscopables]: { readonly
+  readonly [Symbol.unscopables]: Readonly<{
     [K in keyof (readonly unknown[])]?: boolean;
-  };
+  }>;
 }
 
 interface Date {
@@ -202,7 +202,7 @@ interface RegExp {
    *               this regular expression will be replaced
    * @param replacer A function that returns the replacement text.
    */
-  [Symbol.replace](string: string, replacer: (substring: string, ...args: readonly any[]) => string): string;
+  [Symbol.replace](string: string, replacer: (substring: string, ...args: readonly unknown[]) => string): string;
 
   /**
    * Finds the position beginning first substring match in a regular expression search
@@ -237,34 +237,34 @@ interface String {
    * containing the results of that search, or null if no matches are found.
    * @param matcher An object that supports being matched against.
    */
-  match(matcher: { [Symbol.match](string: string): RegExpMatchArray | null }): RegExpMatchArray | null;
+  match(matcher: Readonly<{ [Symbol.match](string: string): RegExpMatchArray | null }>): RegExpMatchArray | null;
 
   /**
    * Passes a string and {@linkcode replaceValue} to the `[Symbol.replace]` method on {@linkcode searchValue}. This method is expected to implement its own replacement algorithm.
    * @param searchValue An object that supports searching for and replacing matches within a string.
    * @param replaceValue The replacement text.
    */
-  replace(searchValue: { [Symbol.replace](string: string, replaceValue: string): string }, replaceValue: string): string;
+  replace(searchValue: Readonly<{ [Symbol.replace](string: string, replaceValue: string): string }>, replaceValue: string): string;
 
   /**
    * Replaces text in a string, using an object that supports replacement within a string.
    * @param searchValue A object can search for and replace matches within a string.
    * @param replacer A function that returns the replacement text.
    */
-  replace(searchValue: { [Symbol.replace](string: string, replacer: (substring: string, ...args: readonly any[]) => string): string }, replacer: (substring: string, ...args: readonly any[]) => string): string;
+  replace(searchValue: Readonly<{ [Symbol.replace](string: string, replacer: (substring: string, ...args: unknown[]) => string): string }>, replacer: (substring: string, ...args: readonly unknown[]) => string): string;
 
   /**
    * Finds the first substring match in a regular expression search.
    * @param searcher An object which supports searching within a string.
    */
-  search(searcher: { [Symbol.search](string: string): number }): number;
+  search(searcher: Readonly<{ [Symbol.search](string: string): number }>): number;
 
   /**
    * Split a string into substrings using the specified separator and return them as an array.
    * @param splitter An object that can split a string.
    * @param limit A value used to limit the number of elements returned in the array.
    */
-  split(splitter: { [Symbol.split](string: string, limit?: number): readonly string[] }, limit?: number): readonly string[];
+  split(splitter: Readonly<{ [Symbol.split](string: string, limit?: number): string[] }>, limit?: number): readonly string[];
 }
 
 interface ArrayBuffer {

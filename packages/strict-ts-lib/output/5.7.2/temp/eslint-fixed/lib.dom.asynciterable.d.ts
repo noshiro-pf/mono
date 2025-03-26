@@ -24,8 +24,8 @@ interface FileSystemDirectoryHandleAsyncIterator<T> extends AsyncIteratorObject<
 }
 
 interface FileSystemDirectoryHandle {
-  [Symbol.asyncIterator](): FileSystemDirectoryHandleAsyncIterator<readonly [string, FileSystemHandle]>;
-  entries(): FileSystemDirectoryHandleAsyncIterator<readonly [string, FileSystemHandle]>;
+  [Symbol.asyncIterator](): FileSystemDirectoryHandleAsyncIterator<[string, FileSystemHandle]>;
+  entries(): FileSystemDirectoryHandleAsyncIterator<[string, FileSystemHandle]>;
   keys(): FileSystemDirectoryHandleAsyncIterator<string>;
   values(): FileSystemDirectoryHandleAsyncIterator<FileSystemHandle>;
 }
@@ -34,7 +34,7 @@ interface ReadableStreamAsyncIterator<T> extends AsyncIteratorObject<T, BuiltinI
   [Symbol.asyncIterator](): ReadableStreamAsyncIterator<T>;
 }
 
-interface ReadableStream<R = unknown> {
+interface ReadableStream<R = any> {
   [Symbol.asyncIterator](options?: ReadableStreamIteratorOptions): ReadableStreamAsyncIterator<R>;
   values(options?: ReadableStreamIteratorOptions): ReadableStreamAsyncIterator<R>;
 }
