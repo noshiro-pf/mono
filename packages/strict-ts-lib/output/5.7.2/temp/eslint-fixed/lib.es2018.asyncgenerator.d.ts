@@ -30,12 +30,12 @@ interface AsyncGeneratorFunction {
    * Creates a new AsyncGenerator object.
    * @param args A list of arguments the function accepts.
    */
-  new (...args: readonly any[]): AsyncGenerator;
+  new (...args: readonly unknown[]): AsyncGenerator;
   /**
    * Creates a new AsyncGenerator object.
    * @param args A list of arguments the function accepts.
    */
-  (...args: readonly any[]): AsyncGenerator;
+  (...args: readonly unknown[]): AsyncGenerator;
   /**
    * The length of the arguments.
    */

@@ -25,7 +25,7 @@ export {};
 
 // Abstract type that allows us to mark `next` as `abstract`
 declare abstract class Iterator<T, TResult = undefined, TNext = unknown> {
-   
+  // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
   abstract next(value?: TNext): IteratorResult<T, TResult>;
 }
 

@@ -24,9 +24,9 @@ interface RegExpExecArray {
 }
 
 interface RegExpIndicesArray extends Array<readonly [number, number]> {
-  readonly groups?: {
-    readonly [key: string]: readonly [number, number];
-  };
+  readonly groups?: Readonly<{
+    [key: string]: readonly [number, number];
+  }>;
 }
 
 interface RegExp {

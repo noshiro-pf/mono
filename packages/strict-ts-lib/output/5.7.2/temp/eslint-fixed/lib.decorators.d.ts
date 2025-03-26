@@ -27,7 +27,7 @@ type DecoratorContext = ClassDecoratorContext | ClassMemberDecoratorContext;
 
 type DecoratorMetadataObject = Record<PropertyKey, unknown> & object;
 
-type DecoratorMetadata = typeof globalThis extends { readonly Symbol: { readonly metadata: symbol } } ? DecoratorMetadataObject : DecoratorMetadataObject | undefined;
+type DecoratorMetadata = typeof globalThis extends Readonly<{ Symbol: Readonly<{ metadata: symbol }> }> ? DecoratorMetadataObject : DecoratorMetadataObject | undefined;
 
 /**
  * Context provided to a class decorator.
@@ -82,7 +82,7 @@ interface ClassMethodDecoratorContext<This = unknown, Value extends (this: This,
   readonly private: boolean;
 
   /** An object that can be used to access the current value of the class element at runtime. */
-  readonly access: {
+  readonly access: Readonly<{
     /**
      * Determines whether an object has a property with the same name as the decorated element.
      */
@@ -94,7 +94,7 @@ interface ClassMethodDecoratorContext<This = unknown, Value extends (this: This,
      * let fn = context.access.get(instance);
      */
     get(object: This): Value;
-  };
+  }>;
 
   /**
    * Adds a callback to be invoked either after static methods are defined but before
@@ -145,7 +145,7 @@ interface ClassGetterDecoratorContext<This = unknown, Value = unknown> {
   readonly private: boolean;
 
   /** An object that can be used to access the current value of the class element at runtime. */
-  readonly access: {
+  readonly access: Readonly<{
     /**
      * Determines whether an object has a property with the same name as the decorated element.
      */
@@ -157,7 +157,7 @@ interface ClassGetterDecoratorContext<This = unknown, Value = unknown> {
      * let value = context.access.get(instance);
      */
     get(object: This): Value;
-  };
+  }>;
 
   /**
    * Adds a callback to be invoked either after static methods are defined but before
@@ -189,7 +189,7 @@ interface ClassSetterDecoratorContext<This = unknown, Value = unknown> {
   readonly private: boolean;
 
   /** An object that can be used to access the current value of the class element at runtime. */
-  readonly access: {
+  readonly access: Readonly<{
     /**
      * Determines whether an object has a property with the same name as the decorated element.
      */
@@ -201,7 +201,7 @@ interface ClassSetterDecoratorContext<This = unknown, Value = unknown> {
      * context.access.set(instance, value);
      */
     set(object: This, value: Value): void;
-  };
+  }>;
 
   /**
    * Adds a callback to be invoked either after static methods are defined but before
@@ -233,7 +233,7 @@ interface ClassAccessorDecoratorContext<This = unknown, Value = unknown> {
   readonly private: boolean;
 
   /** An object that can be used to access the current value of the class element at runtime. */
-  readonly access: {
+  readonly access: Readonly<{
     /**
      * Determines whether an object has a property with the same name as the decorated element.
      */
@@ -254,7 +254,7 @@ interface ClassAccessorDecoratorContext<This = unknown, Value = unknown> {
      * context.access.set(instance, value);
      */
     set(object: This, value: Value): void;
-  };
+  }>;
 
   /**
    * Adds a callback to be invoked immediately after the auto `accessor` being
@@ -332,7 +332,7 @@ interface ClassFieldDecoratorContext<This = unknown, Value = unknown> {
   readonly private: boolean;
 
   /** An object that can be used to access the current value of the class element at runtime. */
-  readonly access: {
+  readonly access: Readonly<{
     /**
      * Determines whether an object has a property with the same name as the decorated element.
      */
@@ -347,7 +347,7 @@ interface ClassFieldDecoratorContext<This = unknown, Value = unknown> {
      * Sets the value of the field on the provided object.
      */
     set(object: This, value: Value): void;
-  };
+  }>;
 
   /**
    * Adds a callback to be invoked immediately after the field being decorated

@@ -19,4 +19,4 @@ and limitations under the License.
 /// WorkerGlobalScope APIs
 /////////////////////////////
 // These are only available in a Web Worker
-declare function importScripts(...urls: readonly string[]): void;
+declare function importScripts(...urls: string[]): void;
