@@ -2,11 +2,57 @@ import { type Node, SyntaxKind, type ts } from 'ts-morph';
 import { type SourceFile } from './types.mjs';
 
 export const replaceToReadonly = (sourceFile: SourceFile): void => {
+  convertArrayGenericTypeToBeReadonly(sourceFile);
+  convertSetAndMapToBeReadonly(sourceFile);
   convertTupleToBeReadonly(sourceFile);
   convertArrayToBeReadonly(sourceFile);
   convertInterfaceMemberToBeReadonly(sourceFile);
   convertIndexSignatureToBeReadonly(sourceFile);
   convertMappedTypeToBeReadonly(sourceFile);
+  convertTypeReferenceToBeReadonly(sourceFile);
+};
+
+const convertArrayGenericTypeToBeReadonly = (sourceFile: SourceFile): void => {
+  for (const node of sourceFile.getDescendantsOfKind(
+    SyntaxKind.TypeReference,
+  )) {
+    // Array<T> to readonly T[]
+    if (node.getTypeName().getText() === 'Array') {
+      const typeArguments = node.getTypeArguments();
+      if (typeArguments.length === 1) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const elementType = typeArguments[0]!;
+        node.replaceWithText(`(readonly ${elementType.getText()}[])`);
+      }
+    }
+  }
+};
+
+const convertSetAndMapToBeReadonly = (sourceFile: SourceFile): void => {
+  for (const node of sourceFile.getDescendantsOfKind(
+    SyntaxKind.TypeReference,
+  )) {
+    const typeName = node.getTypeName().getText();
+    // Set<T> to ReadonlySet<T>
+    if (typeName === 'Set') {
+      const typeArguments = node.getTypeArguments();
+      if (typeArguments.length === 1) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const elementType = typeArguments[0]!;
+        node.replaceWithText(`ReadonlySet<${elementType.getText()}>`);
+      }
+    }
+
+    // Map<T> to ReadonlyMap<T>
+    if (typeName === 'Map') {
+      const typeArguments = node.getTypeArguments();
+      if (typeArguments.length === 1) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const elementType = typeArguments[0]!;
+        node.replaceWithText(`ReadonlyMap<${elementType.getText()}>`);
+      }
+    }
+  }
 };
 
 const convertTupleToBeReadonly = (sourceFile: SourceFile): void => {
@@ -24,7 +70,9 @@ const convertTupleToBeReadonly = (sourceFile: SourceFile): void => {
 };
 
 const convertArrayToBeReadonly = (sourceFile: SourceFile): void => {
-  for (const node of sourceFile.getDescendantsOfKind(SyntaxKind.ArrayType)) {
+  for (const [i, node] of sourceFile
+    .getDescendantsOfKind(SyntaxKind.ArrayType)
+    .entries()) {
     const elementTypeNode = node.getChildAtIndex(0); // T in T[]
     const parent = node.getParent();
     if (
@@ -35,6 +83,7 @@ const convertArrayToBeReadonly = (sourceFile: SourceFile): void => {
     }
 
     node.replaceWithText(`(readonly ${elementTypeNode.getText()}[])`);
+    console.log(i, sourceFile.getText());
   }
 };
 
@@ -113,6 +162,40 @@ const convertMappedTypeToBeReadonly = (sourceFile: SourceFile): void => {
     //   node.readonly
     // }
     // node.getCombinedModifierFlags.setIsReadonly(true);
+  }
+};
+
+const convertTypeReferenceToBeReadonly = (sourceFile: SourceFile): void => {
+  for (const node of sourceFile.getDescendantsOfKind(
+    SyntaxKind.TypeReference,
+  )) {
+    for (const args of node.getTypeArguments()) {
+      if (args.isKind(SyntaxKind.TupleType)) {
+        const parent = node.getParent();
+        if (
+          parent.isKind(SyntaxKind.TypeOperator) &&
+          parent.getOperator() === SyntaxKind.ReadonlyKeyword
+        ) {
+          continue;
+        }
+
+        node.replaceWithText(`(readonly ${node.getText()})`);
+      }
+
+      if (args.isKind(SyntaxKind.ArrayType)) {
+        const parent = node.getParent();
+        if (
+          parent.isKind(SyntaxKind.TypeOperator) &&
+          parent.getOperator() === SyntaxKind.ReadonlyKeyword
+        ) {
+          continue;
+        }
+
+        const elementTypeNode = node.getChildAtIndex(0); // T in T[]
+
+        node.replaceWithText(`(readonly ${elementTypeNode.getText()}[])`);
+      }
+    }
   }
 };
 
