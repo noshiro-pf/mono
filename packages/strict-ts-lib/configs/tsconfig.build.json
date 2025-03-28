@@ -4,5 +4,6 @@
     "types": ["node"],
     "outDir": "../dist"
   },
-  "include": ["../src/**/*.mts"]
+  "include": ["../src/**/*.mts"],
+  "exclude": ["**/*.test.mts"]
 }

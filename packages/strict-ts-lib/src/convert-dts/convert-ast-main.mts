@@ -8,29 +8,30 @@ export const convertWithAst = (
   filename: string,
   converterConfig: ConverterConfig,
 ): Result<string, string> => {
-  const _options: ConverterOptions = {
+  const options: ConverterOptions = {
     config: converterConfig,
     readonlyModifier:
       converterConfig.returnType === 'mutable' ? '' : 'readonly ',
     brandedNumber: createBrandedNumber(converterConfig.numberType),
   } as const;
 
-  return (
-    // .chain((r) => {
-    //   if (Result.isErr(r)) return r;
-    //   const s = r.value;
+  if (Math.PI < 0) {
+    console.log(options);
+  }
 
-    //   switch (filename) {
-    //     case 'lib.es5.d.ts':
-    //       return convertAstLibEs5(s, options);
+  return pipe(Result.ok(src))
+    .chain((r) => {
+      if (Result.isErr(r)) return r;
+      const s = r.value;
 
-    //     default:
-    //       return Result.ok(s);
-    //   }
-    // }).value;
-    // .chain((r) => (Result.isErr(r) ? r : convertAstCommon(r.value)))
-    pipe(Result.ok(src)).chain((r) =>
-      Result.isErr(r) ? r : convertAstCommonManual(r.value),
-    ).value
-  );
+      switch (filename) {
+        // case 'lib.es5.d.ts':
+        //   return convertAstLibEs5(s, options);
+
+        default:
+          return Result.ok(s);
+      }
+    })
+    .chain((r) => (Result.isErr(r) ? r : convertAstCommonManual(r.value)))
+    .value;
 };
