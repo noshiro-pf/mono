@@ -46,10 +46,14 @@ const convertSetAndMapToBeReadonly = (sourceFile: SourceFile): void => {
     // Map<T> to ReadonlyMap<T>
     if (typeName === 'Map') {
       const typeArguments = node.getTypeArguments();
-      if (typeArguments.length === 1) {
+      if (typeArguments.length === 2) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const elementType = typeArguments[0]!;
-        node.replaceWithText(`ReadonlyMap<${elementType.getText()}>`);
+        const keyType = typeArguments[0]!;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const valueType = typeArguments[1]!;
+        node.replaceWithText(
+          `ReadonlyMap<${keyType.getText()}, ${valueType.getText()}>`,
+        );
       }
     }
   }
@@ -86,6 +90,23 @@ const convertArrayToBeReadonly = (sourceFile: SourceFile): void => {
     console.log(i, sourceFile.getText());
   }
 };
+// const convertArrayToBeReadonly = (sourceFile: SourceFile): void => {
+//   for (const [i, node] of sourceFile
+//     .getDescendantsOfKind(SyntaxKind.ArrayType)
+//     .entries()) {
+//     const elementTypeNode = node.getChildAtIndex(0); // T in T[]
+//     const parent = node.getParent();
+//     if (
+//       parent.isKind(SyntaxKind.TypeOperator) &&
+//       parent.getOperator() === SyntaxKind.ReadonlyKeyword
+//     ) {
+//       continue;
+//     }
+
+//     node.replaceWithText(`(readonly ${elementTypeNode.getText()}[])`);
+//     console.log(i, sourceFile.getText());
+//   }
+// };
 
 const convertInterfaceMemberToBeReadonly = (sourceFile: SourceFile): void => {
   for (const node of sourceFile.getDescendantsOfKind(
