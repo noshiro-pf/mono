@@ -13,6 +13,6 @@
   "dependencies": {
     "command-line-args": "^6.0.0",
     "command-line-usage": "^7.0.1",
-    "ts-morph": "^22.0.0"
+    "ts-morph": "^25.0.1"
   }
 }

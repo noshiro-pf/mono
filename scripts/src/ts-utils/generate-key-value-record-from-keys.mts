@@ -2,7 +2,9 @@ type KeyValueRecordFromKeys<Keys extends readonly string[]> = Readonly<{
   [K in Keys[number]]: K;
 }>;
 
-export const generateKeyValueRecordFromKeys = <Keys extends readonly string[]>(
+export const generateKeyValueRecordFromKeys = <
+  const Keys extends readonly string[],
+>(
   keys: Keys,
 ): KeyValueRecordFromKeys<Keys> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

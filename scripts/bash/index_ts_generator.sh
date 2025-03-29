@@ -6,7 +6,7 @@ SCRIPT_DIR=$(cd $(dirname "$0") || exit; pwd)
 
 # configs
 ADD_SUB_DIRECTORY_EXPORT_IN_INDEX_TS="true"
-TS_FILENAME_REGEX="^[a-zA-Z0-9_\-]+.[mc]?tsx?$"
+TS_FILENAME_REGEX="^[a-zA-Z0-9_\.\-]+.[mc]?tsx?$"
 
 # args
 target_directory=$1

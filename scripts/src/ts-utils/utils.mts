@@ -4,9 +4,9 @@ export function zeros(len: number): readonly 0[] {
   return Array.from({ length: len }, () => 0);
 }
 
-export const castMutable = <T,>(mutable: T): Mutable<T> =>
+export const castMutable = <const T,>(mutable: T): Mutable<T> =>
   mutable as Mutable<T>;
 
-export const castDeepMutable = <T,>(mutable: T): DeepMutable<T> =>
+export const castDeepMutable = <const T,>(mutable: T): DeepMutable<T> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   mutable as DeepMutable<T>;

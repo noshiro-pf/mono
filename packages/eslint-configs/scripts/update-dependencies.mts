@@ -10,7 +10,7 @@ const eslintDir = path.resolve(thisDir, '..');
 
 const strictTsLibSourceDir = path.resolve(
   monoRootDir,
-  './packages/strict-ts-lib/source',
+  './packages/strict-ts-lib',
 );
 
 const rewritePackageVersion = async (
