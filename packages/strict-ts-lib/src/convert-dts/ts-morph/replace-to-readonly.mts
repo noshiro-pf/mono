@@ -1,81 +1,135 @@
-import { type ArrayTypeNode, type Node, SyntaxKind, type ts } from 'ts-morph';
+/* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
+import {
+  type ArrayTypeNode,
+  type IndexSignatureDeclaration,
+  type InterfaceDeclaration,
+  type Node,
+  SyntaxKind,
+  type ts,
+  type TupleTypeNode,
+  type TypeReferenceNode,
+} from 'ts-morph';
 import { type SourceFile } from './types.mjs';
 
 export const replaceToReadonly = (sourceFile: SourceFile): void => {
-  convertArrayGenericTypeToBeReadonly(sourceFile);
-  convertSetAndMapToBeReadonly(sourceFile);
-  convertTupleToBeReadonly(sourceFile);
   convertArrayToBeReadonlyRec(sourceFile);
-  convertInterfaceMemberToBeReadonly(sourceFile);
-  convertIndexSignatureToBeReadonly(sourceFile);
   convertMappedTypeToBeReadonly(sourceFile);
   convertTypeReferenceToBeReadonly(sourceFile);
+
+  for (const node of sourceFile.getDescendants()) {
+    convertToReadonly(node);
+  }
 };
 
-const convertArrayGenericTypeToBeReadonly = (sourceFile: SourceFile): void => {
-  for (const node of sourceFile.getDescendantsOfKind(
-    SyntaxKind.TypeReference,
-  )) {
-    // Array<T> to readonly T[]
-    if (node.getTypeName().getText() === 'Array') {
-      const typeArguments = node.getTypeArguments();
-      if (typeArguments.length === 1) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const elementType = typeArguments[0]!;
-        node.replaceWithText(`(readonly ${elementType.getText()}[])`);
+const convertToReadonly = (node: Node): void => {
+  if (node.wasForgotten()) return;
+
+  if (node.isKind(SyntaxKind.ArrayType)) {
+    convertArrayTypeNode(node);
+  }
+
+  if (node.isKind(SyntaxKind.TupleType)) {
+    convertTupleTypeNode(node);
+  }
+
+  if (node.isKind(SyntaxKind.TypeReference)) {
+    convertTypeReferenceNode(node);
+  }
+
+  if (node.isKind(SyntaxKind.IndexSignature)) {
+    convertIndexSignature(node);
+  }
+
+  if (node.isKind(SyntaxKind.InterfaceDeclaration)) {
+    convertInterfaceDeclaration(node);
+  }
+};
+
+const convertArrayTypeNode = (node: ArrayTypeNode): void => {};
+
+const convertTupleTypeNode = (node: TupleTypeNode): void => {
+  const parent = node.getParent();
+  if (
+    parent.isKind(SyntaxKind.TypeOperator) &&
+    parent.getOperator() === SyntaxKind.ReadonlyKeyword
+  ) {
+    return;
+  }
+
+  node.replaceWithText(`(readonly ${node.getText()})`);
+};
+
+const convertIndexSignature = (node: IndexSignatureDeclaration): void => {
+  if (
+    node
+      .getModifiers()
+      .some((modifier) => modifier.isKind(SyntaxKind.ReadonlyKeyword))
+  ) {
+    return;
+  }
+  node.setIsReadonly(true);
+};
+
+const convertInterfaceDeclaration = (node: InterfaceDeclaration): void => {
+  for (const member of node.getMembers()) {
+    if (member.isKind(SyntaxKind.PropertySignature)) {
+      const property = member;
+
+      // すでに readonly が付いている場合はスキップ
+      if (
+        property
+          .getModifiers()
+          .some((modifier) => modifier.isKind(SyntaxKind.ReadonlyKeyword))
+      ) {
+        continue;
       }
+
+      // readonly を追加
+      property.setIsReadonly(true);
     }
   }
 };
 
-const convertSetAndMapToBeReadonly = (sourceFile: SourceFile): void => {
-  for (const node of sourceFile.getDescendantsOfKind(
-    SyntaxKind.TypeReference,
-  )) {
-    const typeName = node.getTypeName().getText();
-    // Set<T> to ReadonlySet<T>
-    if (typeName === 'Set') {
-      const typeArguments = node.getTypeArguments();
-      if (typeArguments.length === 1) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const elementType = typeArguments[0]!;
-        node.replaceWithText(`ReadonlySet<${elementType.getText()}>`);
-      }
-    }
+const convertTypeReferenceNode = (node: TypeReferenceNode): void => {
+  const typeName = node.getTypeName().getText();
 
-    // Map<T> to ReadonlyMap<T>
-    if (typeName === 'Map') {
-      const typeArguments = node.getTypeArguments();
-      if (typeArguments.length === 2) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const keyType = typeArguments[0]!;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const valueType = typeArguments[1]!;
-        node.replaceWithText(
-          `ReadonlyMap<${keyType.getText()}, ${valueType.getText()}>`,
-        );
-      }
+  // Array<T> to readonly T[]
+  if (typeName === 'Array') {
+    const typeArguments = node.getTypeArguments();
+    if (typeArguments.length === 1) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const elementType = typeArguments[0]!;
+      node.replaceWithText(`(readonly ${elementType.getText()}[])`);
     }
   }
-};
 
-const convertTupleToBeReadonly = (sourceFile: SourceFile): void => {
-  for (const node of sourceFile.getDescendantsOfKind(SyntaxKind.TupleType)) {
-    const parent = node.getParent();
-    if (
-      parent.isKind(SyntaxKind.TypeOperator) &&
-      parent.getOperator() === SyntaxKind.ReadonlyKeyword
-    ) {
-      continue;
+  // Set<T> to ReadonlySet<T>
+  if (typeName === 'Set') {
+    const typeArguments = node.getTypeArguments();
+    if (typeArguments.length === 1) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const elementType = typeArguments[0]!;
+      node.replaceWithText(`ReadonlySet<${elementType.getText()}>`);
     }
+  }
 
-    node.replaceWithText(`(readonly ${node.getText()})`);
+  // Map<T> to ReadonlyMap<T>
+  if (typeName === 'Map') {
+    const typeArguments = node.getTypeArguments();
+    if (typeArguments.length === 2) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const keyType = typeArguments[0]!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const valueType = typeArguments[1]!;
+      node.replaceWithText(
+        `ReadonlyMap<${keyType.getText()}, ${valueType.getText()}>`,
+      );
+    }
   }
 };
 
 /** 配列型 T[] を readonly T[] に変換 (再帰的に処理) */
 const convertArrayToBeReadonlyRec = (sourceFile: SourceFile): void => {
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   const convertArrayToBeReadonly = (mut_node: ArrayTypeNode): void => {
     {
       const elementTypeNode = mut_node.getElementTypeNode(); // T in T[]
@@ -103,45 +157,6 @@ const convertArrayToBeReadonlyRec = (sourceFile: SourceFile): void => {
   for (const node of sourceFile.getDescendantsOfKind(SyntaxKind.ArrayType)) {
     if (node.wasForgotten()) continue;
     convertArrayToBeReadonly(node);
-  }
-};
-
-const convertInterfaceMemberToBeReadonly = (sourceFile: SourceFile): void => {
-  for (const node of sourceFile.getDescendantsOfKind(
-    SyntaxKind.InterfaceDeclaration,
-  )) {
-    for (const member of node.getMembers()) {
-      if (member.isKind(SyntaxKind.PropertySignature)) {
-        const property = member;
-
-        // すでに readonly が付いている場合はスキップ
-        if (
-          property
-            .getModifiers()
-            .some((modifier) => modifier.isKind(SyntaxKind.ReadonlyKeyword))
-        ) {
-          continue;
-        }
-
-        // readonly を追加
-        property.setIsReadonly(true);
-      }
-    }
-  }
-};
-
-const convertIndexSignatureToBeReadonly = (sourceFile: SourceFile): void => {
-  for (const node of sourceFile.getDescendantsOfKind(
-    SyntaxKind.IndexSignature,
-  )) {
-    if (
-      node
-        .getModifiers()
-        .some((modifier) => modifier.isKind(SyntaxKind.ReadonlyKeyword))
-    ) {
-      continue;
-    }
-    node.setIsReadonly(true);
   }
 };
 
