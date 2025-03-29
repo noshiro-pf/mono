@@ -71,6 +71,19 @@ describe('replaceToReadonly', () => {
         '}',
       ),
     },
+    {
+      name: 'mutable arrays (nested 2)',
+      source: codeFromStringLines(
+        'function foo(a: { p: number[]}[], b: Promise<number[][]>) {',
+        '  console.log(a, b);',
+        '}',
+      ),
+      expected: codeFromStringLines(
+        'function foo(a: readonly (Readonly<{ p: readonly number[] }>)[], b: Promise<readonly (readonly number[])[]>) {',
+        '  console.log(a, b);',
+        '}',
+      ),
+    },
     // {
     //   name: 'mutable arrays (in type alias)',
     //   source: codeFromStringLines(

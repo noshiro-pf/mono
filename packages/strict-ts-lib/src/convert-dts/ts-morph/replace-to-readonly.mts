@@ -73,64 +73,38 @@ const convertTupleToBeReadonly = (sourceFile: SourceFile): void => {
   }
 };
 
+/** 配列型 T[] を readonly T[] に変換 (再帰的に処理) */
 const convertArrayToBeReadonly = (sourceFile: SourceFile): void => {
-  for (const arrayTypeNode of sourceFile.getDescendantsOfKind(
-    SyntaxKind.ArrayType,
-  )) {
-    let mut_currentTypeNode: ArrayTypeNode = arrayTypeNode;
-    let mut_depth = 0;
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  const processArrayTypeNode = (mut_node: ArrayTypeNode): void => {
+    {
+      const elementTypeNode = mut_node.getElementTypeNode(); // T in T[]
 
-    while (true) {
-      const n = mut_currentTypeNode.getElementTypeNode();
-
-      if (n.isKind(SyntaxKind.ArrayType)) {
-        mut_currentTypeNode = n;
-        mut_depth += 1;
-      } else {
-        break;
+      if (elementTypeNode.isKind(SyntaxKind.ArrayType)) {
+        processArrayTypeNode(elementTypeNode); // ネストした配列型を再帰的に処理
       }
     }
 
-    const innermostType: ts.TypeNode | undefined =
-      mut_currentTypeNode.getElementTypeNode().compilerNode;
+    {
+      const parent = mut_node.getParent();
+      if (
+        parent.isKind(SyntaxKind.TypeOperator) &&
+        parent.getOperator() === SyntaxKind.ReadonlyKeyword
+      ) {
+        return; // skip if already readonly
+      }
 
-    console.log({
-      innermostType,
-      mut_depth,
-    });
+      const elementTypeNode = mut_node.getElementTypeNode(); // T in T[]
+      const elementTypeText = elementTypeNode.getText(); // 更新されたテキストを取得
+      mut_node.replaceWithText(`(readonly ${elementTypeText}[])`);
+    }
+  };
 
-    const readonlyElementType: ts.TypeNode = innermostType;
-    let mut_newArrayType = readonlyElementType;
-    //     for (let i = 0; i < depth; i++) {
-    //       mut_newArrayType = project.createNodeFromCompilerNode(factory.createArrayTypeNode(
-    //         project.createNodeFromCompilerNode( factory.createTypeReferenceNode(
-    //           factory.createIdentifier("readonly"),
-    //           factory.createTypeParameterDeclaration([
-    //             project.createNodeFromCompilerNode(factory.createArrayTypeNode( mut_newArrayType.compilerNode, undefined) as ts.TypeNode] )),
-    //         ), undefined) as ts.TypeNode,
-    //       ), undefined);
-    //     }
-    //     arrayTypeNode.replaceWithText(mut_newArrayType.getText());
+  for (const node of sourceFile.getDescendantsOfKind(SyntaxKind.ArrayType)) {
+    if (node.wasForgotten()) continue;
+    processArrayTypeNode(node);
   }
 };
-
-// const convertArrayToBeReadonly = (sourceFile: SourceFile): void => {
-//   for (const [i, node] of sourceFile
-//     .getDescendantsOfKind(SyntaxKind.ArrayType)
-//     .entries()) {
-//     const elementTypeNode = node.getChildAtIndex(0); // T in T[]
-//     const parent = node.getParent();
-//     if (
-//       parent.isKind(SyntaxKind.TypeOperator) &&
-//       parent.getOperator() === SyntaxKind.ReadonlyKeyword
-//     ) {
-//       continue;
-//     }
-
-//     node.replaceWithText(`(readonly ${elementTypeNode.getText()}[])`);
-//     console.log(i, sourceFile.getText());
-//   }
-// };
 
 const convertInterfaceMemberToBeReadonly = (sourceFile: SourceFile): void => {
   for (const node of sourceFile.getDescendantsOfKind(
