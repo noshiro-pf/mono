@@ -1,4 +1,4 @@
-import { type Node, SyntaxKind, type ts } from 'ts-morph';
+import { type ArrayTypeNode, type Node, SyntaxKind, type ts } from 'ts-morph';
 import { type SourceFile } from './types.mjs';
 
 export const replaceToReadonly = (sourceFile: SourceFile): void => {
@@ -74,22 +74,46 @@ const convertTupleToBeReadonly = (sourceFile: SourceFile): void => {
 };
 
 const convertArrayToBeReadonly = (sourceFile: SourceFile): void => {
-  for (const [i, node] of sourceFile
-    .getDescendantsOfKind(SyntaxKind.ArrayType)
-    .entries()) {
-    const elementTypeNode = node.getChildAtIndex(0); // T in T[]
-    const parent = node.getParent();
-    if (
-      parent.isKind(SyntaxKind.TypeOperator) &&
-      parent.getOperator() === SyntaxKind.ReadonlyKeyword
-    ) {
-      continue;
+  for (const arrayTypeNode of sourceFile.getDescendantsOfKind(
+    SyntaxKind.ArrayType,
+  )) {
+    let mut_currentTypeNode: ArrayTypeNode = arrayTypeNode;
+    let mut_depth = 0;
+
+    while (true) {
+      const n = mut_currentTypeNode.getElementTypeNode();
+
+      if (n.isKind(SyntaxKind.ArrayType)) {
+        mut_currentTypeNode = n;
+        mut_depth += 1;
+      } else {
+        break;
+      }
     }
 
-    node.replaceWithText(`(readonly ${elementTypeNode.getText()}[])`);
-    console.log(i, sourceFile.getText());
+    const innermostType: ts.TypeNode | undefined =
+      mut_currentTypeNode.getElementTypeNode().compilerNode;
+
+    console.log({
+      innermostType,
+      mut_depth,
+    });
+
+    const readonlyElementType: ts.TypeNode = innermostType;
+    let mut_newArrayType = readonlyElementType;
+    //     for (let i = 0; i < depth; i++) {
+    //       mut_newArrayType = project.createNodeFromCompilerNode(factory.createArrayTypeNode(
+    //         project.createNodeFromCompilerNode( factory.createTypeReferenceNode(
+    //           factory.createIdentifier("readonly"),
+    //           factory.createTypeParameterDeclaration([
+    //             project.createNodeFromCompilerNode(factory.createArrayTypeNode( mut_newArrayType.compilerNode, undefined) as ts.TypeNode] )),
+    //         ), undefined) as ts.TypeNode,
+    //       ), undefined);
+    //     }
+    //     arrayTypeNode.replaceWithText(mut_newArrayType.getText());
   }
 };
+
 // const convertArrayToBeReadonly = (sourceFile: SourceFile): void => {
 //   for (const [i, node] of sourceFile
 //     .getDescendantsOfKind(SyntaxKind.ArrayType)
