@@ -5,7 +5,7 @@ export const replaceToReadonly = (sourceFile: SourceFile): void => {
   convertArrayGenericTypeToBeReadonly(sourceFile);
   convertSetAndMapToBeReadonly(sourceFile);
   convertTupleToBeReadonly(sourceFile);
-  convertArrayToBeReadonly(sourceFile);
+  convertArrayToBeReadonlyRec(sourceFile);
   convertInterfaceMemberToBeReadonly(sourceFile);
   convertIndexSignatureToBeReadonly(sourceFile);
   convertMappedTypeToBeReadonly(sourceFile);
@@ -74,14 +74,14 @@ const convertTupleToBeReadonly = (sourceFile: SourceFile): void => {
 };
 
 /** 配列型 T[] を readonly T[] に変換 (再帰的に処理) */
-const convertArrayToBeReadonly = (sourceFile: SourceFile): void => {
+const convertArrayToBeReadonlyRec = (sourceFile: SourceFile): void => {
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  const processArrayTypeNode = (mut_node: ArrayTypeNode): void => {
+  const convertArrayToBeReadonly = (mut_node: ArrayTypeNode): void => {
     {
       const elementTypeNode = mut_node.getElementTypeNode(); // T in T[]
 
       if (elementTypeNode.isKind(SyntaxKind.ArrayType)) {
-        processArrayTypeNode(elementTypeNode); // ネストした配列型を再帰的に処理
+        convertArrayToBeReadonly(elementTypeNode); // ネストした配列型を再帰的に処理
       }
     }
 
@@ -102,7 +102,7 @@ const convertArrayToBeReadonly = (sourceFile: SourceFile): void => {
 
   for (const node of sourceFile.getDescendantsOfKind(SyntaxKind.ArrayType)) {
     if (node.wasForgotten()) continue;
-    processArrayTypeNode(node);
+    convertArrayToBeReadonly(node);
   }
 };
 
