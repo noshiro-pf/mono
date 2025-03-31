@@ -275,43 +275,40 @@ const updateTypeReferenceNode = (node: TypeReferenceNode): void => {
     if (typeArguments.length === 1) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       let mut_elementTypeNode = typeArguments[0]!;
+      {
+        if (mut_elementTypeNode.isKind(SyntaxKind.ParenthesizedType)) {
+          mut_elementTypeNode =
+            removeMultipleNestedParentheses(mut_elementTypeNode);
+        }
 
-      if (mut_elementTypeNode.isKind(SyntaxKind.ParenthesizedType)) {
-        mut_elementTypeNode =
-          removeMultipleNestedParentheses(mut_elementTypeNode);
-      }
-
-      // Readonly<T[]> -> T[]
-      if (mut_elementTypeNode.isKind(SyntaxKind.ArrayType)) {
         updateNode(mut_elementTypeNode);
-        node.replaceWithText(mut_elementTypeNode.getText());
-        return;
       }
+
+      const elementTypeNode = mut_elementTypeNode;
 
       // Readonly<readonly T[]> -> readonly T[]
       if (
-        mut_elementTypeNode.isKind(SyntaxKind.TypeOperator) &&
-        mut_elementTypeNode.getOperator() === SyntaxKind.ReadonlyKeyword
+        elementTypeNode.isKind(SyntaxKind.TypeOperator) &&
+        elementTypeNode.getOperator() === SyntaxKind.ReadonlyKeyword
       ) {
-        updateNode(mut_elementTypeNode);
-        node.replaceWithText(mut_elementTypeNode.getText());
+        node.replaceWithText(elementTypeNode.getText());
         return;
       }
 
       // Readonly<Readonly<T>> -> Readonly<T'>
       if (
-        mut_elementTypeNode.isKind(SyntaxKind.TypeReference) &&
-        mut_elementTypeNode.getTypeName().getText() === 'Readonly'
+        elementTypeNode.isKind(SyntaxKind.TypeReference) &&
+        elementTypeNode.getTypeName().getText() === 'Readonly'
       ) {
-        const typeArg = mut_elementTypeNode.getTypeArguments();
+        const typeArg = elementTypeNode.getTypeArguments();
         if (typeArg.length === 1) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const elemType = typeArg[0]!; // T in Readonly<T>
-          updateNode(elemType);
+          // // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          // const elemType = typeArg[0]!; // T in Readonly<T>
+          // updateNode(elemType);
 
           node.replaceWithText(
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            `Readonly<${mut_elementTypeNode.getTypeArguments()[0]!.getText()}>`,
+            `Readonly<${elementTypeNode.getTypeArguments()[0]!.getText()}>`,
           );
           return;
         } else {

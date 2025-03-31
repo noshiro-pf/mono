@@ -1131,18 +1131,18 @@ describe('canonicalizeToReadonly', () => {
       },
       {
         name: 'readonly array type wrapped with `Readonly`',
-        source: 'type T = Readonly<readonly 1[]>;',
-        expected: 'type T = readonly 1[];',
+        source: 'type T = Readonly<readonly 2[]>;',
+        expected: 'type T = readonly 2[];',
       },
       {
         name: 'nested Readonly',
-        source: 'type T = Readonly<Readonly<{ x: 1 }>>;',
-        expected: 'type T = Readonly<{ x: 1 }>;',
+        source: 'type T = Readonly<Readonly<{ x: 3 }>>;',
+        expected: 'type T = Readonly<{ x: 3 }>;',
       },
       {
         name: 'nested Readonly 2',
-        source: 'type T = Readonly<((Readonly<Readonly<(({ x: 1 })[])>>))>;',
-        expected: 'type T = readonly Readonly<{ x: 1 }>[];',
+        source: 'type T = Readonly<((Readonly<Readonly<(({ x: 4 })[])>>))>;',
+        expected: 'type T = readonly Readonly<{ x: 4 }>[];',
       },
     ])('$name', testCanonicalizeToReadonly);
   });
