@@ -1224,5 +1224,12 @@ const testCanonicalizeToReadonly = async ({
   expected: string;
   debug?: boolean;
 }>): Promise<void> => {
-  await testFn(canonicalizeToReadonly, source, expected, debug ?? false);
+  const { expectedFormatted, result } = await testFn(
+    canonicalizeToReadonly,
+    source,
+    expected,
+    debug ?? false,
+  );
+
+  expect(result).toBe(expectedFormatted);
 };

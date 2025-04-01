@@ -79,12 +79,12 @@ const updateNode = (node: Node): void => {
     updateUnionTypeNode(node);
     return;
   }
-  if (node.isKind(SyntaxKind.ParenthesizedType)) {
-    const innerElem = node.getTypeNode(); // T in (T)
-    updateNode(innerElem);
-    node.replaceWithText(node.getText());
-    return;
-  }
+  // if (node.isKind(SyntaxKind.ParenthesizedType)) {
+  //   const innerElem = node.getTypeNode(); // T in (T)
+  //   updateNode(innerElem);
+  //   node.replaceWithText(node.getText());
+  //   return;
+  // }
   noop();
 };
 
