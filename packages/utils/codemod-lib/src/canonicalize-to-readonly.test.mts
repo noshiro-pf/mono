@@ -1,8 +1,6 @@
 /* eslint-disable vitest/expect-expect */
-import * as prettier from 'prettier';
-import { Project } from 'ts-morph';
 import { canonicalizeToReadonly } from './canonicalize-to-readonly.mjs';
-import { codeFromStringLines } from './utils/index.mjs';
+import { codeFromStringLines, testFn } from './utils/index.mjs';
 
 describe('canonicalizeToReadonly', () => {
   describe('type literals', () => {
@@ -1226,29 +1224,5 @@ const testCanonicalizeToReadonly = async ({
   expected: string;
   debug?: boolean;
 }>): Promise<void> => {
-  let mut_spy = undefined;
-
-  if (debug !== true) {
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
-    mut_spy = vi.spyOn(console, 'debug').mockImplementation(() => {});
-  }
-
-  const project = new Project();
-  const sourceFile = project.createSourceFile('__tempfile__.ts', source);
-
-  canonicalizeToReadonly(sourceFile);
-
-  const result = await prettier.format(sourceFile.getText(), {
-    parser: 'typescript',
-  });
-
-  sourceFile.delete();
-
-  const expectedFormatted = await prettier.format(expected, {
-    parser: 'typescript',
-  });
-
-  expect(result.trimEnd()).toBe(expectedFormatted.trimEnd());
-
-  if (Math.PI < 0) mut_spy?.mockRestore();
+  await testFn(canonicalizeToReadonly, source, expected, debug ?? false);
 };

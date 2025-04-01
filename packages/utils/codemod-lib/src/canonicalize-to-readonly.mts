@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
-import { Arr } from '@noshiro/ts-utils';
+import { Arr, noop } from '@noshiro/ts-utils';
 import {
   type ArrayTypeNode,
   type ClassDeclaration,
@@ -79,12 +79,13 @@ const updateNode = (node: Node): void => {
     updateUnionTypeNode(node);
     return;
   }
-  // if (node.isKind(SyntaxKind.ParenthesizedType)) {
-  //   const innerElem = node.getTypeNode(); // T in (T)
-  //   updateNode(innerElem);
-  //   node.getTypeNode().forgetDescendants();
-  // }
-  console.debug();
+  if (node.isKind(SyntaxKind.ParenthesizedType)) {
+    const innerElem = node.getTypeNode(); // T in (T)
+    updateNode(innerElem);
+    node.replaceWithText(node.getText());
+    return;
+  }
+  noop();
 };
 
 /** Converts an array type `T[]` to a `readonly T[]` */
@@ -313,7 +314,7 @@ const updateTypeReferenceNode = (node: TypeReferenceNode): void => {
     }
   }
 
-  console.debug();
+  noop();
 };
 
 /**
@@ -388,7 +389,10 @@ const updateIntersectionTypeNode = (node: IntersectionTypeNode): void => {
 
   const typeNodes = node.getTypeNodes();
 
-  console.debug(typeNodes.map((t) => t.getText()));
+  console.debug(
+    'updateIntersection:typeNodes',
+    typeNodes.map((t) => t.getText()),
+  );
 
   if (
     typeNodes.every((type) => type.isKind(SyntaxKind.TypeReference)) &&
@@ -403,7 +407,7 @@ const updateIntersectionTypeNode = (node: IntersectionTypeNode): void => {
     const args = typeNodes.map((type) => type.getTypeArguments()[0]!);
 
     console.debug(
-      'args',
+      'updateIntersection:args',
       args.map((a) => a.getText()),
     );
 
