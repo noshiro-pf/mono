@@ -5,6 +5,7 @@ import {
   type ClassDeclaration,
   type IndexSignatureDeclaration,
   type InterfaceDeclaration,
+  type IntersectionTypeNode,
   type MappedTypeNode,
   type NamedTupleMember,
   type Node,
@@ -15,11 +16,9 @@ import {
   type TypeLiteralNode,
   type TypeNode,
   type TypeReferenceNode,
+  type UnionTypeNode,
 } from 'ts-morph';
 import { type SourceFile } from './types.mjs';
-
-// eslint-disable-next-line functional/immutable-data
-console.debug = () => {};
 
 export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
   sourceFile.forEachDescendant((node) => {
@@ -34,7 +33,9 @@ export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
       kind === SyntaxKind.IndexSignature ||
       kind === SyntaxKind.NamedTupleMember ||
       kind === SyntaxKind.TypeReference ||
-      kind === SyntaxKind.ParenthesizedType
+      kind === SyntaxKind.ParenthesizedType ||
+      kind === SyntaxKind.IntersectionType ||
+      kind === SyntaxKind.UnionType
     ) {
       updateNode(node);
     }
@@ -79,6 +80,14 @@ const updateNode = (node: Node): void => {
   }
   if (node.isKind(SyntaxKind.MappedType)) {
     updateMappedTypeNode(node);
+    return;
+  }
+  if (node.isKind(SyntaxKind.IntersectionType)) {
+    updateIntersectionTypeNode(node);
+    return;
+  }
+  if (node.isKind(SyntaxKind.UnionType)) {
+    updateUnionTypeNode(node);
     return;
   }
   if (node.isKind(SyntaxKind.ParenthesizedType)) {
@@ -216,7 +225,7 @@ const updateTypeReferenceNode = (node: TypeReferenceNode): void => {
     const typeArguments = node.getTypeArguments();
     if (!Arr.isArrayOfLength1(typeArguments)) {
       console.warn(
-        `Warning: Unexpected number of type arguments "${typeArguments.length}" for Array.`,
+        `Warning: Unexpected number of type arguments "${typeArguments.length}" for ${typeName}.`,
       );
       return;
     }
@@ -263,24 +272,25 @@ const updateTypeReferenceNode = (node: TypeReferenceNode): void => {
 
   // remove unnecessary `Readonly` wrappers
   if (typeName === 'Readonly') {
+    console.debug('TypeReference - Readonly', node.getText());
+
     const typeArguments = node.getTypeArguments();
 
     if (!Arr.isArrayOfLength1(typeArguments)) {
       console.warn(
-        `Warning: Unexpected number of type arguments "${typeArguments.length}" for Map.`,
+        `Warning: Unexpected number of type arguments "${typeArguments.length}" for Readonly.`,
       );
       return;
     }
 
     let mut_elementTypeNode = typeArguments[0];
-    {
-      if (mut_elementTypeNode.isKind(SyntaxKind.ParenthesizedType)) {
-        mut_elementTypeNode =
-          removeMultipleNestedParentheses(mut_elementTypeNode);
-      }
 
-      updateNode(mut_elementTypeNode);
+    if (mut_elementTypeNode.isKind(SyntaxKind.ParenthesizedType)) {
+      mut_elementTypeNode =
+        removeMultipleNestedParentheses(mut_elementTypeNode);
     }
+
+    updateNode(mut_elementTypeNode);
 
     const elementTypeNode = mut_elementTypeNode;
 
@@ -311,7 +321,7 @@ const updateTypeReferenceNode = (node: TypeReferenceNode): void => {
     }
   }
 
-  console.debug(typeName);
+  console.debug();
 };
 
 /**
@@ -327,9 +337,11 @@ const updateTypeReferenceNode = (node: TypeReferenceNode): void => {
  *     Readonly<{ [key in Obj]: V }>;
  */
 const updateMappedTypeNode = (node: MappedTypeNode): void => {
-  const v = node.getTypeNode();
-  if (v !== undefined) {
-    updateNode(v);
+  {
+    const v = node.getTypeNode();
+    if (v !== undefined) {
+      updateNode(v);
+    }
   }
 
   const readonlyToken = node.getReadonlyToken() satisfies
@@ -375,7 +387,65 @@ const updateMappedTypeNode = (node: MappedTypeNode): void => {
   }
 };
 
-/** Convert all nodes recursively */
+/** Readonly<A> & Readonly<B> -> Readonly<A & B> */
+const updateIntersectionTypeNode = (node: IntersectionTypeNode): void => {
+  console.debug('Intersection', node.getText());
+
+  // Recursive processing
+  for (const tn of node.getTypeNodes()) {
+    updateNode(tn);
+  }
+
+  const typeNodes = node.getTypeNodes();
+
+  if (
+    typeNodes.every((type) => type.isKind(SyntaxKind.TypeReference)) &&
+    typeNodes.every(
+      (type) =>
+        type.getTypeName().getText() === 'Readonly' &&
+        Arr.isArrayOfLength1(type.getTypeArguments()),
+    )
+  ) {
+    // Readonly<*> & ... & Readonly<*>
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const args = typeNodes.map((type) => type.getTypeArguments()[0]!);
+
+    node.replaceWithText(
+      `Readonly<${args.map((a) => a.getText()).join(' & ')}>`,
+    );
+  }
+};
+
+/** Readonly<A> | Readonly<B> -> Readonly<A | B> */
+const updateUnionTypeNode = (node: UnionTypeNode): void => {
+  console.debug('Union', node.getText());
+
+  // Recursive processing
+  for (const tn of node.getTypeNodes()) {
+    updateNode(tn);
+  }
+
+  const typeNodes = node.getTypeNodes();
+
+  if (
+    typeNodes.every((type) => type.isKind(SyntaxKind.TypeReference)) &&
+    typeNodes.every(
+      (type) =>
+        type.getTypeName().getText() === 'Readonly' &&
+        Arr.isArrayOfLength1(type.getTypeArguments()),
+    )
+  ) {
+    // Readonly<*> & ... & Readonly<*>
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const args = typeNodes.map((type) => type.getTypeArguments()[0]!);
+
+    node.replaceWithText(
+      `Readonly<${args.map((a) => a.getText()).join(' | ')}>`,
+    );
+  }
+};
+
+/** Convert ((T)) -> (T) */
 const removeMultipleNestedParentheses = (
   node: ParenthesizedTypeNode,
 ): TypeNode => {

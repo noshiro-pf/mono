@@ -933,7 +933,7 @@ describe('canonicalizeToReadonly', () => {
           source:
             'function foo(...numbers: ReadonlyArray<number>): { readonly a: Array<number> } | { readonly b: string[] } {}',
           expected:
-            'function foo(...numbers: readonly number[]): Readonly<{ a: readonly number[] }> | Readonly<{ b: readonly string[] }> {}',
+            'function foo(...numbers: readonly number[]): Readonly<{ a: readonly number[] } | { b: readonly string[] }> {}',
         },
         {
           name: 'mutable return types',
@@ -953,7 +953,7 @@ describe('canonicalizeToReadonly', () => {
           source:
             'function foo(...numbers: ReadonlyArray<number>): { readonly a: Array<number> } & { readonly b: string[] } {}',
           expected:
-            'function foo(...numbers: readonly number[]): Readonly<{ a: readonly number[] }> & Readonly<{ b: readonly string[] }> {}',
+            'function foo(...numbers: readonly number[]): Readonly<{ a: readonly number[] } & { b: readonly string[] }> {}',
         },
         {
           name: 'mutable return types',
@@ -1141,6 +1141,19 @@ describe('canonicalizeToReadonly', () => {
         source: 'type T = Readonly<((Readonly<Readonly<(({ x: 4 })[])>>))>;',
         expected: 'type T = readonly Readonly<{ x: 4 }>[];',
       },
+      {
+        name: 'intersection',
+        source:
+          'type T = readonly (Readonly<{ x: 1 }> & Readonly<{ y: 2 }>)[];',
+        expected: 'type T = readonly Readonly<{ x: 1 } & { y: 2 }>[];',
+        debug: true,
+      },
+      // {
+      //   name: 'union',
+      //   source:
+      //     'type T = readonly (Readonly<{ x: 1 }> | Readonly<{ y: 2 }>)[];',
+      //   expected: 'type T = readonly Readonly<{ x: 1 } | { y: 2 }>[];',
+      // },
     ])('$name', testCanonicalizeToReadonly);
   });
 
@@ -1208,12 +1221,19 @@ const testCanonicalizeToReadonly = async ({
   name,
   source,
   expected,
+  debug,
 }: Readonly<{
   name: string;
   source: string;
   expected: string;
+  debug?: boolean;
 }>): Promise<void> => {
   console.debug(name);
+
+  if (debug !== true) {
+    // eslint-disable-next-line vitest/no-restricted-vi-methods
+    vi.spyOn(console, 'debug').mockImplementation(() => {});
+  }
 
   const project = new Project();
   const sourceFile = project.createSourceFile('__tempfile__.ts', source);
