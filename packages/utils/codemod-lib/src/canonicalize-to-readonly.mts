@@ -6,7 +6,6 @@ import {
   type InterfaceDeclaration,
   type IntersectionTypeNode,
   type MappedTypeNode,
-  type NamedTupleMember,
   type Node,
   SyntaxKind,
   type ts,
@@ -31,8 +30,6 @@ export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
       kind === SyntaxKind.ArrayType ||
       kind === SyntaxKind.TupleType ||
       kind === SyntaxKind.TypeLiteral ||
-      kind === SyntaxKind.IndexSignature ||
-      kind === SyntaxKind.NamedTupleMember ||
       kind === SyntaxKind.TypeReference ||
       kind === SyntaxKind.IntersectionType ||
       kind === SyntaxKind.UnionType
@@ -54,10 +51,6 @@ const updateNode = (node: Node): void => {
     updateTupleTypeNode(node);
     return;
   }
-  if (node.isKind(SyntaxKind.NamedTupleMember)) {
-    updateNamedTupleMember(node);
-    return;
-  }
   if (node.isKind(SyntaxKind.TypeLiteral)) {
     updateTypeLiteralNode(node);
     return;
@@ -66,10 +59,6 @@ const updateNode = (node: Node): void => {
     updateTypeReferenceNode(node);
     return;
   }
-  // if (node.isKind(SyntaxKind.IndexSignature)) {
-  //   updateIndexSignatureNode(node);
-  //   return;
-  // }
   if (node.isKind(SyntaxKind.InterfaceDeclaration)) {
     updateInterfaceDeclarationNode(node);
     return;
@@ -125,7 +114,11 @@ const updateArrayTypeNode = (node: ArrayTypeNode): void => {
 const updateTupleTypeNode = (node: TupleTypeNode): void => {
   // Recursive processing
   for (const el of node.getElements()) {
-    updateNode(el);
+    if (el.isKind(SyntaxKind.NamedTupleMember)) {
+      updateNode(el.getTypeNode());
+    } else {
+      updateNode(el);
+    }
   }
 
   {
@@ -139,10 +132,6 @@ const updateTupleTypeNode = (node: TupleTypeNode): void => {
   }
 
   node.replaceWithText(`(readonly ${node.getText()})`);
-};
-
-const updateNamedTupleMember = (node: NamedTupleMember): void => {
-  updateNode(node.getTypeNode());
 };
 
 // Convert `{ member: X }` to a `Readonly<{ member: X }>`
@@ -207,13 +196,6 @@ const updateClassDeclarationNode = (node: ClassDeclaration): void => {
     }
   }
 };
-
-// const updateIndexSignatureNode = (node: IndexSignatureDeclaration): void => {
-//   const v = node.getReturnTypeNode();
-//   if (v !== undefined) {
-//     updateNode(v);
-//   }
-// };
 
 const updateTypeReferenceNode = (node: TypeReferenceNode): void => {
   for (const arg of node.getTypeArguments()) {
