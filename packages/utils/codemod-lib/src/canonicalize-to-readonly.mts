@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 import { Arr, noop } from '@noshiro/ts-utils';
 import {
-  type ArrayTypeNode,
   type ClassDeclaration,
   type InterfaceDeclaration,
   type IntersectionTypeNode,
@@ -34,7 +33,7 @@ export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
       case ts.SyntaxKind.TypeReference:
       case ts.SyntaxKind.IntersectionType:
       case ts.SyntaxKind.UnionType:
-        return node;
+        return ts.isTypeNode(node) ? transformNode(node) : node;
 
       default:
         return node;
@@ -43,44 +42,33 @@ export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
 };
 
 /** Convert all nodes to readonly type (recursively) */
-const updateNode = (node: Node): void => {
-  if (node.wasForgotten()) return;
-
-  if (node.isKind(SyntaxKind.ArrayType)) {
-    updateArrayTypeNode(node);
-    return;
+const transformNode = (node: ts.TypeNode): ts.TypeNode => {
+  if (ts.isArrayTypeNode(node)) {
+    return transformArrayTypeNode(node);
   }
-  if (node.isKind(SyntaxKind.TupleType)) {
-    updateTupleTypeNode(node);
-    return;
+  if (ts.isTupleTypeNode(node)) {
+    return updateTupleTypeNode(node);
   }
-  if (node.isKind(SyntaxKind.TypeLiteral)) {
-    updateTypeLiteralNode(node);
-    return;
+  if (ts.isTypeLiteralNode(node)) {
+    return updateTypeLiteralNode(node);
   }
   if (node.isKind(SyntaxKind.TypeReference)) {
-    updateTypeReferenceNode(node);
-    return;
+    return updateTypeReferenceNode(node);
   }
   if (node.isKind(SyntaxKind.InterfaceDeclaration)) {
-    updateInterfaceDeclarationNode(node);
-    return;
+    return updateInterfaceDeclarationNode(node);
   }
   if (node.isKind(SyntaxKind.ClassDeclaration)) {
-    updateClassDeclarationNode(node);
-    return;
+    return updateClassDeclarationNode(node);
   }
   if (node.isKind(SyntaxKind.MappedType)) {
-    updateMappedTypeNode(node);
-    return;
+    return updateMappedTypeNode(node);
   }
   if (node.isKind(SyntaxKind.IntersectionType)) {
-    updateIntersectionTypeNode(node);
-    return;
+    return updateIntersectionTypeNode(node);
   }
   if (node.isKind(SyntaxKind.UnionType)) {
-    updateUnionTypeNode(node);
-    return;
+    return updateUnionTypeNode(node);
   }
   // if (node.isKind(SyntaxKind.ParenthesizedType)) {
   //   const innerElem = node.getTypeNode(); // T in (T)
@@ -92,19 +80,22 @@ const updateNode = (node: Node): void => {
 };
 
 /** Converts an array type `T[]` to a `readonly T[]` */
-const updateArrayTypeNode = (node: ArrayTypeNode): void => {
+const transformArrayTypeNode = (node: ts.ArrayTypeNode): ts.TypeNode => {
   // Recursive processing
-  updateNode(node.getElementTypeNode());
+  const T = transformNode(node.elementType);
 
   {
-    const parent: Node = node.getParent();
+    const parent: ts.Node = node.parent;
     if (
-      parent.isKind(SyntaxKind.TypeOperator) &&
-      parent.getOperator() === SyntaxKind.ReadonlyKeyword
+      ts.isTypeOperatorNode(parent) &&
+      parent.operator === ts.SyntaxKind.ReadonlyKeyword
     ) {
-      return; // skip if already readonly
+      return ts.factory.createTypeOperatorNode(
+        ts.SyntaxKind.ReadonlyKeyword,
+        ts.factory.createArrayTypeNode(T),
+      );
     }
-    if (parent.isKind(SyntaxKind.RestType)) {
+    if (ts.isRestTypeNode(parent)) {
       return; // skip if ...T[]
     }
   }
@@ -119,9 +110,9 @@ const updateTupleTypeNode = (node: TupleTypeNode): void => {
   // Recursive processing
   for (const el of node.getElements()) {
     if (el.isKind(SyntaxKind.NamedTupleMember)) {
-      updateNode(el.getTypeNode());
+      transformNode(el.getTypeNode());
     } else {
-      updateNode(el);
+      transformNode(el);
     }
   }
 
@@ -146,14 +137,14 @@ const updateTypeLiteralNode = (node: TypeLiteralNode): void => {
       mb.setIsReadonly(false);
       const n = mb.getTypeNode();
       if (n !== undefined) {
-        updateNode(n);
+        transformNode(n);
       }
     }
     if (mb.isKind(SyntaxKind.IndexSignature)) {
       mb.setIsReadonly(false);
       const v = mb.getReturnTypeNode();
       if (v !== undefined) {
-        updateNode(v);
+        transformNode(v);
       }
     }
   }
@@ -203,7 +194,7 @@ const updateClassDeclarationNode = (node: ClassDeclaration): void => {
 
 const updateTypeReferenceNode = (node: TypeReferenceNode): void => {
   for (const arg of node.getTypeArguments()) {
-    updateNode(arg);
+    transformNode(arg);
   }
 
   const typeName = node.getTypeName().getText();
@@ -272,7 +263,7 @@ const updateTypeReferenceNode = (node: TypeReferenceNode): void => {
         return;
       }
 
-      updateNode(removeRedundantParentheses(typeArg[0]));
+      transformNode(removeRedundantParentheses(typeArg[0]));
     }
 
     const typeArguments = node.getTypeArguments();
@@ -336,7 +327,7 @@ const updateMappedTypeNode = (node: MappedTypeNode): void => {
   {
     const v = node.getTypeNode();
     if (v !== undefined) {
-      updateNode(v);
+      transformNode(v);
     }
   }
 
@@ -387,7 +378,7 @@ const updateMappedTypeNode = (node: MappedTypeNode): void => {
 const updateIntersectionTypeNode = (node: IntersectionTypeNode): void => {
   // Recursive processing
   for (const tn of node.getTypeNodes()) {
-    updateNode(tn);
+    transformNode(tn);
   }
 
   const typeNodes = node.getTypeNodes();
@@ -426,7 +417,7 @@ const updateUnionTypeNode = (node: UnionTypeNode): void => {
 
   // Recursive processing
   for (const tn of node.getTypeNodes()) {
-    updateNode(tn);
+    transformNode(tn);
   }
 
   const typeNodes = node.getTypeNodes();
