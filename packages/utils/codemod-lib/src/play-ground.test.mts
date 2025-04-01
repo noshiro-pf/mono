@@ -5,6 +5,7 @@ test('playground', async () => {
   const source = codeFromStringLines(
     //
     '[1];',
+    '',
     '[2];',
     '[3];',
   );
@@ -12,6 +13,7 @@ test('playground', async () => {
   const expected = codeFromStringLines(
     //
     '[2];',
+    '',
     '[3];',
     '[4];',
   );
