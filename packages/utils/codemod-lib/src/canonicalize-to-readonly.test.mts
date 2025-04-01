@@ -1218,21 +1218,19 @@ describe('canonicalizeToReadonly', () => {
 });
 
 const testCanonicalizeToReadonly = async ({
-  name,
   source,
   expected,
   debug,
 }: Readonly<{
-  name: string;
   source: string;
   expected: string;
   debug?: boolean;
 }>): Promise<void> => {
-  console.debug(name);
+  let mut_spy = undefined;
 
   if (debug !== true) {
     // eslint-disable-next-line vitest/no-restricted-vi-methods
-    vi.spyOn(console, 'debug').mockImplementation(() => {});
+    mut_spy = vi.spyOn(console, 'debug').mockImplementation(() => {});
   }
 
   const project = new Project();
@@ -1251,4 +1249,6 @@ const testCanonicalizeToReadonly = async ({
   });
 
   expect(result.trimEnd()).toBe(expectedFormatted.trimEnd());
+
+  if (Math.PI < 0) mut_spy?.mockRestore();
 };
