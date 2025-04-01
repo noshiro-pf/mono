@@ -1,7 +1,7 @@
 /* eslint-disable vitest/expect-expect */
 import * as prettier from 'prettier';
 import { Project } from 'ts-morph';
-import { canonicalizeToReadonly } from './replace-to-readonly.mjs';
+import { canonicalizeToReadonly } from './canonicalize-to-readonly.mjs';
 import { codeFromStringLines } from './utils/index.mjs';
 
 describe('canonicalizeToReadonly', () => {

@@ -1,6 +1,6 @@
 import { Project } from 'ts-morph';
+import { canonicalizeToReadonly } from './canonicalize-to-readonly.mjs';
 import { replaceAnyWithUnknown } from './replace-any-with-unknown.mjs';
-import { canonicalizeToReadonly } from './replace-to-readonly.mjs';
 
 export const replaceWithTsMorph = async (filepath: string): Promise<void> => {
   const project = new Project();
