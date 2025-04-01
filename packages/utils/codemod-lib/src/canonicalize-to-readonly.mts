@@ -6,10 +6,9 @@ import {
   type InterfaceDeclaration,
   type IntersectionTypeNode,
   type MappedTypeNode,
-  Node,
-  Project,
+  type Node,
   SyntaxKind,
-  ts,
+  type ts,
   type TupleTypeNode,
   type TypeLiteralNode,
   type TypeNode,
@@ -19,16 +18,10 @@ import {
 import { type SourceFile } from './types.mjs';
 
 export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
-  const project = new Project();
-
   // sourceFile.formatText({})
   sourceFile.forEachDescendant((node) => {
-    if (node.wasForgotten()) return;
-
     const kind = node.getKind();
     console.debug(`${node.getText()}  (kind=${node.getKindName()})`);
-
-    if (!Node.isTypeNode(node)) return;
 
     if (
       kind === SyntaxKind.ClassDeclaration ||
@@ -41,13 +34,15 @@ export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
       kind === SyntaxKind.IntersectionType ||
       kind === SyntaxKind.UnionType
     ) {
-      updateNode(project, node);
+      updateNode(node);
     }
   });
 };
 
 /** Convert all nodes to readonly type (recursively) */
-const updateNode = (project: Project, node: TypeNode): TypeNode => {
+const updateNode = (node: Node): void => {
+  if (node.wasForgotten()) return;
+
   if (node.isKind(SyntaxKind.ArrayType)) {
     updateArrayTypeNode(node);
     return;
@@ -86,12 +81,11 @@ const updateNode = (project: Project, node: TypeNode): TypeNode => {
   }
   if (node.isKind(SyntaxKind.ParenthesizedType)) {
     const innerElem = node.getTypeNode(); // T in (T)
-    return project.createNodeFromCompilerNode(
-      ts.factory.createParenthesizedType(updateNode(innerElem).compilerNode),
-    );
+    updateNode(innerElem);
+    node.replaceWithText(node.getText());
+    return;
   }
-
-  return node;
+  noop();
 };
 
 /** Converts an array type `T[]` to a `readonly T[]` */
