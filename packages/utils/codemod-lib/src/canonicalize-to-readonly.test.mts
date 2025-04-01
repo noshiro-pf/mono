@@ -1,8 +1,6 @@
 /* eslint-disable vitest/expect-expect */
-import * as prettier from 'prettier';
-import { Project } from 'ts-morph';
-import { canonicalizeToReadonly } from './replace-to-readonly.mjs';
-import { codeFromStringLines } from './utils/index.mjs';
+import { canonicalizeToReadonly } from './canonicalize-to-readonly.mjs';
+import { codeFromStringLines, testFn } from './utils/index.mjs';
 
 describe('canonicalizeToReadonly', () => {
   describe('type literals', () => {
@@ -933,7 +931,7 @@ describe('canonicalizeToReadonly', () => {
           source:
             'function foo(...numbers: ReadonlyArray<number>): { readonly a: Array<number> } | { readonly b: string[] } {}',
           expected:
-            'function foo(...numbers: readonly number[]): Readonly<{ a: readonly number[] }> | Readonly<{ b: readonly string[] }> {}',
+            'function foo(...numbers: readonly number[]): Readonly<{ a: readonly number[] } | { b: readonly string[] }> {}',
         },
         {
           name: 'mutable return types',
@@ -953,7 +951,7 @@ describe('canonicalizeToReadonly', () => {
           source:
             'function foo(...numbers: ReadonlyArray<number>): { readonly a: Array<number> } & { readonly b: string[] } {}',
           expected:
-            'function foo(...numbers: readonly number[]): Readonly<{ a: readonly number[] }> & Readonly<{ b: readonly string[] }> {}',
+            'function foo(...numbers: readonly number[]): Readonly<{ a: readonly number[] } & { b: readonly string[] }> {}',
         },
         {
           name: 'mutable return types',
@@ -1141,6 +1139,19 @@ describe('canonicalizeToReadonly', () => {
         source: 'type T = Readonly<((Readonly<Readonly<(({ x: 4 })[])>>))>;',
         expected: 'type T = readonly Readonly<{ x: 4 }>[];',
       },
+      {
+        name: 'intersection',
+        source:
+          'type T = readonly (Readonly<{ x: 1 }> & Readonly<{ y: 2 }>)[];',
+        expected: 'type T = readonly Readonly<{ x: 1 } & { y: 2 }>[];',
+        debug: true,
+      },
+      // {
+      //   name: 'union',
+      //   source:
+      //     'type T = readonly (Readonly<{ x: 1 }> | Readonly<{ y: 2 }>)[];',
+      //   expected: 'type T = readonly Readonly<{ x: 1 } | { y: 2 }>[];',
+      // },
     ])('$name', testCanonicalizeToReadonly);
   });
 
@@ -1205,30 +1216,13 @@ describe('canonicalizeToReadonly', () => {
 });
 
 const testCanonicalizeToReadonly = async ({
-  name,
   source,
   expected,
+  debug,
 }: Readonly<{
-  name: string;
   source: string;
   expected: string;
+  debug?: boolean;
 }>): Promise<void> => {
-  console.debug(name);
-
-  const project = new Project();
-  const sourceFile = project.createSourceFile('__tempfile__.ts', source);
-
-  canonicalizeToReadonly(sourceFile);
-
-  const result = await prettier.format(sourceFile.getText(), {
-    parser: 'typescript',
-  });
-
-  sourceFile.delete();
-
-  const expectedFormatted = await prettier.format(expected, {
-    parser: 'typescript',
-  });
-
-  expect(result.trimEnd()).toBe(expectedFormatted.trimEnd());
+  await testFn(canonicalizeToReadonly, source, expected, debug ?? false);
 };

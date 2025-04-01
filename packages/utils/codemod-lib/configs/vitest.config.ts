@@ -14,5 +14,6 @@ export default defineConfig({
       tsconfig: path.resolve(thisDir, 'tsconfig.test.json'),
     },
     passWithNoTests: true,
+    restoreMocks: true,
   },
 });
