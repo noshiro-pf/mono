@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
+import { Arr } from '@noshiro/ts-utils';
 import {
   type ArrayTypeNode,
   type ClassDeclaration,
@@ -213,48 +214,50 @@ const updateTypeReferenceNode = (node: TypeReferenceNode): void => {
   // Array<T> / ReadonlyArray<T> to (readonly T[])
   if (typeName === 'Array' || typeName === 'ReadonlyArray') {
     const typeArguments = node.getTypeArguments();
-    if (typeArguments.length === 1) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const elementType = typeArguments[0]!;
-      node.replaceWithText(`(readonly ${elementType.getText()}[])`);
-    } else {
+    if (!Arr.isArrayOfLength1(typeArguments)) {
       console.warn(
         `Warning: Unexpected number of type arguments "${typeArguments.length}" for Array.`,
       );
+      return;
     }
+
+    const elementType = typeArguments[0];
+    node.replaceWithText(`(readonly ${elementType.getText()}[])`);
+    return;
   }
 
   // Set<T> to ReadonlySet<T>
   if (typeName === 'Set') {
     const typeArguments = node.getTypeArguments();
-    if (typeArguments.length === 1) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const elementType = typeArguments[0]!;
-      node.replaceWithText(`ReadonlySet<${elementType.getText()}>`);
-    } else {
+
+    if (!Arr.isArrayOfLength1(typeArguments)) {
       console.warn(
         `Warning: Unexpected number of type arguments "${typeArguments.length}" for Set.`,
       );
+      return;
     }
+
+    const elementType = typeArguments[0];
+    node.replaceWithText(`ReadonlySet<${elementType.getText()}>`);
     return;
   }
 
   // Map<T> to ReadonlyMap<T>
   if (typeName === 'Map') {
     const typeArguments = node.getTypeArguments();
-    if (typeArguments.length === 2) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const keyType = typeArguments[0]!;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const valueType = typeArguments[1]!;
-      node.replaceWithText(
-        `ReadonlyMap<${keyType.getText()}, ${valueType.getText()}>`,
-      );
-    } else {
+
+    if (!Arr.isArrayOfLength2(typeArguments)) {
       console.warn(
         `Warning: Unexpected number of type arguments "${typeArguments.length}" for Map.`,
       );
+      return;
     }
+
+    const keyType = typeArguments[0];
+    const valueType = typeArguments[1];
+    node.replaceWithText(
+      `ReadonlyMap<${keyType.getText()}, ${valueType.getText()}>`,
+    );
     return;
   }
 
@@ -262,55 +265,49 @@ const updateTypeReferenceNode = (node: TypeReferenceNode): void => {
   if (typeName === 'Readonly') {
     const typeArguments = node.getTypeArguments();
 
-    if (typeArguments.length === 1) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      let mut_elementTypeNode = typeArguments[0]!;
-      {
-        if (mut_elementTypeNode.isKind(SyntaxKind.ParenthesizedType)) {
-          mut_elementTypeNode =
-            removeMultipleNestedParentheses(mut_elementTypeNode);
-        }
-
-        updateNode(mut_elementTypeNode);
-      }
-
-      const elementTypeNode = mut_elementTypeNode;
-
-      // Readonly<readonly T[]> -> readonly T[]
-      if (
-        elementTypeNode.isKind(SyntaxKind.TypeOperator) &&
-        elementTypeNode.getOperator() === SyntaxKind.ReadonlyKeyword
-      ) {
-        node.replaceWithText(elementTypeNode.getText());
-        return;
-      }
-
-      // Readonly<Readonly<T>> -> Readonly<T'>
-      if (
-        elementTypeNode.isKind(SyntaxKind.TypeReference) &&
-        elementTypeNode.getTypeName().getText() === 'Readonly'
-      ) {
-        const typeArg = elementTypeNode.getTypeArguments();
-        if (typeArg.length === 1) {
-          // // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          // const elemType = typeArg[0]!; // T in Readonly<T>
-          // updateNode(elemType);
-
-          node.replaceWithText(
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            `Readonly<${elementTypeNode.getTypeArguments()[0]!.getText()}>`,
-          );
-          return;
-        } else {
-          console.warn(
-            `Warning: Unexpected number of type arguments "${typeArguments.length}" for Readonly.`,
-          );
-        }
-      }
-    } else {
+    if (!Arr.isArrayOfLength1(typeArguments)) {
       console.warn(
         `Warning: Unexpected number of type arguments "${typeArguments.length}" for Map.`,
       );
+      return;
+    }
+
+    let mut_elementTypeNode = typeArguments[0];
+    {
+      if (mut_elementTypeNode.isKind(SyntaxKind.ParenthesizedType)) {
+        mut_elementTypeNode =
+          removeMultipleNestedParentheses(mut_elementTypeNode);
+      }
+
+      updateNode(mut_elementTypeNode);
+    }
+
+    const elementTypeNode = mut_elementTypeNode;
+
+    // Readonly<readonly T[]> -> readonly T[]
+    if (
+      elementTypeNode.isKind(SyntaxKind.TypeOperator) &&
+      elementTypeNode.getOperator() === SyntaxKind.ReadonlyKeyword
+    ) {
+      node.replaceWithText(elementTypeNode.getText());
+      return;
+    }
+
+    // Readonly<Readonly<T>> -> Readonly<T'>
+    if (
+      elementTypeNode.isKind(SyntaxKind.TypeReference) &&
+      elementTypeNode.getTypeName().getText() === 'Readonly'
+    ) {
+      const typeArg = elementTypeNode.getTypeArguments();
+      if (!Arr.isArrayOfLength1(typeArg)) {
+        console.warn(
+          `Warning: Unexpected number of type arguments "${typeArguments.length}" for Readonly.`,
+        );
+        return;
+      }
+
+      node.replaceWithText(`Readonly<${typeArg[0].getText()}>`);
+      return;
     }
   }
 
