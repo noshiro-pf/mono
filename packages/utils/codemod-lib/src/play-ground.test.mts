@@ -4,22 +4,22 @@ import { codeFromStringLines, testFn } from './index.mjs';
 test('playground', async () => {
   const source = codeFromStringLines(
     //
-    '1;',
-    '2;',
-    '3;',
+    '[1];',
+    '[2];',
+    '[3];',
   );
 
   const expected = codeFromStringLines(
     //
-    '2;',
-    '3;',
-    '4;',
+    '[2];',
+    '[3];',
+    '[4];',
   );
 
   const { expectedFormatted, result } = await testFn(
     (sourceFile) =>
       sourceFile.transform((traversal) => {
-        const node = traversal.visitChildren(); // return type is `ts.Node`
+        const node: ts.Node = traversal.visitChildren();
 
         if (ts.isNumericLiteral(node)) {
           const incrementedValue = Number.parseInt(node.text, 10) + 1;
@@ -32,7 +32,7 @@ test('playground', async () => {
       }),
     source,
     expected,
-    false,
+    true,
   );
 
   expect(result).toBe(expectedFormatted);
