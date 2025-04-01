@@ -4,17 +4,27 @@ import { codeFromStringLines, testFn } from './index.mjs';
 test('playground', async () => {
   const source = codeFromStringLines(
     //
+    '',
+    '// [1]',
     '[1];',
     '',
+    '',
+    '// [2]',
     '[2];',
+    '// [3]',
     '[3];',
   );
 
   const expected = codeFromStringLines(
     //
+    '',
+    '// [1]',
     '[2];',
     '',
+    '',
+    '// [2]',
     '[3];',
+    '// [3]',
     '[4];',
   );
 
