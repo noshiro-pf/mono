@@ -7,7 +7,7 @@ export const testFn = async (
   source: string,
   expected: string,
   debug: boolean,
-): Promise<void> => {
+): Promise<Readonly<{ result: string; expectedFormatted: string }>> => {
   if (!debug) {
     // eslint-disable-next-line vitest/no-restricted-vi-methods
     vi.spyOn(console, 'debug').mockImplementation(() => {});
@@ -28,5 +28,8 @@ export const testFn = async (
     parser: 'typescript',
   });
 
-  expect(result.trimEnd()).toBe(expectedFormatted.trimEnd());
+  return {
+    expectedFormatted: expectedFormatted.trimEnd(),
+    result: result.trimEnd(),
+  };
 };

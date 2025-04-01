@@ -1,41 +1,39 @@
+import { ts } from 'ts-morph';
 import { codeFromStringLines, testFn } from './index.mjs';
 
-describe('playground', () => {
+test('playground', async () => {
   const source = codeFromStringLines(
-    'function foo() {',
-    '  return [1, 2, 3] as const;',
-    '}',
-    '',
-    '',
-    '',
-    'function foo() {',
-    '  let foo: {',
-    '    a: number,',
-    '    b: ReadonlyArray<string>,',
-    '    c: () => string,',
-    '    d: { [key: string]: string[] },',
-    '    [key: string]: string[],',
-    '    readonly d: {',
-    '      a: number,',
-    '      b: ReadonlyArray<string>,',
-    '      c: () => string,',
-    '      d: { [key: string]: string[] },',
-    '      [key: string]: string[],',
-    '    }',
-    '  }',
-    '};',
+    //
+    '[1];',
+    '[2];',
+    '[3];',
   );
 
-  testFn(
-    (sourceFile) => {
-      let mut_i = 0;
-      sourceFile.forEachChild((child) => {
-        console.debug(mut_i, child.getText());
-        mut_i += 1;
-      });
-    },
+  const expected = codeFromStringLines(
+    //
+    '[2];',
+    '[3];',
+    '[4];',
+  );
+
+  const { expectedFormatted, result } = await testFn(
+    (sourceFile) =>
+      sourceFile.transform((traversal) => {
+        const node: ts.Node = traversal.visitChildren();
+
+        if (ts.isNumericLiteral(node)) {
+          const incrementedValue = Number.parseInt(node.text, 10) + 1;
+          return traversal.factory.createNumericLiteral(
+            incrementedValue.toString(),
+          );
+        }
+
+        return node;
+      }),
     source,
-    source,
-    false,
-  ).catch(() => {});
+    expected,
+    true,
+  );
+
+  expect(result).toBe(expectedFormatted);
 });

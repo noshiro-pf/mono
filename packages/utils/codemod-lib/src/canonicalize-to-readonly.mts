@@ -8,7 +8,7 @@ import {
   type MappedTypeNode,
   type Node,
   SyntaxKind,
-  type ts,
+  ts,
   type TupleTypeNode,
   type TypeLiteralNode,
   type TypeNode,
@@ -18,23 +18,26 @@ import {
 import { type SourceFile } from './types.mjs';
 
 export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
-  // sourceFile.formatText({})
-  sourceFile.forEachDescendant((node) => {
-    const kind = node.getKind();
-    console.debug(`${node.getText()}  (kind=${node.getKindName()})`);
+  sourceFile.transform((traversal) => {
+    const node: ts.Node = traversal.visitChildren();
 
-    if (
-      kind === SyntaxKind.ClassDeclaration ||
-      kind === SyntaxKind.InterfaceDeclaration ||
-      kind === SyntaxKind.MappedType ||
-      kind === SyntaxKind.ArrayType ||
-      kind === SyntaxKind.TupleType ||
-      kind === SyntaxKind.TypeLiteral ||
-      kind === SyntaxKind.TypeReference ||
-      kind === SyntaxKind.IntersectionType ||
-      kind === SyntaxKind.UnionType
-    ) {
-      updateNode(node);
+    console.debug(`${node.getText()}  (kind=${ts.SyntaxKind[node.kind]})`);
+
+    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+    switch (node.kind) {
+      case ts.SyntaxKind.ClassDeclaration:
+      case ts.SyntaxKind.InterfaceDeclaration:
+      case ts.SyntaxKind.MappedType:
+      case ts.SyntaxKind.ArrayType:
+      case ts.SyntaxKind.TupleType:
+      case ts.SyntaxKind.TypeLiteral:
+      case ts.SyntaxKind.TypeReference:
+      case ts.SyntaxKind.IntersectionType:
+      case ts.SyntaxKind.UnionType:
+        return node;
+
+      default:
+        return node;
     }
   });
 };
@@ -79,12 +82,12 @@ const updateNode = (node: Node): void => {
     updateUnionTypeNode(node);
     return;
   }
-  if (node.isKind(SyntaxKind.ParenthesizedType)) {
-    const innerElem = node.getTypeNode(); // T in (T)
-    updateNode(innerElem);
-    node.replaceWithText(node.getText());
-    return;
-  }
+  // if (node.isKind(SyntaxKind.ParenthesizedType)) {
+  //   const innerElem = node.getTypeNode(); // T in (T)
+  //   updateNode(innerElem);
+  //   node.replaceWithText(node.getText());
+  //   return;
+  // }
   noop();
 };
 
