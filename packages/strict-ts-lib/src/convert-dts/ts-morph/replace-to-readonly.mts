@@ -21,26 +21,23 @@ import { type SourceFile } from './types.mjs';
 console.debug = () => {};
 
 export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
-  // for (const node of sourceFile.getDescendants().filter(isNodeToCheck)) {
-  //   updateNode(node);
-  // }
-
-  for (const kind of [
-    SyntaxKind.ClassDeclaration,
-    SyntaxKind.InterfaceDeclaration,
-    SyntaxKind.MappedType,
-    SyntaxKind.ArrayType,
-    SyntaxKind.TupleType,
-    SyntaxKind.TypeLiteral,
-    SyntaxKind.IndexSignature,
-    SyntaxKind.NamedTupleMember,
-    SyntaxKind.TypeReference,
-    SyntaxKind.ParenthesizedType,
-  ]) {
-    for (const node of sourceFile.getDescendantsOfKind(kind)) {
+  sourceFile.forEachDescendant((node) => {
+    const kind = node.getKind();
+    if (
+      kind === SyntaxKind.ClassDeclaration ||
+      kind === SyntaxKind.InterfaceDeclaration ||
+      kind === SyntaxKind.MappedType ||
+      kind === SyntaxKind.ArrayType ||
+      kind === SyntaxKind.TupleType ||
+      kind === SyntaxKind.TypeLiteral ||
+      kind === SyntaxKind.IndexSignature ||
+      kind === SyntaxKind.NamedTupleMember ||
+      kind === SyntaxKind.TypeReference ||
+      kind === SyntaxKind.ParenthesizedType
+    ) {
       updateNode(node);
     }
-  }
+  });
 };
 
 /** Convert all nodes to readonly type (recursively) */
@@ -86,13 +83,6 @@ const updateNode = (node: Node): void => {
   if (node.isKind(SyntaxKind.ParenthesizedType)) {
     const innerElem = node.getTypeNode(); // T in (T)
     updateNode(innerElem);
-
-    // // ((T)) -> (T)
-    // if (innerElem.isKind(SyntaxKind.ParenthesizedType)) {
-
-    //   node.replaceWithText(innerElem.getText());
-    // }
-    // return;
   }
 };
 
