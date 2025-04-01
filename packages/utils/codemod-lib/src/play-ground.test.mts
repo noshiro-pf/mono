@@ -30,7 +30,7 @@ describe('playground', () => {
     (sourceFile) => {
       let mut_i = 0;
       sourceFile.forEachChild((child) => {
-        console.log(mut_i, child.getText());
+        console.debug(mut_i, child.getText());
         mut_i += 1;
       });
     },
