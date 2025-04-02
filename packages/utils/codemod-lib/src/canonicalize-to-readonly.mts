@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
-import { Arr, mapOptional, noop } from '@noshiro/ts-utils';
-import { type Node, SyntaxKind, ts, type TypeNode } from 'ts-morph';
+import { Arr, mapOptional, match, noop } from '@noshiro/ts-utils';
+import { SyntaxKind, ts, type TypeNode } from 'ts-morph';
 import { type SourceFile } from './types.mjs';
 
 export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
@@ -153,8 +153,11 @@ const transformTupleTypeNode = (
 const transformTypeLiteralNode = (
   node: ts.TypeLiteralNode,
 ): ts.TypeLiteralNode | ts.TypeReferenceNode => {
-  // Recursive processing
-  const members: ts.NodeArray<ts.TypeElement> = transformMembers(node.members);
+  const newTypeLiteralNode = ts.factory.updateTypeLiteralNode(
+    node,
+    // Recursive processing
+    transformMembers(node.members, 'remove'),
+  );
 
   {
     const parent = node.parent;
@@ -164,13 +167,11 @@ const transformTypeLiteralNode = (
       parent.typeName.getText() === 'Readonly'
     ) {
       // skip if already readonly
-      return ts.factory.updateTypeLiteralNode(node, members);
+      return newTypeLiteralNode;
     }
   }
 
-  return ts.factory.createTypeReferenceNode('Readonly', [
-    ts.factory.updateTypeLiteralNode(node, members),
-  ]);
+  return ts.factory.createTypeReferenceNode('Readonly', [newTypeLiteralNode]);
 };
 
 // Making interface members readonly
@@ -178,25 +179,25 @@ const transformInterfaceDeclarationNode = (
   node: ts.InterfaceDeclaration,
 ): ts.InterfaceDeclaration =>
   ts.factory.createInterfaceDeclaration(
-    node.modifiers?.filter(removeReadonlyModifier),
+    removeReadonlyFromModifiers(node.modifiers),
     node.name,
     node.typeParameters?.map(transformTypeParameterDeclaration),
     node.heritageClauses?.map(transformHeritageClause),
-    transformMembers(node.members),
+    transformMembers(node.members, 'add'),
   );
 
 const transformClassDeclarationNode = (
   node: ts.ClassDeclaration,
 ): ts.ClassDeclaration =>
   ts.factory.createClassDeclaration(
-    node.modifiers?.filter(removeReadonlyModifier),
+    node.modifiers,
     node.name,
     node.typeParameters?.map(transformTypeParameterDeclaration),
     node.heritageClauses?.map(transformHeritageClause),
     node.members.map((mb: ts.ClassElement): ts.ClassElement => {
       if (ts.isPropertyDeclaration(mb)) {
         return ts.factory.createPropertyDeclaration(
-          mb.modifiers?.filter(removeReadonlyModifier),
+          addReadonlyToModifiers(mb.modifiers),
           mb.name,
           mb.questionToken,
           mapOptional(mb.type, transformNode),
@@ -205,7 +206,7 @@ const transformClassDeclarationNode = (
       }
       if (ts.isMethodDeclaration(mb)) {
         return ts.factory.createMethodDeclaration(
-          mb.modifiers?.filter(removeReadonlyModifier),
+          addReadonlyToModifiers(mb.modifiers),
           mb.asteriskToken,
           mb.name,
           mb.questionToken,
@@ -217,19 +218,19 @@ const transformClassDeclarationNode = (
       }
       if (ts.isConstructorDeclaration(mb)) {
         return ts.factory.createConstructorDeclaration(
-          mb.modifiers?.filter(removeReadonlyModifier),
+          mb.modifiers,
           mb.parameters.map(transformParameterDeclaration),
           mb.body,
         );
       }
       if (ts.isGetAccessorDeclaration(mb)) {
-        return transformGetAccessorDeclaration(mb);
+        return transformGetAccessorDeclaration(mb, 'add');
       }
       if (ts.isSetAccessorDeclaration(mb)) {
-        return transformSetAccessorDeclaration(mb);
+        return transformSetAccessorDeclaration(mb, 'add');
       }
       if (ts.isIndexSignatureDeclaration(mb)) {
-        return transformIndexSignatureDeclaration(mb);
+        return transformIndexSignatureDeclaration(mb, 'add');
       }
       if (ts.isClassStaticBlockDeclaration(mb)) {
         return ts.factory.createClassStaticBlockDeclaration(mb.body);
@@ -240,23 +241,6 @@ const transformClassDeclarationNode = (
       throw new TypeError(`Unexpected type of node: ${ts.SyntaxKind[mb.kind]}`);
     }),
   );
-
-{
-  for (const el of node.getDescendants()) {
-    if (el.isKind(SyntaxKind.IndexSignature)) {
-      el.setIsReadonly(true);
-    }
-    if (el.isKind(SyntaxKind.PropertyDeclaration)) {
-      el.setIsReadonly(true);
-    }
-  }
-
-  for (const ctor of node.getConstructors()) {
-    for (const parameter of ctor.getParameters()) {
-      parameter.setIsReadonly(true);
-    }
-  }
-}
 
 const transformTypeReferenceNode = (
   node: ts.TypeReferenceNode,
@@ -394,54 +378,29 @@ const transformTypeReferenceNode = (
 const transformMappedTypeNode = (
   node: ts.MappedTypeNode,
 ): ts.MappedTypeNode | ts.TypeReferenceNode => {
-  {
-    const v = node.getTypeNode();
-    if (v !== undefined) {
-      transformNode(v);
-    }
-  }
-
-  const readonlyToken = node.getReadonlyToken() satisfies
-    | Node<ts.ReadonlyKeyword>
-    | Node<ts.PlusToken>
-    | Node<ts.MinusToken>
-    | undefined;
-
-  if (readonlyToken !== undefined) {
-    switch (
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      readonlyToken.getKind() as
-        | SyntaxKind.ReadonlyKeyword
-        | SyntaxKind.PlusToken
-        | SyntaxKind.MinusToken
-    ) {
-      case SyntaxKind.ReadonlyKeyword:
-        node.replaceWithText(node.getText().replace(/^\{\s*readonly/u, '{'));
-        break;
-
-      case SyntaxKind.PlusToken:
-        node.replaceWithText(node.getText().replace(/^\{\s*\+readonly/u, '{'));
-        break;
-
-      case SyntaxKind.MinusToken:
-        node.replaceWithText(node.getText().replace(/^\{\s*-readonly/u, '{'));
-        break;
-    }
-  }
+  const newMappedTypeNode = ts.factory.updateMappedTypeNode(
+    node,
+    undefined, // remove readonlyToken
+    node.typeParameter,
+    node.nameType,
+    node.questionToken,
+    mapOptional(node.type, transformNode),
+    node.members,
+  );
 
   {
-    const p = node.getParent();
-
-    // Skip if already of type `Readonly<{ [key: string]: string }>`
+    const parent = node.parent;
+    // Skip if already of type `Readonly<{ member: X }>`
     if (
-      p.isKind(SyntaxKind.TypeReference) &&
-      p.getTypeName().getText() === 'Readonly'
+      ts.isTypeReferenceNode(parent) &&
+      parent.typeName.getText() === 'Readonly'
     ) {
-      return;
+      // skip if already readonly
+      return newMappedTypeNode;
     }
-
-    node.replaceWithText(`Readonly<${node.getText()}>`);
   }
+
+  return ts.factory.createTypeReferenceNode('Readonly', [newMappedTypeNode]);
 };
 
 /** Readonly<A> & Readonly<B> -> Readonly<A & B> */
@@ -520,9 +479,13 @@ const removeRedundantParentheses = (node: TypeNode): TypeNode =>
 
 const transformPropertySignature = (
   node: ts.PropertySignature,
+  readonly: 'add' | 'remove',
 ): ts.PropertySignature =>
   ts.factory.createPropertySignature(
-    node.modifiers?.filter(removeReadonlyModifier),
+    match(readonly, {
+      add: addReadonlyToModifiers(node.modifiers),
+      remove: removeReadonlyFromModifiers(node.modifiers),
+    }),
     node.name,
     node.questionToken,
     mapOptional(node.type, transformNode),
@@ -530,18 +493,26 @@ const transformPropertySignature = (
 
 const transformIndexSignatureDeclaration = (
   node: ts.IndexSignatureDeclaration,
+  readonly: 'add' | 'remove',
 ): ts.IndexSignatureDeclaration =>
   ts.factory.createIndexSignature(
-    node.modifiers?.filter(removeReadonlyModifier),
+    match(readonly, {
+      add: addReadonlyToModifiers(node.modifiers),
+      remove: removeReadonlyFromModifiers(node.modifiers),
+    }),
     node.parameters.map(transformParameterDeclaration),
     transformNode(node.type),
   );
 
 const transformMethodSignature = (
   node: ts.MethodSignature,
+  readonly: 'add' | 'remove',
 ): ts.MethodSignature =>
   ts.factory.createMethodSignature(
-    node.modifiers?.filter(removeReadonlyModifier),
+    match(readonly, {
+      add: addReadonlyToModifiers(node.modifiers),
+      remove: removeReadonlyFromModifiers(node.modifiers),
+    }),
     node.name,
     node.questionToken,
     node.typeParameters?.map(transformTypeParameterDeclaration),
@@ -569,9 +540,13 @@ const transformConstructSignatureDeclaration = (
 
 const transformGetAccessorDeclaration = (
   node: ts.GetAccessorDeclaration,
+  readonly: 'add' | 'remove',
 ): ts.GetAccessorDeclaration =>
   ts.factory.createGetAccessorDeclaration(
-    node.modifiers?.filter(removeReadonlyModifier),
+    match(readonly, {
+      add: addReadonlyToModifiers(node.modifiers),
+      remove: removeReadonlyFromModifiers(node.modifiers),
+    }),
     node.name,
     node.parameters.map(transformParameterDeclaration),
     mapOptional(node.type, transformNode),
@@ -580,9 +555,13 @@ const transformGetAccessorDeclaration = (
 
 const transformSetAccessorDeclaration = (
   node: ts.SetAccessorDeclaration,
+  readonly: 'add' | 'remove',
 ): ts.SetAccessorDeclaration =>
   ts.factory.createSetAccessorDeclaration(
-    node.modifiers?.filter(removeReadonlyModifier),
+    match(readonly, {
+      add: addReadonlyToModifiers(node.modifiers),
+      remove: removeReadonlyFromModifiers(node.modifiers),
+    }),
     node.name,
     node.parameters.map(transformParameterDeclaration),
     node.body,
@@ -590,17 +569,18 @@ const transformSetAccessorDeclaration = (
 
 const transformMembers = (
   members: ts.NodeArray<ts.TypeElement>,
+  readonly: 'add' | 'remove',
 ): ts.NodeArray<ts.TypeElement> =>
   ts.factory.createNodeArray(
     members.map((mb) => {
       if (ts.isPropertySignature(mb)) {
-        return transformPropertySignature(mb);
+        return transformPropertySignature(mb, readonly);
       }
       if (ts.isIndexSignatureDeclaration(mb)) {
-        return transformIndexSignatureDeclaration(mb);
+        return transformIndexSignatureDeclaration(mb, readonly);
       }
       if (ts.isMethodSignature(mb)) {
-        return transformMethodSignature(mb);
+        return transformMethodSignature(mb, readonly);
       }
       if (ts.isCallSignatureDeclaration(mb)) {
         return transformCallSignatureDeclaration(mb);
@@ -609,10 +589,10 @@ const transformMembers = (
         return transformConstructSignatureDeclaration(mb);
       }
       if (ts.isGetAccessorDeclaration(mb)) {
-        return transformGetAccessorDeclaration(mb);
+        return transformGetAccessorDeclaration(mb, readonly);
       }
       if (ts.isSetAccessorDeclaration(mb)) {
-        return transformSetAccessorDeclaration(mb);
+        return transformSetAccessorDeclaration(mb, readonly);
       }
       throw new TypeError(`Unexpected type of node: ${ts.SyntaxKind[mb.kind]}`);
     }),
@@ -633,7 +613,7 @@ const transformParameterDeclaration = (
   p: ts.ParameterDeclaration,
 ): ts.ParameterDeclaration =>
   ts.factory.createParameterDeclaration(
-    p.modifiers?.filter(removeReadonlyModifier),
+    removeReadonlyFromModifiers(p.modifiers),
     p.dotDotDotToken,
     p.name,
     p.questionToken,
@@ -652,5 +632,15 @@ const transformHeritageClause = (hc: ts.HeritageClause): ts.HeritageClause =>
     ),
   );
 
-const removeReadonlyModifier = (m: ts.ModifierLike): boolean =>
-  !ts.isReadonlyKeywordOrPlusOrMinusToken(m);
+const removeReadonlyFromModifiers = <M extends ts.ModifierLike>(
+  modifiers: ts.NodeArray<M> | undefined,
+): readonly M[] | undefined =>
+  modifiers?.filter((m) => !ts.isReadonlyKeywordOrPlusOrMinusToken(m));
+
+const addReadonlyToModifiers = <M extends ts.ModifierLike>(
+  modifiers: ts.NodeArray<M> | undefined,
+): readonly (M | ts.ReadonlyKeyword)[] | undefined =>
+  mapOptional(modifiers, (ms) => [
+    ...ms.filter((m) => !ts.isReadonlyKeywordOrPlusOrMinusToken(m)),
+    ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword),
+  ]);
