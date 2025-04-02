@@ -181,23 +181,67 @@ const transformInterfaceDeclarationNode = (
     node.modifiers?.filter(removeReadonlyModifier),
     node.name,
     node.typeParameters?.map(transformTypeParameterDeclaration),
-    node.heritageClauses?.map((hc) =>
-      ts.factory.createHeritageClause(
-        hc.token,
-        hc.types.map((t) =>
-          ts.factory.createExpressionWithTypeArguments(
-            t.expression,
-            t.typeArguments?.map(transformNode),
-          ),
-        ),
-      ),
-    ),
+    node.heritageClauses?.map(transformHeritageClause),
     transformMembers(node.members),
   );
 
 const transformClassDeclarationNode = (
   node: ts.ClassDeclaration,
-): ts.ClassDeclaration => {
+): ts.ClassDeclaration =>
+  ts.factory.createClassDeclaration(
+    node.modifiers?.filter(removeReadonlyModifier),
+    node.name,
+    node.typeParameters?.map(transformTypeParameterDeclaration),
+    node.heritageClauses?.map(transformHeritageClause),
+    node.members.map((mb: ts.ClassElement): ts.ClassElement => {
+      if (ts.isPropertyDeclaration(mb)) {
+        return ts.factory.createPropertyDeclaration(
+          mb.modifiers?.filter(removeReadonlyModifier),
+          mb.name,
+          mb.questionToken,
+          mapOptional(mb.type, transformNode),
+          mb.initializer,
+        );
+      }
+      if (ts.isMethodDeclaration(mb)) {
+        return ts.factory.createMethodDeclaration(
+          mb.modifiers?.filter(removeReadonlyModifier),
+          mb.asteriskToken,
+          mb.name,
+          mb.questionToken,
+          mb.typeParameters?.map(transformTypeParameterDeclaration),
+          mb.parameters.map(transformParameterDeclaration),
+          mapOptional(mb.type, transformNode),
+          mb.body,
+        );
+      }
+      if (ts.isConstructorDeclaration(mb)) {
+        return ts.factory.createConstructorDeclaration(
+          mb.modifiers?.filter(removeReadonlyModifier),
+          mb.parameters.map(transformParameterDeclaration),
+          mb.body,
+        );
+      }
+      if (ts.isGetAccessorDeclaration(mb)) {
+        return transformGetAccessorDeclaration(mb);
+      }
+      if (ts.isSetAccessorDeclaration(mb)) {
+        return transformSetAccessorDeclaration(mb);
+      }
+      if (ts.isIndexSignatureDeclaration(mb)) {
+        return transformIndexSignatureDeclaration(mb);
+      }
+      if (ts.isClassStaticBlockDeclaration(mb)) {
+        return ts.factory.createClassStaticBlockDeclaration(mb.body);
+      }
+      if (ts.isSemicolonClassElement(mb)) {
+        return ts.factory.createSemicolonClassElement();
+      }
+      throw new TypeError(`Unexpected type of node: ${ts.SyntaxKind[mb.kind]}`);
+    }),
+  );
+
+{
   for (const el of node.getDescendants()) {
     if (el.isKind(SyntaxKind.IndexSignature)) {
       el.setIsReadonly(true);
@@ -212,7 +256,7 @@ const transformClassDeclarationNode = (
       parameter.setIsReadonly(true);
     }
   }
-};
+}
 
 const transformTypeReferenceNode = (
   node: ts.TypeReferenceNode,
@@ -474,68 +518,102 @@ const removeRedundantParentheses = (node: TypeNode): TypeNode =>
     ? removeRedundantParentheses(node.getTypeNode())
     : node;
 
+const transformPropertySignature = (
+  node: ts.PropertySignature,
+): ts.PropertySignature =>
+  ts.factory.createPropertySignature(
+    node.modifiers?.filter(removeReadonlyModifier),
+    node.name,
+    node.questionToken,
+    mapOptional(node.type, transformNode),
+  );
+
+const transformIndexSignatureDeclaration = (
+  node: ts.IndexSignatureDeclaration,
+): ts.IndexSignatureDeclaration =>
+  ts.factory.createIndexSignature(
+    node.modifiers?.filter(removeReadonlyModifier),
+    node.parameters.map(transformParameterDeclaration),
+    transformNode(node.type),
+  );
+
+const transformMethodSignature = (
+  node: ts.MethodSignature,
+): ts.MethodSignature =>
+  ts.factory.createMethodSignature(
+    node.modifiers?.filter(removeReadonlyModifier),
+    node.name,
+    node.questionToken,
+    node.typeParameters?.map(transformTypeParameterDeclaration),
+    node.parameters.map(transformParameterDeclaration),
+    mapOptional(node.type, transformNode),
+  );
+
+const transformCallSignatureDeclaration = (
+  node: ts.CallSignatureDeclaration,
+): ts.CallSignatureDeclaration =>
+  ts.factory.createCallSignature(
+    node.typeParameters?.map(transformTypeParameterDeclaration),
+    node.parameters.map(transformParameterDeclaration),
+    mapOptional(node.type, transformNode),
+  );
+
+const transformConstructSignatureDeclaration = (
+  node: ts.ConstructSignatureDeclaration,
+): ts.ConstructSignatureDeclaration =>
+  ts.factory.createConstructSignature(
+    node.typeParameters?.map(transformTypeParameterDeclaration),
+    node.parameters.map(transformParameterDeclaration),
+    mapOptional(node.type, transformNode),
+  );
+
+const transformGetAccessorDeclaration = (
+  node: ts.GetAccessorDeclaration,
+): ts.GetAccessorDeclaration =>
+  ts.factory.createGetAccessorDeclaration(
+    node.modifiers?.filter(removeReadonlyModifier),
+    node.name,
+    node.parameters.map(transformParameterDeclaration),
+    mapOptional(node.type, transformNode),
+    node.body,
+  );
+
+const transformSetAccessorDeclaration = (
+  node: ts.SetAccessorDeclaration,
+): ts.SetAccessorDeclaration =>
+  ts.factory.createSetAccessorDeclaration(
+    node.modifiers?.filter(removeReadonlyModifier),
+    node.name,
+    node.parameters.map(transformParameterDeclaration),
+    node.body,
+  );
+
 const transformMembers = (
   members: ts.NodeArray<ts.TypeElement>,
 ): ts.NodeArray<ts.TypeElement> =>
   ts.factory.createNodeArray(
     members.map((mb) => {
       if (ts.isPropertySignature(mb)) {
-        return ts.factory.createPropertySignature(
-          mb.modifiers?.filter(removeReadonlyModifier),
-          mb.name,
-          mb.questionToken,
-          mapOptional(mb.type, transformNode),
-        );
+        return transformPropertySignature(mb);
       }
       if (ts.isIndexSignatureDeclaration(mb)) {
-        return ts.factory.createIndexSignature(
-          mb.modifiers?.filter(removeReadonlyModifier),
-          mb.parameters.map(transformParameterDeclaration),
-          transformNode(mb.type),
-        );
+        return transformIndexSignatureDeclaration(mb);
       }
       if (ts.isMethodSignature(mb)) {
-        return ts.factory.createMethodSignature(
-          mb.modifiers?.filter(removeReadonlyModifier),
-          mb.name,
-          mb.questionToken,
-          mb.typeParameters?.map(transformTypeParameterDeclaration),
-          mb.parameters.map(transformParameterDeclaration),
-          mapOptional(mb.type, transformNode),
-        );
+        return transformMethodSignature(mb);
       }
       if (ts.isCallSignatureDeclaration(mb)) {
-        return ts.factory.createCallSignature(
-          mb.typeParameters?.map(transformTypeParameterDeclaration),
-          mb.parameters.map(transformParameterDeclaration),
-          mapOptional(mb.type, transformNode),
-        );
+        return transformCallSignatureDeclaration(mb);
       }
       if (ts.isConstructSignatureDeclaration(mb)) {
-        return ts.factory.createConstructSignature(
-          mb.typeParameters?.map(transformTypeParameterDeclaration),
-          mb.parameters.map(transformParameterDeclaration),
-          mapOptional(mb.type, transformNode),
-        );
+        return transformConstructSignatureDeclaration(mb);
       }
       if (ts.isGetAccessorDeclaration(mb)) {
-        return ts.factory.createGetAccessorDeclaration(
-          mb.modifiers?.filter(removeReadonlyModifier),
-          mb.name,
-          mb.parameters.map(transformParameterDeclaration),
-          mapOptional(mb.type, transformNode),
-          mb.body,
-        );
+        return transformGetAccessorDeclaration(mb);
       }
       if (ts.isSetAccessorDeclaration(mb)) {
-        return ts.factory.createSetAccessorDeclaration(
-          mb.modifiers?.filter(removeReadonlyModifier),
-          mb.name,
-          mb.parameters.map(transformParameterDeclaration),
-          mb.body,
-        );
+        return transformSetAccessorDeclaration(mb);
       }
-
       throw new TypeError(`Unexpected type of node: ${ts.SyntaxKind[mb.kind]}`);
     }),
     members.hasTrailingComma,
@@ -561,6 +639,17 @@ const transformParameterDeclaration = (
     p.questionToken,
     mapOptional(p.type, transformNode),
     p.initializer,
+  );
+
+const transformHeritageClause = (hc: ts.HeritageClause): ts.HeritageClause =>
+  ts.factory.createHeritageClause(
+    hc.token,
+    hc.types.map((t) =>
+      ts.factory.createExpressionWithTypeArguments(
+        t.expression,
+        t.typeArguments?.map(transformNode),
+      ),
+    ),
   );
 
 const removeReadonlyModifier = (m: ts.ModifierLike): boolean =>
