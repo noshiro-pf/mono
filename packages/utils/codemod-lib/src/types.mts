@@ -1,3 +1,3 @@
-import { type SourceFile as SourceFile_ } from 'ts-morph';
+import type * as ts from 'typescript';
 
-export type SourceFile = DeepReadonly<SourceFile_>;
+export type SourceFile = DeepReadonly<ts.SourceFile>;

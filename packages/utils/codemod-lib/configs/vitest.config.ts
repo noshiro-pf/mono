@@ -15,5 +15,6 @@ export default defineConfig({
     },
     passWithNoTests: true,
     restoreMocks: true,
+    hideSkippedTests: true,
   },
 });
