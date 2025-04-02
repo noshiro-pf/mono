@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
-import { Arr, noop } from '@noshiro/ts-utils';
+import { Arr, mapOptional, noop } from '@noshiro/ts-utils';
 import { type Node, SyntaxKind, ts, type TypeNode } from 'ts-morph';
 import { type SourceFile } from './types.mjs';
 
@@ -20,7 +20,7 @@ export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
       case ts.SyntaxKind.TypeReference:
       case ts.SyntaxKind.IntersectionType:
       case ts.SyntaxKind.UnionType:
-        return ts.isTypeNode(node) ? transformNode(node) : node;
+        return transformNode(node);
 
       default:
         return node;
@@ -28,8 +28,26 @@ export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
   });
 };
 
+// type TargetNodeTypes =
+//   | ts.ArrayTypeNode
+//   | ts.TupleTypeNode
+//   | ts.TypeLiteralNode
+//   | ts.TypeReferenceNode
+//   | ts.InterfaceDeclaration
+//   | ts.ClassDeclaration
+//   | ts.MappedTypeNode
+//   | ts.IntersectionTypeNode
+//   | ts.UnionTypeNode;
+
+type TransformNodeFn = ((
+  node: ts.InterfaceDeclaration,
+) => ts.InterfaceDeclaration) &
+  ((node: ts.ClassDeclaration) => ts.ClassDeclaration) &
+  ((node: ts.TypeNode) => ts.TypeNode);
+
 /** Convert all nodes to readonly type (recursively) */
-const transformNode = (node: ts.TypeNode): ts.TypeNode => {
+// eslint-disable-next-line total-functions/no-unsafe-type-assertion
+const transformNode: TransformNodeFn = ((node) => {
   if (ts.isArrayTypeNode(node)) {
     return transformArrayTypeNode(node);
   }
@@ -65,10 +83,12 @@ const transformNode = (node: ts.TypeNode): ts.TypeNode => {
   // }
 
   return node;
-};
+}) as TransformNodeFn;
 
 /** Converts an array type `T[]` to a `readonly T[]` */
-const transformArrayTypeNode = (node: ts.ArrayTypeNode): ts.TypeNode => {
+const transformArrayTypeNode = (
+  node: ts.ArrayTypeNode,
+): ts.ArrayTypeNode | ts.TypeOperatorNode => {
   // Recursive processing
   const T = transformNode(node.elementType);
 
@@ -95,7 +115,9 @@ const transformArrayTypeNode = (node: ts.ArrayTypeNode): ts.TypeNode => {
 };
 
 /** Convert a tuple type `[T1, T2, T3]` to a `readonly [T1, T2, T3]` */
-const transformTupleTypeNode = (node: ts.TupleTypeNode): ts.TypeNode => {
+const transformTupleTypeNode = (
+  node: ts.TupleTypeNode,
+): ts.TupleTypeNode | ts.TypeOperatorNode => {
   // Recursive processing
   const Ts = node.elements.map((el) =>
     ts.isNamedTupleMember(el)
@@ -128,56 +150,54 @@ const transformTupleTypeNode = (node: ts.TupleTypeNode): ts.TypeNode => {
 };
 
 // Convert `{ member: X }` to a `Readonly<{ member: X }>`
-const transformTypeLiteralNode = (node: ts.TypeLiteralNode): ts.TypeNode => {
+const transformTypeLiteralNode = (
+  node: ts.TypeLiteralNode,
+): ts.TypeLiteralNode | ts.TypeReferenceNode => {
   // Recursive processing
-  for (const mb of node.getMembers()) {
-    if (mb.isKind(SyntaxKind.PropertySignature)) {
-      mb.setIsReadonly(false);
-      const n = mb.getTypeNode();
-      if (n !== undefined) {
-        transformNode(n);
-      }
-    }
-    if (mb.isKind(SyntaxKind.IndexSignature)) {
-      mb.setIsReadonly(false);
-      const v = mb.getReturnTypeNode();
-      if (v !== undefined) {
-        transformNode(v);
-      }
-    }
-  }
-  {
-    const p = node.getParent();
+  const members: ts.NodeArray<ts.TypeElement> = transformMembers(node.members);
 
+  {
+    const parent = node.parent;
     // Skip if already of type `Readonly<{ member: X }>`
     if (
-      p.isKind(SyntaxKind.TypeReference) &&
-      p.getTypeName().getText() === 'Readonly'
+      ts.isTypeReferenceNode(parent) &&
+      parent.typeName.getText() === 'Readonly'
     ) {
-      return;
+      // skip if already readonly
+      return ts.factory.updateTypeLiteralNode(node, members);
     }
-
-    node.replaceWithText(`Readonly<${node.getText()}>`);
   }
+
+  return ts.factory.createTypeReferenceNode('Readonly', [
+    ts.factory.updateTypeLiteralNode(node, members),
+  ]);
 };
 
 // Making interface members readonly
 const transformInterfaceDeclarationNode = (
   node: ts.InterfaceDeclaration,
-): ts.TypeNode => {
-  for (const member of node.getMembers()) {
-    if (member.isKind(SyntaxKind.PropertySignature)) {
-      member.setIsReadonly(true);
-    }
-    if (member.isKind(SyntaxKind.IndexSignature)) {
-      member.setIsReadonly(true);
-    }
-  }
-};
+): ts.InterfaceDeclaration =>
+  ts.factory.createInterfaceDeclaration(
+    node.modifiers?.filter(removeReadonlyModifier),
+    node.name,
+    node.typeParameters?.map(transformTypeParameterDeclaration),
+    node.heritageClauses?.map((hc) =>
+      ts.factory.createHeritageClause(
+        hc.token,
+        hc.types.map((t) =>
+          ts.factory.createExpressionWithTypeArguments(
+            t.expression,
+            t.typeArguments?.map(transformNode),
+          ),
+        ),
+      ),
+    ),
+    transformMembers(node.members),
+  );
 
 const transformClassDeclarationNode = (
   node: ts.ClassDeclaration,
-): ts.TypeNode => {
+): ts.ClassDeclaration => {
   for (const el of node.getDescendants()) {
     if (el.isKind(SyntaxKind.IndexSignature)) {
       el.setIsReadonly(true);
@@ -327,7 +347,9 @@ const transformTypeReferenceNode = (
  *
  *     Readonly<{ [key in Obj]: V }>;
  */
-const transformMappedTypeNode = (node: ts.MappedTypeNode): ts.TypeNode => {
+const transformMappedTypeNode = (
+  node: ts.MappedTypeNode,
+): ts.MappedTypeNode | ts.TypeReferenceNode => {
   {
     const v = node.getTypeNode();
     if (v !== undefined) {
@@ -381,7 +403,7 @@ const transformMappedTypeNode = (node: ts.MappedTypeNode): ts.TypeNode => {
 /** Readonly<A> & Readonly<B> -> Readonly<A & B> */
 const transformIntersectionTypeNode = (
   node: ts.IntersectionTypeNode,
-): ts.TypeNode => {
+): ts.IntersectionTypeNode | ts.TypeReferenceNode => {
   // Recursive processing
   for (const tn of node.getTypeNodes()) {
     transformNode(tn);
@@ -451,3 +473,95 @@ const removeRedundantParentheses = (node: TypeNode): TypeNode =>
   node.isKind(SyntaxKind.ParenthesizedType)
     ? removeRedundantParentheses(node.getTypeNode())
     : node;
+
+const transformMembers = (
+  members: ts.NodeArray<ts.TypeElement>,
+): ts.NodeArray<ts.TypeElement> =>
+  ts.factory.createNodeArray(
+    members.map((mb) => {
+      if (ts.isPropertySignature(mb)) {
+        return ts.factory.createPropertySignature(
+          mb.modifiers?.filter(removeReadonlyModifier),
+          mb.name,
+          mb.questionToken,
+          mapOptional(mb.type, transformNode),
+        );
+      }
+      if (ts.isIndexSignatureDeclaration(mb)) {
+        return ts.factory.createIndexSignature(
+          mb.modifiers?.filter(removeReadonlyModifier),
+          mb.parameters.map(transformParameterDeclaration),
+          transformNode(mb.type),
+        );
+      }
+      if (ts.isMethodSignature(mb)) {
+        return ts.factory.createMethodSignature(
+          mb.modifiers?.filter(removeReadonlyModifier),
+          mb.name,
+          mb.questionToken,
+          mb.typeParameters?.map(transformTypeParameterDeclaration),
+          mb.parameters.map(transformParameterDeclaration),
+          mapOptional(mb.type, transformNode),
+        );
+      }
+      if (ts.isCallSignatureDeclaration(mb)) {
+        return ts.factory.createCallSignature(
+          mb.typeParameters?.map(transformTypeParameterDeclaration),
+          mb.parameters.map(transformParameterDeclaration),
+          mapOptional(mb.type, transformNode),
+        );
+      }
+      if (ts.isConstructSignatureDeclaration(mb)) {
+        return ts.factory.createConstructSignature(
+          mb.typeParameters?.map(transformTypeParameterDeclaration),
+          mb.parameters.map(transformParameterDeclaration),
+          mapOptional(mb.type, transformNode),
+        );
+      }
+      if (ts.isGetAccessorDeclaration(mb)) {
+        return ts.factory.createGetAccessorDeclaration(
+          mb.modifiers?.filter(removeReadonlyModifier),
+          mb.name,
+          mb.parameters.map(transformParameterDeclaration),
+          mapOptional(mb.type, transformNode),
+          mb.body,
+        );
+      }
+      if (ts.isSetAccessorDeclaration(mb)) {
+        return ts.factory.createSetAccessorDeclaration(
+          mb.modifiers?.filter(removeReadonlyModifier),
+          mb.name,
+          mb.parameters.map(transformParameterDeclaration),
+          mb.body,
+        );
+      }
+
+      throw new TypeError(`Unexpected type of node: ${ts.SyntaxKind[mb.kind]}`);
+    }),
+    members.hasTrailingComma,
+  );
+
+const transformTypeParameterDeclaration = (
+  tp: ts.TypeParameterDeclaration,
+): ts.TypeParameterDeclaration =>
+  ts.factory.createTypeParameterDeclaration(
+    tp.modifiers,
+    tp.name,
+    mapOptional(tp.constraint, transformNode),
+    mapOptional(tp.default, transformNode),
+  );
+
+const transformParameterDeclaration = (
+  p: ts.ParameterDeclaration,
+): ts.ParameterDeclaration =>
+  ts.factory.createParameterDeclaration(
+    p.modifiers?.filter(removeReadonlyModifier),
+    p.dotDotDotToken,
+    p.name,
+    p.questionToken,
+    mapOptional(p.type, transformNode),
+    p.initializer,
+  );
+
+const removeReadonlyModifier = (m: ts.ModifierLike): boolean =>
+  !ts.isReadonlyKeywordOrPlusOrMinusToken(m);
