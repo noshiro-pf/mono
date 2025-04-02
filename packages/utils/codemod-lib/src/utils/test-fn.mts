@@ -1,6 +1,7 @@
 import * as prettier from 'prettier';
 import { Project } from 'ts-morph';
 import { type SourceFile } from '../types.mjs';
+import { wrapSource } from './wrap-transformer.mjs';
 
 export const testFn = async (
   fn: (srcFile: SourceFile) => void,
@@ -14,7 +15,12 @@ export const testFn = async (
   }
 
   const project = new Project();
-  const sourceFile = project.createSourceFile('__tempfile__.ts', source);
+
+  // ファイル先頭のコメント行が消えてしまうのでダミーの `;`行を追加している（prettier.format で削除される）
+  const sourceFile = project.createSourceFile(
+    '__tempfile__.ts',
+    wrapSource(source),
+  );
 
   fn(sourceFile);
 

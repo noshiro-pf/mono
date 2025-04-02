@@ -5,10 +5,13 @@ test('playground', async () => {
   const source = codeFromStringLines(
     //
     '',
+    '[0];',
+    '/* aaa */',
     '// [1]',
     '[1];',
     '',
     '',
+    '/* bbb */',
     '// [2]',
     '[2];',
     '// [3]',
@@ -18,10 +21,13 @@ test('playground', async () => {
   const expected = codeFromStringLines(
     //
     '',
+    '[1];',
+    '/* aaa */',
     '// [1]',
     '[2];',
     '',
     '',
+    '/* bbb */',
     '// [2]',
     '[3];',
     '// [3]',
@@ -32,7 +38,10 @@ test('playground', async () => {
     (sourceFile) =>
       sourceFile.transform((traversal) => {
         const node: ts.Node = traversal.visitChildren();
-
+        // try {
+        //   console.log(`"${node.getFullText()}"`);
+        //   console.log(`"${node.getText()}"`);
+        // } catch {}
         if (ts.isNumericLiteral(node)) {
           const incrementedValue = Number.parseInt(node.text, 10) + 1;
           return traversal.factory.createNumericLiteral(
