@@ -1,6 +1,6 @@
 /* eslint-disable vitest/expect-expect */
 import { canonicalizeToReadonly } from './canonicalize-to-readonly.mjs';
-import { codeFromStringLines, testFn } from './utils/index.mjs';
+import { codeFromStringLines, testFn, wrapSource } from './utils/index.mjs';
 
 describe('canonicalizeToReadonly', () => {
   describe('type literals', () => {
@@ -1226,7 +1226,7 @@ const testCanonicalizeToReadonly = async ({
 }>): Promise<void> => {
   const { expectedFormatted, result } = await testFn(
     canonicalizeToReadonly,
-    source,
+    wrapSource(source),
     expected,
     debug ?? false,
   );
