@@ -1,5 +1,10 @@
-import { ts } from 'ts-morph';
-import { codeFromStringLines, testFn } from './index.mjs';
+import { pipe } from '@noshiro/ts-utils';
+import * as ts from 'typescript';
+import {
+  codeFromStringLines,
+  createTransformerFactory,
+  testPreprocess,
+} from './index.mjs';
 
 test('playground', async () => {
   const source = codeFromStringLines(
@@ -34,23 +39,17 @@ test('playground', async () => {
     '[4];',
   );
 
-  const { expectedFormatted, result } = await testFn(
-    (sourceFile) =>
-      sourceFile.transform((traversal) => {
-        const node: ts.Node = traversal.visitChildren();
-        // try {
-        //   console.log(`"${node.getFullText()}"`);
-        //   console.log(`"${node.getText()}"`);
-        // } catch {}
-        if (ts.isNumericLiteral(node)) {
-          const incrementedValue = Number.parseInt(node.text, 10) + 1;
-          return traversal.factory.createNumericLiteral(
-            incrementedValue.toString(),
-          );
-        }
+  const { expectedFormatted, result } = await testPreprocess(
+    createTransformerFactory((context) => {
+      const visitor: ts.Visitor = (node: ts.Node): ts.VisitResult<ts.Node> =>
+        ts.isNumericLiteral(node)
+          ? pipe(Number.parseInt(node.text, 10) + 1).chain((incrementedValue) =>
+              context.factory.createNumericLiteral(incrementedValue.toString()),
+            ).value
+          : ts.visitEachChild(node, visitor, context);
 
-        return node;
-      }),
+      return visitor;
+    }),
     source,
     expected,
     true,

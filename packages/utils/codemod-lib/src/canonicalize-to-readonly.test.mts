@@ -1,6 +1,10 @@
 /* eslint-disable vitest/expect-expect */
 import { canonicalizeToReadonly } from './canonicalize-to-readonly.mjs';
-import { codeFromStringLines, testFn, wrapSource } from './utils/index.mjs';
+import {
+  codeFromStringLines,
+  testPreprocess,
+  wrapSource,
+} from './utils/index.mjs';
 
 describe('canonicalizeToReadonly', () => {
   describe('type literals', () => {
@@ -16,6 +20,7 @@ describe('canonicalizeToReadonly', () => {
         source: 'function foo(a: { readonly p: string[], q: bigint[] }[]) {}',
         expected:
           'function foo(a: readonly Readonly<{ p: readonly string[], q: readonly bigint[] }>[]) {}',
+        debug: true,
       },
       {
         name: 'in type alias',
@@ -1224,7 +1229,7 @@ const testCanonicalizeToReadonly = async ({
   expected: string;
   debug?: boolean;
 }>): Promise<void> => {
-  const { expectedFormatted, result } = await testFn(
+  const { expectedFormatted, result } = await testPreprocess(
     canonicalizeToReadonly,
     wrapSource(source),
     expected,
