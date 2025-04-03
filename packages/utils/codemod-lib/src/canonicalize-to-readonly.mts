@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
-import { Arr, mapOptional, match, noop } from '@noshiro/ts-utils';
-import { SyntaxKind, ts } from 'ts-morph';
+import { Arr, mapOptional, match } from '@noshiro/ts-utils';
+import { ts } from 'ts-morph';
 import { type SourceFile } from './types.mjs';
 
 export const canonicalizeToReadonly = (sourceFile: SourceFile): void => {
@@ -231,7 +231,7 @@ const transformTypeReferenceNode = (
   if (typeName === 'Array' || typeName === 'ReadonlyArray') {
     if (!Arr.isArrayOfLength1(newTypeArguments)) {
       throw new Error(
-        `Warning: Unexpected number of type arguments "${newTypeArguments.length}" for ${typeName}.`,
+        `Unexpected number of type arguments "${newTypeArguments.length}" for ${typeName}.`,
       );
     }
 
@@ -242,7 +242,7 @@ const transformTypeReferenceNode = (
   if (typeName === 'Set') {
     if (!Arr.isArrayOfLength1(newTypeArguments)) {
       throw new Error(
-        `Warning: Unexpected number of type arguments "${newTypeArguments.length}" for Set.`,
+        `Unexpected number of type arguments "${newTypeArguments.length}" for Set.`,
       );
     }
 
@@ -256,7 +256,7 @@ const transformTypeReferenceNode = (
   if (typeName === 'Map') {
     if (!Arr.isArrayOfLength2(newTypeArguments)) {
       throw new Error(
-        `Warning: Unexpected number of type arguments "${newTypeArguments.length}" for Map.`,
+        `Unexpected number of type arguments "${newTypeArguments.length}" for Map.`,
       );
     }
 
@@ -271,44 +271,34 @@ const transformTypeReferenceNode = (
     {
       if (!Arr.isArrayOfLength1(newTypeArguments)) {
         throw new Error(
-          `Warning: Unexpected number of type arguments "${newTypeArguments.length}" for Readonly.`,
+          `Unexpected number of type arguments "${newTypeArguments.length}" for Readonly.`,
         );
       }
     }
 
     const T = newTypeArguments[0];
 
-    transformNode(removeRedundantParentheses(typeArg[0]));
-
-    const elementTypeNode = removeRedundantParentheses(T);
-
     // Readonly<readonly T[]> -> readonly T[]
     if (
-      elementTypeNode.isKind(SyntaxKind.TypeOperator) &&
-      elementTypeNode.getOperator() === SyntaxKind.ReadonlyKeyword
+      ts.isTypeOperatorNode(T) &&
+      T.operator === ts.SyntaxKind.ReadonlyKeyword
     ) {
-      node.replaceWithText(elementTypeNode.getText());
-      return;
+      return createReadonlyArrayTypeNode(T);
     }
 
-    // Readonly<Readonly<T>> -> Readonly<T'>
-    if (
-      elementTypeNode.isKind(SyntaxKind.TypeReference) &&
-      elementTypeNode.getTypeName().getText() === 'Readonly'
-    ) {
-      const typeArg = elementTypeNode.getTypeArguments();
-      if (!Arr.isArrayOfLength1(typeArg)) {
-        console.warn(
-          `Warning: Unexpected number of type arguments "${typeArg.length}" for Readonly.`,
+    // Readonly<Readonly<T>> -> Readonly<T>
+    if (ts.isTypeReferenceNode(T) && T.typeName.getText() === 'Readonly') {
+      const typeArgs = T.typeArguments ?? [];
+      if (!Arr.isArrayOfLength1(typeArgs)) {
+        throw new Error(
+          `Unexpected number of type arguments "${typeArgs.length}" for Readonly.`,
         );
-        return;
       }
-      node.replaceWithText(`Readonly<${typeArg[0].getText()}>`);
-      return;
+      return createReadonlyTypeNode(typeArgs[0]);
     }
   }
 
-  noop();
+  return ts.factory.createTypeReferenceNode(node.typeName, newTypeArguments);
 };
 
 /**
