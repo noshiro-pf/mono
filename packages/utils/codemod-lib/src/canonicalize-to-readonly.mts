@@ -197,7 +197,7 @@ const transformInterfaceDeclarationNode = (
   context: ts.TransformationContext,
 ): ts.InterfaceDeclaration =>
   context.factory.createInterfaceDeclaration(
-    removeReadonlyFromModifiers(node.modifiers),
+    addReadonlyToModifiers(node.modifiers, context),
     node.name,
     node.typeParameters?.map((n) =>
       transformTypeParameterDeclaration(n, context),
