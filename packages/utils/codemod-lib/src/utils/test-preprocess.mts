@@ -35,9 +35,10 @@ export const testPreprocess = async (
 
   const resultCode = printer.printFile(transformedSourceFile);
 
-  const result = await prettier.format(resultCode.replaceAll('\n', ' '), {
-    parser: 'typescript',
-  });
+  const resultFormatted = await prettier.format(
+    resultCode.replaceAll('\n', ' '),
+    { parser: 'typescript' },
+  );
 
   const expectedFormatted = await prettier.format(
     expected.replaceAll('\n', ' '),
@@ -46,6 +47,6 @@ export const testPreprocess = async (
 
   return {
     expectedFormatted: expectedFormatted.trimEnd(),
-    result: result.trimEnd(),
+    result: resultFormatted.trimEnd(),
   };
 };
