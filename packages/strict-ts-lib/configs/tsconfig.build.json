@@ -1,0 +1,9 @@
+{
+  "extends": "../../../configs/tsconfig/tsconfig.build.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "outDir": "../dist"
+  },
+  "include": ["../src/**/*.mts"],
+  "exclude": ["**/*.test.mts"]
+}
