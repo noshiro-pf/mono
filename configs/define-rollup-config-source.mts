@@ -7,9 +7,11 @@ import { RollupOptions } from 'rollup';
 export const defineRollupConfig = ({
   configDir,
   outDirRelative,
+  variablesToDrop,
 }: Readonly<{
   configDir: string;
   outDirRelative: string;
+  variablesToDrop?: readonly string[];
 }>) =>
   ({
     input: glob.globSync(path.resolve(configDir, '../src/**/*.mts'), {
@@ -26,6 +28,9 @@ export const defineRollupConfig = ({
     plugins: [
       rollupPluginReplace.default({
         'import.meta.vitest': 'undefined',
+        ...Object.fromEntries(
+          variablesToDrop?.map((v) => [v, 'undefined']) ?? [],
+        ),
         preventAssignment: true,
       }),
 

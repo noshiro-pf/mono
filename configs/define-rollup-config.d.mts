@@ -1,9 +1,11 @@
 export declare const defineRollupConfig: ({
   configDir,
   outDirRelative,
+  variablesToDrop,
 }: Readonly<{
   configDir: string;
   outDirRelative: string;
+  variablesToDrop?: readonly string[];
 }>) => {
   readonly input: string[];
   readonly output: {

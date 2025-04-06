@@ -3,7 +3,16 @@
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
-  "main": "index.js",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    "./define-rollup-config": {
+      "import": {
+        "types": "./define-rollup-config.d.mts",
+        "default": "./define-rollup-config.mjs"
+      }
+    }
+  },
   "scripts": {
     "build": "run-s build:clean build:tsc build:rename1 build:rename2 build:fmt",
     "build:clean": "rimraf define-rollup-config.mjs define-rollup-config.d.mts",
