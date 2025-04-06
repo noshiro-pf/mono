@@ -9,8 +9,6 @@ import {
   isReadonlyArrayNode,
   isReadonlyNode,
   isReadonlyTupleNode,
-  isSpreadNamedTupleMemberNode,
-  isSpreadParameterNode,
 } from '../functions/index.mjs';
 import { createTransformerFactory, printNode } from '../utils/index.mjs';
 
@@ -26,7 +24,6 @@ import { createTransformerFactory, printNode } from '../utils/index.mjs';
  * - `ReadonlyArray<T>` to `readonly T[]`
  * - `Readonly<A> & Readonly<B>` to `Readonly<A & B>`
  * - `Readonly<A> | Readonly<B>` to `Readonly<A | B>`
- * - `(...args: readonly T[]) => any` to `(...args: T[]) => any`
  */
 export const normalizeReadonlyTypes: ts.TransformerFactory<ts.SourceFile> =
   createTransformerFactory((context) => {
@@ -159,18 +156,6 @@ const transformTypeReferenceNode = (
     }
 
     const T = newTypeArguments[0];
-
-    const parent = node.parent as ts.Node | undefined;
-
-    if (
-      parent !== undefined &&
-      // `(...args: any) => any` -> `(...args: unknown[]) => any`
-      (isSpreadParameterNode(parent) ||
-        // `[name: E0, ...args: any)]` -> `[name: E0, ...args:
-        isSpreadNamedTupleMemberNode(parent))
-    ) {
-      return context.factory.createArrayTypeNode(T);
-    }
 
     return createReadonlyArrayTypeNode(T, context);
   }
@@ -331,6 +316,14 @@ const transformParenthesizedTypeNode = (
   // remove () if T is TypeOperatorNode
   // e.g. `(readonly A[])` -> `readonly A[]`
   if (ts.isTypeOperatorNode(T)) return T;
+
+  // remove () if T is ArrayTypeNode
+  // e.g. `(A[])` -> `A[]`
+  if (ts.isArrayTypeNode(T)) return T;
+
+  // remove () if T is TupleTypeNode
+  // e.g. `([A])` -> `[A]`
+  if (ts.isTupleTypeNode(T)) return T;
 
   if (isPrimitiveTypeNode(T)) return T;
 
