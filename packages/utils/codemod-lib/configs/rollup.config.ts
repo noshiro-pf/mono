@@ -22,6 +22,7 @@ export default defineConfig({
     // @ts-expect-error ???
     rollupPluginReplace.default({
       'import.meta.vitest': 'undefined',
+      'console.debug': 'undefined',
       preventAssignment: true,
     }),
 
