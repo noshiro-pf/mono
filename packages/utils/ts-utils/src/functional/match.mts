@@ -10,12 +10,15 @@ type IsLiteralTypeImpl<T extends RecordKeyType> = string extends T
       ? false
       : true;
 
+type StrictPropertyCheck<T, ExpectedKeys extends string> =
+  RelaxedExclude<keyof T, ExpectedKeys> extends never ? T : never;
+
 export const strictMatch = <
-  const Case extends RecordKeyType,
+  const Case extends string,
   const R extends Record<Case, unknown>,
 >(
   target: Case,
-  cases: R,
+  cases: StrictPropertyCheck<R, Case>,
 ): R[Case] => cases[target];
 
 export function match<const Case extends RecordKeyType, const V>(

@@ -42,6 +42,21 @@ describe('strictMatch', () => {
 
     expect(res).toBeUndefined();
   });
+
+  test('A case with excess properties', () => {
+    // @ts-expect-error excess properties
+    const res = strictMatch(direction, {
+      E: 2,
+      N: 3,
+      S: 4,
+      W: 5,
+      X: 0,
+    });
+
+    expectType<typeof res, 2 | 3 | 4 | 5>('=');
+
+    expect(res).toBe(3);
+  });
 });
 
 describe('match', () => {
