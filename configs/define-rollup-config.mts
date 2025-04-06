@@ -24,18 +24,15 @@ export const defineRollupConfig = ({
       entryFileNames: '[name].mjs',
     },
     plugins: [
-      // @ts-expect-error ???
       rollupPluginReplace.default({
         'import.meta.vitest': 'undefined',
         preventAssignment: true,
       }),
 
-      // @ts-expect-error ???
       pluginTypescript.default({
         tsconfig: path.resolve(configDir, './tsconfig.build.json'),
       }),
 
-      // @ts-expect-error ???
       rollupPluginReplace.default({
         "import 'vitest'": 'undefined',
         preventAssignment: true,

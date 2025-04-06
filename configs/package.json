@@ -1,0 +1,10 @@
+{
+  "name": "@noshiro/mono-configs",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  }
+}
