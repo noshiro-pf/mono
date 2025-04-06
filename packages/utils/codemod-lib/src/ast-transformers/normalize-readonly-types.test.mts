@@ -3,6 +3,33 @@ import { codeFromStringLines, testPreprocess } from '../utils/index.mjs';
 import { normalizeReadonlyTypes } from './normalize-readonly-types.mjs';
 
 describe('normalizeReadonlyTypes', () => {
+  describe('ReadonlyArray', () => {
+    test.each([
+      {
+        name: 'Local types within function',
+        source: codeFromStringLines(
+          'function foo() {',
+          '  type Foo = ReadonlyArray<string>;',
+          '  type Bar = Array<string>;',
+          '}',
+        ),
+        expected: codeFromStringLines(
+          'function foo() {',
+          '  type Foo = readonly string[];',
+          '  type Bar = string[];',
+          '}',
+        ),
+      },
+      {
+        name: 'Type literal elements with a readonly modifier in an array',
+        source:
+          'type foo = ReadonlyArray<{ readonly type: string, readonly code: string }>;',
+        expected:
+          'type foo = readonly Readonly<{ type: string, code: string }>[];',
+      },
+    ])('$name', testFn);
+  });
+
   describe('Normalize `Readonly` wrappers', () => {
     test.each([
       {

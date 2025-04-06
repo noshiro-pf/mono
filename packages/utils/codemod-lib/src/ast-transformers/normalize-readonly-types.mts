@@ -95,6 +95,8 @@ const transformTypeReferenceNode = (
       );
     }
 
+    const T = newTypeArguments[0];
+
     const parent = node.parent as ts.Node | undefined;
 
     if (
@@ -104,10 +106,12 @@ const transformTypeReferenceNode = (
         // `[name: E0, ...args: any)]` -> `[name: E0, ...args:
         isSpreadNamedTupleMemberNode(parent))
     ) {
-      return context.factory.createArrayTypeNode(newTypeArguments[0]);
+      return context.factory.createArrayTypeNode(T);
     }
 
-    return createReadonlyArrayTypeNode(newTypeArguments[0], context);
+    return typeNameStr === 'Array'
+      ? context.factory.createArrayTypeNode(T)
+      : createReadonlyArrayTypeNode(T, context);
   }
 
   // remove unnecessary `Readonly` wrappers
