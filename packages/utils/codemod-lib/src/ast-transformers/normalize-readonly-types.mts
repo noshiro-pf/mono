@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
-import { Arr, expectType } from '@noshiro/ts-utils';
+import { Arr, expectType, mapOptional, strictMatch } from '@noshiro/ts-utils';
 import * as ts from 'typescript';
 import {
   createReadonlyArrayTypeNode,
@@ -14,6 +14,20 @@ import {
 } from '../functions/index.mjs';
 import { createTransformerFactory, printNode } from '../utils/index.mjs';
 
+/**
+ * Normalize Readonly types.
+ *
+ * - `Readonly<Readonly<T>>` to `Readonly<T>`
+ * - `Readonly<T[]>` to `readonly T[]`
+ * - `Readonly<readonly T[]>` to `readonly T[]`
+ * - `Readonly<[T1, T2, T3]>` to `readonly [T1, T2, T3]`
+ * - `Readonly<readonly [T1, T2, T3]>` to `readonly [T1, T2, T3]`
+ * - `ReadonlyArray<T>` to `readonly T[]`
+ * - `ReadonlyArray<T>` to `readonly T[]`
+ * - `Readonly<A> & Readonly<B>` to `Readonly<A & B>`
+ * - `Readonly<A> | Readonly<B>` to `Readonly<A | B>`
+ * - `(...args: readonly T[]) => any` to `(...args: T[]) => any`
+ */
 export const normalizeReadonlyTypes: ts.TransformerFactory<ts.SourceFile> =
   createTransformerFactory((context) => {
     const visitor: ts.Visitor = (node: ts.Node): ts.VisitResult<ts.Node> =>
@@ -26,15 +40,17 @@ type TransformNodeFn = <N extends ts.Node>(
   node: N,
   visitor: ts.Visitor,
   context: ts.TransformationContext,
-) => N extends ts.TypeReferenceNode
-  ? N | ts.TypeNode
-  : N extends ts.IntersectionTypeNode
-    ? N | ts.TypeReferenceNode
-    : N extends ts.UnionTypeNode
-      ? N | ts.TypeNode
-      : N extends ts.ParenthesizedTypeNode
+) => N extends ts.TypeLiteralNode
+  ? N | ts.TypeReferenceNode
+  : N extends ts.TypeReferenceNode
+    ? N | ts.TypeNode
+    : N extends ts.IntersectionTypeNode
+      ? N | ts.TypeReferenceNode
+      : N extends ts.UnionTypeNode
         ? N | ts.TypeNode
-        : N;
+        : N extends ts.ParenthesizedTypeNode
+          ? N | ts.TypeNode
+          : N;
 
 /** Convert all nodes to readonly type (recursively) */
 // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -44,6 +60,9 @@ const transformNode: TransformNodeFn = ((node, visitor, context) => {
     printNode(node, node.getSourceFile()),
   );
 
+  if (ts.isTypeLiteralNode(node)) {
+    return transformTypeLiteralNode(node, visitor, context);
+  }
   if (ts.isTypeReferenceNode(node)) {
     return transformTypeReferenceNode(node, visitor, context);
   }
@@ -59,6 +78,50 @@ const transformNode: TransformNodeFn = ((node, visitor, context) => {
 
   return ts.visitEachChild(node, visitor, context);
 }) as TransformNodeFn;
+
+// `{ readonly member: V }` -> `Readonly<{ member: V }>`
+const transformTypeLiteralNode = (
+  node: ts.TypeLiteralNode,
+  visitor: ts.Visitor,
+  context: ts.TransformationContext,
+): ts.TypeLiteralNode | ts.TypeReferenceNode => {
+  const allMembersAreReadonly: boolean = node.members
+    .filter(
+      (mb) => ts.isPropertySignature(mb) || ts.isIndexSignatureDeclaration(mb),
+    )
+    .every(
+      (mb) =>
+        mb.modifiers?.some((m) => m.kind === ts.SyntaxKind.ReadonlyKeyword) ??
+        false,
+    );
+
+  const newTypeLiteralNode = context.factory.updateTypeLiteralNode(
+    node,
+    // Recursive processing
+    transformMembers(
+      node.members,
+      allMembersAreReadonly ? 'remove' : 'keep',
+      visitor,
+      context,
+    ),
+  );
+
+  if (!allMembersAreReadonly) return newTypeLiteralNode;
+
+  {
+    const parent = node.parent as ts.Node | undefined;
+
+    // Skip if already of type `Readonly<{ member: V }>`
+    if (parent !== undefined && isReadonlyNode(parent)) {
+      // skip if already readonly
+      // `{ member: V }`
+      return newTypeLiteralNode;
+    }
+  }
+
+  // `Readonly<{ member: V }>`
+  return createReadonlyTypeNode(newTypeLiteralNode, context);
+};
 
 const transformTypeReferenceNode = (
   node: ts.TypeReferenceNode,
@@ -87,8 +150,8 @@ const transformTypeReferenceNode = (
 
   const typeNameStr = node.typeName.text;
 
-  // Array<T> / ReadonlyArray<T> to readonly T[]
-  if (typeNameStr === 'Array' || typeNameStr === 'ReadonlyArray') {
+  // ReadonlyArray<T> to readonly T[]
+  if (typeNameStr === 'ReadonlyArray') {
     if (!Arr.isArrayOfLength1(newTypeArguments)) {
       throw new Error(
         `Unexpected number of type arguments "${newTypeArguments.length}" for ${typeNameStr}.`,
@@ -109,9 +172,7 @@ const transformTypeReferenceNode = (
       return context.factory.createArrayTypeNode(T);
     }
 
-    return typeNameStr === 'Array'
-      ? context.factory.createArrayTypeNode(T)
-      : createReadonlyArrayTypeNode(T, context);
+    return createReadonlyArrayTypeNode(T, context);
   }
 
   // remove unnecessary `Readonly` wrappers
@@ -130,7 +191,7 @@ const transformTypeReferenceNode = (
       return createReadonlyArrayTypeNode(T.elementType, context);
     }
 
-    // T = E[]
+    // T = [E1, E2, E3]
     // Readonly<[E1, E2, E3]> -> readonly [E1, E2, E3]
     if (ts.isTupleTypeNode(T)) {
       return createReadonlyTupleTypeNode(T.elements, context);
@@ -283,3 +344,71 @@ const transformParenthesizedTypeNode = (
 
 const removeParentheses = (node: ts.TypeNode): ts.TypeNode =>
   ts.isParenthesizedTypeNode(node) ? node.type : node;
+
+const transformMembers = (
+  members: ts.NodeArray<ts.TypeElement>,
+  readonly: 'remove' | 'keep',
+  visitor: ts.Visitor,
+  context: ts.TransformationContext,
+): ts.NodeArray<ts.TypeElement> =>
+  context.factory.createNodeArray(
+    members.map((mb) => {
+      console.debug(
+        `transformMembers [${ts.SyntaxKind[mb.kind]}]`,
+        printNode(mb, mb.getSourceFile()),
+      );
+
+      if (ts.isPropertySignature(mb)) {
+        return transformPropertySignature(mb, readonly, visitor, context);
+      }
+      if (ts.isIndexSignatureDeclaration(mb)) {
+        return transformIndexSignatureDeclaration(
+          mb,
+          readonly,
+          visitor,
+          context,
+        );
+      }
+
+      return transformNode(mb, visitor, context);
+    }),
+    members.hasTrailingComma,
+  );
+
+const transformPropertySignature = (
+  node: ts.PropertySignature,
+  readonly: 'remove' | 'keep',
+  visitor: ts.Visitor,
+  context: ts.TransformationContext,
+): ts.PropertySignature =>
+  context.factory.updatePropertySignature(
+    node,
+    strictMatch(readonly, {
+      remove: removeReadonlyFromModifiers(node.modifiers),
+      keep: node.modifiers,
+    }),
+    node.name,
+    node.questionToken,
+    mapOptional(node.type, (t) => transformNode(t, visitor, context)),
+  );
+
+const transformIndexSignatureDeclaration = (
+  node: ts.IndexSignatureDeclaration,
+  readonly: 'remove' | 'keep',
+  visitor: ts.Visitor,
+  context: ts.TransformationContext,
+): ts.IndexSignatureDeclaration =>
+  context.factory.updateIndexSignature(
+    node,
+    strictMatch(readonly, {
+      remove: removeReadonlyFromModifiers(node.modifiers),
+      keep: node.modifiers,
+    }),
+    node.parameters.map((n) => transformNode(n, visitor, context)),
+    transformNode(node.type, visitor, context),
+  );
+
+const removeReadonlyFromModifiers = <M extends ts.ModifierLike>(
+  modifiers: ts.NodeArray<M> | undefined,
+): readonly M[] | undefined =>
+  modifiers?.filter((m) => !ts.isReadonlyKeywordOrPlusOrMinusToken(m));

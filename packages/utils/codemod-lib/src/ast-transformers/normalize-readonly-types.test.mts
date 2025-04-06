@@ -16,7 +16,7 @@ describe('normalizeReadonlyTypes', () => {
         expected: codeFromStringLines(
           'function foo() {',
           '  type Foo = readonly string[];',
-          '  type Bar = string[];',
+          '  type Bar = Array<string>;',
           '}',
         ),
       },
@@ -51,6 +51,11 @@ describe('normalizeReadonlyTypes', () => {
         name: 'Nested Readonly wrapper',
         source: 'type T = Readonly<Readonly<{ x: 3 }>>;',
         expected: 'type T = Readonly<{ x: 3 }>;',
+      },
+      {
+        name: 'Deeply nested Readonly wrapper',
+        source: 'type T = Readonly<Readonly<Readonly<{ x: 2 }>>>;',
+        expected: 'type T = Readonly<{ x: 2 }>;',
       },
       {
         name: 'Deeply nested Readonly wrapper',
