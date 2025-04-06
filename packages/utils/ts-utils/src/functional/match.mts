@@ -10,6 +10,14 @@ type IsLiteralTypeImpl<T extends RecordKeyType> = string extends T
       ? false
       : true;
 
+export const strictMatch = <
+  const Case extends RecordKeyType,
+  const R extends Record<Case, unknown>,
+>(
+  target: Case,
+  cases: R,
+): R[Case] => cases[target];
+
 export function match<const Case extends RecordKeyType, const V>(
   target: Case,
   cases: Record<Case, V>,
