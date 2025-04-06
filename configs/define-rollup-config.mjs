@@ -2,7 +2,6 @@ import * as rollupPluginReplace from '@rollup/plugin-replace';
 import * as pluginTypescript from '@rollup/plugin-typescript';
 import * as glob from 'glob';
 import path from 'node:path';
-
 export const defineRollupConfig = ({ configDir, outDirRelative }) => ({
   input: glob.globSync(path.resolve(configDir, '../src/**/*.mts'), {
     ignore: '**/*.test.mts',
