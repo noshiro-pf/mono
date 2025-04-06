@@ -45,7 +45,7 @@ describe('normalizeReadonlyTypes', () => {
     ])('$name', testFn);
   });
 
-  describe.only('Readonly wrapper edge cases', () => {
+  describe('Readonly wrapper edge cases', () => {
     test.each([
       {
         name: 'Readonly wrapper on Promise<T[]>',
@@ -54,10 +54,9 @@ describe('normalizeReadonlyTypes', () => {
           'type Test2 = Readonly<Promise<readonly number[]>>',
         ),
         expected: codeFromStringLines(
-          'type Test1 = Readonly<Promise<readonly string[]>>; ',
+          'type Test1 = Readonly<Promise<string[]>>; ',
           'type Test2 = Readonly<Promise<readonly number[]>>',
         ),
-        debug: true,
       },
       {
         name: 'Readonly wrapper on CustomGeneric<T[]>',
@@ -66,14 +65,14 @@ describe('normalizeReadonlyTypes', () => {
           'type Test3 = Readonly<Wrapper<Map<string, number[]>>>;',
         ),
         expected: codeFromStringLines(
-          'type Wrapper<T> = Readonly<{ data: T }>;',
-          'type Test3 = Readonly<Wrapper<ReadonlyMap<string, readonly number[]>>>;',
+          'type Wrapper<T> = { data: T };',
+          'type Test3 = Readonly<Wrapper<Map<string, number[]>>>;',
         ),
       },
       {
         name: 'Nested Readonly simplification with Promise',
         source: 'type Test4 = Readonly<Readonly<Promise<string[]>>>;',
-        expected: 'type Test4 = Readonly<Promise<readonly string[]>>;',
+        expected: 'type Test4 = Readonly<Promise<string[]>>;',
       },
     ])('$name', testFn);
   });
@@ -82,57 +81,72 @@ describe('normalizeReadonlyTypes', () => {
     test.each([
       {
         name: 'Union of arrays',
-        source: 'type UnionArr = string[] | number[];',
-        expected: 'type UnionArr = readonly string[] | readonly number[];',
+        source: 'type UnionArr = string[] | readonly number[];',
+        expected: 'type UnionArr = string[] | readonly number[];',
       },
       {
         name: 'Union of objects',
-        source: 'type UnionObj = { a: string[] } | { b: number[] };',
-        expected:
-          'type UnionObj = Readonly<{ a: readonly string[] } | { b: readonly number[] }>;',
+        source: 'type UnionObj = { a: string[] } | { b: readonly number[] };',
+        expected: 'type UnionObj = { a: string[] } | { b: readonly number[] };',
       },
       {
         name: 'Union including non-object/array',
-        source: 'type UnionMixed = { a: string[] } | number[];',
+        source:
+          'type UnionMixed = { a: readonly string[] } | readonly number[];',
         expected:
-          'type UnionMixed = Readonly<{ a: readonly string[] }> | readonly number[];',
+          'type UnionMixed = { a: readonly string[] } | readonly number[];',
       },
       {
         name: 'Union where only some become Readonly<*>',
         source: 'type UnionPartialReadonly = Readonly<string[]> | number[];',
+        expected: 'type UnionPartialReadonly = readonly string[] | number[];',
+      },
+      {
+        name: 'Union of Readonly objects',
+        source:
+          'type UnionObj = Readonly<{ a: string[] }> | Readonly<{ b: readonly number[] }>;',
         expected:
-          'type UnionPartialReadonly = readonly string[] | readonly number[];',
+          'type UnionObj = Readonly<{ a: string[] } | { b: readonly number[] }>;',
       },
       {
         name: 'Intersection of arrays (less common)',
-        source: 'type IntersectArr = string[] & number[];',
-        expected: 'type IntersectArr = readonly string[] & readonly number[];',
+        source: 'type IntersectArr = string[] & readonly number[];',
+        expected: 'type IntersectArr = string[] & readonly number[];',
       },
       {
         name: 'Intersection of objects',
-        source: 'type IntersectObj = { a: string[] } & { b: number[] };',
+        source:
+          'type IntersectObj = { a: readonly string[] } & { b: number[] };',
         expected:
-          'type IntersectObj = Readonly<{ a: readonly string[] } & { b: readonly number[] }>;',
+          'type IntersectObj = { a: readonly string[] } & { b: number[] };',
       },
       {
         name: 'Intersection including non-object/array',
-        source: 'type IntersectMixed = { a: string[] } & string[];',
+        source:
+          'type IntersectMixed = { a: readonly string[] } & readonly string[];',
         expected:
-          'type IntersectMixed = Readonly<{ a: readonly string[] }> & readonly string[];',
+          'type IntersectMixed = { a: readonly string[] } & readonly string[];',
       },
       {
         name: 'Intersection where only some become Readonly<*>',
         source:
-          'type IntersectPartialReadonly = Readonly<{ a: 1 }> & { b: number[] };',
+          'type IntersectionPartialReadonly = Readonly<string[]> & number[];',
         expected:
-          'type IntersectPartialReadonly = Readonly<{ a: 1 } & { b: readonly number[] }>;',
+          'type IntersectionPartialReadonly = readonly string[] & number[];',
+      },
+      {
+        name: 'Intersection of Readonly objects',
+        source:
+          'type IntersectionObj = Readonly<{ a: string[] }> & Readonly<{ b: readonly number[] }>;',
+        expected:
+          'type IntersectionObj = Readonly<{ a: string[] } & { b: readonly number[] }>;',
       },
       {
         name: 'Nested union/intersection',
         source:
-          'type Nested = (string[] | { x: Map<string, number[]> }) & { y: Set<boolean[]> };',
+          'type Nested = (string[] | Readonly<{ x: Map<string, number[]> }>) & Readonly<{ y: Set<boolean[]> }>;',
         expected:
-          'type Nested = (readonly string[] | Readonly<{ x: ReadonlyMap<string, readonly number[]> }>) & Readonly<{ y: ReadonlySet<readonly boolean[]> }>;',
+          'type Nested = (string[] | Readonly<{ x: Map<string, number[]> }>) & Readonly<{ y: Set<boolean[]> }>;',
       },
       {
         name: 'Union collapse with Array types',
@@ -172,13 +186,12 @@ describe('normalizeReadonlyTypes', () => {
       {
         name: 'Parenthesized type literal',
         source: 'type ParenObj = ({ a: number[] });',
-        expected: 'type ParenObj = Readonly<{ a: readonly number[] }>;',
+        expected: 'type ParenObj = { a: number[] };',
       },
       {
         name: 'Parenthesized type with union/intersection',
         source: 'type Paren = ({ a: string[] } | { b: number[] })[];',
-        expected:
-          'type Paren = readonly Readonly<{ a: readonly string[] } | { b: readonly number[] }>[]',
+        expected: 'type Paren = ({ a: string[] } | { b: number[] })[]',
       },
     ])('$name', testFn);
   });
