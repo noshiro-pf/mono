@@ -342,6 +342,11 @@ describe('normalizeReadonlyTypes', () => {
         expected: 'type T = readonly [string, number];',
       },
       {
+        name: 'readonly [T1, ...T2[]] is unchanged',
+        source: 'type T = readonly [string, ...number[]];',
+        expected: 'type T = readonly [string, ...number[]];;',
+      },
+      {
         name: 'ReadonlySet<T> is unchanged',
         source: 'type T = ReadonlySet<number>;',
         expected: 'type T = ReadonlySet<number>;',

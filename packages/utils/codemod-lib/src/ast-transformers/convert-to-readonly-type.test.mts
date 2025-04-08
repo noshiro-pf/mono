@@ -22,99 +22,6 @@ const testFn = ({
 };
 
 describe('convertToReadonlyType', () => {
-  describe('Type literals', () => {
-    test.each([
-      {
-        name: 'In function args',
-        source: 'function foo(a: { p: number[], readonly q: boolean[] }) {}',
-        expected:
-          'function foo(a: Readonly<{ p: readonly number[], q: readonly boolean[] }>) {}',
-      },
-      {
-        name: 'Nested, in function args',
-        source: 'function foo(a: { readonly p: string[], q: bigint[] }[]) {}',
-        expected:
-          'function foo(a: readonly Readonly<{ p: readonly string[], q: readonly bigint[] }>[]) {}',
-      },
-      {
-        name: 'In type alias',
-        source: codeFromStringLines(
-          'type TypeAlias = {',
-          '  a: number[]',
-          '};',
-        ),
-        expected: codeFromStringLines(
-          'type TypeAlias = Readonly<{',
-          '  a: readonly number[]',
-          '}>;',
-        ),
-      },
-      {
-        name: 'Type literals without readonly modifiers',
-        source: codeFromStringLines(
-          'let foo: {',
-          '  a: number,',
-          '  b: ReadonlyArray<string>,',
-          '  c: () => string,',
-          '  d: { readonly [key: string]: string[] },',
-          '  [key: string]: string[],',
-          '  readonly e: {',
-          '    a: number,',
-          '    b: ReadonlyArray<string>,',
-          '    c: () => string,',
-          '    d: { readonly [key: string]: string[] },',
-          '    [key: string]: string[],',
-          '  }',
-          '};',
-        ),
-        expected: codeFromStringLines(
-          'let foo: Readonly<{',
-          '  a: number,',
-          '  b: readonly string[],',
-          '  c: () => string,',
-          '  d: Readonly<{ [key: string]: readonly string[] }>,',
-          '  [key: string]: readonly string[],',
-          '  e: Readonly<{',
-          '    a: number,',
-          '    b: readonly string[],',
-          '    c: () => string,',
-          '    d: Readonly<{ [key: string]: readonly string[] }>,',
-          '    [key: string]: readonly string[],',
-          '  }>',
-          '}>;',
-        ),
-      },
-      {
-        name: 'Type literal elements with a readonly modifier in an array',
-        source:
-          'type foo = ReadonlyArray<{ readonly type: string, readonly code: string }>;',
-        expected:
-          'type foo = readonly Readonly<{ type: string, code: string }>[];',
-      },
-      {
-        name: 'Type literals with readonly on members',
-        source: codeFromStringLines(
-          'let foo: {',
-          '  readonly a: number,',
-          '  readonly b: ReadonlyArray<string>,',
-          '  readonly c: () => string,',
-          '  readonly d: { readonly [key: string]: string[] },',
-          '  readonly [key: string]: string[]',
-          '};',
-        ),
-        expected: codeFromStringLines(
-          'let foo: Readonly<{',
-          '  a: number,',
-          '  b: readonly string[],',
-          '  c: () => string,',
-          '  d: Readonly<{ [key: string]: readonly string[] }>,',
-          '  [key: string]: readonly string[]',
-          '}>;',
-        ),
-      },
-    ])('$name', testFn);
-  });
-
   describe('Arrays', () => {
     test.each([
       {
@@ -177,14 +84,16 @@ describe('convertToReadonlyType', () => {
       {
         name: 'Mutable arrays nested within objects',
         source: codeFromStringLines(
-          'function foo(a: { p: number[] }[], b: Promise<number[][]>) {',
-          '  console.log(a, b);',
-          '}',
+          'function foo(',
+          '    a: { p: number[] }[],',
+          '    b: Promise<number[][]>',
+          ') {}',
         ),
         expected: codeFromStringLines(
-          'function foo(a: readonly Readonly<{ p: readonly number[] }>[], b: Promise<readonly (readonly number[])[]>) {',
-          '  console.log(a, b);',
-          '}',
+          'function foo(',
+          '  a: readonly Readonly<{ p: readonly number[] }>[],',
+          '  b: Promise<readonly (readonly number[])[]>',
+          ') {}',
         ),
       },
       {
@@ -311,6 +220,19 @@ describe('convertToReadonlyType', () => {
         expected: 'type RestTuple = readonly [string, ...number[]];',
       },
       {
+        name: 'Tuple with rest element nested',
+        source: 'type RestTuple = [string, ...[boolean, ...number[]]];',
+        expected:
+          'type RestTuple = readonly [string, ...[boolean, ...number[]]];',
+      },
+      {
+        name: 'Tuple with rest element nested (already readonly)',
+        source:
+          'type RestTuple = readonly [string, ...readonly [boolean, ...readonly number[]]];',
+        expected:
+          'type RestTuple = readonly [string, ...[boolean, ...number[]]];',
+      },
+      {
         name: 'Tuple with optional and rest elements',
         source: 'type OptionalRestTuple = [string?, ...Map<string, number>[]];',
         expected:
@@ -395,6 +317,99 @@ describe('convertToReadonlyType', () => {
           'function foo(a: Map<string, number>, b: Promise<Map<string, number>>) {}',
         expected:
           'function foo(a: ReadonlyMap<string, number>, b: Promise<ReadonlyMap<string, number>>) {}',
+      },
+    ])('$name', testFn);
+  });
+
+  describe('Type literals', () => {
+    test.each([
+      {
+        name: 'In function args',
+        source: 'function foo(a: { p: number[], readonly q: boolean[] }) {}',
+        expected:
+          'function foo(a: Readonly<{ p: readonly number[], q: readonly boolean[] }>) {}',
+      },
+      {
+        name: 'Nested, in function args',
+        source: 'function foo(a: { readonly p: string[], q: bigint[] }[]) {}',
+        expected:
+          'function foo(a: readonly Readonly<{ p: readonly string[], q: readonly bigint[] }>[]) {}',
+      },
+      {
+        name: 'In type alias',
+        source: codeFromStringLines(
+          'type TypeAlias = {',
+          '  a: number[]',
+          '};',
+        ),
+        expected: codeFromStringLines(
+          'type TypeAlias = Readonly<{',
+          '  a: readonly number[]',
+          '}>;',
+        ),
+      },
+      {
+        name: 'Type literals without readonly modifiers',
+        source: codeFromStringLines(
+          'let foo: {',
+          '  a: number,',
+          '  b: ReadonlyArray<string>,',
+          '  c: () => string,',
+          '  d: { readonly [key: string]: string[] },',
+          '  [key: string]: string[],',
+          '  readonly e: {',
+          '    a: number,',
+          '    b: ReadonlyArray<string>,',
+          '    c: () => string,',
+          '    d: { readonly [key: string]: string[] },',
+          '    [key: string]: string[],',
+          '  }',
+          '};',
+        ),
+        expected: codeFromStringLines(
+          'let foo: Readonly<{',
+          '  a: number,',
+          '  b: readonly string[],',
+          '  c: () => string,',
+          '  d: Readonly<{ [key: string]: readonly string[] }>,',
+          '  [key: string]: readonly string[],',
+          '  e: Readonly<{',
+          '    a: number,',
+          '    b: readonly string[],',
+          '    c: () => string,',
+          '    d: Readonly<{ [key: string]: readonly string[] }>,',
+          '    [key: string]: readonly string[],',
+          '  }>',
+          '}>;',
+        ),
+      },
+      {
+        name: 'Type literal elements with a readonly modifier in an array',
+        source:
+          'type foo = ReadonlyArray<{ readonly type: string, readonly code: string }>;',
+        expected:
+          'type foo = readonly Readonly<{ type: string, code: string }>[];',
+      },
+      {
+        name: 'Type literals with readonly on members',
+        source: codeFromStringLines(
+          'let foo: {',
+          '  readonly a: number,',
+          '  readonly b: ReadonlyArray<string>,',
+          '  readonly c: () => string,',
+          '  readonly d: { readonly [key: string]: string[] },',
+          '  readonly [key: string]: string[]',
+          '};',
+        ),
+        expected: codeFromStringLines(
+          'let foo: Readonly<{',
+          '  a: number,',
+          '  b: readonly string[],',
+          '  c: () => string,',
+          '  d: Readonly<{ [key: string]: readonly string[] }>,',
+          '  [key: string]: readonly string[]',
+          '}>;',
+        ),
       },
     ])('$name', testFn);
   });
@@ -951,12 +966,12 @@ describe('convertToReadonlyType', () => {
         {
           name: 'Rest parameter with explicit ReadonlyArray type',
           source: 'function foo(...a: ReadonlyArray<number>) {}',
-          expected: 'function foo(...a: number[]) {}',
+          expected: 'function foo(...a: readonly number[]) {}',
         },
         {
           name: 'Rest parameter with explicit readonly array type',
           source: 'const foo = (...a: readonly number[]) => {}',
-          expected: 'const foo = (...a: number[]) => {}',
+          expected: 'const foo = (...a: readonly number[]) => {}',
         },
         {
           name: 'Unnecessary readonly operator',
