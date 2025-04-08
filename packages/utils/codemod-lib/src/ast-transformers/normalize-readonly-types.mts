@@ -57,11 +57,11 @@ const transformNode: TransformNodeFn = ((node, visitor, context) => {
     printNode(node, node.getSourceFile()),
   );
 
-  if (ts.isTypeLiteralNode(node)) {
-    return transformTypeLiteralNode(node, visitor, context);
-  }
   if (ts.isTypeReferenceNode(node)) {
     return transformTypeReferenceNode(node, visitor, context);
+  }
+  if (ts.isTypeLiteralNode(node)) {
+    return transformTypeLiteralNode(node, visitor, context);
   }
   if (ts.isIntersectionTypeNode(node)) {
     return transformIntersectionTypeNode(node, visitor, context);
@@ -155,9 +155,7 @@ const transformTypeReferenceNode = (
       );
     }
 
-    const T = newTypeArguments[0];
-
-    return createReadonlyArrayTypeNode(T, context);
+    return createReadonlyArrayTypeNode(newTypeArguments[0], context);
   }
 
   // remove unnecessary `Readonly` wrappers

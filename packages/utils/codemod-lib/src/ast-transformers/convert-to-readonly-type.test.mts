@@ -2,6 +2,25 @@
 import { codeFromStringLines, testPreprocess } from '../utils/index.mjs';
 import { convertToReadonlyType } from './convert-to-readonly-type.mjs';
 
+const testFn = ({
+  source,
+  expected,
+  debug,
+}: Readonly<{
+  source: string;
+  expected: string;
+  debug?: boolean;
+}>): void => {
+  const { expectedFormatted, result } = testPreprocess(
+    convertToReadonlyType,
+    source,
+    expected,
+    debug ?? false,
+  );
+
+  expect(result).toBe(expectedFormatted);
+};
+
 describe('convertToReadonlyType', () => {
   describe('Type literals', () => {
     test.each([
@@ -942,7 +961,7 @@ describe('convertToReadonlyType', () => {
         {
           name: 'Unnecessary readonly operator',
           source: 'const foo = (...a: readonly unknown[]) => {}',
-          expected: 'const foo = (...a: unknown[]) => {}',
+          expected: 'const foo = (...a: readonly unknown[]) => {}',
         },
         {
           name: 'Unnecessary readonly operator',
@@ -1720,22 +1739,3 @@ describe('convertToReadonlyType', () => {
   //   test.each([])('$name', testFn);
   // });
 });
-
-const testFn = ({
-  source,
-  expected,
-  debug,
-}: Readonly<{
-  source: string;
-  expected: string;
-  debug?: boolean;
-}>): void => {
-  const { expectedFormatted, result } = testPreprocess(
-    convertToReadonlyType,
-    source,
-    expected,
-    debug ?? false,
-  );
-
-  expect(result).toBe(expectedFormatted);
-};
