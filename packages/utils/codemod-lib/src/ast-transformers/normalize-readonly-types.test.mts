@@ -2,6 +2,25 @@
 import { codeFromStringLines, testPreprocess } from '../utils/index.mjs';
 import { normalizeReadonlyTypes } from './normalize-readonly-types.mjs';
 
+const testFn = ({
+  source,
+  expected,
+  debug,
+}: Readonly<{
+  source: string;
+  expected: string;
+  debug?: boolean;
+}>): void => {
+  const { expectedFormatted, result } = testPreprocess(
+    normalizeReadonlyTypes,
+    source,
+    expected,
+    debug ?? false,
+  );
+
+  expect(result).toBe(expectedFormatted);
+};
+
 describe('normalizeReadonlyTypes', () => {
   describe('ReadonlyArray', () => {
     test.each([
@@ -65,13 +84,13 @@ describe('normalizeReadonlyTypes', () => {
         expected: 'type T = Readonly<{ x: 2 }>;',
       },
       {
-        name: 'Deeply nested Readonly wrapper with array/parens', // 名前修正
+        name: 'Deeply nested Readonly wrapper with array/parens',
         source: 'type T = Readonly<((Readonly<Readonly<(({ x: 4 })[])>>))>;',
         // Readonly<( (Readonly<Readonly<({ x: 4 }[])>>) )>
-        // -> Readonly<Readonly<Readonly<({ x: 4 }[])>>>   (remove ParenthesizedTypeNode)
-        // -> Readonly<Readonly<({ x: 4 }[])>>             (Readonly<Readonly<T>> -> Readonly<T>)
-        // -> Readonly<({ x: 4 }[])>                       (Readonly<Readonly<T>> -> Readonly<T>)
-        // -> readonly { x: 4 }[]                          (Readonly<T[]> -> readonly T[])
+        // -> Readonly<Readonly<Readonly<({ x: 4 }[])>>>  (remove ParenthesizedTypeNode)
+        // -> Readonly<Readonly<({ x: 4 }[])>>            (Readonly<Readonly<T>> -> Readonly<T>)
+        // -> Readonly<({ x: 4 }[])>                      (Readonly<Readonly<T>> -> Readonly<T>)
+        // -> readonly { x: 4 }[]                         (Readonly<T[]> -> readonly T[])
         expected: 'type T = readonly { x: 4 }[];',
       },
       {
@@ -93,30 +112,28 @@ describe('normalizeReadonlyTypes', () => {
     ])('$name', testFn);
   });
 
-  // ここまでチェック済み！！！
-
   describe('Readonly wrapper edge cases', () => {
     test.each([
       {
         name: 'Readonly wrapper on Promise<T[]>',
         source: codeFromStringLines(
-          'type Test1 = Readonly<Promise<string[]>>; ', // Promise<string[]> は正規化対象外
-          'type Test2 = Readonly<Promise<readonly number[]>>', // Promise<readonly number[]> も正規化対象外
+          'type Test1 = Readonly<Promise<string[]>>; ', // Promise<string[]> is not a normalization target
+          'type Test2 = Readonly<Promise<readonly number[]>>', // Promise<readonly number[]> is also not a normalization target
         ),
         expected: codeFromStringLines(
-          'type Test1 = Readonly<Promise<string[]>>; ', // そのまま
-          'type Test2 = Readonly<Promise<readonly number[]>>', // そのまま
+          'type Test1 = Readonly<Promise<string[]>>; ', // As is
+          'type Test2 = Readonly<Promise<readonly number[]>>', // As is
         ),
       },
       {
         name: 'Readonly wrapper on CustomGeneric<T[]>',
         source: codeFromStringLines(
           'type Wrapper<T> = { data: T };',
-          'type Test3 = Readonly<Wrapper<Map<string, number[]>>>;', // Map や Array は対象外
+          'type Test3 = Readonly<Wrapper<Map<string, number[]>>>;', // Map and Array are not targets
         ),
         expected: codeFromStringLines(
           'type Wrapper<T> = { data: T };',
-          'type Test3 = Readonly<Wrapper<Map<string, number[]>>>;', // そのまま
+          'type Test3 = Readonly<Wrapper<Map<string, number[]>>>;', // As is
         ),
       },
       {
@@ -133,66 +150,80 @@ describe('normalizeReadonlyTypes', () => {
       {
         name: 'Union of arrays',
         source: 'type UnionArr = string[] | readonly number[];',
-        expected: 'type UnionArr = string[] | readonly number[];', // 変更なし
+        expected: 'type UnionArr = string[] | readonly number[];', // Unchanged
       },
       {
         name: 'Union of objects',
         source: 'type UnionObj = { a: string[] } | { b: readonly number[] };',
-        expected: 'type UnionObj = { a: string[] } | { b: readonly number[] };', // 変更なし
+        expected: 'type UnionObj = { a: string[] } | { b: readonly number[] };', // Unchanged
       },
       {
         name: 'Union including non-object/array',
         source:
           'type UnionMixed = { a: readonly string[] } | readonly number[];',
         expected:
-          'type UnionMixed = { a: readonly string[] } | readonly number[];', // 変更なし
+          'type UnionMixed = { a: readonly string[] } | readonly number[];', // Unchanged
       },
       {
-        name: 'Union where only one part is normalized', // 名前修正
+        name: 'Union where only one part is normalized',
         source: 'type UnionPartialReadonly = Readonly<string[]> | number[];',
-        expected: 'type UnionPartialReadonly = readonly string[] | number[];', // Readonly<string[]> のみ正規化
+        expected: 'type UnionPartialReadonly = readonly string[] | number[];', // Only Readonly<string[]> is normalized
       },
       {
         name: 'Union of Readonly objects',
         source:
           'type UnionObj = Readonly<{ a: string[] }> | Readonly<{ b: readonly number[] }>;',
         // Readonly<A> | Readonly<B> -> Readonly<A | B> (Collapse)
-        // 内側の型は正規化されない (string[], readonly number[])
+        // Inner types are not normalized (string[], readonly number[])
         expected:
           'type UnionObj = Readonly<{ a: string[] } | { b: readonly number[] }>;',
       },
       {
+        name: 'Union of generic and non-generic readonly objects',
+        source:
+          'type IntersectMixed = { readonly a: string[] } & Readonly<{ b: readonly number[] }>;',
+        expected:
+          'type IntersectMixed = Readonly<{ a: string[] } & { b: readonly number[] }>;',
+      },
+      {
+        name: 'Intersection of readonly object and non-readonly object',
+        source:
+          'type IntersectMixed = { readonly a: string[] } & { b: readonly number[] };',
+        expected:
+          'type IntersectMixed = Readonly<{ a: string[] }> & { b: readonly number[] };',
+      },
+      {
         name: 'Intersection of arrays (less common)',
         source: 'type IntersectArr = string[] & readonly number[];',
-        expected: 'type IntersectArr = string[] & readonly number[];', // 変更なし
+        expected: 'type IntersectArr = string[] & readonly number[];', // Unchanged
       },
       {
         name: 'Intersection of objects',
         source:
           'type IntersectObj = { a: readonly string[] } & { b: number[] };',
         expected:
-          'type IntersectObj = { a: readonly string[] } & { b: number[] };', // 変更なし
+          'type IntersectObj = { a: readonly string[] } & { b: number[] };', // Unchanged
       },
       {
         name: 'Intersection including non-object/array',
         source:
           'type IntersectMixed = { a: readonly string[] } & readonly string[];',
         expected:
-          'type IntersectMixed = { a: readonly string[] } & readonly string[];', // 変更なし
+          'type IntersectMixed = { a: readonly string[] } & readonly string[];', // Unchanged
       },
       {
-        name: 'Intersection where only one part is normalized', // 名前修正
+        name: 'Intersection where only one part is normalized',
         source:
           'type IntersectionPartialReadonly = Readonly<string[]> & number[];',
         expected:
-          'type IntersectionPartialReadonly = readonly string[] & number[];', // Readonly<string[]> のみ正規化
+          'type IntersectionPartialReadonly = readonly string[] & number[];', // Only Readonly<string[]> is normalized
       },
       {
         name: 'Intersection of Readonly objects',
         source:
           'type IntersectionObj = Readonly<{ a: string[] }> & Readonly<{ b: readonly number[] }>;',
         // Readonly<A> & Readonly<B> -> Readonly<A & B> (Collapse)
-        // 内側の型は正規化されない (string[], readonly number[])
+        // Inner types are not normalized (string[], readonly number[])
         expected:
           'type IntersectionObj = Readonly<{ a: string[] } & { b: readonly number[] }>;',
       },
@@ -200,29 +231,29 @@ describe('normalizeReadonlyTypes', () => {
         name: 'Nested union/intersection',
         source:
           'type Nested = (string[] | Readonly<{ x: Map<string, number[]> }>) & Readonly<{ y: Set<boolean[]> }>;',
-        // 各要素は正規化対象外なので、全体として変更なし
+        // Each part is not a normalization target, so unchanged
         expected:
           'type Nested = (string[] | Readonly<{ x: Map<string, number[]> }>) & Readonly<{ y: Set<boolean[]> }>;',
       },
       {
-        name: 'Union collapse with Array types', // ★ 期待値を実装に合わせて修正
+        name: 'Union collapse with Array types',
         source: 'type UArr = Readonly<string[]> | Readonly<number[]>;',
         // Readonly<A[]> | Readonly<B[]> -> Readonly<A[] | B[]>
-        expected: 'type UArr = Readonly<string[] | number[]>;',
+        expected: 'type UArr = readonly string[] | readonly number[];',
       },
       {
-        name: 'Intersection collapse with Array types', // ★ 期待値を実装に合わせて修正
+        name: 'Intersection collapse with Array types',
         source: 'type IArr = Readonly<string[]> & Readonly<number[]>;',
         // Readonly<A[]> & Readonly<B[]> -> Readonly<A[] & B[]>
-        expected: 'type IArr = Readonly<string[] & number[]>;',
+        expected: 'type IArr = readonly string[] & readonly number[];',
       },
       {
-        name: 'Union of readonly arrays in Readonly', // OK (実装の Unwrapping Logic 確認)
+        name: 'Union of readonly arrays in Readonly',
         source: 'type UArr = Readonly<readonly string[] | readonly number[]>;',
         expected: 'type UArr = readonly string[] | readonly number[];',
       },
       {
-        name: 'Intersection of readonly arrays in Readonly', // OK (実装の Unwrapping Logic 確認)
+        name: 'Intersection of readonly arrays in Readonly',
         source: 'type IArr = Readonly<readonly string[] & readonly number[]>;',
         expected: 'type IArr = readonly string[] & readonly number[];',
       },
@@ -249,57 +280,56 @@ describe('normalizeReadonlyTypes', () => {
       {
         name: 'Parenthesized type with union/intersection',
         source: 'type Paren = ({ a: string[] } | { b: number[] })[];',
-        expected: 'type Paren = ({ a: string[] } | { b: number[] })[]', // 変更なし
+        expected: 'type Paren = ({ a: string[] } | { b: number[] })[]', // Unchanged
       },
       {
-        name: 'Nested Parentheses Removal', // 追加
-        source: 'type NestedParen = ((readonly T[]));', // Assuming T exists
+        name: 'Nested Parentheses Removal',
+        source: 'type NestedParen = ((readonly number[]));',
         // ((readonly T[])) -> (readonly T[]) -> readonly T[]
-        expected: 'type NestedParen = readonly T[];',
+        expected: 'type NestedParen = readonly number[];',
       },
       {
-        name: 'Parentheses around primitive', // 追加
+        name: 'Parentheses around primitive',
         source: 'type ParenPrim = (number);',
-        expected: 'type ParenPrim = number;', // 括弧除去
+        expected: 'type ParenPrim = number;', // Parentheses removed
       },
       {
-        name: 'Parentheses around Readonly<T>', // 追加
-        source: 'type ParenReadonly = (Readonly<{a: number}>);',
-        // (Readonly<T>) -> Readonly<T> (TypeReference なので括弧除去)
-        expected: 'type ParenReadonly = Readonly<{a: number}>;',
+        name: 'Parentheses around Readonly<T>',
+        source: 'type ParenReadonly = (Readonly<{ a: number }>);',
+        // (Readonly<T>) -> Readonly<T> (Parentheses removed because inner type is TypeReference)
+        expected: 'type ParenReadonly = Readonly<{ a: number }>;',
       },
     ])('$name', testFn);
   });
 
   describe('Type literals', () => {
     test.each([
-      // ... (既存のテストケース) ...
       {
-        name: 'Type literal with one readonly member (unchanged)', // 追加
+        name: 'Type literal with one readonly member (unchanged)',
         source: 'type T = { readonly a: number; b: string };',
-        expected: 'type T = { readonly a: number; b: string };', // 正規化のみなので変更なし
+        expected: 'type T = { readonly a: number; b: string };', // Unchanged (normalization only)
       },
       {
-        name: 'Type literal with no readonly members (unchanged)', // 追加
+        name: 'Type literal with no readonly members (unchanged)',
         source: 'type T = { a: number; b: string };',
-        expected: 'type T = { a: number; b: string };', // 正規化のみなので変更なし
+        expected: 'type T = { a: number; b: string };', // Unchanged (normalization only)
       },
       {
-        name: 'Type literal with all members readonly (normalized)', // 追加
+        name: 'Type literal with all members readonly (normalized)',
         source: 'type T = { readonly a: number; readonly b: string };',
-        // All members readonly -> Readonly<{...}> に正規化 (内部の readonly は削除)
+        // All members readonly -> Normalized to Readonly<{...}> (inner readonly removed)
         expected: 'type T = Readonly<{ a: number; b: string }>;',
       },
       {
-        name: 'Readonly type literal (canonical form, unchanged)', // 追加
+        name: 'Readonly type literal (canonical form, unchanged)',
         source: 'type T = Readonly<{ a: number; b: string }>;',
-        expected: 'type T = Readonly<{ a: number; b: string }>;', // 既に正規形なので変更なし
+        expected: 'type T = Readonly<{ a: number; b: string }>;', // Unchanged (already canonical form)
       },
     ])('$name', testFn);
   });
 
   describe('Canonical readonly forms are stable', () => {
-    // 追加: 正規形が変更されないことの確認
+    // Verify canonical forms are stable
     test.each([
       {
         name: 'readonly T[] is unchanged',
@@ -327,7 +357,7 @@ describe('normalizeReadonlyTypes', () => {
         expected: 'type T = Readonly<{ a: string }>;',
       },
       {
-        name: 'Interface with readonly member is unchanged', // Interface 自体は変換対象外のはず
+        name: 'Interface with readonly member is unchanged', // Interface itself should not be transformed
         source: 'interface I { readonly prop: number; }',
         expected: 'interface I { readonly prop: number; }',
       },
@@ -347,7 +377,7 @@ describe('normalizeReadonlyTypes', () => {
   });
 
   describe('Non-readonly forms are unchanged', () => {
-    // 追加: readonly でない型が変更されないことの確認
+    // Verify non-readonly forms are unchanged
     test.each([
       {
         name: 'T[] is unchanged',
@@ -380,12 +410,12 @@ describe('normalizeReadonlyTypes', () => {
         expected: 'type T = Array<string>;',
       },
       {
-        name: 'Interface members without readonly are unchanged', // Interface 自体は変換対象外のはず
+        name: 'Interface members without readonly are unchanged', // Interface itself should not be transformed
         source: 'interface I { prop: number[]; }',
         expected: 'interface I { prop: number[]; }',
       },
       {
-        name: 'Class members without readonly are unchanged', // Class 自体は変換対象外のはず
+        name: 'Class members without readonly are unchanged', // Class itself should not be transformed
         source: 'class C { prop: number[]; }',
         expected: 'class C { prop: number[]; }',
       },
@@ -396,22 +426,3 @@ describe('normalizeReadonlyTypes', () => {
   //   test.each([])('$name', testFn);
   // });
 });
-
-const testFn = ({
-  source,
-  expected,
-  debug,
-}: Readonly<{
-  source: string;
-  expected: string;
-  debug?: boolean;
-}>): void => {
-  const { expectedFormatted, result } = testPreprocess(
-    normalizeReadonlyTypes,
-    source,
-    expected,
-    debug ?? false,
-  );
-
-  expect(result).toBe(expectedFormatted);
-};
