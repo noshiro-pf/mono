@@ -44,6 +44,15 @@ type TransformNodeFn = <N extends ts.Node>(
   node: N,
   visitor: ts.Visitor,
   context: ts.TransformationContext,
+  /**
+   * `readonly [string, ...number[]]` の内側の `number[]` からは readonly
+   * を省いた形に統一するために、 変換の再帰呼び出し時にその階層をmutable にするかどうかを制御する。
+   *
+   * - `"deep"` : 再帰的に readonly を適用する `DeepReadonly` などの型ユーティリティの内部のノードであることを表す。
+   * - `"shallow"` : 通常の `Readonly` や `readonly` などの直下のノードであることを表す。
+   * - `"none"` : それ以外
+   */
+  // readonlyContext: 'deep' | 'shallow' | 'none',
 ) => N extends ts.ArrayTypeNode | ts.TupleTypeNode
   ? N | ts.TypeOperatorNode
   : N extends ts.TypeLiteralNode
@@ -68,6 +77,7 @@ const transformNode: TransformNodeFn = ((node, visitor, context) => {
   console.debug(
     `[${ts.SyntaxKind[node.kind]}]:\t`,
     printNode(node, node.getSourceFile()),
+    // `readonlyContext: ${readonlyContext}`,
   );
 
   if (ts.isTypeReferenceNode(node)) {
@@ -90,6 +100,9 @@ const transformNode: TransformNodeFn = ((node, visitor, context) => {
   }
   if (ts.isTupleTypeNode(node)) {
     return transformTupleTypeNode(node, visitor, context);
+  }
+  if (ts.isRestTypeNode(node)) {
+    return transformRestTypeNode(node, visitor, context);
   }
   if (ts.isTypeOperatorNode(node)) {
     return transformTypeOperatorNode(node, visitor, context);
@@ -119,15 +132,14 @@ const transformArrayTypeNode = (
   {
     const parent = node.parent as ts.Node | undefined;
 
-    if (parent !== undefined) {
-      if (
-        ts.isTypeOperatorNode(parent) &&
-        parent.operator === ts.SyntaxKind.ReadonlyKeyword
-      ) {
-        // skip if already readonly
-        // `E[]`
-        return context.factory.createArrayTypeNode(E);
-      }
+    if (
+      parent !== undefined &&
+      ts.isTypeOperatorNode(parent) &&
+      parent.operator === ts.SyntaxKind.ReadonlyKeyword
+    ) {
+      // skip if already readonly
+      // `E[]`
+      return context.factory.createArrayTypeNode(E);
     }
   }
 
@@ -160,15 +172,14 @@ const transformTupleTypeNode = (
   {
     const parent = node.parent as ts.Node | undefined;
 
-    if (parent !== undefined) {
-      if (
-        ts.isTypeOperatorNode(parent) &&
-        parent.operator === ts.SyntaxKind.ReadonlyKeyword
-      ) {
-        // skip if already readonly
-        // `[E1, E2, E3]`
-        return context.factory.createTupleTypeNode(Es);
-      }
+    if (
+      parent !== undefined &&
+      ts.isTypeOperatorNode(parent) &&
+      parent.operator === ts.SyntaxKind.ReadonlyKeyword
+    ) {
+      // skip if already readonly
+      // `[E1, E2, E3]`
+      return context.factory.createTupleTypeNode(Es);
     }
   }
 
@@ -177,6 +188,22 @@ const transformTupleTypeNode = (
     ts.SyntaxKind.ReadonlyKeyword,
     context.factory.updateTupleTypeNode(node, Es),
   );
+};
+
+// `...readonly E[]` -> `...E[]`
+const transformRestTypeNode = (
+  node: ts.RestTypeNode,
+  visitor: ts.Visitor,
+  context: ts.TransformationContext,
+): ts.RestTypeNode => {
+  // Recursive processing
+  const T = transformNode(node.type, visitor, context);
+
+  if (isReadonlyArrayNode(T) || isReadonlyTupleNode(T)) {
+    return context.factory.updateRestTypeNode(node, T.type);
+  }
+
+  return context.factory.updateRestTypeNode(node, T);
 };
 
 // `{ member: V }` -> `Readonly<{ member: V }>`

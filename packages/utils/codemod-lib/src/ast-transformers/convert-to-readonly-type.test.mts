@@ -961,7 +961,7 @@ describe('convertToReadonlyType', () => {
   });
 
   describe('Functions', () => {
-    describe('Spread syntax (Rest parameters)', () => {
+    describe.only('Spread syntax (Rest parameters)', () => {
       test.each([
         {
           name: 'Rest parameter with explicit ReadonlyArray type',

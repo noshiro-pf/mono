@@ -63,6 +63,9 @@ const transformNode: TransformNodeFn = ((node, visitor, context) => {
   if (ts.isTypeLiteralNode(node)) {
     return transformTypeLiteralNode(node, visitor, context);
   }
+  if (ts.isRestTypeNode(node)) {
+    return transformRestTypeNode(node, visitor, context);
+  }
   if (ts.isIntersectionTypeNode(node)) {
     return transformIntersectionTypeNode(node, visitor, context);
   }
@@ -224,6 +227,22 @@ const transformTypeReferenceNode = (
     node.typeName,
     newTypeArguments,
   );
+};
+
+// `...readonly E[]` -> `...E[]`
+const transformRestTypeNode = (
+  node: ts.RestTypeNode,
+  visitor: ts.Visitor,
+  context: ts.TransformationContext,
+): ts.RestTypeNode => {
+  // Recursive processing
+  const T = transformNode(node.type, visitor, context);
+
+  if (isReadonlyArrayNode(T) || isReadonlyTupleNode(T)) {
+    return context.factory.updateRestTypeNode(node, T.type);
+  }
+
+  return context.factory.updateRestTypeNode(node, T);
 };
 
 /** `Readonly<A> & Readonly<B>` -> `Readonly<A & B>` */
