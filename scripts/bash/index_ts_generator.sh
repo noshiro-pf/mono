@@ -6,7 +6,7 @@ SCRIPT_DIR=$(cd $(dirname "$0") || exit; pwd)
 
 # configs
 ADD_SUB_DIRECTORY_EXPORT_IN_INDEX_TS="true"
-TS_FILENAME_REGEX="^[a-zA-Z0-9_\-]+.[mc]?tsx?$"
+TS_FILENAME_REGEX="^[a-zA-Z0-9_\.\-]+.[mc]?tsx?$"
 
 # args
 target_directory=$1
@@ -95,7 +95,7 @@ for directory in $(find . -mindepth "${min_recursion_depth}" -maxdepth "${max_re
 
             # only files that match a regular expression "[a-zA-Z0-9_]+.ts"
             if [ "${filename}" != "index${ext}" ]; then
-                if [[ ${filename} =~ ${TS_FILENAME_REGEX} ]]; then
+                if [[ "${filename}" =~ ${TS_FILENAME_REGEX} ]] && ! echo "$filename" | grep -q '\.test\.'; then
                     # add line "export * from 'filename'"
                     if [ "${extension}" = "mts" ]; then
                         result+="export * from './${filename_without_ext}.mjs';"

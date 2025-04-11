@@ -1,0 +1,250 @@
+import * as ts from 'typescript';
+
+/**
+ * Checks if a given TypeScript node represents a primitive type.
+ *
+ * @param node - The TypeScript node to check.
+ * @returns True if the node represents a primitive type, false otherwise.
+ */
+
+/**
+ * 指定されたノードがプリミティブ型を表す型ノードかどうかを判定します。 (any, unknown, never を含むかは要件に応じて調整してください)
+ *
+ * @param node チェックするノード
+ * @returns プリミティブ型ノードであれば true、そうでなければ false
+ */
+export const isPrimitiveTypeNode = (node: ts.Node): boolean => {
+  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+  switch (node.kind) {
+    case ts.SyntaxKind.StringKeyword:
+    case ts.SyntaxKind.NumberKeyword:
+    case ts.SyntaxKind.BooleanKeyword:
+    case ts.SyntaxKind.BigIntKeyword:
+    case ts.SyntaxKind.SymbolKeyword:
+    case ts.SyntaxKind.UndefinedKeyword:
+      return true;
+
+    case ts.SyntaxKind.VoidKeyword:
+    case ts.SyntaxKind.AnyKeyword:
+    case ts.SyntaxKind.UnknownKeyword:
+    case ts.SyntaxKind.NeverKeyword:
+      return true;
+
+    // null, "aaa", 1.23, 456n
+    case ts.SyntaxKind.LiteralType:
+      return true;
+
+    default:
+      return false;
+  }
+};
+
+if (import.meta.vitest !== undefined) {
+  describe('isPrimitiveTypeNode', () => {
+    describe('positive cases', () => {
+      test.each([
+        {
+          name: 'string',
+          node: ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+        },
+        {
+          name: 'number',
+          node: ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+        },
+
+        {
+          name: 'boolean',
+          node: ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+        },
+        {
+          name: 'bigint',
+          node: ts.factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword),
+        },
+        {
+          name: 'symbol',
+          node: ts.factory.createKeywordTypeNode(ts.SyntaxKind.SymbolKeyword),
+        },
+        {
+          name: 'undefined',
+          node: ts.factory.createKeywordTypeNode(
+            ts.SyntaxKind.UndefinedKeyword,
+          ),
+        },
+        {
+          name: 'null',
+          node: ts.factory.createLiteralTypeNode(ts.factory.createNull()),
+        },
+        {
+          name: 'void',
+          node: ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
+        },
+        {
+          name: 'any',
+          node: ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+        },
+        {
+          name: 'unknown',
+          node: ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
+        },
+        {
+          name: 'never',
+          node: ts.factory.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword),
+        },
+
+        {
+          name: 'string literal ("hello")',
+          node: ts.factory.createLiteralTypeNode(
+            ts.factory.createStringLiteral('hello'),
+          ),
+        },
+        {
+          name: 'number literal (123)',
+          node: ts.factory.createLiteralTypeNode(
+            ts.factory.createNumericLiteral('123'),
+          ),
+        },
+        {
+          name: 'bigint literal (123n)',
+          node: ts.factory.createLiteralTypeNode(
+            ts.factory.createBigIntLiteral('123n'),
+          ),
+        },
+        {
+          name: 'boolean literal (true)',
+          node: ts.factory.createLiteralTypeNode(ts.factory.createTrue()),
+        },
+        {
+          name: 'boolean literal (false)',
+          node: ts.factory.createLiteralTypeNode(ts.factory.createFalse()),
+        },
+      ])('$name', ({ node }) => {
+        expect(isPrimitiveTypeNode(node)).toBe(true);
+      });
+    });
+
+    describe('negative cases', () => {
+      test.each([
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createTypeReferenceNode(
+            ts.factory.createIdentifier('Date'),
+          ),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createArrayTypeNode(
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+          ),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createTupleTypeNode([]),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createTypeLiteralNode([]),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createTypeOperatorNode(
+            ts.SyntaxKind.ReadonlyKeyword,
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+          ),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createUnionTypeNode([]),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createIntersectionTypeNode([]),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createMappedTypeNode(
+            undefined,
+            ts.factory.createTypeParameterDeclaration(
+              undefined,
+              'K',
+              undefined,
+              undefined,
+            ),
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+          ),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createParenthesizedType(
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+          ),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createConditionalTypeNode(
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+          ),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createIndexedAccessTypeNode(
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+          ),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createTypeQueryNode(
+            ts.factory.createIdentifier('foo'),
+          ),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createTypePredicateNode(
+            undefined,
+            ts.factory.createIdentifier('foo'),
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+          ),
+        },
+        { name: 'Non-primitive types', node: ts.factory.createThisTypeNode() },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createTemplateLiteralType(
+            ts.factory.createTemplateHead(''),
+            [],
+          ),
+        },
+        {
+          name: 'Non-primitive types',
+          node: ts.factory.createInferTypeNode(
+            ts.factory.createTypeParameterDeclaration(
+              undefined,
+              'T',
+              undefined,
+              undefined,
+            ),
+          ),
+        },
+
+        { name: 'Not a TypeNode', node: ts.factory.createIdentifier('foo') },
+        {
+          name: 'Not a TypeNode',
+          node: ts.factory.createVariableStatement(
+            undefined,
+            ts.factory.createVariableDeclarationList(
+              [ts.factory.createVariableDeclaration('foo')],
+              ts.NodeFlags.Let,
+            ),
+          ),
+        },
+      ])('$name', ({ node }) => {
+        expect(isPrimitiveTypeNode(node)).toBe(false);
+      });
+    });
+  });
+}

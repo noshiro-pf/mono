@@ -1,0 +1,120 @@
+@@ -1,19 +1,5 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
+ /// <reference no-default-lib="true"/>
++/// <reference types="@noshiro/ts-type-utils" />
+ 
+ /////////////////////////////
+ /// Worker Iterable APIs
+@@ -26,21 +12,21 @@ interface AbortSignal {
+ 
+ interface CSSNumericArray {
+   [Symbol.iterator](): ArrayIterator<CSSNumericValue>;
+-  entries(): ArrayIterator<[number, CSSNumericValue]>;
++  entries(): ArrayIterator<readonly [number, CSSNumericValue]>;
+   keys(): ArrayIterator<number>;
+   values(): ArrayIterator<CSSNumericValue>;
+ }
+ 
+ interface CSSTransformValue {
+   [Symbol.iterator](): ArrayIterator<CSSTransformComponent>;
+-  entries(): ArrayIterator<[number, CSSTransformComponent]>;
++  entries(): ArrayIterator<readonly [number, CSSTransformComponent]>;
+   keys(): ArrayIterator<number>;
+   values(): ArrayIterator<CSSTransformComponent>;
+ }
+ 
+ interface CSSUnparsedValue {
+   [Symbol.iterator](): ArrayIterator<CSSUnparsedSegment>;
+-  entries(): ArrayIterator<[number, CSSUnparsedSegment]>;
++  entries(): ArrayIterator<readonly [number, CSSUnparsedSegment]>;
+   keys(): ArrayIterator<number>;
+   values(): ArrayIterator<CSSUnparsedSegment>;
+ }
+@@ -82,9 +68,9 @@ interface FormDataIterator<T>
+ }
+ 
+ interface FormData {
+-  [Symbol.iterator](): FormDataIterator<[string, FormDataEntryValue]>;
++  [Symbol.iterator](): FormDataIterator<readonly [string, FormDataEntryValue]>;
+   /** Returns an array of key, value pairs for every entry in the list. */
+-  entries(): FormDataIterator<[string, FormDataEntryValue]>;
++  entries(): FormDataIterator<readonly [string, FormDataEntryValue]>;
+   /** Returns a list of keys in the list. */
+   keys(): FormDataIterator<string>;
+   /** Returns a list of values in the list. */
+@@ -97,9 +83,9 @@ interface HeadersIterator<T>
+ }
+ 
+ interface Headers {
+-  [Symbol.iterator](): HeadersIterator<[string, string]>;
++  [Symbol.iterator](): HeadersIterator<readonly [string, string]>;
+   /** Returns an iterator allowing to go through all key/value pairs contained in this object. */
+-  entries(): HeadersIterator<[string, string]>;
++  entries(): HeadersIterator<readonly [string, string]>;
+   /** Returns an iterator allowing to go through all keys of the key/value pairs contained in this object. */
+   keys(): HeadersIterator<string>;
+   /** Returns an iterator allowing to go through all values of the key/value pairs contained in this object. */
+@@ -134,13 +120,13 @@ interface IDBObjectStore {
+   ): IDBIndex;
+ }
+ 
+-interface MessageEvent<T = any> {
++interface MessageEvent<T = unknown> {
+   /** @deprecated */
+   initMessageEvent(
+     type: string,
+     bubbles?: boolean,
+     cancelable?: boolean,
+-    data?: any,
++    data?: unknown,
+     origin?: string,
+     lastEventId?: string,
+     source?: MessageEventSource | null,
+@@ -155,10 +141,10 @@ interface StylePropertyMapReadOnlyIterator<T>
+ 
+ interface StylePropertyMapReadOnly {
+   [Symbol.iterator](): StylePropertyMapReadOnlyIterator<
+-    [string, Iterable<CSSStyleValue>]
++    readonly [string, Iterable<CSSStyleValue>]
+   >;
+   entries(): StylePropertyMapReadOnlyIterator<
+-    [string, Iterable<CSSStyleValue>]
++    readonly [string, Iterable<CSSStyleValue>]
+   >;
+   keys(): StylePropertyMapReadOnlyIterator<string>;
+   values(): StylePropertyMapReadOnlyIterator<Iterable<CSSStyleValue>>;
+@@ -256,9 +242,9 @@ interface URLSearchParamsIterator<T>
+ }
+ 
+ interface URLSearchParams {
+-  [Symbol.iterator](): URLSearchParamsIterator<[string, string]>;
++  [Symbol.iterator](): URLSearchParamsIterator<readonly [string, string]>;
+   /** Returns an array of key, value pairs for every entry in the search params. */
+-  entries(): URLSearchParamsIterator<[string, string]>;
++  entries(): URLSearchParamsIterator<readonly [string, string]>;
+   /** Returns a list of keys in the search params. */
+   keys(): URLSearchParamsIterator<string>;
+   /** Returns a list of values in the search params. */
+@@ -344,7 +330,7 @@ interface WebGL2RenderingContextBase {
+     program: WebGLProgram,
+     uniformIndices: Iterable<GLuint>,
+     pname: GLenum,
+-  ): any;
++  ): unknown;
+   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getUniformIndices) */
+   getUniformIndices(
+     program: WebGLProgram,
