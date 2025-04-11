@@ -1,3 +1,4 @@
+export * from './bp-button-overflow-hidden';
 export * from './description';
 export * from './form-label';
 export * from './icon';
