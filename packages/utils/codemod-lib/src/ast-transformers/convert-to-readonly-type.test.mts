@@ -1,6 +1,7 @@
 /* eslint-disable vitest/expect-expect */
 import { codeFromStringLines, testPreprocess } from '../utils/index.mjs';
 import { convertToReadonlyType } from './convert-to-readonly-type.mjs';
+import { toUnionAndIntersectionTestCase } from './test-utils.mjs';
 
 const testFn = ({
   source,
@@ -317,99 +318,6 @@ describe('convertToReadonlyType', () => {
           'function foo(a: Map<string, number>, b: Promise<Map<string, number>>) {}',
         expected:
           'function foo(a: ReadonlyMap<string, number>, b: Promise<ReadonlyMap<string, number>>) {}',
-      },
-    ])('$name', testFn);
-  });
-
-  describe('Type literals', () => {
-    test.each([
-      {
-        name: 'In function args',
-        source: 'function foo(a: { p: number[], readonly q: boolean[] }) {}',
-        expected:
-          'function foo(a: Readonly<{ p: readonly number[], q: readonly boolean[] }>) {}',
-      },
-      {
-        name: 'Nested, in function args',
-        source: 'function foo(a: { readonly p: string[], q: bigint[] }[]) {}',
-        expected:
-          'function foo(a: readonly Readonly<{ p: readonly string[], q: readonly bigint[] }>[]) {}',
-      },
-      {
-        name: 'In type alias',
-        source: codeFromStringLines(
-          'type TypeAlias = {',
-          '  a: number[]',
-          '};',
-        ),
-        expected: codeFromStringLines(
-          'type TypeAlias = Readonly<{',
-          '  a: readonly number[]',
-          '}>;',
-        ),
-      },
-      {
-        name: 'Type literals without readonly modifiers',
-        source: codeFromStringLines(
-          'let foo: {',
-          '  a: number,',
-          '  b: ReadonlyArray<string>,',
-          '  c: () => string,',
-          '  d: { readonly [key: string]: string[] },',
-          '  [key: string]: string[],',
-          '  readonly e: {',
-          '    a: number,',
-          '    b: ReadonlyArray<string>,',
-          '    c: () => string,',
-          '    d: { readonly [key: string]: string[] },',
-          '    [key: string]: string[],',
-          '  }',
-          '};',
-        ),
-        expected: codeFromStringLines(
-          'let foo: Readonly<{',
-          '  a: number,',
-          '  b: readonly string[],',
-          '  c: () => string,',
-          '  d: Readonly<{ [key: string]: readonly string[] }>,',
-          '  [key: string]: readonly string[],',
-          '  e: Readonly<{',
-          '    a: number,',
-          '    b: readonly string[],',
-          '    c: () => string,',
-          '    d: Readonly<{ [key: string]: readonly string[] }>,',
-          '    [key: string]: readonly string[],',
-          '  }>',
-          '}>;',
-        ),
-      },
-      {
-        name: 'Type literal elements with a readonly modifier in an array',
-        source:
-          'type foo = ReadonlyArray<{ readonly type: string, readonly code: string }>;',
-        expected:
-          'type foo = readonly Readonly<{ type: string, code: string }>[];',
-      },
-      {
-        name: 'Type literals with readonly on members',
-        source: codeFromStringLines(
-          'let foo: {',
-          '  readonly a: number,',
-          '  readonly b: ReadonlyArray<string>,',
-          '  readonly c: () => string,',
-          '  readonly d: { readonly [key: string]: string[] },',
-          '  readonly [key: string]: string[]',
-          '};',
-        ),
-        expected: codeFromStringLines(
-          'let foo: Readonly<{',
-          '  a: number,',
-          '  b: readonly string[],',
-          '  c: () => string,',
-          '  d: Readonly<{ [key: string]: readonly string[] }>,',
-          '  [key: string]: readonly string[]',
-          '}>;',
-        ),
       },
     ])('$name', testFn);
   });
@@ -961,7 +869,7 @@ describe('convertToReadonlyType', () => {
   });
 
   describe('Functions', () => {
-    describe.only('Spread syntax (Rest parameters)', () => {
+    describe('Spread syntax (Rest parameters)', () => {
       test.each([
         {
           name: 'Rest parameter with explicit ReadonlyArray type',
@@ -974,19 +882,14 @@ describe('convertToReadonlyType', () => {
           expected: 'const foo = (...a: readonly number[]) => {}',
         },
         {
-          name: 'Unnecessary readonly operator',
-          source: 'const foo = (...a: readonly unknown[]) => {}',
+          name: 'Rest parameter with mutable array type',
+          source: 'const foo = (...a: unknown[]) => {}',
           expected: 'const foo = (...a: readonly unknown[]) => {}',
         },
         {
-          name: 'Unnecessary readonly operator',
-          source: 'const foo = (...a: unknown[]) => {}',
-          expected: 'const foo = (...a: unknown[]) => {}',
-        },
-        {
-          name: 'Unnecessary readonly operator',
+          name: 'Rest parameter with Readonly',
           source: 'const foo = (...a: Readonly<unknown[]>) => {}',
-          expected: 'const foo = (...a: unknown[]) => {}',
+          expected: 'const foo = (...a: readonly unknown[]) => {}',
         },
       ])('$name', testFn);
     });
@@ -999,17 +902,17 @@ describe('convertToReadonlyType', () => {
             'declare function f1(...numbers: ReadonlyArray<number>): Array<number>',
             'declare function f2(...numbers: readonly number[]): number[]',
             'declare function f3(...numbers: ReadonlyArray<number>): Promise<Array<number>>',
-            'declare function f4(...numbers: ReadonlyArray<number>): Promise<number[]>',
-            'declare function f5(...numbers: ReadonlyArray<number>): Promise<Foo<Array<number>>>',
-            'declare function f6(...numbers: ReadonlyArray<number>): Promise<Foo<number[]>>',
+            'declare function f4(...numbers: number[]): Promise<number[]>',
+            'declare function f5(...numbers: Array<number>): Promise<Foo<Array<number>>>',
+            'declare function f6(...numbers: Readonly<number[]>): Promise<Foo<number[]>>',
           ),
           expected: codeFromStringLines(
-            'declare function f1(...numbers: number[]): readonly number[]',
-            'declare function f2(...numbers: number[]): readonly number[]',
-            'declare function f3(...numbers: number[]): Promise<readonly number[]>',
-            'declare function f4(...numbers: number[]): Promise<readonly number[]>',
-            'declare function f5(...numbers: number[]): Promise<Foo<readonly number[]>>',
-            'declare function f6(...numbers: number[]): Promise<Foo<readonly number[]>>',
+            'declare function f1(...numbers: readonly number[]): readonly number[]',
+            'declare function f2(...numbers: readonly number[]): readonly number[]',
+            'declare function f3(...numbers: readonly number[]): Promise<readonly number[]>',
+            'declare function f4(...numbers: readonly number[]): Promise<readonly number[]>',
+            'declare function f5(...numbers: readonly number[]): Promise<Foo<readonly number[]>>',
+            'declare function f6(...numbers: readonly number[]): Promise<Foo<readonly number[]>>',
           ),
         },
         {
@@ -1019,8 +922,8 @@ describe('convertToReadonlyType', () => {
             'const bar = (...numbers: readonly number[]): number[] => {}',
           ),
           expected: codeFromStringLines(
-            'const foo = (...numbers: number[]): readonly number[] => {}',
-            'const bar = (...numbers: number[]): readonly number[] => {}',
+            'const foo = (...numbers: readonly number[]): readonly number[] => {}',
+            'const bar = (...numbers: readonly number[]): readonly number[] => {}',
           ),
         },
         {
@@ -1030,15 +933,15 @@ describe('convertToReadonlyType', () => {
             '  foo(...numbers: ReadonlyArray<number>): Array<number> {}',
             '}',
             'class Bar {',
-            '  foo(...numbers: readonly number[]): number[] {}',
+            '  foo(...numbers: number[]): number[] {}',
             '}',
           ),
           expected: codeFromStringLines(
             'class Foo {',
-            '  foo(...numbers: number[]): readonly number[] {}',
+            '  foo(...numbers: readonly number[]): readonly number[] {}',
             '}',
             'class Bar {',
-            '  foo(...numbers: number[]): readonly number[] {}',
+            '  foo(...numbers: readonly number[]): readonly number[] {}',
             '}',
           ),
         },
@@ -1047,14 +950,14 @@ describe('convertToReadonlyType', () => {
           source:
             'declare function foo(...numbers: ReadonlyArray<number>): { readonly a: Array<number> } & { readonly b: string[] }',
           expected:
-            'declare function foo(...numbers: number[]): Readonly<{ a: readonly number[] } & { b: readonly string[] }>',
+            'declare function foo(...numbers: readonly number[]): Readonly<{ a: readonly number[] } & { b: readonly string[] }>',
         },
         {
           name: 'Mutable return types (union)',
           source:
             'declare function foo(...numbers: ReadonlyArray<number>): { readonly a: Array<number> } | { readonly b: string[] }',
           expected:
-            'declare function foo(...numbers: number[]): Readonly<{ a: readonly number[] } | { b: readonly string[] }>',
+            'declare function foo(...numbers: readonly number[]): Readonly<{ a: readonly number[] } | { b: readonly string[] }>',
         },
         {
           name: 'Mutable return types (wrapped in another type)',
@@ -1065,8 +968,8 @@ describe('convertToReadonlyType', () => {
           ),
           expected: codeFromStringLines(
             'type Foo<T> = Readonly<{ x: T; }>;',
-            'declare function func1(...numbers: number[]): Promise<Foo<readonly number[]>>',
-            'declare function func2(...numbers: number[]): Promise<Foo<readonly number[]>>',
+            'declare function func1(...numbers: readonly number[]): Promise<Foo<readonly number[]>>',
+            'declare function func2(...numbers: readonly number[]): Promise<Foo<readonly number[]>>',
           ),
         },
         {
@@ -1277,38 +1180,57 @@ describe('convertToReadonlyType', () => {
       {
         name: 'Array type wrapped with `Readonly`',
         source: 'type T = Readonly<1[]>;',
-        expected: 'type T = readonly 1[];',
+        expected: 'type T = readonly 1[];', // Readonly<T[]> -> readonly T[]
       },
       {
         name: 'Readonly array type wrapped with `Readonly`',
         source: 'type T = Readonly<readonly 2[]>;',
-        expected: 'type T = readonly 2[];',
+        expected: 'type T = readonly 2[];', // Readonly<readonly T[]> -> readonly T[]
+      },
+      {
+        name: 'Tuple type wrapped with `Readonly`',
+        source: 'type T = Readonly<[1, 2]>;',
+        expected: 'type T = readonly [1, 2];', // Readonly<[T]> -> readonly [T]
       },
       {
         name: 'Readonly tuple type wrapped with `Readonly`',
         source: 'type T = Readonly<readonly [1, 2, 3]>;',
-        expected: 'type T = readonly [1, 2, 3];',
+        expected: 'type T = readonly [1, 2, 3];', // Readonly<readonly [T]> -> readonly [T]
       },
       {
         name: 'Nested Readonly wrapper',
         source: 'type T = Readonly<Readonly<{ x: 3 }>>;',
-        expected: 'type T = Readonly<{ x: 3 }>;',
+        expected: 'type T = Readonly<{ x: 3 }>;', // Readonly<Readonly<T>> -> Readonly<T>
       },
       {
         name: 'Deeply nested Readonly wrapper',
+        source: 'type T = Readonly<Readonly<Readonly<{ x: 2 }>>>;',
+        expected: 'type T = Readonly<{ x: 2 }>;',
+      },
+      {
+        name: 'Deeply nested Readonly wrapper with array/parens',
         source: 'type T = Readonly<((Readonly<Readonly<(({ x: 4 })[])>>))>;',
+        // Readonly<( (Readonly<Readonly<({ x: 4 }[])>>) )>
+        // -> Readonly<Readonly<Readonly<({ x: 4 }[])>>>  (remove ParenthesizedTypeNode)
+        // -> Readonly<Readonly<({ x: 4 }[])>>            (Readonly<Readonly<T>> -> Readonly<T>)
+        // -> Readonly<({ x: 4 }[])>                      (Readonly<Readonly<T>> -> Readonly<T>)
+        // -> readonly { x: 4 }[]                         (Readonly<T[]> -> readonly T[])
         expected: 'type T = readonly Readonly<{ x: 4 }>[];',
       },
       {
         name: 'Intersection within readonly array',
         source:
           'type T = readonly (Readonly<{ x: 1 }> & Readonly<{ y: 2 }>)[];',
+        // readonly (Readonly<A> & Readonly<B>)[]
+        // -> readonly Readonly<A & B>[] (Inner Intersection Collapse)
         expected: 'type T = readonly Readonly<{ x: 1 } & { y: 2 }>[];',
       },
       {
         name: 'Union within readonly array',
         source:
           'type T = readonly (Readonly<{ x: 1 }> | Readonly<{ y: 2 }>)[];',
+        // readonly (Readonly<A> | Readonly<B>)[]
+        // -> readonly Readonly<A | B>[] (Inner Union Collapse)
         expected: 'type T = readonly Readonly<{ x: 1 } | { y: 2 }>[];',
       },
     ])('$name', testFn);
@@ -1331,16 +1253,17 @@ describe('convertToReadonlyType', () => {
         name: 'Readonly wrapper on CustomGeneric<T[]>',
         source: codeFromStringLines(
           'type Wrapper<T> = { data: T };',
-          'type Test3 = Readonly<Wrapper<Map<string, number[]>>>;',
+          'type Test3 = Readonly<Wrapper<Map<string, number[]>>>;', // Map and Array are not targets
         ),
         expected: codeFromStringLines(
           'type Wrapper<T> = Readonly<{ data: T }>;',
-          'type Test3 = Readonly<Wrapper<ReadonlyMap<string, readonly number[]>>>;',
+          'type Test3 = Readonly<Wrapper<ReadonlyMap<string, readonly number[]>>>;', // As is
         ),
       },
       {
         name: 'Nested Readonly simplification with Promise',
         source: 'type Test4 = Readonly<Readonly<Promise<string[]>>>;',
+        // Readonly<Readonly<T>> -> Readonly<T>
         expected: 'type Test4 = Readonly<Promise<readonly string[]>>;',
       },
     ])('$name', testFn);
@@ -1412,79 +1335,314 @@ describe('convertToReadonlyType', () => {
 
   describe('Union and intersection types', () => {
     test.each([
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} of arrays`,
+        testCase: (op) => ({
+          source: `type Arr =  string[] ${op} readonly number[];`,
+          expected: `type Arr = readonly string[] ${op} readonly number[];`,
+        }),
+      }),
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} of objects`,
+        testCase: (op) => ({
+          source: `type Obj = { a: string[] } ${op} { b: readonly number[] };`,
+          expected: `type Obj = Readonly<{ a: readonly string[] } ${op} { b: readonly number[] }>;`,
+        }),
+      }),
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} including non-object/array`,
+        testCase: (op) => ({
+          source: `type Obj = { a: readonly string[] } ${op} readonly number[];`,
+          expected: `type Obj = Readonly<{ a: readonly string[] }> ${op} readonly number[];`,
+        }),
+      }),
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} where only one part is normalized`,
+        testCase: (op) => ({
+          source: `type PartialReadonlyType = Readonly<string[]> ${op} number[];`,
+          expected: `type PartialReadonlyType = readonly string[] ${op} readonly number[];`,
+        }),
+      }),
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} of Readonly objects`,
+        testCase: (op) => ({
+          source: `type Obj = Readonly<{ a: string[] }> ${op} Readonly<{ b: readonly number[] }>;`,
+          // Readonly<A> | Readonly<B> -> Readonly<A | B> (Collapse)
+          // Inner types are not normalized (string[], readonly number[])
+          expected: `type Obj = Readonly<{ a: readonly string[] } ${op} { b: readonly number[] }>;`,
+        }),
+      }),
+
       {
-        name: 'Union of arrays',
-        source: 'type UnionArr = string[] | number[];',
-        expected: 'type UnionArr = readonly string[] | readonly number[];',
-      },
-      {
-        name: 'Union of objects',
-        source: 'type UnionObj = { a: string[] } | { b: number[] };',
-        expected:
-          'type UnionObj = Readonly<{ a: readonly string[] } | { b: readonly number[] }>;',
-      },
-      {
-        name: 'Union including non-object/array',
-        source: 'type UnionMixed = { a: string[] } | number[];',
-        expected:
-          'type UnionMixed = Readonly<{ a: readonly string[] }> | readonly number[];',
-      },
-      {
-        name: 'Union where only some become Readonly<*>',
-        source: 'type UnionPartialReadonly = Readonly<string[]> | number[];',
-        expected:
-          'type UnionPartialReadonly = readonly string[] | readonly number[];',
-      },
-      {
-        name: 'Intersection of arrays (less common)',
-        source: 'type IntersectArr = string[] & number[];',
-        expected: 'type IntersectArr = readonly string[] & readonly number[];',
-      },
-      {
-        name: 'Intersection of objects',
-        source: 'type IntersectObj = { a: string[] } & { b: number[] };',
-        expected:
-          'type IntersectObj = Readonly<{ a: readonly string[] } & { b: readonly number[] }>;',
-      },
-      {
-        name: 'Intersection including non-object/array',
-        source: 'type IntersectMixed = { a: string[] } & string[];',
-        expected:
-          'type IntersectMixed = Readonly<{ a: readonly string[] }> & readonly string[];',
-      },
-      {
-        name: 'Intersection where only some become Readonly<*>',
+        name: 'Union of generic and non-generic readonly objects',
         source:
-          'type IntersectPartialReadonly = Readonly<{ a: 1 }> & { b: number[] };',
+          'type IntersectMixed = { readonly a: string[] } & Readonly<{ b: readonly number[] }>;',
         expected:
-          'type IntersectPartialReadonly = Readonly<{ a: 1 } & { b: readonly number[] }>;',
+          'type IntersectMixed = Readonly<{ a: readonly string[] } & { b: readonly number[] }>;',
+      },
+      {
+        name: 'Intersection of readonly object and non-readonly object',
+        source:
+          'type IntersectMixed = { readonly a: string[] } & { b: readonly number[] };',
+        expected:
+          'type IntersectMixed = Readonly<{ a: readonly string[] } & { b: readonly number[] }>;',
       },
       {
         name: 'Nested union/intersection',
         source:
           'type Nested = (string[] | { x: Map<string, number[]> }) & { y: Set<boolean[]> };',
+        // Each part is not a normalization target, so unchanged
         expected:
           'type Nested = (readonly string[] | Readonly<{ x: ReadonlyMap<string, readonly number[]> }>) & Readonly<{ y: ReadonlySet<readonly boolean[]> }>;',
       },
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} where only some become Readonly<*>`,
+        testCase: (op) => ({
+          source: `type PartialReadonly = Readonly<string[]> ${op} number[];`,
+          expected: `type PartialReadonly = readonly string[] ${op} readonly number[];`,
+        }),
+      }),
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} collapse with Array types`,
+        testCase: (op) => ({
+          source: `type Arr = Readonly<string[]> ${op} Readonly<number[]>;`,
+          // Readonly<A[]> | Readonly<B[]> -> readonly A[] | readonly B[]
+          // Readonly<A[]> & Readonly<B[]> -> readonly A[] & readonly B[]
+          expected: `type Arr = readonly string[] ${op} readonly number[];`,
+        }),
+      }),
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} of readonly arrays in Readonly`,
+        testCase: (op) => ({
+          source: `type Arr = Readonly<readonly string[] ${op} readonly number[]>;`,
+          expected: `type Arr = readonly string[] ${op} readonly number[];`,
+        }),
+      }),
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} of primitives`,
+        testCase: (op) => ({
+          source: `type Arr = Readonly<number ${op} boolean ${op} string>;`,
+          expected: `type Arr = number ${op} boolean ${op} string;`,
+        }),
+      }),
+
+      ...[
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<Readonly<{ x: string }> ${op} readonly number[]>;`,
+          expected: `type Mixed = readonly number[] ${op} Readonly<{ x: string }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string } ${op} readonly number[]>;`,
+          expected: `type Mixed = readonly number[] ${op} Readonly<{ x: string }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string }> ${op} Readonly<number[]>;`,
+          expected: `type Mixed = Readonly<{ x: string }> ${op} readonly number[];`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string } ${op} Readonly<number[]>>;`,
+          expected: `type Mixed = readonly number[] ${op} Readonly<{ x: string }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string }> ${op} readonly number[];`,
+          expected: `type Mixed = Readonly<{ x: string }> ${op} readonly number[];`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string } ${op} readonly number[] ${op} { y: number } ${op} readonly string[]>;`,
+          expected: `type Mixed = readonly number[] ${op} readonly string[] ${op} Readonly<{ x: string } ${op} { y: number }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string } ${op} readonly number[] ${op} { y: number } ${op} readonly string[]>;`,
+          expected: `type Mixed = readonly number[] ${op} readonly string[] ${op} Readonly<{ x: string } ${op} { y: number }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string } ${op} number[] ${op} Readonly<{ y: number }> ${op} readonly string[]>;`,
+          expected: `type Mixed = readonly number[] ${op} readonly string[] ${op} Readonly<{ x: string } ${op} { y: number }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<unknown ${op} { x: string } ${op} number[] ${op} Readonly<{ y: number }> ${op} readonly string[]>;`,
+          expected: `type Mixed = unknown ${op} readonly number[] ${op} readonly string[] ${op} Readonly<{ x: string } ${op} { y: number }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Primitive = Readonly<number ${op} boolean ${op} string>;`,
+          expected: `type Primitive = number ${op} boolean ${op} string;`,
+        }),
+      ].flatMap((t, i) =>
+        toUnionAndIntersectionTestCase({
+          title: (op) => `${op} of mixed types ${i}`,
+          testCase: t,
+        }),
+      ),
+    ])('$name', testFn);
+  });
+
+  describe('Parenthesized types', () => {
+    test.each([
       {
-        name: 'Union collapse with Array types',
-        source: 'type UArr = Readonly<string[]> | Readonly<number[]>;',
-        expected: 'type UArr = readonly string[] | readonly number[];',
+        name: 'Parenthesized readonly array',
+        source: 'type ParenReadonlyArr = (readonly string[]);',
+        expected: 'type ParenReadonlyArr = readonly string[];',
       },
       {
-        name: 'Intersection collapse with Array types',
-        source: 'type IArr = Readonly<string[]> & Readonly<number[]>;',
-        expected: 'type IArr = readonly string[] & readonly number[];',
+        name: 'Parenthesized nested readonly array',
+        source: 'type ParenNestedReadonlyArr = readonly (readonly string[])[];',
+        expected:
+          'type ParenNestedReadonlyArr = readonly (readonly string[])[];',
       },
       {
-        name: 'Union of readonly arrays in Readonly',
-        source: 'type UArr = Readonly<readonly string[] | readonly number[]>;',
-        expected: 'type UArr = readonly string[] | readonly number[];',
+        name: 'Parenthesized readonly tuple',
+        source: 'type ParenReadonlyTup = (readonly [string, number]);',
+        expected: 'type ParenReadonlyTup = readonly [string, number];',
       },
       {
-        name: 'Intersection of readonly arrays in Readonly',
-        source: 'type UArr = Readonly<readonly string[] & readonly number[]>;',
-        expected: 'type UArr = readonly string[] & readonly number[];',
+        name: 'Parenthesized type literal',
+        source: 'type ParenObj = ({ a: number[] });',
+        expected: 'type ParenObj = Readonly<{ a: readonly number[] }>;',
+      },
+      {
+        name: 'Parenthesized type with union/intersection',
+        source: 'type Paren = ({ a: string[] } | { b: number[] })[];',
+        expected:
+          'type Paren = readonly Readonly<{ a: readonly string[] } | { b: readonly number[] }>[]',
+      },
+      {
+        name: 'Nested Parentheses Removal',
+        source: 'type NestedParen = ((readonly number[]));',
+        // ((readonly T[])) -> (readonly T[]) -> readonly T[]
+        expected: 'type NestedParen = readonly number[];',
+      },
+      {
+        name: 'Parentheses around primitive',
+        source: 'type ParenPrim = (number);',
+        expected: 'type ParenPrim = number;', // Parentheses removed
+      },
+      {
+        name: 'Parentheses around Readonly<T>',
+        source: 'type ParenReadonly = (Readonly<{ a: number }>);',
+        // (Readonly<T>) -> Readonly<T> (Parentheses removed because inner type is TypeReference)
+        expected: 'type ParenReadonly = Readonly<{ a: number }>;',
+      },
+    ])('$name', testFn);
+  });
+
+  describe('Type literals', () => {
+    test.each([
+      {
+        name: 'Type literal with one readonly member (unchanged)',
+        source: 'type T = { readonly a: number; b: string };',
+        expected: 'type T = Readonly<{ a: number; b: string }>;',
+      },
+      {
+        name: 'Type literal with no readonly members',
+        source: 'type T = { a: number; b: string };',
+        expected: 'type T = Readonly<{ a: number; b: string }>;',
+      },
+      {
+        name: 'Type literal with all members readonly (normalized)',
+        source: 'type T = { readonly a: number; readonly b: string };',
+        // All members readonly -> Normalized to Readonly<{...}> (inner readonly removed)
+        expected: 'type T = Readonly<{ a: number; b: string }>;',
+      },
+      {
+        name: 'Readonly type literal (canonical form, unchanged)',
+        source: 'type T = Readonly<{ a: number; b: string }>;',
+        expected: 'type T = Readonly<{ a: number; b: string }>;', // Unchanged (already canonical form)
+      },
+      {
+        name: 'In function args',
+        source: 'function foo(a: { p: number[], readonly q: boolean[] }) {}',
+        expected:
+          'function foo(a: Readonly<{ p: readonly number[], q: readonly boolean[] }>) {}',
+      },
+      {
+        name: 'Nested, in function args',
+        source: 'function foo(a: { readonly p: string[], q: bigint[] }[]) {}',
+        expected:
+          'function foo(a: readonly Readonly<{ p: readonly string[], q: readonly bigint[] }>[]) {}',
+      },
+      {
+        name: 'In type alias',
+        source: codeFromStringLines(
+          'type TypeAlias = {',
+          '  a: number[]',
+          '};',
+        ),
+        expected: codeFromStringLines(
+          'type TypeAlias = Readonly<{',
+          '  a: readonly number[]',
+          '}>;',
+        ),
+      },
+      {
+        name: 'Type literals without readonly modifiers',
+        source: codeFromStringLines(
+          'let foo: {',
+          '  a: number,',
+          '  b: ReadonlyArray<string>,',
+          '  c: () => string,',
+          '  d: { readonly [key: string]: string[] },',
+          '  [key: string]: string[],',
+          '  readonly e: {',
+          '    a: number,',
+          '    b: ReadonlyArray<string>,',
+          '    c: () => string,',
+          '    d: { readonly [key: string]: string[] },',
+          '    [key: string]: string[],',
+          '  }',
+          '};',
+        ),
+        expected: codeFromStringLines(
+          'let foo: Readonly<{',
+          '  a: number,',
+          '  b: readonly string[],',
+          '  c: () => string,',
+          '  d: Readonly<{ [key: string]: readonly string[] }>,',
+          '  [key: string]: readonly string[],',
+          '  e: Readonly<{',
+          '    a: number,',
+          '    b: readonly string[],',
+          '    c: () => string,',
+          '    d: Readonly<{ [key: string]: readonly string[] }>,',
+          '    [key: string]: readonly string[],',
+          '  }>',
+          '}>;',
+        ),
+      },
+      {
+        name: 'Type literal elements with a readonly modifier in an array',
+        source:
+          'type foo = ReadonlyArray<{ readonly type: string, readonly code: string }>;',
+        expected:
+          'type foo = readonly Readonly<{ type: string, code: string }>[];',
+      },
+      {
+        name: 'Type literals with readonly on members',
+        source: codeFromStringLines(
+          'let foo: {',
+          '  readonly a: number,',
+          '  readonly b: ReadonlyArray<string>,',
+          '  readonly c: () => string,',
+          '  readonly d: { readonly [key: string]: string[] },',
+          '  readonly [key: string]: string[]',
+          '};',
+        ),
+        expected: codeFromStringLines(
+          'let foo: Readonly<{',
+          '  a: number,',
+          '  b: readonly string[],',
+          '  c: () => string,',
+          '  d: Readonly<{ [key: string]: readonly string[] }>,',
+          '  [key: string]: readonly string[]',
+          '}>;',
+        ),
       },
     ])('$name', testFn);
   });
@@ -1509,6 +1667,54 @@ describe('convertToReadonlyType', () => {
           'type MyConstructor = new (arg: string[]) => { prop: number[] };',
         expected:
           'type MyConstructor = new (arg: readonly string[]) => Readonly<{ prop: readonly number[] }>;',
+      },
+    ])('$name', testFn);
+  });
+
+  describe('Canonical readonly forms are stable', () => {
+    // Verify canonical forms are stable
+    test.each([
+      {
+        name: 'readonly T[] is unchanged',
+        source: 'type T = readonly string[];',
+        expected: 'type T = readonly string[];',
+      },
+      {
+        name: 'readonly [T1, T2] is unchanged',
+        source: 'type T = readonly [string, number];',
+        expected: 'type T = readonly [string, number];',
+      },
+      {
+        name: 'readonly [T1, ...T2[]] is unchanged',
+        source: 'type T = readonly [string, ...number[]];',
+        expected: 'type T = readonly [string, ...number[]];',
+      },
+      {
+        name: 'ReadonlySet<T> is unchanged',
+        source: 'type T = ReadonlySet<number>;',
+        expected: 'type T = ReadonlySet<number>;',
+      },
+      {
+        name: 'ReadonlyMap<K, V> is unchanged',
+        source: 'type T = ReadonlyMap<string, boolean>;',
+        expected: 'type T = ReadonlyMap<string, boolean>;',
+      },
+      {
+        name: 'Readonly<{ a: T }> is unchanged',
+        source: 'type T = Readonly<{ a: string }>;',
+        expected: 'type T = Readonly<{ a: string }>;',
+      },
+      {
+        name: 'Interface with readonly member is unchanged', // Interface itself should not be transformed
+        source: 'interface I { readonly prop: number; }',
+        expected: 'interface I { readonly prop: number; }',
+      },
+      {
+        name: 'Complex nested readonly is unchanged',
+        source:
+          'type T = ReadonlyMap<string, readonly Readonly<{ p: readonly boolean[] }>[]>;',
+        expected:
+          'type T = ReadonlyMap<string, readonly Readonly<{ p: readonly boolean[] }>[]>;',
       },
     ])('$name', testFn);
   });
@@ -1595,32 +1801,6 @@ describe('convertToReadonlyType', () => {
           'type InferToObject<T> = T extends Set<infer I> ? { item: I[] } : never;',
         expected:
           'type InferToObject<T> = T extends ReadonlySet<infer I> ? Readonly<{ item: readonly I[] }> : never;',
-      },
-    ])('$name', testFn);
-  });
-
-  describe('Parenthesized types', () => {
-    test.each([
-      {
-        name: 'Parenthesized readonly array',
-        source: 'type ParenReadonlyArr = (readonly string[]);',
-        expected: 'type ParenReadonlyArr = readonly string[];',
-      },
-      {
-        name: 'Parenthesized readonly tuple',
-        source: 'type ParenReadonlyTup = (readonly [string, number]);',
-        expected: 'type ParenReadonlyTup = readonly [string, number];',
-      },
-      {
-        name: 'Parenthesized type literal',
-        source: 'type ParenObj = ({ a: number[] });',
-        expected: 'type ParenObj = Readonly<{ a: readonly number[] }>;',
-      },
-      {
-        name: 'Parenthesized type with union/intersection',
-        source: 'type Paren = ({ a: string[] } | { b: number[] })[];',
-        expected:
-          'type Paren = readonly Readonly<{ a: readonly string[] } | { b: readonly number[] }>[]',
       },
     ])('$name', testFn);
   });

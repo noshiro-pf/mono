@@ -217,8 +217,8 @@ describe('normalizeReadonlyTypes', () => {
         title: (op) => `${op} collapse with Array types`,
         testCase: (op) => ({
           source: `type Arr = Readonly<string[]> ${op} Readonly<number[]>;`,
-          // Readonly<A[]> | Readonly<B[]> -> Readonly<A[] | B[]>
-          // Readonly<A[]> & Readonly<B[]> -> Readonly<A[] & B[]>
+          // Readonly<A[]> | Readonly<B[]> -> readonly A[] | readonly B[]
+          // Readonly<A[]> & Readonly<B[]> -> readonly A[] & readonly B[]
           expected: `type Arr = readonly string[] ${op} readonly number[];`,
         }),
       }),
@@ -342,12 +342,12 @@ describe('normalizeReadonlyTypes', () => {
       {
         name: 'Type literal with one readonly member (unchanged)',
         source: 'type T = { readonly a: number; b: string };',
-        expected: 'type T = { readonly a: number; b: string };', // Unchanged (normalization only)
+        expected: 'type T = { readonly a: number; b: string };', // Unchanged
       },
       {
         name: 'Type literal with no readonly members (unchanged)',
         source: 'type T = { a: number; b: string };',
-        expected: 'type T = { a: number; b: string };', // Unchanged (normalization only)
+        expected: 'type T = { a: number; b: string };', // Unchanged
       },
       {
         name: 'Type literal with all members readonly (normalized)',

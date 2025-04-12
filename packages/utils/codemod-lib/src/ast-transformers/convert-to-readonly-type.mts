@@ -29,7 +29,8 @@ import { debugPrintWrapper } from './test-utils.mjs';
  *
  * - Mutable to readonly
  *
- *   - A
+ *   - `T[]` to `readonly T[]`
+ *   - `Array<T>` to `readonly T[]`
  * - Normalize
  *
  *   - `Readonly<Readonly<T>>` to `Readonly<T>`
@@ -56,15 +57,6 @@ type TransformNodeFn = <N extends ts.Node>(
   context: ts.TransformationContext,
   readonlyContext: ReadonlyContext,
   depth: SafeUintWithSmallInt,
-  /**
-   * `readonly [string, ...number[]]` の内側の `number[]` からは readonly
-   * を省いた形に統一するために、 変換の再帰呼び出し時にその階層をmutable にするかどうかを制御する。
-   *
-   * - `"deep"` : 再帰的に readonly を適用する `DeepReadonly` などの型ユーティリティの内部のノードであることを表す。
-   * - `"shallow"` : 通常の `Readonly` や `readonly` などの直下のノードであることを表す。
-   * - `"none"` : それ以外
-   */
-  // readonlyContext: 'deep' | 'shallow' | 'none',
 ) => N extends ts.ArrayTypeNode | ts.TupleTypeNode
   ? N | ts.TypeOperatorNode
   : N extends ts.TypeLiteralNode
@@ -750,7 +742,6 @@ const transformTupleTypeNode = (
     case 'DeepReadonly':
     case 'Readonly':
     case 'readonly':
-      // skip if already readonly
       return context.factory.updateTupleTypeNode(node, Es);
 
     case 'none':
