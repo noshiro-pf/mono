@@ -64,6 +64,8 @@ const brandedNumbers = [
 
   'NewArrayMaxSize',
 
+  'SafeUintWithSmallInt',
+
   ...brandedNumberFromTypeUtils,
 ] as const;
 
@@ -128,6 +130,7 @@ export const brandedNumberTypeDefString = (): string => {
     ArraySearchResult,
     TypedArraySearchResult,
     NewArrayMaxSize,
+    SafeUintWithSmallInt,
 
     ...rest
   } = BrandedNumberName;
