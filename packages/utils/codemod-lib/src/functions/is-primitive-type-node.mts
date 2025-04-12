@@ -8,10 +8,11 @@ import * as ts from 'typescript';
  */
 
 /**
- * 指定されたノードがプリミティブ型を表す型ノードかどうかを判定します。 (any, unknown, never を含むかは要件に応じて調整してください)
+ * Determines whether the specified node is a type node that represents a
+ * primitive type.
  *
- * @param node チェックするノード
- * @returns プリミティブ型ノードであれば true、そうでなければ false
+ * @param node The node to check
+ * @returns True if it is a primitive type node, false if not
  */
 export const isPrimitiveTypeNode = (node: ts.Node): boolean => {
   // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check

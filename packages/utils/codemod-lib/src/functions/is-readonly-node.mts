@@ -1,6 +1,13 @@
 import { Arr, expectType } from '@noshiro/ts-utils';
 import * as ts from 'typescript';
 
+export const isReadonlyTupleOrArrayNode = (
+  node: ts.Node,
+): node is ts.TypeOperatorNode & Readonly<{ type: ts.ArrayTypeNode }> =>
+  ts.isTypeOperatorNode(node) &&
+  node.operator === ts.SyntaxKind.ReadonlyKeyword &&
+  (ts.isArrayTypeNode(node.type) || ts.isTupleTypeNode(node.type));
+
 export const isReadonlyArrayNode = (
   node: ts.Node,
 ): node is ts.TypeOperatorNode & Readonly<{ type: ts.ArrayTypeNode }> =>

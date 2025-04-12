@@ -268,6 +268,12 @@ describe('normalizeReadonlyTypes', () => {
         expected: 'type ParenReadonlyArr = readonly string[];',
       },
       {
+        name: 'Parenthesized nested readonly array',
+        source: 'type ParenNestedReadonlyArr = readonly (readonly string[])[];',
+        expected:
+          'type ParenNestedReadonlyArr = readonly (readonly string[])[];',
+      },
+      {
         name: 'Parenthesized readonly tuple',
         source: 'type ParenReadonlyTup = (readonly [string, number]);',
         expected: 'type ParenReadonlyTup = readonly [string, number];',
