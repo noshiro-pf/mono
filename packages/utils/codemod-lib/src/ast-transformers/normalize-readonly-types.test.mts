@@ -231,6 +231,14 @@ describe('normalizeReadonlyTypes', () => {
         }),
       }),
 
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} of primitives`,
+        testCase: (op) => ({
+          source: `type Arr = Readonly<number ${op} boolean ${op} string>;`,
+          expected: `type Arr = number ${op} boolean ${op} string;`,
+        }),
+      }),
+
       ...[
         (op: '|' | '&') => ({
           source: `type Mixed = Readonly<Readonly<{ x: string }> ${op} readonly number[]>;`,
@@ -242,7 +250,7 @@ describe('normalizeReadonlyTypes', () => {
         }),
         (op: '|' | '&') => ({
           source: `type Mixed = Readonly<{ x: string }> ${op} Readonly<number[]>;`,
-          expected: `type Mixed = readonly number[] ${op} Readonly<{ x: string }>;`,
+          expected: `type Mixed = Readonly<{ x: string }> ${op} readonly number[];`,
         }),
         (op: '|' | '&') => ({
           source: `type Mixed = Readonly<{ x: string } ${op} Readonly<number[]>>;`,
@@ -250,11 +258,11 @@ describe('normalizeReadonlyTypes', () => {
         }),
         (op: '|' | '&') => ({
           source: `type Mixed = Readonly<{ x: string }> ${op} readonly number[];`,
-          expected: `type Mixed = readonly number[] ${op} Readonly<{ x: string }>;`,
+          expected: `type Mixed = Readonly<{ x: string }> ${op} readonly number[];`,
         }),
         (op: '|' | '&') => ({
           source: `type Mixed = Readonly<{ x: string } ${op} readonly number[] ${op} { y: number } ${op} readonly string[]>;`,
-          expected: `type Mixed = Readonly<{ x: string } ${op} { y: number }> ${op} readonly number[] ${op} readonly string[];`,
+          expected: `type Mixed = readonly number[] ${op} readonly string[] ${op} Readonly<{ x: string } ${op} { y: number }>;`,
         }),
         (op: '|' | '&') => ({
           source: `type Mixed = Readonly<{ x: string } ${op} readonly number[] ${op} { y: number } ${op} readonly string[]>;`,
@@ -267,6 +275,10 @@ describe('normalizeReadonlyTypes', () => {
         (op: '|' | '&') => ({
           source: `type Mixed = Readonly<unknown ${op} { x: string } ${op} number[] ${op} Readonly<{ y: number }> ${op} readonly string[]>;`,
           expected: `type Mixed = unknown ${op} readonly number[] ${op} readonly string[] ${op} Readonly<{ x: string } ${op} { y: number }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Primitive = Readonly<number ${op} boolean ${op} string>;`,
+          expected: `type Primitive = number ${op} boolean ${op} string;`,
         }),
       ].flatMap((t, i) =>
         toUnionAndIntersectionTestCase({
