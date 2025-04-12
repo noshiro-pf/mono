@@ -94,7 +94,13 @@ const transformNode: TransformNodeFn = ((
   if (ts.isRestTypeNode(node)) {
     return transformRestTypeNode(node, visitor, context, readonlyContext);
   }
+
   if (ts.isIntersectionTypeNode(node)) {
+    if (readonlyContext === 'readonly') {
+      throw new Error(
+        'Invalid readonlyContext "readonly" passed to IntersectionTypeNode',
+      );
+    }
     return transformIntersectionTypeNode(
       node,
       visitor,
@@ -102,9 +108,16 @@ const transformNode: TransformNodeFn = ((
       readonlyContext,
     );
   }
+
   if (ts.isUnionTypeNode(node)) {
+    if (readonlyContext === 'readonly') {
+      throw new Error(
+        'Invalid readonlyContext "readonly" passed to UnionTypeNode',
+      );
+    }
     return transformUnionTypeNode(node, visitor, context, readonlyContext);
   }
+
   if (ts.isParenthesizedTypeNode(node)) {
     return transformParenthesizedTypeNode(
       node,
@@ -559,7 +572,7 @@ const transformMembers = (
   readonlyModifier: 'remove' | 'keep',
   visitor: ts.Visitor,
   context: ts.TransformationContext,
-  readonlyContext: 'DeepReadonly' | 'none',
+  readonlyContext: Extract<ReadonlyContext, 'DeepReadonly' | 'none'>,
 ): ts.NodeArray<ts.TypeElement> =>
   context.factory.createNodeArray(
     members.map((mb) => {
@@ -583,10 +596,11 @@ const transformMembers = (
           readonlyModifier,
           visitor,
           context,
+          readonlyContext,
         );
       }
 
-      return transformNode(mb, visitor, context);
+      return transformNode(mb, visitor, context, readonlyContext);
     }),
     members.hasTrailingComma,
   );
@@ -596,7 +610,7 @@ const transformPropertySignature = (
   readonlyModifier: 'remove' | 'keep',
   visitor: ts.Visitor,
   context: ts.TransformationContext,
-  readonlyContext: 'DeepReadonly' | 'none',
+  readonlyContext: Extract<ReadonlyContext, 'DeepReadonly' | 'none'>,
 ): ts.PropertySignature =>
   context.factory.updatePropertySignature(
     node,
@@ -606,7 +620,9 @@ const transformPropertySignature = (
     }),
     node.name,
     node.questionToken,
-    mapOptional(node.type, (t) => transformNode(t, visitor, context)),
+    mapOptional(node.type, (t) =>
+      transformNode(t, visitor, context, readonlyContext),
+    ),
   );
 
 const transformIndexSignatureDeclaration = (
@@ -614,6 +630,7 @@ const transformIndexSignatureDeclaration = (
   readonlyModifier: 'remove' | 'keep',
   visitor: ts.Visitor,
   context: ts.TransformationContext,
+  readonlyContext: Extract<ReadonlyContext, 'DeepReadonly' | 'none'>,
 ): ts.IndexSignatureDeclaration =>
   context.factory.updateIndexSignature(
     node,
@@ -621,8 +638,10 @@ const transformIndexSignatureDeclaration = (
       remove: removeReadonlyFromModifiers(node.modifiers),
       keep: node.modifiers,
     }),
-    node.parameters.map((n) => transformNode(n, visitor, context)),
-    transformNode(node.type, visitor, context),
+    node.parameters.map((n) =>
+      transformNode(n, visitor, context, readonlyContext),
+    ),
+    transformNode(node.type, visitor, context, readonlyContext),
   );
 
 const removeReadonlyFromModifiers = <M extends ts.ModifierLike>(
