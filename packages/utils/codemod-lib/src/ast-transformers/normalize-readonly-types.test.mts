@@ -77,6 +77,7 @@ describe('normalizeReadonlyTypes', () => {
         name: 'Nested Readonly wrapper',
         source: 'type T = Readonly<Readonly<{ x: 3 }>>;',
         expected: 'type T = Readonly<{ x: 3 }>;', // Readonly<Readonly<T>> -> Readonly<T>
+        debug: true,
       },
       {
         name: 'Deeply nested Readonly wrapper',
