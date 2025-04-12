@@ -326,7 +326,7 @@ const transformTypeReferenceNode = (
       return createReadonlyArrayTypeNode(T, context);
     }
 
-    // remove unnecessary `Readonly` wrappers
+    // remove unnecessary `Readonly` wrapper or convert to readonly operator
     if (typeNameStr === 'Readonly') {
       if (!Arr.isArrayOfLength1(typeArguments)) {
         throw new Error(

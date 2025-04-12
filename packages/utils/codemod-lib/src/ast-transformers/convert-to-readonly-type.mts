@@ -2,6 +2,7 @@
 import {
   Arr,
   expectType,
+  ISet,
   mapOptional,
   SafeUint,
   strictMatch,
@@ -48,14 +49,44 @@ type ConvertToReadonlyTypeOptions = Readonly<{
  *   - `Readonly<A> | Readonly<B>` to `Readonly<A | B>`
  */
 export const convertToReadonlyType = (
-  options: ConvertToReadonlyTypeOptions,
-): ts.TransformerFactory<ts.SourceFile> =>
-  createTransformerFactory((context) => {
+  options?: ConvertToReadonlyTypeOptions,
+): ts.TransformerFactory<ts.SourceFile> => {
+  if (
+    options !== undefined &&
+    invalidDeepReadonlyTypeName.has(options.DeepReadonlyTypeName)
+  ) {
+    throw new Error(
+      `Invalid DeepReadonlyTypeName "${options.DeepReadonlyTypeName}" passed to convertToReadonlyType`,
+    );
+  }
+
+  return createTransformerFactory((context) => {
     const visitor: ts.Visitor = (node: ts.Node): ts.VisitResult<ts.Node> =>
-      transformNode(node, visitor, context, 'none', options, 0);
+      transformNode(
+        node,
+        visitor,
+        context,
+        'none',
+        options ?? {
+          DeepReadonlyTypeName: 'DeepReadonly',
+        },
+        0,
+      );
 
     return visitor;
   });
+};
+
+const invalidDeepReadonlyTypeName = ISet.new([
+  'Readonly',
+  'readonly',
+  'ReadonlyArray',
+  'Array',
+  'Set',
+  'Map',
+  'ReadonlySet',
+  'ReadonlyMap',
+]);
 
 type TransformNodeFn = <N extends ts.Node>(
   node: N,
@@ -594,7 +625,7 @@ const transformTypeReferenceNode = (
       );
     }
 
-    // remove unnecessary `Readonly` wrappers
+    // remove unnecessary `Readonly` wrapper or convert to readonly operator
     if (typeNameStr === 'Readonly') {
       if (!Arr.isArrayOfLength1(typeArguments)) {
         throw new Error(
@@ -697,6 +728,166 @@ const transformTypeReferenceNode = (
             ...primitives,
             ...arraysAndTuples,
             ...readonlyTypeLiterals,
+          ]),
+        );
+      }
+
+      // T = A & B & C
+      if (ts.isIntersectionTypeNode(T)) {
+        if (T.types.every(isReadonlyTypeNode)) {
+          return context.factory.updateTypeReferenceNode(
+            node,
+            node.typeName,
+            context.factory.createNodeArray([
+              context.factory.updateIntersectionTypeNode(
+                T,
+                context.factory.createNodeArray(
+                  T.types.map((t: ReadonlyTypeNode) => t.typeArguments[0]),
+                ),
+              ),
+            ]),
+          );
+        }
+
+        if (T.types.every(isShallowReadonlyTypeNode)) {
+          return T;
+        }
+
+        // `Readonly<number & { x: X } & readonly E[]> -> number & readonly E[] & Readonly<{ x: X }>`
+        const primitives = T.types.filter(isPrimitiveTypeNode);
+
+        const arraysAndTuples = T.types
+          .filter(
+            (t) =>
+              ts.isArrayTypeNode(t) ||
+              ts.isTupleTypeNode(t) ||
+              isReadonlyTupleOrArrayTypeNode(t),
+          )
+          .map((t) =>
+            isReadonlyTupleOrArrayTypeNode(t)
+              ? t
+              : createReadonlyTypeOperatorNode(t, context),
+          );
+
+        const typeLiterals = T.types.filter(ts.isTypeLiteralNode);
+
+        const readonlyTypeLiterals =
+          typeLiterals.length === 0
+            ? []
+            : [
+                createReadonlyTypeNode(
+                  context.factory.createIntersectionTypeNode(typeLiterals),
+                  context,
+                ),
+              ];
+
+        return context.factory.updateIntersectionTypeNode(
+          T,
+          context.factory.createNodeArray([
+            ...primitives,
+            ...arraysAndTuples,
+            ...readonlyTypeLiterals,
+          ]),
+        );
+      }
+
+      return context.factory.updateTypeReferenceNode(
+        node,
+        node.typeName,
+        context.factory.createNodeArray([T]),
+      );
+    }
+
+    // DeepReadonly
+    if (typeNameStr === options.DeepReadonlyTypeName) {
+      if (!Arr.isArrayOfLength1(typeArguments)) {
+        throw new Error(
+          `Unexpected number of type arguments "${typeArguments.length}" for Readonly.`,
+        );
+      }
+
+      // Recursive processing
+      const T = transformNode(
+        typeArguments[0],
+        visitor,
+        context,
+        nextReadonlyContext(readonlyContext, 'DeepReadonly'),
+        options,
+        SafeUint.add(1, depth),
+      );
+
+      // DeepReadonly<DeepReadonly<T>> -> DeepReadonly<T>
+      if (readonlyContext === 'DeepReadonly') {
+        return T;
+      }
+
+      // Readonly<number> -> number
+      if (isPrimitiveTypeNode(T)) {
+        return T;
+      }
+
+      // T = P[]
+      // DeepReadonly<P[]> -> readonly P[]
+      //
+      if (ts.isArrayTypeNode(T) && isPrimitiveTypeNode(T.elementType)) {
+        return createReadonlyTypeOperatorNode(T, context);
+      }
+
+      // T = [P1, P2, P3]
+      // DeepReadonly<[P1, P2, P3]> -> readonly [P1, P2, P3]
+      if (ts.isTupleTypeNode(T) && T.elements.every(isPrimitiveTypeNode)) {
+        return createReadonlyTypeOperatorNode(T, context);
+      }
+
+      // T = A | B | C
+      if (ts.isUnionTypeNode(T)) {
+        const grouped = Arr.groupBy(T.types, (t) =>
+          isPrimitiveTypeNode(t)
+            ? 'primitives'
+            : ts.isArrayTypeNode(t) ||
+                ts.isTupleTypeNode(t) ||
+                isReadonlyTupleOrArrayTypeNode(t)
+              ? 'arraysAndTuples'
+              : ts.isTypeLiteralNode(t)
+                ? 'typeLiterals'
+                : 'others',
+        );
+
+        // `Readonly<number | { x: X } | readonly E[]> -> number | readonly E[] | Readonly<{ x: X }>`
+        const primitives = grouped.get('primitives') ?? [];
+
+        const arraysAndTuples =
+          grouped.get('arraysAndTuples')?.map((t) =>
+            isReadonlyTupleOrArrayTypeNode(t)
+              ? t
+              : createReadonlyTypeOperatorNode(
+                  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+                  t as ts.ArrayTypeNode | ts.TupleTypeNode,
+                  context,
+                ),
+          ) ?? [];
+
+        const typeLiterals = grouped.get('typeLiterals');
+
+        const others = grouped.get('others') ?? [];
+
+        const readonlyTypeLiterals =
+          typeLiterals === undefined
+            ? []
+            : [
+                createReadonlyTypeNode(
+                  context.factory.createUnionTypeNode(typeLiterals),
+                  context,
+                ),
+              ];
+
+        return context.factory.updateUnionTypeNode(
+          T,
+          context.factory.createNodeArray([
+            ...primitives,
+            ...arraysAndTuples,
+            ...readonlyTypeLiterals,
+            ...others,
           ]),
         );
       }

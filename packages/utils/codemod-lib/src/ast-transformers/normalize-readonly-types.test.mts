@@ -261,11 +261,49 @@ describe('normalizeReadonlyTypes', () => {
           expected: `type Mixed = Readonly<{ x: string }> ${op} readonly number[];`,
         }),
         (op: '|' | '&') => ({
-          source: `type Mixed = Readonly<{ x: string } ${op} readonly number[] ${op} { y: number } ${op} readonly string[]>;`,
-          expected: `type Mixed = readonly number[] ${op} readonly string[] ${op} Readonly<{ x: string } ${op} { y: number }>;`,
+          source: codeFromStringLines(
+            'type Mixed = Readonly<',
+            [
+              '{ x: string }',
+              'readonly number[]',
+              '{ y: number }',
+              'readonly string[]',
+            ].join(op),
+            '>;',
+          ),
+          expected: codeFromStringLines(
+            'type Mixed = ',
+            [
+              'readonly number[]',
+              'readonly string[]',
+              `Readonly<{ x: string } ${op} { y: number }>`,
+            ].join(op),
+            '>;',
+          ),
         }),
         (op: '|' | '&') => ({
-          source: `type Mixed = Readonly<{ x: string } ${op} readonly number[] ${op} { y: number } ${op} readonly string[]>;`,
+          source: codeFromStringLines(
+            'type Mixed = ',
+            [
+              'Readonly<{ x: string }>',
+              'readonly number[]',
+              '{ readonly y: number }',
+              'readonly string[]',
+            ].join(op),
+            ';',
+          ),
+          expected: codeFromStringLines(
+            'type Mixed = ',
+            [
+              'readonly number[]',
+              'readonly string[]',
+              `Readonly<{ x: string } ${op} { y: number }>`,
+            ].join(op),
+            ';',
+          ),
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string } ${op} readonly number[] ${op} Readonly<{ y: number }> ${op} readonly string[]>;`,
           expected: `type Mixed = readonly number[] ${op} readonly string[] ${op} Readonly<{ x: string } ${op} { y: number }>;`,
         }),
         (op: '|' | '&') => ({
