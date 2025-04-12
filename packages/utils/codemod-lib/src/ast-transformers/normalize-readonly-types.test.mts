@@ -1,7 +1,7 @@
 /* eslint-disable vitest/expect-expect */
 import { codeFromStringLines, testPreprocess } from '../utils/index.mjs';
 import { normalizeReadonlyTypes } from './normalize-readonly-types.mjs';
-import { toUnionAndIntersectionTestCase } from './test-case-utils.mjs';
+import { toUnionAndIntersectionTestCase } from './test-utils.mjs';
 
 const testFn = ({
   source,

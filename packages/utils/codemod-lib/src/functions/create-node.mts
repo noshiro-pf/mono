@@ -11,21 +11,21 @@ export const createReadonlyTypeOperatorNode = (
   );
 
 export const createReadonlyTupleTypeNode = (
-  Es: readonly ts.TypeNode[],
+  elementTypes: readonly ts.TypeNode[],
   context: ts.TransformationContext,
 ): ts.TypeOperatorNode =>
-  context.factory.createTypeOperatorNode(
-    ts.SyntaxKind.ReadonlyKeyword,
-    context.factory.createTupleTypeNode(Es),
+  createReadonlyTypeOperatorNode(
+    context.factory.createTupleTypeNode(elementTypes),
+    context,
   );
 
 export const createReadonlyArrayTypeNode = (
-  t: ts.TypeNode,
+  elementType: ts.TypeNode,
   context: ts.TransformationContext,
 ): ts.TypeOperatorNode =>
-  context.factory.createTypeOperatorNode(
-    ts.SyntaxKind.ReadonlyKeyword,
-    context.factory.createArrayTypeNode(t),
+  createReadonlyTypeOperatorNode(
+    context.factory.createArrayTypeNode(elementType),
+    context,
   );
 
 export const createReadonlyTypeNode = (

@@ -22,6 +22,7 @@ import {
   type ReadonlyTypeNode,
 } from '../functions/index.mjs';
 import { createTransformerFactory, printNode } from '../utils/index.mjs';
+import { debugPrintWrapper } from './test-utils.mjs';
 
 /**
  * Normalize Readonly types.
@@ -64,29 +65,6 @@ type TransformNodeFn = <N extends ts.Node>(
             ? N | ts.TypeNode
             : N;
 
-const debugPrintWrapper = <N extends ts.Node>(
-  message: string,
-  nodeBefore: ts.Node,
-  nodeAfter: N,
-  depth: SafeUintWithSmallInt,
-): N => {
-  const indent = '  '.repeat(depth);
-
-  console.debug(
-    `${indent}${message}  [${ts.SyntaxKind[nodeBefore.kind]}]  ->  [${ts.SyntaxKind[nodeAfter.kind]}]:  `,
-  );
-  console.debug(
-    `${indent}${printNode(nodeBefore, nodeBefore.getSourceFile()).replaceAll('\n', `\n${indent}`)}`,
-  );
-  console.debug(`${indent}↓`);
-  console.debug(
-    `${indent}${printNode(nodeAfter, nodeAfter.getSourceFile()).replaceAll('\n', `\n${indent}`)}`,
-  );
-  console.debug();
-
-  return nodeAfter;
-};
-
 /** Convert all nodes to readonly type (recursively) */
 // eslint-disable-next-line total-functions/no-unsafe-type-assertion
 const transformNode: TransformNodeFn = ((
@@ -97,7 +75,7 @@ const transformNode: TransformNodeFn = ((
   depth,
 ) => {
   console.debug(`transformNode\t[${ts.SyntaxKind[node.kind]}]`);
-  console.debug(printNode(node, node.getSourceFile()));
+  console.debug(printNode(node));
   console.debug();
 
   if (ts.isTypeReferenceNode(node)) {
@@ -516,16 +494,6 @@ const transformArrayTypeNode = (
   );
 
   return context.factory.updateArrayTypeNode(node, E);
-
-  // switch (readonlyContext) {
-  //   case 'DeepReadonly':
-  //   case 'Readonly':
-  //   case 'readonly':
-  //     return context.factory.updateArrayTypeNode(node, E);
-
-  //   case 'none':
-  //     return context.factory.updateArrayTypeNode(node, E);
-  // }
 };
 
 /** `tr([E1, E2, E3])` |-> `[tr(E1), tr(E2), tr(E3)]` */
@@ -562,19 +530,6 @@ const transformTupleTypeNode = (
   );
 
   return context.factory.updateTupleTypeNode(node, Es);
-
-  // switch (readonlyContext) {
-  //   case 'DeepReadonly':
-  //   case 'Readonly':
-  //   case 'readonly':
-  //     return context.factory.updateTupleTypeNode(node, Es);
-
-  //   case 'none':
-  //     return createReadonlyTypeOperatorNode(
-  //       context.factory.updateTupleTypeNode(node, Es),
-  //       context,
-  //     );
-  // }
 };
 
 /** `tr("...T")` |-> `...tr(T)` */

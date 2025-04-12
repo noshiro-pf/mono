@@ -23,10 +23,7 @@ type TransformNodeFn = <N extends ts.Node>(
 /** Convert all nodes to readonly type (recursively) */
 // eslint-disable-next-line total-functions/no-unsafe-type-assertion
 const transformNode: TransformNodeFn = ((node, visitor, context) => {
-  console.debug(
-    `[${ts.SyntaxKind[node.kind]}]:\t`,
-    printNode(node, node.getSourceFile()),
-  );
+  console.debug(`[${ts.SyntaxKind[node.kind]}]:\t`, printNode(node));
 
   if (ts.isTypeNode(node) && node.kind === ts.SyntaxKind.AnyKeyword) {
     const parent = node.parent as ts.Node | undefined;
