@@ -9,15 +9,17 @@ import {
 import * as ts from 'typescript';
 import {
   createReadonlyArrayTypeNode,
-  createReadonlyTupleTypeNode,
   createReadonlyTypeNode,
   createReadonlyTypeOperatorNode,
   isPrimitiveTypeNode,
   isReadonlyArrayTypeNode,
+  isReadonlyTupleOrArrayTypeNode,
   isReadonlyTupleTypeNode,
   isReadonlyTypeNode,
+  isShallowReadonlyTypeNode,
   nextReadonlyContext,
   type ReadonlyContext,
+  type ReadonlyTypeNode,
 } from '../functions/index.mjs';
 import { createTransformerFactory, printNode } from '../utils/index.mjs';
 import { debugPrintWrapper } from './test-utils.mjs';
@@ -143,41 +145,19 @@ const transformNode: TransformNodeFn = ((
   }
 
   if (ts.isInterfaceDeclaration(node)) {
-    if (readonlyContext === 'readonly') {
-      throw new Error(
-        'Invalid readonlyContext "readonly" passed to InterfaceDeclaration',
-      );
-    }
     return debugPrintWrapper(
       'transformInterfaceDeclarationNode',
       node,
-      transformInterfaceDeclarationNode(
-        node,
-        visitor,
-        context,
-        readonlyContext,
-        depth,
-      ),
+      transformInterfaceDeclarationNode(node, visitor, context, depth),
       depth,
     );
   }
 
   if (ts.isClassDeclaration(node)) {
-    if (readonlyContext === 'readonly') {
-      throw new Error(
-        'Invalid readonlyContext "readonly" passed to ClassDeclaration',
-      );
-    }
     return debugPrintWrapper(
       'transformClassDeclarationNode',
       node,
-      transformClassDeclarationNode(
-        node,
-        visitor,
-        context,
-        readonlyContext,
-        depth,
-      ),
+      transformClassDeclarationNode(node, visitor, context, depth),
       depth,
     );
   }
@@ -275,31 +255,37 @@ const transformNode: TransformNodeFn = ((
   return ts.visitEachChild(node, visitor, context);
 }) as TransformNodeFn;
 
-// `{ member: V }` -> `Readonly<{ member: V }>`
+// `{ readonly member: V } |-> Readonly<{ member: V }>`
 const transformTypeLiteralNode = (
   node: ts.TypeLiteralNode,
   visitor: ts.Visitor,
   context: ts.TransformationContext,
+  readonlyContext: Exclude<ReadonlyContext, 'readonly'>,
+  depth: SafeUintWithSmallInt,
 ): ts.TypeLiteralNode | ts.TypeReferenceNode => {
   const newTypeLiteralNode = context.factory.updateTypeLiteralNode(
     node,
     // Recursive processing
-    transformMembers(node.members, 'remove', visitor, context),
+    transformMembers(
+      node.members,
+      'remove',
+      visitor,
+      context,
+      nextReadonlyContext(readonlyContext, 'none'),
+      SafeUint.add(1, depth),
+    ),
   );
 
-  {
-    const parent = node.parent as ts.Node | undefined;
-
-    // Skip if already of type `Readonly<{ member: V }>`
-    if (parent !== undefined && isReadonlyTypeNode(parent)) {
-      // skip if already readonly
-      // `{ member: V }`
+  switch (readonlyContext) {
+    case 'DeepReadonly':
+    case 'Readonly':
+      // Don't wrap with Readonly if already readonly
       return newTypeLiteralNode;
-    }
-  }
 
-  // `Readonly<{ member: V }>`
-  return createReadonlyTypeNode(newTypeLiteralNode, context);
+    case 'none':
+      // `{ readonly x: X, readonly y: Y } |-> Readonly<{ x: X, y: Y }>`
+      return createReadonlyTypeNode(newTypeLiteralNode, context);
+  }
 };
 
 // Making interface members readonly
@@ -307,27 +293,44 @@ const transformInterfaceDeclarationNode = (
   node: ts.InterfaceDeclaration,
   visitor: ts.Visitor,
   context: ts.TransformationContext,
+  depth: SafeUintWithSmallInt,
 ): ts.InterfaceDeclaration =>
   context.factory.updateInterfaceDeclaration(
     node,
     node.modifiers,
     node.name,
-    node.typeParameters?.map((n) => transformNode(n, visitor, context)),
-    node.heritageClauses?.map((n) => transformNode(n, visitor, context)),
-    transformMembers(node.members, 'add', visitor, context),
+    node.typeParameters?.map((n) =>
+      transformNode(n, visitor, context, 'none', SafeUint.add(1, depth)),
+    ),
+    node.heritageClauses?.map((n) =>
+      transformNode(n, visitor, context, 'none', SafeUint.add(1, depth)),
+    ),
+    transformMembers(
+      node.members,
+      'add',
+      visitor,
+      context,
+      'none',
+      SafeUint.add(1, depth),
+    ),
   );
 
 const transformClassDeclarationNode = (
   node: ts.ClassDeclaration,
   visitor: ts.Visitor,
   context: ts.TransformationContext,
+  depth: SafeUintWithSmallInt,
 ): ts.ClassDeclaration =>
   context.factory.updateClassDeclaration(
     node,
     node.modifiers,
     node.name,
-    node.typeParameters?.map((n) => transformNode(n, visitor, context)),
-    node.heritageClauses?.map((n) => transformNode(n, visitor, context)),
+    node.typeParameters?.map((n) =>
+      transformNode(n, visitor, context, 'none', SafeUint.add(1, depth)),
+    ),
+    node.heritageClauses?.map((n) =>
+      transformNode(n, visitor, context, 'none', SafeUint.add(1, depth)),
+    ),
     node.members.map((mb: ts.ClassElement): ts.ClassElement => {
       console.debug(
         `transformClassDeclarationNode [${ts.SyntaxKind[mb.kind]}]`,
@@ -340,12 +343,21 @@ const transformClassDeclarationNode = (
           addReadonlyToModifiers(mb.modifiers, context),
           mb.name,
           mb.questionToken,
-          mapOptional(mb.type, (n) => transformNode(n, visitor, context)),
+          mapOptional(mb.type, (n) =>
+            transformNode(n, visitor, context, 'none', SafeUint.add(1, depth)),
+          ),
           mb.initializer,
         );
       }
       if (ts.isIndexSignatureDeclaration(mb)) {
-        return transformIndexSignatureDeclaration(mb, 'add', visitor, context);
+        return transformIndexSignatureDeclaration(
+          mb,
+          'add',
+          visitor,
+          context,
+          'none',
+          SafeUint.add(1, depth),
+        );
       }
       if (ts.isConstructorDeclaration(mb)) {
         return context.factory.updateConstructorDeclaration(
@@ -358,7 +370,15 @@ const transformClassDeclarationNode = (
               n.dotDotDotToken,
               n.name,
               n.questionToken,
-              mapOptional(n.type, (t) => transformNode(t, visitor, context)),
+              mapOptional(n.type, (t) =>
+                transformNode(
+                  t,
+                  visitor,
+                  context,
+                  'none',
+                  SafeUint.add(1, depth),
+                ),
+              ),
               n.initializer,
             ),
           ),
@@ -368,146 +388,292 @@ const transformClassDeclarationNode = (
         );
       }
 
-      return transformNode(mb, visitor, context);
+      return transformNode(
+        mb,
+        visitor,
+        context,
+        'none',
+        SafeUint.add(1, depth),
+      );
     }),
   );
 
+/**
+ * - `tr(ReadonlyArray<E>) |-> readonly tr(E)[]`
+ * - `tr(Readonly<Readonly<E>>) |-> Readonly<tr(E)>`
+ * - `tr(DeepReadonly<Readonly<E>>) |-> DeepReadonly<tr(E)>`
+ * - `tr(Readonly<number>) |-> number`
+ * - `tr(Readonly<E[]>) |-> readonly tr(E)[]`
+ * - `tr(Readonly<[E1, E2, E3]>) |-> readonly [tr(E1), tr(E2), tr(E3)]`
+ * - `tr(Readonly<readonly E[]>) |-> readonly tr(E)[]`
+ * - `tr(Readonly<readonly [E1, E2, E3]>) |-> readonly [tr(E1), tr(E2), tr(E3)]`
+ * - `tr(Readonly<A | readonly E[]>) |-> Readonly<tr(A)> | readonly tr(E)[]>`
+ */
 const transformTypeReferenceNode = (
   node: ts.TypeReferenceNode,
   visitor: ts.Visitor,
   context: ts.TransformationContext,
+  readonlyContext: Exclude<ReadonlyContext, 'readonly'>,
+  depth: SafeUintWithSmallInt,
 ): ts.TypeNode => {
-  // Recursive processing
-  const newTypeArguments = context.factory.createNodeArray(
-    node.typeArguments?.map((n) =>
-      removeParentheses(transformNode(n, visitor, context)),
-    ) ?? [],
-  );
-
   expectType<
     typeof node.typeName.kind,
     ts.SyntaxKind.Identifier | ts.SyntaxKind.QualifiedName
   >('=');
 
-  if (node.typeName.kind === ts.SyntaxKind.QualifiedName) {
-    return context.factory.updateTypeReferenceNode(
-      node,
-      node.typeName,
-      newTypeArguments,
-    );
-  }
+  if (node.typeName.kind === ts.SyntaxKind.Identifier) {
+    const typeArguments =
+      node.typeArguments ?? context.factory.createNodeArray([]);
 
-  const typeNameStr = node.typeName.text;
+    const typeNameStr = node.typeName.text;
 
-  // Array<T> / ReadonlyArray<T> to readonly T[]
-  if (typeNameStr === 'Array' || typeNameStr === 'ReadonlyArray') {
-    if (!Arr.isArrayOfLength1(newTypeArguments)) {
-      throw new Error(
-        `Unexpected number of type arguments "${newTypeArguments.length}" for ${typeNameStr}.`,
+    // Array<T> / ReadonlyArray<T> to readonly T[]
+    if (typeNameStr === 'Array' || typeNameStr === 'ReadonlyArray') {
+      if (!Arr.isArrayOfLength1(typeArguments)) {
+        throw new Error(
+          `Unexpected number of type arguments "${typeArguments.length}" for ${typeNameStr}.`,
+        );
+      }
+
+      // Recursive processing
+      const T = transformNode(
+        typeArguments[0],
+        visitor,
+        context,
+        'none',
+        SafeUint.add(1, depth),
+      );
+
+      return createReadonlyArrayTypeNode(T, context);
+    }
+
+    // Set<T> to ReadonlySet<T>
+    if (typeNameStr === 'Set') {
+      if (!Arr.isArrayOfLength1(typeArguments)) {
+        throw new Error(
+          `Unexpected number of type arguments "${typeArguments.length}" for Set.`,
+        );
+      }
+
+      return context.factory.updateTypeReferenceNode(
+        node,
+        context.factory.createIdentifier('ReadonlySet'),
+        context.factory.createNodeArray([
+          transformNode(
+            typeArguments[0],
+            visitor,
+            context,
+            nextReadonlyContext(readonlyContext, 'none'),
+            SafeUint.add(1, depth),
+          ),
+        ]),
       );
     }
 
-    return createReadonlyArrayTypeNode(newTypeArguments[0], context);
-  }
+    // Map<T> to ReadonlyMap<T>
+    if (typeNameStr === 'Map') {
+      if (!Arr.isArrayOfLength2(typeArguments)) {
+        throw new Error(
+          `Unexpected number of type arguments "${typeArguments.length}" for Map.`,
+        );
+      }
 
-  // Set<T> to ReadonlySet<T>
-  if (typeNameStr === 'Set') {
-    if (!Arr.isArrayOfLength1(newTypeArguments)) {
-      throw new Error(
-        `Unexpected number of type arguments "${newTypeArguments.length}" for Set.`,
+      return context.factory.updateTypeReferenceNode(
+        node,
+        context.factory.createIdentifier('ReadonlyMap'),
+        context.factory.createNodeArray(
+          typeArguments.map((a) =>
+            transformNode(
+              a,
+              visitor,
+              context,
+              nextReadonlyContext(readonlyContext, 'none'),
+              SafeUint.add(1, depth),
+            ),
+          ),
+        ),
       );
     }
 
-    return context.factory.updateTypeReferenceNode(
-      node,
-      context.factory.createIdentifier('ReadonlySet'),
-      newTypeArguments,
-    );
-  }
+    // remove unnecessary `Readonly` wrappers
+    if (typeNameStr === 'Readonly') {
+      if (!Arr.isArrayOfLength1(typeArguments)) {
+        throw new Error(
+          `Unexpected number of type arguments "${typeArguments.length}" for Readonly.`,
+        );
+      }
 
-  // Map<T> to ReadonlyMap<T>
-  if (typeNameStr === 'Map') {
-    if (!Arr.isArrayOfLength2(newTypeArguments)) {
-      throw new Error(
-        `Unexpected number of type arguments "${newTypeArguments.length}" for Map.`,
+      // Recursive processing
+      const T = transformNode(
+        typeArguments[0],
+        visitor,
+        context,
+        nextReadonlyContext(readonlyContext, 'Readonly'),
+        SafeUint.add(1, depth),
       );
-    }
 
-    return context.factory.updateTypeReferenceNode(
-      node,
-      context.factory.createIdentifier('ReadonlyMap'),
-      newTypeArguments,
-    );
-  }
-
-  // remove unnecessary `Readonly` wrappers
-  if (typeNameStr === 'Readonly') {
-    if (!Arr.isArrayOfLength1(newTypeArguments)) {
-      throw new Error(
-        `Unexpected number of type arguments "${newTypeArguments.length}" for Readonly.`,
-      );
-    }
-
-    const T = newTypeArguments[0];
-
-    // T = E[]
-    // Readonly<E[]> -> readonly E[]
-    if (ts.isArrayTypeNode(T)) {
-      return createReadonlyArrayTypeNode(T.elementType, context);
-    }
-
-    // T = [E1, E2, E3]
-    // Readonly<[E1, E2, E3]> -> readonly [E1, E2, E3]
-    if (ts.isTupleTypeNode(T)) {
-      return createReadonlyTupleTypeNode(T.elements, context);
-    }
-
-    // T = readonly E[]
-    // Readonly<readonly E[]> -> readonly E[]
-    // Readonly<readonly [E1, E2, E3]> -> readonly [E1, E2, E3]
-    if (isReadonlyArrayTypeNode(T) || isReadonlyTupleTypeNode(T)) {
-      return T;
-    }
-
-    // T = Readonly<E>
-    // Readonly<Readonly<E>> -> Readonly<E>
-    if (isReadonlyTypeNode(T)) {
-      return T;
-    }
-
-    // T = A | B | C
-    if (ts.isUnionTypeNode(T)) {
-      // T = readonly A[] | Readonly<B>
-      // Readonly<readonly A[] | Readonly<B>> -> readonly A[] | Readonly<B>
+      // Readonly<Readonly<T>> -> Readonly<T>
+      // DeepReadonly<Readonly<T>> -> DeepReadonly<T>
       if (
-        T.types.every(
-          (t) => isReadonlyArrayTypeNode(t) || isReadonlyTypeNode(t),
-        )
+        readonlyContext === 'DeepReadonly' ||
+        readonlyContext === 'Readonly'
       ) {
         return T;
       }
 
-      return createReadonlyTypeNode(T, context);
-    }
-    // T = A & B & C
-    if (ts.isIntersectionTypeNode(T)) {
-      // T = readonly A[] & Readonly<B>
-      // Readonly<readonly A[] & Readonly<B>> -> readonly A[] & Readonly<B>
-      if (
-        T.types.every(
-          (t) => isReadonlyArrayTypeNode(t) || isReadonlyTypeNode(t),
-        )
-      ) {
+      // Readonly<number> -> number
+      if (isPrimitiveTypeNode(T)) {
         return T;
       }
 
-      return createReadonlyTypeNode(T, context);
-    }
+      // T = E[]
+      // Readonly<E[]> -> readonly E[]
+      //
+      // T = [E1, E2, E3]
+      // Readonly<[E1, E2, E3]> -> readonly [E1, E2, E3]
+      if (ts.isArrayTypeNode(T) || ts.isTupleTypeNode(T)) {
+        return createReadonlyTypeOperatorNode(T, context);
+      }
 
-    if (isPrimitiveTypeNode(T)) {
-      return T;
+      // T = readonly E[] or readonly [E1, E2, E3]
+      // Readonly<readonly E[]> -> readonly E[]
+      // Readonly<readonly [E1, E2, E3]> -> readonly [E1, E2, E3]
+      if (isReadonlyTupleOrArrayTypeNode(T)) {
+        return T;
+      }
+
+      // T = A | B | C
+      if (ts.isUnionTypeNode(T)) {
+        if (T.types.every(isReadonlyTypeNode)) {
+          return context.factory.updateTypeReferenceNode(
+            node,
+            node.typeName,
+            context.factory.createNodeArray([
+              context.factory.updateUnionTypeNode(
+                T,
+                context.factory.createNodeArray(
+                  T.types.map((t: ReadonlyTypeNode) => t.typeArguments[0]),
+                ),
+              ),
+            ]),
+          );
+        }
+
+        if (T.types.every(isShallowReadonlyTypeNode)) {
+          return T;
+        }
+
+        // `Readonly<number | { x: X } | readonly E[]> -> number | readonly E[] | Readonly<{ x: X }>`
+        const primitives = T.types.filter(isPrimitiveTypeNode);
+
+        const arraysAndTuples = T.types
+          .filter(
+            (t) =>
+              ts.isArrayTypeNode(t) ||
+              ts.isTupleTypeNode(t) ||
+              isReadonlyTupleOrArrayTypeNode(t),
+          )
+          .map((t) =>
+            isReadonlyTupleOrArrayTypeNode(t)
+              ? t
+              : createReadonlyTypeOperatorNode(t, context),
+          );
+
+        const typeLiterals = T.types.filter(ts.isTypeLiteralNode);
+
+        const readonlyTypeLiterals =
+          typeLiterals.length === 0
+            ? []
+            : [
+                createReadonlyTypeNode(
+                  context.factory.createUnionTypeNode(typeLiterals),
+                  context,
+                ),
+              ];
+
+        return context.factory.updateUnionTypeNode(
+          T,
+          context.factory.createNodeArray([
+            ...primitives,
+            ...arraysAndTuples,
+            ...readonlyTypeLiterals,
+          ]),
+        );
+      }
+
+      // T = A & B & C
+      if (ts.isIntersectionTypeNode(T)) {
+        if (T.types.every(isReadonlyTypeNode)) {
+          return context.factory.updateTypeReferenceNode(
+            node,
+            node.typeName,
+            context.factory.createNodeArray([
+              context.factory.updateIntersectionTypeNode(
+                T,
+                context.factory.createNodeArray(
+                  T.types.map((t: ReadonlyTypeNode) => t.typeArguments[0]),
+                ),
+              ),
+            ]),
+          );
+        }
+
+        if (T.types.every(isShallowReadonlyTypeNode)) {
+          return T;
+        }
+
+        // `Readonly<number & { x: X } & readonly E[]> -> number & readonly E[] & Readonly<{ x: X }>`
+        const primitives = T.types.filter(isPrimitiveTypeNode);
+
+        const arraysAndTuples = T.types
+          .filter(
+            (t) =>
+              ts.isArrayTypeNode(t) ||
+              ts.isTupleTypeNode(t) ||
+              isReadonlyTupleOrArrayTypeNode(t),
+          )
+          .map((t) =>
+            isReadonlyTupleOrArrayTypeNode(t)
+              ? t
+              : createReadonlyTypeOperatorNode(t, context),
+          );
+
+        const typeLiterals = T.types.filter(ts.isTypeLiteralNode);
+
+        const readonlyTypeLiterals =
+          typeLiterals.length === 0
+            ? []
+            : [
+                createReadonlyTypeNode(
+                  context.factory.createIntersectionTypeNode(typeLiterals),
+                  context,
+                ),
+              ];
+
+        return context.factory.updateIntersectionTypeNode(
+          T,
+          context.factory.createNodeArray([
+            ...primitives,
+            ...arraysAndTuples,
+            ...readonlyTypeLiterals,
+          ]),
+        );
+      }
+
+      return context.factory.updateTypeReferenceNode(
+        node,
+        node.typeName,
+        context.factory.createNodeArray([T]),
+      );
     }
   }
+
+  // Recursive processing
+  const newTypeArguments = context.factory.createNodeArray(
+    node.typeArguments?.map((n) =>
+      transformNode(n, visitor, context, 'none', SafeUint.add(1, depth)),
+    ) ?? [],
+  );
 
   return context.factory.updateTypeReferenceNode(
     node,
@@ -669,7 +835,15 @@ const transformMappedTypeNode = (
     node.typeParameter,
     node.nameType,
     node.questionToken,
-    mapOptional(node.type, (n) => transformNode(n, visitor, context)),
+    mapOptional(node.type, (n) =>
+      transformNode(
+        n,
+        visitor,
+        context,
+        nextReadonlyContext(readonlyContext, 'none'),
+        SafeUint.add(1, depth),
+      ),
+    ),
     node.members,
   );
 
@@ -842,9 +1016,6 @@ const transformParenthesizedTypeNode = (
   return context.factory.updateParenthesizedType(node, T);
 };
 
-const removeParentheses = (node: ts.TypeNode): ts.TypeNode =>
-  ts.isParenthesizedTypeNode(node) ? node.type : node;
-
 /**
  * `tr(["member1: V1", "member2: V2", "member3: V3"])`
  *
@@ -852,60 +1023,103 @@ const removeParentheses = (node: ts.TypeNode): ts.TypeNode =>
  */
 const transformMembers = (
   members: ts.NodeArray<ts.TypeElement>,
-  readonly: 'add' | 'remove',
+  readonlyModifier: 'add' | 'remove',
   visitor: ts.Visitor,
   context: ts.TransformationContext,
+  readonlyContext: Extract<ReadonlyContext, 'DeepReadonly' | 'none'>,
+  depth: SafeUintWithSmallInt,
 ): ts.NodeArray<ts.TypeElement> =>
   context.factory.createNodeArray(
     members.map((mb) => {
       if (ts.isPropertySignature(mb)) {
-        return transformPropertySignature(mb, readonly, visitor, context);
+        return transformPropertySignature(
+          mb,
+          readonlyModifier,
+          visitor,
+          context,
+          readonlyContext,
+          SafeUint.add(1, depth),
+        );
       }
       if (ts.isIndexSignatureDeclaration(mb)) {
         return transformIndexSignatureDeclaration(
           mb,
-          readonly,
+          readonlyModifier,
           visitor,
           context,
+          readonlyContext,
+          SafeUint.add(1, depth),
         );
       }
 
-      return transformNode(mb, visitor, context);
+      return transformNode(
+        mb,
+        visitor,
+        context,
+        readonlyContext,
+        SafeUint.add(1, depth),
+      );
     }),
     members.hasTrailingComma,
   );
 
 const transformPropertySignature = (
   node: ts.PropertySignature,
-  readonly: 'add' | 'remove',
+  readonlyModifier: 'add' | 'remove',
   visitor: ts.Visitor,
   context: ts.TransformationContext,
+  readonlyContext: Extract<ReadonlyContext, 'DeepReadonly' | 'none'>,
+  depth: SafeUintWithSmallInt,
 ): ts.PropertySignature =>
   context.factory.updatePropertySignature(
     node,
-    strictMatch(readonly, {
+    strictMatch(readonlyModifier, {
       add: addReadonlyToModifiers(node.modifiers, context),
       remove: removeReadonlyFromModifiers(node.modifiers),
     }),
     node.name,
     node.questionToken,
-    mapOptional(node.type, (t) => transformNode(t, visitor, context)),
+    mapOptional(node.type, (t) =>
+      transformNode(
+        t,
+        visitor,
+        context,
+        readonlyContext,
+        SafeUint.add(1, depth),
+      ),
+    ),
   );
 
 const transformIndexSignatureDeclaration = (
   node: ts.IndexSignatureDeclaration,
-  readonly: 'add' | 'remove',
+  readonlyModifier: 'add' | 'remove',
   visitor: ts.Visitor,
   context: ts.TransformationContext,
+  readonlyContext: Extract<ReadonlyContext, 'DeepReadonly' | 'none'>,
+  depth: SafeUintWithSmallInt,
 ): ts.IndexSignatureDeclaration =>
   context.factory.updateIndexSignature(
     node,
-    strictMatch(readonly, {
+    strictMatch(readonlyModifier, {
       add: addReadonlyToModifiers(node.modifiers, context),
       remove: removeReadonlyFromModifiers(node.modifiers),
     }),
-    node.parameters.map((n) => transformNode(n, visitor, context)),
-    transformNode(node.type, visitor, context),
+    node.parameters.map((n) =>
+      transformNode(
+        n,
+        visitor,
+        context,
+        readonlyContext,
+        SafeUint.add(1, depth),
+      ),
+    ),
+    transformNode(
+      node.type,
+      visitor,
+      context,
+      readonlyContext,
+      SafeUint.add(1, depth),
+    ),
   );
 
 const removeReadonlyFromModifiers = <M extends ts.ModifierLike>(
