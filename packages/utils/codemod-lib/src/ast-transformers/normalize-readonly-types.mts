@@ -219,6 +219,9 @@ const transformNode: TransformNodeFn = ((
     );
   }
 
+  console.debug('(recursion)');
+  console.debug();
+
   return ts.visitEachChild(node, visitor, context);
 }) as TransformNodeFn;
 
@@ -405,6 +408,12 @@ const transformTypeReferenceNode = (
 
       //   return createReadonlyTypeNode(T, context);
       // }
+
+      return context.factory.updateTypeReferenceNode(
+        node,
+        node.typeName,
+        context.factory.createNodeArray([T]),
+      );
     }
   }
 
