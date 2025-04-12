@@ -24,6 +24,10 @@ import {
 import { createTransformerFactory, printNode } from '../utils/index.mjs';
 import { debugPrintWrapper } from './test-utils.mjs';
 
+type ConvertToReadonlyTypeOptions = Readonly<{
+  DeepReadonlyTypeName: string;
+}>;
+
 /**
  * Convert all types to readonly.
  *
@@ -43,10 +47,12 @@ import { debugPrintWrapper } from './test-utils.mjs';
  *   - `Readonly<A> & Readonly<B>` to `Readonly<A & B>`
  *   - `Readonly<A> | Readonly<B>` to `Readonly<A | B>`
  */
-export const convertToReadonlyType: ts.TransformerFactory<ts.SourceFile> =
+export const convertToReadonlyType = (
+  options: ConvertToReadonlyTypeOptions,
+): ts.TransformerFactory<ts.SourceFile> =>
   createTransformerFactory((context) => {
     const visitor: ts.Visitor = (node: ts.Node): ts.VisitResult<ts.Node> =>
-      transformNode(node, visitor, context, 'none', 0);
+      transformNode(node, visitor, context, 'none', options, 0);
 
     return visitor;
   });
@@ -56,6 +62,7 @@ type TransformNodeFn = <N extends ts.Node>(
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: ReadonlyContext,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ) => N extends ts.ArrayTypeNode | ts.TupleTypeNode
   ? N | ts.TypeOperatorNode
@@ -82,6 +89,7 @@ const transformNode: TransformNodeFn = ((
   visitor,
   context,
   readonlyContext,
+  options,
   depth,
 ) => {
   console.debug(`transformNode\t[${ts.SyntaxKind[node.kind]}]`);
@@ -102,6 +110,7 @@ const transformNode: TransformNodeFn = ((
         visitor,
         context,
         readonlyContext,
+        options,
         depth,
       ),
       depth,
@@ -117,7 +126,14 @@ const transformNode: TransformNodeFn = ((
     return debugPrintWrapper(
       'transformTypeLiteralNode',
       node,
-      transformTypeLiteralNode(node, visitor, context, readonlyContext, depth),
+      transformTypeLiteralNode(
+        node,
+        visitor,
+        context,
+        readonlyContext,
+        options,
+        depth,
+      ),
       depth,
     );
   }
@@ -131,7 +147,14 @@ const transformNode: TransformNodeFn = ((
     return debugPrintWrapper(
       'transformMappedTypeNode',
       node,
-      transformMappedTypeNode(node, visitor, context, readonlyContext, depth),
+      transformMappedTypeNode(
+        node,
+        visitor,
+        context,
+        readonlyContext,
+        options,
+        depth,
+      ),
       depth,
     );
   }
@@ -140,7 +163,7 @@ const transformNode: TransformNodeFn = ((
     return debugPrintWrapper(
       'transformInterfaceDeclarationNode',
       node,
-      transformInterfaceDeclarationNode(node, visitor, context, depth),
+      transformInterfaceDeclarationNode(node, visitor, context, options, depth),
       depth,
     );
   }
@@ -149,7 +172,7 @@ const transformNode: TransformNodeFn = ((
     return debugPrintWrapper(
       'transformClassDeclarationNode',
       node,
-      transformClassDeclarationNode(node, visitor, context, depth),
+      transformClassDeclarationNode(node, visitor, context, options, depth),
       depth,
     );
   }
@@ -158,7 +181,14 @@ const transformNode: TransformNodeFn = ((
     return debugPrintWrapper(
       'transformArrayTypeNode',
       node,
-      transformArrayTypeNode(node, visitor, context, readonlyContext, depth),
+      transformArrayTypeNode(
+        node,
+        visitor,
+        context,
+        readonlyContext,
+        options,
+        depth,
+      ),
       depth,
     );
   }
@@ -166,7 +196,14 @@ const transformNode: TransformNodeFn = ((
     return debugPrintWrapper(
       'transformTupleTypeNode',
       node,
-      transformTupleTypeNode(node, visitor, context, readonlyContext, depth),
+      transformTupleTypeNode(
+        node,
+        visitor,
+        context,
+        readonlyContext,
+        options,
+        depth,
+      ),
       depth,
     );
   }
@@ -174,7 +211,14 @@ const transformNode: TransformNodeFn = ((
     return debugPrintWrapper(
       'transformRestTypeNode',
       node,
-      transformRestTypeNode(node, visitor, context, readonlyContext, depth),
+      transformRestTypeNode(
+        node,
+        visitor,
+        context,
+        readonlyContext,
+        options,
+        depth,
+      ),
       depth,
     );
   }
@@ -187,7 +231,14 @@ const transformNode: TransformNodeFn = ((
     return debugPrintWrapper(
       'transformTypeOperatorNode',
       node,
-      transformTypeOperatorNode(node, visitor, context, readonlyContext, depth),
+      transformTypeOperatorNode(
+        node,
+        visitor,
+        context,
+        readonlyContext,
+        options,
+        depth,
+      ),
       depth,
     );
   }
@@ -206,6 +257,7 @@ const transformNode: TransformNodeFn = ((
         visitor,
         context,
         readonlyContext,
+        options,
         depth,
       ),
       depth,
@@ -221,7 +273,14 @@ const transformNode: TransformNodeFn = ((
     return debugPrintWrapper(
       'transformUnionTypeNode',
       node,
-      transformUnionTypeNode(node, visitor, context, readonlyContext, depth),
+      transformUnionTypeNode(
+        node,
+        visitor,
+        context,
+        readonlyContext,
+        options,
+        depth,
+      ),
       depth,
     );
   }
@@ -235,6 +294,7 @@ const transformNode: TransformNodeFn = ((
         visitor,
         context,
         readonlyContext,
+        options,
         depth,
       ),
       depth,
@@ -253,6 +313,7 @@ const transformTypeLiteralNode = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: Exclude<ReadonlyContext, 'readonly'>,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.TypeLiteralNode | ts.TypeReferenceNode => {
   const newTypeLiteralNode = context.factory.updateTypeLiteralNode(
@@ -264,6 +325,7 @@ const transformTypeLiteralNode = (
       visitor,
       context,
       nextReadonlyContext(readonlyContext, 'none'),
+      options,
       SafeUint.add(1, depth),
     ),
   );
@@ -285,6 +347,7 @@ const transformInterfaceDeclarationNode = (
   node: ts.InterfaceDeclaration,
   visitor: ts.Visitor,
   context: ts.TransformationContext,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.InterfaceDeclaration =>
   context.factory.updateInterfaceDeclaration(
@@ -292,10 +355,24 @@ const transformInterfaceDeclarationNode = (
     node.modifiers,
     node.name,
     node.typeParameters?.map((n) =>
-      transformNode(n, visitor, context, 'none', SafeUint.add(1, depth)),
+      transformNode(
+        n,
+        visitor,
+        context,
+        'none',
+        options,
+        SafeUint.add(1, depth),
+      ),
     ),
     node.heritageClauses?.map((n) =>
-      transformNode(n, visitor, context, 'none', SafeUint.add(1, depth)),
+      transformNode(
+        n,
+        visitor,
+        context,
+        'none',
+        options,
+        SafeUint.add(1, depth),
+      ),
     ),
     transformMembers(
       node.members,
@@ -303,6 +380,7 @@ const transformInterfaceDeclarationNode = (
       visitor,
       context,
       'none',
+      options,
       SafeUint.add(1, depth),
     ),
   );
@@ -311,6 +389,7 @@ const transformClassDeclarationNode = (
   node: ts.ClassDeclaration,
   visitor: ts.Visitor,
   context: ts.TransformationContext,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.ClassDeclaration =>
   context.factory.updateClassDeclaration(
@@ -318,10 +397,24 @@ const transformClassDeclarationNode = (
     node.modifiers,
     node.name,
     node.typeParameters?.map((n) =>
-      transformNode(n, visitor, context, 'none', SafeUint.add(1, depth)),
+      transformNode(
+        n,
+        visitor,
+        context,
+        'none',
+        options,
+        SafeUint.add(1, depth),
+      ),
     ),
     node.heritageClauses?.map((n) =>
-      transformNode(n, visitor, context, 'none', SafeUint.add(1, depth)),
+      transformNode(
+        n,
+        visitor,
+        context,
+        'none',
+        options,
+        SafeUint.add(1, depth),
+      ),
     ),
     node.members.map((mb: ts.ClassElement): ts.ClassElement => {
       console.debug(
@@ -336,7 +429,14 @@ const transformClassDeclarationNode = (
           mb.name,
           mb.questionToken,
           mapOptional(mb.type, (n) =>
-            transformNode(n, visitor, context, 'none', SafeUint.add(1, depth)),
+            transformNode(
+              n,
+              visitor,
+              context,
+              'none',
+              options,
+              SafeUint.add(1, depth),
+            ),
           ),
           mb.initializer,
         );
@@ -348,6 +448,7 @@ const transformClassDeclarationNode = (
           visitor,
           context,
           'none',
+          options,
           SafeUint.add(1, depth),
         );
       }
@@ -368,6 +469,7 @@ const transformClassDeclarationNode = (
                   visitor,
                   context,
                   'none',
+                  options,
                   SafeUint.add(1, depth),
                 ),
               ),
@@ -385,6 +487,7 @@ const transformClassDeclarationNode = (
         visitor,
         context,
         'none',
+        options,
         SafeUint.add(1, depth),
       );
     }),
@@ -406,6 +509,7 @@ const transformTypeReferenceNode = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: Exclude<ReadonlyContext, 'readonly'>,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.TypeNode => {
   expectType<
@@ -433,6 +537,7 @@ const transformTypeReferenceNode = (
         visitor,
         context,
         'none',
+        options,
         SafeUint.add(1, depth),
       );
 
@@ -456,6 +561,7 @@ const transformTypeReferenceNode = (
             visitor,
             context,
             nextReadonlyContext(readonlyContext, 'none'),
+            options,
             SafeUint.add(1, depth),
           ),
         ]),
@@ -480,6 +586,7 @@ const transformTypeReferenceNode = (
               visitor,
               context,
               nextReadonlyContext(readonlyContext, 'none'),
+              options,
               SafeUint.add(1, depth),
             ),
           ),
@@ -501,6 +608,7 @@ const transformTypeReferenceNode = (
         visitor,
         context,
         nextReadonlyContext(readonlyContext, 'Readonly'),
+        options,
         SafeUint.add(1, depth),
       );
 
@@ -663,7 +771,14 @@ const transformTypeReferenceNode = (
   // Recursive processing
   const newTypeArguments = context.factory.createNodeArray(
     node.typeArguments?.map((n) =>
-      transformNode(n, visitor, context, 'none', SafeUint.add(1, depth)),
+      transformNode(
+        n,
+        visitor,
+        context,
+        'none',
+        options,
+        SafeUint.add(1, depth),
+      ),
     ) ?? [],
   );
 
@@ -680,6 +795,7 @@ const transformArrayTypeNode = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: ReadonlyContext,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.ArrayTypeNode | ts.TypeOperatorNode => {
   // Recursive processing
@@ -688,6 +804,7 @@ const transformArrayTypeNode = (
     visitor,
     context,
     nextReadonlyContext(readonlyContext, 'none'),
+    options,
     SafeUint.add(1, depth),
   );
 
@@ -711,6 +828,7 @@ const transformTupleTypeNode = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: ReadonlyContext,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.TupleTypeNode | ts.TypeOperatorNode => {
   // Recursive processing
@@ -726,6 +844,7 @@ const transformTupleTypeNode = (
             visitor,
             context,
             nextReadonlyContext(readonlyContext, 'none'),
+            options,
             SafeUint.add(1, depth),
           ),
         )
@@ -734,6 +853,7 @@ const transformTupleTypeNode = (
           visitor,
           context,
           nextReadonlyContext(readonlyContext, 'none'),
+          options,
           SafeUint.add(1, depth),
         ),
   );
@@ -758,6 +878,7 @@ const transformRestTypeNode = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: ReadonlyContext,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.RestTypeNode => {
   // Recursive processing
@@ -766,6 +887,7 @@ const transformRestTypeNode = (
     visitor,
     context,
     readonlyContext === 'DeepReadonly' ? 'DeepReadonly' : 'none',
+    options,
     SafeUint.add(1, depth),
   );
 
@@ -790,6 +912,7 @@ const transformTypeOperatorNode = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: Exclude<ReadonlyContext, 'readonly'>,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.TypeNode => {
   // Recursive processing
@@ -801,6 +924,7 @@ const transformTypeOperatorNode = (
       readonlyContext,
       node.operator === ts.SyntaxKind.ReadonlyKeyword ? 'readonly' : 'none',
     ),
+    options,
     SafeUint.add(1, depth),
   );
 
@@ -818,6 +942,7 @@ const transformMappedTypeNode = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: Exclude<ReadonlyContext, 'readonly'>,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.MappedTypeNode | ts.TypeReferenceNode => {
   const newMappedTypeNode = context.factory.updateMappedTypeNode(
@@ -832,6 +957,7 @@ const transformMappedTypeNode = (
         visitor,
         context,
         nextReadonlyContext(readonlyContext, 'none'),
+        options,
         SafeUint.add(1, depth),
       ),
     ),
@@ -859,6 +985,7 @@ const transformIntersectionTypeNode = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: Exclude<ReadonlyContext, 'readonly'>,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.IntersectionTypeNode | ts.TypeReferenceNode => {
   // Recursive processing
@@ -869,6 +996,7 @@ const transformIntersectionTypeNode = (
         visitor,
         context,
         readonlyContext,
+        options,
         SafeUint.add(1, depth),
       ),
     );
@@ -910,6 +1038,7 @@ const transformUnionTypeNode = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: Exclude<ReadonlyContext, 'readonly'>,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.UnionTypeNode | ts.TypeReferenceNode => {
   // Recursive processing
@@ -920,6 +1049,7 @@ const transformUnionTypeNode = (
         visitor,
         context,
         readonlyContext,
+        options,
         SafeUint.add(1, depth),
       ),
     );
@@ -958,6 +1088,7 @@ const transformParenthesizedTypeNode = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: ReadonlyContext,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.TypeNode => {
   if (ts.isParenthesizedTypeNode(node.type)) {
@@ -967,6 +1098,7 @@ const transformParenthesizedTypeNode = (
       visitor,
       context,
       readonlyContext,
+      options,
       SafeUint.add(1, depth),
     );
   }
@@ -976,6 +1108,7 @@ const transformParenthesizedTypeNode = (
     visitor,
     context,
     readonlyContext,
+    options,
     SafeUint.add(1, depth),
   );
 
@@ -1018,6 +1151,7 @@ const transformMembers = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: Extract<ReadonlyContext, 'DeepReadonly' | 'none'>,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.NodeArray<ts.TypeElement> =>
   context.factory.createNodeArray(
@@ -1029,6 +1163,7 @@ const transformMembers = (
           visitor,
           context,
           readonlyContext,
+          options,
           SafeUint.add(1, depth),
         );
       }
@@ -1039,6 +1174,7 @@ const transformMembers = (
           visitor,
           context,
           readonlyContext,
+          options,
           SafeUint.add(1, depth),
         );
       }
@@ -1048,6 +1184,7 @@ const transformMembers = (
         visitor,
         context,
         readonlyContext,
+        options,
         SafeUint.add(1, depth),
       );
     }),
@@ -1060,6 +1197,7 @@ const transformPropertySignature = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: Extract<ReadonlyContext, 'DeepReadonly' | 'none'>,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.PropertySignature =>
   context.factory.updatePropertySignature(
@@ -1076,6 +1214,7 @@ const transformPropertySignature = (
         visitor,
         context,
         readonlyContext,
+        options,
         SafeUint.add(1, depth),
       ),
     ),
@@ -1087,6 +1226,7 @@ const transformIndexSignatureDeclaration = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
   readonlyContext: Extract<ReadonlyContext, 'DeepReadonly' | 'none'>,
+  options: ConvertToReadonlyTypeOptions,
   depth: SafeUintWithSmallInt,
 ): ts.IndexSignatureDeclaration =>
   context.factory.updateIndexSignature(
@@ -1101,6 +1241,7 @@ const transformIndexSignatureDeclaration = (
         visitor,
         context,
         readonlyContext,
+        options,
         SafeUint.add(1, depth),
       ),
     ),
@@ -1109,6 +1250,7 @@ const transformIndexSignatureDeclaration = (
       visitor,
       context,
       readonlyContext,
+      options,
       SafeUint.add(1, depth),
     ),
   );

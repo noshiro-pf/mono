@@ -13,7 +13,7 @@ const testFn = ({
   debug?: boolean;
 }>): void => {
   const { expectedFormatted, result } = testPreprocess(
-    convertToReadonlyType,
+    convertToReadonlyType({ DeepReadonlyTypeName: 'DeepReadonly' }),
     source,
     expected,
     debug ?? false,
