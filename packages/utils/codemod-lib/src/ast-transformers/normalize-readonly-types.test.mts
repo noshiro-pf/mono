@@ -1,6 +1,7 @@
 /* eslint-disable vitest/expect-expect */
 import { codeFromStringLines, testPreprocess } from '../utils/index.mjs';
 import { normalizeReadonlyTypes } from './normalize-readonly-types.mjs';
+import { toUnionAndIntersectionTestCase } from './test-case-utils.mjs';
 
 const testFn = ({
   source,
@@ -147,37 +148,48 @@ describe('normalizeReadonlyTypes', () => {
 
   describe('Union and intersection types', () => {
     test.each([
-      {
-        name: 'Union of arrays',
-        source: 'type UnionArr = string[] | readonly number[];',
-        expected: 'type UnionArr = string[] | readonly number[];', // Unchanged
-      },
-      {
-        name: 'Union of objects',
-        source: 'type UnionObj = { a: string[] } | { b: readonly number[] };',
-        expected: 'type UnionObj = { a: string[] } | { b: readonly number[] };', // Unchanged
-      },
-      {
-        name: 'Union including non-object/array',
-        source:
-          'type UnionMixed = { a: readonly string[] } | readonly number[];',
-        expected:
-          'type UnionMixed = { a: readonly string[] } | readonly number[];', // Unchanged
-      },
-      {
-        name: 'Union where only one part is normalized',
-        source: 'type UnionPartialReadonly = Readonly<string[]> | number[];',
-        expected: 'type UnionPartialReadonly = readonly string[] | number[];', // Only Readonly<string[]> is normalized
-      },
-      {
-        name: 'Union of Readonly objects',
-        source:
-          'type UnionObj = Readonly<{ a: string[] }> | Readonly<{ b: readonly number[] }>;',
-        // Readonly<A> | Readonly<B> -> Readonly<A | B> (Collapse)
-        // Inner types are not normalized (string[], readonly number[])
-        expected:
-          'type UnionObj = Readonly<{ a: string[] } | { b: readonly number[] }>;',
-      },
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} of arrays`,
+        testCase: (op) => ({
+          source: `type Arr =  string[] ${op} readonly number[];`,
+          expected: `type Arr = string[] ${op} readonly number[];`, // Unchanged
+        }),
+      }),
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} of objects`,
+        testCase: (op) => ({
+          source: `type Obj = { a: string[] } ${op} { b: readonly number[] };`,
+          expected: `type Obj = { a: string[] } ${op} { b: readonly number[] };`, // Unchanged
+        }),
+      }),
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} including non-object/array`,
+        testCase: (op) => ({
+          source: `type Obj = { a: readonly string[] } ${op} readonly number[];`,
+          expected: `type Obj = { a: readonly string[] } ${op} readonly number[];`, // Unchanged
+        }),
+      }),
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} where only one part is normalized`,
+        testCase: (op) => ({
+          source: `type PartialReadonlyType = Readonly<string[]> ${op} number[];`,
+          expected: `type PartialReadonlyType = readonly string[] ${op} number[];`, // Only Readonly<string[]> is normalized
+        }),
+      }),
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} of Readonly objects`,
+        testCase: (op) => ({
+          source: `type Obj = Readonly<{ a: string[] }> ${op} Readonly<{ b: readonly number[] }>;`,
+          // Readonly<A> | Readonly<B> -> Readonly<A | B> (Collapse)
+          // Inner types are not normalized (string[], readonly number[])
+          expected: `type Obj = Readonly<{ a: string[] } ${op} { b: readonly number[] }>;`,
+        }),
+      }),
+
       {
         name: 'Union of generic and non-generic readonly objects',
         source:
@@ -193,41 +205,6 @@ describe('normalizeReadonlyTypes', () => {
           'type IntersectMixed = Readonly<{ a: string[] }> & { b: readonly number[] };',
       },
       {
-        name: 'Intersection of arrays (less common)',
-        source: 'type IntersectArr = string[] & readonly number[];',
-        expected: 'type IntersectArr = string[] & readonly number[];', // Unchanged
-      },
-      {
-        name: 'Intersection of objects',
-        source:
-          'type IntersectObj = { a: readonly string[] } & { b: number[] };',
-        expected:
-          'type IntersectObj = { a: readonly string[] } & { b: number[] };', // Unchanged
-      },
-      {
-        name: 'Intersection including non-object/array',
-        source:
-          'type IntersectMixed = { a: readonly string[] } & readonly string[];',
-        expected:
-          'type IntersectMixed = { a: readonly string[] } & readonly string[];', // Unchanged
-      },
-      {
-        name: 'Intersection where only one part is normalized',
-        source:
-          'type IntersectionPartialReadonly = Readonly<string[]> & number[];',
-        expected:
-          'type IntersectionPartialReadonly = readonly string[] & number[];', // Only Readonly<string[]> is normalized
-      },
-      {
-        name: 'Intersection of Readonly objects',
-        source:
-          'type IntersectionObj = Readonly<{ a: string[] }> & Readonly<{ b: readonly number[] }>;',
-        // Readonly<A> & Readonly<B> -> Readonly<A & B> (Collapse)
-        // Inner types are not normalized (string[], readonly number[])
-        expected:
-          'type IntersectionObj = Readonly<{ a: string[] } & { b: readonly number[] }>;',
-      },
-      {
         name: 'Nested union/intersection',
         source:
           'type Nested = (string[] | Readonly<{ x: Map<string, number[]> }>) & Readonly<{ y: Set<boolean[]> }>;',
@@ -235,44 +212,68 @@ describe('normalizeReadonlyTypes', () => {
         expected:
           'type Nested = (string[] | Readonly<{ x: Map<string, number[]> }>) & Readonly<{ y: Set<boolean[]> }>;',
       },
-      {
-        name: 'Union collapse with Array types',
-        source: 'type UArr = Readonly<string[]> | Readonly<number[]>;',
-        // Readonly<A[]> | Readonly<B[]> -> Readonly<A[] | B[]>
-        expected: 'type UArr = readonly string[] | readonly number[];',
-      },
-      {
-        name: 'Intersection collapse with Array types',
-        source: 'type IArr = Readonly<string[]> & Readonly<number[]>;',
-        // Readonly<A[]> & Readonly<B[]> -> Readonly<A[] & B[]>
-        expected: 'type IArr = readonly string[] & readonly number[];',
-      },
-      {
-        name: 'Union of readonly arrays in Readonly',
-        source: 'type UArr = Readonly<readonly string[] | readonly number[]>;',
-        expected: 'type UArr = readonly string[] | readonly number[];',
-      },
-      {
-        name: 'Intersection of readonly arrays in Readonly',
-        source: 'type IArr = Readonly<readonly string[] & readonly number[]>;',
-        expected: 'type IArr = readonly string[] & readonly number[];',
-      },
-      {
-        name: 'Union mixed 1',
-        source:
-          'type Mixed = Readonly<Readonly<{ x: string }> | readonly number[]>;',
-        expected: 'type Mixed = Readonly<{ x: string }> | readonly number[];',
-      },
-      {
-        name: 'Union mixed 2',
-        source: 'type Mixed = Readonly<{ x: string }> | readonly number[];',
-        expected: 'type Mixed = Readonly<{ x: string }> | readonly number[];',
-      },
-      {
-        name: 'Union mixed 3',
-        source: 'type Mixed = Readonly<{ x: string } | readonly number[]>;',
-        expected: 'type Mixed = Readonly<{ x: string }> | readonly number[];',
-      },
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} collapse with Array types`,
+        testCase: (op) => ({
+          source: `type Arr = Readonly<string[]> ${op} Readonly<number[]>;`,
+          // Readonly<A[]> | Readonly<B[]> -> Readonly<A[] | B[]>
+          // Readonly<A[]> & Readonly<B[]> -> Readonly<A[] & B[]>
+          expected: `type Arr = readonly string[] ${op} readonly number[];`,
+        }),
+      }),
+
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `${op} of readonly arrays in Readonly`,
+        testCase: (op) => ({
+          source: `type Arr = Readonly<readonly string[] ${op} readonly number[]>;`,
+          expected: `type Arr = readonly string[] ${op} readonly number[];`,
+        }),
+      }),
+
+      ...[
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<Readonly<{ x: string }> ${op} readonly number[]>;`,
+          expected: `type Mixed = readonly number[] ${op} Readonly<{ x: string }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string } ${op} readonly number[]>;`,
+          expected: `type Mixed = readonly number[] ${op} Readonly<{ x: string }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string }> ${op} Readonly<number[]>;`,
+          expected: `type Mixed = readonly number[] ${op} Readonly<{ x: string }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string } ${op} Readonly<number[]>>;`,
+          expected: `type Mixed = readonly number[] ${op} Readonly<{ x: string }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string }> ${op} readonly number[];`,
+          expected: `type Mixed = readonly number[] ${op} Readonly<{ x: string }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string } ${op} readonly number[] ${op} { y: number } ${op} readonly string[]>;`,
+          expected: `type Mixed = Readonly<{ x: string } ${op} { y: number }> ${op} readonly number[] ${op} readonly string[];`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string } ${op} readonly number[] ${op} { y: number } ${op} readonly string[]>;`,
+          expected: `type Mixed = readonly number[] ${op} readonly string[] ${op} Readonly<{ x: string } ${op} { y: number }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<{ x: string } ${op} number[] ${op} Readonly<{ y: number }> ${op} readonly string[]>;`,
+          expected: `type Mixed = readonly number[] ${op} readonly string[] ${op} Readonly<{ x: string } ${op} { y: number }>;`,
+        }),
+        (op: '|' | '&') => ({
+          source: `type Mixed = Readonly<unknown ${op} { x: string } ${op} number[] ${op} Readonly<{ y: number }> ${op} readonly string[]>;`,
+          expected: `type Mixed = unknown ${op} readonly number[] ${op} readonly string[] ${op} Readonly<{ x: string } ${op} { y: number }>;`,
+        }),
+      ].flatMap((t, i) =>
+        toUnionAndIntersectionTestCase({
+          title: (op) => `${op} of mixed types ${i}`,
+          testCase: t,
+        }),
+      ),
     ])('$name', testFn);
   });
 

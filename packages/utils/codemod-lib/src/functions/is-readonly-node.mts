@@ -1,10 +1,11 @@
 import { Arr, expectType } from '@noshiro/ts-utils';
 import * as ts from 'typescript';
+import { isPrimitiveTypeNode } from './is-primitive-type-node.mjs';
 
-export const isReadonlyOrReadonlyTupleOrArrayNode = (
-  node: ts.Node,
-): node is ReadonlyArrayTypeNode | ReadonlyTupleTypeNode | ReadonlyNode =>
-  isReadonlyTupleOrArrayTypeNode(node) || isReadonlyNode(node);
+export const isShallowReadonlyTypeNode = (node: ts.Node): boolean =>
+  isReadonlyTupleOrArrayTypeNode(node) ||
+  isReadonlyTypeNode(node) ||
+  isPrimitiveTypeNode(node);
 
 export const isReadonlyTupleOrArrayTypeNode = (
   node: ts.Node,
@@ -51,7 +52,7 @@ export type ReadonlyTupleTypeNode = ts.TypeOperatorNode &
     type: ts.TupleTypeNode;
   }>;
 
-export const isReadonlyTupleNode = (
+export const isReadonlyTupleTypeNode = (
   node: ts.Node,
 ): node is ReadonlyTupleTypeNode =>
   ts.isTypeOperatorNode(node) &&
@@ -70,7 +71,7 @@ if (import.meta.vitest !== undefined) {
       ]),
     ) as ts.Node;
 
-    if (isReadonlyTupleNode(node)) {
+    if (isReadonlyTupleTypeNode(node)) {
       expectType<typeof node.operator, ts.SyntaxKind.ReadonlyKeyword>('=');
       expectType<typeof node.type, ts.TypeNode & ts.TupleTypeNode>('=');
     }
@@ -79,7 +80,7 @@ if (import.meta.vitest !== undefined) {
   });
 }
 
-export type ReadonlyNode = ts.TypeReferenceNode &
+export type ReadonlyTypeNode = ts.TypeReferenceNode &
   Readonly<{
     typeName: Readonly<{
       kind: ts.SyntaxKind.Identifier;
@@ -88,7 +89,7 @@ export type ReadonlyNode = ts.TypeReferenceNode &
     typeArguments: ts.NodeArray<ts.TypeNode> & readonly [ts.TypeNode];
   }>;
 
-export const isReadonlyNode = (node: ts.Node): node is ReadonlyNode =>
+export const isReadonlyTypeNode = (node: ts.Node): node is ReadonlyTypeNode =>
   ts.isTypeReferenceNode(node) &&
   node.typeName.kind === ts.SyntaxKind.Identifier &&
   node.typeName.text === 'Readonly' &&
@@ -112,7 +113,7 @@ if (import.meta.vitest !== undefined) {
       ],
     ) as ts.Node;
 
-    if (isReadonlyNode(node)) {
+    if (isReadonlyTypeNode(node)) {
       expectType<typeof node.kind, ts.SyntaxKind.TypeReference>('=');
       expectType<typeof node.typeName.kind, ts.SyntaxKind.Identifier>('=');
       expectType<typeof node.typeName.text, 'Readonly'>('=');
@@ -121,7 +122,7 @@ if (import.meta.vitest !== undefined) {
 
     expect(node.kind).toBe(ts.SyntaxKind.TypeReference);
 
-    if (!isReadonlyNode(node)) {
+    if (!isReadonlyTypeNode(node)) {
       throw new Error('node should be ReadonlyNode');
     }
 

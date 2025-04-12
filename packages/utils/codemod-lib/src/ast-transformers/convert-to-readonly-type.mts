@@ -7,8 +7,8 @@ import {
   createReadonlyTypeNode,
   isPrimitiveTypeNode,
   isReadonlyArrayTypeNode,
-  isReadonlyNode,
-  isReadonlyTupleNode,
+  isReadonlyTupleTypeNode,
+  isReadonlyTypeNode,
   isSpreadNamedTupleMemberNode,
   isSpreadParameterNode,
 } from '../functions/index.mjs';
@@ -199,7 +199,7 @@ const transformRestTypeNode = (
   // Recursive processing
   const T = transformNode(node.type, visitor, context);
 
-  if (isReadonlyArrayTypeNode(T) || isReadonlyTupleNode(T)) {
+  if (isReadonlyArrayTypeNode(T) || isReadonlyTupleTypeNode(T)) {
     return context.factory.updateRestTypeNode(node, T.type);
   }
 
@@ -222,7 +222,7 @@ const transformTypeLiteralNode = (
     const parent = node.parent as ts.Node | undefined;
 
     // Skip if already of type `Readonly<{ member: V }>`
-    if (parent !== undefined && isReadonlyNode(parent)) {
+    if (parent !== undefined && isReadonlyTypeNode(parent)) {
       // skip if already readonly
       // `{ member: V }`
       return newTypeLiteralNode;
@@ -396,13 +396,13 @@ const transformTypeReferenceNode = (
     // T = readonly E[]
     // Readonly<readonly E[]> -> readonly E[]
     // Readonly<readonly [E1, E2, E3]> -> readonly [E1, E2, E3]
-    if (isReadonlyArrayTypeNode(T) || isReadonlyTupleNode(T)) {
+    if (isReadonlyArrayTypeNode(T) || isReadonlyTupleTypeNode(T)) {
       return T;
     }
 
     // T = Readonly<E>
     // Readonly<Readonly<E>> -> Readonly<E>
-    if (isReadonlyNode(T)) {
+    if (isReadonlyTypeNode(T)) {
       return T;
     }
 
@@ -411,7 +411,9 @@ const transformTypeReferenceNode = (
       // T = readonly A[] | Readonly<B>
       // Readonly<readonly A[] | Readonly<B>> -> readonly A[] | Readonly<B>
       if (
-        T.types.every((t) => isReadonlyArrayTypeNode(t) || isReadonlyNode(t))
+        T.types.every(
+          (t) => isReadonlyArrayTypeNode(t) || isReadonlyTypeNode(t),
+        )
       ) {
         return T;
       }
@@ -423,7 +425,9 @@ const transformTypeReferenceNode = (
       // T = readonly A[] & Readonly<B>
       // Readonly<readonly A[] & Readonly<B>> -> readonly A[] & Readonly<B>
       if (
-        T.types.every((t) => isReadonlyArrayTypeNode(t) || isReadonlyNode(t))
+        T.types.every(
+          (t) => isReadonlyArrayTypeNode(t) || isReadonlyTypeNode(t),
+        )
       ) {
         return T;
       }
@@ -467,7 +471,7 @@ const transformMappedTypeNode = (
   {
     const parent = node.parent as ts.Node | undefined;
     // Skip if already of type `Readonly<{ member: X }>`
-    if (parent !== undefined && isReadonlyNode(parent)) {
+    if (parent !== undefined && isReadonlyTypeNode(parent)) {
       // skip if already readonly
       return newMappedTypeNode;
     }
@@ -492,7 +496,7 @@ const transformIntersectionTypeNode = (
     newTypes.map((n) => printNode(n, node.getSourceFile())),
   );
 
-  if (newTypes.every(isReadonlyNode)) {
+  if (newTypes.every(isReadonlyTypeNode)) {
     // Readonly<*> & ... & Readonly<*>
     const args = context.factory.createNodeArray(
       newTypes.map(
@@ -526,7 +530,7 @@ const transformUnionTypeNode = (
     newTypes.map((n) => printNode(n, node.getSourceFile())),
   );
 
-  if (newTypes.every(isReadonlyNode)) {
+  if (newTypes.every(isReadonlyTypeNode)) {
     // Readonly<*> | ... | Readonly<*>
     const args = context.factory.createNodeArray(
       newTypes.map(

@@ -13,12 +13,13 @@ import {
   createReadonlyTypeOperatorNode,
   isPrimitiveTypeNode,
   isReadonlyArrayTypeNode,
-  isReadonlyNode,
-  isReadonlyOrReadonlyTupleOrArrayNode,
-  isReadonlyTupleNode,
   isReadonlyTupleOrArrayTypeNode,
+  isReadonlyTupleTypeNode,
+  isReadonlyTypeNode,
+  isShallowReadonlyTypeNode,
   nextReadonlyContext,
   type ReadonlyContext,
+  type ReadonlyTypeNode,
 } from '../functions/index.mjs';
 import { createTransformerFactory, printNode } from '../utils/index.mjs';
 
@@ -298,6 +299,17 @@ const transformTypeLiteralNode = (
   }
 };
 
+/**
+ * - `tr(ReadonlyArray<E>) |-> readonly tr(E)[]`
+ * - `tr(Readonly<Readonly<E>>) |-> Readonly<tr(E)>`
+ * - `tr(DeepReadonly<Readonly<E>>) |-> DeepReadonly<tr(E)>`
+ * - `tr(Readonly<number>) |-> number`
+ * - `tr(Readonly<E[]>) |-> readonly tr(E)[]`
+ * - `tr(Readonly<[E1, E2, E3]>) |-> readonly [tr(E1), tr(E2), tr(E3)]`
+ * - `tr(Readonly<readonly E[]>) |-> readonly tr(E)[]`
+ * - `tr(Readonly<readonly [E1, E2, E3]>) |-> readonly [tr(E1), tr(E2), tr(E3)]`
+ * - `tr(Readonly<A | readonly E[]>) |-> Readonly<tr(A)> | readonly tr(E)[]>`
+ */
 const transformTypeReferenceNode = (
   node: ts.TypeReferenceNode,
   visitor: ts.Visitor,
@@ -385,11 +397,99 @@ const transformTypeReferenceNode = (
 
       // T = A | B | C
       // T = A & B & C
-      if (
-        (ts.isUnionTypeNode(T) || ts.isIntersectionTypeNode(T)) &&
-        T.types.every(isReadonlyOrReadonlyTupleOrArrayNode)
-      ) {
-        return T;
+      if (ts.isUnionTypeNode(T) || ts.isIntersectionTypeNode(T)) {
+        if (T.types.every(isReadonlyTypeNode)) {
+          return context.factory.updateTypeReferenceNode(
+            node,
+            node.typeName,
+            context.factory.createNodeArray([
+              ts.isUnionTypeNode(T)
+                ? context.factory.updateUnionTypeNode(
+                    T,
+                    context.factory.createNodeArray(
+                      T.types.map((t: ReadonlyTypeNode) => t.typeArguments[0]),
+                    ),
+                  )
+                : context.factory.updateIntersectionTypeNode(
+                    T,
+                    context.factory.createNodeArray(
+                      T.types.map((t: ReadonlyTypeNode) => t.typeArguments[0]),
+                    ),
+                  ),
+            ]),
+            // context.factory.createNodeArray(
+            //   T.types.map((t: ReadonlyTypeNode) => t.typeArguments[0]),
+            // ),
+          );
+        }
+
+        if (T.types.every(isShallowReadonlyTypeNode)) {
+          return T;
+        }
+
+        // `Readonly<number | { x: X } | readonly E[]> -> number | readonly E[] | Readonly<{ x: X }>`
+        const primitives = T.types.filter(isPrimitiveTypeNode);
+        const arraysAndTuples = T.types.filter(
+          (t) =>
+            ts.isArrayTypeNode(t) ||
+            ts.isTupleTypeNode(t) ||
+            isReadonlyTupleOrArrayTypeNode(t),
+        );
+        const typeLiterals = T.types.filter(ts.isTypeLiteralNode);
+
+        const readonlyTypeLiterals =
+          typeLiterals.length === 0
+            ? []
+            : [
+                createReadonlyTypeNode(
+                  ts.isUnionTypeNode(T)
+                    ? context.factory.createUnionTypeNode(typeLiterals)
+                    : context.factory.createIntersectionTypeNode(typeLiterals),
+                  context,
+                ),
+              ];
+
+        return ts.isUnionTypeNode(T)
+          ? context.factory.updateUnionTypeNode(
+              T,
+              context.factory.createNodeArray([
+                ...primitives,
+                ...arraysAndTuples,
+                ...readonlyTypeLiterals,
+              ]),
+            )
+          : context.factory.updateIntersectionTypeNode(
+              T,
+              context.factory.createNodeArray([
+                ...primitives,
+                ...arraysAndTuples,
+                ...readonlyTypeLiterals,
+              ]),
+            );
+
+        // context.factory.updateTypeReferenceNode(
+        // node,
+        // node.typeName,
+        // context.factory.createNodeArray([
+        //   ts.isUnionTypeNode(T)
+        //     ? context.factory.updateUnionTypeNode(
+        //         T,
+        //         context.factory.createNodeArray([
+        //           ...primitives,
+        //           ...arraysAndTuples,
+        //           ...typeLiterals,
+        //         ]),
+        //       )
+        //     : context.factory.updateIntersectionTypeNode(
+        //         T,
+        //         context.factory.createNodeArray([
+        //           ...primitives,
+        //           ...arraysAndTuples,
+        //           ...typeLiterals,
+        //         ]),
+        //       ),
+        // ]),
+        // );
       }
       //   // T = readonly A[] | Readonly<B>
       //   // Readonly<readonly A[] | Readonly<B>> -> readonly A[] | Readonly<B>
@@ -520,7 +620,7 @@ const transformRestTypeNode = (
 
   // `tr("...readonly E[]") |-> ...tr(E)[]`
   // `tr("...readonly [E1, E2]") |-> ...[tr(E1), tr(E2)]`
-  if (isReadonlyArrayTypeNode(R) || isReadonlyTupleNode(R)) {
+  if (isReadonlyArrayTypeNode(R) || isReadonlyTupleTypeNode(R)) {
     return context.factory.updateRestTypeNode(
       node,
       R.type /* = tr(E)[] or [tr(E1), tr(E2)] */,
@@ -579,7 +679,7 @@ const transformIntersectionTypeNode = (
       ),
     );
 
-  if (newTypes.every(isReadonlyNode)) {
+  if (newTypes.every(isReadonlyTypeNode)) {
     // Readonly<*> & ... & Readonly<*>
     const args = context.factory.createNodeArray(
       newTypes.map((type) => type.typeArguments[0]),
@@ -605,8 +705,8 @@ const transformIntersectionTypeNode = (
 };
 
 /**
- * - `tr(A | B) -> tr(A) | tr(B)`
- * - `tr(Readonly<A> | Readonly<B>) -> Readonly<tr(A) | tr(B)>`
+ * - `tr(A | B) |-> tr(A) | tr(B)`
+ * - `tr(Readonly<A> | Readonly<B>) |-> Readonly<tr(A) | tr(B)>`
  */
 const transformUnionTypeNode = (
   node: ts.UnionTypeNode,
@@ -627,7 +727,7 @@ const transformUnionTypeNode = (
       ),
     );
 
-  if (newTypes.every(isReadonlyNode)) {
+  if (newTypes.every(isReadonlyTypeNode)) {
     // Readonly<*> | ... | Readonly<*>
     const args = context.factory.createNodeArray(
       newTypes.map((type) => type.typeArguments[0]),
