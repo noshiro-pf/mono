@@ -6,7 +6,7 @@ import {
   createReadonlyTupleTypeNode,
   createReadonlyTypeNode,
   isPrimitiveTypeNode,
-  isReadonlyArrayNode,
+  isReadonlyArrayTypeNode,
   isReadonlyNode,
   isReadonlyTupleNode,
   isSpreadNamedTupleMemberNode,
@@ -199,7 +199,7 @@ const transformRestTypeNode = (
   // Recursive processing
   const T = transformNode(node.type, visitor, context);
 
-  if (isReadonlyArrayNode(T) || isReadonlyTupleNode(T)) {
+  if (isReadonlyArrayTypeNode(T) || isReadonlyTupleNode(T)) {
     return context.factory.updateRestTypeNode(node, T.type);
   }
 
@@ -396,7 +396,7 @@ const transformTypeReferenceNode = (
     // T = readonly E[]
     // Readonly<readonly E[]> -> readonly E[]
     // Readonly<readonly [E1, E2, E3]> -> readonly [E1, E2, E3]
-    if (isReadonlyArrayNode(T) || isReadonlyTupleNode(T)) {
+    if (isReadonlyArrayTypeNode(T) || isReadonlyTupleNode(T)) {
       return T;
     }
 
@@ -410,7 +410,9 @@ const transformTypeReferenceNode = (
     if (ts.isUnionTypeNode(T)) {
       // T = readonly A[] | Readonly<B>
       // Readonly<readonly A[] | Readonly<B>> -> readonly A[] | Readonly<B>
-      if (T.types.every((t) => isReadonlyArrayNode(t) || isReadonlyNode(t))) {
+      if (
+        T.types.every((t) => isReadonlyArrayTypeNode(t) || isReadonlyNode(t))
+      ) {
         return T;
       }
 
@@ -420,7 +422,9 @@ const transformTypeReferenceNode = (
     if (ts.isIntersectionTypeNode(T)) {
       // T = readonly A[] & Readonly<B>
       // Readonly<readonly A[] & Readonly<B>> -> readonly A[] & Readonly<B>
-      if (T.types.every((t) => isReadonlyArrayNode(t) || isReadonlyNode(t))) {
+      if (
+        T.types.every((t) => isReadonlyArrayTypeNode(t) || isReadonlyNode(t))
+      ) {
         return T;
       }
 
@@ -549,7 +553,7 @@ const transformTypeOperatorNode = (
   visitor: ts.Visitor,
   context: ts.TransformationContext,
 ): ts.TypeNode => {
-  if (isReadonlyArrayNode(node)) {
+  if (isReadonlyArrayTypeNode(node)) {
     const parent = node.parent as ts.Node | undefined;
 
     const E = transformNode(node.type.elementType, visitor, context);

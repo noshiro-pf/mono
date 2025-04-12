@@ -12,10 +12,11 @@ import {
   createReadonlyTypeNode,
   createReadonlyTypeOperatorNode,
   isPrimitiveTypeNode,
-  isReadonlyArrayNode,
+  isReadonlyArrayTypeNode,
   isReadonlyNode,
+  isReadonlyOrReadonlyTupleOrArrayNode,
   isReadonlyTupleNode,
-  isReadonlyTupleOrArrayNode,
+  isReadonlyTupleOrArrayTypeNode,
   nextReadonlyContext,
   type ReadonlyContext,
 } from '../functions/index.mjs';
@@ -225,7 +226,7 @@ const transformNode: TransformNodeFn = ((
   return ts.visitEachChild(node, visitor, context);
 }) as TransformNodeFn;
 
-// `{ readonly member: V }` -> `Readonly<{ member: V }>`
+// `{ readonly member: V } |-> Readonly<{ member: V }>`
 const transformTypeLiteralNode = (
   node: ts.TypeLiteralNode,
   visitor: ts.Visitor,
@@ -263,7 +264,7 @@ const transformTypeLiteralNode = (
         );
 
       return allMembersAreReadonly
-        ? // `{ readonly x: X, readonly y: Y }` -> `Readonly<{ x: X, y: Y }>`
+        ? // `{ readonly x: X, readonly y: Y } |-> Readonly<{ x: X, y: Y }>`
           createReadonlyTypeNode(
             context.factory.updateTypeLiteralNode(
               node,
@@ -378,30 +379,20 @@ const transformTypeReferenceNode = (
       // T = E[] or [E1, E2, E3]
       // Readonly<readonly E[]> -> readonly E[]
       // Readonly<readonly [E1, E2, E3]> -> readonly [E1, E2, E3]
-      if (isReadonlyTupleOrArrayNode(T)) {
+      if (isReadonlyTupleOrArrayTypeNode(T)) {
         return T;
       }
 
-      // // T = Readonly<E>
-      // // Readonly<Readonly<E>> -> Readonly<E>
-      // if (isReadonlyNode(T)) {
-      //   return T;
-      // }
-
-      // // T = A | B | C
-      // if (ts.isUnionTypeNode(T)) {
+      // T = A | B | C
+      // T = A & B & C
+      if (
+        (ts.isUnionTypeNode(T) || ts.isIntersectionTypeNode(T)) &&
+        T.types.every(isReadonlyOrReadonlyTupleOrArrayNode)
+      ) {
+        return T;
+      }
       //   // T = readonly A[] | Readonly<B>
       //   // Readonly<readonly A[] | Readonly<B>> -> readonly A[] | Readonly<B>
-      //   if (T.types.every((t) => isReadonlyArrayNode(t) || isReadonlyNode(t))) {
-      //     return T;
-      //   }
-
-      //   return createReadonlyTypeNode(T, context);
-      // }
-      // // T = A & B & C
-      // if (ts.isIntersectionTypeNode(T)) {
-      //   // T = readonly A[] & Readonly<B>
-      //   // Readonly<readonly A[] & Readonly<B>> -> readonly A[] & Readonly<B>
       //   if (T.types.every((t) => isReadonlyArrayNode(t) || isReadonlyNode(t))) {
       //     return T;
       //   }
@@ -448,18 +439,17 @@ const transformArrayTypeNode = (
     SafeUint.add(1, depth),
   );
 
-  switch (readonlyContext) {
-    case 'DeepReadonly':
-    case 'Readonly':
-    case 'readonly':
-      return context.factory.updateArrayTypeNode(node, E);
+  return context.factory.updateArrayTypeNode(node, E);
 
-    case 'none':
-      return createReadonlyTypeOperatorNode(
-        context.factory.updateArrayTypeNode(node, E),
-        context,
-      );
-  }
+  // switch (readonlyContext) {
+  //   case 'DeepReadonly':
+  //   case 'Readonly':
+  //   case 'readonly':
+  //     return context.factory.updateArrayTypeNode(node, E);
+
+  //   case 'none':
+  //     return context.factory.updateArrayTypeNode(node, E);
+  // }
 };
 
 /** `tr([E1, E2, E3])` |-> `[tr(E1), tr(E2), tr(E3)]` */
@@ -495,18 +485,20 @@ const transformTupleTypeNode = (
         ),
   );
 
-  switch (readonlyContext) {
-    case 'DeepReadonly':
-    case 'Readonly':
-    case 'readonly':
-      return context.factory.updateTupleTypeNode(node, Es);
+  return context.factory.updateTupleTypeNode(node, Es);
 
-    case 'none':
-      return createReadonlyTypeOperatorNode(
-        context.factory.updateTupleTypeNode(node, Es),
-        context,
-      );
-  }
+  // switch (readonlyContext) {
+  //   case 'DeepReadonly':
+  //   case 'Readonly':
+  //   case 'readonly':
+  //     return context.factory.updateTupleTypeNode(node, Es);
+
+  //   case 'none':
+  //     return createReadonlyTypeOperatorNode(
+  //       context.factory.updateTupleTypeNode(node, Es),
+  //       context,
+  //     );
+  // }
 };
 
 /** `tr("...T")` |-> `...tr(T)` */
@@ -526,9 +518,9 @@ const transformRestTypeNode = (
     SafeUint.add(1, depth),
   );
 
-  // `tr("...readonly E[]")` -> `...tr(E)[]`
-  // `tr("...readonly [E1, E2]")` -> `...[tr(E1), tr(E2)]`
-  if (isReadonlyArrayNode(R) || isReadonlyTupleNode(R)) {
+  // `tr("...readonly E[]") |-> ...tr(E)[]`
+  // `tr("...readonly [E1, E2]") |-> ...[tr(E1), tr(E2)]`
+  if (isReadonlyArrayTypeNode(R) || isReadonlyTupleNode(R)) {
     return context.factory.updateRestTypeNode(
       node,
       R.type /* = tr(E)[] or [tr(E1), tr(E2)] */,
@@ -539,8 +531,8 @@ const transformRestTypeNode = (
 };
 
 /**
- * - `readonly T[][]` -> `readonly (readonly T[])[]`
- * - `keyof { a: number[] }` -> `keyof Readonly<{ a: readonly number[] }>`
+ * - `readonly T[][] |-> readonly (readonly T[])[]`
+ * - `keyof { a: number[] } |-> keyof Readonly<{ a: readonly number[] }>`
  */
 const transformTypeOperatorNode = (
   node: ts.TypeOperatorNode,
@@ -582,15 +574,10 @@ const transformIntersectionTypeNode = (
         n,
         visitor,
         context,
-        nextReadonlyContext(readonlyContext, 'none'),
+        readonlyContext,
         SafeUint.add(1, depth),
       ),
     );
-
-  // console.debug(
-  //   'Intersection converted',
-  //   newTypes.map((n) => printNode(n, node.getSourceFile())),
-  // );
 
   if (newTypes.every(isReadonlyNode)) {
     // Readonly<*> & ... & Readonly<*>
@@ -635,15 +622,10 @@ const transformUnionTypeNode = (
         n,
         visitor,
         context,
-        nextReadonlyContext(readonlyContext, 'none'),
+        readonlyContext,
         SafeUint.add(1, depth),
       ),
     );
-
-  // console.debug(
-  //   'Union converted',
-  //   newTypes.map((n) => printNode(n, node.getSourceFile())),
-  // );
 
   if (newTypes.every(isReadonlyNode)) {
     // Readonly<*> | ... | Readonly<*>
@@ -698,27 +680,27 @@ const transformParenthesizedTypeNode = (
   );
 
   // remove () if T is TypeReferenceNode
-  // e.g. `(Readonly<A>)` -> `Readonly<A>`
+  // e.g. `(Readonly<A>) |-> Readonly<A>`
   if (ts.isTypeReferenceNode(T)) return T;
 
   // remove () if T is TypeOperatorNode
-  // e.g. `(readonly A[])` -> `readonly A[]`
+  // e.g. `(readonly A[]) |-> readonly A[]`
   if (ts.isTypeOperatorNode(T)) return T;
 
   // remove () if T is ArrayTypeNode
-  // e.g. `(A[])` -> `A[]`
+  // e.g. `(A[]) |-> A[]`
   if (ts.isArrayTypeNode(T)) return T;
 
   // remove () if T is TupleTypeNode
-  // e.g. `([A])` -> `[A]`
+  // e.g. `([A]) |-> [A]`
   if (ts.isTupleTypeNode(T)) return T;
 
   // remove () if T is PrimitiveTypeNode
-  // e.g. `(number)` -> `number`
+  // e.g. `(number) |-> number`
   if (isPrimitiveTypeNode(T)) return T;
 
   // remove () if T is TypeLiteralNode
-  // e.g. `({ member: V })` -> `{ member: V }`
+  // e.g. `({ member: V }) |-> { member: V }`
   if (ts.isTypeLiteralNode(T)) return T;
 
   // otherwise, keep ()

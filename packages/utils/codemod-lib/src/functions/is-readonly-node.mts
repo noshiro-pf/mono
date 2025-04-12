@@ -1,17 +1,27 @@
 import { Arr, expectType } from '@noshiro/ts-utils';
 import * as ts from 'typescript';
 
-export const isReadonlyTupleOrArrayNode = (
+export const isReadonlyOrReadonlyTupleOrArrayNode = (
   node: ts.Node,
-): node is ts.TypeOperatorNode &
-  Readonly<{ type: ts.ArrayTypeNode | ts.TupleTypeNode }> =>
+): node is ReadonlyArrayTypeNode | ReadonlyTupleTypeNode | ReadonlyNode =>
+  isReadonlyTupleOrArrayTypeNode(node) || isReadonlyNode(node);
+
+export const isReadonlyTupleOrArrayTypeNode = (
+  node: ts.Node,
+): node is ReadonlyArrayTypeNode | ReadonlyTupleTypeNode =>
   ts.isTypeOperatorNode(node) &&
   node.operator === ts.SyntaxKind.ReadonlyKeyword &&
   (ts.isArrayTypeNode(node.type) || ts.isTupleTypeNode(node.type));
 
-export const isReadonlyArrayNode = (
+export type ReadonlyArrayTypeNode = ts.TypeOperatorNode &
+  Readonly<{
+    operator: ts.SyntaxKind.ReadonlyKeyword;
+    type: ts.ArrayTypeNode;
+  }>;
+
+export const isReadonlyArrayTypeNode = (
   node: ts.Node,
-): node is ts.TypeOperatorNode & Readonly<{ type: ts.ArrayTypeNode }> =>
+): node is ReadonlyArrayTypeNode =>
   ts.isTypeOperatorNode(node) &&
   node.operator === ts.SyntaxKind.ReadonlyKeyword &&
   ts.isArrayTypeNode(node.type);
@@ -26,13 +36,8 @@ if (import.meta.vitest !== undefined) {
       ),
     ) as ts.Node;
 
-    if (isReadonlyArrayNode(node)) {
-      expectType<
-        typeof node.operator,
-        | ts.SyntaxKind.KeyOfKeyword
-        | ts.SyntaxKind.ReadonlyKeyword
-        | ts.SyntaxKind.UniqueKeyword
-      >('=');
+    if (isReadonlyArrayTypeNode(node)) {
+      expectType<typeof node.operator, ts.SyntaxKind.ReadonlyKeyword>('=');
       expectType<typeof node.type, ts.TypeNode & ts.ArrayTypeNode>('=');
     }
 
@@ -40,9 +45,15 @@ if (import.meta.vitest !== undefined) {
   });
 }
 
+export type ReadonlyTupleTypeNode = ts.TypeOperatorNode &
+  Readonly<{
+    operator: ts.SyntaxKind.ReadonlyKeyword;
+    type: ts.TupleTypeNode;
+  }>;
+
 export const isReadonlyTupleNode = (
   node: ts.Node,
-): node is ts.TypeOperatorNode & Readonly<{ type: ts.TupleTypeNode }> =>
+): node is ReadonlyTupleTypeNode =>
   ts.isTypeOperatorNode(node) &&
   node.operator === ts.SyntaxKind.ReadonlyKeyword &&
   ts.isTupleTypeNode(node.type);
@@ -60,12 +71,7 @@ if (import.meta.vitest !== undefined) {
     ) as ts.Node;
 
     if (isReadonlyTupleNode(node)) {
-      expectType<
-        typeof node.operator,
-        | ts.SyntaxKind.KeyOfKeyword
-        | ts.SyntaxKind.ReadonlyKeyword
-        | ts.SyntaxKind.UniqueKeyword
-      >('=');
+      expectType<typeof node.operator, ts.SyntaxKind.ReadonlyKeyword>('=');
       expectType<typeof node.type, ts.TypeNode & ts.TupleTypeNode>('=');
     }
 
@@ -73,16 +79,16 @@ if (import.meta.vitest !== undefined) {
   });
 }
 
-export const isReadonlyNode = (
-  node: ts.Node,
-): node is ts.TypeReferenceNode &
+export type ReadonlyNode = ts.TypeReferenceNode &
   Readonly<{
     typeName: Readonly<{
       kind: ts.SyntaxKind.Identifier;
       text: 'Readonly';
     }>;
     typeArguments: ts.NodeArray<ts.TypeNode> & readonly [ts.TypeNode];
-  }> =>
+  }>;
+
+export const isReadonlyNode = (node: ts.Node): node is ReadonlyNode =>
   ts.isTypeReferenceNode(node) &&
   node.typeName.kind === ts.SyntaxKind.Identifier &&
   node.typeName.text === 'Readonly' &&

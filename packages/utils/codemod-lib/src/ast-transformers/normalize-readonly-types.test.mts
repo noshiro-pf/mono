@@ -77,7 +77,6 @@ describe('normalizeReadonlyTypes', () => {
         name: 'Nested Readonly wrapper',
         source: 'type T = Readonly<Readonly<{ x: 3 }>>;',
         expected: 'type T = Readonly<{ x: 3 }>;', // Readonly<Readonly<T>> -> Readonly<T>
-        debug: true,
       },
       {
         name: 'Deeply nested Readonly wrapper',
@@ -257,6 +256,22 @@ describe('normalizeReadonlyTypes', () => {
         name: 'Intersection of readonly arrays in Readonly',
         source: 'type IArr = Readonly<readonly string[] & readonly number[]>;',
         expected: 'type IArr = readonly string[] & readonly number[];',
+      },
+      {
+        name: 'Union mixed 1',
+        source:
+          'type Mixed = Readonly<Readonly<{ x: string }> | readonly number[]>;',
+        expected: 'type Mixed = Readonly<{ x: string }> | readonly number[];',
+      },
+      {
+        name: 'Union mixed 2',
+        source: 'type Mixed = Readonly<{ x: string }> | readonly number[];',
+        expected: 'type Mixed = Readonly<{ x: string }> | readonly number[];',
+      },
+      {
+        name: 'Union mixed 3',
+        source: 'type Mixed = Readonly<{ x: string } | readonly number[]>;',
+        expected: 'type Mixed = Readonly<{ x: string }> | readonly number[];',
       },
     ])('$name', testFn);
   });
