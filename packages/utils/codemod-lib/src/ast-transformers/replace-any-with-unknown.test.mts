@@ -17,12 +17,12 @@ describe('replaceAnyWithUnknown', () => {
     {
       name: 'Spread syntax in function arguments',
       source: 'const fn = (...args: any): void => {}',
-      expected: 'const fn = (...args: unknown[]): void => {}',
+      expected: 'const fn = (...args: readonly unknown[]): void => {}',
     },
     {
       name: 'Spread syntax in named tuple member',
       source: 'type Foo = [number, ...args: any];',
-      expected: 'type Foo = [number, ...args: unknown[]];',
+      expected: 'type Foo = [number, ...args: readonly unknown[]];',
     },
   ])('$name', testFn);
 });

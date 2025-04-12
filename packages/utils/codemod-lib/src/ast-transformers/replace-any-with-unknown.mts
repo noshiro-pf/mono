@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 import * as ts from 'typescript';
 import {
+  createReadonlyArrayTypeNode,
   isSpreadNamedTupleMemberNode,
   isSpreadParameterNode,
 } from '../functions/index.mjs';
@@ -35,8 +36,9 @@ const transformNode: TransformNodeFn = ((node, visitor, context) => {
         // `[name: E0, ...args: any)]` -> `[name: E0, ...args: any]`
         isSpreadNamedTupleMemberNode(parent))
     ) {
-      return context.factory.createArrayTypeNode(
+      return createReadonlyArrayTypeNode(
         context.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
+        context,
       );
     }
 
