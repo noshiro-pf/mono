@@ -17,10 +17,10 @@ import {
   isReadonlyTupleOrArrayTypeNode,
   isReadonlyTupleTypeNode,
   isReadonlyTypeNode,
-  isShallowReadonlyTypeNode,
   nextReadonlyContext,
+  type ReadonlyArrayTypeNode,
   type ReadonlyContext,
-  type ReadonlyTypeNode,
+  type ReadonlyTupleTypeNode,
 } from '../functions/index.mjs';
 import { createTransformerFactory, printNode } from '../utils/index.mjs';
 import { debugPrintWrapper } from './test-utils.mjs';
@@ -674,46 +674,32 @@ const transformTypeReferenceNode = (
       }
 
       // T = A | B | C
-      if (ts.isUnionTypeNode(T)) {
-        if (T.types.every(isReadonlyTypeNode)) {
-          return context.factory.updateTypeReferenceNode(
-            node,
-            node.typeName,
-            context.factory.createNodeArray([
-              context.factory.updateUnionTypeNode(
-                T,
-                context.factory.createNodeArray(
-                  T.types.map((t: ReadonlyTypeNode) => t.typeArguments[0]),
-                ),
-              ),
-            ]),
-          );
-        }
+      // T = A & B & C
+      if (ts.isUnionTypeNode(T) || ts.isIntersectionTypeNode(T)) {
+        const grouped = Arr.groupBy(T.types, (t) =>
+          isPrimitiveTypeNode(t)
+            ? 'primitives'
+            : isReadonlyTupleOrArrayTypeNode(t)
+              ? 'arraysAndTuples'
+              : ts.isTypeLiteralNode(t)
+                ? 'typeLiterals'
+                : 'others',
+        );
 
-        if (T.types.every(isShallowReadonlyTypeNode)) {
-          return T;
-        }
+        const primitives = grouped.get('primitives') ?? [];
 
-        // `Readonly<number | { x: X } | readonly E[]> -> number | readonly E[] | Readonly<{ x: X }>`
-        const primitives = T.types.filter(isPrimitiveTypeNode);
+        const arraysAndTuples =
+          grouped.get('arraysAndTuples')?.map(
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            (t) => (t as ReadonlyTupleTypeNode | ReadonlyArrayTypeNode).type,
+          ) ?? [];
 
-        const arraysAndTuples = T.types
-          .filter(
-            (t) =>
-              ts.isArrayTypeNode(t) ||
-              ts.isTupleTypeNode(t) ||
-              isReadonlyTupleOrArrayTypeNode(t),
-          )
-          .map((t) =>
-            isReadonlyTupleOrArrayTypeNode(t)
-              ? t
-              : createReadonlyTypeOperatorNode(t, context),
-          );
+        const typeLiterals = grouped.get('typeLiterals');
 
-        const typeLiterals = T.types.filter(ts.isTypeLiteralNode);
+        const others = grouped.get('others') ?? [];
 
         const readonlyTypeLiterals =
-          typeLiterals.length === 0
+          typeLiterals === undefined
             ? []
             : [
                 createReadonlyTypeNode(
@@ -722,73 +708,21 @@ const transformTypeReferenceNode = (
                 ),
               ];
 
-        return context.factory.updateUnionTypeNode(
-          T,
-          context.factory.createNodeArray([
-            ...primitives,
-            ...arraysAndTuples,
-            ...readonlyTypeLiterals,
-          ]),
-        );
-      }
+        const nodeArray = context.factory.createNodeArray([
+          ...primitives,
+          ...arraysAndTuples,
+          ...readonlyTypeLiterals,
+          ...others,
+        ]);
 
-      // T = A & B & C
-      if (ts.isIntersectionTypeNode(T)) {
-        if (T.types.every(isReadonlyTypeNode)) {
-          return context.factory.updateTypeReferenceNode(
-            node,
-            node.typeName,
-            context.factory.createNodeArray([
-              context.factory.updateIntersectionTypeNode(
-                T,
-                context.factory.createNodeArray(
-                  T.types.map((t: ReadonlyTypeNode) => t.typeArguments[0]),
-                ),
-              ),
-            ]),
-          );
-        }
+        // Readonly<number & { x: X } & { y: Y } & readonly E[]>
+        // -> number & readonly E[] & Readonly<{ x: X } & { y: Y }>
 
-        if (T.types.every(isShallowReadonlyTypeNode)) {
-          return T;
-        }
-
-        // `Readonly<number & { x: X } & readonly E[]> -> number & readonly E[] & Readonly<{ x: X }>`
-        const primitives = T.types.filter(isPrimitiveTypeNode);
-
-        const arraysAndTuples = T.types
-          .filter(
-            (t) =>
-              ts.isArrayTypeNode(t) ||
-              ts.isTupleTypeNode(t) ||
-              isReadonlyTupleOrArrayTypeNode(t),
-          )
-          .map((t) =>
-            isReadonlyTupleOrArrayTypeNode(t)
-              ? t
-              : createReadonlyTypeOperatorNode(t, context),
-          );
-
-        const typeLiterals = T.types.filter(ts.isTypeLiteralNode);
-
-        const readonlyTypeLiterals =
-          typeLiterals.length === 0
-            ? []
-            : [
-                createReadonlyTypeNode(
-                  context.factory.createIntersectionTypeNode(typeLiterals),
-                  context,
-                ),
-              ];
-
-        return context.factory.updateIntersectionTypeNode(
-          T,
-          context.factory.createNodeArray([
-            ...primitives,
-            ...arraysAndTuples,
-            ...readonlyTypeLiterals,
-          ]),
-        );
+        // Readonly<number | { x: X } | { y: Y } | readonly E[]>
+        // -> number | readonly E[] | Readonly<{ x: X } | { y: Y }>
+        return ts.isIntersectionTypeNode(T)
+          ? context.factory.updateIntersectionTypeNode(T, nodeArray)
+          : context.factory.updateUnionTypeNode(T, nodeArray);
       }
 
       return context.factory.updateTypeReferenceNode(
@@ -840,32 +774,21 @@ const transformTypeReferenceNode = (
       }
 
       // T = A | B | C
-      if (ts.isUnionTypeNode(T)) {
+      // T = A & B & C
+      if (ts.isUnionTypeNode(T) || ts.isIntersectionTypeNode(T)) {
         const grouped = Arr.groupBy(T.types, (t) =>
           isPrimitiveTypeNode(t)
             ? 'primitives'
-            : ts.isArrayTypeNode(t) ||
-                ts.isTupleTypeNode(t) ||
-                isReadonlyTupleOrArrayTypeNode(t)
+            : ts.isArrayTypeNode(t) || ts.isTupleTypeNode(t)
               ? 'arraysAndTuples'
               : ts.isTypeLiteralNode(t)
                 ? 'typeLiterals'
                 : 'others',
         );
 
-        // `Readonly<number | { x: X } | readonly E[]> -> number | readonly E[] | Readonly<{ x: X }>`
         const primitives = grouped.get('primitives') ?? [];
 
-        const arraysAndTuples =
-          grouped.get('arraysAndTuples')?.map((t) =>
-            isReadonlyTupleOrArrayTypeNode(t)
-              ? t
-              : createReadonlyTypeOperatorNode(
-                  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-                  t as ts.ArrayTypeNode | ts.TupleTypeNode,
-                  context,
-                ),
-          ) ?? [];
+        const arraysAndTuples = grouped.get('arraysAndTuples') ?? [];
 
         const typeLiterals = grouped.get('typeLiterals');
 
@@ -881,74 +804,21 @@ const transformTypeReferenceNode = (
                 ),
               ];
 
-        return context.factory.updateUnionTypeNode(
-          T,
-          context.factory.createNodeArray([
-            ...primitives,
-            ...arraysAndTuples,
-            ...readonlyTypeLiterals,
-            ...others,
-          ]),
-        );
-      }
+        const nodeArray = context.factory.createNodeArray([
+          ...primitives,
+          ...arraysAndTuples,
+          ...readonlyTypeLiterals,
+          ...others,
+        ]);
 
-      // T = A & B & C
-      if (ts.isIntersectionTypeNode(T)) {
-        if (T.types.every(isReadonlyTypeNode)) {
-          return context.factory.updateTypeReferenceNode(
-            node,
-            node.typeName,
-            context.factory.createNodeArray([
-              context.factory.updateIntersectionTypeNode(
-                T,
-                context.factory.createNodeArray(
-                  T.types.map((t: ReadonlyTypeNode) => t.typeArguments[0]),
-                ),
-              ),
-            ]),
-          );
-        }
+        // Readonly<number & { x: X } & { y: Y } & readonly E[]>
+        // -> number & readonly E[] & Readonly<{ x: X } & { y: Y }>
 
-        if (T.types.every(isShallowReadonlyTypeNode)) {
-          return T;
-        }
-
-        // `Readonly<number & { x: X } & readonly E[]> -> number & readonly E[] & Readonly<{ x: X }>`
-        const primitives = T.types.filter(isPrimitiveTypeNode);
-
-        const arraysAndTuples = T.types
-          .filter(
-            (t) =>
-              ts.isArrayTypeNode(t) ||
-              ts.isTupleTypeNode(t) ||
-              isReadonlyTupleOrArrayTypeNode(t),
-          )
-          .map((t) =>
-            isReadonlyTupleOrArrayTypeNode(t)
-              ? t
-              : createReadonlyTypeOperatorNode(t, context),
-          );
-
-        const typeLiterals = T.types.filter(ts.isTypeLiteralNode);
-
-        const readonlyTypeLiterals =
-          typeLiterals.length === 0
-            ? []
-            : [
-                createReadonlyTypeNode(
-                  context.factory.createIntersectionTypeNode(typeLiterals),
-                  context,
-                ),
-              ];
-
-        return context.factory.updateIntersectionTypeNode(
-          T,
-          context.factory.createNodeArray([
-            ...primitives,
-            ...arraysAndTuples,
-            ...readonlyTypeLiterals,
-          ]),
-        );
+        // Readonly<number | { x: X } | { y: Y } | readonly E[]>
+        // -> number | readonly E[] | Readonly<{ x: X } | { y: Y }>
+        return ts.isIntersectionTypeNode(T)
+          ? context.factory.updateIntersectionTypeNode(T, nodeArray)
+          : context.factory.updateUnionTypeNode(T, nodeArray);
       }
 
       return context.factory.updateTypeReferenceNode(
@@ -1119,7 +989,10 @@ const transformTypeOperatorNode = (
     SafeUint.add(1, depth),
   );
 
-  return context.factory.updateTypeOperatorNode(node, newType);
+  // DeepReadonly<readonly E[]> -> DeepReadonly<E[]>
+  return readonlyContext === 'DeepReadonly'
+    ? newType
+    : context.factory.updateTypeOperatorNode(node, newType);
 };
 
 /**
@@ -1201,17 +1074,16 @@ const transformIntersectionTypeNode = (
       newTypes.map((type) => type.typeArguments[0]),
     );
 
-    switch (readonlyContext) {
-      case 'DeepReadonly':
-      case 'Readonly':
-        return context.factory.updateIntersectionTypeNode(node, args);
-
-      case 'none':
-        return createReadonlyTypeNode(
-          context.factory.updateIntersectionTypeNode(node, args),
-          context,
-        );
+    if (readonlyContext !== 'none') {
+      throw new Error(
+        `readonlyContext cannot be "${readonlyContext}" if all newTypes are ReadonlyTypeNode`,
+      );
     }
+
+    return createReadonlyTypeNode(
+      context.factory.updateIntersectionTypeNode(node, args),
+      context,
+    );
   }
 
   return context.factory.updateIntersectionTypeNode(
@@ -1254,17 +1126,16 @@ const transformUnionTypeNode = (
       newTypes.map((type) => type.typeArguments[0]),
     );
 
-    switch (readonlyContext) {
-      case 'DeepReadonly':
-      case 'Readonly':
-        return context.factory.updateUnionTypeNode(node, args);
-
-      case 'none':
-        return createReadonlyTypeNode(
-          context.factory.updateUnionTypeNode(node, args),
-          context,
-        );
+    if (readonlyContext !== 'none') {
+      throw new Error(
+        `readonlyContext cannot be "${readonlyContext}" if all newTypes are ReadonlyTypeNode`,
+      );
     }
+
+    return createReadonlyTypeNode(
+      context.factory.updateUnionTypeNode(node, args),
+      context,
+    );
   }
 
   return context.factory.updateUnionTypeNode(
