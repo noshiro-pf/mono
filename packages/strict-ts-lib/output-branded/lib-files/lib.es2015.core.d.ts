@@ -571,7 +571,7 @@ interface String {
    *
    * @param count Number of copies to append
    */
-  repeat(count: SafeUint): string;
+  repeat(count: NumberType.StringSizeArgNonNegative): string;
 
   /**
    * Returns true if the sequence of elements of searchString converted to a

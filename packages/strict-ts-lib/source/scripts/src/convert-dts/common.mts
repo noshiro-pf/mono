@@ -134,14 +134,16 @@ export const brandedNumberTypeDefString = (): string => {
     TypedArraySearchResult,
     NewArrayMaxSize,
 
-    ...rest
+    ...fromTypeUtils
   } = BrandedNumberName;
 
-  expectType<keyof typeof rest, (typeof brandedNumberFromTypeUtils)[number]>(
-    '=',
-  );
+  expectType<
+    keyof typeof fromTypeUtils,
+    (typeof brandedNumberFromTypeUtils)[number]
+  >('=');
 
-  const { SafeUint, Uint32, PositiveNumber, NegativeInt32, SafeInt } = rest;
+  const { SafeUint, Uint32, PositiveNumber, NegativeInt32, SafeInt } =
+    fromTypeUtils;
 
   return [
     '/**',
