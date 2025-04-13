@@ -25,25 +25,34 @@ export const EventListPage = memoNamed('EventListPage', () => {
 
   const eventListWithHandler = useMemo(
     () =>
-      eventList?.map((e) =>
-        tp(
-          e,
-          () => {
-            if (fireAuthUser === undefined) return;
-            archiveEventScheduleHandler(e.eventScheduleMetadata.id, {
-              id: UserId.cast(fireAuthUser.uid),
-              name: UserName.cast(fireAuthUser.displayName ?? ''),
-            }).catch(noop);
-          },
-          () => {
-            if (fireAuthUser === undefined) return;
-            unarchiveEventScheduleHandler(e.eventScheduleMetadata.id, {
-              id: UserId.cast(fireAuthUser.uid),
-              name: UserName.cast(fireAuthUser.displayName ?? ''),
-            }).catch(noop);
-          },
+      eventList
+        // TODO: backend でソートするようにする
+        ?.toSorted(
+          (a, b) =>
+            (b.eventScheduleMetadata.createdAtMillis ??
+              Date.parse(b.eventScheduleMetadata.createdAt)) -
+            (a.eventScheduleMetadata.createdAtMillis ??
+              Date.parse(a.eventScheduleMetadata.createdAt)),
+        )
+        .map((e) =>
+          tp(
+            e,
+            () => {
+              if (fireAuthUser === undefined) return;
+              archiveEventScheduleHandler(e.eventScheduleMetadata.id, {
+                id: UserId.cast(fireAuthUser.uid),
+                name: UserName.cast(fireAuthUser.displayName ?? ''),
+              }).catch(noop);
+            },
+            () => {
+              if (fireAuthUser === undefined) return;
+              unarchiveEventScheduleHandler(e.eventScheduleMetadata.id, {
+                id: UserId.cast(fireAuthUser.uid),
+                name: UserName.cast(fireAuthUser.displayName ?? ''),
+              }).catch(noop);
+            },
+          ),
         ),
-      ),
 
     [eventList, fireAuthUser],
   );
