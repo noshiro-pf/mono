@@ -1930,7 +1930,108 @@ describe('convertToReadonlyType', () => {
     ])('$name', testFn);
   });
 
-  // describe('test', () => {
-  //   test.each([])('$name', testFn);
-  // });
+  describe('DeepReadonly', () => {
+    test.each([
+      {
+        name: 'DeepReadonly with primitive types',
+        source: 'type T = DeepReadonly<number>;',
+        expected: 'type T = number;',
+      },
+      {
+        name: 'DeepReadonly with array types',
+        source: 'type T = DeepReadonly<number[]>;',
+        expected: 'type T = readonly number[];',
+      },
+      {
+        name: 'DeepReadonly with nested array types',
+        source: 'type T = DeepReadonly<number[][]>;',
+        expected: 'type T = readonly (readonly number[])[];',
+      },
+      {
+        name: 'DeepReadonly with object types',
+        source: 'type T = DeepReadonly<{ a: string; b: number }>;',
+        expected: 'type T = Readonly<{ a: string; b: number }>;',
+      },
+      {
+        name: 'DeepReadonly with nested object types',
+        source: 'type T = DeepReadonly<{ a: { b: string } }>;',
+        expected: 'type T = Readonly<{ a: Readonly<{ b: string }> }>;',
+      },
+      {
+        name: 'DeepReadonly with Map types',
+        source: 'type T = DeepReadonly<Map<string, number>>;',
+        expected: 'type T = ReadonlyMap<string, number>;',
+      },
+      {
+        name: 'DeepReadonly with nested Map types',
+        source: 'type T = DeepReadonly<Map<string, number[]>>;',
+        expected: 'type T = ReadonlyMap<string, readonly number[]>;',
+      },
+      {
+        name: 'DeepReadonly with Set types',
+        source: 'type T = DeepReadonly<Set<string>>;',
+        expected: 'type T = ReadonlySet<string>;',
+      },
+      {
+        name: 'DeepReadonly with nested Set types',
+        source: 'type T = DeepReadonly<Set<{ a: number }>>;',
+        expected: 'type T = ReadonlySet<Readonly<{ a: number }>>;',
+      },
+      {
+        name: 'DeepReadonly with complex nested types',
+        source: 'type T = DeepReadonly<{ a: Map<string, { b: number[] }> }>;',
+        expected: 'type T = Readonly<{ a: ReadonlyMap<string, Readonly<{ b: readonly number[] }>> }>;',
+      },
+      {
+        name: 'DeepReadonly with tuple types',
+        source: 'type T = DeepReadonly<[string, number]>;',
+        expected: 'type T = readonly [string, number];',
+      },
+      {
+        name: 'DeepReadonly with nested tuple types',
+        source: 'type T = DeepReadonly<[string, [number, boolean]]>;',
+        expected: 'type T = readonly [string, readonly [number, boolean]];',
+      },
+      {
+        name: 'DeepReadonly with union types',
+        source: 'type T = DeepReadonly<string | number[]>;',
+        expected: 'type T = string | readonly number[];',
+      },
+      {
+        name: 'DeepReadonly with intersection types',
+        source: 'type T = DeepReadonly<{ a: string } & { b: number[] }>;',
+        expected: 'type T = Readonly<{ a: string }> & Readonly<{ b: readonly number[] }>;',
+      },
+      {
+        name: 'Nested DeepReadonly types',
+        source: 'type T = DeepReadonly<DeepReadonly<number[]>>;',
+        expected: 'type T = readonly number[];',
+      },
+      {
+        name: 'DeepReadonly with Readonly',
+        source: 'type T = DeepReadonly<Readonly<{ a: string }>>;',
+        expected: 'type T = Readonly<{ a: string }>;',
+      },
+      {
+        name: 'Readonly with DeepReadonly',
+        source: 'type T = Readonly<DeepReadonly<{ a: string[] }>>;',
+        expected: 'type T = Readonly<{ a: readonly string[] }>;',
+      },
+      {
+        name: 'DeepReadonly in function parameters',
+        source: 'function foo(a: DeepReadonly<{ data: number[] }>) {}',
+        expected: 'function foo(a: Readonly<{ data: readonly number[] }>) {}',
+      },
+      {
+        name: 'DeepReadonly in variable declarations',
+        source: 'const data: DeepReadonly<{ items: Array<{ id: string }> }> = { items: [] };',
+        expected: 'const data: Readonly<{ items: readonly Readonly<{ id: string }>[] }> = { items: [] };',
+      },
+      {
+        name: 'DeepReadonly with complex data structures',
+        source: 'type T = DeepReadonly<{ data: Array<{ id: string; items: Array<{ name: string }> }> }>;',
+        expected: 'type T = Readonly<{ data: readonly Readonly<{ id: string; items: readonly Readonly<{ name: string }>[] }>[] }>;',
+      },
+    ])('$name', testFn);
+  });
 });
