@@ -1,4 +1,4 @@
-import { pipe } from '@noshiro/ts-utils';
+import { pipe } from '@noshiro/ts-type-utils';
 import * as ts from 'typescript';
 import {
   codeFromStringLines,

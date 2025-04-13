@@ -5,7 +5,7 @@ import {
   mapOptional,
   SafeUint,
   strictMatch,
-} from '@noshiro/ts-utils';
+} from '@noshiro/ts-type-utils';
 import * as ts from 'typescript';
 import {
   createReadonlyArrayTypeNode,
