@@ -1819,7 +1819,7 @@ describe('convertToReadonlyType', () => {
           'let list: List<number[]>;',
         ),
         expected: codeFromStringLines(
-          'type List<T> = Readonly<{ value: T, next: List<T> | null }>;',
+          'type List<T> = Readonly<{ value: T, next: null | List<T> }>;',
           'let list: List<readonly number[]>;',
         ),
       },

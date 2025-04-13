@@ -1,5 +1,24 @@
 import * as ts from 'typescript';
 
+export type PrimitiveTypeNode = Readonly<
+  | ts.LiteralTypeNode
+  | ts.TemplateLiteralTypeNode
+  | (ts.TypeNode & {
+      kind:
+        | ts.SyntaxKind.StringKeyword
+        | ts.SyntaxKind.BooleanKeyword
+        | ts.SyntaxKind.NumberKeyword
+        | ts.SyntaxKind.BigIntKeyword
+        | ts.SyntaxKind.SymbolKeyword
+        | ts.SyntaxKind.UndefinedKeyword
+        | ts.SyntaxKind.VoidKeyword
+        | ts.SyntaxKind.AnyKeyword
+        | ts.SyntaxKind.UnknownKeyword
+        | ts.SyntaxKind.ObjectKeyword
+        | ts.SyntaxKind.NeverKeyword;
+    })
+>;
+
 /**
  * Checks if a given TypeScript node represents a primitive type.
  *
@@ -14,31 +33,22 @@ import * as ts from 'typescript';
  * @param node The node to check
  * @returns True if it is a primitive type node, false if not
  */
-export const isPrimitiveTypeNode = (node: ts.Node): boolean => {
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
-  switch (node.kind) {
-    case ts.SyntaxKind.StringKeyword:
-    case ts.SyntaxKind.NumberKeyword:
-    case ts.SyntaxKind.BooleanKeyword:
-    case ts.SyntaxKind.BigIntKeyword:
-    case ts.SyntaxKind.SymbolKeyword:
-    case ts.SyntaxKind.UndefinedKeyword:
-      return true;
-
-    case ts.SyntaxKind.VoidKeyword:
-    case ts.SyntaxKind.AnyKeyword:
-    case ts.SyntaxKind.UnknownKeyword:
-    case ts.SyntaxKind.NeverKeyword:
-      return true;
-
-    // null, "aaa", 1.23, 456n
-    case ts.SyntaxKind.LiteralType:
-      return true;
-
-    default:
-      return false;
-  }
-};
+export const isPrimitiveTypeNode = (node: ts.Node): node is PrimitiveTypeNode =>
+  // null, "aaa", 1.23, 456n
+  ts.isLiteralTypeNode(node) ||
+  ts.isTemplateLiteralTypeNode(node) ||
+  (ts.isTypeNode(node) &&
+    (node.kind === ts.SyntaxKind.StringKeyword ||
+      node.kind === ts.SyntaxKind.BooleanKeyword ||
+      node.kind === ts.SyntaxKind.NumberKeyword ||
+      node.kind === ts.SyntaxKind.BigIntKeyword ||
+      node.kind === ts.SyntaxKind.SymbolKeyword ||
+      node.kind === ts.SyntaxKind.UndefinedKeyword ||
+      node.kind === ts.SyntaxKind.VoidKeyword ||
+      node.kind === ts.SyntaxKind.AnyKeyword ||
+      node.kind === ts.SyntaxKind.UnknownKeyword ||
+      node.kind === ts.SyntaxKind.ObjectKeyword ||
+      node.kind === ts.SyntaxKind.NeverKeyword));
 
 if (import.meta.vitest !== undefined) {
   describe('isPrimitiveTypeNode', () => {
@@ -117,6 +127,13 @@ if (import.meta.vitest !== undefined) {
         {
           name: 'boolean literal (false)',
           node: ts.factory.createLiteralTypeNode(ts.factory.createFalse()),
+        },
+        {
+          name: 'TemplateLiteral',
+          node: ts.factory.createTemplateLiteralType(
+            ts.factory.createTemplateHead(''),
+            [],
+          ),
         },
       ])('$name', ({ node }) => {
         expect(isPrimitiveTypeNode(node)).toBe(true);
@@ -213,13 +230,7 @@ if (import.meta.vitest !== undefined) {
           ),
         },
         { name: 'Non-primitive types', node: ts.factory.createThisTypeNode() },
-        {
-          name: 'Non-primitive types',
-          node: ts.factory.createTemplateLiteralType(
-            ts.factory.createTemplateHead(''),
-            [],
-          ),
-        },
+
         {
           name: 'Non-primitive types',
           node: ts.factory.createInferTypeNode(
