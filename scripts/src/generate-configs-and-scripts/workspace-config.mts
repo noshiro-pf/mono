@@ -67,8 +67,9 @@ const fillDefaultsForUtil = (
   options?: Readonly<{
     tsType?: WorkspaceConfig['tsType'];
     gi?: WorkspaceConfig['packageJson']['scripts']['gi'];
-    passWithNoTests?: WorkspaceConfig['packageJson']['scripts']['passWithNoTests'];
     hasScripts?: boolean;
+    rollupConfig?: WorkspaceConfig['rollupConfig'];
+    vitestConfig?: WorkspaceConfig['vitestConfig'];
   }>,
 ): WorkspaceConfig => ({
   utilOrApp: defaultsForUtil.utilOrApp,
@@ -80,11 +81,12 @@ const fillDefaultsForUtil = (
     ...defaultsForUtil.typeCheckIncludes,
     options?.hasScripts === true ? workspaceScriptsDirName : undefined,
   ].filter(isNotUndefined),
+  rollupConfig: options?.rollupConfig ?? defaultsForUtil.rollupConfig,
+  vitestConfig: options?.vitestConfig ?? defaultsForUtil.vitestConfig,
   packageJson: {
     scripts: {
       gi: options?.gi ?? defaultsForUtil.packageJson.scripts.gi,
       publish: defaultsForUtil.packageJson.scripts.publish,
-      passWithNoTests: options?.passWithNoTests,
     },
   },
 });
@@ -94,13 +96,11 @@ const fillDefaultsForApp = ({
   gi,
   giIgnore,
   hasScripts,
-  passWithNoTests,
   playwright = true,
 }: Readonly<{
   tsType: WorkspaceConfig['tsType'];
   gi?: WorkspaceConfig['packageJson']['scripts']['gi'];
   giIgnore?: WorkspaceConfig['packageJson']['scripts']['giIgnore'];
-  passWithNoTests?: WorkspaceConfig['packageJson']['scripts']['passWithNoTests'];
   hasScripts?: boolean;
   playwright?: boolean;
 }>): WorkspaceConfig => ({
@@ -123,9 +123,11 @@ const fillDefaultsForApp = ({
       gi: gi ?? 1,
       giIgnore: giIgnore ?? ['assets'],
       publish: false,
-      passWithNoTests: passWithNoTests ?? true,
       e2e: playwright ? 'playwright' : undefined,
     },
+  },
+  vitestConfig: {
+    passWithNoTests: true,
   },
 });
 
@@ -148,24 +150,44 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
   'global-ts-utils': workspaceConfigGlobalUtil,
 
   template: fillDefaultsForUtil({
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
   'better-preact-use-state': fillDefaultsForUtil({
-    passWithNoTests: true,
     tsType: 'preact',
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
   'better-react-use-state': fillDefaultsForUtil({
-    passWithNoTests: true,
     tsType: 'react',
+    vitestConfig: {
+      passWithNoTests: true,
+    },
+  }),
+  'codemod-lib': fillDefaultsForUtil({
+    rollupConfig: {
+      variablesToDrop: ['console.debug'],
+    },
+    vitestConfig: {
+      passWithNoTests: true,
+      hideSkippedTests: true,
+      restoreMocks: true,
+    },
   }),
   'ts-utils': fillDefaultsForUtil(),
   'numeric-input-utils': fillDefaultsForUtil({
-    passWithNoTests: true,
     tsType: 'react',
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
   'tiny-router-observable': fillDefaultsForUtil({
-    passWithNoTests: true,
     tsType: 'dom',
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
   'io-ts': fillDefaultsForUtil(),
   'io-ts-types': fillDefaultsForUtil(),
@@ -181,65 +203,91 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
   }),
   'deep-object-diff': fillDefaultsForUtil({
     gi: false,
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
   'fast-deep-equal': fillDefaultsForUtil({
     gi: false,
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
   'preact-utils': fillDefaultsForUtil({
     tsType: 'preact',
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
   'react-blueprintjs-utils': fillDefaultsForUtil({
     tsType: 'react',
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
   'react-mui-utils': fillDefaultsForUtil({
     gi: 1,
     tsType: 'react-emotion',
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
   'react-utils-styled': fillDefaultsForUtil({
     tsType: 'react',
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
   'react-utils': fillDefaultsForUtil({
     tsType: 'react',
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
 
   'resize-observer-preact-hooks': fillDefaultsForUtil({
     tsType: 'preact',
     gi: false,
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
   'resize-observer-react-hooks': fillDefaultsForUtil({
     tsType: 'react',
     gi: false,
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
 
   'syncflow-preact-hooks': fillDefaultsForUtil({
     tsType: 'preact',
     gi: 0,
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
     hasScripts: true,
   }),
   'syncflow-react-hooks': fillDefaultsForUtil({
     tsType: 'react',
     gi: 0,
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
     hasScripts: true,
   }),
 
   'tiny-router-preact-hooks': fillDefaultsForUtil({
     tsType: 'preact',
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
   'tiny-router-react-hooks': fillDefaultsForUtil({
     tsType: 'react',
-    passWithNoTests: true,
+    vitestConfig: {
+      passWithNoTests: true,
+    },
   }),
 
   goober: produce(defaultsForUtil, (draft) => {

@@ -42,7 +42,18 @@ export type WorkspaceConfig = DeepReadonly<
 
     // tsconfig.compilerOptions を特別に指定する場合の定義
     tsconfig?: {
-      compilerOptions: UnknownRecord;
+      compilerOptions?: UnknownRecord;
+      include?: string[];
+      exclude?: string[];
+    };
+
+    rollupConfig?: {
+      variablesToDrop: string[];
+    };
+    vitestConfig?: {
+      passWithNoTests?: true;
+      restoreMocks?: true;
+      hideSkippedTests?: true;
     };
 
     // package.json の scripts の記述に使用するパラメータ定義
@@ -51,7 +62,6 @@ export type WorkspaceConfig = DeepReadonly<
         gi: 0 | 1 | 2 | 3 | false;
         giIgnore?: string[];
         publish: boolean;
-        passWithNoTests?: true;
         lint?: false;
         e2e?: 'playwright';
         hasFirebaseFunction?: boolean;
