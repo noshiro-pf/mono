@@ -214,7 +214,7 @@ export const convertLibEs2015Core =
           ),
           replaceWithNoMatchCheck(
             `repeat(count: number): string`,
-            `repeat(count: ${brandedNumber.SafeUint}): string`,
+            `repeat(count: ${brandedNumber.StringSizeArgNonNegative}): string`,
           ),
           replaceWithNoMatchCheck(
             'includes(searchString: string, position?: number): boolean;',
