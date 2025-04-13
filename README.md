@@ -1,6 +1,6 @@
 # mono
 
-A monorepo for nodejs projects.
+A monorepo for nodejs projects. This repository contains multiple applications and utility libraries.
 
 ## Clone
 
