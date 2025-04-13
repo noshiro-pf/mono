@@ -10,16 +10,16 @@ import {
 
 export const groupUnionIntersectionTypes = (
   types: DeepReadonly<ts.TypeNode[]>,
-): DeepReadonly<{
-  primitives: PrimitiveTypeNode[];
-  arraysAndTuples: (
+): Readonly<{
+  primitives: readonly PrimitiveTypeNode[];
+  arraysAndTuples: readonly (
     | ts.ArrayTypeNode
     | ts.TupleTypeNode
     | ReadonlyArrayTypeNode
     | ReadonlyTupleTypeNode
   )[];
-  typeLiterals: ts.TypeLiteralNode[];
-  others: ts.TypeNode[];
+  typeLiterals: readonly ts.TypeLiteralNode[];
+  others: readonly ts.TypeNode[];
 }> => {
   // assume types are normalized
   const grouped = Arr.groupBy(types, (t) =>

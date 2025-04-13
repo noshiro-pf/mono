@@ -2,7 +2,6 @@
 import {
   Arr,
   expectType,
-  ISet,
   mapOptional,
   SafeUint,
   strictMatch,
@@ -24,6 +23,7 @@ import { createTransformerFactory, printNode } from '../utils/index.mjs';
 import {
   compareUnionIntersectionTypes,
   groupUnionIntersectionTypes,
+  invalidDeepReadonlyTypeName,
   type ReadonlyTransformerOptions,
 } from './readonly-transformer-fn/index.mjs';
 import { debugPrintWrapper } from './test-utils.mjs';
@@ -75,17 +75,6 @@ export const convertToReadonlyType = (
     return visitor;
   });
 };
-
-const invalidDeepReadonlyTypeName = ISet.new([
-  'Readonly',
-  'readonly',
-  'ReadonlyArray',
-  'Array',
-  'Set',
-  'Map',
-  'ReadonlySet',
-  'ReadonlyMap',
-]);
 
 type TransformNodeFn = <N extends ts.Node>(
   node: N,
