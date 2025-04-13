@@ -1,6 +1,6 @@
 # mono
 
-A monorepo for nodejs projects.
+A monorepo for nodejs projects. This repository contains multiple applications and utility libraries.
 
 ## Clone
 
@@ -12,7 +12,7 @@ git clone --recursive
 
 ```sh
 $  yarn
-$  yarn ws:build
+$  yarn setup
 ```
 
 ## monorepo 構成
@@ -43,11 +43,11 @@ $  yarn ws:build
         -   `--stages` または `--serial` オプションで実行する場合、各 package.json の dependencies の依存グラフにしたがって順番に実行することができる。
     -   wireit
         -   用途
-            -   コマンド実行をキャッシュし、再実行時に入出力ファイル群に変化がなければ実行をスキップする。
             -   コマンド間の依存関係を記述する。
                 -   あるコマンドの前に別のコマンドを実行する必要がある場合に使用している。
                 -   packages/utils に関しては repository 初期設定として予めビルドしておく運用を想定しており、 packages/apps 内の各コマンドで依存 utils の build を dependencies に加えることはしていない（記述が多くなるデメリットがあり、キャッシュされた結果とはいえ実行時間が伸びることによる不便さが大きいため）。
-        -   TODO: `Wireit could not find the script name in the "npm_config_argv" environment variable. Arguments may not be interpreted correctly. See https://github.com/yarnpkg/yarn/issues/8905, and please consider upgrading to yarn 3.x or switching to npm.` という警告が出ているので yarn v3 に更新する。
+            -   コマンド実行のキャッシュ化はしない。たまに一部コマンドが上手く動かなくなったときに wireit キャッシュのせいであることがあったため。
+        -   TODO: `Wireit could not find the script name in the "npm_config_argv" environment variable. Arguments may not be interpreted correctly. See https://github.com/yarnpkg/yarn/issues/8905, and please consider upgrading to yarn 3.x or switching to npm.` という警告が出ているので対応する。
 -   configs
     -   tsconfig
         -   各 workspace で継承する共通 tsconfig 定義を置いている。
@@ -77,16 +77,16 @@ $  yarn ws:build
 ## Workspace 追加方法
 
 -   Preact app
-    -   `yarn create:preact-app:vite <package-name> && yarn`
+    -   `yarn create:preact-app <package-name> && yarn`
 -   React app
-    -   `yarn create:react-app:vite <package-name> && yarn`
+    -   `yarn create:react-app <package-name> && yarn`
 -   Utility
     -   `yarn create:util <package-name> && yarn`
 -   Slides
     -   `yarn create:slides <package-name> && yarn`
 
-各ディレクトリに設置してある template workspace がコピーされ、ディレクトリ名と package.json 内の name フィールドが `<package-name>` で置換される。
-ディレクトリ作成後に yarn を実行して workspace として認識させる必要がある（しないと node_modules 内に symlink が張られない）。
+各カテゴリに対応するディレクトリに設置してある template workspace がコピーされ、 yarn workspace 名と package.json 内の name フィールドが `<package-name>` で置換される。
+workspace 作成後に yarn を実行して yarn workspace として認識させる必要がある（node_modules 内に symlink が作成される）。
 
 ## CI
 
