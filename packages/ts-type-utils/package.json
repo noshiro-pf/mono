@@ -9,7 +9,8 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./ts-type-utils.d.mts"
+        "types": "./ts-type-utils.d.mts",
+        "default": "./ts-type-utils.d.mts"
       }
     }
   },
