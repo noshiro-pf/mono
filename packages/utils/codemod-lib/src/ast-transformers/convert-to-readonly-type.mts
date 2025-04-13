@@ -685,7 +685,9 @@ const transformTypeReferenceNode = (
             ? []
             : [
                 createReadonlyTypeNode(
-                  context.factory.createUnionTypeNode(typeLiterals),
+                  ts.isIntersectionTypeNode(T)
+                    ? context.factory.createIntersectionTypeNode(typeLiterals)
+                    : context.factory.createUnionTypeNode(typeLiterals),
                   context,
                 ),
               ];
@@ -769,7 +771,16 @@ const transformTypeReferenceNode = (
                   context.factory.createIdentifier(
                     options.DeepReadonlyTypeName,
                   ),
-                  [context.factory.createUnionTypeNode(typeLiterals)],
+                  [
+                    createReadonlyTypeNode(
+                      ts.isIntersectionTypeNode(T)
+                        ? context.factory.createIntersectionTypeNode(
+                            typeLiterals,
+                          )
+                        : context.factory.createUnionTypeNode(typeLiterals),
+                      context,
+                    ),
+                  ],
                 ),
               ];
 
@@ -840,10 +851,10 @@ const transformArrayTypeNode = (
 
   switch (readonlyContext) {
     case 'DeepReadonly':
-    case 'Readonly':
     case 'readonly':
       return context.factory.updateArrayTypeNode(node, E);
 
+    case 'Readonly':
     case 'none':
       return createReadonlyTypeOperatorNode(
         context.factory.updateArrayTypeNode(node, E),
@@ -890,10 +901,10 @@ const transformTupleTypeNode = (
 
   switch (readonlyContext) {
     case 'DeepReadonly':
-    case 'Readonly':
     case 'readonly':
       return context.factory.updateTupleTypeNode(node, Es);
 
+    case 'Readonly':
     case 'none':
       return createReadonlyTypeOperatorNode(
         context.factory.updateTupleTypeNode(node, Es),

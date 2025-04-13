@@ -1355,7 +1355,7 @@ describe('convertToReadonlyType', () => {
         title: (op) => `${op} including non-object/array`,
         testCase: (op) => ({
           source: `type Obj = { a: readonly string[] } ${op} readonly number[];`,
-          expected: `type Obj = Readonly<{ a: readonly string[] }> ${op} readonly number[];`,
+          expected: `type Obj = readonly number[] ${op} Readonly<{ a: readonly string[] }>;`,
         }),
       }),
 
@@ -1445,7 +1445,7 @@ describe('convertToReadonlyType', () => {
         }),
         (op: '|' | '&') => ({
           source: `type Mixed = Readonly<{ x: string }> ${op} Readonly<number[]>;`,
-          expected: `type Mixed = Readonly<{ x: string }> ${op} readonly number[];`,
+          expected: `type Mixed = readonly number[] ${op} Readonly<{ x: string }>;`,
         }),
         (op: '|' | '&') => ({
           source: `type Mixed = Readonly<{ x: string } ${op} Readonly<number[]>>;`,
@@ -1453,7 +1453,7 @@ describe('convertToReadonlyType', () => {
         }),
         (op: '|' | '&') => ({
           source: `type Mixed = Readonly<{ x: string }> ${op} readonly number[];`,
-          expected: `type Mixed = Readonly<{ x: string }> ${op} readonly number[];`,
+          expected: `type Mixed = readonly number[] ${op} Readonly<{ x: string }>;`,
         }),
         (op: '|' | '&') => ({
           source: `type Mixed = Readonly<{ x: string } ${op} readonly number[] ${op} { y: number } ${op} readonly string[]>;`,
