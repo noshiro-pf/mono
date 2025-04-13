@@ -19,21 +19,20 @@ export const generateRollupConfigForUtils = async (
 
   if (!cfg.gen.build) return;
 
-  const depth = workspaceLocation.split('/').length + 1;
-
-  const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
-
   const content = [
     '/* eslint-disable import/no-default-export */',
     '/* eslint-disable import/no-internal-modules */',
     '',
+    "import { defineRollupConfig } from '@noshiro/mono-configs/define-rollup-config';",
     "import { toThisDir } from '@noshiro/mono-utils';",
-    `import { defineRollupConfig } from '${pathPrefixToRoot}/configs/define-rollup-config.mjs';`,
     `import tsconfig from './${tsconfigBuildJsonName}' with { type: 'json' };`,
     '',
     'export default defineRollupConfig({',
     '  configDir: toThisDir(import.meta.url),',
     '  outDirRelative: tsconfig.compilerOptions.outDir,',
+    cfg.rollupConfig?.variablesToDrop !== undefined
+      ? `  variablesToDrop: ${JSON.stringify(cfg.rollupConfig.variablesToDrop)},`
+      : '',
     '});',
   ].join('\n');
 

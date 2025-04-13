@@ -35,7 +35,11 @@ export const generateVitestConfigForUtils = async (
     '    typecheck: {',
     `      tsconfig: path.resolve(thisDir, '${tsconfigTestJsonName}'),`,
     '    },',
-    cfg.packageJson.scripts.passWithNoTests ? '    passWithNoTests: true,' : '',
+    cfg.vitestConfig?.passWithNoTests === true ? 'passWithNoTests: true,' : '',
+    cfg.vitestConfig?.restoreMocks === true ? 'restoreMocks: true,' : '',
+    cfg.vitestConfig?.hideSkippedTests === true
+      ? 'hideSkippedTests: true,'
+      : '',
     '  },',
     '});',
   ].join('\n');

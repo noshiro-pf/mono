@@ -76,6 +76,7 @@
   "devDependencies": {
     "@google/clasp": "^2.4.2",
     "@mdx-js/rollup": "^3.1.0",
+    "@noshiro/mono-configs": "*",
     "@playwright/test": "^1.49.1",
     "@preact/preset-vite": "^2.9.2",
     "@rollup/plugin-inject": "^5.0.5",
