@@ -1980,7 +1980,8 @@ describe('convertToReadonlyType', () => {
       {
         name: 'DeepReadonly with complex nested types',
         source: 'type T = DeepReadonly<{ a: Map<string, { b: number[] }> }>;',
-        expected: 'type T = Readonly<{ a: ReadonlyMap<string, Readonly<{ b: readonly number[] }>> }>;',
+        expected:
+          'type T = Readonly<{ a: ReadonlyMap<string, Readonly<{ b: readonly number[] }>> }>;',
       },
       {
         name: 'DeepReadonly with tuple types',
@@ -2000,7 +2001,8 @@ describe('convertToReadonlyType', () => {
       {
         name: 'DeepReadonly with intersection types',
         source: 'type T = DeepReadonly<{ a: string } & { b: number[] }>;',
-        expected: 'type T = Readonly<{ a: string }> & Readonly<{ b: readonly number[] }>;',
+        expected:
+          'type T = Readonly<{ a: string }> & Readonly<{ b: readonly number[] }>;',
       },
       {
         name: 'Nested DeepReadonly types',
@@ -2025,12 +2027,15 @@ describe('convertToReadonlyType', () => {
       {
         name: 'DeepReadonly in variable declarations',
         source: 'const data: DeepReadonly<{ items: Array<{ id: string }> }> = { items: [] };',
-        expected: 'const data: Readonly<{ items: readonly Readonly<{ id: string }>[] }> = { items: [] };',
+        expected:
+          'const data: Readonly<{ items: readonly Readonly<{ id: string }>[] }> = { items: [] };',
       },
       {
         name: 'DeepReadonly with complex data structures',
-        source: 'type T = DeepReadonly<{ data: Array<{ id: string; items: Array<{ name: string }> }> }>;',
-        expected: 'type T = Readonly<{ data: readonly Readonly<{ id: string; items: readonly Readonly<{ name: string }>[] }>[] }>;',
+        source:
+          'type T = DeepReadonly<{ data: Array<{ id: string; items: Array<{ name: string }> }> }>;',
+        expected:
+          'type T = Readonly<{ data: readonly Readonly<{ id: string; items: readonly Readonly<{ name: string }>[] }>[] }>;',
       },
     ])('$name', testFn);
   });
