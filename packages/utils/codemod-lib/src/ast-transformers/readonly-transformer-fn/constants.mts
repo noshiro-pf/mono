@@ -1,4 +1,4 @@
-import { ISet } from '@noshiro/ts-type-utils';
+import { ISet } from '@noshiro/ts-utils';
 
 export const invalidDeepReadonlyTypeName = ISet.new([
   'Readonly',

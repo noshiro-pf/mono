@@ -1,4 +1,4 @@
-import { Arr } from '@noshiro/ts-type-utils';
+import { Arr } from '@noshiro/ts-utils';
 import * as ts from 'typescript';
 import {
   isPrimitiveTypeNode,

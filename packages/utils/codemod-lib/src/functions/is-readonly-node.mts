@@ -1,4 +1,4 @@
-import { Arr, expectType } from '@noshiro/ts-type-utils';
+import { Arr, expectType } from '@noshiro/ts-utils';
 import * as ts from 'typescript';
 import { isPrimitiveTypeNode } from './is-primitive-type-node.mjs';
 
