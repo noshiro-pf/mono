@@ -6,7 +6,8 @@ SCRIPT_DIR=$(cd $(dirname "$0") || exit; pwd)
 
 # configs
 ADD_SUB_DIRECTORY_EXPORT_IN_INDEX_TS="true"
-TS_FILENAME_REGEX="^[a-zA-Z0-9_\-]+.[mc]?tsx?$"
+TS_FILENAME_REGEX="^[a-zA-Z0-9_\.\-]+.[mc]?tsx?$"
+
 
 # args
 target_directory=$1
@@ -95,7 +96,7 @@ for directory in $(find . -mindepth "${min_recursion_depth}" -maxdepth "${max_re
 
             # only files that match a regular expression "[a-zA-Z0-9_]+.ts"
             if [ "${filename}" != "index${ext}" ]; then
-                if [[ "${filename}" =~ ${TS_FILENAME_REGEX} ]] && ! echo "$filename" | grep -q '\.test\.'; then
+                if [[ "${filename}" =~ ${TS_FILENAME_REGEX} ]] && ! echo "$filename" | grep -q '\.test\.' && ! echo "$filename" | grep -q '\.d\.'; then
                     # add line "export * from 'filename'"
                     if [ "${extension}" = "mts" ]; then
                         result+="export * from './${filename_without_ext}.mjs';"
@@ -164,5 +165,5 @@ echo
 echo "--- prettier ---"
 
 if [ -n "${index_ts_files}" ]; then
-    node "${SCRIPT_DIR}"/../../node_modules/.bin/prettier --config "${SCRIPT_DIR}"/../../.prettierrc --ignore-unknown --no-error-on-unmatched-pattern --cache --cache-strategy content --write ${index_ts_files}
+    node "${SCRIPT_DIR}"/../../node_modules/.bin/prettier --config "${SCRIPT_DIR}"/../../.prettierrc --ignore-unknown --no-error-on-unmatched-pattern --write ${index_ts_files}
 fi
