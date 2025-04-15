@@ -11,6 +11,7 @@
     "scripts"
   ],
   "scripts": {
+    "build:configs": "yarn workspace @noshiro/mono-configs build",
     "build:mono-utils": "yarn workspace @noshiro/mono-utils build",
     "ci": "run-s setup zz:check:no-diff fmt:all zz:check:no-diff ws:gi zz:check:no-diff ws:build zz:check:no-diff ci:lint-and-test zz:check:no-diff",
     "ci:clean-build-and-cache": "run-s clean:build-and-cache ci",
@@ -37,7 +38,7 @@
     "generate-configs": "wireit",
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "pub:all": "zx scripts/commands/publish-packages.mjs",
-    "setup": "run-s build:mono-utils generate-configs ws:build:utils",
+    "setup": "run-s build:configs build:mono-utils generate-configs ws:build:utils",
     "type-check-eslint-configs": "tsc --noEmit",
     "type-check-eslint-configs:watch": "tsc --noEmit --watch",
     "ws:build": "yarn zz:wsrun-stages build",
@@ -81,6 +82,7 @@
     "@preact/preset-vite": "^2.9.2",
     "@rollup/plugin-inject": "^5.0.5",
     "@rollup/plugin-replace": "^6.0.2",
+    "@rollup/plugin-strip": "^3.0.4",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/argparse": "^2.0.16",
     "@types/google-apps-script": "^1.0.83",

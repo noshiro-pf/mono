@@ -1,4 +1,5 @@
 import * as rollupPluginReplace from '@rollup/plugin-replace';
+import * as rollupPluginStrip from '@rollup/plugin-strip';
 import * as pluginTypescript from '@rollup/plugin-typescript';
 import * as glob from 'glob';
 import path from 'node:path';
@@ -21,9 +22,6 @@ export const defineRollupConfig = ({
   plugins: [
     rollupPluginReplace.default({
       'import.meta.vitest': 'undefined',
-      ...Object.fromEntries(
-        variablesToDrop?.map((v) => [v, 'undefined']) ?? [],
-      ),
       preventAssignment: true,
     }),
     pluginTypescript.default({
@@ -32,6 +30,10 @@ export const defineRollupConfig = ({
     rollupPluginReplace.default({
       "import 'vitest'": 'undefined',
       preventAssignment: true,
+    }),
+    rollupPluginStrip.default({
+      functions: variablesToDrop,
+      include: '**/*.(mts|ts|mjs|js)',
     }),
   ],
 });
