@@ -205,6 +205,10 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
               name: UserName.cast(fireAuthUser?.displayName ?? ''),
             },
             archivedBy: [],
+
+            // TODO: fix createdAt and updatedAt value
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
           }),
       ),
     );
@@ -229,6 +233,9 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
             answerIcons,
             notificationSettingsWithEmail:
               notificationSettingsWithEmail ?? 'none',
+            // TODO: fix createdAt and updatedAt value
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
           }),
       ),
     );
