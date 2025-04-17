@@ -127,7 +127,7 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     { accessibility: 'no-public' },
   ], // modified
   '@typescript-eslint/explicit-module-boundary-types': 'off', // preferred to use explicit-function-return-type
-  '@typescript-eslint/init-declarations': withDefaultOption('error'),
+  '@typescript-eslint/init-declarations': 'off', // let is disabled by functional/no-let
   '@typescript-eslint/member-ordering': 'off', // disabled
 
   /**
