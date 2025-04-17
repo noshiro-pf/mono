@@ -360,6 +360,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
       test: false,
       lint: false,
     };
+    draft.packageJson.sideEffects = false;
   }),
 
   // apps

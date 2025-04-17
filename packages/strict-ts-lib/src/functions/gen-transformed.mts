@@ -3,7 +3,7 @@ import {
   astTransformerToStringTransformer,
   convertToReadonlyTypeTransformer,
   replaceAnyWithUnknownTransformer,
-} from '@noshiro/codemod-lib';
+} from 'ts-codemod-lib';
 import 'zx/globals';
 import { paths } from '../constants.mjs';
 import { getSrcFileList } from '../convert-dts/index.mjs';

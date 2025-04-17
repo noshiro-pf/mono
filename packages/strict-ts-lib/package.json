@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
-  "sideEffects": true,
+  "sideEffects": false,
   "type": "module",
   "scripts": {
     "build": "wireit",
@@ -51,9 +51,9 @@
   },
   "devDependencies": {
     "@ast-grep/napi": "^0.36.1",
-    "@noshiro/codemod-lib": "*",
     "@noshiro/mono-utils": "*",
-    "@noshiro/ts-type-utils": "*"
+    "@noshiro/ts-type-utils": "*",
+    "ts-codemod-lib": "*"
   },
   "wireit": {
     "build": {
