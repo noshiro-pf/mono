@@ -45,7 +45,7 @@ packages/strict-ts-lib/output/**/normal/lib-files
 packages/strict-ts-lib/output/**/normal/packages
 packages/strict-ts-lib/output/**/temp/copied
 packages/strict-ts-lib/output/**/temp/copied-for-diff
-packages/strict-ts-lib/output/**/temp/eslint-fixed
+packages/strict-ts-lib/output/**/temp/transformed
 
 packages/others/slack-archive-tools/archive
 
