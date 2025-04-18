@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
-  "sideEffects": true,
+  "sideEffects": false,
   "type": "module",
   "scripts": {
     "build": "wireit",
