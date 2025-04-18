@@ -1,5 +1,5 @@
 import * as ts from 'typescript';
-import { IGNORE_FILE_COMMENT_TEXT } from '../functions/index.mjs';
+import { IGNORE_FILE_COMMENT_TEXT } from '../constants/index.mjs';
 
 export const createTransformerFactory =
   (

@@ -2802,6 +2802,21 @@ describe('convertToReadonlyTypeTransformer', () => {
           'type C = readonly boolean[]; // Should be transformed',
         ),
       },
+      {
+        name: 'File scope transformer-ignore',
+        source: codeFromStringLines(
+          '/* transformer-ignore */',
+          'type A = number[]; // Should be skipped',
+          'type B = string[]; // Should be skipped',
+          'type C = boolean[]; // Should be skipped',
+        ),
+        expected: codeFromStringLines(
+          '/* transformer-ignore */',
+          'type A = number[]; // Should be skipped',
+          'type B = string[]; // Should be skipped',
+          'type C = boolean[]; // Should be skipped',
+        ),
+      },
     ])('$name', testFn);
   });
 

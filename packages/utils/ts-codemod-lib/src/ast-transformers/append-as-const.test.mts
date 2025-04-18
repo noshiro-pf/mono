@@ -135,6 +135,21 @@ describe('appendAsConstTransformer', () => {
         'const transformedObject = { y: false } as const; // This should be transformed',
       ),
     },
+    {
+      name: 'File scope transformer-ignore',
+      source: codeFromStringLines(
+        '/* transformer-ignore */',
+        'const transformedArray = [10, 20]; // This should be skipped',
+        'const skippedObject = { x: true }; // This should be skipped',
+        'const transformedObject = { y: false }; // This should be skipped',
+      ),
+      expected: codeFromStringLines(
+        '/* transformer-ignore */',
+        'const transformedArray = [10, 20]; // This should be skipped',
+        'const skippedObject = { x: true }; // This should be skipped',
+        'const transformedObject = { y: false }; // This should be skipped',
+      ),
+    },
     // Cases where the transformer doesn't modify the code
     {
       name: 'Primitive literal - number',

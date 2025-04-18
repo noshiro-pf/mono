@@ -1,5 +1,5 @@
 import * as ts from 'typescript';
-import { IGNORE_LINE_COMMENT_TEXT } from './constants.js';
+import { IGNORE_LINE_COMMENT_TEXT } from '../constants/index.mjs';
 
 export const hasDisableNextLineComment = (node: ts.Node): boolean => {
   // --- Logic to determine if skipping is needed ---
