@@ -2783,7 +2783,9 @@ describe('convertToReadonlyTypeTransformer', () => {
       expect(() => {
         testPreprocess(
           convertToReadonlyTypeTransformer({
-            DeepReadonlyTypeName: 'Readonly',
+            DeepReadonly: {
+              typeName: 'Readonly',
+            },
           }),
           'type T = number[];',
           'type T = readonly number[];',

@@ -38,11 +38,9 @@ import { debugPrintWrapper } from './test-utils.mjs';
  * Convert all types to readonly.
  *
  * - Mutable to readonly
- *
  *   - `T[]` to `readonly T[]`
  *   - `Array<T>` to `readonly T[]`
  * - Normalize
- *
  *   - `Readonly<Readonly<T>>` to `Readonly<T>`
  *   - `Readonly<T[]>` to `readonly T[]`
  *   - `Readonly<readonly T[]>` to `readonly T[]`
@@ -57,15 +55,16 @@ export const convertToReadonlyTypeTransformer = (
   options?: ReadonlyTransformerOptions,
 ): ts.TransformerFactory<ts.SourceFile> => {
   if (
-    options?.DeepReadonlyTypeName !== undefined &&
-    invalidDeepReadonlyTypeName.has(options.DeepReadonlyTypeName)
+    options?.DeepReadonly?.typeName !== undefined &&
+    invalidDeepReadonlyTypeName.has(options.DeepReadonly.typeName)
   ) {
     throw new Error(
-      `Invalid DeepReadonlyTypeName "${options.DeepReadonlyTypeName}" passed to convertToReadonlyType`,
+      `Invalid DeepReadonlyTypeName "${options.DeepReadonly.typeName}" passed to convertToReadonlyType`,
     );
   }
 
-  const DeepReadonlyTypeName = options?.DeepReadonlyTypeName ?? 'DeepReadonly';
+  const DeepReadonlyTypeName =
+    options?.DeepReadonly?.typeName ?? 'DeepReadonly';
 
   const ignorePrefixes = options?.ignorePrefixes ?? ['mut_'];
 
