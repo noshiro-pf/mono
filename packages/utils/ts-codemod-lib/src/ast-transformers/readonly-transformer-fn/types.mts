@@ -35,7 +35,8 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
      *
      * @default 'keep'
      */
-    applyLevel?: 'applyAgressively' | 'keep' | 'removeAsPossible';
+    // TODO
+    // applyLevel?: 'applyAgressively' | 'keep' | 'removeAsPossible';
   };
 
   /**
@@ -54,6 +55,14 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
 }>;
 
 export type ReadonlyTransformerOptionsInternal = Readonly<{
-  DeepReadonlyTypeName: string;
+  DeepReadonly: Readonly<{
+    typeName: string;
+
+    // removeAsPossible: 正規化後、 DeepReadonly の子ノードが typeLiteral かまたはその union or intersection であり、 それぞれの TypeLiteral がプリミティブ値のメンバーしか持たない場合。
+    applyLevel: 'applyAgressively' | 'keep' | 'removeAsPossible';
+  }>;
+
+  ignoreEmptyObjectTypes: boolean;
+
   ignorePrefixChecker: undefined | ((node: ts.Node | undefined) => boolean);
 }>;

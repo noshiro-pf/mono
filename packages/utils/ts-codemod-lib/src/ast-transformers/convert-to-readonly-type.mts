@@ -81,7 +81,11 @@ export const convertToReadonlyTypeTransformer = (
         context,
         { type: 'none', indexedAccessDepth: 0 },
         {
-          DeepReadonlyTypeName,
+          DeepReadonly: {
+            typeName: DeepReadonlyTypeName,
+            applyLevel: 'keep',
+          },
+          ignoreEmptyObjectTypes: options?.ignoreEmptyObjectTypes ?? true,
           ignorePrefixChecker,
         },
         0,
@@ -855,7 +859,7 @@ const transformTypeReferenceNode = (
     }
 
     // DeepReadonly
-    if (typeNameStr === options.DeepReadonlyTypeName) {
+    if (typeNameStr === options.DeepReadonly.typeName) {
       if (!Arr.isArrayOfLength1(typeArguments)) {
         throw new Error(
           `Unexpected number of type arguments "${typeArguments.length}" for Readonly.`,
@@ -911,7 +915,7 @@ const transformTypeReferenceNode = (
             : [
                 context.factory.createTypeReferenceNode(
                   context.factory.createIdentifier(
-                    options.DeepReadonlyTypeName,
+                    options.DeepReadonly.typeName,
                   ),
                   [
                     createReadonlyTypeNode(
