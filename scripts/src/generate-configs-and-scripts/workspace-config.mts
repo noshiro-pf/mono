@@ -170,13 +170,16 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
     rollupConfig: {
       variablesToDrop: ['console.debug'],
     },
+    gi: 1,
     vitestConfig: {
       passWithNoTests: true,
       hideSkippedTests: true,
       restoreMocks: true,
     },
   }),
-  'ts-utils': fillDefaultsForUtil(),
+  'ts-utils': fillDefaultsForUtil({
+    hasScripts: true,
+  }),
   'numeric-input-utils': fillDefaultsForUtil({
     tsType: 'react',
     vitestConfig: {
@@ -359,6 +362,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
       test: false,
       lint: false,
     };
+    draft.packageJson.sideEffects = false;
   }),
 
   // apps
