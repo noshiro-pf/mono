@@ -101,22 +101,22 @@ describe('appendAsConstTransformer', () => {
     {
       name: 'Skip ArrayLiteralExpression with disable comment',
       source: codeFromStringLines(
-        '// transformer-disable-next-line',
+        '// transformer-ignore-next-line',
         'const skippedArray = [1, 2, 3];',
       ),
       expected: codeFromStringLines(
-        '// transformer-disable-next-line',
+        '// transformer-ignore-next-line',
         'const skippedArray = [1, 2, 3];', // Expect no "as const"
       ),
     },
     {
       name: 'Skip ObjectLiteralExpression with disable comment',
       source: codeFromStringLines(
-        '// transformer-disable-next-line',
+        '// transformer-ignore-next-line',
         'const skippedObject = { a: 1, b: "hello" };',
       ),
       expected: codeFromStringLines(
-        '// transformer-disable-next-line',
+        '// transformer-ignore-next-line',
         'const skippedObject = { a: 1, b: "hello" };', // Expect no "as const"
       ),
     },
@@ -124,13 +124,13 @@ describe('appendAsConstTransformer', () => {
       name: 'Disable comment only affects the immediate next line',
       source: codeFromStringLines(
         'const transformedArray = [10, 20]; // This should be transformed',
-        '// transformer-disable-next-line',
+        '// transformer-ignore-next-line',
         'const skippedObject = { x: true }; // This should be skipped',
         'const transformedObject = { y: false }; // This should be transformed',
       ),
       expected: codeFromStringLines(
         'const transformedArray = [10, 20] as const; // This should be transformed',
-        '// transformer-disable-next-line',
+        '// transformer-ignore-next-line',
         'const skippedObject = { x: true }; // This should be skipped',
         'const transformedObject = { y: false } as const; // This should be transformed',
       ),

@@ -1,5 +1,5 @@
 import * as ts from 'typescript';
-import { DISABLE_COMMENT_TEXT } from './constants.js';
+import { IGNORE_LINE_COMMENT_TEXT } from './constants.js';
 
 export const hasDisableNextLineComment = (node: ts.Node): boolean => {
   // --- Logic to determine if skipping is needed ---
@@ -57,7 +57,7 @@ export const hasDisableNextLineComment = (node: ts.Node): boolean => {
                 // eslint-disable-next-line total-functions/no-unsafe-type-assertion
                 commentRange.end as NumberType.StringSizeArg,
               );
-              if (commentText.includes(DISABLE_COMMENT_TEXT)) {
+              if (commentText.includes(IGNORE_LINE_COMMENT_TEXT)) {
                 return true; // Found the disable comment, skip transformation
               }
             }

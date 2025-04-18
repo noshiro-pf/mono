@@ -1,4 +1,5 @@
 import * as ts from 'typescript';
+import { IGNORE_FILE_COMMENT_TEXT } from '../functions/index.mjs';
 
 export const createTransformerFactory =
   (
@@ -7,5 +8,7 @@ export const createTransformerFactory =
   ): ts.TransformerFactory<ts.SourceFile> =>
   (context) =>
   (rootNode) =>
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    ts.visitNode(rootNode, genVisitor(context), ts.isSourceFile)!;
+    rootNode.getFullText().includes(IGNORE_FILE_COMMENT_TEXT)
+      ? rootNode
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        ts.visitNode(rootNode, genVisitor(context), ts.isSourceFile)!;

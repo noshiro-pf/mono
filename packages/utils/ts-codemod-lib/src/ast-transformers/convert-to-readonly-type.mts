@@ -59,7 +59,7 @@ export const convertToReadonlyTypeTransformer = (
     invalidDeepReadonlyTypeName.has(options.DeepReadonly.typeName)
   ) {
     throw new Error(
-      `Invalid DeepReadonlyTypeName "${options.DeepReadonly.typeName}" passed to convertToReadonlyType`,
+      `Invalid DeepReadonly typeName "${options.DeepReadonly.typeName}" passed to convertToReadonlyType`,
     );
   }
 
@@ -444,6 +444,10 @@ const transformTypeLiteralNode = (
   options: ReadonlyTransformerOptionsInternal,
   depth: SafeUintWithSmallInt,
 ): ts.TypeLiteralNode | ts.TypeReferenceNode => {
+  if (options.ignoreEmptyObjectTypes && node.members.length === 0) {
+    return node;
+  }
+
   const newTypeLiteralNode = context.factory.updateTypeLiteralNode(
     node,
     // Recursive processing

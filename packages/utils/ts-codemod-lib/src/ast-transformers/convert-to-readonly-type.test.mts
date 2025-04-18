@@ -1667,6 +1667,33 @@ describe('convertToReadonlyTypeTransformer', () => {
           '}>;',
         ),
       },
+      {
+        name: 'Empty type literal',
+        source: codeFromStringLines(
+          'type foo = {};',
+          'type bar = Readonly<{}>;',
+        ),
+        expected: codeFromStringLines(
+          //
+          'type foo = {};',
+          'type bar = Readonly<{}>;',
+        ),
+      },
+      {
+        name: 'Empty type literal with ignoreEmptyObjectTypes = false',
+        source: codeFromStringLines(
+          'type foo = {};',
+          'type bar = Readonly<{}>;',
+        ),
+        expected: codeFromStringLines(
+          //
+          'type foo = Readonly<{}>;',
+          'type bar = Readonly<{}>;',
+        ),
+        options: {
+          ignoreEmptyObjectTypes: false,
+        },
+      },
     ])('$name', testFn);
   });
 
@@ -2582,55 +2609,55 @@ describe('convertToReadonlyTypeTransformer', () => {
       {
         name: 'Skip Array type with disable comment',
         source: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type Foo = number[];',
         ),
         expected: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type Foo = number[];', // Should not change to readonly number[]
         ),
       },
       {
         name: 'Skip Generic Array type with disable comment',
         source: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type Bar = Array<string>;',
         ),
         expected: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type Bar = Array<string>;', // Should not change to readonly string[]
         ),
       },
       {
         name: 'Skip Tuple type with disable comment',
         source: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type Baz = [number, string];',
         ),
         expected: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type Baz = [number, string];', // Should not change to readonly [...]
         ),
       },
       {
         name: 'Skip Set type with disable comment',
         source: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type Qux = Set<number>;',
         ),
         expected: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type Qux = Set<number>;', // Should not change to ReadonlySet
         ),
       },
       {
         name: 'Skip Map type with disable comment',
         source: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type Quux = Map<string, boolean>;',
         ),
         expected: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type Quux = Map<string, boolean>;', // Should not change to ReadonlyMap
         ),
       },
@@ -2638,14 +2665,14 @@ describe('convertToReadonlyTypeTransformer', () => {
         name: 'Skip Interface property with disable comment',
         source: codeFromStringLines(
           'interface MyInterface {',
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           '  prop: string[];', // This specific property should be skipped
           '  anotherProp: number[];', // This should still be transformed
           '}',
         ),
         expected: codeFromStringLines(
           'interface MyInterface {',
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           '  prop: string[];', // Should remain mutable
           '  readonly anotherProp: readonly number[];', // Should become readonly
           '}',
@@ -2654,14 +2681,14 @@ describe('convertToReadonlyTypeTransformer', () => {
       {
         name: 'Skip whole Interface with disable comment',
         source: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'interface MyInterface {',
           '  prop: string[];',
           '  anotherProp: number[];',
           '}',
         ),
         expected: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'interface MyInterface {',
           '  prop: string[];', // Should not change
           '  anotherProp: number[];', // Should not change
@@ -2672,14 +2699,14 @@ describe('convertToReadonlyTypeTransformer', () => {
         name: 'Skip Class property with disable comment',
         source: codeFromStringLines(
           'class MyClass {',
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           '  prop: number[] = [];', // This specific property should be skipped
           '  another: boolean[] = [];', // This should still be transformed
           '}',
         ),
         expected: codeFromStringLines(
           'class MyClass {',
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           '  prop: number[] = [];', // Should remain mutable
           '  readonly another: readonly boolean[] = [];', // Should become readonly
           '}',
@@ -2688,14 +2715,14 @@ describe('convertToReadonlyTypeTransformer', () => {
       {
         name: 'Skip whole Class with disable comment',
         source: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'class MyClass {',
           '  prop: number[] = [];',
           '  another: boolean[] = [];',
           '}',
         ),
         expected: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'class MyClass {',
           '  prop: number[] = [];', // Should not change
           '  another: boolean[] = [];', // Should not change
@@ -2707,7 +2734,7 @@ describe('convertToReadonlyTypeTransformer', () => {
         source: codeFromStringLines(
           'function myFunc(',
           '  a: string[],', // Should be transformed
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           '  b: Map<string, number>,', // Should be skipped
           '  c: Set<boolean>', // Should be transformed
           ') {}',
@@ -2715,7 +2742,7 @@ describe('convertToReadonlyTypeTransformer', () => {
         expected: codeFromStringLines(
           'function myFunc(',
           '  a: readonly string[],', // Should be transformed
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           '  b: Map<string, number>,', // Should be skipped
           '  c: ReadonlySet<boolean>', // Should be transformed
           ') {}',
@@ -2724,11 +2751,11 @@ describe('convertToReadonlyTypeTransformer', () => {
       {
         name: 'Skip whole Function declaration with disable comment',
         source: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'function myFunc(a: string[], b: Map<string, number>): Set<boolean>[] {}',
         ),
         expected: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'function myFunc(a: string[], b: Map<string, number>): Set<boolean>[] {}', // Should not change
         ),
       },
@@ -2738,25 +2765,25 @@ describe('convertToReadonlyTypeTransformer', () => {
           'function myFunc(',
           '  a: string[] // Param should be transformed',
           '):',
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'Set<number>[] {} // Return type should be skipped',
         ),
         expected: codeFromStringLines(
           'function myFunc(',
           '  a: readonly string[] // Param should be transformed',
           '):',
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'Set<number>[] {} // Return type should be skipped',
         ),
       },
       {
         name: 'Skip Type literal with disable comment',
         source: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type Corge = { x: number[] };',
         ),
         expected: codeFromStringLines(
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type Corge = { x: number[] };', // Should not change to Readonly<{...}>
         ),
       },
@@ -2764,13 +2791,13 @@ describe('convertToReadonlyTypeTransformer', () => {
         name: 'Disable comment only affects next line (mixed constructs)',
         source: codeFromStringLines(
           'type A = number[]; // Should be transformed',
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type B = string[]; // Should be skipped',
           'type C = boolean[]; // Should be transformed',
         ),
         expected: codeFromStringLines(
           'type A = readonly number[]; // Should be transformed',
-          '// transformer-disable-next-line',
+          '// transformer-ignore-next-line',
           'type B = string[]; // Should be skipped',
           'type C = readonly boolean[]; // Should be transformed',
         ),
@@ -2792,7 +2819,7 @@ describe('convertToReadonlyTypeTransformer', () => {
           false,
         );
       }).toThrow(
-        'Invalid DeepReadonlyTypeName "Readonly" passed to convertToReadonlyType',
+        'Invalid DeepReadonly typeName "Readonly" passed to convertToReadonlyType',
       );
     });
 
