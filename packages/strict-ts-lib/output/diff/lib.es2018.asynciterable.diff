@@ -1,4 +1,4 @@
-@@ -1,22 +1,8 @@
+@@ -1,49 +1,37 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -23,8 +23,7 @@
 +/// <reference path="./lib.es2015.iterable.d.ts" />
  
  interface SymbolConstructor {
-   /**
-@@ -26,21 +12,23 @@ interface SymbolConstructor {
+   /** A method that returns the default async iterator for an object. Called by the semantics of the for-await-of statement. */
    readonly asyncIterator: unique symbol;
  }
  
@@ -53,10 +52,8 @@
    extends AsyncIterator<T, TReturn, TNext> {
    [Symbol.asyncIterator](): AsyncIterableIterator<T, TReturn, TNext>;
  }
-@@ -49,7 +37,7 @@ interface AsyncIterableIterator<T, TReturn = any, TNext = any>
-  * Describes an {@link AsyncIterator} produced by the runtime that inherits from
-  * the intrinsic `AsyncIterator.prototype`.
-  */
+ 
+ /** Describes an {@link AsyncIterator} produced by the runtime that inherits from the intrinsic `AsyncIterator.prototype`. */
 -interface AsyncIteratorObject<T, TReturn = unknown, TNext = unknown>
 +interface AsyncIteratorObject<T, TReturn = any, TNext = unknown>
    extends AsyncIterator<T, TReturn, TNext> {

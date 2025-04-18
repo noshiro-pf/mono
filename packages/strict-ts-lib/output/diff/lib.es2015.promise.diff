@@ -24,7 +24,7 @@
  
    /**
     * Creates a new Promise.
-@@ -30,7 +16,7 @@ interface PromiseConstructor {
+@@ -27,7 +13,7 @@ interface PromiseConstructor {
    new <T>(
      executor: (
        resolve: (value: T | PromiseLike<T>) => void,
@@ -33,7 +33,7 @@
      ) => void,
    ): Promise<T>;
  
-@@ -41,7 +27,7 @@ interface PromiseConstructor {
+@@ -37,7 +23,7 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
@@ -42,7 +42,7 @@
      values: T,
    ): Promise<{ -readonly [P in keyof T]: Awaited<T[P]> }>;
  
-@@ -55,7 +41,7 @@ interface PromiseConstructor {
+@@ -50,7 +36,7 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
@@ -51,7 +51,7 @@
      values: T,
    ): Promise<Awaited<T[number]>>;
  
-@@ -68,7 +54,7 @@ interface PromiseConstructor {
+@@ -63,7 +49,7 @@ interface PromiseConstructor {
     * @param reason The reason the promise was rejected.
     * @returns A new rejected Promise.
     */
@@ -60,7 +60,7 @@
  
    /**
     * Creates a new resolved promise.
-@@ -92,4 +78,4 @@ interface PromiseConstructor {
+@@ -87,4 +73,4 @@ interface PromiseConstructor {
    resolve<T>(value: T | PromiseLike<T>): Promise<Awaited<T>>;
  }
  

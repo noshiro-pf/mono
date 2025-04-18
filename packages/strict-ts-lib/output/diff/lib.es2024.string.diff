@@ -18,4 +18,4 @@
 +/// <reference types="@noshiro/ts-type-utils" />
  
  interface String {
-   /**
+   /** Returns true if all leading surrogates and trailing surrogates appear paired and in order. */

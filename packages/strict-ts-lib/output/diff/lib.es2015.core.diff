@@ -19,8 +19,8 @@
  
  interface Array<T> {
    /**
-@@ -29,12 +15,12 @@ interface Array<T> {
-    *   instead.
+@@ -23,12 +9,12 @@ interface Array<T> {
+    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
     */
    find<S extends T>(
 -    predicate: (value: T, index: number, obj: T[]) => value is S,
@@ -36,8 +36,8 @@
    ): T | undefined;
  
    /**
-@@ -50,8 +36,8 @@ interface Array<T> {
-    *   instead.
+@@ -38,8 +24,8 @@ interface Array<T> {
+    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
     */
    findIndex(
 -    predicate: (value: T, index: number, obj: T[]) => unknown,
@@ -47,7 +47,7 @@
    ): number;
  
    /**
-@@ -80,7 +66,7 @@ interface Array<T> {
+@@ -61,7 +47,7 @@ interface Array<T> {
    copyWithin(target: number, start: number, end?: number): this;
  
    toLocaleString(
@@ -56,7 +56,7 @@
      options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions,
    ): string;
  }
-@@ -103,7 +89,7 @@ interface ArrayConstructor {
+@@ -84,7 +70,7 @@ interface ArrayConstructor {
    from<T, U>(
      arrayLike: ArrayLike<T>,
      mapfn: (v: T, k: number) => U,
@@ -65,7 +65,7 @@
    ): U[];
  
    /**
-@@ -111,7 +97,7 @@ interface ArrayConstructor {
+@@ -92,7 +78,7 @@ interface ArrayConstructor {
     *
     * @param items A set of elements to include in the new array object.
     */
@@ -74,7 +74,7 @@
  }
  
  interface DateConstructor {
-@@ -133,7 +119,7 @@ interface Math {
+@@ -110,7 +96,7 @@ interface Math {
     *
     * @param x A numeric expression.
     */
@@ -83,16 +83,16 @@
  
    /**
     * Returns the result of 32-bit multiplication of two numbers.
-@@ -232,7 +218,7 @@ interface Math {
-    *   is +Infinity. If any argument is NaN, the result is NaN. If all arguments
-    *   are either +0 or −0, the result is +0.
+@@ -203,7 +189,7 @@ interface Math {
+    * @param values Values to compute the square root for. If no arguments are passed, the result is +0. If there is only one argument, the result is the absolute value. If any argument is +Infinity or -Infinity, the result is +Infinity. If any argument is NaN, the result is NaN. If all arguments are either +0 or −0,
+    *   the result is +0.
     */
 -  hypot(...values: number[]): number;
 +  hypot(...values: readonly number[]): number;
  
    /**
-    * Returns the integral part of the a numeric expression, x, removing any
-@@ -273,14 +259,14 @@ interface NumberConstructor {
+    * Returns the integral part of the a numeric expression, x, removing any fractional digits. If x is already an integer, the result is x.
+@@ -236,28 +222,28 @@ interface NumberConstructor {
     *
     * @param number A numeric value.
     */
@@ -108,8 +108,7 @@
 +  isInteger(number: number): boolean;
  
    /**
-    * Returns a Boolean value that indicates whether a value is the reserved
-@@ -290,14 +276,14 @@ interface NumberConstructor {
+    * Returns a Boolean value that indicates whether a value is the reserved value NaN (not a number). Unlike the global isNaN(), Number.isNaN() doesn't forcefully convert the parameter to a number. Only values of the type number, that are also NaN, result in true.
     *
     * @param number A numeric value.
     */
@@ -124,18 +123,18 @@
 -  isSafeInteger(number: unknown): boolean;
 +  isSafeInteger(number: number): boolean;
  
-   /**
-    * The value of the largest integer n such that n and n + 1 are both exactly
-@@ -329,7 +315,7 @@ interface NumberConstructor {
-    *   '0x' are considered hexadecimal. All other strings are considered
-    *   decimal.
+   /** The value of the largest integer n such that n and n + 1 are both exactly representable as a Number value. The value of Number.MAX_SAFE_INTEGER is 9007199254740991 2^53 − 1. */
+   readonly MAX_SAFE_INTEGER: number;
+@@ -278,7 +264,7 @@ interface NumberConstructor {
+    * @param string A string to convert into a number.
+    * @param radix A value between 2 and 36 that specifies the base of the number in `string`. If this argument is not supplied, strings with a prefix of '0x' are considered hexadecimal. All other strings are considered decimal.
     */
 -  parseInt(string: string, radix?: number): number;
 +  parseInt(string: string, radix?: UintRange<2, 37>): number;
  }
  
  interface ObjectConstructor {
-@@ -375,14 +361,14 @@ interface ObjectConstructor {
+@@ -320,21 +306,21 @@ interface ObjectConstructor {
     * @param target The target object to copy to.
     * @param sources One or more source objects from which to copy properties
     */
@@ -151,17 +150,16 @@
 +  getOwnPropertySymbols(o: unknown): symbol[];
  
    /**
-    * Returns the names of the enumerable string properties and methods of an
-@@ -392,7 +378,7 @@ interface ObjectConstructor {
-    *   object that you created or an existing Document Object Model (DOM)
-    *   object.
+    * Returns the names of the enumerable string properties and methods of an object.
+    *
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
     */
 -  keys(o: {}): string[];
 +  // keys(o: {}): string[];
  
    /**
     * Returns true if the values are the same value, false otherwise.
-@@ -400,7 +386,7 @@ interface ObjectConstructor {
+@@ -342,7 +328,7 @@ interface ObjectConstructor {
     * @param value1 The first value.
     * @param value2 The second value.
     */
@@ -169,8 +167,8 @@
 +  is(value1: unknown, value2: unknown): boolean;
  
    /**
-    * Sets the prototype of a specified object o to object proto or null. Returns
-@@ -409,7 +395,7 @@ interface ObjectConstructor {
+    * Sets the prototype of a specified object o to object proto or null. Returns the object o.
+@@ -350,7 +336,7 @@ interface ObjectConstructor {
     * @param o The object to change its prototype.
     * @param proto The value of the new prototype or null.
     */
@@ -179,7 +177,7 @@
  }
  
  interface ReadonlyArray<T> {
-@@ -427,11 +413,11 @@ interface ReadonlyArray<T> {
+@@ -362,11 +348,11 @@ interface ReadonlyArray<T> {
     */
    find<S extends T>(
      predicate: (value: T, index: number, obj: readonly T[]) => value is S,
@@ -194,8 +192,8 @@
    ): T | undefined;
  
    /**
-@@ -447,12 +433,12 @@ interface ReadonlyArray<T> {
-    *   instead.
+@@ -376,12 +362,12 @@ interface ReadonlyArray<T> {
+    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
     */
    findIndex(
 -    predicate: (value: T, index: number, obj: readonly T[]) => unknown,
@@ -210,16 +208,16 @@
      options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions,
    ): string;
  }
-@@ -662,7 +648,7 @@ interface StringConstructor {
-    * Return the String value whose elements are, in order, the elements in the
-    * List elements. If length is 0, the empty string is returned.
-    */
+@@ -556,7 +542,7 @@ interface String {
+ 
+ interface StringConstructor {
+   /** Return the String value whose elements are, in order, the elements in the List elements. If length is 0, the empty string is returned. */
 -  fromCodePoint(...codePoints: number[]): string;
 +  fromCodePoint(...codePoints: readonly number[]): string;
  
    /**
-    * String.raw is usually used as a tag function of a Tagged Template String.
-@@ -676,70 +662,70 @@ interface StringConstructor {
+    * String.raw is usually used as a tag function of a Tagged Template String. When called as such, the first argument will be a well formed template call site object and the rest parameter will contain the substitution values. It can also be called directly, for example, to interleave strings and values from your own
+@@ -566,70 +552,70 @@ interface StringConstructor {
     * @param substitutions A set of substitution values.
     */
    raw(

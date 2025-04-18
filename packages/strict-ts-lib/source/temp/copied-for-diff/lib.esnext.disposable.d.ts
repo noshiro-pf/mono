@@ -20,16 +20,10 @@ and limitations under the License.
 /// <reference lib="es2018.asynciterable" />
 
 interface SymbolConstructor {
-  /**
-   * A method that is used to release resources held by an object. Called by the
-   * semantics of the `using` statement.
-   */
+  /** A method that is used to release resources held by an object. Called by the semantics of the `using` statement. */
   readonly dispose: unique symbol;
 
-  /**
-   * A method that is used to asynchronously release resources held by an
-   * object. Called by the semantics of the `await using` statement.
-   */
+  /** A method that is used to asynchronously release resources held by an object. Called by the semantics of the `await using` statement. */
   readonly asyncDispose: unique symbol;
 }
 
@@ -56,16 +50,12 @@ declare var SuppressedError: SuppressedErrorConstructor;
 interface DisposableStack {
   /** Returns a value indicating whether this stack has been disposed. */
   readonly disposed: boolean;
-  /**
-   * Disposes each resource in the stack in the reverse order that they were
-   * added.
-   */
+  /** Disposes each resource in the stack in the reverse order that they were added. */
   dispose(): void;
   /**
    * Adds a disposable resource to the stack, returning the resource.
    *
-   * @param value The resource to add. `null` and `undefined` will not be added,
-   *   but will be returned.
+   * @param value The resource to add. `null` and `undefined` will not be added, but will be returned.
    * @returns The provided {@link value}.
    */
   use<T extends Disposable | null | undefined>(value: T): T;
@@ -73,16 +63,14 @@ interface DisposableStack {
    * Adds a value and associated disposal callback as a resource to the stack.
    *
    * @param value The value to add.
-   * @param onDispose The callback to use in place of a `[Symbol.dispose]()`
-   *   method. Will be invoked with `value` as the first parameter.
+   * @param onDispose The callback to use in place of a `[Symbol.dispose]()` method. Will be invoked with `value` as the first parameter.
    * @returns The provided {@link value}.
    */
   adopt<T>(value: T, onDispose: (value: T) => void): T;
   /** Adds a callback to be invoked when the stack is disposed. */
   defer(onDispose: () => void): void;
   /**
-   * Move all resources out of this stack and into a new `DisposableStack`, and
-   * marks this stack as disposed.
+   * Move all resources out of this stack and into a new `DisposableStack`, and marks this stack as disposed.
    *
    * @example
    *   ```ts
@@ -125,16 +113,12 @@ declare var DisposableStack: DisposableStackConstructor;
 interface AsyncDisposableStack {
   /** Returns a value indicating whether this stack has been disposed. */
   readonly disposed: boolean;
-  /**
-   * Disposes each resource in the stack in the reverse order that they were
-   * added.
-   */
+  /** Disposes each resource in the stack in the reverse order that they were added. */
   disposeAsync(): Promise<void>;
   /**
    * Adds a disposable resource to the stack, returning the resource.
    *
-   * @param value The resource to add. `null` and `undefined` will not be added,
-   *   but will be returned.
+   * @param value The resource to add. `null` and `undefined` will not be added, but will be returned.
    * @returns The provided {@link value}.
    */
   use<T extends AsyncDisposable | Disposable | null | undefined>(value: T): T;
@@ -142,17 +126,14 @@ interface AsyncDisposableStack {
    * Adds a value and associated disposal callback as a resource to the stack.
    *
    * @param value The value to add.
-   * @param onDisposeAsync The callback to use in place of a
-   *   `[Symbol.asyncDispose]()` method. Will be invoked with `value` as the
-   *   first parameter.
+   * @param onDisposeAsync The callback to use in place of a `[Symbol.asyncDispose]()` method. Will be invoked with `value` as the first parameter.
    * @returns The provided {@link value}.
    */
   adopt<T>(value: T, onDisposeAsync: (value: T) => PromiseLike<void> | void): T;
   /** Adds a callback to be invoked when the stack is disposed. */
   defer(onDisposeAsync: () => PromiseLike<void> | void): void;
   /**
-   * Move all resources out of this stack and into a new `DisposableStack`, and
-   * marks this stack as disposed.
+   * Move all resources out of this stack and into a new `DisposableStack`, and marks this stack as disposed.
    *
    * @example
    *   ```ts

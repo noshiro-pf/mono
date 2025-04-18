@@ -27,16 +27,14 @@ interface SymbolConstructor {
   (description?: string | number): symbol;
 
   /**
-   * Returns a Symbol object from the global symbol registry matching the given
-   * key if found. Otherwise, returns a new symbol with this key.
+   * Returns a Symbol object from the global symbol registry matching the given key if found. Otherwise, returns a new symbol with this key.
    *
    * @param key Key to search for.
    */
   for(key: string): symbol;
 
   /**
-   * Returns a key from the global symbol registry matching the given Symbol if
-   * found. Otherwise, returns a undefined.
+   * Returns a key from the global symbol registry matching the given Symbol if found. Otherwise, returns a undefined.
    *
    * @param sym Symbol to find the key for.
    */

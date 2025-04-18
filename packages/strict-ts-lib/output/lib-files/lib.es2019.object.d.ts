@@ -30,8 +30,8 @@ declare namespace StrictLibInternals {
 
   /**
    * - `['x' | 'y' | 'z', number][]]` -> `'x' | 'y' | 'z'`
-   * - `[['a' | 'b' | 'c', number], ...['x' | 'y' | 'z', number][]]` -> `'a' | 'b'
-   *   | 'c' | 'x' | 'y' | 'z'`
+   * - `[['a' | 'b' | 'c', number], ...['x' | 'y' | 'z', number][]]` -> `'a' | 'b' |
+   *   'c' | 'x' | 'y' | 'z'`
    *
    * @internal
    *
@@ -88,17 +88,16 @@ interface ObjectConstructor {
   /**
    * Returns an object created by key-value entries for properties and methods
    *
-   * @param entries An iterable object that contains key-value entries for
-   *   properties and methods.
+   * @param entries An iterable object that contains key-value entries for properties and methods.
+   * ```ts
+   * const entries = [
+   *   ['x', 1],
+   *   ['y', 3],
+   * ] as const satisfies [['x', 1], ['y', 3]];
    *
-   *   ```ts
-   *   const entries = [
-   *     ['x', 1],
-   *     ['y', 3],
-   *   ] as const satisfies [['x', 1], ['y', 3]];
+   * const obj = Object.fromEntries(entries) satisfies { x: 1; y: 3 };
+   * ```
    *
-   *   const obj = Object.fromEntries(entries) satisfies { x: 1; y: 3 };
-   *   ```
    * @note `entries` がタプル型の場合には key-value の組み合わせも反映した型にする。
    * そうでない場合、 `K` が union 型の場合、`entries` がそのすべてを網羅しているとは限らないため、
    * `fromEntries` の返り値型がその union 要素すべてを含む型になってしまわないように `Partial` を付けている。
@@ -119,21 +118,19 @@ interface ObjectConstructor {
 
   /**
    * Returns an object created by key-value entries for properties and methods
+   * @param entries An iterable object that contains key-value entries for properties and methods.
    *
-   * @param entries An iterable object that contains key-value entries for
-   *   properties and methods.
+   * ```ts
+   * const entries: readonly (readonly ['x' | 'y' | 'z' | 4, 1 | 2 | 3])[] = [
+   *   ['x', 1],
+   *   ['y', 2],
+   *   ['z', 3],
+   *   [4, 3],
+   * ] as const;
    *
-   *   ```ts
-   *   const entries: readonly (readonly ['x' | 'y' | 'z' | 4, 1 | 2 | 3])[] =
-   *     [
-   *       ['x', 1],
-   *       ['y', 2],
-   *       ['z', 3],
-   *       [4, 3],
-   *     ] as const;
+   * const obj = Object.fromEntries(entries); // Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>
+   * ```
    *
-   *   const obj = Object.fromEntries(entries); // Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>
-   *   ```
    */
   fromEntries<K extends PropertyKey, V>(
     entries: Iterable<readonly [K, V]>,
@@ -142,8 +139,7 @@ interface ObjectConstructor {
   /**
    * Returns an object created by key-value entries for properties and methods
    *
-   * @param entries An iterable object that contains key-value entries for
-   *   properties and methods.
+   * @param entries An iterable object that contains key-value entries for properties and methods.
    */
   fromEntries(entries: Iterable<readonly unknown[]>): unknown;
 }

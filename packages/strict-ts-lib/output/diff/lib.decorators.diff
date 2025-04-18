@@ -41,7 +41,7 @@
  > {
    /** The kind of element that was decorated. */
    readonly kind: 'class';
-@@ -83,10 +69,10 @@ interface ClassDecoratorContext<
+@@ -80,10 +66,10 @@ interface ClassDecoratorContext<
   */
  interface ClassMethodDecoratorContext<
    This = unknown,

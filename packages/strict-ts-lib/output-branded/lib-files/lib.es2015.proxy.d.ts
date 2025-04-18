@@ -25,8 +25,7 @@ interface ProxyHandler<T extends object> {
    * A trap for `Object.defineProperty()`.
    *
    * @param target The original object which is being proxied.
-   * @returns A `Boolean` indicating whether or not the property has been
-   *   defined.
+   * @returns A `Boolean` indicating whether or not the property has been defined.
    */
   defineProperty?(
     target: T,
@@ -128,8 +127,7 @@ interface ProxyConstructor {
    * Creates a revocable Proxy object.
    *
    * @param target A target object to wrap with Proxy.
-   * @param handler An object whose properties define the behavior of Proxy when
-   *   an operation is attempted on it.
+   * @param handler An object whose properties define the behavior of Proxy when an operation is attempted on it.
    */
   revocable<T extends object>(
     target: T,
@@ -137,15 +135,11 @@ interface ProxyConstructor {
   ): { readonly proxy: T; readonly revoke: () => void };
 
   /**
-   * Creates a Proxy object. The Proxy object allows you to create an object
-   * that can be used in place of the original object, but which may redefine
-   * fundamental Object operations like getting, setting, and defining
-   * properties. Proxy objects are commonly used to log property accesses,
-   * validate, format, or sanitize inputs.
+   * Creates a Proxy object. The Proxy object allows you to create an object that can be used in place of the original object, but which may redefine fundamental Object operations like getting, setting, and defining properties. Proxy objects are commonly used to log property accesses, validate, format, or sanitize
+   * inputs.
    *
    * @param target A target object to wrap with Proxy.
-   * @param handler An object whose properties define the behavior of Proxy when
-   *   an operation is attempted on it.
+   * @param handler An object whose properties define the behavior of Proxy when an operation is attempted on it.
    */
   new <T extends object>(target: T, handler: ProxyHandler<T>): T;
 }

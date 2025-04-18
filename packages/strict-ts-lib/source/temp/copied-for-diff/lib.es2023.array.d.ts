@@ -17,16 +17,10 @@ and limitations under the License.
 
 interface Array<T> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends T>(
     predicate: (value: T, index: number, array: T[]) => value is S,
@@ -38,16 +32,10 @@ interface Array<T> {
   ): T | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: T, index: number, array: T[]) => unknown,
@@ -60,11 +48,7 @@ interface Array<T> {
   /**
    * Returns a copy of an array with its elements sorted.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending, ASCII
-   *   character order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
    *
    *   ```ts
    *   [11, 2, 22, 1].toSorted((a, b) => a - b); // [1, 2, 11, 22]
@@ -73,36 +57,28 @@ interface Array<T> {
   toSorted(compareFn?: (a: T, b: T) => number): T[];
 
   /**
-   * Copies an array and removes elements and, if necessary, inserts new
-   * elements in their place. Returns the copied array.
+   * Copies an array and removes elements and, if necessary, inserts new elements in their place. Returns the copied array.
    *
-   * @param start The zero-based location in the array from which to start
-   *   removing elements.
+   * @param start The zero-based location in the array from which to start removing elements.
    * @param deleteCount The number of elements to remove.
-   * @param items Elements to insert into the copied array in place of the
-   *   deleted elements.
+   * @param items Elements to insert into the copied array in place of the deleted elements.
    * @returns The copied array.
    */
   toSpliced(start: number, deleteCount: number, ...items: T[]): T[];
 
   /**
-   * Copies an array and removes elements while returning the remaining
-   * elements.
+   * Copies an array and removes elements while returning the remaining elements.
    *
-   * @param start The zero-based location in the array from which to start
-   *   removing elements.
+   * @param start The zero-based location in the array from which to start removing elements.
    * @param deleteCount The number of elements to remove.
    * @returns A copy of the original array with the remaining elements.
    */
   toSpliced(start: number, deleteCount?: number): T[];
 
   /**
-   * Copies an array, then overwrites the value at the provided index with the
-   * given value. If the index is negative, then it replaces from the end of the
-   * array.
+   * Copies an array, then overwrites the value at the provided index with the given value. If the index is negative, then it replaces from the end of the array.
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to write into the copied array.
    * @returns The copied array with the updated value.
    */
@@ -111,16 +87,10 @@ interface Array<T> {
 
 interface ReadonlyArray<T> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends T>(
     predicate: (value: T, index: number, array: readonly T[]) => value is S,
@@ -132,36 +102,23 @@ interface ReadonlyArray<T> {
   ): T | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: T, index: number, array: readonly T[]) => unknown,
     thisArg?: any,
   ): number;
 
-  /**
-   * Copies the array and returns the copied array with all of its elements
-   * reversed.
-   */
+  /** Copies the array and returns the copied array with all of its elements reversed. */
   toReversed(): T[];
 
   /**
    * Copies and sorts the array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending, ASCII
-   *   character order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
    *
    *   ```ts
    *   [11, 2, 22, 1].toSorted((a, b) => a - b); // [1, 2, 11, 22]
@@ -170,36 +127,28 @@ interface ReadonlyArray<T> {
   toSorted(compareFn?: (a: T, b: T) => number): T[];
 
   /**
-   * Copies an array and removes elements while, if necessary, inserting new
-   * elements in their place, returning the remaining elements.
+   * Copies an array and removes elements while, if necessary, inserting new elements in their place, returning the remaining elements.
    *
-   * @param start The zero-based location in the array from which to start
-   *   removing elements.
+   * @param start The zero-based location in the array from which to start removing elements.
    * @param deleteCount The number of elements to remove.
-   * @param items Elements to insert into the copied array in place of the
-   *   deleted elements.
+   * @param items Elements to insert into the copied array in place of the deleted elements.
    * @returns A copy of the original array with the remaining elements.
    */
   toSpliced(start: number, deleteCount: number, ...items: T[]): T[];
 
   /**
-   * Copies an array and removes elements while returning the remaining
-   * elements.
+   * Copies an array and removes elements while returning the remaining elements.
    *
-   * @param start The zero-based location in the array from which to start
-   *   removing elements.
+   * @param start The zero-based location in the array from which to start removing elements.
    * @param deleteCount The number of elements to remove.
    * @returns A copy of the original array with the remaining elements.
    */
   toSpliced(start: number, deleteCount?: number): T[];
 
   /**
-   * Copies an array, then overwrites the value at the provided index with the
-   * given value. If the index is negative, then it replaces from the end of the
-   * array
+   * Copies an array, then overwrites the value at the provided index with the given value. If the index is negative, then it replaces from the end of the array
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
@@ -208,16 +157,10 @@ interface ReadonlyArray<T> {
 
 interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends number>(
     predicate: (value: number, index: number, array: this) => value is S,
@@ -229,16 +172,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
   ): number | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: number, index: number, array: this) => unknown,
@@ -251,10 +188,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies and sorts the array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   const myNums = Int8Array<Buffer>.from([11, 2, 22, 1]);
@@ -268,8 +202,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies the array and inserts the given number at the provided index.
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
@@ -278,16 +211,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
 
 interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends number>(
     predicate: (value: number, index: number, array: this) => value is S,
@@ -299,16 +226,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
   ): number | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: number, index: number, array: this) => unknown,
@@ -321,10 +242,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies and sorts the array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   const myNums = Uint8Array<Buffer>.from([11, 2, 22, 1]);
@@ -338,8 +256,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies the array and inserts the given number at the provided index.
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
@@ -348,16 +265,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
 
 interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends number>(
     predicate: (value: number, index: number, array: this) => value is S,
@@ -369,16 +280,10 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
   ): number | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: number, index: number, array: this) => unknown,
@@ -391,10 +296,7 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies and sorts the array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   const myNums = Uint8ClampedArray<Buffer>.from([11, 2, 22, 1]);
@@ -408,8 +310,7 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies the array and inserts the given number at the provided index.
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
@@ -418,16 +319,10 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
 
 interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends number>(
     predicate: (value: number, index: number, array: this) => value is S,
@@ -439,16 +334,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
   ): number | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: number, index: number, array: this) => unknown,
@@ -461,10 +350,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies and sorts the array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   const myNums = Int16Array<Buffer>.from([11, 2, -22, 1]);
@@ -478,8 +364,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies the array and inserts the given number at the provided index.
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
@@ -488,16 +373,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
 
 interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends number>(
     predicate: (value: number, index: number, array: this) => value is S,
@@ -509,16 +388,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
   ): number | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: number, index: number, array: this) => unknown,
@@ -531,10 +404,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies and sorts the array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   const myNums = Uint16Array<Buffer>.from([11, 2, 22, 1]);
@@ -548,8 +418,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies the array and inserts the given number at the provided index.
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
@@ -558,16 +427,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
 
 interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends number>(
     predicate: (value: number, index: number, array: this) => value is S,
@@ -579,16 +442,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
   ): number | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: number, index: number, array: this) => unknown,
@@ -601,10 +458,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies and sorts the array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   const myNums = Int32Array<Buffer>.from([11, 2, -22, 1]);
@@ -618,8 +472,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies the array and inserts the given number at the provided index.
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
@@ -628,16 +481,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
 
 interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends number>(
     predicate: (value: number, index: number, array: this) => value is S,
@@ -649,16 +496,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
   ): number | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: number, index: number, array: this) => unknown,
@@ -671,10 +512,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies and sorts the array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   const myNums = Uint32Array<Buffer>.from([11, 2, 22, 1]);
@@ -688,8 +526,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies the array and inserts the given number at the provided index.
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
@@ -698,16 +535,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
 
 interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends number>(
     predicate: (value: number, index: number, array: this) => value is S,
@@ -719,16 +550,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
   ): number | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: number, index: number, array: this) => unknown,
@@ -741,10 +566,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies and sorts the array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   const myNums = Float32Array<Buffer>.from([11.25, 2, -22.5, 1]);
@@ -758,8 +580,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies the array and inserts the given number at the provided index.
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
@@ -768,16 +589,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
 
 interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends number>(
     predicate: (value: number, index: number, array: this) => value is S,
@@ -789,16 +604,10 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
   ): number | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: number, index: number, array: this) => unknown,
@@ -811,10 +620,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies and sorts the array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   const myNums = Float64Array<Buffer>.from([11.25, 2, -22.5, 1]);
@@ -828,8 +634,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies the array and inserts the given number at the provided index.
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
@@ -838,16 +643,10 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
 
 interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends bigint>(
     predicate: (value: bigint, index: number, array: this) => value is S,
@@ -859,16 +658,10 @@ interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
   ): bigint | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: bigint, index: number, array: this) => unknown,
@@ -881,10 +674,7 @@ interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies and sorts the array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   const myNums = BigInt64Array<Buffer>.from([11n, 2n, -22n, 1n]);
@@ -898,8 +688,7 @@ interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies the array and inserts the given bigint at the provided index.
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
@@ -908,16 +697,10 @@ interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
 
 interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
-   * Returns the value of the last element in the array where predicate is true,
-   * and undefined otherwise.
+   * Returns the value of the last element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate FindLast calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLast immediately returns that
-   *   element value. Otherwise, findLast returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLast calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLast immediately returns that element value. Otherwise, findLast returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLast<S extends bigint>(
     predicate: (value: bigint, index: number, array: this) => value is S,
@@ -929,16 +712,10 @@ interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
   ): bigint | undefined;
 
   /**
-   * Returns the index of the last element in the array where predicate is true,
-   * and -1 otherwise.
+   * Returns the index of the last element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate FindLastIndex calls predicate once for each element of the
-   *   array, in descending order, until it finds one where predicate returns
-   *   true. If such an element is found, findLastIndex immediately returns that
-   *   element index. Otherwise, findLastIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate FindLastIndex calls predicate once for each element of the array, in descending order, until it finds one where predicate returns true. If such an element is found, findLastIndex immediately returns that element index. Otherwise, findLastIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
     predicate: (value: bigint, index: number, array: this) => unknown,
@@ -951,10 +728,7 @@ interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies and sorts the array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   const myNums = BigUint64Array<Buffer>.from([11n, 2n, 22n, 1n]);
@@ -968,8 +742,7 @@ interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
   /**
    * Copies the array and inserts the given bigint at the provided index.
    *
-   * @param index The index of the value to overwrite. If the index is negative,
-   *   then it replaces from the end of the array.
+   * @param index The index of the value to overwrite. If the index is negative, then it replaces from the end of the array.
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */

@@ -35,7 +35,7 @@
  
  /** Represents the completion of an asynchronous operation */
  interface PromiseConstructor {
-@@ -39,7 +25,7 @@ interface PromiseConstructor {
+@@ -35,7 +21,7 @@ interface PromiseConstructor {
     * @param values An array or iterable of Promises.
     * @returns A new Promise.
     */

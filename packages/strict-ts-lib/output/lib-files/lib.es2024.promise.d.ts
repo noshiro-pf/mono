@@ -9,8 +9,7 @@ interface PromiseWithResolvers<T> {
 
 interface PromiseConstructor {
   /**
-   * Creates a new Promise and returns it in an object, along with its resolve
-   * and reject functions.
+   * Creates a new Promise and returns it in an object, along with its resolve and reject functions.
    *
    * @returns An object with the properties `promise`, `resolve`, and `reject`.
    *

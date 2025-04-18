@@ -4,67 +4,34 @@
 /// <reference lib="es2015.symbol" />
 
 interface SymbolConstructor {
-  /**
-   * A method that determines if a constructor object recognizes an object as
-   * one of the constructor’s instances. Called by the semantics of the
-   * instanceof operator.
-   */
+  /** A method that determines if a constructor object recognizes an object as one of the constructor’s instances. Called by the semantics of the instanceof operator. */
   readonly hasInstance: unique symbol;
 
-  /**
-   * A Boolean value that if true indicates that an object should flatten to its
-   * array elements by Array.prototype.concat.
-   */
+  /** A Boolean value that if true indicates that an object should flatten to its array elements by Array.prototype.concat. */
   readonly isConcatSpreadable: unique symbol;
 
-  /**
-   * A regular expression method that matches the regular expression against a
-   * string. Called by the String.prototype.match method.
-   */
+  /** A regular expression method that matches the regular expression against a string. Called by the String.prototype.match method. */
   readonly match: unique symbol;
 
-  /**
-   * A regular expression method that replaces matched substrings of a string.
-   * Called by the String.prototype.replace method.
-   */
+  /** A regular expression method that replaces matched substrings of a string. Called by the String.prototype.replace method. */
   readonly replace: unique symbol;
 
-  /**
-   * A regular expression method that returns the index within a string that
-   * matches the regular expression. Called by the String.prototype.search
-   * method.
-   */
+  /** A regular expression method that returns the index within a string that matches the regular expression. Called by the String.prototype.search method. */
   readonly search: unique symbol;
 
-  /**
-   * A function valued property that is the constructor function that is used to
-   * create derived objects.
-   */
+  /** A function valued property that is the constructor function that is used to create derived objects. */
   readonly species: unique symbol;
 
-  /**
-   * A regular expression method that splits a string at the indices that match
-   * the regular expression. Called by the String.prototype.split method.
-   */
+  /** A regular expression method that splits a string at the indices that match the regular expression. Called by the String.prototype.split method. */
   readonly split: unique symbol;
 
-  /**
-   * A method that converts an object to a corresponding primitive value. Called
-   * by the ToPrimitive abstract operation.
-   */
+  /** A method that converts an object to a corresponding primitive value. Called by the ToPrimitive abstract operation. */
   readonly toPrimitive: unique symbol;
 
-  /**
-   * A String value that is used in the creation of the default string
-   * description of an object. Called by the built-in method
-   * Object.prototype.toString.
-   */
+  /** A String value that is used in the creation of the default string description of an object. Called by the built-in method Object.prototype.toString. */
   readonly toStringTag: unique symbol;
 
-  /**
-   * An Object whose truthy properties are properties that are excluded from the
-   * 'with' environment bindings of the associated objects.
-   */
+  /** An Object whose truthy properties are properties that are excluded from the 'with' environment bindings of the associated objects. */
   readonly unscopables: unique symbol;
 }
 
@@ -76,20 +43,14 @@ interface Symbol {
 }
 
 interface Array<T> {
-  /**
-   * Is an object whose properties have the value 'true' when they will be
-   * absent when used in a 'with' statement.
-   */
+  /** Is an object whose properties have the value 'true' when they will be absent when used in a 'with' statement. */
   readonly [Symbol.unscopables]: {
     readonly [K in keyof (readonly any[])]?: boolean;
   };
 }
 
 interface ReadonlyArray<T> {
-  /**
-   * Is an object whose properties have the value 'true' when they will be
-   * absent when used in a 'with' statement.
-   */
+  /** Is an object whose properties have the value 'true' when they will be absent when used in a 'with' statement. */
   readonly [Symbol.unscopables]: {
     readonly [K in keyof (readonly any[])]?: boolean;
   };
@@ -105,12 +66,9 @@ interface Date {
   /**
    * Converts a Date object to a string or number.
    *
-   * @param hint The strings "number", "string", or "default" to specify what
-   *   primitive to return.
-   * @returns A number if 'hint' was "number", a string if 'hint' was "string"
-   *   or "default".
-   * @throws {TypeError} If 'hint' was given something other than "number",
-   *   "string", or "default".
+   * @param hint The strings "number", "string", or "default" to specify what primitive to return.
+   * @returns A number if 'hint' was "number", a string if 'hint' was "string" or "default".
+   * @throws {TypeError} If 'hint' was given something other than "number", "string", or "default".
    */
   [Symbol.toPrimitive](hint: string): string | number;
 }
@@ -137,11 +95,9 @@ interface JSON {
 
 interface Function {
   /**
-   * Determines whether the given value inherits from this function if this
-   * function was used as a constructor function.
+   * Determines whether the given value inherits from this function if this function was used as a constructor function.
    *
-   * A constructor function can control which objects are recognized as its
-   * instances by 'instanceof' by overriding this method.
+   * A constructor function can control which objects are recognized as its instances by 'instanceof' by overriding this method.
    */
   [Symbol.hasInstance](value: unknown): boolean;
 }
@@ -164,8 +120,7 @@ interface PromiseConstructor {
 
 interface RegExp {
   /**
-   * Matches a string with this regular expression, and returns an array
-   * containing the results of that search.
+   * Matches a string with this regular expression, and returns an array containing the results of that search.
    *
    * @param string A string to search within.
    */
@@ -174,18 +129,15 @@ interface RegExp {
   /**
    * Replaces text in a string, using this regular expression.
    *
-   * @param string A String object or string literal whose contents matching
-   *   against this regular expression will be replaced
-   * @param replaceValue A String object or string literal containing the text
-   *   to replace for every successful match of this regular expression.
+   * @param string A String object or string literal whose contents matching against this regular expression will be replaced
+   * @param replaceValue A String object or string literal containing the text to replace for every successful match of this regular expression.
    */
   [Symbol.replace](string: string, replaceValue: string): string;
 
   /**
    * Replaces text in a string, using this regular expression.
    *
-   * @param string A String object or string literal whose contents matching
-   *   against this regular expression will be replaced
+   * @param string A String object or string literal whose contents matching against this regular expression will be replaced
    * @param replacer A function that returns the replacement text.
    */
   [Symbol.replace](
@@ -194,24 +146,19 @@ interface RegExp {
   ): string;
 
   /**
-   * Finds the position beginning first substring match in a regular expression
-   * search using this regular expression.
+   * Finds the position beginning first substring match in a regular expression search using this regular expression.
    *
    * @param string The string to search within.
    */
   [Symbol.search](string: string): NumberType.StringSize;
 
   /**
-   * Returns an array of substrings that were delimited by strings in the
-   * original input that match against this regular expression.
+   * Returns an array of substrings that were delimited by strings in the original input that match against this regular expression.
    *
-   * If the regular expression contains capturing parentheses, then each time
-   * this regular expression matches, the results (including any undefined
-   * results) of the capturing parentheses are spliced.
+   * If the regular expression contains capturing parentheses, then each time this regular expression matches, the results (including any undefined results) of the capturing parentheses are spliced.
    *
    * @param string String value to split
-   * @param limit If not undefined, the output array is truncated so that it
-   *   contains no more than 'limit' elements.
+   * @param limit If not undefined, the output array is truncated so that it contains no more than 'limit' elements.
    */
   [Symbol.split](
     string: string,
@@ -225,9 +172,7 @@ interface RegExpConstructor {
 
 interface String {
   /**
-   * Matches a string or an object that supports being matched against, and
-   * returns an array containing the results of that search, or null if no
-   * matches are found.
+   * Matches a string or an object that supports being matched against, and returns an array containing the results of that search, or null if no matches are found.
    *
    * @param matcher An object that supports being matched against.
    */
@@ -236,12 +181,9 @@ interface String {
   }): RegExpMatchArray | null;
 
   /**
-   * Passes a string and {@linkcode replaceValue} to the `[Symbol.replace]`
-   * method on {@linkcode searchValue}. This method is expected to implement its
-   * own replacement algorithm.
+   * Passes a string and {@linkcode replaceValue} to the `[Symbol.replace]` method on {@linkcode searchValue}. This method is expected to implement its own replacement algorithm.
    *
-   * @param searchValue An object that supports searching for and replacing
-   *   matches within a string.
+   * @param searchValue An object that supports searching for and replacing matches within a string.
    * @param replaceValue The replacement text.
    */
   replace(
@@ -252,11 +194,9 @@ interface String {
   ): string;
 
   /**
-   * Replaces text in a string, using an object that supports replacement within
-   * a string.
+   * Replaces text in a string, using an object that supports replacement within a string.
    *
-   * @param searchValue A object can search for and replace matches within a
-   *   string.
+   * @param searchValue A object can search for and replace matches within a string.
    * @param replacer A function that returns the replacement text.
    */
   replace(
@@ -277,12 +217,10 @@ interface String {
   search(searcher: { [Symbol.search](string: string): number }): number;
 
   /**
-   * Split a string into substrings using the specified separator and return
-   * them as an array.
+   * Split a string into substrings using the specified separator and return them as an array.
    *
    * @param splitter An object that can split a string.
-   * @param limit A value used to limit the number of elements returned in the
-   *   array.
+   * @param limit A value used to limit the number of elements returned in the array.
    */
   split(
     splitter: {
