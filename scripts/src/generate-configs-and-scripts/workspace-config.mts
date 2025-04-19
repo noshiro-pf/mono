@@ -177,9 +177,7 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
       restoreMocks: true,
     },
   }),
-  'ts-utils': fillDefaultsForUtil({
-    hasScripts: true,
-  }),
+  'ts-utils': fillDefaultsForUtil(),
   'numeric-input-utils': fillDefaultsForUtil({
     tsType: 'react',
     vitestConfig: {
