@@ -3,8 +3,9 @@ import * as ts from 'typescript';
 import { decodeEmptyLines, encodeEmptyLines } from '../utils/index.mjs';
 
 export const astTransformerToStringTransformer =
+  (transformers: readonly ts.TransformerFactory<ts.SourceFile>[]) =>
   (
-    transformers: readonly ts.TransformerFactory<ts.SourceFile>[],
+    source: string,
     options?: DeepReadonly<{
       /** @default `"tsconfig.json"` */
       filename?: string;
@@ -20,8 +21,7 @@ export const astTransformerToStringTransformer =
       /** @default `false` */
       debug?: boolean;
     }>,
-  ) =>
-  (source: string): string => {
+  ): string => {
     // Read project settings from tsconfig.json
     const configPath = ts.findConfigFile(
       /* searchPath */ options?.tsconfig?.searchPath ?? process.cwd(),
