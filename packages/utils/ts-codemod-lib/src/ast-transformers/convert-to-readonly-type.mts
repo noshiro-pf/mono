@@ -28,7 +28,7 @@ import {
   type ReadonlyContext,
   type ReadonlyTransformerOptions,
   type ReadonlyTransformerOptionsInternal,
-} from './readonly-transformer-fn/index.mjs';
+} from './readonly-transformer-helpers/index.mjs';
 import { debugPrintWrapper } from './test-utils.mjs';
 
 // https://github.com/eslint-functional/eslint-plugin-functional/blob/main/src/rules/prefer-readonly-type.ts

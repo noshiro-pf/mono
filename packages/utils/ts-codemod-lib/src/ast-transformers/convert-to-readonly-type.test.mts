@@ -1,7 +1,7 @@
 /* eslint-disable vitest/expect-expect */
 import { codeFromStringLines, testPreprocess } from '../utils/index.mjs';
 import { convertToReadonlyTypeTransformer } from './convert-to-readonly-type.mjs';
-import { type ReadonlyTransformerOptions } from './readonly-transformer-fn/index.mjs';
+import { type ReadonlyTransformerOptions } from './readonly-transformer-helpers/index.mjs';
 import { toUnionAndIntersectionTestCase } from './test-utils.mjs';
 
 const testFn = ({
@@ -2126,7 +2126,8 @@ describe('convertToReadonlyTypeTransformer', () => {
           'type /* Block Comment */ WithComments = {',
           '  prop1: string[]; // Trailing comment',
           '  /* Another block */',
-          '  prop2: number[];',
+          '  prop2: /* member type comment */ Readonly< /* member type inner comment */ number[]>;',
+          '  /* End block */',
           '};',
         ),
         expected: codeFromStringLines(
@@ -2134,7 +2135,8 @@ describe('convertToReadonlyTypeTransformer', () => {
           'type /* Block Comment */ WithComments = Readonly<{',
           '  prop1: readonly string[]; // Trailing comment',
           '  /* Another block */',
-          '  prop2: readonly number[];',
+          '  prop2: /* member type comment */ /* member type inner comment */ readonly number[];',
+          '  /* End block */',
           '}>;',
         ),
       },
