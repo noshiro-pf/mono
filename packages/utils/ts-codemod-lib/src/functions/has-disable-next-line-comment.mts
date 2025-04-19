@@ -12,7 +12,7 @@ export const hasDisableNextLineComment = (node: ts.Node): boolean => {
   } catch (error) {
     console.error(error);
     // Error handling because some nodes might not have a SourceFile
-    // console.warn("Could not get SourceFile for node:", node.kind);
+    console.warn('Could not get SourceFile for node:', node.kind);
     // In this case, proceed without checking for skips (continue with normal transformation)
     return false;
   }
