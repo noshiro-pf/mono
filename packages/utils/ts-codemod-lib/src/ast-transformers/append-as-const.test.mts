@@ -12,7 +12,7 @@ const testFn = ({
   debug?: boolean;
 }>): void => {
   const { expectedFormatted, result } = testPreprocess(
-    appendAsConstTransformer,
+    appendAsConstTransformer(),
     source,
     expected,
     debug ?? false,

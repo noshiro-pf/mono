@@ -1,7 +1,9 @@
 /* eslint-disable vitest/expect-expect */
 import { codeFromStringLines, testPreprocess } from '../utils/index.mjs';
-import { convertToReadonlyTypeTransformer } from './convert-to-readonly-type.mjs';
-import { type ReadonlyTransformerOptions } from './readonly-transformer-helpers/index.mjs';
+import {
+  convertToReadonlyTypeTransformer,
+  type ReadonlyTransformerOptions,
+} from './convert-to-readonly-type.mjs';
 import { toUnionAndIntersectionTestCase } from './test-utils.mjs';
 
 const testFn = ({
