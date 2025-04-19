@@ -9,10 +9,13 @@ export const hasDisableNextLineComment = (node: ts.Node): boolean => {
   try {
     mut_sourceFile = node.getSourceFile();
     mut_sourceText = mut_sourceFile.getFullText();
-  } catch (error) {
-    console.error(error);
+  } catch {
+    // console.debug(error);
     // Error handling because some nodes might not have a SourceFile
-    console.warn('Could not get SourceFile for node:', node.kind);
+    // console.debug(
+    //   'Could not get SourceFile for node:',
+    //   ts.SyntaxKind[node.kind],
+    // );
     // In this case, proceed without checking for skips (continue with normal transformation)
     return false;
   }
