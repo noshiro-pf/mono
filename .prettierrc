@@ -9,15 +9,6 @@
   "jsxSingleQuote": true,
   "overrides": [
     {
-      "files": ["experimental/**/*", "packages/tools/eslint-custom-rules/**/*"],
-      "options": {
-        "plugins": [
-          "prettier-plugin-organize-imports",
-          "prettier-plugin-packagejson"
-        ]
-      }
-    },
-    {
       "files": ["**/*.md", "**/*.mdx"],
       "options": {
         "tabWidth": 4
@@ -26,10 +17,6 @@
     {
       "files": ["articles/**/*"],
       "options": {
-        "plugins": [
-          "prettier-plugin-organize-imports",
-          "prettier-plugin-packagejson"
-        ],
         "tabWidth": 2
       }
     }
