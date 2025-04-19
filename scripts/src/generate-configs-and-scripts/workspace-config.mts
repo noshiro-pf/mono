@@ -166,10 +166,11 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
       passWithNoTests: true,
     },
   }),
-  'codemod-lib': fillDefaultsForUtil({
+  'ts-codemod-lib': fillDefaultsForUtil({
     rollupConfig: {
       variablesToDrop: ['console.debug'],
     },
+    gi: 1,
     vitestConfig: {
       passWithNoTests: true,
       hideSkippedTests: true,
@@ -353,25 +354,13 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
   }),
 
   'strict-ts-lib': produce(defaultsForUtil, (draft) => {
-    draft.useVite = false;
-
-    if (draft.tsconfig === undefined) {
-      draft.tsconfig = { compilerOptions: { types: ['node'] } };
-    } else {
-      draft.tsconfig.compilerOptions = { types: ['node'] };
-    }
-
     draft.gen = {
       typeCheck: true,
       build: false,
       test: false,
       lint: false,
     };
-
-    draft.typeCheckIncludes = [
-      `${workspaceScriptsDirName}/src`,
-      workspaceConfigsDirName,
-    ];
+    draft.packageJson.sideEffects = false;
   }),
 
   // apps

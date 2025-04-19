@@ -65,7 +65,8 @@ const updatePackageJsonImpl = (
   mut_packageJson['license'] = 'MIT';
   mut_packageJson['author'] = 'noshiro-pf <noshiro.pf@gmail.com>';
   mut_packageJson['sideEffects'] =
-    cfg.useVite === true || packageName.startsWith('global-');
+    cfg.packageJson.sideEffects ??
+    (cfg.useVite === true || packageName.startsWith('global-'));
   mut_packageJson['type'] = 'module';
 
   delete mut_packageJson['module'];

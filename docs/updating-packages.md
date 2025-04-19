@@ -7,7 +7,6 @@
 $  yarn add --dev -W  \
         sort-package-json@latest                 \
         prettier@latest                          \
-        prettier-plugin-jsdoc@latest  \
         prettier-plugin-organize-imports@latest  \
         prettier-plugin-packagejson@latest
 ```
@@ -20,7 +19,6 @@ $  yarn add --dev -W  \
 ```sh
 $  yarn add --dev -W     \
         typescript@latest  \
-        ts-morph@latest    \
         tslib@latest
 ```
 

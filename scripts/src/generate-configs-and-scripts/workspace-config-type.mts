@@ -58,6 +58,7 @@ export type WorkspaceConfig = DeepReadonly<
 
     // package.json の scripts の記述に使用するパラメータ定義
     packageJson: {
+      sideEffects?: boolean;
       scripts: {
         gi: 0 | 1 | 2 | 3 | false;
         giIgnore?: string[];

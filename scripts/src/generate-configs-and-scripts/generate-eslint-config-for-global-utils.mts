@@ -19,7 +19,7 @@ export const generateEsLintConfigForGlobalUtils = async (
   const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
 
   const content = [
-    "/** @typedef { import('@noshiro/eslint-configs').FlatConfig } FlatConfig */",
+    "/** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */",
     '',
     "import { eslintFlatConfigForTypeScript } from '@noshiro/eslint-configs';",
     "import { toThisDir } from '@noshiro/mono-utils';",
