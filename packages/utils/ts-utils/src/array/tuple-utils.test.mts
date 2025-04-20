@@ -84,7 +84,17 @@ describe('Tpl.sortedBy', () => {
       typeof sorted,
       ArrayOfLength<
         3,
-        Readonly<{ v: 1 }> | Readonly<{ v: 2 }> | Readonly<{ v: 3 }>
+        Readonly<
+          | {
+              v: 1;
+            }
+          | {
+              v: 2;
+            }
+          | {
+              v: 3;
+            }
+        >
       >
     >('=');
 
@@ -103,7 +113,17 @@ describe('Tpl.sortedBy', () => {
       typeof sorted,
       ArrayOfLength<
         3,
-        Readonly<{ v: 1 }> | Readonly<{ v: 2 }> | Readonly<{ v: 3 }>
+        Readonly<
+          | {
+              v: 1;
+            }
+          | {
+              v: 2;
+            }
+          | {
+              v: 3;
+            }
+        >
       >
     >('=');
 
@@ -127,11 +147,9 @@ describe('Tpl.findIndex', () => {
     });
   }
   {
-    const xs: readonly Readonly<{ v: 1 | 2 | 3 }>[] = [
-      { v: 2 },
-      { v: 1 },
-      { v: 3 },
-    ] as const;
+    const xs: readonly Readonly<{
+      v: 1 | 2 | 3;
+    }>[] = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
 
     const result = Tpl.findIndex(xs, (x) => x.v === 1);
 
