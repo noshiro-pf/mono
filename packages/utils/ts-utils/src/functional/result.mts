@@ -27,15 +27,17 @@ export namespace Result {
 
   export type NarrowToErr<R extends Base> = R extends Ok<unknown> ? never : R;
 
-  export const ok = <const S,>(value: S): Ok<S> => ({
-    type: OkTypeSymbol,
-    value,
-  });
+  export const ok = <const S,>(value: S): Ok<S> =>
+    ({
+      type: OkTypeSymbol,
+      value,
+    }) as const;
 
-  export const err = <const E,>(value: E): Err<E> => ({
-    type: ErrTypeSymbol,
-    value,
-  });
+  export const err = <const E,>(value: E): Err<E> =>
+    ({
+      type: ErrTypeSymbol,
+      value,
+    }) as const;
 
   // eslint-disable-next-line no-restricted-syntax
   const toStr_ = String;

@@ -14,14 +14,14 @@ const isInRangeInclusive =
   (x: number): boolean =>
     lowerBound <= x && x <= upperBound;
 
-type LEQ = {
-  readonly [N in SmallUint]: Index<N>;
-};
+type LEQ = Readonly<{
+  [N in SmallUint]: Index<N>;
+}>;
 
 /* cspell:disable-next-line */
-type LEQC = {
-  readonly [N in SmallUint]: Index<N> | N;
-};
+type LEQC = Readonly<{
+  [N in SmallUint]: Index<N> | N;
+}>;
 
 /** `lowerBound <= x < upperBound` */
 const isUintInRange =
