@@ -1,7 +1,15 @@
 import { ISetMapped } from './iset-mapped.mjs';
 
-const toKey = (a: Readonly<{ v: number }>): number => a.v;
-const fromKey = (k: number): Readonly<{ v: number }> => ({ v: k });
+const toKey = (
+  a: Readonly<{
+    v: number;
+  }>,
+): number => a.v;
+const fromKey = (
+  k: number,
+): Readonly<{
+  v: number;
+}> => ({ v: k }) as const;
 
 describe('ISetMapped[Symbol.iterator]', () => {
   test('case 1', () => {
@@ -37,7 +45,12 @@ describe('ISetMapped.has', () => {
     expect(s0.has({ v: 4 })).toBe(false);
   });
   test('case 3', () => {
-    const s0 = ISetMapped.new<{ v: number }, number>([], toKey, fromKey);
+    const s0 = ISetMapped.new<
+      Readonly<{
+        v: number;
+      }>,
+      number
+    >([], toKey, fromKey);
 
     expect(s0.has({ v: 3 })).toBe(false);
   });

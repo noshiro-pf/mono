@@ -101,11 +101,17 @@ describe('Arr', () => {
 
       expectType<
         typeof sorted,
-        readonly (
-          | Readonly<{ v: 1 }>
-          | Readonly<{ v: 2 }>
-          | Readonly<{ v: 3 }>
-        )[]
+        readonly Readonly<
+          | {
+              v: 1;
+            }
+          | {
+              v: 2;
+            }
+          | {
+              v: 3;
+            }
+        >[]
       >('=');
 
       test('case 1', () => {
@@ -122,11 +128,17 @@ describe('Arr', () => {
 
       expectType<
         typeof sorted,
-        readonly (
-          | Readonly<{ v: 1 }>
-          | Readonly<{ v: 2 }>
-          | Readonly<{ v: 3 }>
-        )[]
+        readonly Readonly<
+          | {
+              v: 1;
+            }
+          | {
+              v: 2;
+            }
+          | {
+              v: 3;
+            }
+        >[]
       >('=');
 
       test('case 2', () => {
@@ -151,14 +163,32 @@ describe('Arr', () => {
       typeof result,
       IMap<
         1 | 2 | 3,
-        readonly (
-          | Readonly<{ x: 1; y: 1 }>
-          | Readonly<{ x: 1; y: 2 }>
-          | Readonly<{ x: 1; y: 3 }>
-          | Readonly<{ x: 2; y: 1 }>
-          | Readonly<{ x: 2; y: 2 }>
-          | Readonly<{ x: 3; y: 1 }>
-        )[]
+        readonly Readonly<
+          | {
+              x: 1;
+              y: 1;
+            }
+          | {
+              x: 1;
+              y: 2;
+            }
+          | {
+              x: 1;
+              y: 3;
+            }
+          | {
+              x: 2;
+              y: 1;
+            }
+          | {
+              x: 2;
+              y: 2;
+            }
+          | {
+              x: 3;
+              y: 1;
+            }
+        >[]
       >
     >('=');
 
@@ -166,14 +196,32 @@ describe('Arr', () => {
       expect(result).toStrictEqual(
         IMap.new<
           1 | 2 | 3,
-          readonly (
-            | Readonly<{ x: 1; y: 1 }>
-            | Readonly<{ x: 1; y: 2 }>
-            | Readonly<{ x: 1; y: 3 }>
-            | Readonly<{ x: 2; y: 1 }>
-            | Readonly<{ x: 2; y: 2 }>
-            | Readonly<{ x: 3; y: 1 }>
-          )[]
+          readonly Readonly<
+            | {
+                x: 1;
+                y: 1;
+              }
+            | {
+                x: 1;
+                y: 2;
+              }
+            | {
+                x: 1;
+                y: 3;
+              }
+            | {
+                x: 2;
+                y: 1;
+              }
+            | {
+                x: 2;
+                y: 2;
+              }
+            | {
+                x: 3;
+                y: 1;
+              }
+          >[]
         >([
           [
             1,

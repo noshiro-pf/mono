@@ -49,12 +49,32 @@ describe('Arr', () => {
 
   describe('minBy', () => {
     const xs: NonEmptyArray<
-      | Readonly<{ x: 1; y: 2 }>
-      | Readonly<{ x: 2; y: 3 }>
-      | Readonly<{ x: 3; y: 2 }>
-      | Readonly<{ x: 4; y: 1 }>
-      | Readonly<{ x: 5; y: 1 }>
-      | Readonly<{ x: 6; y: 1 }>
+      Readonly<
+        | {
+            x: 1;
+            y: 2;
+          }
+        | {
+            x: 2;
+            y: 3;
+          }
+        | {
+            x: 3;
+            y: 2;
+          }
+        | {
+            x: 4;
+            y: 1;
+          }
+        | {
+            x: 5;
+            y: 1;
+          }
+        | {
+            x: 6;
+            y: 1;
+          }
+      >
     > = [
       { x: 5, y: 1 },
       { x: 4, y: 1 },
@@ -68,12 +88,32 @@ describe('Arr', () => {
 
     expectType<
       typeof result,
-      | Readonly<{ x: 1; y: 2 }>
-      | Readonly<{ x: 2; y: 3 }>
-      | Readonly<{ x: 3; y: 2 }>
-      | Readonly<{ x: 4; y: 1 }>
-      | Readonly<{ x: 5; y: 1 }>
-      | Readonly<{ x: 6; y: 1 }>
+      Readonly<
+        | {
+            x: 1;
+            y: 2;
+          }
+        | {
+            x: 2;
+            y: 3;
+          }
+        | {
+            x: 3;
+            y: 2;
+          }
+        | {
+            x: 4;
+            y: 1;
+          }
+        | {
+            x: 5;
+            y: 1;
+          }
+        | {
+            x: 6;
+            y: 1;
+          }
+      >
     >('=');
 
     test('case 1', () => {
@@ -83,12 +123,32 @@ describe('Arr', () => {
 
   describe('maxBy', () => {
     const xs: NonEmptyArray<
-      | Readonly<{ x: 1; y: 2 }>
-      | Readonly<{ x: 2; y: 3 }>
-      | Readonly<{ x: 3; y: 2 }>
-      | Readonly<{ x: 4; y: 1 }>
-      | Readonly<{ x: 5; y: 1 }>
-      | Readonly<{ x: 6; y: 1 }>
+      Readonly<
+        | {
+            x: 1;
+            y: 2;
+          }
+        | {
+            x: 2;
+            y: 3;
+          }
+        | {
+            x: 3;
+            y: 2;
+          }
+        | {
+            x: 4;
+            y: 1;
+          }
+        | {
+            x: 5;
+            y: 1;
+          }
+        | {
+            x: 6;
+            y: 1;
+          }
+      >
     > = [
       { x: 5, y: 1 },
       { x: 4, y: 1 },
@@ -102,12 +162,32 @@ describe('Arr', () => {
 
     expectType<
       typeof result,
-      | Readonly<{ x: 1; y: 2 }>
-      | Readonly<{ x: 2; y: 3 }>
-      | Readonly<{ x: 3; y: 2 }>
-      | Readonly<{ x: 4; y: 1 }>
-      | Readonly<{ x: 5; y: 1 }>
-      | Readonly<{ x: 6; y: 1 }>
+      Readonly<
+        | {
+            x: 1;
+            y: 2;
+          }
+        | {
+            x: 2;
+            y: 3;
+          }
+        | {
+            x: 3;
+            y: 2;
+          }
+        | {
+            x: 4;
+            y: 1;
+          }
+        | {
+            x: 5;
+            y: 1;
+          }
+        | {
+            x: 6;
+            y: 1;
+          }
+      >
     >('=');
 
     test('case 1', () => {

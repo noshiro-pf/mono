@@ -49,20 +49,24 @@ const lastIndexOf = <const T extends readonly unknown[]>(
 const map = <const T extends readonly unknown[], const B>(
   tpl: T,
   mapFn: (a: T[number], index: NumberType.ArraySize) => B,
-): { readonly [K in keyof T]: B } =>
+): Readonly<{
+  [K in keyof T]: B;
+}> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  tpl.map(mapFn as (a: unknown, index: NumberType.ArraySize) => B) as {
-    readonly [K in keyof T]: B;
-  };
+  tpl.map(mapFn as (a: unknown, index: NumberType.ArraySize) => B) as Readonly<{
+    [K in keyof T]: B;
+  }>;
 
 const set = <const T extends readonly unknown[], const N>(
   tpl: T,
   index: Index<Length<T>>,
   newValue: N,
-): { readonly [K in keyof T]: N | T[K] } =>
-  map(tpl, (a, i) => (i === index ? newValue : a)) as {
-    readonly [K in keyof T]: N | T[K];
-  };
+): Readonly<{
+  [K in keyof T]: N | T[K];
+}> =>
+  map(tpl, (a, i) => (i === index ? newValue : a)) as Readonly<{
+    [K in keyof T]: N | T[K];
+  }>;
 
 // TODO: improve type
 const update = <const T extends readonly unknown[], const N>(
@@ -70,46 +74,60 @@ const update = <const T extends readonly unknown[], const N>(
 
   index: NumberType.ArraySize | (Index<Length<T>> & SmallUint),
   updater: (prev: T[number]) => N,
-): { readonly [K in keyof T]: N | T[K] } =>
-  map(tpl, (a, i) => (i === index ? updater(a) : a)) as {
-    readonly [K in keyof T]: N | T[K];
-  };
+): Readonly<{
+  [K in keyof T]: N | T[K];
+}> =>
+  map(tpl, (a, i) => (i === index ? updater(a) : a)) as Readonly<{
+    [K in keyof T]: N | T[K];
+  }>;
 
 function sorted<const T extends readonly number[]>(
   tpl: T,
-): { readonly [K in keyof T]: T[number] };
+): Readonly<{
+  [K in keyof T]: T[number];
+}>;
 function sorted<const T extends readonly unknown[]>(
   tpl: T,
   // eslint-disable-next-line @typescript-eslint/unified-signatures
   comparator: (x: T[number], y: T[number]) => number,
-): { readonly [K in keyof T]: T[number] };
+): Readonly<{
+  [K in keyof T]: T[number];
+}>;
 function sorted<const T extends readonly unknown[]>(
   tpl: T,
   comparator?: (x: T[number], y: T[number]) => number,
-): { readonly [K in keyof T]: T[number] } {
+): Readonly<{
+  [K in keyof T]: T[number];
+}> {
   const cmp = comparator ?? ((x, y) => Num.from(x) - Num.from(y));
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return tpl.toSorted(cmp) as {
-    readonly [K in keyof T]: T[number];
-  };
+  return tpl.toSorted(cmp) as Readonly<{
+    [K in keyof T]: T[number];
+  }>;
 }
 
 function sortedBy<const T extends readonly unknown[]>(
   tpl: T,
   comparatorValueMapper: (value: T[number]) => number,
   comparator?: (x: number, y: number) => number,
-): { readonly [K in keyof T]: T[number] };
+): Readonly<{
+  [K in keyof T]: T[number];
+}>;
 function sortedBy<const T extends readonly unknown[], const B>(
   tpl: T,
   comparatorValueMapper: (value: T[number]) => B,
   comparator: (x: B, y: B) => number,
-): { readonly [K in keyof T]: T[number] };
+): Readonly<{
+  [K in keyof T]: T[number];
+}>;
 function sortedBy<const T extends readonly unknown[], const B>(
   tpl: T,
   comparatorValueMapper: (value: T[number]) => B,
   comparator?: (x: B, y: B) => number,
-): { readonly [K in keyof T]: T[number] } {
+): Readonly<{
+  [K in keyof T]: T[number];
+}> {
   return sorted(tpl, (x, y) =>
     comparator === undefined
       ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion

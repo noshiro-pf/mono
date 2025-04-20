@@ -5,50 +5,59 @@ interface ISetInterface<K> {
   new (iterable: Iterable<K>): void;
 
   // Getting information
-  size: NumberType.ArraySize;
-  isEmpty: boolean;
-  has: (key: K | (WidenLiteral<K> & {})) => boolean;
+  readonly size: NumberType.ArraySize;
+  readonly isEmpty: boolean;
+  readonly has: (key: K | (WidenLiteral<K> & {})) => boolean;
 
   // Reducing a value
-  every: ((predicate: (key: K) => boolean) => boolean) &
+  readonly every: ((predicate: (key: K) => boolean) => boolean) &
     (<L extends K>(predicate: (key: K) => key is L) => this is ISet<L>);
-  some: (predicate: (key: K) => boolean) => boolean;
+  readonly some: (predicate: (key: K) => boolean) => boolean;
 
   // Mutation
-  add: (key: K) => ISet<K>;
-  delete: (key: K) => ISet<K>;
-  withMutations: (
+  readonly add: (key: K) => ISet<K>;
+  readonly delete: (key: K) => ISet<K>;
+  readonly withMutations: (
     actions: readonly Readonly<
-      { type: 'add'; key: K } | { type: 'delete'; key: K }
+      | {
+          type: 'add';
+          key: K;
+        }
+      | {
+          type: 'delete';
+          key: K;
+        }
     >[],
   ) => ISet<K>;
 
   // Sequence algorithms
-  map: <K2>(mapFn: (key: K) => K2) => ISet<K2>;
+  readonly map: <K2>(mapFn: (key: K) => K2) => ISet<K2>;
 
-  filter: (<K2 extends K>(predicate: (key: K) => key is K2) => ISet<K2>) &
+  readonly filter: (<K2 extends K>(
+    predicate: (key: K) => key is K2,
+  ) => ISet<K2>) &
     ((predicate: (key: K) => boolean) => ISet<K>);
 
-  filterNot: (predicate: (key: K) => boolean) => ISet<K>;
+  readonly filterNot: (predicate: (key: K) => boolean) => ISet<K>;
 
   // Set operations
-  isSubsetOf: (set: ISet<K>) => boolean;
-  isSupersetOf: (set: ISet<K>) => boolean;
-  subtract: (set: ISet<K>) => ISet<K>;
-  intersect: (set: ISet<K>) => ISet<K>;
-  union: <K2>(set: ISet<K2>) => ISet<K | K2>;
+  readonly isSubsetOf: (set: ISet<K>) => boolean;
+  readonly isSupersetOf: (set: ISet<K>) => boolean;
+  readonly subtract: (set: ISet<K>) => ISet<K>;
+  readonly intersect: (set: ISet<K>) => ISet<K>;
+  readonly union: <K2>(set: ISet<K2>) => ISet<K | K2>;
 
   // Side effects
-  forEach: (callbackfn: (key: K) => void) => void;
+  readonly forEach: (callbackfn: (key: K) => void) => void;
 
   // Iterators
-  keys: () => IterableIterator<K>;
-  values: () => IterableIterator<K>;
-  entries: () => IterableIterator<readonly [K, K]>;
+  readonly keys: () => IterableIterator<K>;
+  readonly values: () => IterableIterator<K>;
+  readonly entries: () => IterableIterator<readonly [K, K]>;
 
   // Conversion
-  toArray: () => readonly K[];
-  toRawSet: () => ReadonlySet<K>;
+  readonly toArray: () => readonly K[];
+  readonly toRawSet: () => ReadonlySet<K>;
 }
 
 export type ISet<K> = Iterable<K> & Readonly<ISetInterface<K>>;
@@ -130,7 +139,14 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
 
   withMutations(
     actions: readonly Readonly<
-      { type: 'add'; key: K } | { type: 'delete'; key: K }
+      | {
+          type: 'add';
+          key: K;
+        }
+      | {
+          type: 'delete';
+          key: K;
+        }
     >[],
   ): ISet<K> {
     // eslint-disable-next-line no-restricted-globals

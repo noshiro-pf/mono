@@ -160,9 +160,9 @@ function newArray<V>(
   return Array.from({ length: len }, () => init);
 }
 
-type LEQ = {
-  readonly [N in SmallUint]: Index<N>;
-};
+type LEQ = Readonly<{
+  [N in SmallUint]: Index<N>;
+}>;
 
 type RangeList<S extends SmallUint, E extends SmallUint> =
   BoolOr<IsUnion<S>, IsUnion<E>> extends true
@@ -261,7 +261,7 @@ const shift = tail;
 
 const butLast = <T extends readonly unknown[]>(list: T): ListType.ButLast<T> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  (isEmpty(list) ? [] : list.slice(0, -1)) as ListType.ButLast<T>;
+  (isEmpty(list) ? ([] as const) : list.slice(0, -1)) as ListType.ButLast<T>;
 
 function take<T extends readonly unknown[], N extends SmallUint>(
   list: T,
@@ -398,7 +398,7 @@ const unshifted = <T extends readonly unknown[], V = T>(
 const concat = <T1 extends readonly unknown[], T2 extends readonly unknown[]>(
   list1: T1,
   list2: T2,
-): readonly [...T1, ...T2] => [...list1, ...list2];
+): readonly [...T1, ...T2] => [...list1, ...list2] as const;
 
 const partition = <N extends WithSmallInt<PositiveInt & Uint32>, A>(
   list: readonly A[],
@@ -695,8 +695,9 @@ const eq = <T,>(list1: readonly T[], list2: readonly T[]): boolean =>
 const isSubset = <A extends Primitive, B extends Primitive = A>(
   list1: readonly A[],
   list2: readonly B[],
+): boolean =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-): boolean => list1.every((a) => list2.includes(a as A & B));
+  list1.every((a) => list2.includes(a as A & B));
 
 /** @returns `list1` ⊃ `list2` */
 const isSuperset = <A extends Primitive, B extends Primitive = A>(
@@ -709,7 +710,7 @@ const setIntersection = <A extends Primitive, B extends Primitive = A>(
   list2: readonly B[],
 ): readonly (A & B)[] =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  list1.filter((e) => list2.includes(e as A & B)) as (A & B)[];
+  list1.filter((e) => list2.includes(e as A & B)) as readonly (A & B)[];
 
 const setDifference = <A extends Primitive>(
   list1: readonly A[],

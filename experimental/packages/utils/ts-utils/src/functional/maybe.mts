@@ -25,10 +25,11 @@ export namespace Maybe {
   export type NarrowToNone<M extends Base> =
     M extends Some<unknown> ? never : M;
 
-  export const some = <const S,>(value: S): Some<S> => ({
-    type: SomeTypeSymbol,
-    value,
-  });
+  export const some = <const S,>(value: S): Some<S> =>
+    ({
+      type: SomeTypeSymbol,
+      value,
+    }) as const;
 
   export const none: None = { type: NoneTypeSymbol } as const;
 

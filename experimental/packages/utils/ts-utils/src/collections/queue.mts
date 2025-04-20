@@ -8,7 +8,7 @@ export type Queue<T> = Readonly<{
 }>;
 
 class QueueClass<T> implements Queue<T> {
-  readonly #data: T[] = [];
+  readonly #mut_data: T[] = [];
   #mut_size: NumberType.ArraySize = toUint32(0);
 
   get isEmpty(): boolean {
@@ -20,11 +20,11 @@ class QueueClass<T> implements Queue<T> {
   dequeue(): T | undefined {
     this.#mut_size = Uint32.max(0, Uint32.sub(this.#mut_size, 1));
 
-    return this.#data.pop();
+    return this.#mut_data.pop();
   }
   enqueue(value: T): void {
     this.#mut_size = Uint32.add(this.#mut_size, 1);
-    this.#data.unshift(value);
+    this.#mut_data.unshift(value);
   }
 }
 
