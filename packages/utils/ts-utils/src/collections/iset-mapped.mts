@@ -5,51 +5,58 @@ interface ISetMappedInterface<K, KM extends SetKeyType> {
   new (iterable: Iterable<K>, toKey: (a: K) => KM, fromKey: (k: KM) => K): void;
 
   // Getting information
-  size: NumberType.ArraySize;
-  isEmpty: boolean;
-  has: (key: K) => boolean;
+  readonly size: NumberType.ArraySize;
+  readonly isEmpty: boolean;
+  readonly has: (key: K) => boolean;
 
   // Reducing a value
-  every: ((predicate: (key: K) => boolean) => boolean) &
+  readonly every: ((predicate: (key: K) => boolean) => boolean) &
     (<L extends K>(
       predicate: (key: K) => key is L,
     ) => this is ISetMapped<L, KM>);
-  some: (predicate: (key: K) => boolean) => boolean;
+  readonly some: (predicate: (key: K) => boolean) => boolean;
 
   // Mutation
-  add: (key: K) => ISetMapped<K, KM>;
-  delete: (key: K) => ISetMapped<K, KM>;
-  withMutations: (
+  readonly add: (key: K) => ISetMapped<K, KM>;
+  readonly delete: (key: K) => ISetMapped<K, KM>;
+  readonly withMutations: (
     actions: readonly Readonly<
-      { type: 'add'; key: K } | { type: 'delete'; key: K }
+      | {
+          type: 'add';
+          key: K;
+        }
+      | {
+          type: 'delete';
+          key: K;
+        }
     >[],
   ) => ISetMapped<K, KM>;
 
   // Sequence algorithms
-  map: (mapFn: (key: K) => K) => ISetMapped<K, KM>;
+  readonly map: (mapFn: (key: K) => K) => ISetMapped<K, KM>;
 
-  filter: (predicate: (value: K) => boolean) => ISetMapped<K, KM>;
+  readonly filter: (predicate: (value: K) => boolean) => ISetMapped<K, KM>;
 
-  filterNot: (predicate: (key: K) => boolean) => ISetMapped<K, KM>;
+  readonly filterNot: (predicate: (key: K) => boolean) => ISetMapped<K, KM>;
 
   // Side effects
-  forEach: (callbackfn: (key: K) => void) => void;
+  readonly forEach: (callbackfn: (key: K) => void) => void;
 
   // Comparison
-  isSubsetOf: (set: ISetMapped<K, KM>) => boolean;
-  isSupersetOf: (set: ISetMapped<K, KM>) => boolean;
-  subtract: (set: ISetMapped<K, KM>) => ISetMapped<K, KM>;
-  intersect: (set: ISetMapped<K, KM>) => ISetMapped<K, KM>;
-  union: (set: ISetMapped<K, KM>) => ISetMapped<K, KM>;
+  readonly isSubsetOf: (set: ISetMapped<K, KM>) => boolean;
+  readonly isSupersetOf: (set: ISetMapped<K, KM>) => boolean;
+  readonly subtract: (set: ISetMapped<K, KM>) => ISetMapped<K, KM>;
+  readonly intersect: (set: ISetMapped<K, KM>) => ISetMapped<K, KM>;
+  readonly union: (set: ISetMapped<K, KM>) => ISetMapped<K, KM>;
 
   // Iterators
-  keys: () => IterableIterator<K>;
-  values: () => IterableIterator<K>;
-  entries: () => IterableIterator<readonly [K, K]>;
+  readonly keys: () => IterableIterator<K>;
+  readonly values: () => IterableIterator<K>;
+  readonly entries: () => IterableIterator<readonly [K, K]>;
 
   // Conversion
-  toArray: () => readonly K[];
-  toRawSet: () => ReadonlySet<KM>;
+  readonly toArray: () => readonly K[];
+  readonly toRawSet: () => ReadonlySet<KM>;
 }
 
 export type ISetMapped<K, KM extends SetKeyType> = Iterable<K> &
@@ -88,7 +95,7 @@ export const ISetMapped = {
     a: ISetMapped<K, KM>,
     b: ISetMapped<K, KM>,
   ): ISetMapped<K, KM> => a.union(b),
-};
+} as const;
 
 class ISetMappedClass<K, KM extends SetKeyType>
   implements ISetMapped<K, KM>, Iterable<K>
@@ -168,7 +175,14 @@ class ISetMappedClass<K, KM extends SetKeyType>
 
   withMutations(
     actions: readonly Readonly<
-      { type: 'add'; key: K } | { type: 'delete'; key: K }
+      | {
+          type: 'add';
+          key: K;
+        }
+      | {
+          type: 'delete';
+          key: K;
+        }
     >[],
   ): ISetMapped<K, KM> {
     // eslint-disable-next-line no-restricted-globals
@@ -279,7 +293,7 @@ class ISetMappedClass<K, KM extends SetKeyType>
     for (const km of this.#set.keys()) {
       const a = this.#fromKey(km);
 
-      yield [a, a];
+      yield [a, a] as const;
     }
   }
 

@@ -72,21 +72,31 @@ describe('Array.find', () => {
     const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
     const result = xs.find((x) => x.v === 1);
 
-    expectType<typeof result, Readonly<{ v: 1 }> | undefined>('=');
+    expectType<
+      typeof result,
+      | Readonly<{
+          v: 1;
+        }>
+      | undefined
+    >('=');
 
     test('case 1', () => {
       expect(result).toStrictEqual({ v: 1 });
     });
   }
   {
-    const xs: readonly Readonly<{ v: 1 | 2 | 3 }>[] = [
-      { v: 2 },
-      { v: 1 },
-      { v: 3 },
-    ] as const;
+    const xs: readonly Readonly<{
+      v: 1 | 2 | 3;
+    }>[] = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
     const result = xs.find((x) => x.v === 1);
 
-    expectType<typeof result, Readonly<{ v: 1 | 2 | 3 }> | undefined>('=');
+    expectType<
+      typeof result,
+      | Readonly<{
+          v: 1 | 2 | 3;
+        }>
+      | undefined
+    >('=');
 
     test('case 2', () => {
       expect(result).toStrictEqual({ v: 1 });
@@ -106,11 +116,9 @@ describe('Array.findIndex', () => {
     });
   }
   {
-    const xs: readonly Readonly<{ v: 1 | 2 | 3 }>[] = [
-      { v: 2 },
-      { v: 1 },
-      { v: 3 },
-    ] as const;
+    const xs: readonly Readonly<{
+      v: 1 | 2 | 3;
+    }>[] = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
     const result = xs.findIndex((x) => x.v === 1);
 
     expectType<typeof result, NumberType.ArraySearchResult>('=');

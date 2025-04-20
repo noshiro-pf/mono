@@ -7,7 +7,10 @@ export type TinyObservable<T> = Readonly<{
 }>;
 
 export type TinyObservableSource<T> = MergeIntersection<
-  Readonly<{ next: (value: T) => void }> & TinyObservable<T>
+  Readonly<{
+    next: (value: T) => void;
+  }> &
+    TinyObservable<T>
 >;
 
 export const createTinyObservable = <T,>(): TinyObservableSource<T> =>
@@ -32,6 +35,6 @@ class TinyObservableClass<T> implements TinyObservableSource<T> {
       unsubscribe: () => {
         this.#mut_subscriptions.delete(id);
       },
-    };
+    } as const;
   }
 }

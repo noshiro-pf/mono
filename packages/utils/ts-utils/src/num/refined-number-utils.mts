@@ -48,57 +48,56 @@ export namespace RefinedNumberUtils {
   export type NumberClass<
     N extends UnknownNumberBrand,
     classes extends 'int' | 'non-negative' | 'positive' | 'range',
-  > = Readonly<
-    ('int' extends classes
+  > = ('int' extends classes
+    ? unknown
+    : 'positive' extends classes
+      ? Readonly<{
+          floor: (x: N, y: N) => RemoveNonZeroBrandKey<ToInt<N>>;
+          ceil: (x: N, y: N) => ToInt<N>;
+          round: (x: N, y: N) => RemoveNonZeroBrandKey<ToInt<N>>;
+        }>
+      : Readonly<{
+          floor: (x: N, y: N) => ToInt<N>;
+          ceil: (x: N, y: N) => ToInt<N>;
+          round: (x: N, y: N) => ToInt<N>;
+        }>) &
+    ('non-negative' extends classes
+      ? Readonly<{
+          MIN_VALUE: number;
+          clamp: (a: number) => N;
+        }>
+      : unknown) &
+    ('non-negative' extends classes
       ? unknown
       : 'positive' extends classes
-        ? {
-            floor: (x: N, y: N) => RemoveNonZeroBrandKey<ToInt<N>>;
-            ceil: (x: N, y: N) => ToInt<N>;
-            round: (x: N, y: N) => RemoveNonZeroBrandKey<ToInt<N>>;
-          }
-        : {
-            floor: (x: N, y: N) => ToInt<N>;
-            ceil: (x: N, y: N) => ToInt<N>;
-            round: (x: N, y: N) => ToInt<N>;
-          }) &
-      ('non-negative' extends classes
-        ? {
-            MIN_VALUE: number;
-            clamp: (a: number) => N;
-          }
-        : unknown) &
-      ('non-negative' extends classes
         ? unknown
-        : 'positive' extends classes
-          ? unknown
-          : {
-              abs: (x: N) => ToNonNegative<N>;
-            }) &
-      ('positive' extends classes
-        ? {
-            MIN_VALUE: number;
-            clamp: (a: number) => N;
-          }
-        : unknown) &
-      ('range' extends classes
-        ? {
-            MIN_VALUE: number;
-            MAX_VALUE: number;
-            clamp: (a: number) => N;
-          }
-        : unknown) & {
-        is: (a: number) => a is N;
-        min: (...values: readonly N[]) => N;
-        max: (...values: readonly N[]) => N;
-        random: (min: N, max: N) => N;
-        pow: (x: N, y: N) => N;
-        add: (x: N, y: N) => N;
-        sub: (x: N, y: N) => N;
-        mul: (x: N, y: N) => N;
-        div: (x: N, y: ToNonZero<N>) => N;
-      }
-  >;
+        : Readonly<{
+            abs: (x: N) => ToNonNegative<N>;
+          }>) &
+    ('positive' extends classes
+      ? Readonly<{
+          MIN_VALUE: number;
+          clamp: (a: number) => N;
+        }>
+      : unknown) &
+    ('range' extends classes
+      ? Readonly<{
+          MIN_VALUE: number;
+          MAX_VALUE: number;
+          clamp: (a: number) => N;
+        }>
+      : unknown) &
+    Readonly<{
+      is: (a: number) => a is N;
+      min: (...values: readonly N[]) => N;
+      max: (...values: readonly N[]) => N;
+      random: (min: N, max: N) => N;
+      pow: (x: N, y: N) => N;
+      add: (x: N, y: N) => N;
+      sub: (x: N, y: N) => N;
+      mul: (x: N, y: N) => N;
+      div: (x: N, y: ToNonZero<N>) => N;
+    }>;
 
   if (import.meta.vitest !== undefined) {
     type BaseKeys =
