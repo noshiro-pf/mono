@@ -121,6 +121,21 @@ type DeepPartial<T> = T extends Primitive
             }
           : T;
 
+type DeepRequired<T> = T extends Primitive
+  ? T
+  : // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+    T extends Function
+    ? T
+    : T extends MutableMap<infer K, infer V>
+      ? ReadonlyMap<DeepRequired<K>, DeepRequired<V>>
+      : T extends MutableSet<infer V>
+        ? ReadonlySet<DeepRequired<V>>
+        : T extends object | readonly unknown[]
+          ? {
+              [K in keyof T]-?: DeepRequired<T[K]>;
+            }
+          : T;
+
 type RecordKeyType = keyof never;
 
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
