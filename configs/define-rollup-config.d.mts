@@ -20,5 +20,6 @@ export declare const defineRollupConfig: ({
     import('rollup').Plugin<any>,
     import('rollup').Plugin<any>,
     import('rollup').Plugin<any>,
+    import('rollup').Plugin<any>,
   ];
 };
