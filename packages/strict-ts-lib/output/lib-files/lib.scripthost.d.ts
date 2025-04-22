@@ -23,11 +23,7 @@ interface TextStreamBase {
   /** The current line number in an input stream. */
   readonly Line: number;
 
-  /**
-   * Closes a text stream. It is not necessary to close standard streams; they
-   * close automatically when the process ends. If you close a standard stream,
-   * be aware that any other pointers to that standard stream become invalid.
-   */
+  /** Closes a text stream. It is not necessary to close standard streams; they close automatically when the process ends. If you close a standard stream, be aware that any other pointers to that standard stream become invalid. */
   Close(): void;
 }
 
@@ -35,10 +31,7 @@ interface TextStreamWriter extends TextStreamBase {
   /** Sends a string to an output stream. */
   Write(s: string): void;
 
-  /**
-   * Sends a specified number of blank lines (newline characters) to an output
-   * stream.
-   */
+  /** Sends a specified number of blank lines (newline characters) to an output stream. */
   WriteBlankLines(intLines: number): void;
 
   /** Sends a string followed by a newline character to an output stream. */
@@ -46,42 +39,23 @@ interface TextStreamWriter extends TextStreamBase {
 }
 
 interface TextStreamReader extends TextStreamBase {
-  /**
-   * Returns a specified number of characters from an input stream, starting at
-   * the current pointer position. Does not return until the ENTER key is
-   * pressed. Can only be used on a stream in reading mode; causes an error in
-   * writing or appending mode.
-   */
+  /** Returns a specified number of characters from an input stream, starting at the current pointer position. Does not return until the ENTER key is pressed. Can only be used on a stream in reading mode; causes an error in writing or appending mode. */
   Read(characters: number): string;
 
-  /**
-   * Returns all characters from an input stream. Can only be used on a stream
-   * in reading mode; causes an error in writing or appending mode.
-   */
+  /** Returns all characters from an input stream. Can only be used on a stream in reading mode; causes an error in writing or appending mode. */
   ReadAll(): string;
 
-  /**
-   * Returns an entire line from an input stream. Although this method extracts
-   * the newline character, it does not add it to the returned string. Can only
-   * be used on a stream in reading mode; causes an error in writing or
-   * appending mode.
-   */
+  /** Returns an entire line from an input stream. Although this method extracts the newline character, it does not add it to the returned string. Can only be used on a stream in reading mode; causes an error in writing or appending mode. */
   ReadLine(): string;
 
   /**
-   * Skips a specified number of characters when reading from an input text
-   * stream. Can only be used on a stream in reading mode; causes an error in
-   * writing or appending mode.
+   * Skips a specified number of characters when reading from an input text stream. Can only be used on a stream in reading mode; causes an error in writing or appending mode.
    *
-   * @param characters Positive number of characters to skip forward. (Backward
-   *   skipping is not supported.)
+   * @param characters Positive number of characters to skip forward. (Backward skipping is not supported.)
    */
   Skip(characters: number): void;
 
-  /**
-   * Skips the next line when reading from an input text stream. Can only be
-   * used on a stream in reading mode, not writing or appending mode.
-   */
+  /** Skips the next line when reading from an input text stream. Can only be used on a stream in reading mode, not writing or appending mode. */
   SkipLine(): void;
 
   /** Indicates whether the stream pointer position is at the end of a line. */
@@ -92,22 +66,13 @@ interface TextStreamReader extends TextStreamBase {
 }
 
 declare const WScript: {
-  /**
-   * Outputs text to either a message box (under WScript.exe) or the command
-   * console window followed by a newline (under CScript.exe).
-   */
+  /** Outputs text to either a message box (under WScript.exe) or the command console window followed by a newline (under CScript.exe). */
   Echo(s: unknown): void;
 
-  /**
-   * Exposes the write-only error output stream for the current script. Can be
-   * accessed only while using CScript.exe.
-   */
+  /** Exposes the write-only error output stream for the current script. Can be accessed only while using CScript.exe. */
   readonly StdErr: TextStreamWriter;
 
-  /**
-   * Exposes the write-only output stream for the current script. Can be
-   * accessed only while using CScript.exe.
-   */
+  /** Exposes the write-only output stream for the current script. Can be accessed only while using CScript.exe. */
   readonly StdOut: TextStreamWriter;
   readonly Arguments: { readonly length: number; Item(n: number): string };
 
@@ -135,27 +100,20 @@ declare const WScript: {
   /** The filename of the currently running script. */
   readonly ScriptName: string;
 
-  /**
-   * Exposes the read-only input stream for the current script. Can be accessed
-   * only while using CScript.exe.
-   */
+  /** Exposes the read-only input stream for the current script. Can be accessed only while using CScript.exe. */
   readonly StdIn: TextStreamReader;
 
   /** Windows Script Host version */
   readonly Version: string;
 
-  /**
-   * Connects a COM object's event sources to functions named with a given
-   * prefix, in the form prefix_event.
-   */
+  /** Connects a COM object's event sources to functions named with a given prefix, in the form prefix_event. */
   ConnectObject(objEventSource: unknown, strPrefix: string): void;
 
   /**
    * Creates a COM object.
    *
    * @param strProgiID
-   * @param strPrefix Function names in the form prefix_event will be bound to
-   *   this object's COM events.
+   * @param strPrefix Function names in the form prefix_event will be bound to this object's COM events.
    */
   CreateObject(strProgID: string, strPrefix?: string): unknown;
 
@@ -163,14 +121,11 @@ declare const WScript: {
   DisconnectObject(obj: unknown): void;
 
   /**
-   * Retrieves an existing object with the specified ProgID from memory, or
-   * creates a new one from a file.
+   * Retrieves an existing object with the specified ProgID from memory, or creates a new one from a file.
    *
-   * @param strPathname Fully qualified path to the file containing the object
-   *   persisted to disk. For objects in memory, pass a zero-length string.
+   * @param strPathname Fully qualified path to the file containing the object persisted to disk. For objects in memory, pass a zero-length string.
    * @param strProgID
-   * @param strPrefix Function names in the form prefix_event will be bound to
-   *   this object's COM events.
+   * @param strPrefix Function names in the form prefix_event will be bound to this object's COM events.
    */
   GetObject(
     strPathname: string,
@@ -179,8 +134,7 @@ declare const WScript: {
   ): unknown;
 
   /**
-   * Suspends script execution for a specified length of time, then continues
-   * execution.
+   * Suspends script execution for a specified length of time, then continues execution.
    *
    * @param intTime Interval (in milliseconds) to suspend script execution.
    */
@@ -196,31 +150,18 @@ declare class SafeArray<T = unknown> {
   private SafeArray_typekey: SafeArray<T>;
 }
 
-/**
- * Allows enumerating over a COM collection, which may not have indexed item
- * access.
- */
+/** Allows enumerating over a COM collection, which may not have indexed item access. */
 interface Enumerator<T = unknown> {
-  /**
-   * Returns true if the current item is the last one in the collection, or the
-   * collection is empty, or the current item is undefined.
-   */
+  /** Returns true if the current item is the last one in the collection, or the collection is empty, or the current item is undefined. */
   atEnd(): boolean;
 
   /** Returns the current item in the collection */
   item(): T;
 
-  /**
-   * Resets the current item in the collection to the first item. If there are
-   * no items in the collection, the current item is set to undefined.
-   */
+  /** Resets the current item in the collection to the first item. If there are no items in the collection, the current item is set to undefined. */
   moveFirst(): void;
 
-  /**
-   * Moves the current item to the next item in the collection. If the
-   * enumerator is at the end of the collection or the collection is empty, the
-   * current item is set to undefined.
-   */
+  /** Moves the current item to the next item in the collection. If the enumerator is at the end of the collection or the collection is empty, the current item is set to undefined. */
   moveNext(): void;
 }
 
@@ -232,18 +173,12 @@ interface EnumeratorConstructor {
 
 declare const Enumerator: EnumeratorConstructor;
 
-/**
- * Enables reading from a COM safe array, which might have an alternate lower
- * bound, or multiple dimensions.
- */
+/** Enables reading from a COM safe array, which might have an alternate lower bound, or multiple dimensions. */
 interface VBArray<T = unknown> {
   /** Returns the number of dimensions (1-based). */
   dimensions(): number;
 
-  /**
-   * Takes an index for each dimension in the array, and returns the item at the
-   * corresponding location.
-   */
+  /** Takes an index for each dimension in the array, and returns the item at the corresponding location. */
   getItem(dimension1Index: number, ...dimensionNIndexes: readonly number[]): T;
 
   /**
@@ -260,11 +195,7 @@ interface VBArray<T = unknown> {
    */
   ubound(dimension?: number): number;
 
-  /**
-   * Returns a Javascript array with all the elements in the VBArray. If there
-   * are multiple dimensions, each successive dimension is appended to the end
-   * of the array. Example: [[1,2,3],[4,5,6]] becomes [1,2,3,4,5,6]
-   */
+  /** Returns a Javascript array with all the elements in the VBArray. If there are multiple dimensions, each successive dimension is appended to the end of the array. Example: [[1,2,3],[4,5,6]] becomes [1,2,3,4,5,6] */
   toArray(): T[];
 }
 

@@ -34,40 +34,40 @@
  /**
   * Evaluates JavaScript code and executes it.
   *
-+ * @deprecated
   * @param x A String value that contains valid JavaScript code.
++ * @deprecated
   */
 -declare function eval(x: string): any;
 +declare function eval(x: string): unknown;
  
  /**
   * Converts a string to an integer.
-@@ -40,7 +27,7 @@ declare function eval(x: string): any;
-  *   in `string`. If this argument is not supplied, strings with a prefix of
-  *   '0x' are considered hexadecimal. All other strings are considered decimal.
+@@ -38,7 +25,7 @@ declare function eval(x: string): any;
+  * @param string A string to convert into a number.
+  * @param radix A value between 2 and 36 that specifies the base of the number in `string`. If this argument is not supplied, strings with a prefix of '0x' are considered hexadecimal. All other strings are considered decimal.
   */
 -declare function parseInt(string: string, radix?: number): number;
 +declare function parseInt(string: string, radix?: UintRange<2, 37>): number;
  
  /**
   * Converts a string to a floating-point number.
-@@ -53,6 +40,7 @@ declare function parseFloat(string: string): number;
-  * Returns a Boolean value that indicates whether a value is the reserved value
-  * NaN (not a number).
+@@ -51,6 +38,7 @@ declare function parseFloat(string: string): number;
+  * Returns a Boolean value that indicates whether a value is the reserved value NaN (not a number).
   *
-+ * @deprecated Use `Number.isNaN` instead.
   * @param number A numeric value.
++ * @deprecated Use `Number.isNaN` instead.
   */
  declare function isNaN(number: number): boolean;
-@@ -60,6 +48,7 @@ declare function isNaN(number: number): boolean;
- /**
+ 
+@@ -58,6 +46,7 @@ declare function isNaN(number: number): boolean;
   * Determines whether a supplied number is finite.
   *
-+ * @deprecated Use `Number.isFinite` instead.
   * @param number Any numeric value.
++ * @deprecated Use `Number.isFinite` instead.
   */
  declare function isFinite(number: number): boolean;
-@@ -122,19 +111,20 @@ interface Symbol {
+ 
+@@ -115,24 +104,25 @@ interface Symbol {
    valueOf(): symbol;
  }
  
@@ -96,16 +96,13 @@
  }
  
  interface Object {
-@@ -142,7 +132,7 @@ interface Object {
-    * The initial value of Object.prototype.constructor is the standard built-in
-    * Object constructor.
-    */
+   /** The initial value of Object.prototype.constructor is the standard built-in Object constructor. */
 -  constructor: Function;
 +  readonly constructor: Function;
  
    /** Returns a string representation of an object. */
    toString(): string;
-@@ -176,9 +166,12 @@ interface Object {
+@@ -166,9 +156,12 @@ interface Object {
  }
  
  interface ObjectConstructor {
@@ -121,7 +118,7 @@
  
    /** A reference to the prototype for a class of objects. */
    readonly prototype: Object;
-@@ -188,7 +181,7 @@ interface ObjectConstructor {
+@@ -178,7 +171,7 @@ interface ObjectConstructor {
     *
     * @param o The object that references the prototype.
     */
@@ -129,8 +126,8 @@
 +  getPrototypeOf(o: unknown): unknown;
  
    /**
-    * Gets the own property descriptor of the specified object. An own property
-@@ -199,7 +192,7 @@ interface ObjectConstructor {
+    * Gets the own property descriptor of the specified object. An own property descriptor is one that is defined directly on the object and is not inherited from the object's prototype.
+@@ -187,7 +180,7 @@ interface ObjectConstructor {
     * @param p Name of the property.
     */
    getOwnPropertyDescriptor(
@@ -139,7 +136,7 @@
      p: PropertyKey,
    ): PropertyDescriptor | undefined;
  
-@@ -211,7 +204,7 @@ interface ObjectConstructor {
+@@ -196,14 +189,14 @@ interface ObjectConstructor {
     *
     * @param o Object that contains the own properties.
     */
@@ -147,8 +144,7 @@
 +  getOwnPropertyNames(o: unknown): string[];
  
    /**
-    * Creates an object that has the specified prototype or that has null
-@@ -219,7 +212,7 @@ interface ObjectConstructor {
+    * Creates an object that has the specified prototype or that has null prototype.
     *
     * @param o Object to use as a prototype. May be null.
     */
@@ -156,8 +152,8 @@
 +  create(o: object | null): unknown;
  
    /**
-    * Creates an object that has the specified prototype, and that optionally
-@@ -231,8 +224,8 @@ interface ObjectConstructor {
+    * Creates an object that has the specified prototype, and that optionally contains specified properties.
+@@ -213,8 +206,8 @@ interface ObjectConstructor {
     */
    create(
      o: object | null,
@@ -167,8 +163,8 @@
 +  ): unknown;
  
    /**
-    * Adds a property to an object, or modifies attributes of an existing
-@@ -248,7 +241,7 @@ interface ObjectConstructor {
+    * Adds a property to an object, or modifies attributes of an existing property.
+@@ -226,7 +219,7 @@ interface ObjectConstructor {
    defineProperty<T>(
      o: T,
      p: PropertyKey,
@@ -177,7 +173,7 @@
    ): T;
  
    /**
-@@ -263,7 +256,7 @@ interface ObjectConstructor {
+@@ -237,7 +230,7 @@ interface ObjectConstructor {
     */
    defineProperties<T>(
      o: T,
@@ -186,7 +182,7 @@
    ): T;
  
    /**
-@@ -289,7 +282,7 @@ interface ObjectConstructor {
+@@ -260,7 +253,7 @@ interface ObjectConstructor {
     * @param o Object on which to lock the attributes.
     */
    freeze<
@@ -195,7 +191,7 @@
      U extends string | bigint | number | boolean | symbol,
    >(
      o: T,
-@@ -316,7 +309,7 @@ interface ObjectConstructor {
+@@ -285,32 +278,39 @@ interface ObjectConstructor {
     *
     * @param o Object to test.
     */
@@ -203,8 +199,7 @@
 +  isSealed(o: unknown): boolean;
  
    /**
-    * Returns true if existing property attributes and values cannot be modified
-@@ -324,7 +317,7 @@ interface ObjectConstructor {
+    * Returns true if existing property attributes and values cannot be modified in an object, and new properties cannot be added to the object.
     *
     * @param o Object to test.
     */
@@ -212,8 +207,7 @@
 +  isFrozen(o: unknown): boolean;
  
    /**
-    * Returns a value that indicates whether new properties can be added to an
-@@ -332,21 +325,28 @@ interface ObjectConstructor {
+    * Returns a value that indicates whether new properties can be added to an object.
     *
     * @param o Object to test.
     */
@@ -221,17 +215,14 @@
 +  isExtensible(o: unknown): boolean;
  
    /**
-    * Returns the names of the enumerable string properties and methods of an
-    * object.
+    * Returns the names of the enumerable string properties and methods of an object.
     *
-+   * @example
-+   *   ```ts
-+   *   const ks = Object.keys({ x: 1, y: 2, z: '3', 3: 4 }); // ('3' | 'x' | 'y' | 'z' | (string & {}))[]
-+   *   ```;
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
 +   *
-    * @param o Object that contains the properties and methods. This can be an
-    *   object that you created or an existing Document Object Model (DOM)
-    *   object.
++   * @example
++   * ```ts
++   * const ks = Object.keys({ x: 1, y: 2, z: '3', 3: 4 }); // ('3' | 'x' | 'y' | 'z' | (string & {}))[]
++   * ```
     */
 -  keys(o: object): string[];
 +  keys<const R extends UnknownRecord>(
@@ -245,7 +236,7 @@
  
  /** Creates a new function. */
  interface Function {
-@@ -357,7 +357,7 @@ interface Function {
+@@ -320,7 +320,7 @@ interface Function {
     * @param thisArg The object to be used as the this object.
     * @param argArray A set of arguments to be passed to the function.
     */
@@ -253,8 +244,8 @@
 +  apply(this: Function, thisArg: unknown, argArray?: unknown): unknown;
  
    /**
-    * Calls a method of an object, substituting another object for the current
-@@ -366,7 +366,11 @@ interface Function {
+    * Calls a method of an object, substituting another object for the current object.
+@@ -328,7 +328,11 @@ interface Function {
     * @param thisArg The object to be used as the current object.
     * @param argArray A list of arguments to be passed to the method.
     */
@@ -266,9 +257,9 @@
 +  ): unknown;
  
    /**
-    * For a given function, creates a bound function that has the same body as
-@@ -377,37 +381,43 @@ interface Function {
-    *   function.
+    * For a given function, creates a bound function that has the same body as the original function. The this object of the bound function is associated with the specified object, and has the specified initial parameters.
+@@ -336,17 +340,21 @@ interface Function {
+    * @param thisArg An object to which the this keyword can refer inside the new function.
     * @param argArray A list of arguments to be passed to the new function.
     */
 -  bind(this: Function, thisArg: any, ...argArray: any[]): any;
@@ -293,11 +284,11 @@
  }
  
  interface FunctionConstructor {
-   /**
+@@ -354,16 +362,18 @@ interface FunctionConstructor {
     * Creates a new function.
     *
-+   * @deprecated Don't use Function constructor
     * @param args A list of arguments the function accepts.
++   * @deprecated Don't use Function constructor
     */
 -  new (...args: string[]): Function;
 -  (...args: string[]): Function;
@@ -310,16 +301,13 @@
 -declare var Function: FunctionConstructor;
 +declare const Function: FunctionConstructor;
  
- /**
-  * Extracts the type of the 'this' parameter of a function type, or 'unknown' if
-  * the function type has no 'this' parameter.
-  */
+ /** Extracts the type of the 'this' parameter of a function type, or 'unknown' if the function type has no 'this' parameter. */
 -type ThisParameterType<T> = T extends (this: infer U, ...args: never) => any
 +type ThisParameterType<T> = T extends (this: infer U, ...args: never) => unknown
    ? U
    : unknown;
  
-@@ -435,7 +445,7 @@ interface CallableFunction extends Function {
+@@ -389,7 +399,7 @@ interface CallableFunction extends Function {
     * @param thisArg The object to be used as the this object.
     * @param args An array of argument values to be passed to the function.
     */
@@ -328,7 +316,7 @@
      this: (this: T, ...args: A) => R,
      thisArg: T,
      args: A,
-@@ -448,7 +458,7 @@ interface CallableFunction extends Function {
+@@ -401,7 +411,7 @@ interface CallableFunction extends Function {
     * @param thisArg The object to be used as the this object.
     * @param args Argument values to be passed to the function.
     */
@@ -337,7 +325,7 @@
      this: (this: T, ...args: A) => R,
      thisArg: T,
      ...args: A
-@@ -471,8 +481,8 @@ interface CallableFunction extends Function {
+@@ -420,8 +430,8 @@ interface CallableFunction extends Function {
     * @param thisArg The object to be used as the this object.
     * @param args Arguments to bind to the parameters of the function.
     */
@@ -348,7 +336,7 @@
      thisArg: T,
      ...args: A
    ): (...args: B) => R;
-@@ -493,7 +503,7 @@ interface NewableFunction extends Function {
+@@ -440,7 +450,7 @@ interface NewableFunction extends Function {
     * @param thisArg The object to be used as the this object.
     * @param args An array of argument values to be passed to the function.
     */
@@ -357,7 +345,7 @@
      this: new (...args: A) => T,
      thisArg: T,
      args: A,
-@@ -506,7 +516,7 @@ interface NewableFunction extends Function {
+@@ -452,7 +462,7 @@ interface NewableFunction extends Function {
     * @param thisArg The object to be used as the this object.
     * @param args Argument values to be passed to the function.
     */
@@ -366,7 +354,7 @@
      this: new (...args: A) => T,
      thisArg: T,
      ...args: A
-@@ -519,7 +529,7 @@ interface NewableFunction extends Function {
+@@ -463,7 +473,7 @@ interface NewableFunction extends Function {
     *
     * @param thisArg The object to be used as the this object.
     */
@@ -374,8 +362,8 @@
 +  bind<T>(this: T, thisArg: unknown): T;
  
    /**
-    * For a given function, creates a bound function that has the same body as
-@@ -529,17 +539,17 @@ interface NewableFunction extends Function {
+    * For a given function, creates a bound function that has the same body as the original function. The this object of the bound function is associated with the specified object, and has the specified initial parameters.
+@@ -471,17 +481,17 @@ interface NewableFunction extends Function {
     * @param thisArg The object to be used as the this object.
     * @param args Arguments to bind to the parameters of the function.
     */
@@ -399,29 +387,26 @@
  }
  
  interface String {
-@@ -549,6 +559,8 @@ interface String {
-   /**
+@@ -492,6 +502,7 @@ interface String {
     * Returns the character at the specified index.
     *
-+   * @deprecated Prefer `String#at(...)` over `String#charAt(...)`.
-+   *   eslint(unicorn/prefer-at)
     * @param pos The zero-based index of the desired character.
++   * @deprecated Prefer `String#at(...)` over `String#charAt(...)`. eslint(unicorn/prefer-at)
     */
    charAt(pos: number): string;
-@@ -564,9 +576,11 @@ interface String {
-   /**
+ 
+@@ -506,8 +517,9 @@ interface String {
     * Returns a string that contains the concatenation of two or more strings.
     *
-+   * @deprecated Prefer the spread operator over `Array#concat(...)`.
-+   *   eslint(unicorn/prefer-spread)
     * @param strings The strings to append to the end of the string.
++   * @deprecated Prefer the spread operator over `Array#concat(...)`. eslint(unicorn/prefer-spread)
     */
 -  concat(...strings: string[]): string;
 +  concat(...strings: readonly string[]): string;
  
    /**
     * Returns the position of the first occurrence of a substring.
-@@ -622,7 +636,7 @@ interface String {
+@@ -555,7 +567,7 @@ interface String {
     */
    replace(
      searchValue: string | RegExp,
@@ -430,25 +415,23 @@
    ): string;
  
    /**
-@@ -675,7 +689,7 @@ interface String {
-    * Converts all alphabetic characters to lowercase, taking into account the
-    * host environment's current locale.
-    */
+@@ -593,13 +605,13 @@ interface String {
+   toLowerCase(): string;
+ 
+   /** Converts all alphabetic characters to lowercase, taking into account the host environment's current locale. */
 -  toLocaleLowerCase(locales?: string | string[]): string;
 +  toLocaleLowerCase(locales?: string | readonly string[]): string;
  
    /** Converts all the alphabetic characters in a string to uppercase. */
    toUpperCase(): string;
-@@ -684,7 +698,7 @@ interface String {
-    * Returns a string where all alphabetic characters have been converted to
-    * uppercase, taking into account the host environment's current locale.
-    */
+ 
+   /** Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale. */
 -  toLocaleUpperCase(locales?: string | string[]): string;
 +  toLocaleUpperCase(locales?: string | readonly string[]): string;
  
-   /**
-    * Removes the leading and trailing white space and line terminator characters
-@@ -715,17 +729,19 @@ interface String {
+   /** Removes the leading and trailing white space and line terminator characters from a string. */
+   trim(): string;
+@@ -624,14 +636,16 @@ interface String {
  }
  
  interface StringConstructor {
@@ -463,16 +446,13 @@
 +  fromCharCode(...codes: readonly number[]): string;
  }
  
- /**
-  * Allows manipulation and formatting of text strings and determination and
-  * location of substrings within strings.
-  */
+ /** Allows manipulation and formatting of text strings and determination and location of substrings within strings. */
 -declare var String: StringConstructor;
 +declare const String: StringConstructor;
  
  interface Boolean {
    /** Returns the primitive value of the specified object. */
-@@ -733,12 +749,14 @@ interface Boolean {
+@@ -639,12 +653,14 @@ interface Boolean {
  }
  
  interface BooleanConstructor {
@@ -489,36 +469,33 @@
  
  interface Number {
    /**
-@@ -747,7 +765,7 @@ interface Number {
-    * @param radix Specifies a radix for converting numeric values to strings.
-    *   This value is only used for numbers.
+@@ -652,36 +668,37 @@ interface Number {
+    *
+    * @param radix Specifies a radix for converting numeric values to strings. This value is only used for numbers.
     */
 -  toString(radix?: number): string;
 +  toString(radix?: UintRange<2, 37>): string;
  
    /**
     * Returns a string representing a number in fixed-point notation.
-@@ -755,7 +773,7 @@ interface Number {
-    * @param fractionDigits Number of digits after the decimal point. Must be in
-    *   the range 0 - 20, inclusive.
+    *
+    * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
     */
 -  toFixed(fractionDigits?: number): string;
 +  toFixed(fractionDigits?: UintRange<0, 101>): string;
  
    /**
     * Returns a string containing a number represented in exponential notation.
-@@ -763,7 +781,7 @@ interface Number {
-    * @param fractionDigits Number of digits after the decimal point. Must be in
-    *   the range 0 - 20, inclusive.
+    *
+    * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
     */
 -  toExponential(fractionDigits?: number): string;
 +  toExponential(fractionDigits?: UintRange<1, 101>): string;
  
    /**
-    * Returns a string containing a number represented either in exponential or
-@@ -772,15 +790,16 @@ interface Number {
-    * @param precision Number of significant digits. Must be in the range 1 - 21,
-    *   inclusive.
+    * Returns a string containing a number represented either in exponential or fixed-point notation with a specified number of digits.
+    *
+    * @param precision Number of significant digits. Must be in the range 1 - 21, inclusive.
     */
 -  toPrecision(precision?: number): string;
 +  toPrecision(precision?: UintRange<1, 101>): string;
@@ -535,18 +512,18 @@
 +  (value?: unknown): number;
    readonly prototype: Number;
  
-   /**
-@@ -820,7 +839,7 @@ interface NumberConstructor {
-  * An object that represents a number of any kind. All JavaScript numbers are
-  * 64-bit floating-point numbers.
-  */
+   /** The largest number that can be represented in JavaScript. Equal to approximately 1.79E+308. */
+@@ -701,7 +718,7 @@ interface NumberConstructor {
+ }
+ 
+ /** An object that represents a number of any kind. All JavaScript numbers are 64-bit floating-point numbers. */
 -declare var Number: NumberConstructor;
 +declare const Number: NumberConstructor;
  
  interface TemplateStringsArray extends ReadonlyArray<string> {
    readonly raw: readonly string[];
-@@ -841,8 +860,8 @@ interface ImportMeta {}
-  * augmented via interface merging.
+@@ -720,8 +737,8 @@ interface ImportMeta {}
+  * If your host environment supports additional options, this type may be augmented via interface merging.
   */
  interface ImportCallOptions {
 -  /** @deprecated */ assert?: ImportAssertions;
@@ -556,7 +533,7 @@
  }
  
  /**
-@@ -852,7 +871,7 @@ interface ImportCallOptions {
+@@ -730,12 +747,12 @@ interface ImportCallOptions {
   * @deprecated
   */
  interface ImportAssertions {
@@ -564,17 +541,14 @@
 +  readonly [key: string]: string;
  }
  
- /**
-@@ -860,7 +879,7 @@ interface ImportAssertions {
-  * `import()`.
-  */
+ /** The type for the `with` property of the optional second argument to `import()`. */
  interface ImportAttributes {
 -  [key: string]: string;
 +  readonly [key: string]: string;
  }
  
  interface Math {
-@@ -893,6 +912,7 @@ interface Math {
+@@ -760,6 +777,7 @@ interface Math {
     *
     * @param x A numeric expression for which the absolute value is needed.
     */
@@ -582,7 +556,7 @@
    abs(x: number): number;
    /**
     * Returns the arc cosine (or inverse cosine) of a number.
-@@ -954,13 +974,13 @@ interface Math {
+@@ -821,13 +839,13 @@ interface Math {
     *
     * @param values Numeric expressions to be evaluated.
     */
@@ -598,16 +572,16 @@
    /**
     * Returns the value of a base expression taken to a specified power.
     *
-@@ -999,7 +1019,7 @@ interface Math {
-  * An intrinsic object that provides basic mathematics functionality and
-  * constants.
-  */
+@@ -863,7 +881,7 @@ interface Math {
+   tan(x: number): number;
+ }
+ /** An intrinsic object that provides basic mathematics functionality and constants. */
 -declare var Math: Math;
 +declare const Math: Math;
  
  /** Enables basic storage and retrieval of dates and times. */
  interface Date {
-@@ -1042,39 +1062,39 @@ interface Date {
+@@ -888,33 +906,33 @@ interface Date {
    /** Gets the year using Universal Coordinated Time (UTC). */
    getUTCFullYear(): number;
    /** Gets the month, using local time. */
@@ -631,10 +605,7 @@
    /** Gets the hours in a date, using local time. */
 -  getHours(): number;
 +  getHours(): HoursEnum;
-   /**
-    * Gets the hours value in a Date object using Universal Coordinated Time
-    * (UTC).
-    */
+   /** Gets the hours value in a Date object using Universal Coordinated Time (UTC). */
 -  getUTCHours(): number;
 +  getUTCHours(): HoursEnum;
    /** Gets the minutes of a Date object, using local time. */
@@ -652,25 +623,22 @@
    /** Gets the milliseconds of a Date, using local time. */
 -  getMilliseconds(): number;
 +  getMilliseconds(): MillisecondsEnum;
-   /**
-    * Gets the milliseconds of a Date object using Universal Coordinated Time
-    * (UTC).
-    */
+   /** Gets the milliseconds of a Date object using Universal Coordinated Time (UTC). */
 -  getUTCMilliseconds(): number;
 +  getUTCMilliseconds(): MillisecondsEnum;
+   /** Gets the difference in minutes between Universal Coordinated Time (UTC) and the time on the local computer. */
+   getTimezoneOffset(): number;
    /**
-    * Gets the difference in minutes between Universal Coordinated Time (UTC) and
-    * the time on the local computer.
-@@ -1217,7 +1237,7 @@ interface Date {
-    * Used by the JSON.stringify method to enable the transformation of an
-    * object's data for JavaScript Object Notation (JSON) serialization.
-    */
+@@ -1031,7 +1049,7 @@ interface Date {
+   /** Returns a date as a string value in ISO format. */
+   toISOString(): string;
+   /** Used by the JSON.stringify method to enable the transformation of an object's data for JavaScript Object Notation (JSON) serialization. */
 -  toJSON(key?: any): string;
 +  toJSON(key?: unknown): string;
  }
  
  interface DateConstructor {
-@@ -1242,12 +1262,12 @@ interface DateConstructor {
+@@ -1050,12 +1068,12 @@ interface DateConstructor {
     */
    new (
      year: number,
@@ -689,7 +657,7 @@
    ): Date;
    (): string;
    readonly prototype: Date;
-@@ -1278,12 +1298,12 @@ interface DateConstructor {
+@@ -1078,35 +1096,35 @@ interface DateConstructor {
     */
    UTC(
      year: number,
@@ -706,9 +674,7 @@
 +    seconds?: SecondsEnum,
 +    ms?: MillisecondsEnum,
    ): number;
-   /**
-    * Returns the number of milliseconds elapsed since midnight, January 1, 1970
-@@ -1292,30 +1312,30 @@ interface DateConstructor {
+   /** Returns the number of milliseconds elapsed since midnight, January 1, 1970 Universal Coordinated Time (UTC). */
    now(): number;
  }
  
@@ -722,10 +688,7 @@
    /** A copy of the search string. */
 -  input?: string;
 +  readonly input?: string;
-   /**
-    * The first match. This will always be present because `null` will be
-    * returned if there are no matches.
-    */
+   /** The first match. This will always be present because `null` will be returned if there are no matches. */
 -  0: string;
 +  readonly 0: string;
  }
@@ -737,17 +700,14 @@
    /** A copy of the search string. */
 -  input: string;
 +  readonly input: string;
-   /**
-    * The first match. This will always be present because `null` will be
-    * returned if there are no matches.
-    */
+   /** The first match. This will always be present because `null` will be returned if there are no matches. */
 -  0: string;
 +  readonly 0: string;
  }
  
  interface RegExp {
-@@ -1361,7 +1381,7 @@ interface RegExp {
-    */
+@@ -1136,7 +1154,7 @@ interface RegExp {
+   /** Returns a Boolean value indicating the state of the multiline flag (m) used with a regular expression. Default is false. Read-only. */
    readonly multiline: boolean;
  
 -  lastIndex: number;
@@ -755,7 +715,7 @@
  
    // Non-standard extensions
    /** @deprecated A legacy feature for browser compatibility */
-@@ -1377,50 +1397,50 @@ interface RegExpConstructor {
+@@ -1152,50 +1170,50 @@ interface RegExpConstructor {
  
    // Non-standard extensions
    /** @deprecated A legacy feature for browser compatibility */
@@ -827,7 +787,7 @@
    stack?: string;
  }
  
-@@ -1430,7 +1450,7 @@ interface ErrorConstructor {
+@@ -1205,7 +1223,7 @@ interface ErrorConstructor {
    readonly prototype: Error;
  }
  
@@ -836,7 +796,7 @@
  
  interface EvalError extends Error {}
  
-@@ -1440,7 +1460,7 @@ interface EvalErrorConstructor extends ErrorConstructor {
+@@ -1215,7 +1233,7 @@ interface EvalErrorConstructor extends ErrorConstructor {
    readonly prototype: EvalError;
  }
  
@@ -845,7 +805,7 @@
  
  interface RangeError extends Error {}
  
-@@ -1450,7 +1470,7 @@ interface RangeErrorConstructor extends ErrorConstructor {
+@@ -1225,7 +1243,7 @@ interface RangeErrorConstructor extends ErrorConstructor {
    readonly prototype: RangeError;
  }
  
@@ -854,7 +814,7 @@
  
  interface ReferenceError extends Error {}
  
-@@ -1460,7 +1480,7 @@ interface ReferenceErrorConstructor extends ErrorConstructor {
+@@ -1235,7 +1253,7 @@ interface ReferenceErrorConstructor extends ErrorConstructor {
    readonly prototype: ReferenceError;
  }
  
@@ -863,7 +823,7 @@
  
  interface SyntaxError extends Error {}
  
-@@ -1470,7 +1490,7 @@ interface SyntaxErrorConstructor extends ErrorConstructor {
+@@ -1245,7 +1263,7 @@ interface SyntaxErrorConstructor extends ErrorConstructor {
    readonly prototype: SyntaxError;
  }
  
@@ -872,7 +832,7 @@
  
  interface TypeError extends Error {}
  
-@@ -1480,7 +1500,7 @@ interface TypeErrorConstructor extends ErrorConstructor {
+@@ -1255,7 +1273,7 @@ interface TypeErrorConstructor extends ErrorConstructor {
    readonly prototype: TypeError;
  }
  
@@ -881,7 +841,7 @@
  
  interface URIError extends Error {}
  
-@@ -1490,7 +1510,7 @@ interface URIErrorConstructor extends ErrorConstructor {
+@@ -1265,7 +1283,7 @@ interface URIErrorConstructor extends ErrorConstructor {
    readonly prototype: URIError;
  }
  
@@ -890,7 +850,7 @@
  
  interface JSON {
    /**
-@@ -1503,8 +1523,8 @@ interface JSON {
+@@ -1276,8 +1294,8 @@ interface JSON {
     */
    parse(
      text: string,
@@ -901,8 +861,8 @@
    /**
     * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
     *
-@@ -1515,9 +1535,9 @@ interface JSON {
-    *   the return-value JSON text to make it easier to read.
+@@ -1286,9 +1304,9 @@ interface JSON {
+    * @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
     */
    stringify(
 -    value: any,
@@ -914,8 +874,8 @@
    ): string;
    /**
     * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
-@@ -1530,9 +1550,9 @@ interface JSON {
-    *   the return-value JSON text to make it easier to read.
+@@ -1298,14 +1316,14 @@ interface JSON {
+    * @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
     */
    stringify(
 -    value: any,
@@ -927,26 +887,23 @@
    ): string;
  }
  
-@@ -1540,7 +1560,7 @@ interface JSON {
-  * An intrinsic object that provides functions to convert JavaScript values to
-  * and from the JavaScript Object Notation (JSON) format.
-  */
+ /** An intrinsic object that provides functions to convert JavaScript values to and from the JavaScript Object Notation (JSON) format. */
 -declare var JSON: JSON;
 +declare const JSON: JSON;
  
  /////////////////////////////
  /// ECMAScript Array API (specially handled by compiler)
-@@ -1551,7 +1571,8 @@ interface ReadonlyArray<T> {
-    * Gets the length of the array. This is a number one higher than the highest
-    * element defined in an array.
-    */
+@@ -1313,7 +1331,8 @@ declare var JSON: JSON;
+ 
+ interface ReadonlyArray<T> {
+   /** Gets the length of the array. This is a number one higher than the highest element defined in an array. */
 -  readonly length: number;
 +  // This is already defined in ts-type-utils.
 +  // readonly length: number;
    /** Returns a string representation of an array. */
    toString(): string;
-   /**
-@@ -1564,13 +1585,13 @@ interface ReadonlyArray<T> {
+   /** Returns a string representation of an array. The elements are converted to string using their toLocaleString methods. */
+@@ -1323,13 +1342,13 @@ interface ReadonlyArray<T> {
     *
     * @param items Additional items to add to the end of array1.
     */
@@ -960,9 +917,9 @@
 -  concat(...items: (T | ConcatArray<T>)[]): T[];
 +  concat(...items: readonly (T | ConcatArray<T>)[]): T[];
    /**
-    * Adds all the elements of an array separated by the specified separator
-    * string.
-@@ -1617,7 +1638,7 @@ interface ReadonlyArray<T> {
+    * Adds all the elements of an array separated by the specified separator string.
+    *
+@@ -1365,7 +1384,7 @@ interface ReadonlyArray<T> {
     */
    every<S extends T>(
      predicate: (value: T, index: number, array: readonly T[]) => value is S,
@@ -971,8 +928,8 @@
    ): this is readonly S[];
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -1631,8 +1652,8 @@ interface ReadonlyArray<T> {
-    *   value.
+@@ -1374,8 +1393,8 @@ interface ReadonlyArray<T> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    every(
 -    predicate: (value: T, index: number, array: readonly T[]) => unknown,
@@ -981,9 +938,9 @@
 +    thisArg?: unknown,
    ): boolean;
    /**
-    * Determines whether the specified callback function returns true for any
-@@ -1647,8 +1668,8 @@ interface ReadonlyArray<T> {
-    *   value.
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -1384,8 +1403,8 @@ interface ReadonlyArray<T> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    some(
 -    predicate: (value: T, index: number, array: readonly T[]) => unknown,
@@ -993,7 +950,7 @@
    ): boolean;
    /**
     * Performs the specified action for each element in an array.
-@@ -1661,7 +1682,7 @@ interface ReadonlyArray<T> {
+@@ -1395,7 +1414,7 @@ interface ReadonlyArray<T> {
     */
    forEach(
      callbackfn: (value: T, index: number, array: readonly T[]) => void,
@@ -1001,8 +958,8 @@
 +    thisArg?: unknown,
    ): void;
    /**
-    * Calls a defined callback function on each element of an array, and returns
-@@ -1676,7 +1697,7 @@ interface ReadonlyArray<T> {
+    * Calls a defined callback function on each element of an array, and returns an array that contains the results.
+@@ -1405,7 +1424,7 @@ interface ReadonlyArray<T> {
     */
    map<U>(
      callbackfn: (value: T, index: number, array: readonly T[]) => U,
@@ -1010,8 +967,8 @@
 +    thisArg?: unknown,
    ): U[];
    /**
-    * Returns the elements of an array that meet the condition specified in a
-@@ -1691,7 +1712,7 @@ interface ReadonlyArray<T> {
+    * Returns the elements of an array that meet the condition specified in a callback function.
+@@ -1415,7 +1434,7 @@ interface ReadonlyArray<T> {
     */
    filter<S extends T>(
      predicate: (value: T, index: number, array: readonly T[]) => value is S,
@@ -1019,9 +976,9 @@
 +    thisArg?: unknown,
    ): S[];
    /**
-    * Returns the elements of an array that meet the condition specified in a
-@@ -1705,8 +1726,8 @@ interface ReadonlyArray<T> {
-    *   value.
+    * Returns the elements of an array that meet the condition specified in a callback function.
+@@ -1424,8 +1443,8 @@ interface ReadonlyArray<T> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    filter(
 -    predicate: (value: T, index: number, array: readonly T[]) => unknown,
@@ -1030,8 +987,8 @@
 +    thisArg?: unknown,
    ): T[];
    /**
-    * Calls the specified callback function for all the elements in an array. The
-@@ -1811,7 +1832,8 @@ interface ReadonlyArray<T> {
+    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
+@@ -1504,7 +1523,8 @@ interface ReadonlyArray<T> {
      initialValue: U,
    ): U;
  
@@ -1041,60 +998,57 @@
  }
  
  interface ConcatArray<T> {
-@@ -1826,7 +1848,8 @@ interface Array<T> {
-    * Gets or sets the length of the array. This is a number one higher than the
-    * highest index in the array.
-    */
+@@ -1516,7 +1536,8 @@ interface ConcatArray<T> {
+ 
+ interface Array<T> {
+   /** Gets or sets the length of the array. This is a number one higher than the highest index in the array. */
 -  length: number;
 +  // This is already defined in ts-type-utils.
 +  // readonly length: number;
    /** Returns a string representation of an array. */
    toString(): string;
-   /**
-@@ -1845,21 +1868,21 @@ interface Array<T> {
+   /** Returns a string representation of an array. The elements are converted to string using their toLocaleString methods. */
+@@ -1528,19 +1549,19 @@ interface Array<T> {
     *
     * @param items New elements to add to the array.
     */
 -  push(...items: T[]): number;
 +  push(...items: readonly T[]): number;
    /**
-    * Combines two or more arrays. This method returns a new array without
-    * modifying any existing arrays.
+    * Combines two or more arrays. This method returns a new array without modifying any existing arrays.
     *
     * @param items Additional arrays and/or items to add to the end of the array.
     */
 -  concat(...items: ConcatArray<T>[]): T[];
 +  concat(...items: readonly ConcatArray<T>[]): T[];
    /**
-    * Combines two or more arrays. This method returns a new array without
-    * modifying any existing arrays.
+    * Combines two or more arrays. This method returns a new array without modifying any existing arrays.
     *
     * @param items Additional arrays and/or items to add to the end of the array.
     */
 -  concat(...items: (T | ConcatArray<T>)[]): T[];
 +  concat(...items: readonly (T | ConcatArray<T>)[]): T[];
    /**
-    * Adds all the elements of an array into a string, separated by the specified
-    * separator string.
-@@ -1927,14 +1950,14 @@ interface Array<T> {
-    *   elements.
+    * Adds all the elements of an array into a string, separated by the specified separator string.
+    *
+@@ -1584,13 +1605,13 @@ interface Array<T> {
+    * @param items Elements to insert into the array in place of the deleted elements.
     * @returns An array containing the elements that were deleted.
     */
 -  splice(start: number, deleteCount: number, ...items: T[]): T[];
 +  splice(start: number, deleteCount: number, ...items: readonly T[]): T[];
    /**
-    * Inserts new elements at the start of an array, and returns the new length
-    * of the array.
+    * Inserts new elements at the start of an array, and returns the new length of the array.
     *
     * @param items Elements to insert at the start of the array.
     */
 -  unshift(...items: T[]): number;
 +  unshift(...items: readonly T[]): number;
    /**
-    * Returns the index of the first occurrence of a value in an array, or -1 if
-    * it is not present.
-@@ -1965,8 +1988,8 @@ interface Array<T> {
-    *   value.
+    * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    *
+@@ -1612,8 +1633,8 @@ interface Array<T> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    every<S extends T>(
 -    predicate: (value: T, index: number, array: T[]) => value is S,
@@ -1104,8 +1058,8 @@
    ): this is S[];
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -1980,8 +2003,8 @@ interface Array<T> {
-    *   value.
+@@ -1622,8 +1643,8 @@ interface Array<T> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    every(
 -    predicate: (value: T, index: number, array: T[]) => unknown,
@@ -1114,9 +1068,9 @@
 +    thisArg?: unknown,
    ): boolean;
    /**
-    * Determines whether the specified callback function returns true for any
-@@ -1996,8 +2019,8 @@ interface Array<T> {
-    *   value.
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -1632,8 +1653,8 @@ interface Array<T> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    some(
 -    predicate: (value: T, index: number, array: T[]) => unknown,
@@ -1126,8 +1080,8 @@
    ): boolean;
    /**
     * Performs the specified action for each element in an array.
-@@ -2009,8 +2032,8 @@ interface Array<T> {
-    *   value.
+@@ -1642,8 +1663,8 @@ interface Array<T> {
+    * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
 -    callbackfn: (value: T, index: number, array: T[]) => void,
@@ -1136,9 +1090,9 @@
 +    thisArg?: unknown,
    ): void;
    /**
-    * Calls a defined callback function on each element of an array, and returns
-@@ -2024,8 +2047,8 @@ interface Array<T> {
-    *   value.
+    * Calls a defined callback function on each element of an array, and returns an array that contains the results.
+@@ -1652,8 +1673,8 @@ interface Array<T> {
+    * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
     */
    map<U>(
 -    callbackfn: (value: T, index: number, array: T[]) => U,
@@ -1147,9 +1101,9 @@
 +    thisArg?: unknown,
    ): U[];
    /**
-    * Returns the elements of an array that meet the condition specified in a
-@@ -2039,8 +2062,8 @@ interface Array<T> {
-    *   value.
+    * Returns the elements of an array that meet the condition specified in a callback function.
+@@ -1662,8 +1683,8 @@ interface Array<T> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    filter<S extends T>(
 -    predicate: (value: T, index: number, array: T[]) => value is S,
@@ -1158,9 +1112,9 @@
 +    thisArg?: unknown,
    ): S[];
    /**
-    * Returns the elements of an array that meet the condition specified in a
-@@ -2054,8 +2077,8 @@ interface Array<T> {
-    *   value.
+    * Returns the elements of an array that meet the condition specified in a callback function.
+@@ -1672,8 +1693,8 @@ interface Array<T> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    filter(
 -    predicate: (value: T, index: number, array: T[]) => unknown,
@@ -1169,8 +1123,8 @@
 +    thisArg?: unknown,
    ): T[];
    /**
-    * Calls the specified callback function for all the elements in an array. The
-@@ -2074,7 +2097,7 @@ interface Array<T> {
+    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
+@@ -1686,7 +1707,7 @@ interface Array<T> {
        previousValue: T,
        currentValue: T,
        currentIndex: number,
@@ -1179,7 +1133,7 @@
      ) => T,
    ): T;
    reduce(
-@@ -2082,7 +2105,7 @@ interface Array<T> {
+@@ -1694,7 +1715,7 @@ interface Array<T> {
        previousValue: T,
        currentValue: T,
        currentIndex: number,
@@ -1188,7 +1142,7 @@
      ) => T,
      initialValue: T,
    ): T;
-@@ -2103,7 +2126,7 @@ interface Array<T> {
+@@ -1709,7 +1730,7 @@ interface Array<T> {
        previousValue: U,
        currentValue: T,
        currentIndex: number,
@@ -1197,7 +1151,7 @@
      ) => U,
      initialValue: U,
    ): U;
-@@ -2125,7 +2148,7 @@ interface Array<T> {
+@@ -1724,7 +1745,7 @@ interface Array<T> {
        previousValue: T,
        currentValue: T,
        currentIndex: number,
@@ -1206,7 +1160,7 @@
      ) => T,
    ): T;
    reduceRight(
-@@ -2133,7 +2156,7 @@ interface Array<T> {
+@@ -1732,7 +1753,7 @@ interface Array<T> {
        previousValue: T,
        currentValue: T,
        currentIndex: number,
@@ -1215,7 +1169,7 @@
      ) => T,
      initialValue: T,
    ): T;
-@@ -2155,40 +2178,47 @@ interface Array<T> {
+@@ -1747,40 +1768,47 @@ interface Array<T> {
        previousValue: U,
        currentValue: T,
        currentIndex: number,
@@ -1232,22 +1186,22 @@
  
  interface ArrayConstructor {
 -  new (arrayLength?: number): any[];
-+  /** @deprecated Use `Array.from({ length })` instead */
++  /** @deprecated use `Array.from({ length })` instead */
 +  new (arrayLength?: number): unknown[];
-+  /** @deprecated Use `Array.from({ length })` instead */
++  /** @deprecated use `Array.from({ length })` instead */
    new <T>(arrayLength: number): T[];
 -  new <T>(...items: T[]): T[];
 -  (arrayLength?: number): any[];
-+  /** @deprecated Use `[...items]` instead */
++  /** @deprecated use `[...items]` instead */
 +  new <T>(...items: readonly T[]): T[];
-+  /** @deprecated Use `Array.from({ length })` instead */
++  /** @deprecated use `Array.from({ length })` instead */
 +  (arrayLength?: number): unknown[];
-+  /** @deprecated Use `Array.from({ length })` instead */
++  /** @deprecated use `Array.from({ length })` instead */
    <T>(arrayLength: number): T[];
 -  <T>(...items: T[]): T[];
 -  isArray(arg: any): arg is any[];
 -  readonly prototype: any[];
-+  /** @deprecated Use `[...items]` instead */
++  /** @deprecated use `[...items]` instead */
 +  <T>(...items: readonly T[]): T[];
 +  isArray(arg: unknown): arg is unknown[];
 +  readonly prototype: readonly unknown[];
@@ -1279,7 +1233,7 @@
    ) => void,
  ) => PromiseLike<T>;
  
-@@ -2206,7 +2236,7 @@ interface PromiseLike<T> {
+@@ -1798,7 +1826,7 @@ interface PromiseLike<T> {
        | undefined
        | null,
      onrejected?:
@@ -1288,7 +1242,7 @@
        | undefined
        | null,
    ): PromiseLike<TResult1 | TResult2>;
-@@ -2227,7 +2257,7 @@ interface Promise<T> {
+@@ -1819,7 +1847,7 @@ interface Promise<T> {
        | undefined
        | null,
      onrejected?:
@@ -1297,7 +1251,7 @@
        | undefined
        | null,
    ): Promise<TResult1 | TResult2>;
-@@ -2240,7 +2270,7 @@ interface Promise<T> {
+@@ -1832,7 +1860,7 @@ interface Promise<T> {
     */
    catch<TResult = never>(
      onrejected?:
@@ -1306,8 +1260,8 @@
        | undefined
        | null,
    ): Promise<T | TResult>;
-@@ -2252,8 +2282,8 @@ interface Promise<T> {
-  */
+@@ -1841,8 +1869,8 @@ interface Promise<T> {
+ /** Recursively unwraps the "awaited type" of a type. Non-promise "thenables" should resolve to `never`. This emulates the behavior of `await`. */
  type Awaited<T> = T extends null | undefined
    ? T // special case for `null | undefined` when not in `--strictNullChecks` mode
 -  : T extends object & { then(onfulfilled: infer F, ...args: infer _): any } // `await` only unwraps object types with a callable `then`. Non-object types are not unwrapped
@@ -1317,7 +1271,7 @@
        ? Awaited<V> // recursively unwrap the value
        : never // the argument to `then` was not callable
      : T; // non-object or non-thenable
-@@ -2264,66 +2294,71 @@ interface ArrayLike<T> {
+@@ -1853,66 +1881,71 @@ interface ArrayLike<T> {
  }
  
  /** Make all properties in T optional */
@@ -1422,18 +1376,18 @@
  
  /** Convert string literal type to lowercase */
  type Lowercase<S extends string> = intrinsic;
-@@ -2345,7 +2380,7 @@ interface ThisType<T> {}
-  * FinalizationRegistry
-  */
+@@ -1931,7 +1964,7 @@ interface ThisType<T> {}
+ 
+ /** Stores types to be used with WeakSet, WeakMap, WeakRef, and FinalizationRegistry */
  interface WeakKeyTypes {
 -  object: object;
 +  readonly object: object;
  }
  
  type WeakKey = WeakKeyTypes[keyof WeakKeyTypes];
-@@ -2369,16 +2404,16 @@ interface ArrayBuffer {
-  * Typed Arrays.
-  */
+@@ -1947,16 +1980,16 @@ interface ArrayBuffer {
+ 
+ /** Allowed ArrayBuffer types for the buffer of an ArrayBufferView and related Typed Arrays. */
  interface ArrayBufferTypes {
 -  ArrayBuffer: ArrayBuffer;
 +  readonly ArrayBuffer: ArrayBuffer;
@@ -1451,25 +1405,25 @@
  
  interface ArrayBufferView<
    TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
-@@ -2429,7 +2464,7 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    * @param byteOffset The place in the buffer at which the value should be
-    *   retrieved.
+@@ -1996,7 +2029,7 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    *
+    * @param byteOffset The place in the buffer at which the value should be retrieved.
     */
 -  getInt8(byteOffset: number): number;
 +  getInt8(byteOffset: number): Int8;
  
    /**
-    * Gets the Int16 value at the specified byte offset from the start of the
-@@ -2462,7 +2497,7 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    * @param byteOffset The place in the buffer at which the value should be
-    *   retrieved.
+    * Gets the Int16 value at the specified byte offset from the start of the view. There is no alignment constraint; multi-byte values may be fetched from any offset.
+@@ -2018,7 +2051,7 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    *
+    * @param byteOffset The place in the buffer at which the value should be retrieved.
     */
 -  getUint8(byteOffset: number): number;
 +  getUint8(byteOffset: number): Uint8;
  
    /**
-    * Gets the Uint16 value at the specified byte offset from the start of the
-@@ -2517,7 +2552,7 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * Gets the Uint16 value at the specified byte offset from the start of the view. There is no alignment constraint; multi-byte values may be fetched from any offset.
+@@ -2060,7 +2093,7 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     * @param byteOffset The place in the buffer at which the value should be set.
     * @param value The value to set.
     */
@@ -1477,8 +1431,8 @@
 +  setInt8(byteOffset: number, value: Int8): void;
  
    /**
-    * Stores an Int16 value at the specified byte offset from the start of the
-@@ -2548,7 +2583,7 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * Stores an Int16 value at the specified byte offset from the start of the view.
+@@ -2086,7 +2119,7 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     * @param byteOffset The place in the buffer at which the value should be set.
     * @param value The value to set.
     */
@@ -1486,8 +1440,8 @@
 +  setUint8(byteOffset: number, value: Uint8): void;
  
    /**
-    * Stores an Uint16 value at the specified byte offset from the start of the
-@@ -2574,13 +2609,17 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * Stores an Uint16 value at the specified byte offset from the start of the view.
+@@ -2108,18 +2141,22 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
  }
  interface DataViewConstructor {
    readonly prototype: DataView<ArrayBufferLike>;
@@ -1505,10 +1459,7 @@
 -declare var DataView: DataViewConstructor;
 +declare const DataView: DataViewConstructor;
  
- /**
-  * A typed array of 8-bit integer values. The contents are initialized to 0. If
-@@ -2588,7 +2627,7 @@ declare var DataView: DataViewConstructor;
-  */
+ /** A typed array of 8-bit integer values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
  interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    /** The size in bytes of each element in the array. */
 -  readonly BYTES_PER_ELEMENT: number;
@@ -1516,8 +1467,8 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: TArrayBuffer;
-@@ -2624,8 +2663,8 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -2146,8 +2183,8 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    every(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -1527,17 +1478,17 @@
    ): boolean;
  
    /**
-@@ -2638,7 +2677,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    * @param end Index to stop filling the array at. If end is negative, it is
-    *   treated as length+end.
+@@ -2157,7 +2194,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param start Index to start filling the array at. If start is negative, it is treated as length+start where length is the length of the array.
+    * @param end Index to stop filling the array at. If end is negative, it is treated as length+end.
     */
 -  fill(value: number, start?: number, end?: number): this;
 +  fill(value: Int8, start?: number, end?: number): this;
  
    /**
-    * Returns the elements of an array that meet the condition specified in a
-@@ -2652,8 +2691,8 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+    * Returns the elements of an array that meet the condition specified in a callback function.
+@@ -2166,8 +2203,8 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    filter(
 -    predicate: (value: number, index: number, array: this) => any,
@@ -1547,8 +1498,8 @@
    ): Int8Array<ArrayBuffer>;
  
    /**
-@@ -2669,9 +2708,9 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   instead.
+@@ -2177,9 +2214,9 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
     */
    find(
 -    predicate: (value: number, index: number, obj: this) => boolean,
@@ -1559,9 +1510,9 @@
 +  ): Int8 | undefined;
  
    /**
-    * Returns the index of the first element in the array where predicate is
-@@ -2686,8 +2725,8 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   instead.
+    * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
+@@ -2188,8 +2225,8 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
     */
    findIndex(
 -    predicate: (value: number, index: number, obj: this) => boolean,
@@ -1571,8 +1522,8 @@
    ): number;
  
    /**
-@@ -2700,8 +2739,8 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -2199,8 +2236,8 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
 -    callbackfn: (value: number, index: number, array: this) => void,
@@ -1582,26 +1533,26 @@
    ): void;
  
    /**
-@@ -2711,7 +2750,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    * @param fromIndex The array index at which to begin the search. If fromIndex
-    *   is omitted, the search starts at index 0.
+@@ -2209,7 +2246,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
     */
 -  indexOf(searchElement: number, fromIndex?: number): number;
 +  indexOf(searchElement: Int8, fromIndex?: number): number;
  
    /**
-    * Adds all the elements of an array separated by the specified separator
-@@ -2730,7 +2769,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    * @param fromIndex The array index at which to begin the search. If fromIndex
-    *   is omitted, the search starts at index 0.
+    * Adds all the elements of an array separated by the specified separator string.
+@@ -2224,7 +2261,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
     */
 -  lastIndexOf(searchElement: number, fromIndex?: number): number;
 +  lastIndexOf(searchElement: Int8, fromIndex?: number): number;
  
    /** The length of the array. */
    readonly length: number;
-@@ -2747,8 +2786,8 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -2236,8 +2273,8 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
     */
    map(
 -    callbackfn: (value: number, index: number, array: this) => number,
@@ -1611,7 +1562,7 @@
    ): Int8Array<ArrayBuffer>;
  
    /**
-@@ -2765,21 +2804,21 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -2248,21 +2285,21 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    reduce(
      callbackfn: (
@@ -1641,8 +1592,8 @@
 +  ): Int8;
  
    /**
-    * Calls the specified callback function for all the elements in an array. The
-@@ -2796,7 +2835,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
+@@ -2273,7 +2310,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -1651,7 +1602,7 @@
        currentIndex: number,
        array: this,
      ) => U,
-@@ -2818,21 +2857,21 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -2288,21 +2325,21 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    reduceRight(
      callbackfn: (
@@ -1681,8 +1632,8 @@
 +  ): Int8;
  
    /**
-    * Calls the specified callback function for all the elements in an array, in
-@@ -2850,7 +2889,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
+@@ -2313,7 +2350,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -1691,17 +1642,17 @@
        currentIndex: number,
        array: this,
      ) => U,
-@@ -2867,7 +2906,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    * @param offset The index in the current array at which the values are to be
-    *   written.
+@@ -2329,7 +2366,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param array A typed or untyped array of values to set.
+    * @param offset The index in the current array at which the values are to be written.
     */
 -  set(array: ArrayLike<number>, offset?: number): void;
 +  set(array: ArrayLike<Int8>, offset?: number): void;
  
    /**
     * Returns a section of an array.
-@@ -2891,23 +2930,23 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -2346,20 +2383,20 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    some(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -1713,13 +1664,8 @@
    /**
     * Sorts an array.
     *
-    * @param compareFn Function used to determine the order of the elements. It
--   *   is expected to return a negative value if first argument is less than
--   *   second argument, zero if they're equal and a positive value otherwise. If
--   *   omitted, the elements are sorted in ascending order.
-+   *   is expected to return a negative value if the first argument is less than
-+   *   the second argument, zero if they're equal, and a positive value
-+   *   otherwise. If omitted, the elements are sorted in ascending order.
+-   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if first argument is less than second argument, zero if they're equal and a positive value otherwise. If omitted, the elements are sorted in ascending order.
++   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
     *
     *   ```ts
     *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -1729,8 +1675,8 @@
 +  sort(compareFn?: (a: Int8, b: Int8) => number): this;
  
    /**
-    * Gets a new Int8Array view of the ArrayBuffer store for this array,
-@@ -2927,35 +2966,35 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * Gets a new Int8Array view of the ArrayBuffer store for this array, referencing the elements at begin, inclusive, up to end, exclusive.
+@@ -2378,35 +2415,35 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    /** Returns the primitive value of the specified object. */
    valueOf(): this;
  
@@ -1772,7 +1718,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -2966,11 +3005,11 @@ interface Int8ArrayConstructor {
+@@ -2417,16 +2454,16 @@ interface Int8ArrayConstructor {
     */
    from<T>(
      arrayLike: ArrayLike<T>,
@@ -1785,10 +1731,7 @@
 -declare var Int8Array: Int8ArrayConstructor;
 +declare const Int8Array: Int8ArrayConstructor;
  
- /**
-  * A typed array of 8-bit unsigned integer values. The contents are initialized
-@@ -2979,7 +3018,7 @@ declare var Int8Array: Int8ArrayConstructor;
-  */
+ /** A typed array of 8-bit unsigned integer values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
  interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    /** The size in bytes of each element in the array. */
 -  readonly BYTES_PER_ELEMENT: number;
@@ -1796,8 +1739,8 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: TArrayBuffer;
-@@ -3015,8 +3054,8 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -2453,8 +2490,8 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    every(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -1807,17 +1750,17 @@
    ): boolean;
  
    /**
-@@ -3029,7 +3068,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    * @param end Index to stop filling the array at. If end is negative, it is
-    *   treated as length+end.
+@@ -2464,7 +2501,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param start Index to start filling the array at. If start is negative, it is treated as length+start where length is the length of the array.
+    * @param end Index to stop filling the array at. If end is negative, it is treated as length+end.
     */
 -  fill(value: number, start?: number, end?: number): this;
 +  fill(value: Uint8, start?: number, end?: number): this;
  
    /**
-    * Returns the elements of an array that meet the condition specified in a
-@@ -3043,8 +3082,8 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+    * Returns the elements of an array that meet the condition specified in a callback function.
+@@ -2473,8 +2510,8 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    filter(
 -    predicate: (value: number, index: number, array: this) => any,
@@ -1827,8 +1770,8 @@
    ): Uint8Array<ArrayBuffer>;
  
    /**
-@@ -3060,9 +3099,9 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   instead.
+@@ -2484,9 +2521,9 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
     */
    find(
 -    predicate: (value: number, index: number, obj: this) => boolean,
@@ -1839,9 +1782,9 @@
 +  ): Uint8 | undefined;
  
    /**
-    * Returns the index of the first element in the array where predicate is
-@@ -3077,8 +3116,8 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   instead.
+    * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
+@@ -2495,8 +2532,8 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
     */
    findIndex(
 -    predicate: (value: number, index: number, obj: this) => boolean,
@@ -1851,8 +1794,8 @@
    ): number;
  
    /**
-@@ -3091,8 +3130,8 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -2506,8 +2543,8 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
 -    callbackfn: (value: number, index: number, array: this) => void,
@@ -1862,26 +1805,26 @@
    ): void;
  
    /**
-@@ -3102,7 +3141,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    * @param fromIndex The array index at which to begin the search. If fromIndex
-    *   is omitted, the search starts at index 0.
+@@ -2516,7 +2553,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
     */
 -  indexOf(searchElement: number, fromIndex?: number): number;
 +  indexOf(searchElement: Uint8, fromIndex?: number): number;
  
    /**
-    * Adds all the elements of an array separated by the specified separator
-@@ -3121,7 +3160,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    * @param fromIndex The array index at which to begin the search. If fromIndex
-    *   is omitted, the search starts at index 0.
+    * Adds all the elements of an array separated by the specified separator string.
+@@ -2531,7 +2568,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
     */
 -  lastIndexOf(searchElement: number, fromIndex?: number): number;
 +  lastIndexOf(searchElement: Uint8, fromIndex?: number): number;
  
    /** The length of the array. */
    readonly length: number;
-@@ -3138,8 +3177,8 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -2543,8 +2580,8 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
     */
    map(
 -    callbackfn: (value: number, index: number, array: this) => number,
@@ -1891,7 +1834,7 @@
    ): Uint8Array<ArrayBuffer>;
  
    /**
-@@ -3156,21 +3195,21 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -2555,21 +2592,21 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    reduce(
      callbackfn: (
@@ -1921,8 +1864,8 @@
 +  ): Uint8;
  
    /**
-    * Calls the specified callback function for all the elements in an array. The
-@@ -3187,7 +3226,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
+@@ -2580,7 +2617,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -1931,7 +1874,7 @@
        currentIndex: number,
        array: this,
      ) => U,
-@@ -3209,21 +3248,21 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -2595,21 +2632,21 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    reduceRight(
      callbackfn: (
@@ -1961,8 +1904,8 @@
 +  ): Uint8;
  
    /**
-    * Calls the specified callback function for all the elements in an array, in
-@@ -3241,7 +3280,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
+@@ -2620,7 +2657,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -1971,17 +1914,17 @@
        currentIndex: number,
        array: this,
      ) => U,
-@@ -3258,7 +3297,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    * @param offset The index in the current array at which the values are to be
-    *   written.
+@@ -2636,7 +2673,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param array A typed or untyped array of values to set.
+    * @param offset The index in the current array at which the values are to be written.
     */
 -  set(array: ArrayLike<number>, offset?: number): void;
 +  set(array: ArrayLike<Uint8>, offset?: number): void;
  
    /**
     * Returns a section of an array.
-@@ -3282,23 +3321,23 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -2653,20 +2690,20 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    some(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -1993,13 +1936,8 @@
    /**
     * Sorts an array.
     *
-    * @param compareFn Function used to determine the order of the elements. It
--   *   is expected to return a negative value if first argument is less than
--   *   second argument, zero if they're equal and a positive value otherwise. If
--   *   omitted, the elements are sorted in ascending order.
-+   *   is expected to return a negative value if the first argument is less than
-+   *   the second argument, zero if they're equal, and a positive value
-+   *   otherwise. If omitted, the elements are sorted in ascending order.
+-   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if first argument is less than second argument, zero if they're equal and a positive value otherwise. If omitted, the elements are sorted in ascending order.
++   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
     *
     *   ```ts
     *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -2009,8 +1947,8 @@
 +  sort(compareFn?: (a: Uint8, b: Uint8) => number): this;
  
    /**
-    * Gets a new Uint8Array view of the ArrayBuffer store for this array,
-@@ -3318,35 +3357,35 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * Gets a new Uint8Array view of the ArrayBuffer store for this array, referencing the elements at begin, inclusive, up to end, exclusive.
+@@ -2685,35 +2722,35 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    /** Returns the primitive value of the specified object. */
    valueOf(): this;
  
@@ -2052,7 +1990,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -3357,11 +3396,11 @@ interface Uint8ArrayConstructor {
+@@ -2724,18 +2761,18 @@ interface Uint8ArrayConstructor {
     */
    from<T>(
      arrayLike: ArrayLike<T>,
@@ -2065,9 +2003,8 @@
 -declare var Uint8Array: Uint8ArrayConstructor;
 +declare const Uint8Array: Uint8ArrayConstructor;
  
- /**
-  * A typed array of 8-bit unsigned integer (clamped) values. The contents are
-@@ -3372,7 +3411,7 @@ interface Uint8ClampedArray<
+ /** A typed array of 8-bit unsigned integer (clamped) values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
+ interface Uint8ClampedArray<
    TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
  > {
    /** The size in bytes of each element in the array. */
@@ -2076,8 +2013,8 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: TArrayBuffer;
-@@ -3408,8 +3447,8 @@ interface Uint8ClampedArray<
-    *   value.
+@@ -2762,8 +2799,8 @@ interface Uint8ClampedArray<
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    every(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2087,17 +2024,17 @@
    ): boolean;
  
    /**
-@@ -3422,7 +3461,7 @@ interface Uint8ClampedArray<
-    * @param end Index to stop filling the array at. If end is negative, it is
-    *   treated as length+end.
+@@ -2773,7 +2810,7 @@ interface Uint8ClampedArray<
+    * @param start Index to start filling the array at. If start is negative, it is treated as length+start where length is the length of the array.
+    * @param end Index to stop filling the array at. If end is negative, it is treated as length+end.
     */
 -  fill(value: number, start?: number, end?: number): this;
 +  fill(value: Uint8, start?: number, end?: number): this;
  
    /**
-    * Returns the elements of an array that meet the condition specified in a
-@@ -3436,8 +3475,8 @@ interface Uint8ClampedArray<
-    *   value.
+    * Returns the elements of an array that meet the condition specified in a callback function.
+@@ -2782,8 +2819,8 @@ interface Uint8ClampedArray<
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    filter(
 -    predicate: (value: number, index: number, array: this) => any,
@@ -2107,8 +2044,8 @@
    ): Uint8ClampedArray<ArrayBuffer>;
  
    /**
-@@ -3453,9 +3492,9 @@ interface Uint8ClampedArray<
-    *   instead.
+@@ -2793,9 +2830,9 @@ interface Uint8ClampedArray<
+    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
     */
    find(
 -    predicate: (value: number, index: number, obj: this) => boolean,
@@ -2119,9 +2056,9 @@
 +  ): Uint8 | undefined;
  
    /**
-    * Returns the index of the first element in the array where predicate is
-@@ -3470,8 +3509,8 @@ interface Uint8ClampedArray<
-    *   instead.
+    * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
+@@ -2804,8 +2841,8 @@ interface Uint8ClampedArray<
+    * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
     */
    findIndex(
 -    predicate: (value: number, index: number, obj: this) => boolean,
@@ -2131,8 +2068,8 @@
    ): number;
  
    /**
-@@ -3484,8 +3523,8 @@ interface Uint8ClampedArray<
-    *   value.
+@@ -2815,8 +2852,8 @@ interface Uint8ClampedArray<
+    * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
 -    callbackfn: (value: number, index: number, array: this) => void,
@@ -2142,26 +2079,26 @@
    ): void;
  
    /**
-@@ -3495,7 +3534,7 @@ interface Uint8ClampedArray<
-    * @param fromIndex The array index at which to begin the search. If fromIndex
-    *   is omitted, the search starts at index 0.
+@@ -2825,7 +2862,7 @@ interface Uint8ClampedArray<
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
     */
 -  indexOf(searchElement: number, fromIndex?: number): number;
 +  indexOf(searchElement: Uint8, fromIndex?: number): number;
  
    /**
-    * Adds all the elements of an array separated by the specified separator
-@@ -3514,7 +3553,7 @@ interface Uint8ClampedArray<
-    * @param fromIndex The array index at which to begin the search. If fromIndex
-    *   is omitted, the search starts at index 0.
+    * Adds all the elements of an array separated by the specified separator string.
+@@ -2840,7 +2877,7 @@ interface Uint8ClampedArray<
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
     */
 -  lastIndexOf(searchElement: number, fromIndex?: number): number;
 +  lastIndexOf(searchElement: Uint8, fromIndex?: number): number;
  
    /** The length of the array. */
    readonly length: number;
-@@ -3531,8 +3570,8 @@ interface Uint8ClampedArray<
-    *   value.
+@@ -2852,8 +2889,8 @@ interface Uint8ClampedArray<
+    * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
     */
    map(
 -    callbackfn: (value: number, index: number, array: this) => number,
@@ -2171,7 +2108,7 @@
    ): Uint8ClampedArray<ArrayBuffer>;
  
    /**
-@@ -3549,21 +3588,21 @@ interface Uint8ClampedArray<
+@@ -2864,21 +2901,21 @@ interface Uint8ClampedArray<
     */
    reduce(
      callbackfn: (
@@ -2201,8 +2138,8 @@
 +  ): Uint8;
  
    /**
-    * Calls the specified callback function for all the elements in an array. The
-@@ -3580,7 +3619,7 @@ interface Uint8ClampedArray<
+    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
+@@ -2889,7 +2926,7 @@ interface Uint8ClampedArray<
    reduce<U>(
      callbackfn: (
        previousValue: U,
@@ -2211,7 +2148,7 @@
        currentIndex: number,
        array: this,
      ) => U,
-@@ -3602,21 +3641,21 @@ interface Uint8ClampedArray<
+@@ -2904,21 +2941,21 @@ interface Uint8ClampedArray<
     */
    reduceRight(
      callbackfn: (
@@ -2241,8 +2178,8 @@
 +  ): Uint8;
  
    /**
-    * Calls the specified callback function for all the elements in an array, in
-@@ -3634,7 +3673,7 @@ interface Uint8ClampedArray<
+    * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
+@@ -2929,7 +2966,7 @@ interface Uint8ClampedArray<
    reduceRight<U>(
      callbackfn: (
        previousValue: U,
@@ -2251,17 +2188,17 @@
        currentIndex: number,
        array: this,
      ) => U,
-@@ -3651,7 +3690,7 @@ interface Uint8ClampedArray<
-    * @param offset The index in the current array at which the values are to be
-    *   written.
+@@ -2945,7 +2982,7 @@ interface Uint8ClampedArray<
+    * @param array A typed or untyped array of values to set.
+    * @param offset The index in the current array at which the values are to be written.
     */
 -  set(array: ArrayLike<number>, offset?: number): void;
 +  set(array: ArrayLike<Uint8>, offset?: number): void;
  
    /**
     * Returns a section of an array.
-@@ -3675,23 +3714,23 @@ interface Uint8ClampedArray<
-    *   value.
+@@ -2962,20 +2999,20 @@ interface Uint8ClampedArray<
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    some(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2273,13 +2210,8 @@
    /**
     * Sorts an array.
     *
-    * @param compareFn Function used to determine the order of the elements. It
--   *   is expected to return a negative value if first argument is less than
--   *   second argument, zero if they're equal and a positive value otherwise. If
--   *   omitted, the elements are sorted in ascending order.
-+   *   is expected to return a negative value if the first argument is less than
-+   *   the second argument, zero if they're equal, and a positive value
-+   *   otherwise. If omitted, the elements are sorted in ascending order.
+-   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if first argument is less than second argument, zero if they're equal and a positive value otherwise. If omitted, the elements are sorted in ascending order.
++   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
     *
     *   ```ts
     *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -2289,8 +2221,8 @@
 +  sort(compareFn?: (a: Uint8, b: Uint8) => number): this;
  
    /**
-    * Gets a new Uint8ClampedArray view of the ArrayBuffer store for this array,
-@@ -3711,35 +3750,35 @@ interface Uint8ClampedArray<
+    * Gets a new Uint8ClampedArray view of the ArrayBuffer store for this array, referencing the elements at begin, inclusive, up to end, exclusive.
+@@ -2994,35 +3031,35 @@ interface Uint8ClampedArray<
    /** Returns the primitive value of the specified object. */
    valueOf(): this;
  
@@ -2332,7 +2264,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -3750,11 +3789,11 @@ interface Uint8ClampedArrayConstructor {
+@@ -3033,16 +3070,16 @@ interface Uint8ClampedArrayConstructor {
     */
    from<T>(
      arrayLike: ArrayLike<T>,
@@ -2345,10 +2277,7 @@
 -declare var Uint8ClampedArray: Uint8ClampedArrayConstructor;
 +declare const Uint8ClampedArray: Uint8ClampedArrayConstructor;
  
- /**
-  * A typed array of 16-bit signed integer values. The contents are initialized
-@@ -3763,7 +3802,7 @@ declare var Uint8ClampedArray: Uint8ClampedArrayConstructor;
-  */
+ /** A typed array of 16-bit signed integer values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
  interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    /** The size in bytes of each element in the array. */
 -  readonly BYTES_PER_ELEMENT: number;
@@ -2356,8 +2285,8 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: TArrayBuffer;
-@@ -3799,8 +3838,8 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -3069,8 +3106,8 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    every(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2367,8 +2296,8 @@
    ): boolean;
  
    /**
-@@ -3827,8 +3866,8 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -3089,8 +3126,8 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    filter(
 -    predicate: (value: number, index: number, array: this) => any,
@@ -2378,7 +2307,7 @@
    ): Int16Array<ArrayBuffer>;
  
    /**
-@@ -3845,7 +3884,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3101,7 +3138,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    find(
      predicate: (value: number, index: number, obj: this) => boolean,
@@ -2387,7 +2316,7 @@
    ): number | undefined;
  
    /**
-@@ -3862,7 +3901,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3112,7 +3149,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    findIndex(
      predicate: (value: number, index: number, obj: this) => boolean,
@@ -2396,7 +2325,7 @@
    ): number;
  
    /**
-@@ -3876,8 +3915,9 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3123,8 +3160,9 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    forEach(
      callbackfn: (value: number, index: number, array: this) => void,
@@ -2407,7 +2336,7 @@
    /**
     * Returns the index of the first occurrence of a value in an array.
     *
-@@ -3922,7 +3962,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3159,7 +3197,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    map(
      callbackfn: (value: number, index: number, array: this) => number,
@@ -2416,8 +2345,8 @@
    ): Int16Array<ArrayBuffer>;
  
    /**
-@@ -4065,17 +4105,17 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -3268,14 +3306,14 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    some(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2429,17 +2358,12 @@
    /**
     * Sorts an array.
     *
-    * @param compareFn Function used to determine the order of the elements. It
--   *   is expected to return a negative value if first argument is less than
--   *   second argument, zero if they're equal and a positive value otherwise. If
--   *   omitted, the elements are sorted in ascending order.
-+   *   is expected to return a negative value if the first argument is less than
-+   *   the second argument, zero if they're equal, and a positive value
-+   *   otherwise. If omitted, the elements are sorted in ascending order.
+-   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if first argument is less than second argument, zero if they're equal and a positive value otherwise. If omitted, the elements are sorted in ascending order.
++   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
     *
     *   ```ts
     *   [11, 2, 22, 1].sort((a, b) => a - b);
-@@ -4115,14 +4155,14 @@ interface Int16ArrayConstructor {
+@@ -3314,14 +3352,14 @@ interface Int16ArrayConstructor {
    new (array: ArrayLike<number> | ArrayBuffer): Int16Array<ArrayBuffer>;
  
    /** The size in bytes of each element in the array. */
@@ -2456,7 +2380,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -4141,10 +4181,10 @@ interface Int16ArrayConstructor {
+@@ -3340,15 +3378,15 @@ interface Int16ArrayConstructor {
    from<T>(
      arrayLike: ArrayLike<T>,
      mapfn: (v: T, k: number) => number,
@@ -2467,10 +2391,7 @@
 -declare var Int16Array: Int16ArrayConstructor;
 +declare const Int16Array: Int16ArrayConstructor;
  
- /**
-  * A typed array of 16-bit unsigned integer values. The contents are initialized
-@@ -4153,7 +4193,7 @@ declare var Int16Array: Int16ArrayConstructor;
-  */
+ /** A typed array of 16-bit unsigned integer values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
  interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    /** The size in bytes of each element in the array. */
 -  readonly BYTES_PER_ELEMENT: number;
@@ -2478,8 +2399,8 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: TArrayBuffer;
-@@ -4189,8 +4229,8 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -3375,8 +3413,8 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    every(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2489,8 +2410,8 @@
    ): boolean;
  
    /**
-@@ -4217,8 +4257,8 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -3395,8 +3433,8 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    filter(
 -    predicate: (value: number, index: number, array: this) => any,
@@ -2500,7 +2421,7 @@
    ): Uint16Array<ArrayBuffer>;
  
    /**
-@@ -4235,7 +4275,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3407,7 +3445,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    find(
      predicate: (value: number, index: number, obj: this) => boolean,
@@ -2509,7 +2430,7 @@
    ): number | undefined;
  
    /**
-@@ -4252,7 +4292,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3418,7 +3456,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    findIndex(
      predicate: (value: number, index: number, obj: this) => boolean,
@@ -2518,7 +2439,7 @@
    ): number;
  
    /**
-@@ -4266,7 +4306,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3429,7 +3467,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    forEach(
      callbackfn: (value: number, index: number, array: this) => void,
@@ -2527,7 +2448,7 @@
    ): void;
  
    /**
-@@ -4313,7 +4353,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3466,7 +3504,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    map(
      callbackfn: (value: number, index: number, array: this) => number,
@@ -2536,8 +2457,8 @@
    ): Uint16Array<ArrayBuffer>;
  
    /**
-@@ -4456,17 +4496,17 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -3575,14 +3613,14 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    some(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2549,17 +2470,12 @@
    /**
     * Sorts an array.
     *
-    * @param compareFn Function used to determine the order of the elements. It
--   *   is expected to return a negative value if first argument is less than
--   *   second argument, zero if they're equal and a positive value otherwise. If
--   *   omitted, the elements are sorted in ascending order.
-+   *   is expected to return a negative value if the first argument is less than
-+   *   the second argument, zero if they're equal, and a positive value
-+   *   otherwise. If omitted, the elements are sorted in ascending order.
+-   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if first argument is less than second argument, zero if they're equal and a positive value otherwise. If omitted, the elements are sorted in ascending order.
++   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
     *
     *   ```ts
     *   [11, 2, 22, 1].sort((a, b) => a - b);
-@@ -4506,14 +4546,14 @@ interface Uint16ArrayConstructor {
+@@ -3621,14 +3659,14 @@ interface Uint16ArrayConstructor {
    new (array: ArrayLike<number> | ArrayBuffer): Uint16Array<ArrayBuffer>;
  
    /** The size in bytes of each element in the array. */
@@ -2576,7 +2492,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -4532,10 +4572,10 @@ interface Uint16ArrayConstructor {
+@@ -3647,14 +3685,14 @@ interface Uint16ArrayConstructor {
    from<T>(
      arrayLike: ArrayLike<T>,
      mapfn: (v: T, k: number) => number,
@@ -2586,11 +2502,7 @@
  }
 -declare var Uint16Array: Uint16ArrayConstructor;
 +declare const Uint16Array: Uint16ArrayConstructor;
- /**
-  * A typed array of 32-bit signed integer values. The contents are initialized
-  * to 0. If the requested number of bytes could not be allocated an exception is
-@@ -4543,7 +4583,7 @@ declare var Uint16Array: Uint16ArrayConstructor;
-  */
+ /** A typed array of 32-bit signed integer values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
  interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    /** The size in bytes of each element in the array. */
 -  readonly BYTES_PER_ELEMENT: number;
@@ -2598,8 +2510,8 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: TArrayBuffer;
-@@ -4579,8 +4619,8 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -3681,8 +3719,8 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    every(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2609,8 +2521,8 @@
    ): boolean;
  
    /**
-@@ -4607,8 +4647,8 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -3701,8 +3739,8 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    filter(
 -    predicate: (value: number, index: number, array: this) => any,
@@ -2620,7 +2532,7 @@
    ): Int32Array<ArrayBuffer>;
  
    /**
-@@ -4625,7 +4665,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3713,7 +3751,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    find(
      predicate: (value: number, index: number, obj: this) => boolean,
@@ -2629,7 +2541,7 @@
    ): number | undefined;
  
    /**
-@@ -4642,7 +4682,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3724,7 +3762,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    findIndex(
      predicate: (value: number, index: number, obj: this) => boolean,
@@ -2638,7 +2550,7 @@
    ): number;
  
    /**
-@@ -4656,7 +4696,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3735,7 +3773,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    forEach(
      callbackfn: (value: number, index: number, array: this) => void,
@@ -2647,7 +2559,7 @@
    ): void;
  
    /**
-@@ -4703,7 +4743,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3772,7 +3810,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    map(
      callbackfn: (value: number, index: number, array: this) => number,
@@ -2656,8 +2568,8 @@
    ): Int32Array<ArrayBuffer>;
  
    /**
-@@ -4846,17 +4886,17 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -3881,14 +3919,14 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    some(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2669,17 +2581,12 @@
    /**
     * Sorts an array.
     *
-    * @param compareFn Function used to determine the order of the elements. It
--   *   is expected to return a negative value if first argument is less than
--   *   second argument, zero if they're equal and a positive value otherwise. If
--   *   omitted, the elements are sorted in ascending order.
-+   *   is expected to return a negative value if the first argument is less than
-+   *   the second argument, zero if they're equal, and a positive value
-+   *   otherwise. If omitted, the elements are sorted in ascending order.
+-   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if first argument is less than second argument, zero if they're equal and a positive value otherwise. If omitted, the elements are sorted in ascending order.
++   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
     *
     *   ```ts
     *   [11, 2, 22, 1].sort((a, b) => a - b);
-@@ -4896,14 +4936,14 @@ interface Int32ArrayConstructor {
+@@ -3927,14 +3965,14 @@ interface Int32ArrayConstructor {
    new (array: ArrayLike<number> | ArrayBuffer): Int32Array<ArrayBuffer>;
  
    /** The size in bytes of each element in the array. */
@@ -2696,7 +2603,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -4922,10 +4962,10 @@ interface Int32ArrayConstructor {
+@@ -3953,15 +3991,15 @@ interface Int32ArrayConstructor {
    from<T>(
      arrayLike: ArrayLike<T>,
      mapfn: (v: T, k: number) => number,
@@ -2707,10 +2614,7 @@
 -declare var Int32Array: Int32ArrayConstructor;
 +declare const Int32Array: Int32ArrayConstructor;
  
- /**
-  * A typed array of 32-bit unsigned integer values. The contents are initialized
-@@ -4934,7 +4974,7 @@ declare var Int32Array: Int32ArrayConstructor;
-  */
+ /** A typed array of 32-bit unsigned integer values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
  interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    /** The size in bytes of each element in the array. */
 -  readonly BYTES_PER_ELEMENT: number;
@@ -2718,8 +2622,8 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: TArrayBuffer;
-@@ -4970,8 +5010,8 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -3988,8 +4026,8 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    every(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2729,8 +2633,8 @@
    ): boolean;
  
    /**
-@@ -4998,8 +5038,8 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -4008,8 +4046,8 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    filter(
 -    predicate: (value: number, index: number, array: this) => any,
@@ -2740,7 +2644,7 @@
    ): Uint32Array<ArrayBuffer>;
  
    /**
-@@ -5016,7 +5056,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4020,7 +4058,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    find(
      predicate: (value: number, index: number, obj: this) => boolean,
@@ -2749,7 +2653,7 @@
    ): number | undefined;
  
    /**
-@@ -5033,7 +5073,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4031,7 +4069,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    findIndex(
      predicate: (value: number, index: number, obj: this) => boolean,
@@ -2758,7 +2662,7 @@
    ): number;
  
    /**
-@@ -5047,8 +5087,9 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4042,8 +4080,9 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    forEach(
      callbackfn: (value: number, index: number, array: this) => void,
@@ -2769,7 +2673,7 @@
    /**
     * Returns the index of the first occurrence of a value in an array.
     *
-@@ -5093,7 +5134,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4078,7 +4117,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    map(
      callbackfn: (value: number, index: number, array: this) => number,
@@ -2778,8 +2682,8 @@
    ): Uint32Array<ArrayBuffer>;
  
    /**
-@@ -5236,17 +5277,17 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -4187,14 +4226,14 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    some(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2791,17 +2695,12 @@
    /**
     * Sorts an array.
     *
-    * @param compareFn Function used to determine the order of the elements. It
--   *   is expected to return a negative value if first argument is less than
--   *   second argument, zero if they're equal and a positive value otherwise. If
--   *   omitted, the elements are sorted in ascending order.
-+   *   is expected to return a negative value if the first argument is less than
-+   *   the second argument, zero if they're equal, and a positive value
-+   *   otherwise. If omitted, the elements are sorted in ascending order.
+-   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if first argument is less than second argument, zero if they're equal and a positive value otherwise. If omitted, the elements are sorted in ascending order.
++   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
     *
     *   ```ts
     *   [11, 2, 22, 1].sort((a, b) => a - b);
-@@ -5286,14 +5327,14 @@ interface Uint32ArrayConstructor {
+@@ -4233,14 +4272,14 @@ interface Uint32ArrayConstructor {
    new (array: ArrayLike<number> | ArrayBuffer): Uint32Array<ArrayBuffer>;
  
    /** The size in bytes of each element in the array. */
@@ -2818,7 +2717,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -5312,10 +5353,10 @@ interface Uint32ArrayConstructor {
+@@ -4259,15 +4298,15 @@ interface Uint32ArrayConstructor {
    from<T>(
      arrayLike: ArrayLike<T>,
      mapfn: (v: T, k: number) => number,
@@ -2829,10 +2728,7 @@
 -declare var Uint32Array: Uint32ArrayConstructor;
 +declare const Uint32Array: Uint32ArrayConstructor;
  
- /**
-  * A typed array of 32-bit float values. The contents are initialized to 0. If
-@@ -5323,7 +5364,7 @@ declare var Uint32Array: Uint32ArrayConstructor;
-  */
+ /** A typed array of 32-bit float values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
  interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    /** The size in bytes of each element in the array. */
 -  readonly BYTES_PER_ELEMENT: number;
@@ -2840,8 +2736,8 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: TArrayBuffer;
-@@ -5359,8 +5400,8 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -4294,8 +4333,8 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    every(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2851,8 +2747,8 @@
    ): boolean;
  
    /**
-@@ -5387,8 +5428,8 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -4314,8 +4353,8 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    filter(
 -    predicate: (value: number, index: number, array: this) => any,
@@ -2862,7 +2758,7 @@
    ): Float32Array<ArrayBuffer>;
  
    /**
-@@ -5405,7 +5446,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4326,7 +4365,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    find(
      predicate: (value: number, index: number, obj: this) => boolean,
@@ -2871,7 +2767,7 @@
    ): number | undefined;
  
    /**
-@@ -5422,7 +5463,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4337,7 +4376,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    findIndex(
      predicate: (value: number, index: number, obj: this) => boolean,
@@ -2880,7 +2776,7 @@
    ): number;
  
    /**
-@@ -5436,7 +5477,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4348,7 +4387,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    forEach(
      callbackfn: (value: number, index: number, array: this) => void,
@@ -2889,7 +2785,7 @@
    ): void;
  
    /**
-@@ -5483,7 +5524,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4385,7 +4424,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    map(
      callbackfn: (value: number, index: number, array: this) => number,
@@ -2898,8 +2794,8 @@
    ): Float32Array<ArrayBuffer>;
  
    /**
-@@ -5626,17 +5667,17 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -4494,14 +4533,14 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    some(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2911,17 +2807,12 @@
    /**
     * Sorts an array.
     *
-    * @param compareFn Function used to determine the order of the elements. It
--   *   is expected to return a negative value if first argument is less than
--   *   second argument, zero if they're equal and a positive value otherwise. If
--   *   omitted, the elements are sorted in ascending order.
-+   *   is expected to return a negative value if the first argument is less than
-+   *   the second argument, zero if they're equal, and a positive value
-+   *   otherwise. If omitted, the elements are sorted in ascending order.
+-   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if first argument is less than second argument, zero if they're equal and a positive value otherwise. If omitted, the elements are sorted in ascending order.
++   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
     *
     *   ```ts
     *   [11, 2, 22, 1].sort((a, b) => a - b);
-@@ -5676,14 +5717,14 @@ interface Float32ArrayConstructor {
+@@ -4540,14 +4579,14 @@ interface Float32ArrayConstructor {
    new (array: ArrayLike<number> | ArrayBuffer): Float32Array<ArrayBuffer>;
  
    /** The size in bytes of each element in the array. */
@@ -2938,7 +2829,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -5702,10 +5743,10 @@ interface Float32ArrayConstructor {
+@@ -4566,15 +4605,15 @@ interface Float32ArrayConstructor {
    from<T>(
      arrayLike: ArrayLike<T>,
      mapfn: (v: T, k: number) => number,
@@ -2949,10 +2840,7 @@
 -declare var Float32Array: Float32ArrayConstructor;
 +declare const Float32Array: Float32ArrayConstructor;
  
- /**
-  * A typed array of 64-bit float values. The contents are initialized to 0. If
-@@ -5713,7 +5754,7 @@ declare var Float32Array: Float32ArrayConstructor;
-  */
+ /** A typed array of 64-bit float values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
  interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    /** The size in bytes of each element in the array. */
 -  readonly BYTES_PER_ELEMENT: number;
@@ -2960,8 +2848,8 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: TArrayBuffer;
-@@ -5749,8 +5790,8 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -4601,8 +4640,8 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    every(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -2971,8 +2859,8 @@
    ): boolean;
  
    /**
-@@ -5777,8 +5818,8 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -4621,8 +4660,8 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    filter(
 -    predicate: (value: number, index: number, array: this) => any,
@@ -2982,7 +2870,7 @@
    ): Float64Array<ArrayBuffer>;
  
    /**
-@@ -5795,7 +5836,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4633,7 +4672,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    find(
      predicate: (value: number, index: number, obj: this) => boolean,
@@ -2991,7 +2879,7 @@
    ): number | undefined;
  
    /**
-@@ -5812,7 +5853,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4644,7 +4683,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    findIndex(
      predicate: (value: number, index: number, obj: this) => boolean,
@@ -3000,7 +2888,7 @@
    ): number;
  
    /**
-@@ -5826,7 +5867,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4655,7 +4694,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    forEach(
      callbackfn: (value: number, index: number, array: this) => void,
@@ -3009,7 +2897,7 @@
    ): void;
  
    /**
-@@ -5873,7 +5914,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4692,7 +4731,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     */
    map(
      callbackfn: (value: number, index: number, array: this) => number,
@@ -3018,8 +2906,8 @@
    ): Float64Array<ArrayBuffer>;
  
    /**
-@@ -6016,17 +6057,17 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
-    *   value.
+@@ -4801,14 +4840,14 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
     */
    some(
 -    predicate: (value: number, index: number, array: this) => unknown,
@@ -3031,17 +2919,12 @@
    /**
     * Sorts an array.
     *
-    * @param compareFn Function used to determine the order of the elements. It
--   *   is expected to return a negative value if first argument is less than
--   *   second argument, zero if they're equal and a positive value otherwise. If
--   *   omitted, the elements are sorted in ascending order.
-+   *   is expected to return a negative value if the first argument is less than
-+   *   the second argument, zero if they're equal, and a positive value
-+   *   otherwise. If omitted, the elements are sorted in ascending order.
+-   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if first argument is less than second argument, zero if they're equal and a positive value otherwise. If omitted, the elements are sorted in ascending order.
++   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
     *
     *   ```ts
     *   [11, 2, 22, 1].sort((a, b) => a - b);
-@@ -6066,14 +6107,14 @@ interface Float64ArrayConstructor {
+@@ -4847,14 +4886,14 @@ interface Float64ArrayConstructor {
    new (array: ArrayLike<number> | ArrayBuffer): Float64Array<ArrayBuffer>;
  
    /** The size in bytes of each element in the array. */
@@ -3058,7 +2941,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -6092,10 +6133,10 @@ interface Float64ArrayConstructor {
+@@ -4873,10 +4912,10 @@ interface Float64ArrayConstructor {
    from<T>(
      arrayLike: ArrayLike<T>,
      mapfn: (v: T, k: number) => number,
@@ -3071,7 +2954,7 @@
  
  /////////////////////////////
  /// ECMAScript Internationalization API
-@@ -6103,12 +6144,12 @@ declare var Float64Array: Float64ArrayConstructor;
+@@ -4884,12 +4923,12 @@ declare var Float64Array: Float64ArrayConstructor;
  
  declare namespace Intl {
    interface CollatorOptions {
@@ -3090,7 +2973,7 @@
        | 'big5han'
        | 'compat'
        | 'dict'
-@@ -6127,17 +6168,17 @@ declare namespace Intl {
+@@ -4908,17 +4947,17 @@ declare namespace Intl {
        | 'unihan'
        | 'zhuyin'
        | undefined;
@@ -3116,7 +2999,7 @@
    }
  
    interface Collator {
-@@ -6146,28 +6187,31 @@ declare namespace Intl {
+@@ -4927,28 +4966,31 @@ declare namespace Intl {
    }
  
    interface CollatorConstructor {
@@ -3158,7 +3041,7 @@
    }
  
    type NumberFormatOptionsCurrencyDisplay =
-@@ -6189,30 +6233,30 @@ declare namespace Intl {
+@@ -4970,30 +5012,30 @@ declare namespace Intl {
        : keyof NumberFormatOptionsUseGroupingRegistry | false;
  
    interface NumberFormatOptions {
@@ -3210,7 +3093,7 @@
    }
  
    interface NumberFormat {
-@@ -6222,30 +6266,39 @@ declare namespace Intl {
+@@ -5003,30 +5045,39 @@ declare namespace Intl {
  
    interface NumberFormatConstructor {
      new (
@@ -3264,7 +3147,7 @@
        | 'short'
        | 'long'
        | 'shortOffset'
-@@ -6253,26 +6306,26 @@ declare namespace Intl {
+@@ -5034,26 +5085,26 @@ declare namespace Intl {
        | 'shortGeneric'
        | 'longGeneric'
        | undefined;
@@ -3308,7 +3191,7 @@
    }
  
    interface DateTimeFormat {
-@@ -6282,21 +6335,21 @@ declare namespace Intl {
+@@ -5063,21 +5114,21 @@ declare namespace Intl {
  
    interface DateTimeFormatConstructor {
      new (
@@ -3334,7 +3217,7 @@
  }
  
  interface String {
-@@ -6316,7 +6369,7 @@ interface String {
+@@ -5091,7 +5142,7 @@ interface String {
     */
    localeCompare(
      that: string,
@@ -3343,8 +3226,8 @@
      options?: Intl.CollatorOptions,
    ): number;
  }
-@@ -6334,7 +6387,7 @@ interface Number {
-    *   comparison options.
+@@ -5105,7 +5156,7 @@ interface Number {
+    * @param options An object that contains one or more properties that specify comparison options.
     */
    toLocaleString(
 -    locales?: string | string[],
@@ -3352,8 +3235,8 @@
      options?: Intl.NumberFormatOptions,
    ): string;
  }
-@@ -6353,7 +6406,7 @@ interface Date {
-    *   comparison options.
+@@ -5119,7 +5170,7 @@ interface Date {
+    * @param options An object that contains one or more properties that specify comparison options.
     */
    toLocaleString(
 -    locales?: string | string[],
@@ -3361,8 +3244,8 @@
      options?: Intl.DateTimeFormatOptions,
    ): string;
    /**
-@@ -6368,7 +6421,7 @@ interface Date {
-    *   comparison options.
+@@ -5130,7 +5181,7 @@ interface Date {
+    * @param options An object that contains one or more properties that specify comparison options.
     */
    toLocaleDateString(
 -    locales?: string | string[],
@@ -3370,8 +3253,8 @@
      options?: Intl.DateTimeFormatOptions,
    ): string;
  
-@@ -6384,7 +6437,13 @@ interface Date {
-    *   comparison options.
+@@ -5142,7 +5193,13 @@ interface Date {
+    * @param options An object that contains one or more properties that specify comparison options.
     */
    toLocaleTimeString(
 -    locales?: string | string[],

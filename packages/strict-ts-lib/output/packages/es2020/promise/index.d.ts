@@ -17,8 +17,7 @@ type PromiseSettledResult<T> =
 
 interface PromiseConstructor {
   /**
-   * Creates a Promise that is resolved with an array of results when all of the
-   * provided Promises resolve or reject.
+   * Creates a Promise that is resolved with an array of results when all of the provided Promises resolve or reject.
    *
    * @param values An array of Promises.
    * @returns A new Promise.
@@ -28,8 +27,7 @@ interface PromiseConstructor {
   ): Promise<{ -readonly [P in keyof T]: PromiseSettledResult<Awaited<T[P]>> }>;
 
   /**
-   * Creates a Promise that is resolved with an array of results when all of the
-   * provided Promises resolve or reject.
+   * Creates a Promise that is resolved with an array of results when all of the provided Promises resolve or reject.
    *
    * @param values An array of Promises.
    * @returns A new Promise.

@@ -1,23 +1,13 @@
 {
   "plugins": [
     "prettier-plugin-organize-imports",
-    "prettier-plugin-packagejson",
-    "prettier-plugin-jsdoc"
+    "prettier-plugin-packagejson"
   ],
   "semi": true,
   "endOfLine": "lf",
   "singleQuote": true,
   "jsxSingleQuote": true,
   "overrides": [
-    {
-      "files": ["experimental/**/*", "packages/tools/eslint-custom-rules/**/*"],
-      "options": {
-        "plugins": [
-          "prettier-plugin-organize-imports",
-          "prettier-plugin-packagejson"
-        ]
-      }
-    },
     {
       "files": ["**/*.md", "**/*.mdx"],
       "options": {
@@ -27,10 +17,6 @@
     {
       "files": ["articles/**/*"],
       "options": {
-        "plugins": [
-          "prettier-plugin-organize-imports",
-          "prettier-plugin-packagejson"
-        ],
         "tabWidth": 2
       }
     }

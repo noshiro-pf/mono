@@ -22,7 +22,7 @@
  
  interface WeakRef<T extends WeakKey> {
    readonly [Symbol.toStringTag]: 'WeakRef';
-@@ -29,7 +15,7 @@ interface WeakRef<T extends WeakKey> {
+@@ -25,7 +11,7 @@ interface WeakRef<T extends WeakKey> {
  }
  
  interface WeakRefConstructor {
@@ -30,8 +30,8 @@
 +  readonly prototype: WeakRef<object>;
  
    /**
-    * Creates a WeakRef instance for the given target value. In es2023 the value
-@@ -41,7 +27,7 @@ interface WeakRefConstructor {
+    * Creates a WeakRef instance for the given target value. In es2023 the value can be either a symbol or an object, in previous versions only object is permissible.
+@@ -35,7 +21,7 @@ interface WeakRefConstructor {
    new <T extends WeakKey>(target: T): WeakRef<T>;
  }
  
@@ -40,7 +40,7 @@
  
  interface FinalizationRegistry<T> {
    readonly [Symbol.toStringTag]: 'FinalizationRegistry';
-@@ -70,7 +56,7 @@ interface FinalizationRegistry<T> {
+@@ -58,7 +44,7 @@ interface FinalizationRegistry<T> {
  }
  
  interface FinalizationRegistryConstructor {
@@ -49,7 +49,7 @@
  
    /**
     * Creates a finalization registry with an associated cleanup callback
-@@ -81,4 +67,4 @@ interface FinalizationRegistryConstructor {
+@@ -68,4 +54,4 @@ interface FinalizationRegistryConstructor {
    new <T>(cleanupCallback: (heldValue: T) => void): FinalizationRegistry<T>;
  }
  

@@ -37,8 +37,7 @@ interface ClassDecoratorContext<
   readonly name: string | undefined;
 
   /**
-   * Adds a callback to be invoked after the class definition has been
-   * finalized.
+   * Adds a callback to be invoked after the class definition has been finalized.
    *
    * @example
    *   ```ts
@@ -62,9 +61,7 @@ interface ClassDecoratorContext<
 /**
  * Context provided to a class method decorator.
  *
- * @template This The type on which the class element will be defined. For a
- *   static class element, this will be the type of the constructor. For a
- *   non-static class element, this will be the type of the instance.
+ * @template This The type on which the class element will be defined. For a static class element, this will be the type of the constructor. For a non-static class element, this will be the type of the instance.
  * @template Value The type of the decorated class method.
  */
 interface ClassMethodDecoratorContext<
@@ -80,24 +77,15 @@ interface ClassMethodDecoratorContext<
   /** The name of the decorated class element. */
   readonly name: string | symbol;
 
-  /**
-   * A value indicating whether the class element is a static (`true`) or
-   * instance (`false`) element.
-   */
+  /** A value indicating whether the class element is a static (`true`) or instance (`false`) element. */
   readonly static: boolean;
 
   /** A value indicating whether the class element has a private name. */
   readonly private: boolean;
 
-  /**
-   * An object that can be used to access the current value of the class element
-   * at runtime.
-   */
+  /** An object that can be used to access the current value of the class element at runtime. */
   readonly access: {
-    /**
-     * Determines whether an object has a property with the same name as the
-     * decorated element.
-     */
+    /** Determines whether an object has a property with the same name as the decorated element. */
     has(object: This): boolean;
     /**
      * Gets the current value of the method from the provided object.
@@ -109,10 +97,7 @@ interface ClassMethodDecoratorContext<
   };
 
   /**
-   * Adds a callback to be invoked either after static methods are defined but
-   * before static initializers are run (when decorating a `static` element), or
-   * before instance initializers are run (when decorating a non-`static`
-   * element).
+   * Adds a callback to be invoked either after static methods are defined but before static initializers are run (when decorating a `static` element), or before instance initializers are run (when decorating a non-`static` element).
    *
    * @example
    *   ```ts
@@ -141,9 +126,7 @@ interface ClassMethodDecoratorContext<
 /**
  * Context provided to a class getter decorator.
  *
- * @template This The type on which the class element will be defined. For a
- *   static class element, this will be the type of the constructor. For a
- *   non-static class element, this will be the type of the instance.
+ * @template This The type on which the class element will be defined. For a static class element, this will be the type of the constructor. For a non-static class element, this will be the type of the instance.
  * @template Value The property type of the decorated class getter.
  */
 interface ClassGetterDecoratorContext<This = unknown, Value = unknown> {
@@ -153,24 +136,15 @@ interface ClassGetterDecoratorContext<This = unknown, Value = unknown> {
   /** The name of the decorated class element. */
   readonly name: string | symbol;
 
-  /**
-   * A value indicating whether the class element is a static (`true`) or
-   * instance (`false`) element.
-   */
+  /** A value indicating whether the class element is a static (`true`) or instance (`false`) element. */
   readonly static: boolean;
 
   /** A value indicating whether the class element has a private name. */
   readonly private: boolean;
 
-  /**
-   * An object that can be used to access the current value of the class element
-   * at runtime.
-   */
+  /** An object that can be used to access the current value of the class element at runtime. */
   readonly access: {
-    /**
-     * Determines whether an object has a property with the same name as the
-     * decorated element.
-     */
+    /** Determines whether an object has a property with the same name as the decorated element. */
     has(object: This): boolean;
     /**
      * Invokes the getter on the provided object.
@@ -181,12 +155,7 @@ interface ClassGetterDecoratorContext<This = unknown, Value = unknown> {
     get(object: This): Value;
   };
 
-  /**
-   * Adds a callback to be invoked either after static methods are defined but
-   * before static initializers are run (when decorating a `static` element), or
-   * before instance initializers are run (when decorating a non-`static`
-   * element).
-   */
+  /** Adds a callback to be invoked either after static methods are defined but before static initializers are run (when decorating a `static` element), or before instance initializers are run (when decorating a non-`static` element). */
   addInitializer(initializer: (this: This) => void): void;
 
   readonly metadata: DecoratorMetadata;
@@ -195,9 +164,7 @@ interface ClassGetterDecoratorContext<This = unknown, Value = unknown> {
 /**
  * Context provided to a class setter decorator.
  *
- * @template This The type on which the class element will be defined. For a
- *   static class element, this will be the type of the constructor. For a
- *   non-static class element, this will be the type of the instance.
+ * @template This The type on which the class element will be defined. For a static class element, this will be the type of the constructor. For a non-static class element, this will be the type of the instance.
  * @template Value The type of the decorated class setter.
  */
 interface ClassSetterDecoratorContext<This = unknown, Value = unknown> {
@@ -207,24 +174,15 @@ interface ClassSetterDecoratorContext<This = unknown, Value = unknown> {
   /** The name of the decorated class element. */
   readonly name: string | symbol;
 
-  /**
-   * A value indicating whether the class element is a static (`true`) or
-   * instance (`false`) element.
-   */
+  /** A value indicating whether the class element is a static (`true`) or instance (`false`) element. */
   readonly static: boolean;
 
   /** A value indicating whether the class element has a private name. */
   readonly private: boolean;
 
-  /**
-   * An object that can be used to access the current value of the class element
-   * at runtime.
-   */
+  /** An object that can be used to access the current value of the class element at runtime. */
   readonly access: {
-    /**
-     * Determines whether an object has a property with the same name as the
-     * decorated element.
-     */
+    /** Determines whether an object has a property with the same name as the decorated element. */
     has(object: This): boolean;
     /**
      * Invokes the setter on the provided object.
@@ -235,12 +193,7 @@ interface ClassSetterDecoratorContext<This = unknown, Value = unknown> {
     set(object: This, value: Value): void;
   };
 
-  /**
-   * Adds a callback to be invoked either after static methods are defined but
-   * before static initializers are run (when decorating a `static` element), or
-   * before instance initializers are run (when decorating a non-`static`
-   * element).
-   */
+  /** Adds a callback to be invoked either after static methods are defined but before static initializers are run (when decorating a `static` element), or before instance initializers are run (when decorating a non-`static` element). */
   addInitializer(initializer: (this: This) => void): void;
 
   readonly metadata: DecoratorMetadata;
@@ -249,9 +202,7 @@ interface ClassSetterDecoratorContext<This = unknown, Value = unknown> {
 /**
  * Context provided to a class `accessor` field decorator.
  *
- * @template This The type on which the class element will be defined. For a
- *   static class element, this will be the type of the constructor. For a
- *   non-static class element, this will be the type of the instance.
+ * @template This The type on which the class element will be defined. For a static class element, this will be the type of the constructor. For a non-static class element, this will be the type of the instance.
  * @template Value The type of decorated class field.
  */
 interface ClassAccessorDecoratorContext<This = unknown, Value = unknown> {
@@ -261,24 +212,15 @@ interface ClassAccessorDecoratorContext<This = unknown, Value = unknown> {
   /** The name of the decorated class element. */
   readonly name: string | symbol;
 
-  /**
-   * A value indicating whether the class element is a static (`true`) or
-   * instance (`false`) element.
-   */
+  /** A value indicating whether the class element is a static (`true`) or instance (`false`) element. */
   readonly static: boolean;
 
   /** A value indicating whether the class element has a private name. */
   readonly private: boolean;
 
-  /**
-   * An object that can be used to access the current value of the class element
-   * at runtime.
-   */
+  /** An object that can be used to access the current value of the class element at runtime. */
   readonly access: {
-    /**
-     * Determines whether an object has a property with the same name as the
-     * decorated element.
-     */
+    /** Determines whether an object has a property with the same name as the decorated element. */
     has(object: This): boolean;
 
     /**
@@ -298,11 +240,7 @@ interface ClassAccessorDecoratorContext<This = unknown, Value = unknown> {
     set(object: This, value: Value): void;
   };
 
-  /**
-   * Adds a callback to be invoked immediately after the auto `accessor` being
-   * decorated is initialized (regardless if the `accessor` is `static` or
-   * not).
-   */
+  /** Adds a callback to be invoked immediately after the auto `accessor` being decorated is initialized (regardless if the `accessor` is `static` or not). */
   addInitializer(initializer: (this: This) => void): void;
 
   readonly metadata: DecoratorMetadata;
@@ -339,21 +277,14 @@ interface ClassAccessorDecoratorTarget<This, Value> {
  * @template Value The property type for the class `accessor` field.
  */
 interface ClassAccessorDecoratorResult<This, Value> {
-  /**
-   * An optional replacement getter function. If not provided, the existing
-   * getter function is used instead.
-   */
+  /** An optional replacement getter function. If not provided, the existing getter function is used instead. */
   get?(this: This): Value;
 
-  /**
-   * An optional replacement setter function. If not provided, the existing
-   * setter function is used instead.
-   */
+  /** An optional replacement setter function. If not provided, the existing setter function is used instead. */
   set?(this: This, value: Value): void;
 
   /**
-   * An optional initializer mutator that is invoked when the underlying field
-   * initializer is evaluated.
+   * An optional initializer mutator that is invoked when the underlying field initializer is evaluated.
    *
    * @param value The incoming initializer value.
    * @returns The replacement initializer value.
@@ -364,9 +295,7 @@ interface ClassAccessorDecoratorResult<This, Value> {
 /**
  * Context provided to a class field decorator.
  *
- * @template This The type on which the class element will be defined. For a
- *   static class element, this will be the type of the constructor. For a
- *   non-static class element, this will be the type of the instance.
+ * @template This The type on which the class element will be defined. For a static class element, this will be the type of the constructor. For a non-static class element, this will be the type of the instance.
  * @template Value The type of the decorated class field.
  */
 interface ClassFieldDecoratorContext<This = unknown, Value = unknown> {
@@ -376,24 +305,15 @@ interface ClassFieldDecoratorContext<This = unknown, Value = unknown> {
   /** The name of the decorated class element. */
   readonly name: string | symbol;
 
-  /**
-   * A value indicating whether the class element is a static (`true`) or
-   * instance (`false`) element.
-   */
+  /** A value indicating whether the class element is a static (`true`) or instance (`false`) element. */
   readonly static: boolean;
 
   /** A value indicating whether the class element has a private name. */
   readonly private: boolean;
 
-  /**
-   * An object that can be used to access the current value of the class element
-   * at runtime.
-   */
+  /** An object that can be used to access the current value of the class element at runtime. */
   readonly access: {
-    /**
-     * Determines whether an object has a property with the same name as the
-     * decorated element.
-     */
+    /** Determines whether an object has a property with the same name as the decorated element. */
     has(object: This): boolean;
 
     /** Gets the value of the field on the provided object. */
@@ -403,10 +323,7 @@ interface ClassFieldDecoratorContext<This = unknown, Value = unknown> {
     set(object: This, value: Value): void;
   };
 
-  /**
-   * Adds a callback to be invoked immediately after the field being decorated
-   * is initialized (regardless if the field is `static` or not).
-   */
+  /** Adds a callback to be invoked immediately after the field being decorated is initialized (regardless if the field is `static` or not). */
   addInitializer(initializer: (this: This) => void): void;
 
   readonly metadata: DecoratorMetadata;

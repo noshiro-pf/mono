@@ -1,8 +1,7 @@
 {
   "plugins": [
     "prettier-plugin-organize-imports",
-    "prettier-plugin-packagejson",
-    "prettier-plugin-jsdoc"
+    "prettier-plugin-packagejson"
   ],
   "semi": true,
   "endOfLine": "lf",
@@ -13,7 +12,6 @@
     {
       "files": ["source/temp/copied", "source/temp/copied/*.d.ts"],
       "options": {
-        "plugins": ["prettier-plugin-jsdoc"],
         "printWidth": 320
       }
     }

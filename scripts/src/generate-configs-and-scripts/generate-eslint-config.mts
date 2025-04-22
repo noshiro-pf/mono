@@ -22,7 +22,7 @@ export const generateEsLintConfig = async (
     cfg.srcDirs.length >= 2 ? `{${cfg.srcDirs.join(',')}}` : cfg.srcDirs[0];
 
   const content = [
-    "/** @typedef { import('@noshiro/eslint-configs').FlatConfig } FlatConfig */",
+    "/** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */",
     '',
     'import {',
     '  eslintFlatConfigForTypeScript,',

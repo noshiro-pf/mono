@@ -18,10 +18,7 @@ and limitations under the License.
 /// <reference lib="es2015.symbol" />
 
 interface SymbolConstructor {
-  /**
-   * A method that returns the default iterator for an object. Called by the
-   * semantics of the for-of statement.
-   */
+  /** A method that returns the default iterator for an object. Called by the semantics of the for-of statement. */
   readonly iterator: unique symbol;
 }
 
@@ -56,20 +53,13 @@ interface IterableIterator<T, TReturn = any, TNext = any>
   [Symbol.iterator](): IterableIterator<T, TReturn, TNext>;
 }
 
-/**
- * Describes an {@link Iterator} produced by the runtime that inherits from the
- * intrinsic `Iterator.prototype`.
- */
+/** Describes an {@link Iterator} produced by the runtime that inherits from the intrinsic `Iterator.prototype`. */
 interface IteratorObject<T, TReturn = unknown, TNext = unknown>
   extends Iterator<T, TReturn, TNext> {
   [Symbol.iterator](): IteratorObject<T, TReturn, TNext>;
 }
 
-/**
- * Defines the `TReturn` type used for built-in iterators produced by `Array`,
- * `Map`, `Set`, and others. This is `undefined` when
- * `strictBuiltInIteratorReturn` is `true`; otherwise, this is `any`.
- */
+/** Defines the `TReturn` type used for built-in iterators produced by `Array`, `Map`, `Set`, and others. This is `undefined` when `strictBuiltInIteratorReturn` is `true`; otherwise, this is `any`. */
 type BuiltinIteratorReturn = intrinsic;
 
 interface ArrayIterator<T>
@@ -223,8 +213,7 @@ interface Promise<T> {}
 
 interface PromiseConstructor {
   /**
-   * Creates a Promise that is resolved with an array of results when all of the
-   * provided Promises resolve, or rejected when any Promise is rejected.
+   * Creates a Promise that is resolved with an array of results when all of the provided Promises resolve, or rejected when any Promise is rejected.
    *
    * @param values An iterable of Promises.
    * @returns A new Promise.
@@ -232,8 +221,7 @@ interface PromiseConstructor {
   all<T>(values: Iterable<T | PromiseLike<T>>): Promise<Awaited<T>[]>;
 
   /**
-   * Creates a Promise that is resolved or rejected when any of the provided
-   * Promises are resolved or rejected.
+   * Creates a Promise that is resolved or rejected when any of the provided Promises are resolved or rejected.
    *
    * @param values An iterable of Promises.
    * @returns A new Promise.

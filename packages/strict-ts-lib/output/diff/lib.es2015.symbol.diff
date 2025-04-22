@@ -19,7 +19,7 @@
  
  interface SymbolConstructor {
    /** A reference to the prototype. */
-@@ -43,4 +29,4 @@ interface SymbolConstructor {
+@@ -41,4 +27,4 @@ interface SymbolConstructor {
    keyFor(sym: symbol): string | undefined;
  }
  

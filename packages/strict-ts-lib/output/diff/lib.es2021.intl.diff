@@ -61,10 +61,10 @@
    }
  
    /**
-@@ -85,17 +71,17 @@ declare namespace Intl {
-      * see [Intl
-      * page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation).
-      */
+@@ -80,17 +66,17 @@ declare namespace Intl {
+    */
+   interface ListFormatOptions {
+     /** The locale matching algorithm to use. For information about this option, see [Intl page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
 -    localeMatcher?: ListFormatLocaleMatcher | undefined;
 +    readonly localeMatcher?: ListFormatLocaleMatcher | undefined;
      /** The format of output message. */
@@ -85,7 +85,7 @@
    }
  
    interface ListFormat {
-@@ -142,7 +128,7 @@ declare namespace Intl {
+@@ -127,7 +113,7 @@ declare namespace Intl {
    }
  
    const ListFormat: {
@@ -93,4 +93,4 @@
 +    readonly prototype: ListFormat;
  
      /**
-      * Creates
+      * Creates [Intl.ListFormat](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat) objects that enable language-sensitive list formatting.

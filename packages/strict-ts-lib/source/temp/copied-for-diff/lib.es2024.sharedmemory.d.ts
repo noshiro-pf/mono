@@ -19,9 +19,7 @@ and limitations under the License.
 
 interface Atomics {
   /**
-   * A non-blocking, asynchronous version of wait which is usable on the main
-   * thread. Waits asynchronously on a shared memory location and returns a
-   * Promise
+   * A non-blocking, asynchronous version of wait which is usable on the main thread. Waits asynchronously on a shared memory location and returns a Promise
    *
    * @param typedArray A shared Int32Array or BigInt64Array.
    * @param index The position in the typedArray to wait on.
@@ -38,9 +36,7 @@ interface Atomics {
     | { async: true; value: Promise<'ok' | 'timed-out'> };
 
   /**
-   * A non-blocking, asynchronous version of wait which is usable on the main
-   * thread. Waits asynchronously on a shared memory location and returns a
-   * Promise
+   * A non-blocking, asynchronous version of wait which is usable on the main thread. Waits asynchronously on a shared memory location and returns a Promise
    *
    * @param typedArray A shared Int32Array or BigInt64Array.
    * @param index The position in the typedArray to wait on.
@@ -66,8 +62,7 @@ interface SharedArrayBuffer {
   get growable(): boolean;
 
   /**
-   * If this SharedArrayBuffer is growable, returns the maximum byte length
-   * given during construction; returns the byte length if not.
+   * If this SharedArrayBuffer is growable, returns the maximum byte length given during construction; returns the byte length if not.
    *
    * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer/maxByteLength)
    */

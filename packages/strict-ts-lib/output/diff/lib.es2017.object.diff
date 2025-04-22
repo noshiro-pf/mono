@@ -44,21 +44,41 @@
  
  interface ObjectConstructor {
    /**
-@@ -23,7 +36,7 @@ interface ObjectConstructor {
-    *   object that you created or an existing Document Object Model (DOM)
-    *   object.
+@@ -21,37 +34,63 @@ interface ObjectConstructor {
+    *
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
     */
 -  values<T>(o: { [s: string]: T } | ArrayLike<T>): T[];
 +  values<T>(o: { readonly [s: string]: T } | ArrayLike<T>): T[];
  
    /**
     * Returns an array of values of the enumerable own properties of an object
-@@ -32,7 +45,30 @@ interface ObjectConstructor {
-    *   object that you created or an existing Document Object Model (DOM)
-    *   object.
+    *
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
     */
 -  values(o: {}): any[];
 +  values(o: {}): unknown[];
+ 
+   /**
+    * Returns an array of key/values of the enumerable own properties of an object
+    *
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
++   *
++   * ```ts
++   * const obj = {
++   *   x: 1,
++   *   y: 2,
++   *   z: 2,
++   *   3: 4,
++   * } as const;
++   *
++   * const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2] | [string, unknown])[]
++   * ```
++   *
++   */
++  entries<const R extends UnknownRecord>(
++    object: R,
++  ): StrictLibInternals.ToObjectEntries<R>;
 +
 +  /**
 +   * Returns an array of key/values of the enumerable own properties of an
@@ -67,27 +87,6 @@
 +   * @param o Object that contains the properties and methods. This can be an
 +   *   object that you created or an existing Document Object Model (DOM)
 +   *   object.
-+   *
-+   *   ```ts
-+   *   const obj = {
-+   *     x: 1,
-+   *     y: 2,
-+   *     z: 2,
-+   *     3: 4,
-+   *   } as const;
-+   *
-+   *   const entries = Object.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2] | [string, unknown])[]
-+   *   ```
-+   */
-+  entries<const R extends UnknownRecord>(
-+    object: R,
-+  ): StrictLibInternals.ToObjectEntries<R>;
- 
-   /**
-    * Returns an array of key/values of the enumerable own properties of an
-@@ -42,7 +78,9 @@ interface ObjectConstructor {
-    *   object that you created or an existing Document Object Model (DOM)
-    *   object.
     */
 -  entries<T>(o: { [s: string]: T } | ArrayLike<T>): [string, T][];
 +  entries<T>(
@@ -95,19 +94,17 @@
 +  ): (readonly [string, T])[];
  
    /**
-    * Returns an array of key/values of the enumerable own properties of an
-@@ -52,7 +90,7 @@ interface ObjectConstructor {
-    *   object that you created or an existing Document Object Model (DOM)
-    *   object.
+    * Returns an array of key/values of the enumerable own properties of an object
+    *
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
     */
 -  entries(o: {}): [string, any][];
 +  entries(o: {}): (readonly [string, unknown])[];
  
    /**
     * Returns an object containing all own property descriptors of an object
-@@ -61,9 +99,9 @@ interface ObjectConstructor {
-    *   object that you created or an existing Document Object Model (DOM)
-    *   object.
+    *
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
     */
 -  getOwnPropertyDescriptors<T>(
 -    o: T,

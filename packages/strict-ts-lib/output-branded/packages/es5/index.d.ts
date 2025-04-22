@@ -14,8 +14,8 @@ declare const Infinity: POSITIVE_INFINITY;
 /**
  * Evaluates JavaScript code and executes it.
  *
- * @deprecated
  * @param x A String value that contains valid JavaScript code.
+ * @deprecated
  */
 declare function eval(x: string): unknown;
 
@@ -23,9 +23,7 @@ declare function eval(x: string): unknown;
  * Converts a string to an integer.
  *
  * @param string A string to convert into a number.
- * @param radix A value between 2 and 36 that specifies the base of the number
- *   in `string`. If this argument is not supplied, strings with a prefix of
- *   '0x' are considered hexadecimal. All other strings are considered decimal.
+ * @param radix A value between 2 and 36 that specifies the base of the number in `string`. If this argument is not supplied, strings with a prefix of '0x' are considered hexadecimal. All other strings are considered decimal.
  */
 declare function parseInt(
   string: string,
@@ -40,19 +38,18 @@ declare function parseInt(
 declare function parseFloat(string: string): number | NaNType;
 
 /**
- * Returns a Boolean value that indicates whether a value is the reserved value
- * NaN (not a number).
+ * Returns a Boolean value that indicates whether a value is the reserved value NaN (not a number).
  *
- * @deprecated Use `Number.isNaN` instead.
  * @param number A numeric value.
+ * @deprecated Use `Number.isNaN` instead.
  */
 declare function isNaN(number: number): boolean;
 
 /**
  * Determines whether a supplied number is finite.
  *
- * @deprecated Use `Number.isFinite` instead.
  * @param number Any numeric value.
+ * @deprecated Use `Number.isFinite` instead.
  */
 declare function isFinite(number: number): boolean;
 
@@ -64,8 +61,7 @@ declare function isFinite(number: number): boolean;
 declare function decodeURI(encodedURI: string): string;
 
 /**
- * Gets the unencoded version of an encoded component of a Uniform Resource
- * Identifier (URI).
+ * Gets the unencoded version of an encoded component of a Uniform Resource Identifier (URI).
  *
  * @param encodedURIComponent A value representing an encoded URI component.
  */
@@ -79,8 +75,7 @@ declare function decodeURIComponent(encodedURIComponent: string): string;
 declare function encodeURI(uri: string): string;
 
 /**
- * Encodes a text string as a valid component of a Uniform Resource Identifier
- * (URI).
+ * Encodes a text string as a valid component of a Uniform Resource Identifier (URI).
  *
  * @param uriComponent A value representing an unencoded URI component.
  */
@@ -89,8 +84,7 @@ declare function encodeURIComponent(
 ): string;
 
 /**
- * Computes a new string in which certain characters have been replaced by a
- * hexadecimal escape sequence.
+ * Computes a new string in which certain characters have been replaced by a hexadecimal escape sequence.
  *
  * @deprecated A legacy feature for browser compatibility
  * @param string A string value
@@ -98,8 +92,7 @@ declare function encodeURIComponent(
 declare function escape(string: string): string;
 
 /**
- * Computes a new string in which hexadecimal escape sequences are replaced with
- * the character that it represents.
+ * Computes a new string in which hexadecimal escape sequences are replaced with the character that it represents.
  *
  * @deprecated A legacy feature for browser compatibility
  * @param string A string value
@@ -131,10 +124,7 @@ interface PropertyDescriptorMap {
 }
 
 interface Object {
-  /**
-   * The initial value of Object.prototype.constructor is the standard built-in
-   * Object constructor.
-   */
+  /** The initial value of Object.prototype.constructor is the standard built-in Object constructor. */
   readonly constructor: Function;
 
   /** Returns a string representation of an object. */
@@ -187,9 +177,7 @@ interface ObjectConstructor {
   getPrototypeOf(o: unknown): unknown;
 
   /**
-   * Gets the own property descriptor of the specified object. An own property
-   * descriptor is one that is defined directly on the object and is not
-   * inherited from the object's prototype.
+   * Gets the own property descriptor of the specified object. An own property descriptor is one that is defined directly on the object and is not inherited from the object's prototype.
    *
    * @param o Object that contains the property.
    * @param p Name of the property.
@@ -200,30 +188,24 @@ interface ObjectConstructor {
   ): PropertyDescriptor | undefined;
 
   /**
-   * Returns the names of the own properties of an object. The own properties of
-   * an object are those that are defined directly on that object, and are not
-   * inherited from the object's prototype. The properties of an object include
-   * both fields (objects) and functions.
+   * Returns the names of the own properties of an object. The own properties of an object are those that are defined directly on that object, and are not inherited from the object's prototype. The properties of an object include both fields (objects) and functions.
    *
    * @param o Object that contains the own properties.
    */
   getOwnPropertyNames(o: unknown): readonly string[];
 
   /**
-   * Creates an object that has the specified prototype or that has null
-   * prototype.
+   * Creates an object that has the specified prototype or that has null prototype.
    *
    * @param o Object to use as a prototype. May be null.
    */
   create(o: object | null): unknown;
 
   /**
-   * Creates an object that has the specified prototype, and that optionally
-   * contains specified properties.
+   * Creates an object that has the specified prototype, and that optionally contains specified properties.
    *
    * @param o Object to use as a prototype. May be null
-   * @param properties JavaScript object that contains one or more property
-   *   descriptors.
+   * @param properties JavaScript object that contains one or more property descriptors.
    */
   create(
     o: object | null,
@@ -231,15 +213,11 @@ interface ObjectConstructor {
   ): unknown;
 
   /**
-   * Adds a property to an object, or modifies attributes of an existing
-   * property.
+   * Adds a property to an object, or modifies attributes of an existing property.
    *
-   * @param o Object on which to add or modify the property. This can be a
-   *   native JavaScript object (that is, a user-defined object or a built in
-   *   object) or a DOM object.
+   * @param o Object on which to add or modify the property. This can be a native JavaScript object (that is, a user-defined object or a built in object) or a DOM object.
    * @param p The property name.
-   * @param attributes Descriptor for the property. It can be for a data
-   *   property or an accessor property.
+   * @param attributes Descriptor for the property. It can be for a data property or an accessor property.
    */
   defineProperty<T>(
     o: T,
@@ -248,14 +226,10 @@ interface ObjectConstructor {
   ): T;
 
   /**
-   * Adds one or more properties to an object, and/or modifies attributes of
-   * existing properties.
+   * Adds one or more properties to an object, and/or modifies attributes of existing properties.
    *
-   * @param o Object on which to add or modify the properties. This can be a
-   *   native JavaScript object or a DOM object.
-   * @param properties JavaScript object that contains one or more descriptor
-   *   objects. Each descriptor object describes a data property or an accessor
-   *   property.
+   * @param o Object on which to add or modify the properties. This can be a native JavaScript object or a DOM object.
+   * @param properties JavaScript object that contains one or more descriptor objects. Each descriptor object describes a data property or an accessor property.
    */
   defineProperties<T>(
     o: T,
@@ -263,24 +237,21 @@ interface ObjectConstructor {
   ): T;
 
   /**
-   * Prevents the modification of attributes of existing properties, and
-   * prevents the addition of new properties.
+   * Prevents the modification of attributes of existing properties, and prevents the addition of new properties.
    *
    * @param o Object on which to lock the attributes.
    */
   seal<T>(o: T): T;
 
   /**
-   * Prevents the modification of existing property attributes and values, and
-   * prevents the addition of new properties.
+   * Prevents the modification of existing property attributes and values, and prevents the addition of new properties.
    *
    * @param f Object on which to lock the attributes.
    */
   freeze<T extends Function>(f: T): T;
 
   /**
-   * Prevents the modification of existing property attributes and values, and
-   * prevents the addition of new properties.
+   * Prevents the modification of existing property attributes and values, and prevents the addition of new properties.
    *
    * @param o Object on which to lock the attributes.
    */
@@ -292,8 +263,7 @@ interface ObjectConstructor {
   ): Readonly<T>;
 
   /**
-   * Prevents the modification of existing property attributes and values, and
-   * prevents the addition of new properties.
+   * Prevents the modification of existing property attributes and values, and prevents the addition of new properties.
    *
    * @param o Object on which to lock the attributes.
    */
@@ -307,41 +277,35 @@ interface ObjectConstructor {
   preventExtensions<T>(o: T): T;
 
   /**
-   * Returns true if existing property attributes cannot be modified in an
-   * object and new properties cannot be added to the object.
+   * Returns true if existing property attributes cannot be modified in an object and new properties cannot be added to the object.
    *
    * @param o Object to test.
    */
   isSealed(o: unknown): boolean;
 
   /**
-   * Returns true if existing property attributes and values cannot be modified
-   * in an object, and new properties cannot be added to the object.
+   * Returns true if existing property attributes and values cannot be modified in an object, and new properties cannot be added to the object.
    *
    * @param o Object to test.
    */
   isFrozen(o: unknown): boolean;
 
   /**
-   * Returns a value that indicates whether new properties can be added to an
-   * object.
+   * Returns a value that indicates whether new properties can be added to an object.
    *
    * @param o Object to test.
    */
   isExtensible(o: unknown): boolean;
 
   /**
-   * Returns the names of the enumerable string properties and methods of an
-   * object.
+   * Returns the names of the enumerable string properties and methods of an object.
+   *
+   * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
    *
    * @example
-   *   ```ts
-   *   const ks = Object.keys({ x: 1, y: 2, z: '3', 3: 4 }); // ('3' | 'x' | 'y' | 'z' | (string & {}))[]
-   *   ```;
-   *
-   * @param o Object that contains the properties and methods. This can be an
-   *   object that you created or an existing Document Object Model (DOM)
-   *   object.
+   * ```ts
+   * const ks = Object.keys({ x: 1, y: 2, z: '3', 3: 4 }); // ('3' | 'x' | 'y' | 'z' | (string & {}))[]
+   * ```
    */
   keys<const R extends UnknownRecord>(
     object: R,
@@ -354,8 +318,7 @@ declare const Object: ObjectConstructor;
 /** Creates a new function. */
 interface Function {
   /**
-   * Calls the function, substituting the specified object for the this value of
-   * the function, and the specified array for the arguments of the function.
+   * Calls the function, substituting the specified object for the this value of the function, and the specified array for the arguments of the function.
    *
    * @param thisArg The object to be used as the this object.
    * @param argArray A set of arguments to be passed to the function.
@@ -363,8 +326,7 @@ interface Function {
   apply(this: Function, thisArg: unknown, argArray?: unknown): unknown;
 
   /**
-   * Calls a method of an object, substituting another object for the current
-   * object.
+   * Calls a method of an object, substituting another object for the current object.
    *
    * @param thisArg The object to be used as the current object.
    * @param argArray A list of arguments to be passed to the method.
@@ -376,12 +338,9 @@ interface Function {
   ): unknown;
 
   /**
-   * For a given function, creates a bound function that has the same body as
-   * the original function. The this object of the bound function is associated
-   * with the specified object, and has the specified initial parameters.
+   * For a given function, creates a bound function that has the same body as the original function. The this object of the bound function is associated with the specified object, and has the specified initial parameters.
    *
-   * @param thisArg An object to which the this keyword can refer inside the new
-   *   function.
+   * @param thisArg An object to which the this keyword can refer inside the new function.
    * @param argArray A list of arguments to be passed to the new function.
    */
   bind(
@@ -405,8 +364,8 @@ interface FunctionConstructor {
   /**
    * Creates a new function.
    *
-   * @deprecated Don't use Function constructor
    * @param args A list of arguments the function accepts.
+   * @deprecated Don't use Function constructor
    */
   new (...args: readonly string[]): Function;
   /** @deprecated Don't use Function constructor */
@@ -416,10 +375,7 @@ interface FunctionConstructor {
 
 declare const Function: FunctionConstructor;
 
-/**
- * Extracts the type of the 'this' parameter of a function type, or 'unknown' if
- * the function type has no 'this' parameter.
- */
+/** Extracts the type of the 'this' parameter of a function type, or 'unknown' if the function type has no 'this' parameter. */
 type ThisParameterType<T> = T extends (this: infer U, ...args: never) => unknown
   ? U
   : unknown;
@@ -434,16 +390,14 @@ type OmitThisParameter<T> =
 
 interface CallableFunction extends Function {
   /**
-   * Calls the function with the specified object as the this value and the
-   * elements of specified array as the arguments.
+   * Calls the function with the specified object as the this value and the elements of specified array as the arguments.
    *
    * @param thisArg The object to be used as the this object.
    */
   apply<T, R>(this: (this: T) => R, thisArg: T): R;
 
   /**
-   * Calls the function with the specified object as the this value and the
-   * elements of specified array as the arguments.
+   * Calls the function with the specified object as the this value and the elements of specified array as the arguments.
    *
    * @param thisArg The object to be used as the this object.
    * @param args An array of argument values to be passed to the function.
@@ -455,8 +409,7 @@ interface CallableFunction extends Function {
   ): R;
 
   /**
-   * Calls the function with the specified object as the this value and the
-   * specified rest arguments as the arguments.
+   * Calls the function with the specified object as the this value and the specified rest arguments as the arguments.
    *
    * @param thisArg The object to be used as the this object.
    * @param args Argument values to be passed to the function.
@@ -468,18 +421,14 @@ interface CallableFunction extends Function {
   ): R;
 
   /**
-   * For a given function, creates a bound function that has the same body as
-   * the original function. The this object of the bound function is associated
-   * with the specified object, and has the specified initial parameters.
+   * For a given function, creates a bound function that has the same body as the original function. The this object of the bound function is associated with the specified object, and has the specified initial parameters.
    *
    * @param thisArg The object to be used as the this object.
    */
   bind<T>(this: T, thisArg: ThisParameterType<T>): OmitThisParameter<T>;
 
   /**
-   * For a given function, creates a bound function that has the same body as
-   * the original function. The this object of the bound function is associated
-   * with the specified object, and has the specified initial parameters.
+   * For a given function, creates a bound function that has the same body as the original function. The this object of the bound function is associated with the specified object, and has the specified initial parameters.
    *
    * @param thisArg The object to be used as the this object.
    * @param args Arguments to bind to the parameters of the function.
@@ -493,15 +442,13 @@ interface CallableFunction extends Function {
 
 interface NewableFunction extends Function {
   /**
-   * Calls the function with the specified object as the this value and the
-   * elements of specified array as the arguments.
+   * Calls the function with the specified object as the this value and the elements of specified array as the arguments.
    *
    * @param thisArg The object to be used as the this object.
    */
   apply<T>(this: new () => T, thisArg: T): void;
   /**
-   * Calls the function with the specified object as the this value and the
-   * elements of specified array as the arguments.
+   * Calls the function with the specified object as the this value and the elements of specified array as the arguments.
    *
    * @param thisArg The object to be used as the this object.
    * @param args An array of argument values to be passed to the function.
@@ -513,8 +460,7 @@ interface NewableFunction extends Function {
   ): void;
 
   /**
-   * Calls the function with the specified object as the this value and the
-   * specified rest arguments as the arguments.
+   * Calls the function with the specified object as the this value and the specified rest arguments as the arguments.
    *
    * @param thisArg The object to be used as the this object.
    * @param args Argument values to be passed to the function.
@@ -526,18 +472,14 @@ interface NewableFunction extends Function {
   ): void;
 
   /**
-   * For a given function, creates a bound function that has the same body as
-   * the original function. The this object of the bound function is associated
-   * with the specified object, and has the specified initial parameters.
+   * For a given function, creates a bound function that has the same body as the original function. The this object of the bound function is associated with the specified object, and has the specified initial parameters.
    *
    * @param thisArg The object to be used as the this object.
    */
   bind<T>(this: T, thisArg: unknown): T;
 
   /**
-   * For a given function, creates a bound function that has the same body as
-   * the original function. The this object of the bound function is associated
-   * with the specified object, and has the specified initial parameters.
+   * For a given function, creates a bound function that has the same body as the original function. The this object of the bound function is associated with the specified object, and has the specified initial parameters.
    *
    * @param thisArg The object to be used as the this object.
    * @param args Arguments to bind to the parameters of the function.
@@ -562,26 +504,23 @@ interface String {
   /**
    * Returns the character at the specified index.
    *
-   * @deprecated Prefer `String#at(...)` over `String#charAt(...)`.
-   *   eslint(unicorn/prefer-at)
    * @param pos The zero-based index of the desired character.
+   * @deprecated Prefer `String#at(...)` over `String#charAt(...)`. eslint(unicorn/prefer-at)
    */
   charAt(pos: NumberType.StringSizeArg): string;
 
   /**
    * Returns the Unicode value of the character at the specified location.
    *
-   * @param index The zero-based index of the desired character. If there is no
-   *   character at the specified index, NaN is returned.
+   * @param index The zero-based index of the desired character. If there is no character at the specified index, NaN is returned.
    */
   charCodeAt(index: NumberType.StringSizeArg): number;
 
   /**
    * Returns a string that contains the concatenation of two or more strings.
    *
-   * @deprecated Prefer the spread operator over `Array#concat(...)`.
-   *   eslint(unicorn/prefer-spread)
    * @param strings The strings to append to the end of the string.
+   * @deprecated Prefer the spread operator over `Array#concat(...)`. eslint(unicorn/prefer-spread)
    */
   concat(...strings: readonly string[]): string;
 
@@ -589,8 +528,7 @@ interface String {
    * Returns the position of the first occurrence of a substring.
    *
    * @param searchString The substring to search for in the string
-   * @param position The index at which to begin searching the String object. If
-   *   omitted, search starts at the beginning of the string.
+   * @param position The index at which to begin searching the String object. If omitted, search starts at the beginning of the string.
    */
   indexOf(
     searchString: string,
@@ -601,8 +539,7 @@ interface String {
    * Returns the last occurrence of a substring in the string.
    *
    * @param searchString The substring to search for.
-   * @param position The index at which to begin searching. If omitted, the
-   *   search begins at the end of the string.
+   * @param position The index at which to begin searching. If omitted, the search begins at the end of the string.
    */
   lastIndexOf(
     searchString: string,
@@ -617,11 +554,9 @@ interface String {
   localeCompare(that: string): number;
 
   /**
-   * Matches a string with a regular expression, and returns an array containing
-   * the results of that search.
+   * Matches a string with a regular expression, and returns an array containing the results of that search.
    *
-   * @param regexp A variable name or string literal containing the regular
-   *   expression pattern and flags.
+   * @param regexp A variable name or string literal containing the regular expression pattern and flags.
    */
   match(regexp: string | RegExp): RegExpMatchArray | null;
 
@@ -629,11 +564,7 @@ interface String {
    * Replaces text in a string, using a regular expression or search string.
    *
    * @param searchValue A string or regular expression to search for.
-   * @param replaceValue A string containing the text to replace. When the
-   *   {@linkcode searchValue} is a `RegExp`, all matches are replaced if the `g`
-   *   flag is set (or only those matches at the beginning, if the `y` flag is
-   *   also present). Otherwise, only the first match of {@linkcode searchValue}
-   *   is replaced.
+   * @param replaceValue A string containing the text to replace. When the {@linkcode searchValue} is a `RegExp`, all matches are replaced if the `g` flag is set (or only those matches at the beginning, if the `y` flag is also present). Otherwise, only the first match of {@linkcode searchValue} is replaced.
    */
   replace(searchValue: string | RegExp, replaceValue: string): string;
 
@@ -658,12 +589,8 @@ interface String {
   /**
    * Returns a section of a string.
    *
-   * @param start The index to the beginning of the specified portion of
-   *   stringObj.
-   * @param end The index to the end of the specified portion of stringObj. The
-   *   substring includes the characters up to, but not including, the character
-   *   indicated by end. If this value is not specified, the substring continues
-   *   to the end of stringObj.
+   * @param start The index to the beginning of the specified portion of stringObj.
+   * @param end The index to the end of the specified portion of stringObj. The substring includes the characters up to, but not including, the character indicated by end. If this value is not specified, the substring continues to the end of stringObj.
    */
   slice(
     start?: NumberType.StringSizeArg,
@@ -671,14 +598,10 @@ interface String {
   ): string;
 
   /**
-   * Split a string into substrings using the specified separator and return
-   * them as an array.
+   * Split a string into substrings using the specified separator and return them as an array.
    *
-   * @param separator A string that identifies character or characters to use in
-   *   separating the string. If omitted, a single-element array containing the
-   *   entire string is returned.
-   * @param limit A value used to limit the number of elements returned in the
-   *   array.
+   * @param separator A string that identifies character or characters to use in separating the string. If omitted, a single-element array containing the entire string is returned.
+   * @param limit A value used to limit the number of elements returned in the array.
    */
   split(
     separator: string | RegExp,
@@ -688,12 +611,8 @@ interface String {
   /**
    * Returns the substring at the specified location within a String object.
    *
-   * @param start The zero-based index number indicating the beginning of the
-   *   substring.
-   * @param end Zero-based index number indicating the end of the substring. The
-   *   substring includes the characters up to, but not including, the character
-   *   indicated by end. If end is omitted, the characters from start through
-   *   the end of the original string are returned.
+   * @param start The zero-based index number indicating the beginning of the substring.
+   * @param end Zero-based index number indicating the end of the substring. The substring includes the characters up to, but not including, the character indicated by end. If end is omitted, the characters from start through the end of the original string are returned.
    */
   substring(
     start: NumberType.StringSizeArgNonNegative,
@@ -703,25 +622,16 @@ interface String {
   /** Converts all the alphabetic characters in a string to lowercase. */
   toLowerCase(): string;
 
-  /**
-   * Converts all alphabetic characters to lowercase, taking into account the
-   * host environment's current locale.
-   */
+  /** Converts all alphabetic characters to lowercase, taking into account the host environment's current locale. */
   toLocaleLowerCase(locales?: string | readonly string[]): string;
 
   /** Converts all the alphabetic characters in a string to uppercase. */
   toUpperCase(): string;
 
-  /**
-   * Returns a string where all alphabetic characters have been converted to
-   * uppercase, taking into account the host environment's current locale.
-   */
+  /** Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale. */
   toLocaleUpperCase(locales?: string | readonly string[]): string;
 
-  /**
-   * Removes the leading and trailing white space and line terminator characters
-   * from a string.
-   */
+  /** Removes the leading and trailing white space and line terminator characters from a string. */
   trim(): string;
 
   /** Returns the length of a String object. */
@@ -729,14 +639,11 @@ interface String {
 
   // IE extensions
   /**
-   * Gets a substring beginning at the specified location and having the
-   * specified length.
+   * Gets a substring beginning at the specified location and having the specified length.
    *
    * @deprecated A legacy feature for browser compatibility
-   * @param from The starting position of the desired substring. The index of
-   *   the first character in the string is zero.
-   * @param length The number of characters to include in the returned
-   *   substring.
+   * @param from The starting position of the desired substring. The index of the first character in the string is zero.
+   * @param length The number of characters to include in the returned substring.
    */
   substr(
     from: NumberType.StringSizeArgNonNegative,
@@ -758,10 +665,7 @@ interface StringConstructor {
   fromCharCode(...codes: readonly number[]): string;
 }
 
-/**
- * Allows manipulation and formatting of text strings and determination and
- * location of substrings within strings.
- */
+/** Allows manipulation and formatting of text strings and determination and location of substrings within strings. */
 declare const String: StringConstructor;
 
 interface Boolean {
@@ -783,33 +687,28 @@ interface Number {
   /**
    * Returns a string representation of an object.
    *
-   * @param radix Specifies a radix for converting numeric values to strings.
-   *   This value is only used for numbers.
+   * @param radix Specifies a radix for converting numeric values to strings. This value is only used for numbers.
    */
   toString(radix?: UintRange<2, 37>): string;
 
   /**
    * Returns a string representing a number in fixed-point notation.
    *
-   * @param fractionDigits Number of digits after the decimal point. Must be in
-   *   the range 0 - 20, inclusive.
+   * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
    */
   toFixed(fractionDigits?: UintRange<0, 101>): string;
 
   /**
    * Returns a string containing a number represented in exponential notation.
    *
-   * @param fractionDigits Number of digits after the decimal point. Must be in
-   *   the range 0 - 20, inclusive.
+   * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
    */
   toExponential(fractionDigits?: UintRange<1, 101>): string;
 
   /**
-   * Returns a string containing a number represented either in exponential or
-   * fixed-point notation with a specified number of digits.
+   * Returns a string containing a number represented either in exponential or fixed-point notation with a specified number of digits.
    *
-   * @param precision Number of significant digits. Must be in the range 1 - 21,
-   *   inclusive.
+   * @param precision Number of significant digits. Must be in the range 1 - 21, inclusive.
    */
   toPrecision(precision?: UintRange<1, 101>): string;
 
@@ -823,43 +722,23 @@ interface NumberConstructor {
   (value?: unknown): number;
   readonly prototype: Number;
 
-  /**
-   * The largest number that can be represented in JavaScript. Equal to
-   * approximately 1.79E+308.
-   */
+  /** The largest number that can be represented in JavaScript. Equal to approximately 1.79E+308. */
   readonly MAX_VALUE: number;
 
-  /**
-   * The closest number to zero that can be represented in JavaScript. Equal to
-   * approximately 5.00E-324.
-   */
+  /** The closest number to zero that can be represented in JavaScript. Equal to approximately 5.00E-324. */
   readonly MIN_VALUE: number;
 
-  /**
-   * A value that is not a number. In equality comparisons, NaN does not equal
-   * any value, including itself. To test whether a value is equivalent to NaN,
-   * use the isNaN function.
-   */
+  /** A value that is not a number. In equality comparisons, NaN does not equal any value, including itself. To test whether a value is equivalent to NaN, use the isNaN function. */
   readonly NaN: NaNType;
 
-  /**
-   * A value that is less than the largest negative number that can be
-   * represented in JavaScript. JavaScript displays NEGATIVE_INFINITY values as
-   * -infinity.
-   */
+  /** A value that is less than the largest negative number that can be represented in JavaScript. JavaScript displays NEGATIVE_INFINITY values as -infinity. */
   readonly NEGATIVE_INFINITY: NEGATIVE_INFINITY;
 
-  /**
-   * A value greater than the largest number that can be represented in
-   * JavaScript. JavaScript displays POSITIVE_INFINITY values as infinity.
-   */
+  /** A value greater than the largest number that can be represented in JavaScript. JavaScript displays POSITIVE_INFINITY values as infinity. */
   readonly POSITIVE_INFINITY: POSITIVE_INFINITY;
 }
 
-/**
- * An object that represents a number of any kind. All JavaScript numbers are
- * 64-bit floating-point numbers.
- */
+/** An object that represents a number of any kind. All JavaScript numbers are 64-bit floating-point numbers. */
 declare const Number: NumberConstructor;
 
 interface TemplateStringsArray extends ReadonlyArray<string> {
@@ -869,16 +748,14 @@ interface TemplateStringsArray extends ReadonlyArray<string> {
 /**
  * The type of `import.meta`.
  *
- * If you need to declare that a given property exists on `import.meta`, this
- * type may be augmented via interface merging.
+ * If you need to declare that a given property exists on `import.meta`, this type may be augmented via interface merging.
  */
 interface ImportMeta {}
 
 /**
  * The type for the optional second argument to `import()`.
  *
- * If your host environment supports additional options, this type may be
- * augmented via interface merging.
+ * If your host environment supports additional options, this type may be augmented via interface merging.
  */
 interface ImportCallOptions {
   /** @deprecated */ readonly assert?: ImportAssertions;
@@ -886,8 +763,7 @@ interface ImportCallOptions {
 }
 
 /**
- * The type for the `assert` property of the optional second argument to
- * `import()`.
+ * The type for the `assert` property of the optional second argument to `import()`.
  *
  * @deprecated
  */
@@ -895,19 +771,13 @@ interface ImportAssertions {
   readonly [key: string]: string;
 }
 
-/**
- * The type for the `with` property of the optional second argument to
- * `import()`.
- */
+/** The type for the `with` property of the optional second argument to `import()`. */
 interface ImportAttributes {
   readonly [key: string]: string;
 }
 
 interface Math {
-  /**
-   * The mathematical constant e. This is Euler's number, the base of natural
-   * logarithms.
-   */
+  /** The mathematical constant e. This is Euler's number, the base of natural logarithms. */
   readonly E: PositiveNumber;
   /** The natural logarithm of 10. */
   readonly LN10: PositiveNumber;
@@ -919,17 +789,12 @@ interface Math {
   readonly LOG10E: PositiveNumber;
   /** Pi. This is the ratio of the circumference of a circle to its diameter. */
   readonly PI: PositiveNumber;
-  /**
-   * The square root of 0.5, or, equivalently, one divided by the square root of
-   * 2.
-   */
+  /** The square root of 0.5, or, equivalently, one divided by the square root of 2. */
   readonly SQRT1_2: PositiveNumber;
   /** The square root of 2. */
   readonly SQRT2: PositiveNumber;
   /**
-   * Returns the absolute value of a number (the value without regard to whether
-   * it is positive or negative). For example, the absolute value of -5 is the
-   * same as the absolute value of 5.
+   * Returns the absolute value of a number (the value without regard to whether it is positive or negative). For example, the absolute value of -5 is the same as the absolute value of 5.
    *
    * @param x A numeric expression for which the absolute value is needed.
    */
@@ -1040,47 +905,26 @@ interface Math {
    */
   tan(x: number): number;
 }
-/**
- * An intrinsic object that provides basic mathematics functionality and
- * constants.
- */
+/** An intrinsic object that provides basic mathematics functionality and constants. */
 declare const Math: Math;
 
 /** Enables basic storage and retrieval of dates and times. */
 interface Date {
-  /**
-   * Returns a string representation of a date. The format of the string depends
-   * on the locale.
-   */
+  /** Returns a string representation of a date. The format of the string depends on the locale. */
   toString(): string;
   /** Returns a date as a string value. */
   toDateString(): string;
   /** Returns a time as a string value. */
   toTimeString(): string;
-  /**
-   * Returns a value as a string value appropriate to the host environment's
-   * current locale.
-   */
+  /** Returns a value as a string value appropriate to the host environment's current locale. */
   toLocaleString(): string;
-  /**
-   * Returns a date as a string value appropriate to the host environment's
-   * current locale.
-   */
+  /** Returns a date as a string value appropriate to the host environment's current locale. */
   toLocaleDateString(): string;
-  /**
-   * Returns a time as a string value appropriate to the host environment's
-   * current locale.
-   */
+  /** Returns a time as a string value appropriate to the host environment's current locale. */
   toLocaleTimeString(): string;
-  /**
-   * Returns the stored time value in milliseconds since midnight, January 1,
-   * 1970 UTC.
-   */
+  /** Returns the stored time value in milliseconds since midnight, January 1, 1970 UTC. */
   valueOf(): SafeUint;
-  /**
-   * Returns the stored time value in milliseconds since midnight, January 1,
-   * 1970 UTC.
-   */
+  /** Returns the stored time value in milliseconds since midnight, January 1, 1970 UTC. */
   getTime(): SafeUint;
   /** Gets the year, using local time. */
   getFullYear(): YearEnum;
@@ -1100,10 +944,7 @@ interface Date {
   getUTCDay(): DayOfWeekIndex;
   /** Gets the hours in a date, using local time. */
   getHours(): HoursEnum;
-  /**
-   * Gets the hours value in a Date object using Universal Coordinated Time
-   * (UTC).
-   */
+  /** Gets the hours value in a Date object using Universal Coordinated Time (UTC). */
   getUTCHours(): HoursEnum;
   /** Gets the minutes of a Date object, using local time. */
   getMinutes(): MinutesEnum;
@@ -1115,21 +956,14 @@ interface Date {
   getUTCSeconds(): SecondsEnum;
   /** Gets the milliseconds of a Date, using local time. */
   getMilliseconds(): MillisecondsEnum;
-  /**
-   * Gets the milliseconds of a Date object using Universal Coordinated Time
-   * (UTC).
-   */
+  /** Gets the milliseconds of a Date object using Universal Coordinated Time (UTC). */
   getUTCMilliseconds(): MillisecondsEnum;
-  /**
-   * Gets the difference in minutes between Universal Coordinated Time (UTC) and
-   * the time on the local computer.
-   */
+  /** Gets the difference in minutes between Universal Coordinated Time (UTC) and the time on the local computer. */
   getTimezoneOffset(): SafeInt;
   /**
    * Sets the date and time value in the Date object.
    *
-   * @param time A numeric value representing the number of elapsed milliseconds
-   *   since midnight, January 1, 1970 GMT.
+   * @param time A numeric value representing the number of elapsed milliseconds since midnight, January 1, 1970 GMT.
    */
   setTime(time: number): number;
   /**
@@ -1139,8 +973,7 @@ interface Date {
    */
   setMilliseconds(ms: number): number;
   /**
-   * Sets the milliseconds value in the Date object using Universal Coordinated
-   * Time (UTC).
+   * Sets the milliseconds value in the Date object using Universal Coordinated Time (UTC).
    *
    * @param ms A numeric value equal to the millisecond value.
    */
@@ -1154,8 +987,7 @@ interface Date {
    */
   setSeconds(sec: number, ms?: number): number;
   /**
-   * Sets the seconds value in the Date object using Universal Coordinated Time
-   * (UTC).
+   * Sets the seconds value in the Date object using Universal Coordinated Time (UTC).
    *
    * @param sec A numeric value equal to the seconds value.
    * @param ms A numeric value equal to the milliseconds value.
@@ -1170,8 +1002,7 @@ interface Date {
    */
   setMinutes(min: number, sec?: number, ms?: number): number;
   /**
-   * Sets the minutes value in the Date object using Universal Coordinated Time
-   * (UTC).
+   * Sets the minutes value in the Date object using Universal Coordinated Time (UTC).
    *
    * @param min A numeric value equal to the minutes value.
    * @param sec A numeric value equal to the seconds value.
@@ -1188,8 +1019,7 @@ interface Date {
    */
   setHours(hours: number, min?: number, sec?: number, ms?: number): number;
   /**
-   * Sets the hours value in the Date object using Universal Coordinated Time
-   * (UTC).
+   * Sets the hours value in the Date object using Universal Coordinated Time (UTC).
    *
    * @param hours A numeric value equal to the hours value.
    * @param min A numeric value equal to the minutes value.
@@ -1198,15 +1028,13 @@ interface Date {
    */
   setUTCHours(hours: number, min?: number, sec?: number, ms?: number): number;
   /**
-   * Sets the numeric day-of-the-month value of the Date object using local
-   * time.
+   * Sets the numeric day-of-the-month value of the Date object using local time.
    *
    * @param date A numeric value equal to the day of the month.
    */
   setDate(date: number): number;
   /**
-   * Sets the numeric day of the month in the Date object using Universal
-   * Coordinated Time (UTC).
+   * Sets the numeric day of the month in the Date object using Universal Coordinated Time (UTC).
    *
    * @param date A numeric value equal to the day of the month.
    */
@@ -1214,54 +1042,38 @@ interface Date {
   /**
    * Sets the month value in the Date object using local time.
    *
-   * @param month A numeric value equal to the month. The value for January is
-   *   0, and other month values follow consecutively.
-   * @param date A numeric value representing the day of the month. If this
-   *   value is not supplied, the value from a call to the getDate method is
-   *   used.
+   * @param month A numeric value equal to the month. The value for January is 0, and other month values follow consecutively.
+   * @param date A numeric value representing the day of the month. If this value is not supplied, the value from a call to the getDate method is used.
    */
   setMonth(month: number, date?: number): number;
   /**
-   * Sets the month value in the Date object using Universal Coordinated Time
-   * (UTC).
+   * Sets the month value in the Date object using Universal Coordinated Time (UTC).
    *
-   * @param month A numeric value equal to the month. The value for January is
-   *   0, and other month values follow consecutively.
-   * @param date A numeric value representing the day of the month. If it is not
-   *   supplied, the value from a call to the getUTCDate method is used.
+   * @param month A numeric value equal to the month. The value for January is 0, and other month values follow consecutively.
+   * @param date A numeric value representing the day of the month. If it is not supplied, the value from a call to the getUTCDate method is used.
    */
   setUTCMonth(month: number, date?: number): number;
   /**
    * Sets the year of the Date object using local time.
    *
    * @param year A numeric value for the year.
-   * @param month A zero-based numeric value for the month (0 for January, 11
-   *   for December). Must be specified if numDate is specified.
+   * @param month A zero-based numeric value for the month (0 for January, 11 for December). Must be specified if numDate is specified.
    * @param date A numeric value equal for the day of the month.
    */
   setFullYear(year: number, month?: number, date?: number): number;
   /**
-   * Sets the year value in the Date object using Universal Coordinated Time
-   * (UTC).
+   * Sets the year value in the Date object using Universal Coordinated Time (UTC).
    *
    * @param year A numeric value equal to the year.
-   * @param month A numeric value equal to the month. The value for January is
-   *   0, and other month values follow consecutively. Must be supplied if
-   *   numDate is supplied.
+   * @param month A numeric value equal to the month. The value for January is 0, and other month values follow consecutively. Must be supplied if numDate is supplied.
    * @param date A numeric value equal to the day of the month.
    */
   setUTCFullYear(year: number, month?: number, date?: number): number;
-  /**
-   * Returns a date converted to a string using Universal Coordinated Time
-   * (UTC).
-   */
+  /** Returns a date converted to a string using Universal Coordinated Time (UTC). */
   toUTCString(): string;
   /** Returns a date as a string value in ISO format. */
   toISOString(): string;
-  /**
-   * Used by the JSON.stringify method to enable the transformation of an
-   * object's data for JavaScript Object Notation (JSON) serialization.
-   */
+  /** Used by the JSON.stringify method to enable the transformation of an object's data for JavaScript Object Notation (JSON) serialization. */
   toJSON(key?: unknown): string;
 }
 
@@ -1271,18 +1083,12 @@ interface DateConstructor {
   /**
    * Creates a new Date.
    *
-   * @param year The full year designation is required for cross-century date
-   *   accuracy. If year is between 0 and 99 is used, then year is assumed to be
-   *   1900 + year.
-   * @param monthIndex The month as a number between 0 and 11 (January to
-   *   December).
+   * @param year The full year designation is required for cross-century date accuracy. If year is between 0 and 99 is used, then year is assumed to be 1900 + year.
+   * @param monthIndex The month as a number between 0 and 11 (January to December).
    * @param date The date as a number between 1 and 31.
-   * @param hours Must be supplied if minutes is supplied. A number from 0 to 23
-   *   (midnight to 11pm) that specifies the hour.
-   * @param minutes Must be supplied if seconds is supplied. A number from 0 to
-   *   59 that specifies the minutes.
-   * @param seconds Must be supplied if milliseconds is supplied. A number from
-   *   0 to 59 that specifies the seconds.
+   * @param hours Must be supplied if minutes is supplied. A number from 0 to 23 (midnight to 11pm) that specifies the hour.
+   * @param minutes Must be supplied if seconds is supplied. A number from 0 to 59 that specifies the minutes.
+   * @param seconds Must be supplied if milliseconds is supplied. A number from 0 to 59 that specifies the seconds.
    * @param ms A number from 0 to 999 that specifies the milliseconds.
    */
   new (
@@ -1297,28 +1103,20 @@ interface DateConstructor {
   (): string;
   readonly prototype: Date;
   /**
-   * Parses a string containing a date, and returns the number of milliseconds
-   * between that date and midnight, January 1, 1970.
+   * Parses a string containing a date, and returns the number of milliseconds between that date and midnight, January 1, 1970.
    *
    * @param s A date string
    */
   parse(s: string): SafeUint;
   /**
-   * Returns the number of milliseconds between midnight, January 1, 1970
-   * Universal Coordinated Time (UTC) (or GMT) and the specified date.
+   * Returns the number of milliseconds between midnight, January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the specified date.
    *
-   * @param year The full year designation is required for cross-century date
-   *   accuracy. If year is between 0 and 99 is used, then year is assumed to be
-   *   1900 + year.
-   * @param monthIndex The month as a number between 0 and 11 (January to
-   *   December).
+   * @param year The full year designation is required for cross-century date accuracy. If year is between 0 and 99 is used, then year is assumed to be 1900 + year.
+   * @param monthIndex The month as a number between 0 and 11 (January to December).
    * @param date The date as a number between 1 and 31.
-   * @param hours Must be supplied if minutes is supplied. A number from 0 to 23
-   *   (midnight to 11pm) that specifies the hour.
-   * @param minutes Must be supplied if seconds is supplied. A number from 0 to
-   *   59 that specifies the minutes.
-   * @param seconds Must be supplied if milliseconds is supplied. A number from
-   *   0 to 59 that specifies the seconds.
+   * @param hours Must be supplied if minutes is supplied. A number from 0 to 23 (midnight to 11pm) that specifies the hour.
+   * @param minutes Must be supplied if seconds is supplied. A number from 0 to 59 that specifies the minutes.
+   * @param seconds Must be supplied if milliseconds is supplied. A number from 0 to 59 that specifies the seconds.
    * @param ms A number from 0 to 999 that specifies the milliseconds.
    */
   UTC(
@@ -1330,10 +1128,7 @@ interface DateConstructor {
     seconds?: SecondsEnum,
     ms?: MillisecondsEnum,
   ): SafeUint;
-  /**
-   * Returns the number of milliseconds elapsed since midnight, January 1, 1970
-   * Universal Coordinated Time (UTC).
-   */
+  /** Returns the number of milliseconds elapsed since midnight, January 1, 1970 Universal Coordinated Time (UTC). */
   now(): SafeUint;
 }
 
@@ -1344,10 +1139,7 @@ interface RegExpMatchArray extends Array<string> {
   readonly index?: NumberType.ArraySizeArg;
   /** A copy of the search string. */
   readonly input?: string;
-  /**
-   * The first match. This will always be present because `null` will be
-   * returned if there are no matches.
-   */
+  /** The first match. This will always be present because `null` will be returned if there are no matches. */
   readonly 0: string;
 }
 
@@ -1356,54 +1148,35 @@ interface RegExpExecArray extends Array<string> {
   readonly index: NumberType.ArraySize;
   /** A copy of the search string. */
   readonly input: string;
-  /**
-   * The first match. This will always be present because `null` will be
-   * returned if there are no matches.
-   */
+  /** The first match. This will always be present because `null` will be returned if there are no matches. */
   readonly 0: string;
 }
 
 interface RegExp {
   /**
-   * Executes a search on a string using a regular expression pattern, and
-   * returns an array containing the results of that search.
+   * Executes a search on a string using a regular expression pattern, and returns an array containing the results of that search.
    *
-   * @param string The String object or string literal on which to perform the
-   *   search.
+   * @param string The String object or string literal on which to perform the search.
    */
   exec(string: string): RegExpExecArray | null;
 
   /**
-   * Returns a Boolean value that indicates whether or not a pattern exists in a
-   * searched string.
+   * Returns a Boolean value that indicates whether or not a pattern exists in a searched string.
    *
    * @param string String on which to perform the search.
    */
   test(string: string): boolean;
 
-  /**
-   * Returns a copy of the text of the regular expression pattern. Read-only.
-   * The regExp argument is a Regular expression object. It can be a variable
-   * name or a literal.
-   */
+  /** Returns a copy of the text of the regular expression pattern. Read-only. The regExp argument is a Regular expression object. It can be a variable name or a literal. */
   readonly source: string;
 
-  /**
-   * Returns a Boolean value indicating the state of the global flag (g) used
-   * with a regular expression. Default is false. Read-only.
-   */
+  /** Returns a Boolean value indicating the state of the global flag (g) used with a regular expression. Default is false. Read-only. */
   readonly global: boolean;
 
-  /**
-   * Returns a Boolean value indicating the state of the ignoreCase flag (i)
-   * used with a regular expression. Default is false. Read-only.
-   */
+  /** Returns a Boolean value indicating the state of the ignoreCase flag (i) used with a regular expression. Default is false. Read-only. */
   readonly ignoreCase: boolean;
 
-  /**
-   * Returns a Boolean value indicating the state of the multiline flag (m) used
-   * with a regular expression. Default is false. Read-only.
-   */
+  /** Returns a Boolean value indicating the state of the multiline flag (m) used with a regular expression. Default is false. Read-only. */
   readonly multiline: boolean;
 
   readonly lastIndex: NumberType.ArraySize;
@@ -1542,9 +1315,7 @@ interface JSON {
    * Converts a JavaScript Object Notation (JSON) string into an object.
    *
    * @param text A valid JSON string.
-   * @param reviver A function that transforms the results. This function is
-   *   called for each member of the object. If a member contains nested
-   *   objects, the nested objects are transformed before the parent object is.
+   * @param reviver A function that transforms the results. This function is called for each member of the object. If a member contains nested objects, the nested objects are transformed before the parent object is.
    */
   parse(
     text: string,
@@ -1553,11 +1324,9 @@ interface JSON {
   /**
    * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
    *
-   * @param value A JavaScript value, usually an object or array, to be
-   *   converted.
+   * @param value A JavaScript value, usually an object or array, to be converted.
    * @param replacer A function that transforms the results.
-   * @param space Adds indentation, white space, and line break characters to
-   *   the return-value JSON text to make it easier to read.
+   * @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
    */
   stringify(
     value: unknown,
@@ -1567,12 +1336,9 @@ interface JSON {
   /**
    * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
    *
-   * @param value A JavaScript value, usually an object or array, to be
-   *   converted.
-   * @param replacer An array of strings and numbers that acts as an approved
-   *   list for selecting the object properties that will be stringified.
-   * @param space Adds indentation, white space, and line break characters to
-   *   the return-value JSON text to make it easier to read.
+   * @param value A JavaScript value, usually an object or array, to be converted.
+   * @param replacer An array of strings and numbers that acts as an approved list for selecting the object properties that will be stringified.
+   * @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
    */
   stringify(
     value: unknown,
@@ -1581,10 +1347,7 @@ interface JSON {
   ): string;
 }
 
-/**
- * An intrinsic object that provides functions to convert JavaScript values to
- * and from the JavaScript Object Notation (JSON) format.
- */
+/** An intrinsic object that provides functions to convert JavaScript values to and from the JavaScript Object Notation (JSON) format. */
 declare const JSON: JSON;
 
 /////////////////////////////
@@ -1592,18 +1355,12 @@ declare const JSON: JSON;
 /////////////////////////////
 
 interface ReadonlyArray<T> {
-  /**
-   * Gets the length of the array. This is a number one higher than the highest
-   * element defined in an array.
-   */
+  /** Gets the length of the array. This is a number one higher than the highest element defined in an array. */
   // This is already defined in ts-type-utils.
   // readonly length: number;
   /** Returns a string representation of an array. */
   toString(): string;
-  /**
-   * Returns a string representation of an array. The elements are converted to
-   * string using their toLocaleString methods.
-   */
+  /** Returns a string representation of an array. The elements are converted to string using their toLocaleString methods. */
   toLocaleString(): string;
   /**
    * Combines two or more arrays.
@@ -1618,20 +1375,16 @@ interface ReadonlyArray<T> {
    */
   concat(...items: readonly (T | ConcatArray<T>)[]): readonly T[];
   /**
-   * Adds all the elements of an array separated by the specified separator
-   * string.
+   * Adds all the elements of an array separated by the specified separator string.
    *
-   * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are
-   *   separated with a comma.
+   * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
    */
   join(separator?: string): string;
   /**
    * Returns a section of an array.
    *
    * @param start The beginning of the specified portion of the array.
-   * @param end The end of the specified portion of the array. This is exclusive
-   *   of the element at the index 'end'.
+   * @param end The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
    */
   slice(
     start?: NumberType.ArraySizeArg,
@@ -1641,8 +1394,7 @@ interface ReadonlyArray<T> {
    * Returns the index of the first occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   indexOf(
     searchElement: T,
@@ -1652,8 +1404,7 @@ interface ReadonlyArray<T> {
    * Returns the index of the last occurrence of a specified value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at the last index in the array.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at the last index in the array.
    */
   lastIndexOf(
     searchElement: T,
@@ -1662,13 +1413,8 @@ interface ReadonlyArray<T> {
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every<S extends T>(
     predicate: (
@@ -1681,13 +1427,8 @@ interface ReadonlyArray<T> {
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every(
     predicate: (
@@ -1698,16 +1439,10 @@ interface ReadonlyArray<T> {
     thisArg?: unknown,
   ): boolean;
   /**
-   * Determines whether the specified callback function returns true for any
-   * element of an array.
+   * Determines whether the specified callback function returns true for any element of an array.
    *
-   * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   true, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The some method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   some(
     predicate: (
@@ -1720,11 +1455,8 @@ interface ReadonlyArray<T> {
   /**
    * Performs the specified action for each element in an array.
    *
-   * @param callbackfn A function that accepts up to three arguments. forEach
-   *   calls the callbackfn function one time for each element in the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   forEach(
     callbackfn: (
@@ -1735,15 +1467,10 @@ interface ReadonlyArray<T> {
     thisArg?: unknown,
   ): void;
   /**
-   * Calls a defined callback function on each element of an array, and returns
-   * an array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns an array that contains the results.
    *
-   * @param callbackfn A function that accepts up to three arguments. The map
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map<U>(
     callbackfn: (
@@ -1754,15 +1481,10 @@ interface ReadonlyArray<T> {
     thisArg?: unknown,
   ): readonly U[];
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter<S extends T>(
     predicate: (
@@ -1773,15 +1495,10 @@ interface ReadonlyArray<T> {
     thisArg?: unknown,
   ): readonly S[];
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
     predicate: (
@@ -1792,16 +1509,10 @@ interface ReadonlyArray<T> {
     thisArg?: unknown,
   ): readonly T[];
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -1821,16 +1532,10 @@ interface ReadonlyArray<T> {
     initialValue: T,
   ): T;
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -1842,17 +1547,10 @@ interface ReadonlyArray<T> {
     initialValue: U,
   ): U;
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -1872,17 +1570,10 @@ interface ReadonlyArray<T> {
     initialValue: T,
   ): T;
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -1909,88 +1600,57 @@ interface ConcatArray<T> {
 }
 
 interface Array<T> {
-  /**
-   * Gets or sets the length of the array. This is a number one higher than the
-   * highest index in the array.
-   */
+  /** Gets or sets the length of the array. This is a number one higher than the highest index in the array. */
   // This is already defined in ts-type-utils.
   // readonly length: number;
   /** Returns a string representation of an array. */
   toString(): string;
-  /**
-   * Returns a string representation of an array. The elements are converted to
-   * string using their toLocaleString methods.
-   */
+  /** Returns a string representation of an array. The elements are converted to string using their toLocaleString methods. */
   toLocaleString(): string;
-  /**
-   * Removes the last element from an array and returns it. If the array is
-   * empty, undefined is returned and the array is not modified.
-   */
+  /** Removes the last element from an array and returns it. If the array is empty, undefined is returned and the array is not modified. */
   pop(): T | undefined;
   /**
-   * Appends new elements to the end of an array, and returns the new length of
-   * the array.
+   * Appends new elements to the end of an array, and returns the new length of the array.
    *
    * @param items New elements to add to the array.
    */
   push(...items: readonly T[]): NumberType.ArraySize;
   /**
-   * Combines two or more arrays. This method returns a new array without
-   * modifying any existing arrays.
+   * Combines two or more arrays. This method returns a new array without modifying any existing arrays.
    *
    * @param items Additional arrays and/or items to add to the end of the array.
    */
   concat(...items: readonly ConcatArray<T>[]): readonly T[];
   /**
-   * Combines two or more arrays. This method returns a new array without
-   * modifying any existing arrays.
+   * Combines two or more arrays. This method returns a new array without modifying any existing arrays.
    *
    * @param items Additional arrays and/or items to add to the end of the array.
    */
   concat(...items: readonly (T | ConcatArray<T>)[]): readonly T[];
   /**
-   * Adds all the elements of an array into a string, separated by the specified
-   * separator string.
+   * Adds all the elements of an array into a string, separated by the specified separator string.
    *
-   * @param separator A string used to separate one element of the array from
-   *   the next in the resulting string. If omitted, the array elements are
-   *   separated with a comma.
+   * @param separator A string used to separate one element of the array from the next in the resulting string. If omitted, the array elements are separated with a comma.
    */
   join(separator?: string): string;
-  /**
-   * Reverses the elements in an array in place. This method mutates the array
-   * and returns a reference to the same array.
-   */
+  /** Reverses the elements in an array in place. This method mutates the array and returns a reference to the same array. */
   reverse(): readonly T[];
-  /**
-   * Removes the first element from an array and returns it. If the array is
-   * empty, undefined is returned and the array is not modified.
-   */
+  /** Removes the first element from an array and returns it. If the array is empty, undefined is returned and the array is not modified. */
   shift(): T | undefined;
   /**
-   * Returns a copy of a section of an array. For both start and end, a negative
-   * index can be used to indicate an offset from the end of the array. For
-   * example, -2 refers to the second to last element of the array.
+   * Returns a copy of a section of an array. For both start and end, a negative index can be used to indicate an offset from the end of the array. For example, -2 refers to the second to last element of the array.
    *
-   * @param start The beginning index of the specified portion of the array. If
-   *   start is undefined, then the slice begins at index 0.
-   * @param end The end index of the specified portion of the array. This is
-   *   exclusive of the element at the index 'end'. If end is undefined, then
-   *   the slice extends to the end of the array.
+   * @param start The beginning index of the specified portion of the array. If start is undefined, then the slice begins at index 0.
+   * @param end The end index of the specified portion of the array. This is exclusive of the element at the index 'end'. If end is undefined, then the slice extends to the end of the array.
    */
   slice(
     start?: NumberType.ArraySizeArg,
     end?: NumberType.ArraySizeArg,
   ): readonly T[];
   /**
-   * Sorts an array in place. This method mutates the array and returns a
-   * reference to the same array.
+   * Sorts an array in place. This method mutates the array and returns a reference to the same array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending, ASCII
-   *   character order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -1998,11 +1658,9 @@ interface Array<T> {
    */
   sort(compareFn?: (a: T, b: T) => number): this;
   /**
-   * Removes elements from an array and, if necessary, inserts new elements in
-   * their place, returning the deleted elements.
+   * Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements.
    *
-   * @param start The zero-based location in the array from which to start
-   *   removing elements.
+   * @param start The zero-based location in the array from which to start removing elements.
    * @param deleteCount The number of elements to remove.
    * @returns An array containing the elements that were deleted.
    */
@@ -2011,14 +1669,11 @@ interface Array<T> {
     deleteCount?: NumberType.ArraySizeArgNonNegative,
   ): readonly T[];
   /**
-   * Removes elements from an array and, if necessary, inserts new elements in
-   * their place, returning the deleted elements.
+   * Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements.
    *
-   * @param start The zero-based location in the array from which to start
-   *   removing elements.
+   * @param start The zero-based location in the array from which to start removing elements.
    * @param deleteCount The number of elements to remove.
-   * @param items Elements to insert into the array in place of the deleted
-   *   elements.
+   * @param items Elements to insert into the array in place of the deleted elements.
    * @returns An array containing the elements that were deleted.
    */
   splice(
@@ -2027,31 +1682,26 @@ interface Array<T> {
     ...items: readonly T[]
   ): readonly T[];
   /**
-   * Inserts new elements at the start of an array, and returns the new length
-   * of the array.
+   * Inserts new elements at the start of an array, and returns the new length of the array.
    *
    * @param items Elements to insert at the start of the array.
    */
   unshift(...items: readonly T[]): NumberType.ArraySize;
   /**
-   * Returns the index of the first occurrence of a value in an array, or -1 if
-   * it is not present.
+   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   indexOf(
     searchElement: T,
     fromIndex?: NumberType.ArraySizeArg,
   ): NumberType.ArraySearchResult;
   /**
-   * Returns the index of the last occurrence of a specified value in an array,
-   * or -1 if it is not present.
+   * Returns the index of the last occurrence of a specified value in an array, or -1 if it is not present.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin searching backward. If
-   *   fromIndex is omitted, the search starts at the last index in the array.
+   * @param fromIndex The array index at which to begin searching backward. If fromIndex is omitted, the search starts at the last index in the array.
    */
   lastIndexOf(
     searchElement: T,
@@ -2060,13 +1710,8 @@ interface Array<T> {
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every<S extends T>(
     predicate: (
@@ -2079,13 +1724,8 @@ interface Array<T> {
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every(
     predicate: (
@@ -2096,16 +1736,10 @@ interface Array<T> {
     thisArg?: unknown,
   ): boolean;
   /**
-   * Determines whether the specified callback function returns true for any
-   * element of an array.
+   * Determines whether the specified callback function returns true for any element of an array.
    *
-   * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   true, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The some method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   some(
     predicate: (
@@ -2118,11 +1752,8 @@ interface Array<T> {
   /**
    * Performs the specified action for each element in an array.
    *
-   * @param callbackfn A function that accepts up to three arguments. forEach
-   *   calls the callbackfn function one time for each element in the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   forEach(
     callbackfn: (
@@ -2133,15 +1764,10 @@ interface Array<T> {
     thisArg?: unknown,
   ): void;
   /**
-   * Calls a defined callback function on each element of an array, and returns
-   * an array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns an array that contains the results.
    *
-   * @param callbackfn A function that accepts up to three arguments. The map
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map<U>(
     callbackfn: (
@@ -2152,15 +1778,10 @@ interface Array<T> {
     thisArg?: unknown,
   ): readonly U[];
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter<S extends T>(
     predicate: (
@@ -2171,15 +1792,10 @@ interface Array<T> {
     thisArg?: unknown,
   ): readonly S[];
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
     predicate: (
@@ -2190,16 +1806,10 @@ interface Array<T> {
     thisArg?: unknown,
   ): readonly T[];
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -2219,16 +1829,10 @@ interface Array<T> {
     initialValue: T,
   ): T;
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -2240,17 +1844,10 @@ interface Array<T> {
     initialValue: U,
   ): U;
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -2270,17 +1867,10 @@ interface Array<T> {
     initialValue: T,
   ): T;
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -2297,17 +1887,17 @@ interface Array<T> {
 }
 
 interface ArrayConstructor {
-  /** @deprecated Use `Array.from({ length })` instead */
+  /** @deprecated use `Array.from({ length })` instead */
   new (arrayLength?: NumberType.NewArrayMaxSize): readonly unknown[];
-  /** @deprecated Use `Array.from({ length })` instead */
+  /** @deprecated use `Array.from({ length })` instead */
   new <T>(arrayLength: NumberType.NewArrayMaxSize): readonly T[];
-  /** @deprecated Use `[...items]` instead */
+  /** @deprecated use `[...items]` instead */
   new <T>(...items: readonly T[]): readonly T[];
-  /** @deprecated Use `Array.from({ length })` instead */
+  /** @deprecated use `Array.from({ length })` instead */
   (arrayLength?: NumberType.NewArrayMaxSize): readonly unknown[];
-  /** @deprecated Use `Array.from({ length })` instead */
+  /** @deprecated use `Array.from({ length })` instead */
   <T>(arrayLength: NumberType.NewArrayMaxSize): readonly T[];
-  /** @deprecated Use `[...items]` instead */
+  /** @deprecated use `[...items]` instead */
   <T>(...items: readonly T[]): readonly T[];
   isArray(arg: unknown): arg is readonly unknown[];
   readonly prototype: readonly unknown[];
@@ -2385,10 +1975,7 @@ interface Promise<T> {
   ): Promise<T | TResult>;
 }
 
-/**
- * Recursively unwraps the "awaited type" of a type. Non-promise "thenables"
- * should resolve to `never`. This emulates the behavior of `await`.
- */
+/** Recursively unwraps the "awaited type" of a type. Non-promise "thenables" should resolve to `never`. This emulates the behavior of `await`. */
 type Awaited<T> = T extends null | undefined
   ? T // special case for `null | undefined` when not in `--strictNullChecks` mode
   : T extends object & { then(onfulfilled: infer F, ...args: infer _): unknown } // `await` only unwraps object types with a callable `then`. Non-object types are not unwrapped
@@ -2484,22 +2071,14 @@ type NoInfer<T> = intrinsic;
 /** Marker for contextual 'this' type */
 interface ThisType<T> {}
 
-/**
- * Stores types to be used with WeakSet, WeakMap, WeakRef, and
- * FinalizationRegistry
- */
+/** Stores types to be used with WeakSet, WeakMap, WeakRef, and FinalizationRegistry */
 interface WeakKeyTypes {
   readonly object: object;
 }
 
 type WeakKey = WeakKeyTypes[keyof WeakKeyTypes];
 
-/**
- * Represents a raw buffer of binary data, which is used to store data for the
- * different typed arrays. ArrayBuffers cannot be read from or written to
- * directly, but can be passed to a typed array or DataView Object to interpret
- * the raw buffer as needed.
- */
+/** Represents a raw buffer of binary data, which is used to store data for the different typed arrays. ArrayBuffers cannot be read from or written to directly, but can be passed to a typed array or DataView Object to interpret the raw buffer as needed. */
 interface ArrayBuffer {
   /** Read-only. The length of the ArrayBuffer (in bytes). */
   readonly byteLength: NumberType.TypedArraySize;
@@ -2511,10 +2090,7 @@ interface ArrayBuffer {
   ): ArrayBuffer;
 }
 
-/**
- * Allowed ArrayBuffer types for the buffer of an ArrayBufferView and related
- * Typed Arrays.
- */
+/** Allowed ArrayBuffer types for the buffer of an ArrayBufferView and related Typed Arrays. */
 interface ArrayBufferTypes {
   readonly ArrayBuffer: ArrayBuffer;
 }
@@ -2545,14 +2121,10 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly byteLength: NumberType.TypedArraySize;
   readonly byteOffset: NumberType.TypedArraySize;
   /**
-   * Gets the Float32 value at the specified byte offset from the start of the
-   * view. There is no alignment constraint; multi-byte values may be fetched
-   * from any offset.
+   * Gets the Float32 value at the specified byte offset from the start of the view. There is no alignment constraint; multi-byte values may be fetched from any offset.
    *
-   * @param byteOffset The place in the buffer at which the value should be
-   *   retrieved.
-   * @param littleEndian If false or undefined, a big-endian value should be
-   *   read.
+   * @param byteOffset The place in the buffer at which the value should be retrieved.
+   * @param littleEndian If false or undefined, a big-endian value should be read.
    */
   getFloat32(
     byteOffset: NumberType.TypedArraySizeArg,
@@ -2560,14 +2132,10 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float32;
 
   /**
-   * Gets the Float64 value at the specified byte offset from the start of the
-   * view. There is no alignment constraint; multi-byte values may be fetched
-   * from any offset.
+   * Gets the Float64 value at the specified byte offset from the start of the view. There is no alignment constraint; multi-byte values may be fetched from any offset.
    *
-   * @param byteOffset The place in the buffer at which the value should be
-   *   retrieved.
-   * @param littleEndian If false or undefined, a big-endian value should be
-   *   read.
+   * @param byteOffset The place in the buffer at which the value should be retrieved.
+   * @param littleEndian If false or undefined, a big-endian value should be read.
    */
   getFloat64(
     byteOffset: NumberType.TypedArraySizeArg,
@@ -2575,38 +2143,27 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float64;
 
   /**
-   * Gets the Int8 value at the specified byte offset from the start of the
-   * view. There is no alignment constraint; multi-byte values may be fetched
-   * from any offset.
+   * Gets the Int8 value at the specified byte offset from the start of the view. There is no alignment constraint; multi-byte values may be fetched from any offset.
    *
-   * @param byteOffset The place in the buffer at which the value should be
-   *   retrieved.
+   * @param byteOffset The place in the buffer at which the value should be retrieved.
    */
   getInt8(byteOffset: NumberType.TypedArraySizeArg): Int8;
 
   /**
-   * Gets the Int16 value at the specified byte offset from the start of the
-   * view. There is no alignment constraint; multi-byte values may be fetched
-   * from any offset.
+   * Gets the Int16 value at the specified byte offset from the start of the view. There is no alignment constraint; multi-byte values may be fetched from any offset.
    *
-   * @param byteOffset The place in the buffer at which the value should be
-   *   retrieved.
-   * @param littleEndian If false or undefined, a big-endian value should be
-   *   read.
+   * @param byteOffset The place in the buffer at which the value should be retrieved.
+   * @param littleEndian If false or undefined, a big-endian value should be read.
    */
   getInt16(
     byteOffset: NumberType.TypedArraySizeArg,
     littleEndian?: boolean,
   ): Int16;
   /**
-   * Gets the Int32 value at the specified byte offset from the start of the
-   * view. There is no alignment constraint; multi-byte values may be fetched
-   * from any offset.
+   * Gets the Int32 value at the specified byte offset from the start of the view. There is no alignment constraint; multi-byte values may be fetched from any offset.
    *
-   * @param byteOffset The place in the buffer at which the value should be
-   *   retrieved.
-   * @param littleEndian If false or undefined, a big-endian value should be
-   *   read.
+   * @param byteOffset The place in the buffer at which the value should be retrieved.
+   * @param littleEndian If false or undefined, a big-endian value should be read.
    */
   getInt32(
     byteOffset: NumberType.TypedArraySizeArg,
@@ -2614,24 +2171,17 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int32;
 
   /**
-   * Gets the Uint8 value at the specified byte offset from the start of the
-   * view. There is no alignment constraint; multi-byte values may be fetched
-   * from any offset.
+   * Gets the Uint8 value at the specified byte offset from the start of the view. There is no alignment constraint; multi-byte values may be fetched from any offset.
    *
-   * @param byteOffset The place in the buffer at which the value should be
-   *   retrieved.
+   * @param byteOffset The place in the buffer at which the value should be retrieved.
    */
   getUint8(byteOffset: NumberType.TypedArraySizeArg): Uint8;
 
   /**
-   * Gets the Uint16 value at the specified byte offset from the start of the
-   * view. There is no alignment constraint; multi-byte values may be fetched
-   * from any offset.
+   * Gets the Uint16 value at the specified byte offset from the start of the view. There is no alignment constraint; multi-byte values may be fetched from any offset.
    *
-   * @param byteOffset The place in the buffer at which the value should be
-   *   retrieved.
-   * @param littleEndian If false or undefined, a big-endian value should be
-   *   read.
+   * @param byteOffset The place in the buffer at which the value should be retrieved.
+   * @param littleEndian If false or undefined, a big-endian value should be read.
    */
   getUint16(
     byteOffset: NumberType.TypedArraySizeArg,
@@ -2639,14 +2189,10 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint16;
 
   /**
-   * Gets the Uint32 value at the specified byte offset from the start of the
-   * view. There is no alignment constraint; multi-byte values may be fetched
-   * from any offset.
+   * Gets the Uint32 value at the specified byte offset from the start of the view. There is no alignment constraint; multi-byte values may be fetched from any offset.
    *
-   * @param byteOffset The place in the buffer at which the value should be
-   *   retrieved.
-   * @param littleEndian If false or undefined, a big-endian value should be
-   *   read.
+   * @param byteOffset The place in the buffer at which the value should be retrieved.
+   * @param littleEndian If false or undefined, a big-endian value should be read.
    */
   getUint32(
     byteOffset: NumberType.TypedArraySizeArg,
@@ -2654,13 +2200,11 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint32;
 
   /**
-   * Stores an Float32 value at the specified byte offset from the start of the
-   * view.
+   * Stores an Float32 value at the specified byte offset from the start of the view.
    *
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
-   * @param littleEndian If false or undefined, a big-endian value should be
-   *   written.
+   * @param littleEndian If false or undefined, a big-endian value should be written.
    */
   setFloat32(
     byteOffset: NumberType.TypedArraySizeArg,
@@ -2669,13 +2213,11 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): void;
 
   /**
-   * Stores an Float64 value at the specified byte offset from the start of the
-   * view.
+   * Stores an Float64 value at the specified byte offset from the start of the view.
    *
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
-   * @param littleEndian If false or undefined, a big-endian value should be
-   *   written.
+   * @param littleEndian If false or undefined, a big-endian value should be written.
    */
   setFloat64(
     byteOffset: NumberType.TypedArraySizeArg,
@@ -2684,8 +2226,7 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): void;
 
   /**
-   * Stores an Int8 value at the specified byte offset from the start of the
-   * view.
+   * Stores an Int8 value at the specified byte offset from the start of the view.
    *
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
@@ -2693,13 +2234,11 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   setInt8(byteOffset: NumberType.TypedArraySizeArg, value: Int8): void;
 
   /**
-   * Stores an Int16 value at the specified byte offset from the start of the
-   * view.
+   * Stores an Int16 value at the specified byte offset from the start of the view.
    *
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
-   * @param littleEndian If false or undefined, a big-endian value should be
-   *   written.
+   * @param littleEndian If false or undefined, a big-endian value should be written.
    */
   setInt16(
     byteOffset: NumberType.TypedArraySizeArg,
@@ -2708,13 +2247,11 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): void;
 
   /**
-   * Stores an Int32 value at the specified byte offset from the start of the
-   * view.
+   * Stores an Int32 value at the specified byte offset from the start of the view.
    *
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
-   * @param littleEndian If false or undefined, a big-endian value should be
-   *   written.
+   * @param littleEndian If false or undefined, a big-endian value should be written.
    */
   setInt32(
     byteOffset: NumberType.TypedArraySizeArg,
@@ -2723,8 +2260,7 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): void;
 
   /**
-   * Stores an Uint8 value at the specified byte offset from the start of the
-   * view.
+   * Stores an Uint8 value at the specified byte offset from the start of the view.
    *
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
@@ -2732,13 +2268,11 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   setUint8(byteOffset: NumberType.TypedArraySizeArg, value: Uint8): void;
 
   /**
-   * Stores an Uint16 value at the specified byte offset from the start of the
-   * view.
+   * Stores an Uint16 value at the specified byte offset from the start of the view.
    *
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
-   * @param littleEndian If false or undefined, a big-endian value should be
-   *   written.
+   * @param littleEndian If false or undefined, a big-endian value should be written.
    */
   setUint16(
     byteOffset: NumberType.TypedArraySizeArg,
@@ -2747,13 +2281,11 @@ interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): void;
 
   /**
-   * Stores an Uint32 value at the specified byte offset from the start of the
-   * view.
+   * Stores an Uint32 value at the specified byte offset from the start of the view.
    *
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
-   * @param littleEndian If false or undefined, a big-endian value should be
-   *   written.
+   * @param littleEndian If false or undefined, a big-endian value should be written.
    */
   setUint32(
     byteOffset: NumberType.TypedArraySizeArg,
@@ -2775,10 +2307,7 @@ interface DataViewConstructor {
 }
 declare const DataView: DataViewConstructor;
 
-/**
- * A typed array of 8-bit integer values. The contents are initialized to 0. If
- * the requested number of bytes could not be allocated an exception is raised.
- */
+/** A typed array of 8-bit integer values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
 interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: 1;
@@ -2793,15 +2322,11 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly byteOffset: NumberType.TypedArraySize;
 
   /**
-   * Returns the this object after copying a section of the array identified by
-   * start and end to the same array starting at position target
+   * Returns the this object after copying a section of the array identified by start and end to the same array starting at position target
    *
-   * @param target If target is negative, it is treated as length+target where
-   *   length is the length of the array.
-   * @param start If start is negative, it is treated as length+start. If end is
-   *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its
-   *   default value.
+   * @param target If target is negative, it is treated as length+target where length is the length of the array.
+   * @param start If start is negative, it is treated as length+start. If end is negative, it is treated as length+end.
+   * @param end If not specified, length of the this object is used as its default value.
    */
   copyWithin(
     target: NumberType.TypedArraySizeArg,
@@ -2812,13 +2337,8 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every(
     predicate: (
@@ -2830,14 +2350,11 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): boolean;
 
   /**
-   * Changes all array elements from `start` to `end` index to a static `value`
-   * and returns the modified array
+   * Changes all array elements from `start` to `end` index to a static `value` and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it
-   *   is treated as length+start where length is the length of the array.
-   * @param end Index to stop filling the array at. If end is negative, it is
-   *   treated as length+end.
+   * @param start Index to start filling the array at. If start is negative, it is treated as length+start where length is the length of the array.
+   * @param end Index to stop filling the array at. If end is negative, it is treated as length+end.
    */
   fill(
     value: Int8,
@@ -2846,15 +2363,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): this;
 
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
     predicate: (
@@ -2866,16 +2378,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int8Array<ArrayBuffer>;
 
   /**
-   * Returns the value of the first element in the array where predicate is
-   * true, and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, find immediately returns that element value.
-   *   Otherwise, find returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, find immediately returns that element value. Otherwise, find returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   find(
     predicate: (
@@ -2887,16 +2393,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int8 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is
-   * true, and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, findIndex immediately returns that element
-   *   index. Otherwise, findIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, findIndex immediately returns that element index. Otherwise, findIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findIndex(
     predicate: (
@@ -2910,11 +2410,8 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Performs the specified action for each element in an array.
    *
-   * @param callbackfn A function that accepts up to three arguments. forEach
-   *   calls the callbackfn function one time for each element in the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   forEach(
     callbackfn: (
@@ -2929,8 +2426,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the first occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   indexOf(
     searchElement: Int8,
@@ -2938,12 +2434,9 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): NumberType.TypedArraySearchResult;
 
   /**
-   * Adds all the elements of an array separated by the specified separator
-   * string.
+   * Adds all the elements of an array separated by the specified separator string.
    *
-   * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are
-   *   separated with a comma.
+   * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
    */
   join(separator?: string): string;
 
@@ -2951,8 +2444,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the last occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   lastIndexOf(
     searchElement: Int8,
@@ -2963,15 +2455,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly length: number;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns
-   * an array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns an array that contains the results.
    *
-   * @param callbackfn A function that accepts up to three arguments. The map
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map(
     callbackfn: (
@@ -2983,16 +2470,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int8Array<ArrayBuffer>;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -3013,16 +2494,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int8;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -3035,17 +2510,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): U;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -3066,17 +2534,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int8;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -3095,8 +2556,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Sets a value or an array of values.
    *
    * @param array A typed or untyped array of values to set.
-   * @param offset The index in the current array at which the values are to be
-   *   written.
+   * @param offset The index in the current array at which the values are to be written.
    */
   set(
     array: ArrayLike<Int8>,
@@ -3107,8 +2567,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns a section of an array.
    *
    * @param start The beginning of the specified portion of the array.
-   * @param end The end of the specified portion of the array. This is exclusive
-   *   of the element at the index 'end'.
+   * @param end The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
    */
   slice(
     start?: NumberType.TypedArraySizeArg,
@@ -3116,16 +2575,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int8Array<ArrayBuffer>;
 
   /**
-   * Determines whether the specified callback function returns true for any
-   * element of an array.
+   * Determines whether the specified callback function returns true for any element of an array.
    *
-   * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   true, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The some method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   some(
     predicate: (
@@ -3139,10 +2592,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -3151,8 +2601,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   sort(compareFn?: (a: Int8, b: Int8) => number): this;
 
   /**
-   * Gets a new Int8Array view of the ArrayBuffer store for this array,
-   * referencing the elements at begin, inclusive, up to end, exclusive.
+   * Gets a new Int8Array view of the ArrayBuffer store for this array, referencing the elements at begin, inclusive, up to end, exclusive.
    *
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
@@ -3216,11 +2665,7 @@ interface Int8ArrayConstructor {
 }
 declare const Int8Array: Int8ArrayConstructor;
 
-/**
- * A typed array of 8-bit unsigned integer values. The contents are initialized
- * to 0. If the requested number of bytes could not be allocated an exception is
- * raised.
- */
+/** A typed array of 8-bit unsigned integer values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
 interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: 1;
@@ -3235,15 +2680,11 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly byteOffset: NumberType.TypedArraySize;
 
   /**
-   * Returns the this object after copying a section of the array identified by
-   * start and end to the same array starting at position target
+   * Returns the this object after copying a section of the array identified by start and end to the same array starting at position target
    *
-   * @param target If target is negative, it is treated as length+target where
-   *   length is the length of the array.
-   * @param start If start is negative, it is treated as length+start. If end is
-   *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its
-   *   default value.
+   * @param target If target is negative, it is treated as length+target where length is the length of the array.
+   * @param start If start is negative, it is treated as length+start. If end is negative, it is treated as length+end.
+   * @param end If not specified, length of the this object is used as its default value.
    */
   copyWithin(
     target: NumberType.TypedArraySizeArg,
@@ -3254,13 +2695,8 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every(
     predicate: (
@@ -3272,14 +2708,11 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): boolean;
 
   /**
-   * Changes all array elements from `start` to `end` index to a static `value`
-   * and returns the modified array
+   * Changes all array elements from `start` to `end` index to a static `value` and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it
-   *   is treated as length+start where length is the length of the array.
-   * @param end Index to stop filling the array at. If end is negative, it is
-   *   treated as length+end.
+   * @param start Index to start filling the array at. If start is negative, it is treated as length+start where length is the length of the array.
+   * @param end Index to stop filling the array at. If end is negative, it is treated as length+end.
    */
   fill(
     value: Uint8,
@@ -3288,15 +2721,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): this;
 
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
     predicate: (
@@ -3308,16 +2736,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint8Array<ArrayBuffer>;
 
   /**
-   * Returns the value of the first element in the array where predicate is
-   * true, and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, find immediately returns that element value.
-   *   Otherwise, find returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, find immediately returns that element value. Otherwise, find returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   find(
     predicate: (
@@ -3329,16 +2751,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint8 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is
-   * true, and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, findIndex immediately returns that element
-   *   index. Otherwise, findIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, findIndex immediately returns that element index. Otherwise, findIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findIndex(
     predicate: (
@@ -3352,11 +2768,8 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Performs the specified action for each element in an array.
    *
-   * @param callbackfn A function that accepts up to three arguments. forEach
-   *   calls the callbackfn function one time for each element in the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   forEach(
     callbackfn: (
@@ -3371,8 +2784,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the first occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   indexOf(
     searchElement: Uint8,
@@ -3380,12 +2792,9 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): NumberType.TypedArraySearchResult;
 
   /**
-   * Adds all the elements of an array separated by the specified separator
-   * string.
+   * Adds all the elements of an array separated by the specified separator string.
    *
-   * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are
-   *   separated with a comma.
+   * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
    */
   join(separator?: string): string;
 
@@ -3393,8 +2802,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the last occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   lastIndexOf(
     searchElement: Uint8,
@@ -3405,15 +2813,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly length: number;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns
-   * an array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns an array that contains the results.
    *
-   * @param callbackfn A function that accepts up to three arguments. The map
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map(
     callbackfn: (
@@ -3425,16 +2828,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint8Array<ArrayBuffer>;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -3455,16 +2852,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint8;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -3477,17 +2868,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): U;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -3508,17 +2892,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint8;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -3537,8 +2914,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Sets a value or an array of values.
    *
    * @param array A typed or untyped array of values to set.
-   * @param offset The index in the current array at which the values are to be
-   *   written.
+   * @param offset The index in the current array at which the values are to be written.
    */
   set(
     array: ArrayLike<Uint8>,
@@ -3549,8 +2925,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns a section of an array.
    *
    * @param start The beginning of the specified portion of the array.
-   * @param end The end of the specified portion of the array. This is exclusive
-   *   of the element at the index 'end'.
+   * @param end The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
    */
   slice(
     start?: NumberType.TypedArraySizeArg,
@@ -3558,16 +2933,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint8Array<ArrayBuffer>;
 
   /**
-   * Determines whether the specified callback function returns true for any
-   * element of an array.
+   * Determines whether the specified callback function returns true for any element of an array.
    *
-   * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   true, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The some method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   some(
     predicate: (
@@ -3581,10 +2950,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -3593,8 +2959,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   sort(compareFn?: (a: Uint8, b: Uint8) => number): this;
 
   /**
-   * Gets a new Uint8Array view of the ArrayBuffer store for this array,
-   * referencing the elements at begin, inclusive, up to end, exclusive.
+   * Gets a new Uint8Array view of the ArrayBuffer store for this array, referencing the elements at begin, inclusive, up to end, exclusive.
    *
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
@@ -3658,11 +3023,7 @@ interface Uint8ArrayConstructor {
 }
 declare const Uint8Array: Uint8ArrayConstructor;
 
-/**
- * A typed array of 8-bit unsigned integer (clamped) values. The contents are
- * initialized to 0. If the requested number of bytes could not be allocated an
- * exception is raised.
- */
+/** A typed array of 8-bit unsigned integer (clamped) values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
 interface Uint8ClampedArray<
   TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
 > {
@@ -3679,15 +3040,11 @@ interface Uint8ClampedArray<
   readonly byteOffset: NumberType.TypedArraySize;
 
   /**
-   * Returns the this object after copying a section of the array identified by
-   * start and end to the same array starting at position target
+   * Returns the this object after copying a section of the array identified by start and end to the same array starting at position target
    *
-   * @param target If target is negative, it is treated as length+target where
-   *   length is the length of the array.
-   * @param start If start is negative, it is treated as length+start. If end is
-   *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its
-   *   default value.
+   * @param target If target is negative, it is treated as length+target where length is the length of the array.
+   * @param start If start is negative, it is treated as length+start. If end is negative, it is treated as length+end.
+   * @param end If not specified, length of the this object is used as its default value.
    */
   copyWithin(
     target: NumberType.TypedArraySizeArg,
@@ -3698,13 +3055,8 @@ interface Uint8ClampedArray<
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every(
     predicate: (
@@ -3716,14 +3068,11 @@ interface Uint8ClampedArray<
   ): boolean;
 
   /**
-   * Changes all array elements from `start` to `end` index to a static `value`
-   * and returns the modified array
+   * Changes all array elements from `start` to `end` index to a static `value` and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it
-   *   is treated as length+start where length is the length of the array.
-   * @param end Index to stop filling the array at. If end is negative, it is
-   *   treated as length+end.
+   * @param start Index to start filling the array at. If start is negative, it is treated as length+start where length is the length of the array.
+   * @param end Index to stop filling the array at. If end is negative, it is treated as length+end.
    */
   fill(
     value: Uint8,
@@ -3732,15 +3081,10 @@ interface Uint8ClampedArray<
   ): this;
 
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
     predicate: (
@@ -3752,16 +3096,10 @@ interface Uint8ClampedArray<
   ): Uint8ClampedArray<ArrayBuffer>;
 
   /**
-   * Returns the value of the first element in the array where predicate is
-   * true, and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, find immediately returns that element value.
-   *   Otherwise, find returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, find immediately returns that element value. Otherwise, find returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   find(
     predicate: (
@@ -3773,16 +3111,10 @@ interface Uint8ClampedArray<
   ): Uint8 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is
-   * true, and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, findIndex immediately returns that element
-   *   index. Otherwise, findIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, findIndex immediately returns that element index. Otherwise, findIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findIndex(
     predicate: (
@@ -3796,11 +3128,8 @@ interface Uint8ClampedArray<
   /**
    * Performs the specified action for each element in an array.
    *
-   * @param callbackfn A function that accepts up to three arguments. forEach
-   *   calls the callbackfn function one time for each element in the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   forEach(
     callbackfn: (
@@ -3815,8 +3144,7 @@ interface Uint8ClampedArray<
    * Returns the index of the first occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   indexOf(
     searchElement: Uint8,
@@ -3824,12 +3152,9 @@ interface Uint8ClampedArray<
   ): NumberType.TypedArraySearchResult;
 
   /**
-   * Adds all the elements of an array separated by the specified separator
-   * string.
+   * Adds all the elements of an array separated by the specified separator string.
    *
-   * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are
-   *   separated with a comma.
+   * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
    */
   join(separator?: string): string;
 
@@ -3837,8 +3162,7 @@ interface Uint8ClampedArray<
    * Returns the index of the last occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   lastIndexOf(
     searchElement: Uint8,
@@ -3849,15 +3173,10 @@ interface Uint8ClampedArray<
   readonly length: number;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns
-   * an array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns an array that contains the results.
    *
-   * @param callbackfn A function that accepts up to three arguments. The map
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map(
     callbackfn: (
@@ -3869,16 +3188,10 @@ interface Uint8ClampedArray<
   ): Uint8ClampedArray<ArrayBuffer>;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -3899,16 +3212,10 @@ interface Uint8ClampedArray<
   ): Uint8;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -3921,17 +3228,10 @@ interface Uint8ClampedArray<
   ): U;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -3952,17 +3252,10 @@ interface Uint8ClampedArray<
   ): Uint8;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -3981,8 +3274,7 @@ interface Uint8ClampedArray<
    * Sets a value or an array of values.
    *
    * @param array A typed or untyped array of values to set.
-   * @param offset The index in the current array at which the values are to be
-   *   written.
+   * @param offset The index in the current array at which the values are to be written.
    */
   set(
     array: ArrayLike<Uint8>,
@@ -3993,8 +3285,7 @@ interface Uint8ClampedArray<
    * Returns a section of an array.
    *
    * @param start The beginning of the specified portion of the array.
-   * @param end The end of the specified portion of the array. This is exclusive
-   *   of the element at the index 'end'.
+   * @param end The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
    */
   slice(
     start?: NumberType.TypedArraySizeArg,
@@ -4002,16 +3293,10 @@ interface Uint8ClampedArray<
   ): Uint8ClampedArray<ArrayBuffer>;
 
   /**
-   * Determines whether the specified callback function returns true for any
-   * element of an array.
+   * Determines whether the specified callback function returns true for any element of an array.
    *
-   * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   true, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The some method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   some(
     predicate: (
@@ -4025,10 +3310,7 @@ interface Uint8ClampedArray<
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -4037,8 +3319,7 @@ interface Uint8ClampedArray<
   sort(compareFn?: (a: Uint8, b: Uint8) => number): this;
 
   /**
-   * Gets a new Uint8ClampedArray view of the ArrayBuffer store for this array,
-   * referencing the elements at begin, inclusive, up to end, exclusive.
+   * Gets a new Uint8ClampedArray view of the ArrayBuffer store for this array, referencing the elements at begin, inclusive, up to end, exclusive.
    *
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
@@ -4102,11 +3383,7 @@ interface Uint8ClampedArrayConstructor {
 }
 declare const Uint8ClampedArray: Uint8ClampedArrayConstructor;
 
-/**
- * A typed array of 16-bit signed integer values. The contents are initialized
- * to 0. If the requested number of bytes could not be allocated an exception is
- * raised.
- */
+/** A typed array of 16-bit signed integer values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
 interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: 2;
@@ -4121,15 +3398,11 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly byteOffset: NumberType.TypedArraySize;
 
   /**
-   * Returns the this object after copying a section of the array identified by
-   * start and end to the same array starting at position target
+   * Returns the this object after copying a section of the array identified by start and end to the same array starting at position target
    *
-   * @param target If target is negative, it is treated as length+target where
-   *   length is the length of the array.
-   * @param start If start is negative, it is treated as length+start. If end is
-   *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its
-   *   default value.
+   * @param target If target is negative, it is treated as length+target where length is the length of the array.
+   * @param start If start is negative, it is treated as length+start. If end is negative, it is treated as length+end.
+   * @param end If not specified, length of the this object is used as its default value.
    */
   copyWithin(
     target: NumberType.TypedArraySizeArg,
@@ -4140,13 +3413,8 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every(
     predicate: (
@@ -4158,14 +3426,11 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): boolean;
 
   /**
-   * Changes all array elements from `start` to `end` index to a static `value`
-   * and returns the modified array
+   * Changes all array elements from `start` to `end` index to a static `value` and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it
-   *   is treated as length+start where length is the length of the array.
-   * @param end Index to stop filling the array at. If end is negative, it is
-   *   treated as length+end.
+   * @param start Index to start filling the array at. If start is negative, it is treated as length+start where length is the length of the array.
+   * @param end Index to stop filling the array at. If end is negative, it is treated as length+end.
    */
   fill(
     value: Int16,
@@ -4174,15 +3439,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): this;
 
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
     predicate: (
@@ -4194,16 +3454,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int16Array<ArrayBuffer>;
 
   /**
-   * Returns the value of the first element in the array where predicate is
-   * true, and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, find immediately returns that element value.
-   *   Otherwise, find returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, find immediately returns that element value. Otherwise, find returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   find(
     predicate: (
@@ -4215,16 +3469,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int16 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is
-   * true, and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, findIndex immediately returns that element
-   *   index. Otherwise, findIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, findIndex immediately returns that element index. Otherwise, findIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findIndex(
     predicate: (
@@ -4238,11 +3486,8 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Performs the specified action for each element in an array.
    *
-   * @param callbackfn A function that accepts up to three arguments. forEach
-   *   calls the callbackfn function one time for each element in the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   forEach(
     callbackfn: (
@@ -4257,8 +3502,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the first occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   indexOf(
     searchElement: Int16,
@@ -4266,12 +3510,9 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): NumberType.TypedArraySearchResult;
 
   /**
-   * Adds all the elements of an array separated by the specified separator
-   * string.
+   * Adds all the elements of an array separated by the specified separator string.
    *
-   * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are
-   *   separated with a comma.
+   * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
    */
   join(separator?: string): string;
 
@@ -4279,8 +3520,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the last occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   lastIndexOf(
     searchElement: Int16,
@@ -4291,15 +3531,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly length: number;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns
-   * an array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns an array that contains the results.
    *
-   * @param callbackfn A function that accepts up to three arguments. The map
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map(
     callbackfn: (
@@ -4311,16 +3546,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int16Array<ArrayBuffer>;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -4341,16 +3570,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int16;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -4363,17 +3586,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): U;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -4394,17 +3610,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int16;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -4423,8 +3632,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Sets a value or an array of values.
    *
    * @param array A typed or untyped array of values to set.
-   * @param offset The index in the current array at which the values are to be
-   *   written.
+   * @param offset The index in the current array at which the values are to be written.
    */
   set(
     array: ArrayLike<Int16>,
@@ -4435,8 +3643,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns a section of an array.
    *
    * @param start The beginning of the specified portion of the array.
-   * @param end The end of the specified portion of the array. This is exclusive
-   *   of the element at the index 'end'.
+   * @param end The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
    */
   slice(
     start?: NumberType.TypedArraySizeArg,
@@ -4444,16 +3651,10 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int16Array<ArrayBuffer>;
 
   /**
-   * Determines whether the specified callback function returns true for any
-   * element of an array.
+   * Determines whether the specified callback function returns true for any element of an array.
    *
-   * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   true, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The some method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   some(
     predicate: (
@@ -4467,10 +3668,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -4479,8 +3677,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   sort(compareFn?: (a: Int16, b: Int16) => number): this;
 
   /**
-   * Gets a new Int16Array view of the ArrayBuffer store for this array,
-   * referencing the elements at begin, inclusive, up to end, exclusive.
+   * Gets a new Int16Array view of the ArrayBuffer store for this array, referencing the elements at begin, inclusive, up to end, exclusive.
    *
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
@@ -4544,11 +3741,7 @@ interface Int16ArrayConstructor {
 }
 declare const Int16Array: Int16ArrayConstructor;
 
-/**
- * A typed array of 16-bit unsigned integer values. The contents are initialized
- * to 0. If the requested number of bytes could not be allocated an exception is
- * raised.
- */
+/** A typed array of 16-bit unsigned integer values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
 interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: 2;
@@ -4563,15 +3756,11 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly byteOffset: NumberType.TypedArraySize;
 
   /**
-   * Returns the this object after copying a section of the array identified by
-   * start and end to the same array starting at position target
+   * Returns the this object after copying a section of the array identified by start and end to the same array starting at position target
    *
-   * @param target If target is negative, it is treated as length+target where
-   *   length is the length of the array.
-   * @param start If start is negative, it is treated as length+start. If end is
-   *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its
-   *   default value.
+   * @param target If target is negative, it is treated as length+target where length is the length of the array.
+   * @param start If start is negative, it is treated as length+start. If end is negative, it is treated as length+end.
+   * @param end If not specified, length of the this object is used as its default value.
    */
   copyWithin(
     target: NumberType.TypedArraySizeArg,
@@ -4582,13 +3771,8 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every(
     predicate: (
@@ -4600,14 +3784,11 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): boolean;
 
   /**
-   * Changes all array elements from `start` to `end` index to a static `value`
-   * and returns the modified array
+   * Changes all array elements from `start` to `end` index to a static `value` and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it
-   *   is treated as length+start where length is the length of the array.
-   * @param end Index to stop filling the array at. If end is negative, it is
-   *   treated as length+end.
+   * @param start Index to start filling the array at. If start is negative, it is treated as length+start where length is the length of the array.
+   * @param end Index to stop filling the array at. If end is negative, it is treated as length+end.
    */
   fill(
     value: Uint16,
@@ -4616,15 +3797,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): this;
 
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
     predicate: (
@@ -4636,16 +3812,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint16Array<ArrayBuffer>;
 
   /**
-   * Returns the value of the first element in the array where predicate is
-   * true, and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, find immediately returns that element value.
-   *   Otherwise, find returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, find immediately returns that element value. Otherwise, find returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   find(
     predicate: (
@@ -4657,16 +3827,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint16 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is
-   * true, and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, findIndex immediately returns that element
-   *   index. Otherwise, findIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, findIndex immediately returns that element index. Otherwise, findIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findIndex(
     predicate: (
@@ -4680,11 +3844,8 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Performs the specified action for each element in an array.
    *
-   * @param callbackfn A function that accepts up to three arguments. forEach
-   *   calls the callbackfn function one time for each element in the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   forEach(
     callbackfn: (
@@ -4699,8 +3860,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the first occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   indexOf(
     searchElement: Uint16,
@@ -4708,12 +3868,9 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): NumberType.TypedArraySearchResult;
 
   /**
-   * Adds all the elements of an array separated by the specified separator
-   * string.
+   * Adds all the elements of an array separated by the specified separator string.
    *
-   * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are
-   *   separated with a comma.
+   * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
    */
   join(separator?: string): string;
 
@@ -4721,8 +3878,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the last occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   lastIndexOf(
     searchElement: Uint16,
@@ -4733,15 +3889,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly length: number;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns
-   * an array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns an array that contains the results.
    *
-   * @param callbackfn A function that accepts up to three arguments. The map
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map(
     callbackfn: (
@@ -4753,16 +3904,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint16Array<ArrayBuffer>;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -4783,16 +3928,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint16;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -4805,17 +3944,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): U;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -4836,17 +3968,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint16;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -4865,8 +3990,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Sets a value or an array of values.
    *
    * @param array A typed or untyped array of values to set.
-   * @param offset The index in the current array at which the values are to be
-   *   written.
+   * @param offset The index in the current array at which the values are to be written.
    */
   set(
     array: ArrayLike<Uint16>,
@@ -4877,8 +4001,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns a section of an array.
    *
    * @param start The beginning of the specified portion of the array.
-   * @param end The end of the specified portion of the array. This is exclusive
-   *   of the element at the index 'end'.
+   * @param end The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
    */
   slice(
     start?: NumberType.TypedArraySizeArg,
@@ -4886,16 +4009,10 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint16Array<ArrayBuffer>;
 
   /**
-   * Determines whether the specified callback function returns true for any
-   * element of an array.
+   * Determines whether the specified callback function returns true for any element of an array.
    *
-   * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   true, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The some method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   some(
     predicate: (
@@ -4909,10 +4026,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -4921,8 +4035,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   sort(compareFn?: (a: Uint16, b: Uint16) => number): this;
 
   /**
-   * Gets a new Uint16Array view of the ArrayBuffer store for this array,
-   * referencing the elements at begin, inclusive, up to end, exclusive.
+   * Gets a new Uint16Array view of the ArrayBuffer store for this array, referencing the elements at begin, inclusive, up to end, exclusive.
    *
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
@@ -4985,11 +4098,7 @@ interface Uint16ArrayConstructor {
   ): Uint16Array<ArrayBuffer>;
 }
 declare const Uint16Array: Uint16ArrayConstructor;
-/**
- * A typed array of 32-bit signed integer values. The contents are initialized
- * to 0. If the requested number of bytes could not be allocated an exception is
- * raised.
- */
+/** A typed array of 32-bit signed integer values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
 interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: 4;
@@ -5004,15 +4113,11 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly byteOffset: NumberType.TypedArraySize;
 
   /**
-   * Returns the this object after copying a section of the array identified by
-   * start and end to the same array starting at position target
+   * Returns the this object after copying a section of the array identified by start and end to the same array starting at position target
    *
-   * @param target If target is negative, it is treated as length+target where
-   *   length is the length of the array.
-   * @param start If start is negative, it is treated as length+start. If end is
-   *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its
-   *   default value.
+   * @param target If target is negative, it is treated as length+target where length is the length of the array.
+   * @param start If start is negative, it is treated as length+start. If end is negative, it is treated as length+end.
+   * @param end If not specified, length of the this object is used as its default value.
    */
   copyWithin(
     target: NumberType.TypedArraySizeArg,
@@ -5023,13 +4128,8 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every(
     predicate: (
@@ -5041,14 +4141,11 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): boolean;
 
   /**
-   * Changes all array elements from `start` to `end` index to a static `value`
-   * and returns the modified array
+   * Changes all array elements from `start` to `end` index to a static `value` and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it
-   *   is treated as length+start where length is the length of the array.
-   * @param end Index to stop filling the array at. If end is negative, it is
-   *   treated as length+end.
+   * @param start Index to start filling the array at. If start is negative, it is treated as length+start where length is the length of the array.
+   * @param end Index to stop filling the array at. If end is negative, it is treated as length+end.
    */
   fill(
     value: Int32,
@@ -5057,15 +4154,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): this;
 
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
     predicate: (
@@ -5077,16 +4169,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int32Array<ArrayBuffer>;
 
   /**
-   * Returns the value of the first element in the array where predicate is
-   * true, and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, find immediately returns that element value.
-   *   Otherwise, find returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, find immediately returns that element value. Otherwise, find returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   find(
     predicate: (
@@ -5098,16 +4184,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int32 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is
-   * true, and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, findIndex immediately returns that element
-   *   index. Otherwise, findIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, findIndex immediately returns that element index. Otherwise, findIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findIndex(
     predicate: (
@@ -5121,11 +4201,8 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Performs the specified action for each element in an array.
    *
-   * @param callbackfn A function that accepts up to three arguments. forEach
-   *   calls the callbackfn function one time for each element in the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   forEach(
     callbackfn: (
@@ -5140,8 +4217,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the first occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   indexOf(
     searchElement: Int32,
@@ -5149,12 +4225,9 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): NumberType.TypedArraySearchResult;
 
   /**
-   * Adds all the elements of an array separated by the specified separator
-   * string.
+   * Adds all the elements of an array separated by the specified separator string.
    *
-   * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are
-   *   separated with a comma.
+   * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
    */
   join(separator?: string): string;
 
@@ -5162,8 +4235,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the last occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   lastIndexOf(
     searchElement: Int32,
@@ -5174,15 +4246,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly length: number;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns
-   * an array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns an array that contains the results.
    *
-   * @param callbackfn A function that accepts up to three arguments. The map
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map(
     callbackfn: (
@@ -5194,16 +4261,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int32Array<ArrayBuffer>;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -5224,16 +4285,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int32;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -5246,17 +4301,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): U;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -5277,17 +4325,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int32;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -5306,8 +4347,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Sets a value or an array of values.
    *
    * @param array A typed or untyped array of values to set.
-   * @param offset The index in the current array at which the values are to be
-   *   written.
+   * @param offset The index in the current array at which the values are to be written.
    */
   set(
     array: ArrayLike<Int32>,
@@ -5318,8 +4358,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns a section of an array.
    *
    * @param start The beginning of the specified portion of the array.
-   * @param end The end of the specified portion of the array. This is exclusive
-   *   of the element at the index 'end'.
+   * @param end The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
    */
   slice(
     start?: NumberType.TypedArraySizeArg,
@@ -5327,16 +4366,10 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Int32Array<ArrayBuffer>;
 
   /**
-   * Determines whether the specified callback function returns true for any
-   * element of an array.
+   * Determines whether the specified callback function returns true for any element of an array.
    *
-   * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   true, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The some method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   some(
     predicate: (
@@ -5350,10 +4383,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -5362,8 +4392,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   sort(compareFn?: (a: Int32, b: Int32) => number): this;
 
   /**
-   * Gets a new Int32Array view of the ArrayBuffer store for this array,
-   * referencing the elements at begin, inclusive, up to end, exclusive.
+   * Gets a new Int32Array view of the ArrayBuffer store for this array, referencing the elements at begin, inclusive, up to end, exclusive.
    *
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
@@ -5427,11 +4456,7 @@ interface Int32ArrayConstructor {
 }
 declare const Int32Array: Int32ArrayConstructor;
 
-/**
- * A typed array of 32-bit unsigned integer values. The contents are initialized
- * to 0. If the requested number of bytes could not be allocated an exception is
- * raised.
- */
+/** A typed array of 32-bit unsigned integer values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
 interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: 4;
@@ -5446,15 +4471,11 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly byteOffset: NumberType.TypedArraySize;
 
   /**
-   * Returns the this object after copying a section of the array identified by
-   * start and end to the same array starting at position target
+   * Returns the this object after copying a section of the array identified by start and end to the same array starting at position target
    *
-   * @param target If target is negative, it is treated as length+target where
-   *   length is the length of the array.
-   * @param start If start is negative, it is treated as length+start. If end is
-   *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its
-   *   default value.
+   * @param target If target is negative, it is treated as length+target where length is the length of the array.
+   * @param start If start is negative, it is treated as length+start. If end is negative, it is treated as length+end.
+   * @param end If not specified, length of the this object is used as its default value.
    */
   copyWithin(
     target: NumberType.TypedArraySizeArg,
@@ -5465,13 +4486,8 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every(
     predicate: (
@@ -5483,14 +4499,11 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): boolean;
 
   /**
-   * Changes all array elements from `start` to `end` index to a static `value`
-   * and returns the modified array
+   * Changes all array elements from `start` to `end` index to a static `value` and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it
-   *   is treated as length+start where length is the length of the array.
-   * @param end Index to stop filling the array at. If end is negative, it is
-   *   treated as length+end.
+   * @param start Index to start filling the array at. If start is negative, it is treated as length+start where length is the length of the array.
+   * @param end Index to stop filling the array at. If end is negative, it is treated as length+end.
    */
   fill(
     value: Uint32,
@@ -5499,15 +4512,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): this;
 
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
     predicate: (
@@ -5519,16 +4527,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint32Array<ArrayBuffer>;
 
   /**
-   * Returns the value of the first element in the array where predicate is
-   * true, and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, find immediately returns that element value.
-   *   Otherwise, find returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, find immediately returns that element value. Otherwise, find returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   find(
     predicate: (
@@ -5540,16 +4542,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint32 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is
-   * true, and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, findIndex immediately returns that element
-   *   index. Otherwise, findIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, findIndex immediately returns that element index. Otherwise, findIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findIndex(
     predicate: (
@@ -5563,11 +4559,8 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Performs the specified action for each element in an array.
    *
-   * @param callbackfn A function that accepts up to three arguments. forEach
-   *   calls the callbackfn function one time for each element in the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   forEach(
     callbackfn: (
@@ -5582,8 +4575,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the first occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   indexOf(
     searchElement: Uint32,
@@ -5591,12 +4583,9 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): NumberType.TypedArraySearchResult;
 
   /**
-   * Adds all the elements of an array separated by the specified separator
-   * string.
+   * Adds all the elements of an array separated by the specified separator string.
    *
-   * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are
-   *   separated with a comma.
+   * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
    */
   join(separator?: string): string;
 
@@ -5604,8 +4593,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the last occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   lastIndexOf(
     searchElement: Uint32,
@@ -5616,15 +4604,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly length: number;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns
-   * an array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns an array that contains the results.
    *
-   * @param callbackfn A function that accepts up to three arguments. The map
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map(
     callbackfn: (
@@ -5636,16 +4619,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint32Array<ArrayBuffer>;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -5666,16 +4643,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint32;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -5688,17 +4659,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): U;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -5719,17 +4683,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint32;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -5748,8 +4705,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Sets a value or an array of values.
    *
    * @param array A typed or untyped array of values to set.
-   * @param offset The index in the current array at which the values are to be
-   *   written.
+   * @param offset The index in the current array at which the values are to be written.
    */
   set(
     array: ArrayLike<Uint32>,
@@ -5760,8 +4716,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns a section of an array.
    *
    * @param start The beginning of the specified portion of the array.
-   * @param end The end of the specified portion of the array. This is exclusive
-   *   of the element at the index 'end'.
+   * @param end The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
    */
   slice(
     start?: NumberType.TypedArraySizeArg,
@@ -5769,16 +4724,10 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Uint32Array<ArrayBuffer>;
 
   /**
-   * Determines whether the specified callback function returns true for any
-   * element of an array.
+   * Determines whether the specified callback function returns true for any element of an array.
    *
-   * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   true, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The some method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   some(
     predicate: (
@@ -5792,10 +4741,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -5804,8 +4750,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   sort(compareFn?: (a: Uint32, b: Uint32) => number): this;
 
   /**
-   * Gets a new Uint32Array view of the ArrayBuffer store for this array,
-   * referencing the elements at begin, inclusive, up to end, exclusive.
+   * Gets a new Uint32Array view of the ArrayBuffer store for this array, referencing the elements at begin, inclusive, up to end, exclusive.
    *
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
@@ -5869,10 +4814,7 @@ interface Uint32ArrayConstructor {
 }
 declare const Uint32Array: Uint32ArrayConstructor;
 
-/**
- * A typed array of 32-bit float values. The contents are initialized to 0. If
- * the requested number of bytes could not be allocated an exception is raised.
- */
+/** A typed array of 32-bit float values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
 interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: 4;
@@ -5887,15 +4829,11 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly byteOffset: NumberType.TypedArraySize;
 
   /**
-   * Returns the this object after copying a section of the array identified by
-   * start and end to the same array starting at position target
+   * Returns the this object after copying a section of the array identified by start and end to the same array starting at position target
    *
-   * @param target If target is negative, it is treated as length+target where
-   *   length is the length of the array.
-   * @param start If start is negative, it is treated as length+start. If end is
-   *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its
-   *   default value.
+   * @param target If target is negative, it is treated as length+target where length is the length of the array.
+   * @param start If start is negative, it is treated as length+start. If end is negative, it is treated as length+end.
+   * @param end If not specified, length of the this object is used as its default value.
    */
   copyWithin(
     target: NumberType.TypedArraySizeArg,
@@ -5906,13 +4844,8 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every(
     predicate: (
@@ -5924,14 +4857,11 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): boolean;
 
   /**
-   * Changes all array elements from `start` to `end` index to a static `value`
-   * and returns the modified array
+   * Changes all array elements from `start` to `end` index to a static `value` and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it
-   *   is treated as length+start where length is the length of the array.
-   * @param end Index to stop filling the array at. If end is negative, it is
-   *   treated as length+end.
+   * @param start Index to start filling the array at. If start is negative, it is treated as length+start where length is the length of the array.
+   * @param end Index to stop filling the array at. If end is negative, it is treated as length+end.
    */
   fill(
     value: Float32,
@@ -5940,15 +4870,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): this;
 
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
     predicate: (
@@ -5960,16 +4885,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float32Array<ArrayBuffer>;
 
   /**
-   * Returns the value of the first element in the array where predicate is
-   * true, and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, find immediately returns that element value.
-   *   Otherwise, find returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, find immediately returns that element value. Otherwise, find returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   find(
     predicate: (
@@ -5981,16 +4900,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float32 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is
-   * true, and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, findIndex immediately returns that element
-   *   index. Otherwise, findIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, findIndex immediately returns that element index. Otherwise, findIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findIndex(
     predicate: (
@@ -6004,11 +4917,8 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Performs the specified action for each element in an array.
    *
-   * @param callbackfn A function that accepts up to three arguments. forEach
-   *   calls the callbackfn function one time for each element in the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   forEach(
     callbackfn: (
@@ -6023,8 +4933,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the first occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   indexOf(
     searchElement: Float32,
@@ -6032,12 +4941,9 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): NumberType.TypedArraySearchResult;
 
   /**
-   * Adds all the elements of an array separated by the specified separator
-   * string.
+   * Adds all the elements of an array separated by the specified separator string.
    *
-   * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are
-   *   separated with a comma.
+   * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
    */
   join(separator?: string): string;
 
@@ -6045,8 +4951,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the last occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   lastIndexOf(
     searchElement: Float32,
@@ -6057,15 +4962,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly length: number;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns
-   * an array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns an array that contains the results.
    *
-   * @param callbackfn A function that accepts up to three arguments. The map
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map(
     callbackfn: (
@@ -6077,16 +4977,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float32Array<ArrayBuffer>;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -6107,16 +5001,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float32;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -6129,17 +5017,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): U;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -6160,17 +5041,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float32;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -6189,8 +5063,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Sets a value or an array of values.
    *
    * @param array A typed or untyped array of values to set.
-   * @param offset The index in the current array at which the values are to be
-   *   written.
+   * @param offset The index in the current array at which the values are to be written.
    */
   set(
     array: ArrayLike<Float32>,
@@ -6201,8 +5074,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns a section of an array.
    *
    * @param start The beginning of the specified portion of the array.
-   * @param end The end of the specified portion of the array. This is exclusive
-   *   of the element at the index 'end'.
+   * @param end The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
    */
   slice(
     start?: NumberType.TypedArraySizeArg,
@@ -6210,16 +5082,10 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float32Array<ArrayBuffer>;
 
   /**
-   * Determines whether the specified callback function returns true for any
-   * element of an array.
+   * Determines whether the specified callback function returns true for any element of an array.
    *
-   * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   true, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The some method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   some(
     predicate: (
@@ -6233,10 +5099,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -6245,8 +5108,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   sort(compareFn?: (a: Float32, b: Float32) => number): this;
 
   /**
-   * Gets a new Float32Array view of the ArrayBuffer store for this array,
-   * referencing the elements at begin, inclusive, up to end, exclusive.
+   * Gets a new Float32Array view of the ArrayBuffer store for this array, referencing the elements at begin, inclusive, up to end, exclusive.
    *
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
@@ -6310,10 +5172,7 @@ interface Float32ArrayConstructor {
 }
 declare const Float32Array: Float32ArrayConstructor;
 
-/**
- * A typed array of 64-bit float values. The contents are initialized to 0. If
- * the requested number of bytes could not be allocated an exception is raised.
- */
+/** A typed array of 64-bit float values. The contents are initialized to 0. If the requested number of bytes could not be allocated an exception is raised. */
 interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /** The size in bytes of each element in the array. */
   readonly BYTES_PER_ELEMENT: 8;
@@ -6328,15 +5187,11 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly byteOffset: NumberType.TypedArraySize;
 
   /**
-   * Returns the this object after copying a section of the array identified by
-   * start and end to the same array starting at position target
+   * Returns the this object after copying a section of the array identified by start and end to the same array starting at position target
    *
-   * @param target If target is negative, it is treated as length+target where
-   *   length is the length of the array.
-   * @param start If start is negative, it is treated as length+start. If end is
-   *   negative, it is treated as length+end.
-   * @param end If not specified, length of the this object is used as its
-   *   default value.
+   * @param target If target is negative, it is treated as length+target where length is the length of the array.
+   * @param start If start is negative, it is treated as length+start. If end is negative, it is treated as length+end.
+   * @param end If not specified, length of the this object is used as its default value.
    */
   copyWithin(
     target: NumberType.TypedArraySizeArg,
@@ -6347,13 +5202,8 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Determines whether all the members of an array satisfy the specified test.
    *
-   * @param predicate A function that accepts up to three arguments. The every
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   false, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The every method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   every(
     predicate: (
@@ -6365,14 +5215,11 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): boolean;
 
   /**
-   * Changes all array elements from `start` to `end` index to a static `value`
-   * and returns the modified array
+   * Changes all array elements from `start` to `end` index to a static `value` and returns the modified array
    *
    * @param value Value to fill array section with
-   * @param start Index to start filling the array at. If start is negative, it
-   *   is treated as length+start where length is the length of the array.
-   * @param end Index to stop filling the array at. If end is negative, it is
-   *   treated as length+end.
+   * @param start Index to start filling the array at. If start is negative, it is treated as length+start where length is the length of the array.
+   * @param end Index to stop filling the array at. If end is negative, it is treated as length+end.
    */
   fill(
     value: Float64,
@@ -6381,15 +5228,10 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): this;
 
   /**
-   * Returns the elements of an array that meet the condition specified in a
-   * callback function.
+   * Returns the elements of an array that meet the condition specified in a callback function.
    *
-   * @param predicate A function that accepts up to three arguments. The filter
-   *   method calls the predicate function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The filter method calls the predicate function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
     predicate: (
@@ -6401,16 +5243,10 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float64Array<ArrayBuffer>;
 
   /**
-   * Returns the value of the first element in the array where predicate is
-   * true, and undefined otherwise.
+   * Returns the value of the first element in the array where predicate is true, and undefined otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, find immediately returns that element value.
-   *   Otherwise, find returns undefined.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, find immediately returns that element value. Otherwise, find returns undefined.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   find(
     predicate: (
@@ -6422,16 +5258,10 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float64 | undefined;
 
   /**
-   * Returns the index of the first element in the array where predicate is
-   * true, and -1 otherwise.
+   * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
    *
-   * @param predicate Find calls predicate once for each element of the array,
-   *   in ascending order, until it finds one where predicate returns true. If
-   *   such an element is found, findIndex immediately returns that element
-   *   index. Otherwise, findIndex returns -1.
-   * @param thisArg If provided, it will be used as the this value for each
-   *   invocation of predicate. If it is not provided, undefined is used
-   *   instead.
+   * @param predicate Find calls predicate once for each element of the array, in ascending order, until it finds one where predicate returns true. If such an element is found, findIndex immediately returns that element index. Otherwise, findIndex returns -1.
+   * @param thisArg If provided, it will be used as the this value for each invocation of predicate. If it is not provided, undefined is used instead.
    */
   findIndex(
     predicate: (
@@ -6445,11 +5275,8 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Performs the specified action for each element in an array.
    *
-   * @param callbackfn A function that accepts up to three arguments. forEach
-   *   calls the callbackfn function one time for each element in the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   forEach(
     callbackfn: (
@@ -6464,8 +5291,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the first occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   indexOf(
     searchElement: Float64,
@@ -6473,12 +5299,9 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): NumberType.TypedArraySearchResult;
 
   /**
-   * Adds all the elements of an array separated by the specified separator
-   * string.
+   * Adds all the elements of an array separated by the specified separator string.
    *
-   * @param separator A string used to separate one element of an array from the
-   *   next in the resulting String. If omitted, the array elements are
-   *   separated with a comma.
+   * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
    */
   join(separator?: string): string;
 
@@ -6486,8 +5309,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns the index of the last occurrence of a value in an array.
    *
    * @param searchElement The value to locate in the array.
-   * @param fromIndex The array index at which to begin the search. If fromIndex
-   *   is omitted, the search starts at index 0.
+   * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
    */
   lastIndexOf(
     searchElement: Float64,
@@ -6498,15 +5320,10 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   readonly length: number;
 
   /**
-   * Calls a defined callback function on each element of an array, and returns
-   * an array that contains the results.
+   * Calls a defined callback function on each element of an array, and returns an array that contains the results.
    *
-   * @param callbackfn A function that accepts up to three arguments. The map
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   callbackfn function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param callbackfn A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
+   * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map(
     callbackfn: (
@@ -6518,16 +5335,10 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float64Array<ArrayBuffer>;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce(
     callbackfn: (
@@ -6548,16 +5359,10 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float64;
 
   /**
-   * Calls the specified callback function for all the elements in an array. The
-   * return value of the callback function is the accumulated result, and is
-   * provided as an argument in the next call to the callback function.
+   * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The reduce
-   *   method calls the callbackfn function one time for each element in the
-   *   array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduce<U>(
     callbackfn: (
@@ -6570,17 +5375,10 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): U;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight(
     callbackfn: (
@@ -6601,17 +5399,10 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float64;
 
   /**
-   * Calls the specified callback function for all the elements in an array, in
-   * descending order. The return value of the callback function is the
-   * accumulated result, and is provided as an argument in the next call to the
-   * callback function.
+   * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
    *
-   * @param callbackfn A function that accepts up to four arguments. The
-   *   reduceRight method calls the callbackfn function one time for each
-   *   element in the array.
-   * @param initialValue If initialValue is specified, it is used as the initial
-   *   value to start the accumulation. The first call to the callbackfn
-   *   function provides this value as an argument instead of an array value.
+   * @param callbackfn A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array.
+   * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
    */
   reduceRight<U>(
     callbackfn: (
@@ -6630,8 +5421,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Sets a value or an array of values.
    *
    * @param array A typed or untyped array of values to set.
-   * @param offset The index in the current array at which the values are to be
-   *   written.
+   * @param offset The index in the current array at which the values are to be written.
    */
   set(
     array: ArrayLike<Float64>,
@@ -6642,8 +5432,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * Returns a section of an array.
    *
    * @param start The beginning of the specified portion of the array.
-   * @param end The end of the specified portion of the array. This is exclusive
-   *   of the element at the index 'end'.
+   * @param end The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
    */
   slice(
     start?: NumberType.TypedArraySizeArg,
@@ -6651,16 +5440,10 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   ): Float64Array<ArrayBuffer>;
 
   /**
-   * Determines whether the specified callback function returns true for any
-   * element of an array.
+   * Determines whether the specified callback function returns true for any element of an array.
    *
-   * @param predicate A function that accepts up to three arguments. The some
-   *   method calls the predicate function for each element in the array until
-   *   the predicate returns a value which is coercible to the Boolean value
-   *   true, or until the end of the array.
-   * @param thisArg An object to which the this keyword can refer in the
-   *   predicate function. If thisArg is omitted, undefined is used as the this
-   *   value.
+   * @param predicate A function that accepts up to three arguments. The some method calls the predicate function for each element in the array until the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   some(
     predicate: (
@@ -6674,10 +5457,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * Sorts an array.
    *
-   * @param compareFn Function used to determine the order of the elements. It
-   *   is expected to return a negative value if the first argument is less than
-   *   the second argument, zero if they're equal, and a positive value
-   *   otherwise. If omitted, the elements are sorted in ascending order.
+   * @param compareFn Function used to determine the order of the elements. It is expected to return a negative value if the first argument is less than the second argument, zero if they're equal, and a positive value otherwise. If omitted, the elements are sorted in ascending order.
    *
    *   ```ts
    *   [11, 2, 22, 1].sort((a, b) => a - b);
@@ -6686,8 +5466,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   sort(compareFn?: (a: Float64, b: Float64) => number): this;
 
   /**
-   * Gets a new Float64Array view of the ArrayBuffer store for this array,
-   * referencing the elements at begin, inclusive, up to end, exclusive.
+   * Gets a new Float64Array view of the ArrayBuffer store for this array, referencing the elements at begin, inclusive, up to end, exclusive.
    *
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
@@ -6967,18 +5746,12 @@ declare namespace Intl {
 
 interface String {
   /**
-   * Determines whether two strings are equivalent in the current or specified
-   * locale.
+   * Determines whether two strings are equivalent in the current or specified locale.
    *
    * @param that String to compare to target string
-   * @param locales A locale string or array of locale strings that contain one
-   *   or more language or locale tags. If you include more than one locale
-   *   string, list them in descending order of priority so that the first entry
-   *   is the preferred locale. If you omit this parameter, the default locale
-   *   of the JavaScript runtime is used. This parameter must conform to BCP 47
-   *   standards; see the Intl.Collator object for details.
-   * @param options An object that contains one or more properties that specify
-   *   comparison options. see the Intl.Collator object for details.
+   * @param locales A locale string or array of locale strings that contain one or more language or locale tags. If you include more than one locale string, list them in descending order of priority so that the first entry is the preferred locale. If you omit this parameter, the default locale of the JavaScript runtime
+   *   is used. This parameter must conform to BCP 47 standards; see the Intl.Collator object for details.
+   * @param options An object that contains one or more properties that specify comparison options. see the Intl.Collator object for details.
    */
   localeCompare(
     that: string,
@@ -6991,13 +5764,9 @@ interface Number {
   /**
    * Converts a number to a string by using the current or specified locale.
    *
-   * @param locales A locale string or array of locale strings that contain one
-   *   or more language or locale tags. If you include more than one locale
-   *   string, list them in descending order of priority so that the first entry
-   *   is the preferred locale. If you omit this parameter, the default locale
-   *   of the JavaScript runtime is used.
-   * @param options An object that contains one or more properties that specify
-   *   comparison options.
+   * @param locales A locale string or array of locale strings that contain one or more language or locale tags. If you include more than one locale string, list them in descending order of priority so that the first entry is the preferred locale. If you omit this parameter, the default locale of the JavaScript runtime
+   *   is used.
+   * @param options An object that contains one or more properties that specify comparison options.
    */
   toLocaleString(
     locales?: string | readonly string[],
@@ -7007,16 +5776,11 @@ interface Number {
 
 interface Date {
   /**
-   * Converts a date and time to a string by using the current or specified
-   * locale.
+   * Converts a date and time to a string by using the current or specified locale.
    *
-   * @param locales A locale string or array of locale strings that contain one
-   *   or more language or locale tags. If you include more than one locale
-   *   string, list them in descending order of priority so that the first entry
-   *   is the preferred locale. If you omit this parameter, the default locale
-   *   of the JavaScript runtime is used.
-   * @param options An object that contains one or more properties that specify
-   *   comparison options.
+   * @param locales A locale string or array of locale strings that contain one or more language or locale tags. If you include more than one locale string, list them in descending order of priority so that the first entry is the preferred locale. If you omit this parameter, the default locale of the JavaScript runtime
+   *   is used.
+   * @param options An object that contains one or more properties that specify comparison options.
    */
   toLocaleString(
     locales?: string | readonly string[],
@@ -7025,13 +5789,9 @@ interface Date {
   /**
    * Converts a date to a string by using the current or specified locale.
    *
-   * @param locales A locale string or array of locale strings that contain one
-   *   or more language or locale tags. If you include more than one locale
-   *   string, list them in descending order of priority so that the first entry
-   *   is the preferred locale. If you omit this parameter, the default locale
-   *   of the JavaScript runtime is used.
-   * @param options An object that contains one or more properties that specify
-   *   comparison options.
+   * @param locales A locale string or array of locale strings that contain one or more language or locale tags. If you include more than one locale string, list them in descending order of priority so that the first entry is the preferred locale. If you omit this parameter, the default locale of the JavaScript runtime
+   *   is used.
+   * @param options An object that contains one or more properties that specify comparison options.
    */
   toLocaleDateString(
     locales?: string | readonly string[],
@@ -7041,13 +5801,9 @@ interface Date {
   /**
    * Converts a time to a string by using the current or specified locale.
    *
-   * @param locales A locale string or array of locale strings that contain one
-   *   or more language or locale tags. If you include more than one locale
-   *   string, list them in descending order of priority so that the first entry
-   *   is the preferred locale. If you omit this parameter, the default locale
-   *   of the JavaScript runtime is used.
-   * @param options An object that contains one or more properties that specify
-   *   comparison options.
+   * @param locales A locale string or array of locale strings that contain one or more language or locale tags. If you include more than one locale string, list them in descending order of priority so that the first entry is the preferred locale. If you omit this parameter, the default locale of the JavaScript runtime
+   *   is used.
+   * @param options An object that contains one or more properties that specify comparison options.
    */
   toLocaleTimeString(
     locales?: string | readonly string[],
