@@ -93,7 +93,7 @@
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
     "better-react-use-state": "*",
-    "firebase": "^10.13.1",
+    "firebase": "^11.6.1",
     "html2canvas": "^1.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.3.1",

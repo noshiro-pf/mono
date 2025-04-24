@@ -40,7 +40,7 @@
     "@noshiro/preact-utils": "*",
     "@noshiro/ts-utils": "*",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^2.14.305",
+    "pdfjs-dist": "^5.1.91",
     "preact": "^10.4.7",
     "preact-router": "^3.2.1"
   },
