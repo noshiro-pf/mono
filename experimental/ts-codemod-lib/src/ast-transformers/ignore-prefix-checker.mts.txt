@@ -1,0 +1,68 @@
+/* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
+
+import { type ISet } from '@noshiro/ts-utils';
+import type * as ts from 'typescript';
+
+export const createIgnorePrefixChecker = (ignorePrefixes: ISet<string>) => ({
+  Identifier: (node: ts.Identifier) =>
+    ignorePrefixes.some((p) => node.text.startsWith(p)),
+
+  ObjectBindingPattern: (node: ts.ObjectBindingPattern) =>
+    node.elements.map(e => ignorePrefixes.some((p) => e.name.startsWith(p)))
+
+  ArrayBindingPattern: (node: ts.Identifier) =>
+    ignorePrefixes.some((p) => node.text.startsWith(p)),
+
+  StringLiteral: (node: ts.Identifier) =>
+    ignorePrefixes.some((p) => node.text.startsWith(p)),
+
+  NoSubstitutionTemplateLiteral: (node: ts.Identifier) =>
+    ignorePrefixes.some((p) => node.text.startsWith(p)),
+
+  NumericLiteral: (node: ts.Identifier) =>
+    ignorePrefixes.some((p) => node.text.startsWith(p)),
+
+  ComputedPropertyName: (node: ts.Identifier) =>
+    ignorePrefixes.some((p) => node.text.startsWith(p)),
+  // [`mut_y`]: number[];
+  PrivateIdentifier: (node: ts.Identifier) =>
+    ignorePrefixes.some((p) => node.text.startsWith(p)),
+
+  BigIntLiteral: (node: ts.Identifier) =>
+    ignorePrefixes.some((p) => node.text.startsWith(p)),
+});
+
+
+  const ignorePrefixChecker = (
+    node: ts.Identifier | ts.BindingName | ts.PropertyName | undefined,
+  ): boolean => {
+    if (node === undefined) return false;
+    if (ts.isIdentifier(node)) {
+      return ignorePrefixes.some((p) => node.text.startsWith(p));
+    }
+
+    if (ts.isBindingName(node)) {
+      expectType<
+        ts.BindingName,
+        ts.Identifier | ts.ObjectBindingPattern | ts.ArrayBindingPattern
+      >('=');
+    }
+
+    if (ts.isPropertyName(node)) {
+      expectType<
+        ts.PropertyName,
+        | ts.Identifier
+        | ts.StringLiteral
+        | ts.NoSubstitutionTemplateLiteral
+        | ts.NumericLiteral
+        | ts.ComputedPropertyName // [`mut_y`]: number[];
+        | ts.PrivateIdentifier
+        | ts.BigIntLiteral
+      >('=');
+
+      if (ts.isStringLiteral(node)) {
+      }
+    }
+
+    return false;
+  };
