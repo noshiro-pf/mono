@@ -1,0 +1,12 @@
+{
+  "$schema": "https://codemod-utils.s3.us-west-1.amazonaws.com/configuration_schema.json",
+  "name": "convert-to-readonly-type",
+  "version": "1.0.0",
+  "engine": "ts-morph",
+  "private": false,
+  "arguments": [],
+  "meta": {
+    "git": "https://github.com/noshiro-pf/mono/blob/main/packages/codemod/convert-to-readonly-type",
+    "tags": ["codemod", "typescript", "ts-morph", "readonly"]
+  }
+}
