@@ -1,5 +1,5 @@
+import { definePlaywrightConfig } from '@noshiro/mono-configs/define-playwright-config';
 import path from 'node:path';
-import { definePlaywrightConfig } from '../../../../configs/define-playwright-config.mjs';
 
 const thisDir = import.meta.dirname;
 
