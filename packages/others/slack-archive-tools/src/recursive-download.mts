@@ -1,4 +1,4 @@
-import { execAsync, toThisDir } from '@noshiro/mono-utils';
+import { execAsync } from '@noshiro/mono-utils';
 import {
   Arr,
   ISet,
@@ -14,7 +14,7 @@ import { extractExt } from './extract-ext.mjs';
 import { getAllJsonFiles } from './get-all-json-files.mjs';
 import { validateJsonObject } from './validator.mjs';
 
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 const rootDir = path.resolve(thisDir, '..');
 
 const srcDir = path.resolve(

@@ -1,12 +1,11 @@
 #!/usr/bin/env zx
 
-import { toThisDir } from '@noshiro/mono-utils';
 import 'zx/globals';
 import { eslintPlugins } from './eslint-plugins.mjs';
 import { generateRulesTypeCore } from './generate-rules-type-core.mjs';
 import { replaceRulesType } from './replace.mjs';
 
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 
 const outDir = path.resolve(thisDir, '../src/types/rules');
 

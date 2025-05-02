@@ -1,11 +1,10 @@
-import { toThisDir } from '@noshiro/mono-utils';
 import { Json, Result } from '@noshiro/ts-utils';
 import type * as fsType from 'node:fs';
 import 'zx/globals';
 import { getAllJsonFiles } from './get-all-json-files.mjs';
 import { validateJsonObject } from './validator.mjs';
 
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 const rootDir = path.resolve(thisDir, '..');
 
 const srcDir = path.resolve(

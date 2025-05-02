@@ -2,10 +2,9 @@
 /* eslint-disable import/no-internal-modules */
 
 import { defineRollupConfig } from '@noshiro/mono-configs/define-rollup-config';
-import { toThisDir } from '@noshiro/mono-utils';
 import tsconfig from './tsconfig.build.json' with { type: 'json' };
 
 export default defineRollupConfig({
-  configDir: toThisDir(import.meta.url),
+  configDir: import.meta.dirname,
   outDirRelative: tsconfig.compilerOptions.outDir,
 });

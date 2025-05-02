@@ -5,12 +5,8 @@ import {
   eslintFlatConfigForVitest,
 } from '@noshiro/eslint-configs';
 import * as path from 'node:path';
-import * as url from 'node:url';
 
-const toThisDir = (importMetaUrl) =>
-  path.dirname(url.fileURLToPath(importMetaUrl));
-
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 
 /** @type {readonly FlatConfig[]} */
 const configs = [

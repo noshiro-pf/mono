@@ -1,8 +1,7 @@
-import { toThisDir } from '@noshiro/mono-utils';
 import * as prettier from 'prettier';
 import 'zx/globals';
 
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 
 fetch('https://zenn.dev/api/articles?username=noshiro_piko&order=latest')
   .then((result) => result.text())

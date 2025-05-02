@@ -1,5 +1,4 @@
 import mdx from '@mdx-js/rollup';
-import { toThisDir } from '@noshiro/mono-utils';
 import preact from '@preact/preset-vite';
 import legacy from '@vitejs/plugin-legacy';
 import * as path from 'node:path';
@@ -7,7 +6,7 @@ import { defineConfig, PluginOption } from 'vite';
 import { type UserConfig } from 'vitest/node';
 import { createInjectDef } from './inject-def';
 
-const thisDir: string = toThisDir(import.meta.url);
+const thisDir: string = import.meta.dirname;
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => {

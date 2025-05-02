@@ -1,8 +1,7 @@
-import { toThisDir } from '@noshiro/mono-utils';
 import * as path from 'node:path';
 import { defineConfig } from 'vitest/config';
 
-const thisDir: string = toThisDir(import.meta.url);
+const thisDir: string = import.meta.dirname;
 
 // https://github.com/vitest-dev/vitest/blob/v1.5.0/test/import-meta/vite.config.ts
 export default defineConfig({

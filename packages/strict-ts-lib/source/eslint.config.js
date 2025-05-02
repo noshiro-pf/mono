@@ -4,10 +4,9 @@ import {
   eslintFlatConfigForTypeScript,
   restrictedSyntax,
 } from '@noshiro/eslint-configs';
-import { toThisDir } from '@noshiro/mono-utils';
 import 'zx/globals';
 
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 
 /** @returns {readonly FlatConfig[]} */
 const defineConfig = () => [

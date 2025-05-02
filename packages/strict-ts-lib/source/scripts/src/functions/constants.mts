@@ -1,4 +1,4 @@
-import { pipe, toThisDir } from '@noshiro/mono-utils';
+import { pipe } from '@noshiro/mono-utils';
 import 'zx/globals';
 import { type ConverterConfig } from '../convert-dts/common.mjs';
 
@@ -13,7 +13,7 @@ export const genLib = false as boolean;
 export const packageManagerName = 'yarn';
 
 // /packages/strict-ts-lib/source/scripts/dist/commands/functions/constants.mts
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 
 // /packages/strict-ts-lib
 const strictTsLibDir = path.resolve(thisDir, '../../../..');

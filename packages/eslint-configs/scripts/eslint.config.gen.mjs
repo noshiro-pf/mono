@@ -4,12 +4,11 @@
 
 /** @typedef {import('../src/types/flat-config.mjs').FlatConfig} FlatConfig */
 
-import { toThisDir } from '@noshiro/mono-utils';
 import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin';
 import typescriptEslintParser from '@typescript-eslint/parser';
 import functional from 'eslint-plugin-functional';
 
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 
 /** @type {readonly FlatConfig[]} */
 const config = [

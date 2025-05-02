@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-globals */
-import { toThisDir } from '@noshiro/mono-utils';
 import { ISet, isRecord } from '@noshiro/ts-utils';
 import type * as fsType from 'node:fs';
 import 'zx/globals';
@@ -7,7 +6,7 @@ import { fileContentValues } from './dump-keys-common.mjs';
 import { getAllJsonFiles } from './get-all-json-files.mjs';
 
 const dumpMessageSubKeys = async (pathKey: string): Promise<void> => {
-  const thisDir = toThisDir(import.meta.url);
+  const thisDir = import.meta.dirname;
   const rootDir = path.resolve(thisDir, '..');
 
   const srcDir = path.resolve(

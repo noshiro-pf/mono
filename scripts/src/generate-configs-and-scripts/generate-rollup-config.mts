@@ -24,11 +24,10 @@ export const generateRollupConfigForUtils = async (
     '/* eslint-disable import/no-internal-modules */',
     '',
     "import { defineRollupConfig } from '@noshiro/mono-configs/define-rollup-config';",
-    "import { toThisDir } from '@noshiro/mono-utils';",
     `import tsconfig from './${tsconfigBuildJsonName}' with { type: 'json' };`,
     '',
     'export default defineRollupConfig({',
-    '  configDir: toThisDir(import.meta.url),',
+    '  configDir: import.meta.dirname,',
     '  outDirRelative: tsconfig.compilerOptions.outDir,',
     cfg.rollupConfig?.variablesToDrop !== undefined
       ? `  variablesToDrop: ${JSON.stringify(cfg.rollupConfig.variablesToDrop)},`

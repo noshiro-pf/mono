@@ -8,11 +8,10 @@ import {
   eslintFlatConfigForVitest,
   genEsLintRestrictedImportsDefFromDevDependencies,
 } from '@noshiro/eslint-configs';
-import { toThisDir } from '@noshiro/mono-utils';
 import * as nodePath from 'node:path';
 import packageJson from './package.json' with { type: 'json' };
 
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 
 /** @returns {Promise<readonly FlatConfig[]>} */
 const defineConfig = async () => {
