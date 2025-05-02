@@ -12,6 +12,7 @@ import {
   type TinyObservableSource as TYPE_TinyObservableSource,
   type Arr as VAR_Arr,
   type assertNotUndefined as VAR_assertNotUndefined,
+  type assertType as VAR_assertType,
   type castDeepMutable as VAR_castDeepMutable,
   type castDeepReadonly as VAR_castDeepReadonly,
   type castMutable as VAR_castMutable,
@@ -132,6 +133,7 @@ declare global {
 
   /* custom types */
 
+  const assertType: typeof VAR_assertType;
   const Arr: typeof VAR_Arr;
   const assertNotUndefined: typeof VAR_assertNotUndefined;
   const castDeepMutable: typeof VAR_castDeepMutable;

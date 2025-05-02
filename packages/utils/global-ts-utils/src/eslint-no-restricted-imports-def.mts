@@ -1,6 +1,7 @@
 export const eslintNoRestrictedImportsDef = {
   name: '@noshiro/ts-utils',
   importNames: [
+    'assertType',
     'Arr',
     'assertNotUndefined',
     'castDeepMutable',

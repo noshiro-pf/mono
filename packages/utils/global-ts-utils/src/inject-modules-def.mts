@@ -2,6 +2,7 @@ import { tp } from '@noshiro/ts-utils';
 
 export const injectModulesDef = Object.fromEntries(
   [
+    'assertType',
     'Arr',
     'assertNotUndefined',
     'castDeepMutable',

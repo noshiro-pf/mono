@@ -6,6 +6,7 @@ await generateAllGlobalDefs({
   rootDir: path.resolve(import.meta.dirname, '../'),
   packageName: packageJson.name.replace(/^@noshiro\/global-/u, '@noshiro/'),
   importsList: [
+    'assertType',
     'Arr',
     'assertNotUndefined',
     'castDeepMutable',
