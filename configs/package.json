@@ -11,6 +11,12 @@
         "types": "./define-rollup-config.d.mts",
         "default": "./define-rollup-config.mjs"
       }
+    },
+    "./define-playwright-config": {
+      "import": {
+        "types": "./define-playwright-config.mts",
+        "default": "./define-playwright-config.mts"
+      }
     }
   },
   "scripts": {

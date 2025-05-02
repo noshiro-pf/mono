@@ -15,13 +15,9 @@ export const generatePlaywrightConfig = async (
 
   if (cfg.utilOrApp !== 'app') return;
 
-  const depth = workspaceLocation.split('/').length + 1;
-
-  const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
-
   const content = [
     "import path from 'node:path';",
-    `import { definePlaywrightConfig } from '${pathPrefixToRoot}/configs/define-playwright-config.mjs';`,
+    `import { definePlaywrightConfig } from '@noshiro/mono-configs/define-playwright-config';`,
     '',
     'const thisDir = import.meta.dirname;',
     '',
