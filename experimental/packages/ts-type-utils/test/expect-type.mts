@@ -18,3 +18,5 @@ export const expectType = <A, B>(
             ? '<=' | (TypeExtends<B, A> extends true ? '>=' | '~=' : '!>=')
             : '!<=' | (TypeExtends<B, A> extends true ? '>=' : '!>=')),
 ): void => undefined;
+
+export const assertType = expectType;
