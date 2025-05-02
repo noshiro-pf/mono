@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { castMutable, isRecord, toThisDir } from '@noshiro/mono-utils';
+import { castMutable, isRecord } from '@noshiro/mono-utils';
 import 'zx/globals';
 import { generateRulesType } from './generate-rules-type.mjs';
 
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 const monoRootDir = path.resolve(thisDir, '../../..');
 
 const eslintDir = path.resolve(thisDir, '..');

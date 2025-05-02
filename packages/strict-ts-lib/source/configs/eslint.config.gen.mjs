@@ -1,11 +1,10 @@
 /** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */
 
-import { toThisDir } from '@noshiro/mono-utils';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import typescriptEslintParser from '@typescript-eslint/parser';
 import functional from 'eslint-plugin-functional';
 
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 
 /** @returns {readonly FlatConfig[]} */
 const defineConfig = () => [

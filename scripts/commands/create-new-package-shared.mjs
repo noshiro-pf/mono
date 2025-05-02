@@ -1,9 +1,8 @@
 // usage: yarn create:preact-app <new-app-name>
 
 import 'zx/globals';
-import { toThisDir } from '../esm/index.mjs';
 
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 const monoRootDir = path.resolve(thisDir, '../..');
 
 /**

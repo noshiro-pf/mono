@@ -24,7 +24,6 @@ export const generateViteConfig = async (
       ? `import mdx from '@mdx-js/rollup';`
       : '',
 
-    `import { toThisDir } from '@noshiro/mono-utils';`,
     cfg.tsType === 'react-emotion' || cfg.tsType === 'react'
       ? `import react from '@vitejs/plugin-react-swc';`
       : cfg.tsType === 'preact'
@@ -36,7 +35,7 @@ export const generateViteConfig = async (
     "import { type UserConfig } from 'vitest/node';",
     `import { createInjectDef } from './inject-def';`,
     ``,
-    `const thisDir: string = toThisDir(import.meta.url);`,
+    `const thisDir: string = import.meta.dirname;`,
     ``,
     `// https://vitejs.dev/config/`,
     `export default defineConfig(async () => {`,

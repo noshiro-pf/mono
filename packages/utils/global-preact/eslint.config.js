@@ -1,10 +1,9 @@
 /** @typedef {import('@noshiro/eslint-configs').FlatConfig} FlatConfig */
 
 import { eslintFlatConfigForTypeScript } from '@noshiro/eslint-configs';
-import { toThisDir } from '@noshiro/mono-utils';
 import * as path from 'node:path';
 
-const thisDir = toThisDir(import.meta.url);
+const thisDir = import.meta.dirname;
 
 /** @type {readonly FlatConfig[]} */
 const config = eslintFlatConfigForTypeScript({

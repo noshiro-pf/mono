@@ -20,11 +20,10 @@ export const generatePlaywrightConfig = async (
   const pathPrefixToRoot = Array.from({ length: depth }, () => '..').join('/');
 
   const content = [
-    "import { toThisDir } from '@noshiro/mono-utils';",
     "import path from 'node:path';",
     `import { definePlaywrightConfig } from '${pathPrefixToRoot}/configs/define-playwright-config.mjs';`,
     '',
-    'const thisDir = toThisDir(import.meta.url);',
+    'const thisDir = import.meta.dirname;',
     '',
     'export default definePlaywrightConfig({',
     "  baseURL: 'http://localhost:5180',",

@@ -154,8 +154,7 @@
     "zx": "^8.3.2"
   },
   "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=20.11.0"
   },
   "wireit": {
     "generate-configs": {
