@@ -39,6 +39,26 @@ export const products: DeepReadonly<{
       imageUrl: '',
     },
     {
+      id: 'better-react-use-state',
+      link: 'https://www.npmjs.com/package/better-react-use-state',
+      title: 'better-react-use-state',
+      subtitle: 'React の useState をより安全かつ便利にするライブラリ',
+      description:
+        '`useState` を改良したものと、 boolean 専用の `useBoolState` という hooks を提供する',
+      implementation: 'TypeScriptで実装。（最終更新：2025年2月8日）',
+      imageUrl: '',
+    },
+    {
+      id: 'better-preact-use-state',
+      link: 'https://www.npmjs.com/package/better-preact-use-state',
+      title: 'better-preact-use-state',
+      subtitle: 'Preact の useState をより安全かつ便利にするライブラリ',
+      description:
+        '`useState` を改良したものと、 boolean 専用の `useBoolState` という hooks を提供する',
+      implementation: 'TypeScriptで実装。（最終更新：2025年2月8日）',
+      imageUrl: '',
+    },
+    {
       id: 'ts-type-utils',
       link: 'https://github.com/noshiro-pf/mono/tree/main/packages/ts-type-utils',
       title: '@noshiro/ts-type-utils',
@@ -64,18 +84,6 @@ export const products: DeepReadonly<{
       subtitle: '簡易的なRouterライブラリ',
       description: 'React Router より簡単なAPIのライブラリが欲しかったので自作',
       implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
-      imageUrl: '',
-    },
-    {
-      id: 'rnjs',
-      link: 'https://github.com/noshiro-pf/mono/tree/main/experimental/rnjs',
-      title: 'rnjs',
-      subtitle:
-        'リアクティブプログラミング用のTypeScriptのライブラリ（"SyncFlow" の過去作）',
-      description:
-        'RxJS風の構文のリアクティブプログラミングライブラリ。RxJSで発生しうる「グリッチ」という現象が起きないようにしたもの（Observableの発火をpriority queueで管理している）。',
-      implementation:
-        'TypeScriptで実装。npmで"rnjs"という名前で公開。（制作日：2019年1月）',
       imageUrl: '',
     },
   ],

@@ -1,5 +1,6 @@
 export const autoImportDef = {
   '@noshiro/ts-utils': [
+    'assertType',
     'Arr',
     'assertNotUndefined',
     'castDeepMutable',
