@@ -61,21 +61,27 @@ export const writings: readonly WritingsInfo[] = [
   {
     id: 'typescript-type-utilities-min-max',
     link: 'https://zenn.dev/noshiro_piko/articles/typescript-type-utilities',
-    title: `${zennArticleTitle.get('typescript-type-utilities') ?? 'TypeScript 型ユーティリティ集'}`,
+    title:
+      zennArticleTitle.get('typescript-type-utilities') ??
+      'TypeScript 型ユーティリティ集',
     subtitle: '',
     body: '私が自作してライブラリやアプリの開発などにも使っている TypeScript の型ユーティリティをまとめました。',
   },
   {
     id: 'typescript-type-utilities',
     link: 'https://zenn.dev/noshiro_piko/articles/typescript-type-level-min',
-    title: `${zennArticleTitle.get('typescript-type-level-min') ?? 'TypeScript の型ユーティリティ Min, Max の実装'}`,
+    title:
+      zennArticleTitle.get('typescript-type-level-min') ??
+      'TypeScript の型ユーティリティ Min, Max の実装',
     subtitle: 'TypeScript の型ユーティリティ Min, Max の実装と解説',
     body: '',
   },
   {
     id: 'typescript-range-type',
     link: 'https://zenn.dev/noshiro_piko/articles/typescript-range-type',
-    title: `${zennArticleTitle.get('typescript-range-type') ?? '［型パズル］TypeScript で連番の配列に詳しい型を付ける'}`,
+    title:
+      zennArticleTitle.get('typescript-range-type') ??
+      '［型パズル］TypeScript で連番の配列に詳しい型を付ける',
     subtitle: 'TypeScript のユーティリティ `rangeArray` の実装と解説',
     body: '',
   },
