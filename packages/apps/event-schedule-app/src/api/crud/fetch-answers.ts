@@ -1,8 +1,4 @@
-import {
-  ANSWER_KEY_CREATED_AT,
-  Answer,
-  firestorePaths,
-} from '@noshiro/event-schedule-app-shared';
+import { Answer, firestorePaths } from '@noshiro/event-schedule-app-shared';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { firestoreEvents } from '../../initialize-firebase';
 
@@ -15,7 +11,7 @@ export const fetchAnswers = (
     getDocs(
       query(
         collection(firestoreEvents, eventId, firestorePaths.answers),
-        orderBy(ANSWER_KEY_CREATED_AT, 'asc'),
+        orderBy('createdAt' satisfies keyof Pick<Answer, 'createdAt'>, 'asc'),
       ),
     ),
   ).then((a) =>
