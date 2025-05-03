@@ -3,7 +3,6 @@
 ## 技術スタック
 
 -   Git
-    -   GitFlow
 -   bash
 -   Web frontend（最近よく使うものを太字で記した）
     -   Languages
@@ -36,9 +35,9 @@
                 -   ある程度複雑になりそうなとき、reducer を書きやすくするために使用
                 -   Undo history が必要なときなど
         -   Routing
-            -   React-router
+            -   自分で選べるときは既存ライブラリは使わず history API ＆ 自作 hooks を使う
             -   [Rocon](https://blog.uhy.ooo/entry/2020-08-10/rocon-alpha/) を試したい
-            -   簡単なルーティングは既存ライブラリは使わず history API ＆ 自作 hooks で済ませることも
+            -   React-router （あまり好きではないが使ったことはある）
         -   UI Library
             -   [**Blueprint.js**](https://blueprintjs.com/docs/)
             -   Material-UI
@@ -46,7 +45,8 @@
             -   **styled-components**
             -   **goober**
         -   Utilities
-            -   (fp-ts)（TypeScript 用関数型ライブラリだがやややりすぎだと感じるのでお手製ライブラリを使っている）
+            -   (fp-ts)（TypeScript で関数型言語っぽく書くためのライブラリだがやややりすぎだと感じるので、必要な機能だけ自作ライブラリで実現している）
+            -   io-ts （APIがイマイチなところやバグが一部のこっていてやや不満なので、使えるときは自作ツールを使っている）
             -   (jQuery) 今は使っていない
         -   Others
             -   Pixi.js
@@ -55,16 +55,19 @@
                 -   discord アプリを作った時に使用した
     -   Development Environment
         -   Package manager
-            -   **yarn**
             -   npm
+            -   yarn
         -   Build environment
-            -   **Webpack**
+            -   **Vite**
+            -   Webpack
             -   esbuild とかも試したい
             -   **[Wireit](https://github.com/google/wireit)**
                 -   ビルド結果のキャッシュ
         -   Testing
-            -   **Jest**
-            -   **Cypress**
+            -   Vitest
+            -   (Jest)
+            -   Playwright
+            -   (Cypress)
         -   Linters & Formatters
             -   **ESLint**
                 -   主要な plugin についてその全ルールの設定を自前で管理しています。
@@ -75,6 +78,9 @@
                         -   これを見つける前は [自作スクリプト](https://qiita.com/pikohideaki/items/9f3843853903fcff392c) をプリプロセスで走らせていた。
                     -   [prettier-package-json](https://www.npmjs.com/package/prettier-package-json)
                         -   package.json のフォーマット
+        -   Auto Release
+            -   **Semantic Release**
+            -   **Changesets**
 -   Web backend（これまで趣味・業務共にウェブフロントエンドを触る時間が圧倒的に多かったため、バックエンドは比較すると知識が少なめ）
     -   Languages
         -   Node.js
@@ -86,8 +92,8 @@
     -   BaaS
         -   **firebase** (hosting, firestore, functions, auth)
         -   Netlify
-        -   **Heroku**
-            -   discord bot に使用
+        -   Heroku
+            -   discord bot 用サーバーに一時期使用していた（今は GCP に移行）
     -   Docker
 -   Others
     -   Languages
