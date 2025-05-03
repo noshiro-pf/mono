@@ -87,25 +87,25 @@ describe('isRecord', () => {
     expect(res).toBe(false);
   });
 
-  // test('Map is not a record', () => {
-  //   const obj = new MutableMap();
-  //   const unk: unknown = obj;
-  //   const res = isRecord(unk);
+  test('Map is not a record', () => {
+    const obj = new Map();
+    const unk: unknown = obj;
+    const res = isRecord(unk);
 
-  //   assertNotType<typeof obj, UnknownRecord>("<=");
-  //   expectType<typeof res, boolean>("=");
+    expectType<typeof obj, UnknownRecord>('!=');
+    expectType<typeof res, boolean>('=');
 
-  //   expect(res).toBe(false);
-  // });
+    expect(res).toBe(false);
+  });
 
-  // test('Set is not a record', () => {
-  //   const obj = new MutableSet();
-  //   const unk: unknown = obj;
-  //   const res = isRecord(unk);
+  test('Set is not a record', () => {
+    const obj = new Set();
+    const unk: unknown = obj;
+    const res = isRecord(unk);
 
-  //   assertNotType<typeof obj, UnknownRecord>("<=");
-  //   expectType<typeof res, boolean>("=");
+    expectType<typeof obj, UnknownRecord>('!=');
+    expectType<typeof res, boolean>('=');
 
-  //   expect(res).toBe(false);
-  // });
+    expect(res).toBe(false);
+  });
 });
