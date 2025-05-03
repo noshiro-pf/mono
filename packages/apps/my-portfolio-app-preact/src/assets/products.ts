@@ -18,6 +18,46 @@ export const products: DeepReadonly<{
 }> = {
   libraries: [
     {
+      id: 'ts-type-forge',
+      link: 'https://github.com/noshiro-pf/ts-type-forge',
+      title: '★ ts-type-forge',
+      subtitle: 'TypeScript 型ユーティリティライブラリ',
+      description:
+        '型の等価性判定を行う TypeEq， DeepReadonly 型， Int 型などの brand 型， 型レベル整数ユーティリティなどを提供するライブラリ。',
+      implementation: 'TypeScriptで実装。 semantic-release で自動リリース。',
+      imageUrl: '',
+    },
+    {
+      id: 'ts-data-forge',
+      link: 'https://github.com/noshiro-pf/ts-data-forge',
+      title: '★ ts-data-forge',
+      subtitle: 'TypeScript ユーティリティライブラリ',
+      description:
+        'ts-type-forge と組み合わせて使うことを想定したランタイムユーティリティライブラリ。 pipe 関数や Optional, Result 型，型ガード関数として機能する Arr.isArrayAtLeastLength など， Int 型などの brand 数値型の加減乗除を行う関数などを提供する。ライブラリ名の "forge" の意味は「鍛造（する）」。データを鍛えてより良い形にする、という意味を込めた。',
+      implementation: 'TypeScriptで実装。 semantic-release で自動リリース。',
+      imageUrl: '',
+    },
+    {
+      id: 'ts-fortress',
+      link: 'https://github.com/noshiro-pf/ts-fortress',
+      title: '★ ts-fortress',
+      subtitle: 'TypeScript ランタイムバリデーションライブラリ',
+      description:
+        'io-ts や zod などと同類のランタイムバリデーションライブラリ。 io-ts や zod に長く存在する不具合や、やや不親切な API の問題を解決しつつ、 io-ts より豊富な brand 数値型や、 整数範囲型（uintRange）なども提供した。ライブラリ名の "fortress" の意味は「要塞」。形の分からない外界から来たデータからアプリケーションを守る、という意味を込めた。',
+      implementation: 'TypeScriptで実装。 semantic-release で自動リリース。',
+      imageUrl: '',
+    },
+    {
+      id: 'ts-repo-utils',
+      link: 'https://github.com/noshiro-pf/ts-repo-utils',
+      title: '★ ts-repo-utils',
+      subtitle: 'TypeScript リポジトリ用のユーティリティ・スクリプト集',
+      description:
+        'git の指定コミットハッシュやブランチ名を指定し、そのコミットからの差分ファイルのみ prettier でフォーマットする format-diff-from コマンド、再帰的に index.ts ファイルを生成する gen-index-ts コマンド、 リポジトリに git 差分が無いかをチェックする assert-repo-is-clean コマンド（CIでの利用を想定）などを提供する CLI ツール。',
+      implementation: 'TypeScriptで実装。 semantic-release で自動リリース。',
+      imageUrl: '',
+    },
+    {
       id: 'syncflow',
       link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/syncflow',
       title: '★ SyncFlow',
@@ -28,33 +68,13 @@ export const products: DeepReadonly<{
       imageUrl: '',
     },
     {
-      id: 'io-ts',
-      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/io-ts',
-      title: '@noshiro/io-ts',
-      subtitle:
-        '外界から来た値の型チェックをより便利に行うためのTypeScriptライブラリ',
+      id: 'better-react-use-state',
+      link: 'https://www.npmjs.com/package/better-react-use-state',
+      title: 'better-react-use-state',
+      subtitle: 'React の useState をより安全かつ便利にするライブラリ',
       description:
-        '説明ページ → https://docs.google.com/presentation/d/19YwEkeNl8x3IWglTv8YjcOZPyMVympXn0qyDLf2mXUI/edit#slide=id.p',
-      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
-      imageUrl: '',
-    },
-    {
-      id: 'ts-type-utils',
-      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/ts-type-utils',
-      title: '@noshiro/ts-type-utils',
-      subtitle: 'TypeScriptの型ユーティリティ集',
-      description:
-        '`type UintRange<1, 5> = 1 | 2 | 3 | 4` のような型ユーティリティのライブラリ',
-      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
-      imageUrl: '',
-    },
-    {
-      id: 'ts-utils',
-      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-utils',
-      title: '@noshiro/ts-utils',
-      subtitle: 'TypeScriptのユーティリティ集',
-      description: 'Result型や配列・オブジェクト操作ユーティリティなど',
-      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
+        '`useState` を改良したものと、 boolean 専用の `useBoolState` という hooks を提供する。 preact 版（better-preact-use-state）もある。',
+      implementation: 'TypeScriptで実装。（最終更新：2025年2月8日）',
       imageUrl: '',
     },
     {
@@ -67,15 +87,14 @@ export const products: DeepReadonly<{
       imageUrl: '',
     },
     {
-      id: 'rnjs',
-      link: 'https://github.com/noshiro-pf/mono/tree/main/experimental/rnjs',
-      title: 'rnjs',
+      id: 'io-ts',
+      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/io-ts',
+      title: '@noshiro/io-ts',
       subtitle:
-        'リアクティブプログラミング用のTypeScriptのライブラリ（"SyncFlow" の過去作）',
+        '外界から来た値のランタイムバリデーション行うためのTypeScriptライブラリ。ts-fortressの前身。',
       description:
-        'RxJS風の構文のリアクティブプログラミングライブラリ。RxJSで発生しうる「グリッチ」という現象が起きないようにしたもの（Observableの発火をpriority queueで管理している）。',
-      implementation:
-        'TypeScriptで実装。npmで"rnjs"という名前で公開。（制作日：2019年1月）',
+        '説明ページ → https://docs.google.com/presentation/d/19YwEkeNl8x3IWglTv8YjcOZPyMVympXn0qyDLf2mXUI/edit#slide=id.p',
+      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
       imageUrl: '',
     },
   ],

@@ -17,7 +17,8 @@ export const writings: readonly WritingsInfo[] = [
   {
     id: 'syncflow-slides',
     link: 'https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.p',
-    title: '★ リアクティブプログラミングライブラリ「SyncFlow」を自作した話',
+    title:
+      '★ ［スライド］リアクティブプログラミングライブラリ「SyncFlow」を自作した話',
     subtitle:
       '私がウェブフロントエンドの状態管理に使用している自作ライブラリの紹介',
     body: 'RxJSで発生するglitchという現象の発生原因とその対処法、他のglitch-freeリアクティブプログラミングライブラリがどう解決しているかを論文等を参照しつつ紹介。最後に拙作「SyncFlow」の実装概要を説明。',
@@ -60,21 +61,41 @@ export const writings: readonly WritingsInfo[] = [
   {
     id: 'typescript-type-utilities-min-max',
     link: 'https://zenn.dev/noshiro_piko/articles/typescript-type-utilities',
-    title: `★ ${zennArticleTitle.get('typescript-type-utilities') ?? 'TypeScript 型ユーティリティ集'}`,
+    title:
+      zennArticleTitle.get('typescript-type-utilities') ??
+      'TypeScript 型ユーティリティ集',
     subtitle: '',
     body: '私が自作してライブラリやアプリの開発などにも使っている TypeScript の型ユーティリティをまとめました。',
   },
   {
     id: 'typescript-type-utilities',
     link: 'https://zenn.dev/noshiro_piko/articles/typescript-type-level-min',
-    title: `★ ${zennArticleTitle.get('typescript-type-level-min') ?? 'TypeScript の型ユーティリティ Min, Max の実装'}`,
+    title:
+      zennArticleTitle.get('typescript-type-level-min') ??
+      'TypeScript の型ユーティリティ Min, Max の実装',
     subtitle: 'TypeScript の型ユーティリティ Min, Max の実装と解説',
     body: '',
   },
   {
+    id: 'typescript-range-type',
+    link: 'https://zenn.dev/noshiro_piko/articles/typescript-range-type',
+    title:
+      zennArticleTitle.get('typescript-range-type') ??
+      '［型パズル］TypeScript で連番の配列に詳しい型を付ける',
+    subtitle: 'TypeScript のユーティリティ `rangeArray` の実装と解説',
+    body: '',
+  },
+  {
+    id: 'typescript-codemod-development',
+    link: 'https://zenn.dev/articles/typescript-codemod-development',
+    title: `${zennArticleTitle.get('typescript-codemod-development') ?? 'TypeScript の codemod ツール開発時の失敗談と得た知見メモ'}`,
+    subtitle: '',
+    body: 'ts-morph などの codemod ツールを色々比較し、実際に開発してみた経験から得た知見をまとめました。',
+  },
+  {
     id: 'type-challenges-introduction',
     link: 'https://docs.google.com/presentation/d/1uyL1tUJkpL8kgoNwpSy28sjCMHNzsYiO1aPC4_yzTYs/edit?usp=sharing',
-    title: '★ type challenges の紹介',
+    title: 'type challenges の紹介',
     subtitle: '',
     body: 'TypeScriptの型パズル集から、個人的に役に立った知識が多く詰まった問題を1問選んで解説してみました。',
   },
@@ -164,14 +185,14 @@ export const writings: readonly WritingsInfo[] = [
   {
     id: 'dezero-slides',
     link: 'https://slides-dezero-06-to-16.web.app/',
-    title: 'ゼロから作るディープラーニング3 step06-16',
+    title: '［スライド］ゼロから作るディープラーニング3 step06-16',
     subtitle: 'ゼロから作るディープラーニング3の社内輪読会で使用した資料',
     body: 'reveal.jsを用いて作成．',
   },
   {
     id: 'slides-chain-rule',
     link: 'https://slides-chain-rule.web.app/',
-    title: '連鎖律のやや厳密な証明',
+    title: '［スライド］連鎖律のやや厳密な証明',
     subtitle: '社内輪読会資料',
     body: 'reveal.jsを用いて作成．',
   },
