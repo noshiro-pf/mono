@@ -1,0 +1,48 @@
+{
+  "name": "ts-type-forge",
+  "version": "0.1.0",
+  "private": false,
+  "keywords": [
+    "typescript",
+    "utility",
+    "types",
+    "static-typing",
+    "mapped-types"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/ts-type-forge.git"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./src/index.d.mts"
+      }
+    }
+  },
+  "types": "./src/index.d.mts",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
+    "fmt": "prettier --write ."
+  },
+  "devDependencies": {
+    "cspell": "^8.19.3",
+    "prettier": "^3.5.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-packagejson": "^2.5.10",
+    "typescript": "^5.7.2",
+    "zx": "^8.5.3"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.8"
+  }
+}
