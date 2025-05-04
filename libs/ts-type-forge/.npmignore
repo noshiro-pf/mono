@@ -1,0 +1,10 @@
+.github
+docs
+scripts
+test
+
+typedoc.json
+tsconfig.json
+.cspell.json
+.prettierrc
+package-lock.json

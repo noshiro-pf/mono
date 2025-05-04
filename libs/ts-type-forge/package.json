@@ -31,8 +31,15 @@
     "LICENSE"
   ],
   "scripts": {
+    "build": "zx scripts/gen-index.mjs",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
-    "fmt": "prettier --write ."
+    "fmt": "prettier --write .",
+    "test": "tsc --noEmit",
+    "testw": "tsc --noEmit --watch",
+    "type-check": "tsc --noEmit",
+    "doc": "run-s doc:typedoc doc:types fmt",
+    "doc:types": "zx scripts/get-type-definitions.mjs",
+    "doc:typedoc": "typedoc"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
@@ -41,12 +48,17 @@
     "@semantic-release/github": "^11.0.2",
     "@semantic-release/npm": "^12.0.1",
     "@semantic-release/release-notes-generator": "^14.0.3",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.15.3",
     "conventional-changelog-conventionalcommits": "^8.0.0",
     "cspell": "^8.19.4",
+    "npm-run-all2": "^8.0.1",
     "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-packagejson": "^2.5.10",
     "semantic-release": "^24.2.3",
+    "typedoc": "^0.28.4",
+    "typedoc-plugin-markdown": "^4.6.3",
     "typescript": "^5.7.2",
     "zx": "^8.5.3"
   },

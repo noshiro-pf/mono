@@ -1,7 +1,7 @@
 {
   "version": "0.2",
   "language": "en",
-  "words": ["noshiro"],
+  "words": ["bivariant", "contravariance", "NAND", "noshiro", "testw", "XNOR"],
   "flagWords": [],
   "ignorePaths": ["./package-lock.json"]
 }

@@ -42,5 +42,5 @@ jobs:
       - name: Install dependencies
         run: npm ci --engine-strict
 
-      # - name: Run type check
-      #   run: npm run test
+      - name: Run type check
+        run: npm run test
