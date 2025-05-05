@@ -61,7 +61,7 @@ const release = async () => {
       core.info('GitHub Release Note created/updated successfully.');
     } catch (error) {
       core.warning(
-        `conventional-github-releaser failed: ${JSON.stringify(error)}. This might happen if the tag was just created.`,
+        `conventional-github-releaser failed: ${getMessage(error)}. This might happen if the tag was just created.`,
       );
       // リリースが既に存在する場合などにエラーになることがあるため warning に留める場合も
       // 必要に応じてエラーハンドリングを調整
@@ -69,7 +69,7 @@ const release = async () => {
 
     core.info('Release process completed successfully.');
   } catch (error) {
-    core.setFailed(`Release failed: ${JSON.stringify(error)}`);
+    core.setFailed(`Release failed: ${getMessage(error)}`);
     console.error(error); // エラー詳細をログに出力
     // 必要なら npm publish 後のタグ作成失敗などでロールバック処理を追加
   }
@@ -85,5 +85,16 @@ const execAsync = (cmd) =>
       resolve(stdout);
     });
   });
+
+/**
+ * @param {unknown} error
+ * @returns
+ */
+const getMessage = (error) => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+};
 
 await release();

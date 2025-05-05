@@ -131,7 +131,7 @@ const prepareRelease = async () => {
 
     core.info('Prepare-release process completed successfully.');
   } catch (error) {
-    core.setFailed(`Prepare-release failed: ${JSON.stringify(error)}`);
+    core.setFailed(`Prepare-release failed: ${getMessage(error)}`);
     console.error(error); // Log detailed error
   }
 };
@@ -257,6 +257,17 @@ const getExistingChangelog = async () => {
     core.warning('CHANGELOG.md not found. Creating a new one.');
     return '# Changelog\n\n'; // Create new if not found
   }
+};
+
+/**
+ * @param {unknown} error
+ * @returns
+ */
+const getMessage = (error) => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
 };
 
 await prepareRelease();
