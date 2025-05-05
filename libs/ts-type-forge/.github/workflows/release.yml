@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - release # Trigger when changes are pushed to the release branch (e.g., PR merged)
+
+permissions:
+  contents: write # for tagging and creating releases
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Node.js 20.x
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          registry-url: 'https://registry.npmjs.org' # Required for npm publish using setup-node
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run release script
+        run: node scripts/release.mjs
+        env:
+          # GITHUB_TOKEN is automatically available
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # NPM_TOKEN needs to be added to repository secrets
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
