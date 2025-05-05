@@ -77,7 +77,9 @@ const listTypes = async () => {
   const dtsFiles = await glob(`${srcDir}/**/*.d.mts`);
 
   /** @type {{ typeName: string; filePath: string; line: number }[][]} */
-  const allTypes = await Promise.all(dtsFiles.map((file) => processFile(file)));
+  const allTypes = await Promise.all(
+    dtsFiles.toSorted().map((file) => processFile(file)),
+  );
 
   const result = allTypes
     .flat(1)

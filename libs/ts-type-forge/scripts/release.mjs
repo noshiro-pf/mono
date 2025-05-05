@@ -75,8 +75,6 @@ const release = async () => {
   }
 };
 
-await release();
-
 /**
  * @param {string} cmd
  * @returns {Promise<string>}
@@ -87,3 +85,5 @@ const execAsync = (cmd) =>
       resolve(stdout);
     });
   });
+
+await release();

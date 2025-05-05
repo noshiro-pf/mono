@@ -136,8 +136,6 @@ const prepareRelease = async () => {
   }
 };
 
-await prepareRelease();
-
 /**
  * Executes a shell command asynchronously.
  * @param {string} cmd - The command to execute.
@@ -260,3 +258,5 @@ const getExistingChangelog = async () => {
     return '# Changelog\n\n'; // Create new if not found
   }
 };
+
+await prepareRelease();
