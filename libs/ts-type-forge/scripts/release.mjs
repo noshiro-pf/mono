@@ -1,37 +1,35 @@
 import core from '@actions/core';
-import { exec, execSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import packageJson from '../package.json' with { type: 'json' };
-
-const gitUserEmail = 'actions@github.com';
-
-const gitUserName = 'github-actions[bot]';
+import { gitUserEmail, gitUserName } from './release-workflow-shared.mjs';
+import { execAsync } from './utils.mjs';
 
 const release = async () => {
   try {
     core.info('Starting release process...');
 
-    // Gitユーザー設定
+    // Git user settings
     await execAsync(`git config user.name "${gitUserName}"`);
     await execAsync(`git config user.email "${gitUserEmail}"`);
 
-    // package.json からバージョンを取得
+    // Get version from package.json
     const version = packageJson.version;
     const tagName = `v${version}`;
     core.info(`Releasing version ${version} (${tagName})`);
 
     // 1. npm publish
     const npmToken = core.getInput('npm-token', { required: true });
-    core.setSecret(npmToken); // トークンをマスク
+    core.setSecret(npmToken); // Mask the token
     core.info('Publishing to npm...');
-    // .npmrc にトークンを設定
+    // Set token in .npmrc
     await execAsync(
       `echo "//registry.npmjs.org/:_authToken=${npmToken}" > .npmrc`,
     );
     await execAsync('npm publish');
     core.info('Successfully published to npm.');
-    await execAsync('rm .npmrc'); // 一時ファイルを削除
+    await execAsync('rm .npmrc'); // Remove temporary file
 
-    // 2. Git タグを push
+    // 2. Push Git tag
     core.info(`Checking if tag ${tagName} exists...`);
     try {
       await execAsync(`git rev-parse ${tagName}`);
@@ -44,17 +42,17 @@ const release = async () => {
       core.info(`Tag ${tagName} pushed successfully.`);
     }
 
-    // 3. GitHub Release Note を更新
+    // 3. Update GitHub Release Note
     const githubToken = core.getInput('github-token', { required: true });
-    core.setSecret(githubToken); // トークンをマスク
+    core.setSecret(githubToken); // Mask the token
     core.info('Creating/Updating GitHub Release Note...');
-    // conventional-github-releaser を実行
-    // 環境変数にトークンを設定して実行
+    // Execute conventional-github-releaser
+    // Execute with token set in environment variables
     try {
-      // preset は angular (または利用している規約) に合わせる
+      // Match preset to angular (or the convention being used)
       execSync(`npx conventional-github-releaser -p angular --pkg .`, {
         env: {
-          ...process.env, // 既存の環境変数を引き継ぐ
+          ...process.env, // Inherit existing environment variables
           CONVENTIONAL_GITHUB_RELEASER_TOKEN: githubToken,
         },
       });
@@ -63,32 +61,22 @@ const release = async () => {
       core.warning(
         `conventional-github-releaser failed: ${getMessage(error)}. This might happen if the tag was just created.`,
       );
-      // リリースが既に存在する場合などにエラーになることがあるため warning に留める場合も
-      // 必要に応じてエラーハンドリングを調整
+      // This can error if the release already exists, so keep it as a warning
+      // Adjust error handling as needed
     }
 
     core.info('Release process completed successfully.');
   } catch (error) {
     core.setFailed(`Release failed: ${getMessage(error)}`);
-    console.error(error); // エラー詳細をログに出力
-    // 必要なら npm publish 後のタグ作成失敗などでロールバック処理を追加
+    console.error(error); // Log detailed error
+    // Add rollback logic if needed, e.g., if tag creation fails after npm publish
   }
 };
 
 /**
- * @param {string} cmd
- * @returns {Promise<string>}
- */
-const execAsync = (cmd) =>
-  new Promise((resolve, _reject) => {
-    exec(cmd, (_error, stdout) => {
-      resolve(stdout);
-    });
-  });
-
-/**
- * @param {unknown} error
- * @returns
+ * Gets the error message.
+ * @param {unknown} error - The error object.
+ * @returns {string} - The error message as a string.
  */
 const getMessage = (error) => {
   if (error instanceof Error) {

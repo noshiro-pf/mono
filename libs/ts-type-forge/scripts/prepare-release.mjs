@@ -5,6 +5,8 @@ import { exec } from 'node:child_process';
 import { readFile, writeFile } from 'node:fs/promises';
 import semver from 'semver';
 import packageJson from '../package.json' with { type: 'json' };
+import { gitUserEmail, gitUserName } from './release-workflow-shared.mjs';
+import { execAsync } from './utils.mjs';
 
 const mainBranch = 'main';
 const releaseBranch = 'release';
@@ -13,10 +15,6 @@ const changelogPath = 'CHANGELOG.md';
 const packageJsonPath = 'package.json';
 
 const bumper = new Bumper(process.cwd()).loadPreset('angular');
-
-// Git user settings (recommended to set in the workflow, but just in case)
-const gitUserEmail = 'actions@github.com';
-const gitUserName = 'github-actions[bot]';
 
 const prepareRelease = async () => {
   try {
@@ -51,12 +49,6 @@ const prepareRelease = async () => {
       existingChangelog.replace(/^# Changelog\n\n/u, ''),
     ].join('\n');
 
-    // Update package.json version
-    packageJson.version = nextVersion;
-    await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
-
-    core.info(`Updated ${packageJsonPath} to version ${nextVersion}`);
-
     // Create or update the release-candidate branch
     core.info(`Checking out ${mainBranch}...`);
     await execAsync(`git fetch origin ${mainBranch}`);
@@ -70,6 +62,12 @@ const prepareRelease = async () => {
       core.info(`${releaseCandidateBranch} branch does not exist remotely.`);
     }
     await execAsync(`git checkout -b ${releaseCandidateBranch}`);
+
+    // Update package.json version
+    packageJson.version = nextVersion;
+    await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
+
+    core.info(`Updated ${packageJsonPath} to version ${nextVersion}`);
 
     // Update CHANGELOG.md (if appending)
     await writeFile(changelogPath, fullChangelog);
@@ -136,19 +134,6 @@ const prepareRelease = async () => {
   }
 };
 
-/**
- * Executes a shell command asynchronously.
- * @param {string} cmd - The command to execute.
- * @returns {Promise<string>} - A promise that resolves with the command's stdout.
- */
-const execAsync = (cmd) =>
-  new Promise((resolve, _reject) => {
-    exec(cmd, (_error, stdout) => {
-      // Note: Error handling might be needed here depending on requirements.
-      resolve(stdout);
-    });
-  });
-
 // Based on node_modules/semver/internal/constants.js
 /**
  * Checks if a string is a valid semver release type.
@@ -160,7 +145,7 @@ const isReleaseType = (type) =>
 
 /**
  * Gets the latest semantic version tag from the release branch.
- * @returns {Promise<string>} - A promise that resolves with the latest tag (e.g., "v1.2.3").
+ * @returns {Promise<`v${string}.${string}.${string}`>} - A promise that resolves with the latest tag (e.g., "v1.2.3").
  */
 const getLatestTag = async () => {
   try {
@@ -170,6 +155,14 @@ const getLatestTag = async () => {
     );
 
     const latestTag = result.toString().trim();
+
+    if (!isSemver(latestTag)) {
+      console.error(
+        `Invalid tag format: ${latestTag}. Expected format: vX.Y.Z`,
+      );
+
+      return 'v0.0.0'; // For the first release
+    }
 
     core.info(`Latest tag on ${releaseBranch}: ${latestTag}`);
     return latestTag;
@@ -269,5 +262,11 @@ const getMessage = (error) => {
   }
   return String(error);
 };
+
+/**
+ * @param {string} str
+ * @return {str is `v${string}.${string}.${string}` }
+ */
+const isSemver = (str) => /^v\d+\.\d+\.\d+$/u.test(str);
 
 await prepareRelease();
