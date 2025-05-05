@@ -16,7 +16,8 @@
  */
 type DeepReadonly<T> = T extends Primitive
   ? T
-  : T extends Function
+  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    T extends (...args: readonly any[]) => any
     ? T
     : T extends MutableMap<infer K, infer V>
       ? ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>
@@ -26,7 +27,7 @@ type DeepReadonly<T> = T extends Primitive
           ? ReadonlySet<DeepReadonly<V>>
           : T extends ReadonlySet<infer V>
             ? ReadonlySet<DeepReadonly<V>>
-            : T extends object | readonly unknown[]
+            : T extends UnknownRecord | readonly unknown[]
               ? {
                   readonly [K in keyof T]: DeepReadonly<T[K]>;
                 }
@@ -44,7 +45,8 @@ type DeepReadonly<T> = T extends Primitive
  */
 type DeepMutable<T> = T extends Primitive
   ? T
-  : T extends Function
+  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    T extends (...args: readonly any[]) => any
     ? T
     : T extends MutableMap<infer K, infer V>
       ? MutableMap<DeepMutable<K>, DeepMutable<V>>
@@ -54,14 +56,14 @@ type DeepMutable<T> = T extends Primitive
           ? MutableSet<DeepMutable<V>>
           : T extends ReadonlySet<infer V>
             ? MutableSet<DeepMutable<V>>
-            : T extends object | readonly unknown[]
+            : T extends UnknownRecord | readonly unknown[]
               ? {
                   -readonly [K in keyof T]: DeepMutable<T[K]>;
                 }
               : T;
 
 /**
- * Recursively applies the `?` optional modifier to all properties of an object or array.
+ * Recursively applies the `?` optional modifier to all properties of an UnknownRecord or array.
  * Handles Map and Set types by applying `DeepPartial` to their keys/values.
  * Primitives and functions are returned as is.
  * @template T - The type to make deeply partial.
@@ -79,7 +81,8 @@ type DeepMutable<T> = T extends Primitive
  */
 type DeepPartial<T> = T extends Primitive
   ? T
-  : T extends Function
+  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    T extends (...args: readonly any[]) => any
     ? T
     : T extends MutableMap<infer K, infer V>
       ? MutableMap<DeepPartial<K>, DeepPartial<V>>
@@ -89,7 +92,7 @@ type DeepPartial<T> = T extends Primitive
           ? MutableSet<DeepPartial<V>>
           : T extends ReadonlySet<infer V>
             ? ReadonlySet<DeepPartial<V>>
-            : T extends object | readonly unknown[]
+            : T extends UnknownRecord | readonly unknown[]
               ? {
                   [K in keyof T]?: DeepPartial<T[K]>;
                 }
@@ -108,7 +111,8 @@ type DeepPartial<T> = T extends Primitive
  */
 type DeepRequired<T> = T extends Primitive
   ? T
-  : T extends Function
+  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    T extends (...args: readonly any[]) => any
     ? T
     : T extends MutableMap<infer K, infer V>
       ? MutableMap<DeepRequired<K>, DeepRequired<V>>
@@ -118,7 +122,7 @@ type DeepRequired<T> = T extends Primitive
           ? MutableSet<DeepRequired<V>>
           : T extends ReadonlySet<infer V>
             ? ReadonlySet<DeepRequired<V>>
-            : T extends object | readonly unknown[]
+            : T extends UnknownRecord | readonly unknown[]
               ? {
                   [K in keyof T]-?: DeepRequired<T[K]>;
                 }

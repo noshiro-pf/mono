@@ -6,8 +6,8 @@ const srcDir = path.resolve(projectRoot, 'src');
 
 const readmePath = path.resolve(projectRoot, './README.md');
 
-const typeRegex = /^type ([^< =]*)/;
-const namespaceRegex = /^declare namespace ([^ \{]*)/;
+const typeRegex = /^type ([^< =]*)/u;
+const namespaceRegex = /^declare namespace ([^ {]*)/u;
 
 const markers = {
   start: '<!-- AUTO-GENERATED TYPES START -->',
@@ -32,8 +32,8 @@ const processFile = async (filePath) => {
 
     for (const [index, line] of lines.entries()) {
       {
-        const match = line.match(typeRegex);
-        if (match !== null && match[1]) {
+        const match = typeRegex.exec(line);
+        if (match?.[1] !== undefined) {
           // Exclude internal namespace helper types if needed (adjust regex if necessary)
           // For now, just matching the pattern
           results.push({
@@ -44,21 +44,20 @@ const processFile = async (filePath) => {
         }
       }
       {
-        const namespaceMatch = line.match(namespaceRegex);
+        const namespaceMatch = namespaceRegex.exec(line);
         if (
-          namespaceMatch !== null &&
-          namespaceMatch[1] !== undefined &&
+          namespaceMatch?.[1] !== undefined &&
           namespaceMatch[1] !== TSTypeForgeInternals // Exclude TSTypeForgeInternals namespace
         ) {
-          for (const [index, line] of lines.entries()) {
-            const typeMatch = line.trimStart().match(typeRegex);
-            if (typeMatch !== null && typeMatch[1]) {
+          for (const [idx, l] of lines.entries()) {
+            const typeMatch = typeRegex.exec(l.trimStart());
+            if (typeMatch?.[1] !== undefined) {
               // Exclude internal namespace helper types if needed (adjust regex if necessary)
               // For now, just matching the pattern
               results.push({
                 typeName: `${namespaceMatch[1]}.${typeMatch[1]}`,
                 filePath: relativePath,
-                line: index + 1,
+                line: idx + 1,
               });
             }
           }
@@ -74,7 +73,7 @@ const processFile = async (filePath) => {
 /**
  * Main function to find and list types.
  */
-async function listTypes() {
+const listTypes = async () => {
   const dtsFiles = await glob(`${srcDir}/**/*.d.mts`);
 
   /** @type {{ typeName: string; filePath: string; line: number }[][]} */
@@ -97,6 +96,6 @@ async function listTypes() {
 
   // Write the updated content back to the README file
   await fs.writeFile(readmePath, newContent, 'utf-8');
-}
+};
 
 listTypes().catch(console.error);

@@ -14,6 +14,7 @@ type Mutable<T> = { -readonly [P in keyof T]: T[P] };
  * type RMap = ReadonlyMap<string, number>;
  * type MMap = ToMutableMap<RMap>; // Map<string, number>
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ToMutableMap<T extends ReadonlyMap<any, any>> =
   T extends ReadonlyMap<infer K, infer V> ? Map<K, V> : never;
 
@@ -24,6 +25,7 @@ type ToMutableMap<T extends ReadonlyMap<any, any>> =
  * type RSet = ReadonlySet<string>;
  * type MSet = ToMutableSet<RSet>; // Set<string>
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ToMutableSet<T extends ReadonlySet<any>> =
   T extends ReadonlySet<infer V> ? Set<V> : never;
 

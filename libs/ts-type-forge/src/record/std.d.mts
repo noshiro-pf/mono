@@ -25,11 +25,13 @@ type StrictOmit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 type RelaxedOmit<T, K> = Pick<T, RelaxedExclude<keyof T, K>>;
 
 /** Construct a type with a set of properties K of type T */
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 type ReadonlyRecord<K extends PropertyKey, T> = {
   readonly [P in K]: T;
 };
 
 /** Construct a type with a set of properties K of type T */
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 type MutableRecord<K extends PropertyKey, T> = {
   [P in K]: T;
 };

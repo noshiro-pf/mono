@@ -37,7 +37,7 @@ type MutableObj = Mutable<ReadonlyObj>; // { a: string; b: number }
 
 > **MutableMap**\<`K`, `V`\> = `Map`\<`K`, `V`\>
 
-Defined in: [others/mutable.d.mts:41](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L41)
+Defined in: [others/mutable.d.mts:43](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L43)
 
 Alias for the standard `Map<K, V>` type. Represents a mutable map.
 
@@ -61,7 +61,7 @@ The type of values in the map.
 
 > **MutableSet**\<`K`\> = `Set`\<`K`\>
 
-Defined in: [others/mutable.d.mts:34](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L34)
+Defined in: [others/mutable.d.mts:36](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L36)
 
 Alias for the standard `Set<K>` type. Represents a mutable set.
 
@@ -79,7 +79,7 @@ The type of elements in the set.
 
 > **ToMutableMap**\<`T`\> = `T` _extends_ `ReadonlyMap`\<infer K, infer V\> ? `Map`\<`K`, `V`\> : `never`
 
-Defined in: [others/mutable.d.mts:17](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L17)
+Defined in: [others/mutable.d.mts:18](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L18)
 
 Converts a `ReadonlyMap<K, V>` type to its mutable counterpart `Map<K, V>`.
 
@@ -104,7 +104,7 @@ type MMap = ToMutableMap<RMap>; // Map<string, number>
 
 > **ToMutableSet**\<`T`\> = `T` _extends_ `ReadonlySet`\<infer V\> ? `Set`\<`V`\> : `never`
 
-Defined in: [others/mutable.d.mts:27](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L27)
+Defined in: [others/mutable.d.mts:29](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L29)
 
 Converts a `ReadonlySet<V>` type to its mutable counterpart `Set<V>`.
 

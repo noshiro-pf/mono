@@ -20,12 +20,12 @@ const generateIndexFile = async () => {
   const referenceLines = dtsFiles
     .map((filePath) => {
       // Make path relative to srcDir and use forward slashes
-      const relativePath = path.relative(srcDir, filePath).replace(/\\/g, '/');
+      const relativePath = path.relative(srcDir, filePath).replace(/\\/gu, '/');
       return `/// <reference path="./${relativePath}" />`;
     })
     .toSorted(); // Sort alphabetically for consistent order
 
-  const fileContent = referenceLines.join('\n') + '\n'; // Add trailing newline
+  const fileContent = `${referenceLines.join('\n')}\n`; // Add trailing newline
 
   try {
     await fs.writeFile(indexFilePath, fileContent, 'utf-8');
@@ -42,4 +42,4 @@ const getDtsFiles = async () => {
   return dtsFiles.filter((filePath) => filePath !== indexFilePath);
 };
 
-generateIndexFile();
+await generateIndexFile();

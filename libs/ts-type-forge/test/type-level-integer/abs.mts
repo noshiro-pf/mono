@@ -13,5 +13,5 @@ expectType<Abs<-1 | -2 | -3>, 1 | 2 | 3>('=');
 // @ts-expect-error Abs does not accept string
 expectType<Abs<'-0'>, 0>('=');
 
-const x = -1;
-expectType<Abs<typeof x>, 1>('=');
+const _x = -1;
+expectType<Abs<typeof _x>, 1>('=');

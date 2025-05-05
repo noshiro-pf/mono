@@ -3,5 +3,5 @@
   "language": "en",
   "words": ["bivariant", "contravariance", "NAND", "noshiro", "testw", "XNOR"],
   "flagWords": [],
-  "ignorePaths": ["./package-lock.json"]
+  "ignorePaths": ["eslint.config.js", "./package-lock.json"]
 }

@@ -12,7 +12,7 @@
 
 > **MutableRecord**\<`K`, `T`\> = `{ [P in K]: T }`
 
-Defined in: [record/std.d.mts:33](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/std.d.mts#L33)
+Defined in: [record/std.d.mts:35](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/std.d.mts#L35)
 
 Construct a type with a set of properties K of type T
 
@@ -32,7 +32,7 @@ Construct a type with a set of properties K of type T
 
 > **ReadonlyRecord**\<`K`, `T`\> = `{ readonly [P in K]: T }`
 
-Defined in: [record/std.d.mts:28](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/std.d.mts#L28)
+Defined in: [record/std.d.mts:29](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/std.d.mts#L29)
 
 Construct a type with a set of properties K of type T
 
