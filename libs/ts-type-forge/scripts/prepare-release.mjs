@@ -85,7 +85,12 @@ const prepareRelease = async () => {
     await execAsync(`git push --force origin ${releaseCandidateBranch}`);
 
     // Create/Update Pull Request
-    const token = core.getInput('github-token', { required: true });
+    const token = process.env['GITHUB_TOKEN'];
+
+    if (token === undefined) {
+      throw new Error('GITHUB_TOKEN is not set.');
+    }
+
     const octokit = github.getOctokit(token);
     const context = github.context;
 

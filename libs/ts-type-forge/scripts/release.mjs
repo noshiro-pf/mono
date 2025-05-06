@@ -43,7 +43,12 @@ const release = async () => {
     }
 
     // 3. Update GitHub Release Note
-    const githubToken = core.getInput('github-token', { required: true });
+    const githubToken = process.env['GITHUB_TOKEN'];
+
+    if (githubToken === undefined) {
+      throw new Error('GITHUB_TOKEN is not set.');
+    }
+
     core.setSecret(githubToken); // Mask the token
     core.info('Creating/Updating GitHub Release Note...');
     // Execute conventional-github-releaser
