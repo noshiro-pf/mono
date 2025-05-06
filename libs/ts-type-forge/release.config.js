@@ -15,7 +15,10 @@ export default {
     // 4-c. Run `npm dist-tag` command to add a tag to the package published on npmjs.
     '@semantic-release/npm',
 
-    // 5. Commit the changes of assets generated during the release flow to the repository.
+    // 5-1. Run prettier to format the code before committing.
+    ['@semantic-release/exec', { prepareCmd: 'npm run fmt' }],
+
+    // 5-2. Commit the changes of assets generated during the release flow to the repository.
     [
       '@semantic-release/git',
       {
