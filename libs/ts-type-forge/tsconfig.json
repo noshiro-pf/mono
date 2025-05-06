@@ -49,5 +49,5 @@
     // Completeness
     "skipLibCheck": false
   },
-  "include": ["./src", "./test", "./scripts"]
+  "include": ["./src", "./test", "./scripts", "./release.config.js"]
 }

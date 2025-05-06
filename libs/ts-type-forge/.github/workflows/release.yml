@@ -1,35 +1,42 @@
-name: Release
+name: Publish to npm (Semantic Release)
 
 on:
   push:
     branches:
-      - release # Trigger when changes are pushed to the release branch (e.g., PR merged)
+      - main # Trigger a push to the main branch
 
 permissions:
-  contents: write # for tagging and creating releases
+  contents: write # To allow semantic-release to update package.json, create tags, and create releases
+  issues: write # To allow semantic-release to comment release notes on related issues/PRs
+  pull-requests: write # To allow semantic-release to comment release notes into the associated PR
 
 jobs:
-  release:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0 # To allow semantic-release to parse the entire commit history
+          persist-credentials: false
 
       - name: Set up Node.js 20.x
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        id: setup_node_id
         with:
           node-version: 20
           cache: 'npm'
           cache-dependency-path: package-lock.json
-          registry-url: 'https://registry.npmjs.org' # Required for npm publish using setup-node
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run release script
-        run: node scripts/release.mjs
+      - name: Run type check
+        run: npm run test
+
+      - name: Run semantic-release
+        run: npx semantic-release
         env:
-          # GITHUB_TOKEN is automatically available
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # NPM_TOKEN needs to be added to repository secrets
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Used for creating GitHub Releases, etc.
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }} # Used for creating GitHub Releases, etc.
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Used for npm publish
