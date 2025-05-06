@@ -6,6 +6,14 @@
 
 A collection of type utilities to enhance your TypeScript development.
 
+## Features
+
+- Provides enhanced built-in types such as [`StrictExclude`](./src/record/std.d.mts#L16), [`StrictOmit`](./src/record/std.d.mts#L22), [`ReadonlyRecord`](./src/record/std.d.mts#L29), etc.
+- No need for import statements for utility types when using Triple-Slash Directives. See [How to use](#how-to-use) section.
+- No runtime cost – it's type-level only.
+- Secure and minimal – no third-party dependencies.
+- Quality – thoroughly tested for type correctness with type-testing.
+
 ## Installation
 
 ```bash
@@ -16,16 +24,43 @@ yarn add ts-type-forge
 pnpm add ts-type-forge
 ```
 
+## How to use
+
+There are two ways to use the types provided by `ts-type-forge`:
+
+1.  **Triple-Slash Directive (Recommended for global availability):**
+    Add `/// <reference types="ts-type-forge" />` to any `.ts` file in your project (e.g., `globals.d.ts` or at the top of a frequently used file). This makes all types from `ts-type-forge` globally available without needing explicit imports.
+
+    ```ts
+    // src/globals.d.ts or any other .ts file
+    /// <reference types="ts-type-forge" />
+
+    // src/types/dice.ts
+    // No import needed
+    export type DiceValue = UintRange<1, 7>; // 1 | 2 | 3 | 4 | 5 | 6
+    ```
+
+2.  **Explicit Imports:**
+    Alternatively, you can import types explicitly if you prefer more granular control or are not using triple-slash directives.
+
+    ```ts
+    // src/types/dice.ts
+    import { type UintRange } from 'ts-type-forge';
+
+    export type DiceValue = UintRange<1, 7>; // 1 | 2 | 3 | 4 | 5 | 6
+    ```
+
 ## Usage Examples
 
-Here we have picked out some examples of using `DeepReadonly`, `JsonValue`, and `UintRange`, but for a list of all other APIs, please refer to the [API reference](./docs/README.md).
+Below are a few examples featuring `DeepReadonly`, `JsonValue`, and `UintRange`. For a comprehensive list of all available types and their detailed documentation, please refer to the [API Reference](#api-reference) section.
 
 ### `DeepReadonly`
 
 Make all properties of a nested object readonly.
 
 ```ts
-import type { DeepReadonly } from 'ts-type-forge';
+// No import needed if using triple-slash directive
+// import type { DeepReadonly } from 'ts-type-forge'; // if importing explicitly
 
 type Config = {
     port: number;
@@ -63,12 +98,95 @@ const config: ReadonlyConfig = {
 // config.features.push('featureC'); // Error: Property 'push' does not exist on type 'readonly string[]'.
 ```
 
+### `StrictOmit`
+
+Create a new type by omitting specified keys from an existing type, ensuring that the keys to be omitted actually exist in the original type. This provides stricter type checking than the built-in `Omit`.
+
+```ts
+// No import needed if using triple-slash directive
+// import type { StrictOmit } from 'ts-type-forge'; // if importing explicitly
+
+type UserProfile = Readonly<{
+    id: string;
+    username: string;
+    email: string;
+    lastLogin: Date;
+    bio?: string;
+}>;
+
+// Create a type for user data that should not include 'lastLogin' or 'id'.
+type UserCreationData = StrictOmit<UserProfile, 'id' | 'lastLogin'>;
+// Result:
+// type UserCreationData = Readonly<{
+//     username: string;
+//     email: string;
+//     bio?: string | undefined;
+// }>;
+
+const newUser: UserCreationData = {
+    username: 'jane_doe',
+    email: 'jane@example.com',
+    // bio: 'Software Developer' // Optional
+};
+
+// The following would cause a type error because 'nonExistentKey' is not in UserProfile:
+// type InvalidOmit = StrictOmit<UserProfile, 'id' | 'nonExistentKey'>; // Error
+```
+
+### `NonEmptyArray`
+
+Represent an array that is guaranteed to have at least one element. This is useful for functions or types that require a collection to be non-empty.
+
+```ts
+// No import needed if using triple-slash directive
+// import type { NonEmptyArray } from 'ts-type-forge'; // if importing explicitly
+
+type Post = Readonly<{
+    title: string;
+    content: string;
+}>;
+
+// A blog must have at least one post.
+type Blog = Readonly<{
+    name: string;
+    posts: NonEmptyArray<Post>; // Ensures posts array is never empty
+}>;
+
+const myBlog: Blog = {
+    name: 'My Tech Journey',
+    posts: [
+        // This array must have at least one element
+        { title: 'First Post', content: 'Hello world!' },
+        { title: 'Understanding TypeScript', content: '...' },
+    ],
+};
+
+// // This would cause a type error
+// const emptyBlog: Blog = {
+//     name: 'Empty Thoughts',
+//     posts: [], // Error: Source has 0 element(s) but target requires 1.
+// };
+
+const getFirstPostTitle = (posts: NonEmptyArray<Post>): string =>
+    posts[0].title; // Safe to access posts[0]
+
+console.log(getFirstPostTitle(myBlog.posts));
+
+const processPosts = (posts: readonly Post[]) => {
+    if (posts.length > 0) {
+        const firstPost = posts[0]; // Need to check length for regular arrays
+        // ...
+    }
+};
+```
+
 ### `JsonValue`
 
 Safely handle JSON parsing results. `JsonValue` represents any valid JSON value (string, number, boolean, null, array of `JsonValue`, or object with string keys and `JsonValue` values).
 
 ```ts
-import type { JsonValue } from 'ts-type-forge';
+// No import needed if using triple-slash directive
+// import type { JsonValue } from 'ts-type-forge'; // if importing explicitly
 
 const jsonString =
     '{"name": "Alice", "age": 30, "isAdmin": false, "tags": ["user", "active"], "metadata": null}';
@@ -104,32 +222,35 @@ try {
 Define precise numeric ranges for function parameters. `UintRange<Start, End>` creates a union of integer literals from `Start` (inclusive) up to `End` (exclusive).
 
 ```ts
-import type { UintRange } from 'ts-type-forge';
+// No import needed if using triple-slash directive
+// import type { UintRange } from 'ts-type-forge'; // if importing explicitly
 
 /**
- * Converts a number to its string representation in the specified radix.
- * @param n The number to convert.
- * @param radix The base to use for representing numeric values. Must be between 2 and 36 (inclusive).
- *              UintRange<2, 37> represents the union 2 | 3 | ... | 36.
+ * Converts a string to an integer.
+ * @param str A string to convert into a number.
+ * @param radix A value between 2 and 36 that specifies the base of the number in `str`.
+ * If this argument is not supplied, strings with a prefix of '0x' are considered hexadecimal.
+ * All other strings are considered decimal.
  */
-declare function numToStr(n: number, radix?: UintRange<2, 37>): string;
+export const parseInteger = (str: string, radix?: UintRange<2, 37>): number =>
+    Number.parseInt(str, radix);
 
 // Valid usages:
-numToStr(10); // radix defaults (usually 10)
-numToStr(10, 2); // Binary
-numToStr(255, 16); // Hexadecimal
-numToStr(123, 36);
+parseInteger('10'); // radix defaults (usually 10)
+parseInteger('10', 2); // Binary
+parseInteger('255', 16); // Hexadecimal
+parseInteger('123', 36);
 
 // Invalid usages (TypeScript will error):
-// numToStr(10, 1);  // Error: Argument of type '1' is not assignable to parameter of type 'UintRange<2, 37>'.
-// numToStr(10, 37); // Error: Argument of type '37' is not assignable to parameter of type 'UintRange<2, 37>'.
+// parseInteger('10', 1); // Error: Argument of type '1' is not assignable to parameter of type 'UintRange<2, 37> | undefined'.
+// parseInteger('10', 37); // Error: Argument of type '37' is not assignable to parameter of type 'UintRange<2, 37> | undefined'.
 ```
 
-## API
+## API Reference
 
-[API reference](./docs/README.md)
+For detailed information on all types, see the [Full API Reference](./docs/README.md).
 
-### Type definition list (source code link)
+### Overview of All Types (with source code links)
 
 <!-- AUTO-GENERATED TYPES START -->
 
