@@ -9,12 +9,16 @@ updates:
       interval: 'weekly'
       day: 'saturday'
     target-branch: 'main'
+    commit-message:
+      prefix: 'fix'
+      prefix-development: 'chore'
 
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
       interval: 'weekly'
       day: 'saturday'
+    target-branch: 'main'
     commit-message:
-      prefix: 'fix'
+      prefix: 'chore'
       include: 'scope'
