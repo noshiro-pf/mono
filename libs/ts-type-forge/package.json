@@ -31,16 +31,20 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "zx scripts/gen-index.mjs",
+    "build": "npm run z:node-eval -- \"import { genRootIndex } from './scripts/functions/gen-root-index.mjs'; genRootIndex();\"",
+    "check-all": "npm run z:node-eval -- \"import { checkAll } from './scripts/cmd/check-all.mjs'; checkAll();\"",
+    "check:ext": "npm run z:node-eval -- \"import { checkExt } from './scripts/functions/check-ext.mjs'; checkExt();\"",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
-    "doc": "run-s doc:typedoc doc:types fmt",
-    "doc:typedoc": "typedoc",
-    "doc:types": "zx scripts/get-type-definitions.mjs",
+    "doc": "npm run z:node-eval -- \"import { genDocs } from './scripts/functions/gen-docs.mjs'; genDocs();\"",
     "fmt": "prettier --write .",
     "lint": "eslint .",
-    "test": "tsc --noEmit",
-    "testw": "tsc --noEmit --watch",
-    "type-check": "tsc --noEmit"
+    "lint:fix": "eslint . --fix",
+    "md": "markdownlint-cli2",
+    "tsc": "tsc --noEmit",
+    "tscw": "tsc --noEmit --watch",
+    "type-check": "tsc --noEmit",
+    "update-packages": "npx npm-check-updates -u --install always --reject @types/node",
+    "z:node-eval": "node --import tsx/esm --input-type=module --eval"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
@@ -51,23 +55,27 @@
     "@semantic-release/github": "^11.0.2",
     "@semantic-release/npm": "^12.0.1",
     "@semantic-release/release-notes-generator": "^14.0.3",
-    "@types/fs-extra": "^11.0.4",
-    "@types/node": "^22.15.17",
+    "@types/node": "^20.17.46",
     "conventional-changelog-conventionalcommits": "^8.0.0",
     "cspell": "^9.0.1",
     "eslint": "^9.26.0",
-    "npm-run-all2": "^8.0.1",
+    "fast-glob": "^3.3.3",
+    "markdownlint": "^0.38.0",
+    "markdownlint-cli2": "^0.18.0",
     "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-packagejson": "^2.5.12",
     "semantic-release": "^24.2.3",
+    "tsx": "^4.19.4",
     "typedoc": "^0.28.4",
     "typedoc-plugin-markdown": "^4.6.3",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.32.0",
-    "zx": "^8.5.4"
+    "typescript-eslint": "^8.32.0"
   },
   "peerDependencies": {
     "typescript": ">=4.8"
+  },
+  "engines": {
+    "node": ">=20.11.0"
   }
 }

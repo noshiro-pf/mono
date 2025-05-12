@@ -1,7 +1,15 @@
 {
   "version": "0.2",
   "language": "en",
-  "words": ["bivariant", "contravariance", "NAND", "noshiro", "testw", "XNOR"],
+  "words": [
+    "bivariant",
+    "contravariance",
+    "NAND",
+    "noshiro",
+    "testw",
+    "tscw",
+    "XNOR"
+  ],
   "flagWords": [],
   "ignorePaths": ["eslint.config.js", "./package-lock.json"]
 }

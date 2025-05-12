@@ -1,10 +1,8 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import '../node-global.mjs';
 
-const projectRoot = path.resolve(import.meta.dirname, '..'); // Assuming the script is in a 'scripts' directory
-const srcDir = path.resolve(projectRoot, 'src');
+const srcDir = path.resolve(projectRootPath, './src');
 
-const readmePath = path.resolve(projectRoot, './README.md');
+const readmePath = path.resolve(projectRootPath, './README.md');
 
 const typeRegex = /^type ([^< =]*)/u;
 const namespaceRegex = /^declare namespace ([^ {]*)/u;
@@ -21,14 +19,21 @@ const TSTypeForgeInternals = 'TSTypeForgeInternals';
  * @param {string} filePath - The path to the file.
  * @returns {Promise<{ typeName: string; filePath: string; line: number }[]>} - A promise resolving to found types.
  */
-const processFile = async (filePath) => {
-  /** @type {{ typeName: string; filePath: string; line: number }[]} */
-  const results = [];
+const processFile = async (
+  filePath: string,
+): Promise<
+  DeepReadonly<{ typeName: string; filePath: string; line: number }[]>
+> => {
+  const results: Readonly<{
+    typeName: string;
+    filePath: string;
+    line: number;
+  }>[] = [];
 
   try {
     const content = await fs.readFile(filePath, 'utf-8');
     const lines = content.split('\n');
-    const relativePath = path.relative(projectRoot, filePath);
+    const relativePath = path.relative(projectRootPath, filePath);
 
     for (const [index, line] of lines.entries()) {
       {
@@ -70,16 +75,12 @@ const processFile = async (filePath) => {
   return results;
 };
 
-/**
- * Main function to find and list types.
- */
-const listTypes = async () => {
+export const genTypeDefinitions = async (): Promise<void> => {
   const dtsFiles = await glob(`${srcDir}/**/*.d.mts`);
 
-  /** @type {{ typeName: string; filePath: string; line: number }[][]} */
-  const allTypes = await Promise.all(
-    dtsFiles.toSorted().map((file) => processFile(file)),
-  );
+  const allTypes: DeepReadonly<
+    { typeName: string; filePath: string; line: number }[][]
+  > = await Promise.all(dtsFiles.toSorted().map((file) => processFile(file)));
 
   const result = allTypes
     .flat(1)
@@ -99,5 +100,3 @@ const listTypes = async () => {
   // Write the updated content back to the README file
   await fs.writeFile(readmePath, newContent, 'utf-8');
 };
-
-listTypes().catch(console.error);

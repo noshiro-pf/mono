@@ -26,9 +26,11 @@ jobs:
       fail-fast: true
       matrix:
         command:
-          - 'fmt'
-          - 'cspell'
-          - 'doc'
+          - fmt
+          - cspell
+          - doc
+          - check:ext
+          - md
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -50,4 +52,4 @@ jobs:
         run: npm run ${{ matrix.command }}
 
       - name: Check if there is no file diff
-        run: .github/git_no_changes.sh
+        run: npm run z:node-eval -- "import { checkIfRepoIsDirty } from './scripts/functions/check-if-repo-is-dirty.mjs'; checkIfRepoIsDirty();"

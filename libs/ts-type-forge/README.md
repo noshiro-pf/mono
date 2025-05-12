@@ -28,8 +28,8 @@ pnpm add ts-type-forge
 
 There are two ways to use the types provided by `ts-type-forge`:
 
-1.  **Triple-Slash Directive (Recommended for global availability):**
-    Add `/// <reference types="ts-type-forge" />` to any `.ts` file in your project (e.g., `globals.d.ts` or at the top of a frequently used file). This makes all types from `ts-type-forge` globally available without needing explicit imports.
+1. **Triple-Slash Directive (Recommended for global availability):**
+   Add `/// <reference types="ts-type-forge" />` to any `.ts` file in your project (e.g., `globals.d.ts` or at the top of a frequently used file). This makes all types from `ts-type-forge` globally available without needing explicit imports.
 
     ```ts
     // src/globals.d.ts or any other .ts file
@@ -40,8 +40,8 @@ There are two ways to use the types provided by `ts-type-forge`:
     export type DiceValue = UintRange<1, 7>; // 1 | 2 | 3 | 4 | 5 | 6
     ```
 
-2.  **Explicit Imports:**
-    Alternatively, you can import types explicitly if you prefer more granular control or are not using triple-slash directives.
+2. **Explicit Imports:**
+   Alternatively, you can import types explicitly if you prefer more granular control or are not using triple-slash directives.
 
     ```ts
     // src/types/dice.ts

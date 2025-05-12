@@ -12,6 +12,9 @@ updates:
     commit-message:
       prefix: 'fix'
       prefix-development: 'chore'
+    ignore:
+      - dependency-name: '@types/node'
+        versions: ['>=21.0.0']
 
   - package-ecosystem: 'github-actions'
     directory: '/'
