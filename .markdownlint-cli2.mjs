@@ -31,6 +31,7 @@ const config = {
     'list-marker-space': false, // prefer Prettier's setting
     'no-duplicate-heading': { siblings_only: true },
     'no-inline-html': false,
+    MD041: false,
   },
 };
 
