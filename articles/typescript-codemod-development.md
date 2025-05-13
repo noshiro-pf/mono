@@ -233,14 +233,14 @@ fs.writeFileSync(filePath, outputCode, 'utf-8');
 console.log(`Recast: Transformed ${filePath}`);
 ```
 
-eslint を使った実装も同様の問題があります。 eslint で実装できれば様々なプロジェクトへの導入がしやすそうで魅力的だなとも思ったのですが…。
+eslint を使った実装も同様の問題があります。 eslint ルールとして実装できれば様々なプロジェクトへの導入がしやすそうで魅力的だなとも思ったのですが…。
 
 ```ts
 // eslint ルール実装例
 
 // rules/any-to-unknown-rule.js
 
-export default createRule<Options, MessageIds>({
+export default createRule({
   meta: {
     type: 'suggestion',
     docs: {
