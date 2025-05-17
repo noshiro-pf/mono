@@ -4,17 +4,21 @@
 version: 2
 updates:
   - package-ecosystem: 'npm' # See documentation for possible values
-    directories: ['!/experimental/**'] # Location of package manifests
+    directories: ['!/experimental/**']
     schedule:
       interval: 'weekly'
       day: 'saturday'
     target-branch: 'main'
+    commit-message:
+      prefix: 'fix'
+      prefix-development: 'chore'
 
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
       interval: 'weekly'
       day: 'saturday'
+    target-branch: 'main'
     commit-message:
-      prefix: 'fix'
+      prefix: 'chore'
       include: 'scope'
