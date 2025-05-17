@@ -219,7 +219,7 @@ try {
 
 ### `UintRange`
 
-Define precise numeric ranges for function parameters. `UintRange<Start, End>` creates a union of integer literals from `Start` (inclusive) up to `End` (exclusive).
+Define precise numeric ranges for function parameters. `UintRange<Start, End>` creates a union of integer literals from `Start` (inclusive) up to `End` (exclusive). You can also use the version where both are inclusive: `UintRangeInclusive`.
 
 ```ts
 // No import needed if using triple-slash directive
@@ -234,6 +234,9 @@ Define precise numeric ranges for function parameters. `UintRange<Start, End>` c
  */
 export const parseInteger = (str: string, radix?: UintRange<2, 37>): number =>
     Number.parseInt(str, radix);
+// or
+// export const parseInteger = (str: string, radix?: UintRangeInclusive<2, 36>): number =>
+//     Number.parseInt(str, radix);
 
 // Valid usages:
 parseInteger('10'); // radix defaults (usually 10)
