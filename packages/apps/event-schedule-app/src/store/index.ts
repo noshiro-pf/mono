@@ -1,5 +1,6 @@
 export * from './answer-page-state';
 export * from './auth';
+export * from './batch-update-page-state';
 export * from './confirm-email-dialog-state';
 export * from './create-event-schedule-page';
 export * from './event-list-page-state';
