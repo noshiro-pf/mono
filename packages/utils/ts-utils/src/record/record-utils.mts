@@ -9,13 +9,13 @@ const set = <const R extends UnknownRecord, const K extends keyof R>(
   record: R,
   key: K,
   newValue: R[K],
-): R => ({ ...record, [key]: newValue });
+): R => ({ ...record, [key]: newValue }) as const;
 
 const update = <const R extends UnknownRecord, const K extends keyof R>(
   record: R,
   key: K,
   updater: (prev: R[K]) => R[K],
-): R => ({ ...record, [key]: updater(record[key]) });
+): R => ({ ...record, [key]: updater(record[key]) }) as const;
 
 const UNSAFE_getIn_impl = (
   obj: UnknownRecord,
@@ -62,7 +62,7 @@ const UNSAFE_updateIn_impl = (
               )
             : v,
         )
-      : {
+      : ({
           ...obj,
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           [keyPath[index]!]: UNSAFE_updateIn_impl(
@@ -72,7 +72,7 @@ const UNSAFE_updateIn_impl = (
             Uint32.add(index, 1),
             updater,
           ),
-        };
+        } as const);
 
 const setIn = <const R extends UnknownRecord>(
   record: R,
@@ -148,8 +148,8 @@ const merge = <const R1 extends UnknownRecord, const R2 extends UnknownRecord>(
       ? R1[Key]
       : never;
 }> =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
-  ({ ...record1, ...record2 }) as any;
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  ({ ...record1, ...record2 }) as const as never;
 
 function hasKeyValue<
   const R extends UnknownRecord,

@@ -3,8 +3,16 @@ import { isNumber, isRecord } from '../index.mjs';
 import { RecordUtils } from './record-utils.mjs';
 
 type R0 = DeepReadonly<{
-  x: { a: number; b: number };
-  y: { c: { d: number; 4: number } };
+  x: {
+    a: number;
+    b: number;
+  };
+  y: {
+    c: {
+      d: number;
+      4: number;
+    };
+  };
   z: [number, number, number];
 }>;
 
@@ -19,7 +27,13 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.get(rcd, 'x');
 
-      expectType<typeof result, DeepReadonly<{ a: number; b: number }>>('=');
+      expectType<
+        typeof result,
+        DeepReadonly<{
+          a: number;
+          b: number;
+        }>
+      >('=');
 
       test('case 1', () => {
         expect(result).toStrictEqual({ a: 1, b: 2 });
@@ -28,9 +42,15 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.get(rcd, 'y');
 
-      expectType<typeof result, DeepReadonly<{ c: { d: number; 4: number } }>>(
-        '=',
-      );
+      expectType<
+        typeof result,
+        DeepReadonly<{
+          c: {
+            d: number;
+            4: number;
+          };
+        }>
+      >('=');
 
       test('case 2', () => {
         expect(result).toStrictEqual({ c: { d: 3, 4: 5 } });
@@ -264,7 +284,10 @@ describe('RecordUtils', () => {
       expectType<
         typeof result,
         DeepReadonly<{
-          x: { a: number; b: number };
+          x: {
+            a: number;
+            b: number;
+          };
         }>
       >('=');
 
@@ -283,8 +306,16 @@ describe('RecordUtils', () => {
       expectType<
         typeof result,
         DeepReadonly<{
-          x: { a: number; b: number };
-          y: { c: { d: number; 4: number } };
+          x: {
+            a: number;
+            b: number;
+          };
+          y: {
+            c: {
+              d: number;
+              4: number;
+            };
+          };
           z: [number, number, number];
           a: 1;
           b: 2;
@@ -312,7 +343,10 @@ describe('RecordUtils', () => {
         typeof result,
         DeepReadonly<{
           x: 1;
-          y: { p: '3'; q: '4' };
+          y: {
+            p: '3';
+            q: '4';
+          };
           z: [number, number, number];
           a: 1;
         }>
@@ -386,8 +420,14 @@ describe('RecordUtils', () => {
   });
 
   describe('hasKeyValue', () => {
-    type Point = { x: number; y: number };
-    type Line = { begin: Point; end: Point };
+    type Point = Readonly<{
+      x: number;
+      y: number;
+    }>;
+    type Line = Readonly<{
+      begin: Point;
+      end: Point;
+    }>;
 
     const isPoint = (a: unknown): a is Point =>
       isRecord(a) &&
