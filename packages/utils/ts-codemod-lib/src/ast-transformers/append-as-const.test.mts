@@ -1,0 +1,333 @@
+/* eslint-disable vitest/expect-expect */
+import * as prettier from 'prettier';
+import { dedent } from '../utils/index.mjs';
+import { appendAsConstTransformer } from './append-as-const.mjs';
+import { transformSourceCode } from './transform-source-code.mjs';
+
+const testFn = async ({
+  source,
+  expected,
+  debug,
+}: Readonly<{
+  source: string;
+  expected: string;
+  debug?: boolean;
+}>): Promise<void> => {
+  if (debug !== true) {
+    // eslint-disable-next-line vitest/no-restricted-vi-methods
+    vi.spyOn(console, 'debug').mockImplementation(() => {});
+
+    // eslint-disable-next-line vitest/no-restricted-vi-methods
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+  }
+
+  const transformed = await formatter(
+    transformSourceCode(source, false, [appendAsConstTransformer()]),
+  );
+  const expectedFormatted = await formatter(expected);
+
+  expect(transformed).toBe(expectedFormatted);
+};
+
+const formatter = (code: string): Promise<string> =>
+  prettier.format(code, {
+    parser: 'typescript',
+  });
+
+describe('appendAsConstTransformer', () => {
+  test.each([
+    {
+      name: 'ArrayLiteralExpression - simple',
+      source: 'const foo = [1, 2, 3];',
+      expected: 'const foo = [1, 2, 3] as const;',
+    },
+    {
+      name: 'ArrayLiteralExpression - empty',
+      source: 'const emptyArray = [];',
+      expected: 'const emptyArray = [] as const;',
+    },
+    {
+      name: 'ArrayLiteralExpression - nested',
+      source: 'const nested = [1, [2, 3], 4];',
+      expected: 'const nested = [1, [2, 3], 4] as const;',
+    },
+    {
+      name: 'ArrayLiteralExpression - with strings',
+      source: "const strArray = ['a', 'b', 'c'];",
+      expected: "const strArray = ['a', 'b', 'c'] as const;",
+    },
+    {
+      name: 'ArrayLiteralExpression - mixed types',
+      source: "const mixed = [1, 'a', true, null];",
+      expected: "const mixed = [1, 'a', true, null] as const;",
+    },
+    {
+      name: 'ObjectLiteralExpression - simple',
+      source: 'const obj = { a: 1, b: 2 };',
+      expected: 'const obj = { a: 1, b: 2 } as const;',
+    },
+    {
+      name: 'ObjectLiteralExpression - empty',
+      source: 'const emptyObj = {};',
+      expected: 'const emptyObj = {} as const;',
+    },
+    {
+      name: 'ObjectLiteralExpression - nested',
+      source: 'const nestedObj = { a: 1, b: { c: 2 } };',
+      expected: 'const nestedObj = { a: 1, b: { c: 2 } } as const;',
+    },
+    {
+      name: 'ObjectLiteralExpression - with array',
+      source: 'const objWithArray = { a: 1, b: [1, 2, 3] };',
+      expected: 'const objWithArray = { a: 1, b: [1, 2, 3] } as const;',
+    },
+    {
+      name: 'Mixed - array with object',
+      source: 'const arrayWithObj = [{ a: 1 }, { b: 2 }];',
+      expected: 'const arrayWithObj = [{ a: 1 }, { b: 2 }] as const;',
+    },
+    {
+      name: 'Variable declaration with multiple variables',
+      source: 'const a = [1, 2], b = { c: 3 };',
+      expected: 'const a = [1, 2] as const, b = { c: 3 } as const;',
+    },
+    {
+      name: 'Variable declaration with mut_ keyword',
+      source: 'const mut_foo = [1, 2, 3];',
+      expected: 'const mut_foo = [1, 2, 3];',
+    },
+    {
+      name: 'Variable declaration with multiple variables',
+      source: 'const mut_a = [1, 2], mut_b = { c: 3 };',
+      expected: 'const mut_a = [1, 2], mut_b = { c: 3 };',
+    },
+    {
+      name: 'Function return',
+      source: 'function foo() { return [1, 2, 3]; }',
+      expected: 'function foo() { return [1, 2, 3] as const; }',
+    },
+    {
+      name: 'Arrow function return',
+      source: 'const foo = () => ({ a: 1, b: 2 });',
+      expected: 'const foo = () => ({ a: 1, b: 2 } as const);',
+    },
+    {
+      name: 'Array in function parameter',
+      source: 'function foo(a = [1, 2]) { return a; }',
+      expected: 'function foo(a = [1, 2] as const) { return a; }',
+    },
+    {
+      name: 'Object in function parameter',
+      source: 'function foo(a = { b: 1 }) { return a; }',
+      expected: 'function foo(a = { b: 1 } as const) { return a; }',
+    },
+    {
+      name: 'Object in function call',
+      source: 'const a = foo({ b: 1 });',
+      expected: 'const a = foo({ b: 1 });',
+    },
+    {
+      name: 'Skip ArrayLiteralExpression with disable comment',
+      source: dedent`
+        // transformer-ignore-next-line
+        const skippedArray = [1, 2, 3];
+      `,
+      expected: dedent`
+        // transformer-ignore-next-line
+        const skippedArray = [1, 2, 3];
+      `,
+    },
+    {
+      name: 'Skip ObjectLiteralExpression with disable comment',
+      source: dedent`
+        // transformer-ignore-next-line
+        const skippedObject = { a: 1, b: "hello" };
+      `,
+      expected: dedent`
+        // transformer-ignore-next-line
+        const skippedObject = { a: 1, b: "hello" };
+      `,
+    },
+    {
+      name: 'Disable comment only affects the immediate next line',
+      source: dedent`
+        const transformedArray = [10, 20]; // This should be transformed
+        // transformer-ignore-next-line
+        const skippedObject = { x: true }; // This should be skipped
+        const transformedObject = { y: false }; // This should be transformed
+      `,
+      expected: dedent`
+        const transformedArray = [10, 20] as const; // This should be transformed
+        // transformer-ignore-next-line
+        const skippedObject = { x: true }; // This should be skipped
+        const transformedObject = { y: false } as const; // This should be transformed
+      `,
+    },
+    {
+      name: 'File scope transformer-ignore',
+      source: dedent`
+        /* transformer-ignore */
+        const transformedArray = [10, 20]; // This should be skipped
+        const skippedObject = { x: true }; // This should be skipped
+        const transformedObject = { y: false }; // This should be skipped
+      `,
+      expected: dedent`
+        /* transformer-ignore */
+        const transformedArray = [10, 20]; // This should be skipped
+        const skippedObject = { x: true }; // This should be skipped
+        const transformedObject = { y: false }; // This should be skipped
+      `,
+    },
+    // Cases where the transformer doesn't modify the code
+    {
+      name: 'Primitive literal - number',
+      source: 'const num = 42;',
+      expected: 'const num = 42;',
+    },
+    {
+      name: 'Primitive literal - string',
+      source: "const str = 'hello';",
+      expected: "const str = 'hello';",
+    },
+    {
+      name: 'Primitive literal - boolean',
+      source: 'const bool = true;',
+      expected: 'const bool = true;',
+    },
+    {
+      name: 'Primitive literal - null',
+      source: 'const n = null;',
+      expected: 'const n = null;',
+    },
+    {
+      name: 'Primitive literal - undefined',
+      source: 'const u = undefined;',
+      expected: 'const u = undefined;',
+    },
+    {
+      name: 'Variable reference',
+      source: 'const a = 1; const b = a;',
+      expected: 'const a = 1; const b = a;',
+    },
+    {
+      name: 'Function call',
+      source: 'const result = foo();',
+      expected: 'const result = foo();',
+    },
+    {
+      name: 'Method call',
+      source: 'const result = obj.method();',
+      expected: 'const result = obj.method();',
+    },
+    {
+      name: 'Binary expression',
+      source: 'const sum = a + b;',
+      expected: 'const sum = a + b;',
+    },
+    {
+      name: 'Template literal',
+      // eslint-disable-next-line no-template-curly-in-string
+      source: 'const greeting = `Hello ${name}`;',
+      // eslint-disable-next-line no-template-curly-in-string
+      expected: 'const greeting = `Hello ${name}`;',
+    },
+    {
+      name: 'New expression',
+      source: 'const date = new Date();',
+      expected: 'const date = new Date();',
+    },
+    {
+      name: 'Already has as const - array',
+      source: 'const arr = [1, 2, 3] as const;',
+      expected: 'const arr = [1, 2, 3] as const;',
+    },
+    {
+      name: 'Already has as const - object',
+      source: 'const obj = { a: 1 } as const;',
+      expected: 'const obj = { a: 1 } as const;',
+    },
+    {
+      name: 'Primitive literal - number',
+      source: 'const num = 42;',
+      expected: 'const num = 42;',
+    },
+    {
+      name: 'Class declaration',
+      source: 'class MyClass { prop = 1; }',
+      expected: 'class MyClass { prop = 1; }',
+    },
+
+    // Tests for removing nested as const
+    {
+      name: 'should remove nested as const from array literal',
+      source: 'const arr = [[1, 2] as const, [3, 4]] as const;',
+      expected: 'const arr = [[1, 2], [3, 4]] as const;',
+    },
+    {
+      name: 'should remove nested as const from object literal',
+      source: 'const obj = { a: { b: 1 } as const, c: 2 } as const;',
+      expected: 'const obj = { a: { b: 1 }, c: 2 } as const;',
+    },
+    {
+      name: 'should remove nested as const from mixed literals',
+      source: 'const mixed = [{ a: 1 } as const, [2] as const] as const;',
+      expected: 'const mixed = [{ a: 1 }, [2]] as const;',
+    },
+    {
+      name: 'should remove deeply nested as const',
+      source: 'const deep = [[{ x: 1 as const }] as const] as const;',
+      expected: 'const deep = [[{ x: 1 }]] as const;',
+    },
+
+    // Tests for removing as const from primitives within literals
+    {
+      name: 'should remove as const from number literal inside array and add as const to top level',
+      source: 'const arr = [1 as const, 2];',
+      expected: 'const arr = [1, 2] as const;',
+    },
+    {
+      name: 'should remove as const from string literal inside object and add as const to top level',
+      source: 'const obj = { key: "value" as const };',
+      expected: 'const obj = { key: "value" } as const;',
+    },
+    {
+      name: 'should remove as const from boolean literal inside array and add as const to top level',
+      source: 'const arr = [true as const, false];',
+      expected: 'const arr = [true, false] as const;',
+    },
+    {
+      name: 'should remove multiple primitive as const inside literals and add as const to top level',
+      source:
+        'const mixed = [1 as const, { val: "str" as const }, false as const];',
+      expected: 'const mixed = [1, { val: "str" }, false] as const;',
+    },
+    {
+      name: 'should remove primitive as const even if parent already has as const',
+      source: 'const arr = [1 as const, 2] as const;',
+      expected: 'const arr = [1, 2] as const;',
+    },
+    {
+      name: 'should remove primitive as const in nested object and add as const to top level',
+      source: 'const obj = { data: { value: 123 as const } };',
+      expected: 'const obj = { data: { value: 123 } } as const;',
+    },
+
+    {
+      name: 'arrow function',
+      source: dedent`
+        export const some = <const S,>(value: S): Some<S> =>
+          ({
+            type: SomeTypeSymbol,
+            value
+          }) as const;
+      `,
+      expected: dedent`
+        export const some = <const S,>(value: S): Some<S> =>
+          ({
+            type: SomeTypeSymbol,
+            value
+          }) as const;
+      `,
+    },
+  ])('$name', testFn);
+});

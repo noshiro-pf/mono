@@ -7,51 +7,62 @@ interface IMapInterface<K, V> {
   new (iterable: Iterable<K>): void;
 
   // Getting information
-  size: NumberType.ArraySize;
-  has: (key: K | (WidenLiteral<K> & {})) => boolean;
-  get: (key: K) => V | undefined;
+  readonly size: NumberType.ArraySize;
+  readonly has: (key: K | (WidenLiteral<K> & {})) => boolean;
+  readonly get: (key: K) => V | undefined;
 
   // Reducing a value
-  every: ((predicate: (value: V, key: K) => boolean) => boolean) &
+  readonly every: ((predicate: (value: V, key: K) => boolean) => boolean) &
     (<W extends V>(
       predicate: (value: V, key: K) => value is W,
     ) => this is IMap<K, W>);
-  some: (predicate: (value: V, key: K) => boolean) => boolean;
+  readonly some: (predicate: (value: V, key: K) => boolean) => boolean;
 
   // Mutation
-  delete: (key: K) => IMap<K, V>;
-  set: (key: K, value: V) => IMap<K, V>;
-  update: (key: K, updater: (value: V) => V) => IMap<K, V>;
-  withMutations: (
+  readonly delete: (key: K) => IMap<K, V>;
+  readonly set: (key: K, value: V) => IMap<K, V>;
+  readonly update: (key: K, updater: (value: V) => V) => IMap<K, V>;
+  readonly withMutations: (
     actions: readonly Readonly<
-      | { type: 'delete'; key: K }
-      | { type: 'set'; key: K; value: V }
-      | { type: 'update'; key: K; updater: (value: V) => V }
+      | {
+          type: 'delete';
+          key: K;
+        }
+      | {
+          type: 'set';
+          key: K;
+          value: V;
+        }
+      | {
+          type: 'update';
+          key: K;
+          updater: (value: V) => V;
+        }
     >[],
   ) => IMap<K, V>;
 
   // Sequence algorithms
-  map: <V2>(mapFn: (value: V, key: K) => V2) => IMap<K, V2>;
-  mapKeys: <K2>(mapFn: (key: K) => K2) => IMap<K2, V>;
-  mapEntries: <K2, V2>(
+  readonly map: <V2>(mapFn: (value: V, key: K) => V2) => IMap<K, V2>;
+  readonly mapKeys: <K2>(mapFn: (key: K) => K2) => IMap<K2, V>;
+  readonly mapEntries: <K2, V2>(
     mapFn: (entry: readonly [K, V]) => readonly [K2, V2],
   ) => IMap<K2, V2>;
 
   // Side effects
-  forEach: (callbackfn: (value: V, key: K) => void) => void;
+  readonly forEach: (callbackfn: (value: V, key: K) => void) => void;
 
   // Iterators
-  keys: () => IterableIterator<K>;
-  values: () => IterableIterator<V>;
-  entries: () => IterableIterator<readonly [K, V]>;
+  readonly keys: () => IterableIterator<K>;
+  readonly values: () => IterableIterator<V>;
+  readonly entries: () => IterableIterator<readonly [K, V]>;
 
   // Conversion
-  toKeysArray: () => readonly K[];
-  toValuesArray: () => readonly V[];
-  toEntriesArray: () => readonly (readonly [K, V])[];
-  toArray: () => readonly (readonly [K, V])[];
-  toSet: () => ISet<V>;
-  toRawMap: () => ReadonlyMap<K, V>;
+  readonly toKeysArray: () => readonly K[];
+  readonly toValuesArray: () => readonly V[];
+  readonly toEntriesArray: () => readonly (readonly [K, V])[];
+  readonly toArray: () => readonly (readonly [K, V])[];
+  readonly toSet: () => ISet<V>;
+  readonly toRawMap: () => ReadonlyMap<K, V>;
 }
 
 export type IMap<K, V> = Iterable<readonly [K, V]> &
@@ -66,7 +77,7 @@ export const IMap = {
 
     return a.every((v, k) => b.get(k) === v);
   },
-};
+} as const;
 
 class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   readonly #map: ReadonlyMap<K, V>;
@@ -145,9 +156,20 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
 
   withMutations(
     actions: readonly Readonly<
-      | { type: 'delete'; key: K }
-      | { type: 'set'; key: K; value: V }
-      | { type: 'update'; key: K; updater: (value: V) => V }
+      | {
+          type: 'delete';
+          key: K;
+        }
+      | {
+          type: 'set';
+          key: K;
+          value: V;
+        }
+      | {
+          type: 'update';
+          key: K;
+          updater: (value: V) => V;
+        }
     >[],
   ): IMap<K, V> {
     // eslint-disable-next-line no-restricted-globals

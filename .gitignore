@@ -1,3 +1,7 @@
+
+# codemod
+
+cdmd_dist
 node_modules
 **/.env
 packages/**/build
@@ -112,3 +116,7 @@ rollup.config-*.mjs
 **/playwright-report/
 **/blob-report/
 **/playwright/.cache/
+
+# codemod
+
+cdmd_dist
