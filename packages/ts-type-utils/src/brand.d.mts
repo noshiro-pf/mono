@@ -1,6 +1,6 @@
 type UnknownBrand = Brand<unknown, never, never>;
 
-/** @internal */
+/** @internal Contains internal implementation details. */
 declare namespace TSTypeUtilsInternals {
   // const brand_: unique symbol;
 
