@@ -1,4 +1,4 @@
-/** @internal */
+/** @internal Contains internal implementation details. */
 declare namespace TSTypeUtilsInternals {
   type IntRangeKeys =
     | '< 2^15'
@@ -42,6 +42,15 @@ declare namespace TSTypeUtilsInternals {
   /** Integers in `[-MaxIndex, -1]` */
   type SmallNegativeInt<MaxIndex extends number = SmallIntIndexMax> =
     NegativeIndex<MaxIndex>;
+
+  type WithSmallIntImpl<N extends Int, MaxIndex extends number> =
+    | Exclude<
+        SmallInt<'', MaxIndex>,
+        | (N extends NegativeNumber ? SmallInt<'>=0', MaxIndex> : never)
+        | (N extends NonNegativeNumber ? SmallInt<'<0', MaxIndex> : never)
+        | (N extends NonZeroNumber ? 0 : never)
+      >
+    | N;
 }
 
 /** Numeric brand type for `NaN` */
@@ -316,16 +325,10 @@ type CastToInt<T> = T extends Int ? T : never;
 type WithSmallInt<
   N extends Int,
   MaxIndex extends number = TSTypeUtilsInternals.SmallIntIndexMax,
-> = WithSmallIntImpl<CastToInt<NormalizeBrandUnion<N>>, MaxIndex>;
-
-type WithSmallIntImpl<N extends Int, MaxIndex extends number> =
-  | Exclude<
-      SmallInt<'', MaxIndex>,
-      | (N extends NegativeNumber ? SmallInt<'>=0', MaxIndex> : never)
-      | (N extends NonNegativeNumber ? SmallInt<'<0', MaxIndex> : never)
-      | (N extends NonZeroNumber ? 0 : never)
-    >
-  | N;
+> = TSTypeUtilsInternals.WithSmallIntImpl<
+  CastToInt<NormalizeBrandUnion<N>>,
+  MaxIndex
+>;
 
 type IntWithSmallInt = WithSmallInt<Int>;
 type SafeIntWithSmallInt = WithSmallInt<SafeInt>;
