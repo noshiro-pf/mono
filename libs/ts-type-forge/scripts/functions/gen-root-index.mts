@@ -1,14 +1,12 @@
 import '../node-global.mjs';
 
-const projectRoot = path.resolve(import.meta.dirname, '..'); // Assuming the script is in a 'scripts' directory
-const srcDir = path.resolve(projectRoot, 'src');
+const srcDir = path.resolve(projectRootPath, 'src');
 const indexFilePath = path.resolve(srcDir, 'index.d.mts');
 
 export const genRootIndex = async (): Promise<void> => {
   console.log(`Searching for .d.mts files in ${srcDir}...`);
 
-  /** @type {readonly string[]} */
-  const dtsFiles = await getDtsFiles();
+  const dtsFiles: readonly string[] = await getDtsFiles();
 
   if (dtsFiles.length === 0) {
     console.log('No .d.mts files found (excluding index.d.mts).');
