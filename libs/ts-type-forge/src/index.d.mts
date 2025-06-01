@@ -1,3 +1,5 @@
+/// <reference path="./branded-types/brand.d.mts" />
+/// <reference path="./branded-types/branded-number-types.d.mts" />
 /// <reference path="./condition/eq.d.mts" />
 /// <reference path="./condition/extends.d.mts" />
 /// <reference path="./condition/is-fixed-length-list.d.mts" />

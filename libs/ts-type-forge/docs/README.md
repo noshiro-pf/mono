@@ -6,6 +6,8 @@
 
 ## Modules
 
+- [branded-types/brand](branded-types/brand.md)
+- [branded-types/branded-number-types](branded-types/branded-number-types.md)
 - [condition/eq](condition/eq.md)
 - [condition/extends](condition/extends.md)
 - [condition/is-fixed-length-list](condition/is-fixed-length-list.md)
