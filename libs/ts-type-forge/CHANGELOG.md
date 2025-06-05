@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v1.1.0...v2.0.0) (2025-06-05)
+
+### Features
+
+- add branded number types ([#58](https://github.com/noshiro-pf/ts-type-forge/issues/58)) ([647e903](https://github.com/noshiro-pf/ts-type-forge/commit/647e90329740dffccdcf2c10a0bb27972b1e64e0))
+
+### BREAKING CHANGES
+
+- Renamed some types for branded number types and added many new branded number types.
+
+Co-authored-by: github-actions[bot] <actions@github.com>
+
 # [1.1.0](https://github.com/noshiro-pf/ts-type-forge/compare/v1.0.1...v1.1.0) (2025-06-01)
 
 ### Features
