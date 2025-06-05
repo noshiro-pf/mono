@@ -17,3 +17,7 @@ Follow the naming conventions below:
 ## Function Definitions
 
 - Use Arrow Functions in all cases
+
+## Typing
+
+- Unless explicitly stated, never use `as any` or `as never`.
