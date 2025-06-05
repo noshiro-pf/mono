@@ -49,3 +49,9 @@ type T6 = IsUnion<unknown>; // false
 type T7 = IsUnion<true | false>; // true (boolean)
 type T8 = IsUnion<boolean>; // true (equivalent to true | false)
 ```
+
+## References
+
+### TSTypeForgeInternals
+
+Re-exports [TSTypeForgeInternals](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md)

@@ -36,3 +36,9 @@ type S3 = Seq<3>; // readonly [0, 1, 2]
 type S0 = Seq<0>; // readonly []
 type S1 = Seq<1>; // readonly [0]
 ```
+
+## References
+
+### TSTypeForgeInternals
+
+Re-exports [TSTypeForgeInternals](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md)

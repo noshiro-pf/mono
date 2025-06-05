@@ -26,7 +26,6 @@ type RecordPaths<R> = TSTypeForgeInternals.RecordPathPrefixes<
   RecordLeafPaths<R>
 >;
 
-/** @internal Contains internal implementation details for path utilities. */
 declare namespace TSTypeForgeInternals {
   /**
    * Generates a union of all prefixes of a given readonly tuple `L`, including the empty tuple `[]`.
@@ -86,7 +85,6 @@ type RecordLeafPaths<R> = R extends readonly unknown[]
     ? TSTypeForgeInternals.LeafPathsImplRecordCase<R, keyof R>
     : readonly [];
 
-/** @internal Contains internal implementation details for path utilities. */
 declare namespace TSTypeForgeInternals {
   /**
    * @internal Recursive implementation helper for `LeafPaths` when dealing with tuples/arrays.
@@ -140,7 +138,6 @@ type RecordLeafPathsWithIndex<R> = R extends readonly unknown[]
     ? TSTypeForgeInternals.LeafPathsWithIndexImplRecordCase<R, keyof R>
     : readonly [];
 
-/** @internal Contains internal implementation details for path utilities. */
 declare namespace TSTypeForgeInternals {
   /**
    * @internal Recursive implementation helper for `LeafPathsWithIndex` when dealing with tuples/arrays.
@@ -204,7 +201,6 @@ type RecordUpdated<
       ? TSTypeForgeInternals.RecordUpdatedImplRecordCase<R, Path, ValueAfter> // Use record logic
       : R; // Not a record or tuple, return as is
 
-/** @internal Contains internal implementation details for path utilities. */
 declare namespace TSTypeForgeInternals {
   /**
    * @internal Recursive implementation helper for `RecordUpdated` when dealing with records.
@@ -292,7 +288,6 @@ type RecordValueAtPathWithIndex<
   Path extends RecordPathsWithIndex<R>,
 > = TSTypeForgeInternals.RecordValueAtPathWithIndexImpl<R, Path, never>;
 
-/** @internal Contains internal implementation details for path utilities. */
 declare namespace TSTypeForgeInternals {
   /**
    * @internal Recursive implementation helper for `RecordValueAtPathWithIndex`.

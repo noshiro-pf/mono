@@ -6,8 +6,18 @@
 
 ## Modules
 
-- [branded-types/brand](branded-types/brand.md)
-- [branded-types/branded-number-types](branded-types/branded-number-types.md)
+- [branded-types/bigint](branded-types/bigint.md)
+- [branded-types/brand](branded-types/brand/README.md)
+- [branded-types/core](branded-types/core.md)
+- [branded-types/finite-number](branded-types/finite-number.md)
+- [branded-types/float](branded-types/float.md)
+- [branded-types/int](branded-types/int.md)
+- [branded-types/int16](branded-types/int16.md)
+- [branded-types/int32](branded-types/int32.md)
+- [branded-types/safe-int](branded-types/safe-int.md)
+- [branded-types/small-int](branded-types/small-int.md)
+- [branded-types/uint16](branded-types/uint16.md)
+- [branded-types/uint32](branded-types/uint32.md)
 - [condition/eq](condition/eq.md)
 - [condition/extends](condition/extends.md)
 - [condition/is-fixed-length-list](condition/is-fixed-length-list.md)

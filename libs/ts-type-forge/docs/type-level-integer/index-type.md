@@ -100,3 +100,9 @@ type NegIdx3 = NegativeIndex<3>; // -1 | -2 | -3
 type NegIdx0 = NegativeIndex<0>; // never
 type NegIdx1 = NegativeIndex<1>; // -1
 ```
+
+## References
+
+### TSTypeForgeInternals
+
+Re-exports [TSTypeForgeInternals](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md)

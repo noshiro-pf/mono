@@ -36,3 +36,9 @@ type Result = Min<U>; // 1
 type ResultSingle = Min<5>; // 5
 type ResultZero = Min<0 | 10>; // 0
 ```
+
+## References
+
+### TSTypeForgeInternals
+
+Re-exports [TSTypeForgeInternals](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md)

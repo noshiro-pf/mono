@@ -1,9 +1,25 @@
 /**
  * Performs a logical NOT operation on a boolean literal type `A`.
+ * This is the type-level equivalent of the JavaScript `!` operator.
+ *
  * @template A - A boolean literal type (`true` or `false`).
+ * @returns The logical negation of `A`: `false` if `A` is `true`, `true` if `A` is `false`.
+ *
  * @example
- * type Result = BoolNot<true>; // false
+ * ```ts
+ * type Result1 = BoolNot<true>;  // false
  * type Result2 = BoolNot<false>; // true
+ *
+ * // Useful in conditional types
+ * type IsDisabled<T> = T extends { enabled: infer E }
+ *   ? E extends boolean
+ *     ? BoolNot<E>
+ *     : never
+ *   : true;
+ *
+ * type Test1 = IsDisabled<{ enabled: true }>;  // false
+ * type Test2 = IsDisabled<{ enabled: false }>; // true
+ * ```
  */
 type BoolNot<A extends boolean> =
   TypeEq<A, true> extends true
@@ -14,13 +30,29 @@ type BoolNot<A extends boolean> =
 
 /**
  * Performs a logical AND operation on two boolean literal types `A` and `B`.
+ * This is the type-level equivalent of the JavaScript `&&` operator.
+ * Returns `true` only when both operands are `true`.
+ *
  * @template A - The first boolean literal type (`true` or `false`).
  * @template B - The second boolean literal type (`true` or `false`).
+ * @returns `true` if both `A` and `B` are `true`, `false` otherwise.
+ *
  * @example
+ * ```ts
  * type T_T = BoolAnd<true, true>;   // true
  * type T_F = BoolAnd<true, false>;  // false
  * type F_T = BoolAnd<false, true>;  // false
  * type F_F = BoolAnd<false, false>; // false
+ *
+ * // Useful for combining conditions
+ * type HasBothFlags<T> = T extends { flagA: infer A, flagB: infer B }
+ *   ? A extends boolean
+ *     ? B extends boolean
+ *       ? BoolAnd<A, B>
+ *       : false
+ *     : false
+ *   : false;
+ * ```
  */
 type BoolAnd<A extends boolean, B extends boolean> =
   TypeEq<A, true> extends true
@@ -39,13 +71,31 @@ type BoolAnd<A extends boolean, B extends boolean> =
 
 /**
  * Performs a logical OR operation on two boolean literal types `A` and `B`.
+ * This is the type-level equivalent of the JavaScript `||` operator.
+ * Returns `true` when at least one operand is `true`.
+ *
  * @template A - The first boolean literal type (`true` or `false`).
  * @template B - The second boolean literal type (`true` or `false`).
+ * @returns `true` if either `A` or `B` (or both) is `true`, `false` otherwise.
+ *
  * @example
+ * ```ts
  * type T_T = BoolOr<true, true>;   // true
  * type T_F = BoolOr<true, false>;  // true
  * type F_T = BoolOr<false, true>;  // true
  * type F_F = BoolOr<false, false>; // false
+ *
+ * // Useful for fallback conditions
+ * type HasAnyFlag<T> = T extends { flagA: infer A, flagB: infer B }
+ *   ? A extends boolean
+ *     ? B extends boolean
+ *       ? BoolOr<A, B>
+ *       : A
+ *     : B extends boolean
+ *       ? B
+ *       : false
+ *   : false;
+ * ```
  */
 type BoolOr<A extends boolean, B extends boolean> =
   TypeEq<A, true> extends true

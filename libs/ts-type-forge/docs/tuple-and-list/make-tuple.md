@@ -42,3 +42,9 @@ type TupleOf0Numbers = MakeTuple<number, 0>; // readonly []
 // type InvalidLength = MakeTuple<boolean, -1>; // Error or unexpected result
 // type InvalidLength2 = MakeTuple<boolean, 1.5>; // Error or unexpected result
 ```
+
+## References
+
+### TSTypeForgeInternals
+
+Re-exports [TSTypeForgeInternals](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md)

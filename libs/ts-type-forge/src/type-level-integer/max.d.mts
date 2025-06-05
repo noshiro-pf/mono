@@ -12,7 +12,6 @@
  */
 type Max<N extends Uint10> = TSTypeForgeInternals.MaxImpl<N, []>;
 
-/** @internal Contains internal implementation details. */
 declare namespace TSTypeForgeInternals {
   // https://zenn.dev/noshiro_piko/articles/typescript-type-level-min
 

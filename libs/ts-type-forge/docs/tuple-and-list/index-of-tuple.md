@@ -38,3 +38,9 @@ type ArrayIndices = IndexOfTuple<string[]>; // number
 type EmptyTupleIndices = IndexOfTuple<[]>; // never
 type ReadonlyArrayIndices = IndexOfTuple<readonly number[]>; // number
 ```
+
+## References
+
+### TSTypeForgeInternals
+
+Re-exports [TSTypeForgeInternals](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md)

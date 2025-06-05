@@ -25,7 +25,6 @@
  */
 type IsUnion<U> = TSTypeForgeInternals.IsUnionImpl<U, U>;
 
-/** @internal */
 declare namespace TSTypeForgeInternals {
   /**
    * Internal implementation detail for `IsUnion`.

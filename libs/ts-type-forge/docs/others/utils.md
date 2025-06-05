@@ -329,3 +329,9 @@ The object type.
 ```ts
 type Values = ValueOf<{ a: string; b: number }>; // string | number
 ```
+
+## References
+
+### TSTypeForgeInternals
+
+Re-exports [TSTypeForgeInternals](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md)

@@ -41,7 +41,6 @@ type NegativeIndex<N extends number> = TSTypeForgeInternals.MapIdx<
   RelaxedExclude<IndexInclusive<N>, 0>
 >;
 
-/** @internal Contains internal implementation details. */
 declare namespace TSTypeForgeInternals {
   /**
    * @internal Converts a negative number string literal (e.g., `"-5"`) to its corresponding negative number literal (`-5`).

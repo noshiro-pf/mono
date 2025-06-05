@@ -8,7 +8,6 @@
  */
 type UnknownBrand = Brand<unknown, never, never>;
 
-/** @internal */
 declare namespace TSTypeForgeInternals {
   // const brand_: unique symbol;
 

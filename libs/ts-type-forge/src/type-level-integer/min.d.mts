@@ -11,7 +11,6 @@
  */
 type Min<N extends Uint10> = TSTypeForgeInternals.MinImpl<N, []>;
 
-/** @internal Contains internal implementation details. */
 declare namespace TSTypeForgeInternals {
   // https://zenn.dev/noshiro_piko/articles/typescript-type-level-min
 

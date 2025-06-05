@@ -37,3 +37,9 @@ type Result = Max<U2>; // 2
 type ResultSingle = Max<5>; // 5
 // type ResultFull = Max<Uint10>; // 1023
 ```
+
+## References
+
+### TSTypeForgeInternals
+
+Re-exports [TSTypeForgeInternals](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md)

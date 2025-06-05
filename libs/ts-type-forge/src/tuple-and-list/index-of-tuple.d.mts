@@ -14,7 +14,6 @@
 type IndexOfTuple<T extends readonly unknown[]> =
   TSTypeForgeInternals.IndexOfTupleImpl<T, keyof T>;
 
-/** @internal */
 declare namespace TSTypeForgeInternals {
   /**
    * Internal implementation detail for `IndexOfTuple`.

@@ -15,12 +15,8 @@ type MakeTuple<
   N extends number,
 > = TSTypeForgeInternals.MakeTupleInternals.MakeTupleImpl<Elm, `${N}`, []>;
 
-/**
- * @link https://techracho.bpsinc.jp/yoshi/2020_09_04/97108
- * @internal Contains internal implementation details for `MakeTuple`. Not intended for direct use.
- */
 declare namespace TSTypeForgeInternals {
-  /** @internal Namespace for `MakeTuple` implementation details. */
+  // https://techracho.bpsinc.jp/yoshi/2020_09_04/97108
   namespace MakeTupleInternals {
     /** @internal Represents the numeric digits 0 through 9. */
     type Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;

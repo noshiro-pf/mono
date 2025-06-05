@@ -13,7 +13,6 @@ type Seq<N extends number> = TSTypeForgeInternals.SeqImpl<
   MakeTuple<unknown, N>
 >;
 
-/** @internal Contains internal implementation details for `Seq`. */
 declare namespace TSTypeForgeInternals {
   /**
    * @internal

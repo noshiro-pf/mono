@@ -111,7 +111,6 @@ type ExcludeFalsyValue<A> = RelaxedExclude<A, FalsyValue>;
 type Intersection<Types extends readonly unknown[]> =
   TSTypeForgeInternals.IntersectionImpl<Types>;
 
-/** @internal */
 declare namespace TSTypeForgeInternals {
   /** @internal */
   export type IntersectionImpl<Types extends readonly unknown[]> =
