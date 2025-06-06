@@ -16,24 +16,25 @@ const TSTypeForgeInternals = 'TSTypeForgeInternals';
 
 /**
  * Processes a single file to find type definitions matching the regex.
- * @param {string} filePath - The path to the file.
- * @returns {Promise<{ typeName: string; filePath: string; line: number }[]>} - A promise resolving to found types.
  */
 const processFile = async (
   filePath: string,
 ): Promise<
-  DeepReadonly<{ typeName: string; filePath: string; line: number }[]>
+  DeepReadonly<{
+    relativePath: string;
+    types: { typeName: string; line: number }[];
+  }>
 > => {
   const results: Readonly<{
     typeName: string;
-    filePath: string;
     line: number;
   }>[] = [];
+
+  const relativePath = path.relative(projectRootPath, filePath);
 
   try {
     const content = await fs.readFile(filePath, 'utf-8');
     const lines = content.split('\n');
-    const relativePath = path.relative(projectRootPath, filePath);
 
     for (const [index, line] of lines.entries()) {
       {
@@ -43,7 +44,6 @@ const processFile = async (
           // For now, just matching the pattern
           results.push({
             typeName: match[1],
-            filePath: relativePath,
             line: index + 1,
           });
         }
@@ -61,7 +61,6 @@ const processFile = async (
               // For now, just matching the pattern
               results.push({
                 typeName: `${namespaceMatch[1]}.${typeMatch[1]}`,
-                filePath: relativePath,
                 line: idx + 1,
               });
             }
@@ -72,22 +71,29 @@ const processFile = async (
   } catch (err) {
     console.error(`Error processing file ${filePath}:`, err);
   }
-  return results;
+  return {
+    relativePath,
+    types: results,
+  };
 };
 
 export const genTypeDefinitions = async (): Promise<void> => {
   const dtsFiles = await glob(`${srcDir}/**/*.d.mts`);
 
   const allTypes: DeepReadonly<
-    { typeName: string; filePath: string; line: number }[][]
-  > = await Promise.all(dtsFiles.toSorted().map((file) => processFile(file)));
+    {
+      relativePath: string;
+      types: { typeName: string; line: number }[];
+    }[]
+  > = await Promise.all(dtsFiles.toSorted().map(processFile));
 
   const result = allTypes
-    .flat(1)
-    .map(
-      ({ typeName, filePath, line }) =>
-        `- [${typeName}](./${filePath}#L${line})`,
-    )
+    .flatMap(({ relativePath, types }) => [
+      `- ${relativePath}`,
+      ...types.map(
+        ({ typeName, line }) => `  - [${typeName}](./${relativePath}#L${line})`,
+      ),
+    ])
     .join('\n');
 
   const content = await fs.readFile(readmePath, 'utf-8');
