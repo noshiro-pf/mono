@@ -1,3 +1,9 @@
+## [2.0.2](https://github.com/noshiro-pf/ts-type-forge/compare/v2.0.1...v2.0.2) (2025-06-06)
+
+### Bug Fixes
+
+- update full API reference in README ([#61](https://github.com/noshiro-pf/ts-type-forge/issues/61)) ([5674f35](https://github.com/noshiro-pf/ts-type-forge/commit/5674f3531c9ad5a4bc68f4176df553bcd8922ff8))
+
 ## [2.0.1](https://github.com/noshiro-pf/ts-type-forge/compare/v2.0.0...v2.0.1) (2025-06-06)
 
 ### Bug Fixes
