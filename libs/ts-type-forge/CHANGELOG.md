@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/noshiro-pf/ts-type-forge/compare/v2.0.0...v2.0.1) (2025-06-06)
+
+### Bug Fixes
+
+- use source-order in typedoc ([#59](https://github.com/noshiro-pf/ts-type-forge/issues/59)) ([11700f9](https://github.com/noshiro-pf/ts-type-forge/commit/11700f9816e6bdf93c9de53eb3ecc784f6b3c398))
+
 # [2.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v1.1.0...v2.0.0) (2025-06-05)
 
 ### Features
