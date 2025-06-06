@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: style-check
+name: Style Check
 
 # Controls when the action will run.
 on:
