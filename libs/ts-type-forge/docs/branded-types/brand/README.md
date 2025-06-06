@@ -12,6 +12,22 @@
 
 ## Type Aliases
 
+### UnknownBrand
+
+> **UnknownBrand** = [`Brand`](#brand)\<`unknown`, `never`, `never`\>
+
+Defined in: [branded-types/brand.d.mts:9](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L9)
+
+Base type for all branded types. Represents a brand with unknown value type and no keys.
+
+#### Example
+
+```ts
+type MyBrand = Brand<string, 'validated', never>;
+```
+
+---
+
 ### Brand\<T, TrueKeys, FalseKeys\>
 
 > **Brand**\<`T`, `TrueKeys`, `FalseKeys`\> = `T` & `TSTypeForgeInternals.BrandEncapsulated`\<\{ readonly \[key in FalseKeys \| TrueKeys\]: key extends TrueKeys ? true : false \}\>
@@ -59,13 +75,13 @@ type NonZeroInt = Brand<number, 'integer', 'zero'>;
 
 ---
 
-### ChangeBaseBrand\<B, T\>
+### UnwrapBrandTrueKeys\<B\>
 
-> **ChangeBaseBrand**\<`B`, `T`\> = [`Brand`](#brand)\<`T`, [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\>
+> **UnwrapBrandTrueKeys**\<`B`\> = [`ExtractTrueKeys`](namespaces/TSTypeForgeInternals/README.md#extracttruekeys)\<`B`\>
 
-Defined in: [branded-types/brand.d.mts:236](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L236)
+Defined in: [branded-types/brand.d.mts:92](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L92)
 
-Changes the underlying value type of a brand while preserving all brand keys.
+Extracts all keys marked as `true` from a branded type.
 
 #### Type Parameters
 
@@ -73,40 +89,28 @@ Changes the underlying value type of a brand while preserving all brand keys.
 
 `B` _extends_ [`UnknownBrand`](#unknownbrand)
 
-The brand whose keys to preserve
-
-##### T
-
-`T`
-
-The new underlying value type
+The branded type to extract keys from
 
 #### Returns
 
-Brand with same keys but different underlying type
+Union of string literal keys that are marked as `true`
 
 #### Example
 
 ```ts
-type UserId = Brand<string, 'UserId' | 'validated'>;
-type NumericUserId = ChangeBaseBrand<UserId, number>;
-// NumericUserId is Brand<number, 'UserId' | 'validated'>
-
-// Useful for type conversions
-type SerializedData = Brand<string, 'json' | 'validated'>;
-type ParsedData = ChangeBaseBrand<SerializedData, object>;
+type NonZeroInt = Brand<number, 'integer', 'zero'>;
+type TrueKeys = UnwrapBrandTrueKeys<NonZeroInt>; // 'integer'
 ```
 
 ---
 
-### ExtendBrand\<B, T, F\>
+### UnwrapBrandFalseKeys\<B\>
 
-> **ExtendBrand**\<`B`, `T`, `F`\> = [`IsNever`](../../condition/is-never.md#isnever)\<`F` & `T`\> _extends_ `true` ? [`Brand`](#brand)\<[`GetBrandValuePart`](#getbrandvaluepart)\<`B`\>, `T` \| [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, `F` \| [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\> : `never`
+> **UnwrapBrandFalseKeys**\<`B`\> = [`ExtractFalseKeys`](namespaces/TSTypeForgeInternals/README.md#extractfalsekeys)\<`B`\>
 
-Defined in: [branded-types/brand.d.mts:205](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L205)
+Defined in: [branded-types/brand.d.mts:107](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L107)
 
-Extends an existing brand with additional true/false keys.
-Fails if the same key would be marked as both true and false.
+Extracts all keys marked as `false` from a branded type.
 
 #### Type Parameters
 
@@ -114,36 +118,78 @@ Fails if the same key would be marked as both true and false.
 
 `B` _extends_ [`UnknownBrand`](#unknownbrand)
 
-The base brand to extend
-
-##### T
-
-`T` _extends_ `string`
-
-Additional keys to mark as true
-
-##### F
-
-`F` _extends_ `string` = `never`
-
-Additional keys to mark as false (defaults to never)
+The branded type to extract keys from
 
 #### Returns
 
-Extended brand type, or never if T and F have common keys
+Union of string literal keys that are marked as `false`
 
 #### Example
 
 ```ts
-type Email = Brand<string, 'email'>;
-type ValidatedEmail = ExtendBrand<Email, 'validated'>;
-// ValidatedEmail has both 'email' and 'validated' as true
+type NonZeroInt = Brand<number, 'integer', 'zero'>;
+type FalseKeys = UnwrapBrandFalseKeys<NonZeroInt>; // 'zero'
+```
 
-type OptionalEmail = ExtendBrand<Email, 'optional', 'required'>;
-// Has 'email' and 'optional' as true, 'required' as false
+---
 
-// This would return never (conflicting keys):
-// type Invalid = ExtendBrand<Email, 'verified', 'verified'>;
+### UnwrapBrandBooleanKeys\<B\>
+
+> **UnwrapBrandBooleanKeys**\<`B`\> = [`ExtractBooleanKeys`](namespaces/TSTypeForgeInternals/README.md#extractbooleankeys)\<`B`\>
+
+Defined in: [branded-types/brand.d.mts:125](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L125)
+
+Extracts all keys that have boolean values (not specifically true or false) from a branded type.
+This occurs when a brand union normalizes and a key becomes `true | false`.
+
+#### Type Parameters
+
+##### B
+
+`B` _extends_ [`UnknownBrand`](#unknownbrand)
+
+The branded type to extract keys from
+
+#### Returns
+
+Union of string literal keys that have boolean values
+
+#### Example
+
+```ts
+type Brand1 = Brand<number, 'key1', never>;
+type Brand2 = Brand<number, never, 'key1'>;
+type UnionBrand = Brand1 | Brand2;
+type BooleanKeys = UnwrapBrandBooleanKeys<UnionBrand>; // 'key1' (since it's true | false)
+```
+
+---
+
+### UnwrapBrandKeys\<B\>
+
+> **UnwrapBrandKeys**\<`B`\> = [`UnwrapBrandBooleanKeys`](#unwrapbrandbooleankeys)\<`B`\> \| [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> \| [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\>
+
+Defined in: [branded-types/brand.d.mts:140](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L140)
+
+Extracts all brand keys (true, false, and boolean) from a branded type.
+
+#### Type Parameters
+
+##### B
+
+`B` _extends_ [`UnknownBrand`](#unknownbrand)
+
+The branded type to extract keys from
+
+#### Returns
+
+Union of all string literal keys in the brand
+
+#### Example
+
+```ts
+type MyBrand = Brand<string, 'validated' | 'normalized', 'empty'>;
+type AllKeys = UnwrapBrandKeys<MyBrand>; // 'validated' | 'normalized' | 'empty'
 ```
 
 ---
@@ -205,6 +251,95 @@ type UserIdValue = GetBrandValuePart<UserId>; // string
 
 type Age = Brand<number, 'Age' | 'positive'>;
 type AgeValue = GetBrandValuePart<Age>; // number
+```
+
+---
+
+### ExtendBrand\<B, T, F\>
+
+> **ExtendBrand**\<`B`, `T`, `F`\> = [`IsNever`](../../condition/is-never.md#isnever)\<`F` & `T`\> _extends_ `true` ? [`Brand`](#brand)\<[`GetBrandValuePart`](#getbrandvaluepart)\<`B`\>, `T` \| [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, `F` \| [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\> : `never`
+
+Defined in: [branded-types/brand.d.mts:205](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L205)
+
+Extends an existing brand with additional true/false keys.
+Fails if the same key would be marked as both true and false.
+
+#### Type Parameters
+
+##### B
+
+`B` _extends_ [`UnknownBrand`](#unknownbrand)
+
+The base brand to extend
+
+##### T
+
+`T` _extends_ `string`
+
+Additional keys to mark as true
+
+##### F
+
+`F` _extends_ `string` = `never`
+
+Additional keys to mark as false (defaults to never)
+
+#### Returns
+
+Extended brand type, or never if T and F have common keys
+
+#### Example
+
+```ts
+type Email = Brand<string, 'email'>;
+type ValidatedEmail = ExtendBrand<Email, 'validated'>;
+// ValidatedEmail has both 'email' and 'validated' as true
+
+type OptionalEmail = ExtendBrand<Email, 'optional', 'required'>;
+// Has 'email' and 'optional' as true, 'required' as false
+
+// This would return never (conflicting keys):
+// type Invalid = ExtendBrand<Email, 'verified', 'verified'>;
+```
+
+---
+
+### ChangeBaseBrand\<B, T\>
+
+> **ChangeBaseBrand**\<`B`, `T`\> = [`Brand`](#brand)\<`T`, [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\>
+
+Defined in: [branded-types/brand.d.mts:236](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L236)
+
+Changes the underlying value type of a brand while preserving all brand keys.
+
+#### Type Parameters
+
+##### B
+
+`B` _extends_ [`UnknownBrand`](#unknownbrand)
+
+The brand whose keys to preserve
+
+##### T
+
+`T`
+
+The new underlying value type
+
+#### Returns
+
+Brand with same keys but different underlying type
+
+#### Example
+
+```ts
+type UserId = Brand<string, 'UserId' | 'validated'>;
+type NumericUserId = ChangeBaseBrand<UserId, number>;
+// NumericUserId is Brand<number, 'UserId' | 'validated'>
+
+// Useful for type conversions
+type SerializedData = Brand<string, 'json' | 'validated'>;
+type ParsedData = ChangeBaseBrand<SerializedData, object>;
 ```
 
 ---
@@ -281,139 +416,4 @@ type Brand2 = Brand<number, 'empty', 'validated'>;
 type UnionBrand = Brand1 | Brand2;
 type Normalized = NormalizeBrandUnion<UnionBrand>;
 // Both 'validated' and 'empty' are removed since they're true | false
-```
-
----
-
-### UnknownBrand
-
-> **UnknownBrand** = [`Brand`](#brand)\<`unknown`, `never`, `never`\>
-
-Defined in: [branded-types/brand.d.mts:9](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L9)
-
-Base type for all branded types. Represents a brand with unknown value type and no keys.
-
-#### Example
-
-```ts
-type MyBrand = Brand<string, 'validated', never>;
-```
-
----
-
-### UnwrapBrandBooleanKeys\<B\>
-
-> **UnwrapBrandBooleanKeys**\<`B`\> = [`ExtractBooleanKeys`](namespaces/TSTypeForgeInternals/README.md#extractbooleankeys)\<`B`\>
-
-Defined in: [branded-types/brand.d.mts:125](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L125)
-
-Extracts all keys that have boolean values (not specifically true or false) from a branded type.
-This occurs when a brand union normalizes and a key becomes `true | false`.
-
-#### Type Parameters
-
-##### B
-
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
-
-The branded type to extract keys from
-
-#### Returns
-
-Union of string literal keys that have boolean values
-
-#### Example
-
-```ts
-type Brand1 = Brand<number, 'key1', never>;
-type Brand2 = Brand<number, never, 'key1'>;
-type UnionBrand = Brand1 | Brand2;
-type BooleanKeys = UnwrapBrandBooleanKeys<UnionBrand>; // 'key1' (since it's true | false)
-```
-
----
-
-### UnwrapBrandFalseKeys\<B\>
-
-> **UnwrapBrandFalseKeys**\<`B`\> = [`ExtractFalseKeys`](namespaces/TSTypeForgeInternals/README.md#extractfalsekeys)\<`B`\>
-
-Defined in: [branded-types/brand.d.mts:107](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L107)
-
-Extracts all keys marked as `false` from a branded type.
-
-#### Type Parameters
-
-##### B
-
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
-
-The branded type to extract keys from
-
-#### Returns
-
-Union of string literal keys that are marked as `false`
-
-#### Example
-
-```ts
-type NonZeroInt = Brand<number, 'integer', 'zero'>;
-type FalseKeys = UnwrapBrandFalseKeys<NonZeroInt>; // 'zero'
-```
-
----
-
-### UnwrapBrandKeys\<B\>
-
-> **UnwrapBrandKeys**\<`B`\> = [`UnwrapBrandBooleanKeys`](#unwrapbrandbooleankeys)\<`B`\> \| [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> \| [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\>
-
-Defined in: [branded-types/brand.d.mts:140](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L140)
-
-Extracts all brand keys (true, false, and boolean) from a branded type.
-
-#### Type Parameters
-
-##### B
-
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
-
-The branded type to extract keys from
-
-#### Returns
-
-Union of all string literal keys in the brand
-
-#### Example
-
-```ts
-type MyBrand = Brand<string, 'validated' | 'normalized', 'empty'>;
-type AllKeys = UnwrapBrandKeys<MyBrand>; // 'validated' | 'normalized' | 'empty'
-```
-
----
-
-### UnwrapBrandTrueKeys\<B\>
-
-> **UnwrapBrandTrueKeys**\<`B`\> = [`ExtractTrueKeys`](namespaces/TSTypeForgeInternals/README.md#extracttruekeys)\<`B`\>
-
-Defined in: [branded-types/brand.d.mts:92](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L92)
-
-Extracts all keys marked as `true` from a branded type.
-
-#### Type Parameters
-
-##### B
-
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
-
-The branded type to extract keys from
-
-#### Returns
-
-Union of string literal keys that are marked as `true`
-
-#### Example
-
-```ts
-type NonZeroInt = Brand<number, 'integer', 'zero'>;
-type TrueKeys = UnwrapBrandTrueKeys<NonZeroInt>; // 'integer'
 ```

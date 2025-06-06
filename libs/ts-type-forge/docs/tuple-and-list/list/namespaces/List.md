@@ -8,106 +8,6 @@
 
 ## Type Aliases
 
-### ButLast\<A\>
-
-> **ButLast**\<`A`\> = `Tuple.ButLast`\<`A`\>
-
-Defined in: [tuple-and-list/list.d.mts:41](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L41)
-
-Gets a new tuple/array type containing all elements of `A` except the last one.
-Delegates to `Tuple.ButLast`.
-
-#### Type Parameters
-
-##### A
-
-`A` _extends_ readonly `unknown`[]
-
-The readonly array or tuple type.
-
-#### Returns
-
-A new type with the last element removed.
-
-#### Example
-
-```ts
-type BL1 = List.ButLast<[1, 2, 3]>; // readonly [1, 2]
-type BL2 = List.ButLast<readonly string[]>; // readonly string[] (unchanged for general arrays)
-type BL3 = List.ButLast<[1]>; // readonly []
-type BL4 = List.ButLast<[]>; // readonly []
-```
-
----
-
-### Concat\<A, B\>
-
-> **Concat**\<`A`, `B`\> = `Tuple.Concat`\<`A`, `B`\>
-
-Defined in: [tuple-and-list/list.d.mts:176](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L176)
-
-Concatenates two readonly arrays or tuples `A` and `B`.
-Delegates to `Tuple.Concat`.
-
-#### Type Parameters
-
-##### A
-
-`A` _extends_ readonly `unknown`[]
-
-The first readonly array or tuple.
-
-##### B
-
-`B` _extends_ readonly `unknown`[]
-
-The second readonly array or tuple.
-
-#### Returns
-
-A new type representing the concatenation of `A` and `B`.
-
-#### Example
-
-```ts
-type C1 = List.Concat<[1, 2], [3, 4]>; // readonly [1, 2, 3, 4]
-type C2 = List.Concat<readonly number[], readonly string[]>; // readonly (string | number)[]
-type C3 = List.Concat<[1], readonly number[]>; // readonly [1, ...number[]]
-```
-
----
-
-### Flatten\<T\>
-
-> **Flatten**\<`T`\> = `Tuple.Flatten`\<`T`\>
-
-Defined in: [tuple-and-list/list.d.mts:163](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L163)
-
-Flattens a nested readonly array/tuple `T` by one level.
-Delegates to `Tuple.Flatten`.
-
-#### Type Parameters
-
-##### T
-
-`T` _extends_ readonly readonly `unknown`[][]
-
-A readonly array/tuple where elements are themselves readonly arrays/tuples.
-
-#### Returns
-
-A new flattened array/tuple type.
-
-#### Example
-
-```ts
-type F1 = List.Flatten<[[1, 2], [3, 4]]>; // readonly [1, 2, 3, 4]
-type F2 = List.Flatten<[readonly number[], readonly string[]]>; // readonly (string | number)[]
-type F3 = List.Flatten<[[1], [2, [3]]]>; // readonly [1, 2, [3]] (only flattens one level)
-```
-
----
-
 ### Head\<T, D\>
 
 > **Head**\<`T`, `D`\> = `Tuple.Head`\<`T`, `D`\>
@@ -179,39 +79,66 @@ type L4 = List.Last<[1]>; // 1
 
 ---
 
-### Partition\<N, T\>
+### ButLast\<A\>
 
-> **Partition**\<`N`, `T`\> = `Tuple.Partition`\<`N`, `T`\>
+> **ButLast**\<`A`\> = `Tuple.ButLast`\<`A`\>
 
-Defined in: [tuple-and-list/list.d.mts:221](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L221)
+Defined in: [tuple-and-list/list.d.mts:41](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L41)
 
-Partitions a readonly array or tuple `T` into sub-arrays/tuples of length `N`.
-Delegates to `Tuple.Partition`.
+Gets a new tuple/array type containing all elements of `A` except the last one.
+Delegates to `Tuple.ButLast`.
 
 #### Type Parameters
 
-##### N
+##### A
 
-`N` _extends_ `number`
+`A` _extends_ readonly `unknown`[]
 
-The desired size of each partition (must be a positive integer literal).
-
-##### T
-
-`T` _extends_ readonly `unknown`[]
-
-The readonly array or tuple type to partition.
+The readonly array or tuple type.
 
 #### Returns
 
-A readonly array/tuple where each element is a sub-array/tuple of length `N`.
+A new type with the last element removed.
 
 #### Example
 
 ```ts
-type P1 = List.Partition<2, [1, 2, 3, 4, 5]>; // readonly [[1, 2], [3, 4], [5]]
-type P2 = List.Partition<3, readonly number[]>; // readonly (readonly number[])[]
-type P3 = List.Partition<1, [1, 2]>; // readonly [[1], [2]]
+type BL1 = List.ButLast<[1, 2, 3]>; // readonly [1, 2]
+type BL2 = List.ButLast<readonly string[]>; // readonly string[] (unchanged for general arrays)
+type BL3 = List.ButLast<[1]>; // readonly []
+type BL4 = List.ButLast<[]>; // readonly []
+```
+
+---
+
+### Tail\<A\>
+
+> **Tail**\<`A`\> = `Tuple.Tail`\<`A`\>
+
+Defined in: [tuple-and-list/list.d.mts:54](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L54)
+
+Gets a new tuple/array type containing all elements of `A` except the first one.
+Delegates to `Tuple.Tail`.
+
+#### Type Parameters
+
+##### A
+
+`A` _extends_ readonly `unknown`[]
+
+The readonly array or tuple type.
+
+#### Returns
+
+A new type with the first element removed.
+
+#### Example
+
+```ts
+type T1 = List.Tail<[1, 2, 3]>; // readonly [2, 3]
+type T2 = List.Tail<readonly string[]>; // readonly string[] (unchanged for general arrays)
+type T3 = List.Tail<[1]>; // readonly []
+type T4 = List.Tail<[]>; // readonly []
 ```
 
 ---
@@ -244,6 +171,158 @@ A new type with elements reversed.
 type R1 = List.Reverse<[1, 2, 3]>; // readonly [3, 2, 1]
 type R2 = List.Reverse<readonly string[]>; // readonly string[]
 type R3 = List.Reverse<[]>; // readonly []
+```
+
+---
+
+### Take\<N, T\>
+
+> **Take**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.Take`\<`N`, `T`\> : `T`
+
+Defined in: [tuple-and-list/list.d.mts:87](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L87)
+
+Takes the first `N` elements from a readonly array or tuple `T`.
+If `T` is a tuple, it returns a new tuple containing the first `N` elements.
+If `T` is a general array, it returns the original array type `T`.
+
+#### Type Parameters
+
+##### N
+
+`N` _extends_ `number`
+
+The number of elements to take.
+
+##### T
+
+`T` _extends_ readonly `unknown`[]
+
+The readonly array or tuple type.
+
+#### Returns
+
+A new type containing the first `N` elements (for tuples) or `T` (for arrays).
+
+#### Example
+
+```ts
+type TK1 = List.Take<2, [1, 2, 3]>; // readonly [1, 2]
+type TK2 = List.Take<5, [1, 2, 3]>; // readonly [1, 2, 3]
+type TK3 = List.Take<2, readonly string[]>; // readonly string[]
+```
+
+---
+
+### Skip\<N, T\>
+
+> **Skip**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.Skip`\<`N`, `T`\> : `T`
+
+Defined in: [tuple-and-list/list.d.mts:102](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L102)
+
+Skips the first `N` elements from a readonly array or tuple `T`.
+If `T` is a tuple, it returns a new tuple containing the elements after the first `N`.
+If `T` is a general array, it returns the original array type `T`.
+
+#### Type Parameters
+
+##### N
+
+`N` _extends_ `number`
+
+The number of elements to skip.
+
+##### T
+
+`T` _extends_ readonly `unknown`[]
+
+The readonly array or tuple type.
+
+#### Returns
+
+A new type containing elements after the first `N` (for tuples) or `T` (for arrays).
+
+#### Example
+
+```ts
+type SK1 = List.Skip<1, [1, 2, 3]>; // readonly [2, 3]
+type SK2 = List.Skip<3, [1, 2, 3]>; // readonly []
+type SK3 = List.Skip<1, readonly string[]>; // readonly string[]
+```
+
+---
+
+### TakeLast\<N, T\>
+
+> **TakeLast**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.TakeLast`\<`N`, `T`\> : `T`
+
+Defined in: [tuple-and-list/list.d.mts:117](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L117)
+
+Takes the last `N` elements from a readonly array or tuple `T`.
+If `T` is a tuple, it returns a new tuple containing the last `N` elements.
+If `T` is a general array, it returns the original array type `T`.
+
+#### Type Parameters
+
+##### N
+
+`N` _extends_ `number`
+
+The number of elements to take.
+
+##### T
+
+`T` _extends_ readonly `unknown`[]
+
+The readonly array or tuple type.
+
+#### Returns
+
+A new type containing the last `N` elements (for tuples) or `T` (for arrays).
+
+#### Example
+
+```ts
+type TL1 = List.TakeLast<2, [1, 2, 3]>; // readonly [2, 3]
+type TL2 = List.TakeLast<5, [1, 2, 3]>; // readonly [1, 2, 3]
+type TL3 = List.TakeLast<2, readonly string[]>; // readonly string[]
+```
+
+---
+
+### SkipLast\<N, T\>
+
+> **SkipLast**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.SkipLast`\<`N`, `T`\> : `T`
+
+Defined in: [tuple-and-list/list.d.mts:132](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L132)
+
+Skips the last `N` elements from a readonly array or tuple `T`.
+If `T` is a tuple, it returns a new tuple containing the elements before the last `N`.
+If `T` is a general array, it returns the original array type `T`.
+
+#### Type Parameters
+
+##### N
+
+`N` _extends_ `number`
+
+The number of elements to skip.
+
+##### T
+
+`T` _extends_ readonly `unknown`[]
+
+The readonly array or tuple type.
+
+#### Returns
+
+A new type containing elements before the last `N` (for tuples) or `T` (for arrays).
+
+#### Example
+
+```ts
+type SL1 = List.SkipLast<1, [1, 2, 3]>; // readonly [1, 2]
+type SL2 = List.SkipLast<3, [1, 2, 3]>; // readonly []
+type SL3 = List.SkipLast<1, readonly string[]>; // readonly string[]
 ```
 
 ---
@@ -292,90 +371,45 @@ type SA2 = List.SetAt<readonly number[], 1, 'x'>; // readonly (string | number)[
 
 ---
 
-### Skip\<N, T\>
+### Flatten\<T\>
 
-> **Skip**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.Skip`\<`N`, `T`\> : `T`
+> **Flatten**\<`T`\> = `Tuple.Flatten`\<`T`\>
 
-Defined in: [tuple-and-list/list.d.mts:102](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L102)
+Defined in: [tuple-and-list/list.d.mts:163](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L163)
 
-Skips the first `N` elements from a readonly array or tuple `T`.
-If `T` is a tuple, it returns a new tuple containing the elements after the first `N`.
-If `T` is a general array, it returns the original array type `T`.
+Flattens a nested readonly array/tuple `T` by one level.
+Delegates to `Tuple.Flatten`.
 
 #### Type Parameters
 
-##### N
-
-`N` _extends_ `number`
-
-The number of elements to skip.
-
 ##### T
 
-`T` _extends_ readonly `unknown`[]
+`T` _extends_ readonly readonly `unknown`[][]
 
-The readonly array or tuple type.
+A readonly array/tuple where elements are themselves readonly arrays/tuples.
 
 #### Returns
 
-A new type containing elements after the first `N` (for tuples) or `T` (for arrays).
+A new flattened array/tuple type.
 
 #### Example
 
 ```ts
-type SK1 = List.Skip<1, [1, 2, 3]>; // readonly [2, 3]
-type SK2 = List.Skip<3, [1, 2, 3]>; // readonly []
-type SK3 = List.Skip<1, readonly string[]>; // readonly string[]
+type F1 = List.Flatten<[[1, 2], [3, 4]]>; // readonly [1, 2, 3, 4]
+type F2 = List.Flatten<[readonly number[], readonly string[]]>; // readonly (string | number)[]
+type F3 = List.Flatten<[[1], [2, [3]]]>; // readonly [1, 2, [3]] (only flattens one level)
 ```
 
 ---
 
-### SkipLast\<N, T\>
+### Concat\<A, B\>
 
-> **SkipLast**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.SkipLast`\<`N`, `T`\> : `T`
+> **Concat**\<`A`, `B`\> = `Tuple.Concat`\<`A`, `B`\>
 
-Defined in: [tuple-and-list/list.d.mts:132](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L132)
+Defined in: [tuple-and-list/list.d.mts:176](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L176)
 
-Skips the last `N` elements from a readonly array or tuple `T`.
-If `T` is a tuple, it returns a new tuple containing the elements before the last `N`.
-If `T` is a general array, it returns the original array type `T`.
-
-#### Type Parameters
-
-##### N
-
-`N` _extends_ `number`
-
-The number of elements to skip.
-
-##### T
-
-`T` _extends_ readonly `unknown`[]
-
-The readonly array or tuple type.
-
-#### Returns
-
-A new type containing elements before the last `N` (for tuples) or `T` (for arrays).
-
-#### Example
-
-```ts
-type SL1 = List.SkipLast<1, [1, 2, 3]>; // readonly [1, 2]
-type SL2 = List.SkipLast<3, [1, 2, 3]>; // readonly []
-type SL3 = List.SkipLast<1, readonly string[]>; // readonly string[]
-```
-
----
-
-### Tail\<A\>
-
-> **Tail**\<`A`\> = `Tuple.Tail`\<`A`\>
-
-Defined in: [tuple-and-list/list.d.mts:54](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L54)
-
-Gets a new tuple/array type containing all elements of `A` except the first one.
-Delegates to `Tuple.Tail`.
+Concatenates two readonly arrays or tuples `A` and `B`.
+Delegates to `Tuple.Concat`.
 
 #### Type Parameters
 
@@ -383,95 +417,24 @@ Delegates to `Tuple.Tail`.
 
 `A` _extends_ readonly `unknown`[]
 
-The readonly array or tuple type.
+The first readonly array or tuple.
+
+##### B
+
+`B` _extends_ readonly `unknown`[]
+
+The second readonly array or tuple.
 
 #### Returns
 
-A new type with the first element removed.
+A new type representing the concatenation of `A` and `B`.
 
 #### Example
 
 ```ts
-type T1 = List.Tail<[1, 2, 3]>; // readonly [2, 3]
-type T2 = List.Tail<readonly string[]>; // readonly string[] (unchanged for general arrays)
-type T3 = List.Tail<[1]>; // readonly []
-type T4 = List.Tail<[]>; // readonly []
-```
-
----
-
-### Take\<N, T\>
-
-> **Take**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.Take`\<`N`, `T`\> : `T`
-
-Defined in: [tuple-and-list/list.d.mts:87](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L87)
-
-Takes the first `N` elements from a readonly array or tuple `T`.
-If `T` is a tuple, it returns a new tuple containing the first `N` elements.
-If `T` is a general array, it returns the original array type `T`.
-
-#### Type Parameters
-
-##### N
-
-`N` _extends_ `number`
-
-The number of elements to take.
-
-##### T
-
-`T` _extends_ readonly `unknown`[]
-
-The readonly array or tuple type.
-
-#### Returns
-
-A new type containing the first `N` elements (for tuples) or `T` (for arrays).
-
-#### Example
-
-```ts
-type TK1 = List.Take<2, [1, 2, 3]>; // readonly [1, 2]
-type TK2 = List.Take<5, [1, 2, 3]>; // readonly [1, 2, 3]
-type TK3 = List.Take<2, readonly string[]>; // readonly string[]
-```
-
----
-
-### TakeLast\<N, T\>
-
-> **TakeLast**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.TakeLast`\<`N`, `T`\> : `T`
-
-Defined in: [tuple-and-list/list.d.mts:117](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L117)
-
-Takes the last `N` elements from a readonly array or tuple `T`.
-If `T` is a tuple, it returns a new tuple containing the last `N` elements.
-If `T` is a general array, it returns the original array type `T`.
-
-#### Type Parameters
-
-##### N
-
-`N` _extends_ `number`
-
-The number of elements to take.
-
-##### T
-
-`T` _extends_ readonly `unknown`[]
-
-The readonly array or tuple type.
-
-#### Returns
-
-A new type containing the last `N` elements (for tuples) or `T` (for arrays).
-
-#### Example
-
-```ts
-type TL1 = List.TakeLast<2, [1, 2, 3]>; // readonly [2, 3]
-type TL2 = List.TakeLast<5, [1, 2, 3]>; // readonly [1, 2, 3]
-type TL3 = List.TakeLast<2, readonly string[]>; // readonly string[]
+type C1 = List.Concat<[1, 2], [3, 4]>; // readonly [1, 2, 3, 4]
+type C2 = List.Concat<readonly number[], readonly string[]>; // readonly (string | number)[]
+type C3 = List.Concat<[1], readonly number[]>; // readonly [1, ...number[]]
 ```
 
 ---
@@ -512,4 +475,41 @@ type Z2 = List.Zip<[1, 2, 3], ['a', 'b']>; // readonly [[1, 'a'], [2, 'b']]
 type Z3 = List.Zip<readonly number[], readonly string[]>; // readonly (readonly [number, string])[]
 type Z4 = List.Zip<[1, 2], readonly string[]>; // readonly [[1, string], [2, string]]
 type Z5 = List.Zip<readonly number[], ['a', 'b']>; // readonly [[number, 'a'], [number, 'b']]
+```
+
+---
+
+### Partition\<N, T\>
+
+> **Partition**\<`N`, `T`\> = `Tuple.Partition`\<`N`, `T`\>
+
+Defined in: [tuple-and-list/list.d.mts:221](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L221)
+
+Partitions a readonly array or tuple `T` into sub-arrays/tuples of length `N`.
+Delegates to `Tuple.Partition`.
+
+#### Type Parameters
+
+##### N
+
+`N` _extends_ `number`
+
+The desired size of each partition (must be a positive integer literal).
+
+##### T
+
+`T` _extends_ readonly `unknown`[]
+
+The readonly array or tuple type to partition.
+
+#### Returns
+
+A readonly array/tuple where each element is a sub-array/tuple of length `N`.
+
+#### Example
+
+```ts
+type P1 = List.Partition<2, [1, 2, 3, 4, 5]>; // readonly [[1, 2], [3, 4], [5]]
+type P2 = List.Partition<3, readonly number[]>; // readonly (readonly number[])[]
+type P3 = List.Partition<1, [1, 2]>; // readonly [[1], [2]]
 ```

@@ -8,49 +8,6 @@
 
 ## Type Aliases
 
-### ExcludeSmallInt\<N, MaxIndex\>
-
-> **ExcludeSmallInt**\<`N`, `MaxIndex`\> = [`RelaxedExclude`](../record/std.md#relaxedexclude)\<`N`, [`SmallInt`](#smallint)\<`""`, `MaxIndex`\>\>
-
-Defined in: [branded-types/small-int.d.mts:113](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L113)
-
-Removes small integer literals from an integer type enhanced with WithSmallInt.
-Useful for converting back to pure branded types.
-
-#### Type Parameters
-
-##### N
-
-`N` _extends_ [`IntWithSmallInt`](int.md#intwithsmallint)
-
-Integer type with small literals to remove from
-
-##### MaxIndex
-
-`MaxIndex` _extends_ `number` = [`SmallIntIndexMax`](brand/namespaces/TSTypeForgeInternals/README.md#smallintindexmax)
-
-Maximum absolute value of literals to remove (default: 40)
-
-#### Returns
-
-The branded type without literal values
-
-#### Example
-
-```ts
-type Count = WithSmallInt<Uint>; // 0 | 1 | ... | 39 | Uint
-type PureCount = RemoveSmallInt<Count>; // Uint
-
-const toLargeCount = (n: Count): RemoveSmallInt<Count> => {
-    if (typeof n === 'number') {
-        return (n + 1000) as Uint; // Convert small to large
-    }
-    return n;
-};
-```
-
----
-
 ### SmallInt\<T, MaxIndex\>
 
 > **SmallInt**\<`T`, `MaxIndex`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"<=0"`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| `0` : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"<0"`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `">=0"`\> _extends_ `true` ? [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> \| `0` : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `">0"`\> _extends_ `true` ? [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"!=0"`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `""`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> \| `0` : `never`
@@ -155,6 +112,49 @@ const increment = (n: Count): Count => {
 type SmallInt = WithSmallInt<Int>; // -40 to 39 | Int
 type SmallUint = WithSmallInt<Uint>; // 0 to 39 | Uint
 type SmallPositiveInt = WithSmallInt<PositiveInt>; // 1 to 39 | PositiveInt
+```
+
+---
+
+### ExcludeSmallInt\<N, MaxIndex\>
+
+> **ExcludeSmallInt**\<`N`, `MaxIndex`\> = [`RelaxedExclude`](../record/std.md#relaxedexclude)\<`N`, [`SmallInt`](#smallint)\<`""`, `MaxIndex`\>\>
+
+Defined in: [branded-types/small-int.d.mts:113](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L113)
+
+Removes small integer literals from an integer type enhanced with WithSmallInt.
+Useful for converting back to pure branded types.
+
+#### Type Parameters
+
+##### N
+
+`N` _extends_ [`IntWithSmallInt`](int.md#intwithsmallint)
+
+Integer type with small literals to remove from
+
+##### MaxIndex
+
+`MaxIndex` _extends_ `number` = [`SmallIntIndexMax`](brand/namespaces/TSTypeForgeInternals/README.md#smallintindexmax)
+
+Maximum absolute value of literals to remove (default: 40)
+
+#### Returns
+
+The branded type without literal values
+
+#### Example
+
+```ts
+type Count = WithSmallInt<Uint>; // 0 | 1 | ... | 39 | Uint
+type PureCount = RemoveSmallInt<Count>; // Uint
+
+const toLargeCount = (n: Count): RemoveSmallInt<Count> => {
+    if (typeof n === 'number') {
+        return (n + 1000) as Uint; // Convert small to large
+    }
+    return n;
+};
 ```
 
 ## References

@@ -15,6 +15,7 @@ const config = {
   gitRevision: 'main',
   excludeInternal: true,
   mergeReadme: true,
+  sort: ['source-order'],
 };
 
 export default config;

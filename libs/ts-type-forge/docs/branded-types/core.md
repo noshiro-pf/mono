@@ -31,24 +31,46 @@ if (checkNaN(value)) {
 
 ---
 
-### NegativeNumber
+### ValidNumber
 
-> **NegativeNumber** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`NonZeroNumber`](#nonzeronumber), `"< 2^15"` \| `"< 2^16"` \| `"< 2^31"` \| `"< 2^32"`, `">=0"`\>
+> **ValidNumber** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`BrandedNumberBaseType`](brand/namespaces/TSTypeForgeInternals/README.md#brandednumberbasetype), `never`, `"NaNValue"`\>
 
-Defined in: [branded-types/core.d.mts:172](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L172)
+Defined in: [branded-types/core.d.mts:101](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L101)
 
-Branded numeric type for negative numbers (x < 0).
-Excludes zero, includes only strictly negative values.
+Branded numeric type for all valid numbers (excluding `NaN`).
+This is the base type for most numeric brands.
 
 #### Example
 
 ```ts
-const isNegative = (x: number): x is NegativeNumber => x < 0;
+const isValidNumber = (x: number): x is ValidNumber => !Number.isNaN(x);
 
-const absoluteValue = (x: NegativeNumber): PositiveNumber =>
-    Math.abs(x) as PositiveNumber;
+const process = (n: ValidNumber) => {
+    // Can safely perform arithmetic without NaN checks
+    return n * 2 + 1;
+};
+```
 
-const debt = (amount: NegativeNumber) => ({ type: 'debt', amount });
+---
+
+### NonZeroNumber
+
+> **NonZeroNumber** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`ValidNumber`](#validnumber), `"!=0"`\>
+
+Defined in: [branded-types/core.d.mts:121](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L121)
+
+Branded numeric type for non-zero numbers.
+Represents values that are not equal to zero (including -0).
+
+#### Example
+
+```ts
+const isNonZero = (x: number): x is NonZeroNumber => x !== 0;
+
+const safeDivide = (a: number, b: NonZeroNumber) => a / b;
+// No division by zero possible
+
+const reciprocal = (x: NonZeroNumber) => 1 / x;
 ```
 
 ---
@@ -76,28 +98,6 @@ const arrayIndex = (arr: readonly unknown[], i: NonNegativeNumber & Int) =>
 
 ---
 
-### NonZeroNumber
-
-> **NonZeroNumber** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`ValidNumber`](#validnumber), `"!=0"`\>
-
-Defined in: [branded-types/core.d.mts:121](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L121)
-
-Branded numeric type for non-zero numbers.
-Represents values that are not equal to zero (including -0).
-
-#### Example
-
-```ts
-const isNonZero = (x: number): x is NonZeroNumber => x !== 0;
-
-const safeDivide = (a: number, b: NonZeroNumber) => a / b;
-// No division by zero possible
-
-const reciprocal = (x: NonZeroNumber) => 1 / x;
-```
-
----
-
 ### PositiveNumber
 
 > **PositiveNumber** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`NonZeroNumber`](#nonzeronumber), [`NonNegativeNumber`](#nonnegativenumber)\>
@@ -120,24 +120,24 @@ const scale = (value: number, factor: PositiveNumber) => value * factor;
 
 ---
 
-### ValidNumber
+### NegativeNumber
 
-> **ValidNumber** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`BrandedNumberBaseType`](brand/namespaces/TSTypeForgeInternals/README.md#brandednumberbasetype), `never`, `"NaNValue"`\>
+> **NegativeNumber** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`NonZeroNumber`](#nonzeronumber), `"< 2^15"` \| `"< 2^16"` \| `"< 2^31"` \| `"< 2^32"`, `">=0"`\>
 
-Defined in: [branded-types/core.d.mts:101](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L101)
+Defined in: [branded-types/core.d.mts:172](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L172)
 
-Branded numeric type for all valid numbers (excluding `NaN`).
-This is the base type for most numeric brands.
+Branded numeric type for negative numbers (x < 0).
+Excludes zero, includes only strictly negative values.
 
 #### Example
 
 ```ts
-const isValidNumber = (x: number): x is ValidNumber => !Number.isNaN(x);
+const isNegative = (x: number): x is NegativeNumber => x < 0;
 
-const process = (n: ValidNumber) => {
-    // Can safely perform arithmetic without NaN checks
-    return n * 2 + 1;
-};
+const absoluteValue = (x: NegativeNumber): PositiveNumber =>
+    Math.abs(x) as PositiveNumber;
+
+const debt = (amount: NegativeNumber) => ({ type: 'debt', amount });
 ```
 
 ## References

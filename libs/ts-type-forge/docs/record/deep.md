@@ -8,6 +8,43 @@
 
 ## Type Aliases
 
+### DeepReadonly\<T\>
+
+> **DeepReadonly**\<`T`\> = `T` _extends_ [`Primitive`](../constants/primitive.md#primitive) ? `T` : `T` _extends_ (...`args`) => `any` ? `T` : `T` _extends_ [`MutableMap`](../others/mutable.md#mutablemap)\<infer K, infer V\> ? `ReadonlyMap`\<[`DeepReadonly`](#deepreadonly)\<`K`\>, [`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` _extends_ `ReadonlyMap`\<infer K, infer V\> ? `ReadonlyMap`\<[`DeepReadonly`](#deepreadonly)\<`K`\>, [`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` _extends_ [`MutableSet`](../others/mutable.md#mutableset)\<infer V\> ? `ReadonlySet`\<[`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` _extends_ `ReadonlySet`\<infer V\> ? `ReadonlySet`\<[`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord) \| readonly `unknown`[] ? `{ readonly [K in keyof T]: DeepReadonly<T[K]> }` : `T`
+
+Defined in: [record/deep.d.mts:17](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/deep.d.mts#L17)
+
+Recursively applies the `readonly` modifier to all properties of an object, array, Map, or Set.
+Primitives and functions are returned as is.
+
+#### Type Parameters
+
+##### T
+
+`T`
+
+The type to make deeply readonly.
+
+#### Returns
+
+A new type with all nested properties marked as readonly.
+
+#### Example
+
+```ts
+type Data = { a: number; b: { c: string[]; d: Map<number, boolean> } };
+type ReadonlyData = DeepReadonly<Data>;
+// Result: {
+//   readonly a: number;
+//   readonly b: {
+//     readonly c: readonly string[];
+//     readonly d: ReadonlyMap<number, boolean>;
+//   };
+// }
+```
+
+---
+
 ### DeepMutable\<T\>
 
 > **DeepMutable**\<`T`\> = `T` _extends_ [`Primitive`](../constants/primitive.md#primitive) ? `T` : `T` _extends_ (...`args`) => `any` ? `T` : `T` _extends_ [`MutableMap`](../others/mutable.md#mutablemap)\<infer K, infer V\> ? [`MutableMap`](../others/mutable.md#mutablemap)\<[`DeepMutable`](#deepmutable)\<`K`\>, [`DeepMutable`](#deepmutable)\<`V`\>\> : `T` _extends_ `ReadonlyMap`\<infer K, infer V\> ? [`MutableMap`](../others/mutable.md#mutablemap)\<[`DeepMutable`](#deepmutable)\<`K`\>, [`DeepMutable`](#deepmutable)\<`V`\>\> : `T` _extends_ [`MutableSet`](../others/mutable.md#mutableset)\<infer V\> ? [`MutableSet`](../others/mutable.md#mutableset)\<[`DeepMutable`](#deepmutable)\<`V`\>\> : `T` _extends_ `ReadonlySet`\<infer V\> ? [`MutableSet`](../others/mutable.md#mutableset)\<[`DeepMutable`](#deepmutable)\<`V`\>\> : `T` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord) \| readonly `unknown`[] ? `{ -readonly [K in keyof T]: DeepMutable<T[K]> }` : `T`
@@ -75,43 +112,6 @@ type PartialData = DeepPartial<Data>;
 //     c?: (string | undefined)[] | undefined;
 //     d?: ReadonlyMap<number | undefined, boolean | undefined> | undefined;
 //   } | undefined;
-// }
-```
-
----
-
-### DeepReadonly\<T\>
-
-> **DeepReadonly**\<`T`\> = `T` _extends_ [`Primitive`](../constants/primitive.md#primitive) ? `T` : `T` _extends_ (...`args`) => `any` ? `T` : `T` _extends_ [`MutableMap`](../others/mutable.md#mutablemap)\<infer K, infer V\> ? `ReadonlyMap`\<[`DeepReadonly`](#deepreadonly)\<`K`\>, [`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` _extends_ `ReadonlyMap`\<infer K, infer V\> ? `ReadonlyMap`\<[`DeepReadonly`](#deepreadonly)\<`K`\>, [`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` _extends_ [`MutableSet`](../others/mutable.md#mutableset)\<infer V\> ? `ReadonlySet`\<[`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` _extends_ `ReadonlySet`\<infer V\> ? `ReadonlySet`\<[`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord) \| readonly `unknown`[] ? `{ readonly [K in keyof T]: DeepReadonly<T[K]> }` : `T`
-
-Defined in: [record/deep.d.mts:17](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/deep.d.mts#L17)
-
-Recursively applies the `readonly` modifier to all properties of an object, array, Map, or Set.
-Primitives and functions are returned as is.
-
-#### Type Parameters
-
-##### T
-
-`T`
-
-The type to make deeply readonly.
-
-#### Returns
-
-A new type with all nested properties marked as readonly.
-
-#### Example
-
-```ts
-type Data = { a: number; b: { c: string[]; d: Map<number, boolean> } };
-type ReadonlyData = DeepReadonly<Data>;
-// Result: {
-//   readonly a: number;
-//   readonly b: {
-//     readonly c: readonly string[];
-//     readonly d: ReadonlyMap<number, boolean>;
-//   };
 // }
 ```
 

@@ -8,33 +8,6 @@
 
 ## Type Aliases
 
-### JsonObject
-
-> **JsonObject** = [`ReadonlyRecord`](../record/std.md#readonlyrecord)\<`string`, [`JsonValue`](#jsonvalue)\>
-
-Defined in: [others/json.d.mts:107](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/json.d.mts#L107)
-
-Represents an immutable JSON object with string keys and `JsonValue` values.
-The object itself and all nested structures are readonly, ensuring immutability
-throughout the entire object tree.
-
-#### Example
-
-```ts
-const config: JsonObject = {
-    database: {
-        host: 'localhost',
-        port: 5432,
-        ssl: true,
-    },
-    features: ['auth', 'logging'],
-};
-
-// config.database.port = 3306; // ✗ Error: readonly property
-```
-
----
-
 ### JsonPrimitive
 
 > **JsonPrimitive** = `boolean` \| `number` \| `string` \| `null`
@@ -53,6 +26,45 @@ const jsonNumber: JsonPrimitive = 42; // ✓ valid
 const jsonBoolean: JsonPrimitive = true; // ✓ valid
 const jsonNull: JsonPrimitive = null; // ✓ valid
 // const invalid: JsonPrimitive = undefined;   // ✗ error
+```
+
+---
+
+### MutableJsonValue
+
+> **MutableJsonValue** = [`JsonPrimitive`](#jsonprimitive) \| [`MutableJsonValue`](#mutablejsonvalue)[] \| \{[`k`: `string`]: [`MutableJsonValue`](#mutablejsonvalue); \}
+
+Defined in: [others/json.d.mts:44](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/json.d.mts#L44)
+
+Represents any valid JSON value that can be modified after creation.
+This includes primitives, mutable arrays of JSON values, or mutable objects
+where keys are strings and values are JSON values.
+
+Use this type when you need to build, modify, or manipulate JSON structures
+programmatically, such as constructing API payloads or transforming data.
+
+#### Example
+
+```ts
+const apiPayload: MutableJsonValue = {
+    user: {
+        name: 'John Doe',
+        age: 30,
+        preferences: ['dark-mode', 'notifications'],
+    },
+};
+
+// Can modify the structure
+if (
+    typeof apiPayload === 'object' &&
+    apiPayload !== null &&
+    'user' in apiPayload
+) {
+    const user = apiPayload.user as MutableJsonValue;
+    if (typeof user === 'object' && user !== null && 'age' in user) {
+        (user as any).age = 31; // Update age
+    }
+}
 ```
 
 ---
@@ -95,6 +107,33 @@ const parseConfig = (jsonString: string): JsonValue => {
 
 ---
 
+### JsonObject
+
+> **JsonObject** = [`ReadonlyRecord`](../record/std.md#readonlyrecord)\<`string`, [`JsonValue`](#jsonvalue)\>
+
+Defined in: [others/json.d.mts:107](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/json.d.mts#L107)
+
+Represents an immutable JSON object with string keys and `JsonValue` values.
+The object itself and all nested structures are readonly, ensuring immutability
+throughout the entire object tree.
+
+#### Example
+
+```ts
+const config: JsonObject = {
+    database: {
+        host: 'localhost',
+        port: 5432,
+        ssl: true,
+    },
+    features: ['auth', 'logging'],
+};
+
+// config.database.port = 3306; // ✗ Error: readonly property
+```
+
+---
+
 ### MutableJsonObject
 
 > **MutableJsonObject** = [`MutableRecord`](../record/std.md#mutablerecord)\<`string`, [`MutableJsonValue`](#mutablejsonvalue)\>
@@ -115,43 +154,4 @@ builder.tags = ['info', 'user-action'];
 
 // All modifications are allowed
 builder.data = { message: 'Updated' }; // ✓ valid
-```
-
----
-
-### MutableJsonValue
-
-> **MutableJsonValue** = [`JsonPrimitive`](#jsonprimitive) \| [`MutableJsonValue`](#mutablejsonvalue)[] \| \{[`k`: `string`]: [`MutableJsonValue`](#mutablejsonvalue); \}
-
-Defined in: [others/json.d.mts:44](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/json.d.mts#L44)
-
-Represents any valid JSON value that can be modified after creation.
-This includes primitives, mutable arrays of JSON values, or mutable objects
-where keys are strings and values are JSON values.
-
-Use this type when you need to build, modify, or manipulate JSON structures
-programmatically, such as constructing API payloads or transforming data.
-
-#### Example
-
-```ts
-const apiPayload: MutableJsonValue = {
-    user: {
-        name: 'John Doe',
-        age: 30,
-        preferences: ['dark-mode', 'notifications'],
-    },
-};
-
-// Can modify the structure
-if (
-    typeof apiPayload === 'object' &&
-    apiPayload !== null &&
-    'user' in apiPayload
-) {
-    const user = apiPayload.user as MutableJsonValue;
-    if (typeof user === 'object' && user !== null && 'age' in user) {
-        (user as any).age = 31; // Update age
-    }
-}
 ```

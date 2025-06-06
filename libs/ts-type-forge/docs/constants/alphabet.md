@@ -8,41 +8,6 @@
 
 ## Type Aliases
 
-### Alphabet
-
-> **Alphabet** = [`LowerAlphabet`](#loweralphabet) \| [`UpperAlphabet`](#upperalphabet)
-
-Defined in: [constants/alphabet.d.mts:77](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/alphabet.d.mts#L77)
-
-Represents the set of both lowercase and uppercase English alphabet letters.
-A union of `LowerAlphabet` and `UpperAlphabet`, covering all 52 English letters.
-
-Useful for general alphabetic character validation, text processing,
-and type-safe operations that work with any English letter.
-
-#### Example
-
-```ts
-type AlphabetCount = 52; // LowerAlphabet (26) + UpperAlphabet (26)
-
-const isAlphabetic = (char: string): char is Alphabet => {
-    return (
-        char.length === 1 &&
-        ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z'))
-    );
-};
-
-type ExtractAlpha<S extends string> = S extends `${infer F}${infer R}`
-    ? F extends Alphabet
-        ? `${F}${ExtractAlpha<R>}`
-        : ExtractAlpha<R>
-    : '';
-
-type OnlyLetters = ExtractAlpha<'H3ll0 W0rld!'>; // 'HllWorld'
-```
-
----
-
 ### LowerAlphabet
 
 > **LowerAlphabet** = `"a"` \| `"b"` \| `"c"` \| `"d"` \| `"e"` \| `"f"` \| `"g"` \| `"h"` \| `"i"` \| `"j"` \| `"k"` \| `"l"` \| `"m"` \| `"n"` \| `"o"` \| `"p"` \| `"q"` \| `"r"` \| `"s"` \| `"t"` \| `"u"` \| `"v"` \| `"w"` \| `"x"` \| `"y"` \| `"z"`
@@ -96,4 +61,39 @@ type T2 = FirstLetter<'world'>; // never
 const isUppercase = (char: string): char is UpperAlphabet => {
     return char.length === 1 && char >= 'A' && char <= 'Z';
 };
+```
+
+---
+
+### Alphabet
+
+> **Alphabet** = [`LowerAlphabet`](#loweralphabet) \| [`UpperAlphabet`](#upperalphabet)
+
+Defined in: [constants/alphabet.d.mts:77](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/alphabet.d.mts#L77)
+
+Represents the set of both lowercase and uppercase English alphabet letters.
+A union of `LowerAlphabet` and `UpperAlphabet`, covering all 52 English letters.
+
+Useful for general alphabetic character validation, text processing,
+and type-safe operations that work with any English letter.
+
+#### Example
+
+```ts
+type AlphabetCount = 52; // LowerAlphabet (26) + UpperAlphabet (26)
+
+const isAlphabetic = (char: string): char is Alphabet => {
+    return (
+        char.length === 1 &&
+        ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z'))
+    );
+};
+
+type ExtractAlpha<S extends string> = S extends `${infer F}${infer R}`
+    ? F extends Alphabet
+        ? `${F}${ExtractAlpha<R>}`
+        : ExtractAlpha<R>
+    : '';
+
+type OnlyLetters = ExtractAlpha<'H3ll0 W0rld!'>; // 'HllWorld'
 ```

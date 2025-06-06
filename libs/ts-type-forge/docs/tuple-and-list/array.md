@@ -8,39 +8,57 @@
 
 ## Type Aliases
 
-### ArrayAtLeastLen\<N, Elm\>
+### MutableNonEmptyArray\<A\>
 
-> **ArrayAtLeastLen**\<`N`, `Elm`\> = readonly \[`...MakeTuple<Elm, N>`, `...Elm[]`\]
+> **MutableNonEmptyArray**\<`A`\> = \[`A`, `...A[]`\]
 
-Defined in: [tuple-and-list/array.d.mts:95](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L95)
+Defined in: [tuple-and-list/array.d.mts:12](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L12)
 
-Creates a readonly array type that is guaranteed to have at least `N` elements of type `Elm`.
+Represents a mutable array that is guaranteed to have at least one element.
 
 #### Type Parameters
 
-##### N
+##### A
 
-`N` _extends_ `number`
-
-The minimum length of the array (must be a non-negative integer literal).
-
-##### Elm
-
-`Elm`
+`A`
 
 The type of elements in the array.
-
-#### Returns
-
-A readonly array type `readonly [Elm, ..., Elm, ...Elm[]]` with at least `N` elements.
 
 #### Example
 
 ```ts
-type AtLeast3Strings = ArrayAtLeastLen<3, string>; // readonly [string, string, string, ...string[]]
-const valid: AtLeast3Strings = ['a', 'b', 'c'];
-const alsoValid: AtLeast3Strings = ['a', 'b', 'c', 'd'];
-// const invalid: AtLeast3Strings = ["a", "b"]; // Error
+type NA = MutableNonEmptyArray<string>; // [string, ...string[]]
+const valid: NA = ['hello'];
+const alsoValid: NA = ['hello', 'world'];
+// const invalid: NA = []; // Error
+```
+
+---
+
+### NonEmptyArray\<A\>
+
+> **NonEmptyArray**\<`A`\> = readonly \[`A`, `...readonly A[]`\]
+
+Defined in: [tuple-and-list/array.d.mts:24](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L24)
+
+Represents a readonly array that is guaranteed to have at least one element.
+
+#### Type Parameters
+
+##### A
+
+`A`
+
+The type of elements in the array.
+
+#### Example
+
+```ts
+type NA = NonEmptyArray<number>; // readonly [number, ...number[]]
+const valid: NA = [1];
+const alsoValid: NA = [1, 2, 3];
+// const invalid: NA = []; // Error
+// valid.push(4); // Error: Property 'push' does not exist on type 'readonly [number, ...number[]]'.
 ```
 
 ---
@@ -113,6 +131,40 @@ type TupleOf0Numbers = ArrayOfLength<0, number>; // readonly []
 
 ---
 
+### MutableArrayOfLength\<N, Elm\>
+
+> **MutableArrayOfLength**\<`N`, `Elm`\> = [`Mutable`](../others/mutable.md#mutable)\<[`ArrayOfLength`](#arrayoflength)\<`N`, `Elm`\>\>
+
+Defined in: [tuple-and-list/array.d.mts:61](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L61)
+
+Creates a mutable tuple type of a specific length `N` with elements of type `Elm`.
+
+#### Type Parameters
+
+##### N
+
+`N` _extends_ `number`
+
+The desired length of the tuple (must be a non-negative integer literal).
+
+##### Elm
+
+`Elm`
+
+The type of elements in the tuple.
+
+#### Returns
+
+A mutable tuple type `[Elm, Elm, ..., Elm]` of length `N`.
+
+#### Example
+
+```ts
+type MutableTupleOf2Booleans = MutableArrayOfLength<2, boolean>; // [boolean, boolean]
+```
+
+---
+
 ### MutableArrayAtLeastLen\<N, Elm\>
 
 > **MutableArrayAtLeastLen**\<`N`, `Elm`\> = [`Mutable`](../others/mutable.md#mutable)\<[`ArrayAtLeastLen`](#arrayatleastlen)\<`N`, `Elm`\>\>
@@ -150,13 +202,13 @@ const alsoValid: AtLeast2Numbers = [1, 2, 3, 4];
 
 ---
 
-### MutableArrayOfLength\<N, Elm\>
+### ArrayAtLeastLen\<N, Elm\>
 
-> **MutableArrayOfLength**\<`N`, `Elm`\> = [`Mutable`](../others/mutable.md#mutable)\<[`ArrayOfLength`](#arrayoflength)\<`N`, `Elm`\>\>
+> **ArrayAtLeastLen**\<`N`, `Elm`\> = readonly \[`...MakeTuple<Elm, N>`, `...Elm[]`\]
 
-Defined in: [tuple-and-list/array.d.mts:61](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L61)
+Defined in: [tuple-and-list/array.d.mts:95](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L95)
 
-Creates a mutable tuple type of a specific length `N` with elements of type `Elm`.
+Creates a readonly array type that is guaranteed to have at least `N` elements of type `Elm`.
 
 #### Type Parameters
 
@@ -164,75 +216,23 @@ Creates a mutable tuple type of a specific length `N` with elements of type `Elm
 
 `N` _extends_ `number`
 
-The desired length of the tuple (must be a non-negative integer literal).
+The minimum length of the array (must be a non-negative integer literal).
 
 ##### Elm
 
 `Elm`
 
-The type of elements in the tuple.
+The type of elements in the array.
 
 #### Returns
 
-A mutable tuple type `[Elm, Elm, ..., Elm]` of length `N`.
+A readonly array type `readonly [Elm, ..., Elm, ...Elm[]]` with at least `N` elements.
 
 #### Example
 
 ```ts
-type MutableTupleOf2Booleans = MutableArrayOfLength<2, boolean>; // [boolean, boolean]
-```
-
----
-
-### MutableNonEmptyArray\<A\>
-
-> **MutableNonEmptyArray**\<`A`\> = \[`A`, `...A[]`\]
-
-Defined in: [tuple-and-list/array.d.mts:12](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L12)
-
-Represents a mutable array that is guaranteed to have at least one element.
-
-#### Type Parameters
-
-##### A
-
-`A`
-
-The type of elements in the array.
-
-#### Example
-
-```ts
-type NA = MutableNonEmptyArray<string>; // [string, ...string[]]
-const valid: NA = ['hello'];
-const alsoValid: NA = ['hello', 'world'];
-// const invalid: NA = []; // Error
-```
-
----
-
-### NonEmptyArray\<A\>
-
-> **NonEmptyArray**\<`A`\> = readonly \[`A`, `...readonly A[]`\]
-
-Defined in: [tuple-and-list/array.d.mts:24](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L24)
-
-Represents a readonly array that is guaranteed to have at least one element.
-
-#### Type Parameters
-
-##### A
-
-`A`
-
-The type of elements in the array.
-
-#### Example
-
-```ts
-type NA = NonEmptyArray<number>; // readonly [number, ...number[]]
-const valid: NA = [1];
-const alsoValid: NA = [1, 2, 3];
-// const invalid: NA = []; // Error
-// valid.push(4); // Error: Property 'push' does not exist on type 'readonly [number, ...number[]]'.
+type AtLeast3Strings = ArrayAtLeastLen<3, string>; // readonly [string, string, string, ...string[]]
+const valid: AtLeast3Strings = ['a', 'b', 'c'];
+const alsoValid: AtLeast3Strings = ['a', 'b', 'c', 'd'];
+// const invalid: AtLeast3Strings = ["a", "b"]; // Error
 ```

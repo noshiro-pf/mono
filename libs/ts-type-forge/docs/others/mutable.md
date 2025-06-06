@@ -54,68 +54,6 @@ type EditableConfig = Mutable<Config>; // { host: string; port: number; ssl: boo
 
 ---
 
-### MutableMap\<K, V\>
-
-> **MutableMap**\<`K`, `V`\> = `Map`\<`K`, `V`\>
-
-Defined in: [others/mutable.d.mts:107](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L107)
-
-Alias for the standard `Map<K, V>` type. Represents a mutable map collection.
-Provided for consistency with naming conventions and to make intent explicit.
-
-#### Type Parameters
-
-##### K
-
-`K`
-
-The type of keys in the map.
-
-##### V
-
-`V`
-
-The type of values in the map.
-
-#### Example
-
-```ts
-type UserCache = MutableMap<string, User>;
-const cache: UserCache = new Map();
-cache.set('user1', { id: 1, name: 'Alice' }); // ✓ allowed - map is mutable
-cache.delete('user1'); // ✓ allowed
-```
-
----
-
-### MutableSet\<K\>
-
-> **MutableSet**\<`K`\> = `Set`\<`K`\>
-
-Defined in: [others/mutable.d.mts:90](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L90)
-
-Alias for the standard `Set<K>` type. Represents a mutable set collection.
-Provided for consistency with naming conventions and to make intent explicit.
-
-#### Type Parameters
-
-##### K
-
-`K`
-
-The type of elements stored in the set.
-
-#### Example
-
-```ts
-type TagSet = MutableSet<string>;
-const tags: TagSet = new Set(['typescript', 'javascript', 'react']);
-tags.add('vue'); // ✓ allowed - set is mutable
-tags.delete('react'); // ✓ allowed
-```
-
----
-
 ### ToMutableMap\<T\>
 
 > **ToMutableMap**\<`T`\> = `T` _extends_ `ReadonlyMap`\<infer K, infer V\> ? `Map`\<`K`, `V`\> : `never`
@@ -184,4 +122,66 @@ type MutableStringSet = ToMutableSet<ReadOnlyStringSet>; // Set<string>
 const convertToMutable = (readonlySet: ReadonlySet<string>): Set<string> => {
     return new Set(readonlySet);
 };
+```
+
+---
+
+### MutableSet\<K\>
+
+> **MutableSet**\<`K`\> = `Set`\<`K`\>
+
+Defined in: [others/mutable.d.mts:90](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L90)
+
+Alias for the standard `Set<K>` type. Represents a mutable set collection.
+Provided for consistency with naming conventions and to make intent explicit.
+
+#### Type Parameters
+
+##### K
+
+`K`
+
+The type of elements stored in the set.
+
+#### Example
+
+```ts
+type TagSet = MutableSet<string>;
+const tags: TagSet = new Set(['typescript', 'javascript', 'react']);
+tags.add('vue'); // ✓ allowed - set is mutable
+tags.delete('react'); // ✓ allowed
+```
+
+---
+
+### MutableMap\<K, V\>
+
+> **MutableMap**\<`K`, `V`\> = `Map`\<`K`, `V`\>
+
+Defined in: [others/mutable.d.mts:107](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L107)
+
+Alias for the standard `Map<K, V>` type. Represents a mutable map collection.
+Provided for consistency with naming conventions and to make intent explicit.
+
+#### Type Parameters
+
+##### K
+
+`K`
+
+The type of keys in the map.
+
+##### V
+
+`V`
+
+The type of values in the map.
+
+#### Example
+
+```ts
+type UserCache = MutableMap<string, User>;
+const cache: UserCache = new Map();
+cache.set('user1', { id: 1, name: 'Alice' }); // ✓ allowed - map is mutable
+cache.delete('user1'); // ✓ allowed
 ```

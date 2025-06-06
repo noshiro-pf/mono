@@ -8,6 +8,102 @@
 
 ## Type Aliases
 
+### RecordPathsWithIndex\<R\>
+
+> **RecordPathsWithIndex**\<`R`\> = [`RecordPathPrefixes`](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md#recordpathprefixes)\<[`RecordLeafPathsWithIndex`](#recordleafpathswithindex)\<`R`\>\>
+
+Defined in: [record/record-path.d.mts:11](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/record-path.d.mts#L11)
+
+Calculates all possible paths (including intermediate paths and the root `[]`) within a nested record `R`,
+allowing `number` as an index type for arrays.
+
+#### Type Parameters
+
+##### R
+
+`R`
+
+The record or array type.
+
+#### Returns
+
+A union of readonly tuples representing all possible paths. Each tuple element is a key (string) or an index (number).
+
+#### Example
+
+```ts
+type Data = { a: { b: string[]; c: number } };
+type P = PathsWithIndex<Data>;
+// P = readonly [] | readonly ["a"] | readonly ["a", "b"] | readonly ["a", "b", number] | readonly ["a", "c"]
+```
+
+---
+
+### RecordPaths\<R\>
+
+> **RecordPaths**\<`R`\> = [`RecordPathPrefixes`](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md#recordpathprefixes)\<[`RecordLeafPaths`](#recordleafpaths)\<`R`\>\>
+
+Defined in: [record/record-path.d.mts:25](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/record-path.d.mts#L25)
+
+Calculates all possible paths (including intermediate paths and the root `[]`) within a nested record `R`,
+using specific number literal indices for tuples.
+
+#### Type Parameters
+
+##### R
+
+`R`
+
+The record or tuple type.
+
+#### Returns
+
+A union of readonly tuples representing all possible paths. Each tuple element is a key (string) or a specific index (number literal).
+
+#### Example
+
+```ts
+type Data = { a: { b: [string, boolean]; c: number } };
+type P = Paths<Data>;
+// P = readonly [] | readonly ["a"] | readonly ["a", "b"] | readonly ["a", "b", 0] | readonly ["a", "b", 1] | readonly ["a", "c"]
+```
+
+---
+
+### RecordPathAndValueTypeTuple\<R\>
+
+> **RecordPathAndValueTypeTuple**\<`R`\> = `TSTypeForgeInternals.AttachValueTypeAtPath`\<`R`, [`RecordPaths`](#recordpaths)\<`R`\>\>
+
+Defined in: [record/record-path.d.mts:69](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/record-path.d.mts#L69)
+
+Generates a union of tuples, where each tuple contains a possible path in `R` (using specific tuple indices)
+and the type of the value located at that path.
+
+#### Type Parameters
+
+##### R
+
+`R`
+
+The record or tuple type.
+
+#### Returns
+
+A union of `readonly [Path, ValueType]` tuples.
+
+#### Example
+
+```ts
+type Data = { a: string; b: [number] };
+type KPV = KeyPathAndValueTypeAtPathTuple<Data>;
+// KPV = | readonly [readonly [], { a: string; b: [number] }]
+//       | readonly [readonly ["a"], string]
+//       | readonly [readonly ["b"], [number]]
+//       | readonly [readonly ["b", 0], number]
+```
+
+---
+
 ### RecordLeafPaths\<R\>
 
 > **RecordLeafPaths**\<`R`\> = `R` _extends_ readonly `unknown`[] ? `TSTypeForgeInternals.LeafPathsImplListCase`\<`R`, keyof `R`\> : `R` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord) ? `TSTypeForgeInternals.LeafPathsImplRecordCase`\<`R`, keyof `R`\> : readonly \[\]
@@ -66,102 +162,6 @@ A union of readonly tuples representing paths to leaf nodes, using `number` for 
 type Data = { a: { b: string[]; c: number } };
 type LP = LeafPathsWithIndex<Data>;
 // LP = readonly ["a", "b", number] | readonly ["a", "c"]
-```
-
----
-
-### RecordPathAndValueTypeTuple\<R\>
-
-> **RecordPathAndValueTypeTuple**\<`R`\> = `TSTypeForgeInternals.AttachValueTypeAtPath`\<`R`, [`RecordPaths`](#recordpaths)\<`R`\>\>
-
-Defined in: [record/record-path.d.mts:69](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/record-path.d.mts#L69)
-
-Generates a union of tuples, where each tuple contains a possible path in `R` (using specific tuple indices)
-and the type of the value located at that path.
-
-#### Type Parameters
-
-##### R
-
-`R`
-
-The record or tuple type.
-
-#### Returns
-
-A union of `readonly [Path, ValueType]` tuples.
-
-#### Example
-
-```ts
-type Data = { a: string; b: [number] };
-type KPV = KeyPathAndValueTypeAtPathTuple<Data>;
-// KPV = | readonly [readonly [], { a: string; b: [number] }]
-//       | readonly [readonly ["a"], string]
-//       | readonly [readonly ["b"], [number]]
-//       | readonly [readonly ["b", 0], number]
-```
-
----
-
-### RecordPaths\<R\>
-
-> **RecordPaths**\<`R`\> = [`RecordPathPrefixes`](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md#recordpathprefixes)\<[`RecordLeafPaths`](#recordleafpaths)\<`R`\>\>
-
-Defined in: [record/record-path.d.mts:25](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/record-path.d.mts#L25)
-
-Calculates all possible paths (including intermediate paths and the root `[]`) within a nested record `R`,
-using specific number literal indices for tuples.
-
-#### Type Parameters
-
-##### R
-
-`R`
-
-The record or tuple type.
-
-#### Returns
-
-A union of readonly tuples representing all possible paths. Each tuple element is a key (string) or a specific index (number literal).
-
-#### Example
-
-```ts
-type Data = { a: { b: [string, boolean]; c: number } };
-type P = Paths<Data>;
-// P = readonly [] | readonly ["a"] | readonly ["a", "b"] | readonly ["a", "b", 0] | readonly ["a", "b", 1] | readonly ["a", "c"]
-```
-
----
-
-### RecordPathsWithIndex\<R\>
-
-> **RecordPathsWithIndex**\<`R`\> = [`RecordPathPrefixes`](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md#recordpathprefixes)\<[`RecordLeafPathsWithIndex`](#recordleafpathswithindex)\<`R`\>\>
-
-Defined in: [record/record-path.d.mts:11](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/record-path.d.mts#L11)
-
-Calculates all possible paths (including intermediate paths and the root `[]`) within a nested record `R`,
-allowing `number` as an index type for arrays.
-
-#### Type Parameters
-
-##### R
-
-`R`
-
-The record or array type.
-
-#### Returns
-
-A union of readonly tuples representing all possible paths. Each tuple element is a key (string) or an index (number).
-
-#### Example
-
-```ts
-type Data = { a: { b: string[]; c: number } };
-type P = PathsWithIndex<Data>;
-// P = readonly [] | readonly ["a"] | readonly ["a", "b"] | readonly ["a", "b", number] | readonly ["a", "c"]
 ```
 
 ---

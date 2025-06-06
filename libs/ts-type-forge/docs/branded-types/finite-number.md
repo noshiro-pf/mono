@@ -57,6 +57,29 @@ const checkOverflow = (x: number): FiniteNumber | InfiniteNumber => {
 
 ---
 
+### POSITIVE_INFINITY
+
+> **POSITIVE_INFINITY** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`IntersectBrand`](brand/README.md#intersectbrand)\<[`InfiniteNumber`](#infinitenumber), [`PositiveNumber`](core.md#positivenumber)\>, `never`, `"< 2^15"` \| `"< 2^16"` \| `"< 2^31"` \| `"< 2^32"`\>
+
+Defined in: [branded-types/finite-number.d.mts:56](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/finite-number.d.mts#L56)
+
+Branded numeric type specifically for `Number.POSITIVE_INFINITY`.
+
+#### Example
+
+```ts
+const isPosInfinity = (x: number): x is POSITIVE_INFINITY =>
+    x === Number.POSITIVE_INFINITY;
+
+const handleLimit = (x: number): FiniteNumber | POSITIVE_INFINITY => {
+    if (x > Number.MAX_VALUE)
+        return Number.POSITIVE_INFINITY as POSITIVE_INFINITY;
+    return x as FiniteNumber;
+};
+```
+
+---
+
 ### NEGATIVE_INFINITY
 
 > **NEGATIVE_INFINITY** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`IntersectBrand`](brand/README.md#intersectbrand)\<[`InfiniteNumber`](#infinitenumber), [`NegativeNumber`](core.md#negativenumber)\>, `never`, `"> -2^16"` \| `"> -2^32"` \| `">= -2^15"` \| `">= -2^31"`\>
@@ -76,6 +99,48 @@ const handleUnderflow = (x: number): FiniteNumber | NEGATIVE_INFINITY => {
         return Number.NEGATIVE_INFINITY as NEGATIVE_INFINITY;
     return x as FiniteNumber;
 };
+```
+
+---
+
+### NonNegativeFiniteNumber
+
+> **NonNegativeFiniteNumber** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`NonNegativeNumber`](core.md#nonnegativenumber), [`FiniteNumber`](#finitenumber)\>
+
+Defined in: [branded-types/finite-number.d.mts:95](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/finite-number.d.mts#L95)
+
+Branded numeric type for finite non-negative numbers.
+Represents finite values greater than or equal to zero.
+
+#### Example
+
+```ts
+const isNonNegativeFinite = (x: number): x is NonNegativeFiniteNumber =>
+    Number.isFinite(x) && x >= 0;
+
+const distance = (x: NonNegativeFiniteNumber) => ({ meters: x });
+const age = (years: NonNegativeFiniteNumber & Int) => ({ years });
+```
+
+---
+
+### PositiveFiniteNumber
+
+> **PositiveFiniteNumber** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`PositiveNumber`](core.md#positivenumber), [`FiniteNumber`](#finitenumber)\>
+
+Defined in: [branded-types/finite-number.d.mts:110](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/finite-number.d.mts#L110)
+
+Branded numeric type for finite positive numbers.
+Represents finite values strictly greater than zero.
+
+#### Example
+
+```ts
+const isPositiveFinite = (x: number): x is PositiveFiniteNumber =>
+    Number.isFinite(x) && x > 0;
+
+const price = (amount: PositiveFiniteNumber) => ({ USD: amount });
+const weight = (kg: PositiveFiniteNumber) => ({ kilograms: kg });
 ```
 
 ---
@@ -103,27 +168,6 @@ const temperature = (celsius: NegativeFiniteNumber) => ({
 
 ---
 
-### NonNegativeFiniteNumber
-
-> **NonNegativeFiniteNumber** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`NonNegativeNumber`](core.md#nonnegativenumber), [`FiniteNumber`](#finitenumber)\>
-
-Defined in: [branded-types/finite-number.d.mts:95](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/finite-number.d.mts#L95)
-
-Branded numeric type for finite non-negative numbers.
-Represents finite values greater than or equal to zero.
-
-#### Example
-
-```ts
-const isNonNegativeFinite = (x: number): x is NonNegativeFiniteNumber =>
-    Number.isFinite(x) && x >= 0;
-
-const distance = (x: NonNegativeFiniteNumber) => ({ meters: x });
-const age = (years: NonNegativeFiniteNumber & Int) => ({ years });
-```
-
----
-
 ### NonZeroFiniteNumber
 
 > **NonZeroFiniteNumber** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`NonZeroNumber`](core.md#nonzeronumber), [`FiniteNumber`](#finitenumber)\>
@@ -141,48 +185,4 @@ const isNonZeroFinite = (x: number): x is NonZeroFiniteNumber =>
 
 const rate = (distance: FiniteNumber, time: NonZeroFiniteNumber) =>
     distance / time; // Safe division, finite result
-```
-
----
-
-### POSITIVE_INFINITY
-
-> **POSITIVE_INFINITY** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`IntersectBrand`](brand/README.md#intersectbrand)\<[`InfiniteNumber`](#infinitenumber), [`PositiveNumber`](core.md#positivenumber)\>, `never`, `"< 2^15"` \| `"< 2^16"` \| `"< 2^31"` \| `"< 2^32"`\>
-
-Defined in: [branded-types/finite-number.d.mts:56](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/finite-number.d.mts#L56)
-
-Branded numeric type specifically for `Number.POSITIVE_INFINITY`.
-
-#### Example
-
-```ts
-const isPosInfinity = (x: number): x is POSITIVE_INFINITY =>
-    x === Number.POSITIVE_INFINITY;
-
-const handleLimit = (x: number): FiniteNumber | POSITIVE_INFINITY => {
-    if (x > Number.MAX_VALUE)
-        return Number.POSITIVE_INFINITY as POSITIVE_INFINITY;
-    return x as FiniteNumber;
-};
-```
-
----
-
-### PositiveFiniteNumber
-
-> **PositiveFiniteNumber** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`PositiveNumber`](core.md#positivenumber), [`FiniteNumber`](#finitenumber)\>
-
-Defined in: [branded-types/finite-number.d.mts:110](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/finite-number.d.mts#L110)
-
-Branded numeric type for finite positive numbers.
-Represents finite values strictly greater than zero.
-
-#### Example
-
-```ts
-const isPositiveFinite = (x: number): x is PositiveFiniteNumber =>
-    Number.isFinite(x) && x > 0;
-
-const price = (amount: PositiveFiniteNumber) => ({ USD: amount });
-const weight = (kg: PositiveFiniteNumber) => ({ kilograms: kg });
 ```
