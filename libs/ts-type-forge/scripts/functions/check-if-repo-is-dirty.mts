@@ -1,8 +1,5 @@
 import '../node-global.mjs';
 
-/**
- * @returns {Promise<void>}
- */
 export const checkIfRepoIsDirty = async (): Promise<void> => {
   const res = await $('git status --porcelain');
 
@@ -21,7 +18,7 @@ export const checkIfRepoIsDirty = async (): Promise<void> => {
 };
 
 /**
- * @returns {Promise<boolean>} - Returns true if the repo is dirty, false otherwise.
+ * Returns true if the repo is dirty, false otherwise.
  */
 export const repoIsDirty = async (): Promise<boolean> => {
   const res = await $('git status --porcelain');

@@ -10,7 +10,7 @@ const namespaceRegex = /^declare namespace ([^ {]*)/u;
 const markers = {
   start: '<!-- AUTO-GENERATED TYPES START -->',
   end: '<!-- AUTO-GENERATED TYPES END -->',
-};
+} as const;
 
 const TSTypeForgeInternals = 'TSTypeForgeInternals';
 

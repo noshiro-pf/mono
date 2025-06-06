@@ -8,8 +8,8 @@ export type ExecResult = Readonly<
 
 /**
  * Executes a shell command asynchronously.
- * @param {TemplateStringsArray} cmd - The command to execute.
- * @returns {Promise<string>} - A promise that resolves with the command's stdout.
+ * @param {string} cmd - The command to execute.
+ * @returns {Promise<ExecResult>} - A promise that resolves with the command's stdout.
  */
 export const $ = (cmd: string): Promise<ExecResult> => {
   console.log(`$ ${cmd}`);

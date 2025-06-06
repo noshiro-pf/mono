@@ -1,9 +1,5 @@
 import '../node-global.mjs';
 
-/**
- * @param {string} dir
- * @param {string} expectedExtensions
- */
 const checkFn = async (
   dir: string,
   expectedExtensions: string,
