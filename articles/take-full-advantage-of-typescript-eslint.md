@@ -553,6 +553,11 @@ JavaScript では循環 import を行っているファイルがあると、定�
     {
       "patterns": [
         {
+          "group": ["vitest"],
+          "importNames": ["describe", "expect", "it"],
+          "message": "Use globals instead."
+        },
+        {
           "group": ["constants/**", "**/../constants/**"],
           "message": "Import from '~/constants' instead."
         }
