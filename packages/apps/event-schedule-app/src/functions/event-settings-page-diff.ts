@@ -85,6 +85,8 @@ type EventSchedulePaths = Exclude<Paths<EventSchedule>, readonly []>;
       | ['notificationSettings']
       | ['timezoneOffsetMinutes']
       | ['title']
+      | ['createdAt']
+      | ['updatedAt']
     >,
     EventSchedulePaths
   >('=');
