@@ -166,10 +166,11 @@ export const workspaceConfig: Record<string, WorkspaceConfig> = {
       passWithNoTests: true,
     },
   }),
-  'codemod-lib': fillDefaultsForUtil({
+  'ts-codemod-lib': fillDefaultsForUtil({
     rollupConfig: {
       variablesToDrop: ['console.debug'],
     },
+    gi: 1,
     vitestConfig: {
       passWithNoTests: true,
       hideSkippedTests: true,
