@@ -1,0 +1,91 @@
+{
+  "name": "typescript-template",
+  "version": "1.0.0",
+  "private": false,
+  "keywords": [
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/typescript-template.git"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "npm run z:node-eval -- \"import { build } from './scripts/functions/build.mjs'; build();\"",
+    "check-all": "npm run z:node-eval -- \"import { checkAll } from './scripts/cmd/check-all.mjs'; checkAll();\"",
+    "check:ext": "npm run z:node-eval -- \"import { checkExt } from './scripts/functions/check-ext.mjs'; checkExt();\"",
+    "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
+    "doc": "npm run z:node-eval -- \"import { genDocs } from './scripts/functions/gen-docs.mjs'; genDocs();\"",
+    "fmt": "prettier --write .",
+    "gi": "npm run z:node-eval -- \"import { genIndex } from './scripts/functions/gen-index.mjs'; genIndex();\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "md": "markdownlint-cli2",
+    "test": "npm run z:vitest -- run",
+    "test:cov": "npm run z:vitest -- run --coverage",
+    "test:cov:ui": "vite preview --outDir ./coverage",
+    "test:ui": "npm run z:vitest -- --ui",
+    "testw": "npm run z:vitest -- watch",
+    "tsc": "tsc --noEmit",
+    "tscw": "tsc --noEmit --watch",
+    "type-check": "tsc --noEmit",
+    "update-packages": "npx npm-check-updates -u --install always --reject @types/node",
+    "z:node-eval": "node --import tsx/esm --input-type=module --eval",
+    "z:vitest": "vitest --config ./configs/vitest.config.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@rollup/plugin-replace": "^6.0.2",
+    "@rollup/plugin-strip": "^3.0.4",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.3",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.3",
+    "@types/node": "^20.19.0",
+    "@vitest/coverage-v8": "^3.2.3",
+    "@vitest/ui": "^3.2.3",
+    "conventional-changelog-conventionalcommits": "^9.0.0",
+    "cspell": "^9.1.1",
+    "eslint": "^9.29.0",
+    "fast-glob": "^3.3.3",
+    "markdownlint-cli2": "^0.18.1",
+    "prettier": "^3.5.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-packagejson": "^2.5.15",
+    "rollup": "^4.43.0",
+    "semantic-release": "^24.2.5",
+    "ts-type-forge": "^2.0.2",
+    "tsx": "^4.20.3",
+    "typedoc": "^0.28.5",
+    "typedoc-plugin-markdown": "^4.6.4",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.0",
+    "vitest": "^3.2.3"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  }
+}
