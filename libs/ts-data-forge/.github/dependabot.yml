@@ -1,0 +1,27 @@
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+# https://docs.github.com/ja/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot
+
+version: 2
+updates:
+  - package-ecosystem: 'npm' # See documentation for possible values
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'saturday'
+    target-branch: 'main'
+    commit-message:
+      prefix: 'fix'
+      prefix-development: 'chore'
+    ignore:
+      - dependency-name: '@types/node'
+        versions: ['>=21.0.0']
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'saturday'
+    target-branch: 'main'
+    commit-message:
+      prefix: 'chore'
+      include: 'scope'
