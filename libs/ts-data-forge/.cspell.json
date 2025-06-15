@@ -1,7 +1,28 @@
 {
   "version": "0.2",
   "language": "en",
-  "words": ["noshiro", "testw", "tscw"],
+  "words": [
+    "bivariant",
+    "contravariance",
+    "darkred",
+    "foldl",
+    "foldr",
+    "funcs",
+    "iset",
+    "LEQC",
+    "NAND",
+    "noshiro",
+    "nums",
+    "strs",
+    "testw",
+    "tscw",
+    "unmemoized",
+    "unshift",
+    "unshifted",
+    "Unstringifiable",
+    "uppercased",
+    "XNOR"
+  ],
   "flagWords": [],
   "ignorePaths": ["eslint.config.js", "./package-lock.json", "docs/**"]
 }

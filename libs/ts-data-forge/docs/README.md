@@ -4,80 +4,76 @@
 
 # Documentation
 
-## Functions
+## Modules
 
-### expectType()
-
-> **expectType**\<`A`, `B`\>(`_relation`): `void`
-
-Defined in: [expect-type.mts:47](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/expect-type.mts#L47)
-
-Compile-time type assertion utility.
-Checks the relationship between type `A` and type `B` based on the `_relation` parameter.
-This function has no runtime effect and is used for static type checking.
-
-Supported relations:
-
-- `expectType<A, B>("=")`: Asserts that type `A` is strictly equal to type `B`.
-- `expectType<A, B>("~=")`: Asserts that type `A` extends type `B`, and type `B` extends type `A` (i.e., they are mutually assignable).
-- `expectType<A, B>("<=")`: Asserts that type `A` extends type `B` (i.e., `A` is a subtype of `B`).
-- `expectType<A, B>(">=")`: Asserts that type `B` extends type `A` (i.e., `B` is a subtype of `A`).
-- `expectType<A, B>("!<=")`: Asserts that type `A` does not extend type `B`.
-- `expectType<A, B>("!>=")`: Asserts that type `B` does not extend type `A`.
-- `expectType<A, B>("!=")`: Asserts that type `A` is not strictly equal to type `B`.
-
-#### Type Parameters
-
-##### A
-
-`A`
-
-The first type for comparison.
-
-##### B
-
-`B`
-
-The second type for comparison.
-
-#### Parameters
-
-##### \_relation
-
-`TypeEq`\<`A`, `B`\> _extends_ `true` ? `"<="` \| `"="` \| `">="` \| `"~="` : `"!="` \| `TypeExtends`\<`A`, `B`\> _extends_ `true` ? `"<="` \| `TypeExtends`\<`B`, `A`\> _extends_ `true` ? `">="` \| `"~="` : `"!>="` : `"!<="` \| `TypeExtends`\<`B`, `A`\> _extends_ `true` ? `">="` : `"!>="`
-
-A string literal representing the expected type relationship.
-TypeScript infers the valid literals based on `A` and `B`.
-Must be one of: `"="`, `"~="`, `"<="`, `">="`, `"!<="`, `"!>="`, `"!="`.
-
-#### Returns
-
-`void`
-
-#### Example
-
-```typescript
-// Type equality
-expectType<string, string>('='); // ✓ passes
-expectType<number, string>('!='); // ✓ passes
-
-// Subtype relationships
-expectType<'hello', string>('<='); // ✓ literal extends string
-expectType<string, 'hello'>('>='); // ✓ string is supertype of literal
-
-// Array type checking in tests
-const result = [1, 2, 3] as const;
-expectType<typeof result, readonly [1, 2, 3]>('='); // ✓ exact tuple match
-
-// Function return type validation
-const fn = () => ({ a: 1, b: 2 });
-expectType<ReturnType<typeof fn>, { a: number; b: number }>('~='); // ✓ structurally equivalent
-
-// Union and intersection types
-expectType<string | number, string>('>='); // ✓ union contains string
-expectType<string, string | number>('<='); // ✓ string extends union
-
-// Negative assertions
-expectType<string, number>('!='); // ✓ different types
-expectType<string, number>('!<='); // ✓ string doesn't extend number
-```
+- [array](array.md)
+- [array/array-utils](array/array-utils/README.md)
+- [array/tuple-utils](array/tuple-utils/README.md)
+- [collections](collections.md)
+- [collections/imap](collections/imap/README.md)
+- [collections/imap-mapped](collections/imap-mapped/README.md)
+- [collections/iset](collections/iset/README.md)
+- [collections/iset-mapped](collections/iset-mapped/README.md)
+- [collections/queue](collections/queue.md)
+- [collections/stack](collections/stack.md)
+- [expect-type](expect-type.md)
+- [functional](functional.md)
+- [functional/match](functional/match.md)
+- [functional/optional](functional/optional/README.md)
+- [functional/pipe](functional/pipe.md)
+- [functional/result](functional/result/README.md)
+- [guard](guard.md)
+- [guard/has-key](guard/has-key.md)
+- [guard/is-non-empty-string](guard/is-non-empty-string.md)
+- [guard/is-non-null-object](guard/is-non-null-object.md)
+- [guard/is-primitive](guard/is-primitive.md)
+- [guard/is-record](guard/is-record.md)
+- [guard/is-type](guard/is-type.md)
+- [guard/key-is-in](guard/key-is-in.md)
+- [iterator](iterator.md)
+- [iterator/range](iterator/range.md)
+- [json](json.md)
+- [json/json](json/json/README.md)
+- [number](number.md)
+- [number/branded-types](number/branded-types.md)
+- [number/branded-types/finite-number](number/branded-types/finite-number.md)
+- [number/branded-types/int](number/branded-types/int.md)
+- [number/branded-types/int16](number/branded-types/int16.md)
+- [number/branded-types/int32](number/branded-types/int32.md)
+- [number/branded-types/non-negative-finite-number](number/branded-types/non-negative-finite-number.md)
+- [number/branded-types/non-negative-int16](number/branded-types/non-negative-int16.md)
+- [number/branded-types/non-negative-int32](number/branded-types/non-negative-int32.md)
+- [number/branded-types/non-zero-finite-number](number/branded-types/non-zero-finite-number.md)
+- [number/branded-types/non-zero-int](number/branded-types/non-zero-int.md)
+- [number/branded-types/non-zero-int16](number/branded-types/non-zero-int16.md)
+- [number/branded-types/non-zero-int32](number/branded-types/non-zero-int32.md)
+- [number/branded-types/non-zero-safe-int](number/branded-types/non-zero-safe-int.md)
+- [number/branded-types/non-zero-uint16](number/branded-types/non-zero-uint16.md)
+- [number/branded-types/non-zero-uint32](number/branded-types/non-zero-uint32.md)
+- [number/branded-types/positive-finite-number](number/branded-types/positive-finite-number.md)
+- [number/branded-types/positive-int](number/branded-types/positive-int.md)
+- [number/branded-types/positive-int16](number/branded-types/positive-int16.md)
+- [number/branded-types/positive-int32](number/branded-types/positive-int32.md)
+- [number/branded-types/positive-safe-int](number/branded-types/positive-safe-int.md)
+- [number/branded-types/positive-uint16](number/branded-types/positive-uint16.md)
+- [number/branded-types/positive-uint32](number/branded-types/positive-uint32.md)
+- [number/branded-types/safe-int](number/branded-types/safe-int.md)
+- [number/branded-types/safe-uint](number/branded-types/safe-uint.md)
+- [number/branded-types/uint](number/branded-types/uint.md)
+- [number/branded-types/uint16](number/branded-types/uint16.md)
+- [number/branded-types/uint32](number/branded-types/uint32.md)
+- [number/enum](number/enum.md)
+- [number/enum/int8](number/enum/int8.md)
+- [number/enum/uint8](number/enum/uint8.md)
+- [number/num](number/num/README.md)
+- [number/refined-number-utils](number/refined-number-utils.md)
+- [object](object.md)
+- [object/object](object/object/README.md)
+- [others](others.md)
+- [others/cast-mutable](others/cast-mutable.md)
+- [others/cast-readonly](others/cast-readonly.md)
+- [others/if-then](others/if-then.md)
+- [others/map-nullable](others/map-nullable.md)
+- [others/memoize-function](others/memoize-function.md)
+- [others/tuple](others/tuple.md)
+- [others/unknown-to-string](others/unknown-to-string.md)
