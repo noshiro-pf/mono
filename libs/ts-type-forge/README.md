@@ -4,24 +4,58 @@
 [![npm downloads](https://img.shields.io/npm/dm/ts-type-forge.svg)](https://www.npmjs.com/package/ts-type-forge)
 [![License](https://img.shields.io/npm/l/ts-type-forge.svg)](./LICENSE)
 
-A collection of type utilities to enhance your TypeScript development.
+**ts-type-forge** is a comprehensive TypeScript type utility library that provides powerful type-level operations with zero runtime cost. It enhances TypeScript development by offering advanced type manipulations, strict type checking utilities, and comprehensive type safety features.
 
 ## Features
 
-- Provides enhanced built-in types such as [`StrictExclude`](./src/record/std.d.mts#L16), [`StrictOmit`](./src/record/std.d.mts#L22), [`ReadonlyRecord`](./src/record/std.d.mts#L29), etc.
-- No need for import statements for utility types when using Triple-Slash Directives. See [How to use](#how-to-use) section.
-- No runtime cost – it's type-level only.
-- Secure and minimal – no third-party dependencies.
-- Quality – thoroughly tested for type correctness with type-testing.
+This library offers a comprehensive suite of type-level utilities, including:
+
+- **Advanced Type Utilities**: Enhanced versions of built-in types like [`StrictExclude`](./src/record/std.d.mts#L86), [`StrictOmit`](./src/record/std.d.mts#L120), [`ReadonlyRecord`](./src/record/std.d.mts#L155), and many more.
+- **Compile-Time Type Checking**: Assert type relationships at compile time with comprehensive condition types.
+- **Branded Types**: Extensive collection of branded number types (`Int`, `Uint`, `SafeInt`, `FiniteNumber`, etc.) for enhanced type safety.
+- **Array and Tuple Utilities**: Type-safe operations with `List` and `Tuple` namespaces for complex array manipulations.
+- **Record Manipulation**: Deep operations like `DeepReadonly`, `DeepPartial`, and advanced path-based record updates.
+- **Type-Level Arithmetic**: Integer operations, ranges (`UintRange`), and mathematical type computations.
+- **Global Type Availability**: No need for import statements when using Triple-Slash Directives.
+- **Zero Runtime Cost**: Pure type-level operations with no runtime dependencies.
+- **Comprehensive Testing**: Thoroughly tested for type correctness with custom type-testing utilities.
 
 ## Installation
 
 ```bash
 npm install ts-type-forge
-# or
+```
+
+Or with other package managers:
+
+```bash
+# Yarn
 yarn add ts-type-forge
-# or
+
+# pnpm
 pnpm add ts-type-forge
+```
+
+## TypeScript Configuration
+
+ts-type-forge works best with strict TypeScript settings:
+
+```json
+{
+    "compilerOptions": {
+        "strict": true, // important
+        "noUncheckedIndexedAccess": true, // important
+        "noPropertyAccessFromIndexSignature": true, // important
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "exactOptionalPropertyTypes": false
+    }
+}
 ```
 
 ## How to use
@@ -50,17 +84,103 @@ There are two ways to use the types provided by `ts-type-forge`:
     export type DiceValue = UintRange<1, 7>; // 1 | 2 | 3 | 4 | 5 | 6
     ```
 
+## Core Modules
+
+### 🎯 Type Conditions and Predicates
+
+Essential type-level conditional logic for advanced type operations.
+
+- **Type Equality** - `TypeEq` for exact type matching
+- **Type Extensions** - `TypeExtends` for subtype relationships
+- **Union Detection** - `IsUnion` for union type identification
+- **Never Detection** - `IsNever` for never type checking
+
+### 🔧 Record and Object Types
+
+Advanced object type manipulations with strict type safety.
+
+- **Strict Operations** - `StrictOmit`, `StrictPick`, `StrictExclude` with key validation
+- **Deep Operations** - `DeepReadonly`, `DeepPartial`, `DeepRequired`
+- **Partial Utilities** - `PartiallyPartial`, `PartiallyOptional`, `PartiallyRequired`
+- **Record Paths** - `RecordPaths`, `RecordValueAtPath` for type-safe property access
+
+### 🔢 Branded Number Types
+
+Comprehensive branded types for enhanced numeric type safety.
+
+- **Basic Types** - `Int`, `Uint`, `SafeInt`, `FiniteNumber`
+- **Range Types** - `Int16`, `Int32`, `Uint16`, `Uint32`
+- **Constraint Types** - `PositiveInt`, `NonZeroInt`, `NonNegativeInt`
+- **Floating Point** - `Float32`, `Float64` with proper constraints
+
+### 📋 Array and Tuple Operations
+
+Type-safe array and tuple utilities with functional programming patterns.
+
+- **Array Types** - `NonEmptyArray`, `ArrayOfLength`, `ArrayAtLeastLen`
+- **List Namespace** - Comprehensive list operations (Head, Tail, Take, Skip, etc.)
+- **Tuple Namespace** - Type-safe tuple manipulations with compile-time guarantees
+
+### 🧮 Type-Level Arithmetic
+
+Mathematical operations performed entirely at the type level.
+
+- **Integer Operations** - `Increment`, `Decrement`, `AbsoluteValue`
+- **Ranges** - `UintRange`, `UintRangeInclusive` for precise numeric constraints
+- **Comparisons** - `Max`, `Min` for type-level comparisons
+
+### 🌐 Constants and Primitives
+
+Pre-defined type constants for common use cases.
+
+- **Basic Constants** - `Primitive`, `FalsyValue`, `UnknownRecord`
+- **Web Types** - `HTTPRequestMethod` for web development
+- **Numeric Enums** - `MonthEnum`, `DateEnum`, `HoursEnum`, etc.
+
 ## Usage Examples
 
-Below are a few examples featuring `DeepReadonly`, `JsonValue`, and `UintRange`. For a comprehensive list of all available types and their detailed documentation, please refer to the [API Reference](#api-reference) section.
+Here are detailed examples showcasing the power of ts-type-forge's type utilities.
 
-### `DeepReadonly`
+For a comprehensive list of all available types and their detailed documentation, please refer to the [API Reference](#api-reference) section.
 
-Make all properties of a nested object readonly.
+### 1. Type-Level Conditional Logic with `TypeEq` and `TypeExtends`
+
+The type utilities allow you to perform complex type checking and assertions at compile time.
 
 ```ts
 // No import needed if using triple-slash directive
-// import type { DeepReadonly } from 'ts-type-forge'; // if importing explicitly
+// import type { TypeEq, TypeExtends } from 'ts-type-forge'; // if importing explicitly
+
+type User = { id: number; name: string };
+type Admin = { id: number; name: string; role: 'admin' };
+
+// Check exact type equality
+type IsExactMatch = TypeEq<User, Admin>; // false
+type IsSameType = TypeEq<User, User>; // true
+
+// Check type extension relationships
+type AdminExtendsUser = TypeExtends<Admin, User>; // true
+type UserExtendsAdmin = TypeExtends<User, Admin>; // false
+
+// Use in conditional types
+type GetUserType<T> =
+    TypeExtends<T, Admin> extends true
+        ? 'admin'
+        : TypeExtends<T, User> extends true
+          ? 'user'
+          : 'unknown';
+
+type AdminType = GetUserType<Admin>; // 'admin'
+type UserType = GetUserType<User>; // 'user'
+```
+
+### 2. Deep Object Manipulation with `DeepReadonly` and `DeepPartial`
+
+Transform nested object types with precise control over mutability and optionality.
+
+```ts
+// No import needed if using triple-slash directive
+// import type { DeepReadonly, DeepPartial } from 'ts-type-forge'; // if importing explicitly
 
 type Config = {
     port: number;
@@ -75,10 +195,9 @@ type Config = {
     features: string[];
 };
 
-// Create a type where all properties, nested or not, are readonly.
+// Create a type where all properties, nested or not, are readonly
 type ReadonlyConfig = DeepReadonly<Config>;
 
-// Example usage:
 const config: ReadonlyConfig = {
     port: 8080,
     database: {
@@ -92,15 +211,25 @@ const config: ReadonlyConfig = {
     features: ['featureA', 'featureB'],
 };
 
-// config.port = 8081; // Error: Cannot assign to 'port' because it is a read-only property.
-// config.database.host = 'remote'; // Error: Cannot assign to 'host' because it is a read-only property.
-// config.database.credentials.user = 'guest'; // Error: Cannot assign to 'user' because it is a read-only property.
-// config.features.push('featureC'); // Error: Property 'push' does not exist on type 'readonly string[]'.
+// config.port = 8081; // Error: Cannot assign to 'port' because it is a read-only property
+// config.database.host = 'remote'; // Error: Cannot assign to 'host' because it is a read-only property
+// config.features.push('featureC'); // Error: Property 'push' does not exist on type 'readonly string[]'
+
+// Create a type where all properties are optional (useful for partial updates)
+type PartialConfig = DeepPartial<Config>;
+
+const partialUpdate: PartialConfig = {
+    database: {
+        host: 'new-host', // Only update specific fields
+        // port and credentials are optional
+    },
+    // port and features are optional
+};
 ```
 
-### `StrictOmit`
+### 3. Strict Type Operations with `StrictOmit`
 
-Create a new type by omitting specified keys from an existing type, ensuring that the keys to be omitted actually exist in the original type. This provides stricter type checking than the built-in `Omit`.
+Enhanced versions of built-in `Omit` utility that provide compile-time key validation.
 
 ```ts
 // No import needed if using triple-slash directive
@@ -114,7 +243,7 @@ type UserProfile = Readonly<{
     bio?: string;
 }>;
 
-// Create a type for user data that should not include 'lastLogin' or 'id'.
+// StrictOmit ensures keys actually exist in the source type
 type UserCreationData = StrictOmit<UserProfile, 'id' | 'lastLogin'>;
 // Result:
 // type UserCreationData = Readonly<{
@@ -126,27 +255,27 @@ type UserCreationData = StrictOmit<UserProfile, 'id' | 'lastLogin'>;
 const newUser: UserCreationData = {
     username: 'jane_doe',
     email: 'jane@example.com',
-    // bio: 'Software Developer' // Optional
+    bio: 'Software Developer', // Optional
 };
 
-// The following would cause a type error because 'nonExistentKey' is not in UserProfile:
+// The following would cause a compile-time error because 'nonExistentKey' doesn't exist:
 // type InvalidOmit = StrictOmit<UserProfile, 'id' | 'nonExistentKey'>; // Error
 ```
 
-### `NonEmptyArray`
+### 4. Array Type Safety with `NonEmptyArray` and `List` Operations
 
-Represent an array that is guaranteed to have at least one element. This is useful for functions or types that require a collection to be non-empty.
+Guarantee array constraints and perform type-safe operations on collections.
 
 ```ts
 // No import needed if using triple-slash directive
-// import type { NonEmptyArray } from 'ts-type-forge'; // if importing explicitly
+// import type { NonEmptyArray, List } from 'ts-type-forge'; // if importing explicitly
 
 type Post = Readonly<{
     title: string;
     content: string;
 }>;
 
-// A blog must have at least one post.
+// A blog must have at least one post
 type Blog = Readonly<{
     name: string;
     posts: NonEmptyArray<Post>; // Ensures posts array is never empty
@@ -161,93 +290,152 @@ const myBlog: Blog = {
     ],
 };
 
-// // This would cause a type error
+// This would cause a type error:
 // const emptyBlog: Blog = {
 //     name: 'Empty Thoughts',
-//     posts: [], // Error: Source has 0 element(s) but target requires 1.
+//     posts: [], // Error: Source has 0 element(s) but target requires 1
 // };
 
 const getFirstPostTitle = (posts: NonEmptyArray<Post>): string =>
-    posts[0].title; // Safe to access posts[0]
+    posts[0].title; // Safe to access posts[0] - guaranteed to exist
 
-console.log(getFirstPostTitle(myBlog.posts));
+// Advanced List operations at the type level
+type NumberList = readonly [1, 2, 3, 4, 5];
 
-const processPosts = (posts: readonly Post[]) => {
-    if (posts.length > 0) {
-        const firstPost = posts[0]; // Need to check length for regular arrays
-        // ...
-    }
-};
+type FirstElement = List.Head<NumberList>; // 1
+type LastElement = List.Last<NumberList>; // 5
+type WithoutFirst = List.Tail<NumberList>; // readonly [2, 3, 4, 5]
+type FirstThree = List.Take<NumberList, 3>; // readonly [1, 2, 3]
+type Reversed = List.Reverse<NumberList>; // readonly [5, 4, 3, 2, 1]
+
+// Combine operations
+type LastThreeReversed = List.Reverse<List.TakeLast<NumberList, 3>>; // readonly [5, 4, 3]
 ```
 
-### `JsonValue`
+### 5. Type-Safe JSON Handling with `JsonValue`
 
-Safely handle JSON parsing results. `JsonValue` represents any valid JSON value (string, number, boolean, null, array of `JsonValue`, or object with string keys and `JsonValue` values).
+Safely represent and work with JSON data structures.
 
 ```ts
 // No import needed if using triple-slash directive
-// import type { JsonValue } from 'ts-type-forge'; // if importing explicitly
+// import type { JsonValue, JsonObject } from 'ts-type-forge'; // if importing explicitly
 
 const jsonString =
     '{"name": "Alice", "age": 30, "isAdmin": false, "tags": ["user", "active"], "metadata": null}';
 
 try {
-    // Cast the result of JSON.parse to JsonValue
+    // Cast the result of JSON.parse to JsonValue for type safety
     const parsedData = JSON.parse(jsonString) as JsonValue;
 
-    // Now you can work with parsedData.
-    // Type guards are recommended to narrow down the type for specific operations.
+    // Use type guards to safely work with parsed data
     if (
         typeof parsedData === 'object' &&
         parsedData !== null &&
         !Array.isArray(parsedData)
     ) {
-        // parsedData is now known to be a JSON object (Record<string, JsonValue>)
-        console.log(parsedData['name']); // Access properties
+        // parsedData is now known to be JsonObject
+        const jsonObj = parsedData as JsonObject;
 
-        if (typeof parsedData['age'] === 'number') {
-            console.log(`Age: ${parsedData['age']}`);
+        console.log(jsonObj['name']); // Access properties safely
+
+        if (typeof jsonObj['age'] === 'number') {
+            console.log(`Age: ${jsonObj['age']}`);
+        }
+
+        if (Array.isArray(jsonObj['tags'])) {
+            jsonObj['tags'].forEach((tag) => {
+                if (typeof tag === 'string') {
+                    console.log(`Tag: ${tag}`);
+                }
+            });
         }
     } else if (Array.isArray(parsedData)) {
-        // parsedData is now known to be a JSON array (JsonValue[])
+        // parsedData is a JSON array
         parsedData.forEach((item) => console.log(item));
     }
 } catch (error) {
     console.error('Failed to parse JSON:', error);
 }
+
+// Define API response types using JsonValue
+type ApiResponse = JsonObject & {
+    readonly status: 'success' | 'error';
+    readonly data?: JsonValue;
+    readonly message?: string;
+};
 ```
 
-### `UintRange`
+### 6. Precise Numeric Ranges with `UintRange` and Branded Types
 
-Define precise numeric ranges for function parameters. `UintRange<Start, End>` creates a union of integer literals from `Start` (inclusive) up to `End` (exclusive). You can also use the version where both are inclusive: `UintRangeInclusive`.
+Define exact numeric constraints and enhance type safety with branded number types.
 
 ```ts
 // No import needed if using triple-slash directive
-// import type { UintRange } from 'ts-type-forge'; // if importing explicitly
+// import type { UintRange, UintRangeInclusive, Int, Uint } from 'ts-type-forge'; // if importing explicitly
 
 /**
- * Converts a string to an integer.
- * @param str A string to convert into a number.
- * @param radix A value between 2 and 36 that specifies the base of the number in `str`.
- * If this argument is not supplied, strings with a prefix of '0x' are considered hexadecimal.
- * All other strings are considered decimal.
+ * Parse integer with constrained radix parameter
+ * @param str A string to convert into a number
+ * @param radix A value between 2 and 36 that specifies the base
  */
 export const parseInteger = (str: string, radix?: UintRange<2, 37>): number =>
     Number.parseInt(str, radix);
-// or
-// export const parseInteger = (str: string, radix?: UintRangeInclusive<2, 36>): number =>
-//     Number.parseInt(str, radix);
+
+// Alternative using inclusive range
+export const parseIntegerInclusive = (
+    str: string,
+    radix?: UintRangeInclusive<2, 36>,
+): number => Number.parseInt(str, radix);
 
 // Valid usages:
-parseInteger('10'); // radix defaults (usually 10)
+parseInteger('10'); // radix defaults to 10
 parseInteger('10', 2); // Binary
 parseInteger('255', 16); // Hexadecimal
-parseInteger('123', 36);
+parseInteger('123', 36); // Maximum base
 
 // Invalid usages (TypeScript will error):
-// parseInteger('10', 1); // Error: Argument of type '1' is not assignable to parameter of type 'UintRange<2, 37> | undefined'.
-// parseInteger('10', 37); // Error: Argument of type '37' is not assignable to parameter of type 'UintRange<2, 37> | undefined'.
+// parseInteger('10', 1); // Error: Argument of type '1' is not assignable to parameter of type 'UintRange<2, 37> | undefined'
+// parseInteger('10', 37); // Error: Argument of type '37' is not assignable to parameter of type 'UintRange<2, 37> | undefined'
+
+// Branded types for additional safety
+type UserId = Brand<number, 'UserId'>;
+type ProductId = Brand<number, 'ProductId'>;
+
+// Create branded values (you would typically have constructor functions)
+declare const userId: UserId;
+declare const productId: ProductId;
+
+// Type-safe functions that can't mix up IDs
+function getUserById(id: UserId): User | null {
+    /* ... */
+}
+function getProductById(id: ProductId): Product | null {
+    /* ... */
+}
+
+// getUserById(productId); // Error: Argument of type 'ProductId' is not assignable to parameter of type 'UserId'
 ```
+
+## Modules Overview
+
+The library is organized into logical modules for easy navigation and understanding:
+
+- **`condition/`**: Type predicates like `TypeEq`, `TypeExtends`, `IsUnion`, `IsNever` for conditional type logic.
+- **`record/`**: Object type utilities including `StrictOmit`, `DeepReadonly`, `RecordPaths`, and partial operations.
+- **`branded-types/`**: Comprehensive branded number types (`Int`, `Uint`, `SafeInt`, `FiniteNumber`, etc.) with range constraints.
+- **`tuple-and-list/`**: Array and tuple operations with `List` and `Tuple` namespaces for type-safe manipulations.
+- **`type-level-integer/`**: Mathematical operations like `Increment`, `UintRange`, `AbsoluteValue` performed at the type level.
+- **`constants/`**: Pre-defined constants like `Primitive`, `FalsyValue`, `HTTPRequestMethod`, and enum types.
+- **`others/`**: Utility types like `JsonValue`, `Mutable`, `WidenLiteral`, and helper functions.
+
+## Key Benefits
+
+- **Type Safety**: All utilities are designed with TypeScript's advanced type system, providing compile-time guarantees.
+- **Zero Runtime Cost**: Pure type-level operations with no runtime dependencies or overhead.
+- **Comprehensive Coverage**: From basic utilities to advanced type manipulations for complex scenarios.
+- **Global Availability**: Use triple-slash directives to make types available without explicit imports.
+- **Extensive Testing**: All utilities are thoroughly tested with custom type-testing framework.
+- **Strict Validation**: Enhanced versions of built-in types with compile-time key validation.
 
 ## API Reference
 
@@ -545,9 +733,20 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
 
 <!-- AUTO-GENERATED TYPES END -->
 
+## Important Notes
+
+- This library is **type-level only** with zero runtime dependencies and no runtime cost.
+- All types are designed to work seamlessly with TypeScript's strict mode settings.
+- The library supports both explicit imports and global type availability via triple-slash directives.
+- Custom type-testing utilities ensure all operations work correctly at compile time.
+
 ## Compatibility Notes
 
-This library requires TypeScript version 4.8 or higher.
+This library requires TypeScript version 4.8 or higher for full compatibility with advanced type features.
+
+## Contributing
+
+Contributions are welcome! Please see the repository's contribution guidelines for detailed information on how to contribute to this project.
 
 ## License
 
