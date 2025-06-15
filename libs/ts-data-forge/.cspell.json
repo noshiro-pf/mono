@@ -3,5 +3,5 @@
   "language": "en",
   "words": ["noshiro", "testw", "tscw"],
   "flagWords": [],
-  "ignorePaths": ["eslint.config.js", "./package-lock.json"]
+  "ignorePaths": ["eslint.config.js", "./package-lock.json", "docs/**"]
 }

@@ -28,6 +28,46 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ALWAYS prefer editing an existing file to creating a new one
 - NEVER proactively create documentation files (\*.md) or README files unless explicitly requested
 
+## Architecture Overview
+
+**ts-data-forge** is a TypeScript utility library providing type-safe functional programming utilities. Key architectural principles:
+
+1. **Type-first design** - Heavy use of TypeScript's type system for compile-time safety
+2. **Zero runtime dependencies** - Only development tooling dependencies
+3. **Functional programming patterns** - Immutable data structures, Optional/Result types
+4. **ESM modules** - Uses `.mts` extensions with `NodeNext` module resolution
+
+## Module Structure
+
+- `array/` - Array and tuple utilities with type-safe operations
+- `collections/` - Immutable data structures (IMap, ISet, IMapMapped, ISetMapped) and mutable structures (Queue, Stack)
+- `functional/` - FP utilities (Optional, Result, pipe, match)
+- `guard/` - Type guard functions for runtime type checking
+- `iterator/` - Iterator utilities (range generators)
+- `json/` - JSON utilities with type safety
+- `number/` - Numeric utilities including branded types and enums
+- `object/` - Object manipulation utilities
+- `others/` - Miscellaneous utilities (casting, memoization, tuples)
+- `expect-type.mts` - Compile-time type assertions for testing
+
+## Testing Approach
+
+Uses **Vitest** with dual testing strategy:
+
+1. **Compile-time type testing** via `expectType` utility
+2. **Runtime behavioral testing** with standard assertions
+
+Example pattern:
+
+```typescript
+import { expectType } from '../expect-type.mjs';
+
+// Type-level assertion
+expectType<typeof result, readonly [0, 0, 0]>('=');
+// Runtime assertion
+expect(result).toStrictEqual([0, 0, 0]);
+```
+
 ## Configuration Notes
 
 - **TypeScript**: Strict mode with `noUncheckedIndexedAccess: true` for enhanced type safety
@@ -62,6 +102,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **PREFER**: Destructuring imports when possible (e.g., `import { foo } from 'bar'`)
 - **PREFER**: Avoid using `// eslint-disable-next-line` or `eslint-disable` as possible.
 - **PREFER**: Avoid any casting as possible.
+- **PREFER**: Use `expectType<A, B>('=')` whenever possible. Avoid using `expectType<A, B>('<=')` or `expectType<A, B>('!=')` except when intended.
 - **RESTRICTIONS**: Do not perform these actions without explicit user instructions:
     - Push to GitHub or remote repositories
     - Access `~/.ssh` or other sensitive directories

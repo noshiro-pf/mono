@@ -10,7 +10,7 @@
 
 > **expectType**\<`A`, `B`\>(`_relation`): `void`
 
-Defined in: [expect-type.mts:47](https://github.com/noshiro-pf/typescript-template/blob/main/src/expect-type.mts#L47)
+Defined in: [expect-type.mts:47](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/expect-type.mts#L47)
 
 Compile-time type assertion utility.
 Checks the relationship between type `A` and type `B` based on the `_relation` parameter.

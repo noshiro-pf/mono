@@ -1,13 +1,18 @@
 {
-  "name": "typescript-template",
-  "version": "1.0.0",
+  "name": "ts-data-forge",
+  "version": "0.1.0",
   "private": false,
   "keywords": [
-    "typescript"
+    "typescript",
+    "utility",
+    "types",
+    "static-typing",
+    "functional-programming",
+    "type-guard"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/noshiro-pf/typescript-template.git"
+    "url": "git+https://github.com/noshiro-pf/ts-data-forge.git"
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
@@ -52,6 +57,9 @@
     "z:node-eval": "node --import tsx/esm --input-type=module --eval",
     "z:vitest": "vitest --config ./configs/vitest.config.ts"
   },
+  "dependencies": {
+    "ts-type-forge": "^2.0.2"
+  },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
     "@rollup/plugin-replace": "^6.0.2",
@@ -77,13 +85,15 @@
     "prettier-plugin-packagejson": "^2.5.15",
     "rollup": "^4.43.0",
     "semantic-release": "^24.2.5",
-    "ts-type-forge": "^2.0.2",
     "tsx": "^4.20.3",
     "typedoc": "^0.28.5",
     "typedoc-plugin-markdown": "^4.6.4",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.34.0",
     "vitest": "^3.2.3"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.8"
   },
   "engines": {
     "node": ">=20.11.0"

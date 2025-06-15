@@ -1,1 +1,1 @@
-export {};
+export * from './expect-type.mjs';

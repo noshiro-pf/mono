@@ -2,6 +2,7 @@ import * as path from 'node:path';
 
 const srcDir = path.resolve(import.meta.dirname, '../src');
 const outDir = path.resolve(import.meta.dirname, '../docs');
+const externalDocumentsDir = path.resolve(import.meta.dirname, '../documents');
 
 /** @type { Partial<import("typedoc").TypeDocOptions & import("typedoc-plugin-markdown").PluginOptions>} */
 const config = {
@@ -15,6 +16,7 @@ const config = {
   gitRevision: 'main',
   excludeInternal: true,
   mergeReadme: true,
+  projectDocuments: [`${externalDocumentsDir}/*.md`],
 };
 
 export default config;
