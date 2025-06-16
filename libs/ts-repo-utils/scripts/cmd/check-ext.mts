@@ -2,10 +2,6 @@ import { assertExt } from '../../src/functions/assert-ext.mjs';
 import '../../src/node-global.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
-/**
- * Command script to check file extensions for ts-repo-utils project.
- * Validates that all TypeScript files use .mts extension.
- */
 await assertExt({
   directories: [
     {

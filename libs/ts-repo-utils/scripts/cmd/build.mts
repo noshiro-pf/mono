@@ -1,4 +1,4 @@
-import { assertExt, assertPathExists, genIndex } from '../../src/index.mjs';
+import { assertPathExists } from '../../src/index.mjs';
 import '../../src/node-global.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -107,20 +107,7 @@ const build = async (): Promise<void> => {
   try {
     // Step 1: Validate file extensions
     echo('1. Checking file extensions...');
-    await assertExt({
-      directories: [
-        {
-          path: path.resolve(projectRootPath, './src'),
-          extension: '.mts',
-          ignorePatterns: ['tsconfig.json', 'globals.d.mts'],
-        },
-        {
-          path: path.resolve(projectRootPath, './scripts'),
-          extension: '.mts',
-          ignorePatterns: ['tsconfig.json'],
-        },
-      ],
-    });
+    await $('npm run check:ext');
 
     // Step 2: Clean previous build
     echo('2. Cleaning dist directory...');
@@ -128,9 +115,7 @@ const build = async (): Promise<void> => {
 
     // Step 3: Generate index files
     echo('3. Generating index files...');
-    await genIndex({
-      targetDirectory: path.resolve(projectRootPath, './src/functions'),
-    });
+    await $('npm run gi');
 
     // Step 4: Type checking
     echo('4. Running type checking...');

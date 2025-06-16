@@ -1,6 +1,5 @@
-import { assertExt, assertRepoIsDirty } from '../../src/index.mjs';
+import { assertRepoIsDirty } from '../../src/index.mjs';
 import '../../src/node-global.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Runs all validation and build steps for the project.
@@ -34,20 +33,7 @@ try {
 
   // Step 3: Check file extensions
   echo('3. Checking file extensions...');
-  await assertExt({
-    directories: [
-      {
-        path: path.resolve(projectRootPath, './src'),
-        extension: '.mts',
-        ignorePatterns: ['tsconfig.json', 'globals.d.mts'],
-      },
-      {
-        path: path.resolve(projectRootPath, './scripts'),
-        extension: '.mts',
-        ignorePatterns: ['tsconfig.json'],
-      },
-    ],
-  });
+  await $('npm run check:ext');
   echo('✓ File extensions validated\n');
 
   // Step 4: Run tests
