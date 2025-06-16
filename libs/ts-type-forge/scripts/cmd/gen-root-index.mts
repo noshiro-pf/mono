@@ -1,9 +1,9 @@
-import '../node-global.mjs';
+import { projectRootPath } from '../project-root-path.mjs';
 
 const srcDir = path.resolve(projectRootPath, 'src');
 const indexFilePath = path.resolve(srcDir, 'index.d.mts');
 
-export const genRootIndex = async (): Promise<void> => {
+const genRootIndex = async (): Promise<void> => {
   console.log(`Searching for .d.mts files in ${srcDir}...`);
 
   const dtsFiles: readonly string[] = await getDtsFiles();
@@ -39,3 +39,5 @@ const getDtsFiles = async (): Promise<readonly string[]> => {
   const dtsFiles = await glob(`${srcDir}/**/*.d.mts`);
   return dtsFiles.filter((filePath) => filePath !== indexFilePath);
 };
+
+await genRootIndex();

@@ -1,34 +1,29 @@
-import { checkExt } from '../functions/check-ext.mjs';
-import { checkIfRepoIsDirty } from '../functions/check-if-repo-is-dirty.mjs';
-import { genDocs } from '../functions/gen-docs.mjs';
-import { genRootIndex } from '../functions/gen-root-index.mjs';
-import '../node-global.mjs';
+import { assertRepoIsDirty } from 'ts-repo-utils';
+import { projectRootPath } from '../project-root-path.mjs';
 
-export const checkAll = async (): Promise<void> => {
-  await $(`cd ${projectRootPath}`);
+await $(`cd ${projectRootPath}`);
 
-  await $('npm i');
+await $('npm i');
 
-  await $(
-    'cspell "**" --gitignore --gitignore-root ./ --no-progress --fail-fast',
-  ).catch(() => {
-    console.error('Spell check failed, try `npm run cspell` for more details.');
-    process.exit(1);
-  });
+await $(
+  'cspell "**" --gitignore --gitignore-root ./ --no-progress --fail-fast',
+).catch(() => {
+  console.error('Spell check failed, try `npm run cspell` for more details.');
+  process.exit(1);
+});
 
-  await checkExt();
+await $('npm run check:ext');
 
-  await $('npm run type-check');
+await $('npm run type-check');
 
-  await $('npm run lint:fix');
-  await checkIfRepoIsDirty();
+await $('npm run lint:fix');
+await assertRepoIsDirty();
 
-  await genRootIndex();
-  await checkIfRepoIsDirty();
+await $('npm run build');
+await assertRepoIsDirty();
 
-  await genDocs();
-  await checkIfRepoIsDirty();
+await $('npm run doc');
+await assertRepoIsDirty();
 
-  await $('npm run fmt');
-  await checkIfRepoIsDirty();
-};
+await $('npm run fmt');
+await assertRepoIsDirty();

@@ -1,4 +1,4 @@
-import '../node-global.mjs';
+import { projectRootPath } from '../project-root-path.mjs';
 
 const srcDir = path.resolve(projectRootPath, './src');
 
