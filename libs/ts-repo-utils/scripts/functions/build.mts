@@ -1,7 +1,5 @@
-import '../node-global.mjs';
-import { ensurePathExists } from '../utils.mjs';
-import { checkExt } from './check-ext.mjs';
-import { genIndex } from './gen-index.mjs';
+import { assertExt, assertPathExists, genIndex } from '../../src/index.mjs';
+import '../../src/node-global.mjs';
 
 // Build configuration
 const BUILD_CONFIG = {
@@ -42,7 +40,7 @@ const typeCheck = async (): Promise<void> => {
  */
 const rollupBuild = async (): Promise<void> => {
   try {
-    await ensurePathExists(BUILD_CONFIG.rollupConfig, 'Rollup config');
+    await assertPathExists(BUILD_CONFIG.rollupConfig, 'Rollup config');
 
     const rollupCmd = [
       'rollup',
@@ -66,7 +64,7 @@ const rollupBuild = async (): Promise<void> => {
  */
 const copyGlobals = async (): Promise<void> => {
   try {
-    await ensurePathExists(BUILD_CONFIG.srcGlobalsFile, 'Global types file');
+    await assertPathExists(BUILD_CONFIG.srcGlobalsFile, 'Global types file');
 
     const destFile = path.resolve(BUILD_CONFIG.distDir, 'globals.d.mts');
     const copyResult = await $(
@@ -108,7 +106,20 @@ export const build = async (): Promise<void> => {
   try {
     // Step 1: Validate file extensions
     echo('1. Checking file extensions...');
-    await checkExt();
+    await assertExt({
+      directories: [
+        {
+          path: path.resolve(projectRootPath, './src'),
+          extension: '.mts',
+          ignorePatterns: ['tsconfig.json', 'globals.d.mts'],
+        },
+        {
+          path: path.resolve(projectRootPath, './scripts'),
+          extension: '.mts',
+          ignorePatterns: ['tsconfig.json'],
+        },
+      ],
+    });
 
     // Step 2: Clean previous build
     echo('2. Cleaning dist directory...');
@@ -116,7 +127,9 @@ export const build = async (): Promise<void> => {
 
     // Step 3: Generate index files
     echo('3. Generating index files...');
-    await genIndex();
+    await genIndex({
+      targetDirectory: path.resolve(projectRootPath, './src/functions'),
+    });
 
     // Step 4: Type checking
     echo('4. Running type checking...');

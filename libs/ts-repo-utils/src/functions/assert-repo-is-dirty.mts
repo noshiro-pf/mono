@@ -1,30 +1,20 @@
 import '../node-global.mjs';
 
 /**
- * Gets the git status of the repository.
- * @returns An object containing status information.
+ * Checks if the repository has uncommitted changes.
+ * @returns True if the repo is dirty, false otherwise.
+ * @throws Error if git command fails.
  */
-const getGitStatus = async (): Promise<{
-  isDirty: boolean;
-  stdout: string;
-}> => {
-  const res = await $('git status --porcelain');
-
-  if (res.type === 'error') {
-    throw new Error(`Failed to get git status: ${res.exception.message}`);
-  }
-
-  return {
-    isDirty: res.stdout.trim() !== '',
-    stdout: res.stdout,
-  };
+export const repoIsDirty = async (): Promise<boolean> => {
+  const status = await getGitStatus();
+  return status.isDirty;
 };
 
 /**
  * Checks if the repository is dirty and exits with code 1 if it is.
  * @throws Error if git command fails.
  */
-export const checkIfRepoIsDirty = async (): Promise<void> => {
+export const assertRepoIsDirty = async (): Promise<void> => {
   try {
     const status = await getGitStatus();
 
@@ -56,11 +46,21 @@ export const checkIfRepoIsDirty = async (): Promise<void> => {
 };
 
 /**
- * Checks if the repository has uncommitted changes.
- * @returns True if the repo is dirty, false otherwise.
- * @throws Error if git command fails.
+ * Gets the git status of the repository.
+ * @returns An object containing status information.
  */
-export const repoIsDirty = async (): Promise<boolean> => {
-  const status = await getGitStatus();
-  return status.isDirty;
+const getGitStatus = async (): Promise<{
+  isDirty: boolean;
+  stdout: string;
+}> => {
+  const res = await $('git status --porcelain');
+
+  if (res.type === 'error') {
+    throw new Error(`Failed to get git status: ${res.exception.message}`);
+  }
+
+  return {
+    isDirty: res.stdout.trim() !== '',
+    stdout: res.stdout,
+  };
 };

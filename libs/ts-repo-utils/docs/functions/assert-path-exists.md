@@ -1,0 +1,63 @@
+[**Documentation**](../README.md)
+
+---
+
+[Documentation](../README.md) / functions/assert-path-exists
+
+# functions/assert-path-exists
+
+## Functions
+
+### assertPathExists()
+
+> **assertPathExists**(`filePath`, `description`): `Promise`\<`void`\>
+
+Defined in: [src/functions/assert-path-exists.mts:23](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-path-exists.mts#L23)
+
+Validates that a path exists and throws if it doesn't.
+
+#### Parameters
+
+##### filePath
+
+`string`
+
+The path to validate.
+
+##### description
+
+`string` = `'Path'`
+
+Description for error message.
+
+#### Returns
+
+`Promise`\<`void`\>
+
+#### Throws
+
+Error if path doesn't exist.
+
+---
+
+### pathExists()
+
+> **pathExists**(`filePath`): `Promise`\<`boolean`\>
+
+Defined in: [src/functions/assert-path-exists.mts:8](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-path-exists.mts#L8)
+
+Checks if a file or directory exists.
+
+#### Parameters
+
+##### filePath
+
+`string`
+
+The path to check.
+
+#### Returns
+
+`Promise`\<`boolean`\>
+
+True if the path exists.

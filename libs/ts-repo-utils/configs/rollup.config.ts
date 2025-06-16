@@ -1,7 +1,7 @@
 import * as rollupPluginReplace from '@rollup/plugin-replace';
 import * as rollupPluginStrip from '@rollup/plugin-strip';
 import * as pluginTypescript from '@rollup/plugin-typescript';
-import '../scripts/node-global.mjs';
+import '../src/node-global.mjs';
 import tsconfig from './tsconfig.build.json' with { type: 'json' };
 
 const outDirRelative = tsconfig.compilerOptions.outDir;

@@ -1,8 +1,7 @@
+import { assertExt, assertRepoIsDirty } from '../../src/index.mjs';
+import '../../src/node-global.mjs';
 import { build } from '../functions/build.mjs';
-import { checkExt } from '../functions/check-ext.mjs';
-import { checkIfRepoIsDirty } from '../functions/check-if-repo-is-dirty.mjs';
 import { genDocs } from '../functions/gen-docs.mjs';
-import '../node-global.mjs';
 
 /**
  * Runs all validation and build steps for the project.
@@ -36,7 +35,20 @@ export const checkAll = async (): Promise<void> => {
 
     // Step 3: Check file extensions
     echo('3. Checking file extensions...');
-    await checkExt();
+    await assertExt({
+      directories: [
+        {
+          path: path.resolve(projectRootPath, './src'),
+          extension: '.mts',
+          ignorePatterns: ['tsconfig.json', 'globals.d.mts'],
+        },
+        {
+          path: path.resolve(projectRootPath, './scripts'),
+          extension: '.mts',
+          ignorePatterns: ['tsconfig.json'],
+        },
+      ],
+    });
     echo('✓ File extensions validated\n');
 
     // Step 4: Run tests
@@ -53,18 +65,18 @@ export const checkAll = async (): Promise<void> => {
     if (lintResult.type === 'error') {
       throw new Error(`Lint fixes failed: ${lintResult.exception.message}`);
     }
-    await checkIfRepoIsDirty();
+    await assertRepoIsDirty();
     echo('✓ Lint fixes applied\n');
 
     // Step 6: Build and check repo status
     echo('6. Building project...');
     await build();
-    await checkIfRepoIsDirty();
+    await assertRepoIsDirty();
 
     // Step 7: Generate docs and check repo status
     echo('7. Generating documentation...');
     await genDocs();
-    await checkIfRepoIsDirty();
+    await assertRepoIsDirty();
 
     // Step 8: Format and check repo status
     echo('8. Formatting code...');
@@ -72,7 +84,7 @@ export const checkAll = async (): Promise<void> => {
     if (fmtResult.type === 'error') {
       throw new Error(`Formatting failed: ${fmtResult.exception.message}`);
     }
-    await checkIfRepoIsDirty();
+    await assertRepoIsDirty();
 
     echo('✅ All checks completed successfully!\n');
   } catch (error) {
@@ -80,3 +92,5 @@ export const checkAll = async (): Promise<void> => {
     throw error;
   }
 };
+
+await checkAll();

@@ -1,1 +1,1 @@
-export * from './expect-type.mjs';
+export * from './functions/index.mjs';

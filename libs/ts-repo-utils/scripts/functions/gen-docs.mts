@@ -1,5 +1,5 @@
-import '../node-global.mjs';
-import { ensurePathExists } from '../utils.mjs';
+import { assertPathExists } from '../../src/index.mjs';
+import '../../src/node-global.mjs';
 
 const TYPEDOC_CONFIG = path.resolve(
   projectRootPath,
@@ -15,7 +15,7 @@ export const genDocs = async (): Promise<void> => {
 
   try {
     // Verify TypeDoc config exists
-    await ensurePathExists(TYPEDOC_CONFIG, 'TypeDoc config');
+    await assertPathExists(TYPEDOC_CONFIG, 'TypeDoc config');
 
     // Step 1: Generate docs with TypeDoc
     echo('1. Generating documentation with TypeDoc...');

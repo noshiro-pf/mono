@@ -1,7 +1,8 @@
 import { default as glob_ } from 'fast-glob';
 import * as fs_ from 'node:fs/promises';
 import * as path_ from 'node:path';
-import { $ as $_, projectRootPath as projectRootPath_ } from './utils.mjs';
+import { $ as $_ } from './functions/exec-async.mjs';
+import { projectRootPath as projectRootPath_ } from './project-root-path.mjs';
 
 const globalsDef = {
   $: $_,
