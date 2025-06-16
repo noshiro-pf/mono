@@ -1,3 +1,9 @@
+# [1.2.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v1.1.0...v1.2.0) (2025-06-16)
+
+### Features
+
+- fix globals and gen index implementations ([#7](https://github.com/noshiro-pf/ts-repo-utils/issues/7)) ([fe666cf](https://github.com/noshiro-pf/ts-repo-utils/commit/fe666cf2e063588e1f8832fdf312e6302c220947))
+
 # [1.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v1.0.1...v1.1.0) (2025-06-16)
 
 ### Features
