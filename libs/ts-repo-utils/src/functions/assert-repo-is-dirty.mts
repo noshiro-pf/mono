@@ -12,7 +12,7 @@ export const repoIsDirty = async (): Promise<boolean> => {
 
 /**
  * Checks if the repository is dirty and exits with code 1 if it is.
- * @throws Error if git command fails.
+ * Shows git status and diff output before exiting.
  */
 export const assertRepoIsDirty = async (): Promise<void> => {
   try {

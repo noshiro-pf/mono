@@ -15,14 +15,11 @@
 Defined in: [src/functions/assert-repo-is-dirty.mts:17](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-repo-is-dirty.mts#L17)
 
 Checks if the repository is dirty and exits with code 1 if it is.
+Shows git status and diff output before exiting.
 
 #### Returns
 
 `Promise`\<`void`\>
-
-#### Throws
-
-Error if git command fails.
 
 ---
 

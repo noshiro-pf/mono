@@ -18,8 +18,8 @@ export type CheckExtConfig = DeepReadonly<{
 
 /**
  * Validates that all files in specified directories have the correct extensions.
+ * Exits with code 1 if any files have incorrect extensions.
  * @param config - Configuration specifying directories and expected extensions.
- * @throws Error with details of all incorrect files found.
  */
 export const assertExt = async (config: CheckExtConfig): Promise<void> => {
   const allIncorrectFiles: string[] = [];
@@ -76,7 +76,8 @@ export const assertExt = async (config: CheckExtConfig): Promise<void> => {
       generateErrorMessage(),
     ].join('\n');
 
-    throw new Error(errorMessage);
+    echo(errorMessage);
+    process.exit(1);
   }
 
   echo('✓ All files have correct extensions');

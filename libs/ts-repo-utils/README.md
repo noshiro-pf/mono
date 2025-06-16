@@ -27,23 +27,20 @@ console.log(exists); // true or false
 
 #### `assertPathExists(filePath: string, description?: string): Promise<void>`
 
-Validates that a path exists and throws an error if it doesn't.
+Validates that a path exists and exits with code 1 if it doesn't.
 
 ```typescript
 import { assertPathExists } from 'ts-repo-utils';
 
-try {
-    await assertPathExists('./src/index.ts', 'Entry point file');
-} catch (error) {
-    console.error('Entry point file does not exist');
-}
+// If the file doesn't exist, this will exit the process with code 1
+await assertPathExists('./src/index.ts', 'Entry point file');
 ```
 
 ### File Extension Validation
 
 #### `assertExt(config: CheckExtConfig): Promise<void>`
 
-Validates that all files in specified directories have the correct extensions.
+Validates that all files in specified directories have the correct extensions. Exits with code 1 if any files have incorrect extensions.
 
 ```typescript
 import { assertExt } from 'ts-repo-utils';
@@ -269,17 +266,14 @@ await formatFiles('dist/**/*.js');
 ### Project Validation
 
 ```typescript
-import { pathExists, assertPathExists, repoIsDirty } from 'ts-repo-utils';
+import { pathExists, assertPathExists, assertRepoIsDirty } from 'ts-repo-utils';
 
-// Check required files exist
+// Check required files exist (exits with code 1 if files don't exist)
 await assertPathExists('./package.json', 'Package manifest');
 await assertPathExists('./tsconfig.json', 'TypeScript config');
 
-// Verify clean repository state
-const isDirty = await repoIsDirty();
-if (isDirty) {
-    throw new Error('Repository has uncommitted changes');
-}
+// Verify clean repository state (exits with code 1 if repo is dirty)
+await assertRepoIsDirty();
 ```
 
 ## License

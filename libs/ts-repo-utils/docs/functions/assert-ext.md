@@ -25,6 +25,7 @@ Configuration for directory extension checking.
 Defined in: [src/functions/assert-ext.mts:24](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-ext.mts#L24)
 
 Validates that all files in specified directories have the correct extensions.
+Exits with code 1 if any files have incorrect extensions.
 
 #### Parameters
 
@@ -41,7 +42,3 @@ Array of directory paths and their expected extensions
 #### Returns
 
 `Promise`\<`void`\>
-
-#### Throws
-
-Error with details of all incorrect files found.

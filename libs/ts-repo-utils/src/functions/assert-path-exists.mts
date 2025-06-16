@@ -1,4 +1,5 @@
 import * as fs from 'node:fs/promises';
+import '../node-global.mjs';
 
 /**
  * Checks if a file or directory exists.
@@ -15,16 +16,16 @@ export const pathExists = async (filePath: string): Promise<boolean> => {
 };
 
 /**
- * Validates that a path exists and throws if it doesn't.
+ * Validates that a path exists and exits with code 1 if it doesn't.
  * @param filePath - The path to validate.
- * @param description - Description for error message.
- * @throws Error if path doesn't exist.
+ * @param description - Description for error message (defaults to 'Path').
  */
 export const assertPathExists = async (
   filePath: string,
   description = 'Path',
 ): Promise<void> => {
   if (!(await pathExists(filePath))) {
-    throw new Error(`${description} does not exist: ${filePath}`);
+    echo(`${description} does not exist: ${filePath}`);
+    process.exit(1);
   }
 };

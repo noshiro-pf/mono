@@ -34,7 +34,7 @@ jobs:
       - name: Run type check
         run: npm run test
 
-      - name: Run type check
+      - name: Build
         run: npm run build
 
       - name: Run semantic-release
