@@ -29,7 +29,7 @@ export const genDocs = async (): Promise<void> => {
 
     // Step 2: Format generated files
     echo('2. Formatting generated files...');
-    const fmtResult = await $('npm run fmt');
+    const fmtResult = await $('prettier --write ./docs');
     if (fmtResult.type === 'error') {
       throw new Error(`Formatting failed: ${fmtResult.exception.message}`);
     }
