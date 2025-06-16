@@ -14,4 +14,3 @@
 - [functions/format](functions/format.md)
 - [functions/gen-index](functions/gen-index.md)
 - [node-global](node-global.md)
-- [project-root-path](project-root-path.md)

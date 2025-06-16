@@ -1,6 +1,5 @@
 import micromatch from 'micromatch';
 import '../node-global.mjs';
-import { assertExt } from './assert-ext.mjs';
 import { assertPathExists } from './assert-path-exists.mjs';
 
 /**
@@ -38,32 +37,14 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
       : config.targetDirectory;
 
   try {
-    // Step 1: Validate file extensions
-    echo('1. Validating file extensions...');
-    await assertExt({
-      directories: [
-        {
-          path: path.resolve(projectRootPath, './src'),
-          extension: '.mts',
-          ignorePatterns: ['tsconfig.json', 'globals.d.mts'],
-        },
-        {
-          path: path.resolve(projectRootPath, './scripts'),
-          extension: '.mts',
-          ignorePatterns: ['tsconfig.json'],
-        },
-      ],
-    });
-    echo('✓ File extensions validated\n');
-
-    // Step 2: Verify target directories exist
+    // Step 1: Verify target directories exist
     for (const dir of targetDirs) {
       const resolvedDir = path.resolve(dir);
       // eslint-disable-next-line no-await-in-loop
       await assertPathExists(resolvedDir, `Target directory: ${dir}`);
     }
 
-    // Step 3: Generate index files
+    // Step 2: Generate index files
     echo('2. Generating index files...');
     for (const dir of targetDirs) {
       const resolvedDir = path.resolve(dir);
@@ -72,7 +53,7 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
     }
     echo('✓ Index files generated\n');
 
-    // Step 4: Format generated files
+    // Step 3: Format generated files
     echo('3. Formatting generated files...');
     const fmtResult = await $('npm run fmt');
     if (fmtResult.type === 'error') {

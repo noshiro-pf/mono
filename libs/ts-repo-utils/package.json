@@ -11,7 +11,7 @@
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
-  "sideEffects": false,
+  "sideEffects": true,
   "type": "module",
   "exports": {
     ".": {
@@ -30,11 +30,11 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npm run z:node-eval -- \"import { build } from './scripts/functions/build.mjs'; build();\"",
+    "build": "npm run z:node-esm -- ./scripts/cmd/build.mjs",
     "check-all": "npm run z:node-esm -- ./scripts/cmd/check-all.mjs",
     "check:ext": "npm run z:node-esm -- ./scripts/cmd/check-ext.mjs",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
-    "doc": "npm run z:node-eval -- \"import { genDocs } from './scripts/functions/gen-docs.mjs'; genDocs();\"",
+    "doc": "npm run z:node-esm -- ./scripts/cmd/gen-docs.mjs",
     "fmt": "npm run z:node-esm -- ./scripts/cmd/fmt-diff.mjs",
     "fmt:full": "prettier --write .",
     "gi": "npm run z:node-esm -- ./scripts/cmd/gi.mjs",
@@ -51,7 +51,6 @@
     "type-check": "tsc --noEmit",
     "update-packages": "npx npm-check-updates -u --install always --reject @types/node",
     "z:node-esm": "node --import tsx/esm",
-    "z:node-eval": "npm run z:node-esm -- --input-type=module --eval",
     "z:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {

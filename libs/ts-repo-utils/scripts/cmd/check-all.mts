@@ -1,7 +1,6 @@
 import { assertExt, assertRepoIsDirty } from '../../src/index.mjs';
 import '../../src/node-global.mjs';
-import { build } from '../functions/build.mjs';
-import { genDocs } from '../functions/gen-docs.mjs';
+import { projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Runs all validation and build steps for the project.
@@ -70,12 +69,12 @@ try {
 
   // Step 6: Build and check repo status
   echo('6. Building project...');
-  await build();
+  await $('npm run build');
   await assertRepoIsDirty();
 
   // Step 7: Generate docs and check repo status
   echo('7. Generating documentation...');
-  await genDocs();
+  await $('npm run doc');
   await assertRepoIsDirty();
 
   // Step 8: Format and check repo status
@@ -89,5 +88,5 @@ try {
   echo('✅ All checks completed successfully!\n');
 } catch (error) {
   echo(`❌ Check failed: ${String(error)}\n`);
-  throw error;
+  process.exit(1);
 }

@@ -100,7 +100,7 @@ await assertRepoIsDirty();
 
 ### Command Execution
 
-#### `$(command: string, options?: ExecOptions): Promise<ExecResult>`
+#### `$(command: string, options?: { silent?: boolean; timeout?: number }): Promise<ExecResult>`
 
 Executes a shell command asynchronously with timeout support and type-safe results.
 
@@ -116,14 +116,14 @@ if (result.type === 'ok') {
 }
 ```
 
-**Types:**
+**Options:**
+
+- `silent?: boolean` - Don't log command/output (default: false)
+- `timeout?: number` - Timeout in milliseconds (default: 30000)
+
+**Return Type:**
 
 ```typescript
-type ExecOptions = Readonly<{
-    silent?: boolean; // Don't log command/output (default: false)
-    timeout?: number; // Timeout in milliseconds (default: 30000)
-}>;
-
 type ExecResult = Readonly<
     | { type: 'ok'; stdout: string; stderr: string }
     | { type: 'error'; exception: ExecException }
@@ -175,7 +175,7 @@ await formatDiffFrom('abc123');
 
 #### `genIndex(config: GenIndexConfig): Promise<void>`
 
-Generates index.mts files recursively in target directories with automatic barrel exports.
+Generates index files recursively in target directories with automatic barrel exports.
 
 ```typescript
 import { genIndex } from 'ts-repo-utils';
@@ -201,11 +201,11 @@ type GenIndexConfig = DeepReadonly<{
 
 **Features:**
 
-- Validates file extensions before generation
 - Creates barrel exports for all subdirectories
-- Supports complex glob exclusion patterns
-- Automatically formats generated files
+- Supports complex glob exclusion patterns (using micromatch)
+- Automatically formats generated files using project's prettier config
 - Works with both single directories and directory arrays
+- Respects source and export extension configuration
 
 ## Key Features
 
@@ -223,7 +223,7 @@ type GenIndexConfig = DeepReadonly<{
 ### Pre-commit Hook
 
 ```typescript
-import { formatChanged, assertExt, repoIsDirty } from 'ts-repo-utils';
+import { formatChanged, assertExt, assertRepoIsDirty } from 'ts-repo-utils';
 
 // Format changed files
 await formatChanged();
@@ -233,7 +233,7 @@ await assertExt({
     directories: [{ path: './src', extension: '.ts' }],
 });
 
-// Ensure no uncommitted changes remain
+// Ensure repository is clean (exits if dirty)
 await assertRepoIsDirty();
 ```
 

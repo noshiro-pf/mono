@@ -1,5 +1,6 @@
 import { assertExt, assertPathExists, genIndex } from '../../src/index.mjs';
 import '../../src/node-global.mjs';
+import { projectRootPath } from '../project-root-path.mjs';
 
 // Build configuration
 const BUILD_CONFIG = {
@@ -100,7 +101,7 @@ const generateDistTsConfig = async (): Promise<void> => {
  * Builds the entire project.
  * @throws Error if any build step fails.
  */
-export const build = async (): Promise<void> => {
+const build = async (): Promise<void> => {
   echo('Starting build process...\n');
 
   try {
@@ -150,6 +151,8 @@ export const build = async (): Promise<void> => {
     echo('✅ Build completed successfully!\n');
   } catch (error) {
     echo(`❌ Build failed: ${String(error)}\n`);
-    throw error;
+    process.exit(1);
   }
 };
+
+await build();
