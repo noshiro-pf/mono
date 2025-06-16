@@ -50,4 +50,4 @@ jobs:
         run: npm run ${{ matrix.command }}
 
       - name: Check if there is no file diff
-        run: npm run z:node-eval -- "import { checkIfRepoIsDirty } from './scripts/functions/check-if-repo-is-dirty.mjs'; checkIfRepoIsDirty();"
+        run: npm run z:node-esm -- ./scripts/cmd/assert-repo-is-dirty.mjs

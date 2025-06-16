@@ -1,5 +1,5 @@
-import '../node-global.mjs';
-import { ensurePathExists } from '../utils.mjs';
+import { assertPathExists } from 'ts-repo-utils';
+import { projectRootPath } from '../project-root-path.mjs';
 
 const TYPEDOC_CONFIG = path.resolve(
   projectRootPath,
@@ -10,12 +10,12 @@ const TYPEDOC_CONFIG = path.resolve(
  * Generates documentation using TypeDoc and formats the output.
  * @throws Error if any step fails.
  */
-export const genDocs = async (): Promise<void> => {
+const genDocs = async (): Promise<void> => {
   echo('Starting documentation generation...\n');
 
   try {
     // Verify TypeDoc config exists
-    await ensurePathExists(TYPEDOC_CONFIG, 'TypeDoc config');
+    await assertPathExists(TYPEDOC_CONFIG, 'TypeDoc config');
 
     // Step 1: Generate docs with TypeDoc
     echo('1. Generating documentation with TypeDoc...');
@@ -29,7 +29,7 @@ export const genDocs = async (): Promise<void> => {
 
     // Step 2: Format generated files
     echo('2. Formatting generated files...');
-    const fmtResult = await $('npm run fmt');
+    const fmtResult = await $('prettier --write ./docs');
     if (fmtResult.type === 'error') {
       throw new Error(`Formatting failed: ${fmtResult.exception.message}`);
     }
@@ -46,6 +46,8 @@ export const genDocs = async (): Promise<void> => {
     echo('✅ Documentation generation completed successfully!\n');
   } catch (error) {
     echo(`❌ Documentation generation failed: ${String(error)}\n`);
-    throw error;
+    process.exit(1);
   }
 };
+
+await genDocs();
