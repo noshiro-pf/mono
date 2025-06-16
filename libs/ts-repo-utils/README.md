@@ -1,3 +1,3 @@
-# typescript-template
+# ts-repo-utils
 
-Template Repository for TypeScript
+Utilities for TypeScript Repositories.
