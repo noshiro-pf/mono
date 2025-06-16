@@ -21,6 +21,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run lint` - ESLint checking
 - `npm run fmt` - Prettier formatting
 
+## High-Level Architecture
+
+**Build Pipeline** (7 steps in sequence):
+
+1. Validates all files use `.mts` extensions
+2. Cleans `dist/` directory
+3. Auto-generates `index.mts` files for all directories
+4. Type-checks with TypeScript
+5. Bundles with Rollup (preserving module structure)
+6. Copies global type definitions
+7. Generates distribution config
+
+**Index Generation System**:
+
+- Automatically creates barrel exports for all directories
+- Excludes test files (`*.test.mts`) and type definitions (`*.d.mts`)
+- Exports reference `.mjs` extensions for ESM compatibility
+- Maintains alphabetical ordering for consistency
+
+**Global Utilities** (`scripts/node-global.mts`):
+
+- Scripts have access to global utilities: `$` (shell commands), `echo`, `path`, `fs`, `glob`
+- The `$` function wraps commands with Promise interface and 30s timeout
+
 ## Important Instructions
 
 - Do what has been asked; nothing more, nothing less
