@@ -84,7 +84,7 @@
     "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-packagejson": "^2.5.15",
-    "rollup": "^4.43.0",
+    "rollup": "^4.44.0",
     "semantic-release": "^24.2.5",
     "ts-repo-utils": "^1.2.0",
     "tsx": "^4.20.3",
