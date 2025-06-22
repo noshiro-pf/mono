@@ -1,5 +1,10 @@
 # ts-repo-utils
 
+[![npm version](https://img.shields.io/npm/v/ts-repo-utils.svg)](https://www.npmjs.com/package/ts-repo-utils)
+[![npm downloads](https://img.shields.io/npm/dm/ts-repo-utils.svg)](https://www.npmjs.com/package/ts-repo-utils)
+[![License](https://img.shields.io/npm/l/ts-repo-utils.svg)](./LICENSE)
+[![codecov](https://codecov.io/gh/noshiro-pf/ts-repo-utils/graph/badge.svg?token=S4688Q0CX3)](https://codecov.io/gh/noshiro-pf/ts-repo-utils)
+
 Utilities for TypeScript Repositories.
 
 A comprehensive toolkit for managing TypeScript projects with strict ESM support, providing essential utilities for file validation, code formatting, git operations, and project automation.
