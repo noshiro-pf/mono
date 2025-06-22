@@ -1,3 +1,17 @@
+# [2.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v1.2.1...v2.0.0) (2025-06-22)
+
+### Features
+
+- use Result pattern ([#21](https://github.com/noshiro-pf/ts-repo-utils/issues/21)) ([9388086](https://github.com/noshiro-pf/ts-repo-utils/commit/938808681f2d88f976b5b73b812f15cabfeecf06))
+
+### BREAKING CHANGES
+
+-   - Removed ExecResult type and changed the return type of `$`
+
+* Renamed `formatChanged` to `formatUntracked`.
+* Removed default argument `"main"` for `formatDiffFrom`.
+* Add diff function to get the diff of a file or directory.
+
 ## [1.2.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v1.2.0...v1.2.1) (2025-06-22)
 
 ### Reverts
