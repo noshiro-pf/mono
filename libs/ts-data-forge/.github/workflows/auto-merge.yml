@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     steps:
-      - run: echo "${{ secrets.DEPENDABOT_AUTO_MERGE_BOT_PRIVATE_KEY }}" | head -c 30
       - name: Generate Token
         id: app-token
         uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
