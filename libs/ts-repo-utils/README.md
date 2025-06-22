@@ -94,7 +94,7 @@ if (isDirty) {
 
 #### `assertRepoIsDirty(): Promise<void>`
 
-Checks if repository is dirty and exits with code 1 if it is (shows changes and diff).
+Checks if repository is dirty and exits with code 1 if it has uncommitted changes (shows changes and diff).
 
 ```typescript
 import { assertRepoIsDirty } from 'ts-repo-utils';
@@ -151,18 +151,18 @@ await formatFiles('src/**/*.ts');
 await formatFiles('src/{index,utils}.ts');
 ```
 
-#### `formatChanged(): Promise<'ok' | 'err'>`
+#### `formatUntracked(): Promise<'ok' | 'err'>`
 
 Format only files that have been changed according to git status.
 
 ```typescript
-import { formatChanged } from 'ts-repo-utils';
+import { formatUntracked } from 'ts-repo-utils';
 
 // Format only modified files
-await formatChanged();
+await formatUntracked();
 ```
 
-#### `formatDiffFrom(base?: string): Promise<'ok' | 'err'>`
+#### `formatDiffFrom(base: string): Promise<'ok' | 'err'>`
 
 Format only files that differ from the specified base branch or commit.
 
@@ -228,10 +228,10 @@ type GenIndexConfig = DeepReadonly<{
 ### Pre-commit Hook
 
 ```typescript
-import { formatChanged, assertExt, assertRepoIsDirty } from 'ts-repo-utils';
+import { formatUntracked, assertExt, assertRepoIsDirty } from 'ts-repo-utils';
 
 // Format changed files
-await formatChanged();
+await formatUntracked();
 
 // Validate file extensions
 await assertExt({
