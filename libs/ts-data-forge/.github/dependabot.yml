@@ -6,7 +6,7 @@ updates:
   - package-ecosystem: 'npm' # See documentation for possible values
     directory: '/'
     schedule:
-      interval: 'daily'
+      interval: 'weekly'
       day: 'saturday'
     target-branch: 'main'
     commit-message:
@@ -19,7 +19,7 @@ updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
-      interval: 'daily'
+      interval: 'weekly'
       day: 'saturday'
     target-branch: 'main'
     commit-message:
