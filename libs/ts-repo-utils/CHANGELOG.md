@@ -1,3 +1,9 @@
+## [1.2.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v1.2.0...v1.2.1) (2025-06-22)
+
+### Reverts
+
+- Revert "chore: bump @rollup/plugin-typescript from 12.1.2 to 12.1.3 ([#11](https://github.com/noshiro-pf/ts-repo-utils/issues/11))" ([#19](https://github.com/noshiro-pf/ts-repo-utils/issues/19)) ([a364e06](https://github.com/noshiro-pf/ts-repo-utils/commit/a364e06f6ecda256c4181058e277f37326af8597))
+
 # [1.2.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v1.1.0...v1.2.0) (2025-06-16)
 
 ### Features
