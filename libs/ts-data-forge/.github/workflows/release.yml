@@ -45,7 +45,7 @@ jobs:
         run: npm run type-check
 
       - name: Run semantic-release
-        run: npx semantic-release --extends configs/release.config.js
+        run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Used for npm publish
