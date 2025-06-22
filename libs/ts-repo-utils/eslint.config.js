@@ -100,7 +100,7 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['eslint.config.js', 'dist'],
+    ignores: ['eslint.config.js', 'dist', 'coverage'],
   },
   {
     files: ['**/*.mjs', '**/*.mts'],
@@ -692,7 +692,7 @@ export default tseslint.config(
       '@typescript-eslint/switch-exhaustiveness-check': [
         'error',
         {
-          allowDefaultCaseForExhaustiveSwitch: true,
+          allowDefaultCaseForExhaustiveSwitch: false,
           requireDefaultForNonUnion: true,
         },
       ],

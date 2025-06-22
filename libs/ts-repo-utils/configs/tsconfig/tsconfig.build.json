@@ -2,6 +2,7 @@
   "extends": "./tsconfig.type-check.json",
   "compilerOptions": {
     // Emit
+    "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
     "importHelpers": true,
     "importsNotUsedAsValues": "remove",

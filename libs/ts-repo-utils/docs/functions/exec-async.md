@@ -6,21 +6,13 @@
 
 # functions/exec-async
 
-## Type Aliases
-
-### ExecResult
-
-> **ExecResult** = `Readonly`\<\{ `stderr`: `string`; `stdout`: `string`; `type`: `"ok"`; \} \| \{ `exception`: `ExecException`; `type`: `"error"`; \}\>
-
-Defined in: [src/functions/exec-async.mts:3](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L3)
-
 ## Functions
 
 ### $()
 
-> **$**(`cmd`, `options`): `Promise`\<[`ExecResult`](#execresult)\>
+> **$**(`cmd`, `options`): `Promise`\<`Result`\<`Readonly`\<\{ `stderr`: `string`; `stdout`: `string`; \}\>, `ExecException`\>\>
 
-Defined in: [src/functions/exec-async.mts:14](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L14)
+Defined in: [src/functions/exec-async.mts:10](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L10)
 
 Executes a shell command asynchronously.
 
@@ -40,6 +32,6 @@ Optional configuration for command execution.
 
 #### Returns
 
-`Promise`\<[`ExecResult`](#execresult)\>
+`Promise`\<`Result`\<`Readonly`\<\{ `stderr`: `string`; `stdout`: `string`; \}\>, `ExecException`\>\>
 
 A promise that resolves with the command result.

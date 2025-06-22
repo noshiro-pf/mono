@@ -1,9 +1,5 @@
 import { exec, type ExecException } from 'node:child_process';
-
-export type ExecResult = Readonly<
-  | { type: 'ok'; stdout: string; stderr: string }
-  | { type: 'error'; exception: ExecException }
->;
+import { Result } from 'ts-data-forge';
 
 /**
  * Executes a shell command asynchronously.
@@ -14,7 +10,9 @@ export type ExecResult = Readonly<
 export const $ = (
   cmd: string,
   options: Readonly<{ silent?: boolean; timeout?: number }> = {},
-): Promise<ExecResult> => {
+): Promise<
+  Result<Readonly<{ stdout: string; stderr: string }>, ExecException>
+> => {
   const { silent = false, timeout = 30000 } = options;
 
   if (!silent) {
@@ -35,9 +33,9 @@ export const $ = (
       }
 
       if (error !== null) {
-        resolve({ type: 'error', exception: error });
+        resolve(Result.err(error));
       } else {
-        resolve({ type: 'ok', stdout, stderr });
+        resolve(Result.ok({ stdout, stderr }));
       }
     });
   });

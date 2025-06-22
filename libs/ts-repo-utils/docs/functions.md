@@ -38,18 +38,6 @@ Re-exports [CheckExtConfig](functions/assert-ext.md#checkextconfig)
 
 ---
 
-### ExecResult
-
-Re-exports [ExecResult](functions/exec-async.md#execresult)
-
----
-
-### formatChanged
-
-Re-exports [formatChanged](functions/format.md#formatchanged)
-
----
-
 ### formatDiffFrom
 
 Re-exports [formatDiffFrom](functions/format.md#formatdifffrom)
@@ -62,6 +50,12 @@ Re-exports [formatFiles](functions/format.md#formatfiles)
 
 ---
 
+### formatUntracked
+
+Re-exports [formatUntracked](functions/format.md#formatuntracked)
+
+---
+
 ### genIndex
 
 Re-exports [genIndex](functions/gen-index.md#genindex)
@@ -71,6 +65,18 @@ Re-exports [genIndex](functions/gen-index.md#genindex)
 ### GenIndexConfig
 
 Re-exports [GenIndexConfig](functions/gen-index.md#genindexconfig)
+
+---
+
+### getDiffFrom
+
+Re-exports [getDiffFrom](functions/diff.md#getdifffrom)
+
+---
+
+### getUntrackedFiles
+
+Re-exports [getUntrackedFiles](functions/diff.md#getuntrackedfiles)
 
 ---
 

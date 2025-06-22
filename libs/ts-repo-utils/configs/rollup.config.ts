@@ -25,6 +25,7 @@ export default {
     sourcemap: true,
     entryFileNames: '[name].mjs',
   },
+  external: (id: string) => !id.startsWith('.') && !path.isAbsolute(id),
   plugins: [
     rollupPluginReplace.default({
       'import.meta.vitest': 'undefined',
@@ -32,7 +33,11 @@ export default {
     }),
     pluginTypescript.default({
       tsconfig: path.resolve(configDir, './tsconfig.build.json'),
-      module: 'NodeNext',
+      compilerOptions: {
+        // Override module settings for bundling
+        module: 'ESNext',
+        moduleResolution: 'bundler',
+      },
     }),
     rollupPluginReplace.default({
       "import 'vitest'": 'undefined',

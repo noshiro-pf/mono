@@ -12,7 +12,7 @@
 
 > **GenIndexConfig** = `DeepReadonly`\<\{ `excludePatterns?`: `string`[]; `exportExtension?`: `` `.${string}` ``; `sourceExtension?`: `` `.${string}` ``; `targetDirectory`: `string` \| `string`[]; \}\>
 
-Defined in: [src/functions/gen-index.mts:8](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L8)
+Defined in: [src/functions/gen-index.mts:9](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L9)
 
 Configuration for index file generation.
 
@@ -22,7 +22,7 @@ Configuration for index file generation.
 
 > **genIndex**(`config`): `Promise`\<`void`\>
 
-Defined in: [src/functions/gen-index.mts:27](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L27)
+Defined in: [src/functions/gen-index.mts:28](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L28)
 
 Generates index.mts files recursively in `config.targetDirectory`.
 

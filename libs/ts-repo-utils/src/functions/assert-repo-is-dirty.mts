@@ -1,3 +1,4 @@
+import { Result } from 'ts-data-forge';
 import '../node-global.mjs';
 
 /**
@@ -29,12 +30,12 @@ export const assertRepoIsDirty = async (): Promise<void> => {
 
     // Show files not tracked by git and unstaged changes
     const addResult = await $('git add -N .');
-    if (addResult.type === 'error') {
+    if (Result.isErr(addResult)) {
       echo('Warning: Failed to add untracked files for diff\n');
     }
 
     const diffResult = await $('git diff');
-    if (diffResult.type === 'error') {
+    if (Result.isErr(diffResult)) {
       echo('Warning: Failed to show diff\n');
     }
 
@@ -55,12 +56,14 @@ const getGitStatus = async (): Promise<{
 }> => {
   const res = await $('git status --porcelain');
 
-  if (res.type === 'error') {
-    throw new Error(`Failed to get git status: ${res.exception.message}`);
+  if (Result.isErr(res)) {
+    throw new Error(`Failed to get git status: ${res.value.message}`);
   }
 
+  const { stdout } = res.value;
+
   return {
-    isDirty: res.stdout.trim() !== '',
-    stdout: res.stdout,
+    isDirty: stdout.trim() !== '',
+    stdout,
   };
 };

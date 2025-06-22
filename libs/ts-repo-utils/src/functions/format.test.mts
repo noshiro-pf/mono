@@ -1,7 +1,7 @@
 import dedent from 'dedent';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { formatDiffFrom, formatFiles } from './format.mjs';
+import { formatFiles } from './format.mjs';
 
 describe('formatFiles', () => {
   const testDir = join(process.cwd(), 'test-format-files');
@@ -113,26 +113,6 @@ describe('formatFiles', () => {
     } finally {
       // Cleanup
       await rm(testDir, { recursive: true, force: true });
-    }
-  });
-});
-
-describe('formatDiffFrom', () => {
-  test('should use default base branch "main"', () => {
-    // This test would require a git repository setup, so we'll just verify the function exists
-    // and can be called with no arguments
-    expect(typeof formatDiffFrom).toBe('function');
-    expect(formatDiffFrom.length).toBe(0); // Function has default parameter
-  });
-
-  test('should accept custom base branch or commit', () => {
-    // Verify the function can be called with a custom base
-    const customBases = ['develop', 'feature/test', 'abc123'];
-
-    for (const base of customBases) {
-      // This would normally test against a real git repo, but we're just verifying
-      // the function signature accepts the parameter
-      expect(() => formatDiffFrom(base)).not.toThrow();
     }
   });
 });

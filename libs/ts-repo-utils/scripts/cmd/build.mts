@@ -1,3 +1,4 @@
+import { Result } from 'ts-data-forge';
 import { assertPathExists } from '../../src/index.mjs';
 import '../../src/node-global.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
@@ -30,8 +31,8 @@ const cleanDist = async (): Promise<void> => {
  */
 const typeCheck = async (): Promise<void> => {
   const result = await $('tsc --noEmit');
-  if (result.type === 'error') {
-    throw new Error(`Type checking failed: ${result.exception.message}`);
+  if (Result.isErr(result)) {
+    throw new Error(`Type checking failed: ${result.value.message}`);
   }
   echo('✓ Type checking passed\n');
 };
@@ -51,8 +52,8 @@ const rollupBuild = async (): Promise<void> => {
     ].join(' ');
 
     const result = await $(rollupCmd);
-    if (result.type === 'error') {
-      throw new Error(`Rollup build failed: ${result.exception.message}`);
+    if (Result.isErr(result)) {
+      throw new Error(`Rollup build failed: ${result.value.message}`);
     }
     echo('✓ Rollup build completed\n');
   } catch (error) {
@@ -71,10 +72,8 @@ const copyGlobals = async (): Promise<void> => {
     const copyResult = await $(
       `cp "${BUILD_CONFIG.srcGlobalsFile}" "${destFile}"`,
     );
-    if (copyResult.type === 'error') {
-      throw new Error(
-        `Failed to copy globals: ${copyResult.exception.message}`,
-      );
+    if (Result.isErr(copyResult)) {
+      throw new Error(`Failed to copy globals: ${copyResult.value.message}`);
     }
     echo('✓ Copied globals.d.mts to dist\n');
   } catch (error) {

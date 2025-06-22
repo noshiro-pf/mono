@@ -22,8 +22,6 @@ export type CheckExtConfig = DeepReadonly<{
  * @param config - Configuration specifying directories and expected extensions.
  */
 export const assertExt = async (config: CheckExtConfig): Promise<void> => {
-  const allIncorrectFiles: string[] = [];
-
   // Check all directories in parallel
   const results = await Promise.all(
     config.directories.map(async ({ path: dir, extension, ignorePatterns }) => {
@@ -41,9 +39,7 @@ export const assertExt = async (config: CheckExtConfig): Promise<void> => {
   );
 
   // Collect all incorrect files
-  results.forEach((incorrectFiles) => {
-    allIncorrectFiles.push(...incorrectFiles);
-  });
+  const allIncorrectFiles: readonly string[] = results.flat();
 
   if (allIncorrectFiles.length > 0) {
     const generateErrorMessage = (): string => {
@@ -59,7 +55,8 @@ export const assertExt = async (config: CheckExtConfig): Promise<void> => {
       }
 
       // Generate message parts for each extension
-      const messageParts = Array.from(extensionGroups.entries()).map(
+      const messageParts = Array.from(
+        extensionGroups.entries(),
         ([ext, dirs]) => {
           const dirList = dirs.length === 1 ? dirs[0] : dirs.join(', ');
           return `${dirList} should have ${ext} extension`;
@@ -94,7 +91,7 @@ const getFilesWithIncorrectExtension = async (
   dir: string,
   expectedExtension: string,
   ignorePatterns?: readonly string[],
-): Promise<string[]> => {
+): Promise<readonly string[]> => {
   await assertPathExists(dir, 'Directory');
 
   const defaultIgnorePatterns = ['tsconfig.json', 'globals.d.*'];

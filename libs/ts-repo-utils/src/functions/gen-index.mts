@@ -1,4 +1,5 @@
 import micromatch from 'micromatch';
+import { Result } from 'ts-data-forge';
 import '../node-global.mjs';
 import { assertPathExists } from './assert-path-exists.mjs';
 
@@ -56,8 +57,8 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
     // Step 3: Format generated files
     echo('3. Formatting generated files...');
     const fmtResult = await $('npm run fmt');
-    if (fmtResult.type === 'error') {
-      throw new Error(`Formatting failed: ${fmtResult.exception.message}`);
+    if (Result.isErr(fmtResult)) {
+      throw new Error(`Formatting failed: ${fmtResult.value.message}`);
     }
     echo('✓ Formatting completed\n');
 
