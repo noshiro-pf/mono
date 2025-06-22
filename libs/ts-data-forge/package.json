@@ -89,7 +89,7 @@
     "ts-repo-utils": "^1.2.0",
     "tsx": "^4.20.3",
     "typedoc": "^0.28.5",
-    "typedoc-plugin-markdown": "^4.6.4",
+    "typedoc-plugin-markdown": "^4.7.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.34.1",
     "vitest": "^3.2.3"
