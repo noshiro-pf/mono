@@ -3,11 +3,11 @@ import { isRecord } from '../guard/index.mjs';
 import { unknownToString } from '../others/index.mjs';
 import { Optional } from './optional.mjs';
 
-/** @internal Symbol to identify the 'Ok' variant of Result. */
-const OkTypeSymbol: unique symbol = Symbol('Result.ok');
+/** @internal String literal tag to identify the 'Ok' variant of Result. */
+const OkTypeTagName = 'ts-data-forge::Result.ok';
 
-/** @internal Symbol to identify the 'Err' variant of Result. */
-const ErrTypeSymbol: unique symbol = Symbol('Result.err');
+/** @internal String literal tag to identify the 'Err' variant of Result. */
+const ErrTypeTagName = 'ts-data-forge::Result.err';
 
 /**
  * @internal
@@ -15,8 +15,12 @@ const ErrTypeSymbol: unique symbol = Symbol('Result.err');
  * @template S The type of the success value.
  */
 type Ok_<S> = Readonly<{
-  /** Discriminant property for the 'Ok' type. */
-  type: typeof OkTypeSymbol;
+  /**
+   * @internal
+   * Discriminant property for the 'Ok' type.
+   */
+  $$tag: typeof OkTypeTagName;
+
   /** The success value. */
   value: S;
 }>;
@@ -27,8 +31,12 @@ type Ok_<S> = Readonly<{
  * @template E The type of the error value.
  */
 type Err_<E> = Readonly<{
-  /** Discriminant property for the 'Err' type. */
-  type: typeof ErrTypeSymbol;
+  /**
+   * @internal
+   * Discriminant property for the 'Err' type.
+   */
+  $$tag: typeof ErrTypeTagName;
+
   /** The error value. */
   value: E;
 }>;
@@ -54,10 +62,10 @@ export namespace Result {
     maybeOptional: unknown,
   ): maybeOptional is Result<unknown, unknown> =>
     isRecord(maybeOptional) &&
-    Object.hasOwn(maybeOptional, 'type') &&
+    Object.hasOwn(maybeOptional, '$$tag') &&
     Object.hasOwn(maybeOptional, 'value') &&
-    (maybeOptional['type'] === ErrTypeSymbol ||
-      maybeOptional['type'] === OkTypeSymbol);
+    (maybeOptional['$$tag'] === ErrTypeTagName ||
+      maybeOptional['$$tag'] === OkTypeTagName);
 
   /**
    * Represents a `Result` that is a success, containing a value.
@@ -134,7 +142,7 @@ export namespace Result {
    * ```
    */
   export const ok = <S,>(value: S): Ok<S> => ({
-    type: OkTypeSymbol,
+    $$tag: OkTypeTagName,
     value,
   });
 
@@ -179,7 +187,7 @@ export namespace Result {
    * ```
    */
   export const err = <E,>(value: E): Err<E> => ({
-    type: ErrTypeSymbol,
+    $$tag: ErrTypeTagName,
     value,
   });
 
@@ -232,7 +240,7 @@ export namespace Result {
    * ```
    */
   export const isOk = <R extends Base>(result: R): result is NarrowToOk<R> =>
-    result.type === OkTypeSymbol;
+    result.$$tag === OkTypeTagName;
 
   /**
    * Checks if a `Result` is `Result.Err`.
@@ -276,7 +284,7 @@ export namespace Result {
    * ```
    */
   export const isErr = <R extends Base>(result: R): result is NarrowToErr<R> =>
-    result.type === ErrTypeSymbol;
+    result.$$tag === ErrTypeTagName;
 
   /**
    * Unwraps a `Result`, returning the success value.

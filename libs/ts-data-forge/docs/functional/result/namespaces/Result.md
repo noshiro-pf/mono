@@ -15,7 +15,7 @@ Provides utilities to handle operations that can succeed or fail.
 
 > **Base** = [`Result`](../README.md#result)\<`unknown`, `unknown`\>
 
-Defined in: [src/functional/result.mts:78](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L78)
+Defined in: [src/functional/result.mts:86](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L86)
 
 Base type for any `Result`, used for generic constraints.
 Represents a `Result` with unknown success and error types.
@@ -26,7 +26,7 @@ Represents a `Result` with unknown success and error types.
 
 > **Err**\<`E`\> = `Err_`\<`E`\>
 
-Defined in: [src/functional/result.mts:72](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L72)
+Defined in: [src/functional/result.mts:80](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L80)
 
 Represents a `Result` that is an error, containing an error value.
 
@@ -44,7 +44,7 @@ The type of the error value.
 
 > **NarrowToErr**\<`R`\> = `R` _extends_ [`Ok`](#ok)\<`unknown`\> ? `never` : `R`
 
-Defined in: [src/functional/result.mts:106](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L106)
+Defined in: [src/functional/result.mts:114](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L114)
 
 Narrows a `Result.Base` type to `Result.Err<E>` if it is an `Err`.
 If the `Result` is `Result.Ok<S>`, resolves to `never`.
@@ -63,7 +63,7 @@ The `Result.Base` type to narrow.
 
 > **NarrowToOk**\<`R`\> = `R` _extends_ [`Err`](#err)\<`unknown`\> ? `never` : `R`
 
-Defined in: [src/functional/result.mts:99](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L99)
+Defined in: [src/functional/result.mts:107](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L107)
 
 Narrows a `Result.Base` type to `Result.Ok<S>` if it is an `Ok`.
 If the `Result` is `Result.Err<E>`, resolves to `never`.
@@ -82,7 +82,7 @@ The `Result.Base` type to narrow.
 
 > **Ok**\<`S`\> = `Ok_`\<`S`\>
 
-Defined in: [src/functional/result.mts:66](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L66)
+Defined in: [src/functional/result.mts:74](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L74)
 
 Represents a `Result` that is a success, containing a value.
 
@@ -100,7 +100,7 @@ The type of the success value.
 
 > **UnwrapErr**\<`R`\> = `R` _extends_ [`Err`](#err)\<infer E\> ? `E` : `never`
 
-Defined in: [src/functional/result.mts:92](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L92)
+Defined in: [src/functional/result.mts:100](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L100)
 
 Extracts the error value type `E` from a `Result.Err<E>`.
 If the `Result` is `Result.Ok<S>`, resolves to `never`.
@@ -119,7 +119,7 @@ The `Result.Base` type to unwrap.
 
 > **UnwrapOk**\<`R`\> = `R` _extends_ [`Ok`](#ok)\<infer S\> ? `S` : `never`
 
-Defined in: [src/functional/result.mts:85](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L85)
+Defined in: [src/functional/result.mts:93](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L93)
 
 Extracts the success value type `S` from a `Result.Ok<S>`.
 If the `Result` is `Result.Err<E>`, resolves to `never`.
@@ -138,7 +138,7 @@ The `Result.Base` type to unwrap.
 
 > `const` **expectToBe**: `ExpectToBeFnOverload`
 
-Defined in: [src/functional/result.mts:849](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L849)
+Defined in: [src/functional/result.mts:857](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L857)
 
 Unwraps a `Result`, returning the success value or throwing an error with the provided message.
 
@@ -182,7 +182,7 @@ console.log(value2); // 42
 
 > `const` **flatMap**: `FlatMapFnOverload`
 
-Defined in: [src/functional/result.mts:794](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L794)
+Defined in: [src/functional/result.mts:802](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L802)
 
 Applies a function that returns a `Result` to the success value of a `Result`.
 If the input is `Err`, returns the original `Err`.
@@ -234,7 +234,7 @@ console.log(Result.unwrapOk(result2)); // 5
 
 > `const` **fold**: `FoldFnOverload`
 
-Defined in: [src/functional/result.mts:725](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L725)
+Defined in: [src/functional/result.mts:733](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L733)
 
 Applies one of two functions depending on whether the `Result` is `Ok` or `Err`.
 
@@ -293,7 +293,7 @@ console.log(Result.unwrapOk(result2)); // 84
 
 > `const` **map**: `MapFnOverload`
 
-Defined in: [src/functional/result.mts:616](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L616)
+Defined in: [src/functional/result.mts:624](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L624)
 
 Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the success value.
 If the `Result` is `Result.Err`, returns the original `Err`.
@@ -338,7 +338,7 @@ console.log(Result.unwrap(result2)); // 10
 
 > `const` **mapErr**: `MapErrFnOverload`
 
-Defined in: [src/functional/result.mts:670](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L670)
+Defined in: [src/functional/result.mts:678](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L678)
 
 Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the error value.
 If the `Result` is `Result.Ok`, returns the original `Ok`.
@@ -383,7 +383,7 @@ console.log(Result.unwrapErr(result2)); // "ERROR"
 
 > `const` **orElse**: `OrElseFnOverload`
 
-Defined in: [src/functional/result.mts:1070](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L1070)
+Defined in: [src/functional/result.mts:1078](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L1078)
 
 Returns the `Result` if it is `Ok`, otherwise returns the alternative.
 
@@ -424,7 +424,7 @@ console.log(Result.unwrapOk(result2)); // "fallback"
 
 > `const` **unwrapErrOr**: `UnwrapErrOrFnOverload`
 
-Defined in: [src/functional/result.mts:566](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L566)
+Defined in: [src/functional/result.mts:574](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L574)
 
 Unwraps a `Result`, returning the error value or a default value if it is `Result.Ok`.
 
@@ -468,7 +468,7 @@ console.log(error2); // "unknown error"
 
 > `const` **unwrapOk**: `UnwrapOkFnOverload`
 
-Defined in: [src/functional/result.mts:373](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L373)
+Defined in: [src/functional/result.mts:381](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L381)
 
 Unwraps a `Result`, returning the success value or `undefined` if it's an error.
 
@@ -521,7 +521,7 @@ const processResult = (r: Result<number, string>) => {
 
 > `const` **unwrapOkOr**: `UnwrapOkOrFnOverload`
 
-Defined in: [src/functional/result.mts:407](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L407)
+Defined in: [src/functional/result.mts:415](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L415)
 
 Unwraps a `Result`, returning the success value or a default value if it is `Result.Err`.
 
@@ -565,7 +565,7 @@ console.log(value2); // 0
 
 > **err**\<`E`\>(`value`): [`Err`](#err)\<`E`\>
 
-Defined in: [src/functional/result.mts:181](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L181)
+Defined in: [src/functional/result.mts:189](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L189)
 
 Creates a `Result.Err` containing the given error value.
 
@@ -632,7 +632,7 @@ const validationError = Result.err<ValidationError>({
 
 > **fromPromise**\<`P`\>(`promise`): `Promise`\<[`Result`](../README.md#result)\<`UnwrapPromise`\<`P`\>, `unknown`\>\>
 
-Defined in: [src/functional/result.mts:898](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L898)
+Defined in: [src/functional/result.mts:906](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L906)
 
 Converts a Promise into a Promise that resolves to a `Result`.
 If the input Promise resolves, the `Result` will be `Ok` with the resolved value.
@@ -666,7 +666,7 @@ A Promise that resolves to `Result<UnwrapPromise<P>, unknown>`.
 
 > **fromThrowable**\<`T`\>(`fn`): [`Result`](../README.md#result)\<`T`, `Error`\>
 
-Defined in: [src/functional/result.mts:962](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L962)
+Defined in: [src/functional/result.mts:970](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L970)
 
 Wraps a function that may throw an exception in a `Result`.
 
@@ -750,7 +750,7 @@ const readFileSync = (path: string): Result<string, Error> =>
 
 > **isErr**\<`R`\>(`result`): `result is NarrowToErr<R>`
 
-Defined in: [src/functional/result.mts:278](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L278)
+Defined in: [src/functional/result.mts:286](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L286)
 
 Checks if a `Result` is `Result.Err`.
 Acts as a type guard, narrowing the type to the error variant.
@@ -816,7 +816,7 @@ const errors = results.filter(Result.isErr).map((err) => err.value); // Validati
 
 > **isOk**\<`R`\>(`result`): `result is NarrowToOk<R>`
 
-Defined in: [src/functional/result.mts:234](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L234)
+Defined in: [src/functional/result.mts:242](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L242)
 
 Checks if a `Result` is `Result.Ok`.
 Acts as a type guard, narrowing the type to the success variant.
@@ -885,7 +885,7 @@ const successes = results.filter(Result.isOk);
 
 > **isResult**(`maybeOptional`): `maybeOptional is Result<unknown, unknown>`
 
-Defined in: [src/functional/result.mts:53](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L53)
+Defined in: [src/functional/result.mts:61](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L61)
 
 Checks if the given value is a `Result`.
 
@@ -909,7 +909,7 @@ The value to check.
 
 > **ok**\<`S`\>(`value`): [`Ok`](#ok)\<`S`\>
 
-Defined in: [src/functional/result.mts:136](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L136)
+Defined in: [src/functional/result.mts:144](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L144)
 
 Creates a `Result.Ok` containing the given success value.
 
@@ -964,7 +964,7 @@ console.log(Result.unwrapOk(result)); // 5
 
 > **swap**\<`R`\>(`result`): [`Result`](../README.md#result)\<[`UnwrapErr`](#unwraperr)\<`R`\>, [`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-Defined in: [src/functional/result.mts:991](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L991)
+Defined in: [src/functional/result.mts:999](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L999)
 
 Swaps the success and error values of a `Result`.
 
@@ -1005,7 +1005,7 @@ console.log(Result.unwrapErr(swapped)); // 42
 
 > **toOptional**\<`R`\>(`result`): [`Optional`](../../optional/README.md#optional)\<[`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-Defined in: [src/functional/result.mts:1045](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L1045)
+Defined in: [src/functional/result.mts:1053](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L1053)
 
 Converts a `Result` to an `Optional`.
 
@@ -1080,7 +1080,7 @@ const processResult = (r: Result<string, Error>) =>
 
 > **unwrapErr**\<`R`\>(`result`): `undefined` \| [`UnwrapErr`](#unwraperr)\<`R`\>
 
-Defined in: [src/functional/result.mts:541](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L541)
+Defined in: [src/functional/result.mts:549](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L549)
 
 Unwraps a `Result`, returning the error value or `undefined` if it is `Result.Ok`.
 
@@ -1148,7 +1148,7 @@ const errors = results.map(Result.unwrapErr).filter((err) => err !== undefined);
 
 > **unwrapErrThrow**\<`R`\>(`result`, `toStr`): [`UnwrapErr`](#unwraperr)\<`R`\>
 
-Defined in: [src/functional/result.mts:481](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L481)
+Defined in: [src/functional/result.mts:489](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L489)
 
 Unwraps a `Result`, returning the error value.
 Throws an error if the `Result` is `Result.Ok`.
@@ -1234,7 +1234,7 @@ const validateAndGetError = (result: Result<any, ValidationError>) => {
 
 > **unwrapThrow**\<`R`\>(`result`, `toStr`): [`UnwrapOk`](#unwrapok)\<`R`\>
 
-Defined in: [src/functional/result.mts:327](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L327)
+Defined in: [src/functional/result.mts:335](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L335)
 
 Unwraps a `Result`, returning the success value.
 Throws an error if the `Result` is `Result.Err`.
@@ -1319,7 +1319,7 @@ const config = Result.unwrapThrow(
 
 > **zip**\<`S1`, `E1`, `S2`, `E2`\>(`resultA`, `resultB`): [`Result`](../README.md#result)\<readonly \[`S1`, `S2`\], `E1` \| `E2`\>
 
-Defined in: [src/functional/result.mts:1125](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L1125)
+Defined in: [src/functional/result.mts:1133](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L1133)
 
 Combines two `Result` values into a single `Result` containing a tuple.
 If either `Result` is `Err`, returns the first `Err` encountered.

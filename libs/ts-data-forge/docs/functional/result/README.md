@@ -16,7 +16,7 @@
 
 > **Result**\<`S`, `E`\> = `Ok_`\<`S`\> \| `Err_`\<`E`\>
 
-Defined in: [src/functional/result.mts:41](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L41)
+Defined in: [src/functional/result.mts:49](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L49)
 
 Represents a value that can either be a success (`Ok`) or an error (`Err`).
 

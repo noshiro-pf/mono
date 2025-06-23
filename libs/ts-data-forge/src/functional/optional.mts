@@ -2,11 +2,11 @@
 import { isRecord } from '../guard/index.mjs';
 import { pipe } from './pipe.mjs';
 
-/** @internal Symbol to identify the 'Some' variant of Optional. */
-const SomeTypeSymbol: unique symbol = Symbol('Optional.some');
+/** @internal String literal tag to identify the 'Some' variant of Optional. */
+const SomeTypeTagName = 'ts-data-forge::Optional.some';
 
-/** @internal Symbol to identify the 'None' variant of Optional. */
-const NoneTypeSymbol: unique symbol = Symbol('Optional.none');
+/** @internal String literal tag to identify the 'None' variant of Optional. */
+const NoneTypeTagName = 'ts-data-forge::Optional.none';
 
 /**
  * @internal
@@ -14,8 +14,12 @@ const NoneTypeSymbol: unique symbol = Symbol('Optional.none');
  * @template S The type of the contained value.
  */
 type Some_<S> = Readonly<{
-  /** Discriminant property for the 'Some' type. */
-  type: typeof SomeTypeSymbol;
+  /**
+   * @internal
+   * Discriminant property for the 'Some' type.
+   */
+  $$tag: typeof SomeTypeTagName;
+
   /** The contained value. */
   value: S;
 }>;
@@ -25,8 +29,11 @@ type Some_<S> = Readonly<{
  * Represents the 'None' variant of an Optional, indicating the absence of a value.
  */
 type None_ = Readonly<{
-  /** Discriminant property for the 'None' type. */
-  type: typeof NoneTypeSymbol;
+  /**
+   * @internal
+   * Discriminant property for the 'None' type.
+   */
+  $$tag: typeof NoneTypeTagName;
 }>;
 
 /**
@@ -49,10 +56,10 @@ export namespace Optional {
     maybeOptional: unknown,
   ): maybeOptional is Optional<unknown> =>
     isRecord(maybeOptional) &&
-    Object.hasOwn(maybeOptional, 'type') &&
-    ((maybeOptional['type'] === SomeTypeSymbol &&
+    Object.hasOwn(maybeOptional, '$$tag') &&
+    ((maybeOptional['$$tag'] === SomeTypeTagName &&
       Object.hasOwn(maybeOptional, 'value')) ||
-      maybeOptional['type'] === NoneTypeSymbol);
+      maybeOptional['$$tag'] === NoneTypeTagName);
 
   /**
    * Represents an {@link Optional} that contains a value.
@@ -108,7 +115,7 @@ export namespace Optional {
    * ```
    */
   export const some = <S,>(value: S): Some<S> => ({
-    type: SomeTypeSymbol,
+    $$tag: SomeTypeTagName,
     value,
   });
 
@@ -123,7 +130,7 @@ export namespace Optional {
    * console.log(Optional.unwrapOr(emptyValue, "default")); // "default"
    * ```
    */
-  export const none: None = { type: NoneTypeSymbol } as const;
+  export const none: None = { $$tag: NoneTypeTagName } as const;
 
   /**
    * Checks if an {@link Optional} is {@link Optional.Some}.
@@ -134,7 +141,7 @@ export namespace Optional {
    */
   export const isSome = <O extends Base>(
     optional: O,
-  ): optional is NarrowToSome<O> => optional.type === SomeTypeSymbol;
+  ): optional is NarrowToSome<O> => optional.$$tag === SomeTypeTagName;
 
   /**
    * Checks if an {@link Optional} is {@link Optional.None}.
@@ -145,7 +152,7 @@ export namespace Optional {
    */
   export const isNone = <O extends Base>(
     optional: O,
-  ): optional is NarrowToNone<O> => optional.type === NoneTypeSymbol;
+  ): optional is NarrowToNone<O> => optional.$$tag === NoneTypeTagName;
 
   /**
    * Unwraps an `Optional`, returning the contained value.
