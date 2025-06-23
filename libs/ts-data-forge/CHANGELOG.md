@@ -1,3 +1,9 @@
+# [1.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.0.2...v1.1.0) (2025-06-23)
+
+### Features
+
+- use string literal for object tag ([#27](https://github.com/noshiro-pf/ts-data-forge/issues/27)) ([8c6f0a6](https://github.com/noshiro-pf/ts-data-forge/commit/8c6f0a6772b5cf185f8d09633039683f2789bf06))
+
 ## [1.0.2](https://github.com/noshiro-pf/ts-data-forge/compare/v1.0.1...v1.0.2) (2025-06-22)
 
 ### Bug Fixes
