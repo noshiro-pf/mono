@@ -8,11 +8,15 @@
     "mhutchie.git-graph",
     "editorconfig.editorconfig",
     "shakram02.bash-beautify",
-    "sbrink.elm",
     "streetsidesoftware.code-spell-checker",
     "dbaeumer.vscode-eslint",
-    "tomoyukim.vscode-mermaid-editor",
     "esbenp.prettier-vscode",
-    "styled-components.vscode-styled-components"
+    "styled-components.vscode-styled-components",
+    "zenn.zenn-preview",
+    "github.vscode-github-actions",
+    "bierner.github-markdown-preview",
+    "davidanson.vscode-markdownlint",
+    "unifiedjs.vscode-mdx",
+    "tomoyukim.vscode-mermaid-editor"
   ]
 }
