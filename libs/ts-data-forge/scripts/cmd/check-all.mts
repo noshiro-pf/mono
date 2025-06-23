@@ -1,77 +1,66 @@
 import { assertRepoIsDirty } from 'ts-repo-utils';
+import { Result } from '../../src/index.mjs';
 
 /**
  * Runs all validation and build steps for the project.
- * @throws Error if any step fails.
  */
+const checkAll = async (): Promise<void> => {
+  echo('Starting full project validation and build...\n');
 
-echo('Starting full project validation and build...\n');
-
-try {
   // Step 1: Install dependencies
   echo('1. Installing dependencies...');
-  const npmInstallResult = await $('npm i');
-  if (npmInstallResult.type === 'error') {
-    throw new Error(
-      `Failed to install dependencies: ${npmInstallResult.exception.message}`,
-    );
-  }
+  await runCmdStep('npm i', 'Failed to install dependencies');
   echo('✓ Dependencies installed\n');
 
   // Step 2: Spell check
   echo('2. Running spell check...');
-  const spellCheckResult = await $(
+  await runCmdStep(
     'cspell "**" --gitignore --gitignore-root ./ --no-progress --fail-fast',
+    'Spell check failed',
   );
-  if (spellCheckResult.type === 'error') {
-    throw new Error(
-      'Spell check failed, try `npm run cspell` for more details.',
-    );
-  }
   echo('✓ Spell check passed\n');
 
   // Step 3: Check file extensions
   echo('3. Checking file extensions...');
-  await $('npm run check:ext');
+  await runCmdStep('npm run check:ext', 'Checking file extensions failed');
   echo('✓ File extensions validated\n');
 
   // Step 4: Run tests
   echo('4. Running tests...');
-  const testResult = await $('npm run test');
-  if (testResult.type === 'error') {
-    throw new Error(`Tests failed: ${testResult.exception.message}`);
-  }
+  await runCmdStep('npm run test', 'Tests failed');
   echo('✓ Tests passed\n');
 
   // Step 5: Lint and check repo status
   echo('5. Running lint fixes...');
-  const lintResult = await $('npm run lint:fix');
-  if (lintResult.type === 'error') {
-    throw new Error(`Lint fixes failed: ${lintResult.exception.message}`);
-  }
+  await runCmdStep('npm run lint', 'Linting failed');
   await assertRepoIsDirty();
   echo('✓ Lint fixes applied\n');
 
   // Step 6: Build and check repo status
   echo('6. Building project...');
-  await $('npm run build');
+  await runCmdStep('npm run build', 'Build failed');
   await assertRepoIsDirty();
 
   // Step 7: Generate docs and check repo status
   echo('7. Generating documentation...');
-  await $('npm run doc');
+  await runCmdStep('npm run doc', 'Documentation generation failed');
   await assertRepoIsDirty();
 
   // Step 8: Format and check repo status
   echo('8. Formatting code...');
-  const fmtResult = await $('npm run fmt');
-  if (fmtResult.type === 'error') {
-    throw new Error(`Formatting failed: ${fmtResult.exception.message}`);
-  }
+  await runCmdStep('npm run fmt', 'Formatting failed');
   await assertRepoIsDirty();
 
   echo('✅ All checks completed successfully!\n');
-} catch (error) {
-  echo(`❌ Check failed: ${String(error)}\n`);
-  process.exit(1);
-}
+};
+
+const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
+  const result = await $(cmd);
+  if (Result.isErr(result)) {
+    echo(`${errorMsg}: ${result.value.message}`);
+    echo('❌ Check failed');
+    process.exit(1);
+  }
+};
+
+await checkAll();

@@ -1,6 +1,7 @@
 import * as rollupPluginReplace from '@rollup/plugin-replace';
 import * as rollupPluginStrip from '@rollup/plugin-strip';
 import * as pluginTypescript from '@rollup/plugin-typescript';
+import 'ts-repo-utils';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 import tsconfig from './tsconfig.build.json' with { type: 'json' };
 
@@ -31,7 +32,11 @@ export default {
     }),
     pluginTypescript.default({
       tsconfig: path.resolve(configDir, './tsconfig.build.json'),
-      module: 'NodeNext',
+      compilerOptions: {
+        // Override module settings for bundling
+        module: 'ESNext',
+        moduleResolution: 'bundler',
+      },
     }),
     rollupPluginReplace.default({
       "import 'vitest'": 'undefined',
