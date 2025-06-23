@@ -1,3 +1,9 @@
+# [2.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v2.0.0...v2.1.0) (2025-06-23)
+
+### Features
+
+- update ts-data-forge to fix Result type ([#23](https://github.com/noshiro-pf/ts-repo-utils/issues/23)) ([48fb1a0](https://github.com/noshiro-pf/ts-repo-utils/commit/48fb1a05cab301cef421e5bb840f3afff1722c4c))
+
 # [2.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v1.2.1...v2.0.0) (2025-06-22)
 
 ### Features
