@@ -1,3 +1,9 @@
+# [2.2.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v2.1.0...v2.2.0) (2025-06-24)
+
+### Features
+
+- update assertExt to support multiple extensions for each directory ([#26](https://github.com/noshiro-pf/ts-repo-utils/issues/26)) ([2ecdde2](https://github.com/noshiro-pf/ts-repo-utils/commit/2ecdde25a4c87e4c987bbd0b46761198e2f03e74))
+
 # [2.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v2.0.0...v2.1.0) (2025-06-23)
 
 ### Features
