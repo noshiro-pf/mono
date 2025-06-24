@@ -1,3 +1,3 @@
 import { formatDiffFrom } from '../../src/index.mjs';
 
-await formatDiffFrom('main');
+await formatDiffFrom('origin/main');

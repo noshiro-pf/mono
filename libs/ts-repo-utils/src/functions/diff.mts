@@ -5,7 +5,12 @@ import '../node-global.mjs';
 /**
  * Get files that have been changed (git status).
  */
-export const getUntrackedFiles = async (): Promise<
+export const getUntrackedFiles = async (
+  options?: Readonly<{
+    /** @default true */
+    excludeDeleted?: boolean;
+  }>,
+): Promise<
   Result<readonly string[], ExecException | Readonly<{ message: string }>>
 > => {
   // Get changed files from git status
@@ -29,7 +34,10 @@ export const getUntrackedFiles = async (): Promise<
     .filter(
       (file): file is string =>
         // Filter out deleted files (status starts with 'D')
-        file !== undefined && !stdout.includes(`D  ${file}`),
+        file !== undefined &&
+        ((options?.excludeDeleted ?? true)
+          ? !stdout.includes(`D  ${file}`)
+          : true),
     );
 
   return Result.ok(files);
@@ -40,11 +48,17 @@ export const getUntrackedFiles = async (): Promise<
  */
 export const getDiffFrom = async (
   base: string,
+  options?: Readonly<{
+    /** @default true */
+    excludeDeleted?: boolean;
+  }>,
 ): Promise<
   Result<readonly string[], ExecException | Readonly<{ message: string }>>
 > => {
   // Get files that differ from base branch/commit (excluding deleted files)
-  const result = await $(`git diff --name-only ${base} --diff-filter=d`);
+  const result = await $(
+    `git diff --name-only ${base} ${(options?.excludeDeleted ?? true) ? '--diff-filter=d' : ''}`,
+  );
 
   if (Result.isErr(result)) {
     return result;

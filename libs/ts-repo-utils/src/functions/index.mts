@@ -5,3 +5,4 @@ export * from './diff.mjs';
 export * from './exec-async.mjs';
 export * from './format.mjs';
 export * from './gen-index.mjs';
+export * from './should-run.mjs';

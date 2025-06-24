@@ -38,6 +38,12 @@ Re-exports [CheckExtConfig](functions/assert-ext.md#checkextconfig)
 
 ---
 
+### checkShouldRunTypeChecks
+
+Re-exports [checkShouldRunTypeChecks](functions/should-run.md#checkshouldruntypechecks)
+
+---
+
 ### formatDiffFrom
 
 Re-exports [formatDiffFrom](functions/format.md#formatdifffrom)

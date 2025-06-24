@@ -14,4 +14,5 @@
 - [functions/exec-async](functions/exec-async.md)
 - [functions/format](functions/format.md)
 - [functions/gen-index](functions/gen-index.md)
+- [functions/should-run](functions/should-run.md)
 - [node-global](node-global.md)

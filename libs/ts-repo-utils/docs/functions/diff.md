@@ -10,9 +10,9 @@
 
 ### getDiffFrom()
 
-> **getDiffFrom**(`base`): `Promise`\<`Result`\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+> **getDiffFrom**(`base`, `options?`): `Promise`\<`Result`\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-Defined in: [src/functions/diff.mts:41](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/diff.mts#L41)
+Defined in: [src/functions/diff.mts:49](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/diff.mts#L49)
 
 Get files that differ from the specified base branch or commit
 
@@ -22,6 +22,10 @@ Get files that differ from the specified base branch or commit
 
 `string`
 
+##### options?
+
+`Readonly`\<\{ `excludeDeleted?`: `boolean`; \}\>
+
 #### Returns
 
 `Promise`\<`Result`\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
@@ -30,11 +34,17 @@ Get files that differ from the specified base branch or commit
 
 ### getUntrackedFiles()
 
-> **getUntrackedFiles**(): `Promise`\<`Result`\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+> **getUntrackedFiles**(`options?`): `Promise`\<`Result`\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
 Defined in: [src/functions/diff.mts:8](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/diff.mts#L8)
 
 Get files that have been changed (git status).
+
+#### Parameters
+
+##### options?
+
+`Readonly`\<\{ `excludeDeleted?`: `boolean`; \}\>
 
 #### Returns
 
