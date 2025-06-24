@@ -1,3 +1,4 @@
+import { isString } from 'ts-data-forge';
 import '../node-global.mjs';
 import { assertPathExists } from './assert-path-exists.mjs';
 
@@ -9,8 +10,10 @@ export type CheckExtConfig = DeepReadonly<{
   directories: {
     /** Directory path to check */
     path: string;
-    /** Expected file extension (including the dot) */
-    extension: string;
+
+    /** Expected file extension(s) (including the dot). Can be a single extension or an array of valid extensions */
+    extension: `.${string}` | `.${string}`[];
+
     /** Optional glob patterns to ignore (defaults to ['tsconfig.json', 'globals.d.*']) */
     ignorePatterns?: string[];
   }[];
@@ -28,7 +31,7 @@ export const assertExt = async (config: CheckExtConfig): Promise<void> => {
       try {
         return await getFilesWithIncorrectExtension(
           dir,
-          extension,
+          isString(extension) ? [extension] : extension,
           ignorePatterns,
         );
       } catch (error) {
@@ -48,10 +51,11 @@ export const assertExt = async (config: CheckExtConfig): Promise<void> => {
 
       for (const { path: dirPath, extension } of config.directories) {
         const relativePath = path.relative(process.cwd(), dirPath);
-        if (!extensionGroups.has(extension)) {
-          extensionGroups.set(extension, []);
+        const extKey = isString(extension) ? extension : extension.join(' or ');
+        if (!extensionGroups.has(extKey)) {
+          extensionGroups.set(extKey, []);
         }
-        extensionGroups.get(extension)?.push(relativePath);
+        extensionGroups.get(extKey)?.push(relativePath);
       }
 
       // Generate message parts for each extension
@@ -83,13 +87,13 @@ export const assertExt = async (config: CheckExtConfig): Promise<void> => {
 /**
  * Checks if all files in a directory have the expected extension.
  * @param dir - The directory to check.
- * @param expectedExtension - The expected file extension.
+ * @param expectedExtensions - The expected file extensions.
  * @param ignorePatterns - Optional glob patterns to ignore.
  * @returns Array of files with incorrect extensions.
  */
 const getFilesWithIncorrectExtension = async (
   dir: string,
-  expectedExtension: string,
+  expectedExtensions: readonly string[],
   ignorePatterns?: readonly string[],
 ): Promise<readonly string[]> => {
   await assertPathExists(dir, 'Directory');
@@ -106,5 +110,8 @@ const getFilesWithIncorrectExtension = async (
     ignore: absoluteIgnorePatterns,
   });
 
-  return files.filter((file) => !file.endsWith(expectedExtension));
+  // Type assertion: glob always returns string[] for this use case
+  return files.filter(
+    (file) => !expectedExtensions.some((ext) => file.endsWith(ext)),
+  );
 };

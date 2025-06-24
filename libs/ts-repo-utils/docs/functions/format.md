@@ -10,9 +10,9 @@
 
 ### formatDiffFrom()
 
-> **formatDiffFrom**(`base`): `Promise`\<`"ok"` \| `"err"`\>
+> **formatDiffFrom**(`base`, `options?`): `Promise`\<`"ok"` \| `"err"`\>
 
-Defined in: [src/functions/format.mts:154](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L154)
+Defined in: [src/functions/format.mts:148](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L148)
 
 Format only files that differ from the specified base branch or commit
 
@@ -23,6 +23,12 @@ Format only files that differ from the specified base branch or commit
 `string`
 
 Base branch name or commit hash to compare against (defaults to 'main')
+
+##### options?
+
+`Readonly`\<\{ `includeUntracked?`: `boolean`; \}\>
+
+Options for formatting
 
 #### Returns
 
@@ -36,7 +42,7 @@ Base branch name or commit hash to compare against (defaults to 'main')
 
 > **formatFiles**(`pathGlob`): `Promise`\<`"ok"` \| `"err"`\>
 
-Defined in: [src/functions/format.mts:13](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L13)
+Defined in: [src/functions/format.mts:71](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L71)
 
 Format files matching the given glob pattern using Prettier
 
@@ -56,11 +62,35 @@ Glob pattern to match files
 
 ---
 
+### formatFilesList()
+
+> **formatFilesList**(`files`): `Promise`\<`"ok"` \| `"err"`\>
+
+Defined in: [src/functions/format.mts:13](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L13)
+
+Format a list of files using Prettier
+
+#### Parameters
+
+##### files
+
+readonly `string`[]
+
+Array of file paths to format
+
+#### Returns
+
+`Promise`\<`"ok"` \| `"err"`\>
+
+'ok' if successful, 'err' if any errors occurred
+
+---
+
 ### formatUntracked()
 
 > **formatUntracked**(): `Promise`\<`"ok"` \| `"err"`\>
 
-Defined in: [src/functions/format.mts:80](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L80)
+Defined in: [src/functions/format.mts:96](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L96)
 
 Format only files that have been changed (git status)
 

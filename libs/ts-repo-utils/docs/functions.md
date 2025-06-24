@@ -56,6 +56,12 @@ Re-exports [formatFiles](functions/format.md#formatfiles)
 
 ---
 
+### formatFilesList
+
+Re-exports [formatFilesList](functions/format.md#formatfileslist)
+
+---
+
 ### formatUntracked
 
 Re-exports [formatUntracked](functions/format.md#formatuntracked)

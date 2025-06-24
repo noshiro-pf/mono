@@ -12,7 +12,7 @@
 
 > **CheckExtConfig** = `DeepReadonly`\<\{ `directories`: `object`[]; \}\>
 
-Defined in: [src/functions/assert-ext.mts:7](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-ext.mts#L7)
+Defined in: [src/functions/assert-ext.mts:8](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-ext.mts#L8)
 
 Configuration for directory extension checking.
 
@@ -22,7 +22,7 @@ Configuration for directory extension checking.
 
 > **assertExt**(`config`): `Promise`\<`void`\>
 
-Defined in: [src/functions/assert-ext.mts:24](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-ext.mts#L24)
+Defined in: [src/functions/assert-ext.mts:27](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-ext.mts#L27)
 
 Validates that all files in specified directories have the correct extensions.
 Exits with code 1 if any files have incorrect extensions.
