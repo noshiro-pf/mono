@@ -59,7 +59,21 @@ const banTypes = {
 };
 
 const restrictedImportsOption = {
-  paths: [],
+  patterns: [
+    {
+      group: ['vitest'],
+      importNames: ['describe', 'expect', 'it'],
+      message: 'Use globals instead.',
+    },
+    {
+      group: ['src/**'],
+      message: 'Use relative import instead.',
+    },
+    {
+      group: ['**/../index.mjs'],
+      message: "Don't import from index.mjs.",
+    },
+  ],
 };
 
 export default tseslint.config(
@@ -86,7 +100,7 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['eslint.config.js'],
+    ignores: ['eslint.config.js', 'dist', 'coverage'],
   },
   {
     files: ['**/*.mjs', '**/*.mts'],
@@ -678,7 +692,7 @@ export default tseslint.config(
       '@typescript-eslint/switch-exhaustiveness-check': [
         'error',
         {
-          allowDefaultCaseForExhaustiveSwitch: true,
+          allowDefaultCaseForExhaustiveSwitch: false,
           requireDefaultForNonUnion: true,
         },
       ],

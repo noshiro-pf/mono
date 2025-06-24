@@ -6,17 +6,17 @@ await assertExt({
     {
       path: path.resolve(projectRootPath, './src'),
       extension: '.d.mts',
-      ignorePatterns: ['tsconfig.json', 'globals.d.mts'],
+      ignorePatterns: [],
     },
     {
       path: path.resolve(projectRootPath, './test'),
       extension: '.mts',
-      ignorePatterns: ['tsconfig.json'],
+      ignorePatterns: [],
     },
     {
       path: path.resolve(projectRootPath, './scripts'),
       extension: '.mts',
-      ignorePatterns: ['tsconfig.json'],
+      ignorePatterns: [],
     },
   ],
 });
