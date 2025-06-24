@@ -84,6 +84,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **PREFER**: Running single tests over the whole test suite for performance
 - **PREFER**: ES modules (import/export) syntax over CommonJS (require)
 - **PREFER**: Destructuring imports when possible (e.g., `import { foo } from 'bar'`)
+    - Exceptions: Node utilities such as fs, path, url etc.
 - **PREFER**: Avoid using `// eslint-disable-next-line` or `eslint-disable` as possible.
 - **PREFER**: Avoid any casting as possible.
 - **RESTRICTIONS**: Do not perform these actions without explicit user instructions:
