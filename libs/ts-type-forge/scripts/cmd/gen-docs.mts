@@ -26,7 +26,7 @@ const genDocs = async (): Promise<void> => {
 
   // Step 2: Format generated files
   echo('2. Formatting generated files...');
-  await runStep('npm run fmt:full', 'Formatting failed');
+  await runStep('npm run fmt', 'Formatting failed');
   echo('✓ Formatting completed\n');
 
   // Step 3: Lint markdown files
