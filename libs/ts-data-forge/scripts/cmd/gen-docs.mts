@@ -7,6 +7,11 @@ const TYPEDOC_CONFIG = path.resolve(
   './configs/typedoc.config.mjs',
 );
 
+const EMBED_SAMPLES_SCRIPT = path.resolve(
+  projectRootPath,
+  './scripts/cmd/embed-samples.mjs',
+);
+
 /**
  * Generates documentation using TypeDoc and formats the output.
  */
@@ -15,6 +20,14 @@ const genDocs = async (): Promise<void> => {
 
   // Verify TypeDoc config exists
   await assertPathExists(TYPEDOC_CONFIG, 'TypeDoc config');
+
+  // Step 0: Embed sample code into README
+  echo('0. Embedding sample code into README...');
+  await runStep(
+    `npm run z:node-esm -- "${EMBED_SAMPLES_SCRIPT}"`,
+    'Sample embedding failed',
+  );
+  echo('✓ Sample code embedded into README\n');
 
   // Step 1: Generate docs with TypeDoc
   echo('1. Generating documentation with TypeDoc...');

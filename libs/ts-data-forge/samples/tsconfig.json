@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "../configs/tsconfig/tsconfig.type-check.json",
+    "../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "paths": {
+      "ts-data-forge": ["../src/index.mts"],
+      "types": ["../src/globals.d.mts"]
+    }
+  },
+  "include": ["./**/*.mts", "./**/*.tsx"]
+}
