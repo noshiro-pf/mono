@@ -359,12 +359,12 @@ export namespace Obj {
   >(
     entries: Entries,
   ): IsFixedLengthList<Entries> extends true
-    ? TsVerifiedInternals.EntriesToObject<Entries>
-    : TsVerifiedInternals.PartialIfKeyIsUnion<
-        TsVerifiedInternals.KeysOfEntries<Entries>,
+    ? TsDataForgeInternals.EntriesToObject<Entries>
+    : TsDataForgeInternals.PartialIfKeyIsUnion<
+        TsDataForgeInternals.KeysOfEntries<Entries>,
         Record<
-          TsVerifiedInternals.KeysOfEntries<Entries>,
-          TsVerifiedInternals.ValuesOfEntries<Entries>
+          TsDataForgeInternals.KeysOfEntries<Entries>,
+          TsDataForgeInternals.ValuesOfEntries<Entries>
         >
       > => Object.fromEntries(entries) as never;
 
@@ -372,7 +372,7 @@ export namespace Obj {
    * @internal
    * Internal type utilities for the Obj module.
    */
-  declare namespace TsVerifiedInternals {
+  declare namespace TsDataForgeInternals {
     type RecursionLimit = 20;
 
     /**

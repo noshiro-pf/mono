@@ -1,5 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
-import { TsVerifiedInternals } from '../refined-number-utils.mjs';
+import { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 type ElementType = Int;
 
@@ -17,7 +17,7 @@ const {
   random,
   is,
   castType,
-} = TsVerifiedInternals.RefinedNumberUtils.operatorsForInteger<
+} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
   ElementType,
   undefined,
   undefined
@@ -269,10 +269,10 @@ export const Int = {
 
 expectType<
   keyof typeof Int,
-  keyof TsVerifiedInternals.RefinedNumberUtils.NumberClass<ElementType, 'int'>
+  keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<ElementType, 'int'>
 >('=');
 
 expectType<
   typeof Int,
-  TsVerifiedInternals.RefinedNumberUtils.NumberClass<ElementType, 'int'>
+  TsDataForgeInternals.RefinedNumberUtils.NumberClass<ElementType, 'int'>
 >('<=');

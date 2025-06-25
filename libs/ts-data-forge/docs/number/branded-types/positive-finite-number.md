@@ -12,7 +12,7 @@
 
 > `const` **asPositiveFiniteNumber**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N` = `castType`
 
-Defined in: [src/number/branded-types/positive-finite-number.mts:89](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/branded-types/positive-finite-number.mts#L89)
+Defined in: [src/number/branded-types/positive-finite-number.mts:93](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/branded-types/positive-finite-number.mts#L93)
 
 Casts a number to a PositiveFiniteNumber type.
 
@@ -53,7 +53,7 @@ const y = asPositiveFiniteNumber(0.001); // PositiveFiniteNumber
 
 > `const` **isPositiveFiniteNumber**: (`a`) => `a is PositiveFiniteNumber` = `is`
 
-Defined in: [src/number/branded-types/positive-finite-number.mts:74](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/branded-types/positive-finite-number.mts#L74)
+Defined in: [src/number/branded-types/positive-finite-number.mts:78](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/branded-types/positive-finite-number.mts#L78)
 
 Checks if a number is a PositiveFiniteNumber (a finite number > 0).
 
@@ -75,7 +75,7 @@ Checks if a number is a PositiveFiniteNumber (a finite number > 0).
 
 > `const` **PositiveFiniteNumber**: `object`
 
-Defined in: [src/number/branded-types/positive-finite-number.mts:125](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/branded-types/positive-finite-number.mts#L125)
+Defined in: [src/number/branded-types/positive-finite-number.mts:129](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/branded-types/positive-finite-number.mts#L129)
 
 Namespace providing type-safe arithmetic operations for positive finite numbers.
 

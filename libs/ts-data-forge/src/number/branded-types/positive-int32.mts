@@ -1,5 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
-import { TsVerifiedInternals } from '../refined-number-utils.mjs';
+import { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 type ElementType = PositiveInt32;
 
@@ -19,7 +19,7 @@ const {
   is,
   castType,
   clamp,
-} = TsVerifiedInternals.RefinedNumberUtils.operatorsForInteger<
+} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
   ElementType,
   1,
   number
@@ -173,7 +173,7 @@ export const PositiveInt32 = {
 
 expectType<
   keyof typeof PositiveInt32,
-  keyof TsVerifiedInternals.RefinedNumberUtils.NumberClass<
+  keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     ElementType,
     'int' | 'positive' | 'range'
   >
@@ -181,7 +181,7 @@ expectType<
 
 expectType<
   typeof PositiveInt32,
-  TsVerifiedInternals.RefinedNumberUtils.NumberClass<
+  TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     ElementType,
     'int' | 'positive' | 'range'
   >

@@ -1,5 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
-import { TsVerifiedInternals } from '../refined-number-utils.mjs';
+import { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 type ElementType = PositiveFiniteNumber;
 
@@ -18,7 +18,7 @@ const {
   is,
   castType,
   clamp,
-} = TsVerifiedInternals.RefinedNumberUtils.operatorsForFloat<
+} = TsDataForgeInternals.RefinedNumberUtils.operatorsForFloat<
   ElementType,
   number,
   undefined
@@ -30,38 +30,42 @@ const {
 
 const floor = (
   x: ElementType,
-): TsVerifiedInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
-  TsVerifiedInternals.RefinedNumberUtils.ToInt<ElementType>
+): TsDataForgeInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
+  TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>
 > =>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  Math.floor(x) as TsVerifiedInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
-    TsVerifiedInternals.RefinedNumberUtils.ToInt<ElementType>
+  Math.floor(
+    x,
+  ) as TsDataForgeInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
+    TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>
   >;
 
 const ceil = (
   x: ElementType,
-): TsVerifiedInternals.RefinedNumberUtils.ToInt<ElementType> =>
+): TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType> =>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  Math.ceil(x) as TsVerifiedInternals.RefinedNumberUtils.ToInt<ElementType>;
+  Math.ceil(x) as TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>;
 
 const round = (
   x: ElementType,
-): TsVerifiedInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
-  TsVerifiedInternals.RefinedNumberUtils.ToInt<ElementType>
+): TsDataForgeInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
+  TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>
 > =>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  Math.round(x) as TsVerifiedInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
-    TsVerifiedInternals.RefinedNumberUtils.ToInt<ElementType>
+  Math.round(
+    x,
+  ) as TsDataForgeInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
+    TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>
   >;
 
 expectType<
-  TsVerifiedInternals.RefinedNumberUtils.ToInt<ElementType>,
+  TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>,
   PositiveInt
 >('=');
 
 expectType<
-  TsVerifiedInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
-    TsVerifiedInternals.RefinedNumberUtils.ToInt<ElementType>
+  TsDataForgeInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
+    TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>
   >,
   Uint
 >('=');
@@ -229,7 +233,7 @@ export const PositiveFiniteNumber = {
 
 expectType<
   keyof typeof PositiveFiniteNumber,
-  keyof TsVerifiedInternals.RefinedNumberUtils.NumberClass<
+  keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     ElementType,
     'positive'
   >
@@ -237,5 +241,5 @@ expectType<
 
 expectType<
   typeof PositiveFiniteNumber,
-  TsVerifiedInternals.RefinedNumberUtils.NumberClass<ElementType, 'positive'>
+  TsDataForgeInternals.RefinedNumberUtils.NumberClass<ElementType, 'positive'>
 >('<=');

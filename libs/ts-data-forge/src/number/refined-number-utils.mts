@@ -3,7 +3,7 @@ import { pipe } from '../functional/index.mjs';
 import { Num } from './num.mjs';
 
 /** @internal */
-export namespace TsVerifiedInternals {
+export namespace TsDataForgeInternals {
   /**
    * Internal utilities for creating and managing refined (branded) number types.
    *

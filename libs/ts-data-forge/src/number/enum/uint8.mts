@@ -1,5 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
-import { TsVerifiedInternals } from '../refined-number-utils.mjs';
+import { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 const typeNameInMessage = 'an non-negative integer less than 256';
 
@@ -10,12 +10,14 @@ const {
   is: isImpl,
   castType: castTypeImpl,
   clamp: clampImpl,
-} = TsVerifiedInternals.RefinedNumberUtils.operatorsForInteger<Uint16, 0, 255>({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: 0,
-  MAX_VALUE: 255,
-  typeNameInMessage,
-} as const);
+} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<Uint16, 0, 255>(
+  {
+    integerOrSafeInteger: 'SafeInteger',
+    MIN_VALUE: 0,
+    MAX_VALUE: 255,
+    typeNameInMessage,
+  } as const,
+);
 
 /**
  * Type guard that checks if a value is an 8-bit unsigned integer.
@@ -286,7 +288,7 @@ export const Uint8 = {
 
 expectType<
   keyof typeof Uint8,
-  keyof TsVerifiedInternals.RefinedNumberUtils.NumberClass<
+  keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     Uint16,
     'int' | 'non-negative' | 'range'
   >

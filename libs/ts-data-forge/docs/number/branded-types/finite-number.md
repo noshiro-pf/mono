@@ -12,7 +12,7 @@
 
 > `const` **asFiniteNumber**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N` = `castType`
 
-Defined in: [src/number/branded-types/finite-number.mts:96](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/branded-types/finite-number.mts#L96)
+Defined in: [src/number/branded-types/finite-number.mts:98](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/branded-types/finite-number.mts#L98)
 
 Casts a number to a FiniteNumber branded type.
 
@@ -62,7 +62,7 @@ const z = asFiniteNumber(0); // FiniteNumber
 
 > `const` **FiniteNumber**: `object`
 
-Defined in: [src/number/branded-types/finite-number.mts:142](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/branded-types/finite-number.mts#L142)
+Defined in: [src/number/branded-types/finite-number.mts:144](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/branded-types/finite-number.mts#L144)
 
 Namespace providing type-safe operations for FiniteNumber branded types.
 
@@ -502,7 +502,7 @@ const rand = FiniteNumber.random(asFiniteNumber(0), asFiniteNumber(1)); // Rando
 
 > `const` **isFiniteNumber**: (`a`) => `a is FiniteNumber` = `is`
 
-Defined in: [src/number/branded-types/finite-number.mts:70](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/branded-types/finite-number.mts#L70)
+Defined in: [src/number/branded-types/finite-number.mts:72](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/branded-types/finite-number.mts#L72)
 
 Type guard that checks if a value is a finite number.
 

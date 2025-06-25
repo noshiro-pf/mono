@@ -1,5 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
-import { TsVerifiedInternals } from '../refined-number-utils.mjs';
+import { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 const typeNameInMessage = 'an integer in [-128, 127]';
 
@@ -10,7 +10,7 @@ const {
   is: isImpl,
   castType: castTypeImpl,
   clamp: clampImpl,
-} = TsVerifiedInternals.RefinedNumberUtils.operatorsForInteger<
+} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
   Int16,
   -128,
   127
@@ -337,7 +337,7 @@ export const Int8 = {
 
 expectType<
   keyof typeof Int8,
-  keyof TsVerifiedInternals.RefinedNumberUtils.NumberClass<
+  keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     Int16,
     'int' | 'range'
   >
