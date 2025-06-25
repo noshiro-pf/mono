@@ -1,3 +1,9 @@
+# [1.2.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.1.0...v1.2.0) (2025-06-25)
+
+### Features
+
+- make range argument optional for branded numeric random function ([#33](https://github.com/noshiro-pf/ts-data-forge/issues/33)) ([7d6ce59](https://github.com/noshiro-pf/ts-data-forge/commit/7d6ce596a062916ba4ddd65d299ea2299b264dda))
+
 # [1.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.0.2...v1.1.0) (2025-06-23)
 
 ### Features
