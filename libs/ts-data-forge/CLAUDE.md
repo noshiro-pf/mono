@@ -100,6 +100,7 @@ expect(result).toStrictEqual([0, 0, 0]);
 - **PREFER**: Running single tests over the whole test suite for performance
 - **PREFER**: ES modules (import/export) syntax over CommonJS (require)
 - **PREFER**: Destructuring imports when possible (e.g., `import { foo } from 'bar'`)
+    - Exceptions: Node utilities such as fs, path, url etc.
 - **PREFER**: Avoid using `// eslint-disable-next-line` or `eslint-disable` as possible.
 - **PREFER**: Avoid any casting as possible.
 - **PREFER**: Use `expectType<A, B>('=')` whenever possible. Avoid using `expectType<A, B>('<=')` or `expectType<A, B>('!=')` except when intended.
