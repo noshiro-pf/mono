@@ -19,12 +19,12 @@ const {
   castType,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForFloat<
   ElementType,
-  undefined,
-  undefined
+  number,
+  number
 >({
   nonZero: true,
-  MIN_VALUE: undefined,
-  MAX_VALUE: undefined,
+  MIN_VALUE: -Number.MAX_VALUE,
+  MAX_VALUE: Number.MAX_VALUE,
   typeNameInMessage,
 } as const);
 

@@ -252,19 +252,19 @@ Raises a Uint to the power of another Uint.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `NonNegativeInt`
+> **random**: (`min?`, `max?`) => `NonNegativeInt`
 
 Generates a random Uint value.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonNegativeInt`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonNegativeInt`, `40`\>
 
 ###### Returns
 

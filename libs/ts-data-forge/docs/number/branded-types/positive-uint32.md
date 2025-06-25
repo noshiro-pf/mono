@@ -260,19 +260,19 @@ Raises a PositiveUint32 to the power of another PositiveUint32.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `PositiveUint32`
+> **random**: (`min?`, `max?`) => `PositiveUint32`
 
 Generates a random PositiveUint32 value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`PositiveUint32`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`PositiveUint32`, `40`\>
 
 ###### Returns
 

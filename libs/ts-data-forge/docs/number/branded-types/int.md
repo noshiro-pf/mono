@@ -305,7 +305,7 @@ Int.pow(asInt(2), asInt(3)); // Int (8)
 
 ##### random()
 
-> **random**: (`min`, `max`) => `Int`
+> **random**: (`min?`, `max?`) => `Int`
 
 Generates a random integer within the specified range (inclusive).
 
@@ -314,15 +314,15 @@ any of: 1, 2, 3, 4, 5, or 6.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`Int`, `40`\>
 
 The minimum value (inclusive)
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`Int`, `40`\>
 
 The maximum value (inclusive)
 

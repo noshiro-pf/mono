@@ -293,17 +293,17 @@ Raises a NonNegativeFiniteNumber to the power of another NonNegativeFiniteNumber
 
 ##### random()
 
-> **random**: (`min`, `max`) => `NonNegativeFiniteNumber`
+> **random**: (`min?`, `max?`) => `NonNegativeFiniteNumber`
 
 Generates a random NonNegativeFiniteNumber value.
 
 ###### Parameters
 
-###### min
+###### min?
 
 `NonNegativeFiniteNumber`
 
-###### max
+###### max?
 
 `NonNegativeFiniteNumber`
 

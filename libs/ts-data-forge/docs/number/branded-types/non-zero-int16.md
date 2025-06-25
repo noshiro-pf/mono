@@ -277,19 +277,19 @@ Raises a NonZeroInt16 to the power of another NonZeroInt16.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `NonZeroInt16`
+> **random**: (`min?`, `max?`) => `NonZeroInt16`
 
 Generates a random NonZeroInt16 value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonZeroInt16`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonZeroInt16`, `40`\>
 
 ###### Returns
 

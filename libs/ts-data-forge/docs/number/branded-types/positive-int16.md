@@ -260,19 +260,19 @@ Raises a PositiveInt16 to the power of another PositiveInt16.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `PositiveInt16`
+> **random**: (`min?`, `max?`) => `PositiveInt16`
 
 Generates a random PositiveInt16 value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`PositiveInt16`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`PositiveInt16`, `40`\>
 
 ###### Returns
 

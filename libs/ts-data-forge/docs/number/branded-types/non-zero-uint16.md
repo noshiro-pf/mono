@@ -260,19 +260,19 @@ Raises a NonZeroUint16 to the power of another NonZeroUint16.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `PositiveUint16`
+> **random**: (`min?`, `max?`) => `PositiveUint16`
 
 Generates a random NonZeroUint16 value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`PositiveUint16`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`PositiveUint16`, `40`\>
 
 ###### Returns
 

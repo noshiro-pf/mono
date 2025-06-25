@@ -21,11 +21,11 @@ const {
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
   ElementType,
   1,
-  undefined
+  number
 >({
   integerOrSafeInteger: 'Integer',
   MIN_VALUE: 1,
-  MAX_VALUE: undefined,
+  MAX_VALUE: Number.MAX_VALUE,
   typeNameInMessage,
 } as const);
 

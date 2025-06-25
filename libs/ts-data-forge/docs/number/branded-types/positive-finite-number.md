@@ -294,17 +294,17 @@ Raises a PositiveFiniteNumber to the power of another PositiveFiniteNumber.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `PositiveFiniteNumber`
+> **random**: (`min?`, `max?`) => `PositiveFiniteNumber`
 
 Generates a random PositiveFiniteNumber value.
 
 ###### Parameters
 
-###### min
+###### min?
 
 `PositiveFiniteNumber`
 
-###### max
+###### max?
 
 `PositiveFiniteNumber`
 

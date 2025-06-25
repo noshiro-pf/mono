@@ -370,7 +370,7 @@ FiniteNumber.pow(asFiniteNumber(2.5), asFiniteNumber(3)); // FiniteNumber (15.62
 
 ##### random()
 
-> **random**: (`min`, `max`) => `FiniteNumber`
+> **random**: (`min?`, `max?`) => `FiniteNumber`
 
 Generates a random finite number within the specified range.
 
@@ -379,13 +379,13 @@ Both bounds are inclusive.
 
 ###### Parameters
 
-###### min
+###### min?
 
 `FiniteNumber`
 
 The minimum value (inclusive)
 
-###### max
+###### max?
 
 `FiniteNumber`
 

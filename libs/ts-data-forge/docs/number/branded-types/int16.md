@@ -254,19 +254,19 @@ Raises an Int16 to the power of another Int16.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `Int16`
+> **random**: (`min?`, `max?`) => `Int16`
 
 Generates a random Int16 value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`Int16`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`Int16`, `40`\>
 
 ###### Returns
 

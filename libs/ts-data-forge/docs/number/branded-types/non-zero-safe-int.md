@@ -277,19 +277,19 @@ Raises a NonZeroSafeInt to the power of another NonZeroSafeInt.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `NonZeroSafeInt`
+> **random**: (`min?`, `max?`) => `NonZeroSafeInt`
 
 Generates a random NonZeroSafeInt value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonZeroSafeInt`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonZeroSafeInt`, `40`\>
 
 ###### Returns
 

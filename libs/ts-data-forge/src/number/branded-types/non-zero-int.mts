@@ -19,13 +19,13 @@ const {
   castType,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
   ElementType,
-  undefined,
-  undefined
+  number,
+  number
 >({
   integerOrSafeInteger: 'Integer',
   nonZero: true,
-  MIN_VALUE: undefined,
-  MAX_VALUE: undefined,
+  MIN_VALUE: -Number.MAX_VALUE,
+  MAX_VALUE: Number.MAX_VALUE,
   typeNameInMessage,
 } as const);
 

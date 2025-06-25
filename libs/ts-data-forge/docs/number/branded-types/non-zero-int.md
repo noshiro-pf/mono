@@ -246,19 +246,19 @@ Raises a non-zero integer to the power of another non-zero integer.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `NonZeroInt`
+> **random**: (`min?`, `max?`) => `NonZeroInt`
 
 Generates a random non-zero integer.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonZeroInt`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonZeroInt`, `40`\>
 
 ###### Returns
 

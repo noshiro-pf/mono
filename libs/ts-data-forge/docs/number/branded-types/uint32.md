@@ -292,19 +292,19 @@ Uint32.pow(asUint32(2), asUint32(10)); // Uint32 (1024)
 
 ##### random()
 
-> **random**: (`min`, `max`) => `Uint32`
+> **random**: (`min?`, `max?`) => `Uint32`
 
 Generates a random Uint32 value.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`Uint32`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`Uint32`, `40`\>
 
 ###### Returns
 

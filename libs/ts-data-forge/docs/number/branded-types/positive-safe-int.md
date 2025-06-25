@@ -259,19 +259,19 @@ Raises a PositiveSafeInt to the power of another PositiveSafeInt.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `PositiveSafeInt`
+> **random**: (`min?`, `max?`) => `PositiveSafeInt`
 
 Generates a random PositiveSafeInt value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`PositiveSafeInt`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`PositiveSafeInt`, `40`\>
 
 ###### Returns
 

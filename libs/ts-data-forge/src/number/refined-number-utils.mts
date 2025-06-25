@@ -212,8 +212,8 @@ export namespace TsDataForgeInternals {
 
     type OperatorsForInteger<
       ElementType extends Int,
-      MIN_VALUE extends number | undefined,
-      MAX_VALUE extends number | undefined,
+      MIN_VALUE extends number,
+      MAX_VALUE extends number,
       ElementTypeWithSmallInt extends
         WithSmallInt<ElementType> = WithSmallInt<ElementType>,
     > = Readonly<{
@@ -254,13 +254,13 @@ export namespace TsDataForgeInternals {
       ) => ElementType;
 
       random: (
-        min: ElementTypeWithSmallInt,
-        max: ElementTypeWithSmallInt,
+        min?: ElementTypeWithSmallInt,
+        max?: ElementTypeWithSmallInt,
       ) => ElementType;
 
       randomNonZero: (
-        min: ElementTypeWithSmallInt,
-        max: ElementTypeWithSmallInt,
+        min?: ElementTypeWithSmallInt,
+        max?: ElementTypeWithSmallInt,
       ) => ElementType;
 
       castType: <N extends number>(x: N) => ElementType & N;
@@ -298,8 +298,8 @@ export namespace TsDataForgeInternals {
      */
     export const operatorsForInteger = <
       ElementType extends Int,
-      MIN_VALUE extends number | undefined,
-      MAX_VALUE extends number | undefined,
+      MIN_VALUE extends number,
+      MAX_VALUE extends number,
     >({
       integerOrSafeInteger,
       nonZero,
@@ -372,20 +372,20 @@ export namespace TsDataForgeInternals {
       ): ElementType => clampOrCastFn(Math.floor(x / y));
 
       const randomImpl = (
-        min: ElementTypeWithSmallInt,
-        max: ElementTypeWithSmallInt,
+        min: number = MIN_VALUE,
+        max: number = MAX_VALUE,
       ): number =>
         min + Math.floor((Math.max(max, min) - min + 1) * Math.random());
 
       // [-5, 5] -> floor(11 * Math.random()) + (-5)
       const random = (
-        min: ElementTypeWithSmallInt,
-        max: ElementTypeWithSmallInt,
+        min?: ElementTypeWithSmallInt,
+        max?: ElementTypeWithSmallInt,
       ): ElementType => clampOrCastFn(randomImpl(min, max));
 
       const randomNonZero = (
-        min: ElementTypeWithSmallInt,
-        max: ElementTypeWithSmallInt,
+        min?: ElementTypeWithSmallInt,
+        max?: ElementTypeWithSmallInt,
       ): ElementType => {
         while (true) {
           const r = randomImpl(min, max);
@@ -435,8 +435,8 @@ export namespace TsDataForgeInternals {
       sub: (x: ElementType, y: ElementType) => ElementType;
       mul: (x: ElementType, y: ElementType) => ElementType;
       div: (x: ElementType, y: ToNonZero<ElementType>) => ElementType;
-      random: (min: ElementType, max: ElementType) => ElementType;
-      randomNonZero: (min: ElementType, max: ElementType) => ElementType;
+      random: (min?: ElementType, max?: ElementType) => ElementType;
+      randomNonZero: (min?: ElementType, max?: ElementType) => ElementType;
 
       castType: <N extends number>(x: N) => ElementType & N;
 
@@ -472,8 +472,8 @@ export namespace TsDataForgeInternals {
      */
     export const operatorsForFloat = <
       ElementType extends UnknownNumberBrand,
-      MIN_VALUE extends number | undefined,
-      MAX_VALUE extends number | undefined,
+      MIN_VALUE extends number,
+      MAX_VALUE extends number,
     >({
       nonZero,
       MIN_VALUE,
@@ -527,12 +527,17 @@ export namespace TsDataForgeInternals {
       const div = (x: ElementType, y: ToNonZero<ElementType>): ElementType =>
         clampOrCastFn(x / y);
 
-      const random = (min: ElementType, max: ElementType): ElementType =>
-        clampOrCastFn(min + (Math.max(max, min) - min) * Math.random());
+      const randomImpl = (
+        min: number = MIN_VALUE,
+        max: number = MAX_VALUE,
+      ): number => min + (Math.max(max, min) - min) * Math.random();
+
+      const random = (min?: ElementType, max?: ElementType): ElementType =>
+        clampOrCastFn(randomImpl(min, max));
 
       const randomNonZero = (
-        min: ElementType,
-        max: ElementType,
+        min?: ElementType,
+        max?: ElementType,
       ): ElementType => {
         while (true) {
           const r = random(min, max);

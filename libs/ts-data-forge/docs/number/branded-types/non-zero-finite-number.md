@@ -287,17 +287,17 @@ Raises a NonZeroFiniteNumber to the power of another NonZeroFiniteNumber.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `NonZeroFiniteNumber`
+> **random**: (`min?`, `max?`) => `NonZeroFiniteNumber`
 
 Generates a random NonZeroFiniteNumber value.
 
 ###### Parameters
 
-###### min
+###### min?
 
 `NonZeroFiniteNumber`
 
-###### max
+###### max?
 
 `NonZeroFiniteNumber`
 

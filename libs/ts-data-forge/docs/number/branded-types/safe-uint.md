@@ -259,19 +259,19 @@ Raises a SafeUint to the power of another SafeUint.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `SafeUint`
+> **random**: (`min?`, `max?`) => `SafeUint`
 
 Generates a random SafeUint value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`SafeUint`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`SafeUint`, `40`\>
 
 ###### Returns
 

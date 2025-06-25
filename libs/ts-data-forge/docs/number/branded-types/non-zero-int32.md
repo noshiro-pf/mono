@@ -277,19 +277,19 @@ Raises a NonZeroInt32 to the power of another NonZeroInt32.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `NonZeroInt32`
+> **random**: (`min?`, `max?`) => `NonZeroInt32`
 
 Generates a random NonZeroInt32 value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonZeroInt32`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonZeroInt32`, `40`\>
 
 ###### Returns
 

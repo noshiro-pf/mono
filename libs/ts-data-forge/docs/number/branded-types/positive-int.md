@@ -351,7 +351,7 @@ PositiveInt.pow(asPositiveInt(2), asPositiveInt(3)); // PositiveInt (8)
 
 ##### random()
 
-> **random**: (`min`, `max`) => `PositiveInt`
+> **random**: (`min?`, `max?`) => `PositiveInt`
 
 Generates a random positive integer within the specified range (inclusive).
 
@@ -360,15 +360,15 @@ If min > max, they are automatically swapped.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`PositiveInt`, `40`\>
 
 The minimum value (inclusive, must be >= 1)
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`PositiveInt`, `40`\>
 
 The maximum value (inclusive, must be >= min)
 

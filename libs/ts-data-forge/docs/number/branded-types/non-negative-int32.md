@@ -259,19 +259,19 @@ Raises a NonNegativeInt32 to the power of another NonNegativeInt32.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `NonNegativeInt32`
+> **random**: (`min?`, `max?`) => `NonNegativeInt32`
 
 Generates a random NonNegativeInt32 value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonNegativeInt32`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonNegativeInt32`, `40`\>
 
 ###### Returns
 

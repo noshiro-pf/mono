@@ -254,19 +254,19 @@ Raises an Int32 to the power of another Int32.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `Int32`
+> **random**: (`min?`, `max?`) => `Int32`
 
 Generates a random Int32 value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`Int32`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`Int32`, `40`\>
 
 ###### Returns
 

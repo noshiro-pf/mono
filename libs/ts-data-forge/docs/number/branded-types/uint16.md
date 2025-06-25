@@ -259,19 +259,19 @@ Raises a Uint16 to the power of another Uint16.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `Uint16`
+> **random**: (`min?`, `max?`) => `Uint16`
 
 Generates a random Uint16 value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`Uint16`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`Uint16`, `40`\>
 
 ###### Returns
 

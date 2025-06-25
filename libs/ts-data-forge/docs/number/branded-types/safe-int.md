@@ -355,7 +355,7 @@ Raises a SafeInt to the power of another SafeInt.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `SafeInt`
+> **random**: (`min?`, `max?`) => `SafeInt`
 
 Generates a random safe integer within the specified range (inclusive).
 
@@ -363,15 +363,15 @@ The range is inclusive on both ends. If min > max, they are automatically swappe
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`SafeInt`, `40`\>
 
 The minimum value (inclusive)
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`SafeInt`, `40`\>
 
 The maximum value (inclusive)
 

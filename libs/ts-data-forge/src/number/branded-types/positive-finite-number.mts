@@ -21,10 +21,10 @@ const {
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForFloat<
   ElementType,
   number,
-  undefined
+  number
 >({
   MIN_VALUE: Number.MIN_VALUE,
-  MAX_VALUE: undefined,
+  MAX_VALUE: Number.MAX_VALUE,
   typeNameInMessage,
 } as const);
 

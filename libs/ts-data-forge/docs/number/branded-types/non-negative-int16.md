@@ -259,19 +259,19 @@ Raises a NonNegativeInt16 to the power of another NonNegativeInt16.
 
 ##### random()
 
-> **random**: (`min`, `max`) => `NonNegativeInt16`
+> **random**: (`min?`, `max?`) => `NonNegativeInt16`
 
 Generates a random NonNegativeInt16 value within the valid range.
 
 ###### Parameters
 
-###### min
+###### min?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonNegativeInt16`, `40`\>
 
-###### max
+###### max?
 
-`WithSmallInt`
+`WithSmallInt`\<`NonNegativeInt16`, `40`\>
 
 ###### Returns
 
