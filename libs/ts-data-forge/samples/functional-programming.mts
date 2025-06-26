@@ -5,34 +5,25 @@ const maybeValue = Optional.some(42);
 
 const doubled = Optional.map(maybeValue, (x) => x * 2);
 
-if (import.meta.vitest !== undefined) {
-  expect(Optional.unwrapOr(doubled, 0)).toBe(84);
-}
+assert.strictEqual(Optional.unwrapOr(doubled, 0), 84);
 
 // Result for error handling
 const success = Result.ok(42);
 
 const mapped = Result.map(success, (x) => x * 2);
 
-if (import.meta.vitest !== undefined) {
-  expect(mapped).toStrictEqual(Result.ok(84));
-}
+assert.deepStrictEqual(mapped, Result.ok(84));
 
 // Advanced pipe usage
-const processNumber = (input: number): Optional<number> => {
-  const result = pipe(input)
+const processNumber = (input: number): Optional<number> =>
+  pipe(input)
     .map((x) => x * 2) // Regular transformation
-    .map((x) => x + 10).value; // Chain transformations // Get the result
+    .map((x) => x + 10) // Chain transformations
+    .map((x) => (x > 50 ? Optional.some(x / 2) : Optional.none)).value; // Get the result
 
-  // Convert to Optional and continue processing
-  return result > 50 ? Optional.some(result / 2) : Optional.none;
-};
+assert.deepStrictEqual(processNumber(30), Optional.some(35));
 
-if (import.meta.vitest !== undefined) {
-  expect(processNumber(30)).toStrictEqual(Optional.some(35));
-
-  expect(processNumber(10)).toStrictEqual(Optional.none);
-}
+assert.deepStrictEqual(processNumber(10), Optional.none);
 
 // Pattern matching with match
 type Status = 'loading' | 'success' | 'error';
@@ -44,17 +35,13 @@ const handleStatus = (status: Status, data?: string): string =>
     error: 'An error occurred',
   });
 
-if (import.meta.vitest !== undefined) {
-  expect(handleStatus('loading')).toBe('Please wait...');
-  expect(handleStatus('success', 'Hello')).toBe('Data: Hello');
-  expect(handleStatus('error')).toBe('An error occurred');
-}
+assert.strictEqual(handleStatus('loading'), 'Please wait...');
+assert.strictEqual(handleStatus('success', 'Hello'), 'Data: Hello');
+assert.strictEqual(handleStatus('error'), 'An error occurred');
 
 // Pattern matching with Result
 const processResult = (result: Result<number, string>): string =>
   Result.isOk(result) ? `Success: ${result.value}` : `Error: ${result.value}`;
 
-if (import.meta.vitest !== undefined) {
-  expect(processResult(Result.ok(42))).toBe('Success: 42');
-  expect(processResult(Result.err('Failed'))).toBe('Error: Failed');
-}
+assert.strictEqual(processResult(Result.ok(42)), 'Success: 42');
+assert.strictEqual(processResult(Result.err('Failed')), 'Error: Failed');

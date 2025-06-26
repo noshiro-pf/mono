@@ -17,16 +17,12 @@ const processData = (data: unknown): string | undefined => {
 // Non-null object checking
 const value: unknown = { key: 'value' };
 
-if (import.meta.vitest !== undefined) {
-  if (isNonNullObject(value)) {
-    // value is guaranteed to be a non-null object
-    expect(Object.keys(value)).toStrictEqual(['key']);
-  }
+if (isNonNullObject(value)) {
+  // value is guaranteed to be a non-null object
+  assert.deepStrictEqual(Object.keys(value), ['key']);
 }
 
 // Example usage
-if (import.meta.vitest !== undefined) {
-  expect(processData({ name: 'Alice' })).toBe('Hello, Alice!');
-  expect(processData({ age: 30 })).toBe(undefined);
-  expect(processData('not an object')).toBe(undefined);
-}
+assert.strictEqual(processData({ name: 'Alice' }), 'Hello, Alice!');
+assert.strictEqual(processData({ age: 30 }), undefined);
+assert.strictEqual(processData('not an object'), undefined);

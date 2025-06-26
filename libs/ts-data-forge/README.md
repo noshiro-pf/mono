@@ -155,34 +155,25 @@ const maybeValue = Optional.some(42);
 
 const doubled = Optional.map(maybeValue, (x) => x * 2);
 
-if (import.meta.vitest !== undefined) {
-    expect(Optional.unwrapOr(doubled, 0)).toBe(84);
-}
+assert.strictEqual(Optional.unwrapOr(doubled, 0), 84);
 
 // Result for error handling
 const success = Result.ok(42);
 
 const mapped = Result.map(success, (x) => x * 2);
 
-if (import.meta.vitest !== undefined) {
-    expect(mapped).toStrictEqual(Result.ok(84));
-}
+assert.deepStrictEqual(mapped, Result.ok(84));
 
 // Advanced pipe usage
-const processNumber = (input: number): Optional<number> => {
-    const result = pipe(input)
+const processNumber = (input: number): Optional<number> =>
+    pipe(input)
         .map((x) => x * 2) // Regular transformation
-        .map((x) => x + 10).value; // Chain transformations // Get the result
+        .map((x) => x + 10) // Chain transformations
+        .map((x) => (x > 50 ? Optional.some(x / 2) : Optional.none)).value; // Get the result
 
-    // Convert to Optional and continue processing
-    return result > 50 ? Optional.some(result / 2) : Optional.none;
-};
+assert.deepStrictEqual(processNumber(30), Optional.some(35));
 
-if (import.meta.vitest !== undefined) {
-    expect(processNumber(30)).toStrictEqual(Optional.some(35));
-
-    expect(processNumber(10)).toStrictEqual(Optional.none);
-}
+assert.deepStrictEqual(processNumber(10), Optional.none);
 
 // Pattern matching with match
 type Status = 'loading' | 'success' | 'error';
@@ -194,20 +185,16 @@ const handleStatus = (status: Status, data?: string): string =>
         error: 'An error occurred',
     });
 
-if (import.meta.vitest !== undefined) {
-    expect(handleStatus('loading')).toBe('Please wait...');
-    expect(handleStatus('success', 'Hello')).toBe('Data: Hello');
-    expect(handleStatus('error')).toBe('An error occurred');
-}
+assert.strictEqual(handleStatus('loading'), 'Please wait...');
+assert.strictEqual(handleStatus('success', 'Hello'), 'Data: Hello');
+assert.strictEqual(handleStatus('error'), 'An error occurred');
 
 // Pattern matching with Result
 const processResult = (result: Result<number, string>): string =>
     Result.isOk(result) ? `Success: ${result.value}` : `Error: ${result.value}`;
 
-if (import.meta.vitest !== undefined) {
-    expect(processResult(Result.ok(42))).toBe('Success: 42');
-    expect(processResult(Result.err('Failed'))).toBe('Error: Failed');
-}
+assert.strictEqual(processResult(Result.ok(42)), 'Success: 42');
+assert.strictEqual(processResult(Result.err('Failed')), 'Error: Failed');
 ```
 
 ### 3. Number Utilities with `Num` and Branded Number Types
@@ -218,45 +205,35 @@ The `Num` object provides safe and convenient functions for numerical operations
 import { Num } from 'ts-data-forge';
 
 // Basic conversions
-if (import.meta.vitest !== undefined) {
-    expect(Num.from('123')).toBe(123);
-    expect(Num.from('abc')).toBeNaN();
-}
+assert.strictEqual(Num.from('123'), 123);
+assert.strictEqual(Number.isNaN(Num.from('abc')), true);
 
 // Range checking
 const inRange = Num.isInRange(0, 10);
 
-if (import.meta.vitest !== undefined) {
-    expect(inRange(5)).toBe(true);
-    expect(inRange(0)).toBe(true); // (inclusive lower bound)
-    expect(inRange(10)).toBe(false); // (exclusive upper bound)
-}
+assert.strictEqual(inRange(5), true);
+assert.strictEqual(inRange(0), true); // (inclusive lower bound)
+assert.strictEqual(inRange(10), false); // (exclusive upper bound)
 
 // Clamping values
 const clamp = Num.clamp(0, 100);
 
-if (import.meta.vitest !== undefined) {
-    expect(clamp(150)).toBe(100);
-    expect(clamp(-10)).toBe(0);
-}
+assert.strictEqual(clamp(150), 100);
+assert.strictEqual(clamp(-10), 0);
 
 // Rounding utilities
 const round2 = Num.round(2);
 
-if (import.meta.vitest !== undefined) {
-    expect(round2(3.14159)).toBe(3.14);
-    expect(Num.roundAt(3.14159, 3)).toBe(3.142);
-    expect(Num.roundToInt(3.7)).toBe(4);
-}
+assert.strictEqual(round2(3.14159), 3.14);
+assert.strictEqual(Num.roundAt(3.14159, 3), 3.142);
+assert.strictEqual(Num.roundToInt(3.7), 4);
 
 // Type guards
 const value = 5; // example value
 if (Num.isNonZero(value)) {
     // value is guaranteed to be non-zero
     const result = Num.div(10, value); // Safe division
-    if (import.meta.vitest !== undefined) {
-        expect(result).toBe(2);
-    }
+    assert.strictEqual(result, 2);
 }
 ```
 
@@ -284,41 +261,39 @@ const unsigned = asUint(42); // Uint - non-negative integer
 const finite = asFiniteNumber(3.14); // FiniteNumber - finite floating-point
 const safeInt = asSafeInt(42); // SafeInt - integer in safe range
 
+assert.strictEqual(integer, 42);
+assert.strictEqual(unsigned, 42);
+assert.strictEqual(finite, 3.14);
+assert.strictEqual(safeInt, 42);
+
 // This line would cause a runtime error:
 // const nonInteger = asInt(3.14);
 
 // Range-constrained types (16-bit, 32-bit)
 const int16 = asInt16(1000); // Int16: [-32768, 32767]
 const uint32 = asUint32(3000000000); // Uint32: [0, 4294967295]
+assert.strictEqual(int16, 1000);
+assert.strictEqual(uint32, 3000000000);
 
 // Non-zero and positive variants
 const nonZeroInt = asNonZeroInt(5); // NonZeroInt - excludes zero
 const positiveInt = asPositiveInt(10); // PositiveInt - excludes zero and negatives
+assert.strictEqual(nonZeroInt, 5);
+assert.strictEqual(positiveInt, 10);
 
 // Type-safe arithmetic with automatic clamping
 const sum = Int16.add(int16, asInt16(2000)); // Int16 (3000)
 const clamped = Int16.clamp(100000); // Int16 (32767 - clamped to MAX_VALUE)
+assert.strictEqual(sum, 3000);
+assert.strictEqual(clamped, 32767);
 
 // Safe division with non-zero types
 const ratio = NonZeroInt.div(asNonZeroInt(10), nonZeroInt); // No division by zero risk
+assert.strictEqual(ratio, 2);
 
 // Random generation within type constraints
 const randomInt16 = Int16.random(); // Int16 (random value in valid range)
-
-console.log({
-    integer,
-    unsigned,
-    finite,
-    safeInt,
-    int16,
-    uint32,
-    nonZeroInt,
-    positiveInt,
-    sum,
-    clamped,
-    ratio,
-    randomInt16,
-});
+assert.isNumber(randomInt16);
 ```
 
 ### 4. Array Utilities with `Arr`
@@ -330,51 +305,50 @@ import { Arr, expectType, Optional } from 'ts-data-forge';
 
 const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3];
 
+// Reduction
+const sum = Arr.sum(numbers);
+
+assert.strictEqual(sum, 20);
+
+// Type-safe length checking
+if (Arr.isArrayAtLeastLength(numbers, 2)) {
+    // numbers is now guaranteed to have at least 2 elements
+    expectType<typeof numbers, readonly [number, number, ...number[]]>('=');
+    assert.strictEqual(numbers[1], 2); // Safe access to index 1
+}
+
+// Take first n elements
+const firstThree = Arr.take(numbers, 3); // [1, 2, 3]
+
+assert.deepStrictEqual(firstThree, [1, 2, 3]);
+
+// Remove duplicates
+const unique = Arr.uniq(numbers); // [1, 2, 3, 4, 5]
+
+assert.deepStrictEqual(unique, [1, 2, 3, 4, 5]);
+
+// Array creation
+const zeros: readonly [0, 0, 0, 0, 0] = Arr.zeros(5);
+assert.deepStrictEqual(zeros, [0, 0, 0, 0, 0]);
+
+const range: readonly [1, 2, 3] = Arr.range(1, 4);
+assert.deepStrictEqual(range, [1, 2, 3]);
+
 const people = [
     { name: 'Alice', age: 30 },
     { name: 'Bob', age: 25 },
     { name: 'Charlie', age: 35 },
 ] as const;
 
-// Reduction
-const sum = Arr.sum(numbers);
-
-if (import.meta.vitest !== undefined) {
-    expect(sum).toBe(20);
-}
-
-// Array creation
-const zeros: readonly [0, 0, 0, 0, 0] = Arr.zeros(5); // [0, 0, 0, 0, 0]
-const range: readonly [1, 2, 3] = Arr.range(1, 4); // [1, 2, 3]
-
-// Type-safe length checking
-if (Arr.isArrayAtLeastLength(numbers, 2)) {
-    // numbers is now guaranteed to have at least 3 elements
-    expectType<typeof numbers, readonly [number, number, ...number[]]>('=');
-    console.log(numbers[1]); // Safe access to index 2
-}
-
-// Take first n elements
-const firstThree = Arr.take(numbers, 3); // [1, 2, 3]
-
-if (import.meta.vitest !== undefined) {
-    expect(firstThree).toStrictEqual([1, 2, 3]);
-}
-
 // Find maximum by property
 const oldestPerson = Arr.maxBy(people, (person) => person.age);
+assert.deepStrictEqual(
+    oldestPerson,
+    Optional.some({ name: 'Charlie', age: 35 } as const),
+);
 if (Optional.isSome(oldestPerson)) {
-    console.log(oldestPerson.value.name); // 'Charlie'
+    assert.strictEqual(oldestPerson.value.name, 'Charlie');
 }
-
-// Remove duplicates
-const unique = Arr.uniq(numbers); // [1, 2, 3, 4, 5]
-
-if (import.meta.vitest !== undefined) {
-    expect(unique).toStrictEqual([1, 2, 3, 4, 5]);
-}
-
-console.log({ zeros, range, firstThree, unique });
 ```
 
 ### 5. Immutable Collections: `IMap` and `ISet`
@@ -390,12 +364,10 @@ const mapWithOne = originalMap.set('one', 1);
 const mapWithTwo = mapWithOne.set('two', 2);
 
 // Original map is unchanged
-if (import.meta.vitest !== undefined) {
-    expect(originalMap.size).toBe(0);
-    expect(mapWithTwo.get('one')).toStrictEqual(Optional.some(1));
+assert.strictEqual(originalMap.size, 0);
+assert.deepStrictEqual(mapWithTwo.get('one'), Optional.some(1));
 
-    expect(mapWithTwo.has('three')).toBe(false);
-}
+assert.strictEqual(mapWithTwo.has('three'), false);
 
 // Using pipe for fluent updates
 const sequence = Arr.seq(10); // [0, 1, 2, ..., 9]
@@ -405,9 +377,7 @@ const pairs = sequence.map(
 const skipped = Arr.skip(pairs, 1); // [ [1, "1"], ..., [9, "9"]]
 const idMap = IMap.create<number, string>(skipped);
 
-if (import.meta.vitest !== undefined) {
-    expect(idMap.size).toBe(9);
-}
+assert.strictEqual(idMap.size, 9);
 
 // Efficient batch updates with withMutations
 const idMapUpdated = idMap.withMutations([
@@ -416,19 +386,15 @@ const idMapUpdated = idMap.withMutations([
     { type: 'delete', key: 4 },
 ]);
 
-if (import.meta.vitest !== undefined) {
-    expect(idMapUpdated.size).toBe(9);
-}
+assert.strictEqual(idMapUpdated.size, 9);
 
 // ISet usage
 const originalSet = ISet.create<number>([]);
 const setWithItems = originalSet.add(1).add(2).add(1); // Duplicate ignored
 
-if (import.meta.vitest !== undefined) {
-    expect(originalSet.size).toBe(0); // (unchanged)
-    expect(setWithItems.has(1)).toBe(true);
-    expect(setWithItems.size).toBe(2);
-}
+assert.strictEqual(originalSet.size, 0); // (unchanged)
+assert.strictEqual(setWithItems.has(1), true);
+assert.strictEqual(setWithItems.size, 2);
 ```
 
 ### 6. Type Guards
@@ -455,19 +421,15 @@ const processData = (data: unknown): string | undefined => {
 // Non-null object checking
 const value: unknown = { key: 'value' };
 
-if (import.meta.vitest !== undefined) {
-    if (isNonNullObject(value)) {
-        // value is guaranteed to be a non-null object
-        expect(Object.keys(value)).toStrictEqual(['key']);
-    }
+if (isNonNullObject(value)) {
+    // value is guaranteed to be a non-null object
+    assert.deepStrictEqual(Object.keys(value), ['key']);
 }
 
 // Example usage
-if (import.meta.vitest !== undefined) {
-    expect(processData({ name: 'Alice' })).toBe('Hello, Alice!');
-    expect(processData({ age: 30 })).toBe(undefined);
-    expect(processData('not an object')).toBe(undefined);
-}
+assert.strictEqual(processData({ name: 'Alice' }), 'Hello, Alice!');
+assert.strictEqual(processData({ age: 30 }), undefined);
+assert.strictEqual(processData('not an object'), undefined);
 ```
 
 ### 7. Iteration with `range`
@@ -478,31 +440,27 @@ Generate ranges for iteration and array creation.
 import { range } from 'ts-data-forge';
 
 // Traditional for loop using range
-if (import.meta.vitest !== undefined) {
-    const values: number[] = [];
-    for (const i of range(0, 5)) {
-        values.push(i);
-    }
-    expect(values).toStrictEqual([0, 1, 2, 3, 4]);
+const values: number[] = [];
+for (const i of range(0, 5)) {
+    values.push(i);
 }
+
+assert.deepStrictEqual(values, [0, 1, 2, 3, 4]);
 
 // Create arrays from ranges
 const numbers = Array.from(range(1, 4)); // [1, 2, 3]
 const squares = Array.from(range(1, 6), (x) => x * x); // [1, 4, 9, 16, 25]
 
-if (import.meta.vitest !== undefined) {
-    expect(numbers).toStrictEqual([1, 2, 3]);
-    expect(squares).toStrictEqual([1, 4, 9, 16, 25]);
-}
+assert.deepStrictEqual(numbers, [1, 2, 3]);
+assert.deepStrictEqual(squares, [1, 4, 9, 16, 25]);
 
 // Step ranges
-if (import.meta.vitest !== undefined) {
-    const stepValues: number[] = [];
-    for (const i of range(0, 10, 2)) {
-        stepValues.push(i);
-    }
-    expect(stepValues).toStrictEqual([0, 2, 4, 6, 8]);
+const stepValues: number[] = [];
+for (const i of range(0, 10, 2)) {
+    stepValues.push(i);
 }
+
+assert.deepStrictEqual(stepValues, [0, 2, 4, 6, 8]);
 ```
 
 ### 8. Mutability Utilities with `castMutable`
@@ -511,8 +469,6 @@ Safely work with readonly types when interfacing with mutable APIs.
 
 ```tsx
 import { castMutable } from 'ts-data-forge';
-
-const readonlyOptions: readonly string[] = ['Option 1', 'Option 2', 'Option 3'];
 
 // Example: Material-UI Autocomplete
 import { Autocomplete, TextField } from '@mui/material';
@@ -526,15 +482,7 @@ export const SomeComponent: React.FC = () => (
     />
 );
 
-// Example with a function that expects mutable array
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const processItems = (mut_items: string[]): void => {
-    mut_items.push('New Item');
-    console.log('Items:', mut_items);
-};
-
-// Use castMutable to safely pass readonly array to mutable API
-processItems(castMutable(readonlyOptions));
+const readonlyOptions: readonly string[] = ['Option 1', 'Option 2', 'Option 3'];
 
 // Immer.js example
 import { produce } from 'immer';
@@ -554,17 +502,8 @@ const updatedState = produce(initialState, (draft) => {
     draft.items = castMutable(newItems); // Safe cast for assignment
 });
 
-if (import.meta.vitest !== undefined) {
-    expect(updatedState.items).toStrictEqual(['newItem1', 'newItem2']);
-}
-
-// Demonstrating type safety
-const mutableCopy = castMutable(readonlyOptions);
-
-if (import.meta.vitest !== undefined) {
-    expect(mutableCopy).toStrictEqual(['Option 1', 'Option 2', 'Option 3']);
-    expect(readonlyOptions).toStrictEqual(['Option 1', 'Option 2', 'Option 3']);
-}
+assert.deepStrictEqual(initialState.items, ['item1', 'item2']);
+assert.deepStrictEqual(updatedState.items, ['newItem1', 'newItem2']);
 ```
 
 ## Modules Overview

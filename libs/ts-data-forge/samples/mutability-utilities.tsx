@@ -1,7 +1,5 @@
 import { castMutable } from 'ts-data-forge';
 
-const readonlyOptions: readonly string[] = ['Option 1', 'Option 2', 'Option 3'];
-
 // Example: Material-UI Autocomplete
 import { Autocomplete, TextField } from '@mui/material';
 
@@ -14,15 +12,7 @@ export const SomeComponent: React.FC = () => (
   />
 );
 
-// Example with a function that expects mutable array
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const processItems = (mut_items: string[]): void => {
-  mut_items.push('New Item');
-  console.log('Items:', mut_items);
-};
-
-// Use castMutable to safely pass readonly array to mutable API
-processItems(castMutable(readonlyOptions));
+const readonlyOptions: readonly string[] = ['Option 1', 'Option 2', 'Option 3'];
 
 // Immer.js example
 import { produce } from 'immer';
@@ -42,14 +32,5 @@ const updatedState = produce(initialState, (draft) => {
   draft.items = castMutable(newItems); // Safe cast for assignment
 });
 
-if (import.meta.vitest !== undefined) {
-  expect(updatedState.items).toStrictEqual(['newItem1', 'newItem2']);
-}
-
-// Demonstrating type safety
-const mutableCopy = castMutable(readonlyOptions);
-
-if (import.meta.vitest !== undefined) {
-  expect(mutableCopy).toStrictEqual(['Option 1', 'Option 2', 'Option 3']);
-  expect(readonlyOptions).toStrictEqual(['Option 1', 'Option 2', 'Option 3']);
-}
+assert.deepStrictEqual(initialState.items, ['item1', 'item2']);
+assert.deepStrictEqual(updatedState.items, ['newItem1', 'newItem2']);

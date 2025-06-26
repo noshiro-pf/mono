@@ -6,12 +6,10 @@ const mapWithOne = originalMap.set('one', 1);
 const mapWithTwo = mapWithOne.set('two', 2);
 
 // Original map is unchanged
-if (import.meta.vitest !== undefined) {
-  expect(originalMap.size).toBe(0);
-  expect(mapWithTwo.get('one')).toStrictEqual(Optional.some(1));
+assert.strictEqual(originalMap.size, 0);
+assert.deepStrictEqual(mapWithTwo.get('one'), Optional.some(1));
 
-  expect(mapWithTwo.has('three')).toBe(false);
-}
+assert.strictEqual(mapWithTwo.has('three'), false);
 
 // Using pipe for fluent updates
 const sequence = Arr.seq(10); // [0, 1, 2, ..., 9]
@@ -21,9 +19,7 @@ const pairs = sequence.map(
 const skipped = Arr.skip(pairs, 1); // [ [1, "1"], ..., [9, "9"]]
 const idMap = IMap.create<number, string>(skipped);
 
-if (import.meta.vitest !== undefined) {
-  expect(idMap.size).toBe(9);
-}
+assert.strictEqual(idMap.size, 9);
 
 // Efficient batch updates with withMutations
 const idMapUpdated = idMap.withMutations([
@@ -32,16 +28,12 @@ const idMapUpdated = idMap.withMutations([
   { type: 'delete', key: 4 },
 ]);
 
-if (import.meta.vitest !== undefined) {
-  expect(idMapUpdated.size).toBe(9);
-}
+assert.strictEqual(idMapUpdated.size, 9);
 
 // ISet usage
 const originalSet = ISet.create<number>([]);
 const setWithItems = originalSet.add(1).add(2).add(1); // Duplicate ignored
 
-if (import.meta.vitest !== undefined) {
-  expect(originalSet.size).toBe(0); // (unchanged)
-  expect(setWithItems.has(1)).toBe(true);
-  expect(setWithItems.size).toBe(2);
-}
+assert.strictEqual(originalSet.size, 0); // (unchanged)
+assert.strictEqual(setWithItems.has(1), true);
+assert.strictEqual(setWithItems.size, 2);
