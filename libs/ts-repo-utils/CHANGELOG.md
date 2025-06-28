@@ -1,3 +1,9 @@
+## [2.2.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v2.2.0...v2.2.1) (2025-06-28)
+
+### Bug Fixes
+
+- bump prettier from 3.5.3 to 3.6.2 ([#29](https://github.com/noshiro-pf/ts-repo-utils/issues/29)) ([eb4227d](https://github.com/noshiro-pf/ts-repo-utils/commit/eb4227d98d49b3a896c766beadbb4eb149a73d11))
+
 # [2.2.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v2.1.0...v2.2.0) (2025-06-24)
 
 ### Features
