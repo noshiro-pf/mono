@@ -1,3 +1,9 @@
+## [2.3.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v2.3.0...v2.3.1) (2025-07-01)
+
+### Bug Fixes
+
+- fix the name of assertRepoIsClean fn ([#36](https://github.com/noshiro-pf/ts-repo-utils/issues/36)) ([a6fd97f](https://github.com/noshiro-pf/ts-repo-utils/commit/a6fd97f522c1780ef3ee7a2b4e50e34fd7d9d59a))
+
 # [2.3.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v2.2.2...v2.3.0) (2025-07-01)
 
 ### Features
