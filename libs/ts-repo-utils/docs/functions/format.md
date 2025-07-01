@@ -12,7 +12,7 @@
 
 > **formatDiffFrom**(`base`, `options?`): `Promise`\<`"ok"` \| `"err"`\>
 
-Defined in: [src/functions/format.mts:148](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L148)
+Defined in: [src/functions/format.mts:180](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L180)
 
 Format only files that differ from the specified base branch or commit
 
@@ -26,7 +26,7 @@ Base branch name or commit hash to compare against (defaults to 'main')
 
 ##### options?
 
-`Readonly`\<\{ `includeUntracked?`: `boolean`; \}\>
+`Readonly`\<\{ `includeUntracked?`: `boolean`; `silent?`: `boolean`; \}\>
 
 Options for formatting
 
@@ -40,9 +40,9 @@ Options for formatting
 
 ### formatFiles()
 
-> **formatFiles**(`pathGlob`): `Promise`\<`"ok"` \| `"err"`\>
+> **formatFiles**(`pathGlob`, `options?`): `Promise`\<`"ok"` \| `"err"`\>
 
-Defined in: [src/functions/format.mts:71](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L71)
+Defined in: [src/functions/format.mts:82](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L82)
 
 Format files matching the given glob pattern using Prettier
 
@@ -54,6 +54,10 @@ Format files matching the given glob pattern using Prettier
 
 Glob pattern to match files
 
+##### options?
+
+`Readonly`\<\{ `silent?`: `boolean`; \}\>
+
 #### Returns
 
 `Promise`\<`"ok"` \| `"err"`\>
@@ -64,7 +68,7 @@ Glob pattern to match files
 
 ### formatFilesList()
 
-> **formatFilesList**(`files`): `Promise`\<`"ok"` \| `"err"`\>
+> **formatFilesList**(`files`, `options?`): `Promise`\<`"ok"` \| `"err"`\>
 
 Defined in: [src/functions/format.mts:13](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L13)
 
@@ -78,6 +82,10 @@ readonly `string`[]
 
 Array of file paths to format
 
+##### options?
+
+`Readonly`\<\{ `silent?`: `boolean`; \}\>
+
 #### Returns
 
 `Promise`\<`"ok"` \| `"err"`\>
@@ -88,11 +96,19 @@ Array of file paths to format
 
 ### formatUntracked()
 
-> **formatUntracked**(): `Promise`\<`"ok"` \| `"err"`\>
+> **formatUntracked**(`options?`): `Promise`\<`"ok"` \| `"err"`\>
 
-Defined in: [src/functions/format.mts:96](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L96)
+Defined in: [src/functions/format.mts:115](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L115)
 
 Format only files that have been changed (git status)
+
+#### Parameters
+
+##### options?
+
+`Readonly`\<\{ `silent?`: `boolean`; \}\>
+
+Options for formatting
 
 #### Returns
 

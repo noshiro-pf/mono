@@ -10,12 +10,18 @@
 
 ### assertRepoIsDirty()
 
-> **assertRepoIsDirty**(): `Promise`\<`void`\>
+> **assertRepoIsDirty**(`options?`): `Promise`\<`void`\>
 
-Defined in: [src/functions/assert-repo-is-dirty.mts:18](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-repo-is-dirty.mts#L18)
+Defined in: [src/functions/assert-repo-is-dirty.mts:20](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-repo-is-dirty.mts#L20)
 
 Checks if the repository is dirty and exits with code 1 if it is.
 Shows git status and diff output before exiting.
+
+#### Parameters
+
+##### options?
+
+`Readonly`\<\{ `silent?`: `boolean`; \}\>
 
 #### Returns
 
@@ -25,11 +31,17 @@ Shows git status and diff output before exiting.
 
 ### repoIsDirty()
 
-> **repoIsDirty**(): `Promise`\<`boolean`\>
+> **repoIsDirty**(`options?`): `Promise`\<`boolean`\>
 
 Defined in: [src/functions/assert-repo-is-dirty.mts:9](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-repo-is-dirty.mts#L9)
 
 Checks if the repository has uncommitted changes.
+
+#### Parameters
+
+##### options?
+
+`Readonly`\<\{ `silent?`: `boolean`; \}\>
 
 #### Returns
 

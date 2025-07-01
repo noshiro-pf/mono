@@ -6,8 +6,10 @@ import '../node-global.mjs';
  * @returns True if the repo is dirty, false otherwise.
  * @throws Error if git command fails.
  */
-export const repoIsDirty = async (): Promise<boolean> => {
-  const status = await getGitStatus();
+export const repoIsDirty = async (
+  options?: Readonly<{ silent?: boolean }>,
+): Promise<boolean> => {
+  const status = await getGitStatus({ silent: options?.silent ?? false });
   return status.isDirty;
 };
 
@@ -15,9 +17,11 @@ export const repoIsDirty = async (): Promise<boolean> => {
  * Checks if the repository is dirty and exits with code 1 if it is.
  * Shows git status and diff output before exiting.
  */
-export const assertRepoIsDirty = async (): Promise<void> => {
+export const assertRepoIsDirty = async (
+  options?: Readonly<{ silent?: boolean }>,
+): Promise<void> => {
   try {
-    const status = await getGitStatus();
+    const status = await getGitStatus({ silent: options?.silent ?? false });
 
     if (!status.isDirty) {
       echo('Repo is clean\n');
@@ -29,12 +33,16 @@ export const assertRepoIsDirty = async (): Promise<void> => {
     echo(status.stdout);
 
     // Show files not tracked by git and unstaged changes
-    const addResult = await $('git add -N .');
+    const addResult = await $('git add -N .', {
+      silent: options?.silent ?? false,
+    });
     if (Result.isErr(addResult)) {
       echo('Warning: Failed to add untracked files for diff\n');
     }
 
-    const diffResult = await $('git diff');
+    const diffResult = await $('git diff', {
+      silent: options?.silent ?? false,
+    });
     if (Result.isErr(diffResult)) {
       echo('Warning: Failed to show diff\n');
     }
@@ -50,11 +58,15 @@ export const assertRepoIsDirty = async (): Promise<void> => {
  * Gets the git status of the repository.
  * @returns An object containing status information.
  */
-const getGitStatus = async (): Promise<{
+const getGitStatus = async (
+  options?: Readonly<{ silent?: boolean }>,
+): Promise<{
   isDirty: boolean;
   stdout: string;
 }> => {
-  const res = await $('git status --porcelain');
+  const res = await $('git status --porcelain', {
+    silent: options?.silent ?? false,
+  });
 
   if (Result.isErr(res)) {
     throw new Error(`Failed to get git status: ${res.value.message}`);

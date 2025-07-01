@@ -12,13 +12,20 @@ import { getDiffFrom, getUntrackedFiles } from './diff.mjs';
  */
 export const formatFilesList = async (
   files: readonly string[],
+  options?: Readonly<{ silent?: boolean }>,
 ): Promise<'ok' | 'err'> => {
+  const silent = options?.silent ?? false;
+
   if (files.length === 0) {
-    echo('No files to format');
+    if (!silent) {
+      echo('No files to format');
+    }
     return 'ok';
   }
 
-  echo(`Formatting ${files.length} files...`);
+  if (!silent) {
+    echo(`Formatting ${files.length} files...`);
+  }
 
   // Format each file
   const results = await Promise.allSettled(
@@ -28,7 +35,7 @@ export const formatFilesList = async (
         const content = await readFile(filePath, 'utf8');
 
         // Resolve prettier config for this file
-        const options = await prettier.resolveConfig(filePath);
+        const prettierOptions = await prettier.resolveConfig(filePath);
 
         // Check if file is ignored by prettier
         const fileInfo = await prettier.getFileInfo(filePath, {
@@ -36,20 +43,24 @@ export const formatFilesList = async (
         });
 
         if (fileInfo.ignored) {
-          echo(`Skipping ignored file: ${filePath}`);
+          if (!silent) {
+            echo(`Skipping ignored file: ${filePath}`);
+          }
           return;
         }
 
         // Format the content
         const formatted = await prettier.format(content, {
-          ...options,
+          ...prettierOptions,
           filepath: filePath,
         });
 
         // Only write if content changed
         if (formatted !== content) {
           await writeFile(filePath, formatted, 'utf8');
-          echo(`Formatted: ${filePath}`);
+          if (!silent) {
+            echo(`Formatted: ${filePath}`);
+          }
         }
       } catch (error) {
         console.error(`Error formatting ${filePath}:`, error);
@@ -68,7 +79,12 @@ export const formatFilesList = async (
  * @param pathGlob - Glob pattern to match files
  * @returns 'ok' if successful, 'err' if any errors occurred
  */
-export const formatFiles = async (pathGlob: string): Promise<'ok' | 'err'> => {
+export const formatFiles = async (
+  pathGlob: string,
+  options?: Readonly<{ silent?: boolean }>,
+): Promise<'ok' | 'err'> => {
+  const silent = options?.silent ?? false;
+
   try {
     // Find all files matching the glob
     const files = await glob(pathGlob, {
@@ -78,11 +94,13 @@ export const formatFiles = async (pathGlob: string): Promise<'ok' | 'err'> => {
     });
 
     if (files.length === 0) {
-      echo('No files found matching pattern:', pathGlob);
+      if (!silent) {
+        echo('No files found matching pattern:', pathGlob);
+      }
       return 'ok';
     }
 
-    return await formatFilesList(files);
+    return await formatFilesList(files, { silent });
   } catch (error) {
     console.error('Error in formatFiles:', error);
     return 'err';
@@ -91,11 +109,18 @@ export const formatFiles = async (pathGlob: string): Promise<'ok' | 'err'> => {
 
 /**
  * Format only files that have been changed (git status)
+ * @param options - Options for formatting
  * @returns 'ok' if successful, 'err' if any errors occurred
  */
-export const formatUntracked = async (): Promise<'ok' | 'err'> => {
+export const formatUntracked = async (
+  options?: Readonly<{ silent?: boolean }>,
+): Promise<'ok' | 'err'> => {
+  const silent = options?.silent ?? false;
+
   try {
-    const untrackedFilesResult = await getUntrackedFiles();
+    const untrackedFilesResult = await getUntrackedFiles({
+      silent,
+    });
 
     if (Result.isErr(untrackedFilesResult)) {
       console.error('Error getting changed files:', untrackedFilesResult.value);
@@ -105,11 +130,15 @@ export const formatUntracked = async (): Promise<'ok' | 'err'> => {
     const files = untrackedFilesResult.value;
 
     if (files.length === 0) {
-      echo('No changed files to format');
+      if (!silent) {
+        echo('No changed files to format');
+      }
       return 'ok';
     }
 
-    echo('Formatting changed files:', files);
+    if (!silent) {
+      echo('Formatting changed files:', files);
+    }
 
     // Filter out non-existent files before formatting
     const fileExistenceChecks = await Promise.allSettled(
@@ -118,7 +147,9 @@ export const formatUntracked = async (): Promise<'ok' | 'err'> => {
           await readFile(filePath, 'utf8');
           return filePath;
         } catch {
-          echo(`Skipping non-existent file: ${filePath}`);
+          if (!silent) {
+            echo(`Skipping non-existent file: ${filePath}`);
+          }
           return undefined;
         }
       }),
@@ -131,7 +162,7 @@ export const formatUntracked = async (): Promise<'ok' | 'err'> => {
       )
       .map((result) => result.value);
 
-    return await formatFilesList(existingFiles);
+    return await formatFilesList(existingFiles, { silent });
   } catch (error) {
     console.error('Error in formatUntracked:', error);
     return 'err';
@@ -143,15 +174,20 @@ export const formatUntracked = async (): Promise<'ok' | 'err'> => {
  * @param base - Base branch name or commit hash to compare against (defaults to 'main')
  * @param options - Options for formatting
  * @param options.includeUntracked - Include untracked files in addition to diff files (default is true)
+ * @param options.silent - Silent mode to suppress command output (default is false)
  * @returns 'ok' if successful, 'err' if any errors occurred
  */
 export const formatDiffFrom = async (
   base: string,
-  options?: Readonly<{ includeUntracked?: boolean }>,
+  options?: Readonly<{ includeUntracked?: boolean; silent?: boolean }>,
 ): Promise<'ok' | 'err'> => {
+  const silent = options?.silent ?? false;
+
   try {
     // Get files that differ from base branch/commit (excluding deleted files)
-    const diffFromBaseResult = await getDiffFrom(base);
+    const diffFromBaseResult = await getDiffFrom(base, {
+      silent,
+    });
 
     if (Result.isErr(diffFromBaseResult)) {
       console.error('Error getting changed files:', diffFromBaseResult.value);
@@ -163,7 +199,9 @@ export const formatDiffFrom = async (
 
     // If includeUntracked is true, also get untracked files
     if (options?.includeUntracked ?? true) {
-      const untrackedFilesResult = await getUntrackedFiles();
+      const untrackedFilesResult = await getUntrackedFiles({
+        silent,
+      });
 
       if (Result.isErr(untrackedFilesResult)) {
         console.error(
@@ -179,20 +217,26 @@ export const formatDiffFrom = async (
       const uniqueFiles = new Set([...diffFiles, ...untrackedFiles]);
       allFiles = Array.from(uniqueFiles);
 
-      echo(
-        `Formatting files that differ from ${base} and untracked files:`,
-        allFiles,
-      );
+      if (!silent) {
+        echo(
+          `Formatting files that differ from ${base} and untracked files:`,
+          allFiles,
+        );
+      }
     } else {
-      echo(`Formatting files that differ from ${base}:`, allFiles);
+      if (!silent) {
+        echo(`Formatting files that differ from ${base}:`, allFiles);
+      }
     }
 
     if (allFiles.length === 0) {
-      echo(`No files to format`);
+      if (!silent) {
+        echo(`No files to format`);
+      }
       return 'ok';
     }
 
-    return await formatFilesList(allFiles);
+    return await formatFilesList(allFiles, { silent });
   } catch (error) {
     console.error('Error in formatDiffFrom:', error);
     return 'err';

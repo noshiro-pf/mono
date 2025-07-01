@@ -16,7 +16,7 @@ export const $ = (
   const { silent = false, timeout = 30000 } = options;
 
   if (!silent) {
-    console.log(`$ ${cmd}`);
+    echo(`$ ${cmd}`);
   }
 
   return new Promise((resolve) => {
@@ -25,7 +25,7 @@ export const $ = (
     exec(cmd, execOptions, (error, stdout, stderr) => {
       if (!silent) {
         if (stdout !== '') {
-          console.log(stdout);
+          echo(stdout);
         }
         if (stderr !== '') {
           console.error(stderr);

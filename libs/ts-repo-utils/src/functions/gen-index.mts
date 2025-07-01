@@ -23,9 +23,13 @@ export type GenIndexConfig = DeepReadonly<{
 /**
  * Generates index.mts files recursively in `config.targetDirectory`.
  * @param config - Configuration for index file generation
+ * @param options - Additional options
  * @throws Error if any step fails.
  */
-export const genIndex = async (config: GenIndexConfig): Promise<void> => {
+export const genIndex = async (
+  config: GenIndexConfig,
+  options?: Readonly<{ silent?: boolean }>,
+): Promise<void> => {
   echo('Starting index file generation...\n');
 
   // Merge config with defaults
@@ -56,7 +60,9 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
 
     // Step 3: Format generated files
     echo('3. Formatting generated files...');
-    const fmtResult = await $('npm run fmt');
+    const fmtResult = await $('npm run fmt', {
+      silent: options?.silent ?? false,
+    });
     if (Result.isErr(fmtResult)) {
       throw new Error(`Formatting failed: ${fmtResult.value.message}`);
     }

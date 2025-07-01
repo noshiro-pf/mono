@@ -54,7 +54,7 @@ describe('formatFiles', () => {
       await createTestFile('test.md', '# Test\n\nSome    spaces');
 
       // Format TypeScript files
-      const result = await formatFiles(`${testDir}/*.ts`);
+      const result = await formatFiles(`${testDir}/*.ts`, { silent: true });
       expect(result).toBe('ok');
 
       // Check that files were formatted
@@ -85,7 +85,9 @@ describe('formatFiles', () => {
   });
 
   test('should return ok when no files match pattern', async () => {
-    const result = await formatFiles('/non-existent-path/*.ts');
+    const result = await formatFiles('/non-existent-path/*.ts', {
+      silent: true,
+    });
     expect(result).toBe('ok');
   });
 
@@ -103,7 +105,9 @@ describe('formatFiles', () => {
       );
 
       // Format with recursive glob
-      const result = await formatFiles(`${testDir}/**/*.ts`);
+      const result = await formatFiles(`${testDir}/**/*.ts`, {
+        silent: true,
+      });
       expect(result).toBe('ok');
 
       // Check that nested file was formatted
@@ -159,7 +163,9 @@ describe('formatFilesList', () => {
       );
 
       // Format the files
-      const result = await formatFilesList([file1, file2]);
+      const result = await formatFilesList([file1, file2], {
+        silent: true,
+      });
       expect(result).toBe('ok');
 
       // Check formatted content
@@ -184,7 +190,9 @@ describe('formatFilesList', () => {
   });
 
   test('should return ok for empty file list', async () => {
-    const result = await formatFilesList([]);
+    const result = await formatFilesList([], {
+      silent: true,
+    });
     expect(result).toBe('ok');
   });
 });
@@ -224,7 +232,7 @@ describe('formatDiffFrom', () => {
 
       vi.mocked(getUntrackedFiles).mockResolvedValue(Result.ok([]));
 
-      const result = await formatDiffFrom('main');
+      const result = await formatDiffFrom('main', { silent: true });
       expect(result).toBe('ok');
 
       // Check file was formatted
@@ -236,7 +244,7 @@ describe('formatDiffFrom', () => {
         `}\n`,
       );
 
-      expect(getDiffFrom).toHaveBeenCalledWith('main');
+      expect(getDiffFrom).toHaveBeenCalledWith('main', { silent: true });
     } finally {
       await fs.rm(testDir, { recursive: true, force: true });
     }
@@ -266,7 +274,10 @@ describe('formatDiffFrom', () => {
         Result.ok([untrackedFile]),
       );
 
-      const result = await formatDiffFrom('main', { includeUntracked: true });
+      const result = await formatDiffFrom('main', {
+        includeUntracked: true,
+        silent: true,
+      });
       expect(result).toBe('ok');
 
       // Check both files were formatted
@@ -284,8 +295,8 @@ describe('formatDiffFrom', () => {
         `}\n`,
       );
 
-      expect(getDiffFrom).toHaveBeenCalledWith('main');
-      expect(getUntrackedFiles).toHaveBeenCalled();
+      expect(getDiffFrom).toHaveBeenCalledWith('main', { silent: true });
+      expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
     } finally {
       await fs.rm(testDir, { recursive: true, force: true });
     }
@@ -306,12 +317,15 @@ describe('formatDiffFrom', () => {
       vi.mocked(getDiffFrom).mockResolvedValue(Result.ok([sharedFile]));
       vi.mocked(getUntrackedFiles).mockResolvedValue(Result.ok([sharedFile]));
 
-      const result = await formatDiffFrom('main', { includeUntracked: true });
+      const result = await formatDiffFrom('main', {
+        includeUntracked: true,
+        silent: true,
+      });
       expect(result).toBe('ok');
 
       // Verify both functions were called
-      expect(getDiffFrom).toHaveBeenCalledWith('main');
-      expect(getUntrackedFiles).toHaveBeenCalled();
+      expect(getDiffFrom).toHaveBeenCalledWith('main', { silent: true });
+      expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
 
       // Check that the file was formatted (content should change)
       const finalContent = await readTestFile(sharedFile);

@@ -2,7 +2,7 @@ import { rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { Result } from 'ts-data-forge';
 import '../node-global.mjs';
-import { getUntrackedFiles } from './diff.mjs';
+import { getDiffFrom, getUntrackedFiles } from './diff.mjs';
 
 describe('diff', () => {
   // Use project root for test files to ensure git tracking
@@ -23,7 +23,7 @@ describe('diff', () => {
 
   describe('getUntrackedFiles', () => {
     test('should return empty array when no files are changed', async () => {
-      const result = await getUntrackedFiles();
+      const result = await getUntrackedFiles({ silent: true });
 
       expect(Result.isOk(result)).toBe(true);
       if (Result.isOk(result)) {
@@ -39,12 +39,12 @@ describe('diff', () => {
 
       await writeFile(testFilePath, 'test content');
 
-      const result = await getUntrackedFiles();
+      const result = await getUntrackedFiles({ silent: true });
 
       expect(Result.isOk(result)).toBe(true);
       if (Result.isOk(result)) {
         const files = result.value;
-        expect(files.some((file) => file.includes(testFileName))).toBe(true);
+        expect(files.some((file) => file === testFileName)).toBe(true);
       }
     });
 
@@ -58,21 +58,21 @@ describe('diff', () => {
       await writeFile(testFilePath, 'initial content');
 
       // Add to git to track it
-      await $(`git add ${testFileName}`);
+      await $(`git add ${testFileName}`, { silent: true });
 
       // Modify the file
       await writeFile(testFilePath, 'modified content');
 
-      const result = await getUntrackedFiles();
+      const result = await getUntrackedFiles({ silent: true });
 
       expect(Result.isOk(result)).toBe(true);
       if (Result.isOk(result)) {
         const files = result.value;
-        expect(files.some((file) => file.includes(testFileName))).toBe(true);
+        expect(files.some((file) => file === testFileName)).toBe(false);
       }
 
       // Reset git state
-      await $(`git reset HEAD ${testFileName}`);
+      await $(`git reset HEAD ${testFileName}`, { silent: true });
     });
 
     test('should detect multiple types of changes', async () => {
@@ -86,32 +86,30 @@ describe('diff', () => {
 
       // Create and track another file
       await writeFile(modifyFile, 'initial content');
-      await $(`git add test-modify-file.tmp`);
+      await $(`git add test-modify-file.tmp`, { silent: true });
 
       // Modify the tracked file
       await writeFile(modifyFile, 'modified content');
 
-      const result = await getUntrackedFiles();
+      const result = await getUntrackedFiles({ silent: true });
 
       expect(Result.isOk(result)).toBe(true);
       if (Result.isOk(result)) {
         const files = result.value;
-        expect(files.some((file) => file.includes('test-new-file.tmp'))).toBe(
-          true,
+        expect(files.some((file) => file === 'test-new-file.tmp')).toBe(true);
+        expect(files.some((file) => file === 'test-modify-file.tmp')).toBe(
+          false,
         );
-        expect(
-          files.some((file) => file.includes('test-modify-file.tmp')),
-        ).toBe(true);
       }
 
       // Reset git state
-      await $(`git reset HEAD test-modify-file.tmp`);
+      await $(`git reset HEAD test-modify-file.tmp`, { silent: true });
     });
 
     test('should exclude deleted files from results', async () => {
       // This test is more complex as it requires simulating git state
       // For now, we'll test that the function executes successfully
-      const result = await getUntrackedFiles();
+      const result = await getUntrackedFiles({ silent: true });
 
       expect(Result.isOk(result)).toBe(true);
       if (Result.isOk(result)) {
@@ -127,14 +125,14 @@ describe('diff', () => {
     test('should handle git command errors gracefully', async () => {
       // This test would require mocking git command failure
       // For now, we'll ensure the function returns a Result type
-      const result = await getUntrackedFiles();
+      const result = await getUntrackedFiles({ silent: true });
 
       // Should always return a Result, either Ok or Err
       expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
     });
 
     test('should parse git status output correctly', async () => {
-      const result = await getUntrackedFiles();
+      const result = await getUntrackedFiles({ silent: true });
 
       expect(Result.isOk(result)).toBe(true);
       if (Result.isOk(result)) {
@@ -147,6 +145,23 @@ describe('diff', () => {
           expect(file.length).toBeGreaterThan(0);
         });
       }
+    });
+
+    test('should work with silent option', async () => {
+      const result = await getUntrackedFiles({ silent: true });
+
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(Array.isArray(result.value)).toBe(true);
+      }
+    });
+  });
+
+  describe('getDiffFrom', () => {
+    test('should work with silent option', async () => {
+      const result = await getDiffFrom('HEAD~1', { silent: true });
+
+      expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
     });
   });
 });

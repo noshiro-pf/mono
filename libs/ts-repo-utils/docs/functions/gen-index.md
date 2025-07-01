@@ -20,9 +20,9 @@ Configuration for index file generation.
 
 ### genIndex()
 
-> **genIndex**(`config`): `Promise`\<`void`\>
+> **genIndex**(`config`, `options?`): `Promise`\<`void`\>
 
-Defined in: [src/functions/gen-index.mts:28](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L28)
+Defined in: [src/functions/gen-index.mts:29](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L29)
 
 Generates index.mts files recursively in `config.targetDirectory`.
 
@@ -55,6 +55,12 @@ File extension of source files to export (default: '.mts')
 `string` \| readonly `string`[]
 
 Target directories to generate index files for (string or array of strings)
+
+##### options?
+
+`Readonly`\<\{ `silent?`: `boolean`; \}\>
+
+Additional options
 
 #### Returns
 
