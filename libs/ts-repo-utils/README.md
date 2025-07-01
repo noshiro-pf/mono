@@ -92,15 +92,15 @@ if (isDirty) {
 }
 ```
 
-#### `assertRepoIsDirty(): Promise<void>`
+#### `assertRepoIsClean(): Promise<void>`
 
-Checks if repository is dirty and exits with code 1 if it has uncommitted changes (shows changes and diff).
+Checks if repository is clean and exits with code 1 if it has uncommitted changes (shows changes and diff).
 
 ```typescript
-import { assertRepoIsDirty } from 'ts-repo-utils';
+import { assertRepoIsClean } from 'ts-repo-utils';
 
 // Use in CI/build scripts to ensure clean state
-await assertRepoIsDirty();
+await assertRepoIsClean();
 ```
 
 ### Command Execution
@@ -228,7 +228,7 @@ type GenIndexConfig = DeepReadonly<{
 ### Pre-commit Hook
 
 ```typescript
-import { formatUntracked, assertExt, assertRepoIsDirty } from 'ts-repo-utils';
+import { formatUntracked, assertExt, assertRepoIsClean } from 'ts-repo-utils';
 
 // Format changed files
 await formatUntracked();
@@ -239,7 +239,7 @@ await assertExt({
 });
 
 // Ensure repository is clean (exits if dirty)
-await assertRepoIsDirty();
+await assertRepoIsClean();
 ```
 
 ### Build Pipeline
@@ -271,14 +271,14 @@ await formatFiles('dist/**/*.js');
 ### Project Validation
 
 ```typescript
-import { pathExists, assertPathExists, assertRepoIsDirty } from 'ts-repo-utils';
+import { pathExists, assertPathExists, assertRepoIsClean } from 'ts-repo-utils';
 
 // Check required files exist (exits with code 1 if files don't exist)
 await assertPathExists('./package.json', 'Package manifest');
 await assertPathExists('./tsconfig.json', 'TypeScript config');
 
 // Verify clean repository state (exits with code 1 if repo is dirty)
-await assertRepoIsDirty();
+await assertRepoIsClean();
 ```
 
 ## License

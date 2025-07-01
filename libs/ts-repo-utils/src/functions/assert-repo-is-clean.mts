@@ -14,7 +14,7 @@ export const repoIsDirty = async (
 };
 
 /**
- * Checks if the repository is dirty and exits with code 1 if it is.
+ * Checks if the repository is clean and exits with code 1 if it is dirty.
  * Shows git status and diff output before exiting.
  */
 export const assertRepoIsClean = async (

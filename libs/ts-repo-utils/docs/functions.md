@@ -28,7 +28,7 @@ Re-exports [assertPathExists](functions/assert-path-exists.md#assertpathexists)
 
 ### assertRepoIsClean
 
-Re-exports [assertRepoIsClean](functions/assert-repo-is-dirty.md#assertrepoisclean)
+Re-exports [assertRepoIsClean](functions/assert-repo-is-clean.md#assertrepoisclean)
 
 ---
 
@@ -100,4 +100,4 @@ Re-exports [pathExists](functions/assert-path-exists.md#pathexists)
 
 ### repoIsDirty
 
-Re-exports [repoIsDirty](functions/assert-repo-is-dirty.md#repoisdirty)
+Re-exports [repoIsDirty](functions/assert-repo-is-clean.md#repoisdirty)
