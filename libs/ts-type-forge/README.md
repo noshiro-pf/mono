@@ -23,17 +23,17 @@ This library offers a comprehensive suite of type-level utilities, including:
 ## Installation
 
 ```bash
-npm install ts-type-forge
+npm add --save-dev ts-type-forge
 ```
 
 Or with other package managers:
 
 ```bash
 # Yarn
-yarn add ts-type-forge
+yarn add --dev ts-type-forge
 
 # pnpm
-pnpm add ts-type-forge
+pnpm add --save-dev ts-type-forge
 ```
 
 ## TypeScript Configuration
@@ -739,6 +739,67 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
 - All types are designed to work seamlessly with TypeScript's strict mode settings.
 - The library supports both explicit imports and global type availability via triple-slash directives.
 - Custom type-testing utilities ensure all operations work correctly at compile time.
+
+## Runtime Type Guards with ts-data-forge
+
+While **ts-type-forge** provides powerful compile-time type utilities, combining it with [**ts-data-forge**](https://www.npmjs.com/package/ts-data-forge) unlocks runtime type validation capabilities that make your TypeScript applications even more robust.
+
+**ts-data-forge** complements ts-type-forge by providing:
+
+- **Type Guard Functions**: Runtime validation for all the branded types defined in ts-type-forge
+- **Type Assertions**: Throw errors when values don't match expected types
+- **Type Predicates**: Safely narrow types at runtime with `is*` functions
+- **JSON Validation**: Runtime validation for `JsonValue` types
+- **Array Guards**: Validate `NonEmptyArray` and other array constraints at runtime
+
+### Example: Combining Type-Level and Runtime Safety
+
+```typescript
+/// <reference types="ts-type-forge" />
+
+// Runtime validation with ts-data-forge
+import {
+    isUint,
+    expectType,
+    assertNonEmptyArray,
+    parseJsonValue,
+    isRecord,
+    hasKey,
+} from 'ts-data-forge';
+
+const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3];
+
+// Type-safe length checking
+if (Arr.isArrayAtLeastLength(numbers, 2)) {
+    // numbers is now guaranteed to have at least 3 elements
+    expectType<typeof numbers, ArrayAtLeastLen<2, number>>('=');
+    console.log(numbers[1]); // Array access to index 0, 1 is now safe even with noUncheckedIndexedAccess enabled
+}
+
+// Safe JSON parsing with type validation
+const jsonString = '{"count": 42, "items": [1, 2, 3]}';
+const data: JsonValue = parseJsonValue(jsonString); // Validates at runtime
+
+// Use the data with confidence
+if (isRecord(data) && hasKey(data, 'count')) {
+    console.log(data.count); // Safe access
+}
+```
+
+### Benefits of Using Both Libraries Together
+
+1. **Complete Type Safety**: Compile-time guarantees with ts-type-forge + runtime validation with ts-data-forge
+2. **API Boundary Protection**: Validate external data (API responses, user input) at runtime
+3. **Developer Experience**: Same type names and conventions across both libraries
+4. **Zero Runtime Cost Option**: Use only ts-type-forge when runtime validation isn't needed
+5. **Progressive Enhancement**: Start with type-level safety, add runtime checks where needed
+
+Install both libraries to get the full TypeScript type safety experience:
+
+```bash
+npm add ts-data-forge
+npm add -D ts-type-forge
+```
 
 ## Compatibility Notes
 
