@@ -1,3 +1,9 @@
+## [3.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v3.0.0...v3.0.1) (2025-07-01)
+
+### Bug Fixes
+
+- rename assertRepoIsDirty to assertRepoIsClean and update references ([#38](https://github.com/noshiro-pf/ts-repo-utils/issues/38)) ([d43db04](https://github.com/noshiro-pf/ts-repo-utils/commit/d43db040d4fbfde92147678fe669d6e34c943f53))
+
 # [3.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v2.3.1...v3.0.0) (2025-07-01)
 
 ### Bug Fixes
