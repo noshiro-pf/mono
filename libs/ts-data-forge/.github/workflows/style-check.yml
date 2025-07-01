@@ -52,4 +52,4 @@ jobs:
         run: npm run ${{ matrix.command }}
 
       - name: Check if there is no file diff
-        run: npm run z:node-esm -- ./scripts/cmd/assert-repo-is-dirty.mjs
+        run: npm run z:node-esm -- ./scripts/cmd/assert-repo-is-clean.mjs
