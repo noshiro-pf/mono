@@ -8,9 +8,9 @@
 
 ## Functions
 
-### assertRepoIsDirty()
+### assertRepoIsClean()
 
-> **assertRepoIsDirty**(`options?`): `Promise`\<`void`\>
+> **assertRepoIsClean**(`options?`): `Promise`\<`void`\>
 
 Defined in: [src/functions/assert-repo-is-dirty.mts:20](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-repo-is-dirty.mts#L20)
 

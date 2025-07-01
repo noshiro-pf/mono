@@ -1,3 +1,3 @@
-import { assertRepoIsDirty } from '../../src/index.mjs';
+import { assertRepoIsClean } from '../../src/index.mjs';
 
-await assertRepoIsDirty();
+await assertRepoIsClean();
