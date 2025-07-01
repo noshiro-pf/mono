@@ -1,7 +1,6 @@
 import dedent from 'dedent';
-import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
+import '../node-global.mjs';
 import { getDiffFrom, getUntrackedFiles } from './diff.mjs';
 import { formatDiffFrom, formatFiles, formatFilesList } from './format.mjs';
 

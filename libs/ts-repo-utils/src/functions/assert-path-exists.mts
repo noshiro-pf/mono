@@ -1,4 +1,3 @@
-import * as fs from 'node:fs/promises';
 import '../node-global.mjs';
 
 /**

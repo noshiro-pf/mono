@@ -1,7 +1,5 @@
-import glob from 'fast-glob';
-import { readFile, writeFile } from 'node:fs/promises';
 import * as prettier from 'prettier';
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import '../node-global.mjs';
 import { getDiffFrom, getUntrackedFiles } from './diff.mjs';
 
@@ -32,7 +30,7 @@ export const formatFilesList = async (
     files.map(async (filePath) => {
       try {
         // Read file content
-        const content = await readFile(filePath, 'utf8');
+        const content = await fs.readFile(filePath, 'utf8');
 
         // Resolve prettier config for this file
         const prettierOptions = await prettier.resolveConfig(filePath);
@@ -57,7 +55,7 @@ export const formatFilesList = async (
 
         // Only write if content changed
         if (formatted !== content) {
-          await writeFile(filePath, formatted, 'utf8');
+          await fs.writeFile(filePath, formatted, 'utf8');
           if (!silent) {
             echo(`Formatted: ${filePath}`);
           }
@@ -144,7 +142,7 @@ export const formatUntracked = async (
     const fileExistenceChecks = await Promise.allSettled(
       files.map(async (filePath) => {
         try {
-          await readFile(filePath, 'utf8');
+          await fs.readFile(filePath, 'utf8');
           return filePath;
         } catch {
           if (!silent) {
@@ -195,7 +193,7 @@ export const formatDiffFrom = async (
     }
 
     const diffFiles = diffFromBaseResult.value;
-    let allFiles = diffFiles;
+    let mut_allFiles = diffFiles;
 
     // If includeUntracked is true, also get untracked files
     if (options?.includeUntracked ?? true) {
@@ -214,29 +212,28 @@ export const formatDiffFrom = async (
       const untrackedFiles = untrackedFilesResult.value;
 
       // Combine and deduplicate files
-      const uniqueFiles = new Set([...diffFiles, ...untrackedFiles]);
-      allFiles = Array.from(uniqueFiles);
+      mut_allFiles = Arr.uniq([...diffFiles, ...untrackedFiles]);
 
       if (!silent) {
         echo(
           `Formatting files that differ from ${base} and untracked files:`,
-          allFiles,
+          mut_allFiles,
         );
       }
     } else {
       if (!silent) {
-        echo(`Formatting files that differ from ${base}:`, allFiles);
+        echo(`Formatting files that differ from ${base}:`, mut_allFiles);
       }
     }
 
-    if (allFiles.length === 0) {
+    if (mut_allFiles.length === 0) {
       if (!silent) {
         echo(`No files to format`);
       }
       return 'ok';
     }
 
-    return await formatFilesList(allFiles, { silent });
+    return await formatFilesList(mut_allFiles, { silent });
   } catch (error) {
     console.error('Error in formatDiffFrom:', error);
     return 'err';

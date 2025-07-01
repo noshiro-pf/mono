@@ -1,5 +1,3 @@
-import { rm, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
 import { Result } from 'ts-data-forge';
 import '../node-global.mjs';
 import { getDiffFrom, getUntrackedFiles } from './diff.mjs';
@@ -13,7 +11,7 @@ describe('diff', () => {
     for (const file of testFiles) {
       try {
         // eslint-disable-next-line no-await-in-loop
-        await rm(file, { force: true });
+        await fs.rm(file, { force: true });
       } catch {
         // Ignore cleanup errors
       }
@@ -34,10 +32,10 @@ describe('diff', () => {
     test('should detect newly created files', async () => {
       // Create a new file in project root
       const testFileName = 'test-new-file.tmp';
-      const testFilePath = join(process.cwd(), testFileName);
+      const testFilePath = path.join(process.cwd(), testFileName);
       testFiles.push(testFilePath);
 
-      await writeFile(testFilePath, 'test content');
+      await fs.writeFile(testFilePath, 'test content');
 
       const result = await getUntrackedFiles({ silent: true });
 
@@ -51,17 +49,17 @@ describe('diff', () => {
     test('should detect modified existing files', async () => {
       // Use an existing file in the project that we can modify safely
       const testFileName = 'test-modify-file.tmp';
-      const testFilePath = join(process.cwd(), testFileName);
+      const testFilePath = path.join(process.cwd(), testFileName);
       testFiles.push(testFilePath);
 
       // Create and commit the file first
-      await writeFile(testFilePath, 'initial content');
+      await fs.writeFile(testFilePath, 'initial content');
 
       // Add to git to track it
       await $(`git add ${testFileName}`, { silent: true });
 
       // Modify the file
-      await writeFile(testFilePath, 'modified content');
+      await fs.writeFile(testFilePath, 'modified content');
 
       const result = await getUntrackedFiles({ silent: true });
 
@@ -77,19 +75,19 @@ describe('diff', () => {
 
     test('should detect multiple types of changes', async () => {
       // Create multiple test files
-      const newFile = join(process.cwd(), 'test-new-file.tmp');
-      const modifyFile = join(process.cwd(), 'test-modify-file.tmp');
+      const newFile = path.join(process.cwd(), 'test-new-file.tmp');
+      const modifyFile = path.join(process.cwd(), 'test-modify-file.tmp');
       testFiles.push(newFile, modifyFile);
 
       // Create new file
-      await writeFile(newFile, 'new file content');
+      await fs.writeFile(newFile, 'new file content');
 
       // Create and track another file
-      await writeFile(modifyFile, 'initial content');
+      await fs.writeFile(modifyFile, 'initial content');
       await $(`git add test-modify-file.tmp`, { silent: true });
 
       // Modify the tracked file
-      await writeFile(modifyFile, 'modified content');
+      await fs.writeFile(modifyFile, 'modified content');
 
       const result = await getUntrackedFiles({ silent: true });
 

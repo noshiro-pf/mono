@@ -12,7 +12,7 @@
 
 > **assertPathExists**(`filePath`, `description`): `Promise`\<`void`\>
 
-Defined in: [src/functions/assert-path-exists.mts:23](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-path-exists.mts#L23)
+Defined in: [src/functions/assert-path-exists.mts:22](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-path-exists.mts#L22)
 
 Validates that a path exists and exits with code 1 if it doesn't.
 
@@ -40,7 +40,7 @@ Description for error message (defaults to 'Path').
 
 > **pathExists**(`filePath`): `Promise`\<`boolean`\>
 
-Defined in: [src/functions/assert-path-exists.mts:9](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-path-exists.mts#L9)
+Defined in: [src/functions/assert-path-exists.mts:8](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-path-exists.mts#L8)
 
 Checks if a file or directory exists.
 

@@ -12,7 +12,7 @@
 
 > **formatDiffFrom**(`base`, `options?`): `Promise`\<`"ok"` \| `"err"`\>
 
-Defined in: [src/functions/format.mts:180](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L180)
+Defined in: [src/functions/format.mts:178](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L178)
 
 Format only files that differ from the specified base branch or commit
 
@@ -42,7 +42,7 @@ Options for formatting
 
 > **formatFiles**(`pathGlob`, `options?`): `Promise`\<`"ok"` \| `"err"`\>
 
-Defined in: [src/functions/format.mts:82](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L82)
+Defined in: [src/functions/format.mts:80](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L80)
 
 Format files matching the given glob pattern using Prettier
 
@@ -70,7 +70,7 @@ Glob pattern to match files
 
 > **formatFilesList**(`files`, `options?`): `Promise`\<`"ok"` \| `"err"`\>
 
-Defined in: [src/functions/format.mts:13](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L13)
+Defined in: [src/functions/format.mts:11](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L11)
 
 Format a list of files using Prettier
 
@@ -98,7 +98,7 @@ Array of file paths to format
 
 > **formatUntracked**(`options?`): `Promise`\<`"ok"` \| `"err"`\>
 
-Defined in: [src/functions/format.mts:115](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L115)
+Defined in: [src/functions/format.mts:113](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L113)
 
 Format only files that have been changed (git status)
 
