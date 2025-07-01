@@ -15,12 +15,12 @@ if (Arr.isArrayAtLeastLength(numbers, 2)) {
 }
 
 // Take first n elements
-const firstThree = Arr.take(numbers, 3); // [1, 2, 3]
+const firstThree = Arr.take(numbers, 3);
 
 assert.deepStrictEqual(firstThree, [1, 2, 3]);
 
 // Remove duplicates
-const unique = Arr.uniq(numbers); // [1, 2, 3, 4, 5]
+const unique = Arr.uniq(numbers);
 
 assert.deepStrictEqual(unique, [1, 2, 3, 4, 5]);
 

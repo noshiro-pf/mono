@@ -9,8 +9,8 @@ for (const i of range(0, 5)) {
 assert.deepStrictEqual(values, [0, 1, 2, 3, 4]);
 
 // Create arrays from ranges
-const numbers = Array.from(range(1, 4)); // [1, 2, 3]
-const squares = Array.from(range(1, 6), (x) => x * x); // [1, 4, 9, 16, 25]
+const numbers = Array.from(range(1, 4));
+const squares = Array.from(range(1, 6), (x) => x * x);
 
 assert.deepStrictEqual(numbers, [1, 2, 3]);
 assert.deepStrictEqual(squares, [1, 4, 9, 16, 25]);

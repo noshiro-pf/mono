@@ -46,8 +46,24 @@ const checkAll = async (): Promise<void> => {
   await runCmdStep('npm run doc', 'Documentation generation failed');
   await assertRepoIsClean();
 
-  // Step 8: Format and check repo status
-  echo('8. Formatting code...');
+  // Step 8: Type check samples
+  echo('8. Type checking samples...');
+  await runCmdStep('npm run type-check:samples', 'Sample type checking failed');
+  echo('✓ Sample type checking passed\n');
+
+  // Step 9: Run tests on samples
+  echo('9. Running tests on samples...');
+  await runCmdStep('npm run test:samples', 'Sample tests failed');
+  echo('✓ Sample tests passed\n');
+
+  // Step 10: Lint samples
+  echo('10. Running lint fixes on samples...');
+  await runCmdStep('npm run lint:samples', 'Linting samples failed');
+  await assertRepoIsClean();
+  echo('✓ Sample lint fixes applied\n');
+
+  // Step 11: Format and check repo status
+  echo('11. Formatting code...');
   await runCmdStep('npm run fmt', 'Formatting failed');
   await assertRepoIsClean();
 

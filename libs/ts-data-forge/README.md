@@ -267,7 +267,9 @@ assert.strictEqual(finite, 3.14);
 assert.strictEqual(safeInt, 42);
 
 // This line would cause a runtime error:
-// const nonInteger = asInt(3.14);
+assert.throw(() => {
+    asInt(3.14);
+});
 
 // Range-constrained types (16-bit, 32-bit)
 const int16 = asInt16(1000); // Int16: [-32768, 32767]
@@ -293,7 +295,8 @@ assert.strictEqual(ratio, 2);
 
 // Random generation within type constraints
 const randomInt16 = Int16.random(); // Int16 (random value in valid range)
-assert.isNumber(randomInt16);
+assert.strictEqual(-32768 <= randomInt16, true);
+assert.strictEqual(randomInt16 <= 32767, true);
 ```
 
 ### 4. Array Utilities with `Arr`
@@ -318,12 +321,12 @@ if (Arr.isArrayAtLeastLength(numbers, 2)) {
 }
 
 // Take first n elements
-const firstThree = Arr.take(numbers, 3); // [1, 2, 3]
+const firstThree = Arr.take(numbers, 3);
 
 assert.deepStrictEqual(firstThree, [1, 2, 3]);
 
 // Remove duplicates
-const unique = Arr.uniq(numbers); // [1, 2, 3, 4, 5]
+const unique = Arr.uniq(numbers);
 
 assert.deepStrictEqual(unique, [1, 2, 3, 4, 5]);
 
@@ -374,7 +377,7 @@ const sequence = Arr.seq(10); // [0, 1, 2, ..., 9]
 const pairs = sequence.map(
     (i) => [i, i.toString()] as readonly [number, string],
 );
-const skipped = Arr.skip(pairs, 1); // [ [1, "1"], ..., [9, "9"]]
+const skipped = Arr.skip(pairs, 1); // [[1, "1"], ..., [9, "9"]]
 const idMap = IMap.create<number, string>(skipped);
 
 assert.strictEqual(idMap.size, 9);
@@ -448,8 +451,8 @@ for (const i of range(0, 5)) {
 assert.deepStrictEqual(values, [0, 1, 2, 3, 4]);
 
 // Create arrays from ranges
-const numbers = Array.from(range(1, 4)); // [1, 2, 3]
-const squares = Array.from(range(1, 6), (x) => x * x); // [1, 4, 9, 16, 25]
+const numbers = Array.from(range(1, 4));
+const squares = Array.from(range(1, 6), (x) => x * x);
 
 assert.deepStrictEqual(numbers, [1, 2, 3]);
 assert.deepStrictEqual(squares, [1, 4, 9, 16, 25]);

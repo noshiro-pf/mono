@@ -23,7 +23,9 @@ assert.strictEqual(finite, 3.14);
 assert.strictEqual(safeInt, 42);
 
 // This line would cause a runtime error:
-// const nonInteger = asInt(3.14);
+assert.throw(() => {
+  asInt(3.14);
+});
 
 // Range-constrained types (16-bit, 32-bit)
 const int16 = asInt16(1000); // Int16: [-32768, 32767]
@@ -49,4 +51,5 @@ assert.strictEqual(ratio, 2);
 
 // Random generation within type constraints
 const randomInt16 = Int16.random(); // Int16 (random value in valid range)
-assert.isNumber(randomInt16);
+assert.strictEqual(-32768 <= randomInt16, true);
+assert.strictEqual(randomInt16 <= 32767, true);

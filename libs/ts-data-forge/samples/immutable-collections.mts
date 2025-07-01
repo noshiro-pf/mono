@@ -16,7 +16,7 @@ const sequence = Arr.seq(10); // [0, 1, 2, ..., 9]
 const pairs = sequence.map(
   (i) => [i, i.toString()] as readonly [number, string],
 );
-const skipped = Arr.skip(pairs, 1); // [ [1, "1"], ..., [9, "9"]]
+const skipped = Arr.skip(pairs, 1); // [[1, "1"], ..., [9, "9"]]
 const idMap = IMap.create<number, string>(skipped);
 
 assert.strictEqual(idMap.size, 9);
