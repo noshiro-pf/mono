@@ -1,3 +1,9 @@
+# [2.3.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v2.2.2...v2.3.0) (2025-07-01)
+
+### Features
+
+- add silent option to all functions and use git ls-files in getUntrackedFiles ([#34](https://github.com/noshiro-pf/ts-repo-utils/issues/34)) ([0b66367](https://github.com/noshiro-pf/ts-repo-utils/commit/0b663675d877a8664b1b3b3e21aa25bdad901a63))
+
 ## [2.2.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v2.2.1...v2.2.2) (2025-06-28)
 
 ### Bug Fixes
