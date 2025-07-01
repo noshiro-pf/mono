@@ -1,5 +1,5 @@
 import { Result } from 'ts-data-forge';
-import { assertRepoIsDirty } from 'ts-repo-utils';
+import { assertRepoIsClean } from 'ts-repo-utils';
 
 /**
  * Runs all validation and build steps for the project.
@@ -33,23 +33,23 @@ const checkAll = async (): Promise<void> => {
   // Step 5: Lint and check repo status
   echo('5. Running lint fixes...');
   await runCmdStep('npm run lint', 'Linting failed');
-  await assertRepoIsDirty();
+  await assertRepoIsClean();
   echo('✓ Lint fixes applied\n');
 
   // Step 6: Build and check repo status
   echo('6. Building project...');
   await runCmdStep('npm run build', 'Build failed');
-  await assertRepoIsDirty();
+  await assertRepoIsClean();
 
   // Step 7: Generate docs and check repo status
   echo('7. Generating documentation...');
   await runCmdStep('npm run doc', 'Documentation generation failed');
-  await assertRepoIsDirty();
+  await assertRepoIsClean();
 
   // Step 8: Format and check repo status
   echo('8. Formatting code...');
   await runCmdStep('npm run fmt', 'Formatting failed');
-  await assertRepoIsDirty();
+  await assertRepoIsClean();
 
   echo('✅ All checks completed successfully!\n');
 };
