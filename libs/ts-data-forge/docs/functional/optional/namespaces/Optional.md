@@ -15,7 +15,7 @@ Provides utilities to handle values that might be absent, similar to Option type
 
 > **Base** = [`Optional`](../README.md#optional)\<`unknown`\>
 
-Defined in: [src/functional/optional.mts:79](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L79)
+Defined in: [src/functional/optional.mts:78](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L78)
 
 Base type for any [Optional](../README.md#optional), used for generic constraints.
 Represents an [Optional](../README.md#optional) with an unknown value type.
@@ -26,7 +26,7 @@ Represents an [Optional](../README.md#optional) with an unknown value type.
 
 > **NarrowToNone**\<`O`\> = `O` _extends_ [`None`](#none) ? `O` : `never`
 
-Defined in: [src/functional/optional.mts:100](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L100)
+Defined in: [src/functional/optional.mts:99](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L99)
 
 Narrows an [Optional.Base](#base) type to [Optional.None](#none) if it is a [Optional.None](#none).
 If the [Optional](../README.md#optional) is [Optional.Some](#some)<S>, resolves to `never`.
@@ -45,7 +45,7 @@ The [Optional.Base](#base) type to narrow.
 
 > **NarrowToSome**\<`O`\> = `O` _extends_ [`None`](#none) ? `never` : `O`
 
-Defined in: [src/functional/optional.mts:93](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L93)
+Defined in: [src/functional/optional.mts:92](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L92)
 
 Narrows an [Optional.Base](#base) type to [Optional.Some](#some)<S> if it is a [Optional.Some](#some).
 If the [Optional](../README.md#optional) is [Optional.None](#none), resolves to `never`.
@@ -64,7 +64,7 @@ The [Optional.Base](#base) type to narrow.
 
 > **None** = `None_`
 
-Defined in: [src/functional/optional.mts:73](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L73)
+Defined in: [src/functional/optional.mts:72](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L72)
 
 Represents an [Optional](../README.md#optional) that does not contain a value (is empty).
 
@@ -74,7 +74,7 @@ Represents an [Optional](../README.md#optional) that does not contain a value (i
 
 > **Some**\<`S`\> = `Some_`\<`S`\>
 
-Defined in: [src/functional/optional.mts:68](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L68)
+Defined in: [src/functional/optional.mts:67](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L67)
 
 Represents an [Optional](../README.md#optional) that contains a value.
 
@@ -92,7 +92,7 @@ The type of the contained value.
 
 > **Unwrap**\<`O`\> = `O` _extends_ [`Some`](#some)\<infer S\> ? `S` : `never`
 
-Defined in: [src/functional/optional.mts:86](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L86)
+Defined in: [src/functional/optional.mts:85](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L85)
 
 Extracts the value type `S` from an [Optional.Some](#some)<S>.
 If the [Optional](../README.md#optional) is [Optional.None](#none), resolves to `never`.
@@ -111,7 +111,7 @@ The [Optional.Base](#base) type to unwrap.
 
 > `const` **expectToBe**: `ExpectToBeFnOverload`
 
-Defined in: [src/functional/optional.mts:583](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L583)
+Defined in: [src/functional/optional.mts:589](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L589)
 
 Unwraps an `Optional`, returning the contained value or throwing an error with the provided message.
 
@@ -155,7 +155,7 @@ console.log(value2); // 42
 
 > `const` **filter**: `FilterFnOverload`
 
-Defined in: [src/functional/optional.mts:528](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L528)
+Defined in: [src/functional/optional.mts:533](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L533)
 
 Filters an `Optional` based on a predicate.
 If the `Optional` is `Some` and the predicate returns true, returns the original `Optional`.
@@ -197,7 +197,7 @@ console.log(Optional.unwrap(result)); // 4
 
 > `const` **flatMap**: `FlatMapFnOverload`
 
-Defined in: [src/functional/optional.mts:477](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L477)
+Defined in: [src/functional/optional.mts:481](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L481)
 
 Applies a function that returns an `Optional` to the value in an `Optional.Some`.
 If the input is `Optional.None`, returns `Optional.None`.
@@ -247,7 +247,7 @@ console.log(Optional.unwrap(result2)); // 42
 
 > `const` **map**: `MapFnOverload`
 
-Defined in: [src/functional/optional.mts:422](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L422)
+Defined in: [src/functional/optional.mts:425](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L425)
 
 Maps an [Optional](../README.md#optional)<S> to [Optional](../README.md#optional)<S2> by applying a function to a contained value.
 If the [Optional](../README.md#optional) is [Optional.None](#none), it returns [Optional.none](#none-1).
@@ -303,7 +303,7 @@ console.log(Optional.unwrap(result2)); // 10
 
 > `const` **none**: [`None`](#none)
 
-Defined in: [src/functional/optional.mts:133](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L133)
+Defined in: [src/functional/optional.mts:132](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L132)
 
 The singleton instance representing [Optional.None](#none) (an empty Optional).
 
@@ -323,7 +323,7 @@ console.log(Optional.unwrapOr(emptyValue, 'default')); // "default"
 
 > `const` **orElse**: `OrElseFnOverload`
 
-Defined in: [src/functional/optional.mts:355](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L355)
+Defined in: [src/functional/optional.mts:357](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L357)
 
 Returns the `Optional` if it is `Some`, otherwise returns the alternative.
 
@@ -431,7 +431,7 @@ if (unwrapped !== undefined) {
 
 > `const` **unwrapOr**: `UnwrapOrFnOverload`
 
-Defined in: [src/functional/optional.mts:282](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L282)
+Defined in: [src/functional/optional.mts:283](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L283)
 
 Unwraps an `Optional`, returning the contained value or a default value if it's `Optional.None`.
 
@@ -493,7 +493,7 @@ const processValue = (input: string) =>
 
 > **fromNullable**\<`T`\>(`value`): [`Optional`](../README.md#optional)\<`NonNullable`\<`T`\>\>
 
-Defined in: [src/functional/optional.mts:687](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L687)
+Defined in: [src/functional/optional.mts:693](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L693)
 
 Converts a nullable value to an `Optional`.
 
@@ -567,7 +567,7 @@ const processNullableInput = (input: string | null) =>
 
 > **isNone**\<`O`\>(`optional`): `optional is NarrowToNone<O>`
 
-Defined in: [src/functional/optional.mts:153](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L153)
+Defined in: [src/functional/optional.mts:152](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L152)
 
 Checks if an [Optional](../README.md#optional) is [Optional.None](#none).
 Acts as a type guard.
@@ -600,7 +600,7 @@ The [Optional](../README.md#optional) to check.
 
 > **isOptional**(`maybeOptional`): `maybeOptional is Optional<unknown>`
 
-Defined in: [src/functional/optional.mts:55](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L55)
+Defined in: [src/functional/optional.mts:54](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L54)
 
 Checks if the given value is an [Optional](../README.md#optional).
 
@@ -624,7 +624,7 @@ The value to check.
 
 > **isSome**\<`O`\>(`optional`): `optional is NarrowToSome<O>`
 
-Defined in: [src/functional/optional.mts:142](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L142)
+Defined in: [src/functional/optional.mts:141](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L141)
 
 Checks if an [Optional](../README.md#optional) is [Optional.Some](#some).
 Acts as a type guard.
@@ -657,7 +657,7 @@ The [Optional](../README.md#optional) to check.
 
 > **some**\<`S`\>(`value`): [`Some`](#some)\<`S`\>
 
-Defined in: [src/functional/optional.mts:117](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L117)
+Defined in: [src/functional/optional.mts:116](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L116)
 
 Creates an [Optional.Some](#some) containing the given value.
 
@@ -700,7 +700,7 @@ console.log(Optional.unwrap(someValue)); // 42
 
 > **toNullable**\<`O`\>(`optional`): `undefined` \| [`Unwrap`](#unwrap)\<`O`\>
 
-Defined in: [src/functional/optional.mts:737](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L737)
+Defined in: [src/functional/optional.mts:743](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L743)
 
 Converts an `Optional` to a nullable value.
 
@@ -773,7 +773,7 @@ if (userName !== undefined) {
 
 > **unwrapThrow**\<`O`\>(`optional`): [`Unwrap`](#unwrap)\<`O`\>
 
-Defined in: [src/functional/optional.mts:190](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L190)
+Defined in: [src/functional/optional.mts:189](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L189)
 
 Unwraps an `Optional`, returning the contained value.
 Throws an error if the `Optional` is `Optional.None`.
@@ -836,7 +836,7 @@ try {
 
 > **zip**\<`A`, `B`\>(`optionalA`, `optionalB`): [`Optional`](../README.md#optional)\<readonly \[`A`, `B`\]\>
 
-Defined in: [src/functional/optional.mts:632](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L632)
+Defined in: [src/functional/optional.mts:638](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L638)
 
 Combines two `Optional` values into a single `Optional` containing a tuple.
 If either `Optional` is `None`, returns `None`.

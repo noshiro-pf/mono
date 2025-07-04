@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
 /**
  * A collection of type-safe object utility functions providing functional programming patterns
  * for object manipulation, including pick, omit, shallow equality checks, and more.
@@ -114,7 +113,8 @@ export namespace Obj {
    * const visible = pickVisible(partialUser); // { name: "Alice" } (age omitted)
    * ```
    */
-  export const pick: PickFnOverload = (<
+  export const pick: // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  PickFnOverload = (<
     const R extends UnknownRecord,
     const Keys extends readonly (keyof R)[],
   >(
@@ -129,15 +129,22 @@ export namespace Obj {
         const [record, keys] = args;
         const keysSet = new Set<keyof R>(keys);
 
-        return Object.fromEntries(
-          Object.entries(record).filter(([k, _v]) => keysSet.has(k)),
-        ) as never;
+        return (
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          Object.fromEntries(
+            Object.entries(record).filter(([k, _v]) => keysSet.has(k)),
+          ) as never
+        );
       }
 
       case 1: {
         const [keys] = args;
         return <R2 extends UnknownRecord>(record: R2) =>
-          pick(record, keys as readonly (keyof R2)[]);
+          pick(
+            record,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            keys as readonly (keyof R2)[],
+          );
       }
     }
   }) as PickFnOverload;
@@ -229,7 +236,8 @@ export namespace Obj {
    * const cleaned = omitCredentials(partialUser); // { id: 1, name: "Alice" }
    * ```
    */
-  export const omit: OmitFnOverload = (<
+  export const omit: // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  OmitFnOverload = (<
     const R extends UnknownRecord,
     const Keys extends readonly (keyof R)[],
   >(
@@ -244,18 +252,24 @@ export namespace Obj {
         const [record, keys] = args;
         const keysSet = new Set<keyof R>(keys);
 
-        return Object.fromEntries(
-          Object.entries(record).filter(([k, _v]) => !keysSet.has(k)),
-        ) as never;
+        return (
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          Object.fromEntries(
+            Object.entries(record).filter(([k, _v]) => !keysSet.has(k)),
+          ) as never
+        );
       }
 
       case 1: {
         const [keys] = args;
-        return <R2 extends UnknownRecord>(record: R2) =>
-          omit(record, keys as readonly (keyof R2)[]) as Omit<
+        return <R2 extends UnknownRecord>(record: R2) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          const result = omit(record, keys as readonly (keyof R2)[]) as Omit<
             R2,
             ArrayElement<Keys>
           >;
+          return result;
+        };
       }
     }
   }) as OmitFnOverload;
@@ -366,7 +380,9 @@ export namespace Obj {
           TsDataForgeInternals.KeysOfEntries<Entries>,
           TsDataForgeInternals.ValuesOfEntries<Entries>
         >
-      > => Object.fromEntries(entries) as never;
+      > =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    Object.fromEntries(entries) as never;
 
   /**
    * @internal

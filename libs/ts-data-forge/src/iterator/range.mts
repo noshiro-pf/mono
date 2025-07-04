@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion, func-names */
 import { SafeInt, asSafeInt } from '../number/index.mjs';
 
 /**
@@ -91,6 +90,7 @@ import { SafeInt, asSafeInt } from '../number/index.mjs';
  * }
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 export const range: RangeFnOverload = function* (
   start: SafeIntWithSmallInt,
   end: SafeIntWithSmallInt,

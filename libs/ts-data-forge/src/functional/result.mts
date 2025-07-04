@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
 import { isRecord } from '../guard/index.mjs';
 import { unknownToString } from '../others/index.mjs';
 import { Optional } from './optional.mjs';
@@ -337,9 +336,11 @@ export namespace Result {
     toStr: (e: UnwrapErr<R>) => string = toStr_,
   ): UnwrapOk<R> => {
     if (isErr(result)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       throw new Error(toStr(result.value as UnwrapErr<R>));
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     return result.value as UnwrapOk<R>;
   };
 
@@ -383,7 +384,8 @@ export namespace Result {
   ): UnwrapOk<R> | undefined =>
     isErr(result)
       ? undefined
-      : (result.value as UnwrapOk<R>)) as UnwrapOkFnOverload;
+      : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        (result.value as UnwrapOk<R>)) as UnwrapOkFnOverload;
 
   type UnwrapOkFnOverload = {
     <R extends Ok<unknown>>(result: R): UnwrapOk<R>;
@@ -422,6 +424,7 @@ export namespace Result {
       case 2: {
         // Direct version: first argument is result
         const [result, defaultValue] = args;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         return isErr(result) ? defaultValue : (result.value as UnwrapOk<R>);
       }
 
@@ -492,10 +495,12 @@ export namespace Result {
   ): UnwrapErr<R> => {
     if (isOk(result)) {
       throw new Error(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         `Expected Err but got Ok: ${toStr(result.value as UnwrapOk<R>)}`,
       );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     return result.value as UnwrapErr<R>;
   };
 
@@ -549,6 +554,7 @@ export namespace Result {
   export const unwrapErr = <R extends Base>(
     result: R,
   ): UnwrapErr<R> | undefined =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     isErr(result) ? (result.value as UnwrapErr<R>) : undefined;
 
   /**
@@ -581,6 +587,7 @@ export namespace Result {
       case 2: {
         // Direct version: first argument is result
         const [result, defaultValue] = args;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         return isErr(result) ? (result.value as UnwrapErr<R>) : defaultValue;
       }
 
@@ -621,6 +628,7 @@ export namespace Result {
    * console.log(Result.unwrap(result2)); // 10
    * ```
    */
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   export const map: MapFnOverload = (<R extends Base, S2>(
     ...args:
       | readonly [result: R, mapFn: (value: UnwrapOk<R>) => S2]
@@ -630,8 +638,10 @@ export namespace Result {
       case 2: {
         const [result, mapFn] = args;
         return isErr(result)
-          ? (result as Err<UnwrapErr<R>>)
-          : ok(mapFn(result.value as UnwrapOk<R>));
+          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            (result as Err<UnwrapErr<R>>)
+          : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            ok(mapFn(result.value as UnwrapOk<R>));
       }
 
       case 1: {
@@ -675,6 +685,7 @@ export namespace Result {
    * console.log(Result.unwrapErr(result2)); // "ERROR"
    * ```
    */
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   export const mapErr: MapErrFnOverload = (<R extends Base, E2>(
     ...args:
       | readonly [result: R, mapFn: (error: UnwrapErr<R>) => E2]
@@ -684,8 +695,10 @@ export namespace Result {
       case 2: {
         const [result, mapFn] = args;
         return isOk(result)
-          ? (result as Ok<UnwrapOk<R>>)
-          : err(mapFn(result.value as UnwrapErr<R>));
+          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            (result as Ok<UnwrapOk<R>>)
+          : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            err(mapFn(result.value as UnwrapErr<R>));
       }
 
       case 1: {
@@ -730,6 +743,7 @@ export namespace Result {
    * console.log(Result.unwrapOk(result2)); // 84
    * ```
    */
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   export const fold: FoldFnOverload = (<R extends Base, S2, E2>(
     ...args:
       | readonly [
@@ -748,8 +762,10 @@ export namespace Result {
       case 3: {
         const [result, mapFn, mapErrFn] = args;
         return isOk(result)
-          ? ok(mapFn(result.value as UnwrapOk<R>))
-          : err(mapErrFn(result.value as UnwrapErr<R>));
+          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            ok(mapFn(result.value as UnwrapOk<R>))
+          : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            err(mapErrFn(result.value as UnwrapErr<R>));
       }
 
       case 2: {
@@ -799,6 +815,7 @@ export namespace Result {
    * console.log(Result.unwrapOk(result2)); // 5
    * ```
    */
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   export const flatMap: FlatMapFnOverload = (<R extends Base, S2, E2>(
     ...args:
       | readonly [result: R, flatMapFn: (value: UnwrapOk<R>) => Result<S2, E2>]
@@ -810,8 +827,10 @@ export namespace Result {
       case 2: {
         const [result, flatMapFn] = args;
         return isErr(result)
-          ? (result as Err<UnwrapErr<R>>)
-          : flatMapFn(result.value as UnwrapOk<R>);
+          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            (result as Err<UnwrapErr<R>>)
+          : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            flatMapFn(result.value as UnwrapOk<R>);
       }
 
       case 1: {
@@ -854,6 +873,7 @@ export namespace Result {
    * console.log(value2); // 42
    * ```
    */
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   export const expectToBe: ExpectToBeFnOverload = (<R extends Base>(
     ...args: readonly [result: R, message: string] | readonly [message: string]
   ): UnwrapOk<R> | (<E>(result: Result<UnwrapOk<R>, E>) => UnwrapOk<R>) => {
@@ -906,6 +926,7 @@ export namespace Result {
   export const fromPromise = <P extends Promise<unknown>>(
     promise: P,
   ): Promise<Result<UnwrapPromise<P>, unknown>> =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     promise.then((v) => ok(v) as Ok<UnwrapPromise<P>>).catch(err);
 
   /**
@@ -999,6 +1020,7 @@ export namespace Result {
   export const swap = <R extends Base>(
     result: R,
   ): Result<UnwrapErr<R>, UnwrapOk<R>> =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     isOk(result) ? err(unwrapOk(result)) : ok(result.value as UnwrapErr<R>);
 
   /**

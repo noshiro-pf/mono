@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
 import { isRecord } from '../guard/index.mjs';
 import { pipe } from './pipe.mjs';
 
@@ -189,6 +188,7 @@ export namespace Optional {
    */
   export const unwrapThrow = <O extends Base>(optional: O): Unwrap<O> => {
     if (isSome(optional)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       return optional.value as Unwrap<O>;
     }
 
@@ -229,7 +229,8 @@ export namespace Optional {
   ): Unwrap<O> | undefined =>
     isNone(optional)
       ? undefined
-      : ((optional as NarrowToSome<O>).value as Unwrap<O>)) as UnwrapFnOverload;
+      : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        ((optional as NarrowToSome<O>).value as Unwrap<O>)) as UnwrapFnOverload;
 
   type UnwrapFnOverload = {
     <O extends Some<unknown>>(optional: O): Unwrap<O>;
@@ -289,7 +290,8 @@ export namespace Optional {
         const [optional, defaultValue] = args;
         return isNone(optional)
           ? defaultValue
-          : ((optional as NarrowToSome<O>).value as Unwrap<O>);
+          : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            ((optional as NarrowToSome<O>).value as Unwrap<O>);
       }
 
       case 1: {
@@ -419,6 +421,7 @@ export namespace Optional {
    * console.log(Optional.unwrap(result2)); // 10
    * ```
    */
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   export const map: MapFnOverload = (<O extends Base, S2>(
     ...args:
       | readonly [optional: O, mapFn: (value: Unwrap<O>) => S2]
@@ -474,6 +477,7 @@ export namespace Optional {
    * console.log(Optional.unwrap(result2)); // 42
    * ```
    */
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   export const flatMap: FlatMapFnOverload = (<O extends Base, S2>(
     ...args:
       | readonly [optional: O, flatMapFn: (value: Unwrap<O>) => Optional<S2>]
@@ -525,6 +529,7 @@ export namespace Optional {
    * console.log(Optional.unwrap(result)); // 4
    * ```
    */
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   export const filter: FilterFnOverload = (<O extends Base>(
     ...args:
       | readonly [optional: O, predicate: (value: Unwrap<O>) => boolean]
@@ -580,6 +585,7 @@ export namespace Optional {
    * console.log(value2); // 42
    * ```
    */
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   export const expectToBe: ExpectToBeFnOverload = (<O extends Base>(
     ...args:
       | readonly [optional: O, message: string]

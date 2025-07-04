@@ -18,7 +18,7 @@ for better composition with pipe operations.
 
 > `const` **omit**: `OmitFnOverload`
 
-Defined in: [src/object/object.mts:232](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/object/object.mts#L232)
+Defined in: [src/object/object.mts:239](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/object/object.mts#L239)
 
 Creates a new record that excludes the specified keys from the source record.
 This function supports both direct usage and curried form for functional composition.
@@ -111,7 +111,7 @@ const cleaned = omitCredentials(partialUser); // { id: 1, name: "Alice" }
 
 > `const` **pick**: `PickFnOverload`
 
-Defined in: [src/object/object.mts:117](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/object/object.mts#L117)
+Defined in: [src/object/object.mts:116](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/object/object.mts#L116)
 
 Creates a new record that contains only the specified keys from the source record.
 This function supports both direct usage and curried form for functional composition.
@@ -190,7 +190,7 @@ const visible = pickVisible(partialUser); // { name: "Alice" } (age omitted)
 
 > **fromEntries**\<`Entries`\>(`entries`): `IsFixedLengthList`\<`Entries`\> _extends_ `true` ? `Readonly`\<`EntriesToObjectImpl`\<\{ \}, `Entries`\>\> : `PartialIfKeyIsUnion`\<`TypeEq`\<`Entries`\[`"length"`\], `0`\> _extends_ `true` ? `never` : `TypeEq`\<`Tail`\<`Entries`\>\[`"length"`\], `0`\> _extends_ `true` ? `Entries`\[`0`\]\[`0`\] : `TypeEq`\<`Tail`\<`Tail`\<`Entries`\>\>\[`"length"`\], `0`\> _extends_ `true` ? `Entries`\[`0`\]\[`0`\] \| `Tail`\<`Entries`\>\[`0`\]\[`0`\] : `TypeEq`\<`Tail`\<`Tail`\<`Tail`\<...\>\>\>\[`"length"`\], `0`\> _extends_ `true` ? `Entries`\[`0`\]\[`0`\] \| `Tail`\<`Entries`\>\[`0`\]\[`0`\] \| `Tail`\<`Tail`\<...\>\>\[`0`\]\[`0`\] : `TypeEq`\<`Tail`\<`Tail`\<...\>\>\[`"length"`\], `0`\> _extends_ `true` ? `Entries`\[`0`\]\[`0`\] \| `Tail`\<...\>\[`0`\]\[`0`\] \| `Tail`\<...\>\[`0`\]\[`0`\] \| `Tail`\<...\>\[`0`\]\[`0`\] : `TypeEq`\<`Tail`\<...\>\[`"length"`\], `0`\> _extends_ `true` ? ...\[...\]\[`0`\] \| ...\[...\]\[`0`\] \| ...\[...\]\[`0`\] \| ...\[...\]\[`0`\] \| ...\[...\]\[`0`\] : `TypeEq`\<...\[...\], `0`\> _extends_ `true` ? ...\[...\] \| ...\[...\] \| ...\[...\] \| ...\[...\] \| ...\[...\] \| ...\[...\] : `TypeEq`\<..., ...\> _extends_ `true` ? ... \| ... \| ... \| ... \| ... \| ... \| ... : ... _extends_ ... ? ... : ..., `Record`\<`TypeEq`\<`Entries`\[`"length"`\], `0`\> _extends_ `true` ? `never` : `TypeEq`\<`Tail`\<`Entries`\>\[`"length"`\], `0`\> _extends_ `true` ? `Entries`\[`0`\]\[`0`\] : `TypeEq`\<`Tail`\<`Tail`\<`Entries`\>\>\[`"length"`\], `0`\> _extends_ `true` ? `Entries`\[`0`\]\[`0`\] \| `Tail`\<`Entries`\>\[`0`\]\[`0`\] : `TypeEq`\<`Tail`\<`Tail`\<...\>\>\[`"length"`\], `0`\> _extends_ `true` ? `Entries`\[`0`\]\[`0`\] \| `Tail`\<...\>\[`0`\]\[`0`\] \| `Tail`\<...\>\[`0`\]\[`0`\] : `TypeEq`\<`Tail`\<...\>\[`"length"`\], `0`\> _extends_ `true` ? ...\[...\]\[`0`\] \| ...\[...\]\[`0`\] \| ...\[...\]\[`0`\] \| ...\[...\]\[`0`\] : `TypeEq`\<...\[...\], `0`\> _extends_ `true` ? ...\[...\] \| ...\[...\] \| ...\[...\] \| ...\[...\] \| ...\[...\] : `TypeEq`\<..., ...\> _extends_ `true` ? ... \| ... \| ... \| ... \| ... \| ... : ... _extends_ ... ? ... : ..., `TypeEq`\<`Entries`\[`"length"`\], `0`\> _extends_ `true` ? `never` : `TypeEq`\<`Tail`\<`Entries`\>\[`"length"`\], `0`\> _extends_ `true` ? `Entries`\[`0`\]\[`1`\] : `TypeEq`\<`Tail`\<`Tail`\<`Entries`\>\>\[`"length"`\], `0`\> _extends_ `true` ? `Entries`\[`0`\]\[`1`\] \| `Tail`\<`Entries`\>\[`0`\]\[`1`\] : `TypeEq`\<`Tail`\<`Tail`\<...\>\>\[`"length"`\], `0`\> _extends_ `true` ? `Entries`\[`0`\]\[`1`\] \| `Tail`\<...\>\[`0`\]\[`1`\] \| `Tail`\<...\>\[`0`\]\[`1`\] : `TypeEq`\<`Tail`\<...\>\[`"length"`\], `0`\> _extends_ `true` ? ...\[...\]\[`1`\] \| ...\[...\]\[`1`\] \| ...\[...\]\[`1`\] \| ...\[...\]\[`1`\] : `TypeEq`\<...\[...\], `0`\> _extends_ `true` ? ...\[...\] \| ...\[...\] \| ...\[...\] \| ...\[...\] \| ...\[...\] : `TypeEq`\<..., ...\> _extends_ `true` ? ... \| ... \| ... \| ... \| ... \| ... : ... _extends_ ... ? ... : ...\>\>
 
-Defined in: [src/object/object.mts:357](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/object/object.mts#L357)
+Defined in: [src/object/object.mts:371](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/object/object.mts#L371)
 
 Creates an object from an array of key-value pairs with precise TypeScript typing.
 This is a type-safe wrapper around `Object.fromEntries` that provides better type inference
@@ -302,7 +302,7 @@ function createUserFromEntries(
 
 > **shallowEq**(`a`, `b`, `eq`): `boolean`
 
-Defined in: [src/object/object.mts:45](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/object/object.mts#L45)
+Defined in: [src/object/object.mts:44](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/object/object.mts#L44)
 
 Performs a shallow equality check on two records using a configurable equality function.
 Verifies that both records have the same number of entries and that for every key in the first record,

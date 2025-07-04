@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { memoizeFunction } from './memoize-function.mjs';
 
 describe('memoizeFunction', () => {
@@ -37,10 +36,12 @@ describe('memoizeFunction', () => {
     const mockFn = vi.fn((_x: number) => undefined);
     const memoized = memoizeFunction(mockFn, (x) => x);
 
+    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
     expect(memoized(5)).toBe(undefined);
     expect(mockFn).toHaveBeenCalledTimes(1);
 
     // Should use cache even for undefined
+    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
     expect(memoized(5)).toBe(undefined);
     expect(mockFn).toHaveBeenCalledTimes(1);
   });

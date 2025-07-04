@@ -16,7 +16,7 @@
 
 > **Optional**\<`S`\> = `None_` \| `Some_`\<`S`\>
 
-Defined in: [src/functional/optional.mts:43](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L43)
+Defined in: [src/functional/optional.mts:42](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L42)
 
 Represents an optional value that can either be 'Some' (containing a value) or 'None' (empty).
 

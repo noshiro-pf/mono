@@ -190,7 +190,7 @@ export default tseslint.config(
       eqeqeq: ['error', 'always', { null: 'ignore' }],
       'for-direction': 'error',
       'func-name-matching': 'error',
-      'func-names': 'error',
+      'func-names': ['error', 'as-needed', { generators: 'never' }],
       'func-style': 'off',
       'grouped-accessor-pairs': 'error',
       'guard-for-in': 'error',

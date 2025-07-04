@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { expectType } from '../expect-type.mjs';
 import { Optional } from './optional.mjs';
 import { pipe } from './pipe.mjs';
@@ -55,6 +54,7 @@ describe('Optional', () => {
     test('should be a singleton None value', () => {
       expect(Optional.isNone(Optional.none)).toBe(true);
       expect(Optional.isSome(Optional.none)).toBe(false);
+      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       expect(Optional.unwrapOr(Optional.none, undefined)).toBe(undefined);
     });
 
@@ -162,6 +162,7 @@ describe('Optional', () => {
     });
 
     test('should return undefined for None', () => {
+      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       expect(Optional.unwrapOr(Optional.none, undefined)).toBe(undefined);
     });
 
@@ -170,6 +171,7 @@ describe('Optional', () => {
       expectTypeOf(Optional.unwrap(someNumber)).toExtend<number | undefined>();
 
       const none = Optional.none;
+      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       expectTypeOf(Optional.unwrapOr(none, undefined)).toExtend<undefined>();
     });
   });
@@ -581,6 +583,7 @@ describe('Optional', () => {
     });
 
     test('should convert None to null', () => {
+      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       expect(Optional.toNullable(Optional.none)).toBe(undefined);
     });
 
@@ -594,8 +597,8 @@ describe('Optional', () => {
     test('should handle undefined as a Some value', () => {
       const someUndefined = Optional.some(undefined);
       expect(Optional.isSome(someUndefined)).toBe(true);
-      const unwrappedUndefined = Optional.unwrap(someUndefined);
-      expect(unwrappedUndefined).toBe(undefined);
+      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+      expect(Optional.unwrap(someUndefined)).toBe(undefined);
 
       // This is different from None
       expect(someUndefined).not.toBe(Optional.none);
