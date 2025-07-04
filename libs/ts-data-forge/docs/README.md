@@ -77,3 +77,5 @@
 - [others/memoize-function](others/memoize-function.md)
 - [others/tuple](others/tuple.md)
 - [others/unknown-to-string](others/unknown-to-string.md)
+- [promise](promise.md)
+- [promise/promise](promise/promise.md)
