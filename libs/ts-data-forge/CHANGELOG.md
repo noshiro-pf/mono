@@ -1,3 +1,9 @@
+# [1.3.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.2.0...v1.3.0) (2025-07-04)
+
+### Features
+
+- add createPromise function ([#44](https://github.com/noshiro-pf/ts-data-forge/issues/44)) ([ff5bf16](https://github.com/noshiro-pf/ts-data-forge/commit/ff5bf167dbf2eba36c7bd6261b039bca5a5f4ce3))
+
 # [1.2.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.1.0...v1.2.0) (2025-06-25)
 
 ### Features
