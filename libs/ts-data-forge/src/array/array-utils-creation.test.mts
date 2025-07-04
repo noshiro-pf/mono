@@ -433,6 +433,102 @@ describe('Arr creations', () => {
     });
   });
 
+  describe('generate', () => {
+    test('basic generator usage', () => {
+      const result = Arr.generate<number>(function* () {
+        yield 1;
+        yield 2;
+        yield 3;
+      });
+
+      expectType<typeof result, readonly number[]>('=');
+      expect(result).toStrictEqual([1, 2, 3]);
+    });
+
+    test('generator with yield*', () => {
+      const result = Arr.generate<number>(function* () {
+        yield 1;
+        yield* [2, 3];
+        yield 4;
+      });
+
+      expectType<typeof result, readonly number[]>('=');
+      expect(result).toStrictEqual([1, 2, 3, 4]);
+    });
+
+    test('empty generator', () => {
+      const result = Arr.generate<string>(function* () {
+        // No yields
+      });
+
+      expectType<typeof result, readonly string[]>('=');
+      expect(result).toStrictEqual([]);
+    });
+
+    test('generator with conditional logic', () => {
+      const condition = true as boolean; // Simulating a condition
+      const result = Arr.generate<number>(function* () {
+        yield 1;
+        if (condition) {
+          yield 2;
+        }
+        yield 3;
+      });
+
+      expectType<typeof result, readonly number[]>('=');
+      expect(result).toStrictEqual([1, 2, 3]);
+    });
+
+    test('generator with early return', () => {
+      const condition = true as boolean; // Simulating a condition
+      const result = Arr.generate<number>(function* () {
+        yield 1;
+        if (condition) {
+          return; // Early return is OK
+        }
+        yield 2; // This won't be reached
+      });
+
+      expectType<typeof result, readonly number[]>('=');
+      expect(result).toStrictEqual([1]);
+    });
+
+    test('generator with complex data types', () => {
+      const result = Arr.generate<{ id: number; name: string }>(function* () {
+        yield { id: 1, name: 'Alice' };
+        yield { id: 2, name: 'Bob' };
+      });
+
+      expectType<typeof result, readonly { id: number; name: string }[]>('=');
+      expect(result).toStrictEqual([
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' },
+      ]);
+    });
+
+    test('generator with different types', () => {
+      const result = Arr.generate<string | number>(function* () {
+        yield 'hello';
+        yield 42;
+        yield 'world';
+      });
+
+      expectType<typeof result, readonly (string | number)[]>('=');
+      expect(result).toStrictEqual(['hello', 42, 'world']);
+    });
+
+    test('generator with loops', () => {
+      const result = Arr.generate<number>(function* () {
+        for (let i = 0; i < 3; i++) {
+          yield i;
+        }
+      });
+
+      expectType<typeof result, readonly number[]>('=');
+      expect(result).toStrictEqual([0, 1, 2]);
+    });
+  });
+
   describe('size/length', () => {
     test('length should be alias for size', () => {
       const array = [1, 2, 3];

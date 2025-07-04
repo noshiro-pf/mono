@@ -583,6 +583,41 @@ export namespace Arr {
   export const newArray = create;
 
   /**
+   * Creates an array from a generator function.
+   *
+   * This utility function provides enhanced type safety by constraining the generator function
+   * to prevent incorrect return values. The generator can only yield values of type T and
+   * must return void, which helps catch common mistakes like returning values instead of yielding.
+   *
+   * @template T - The type of elements in the generated array
+   * @param generatorFn - A function that returns a generator yielding elements of type T
+   * @returns A readonly array containing all yielded values from the generator
+   *
+   * @example
+   * ```typescript
+   * const nums:readonly number[] = Arr.generate<number>(function* () {
+   *   yield 1;
+   *   yield* [2, 3];
+   * });
+   *
+   * assert.deepStrictEqual(nums, [1, 2, 3]);
+   *
+   * // Type safety - prevents incorrect returns:
+   * const nums2 = Arr.generate<number>(function* () {
+   *   yield 1;
+   *   if (someCondition) {
+   *     return; // OK - returning is allowed, but must be void
+   *   }
+   *   yield* [2, 3];
+   *   // return 1; // NG - TypeScript error, cannot return T
+   * });
+   * ```
+   */
+  export const generate = <T,>(
+    generatorFn: () => Generator<T, void, unknown>,
+  ): readonly T[] => Array.from(generatorFn());
+
+  /**
    * Creates a shallow copy of an array, preserving the exact type signature.
    *
    * This function creates a new array with the same elements as the input, but with a new array reference.
