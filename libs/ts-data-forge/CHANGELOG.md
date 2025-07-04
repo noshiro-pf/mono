@@ -1,3 +1,9 @@
+# [1.5.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.4.0...v1.5.0) (2025-07-04)
+
+### Features
+
+- use NonZeroNumber in divInt divisor ([#47](https://github.com/noshiro-pf/ts-data-forge/issues/47)) ([b1fc2db](https://github.com/noshiro-pf/ts-data-forge/commit/b1fc2db061b911d6ec94565c2af59a66a327a9ef))
+
 # [1.4.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.3.0...v1.4.0) (2025-07-04)
 
 ### Features
