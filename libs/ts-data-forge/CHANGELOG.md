@@ -1,3 +1,9 @@
+## [1.5.1](https://github.com/noshiro-pf/ts-data-forge/compare/v1.5.0...v1.5.1) (2025-07-04)
+
+### Bug Fixes
+
+- reduce JSDoc examples ([#48](https://github.com/noshiro-pf/ts-data-forge/issues/48)) ([9a8b301](https://github.com/noshiro-pf/ts-data-forge/commit/9a8b3017525ee75760eb9f0e86b488688451eb57))
+
 # [1.5.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.4.0...v1.5.0) (2025-07-04)
 
 ### Features
