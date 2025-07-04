@@ -1,5 +1,6 @@
 import { expectType } from '../expect-type.mjs';
 import { pipe } from '../functional/index.mjs';
+import { asNonZeroFiniteNumber } from './index.mjs';
 import { Num } from './num.mjs';
 
 const testClamp = (
@@ -176,7 +177,7 @@ describe('Num', () => {
       expect(Num.divInt(10, 3)).toBe(3);
       expect(Num.divInt(7, 2)).toBe(3);
       expect(Num.divInt(-7, 2)).toBe(-4); // floor division
-      expect(Num.divInt(10.7, 3.2)).toBe(3); // floors both operands
+      expect(Num.divInt(10.7, asNonZeroFiniteNumber(3.2))).toBe(3); // floors both operands
     });
   });
 

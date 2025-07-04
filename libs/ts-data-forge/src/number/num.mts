@@ -416,8 +416,10 @@ export namespace Num {
    * Num.divInt(10, 0);   // NaN
    * ```
    */
-  export const divInt = (a: number, b: number): number =>
-    Math.floor(Math.floor(a) / Math.floor(b));
+  export const divInt = (
+    a: number,
+    b: NonZeroNumber | SmallInt<'!=0'>,
+  ): number => Math.floor(Math.floor(a) / Math.floor(b));
 
   /**
    * Rounds a number to a specified number of decimal places.
