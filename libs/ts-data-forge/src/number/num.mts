@@ -41,10 +41,7 @@ export namespace Num {
    * @returns The numeric representation of `n`.
    * @example
    * ```typescript
-   * Num.from('123'); // 123
    * Num.from('123.45'); // 123.45
-   * Num.from(true); // 1
-   * Num.from(false); // 0
    * Num.from('hello'); // NaN
    * ```
    */
@@ -230,15 +227,6 @@ export namespace Num {
    *
    * @example
    * ```typescript
-   * // Array index validation
-   * const isValidIndex = Num.isUintInRange(0, 10);
-   * const index: number = getUserInput();
-   *
-   * if (isValidIndex(index)) {
-   *   // index is typed as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
-   *   const value = array[index]; // Safe array access
-   * }
-   *
    * // Custom range validation
    * const isValidPercentage = Num.isUintInRange(0, 101);
    * if (isValidPercentage(value)) {
@@ -269,19 +257,11 @@ export namespace Num {
    *
    * @example
    * ```typescript
-   * // Score validation (0-100)
    * const isValidScore = Num.isUintInRangeInclusive(0, 100);
    * const score: number = getTestScore();
-   *
    * if (isValidScore(score)) {
    *   // score is typed as 0 | 1 | 2 | ... | 100
    *   const grade = calculateGrade(score);
-   * }
-   *
-   * // Day of month validation
-   * const isValidDay = Num.isUintInRangeInclusive(1, 31);
-   * if (isValidDay(day)) {
-   *   // day is typed as 1 | 2 | ... | 31
    * }
    * ```
    */
@@ -298,37 +278,14 @@ export namespace Num {
    * - **Curried usage**: Pass bounds to get a reusable clamping function
    *
    * @example
-   * Direct usage:
    * ```typescript
+   * // Direct usage
    * Num.clamp(15, 0, 10); // 10 (clamped to upper bound)
-   * Num.clamp(-5, 0, 10); // 0 (clamped to lower bound)
    * Num.clamp(5, 0, 10);  // 5 (within bounds)
-   * Num.clamp(NaN, 0, 10); // 0 (invalid values default to lower bound)
-   * ```
    *
-   * @example
-   * Curried usage for reusable functions:
-   * ```typescript
+   * // Curried usage
    * const clampToPercent = Num.clamp(0, 100);
    * clampToPercent(150); // 100
-   * clampToPercent(-10); // 0
-   * clampToPercent(75);  // 75
-   *
-   * // Perfect for pipe composition
-   * const result = pipe(userInput)
-   *   .map(Number)
-   *   .map(clampToPercent).value;
-   * ```
-   *
-   * @example
-   * Working with arrays and functional programming:
-   * ```typescript
-   * const clampTo0_1 = Num.clamp(0, 1);
-   * const normalizedValues = values.map(clampTo0_1);
-   *
-   * // Temperature clamping
-   * const clampTemperature = Num.clamp(-40, 50);
-   * const safeTemperatures = readings.map(clampTemperature);
    * ```
    */
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -373,11 +330,7 @@ export namespace Num {
    *
    * @example
    * ```typescript
-   * // Safe division with literals
-   * const result1 = Num.div(10, 2); // 5
-   * const result2 = Num.div(7, 3); // 2.3333...
-   *
-   * // Compile-time error prevention
+   * const result = Num.div(10, 2); // 5
    * // Num.div(10, 0); // ❌ TypeScript error: Type '0' is not assignable
    *
    * // With type guards
@@ -411,9 +364,6 @@ export namespace Num {
    * ```typescript
    * Num.divInt(10, 3);   // 3
    * Num.divInt(10, -3);  // -4 (floor division)
-   * Num.divInt(-10, 3);  // -4
-   * Num.divInt(10.7, 3.2); // 3 (floors both inputs first)
-   * Num.divInt(10, 0);   // NaN
    * ```
    */
   export const divInt = (
@@ -434,10 +384,7 @@ export namespace Num {
    * @example
    * ```typescript
    * Num.roundAt(3.14159, 2);   // 3.14
-   * Num.roundAt(3.14159, 4);   // 3.1416
    * Num.roundAt(10.5, 0);      // 11
-   * Num.roundAt(-10.5, 0);     // -10
-   * Num.roundAt(0.005, 2);     // 0.01
    * ```
    */
   export const roundAt = (
@@ -463,9 +410,6 @@ export namespace Num {
    * ```typescript
    * Num.roundToInt(3.2);   // 3
    * Num.roundToInt(3.5);   // 4
-   * Num.roundToInt(3.8);   // 4
-   * Num.roundToInt(-3.2);  // -3
-   * Num.roundToInt(-3.8);  // -3
    * ```
    */
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -483,19 +427,9 @@ export namespace Num {
    *
    * @example
    * ```typescript
-   * // Create specialized rounding functions
    * const roundTo2 = Num.round(2);
-   * const roundTo4 = Num.round(4);
-   *
    * roundTo2(3.14159);  // 3.14
    * roundTo2(2.71828);  // 2.72
-   * roundTo2(10);       // 10
-   *
-   * roundTo4(3.14159);  // 3.1416
-   *
-   * // Use with array operations
-   * const values = [1.234, 5.678, 9.012];
-   * const rounded = values.map(roundTo2); // [1.23, 5.68, 9.01]
    * ```
    */
   export const round = (
@@ -519,20 +453,8 @@ export namespace Num {
    *
    * @example
    * ```typescript
-   * Num.mapNaN2Undefined(42);           // 42
-   * Num.mapNaN2Undefined(0);            // 0
-   * Num.mapNaN2Undefined(NaN);          // undefined
-   * Num.mapNaN2Undefined(Math.sqrt(-1)); // undefined
-   *
-   * // Useful in chains
-   * const result = Num.mapNaN2Undefined(parseFloat(userInput)) ?? 0;
-   *
-   * // Type narrowing
-   * const value = Math.sqrt(x);
-   * const safe = Num.mapNaN2Undefined(value);
-   * if (safe !== undefined) {
-   *   // safe is typed without NaN
-   * }
+   * Num.mapNaN2Undefined(42);   // 42
+   * Num.mapNaN2Undefined(NaN);  // undefined
    * ```
    */
   export const mapNaN2Undefined = <N extends number>(
@@ -558,15 +480,6 @@ export namespace Num {
    * ```typescript
    * const zero = 0 as 0;
    * const one = Num.increment(zero); // type is 1, value is 1
-   *
-   * const five = 5 as 5;
-   * const six = Num.increment(five); // type is 6, value is 6
-   *
-   * // Type-safe counter
-   * type Counter<N extends SmallUint> = {
-   *   value: N;
-   *   next(): Counter<Increment<N>>;
-   * };
    * ```
    */
   export const increment = <N extends SmallUint>(n: N): Increment<N> =>
@@ -588,16 +501,6 @@ export namespace Num {
    * ```typescript
    * const three = 3 as 3;
    * const two = Num.decrement(three); // type is 2, value is 2
-   *
-   * const one = 1 as 1;
-   * const zero = Num.decrement(one); // type is 0, value is 0
-   *
-   * // Type-safe countdown
-   * function countdown<N extends PositiveSmallInt>(
-   *   n: N
-   * ): N extends 1 ? 0 : Decrement<N> {
-   *   return Num.decrement(n);
-   * }
    * ```
    */
   export const decrement = <N extends PositiveSmallInt>(n: N): Decrement<N> =>

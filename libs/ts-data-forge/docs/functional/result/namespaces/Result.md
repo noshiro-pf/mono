@@ -138,7 +138,7 @@ The `Result.Base` type to unwrap.
 
 > `const` **expectToBe**: `ExpectToBeFnOverload`
 
-Defined in: [src/functional/result.mts:877](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L877)
+Defined in: [src/functional/result.mts:774](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L774)
 
 Unwraps a `Result`, returning the success value or throwing an error with the provided message.
 
@@ -165,15 +165,9 @@ Error with the provided message if the `Result` is `Result.Err`.
 #### Example
 
 ```typescript
-// Regular usage
 const result = Result.ok(42);
 const value = Result.expectToBe(result, 'Operation must succeed');
 console.log(value); // 42
-
-// Curried usage for pipe composition
-const mustBeOk = Result.expectToBe('Operation must succeed');
-const value2 = pipe(Result.ok(42)).map(mustBeOk).value;
-console.log(value2); // 42
 ```
 
 ---
@@ -182,7 +176,7 @@ console.log(value2); // 42
 
 > `const` **flatMap**: `FlatMapFnOverload`
 
-Defined in: [src/functional/result.mts:819](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L819)
+Defined in: [src/functional/result.mts:722](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L722)
 
 Applies a function that returns a `Result` to the success value of a `Result`.
 If the input is `Err`, returns the original `Err`.
@@ -215,17 +209,11 @@ The result of applying the function, or the original `Err`.
 #### Example
 
 ```typescript
-// Regular usage
 const divide = (a: number, b: number): Result<number, string> =>
     b === 0 ? Result.err('Division by zero') : Result.ok(a / b);
 
 const result = Result.flatMap(Result.ok(10), (x) => divide(x, 2));
 console.log(Result.unwrapOk(result)); // 5
-
-// Curried usage for pipe composition
-const divideBy2 = Result.flatMap((x: number) => divide(x, 2));
-const result2 = pipe(Result.ok(10)).map(divideBy2).value;
-console.log(Result.unwrapOk(result2)); // 5
 ```
 
 ---
@@ -234,7 +222,7 @@ console.log(Result.unwrapOk(result2)); // 5
 
 > `const` **fold**: `FoldFnOverload`
 
-Defined in: [src/functional/result.mts:747](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L747)
+Defined in: [src/functional/result.mts:656](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L656)
 
 Applies one of two functions depending on whether the `Result` is `Ok` or `Err`.
 
@@ -269,7 +257,6 @@ A new `Result<S2, E2>` based on the applied function.
 #### Example
 
 ```typescript
-// Regular usage
 const result = Result.ok(42);
 const folded = Result.fold(
     result,
@@ -277,14 +264,6 @@ const folded = Result.fold(
     () => 0,
 );
 console.log(Result.unwrapOk(folded)); // 84
-
-// Curried usage for pipe composition
-const folder = Result.fold(
-    (x: number) => x * 2,
-    () => 0,
-);
-const result2 = pipe(Result.ok(42)).map(folder).value;
-console.log(Result.unwrapOk(result2)); // 84
 ```
 
 ---
@@ -293,7 +272,7 @@ console.log(Result.unwrapOk(result2)); // 84
 
 > `const` **map**: `MapFnOverload`
 
-Defined in: [src/functional/result.mts:632](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L632)
+Defined in: [src/functional/result.mts:553](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L553)
 
 Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the success value.
 If the `Result` is `Result.Err`, returns the original `Err`.
@@ -338,7 +317,7 @@ console.log(Result.unwrap(result2)); // 10
 
 > `const` **mapErr**: `MapErrFnOverload`
 
-Defined in: [src/functional/result.mts:689](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L689)
+Defined in: [src/functional/result.mts:604](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L604)
 
 Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the error value.
 If the `Result` is `Result.Ok`, returns the original `Ok`.
@@ -366,15 +345,9 @@ A new `Result<UnwrapOk<R>, E2>`.
 #### Example
 
 ```typescript
-// Regular usage
 const result = Result.err('error');
 const mapped = Result.mapErr(result, (e) => e.toUpperCase());
 console.log(Result.unwrapErr(mapped)); // "ERROR"
-
-// Curried usage for pipe composition
-const errorUppercase = Result.mapErr((e: string) => e.toUpperCase());
-const result2 = pipe(Result.err('error')).map(errorUppercase).value;
-console.log(Result.unwrapErr(result2)); // "ERROR"
 ```
 
 ---
@@ -383,7 +356,7 @@ console.log(Result.unwrapErr(result2)); // "ERROR"
 
 > `const` **orElse**: `OrElseFnOverload`
 
-Defined in: [src/functional/result.mts:1100](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L1100)
+Defined in: [src/functional/result.mts:936](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L936)
 
 Returns the `Result` if it is `Ok`, otherwise returns the alternative.
 
@@ -406,16 +379,10 @@ The first `Result` if `Ok`, otherwise the alternative.
 #### Example
 
 ```typescript
-// Regular usage
 const primary = Result.err('error');
 const fallback = Result.ok('default');
 const result = Result.orElse(primary, fallback);
 console.log(Result.unwrapOk(result)); // "default"
-
-// Curried usage for pipe composition
-const fallbackTo = Result.orElse(Result.ok('fallback'));
-const result2 = pipe(Result.err('error')).map(fallbackTo).value;
-console.log(Result.unwrapOk(result2)); // "fallback"
 ```
 
 ---
@@ -424,7 +391,7 @@ console.log(Result.unwrapOk(result2)); // "fallback"
 
 > `const` **unwrapErrOr**: `UnwrapErrOrFnOverload`
 
-Defined in: [src/functional/result.mts:580](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L580)
+Defined in: [src/functional/result.mts:501](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L501)
 
 Unwraps a `Result`, returning the error value or a default value if it is `Result.Ok`.
 
@@ -451,15 +418,9 @@ The error value if `Result.Err`, otherwise `defaultValue`.
 #### Example
 
 ```typescript
-// Regular usage
 const result = Result.err('failed');
 const error = Result.unwrapErrOr(result, 'default');
 console.log(error); // "failed"
-
-// Curried usage for pipe composition
-const unwrapErrorWithDefault = Result.unwrapErrOr('unknown error');
-const error2 = pipe(Result.ok(42)).map(unwrapErrorWithDefault).value;
-console.log(error2); // "unknown error"
 ```
 
 ---
@@ -468,7 +429,7 @@ console.log(error2); // "unknown error"
 
 > `const` **unwrapOk**: `UnwrapOkFnOverload`
 
-Defined in: [src/functional/result.mts:382](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L382)
+Defined in: [src/functional/result.mts:362](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L362)
 
 Unwraps a `Result`, returning the success value or `undefined` if it's an error.
 
@@ -521,7 +482,7 @@ const processResult = (r: Result<number, string>) => {
 
 > `const` **unwrapOkOr**: `UnwrapOkOrFnOverload`
 
-Defined in: [src/functional/result.mts:417](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L417)
+Defined in: [src/functional/result.mts:391](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L391)
 
 Unwraps a `Result`, returning the success value or a default value if it is `Result.Err`.
 
@@ -548,15 +509,9 @@ The success value if `Result.Ok`, otherwise `defaultValue`.
 #### Example
 
 ```typescript
-// Regular usage
 const result = Result.ok(42);
 const value = Result.unwrapOkOr(result, 0);
 console.log(value); // 42
-
-// Curried usage for pipe composition
-const unwrapWithDefault = Result.unwrapOkOr(0);
-const value2 = pipe(Result.err('error')).map(unwrapWithDefault).value;
-console.log(value2); // 0
 ```
 
 ## Functions
@@ -632,7 +587,7 @@ const validationError = Result.err<ValidationError>({
 
 > **fromPromise**\<`P`\>(`promise`): `Promise`\<[`Result`](../README.md#result)\<`UnwrapPromise`\<`P`\>, `unknown`\>\>
 
-Defined in: [src/functional/result.mts:926](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L926)
+Defined in: [src/functional/result.mts:823](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L823)
 
 Converts a Promise into a Promise that resolves to a `Result`.
 If the input Promise resolves, the `Result` will be `Ok` with the resolved value.
@@ -666,7 +621,7 @@ A Promise that resolves to `Result<UnwrapPromise<P>, unknown>`.
 
 > **fromThrowable**\<`T`\>(`fn`): [`Result`](../README.md#result)\<`T`, `Error`\>
 
-Defined in: [src/functional/result.mts:991](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L991)
+Defined in: [src/functional/result.mts:855](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L855)
 
 Wraps a function that may throw an exception in a `Result`.
 
@@ -710,38 +665,6 @@ const validJson = parseJson<{ valid: boolean }>('{"valid": true}');
 if (Result.isOk(validJson)) {
     console.log(validJson.value.valid); // true
 }
-
-const invalidJson = parseJson('{invalid json}');
-if (Result.isErr(invalidJson)) {
-    console.log(invalidJson.value.message); // SyntaxError message
-}
-
-// Using with custom validation
-const parsePositiveNumber = (str: string): Result<number, Error> =>
-    Result.fromThrowable(() => {
-        const num = Number(str);
-        if (Number.isNaN(num)) throw new Error(`Not a number: ${str}`);
-        if (num <= 0) throw new Error(`Must be positive: ${num}`);
-        return num;
-    });
-
-const success = parsePositiveNumber('42');
-console.log(Result.unwrapOkOr(success, 0)); // 42
-
-const failure = parsePositiveNumber('abc');
-console.log(Result.unwrapOkOr(failure, 0)); // 0
-
-// Wrapping DOM operations that might fail
-const getElementText = (id: string): Result<string, Error> =>
-    Result.fromThrowable(() => {
-        const element = document.getElementById(id);
-        if (!element) throw new Error(`Element not found: ${id}`);
-        return element.textContent || '';
-    });
-
-// Wrapping file operations
-const readFileSync = (path: string): Result<string, Error> =>
-    Result.fromThrowable(() => require('fs').readFileSync(path, 'utf8'));
 ```
 
 ---
@@ -964,7 +887,7 @@ console.log(Result.unwrapOk(result)); // 5
 
 > **swap**\<`R`\>(`result`): [`Result`](../README.md#result)\<[`UnwrapErr`](#unwraperr)\<`R`\>, [`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-Defined in: [src/functional/result.mts:1020](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L1020)
+Defined in: [src/functional/result.mts:884](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L884)
 
 Swaps the success and error values of a `Result`.
 
@@ -1005,7 +928,7 @@ console.log(Result.unwrapErr(swapped)); // 42
 
 > **toOptional**\<`R`\>(`result`): [`Optional`](../../optional/README.md#optional)\<[`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-Defined in: [src/functional/result.mts:1075](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L1075)
+Defined in: [src/functional/result.mts:917](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L917)
 
 Converts a `Result` to an `Optional`.
 
@@ -1050,28 +973,6 @@ console.log(Optional.unwrap(optional)); // 42
 const errResult = Result.err('Network error');
 const none = Result.toOptional(errResult);
 console.log(Optional.isNone(none)); // true
-
-// Use case: when you only care about success, not error details
-const fetchUserName = (id: number): Result<string, ApiError> => {
-    // ... implementation
-};
-
-const maybeUserName = Result.toOptional(fetchUserName(123));
-const displayName = Optional.unwrapOr(maybeUserName, 'Unknown User');
-
-// Converting multiple Results and filtering successes
-const userIds = [1, 2, 3, 4];
-const userNames = userIds
-    .map(fetchUserName)
-    .map(Result.toOptional)
-    .filter(Optional.isSome)
-    .map(Optional.unwrap); // string[]
-
-// Chaining with Optional operations
-const processResult = (r: Result<string, Error>) =>
-    pipe(Result.toOptional(r))
-        .map(Optional.map((s) => s.toUpperCase()))
-        .map(Optional.filter((s) => s.length > 0)).value;
 ```
 
 ---
@@ -1080,7 +981,7 @@ const processResult = (r: Result<string, Error>) =>
 
 > **unwrapErr**\<`R`\>(`result`): `undefined` \| [`UnwrapErr`](#unwraperr)\<`R`\>
 
-Defined in: [src/functional/result.mts:554](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L554)
+Defined in: [src/functional/result.mts:481](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L481)
 
 Unwraps a `Result`, returning the error value or `undefined` if it is `Result.Ok`.
 
@@ -1113,33 +1014,11 @@ The error value if `Result.Err`, otherwise `undefined`.
 #### Example
 
 ```typescript
-// Basic error extraction
 const failure = Result.err('Connection failed');
 console.log(Result.unwrapErr(failure)); // "Connection failed"
 
 const success = Result.ok(42);
 console.log(Result.unwrapErr(success)); // undefined
-
-// Error handling patterns
-const handleApiCall = (result: Result<Data, ApiError>) => {
-    const error = Result.unwrapErr(result);
-    if (error !== undefined) {
-        switch (error.type) {
-            case 'NETWORK_ERROR':
-                return retry(result);
-            case 'AUTH_ERROR':
-                return redirectToLogin();
-            default:
-                return showGenericError(error);
-        }
-    }
-    // Handle success case...
-};
-
-// Collecting errors from multiple operations
-const results = await Promise.all([operation1(), operation2(), operation3()]);
-
-const errors = results.map(Result.unwrapErr).filter((err) => err !== undefined); // Only actual errors
 ```
 
 ---
@@ -1148,7 +1027,7 @@ const errors = results.map(Result.unwrapErr).filter((err) => err !== undefined);
 
 > **unwrapErrThrow**\<`R`\>(`result`, `toStr`): [`UnwrapErr`](#unwraperr)\<`R`\>
 
-Defined in: [src/functional/result.mts:492](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L492)
+Defined in: [src/functional/result.mts:447](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L447)
 
 Unwraps a `Result`, returning the error value.
 Throws an error if the `Result` is `Result.Ok`.
@@ -1192,40 +1071,15 @@ Error with message "Expected Err but got Ok: {value}" if the `Result` is `Result
 #### Example
 
 ```typescript
-// Basic usage - extracting error from known failure
 const failure = Result.err('Network timeout');
 console.log(Result.unwrapErrThrow(failure)); // "Network timeout"
 
-// Throws when Result is unexpectedly Ok
 const success = Result.ok(42);
 try {
     Result.unwrapErrThrow(success); // throws Error: "Expected Err but got Ok: 42"
 } catch (error) {
     console.log(error.message); // "Expected Err but got Ok: 42"
 }
-
-// Custom success value string conversion
-interface User {
-    name: string;
-    id: number;
-}
-const userResult = Result.ok<User>({ name: 'John', id: 123 });
-try {
-    Result.unwrapErrThrow(
-        userResult,
-        (user) => `User(${user.name}:${user.id})`,
-    );
-} catch (error) {
-    console.log(error.message); // "Expected Err but got Ok: User(John:123)"
-}
-
-// In error handling contexts
-const validateAndGetError = (result: Result<any, ValidationError>) => {
-    if (Result.isErr(result)) {
-        return Result.unwrapErrThrow(result); // Safe to unwrap error
-    }
-    throw new Error('Validation unexpectedly succeeded');
-};
 ```
 
 ---
@@ -1234,7 +1088,7 @@ const validateAndGetError = (result: Result<any, ValidationError>) => {
 
 > **unwrapThrow**\<`R`\>(`result`, `toStr`): [`UnwrapOk`](#unwrapok)\<`R`\>
 
-Defined in: [src/functional/result.mts:334](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L334)
+Defined in: [src/functional/result.mts:314](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L314)
 
 Unwraps a `Result`, returning the success value.
 Throws an error if the `Result` is `Result.Err`.
@@ -1278,7 +1132,6 @@ Error with the stringified error value if the `Result` is `Result.Err`.
 #### Example
 
 ```typescript
-// Basic usage with default string conversion
 const success = Result.ok(42);
 console.log(Result.unwrapThrow(success)); // 42
 
@@ -1288,29 +1141,6 @@ try {
 } catch (error) {
     console.log(error.message); // "Network error"
 }
-
-// Custom error string conversion
-interface ApiError {
-    code: number;
-    message: string;
-}
-
-const apiResult = Result.err<ApiError>({ code: 404, message: 'Not found' });
-try {
-    Result.unwrapThrow(
-        apiResult,
-        (err) => `API Error ${err.code}: ${err.message}`,
-    );
-} catch (error) {
-    console.log(error.message); // "API Error 404: Not found"
-}
-
-// In contexts where failure is unexpected
-const configResult = loadConfiguration();
-const config = Result.unwrapThrow(
-    configResult,
-    (err) => `Failed to load configuration: ${err}`,
-); // Will throw if config loading fails
 ```
 
 ---
@@ -1319,7 +1149,7 @@ const config = Result.unwrapThrow(
 
 > **zip**\<`S1`, `E1`, `S2`, `E2`\>(`resultA`, `resultB`): [`Result`](../README.md#result)\<readonly \[`S1`, `S2`\], `E1` \| `E2`\>
 
-Defined in: [src/functional/result.mts:1155](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L1155)
+Defined in: [src/functional/result.mts:991](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L991)
 
 Combines two `Result` values into a single `Result` containing a tuple.
 If either `Result` is `Err`, returns the first `Err` encountered.

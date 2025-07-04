@@ -111,7 +111,7 @@ The [Optional.Base](#base) type to unwrap.
 
 > `const` **expectToBe**: `ExpectToBeFnOverload`
 
-Defined in: [src/functional/optional.mts:589](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L589)
+Defined in: [src/functional/optional.mts:498](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L498)
 
 Unwraps an `Optional`, returning the contained value or throwing an error with the provided message.
 
@@ -138,15 +138,9 @@ Error with the provided message if the `Optional` is `Optional.None`.
 #### Example
 
 ```typescript
-// Regular usage
 const some = Optional.some(42);
 const value = Optional.expectToBe(some, 'Value must exist');
 console.log(value); // 42
-
-// Curried usage for pipe composition
-const getValue = Optional.expectToBe('Value must exist');
-const value2 = pipe(Optional.some(42)).map(getValue).value;
-console.log(value2); // 42
 ```
 
 ---
@@ -155,7 +149,7 @@ console.log(value2); // 42
 
 > `const` **filter**: `FilterFnOverload`
 
-Defined in: [src/functional/optional.mts:533](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L533)
+Defined in: [src/functional/optional.mts:448](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L448)
 
 Filters an `Optional` based on a predicate.
 If the `Optional` is `Some` and the predicate returns true, returns the original `Optional`.
@@ -180,15 +174,9 @@ The filtered `Optional`.
 #### Example
 
 ```typescript
-// Regular usage
 const someEven = Optional.some(4);
 const filtered = Optional.filter(someEven, (x) => x % 2 === 0);
 console.log(Optional.unwrap(filtered)); // 4
-
-// Curried usage for pipe composition
-const evenFilter = Optional.filter((x: number) => x % 2 === 0);
-const result = pipe(Optional.some(4)).map(evenFilter).value;
-console.log(Optional.unwrap(result)); // 4
 ```
 
 ---
@@ -197,7 +185,7 @@ console.log(Optional.unwrap(result)); // 4
 
 > `const` **flatMap**: `FlatMapFnOverload`
 
-Defined in: [src/functional/optional.mts:481](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L481)
+Defined in: [src/functional/optional.mts:402](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L402)
 
 Applies a function that returns an `Optional` to the value in an `Optional.Some`.
 If the input is `Optional.None`, returns `Optional.None`.
@@ -226,7 +214,6 @@ The result of applying the function, or `Optional.None`.
 #### Example
 
 ```typescript
-// Regular usage
 const parseNumber = (s: string): Optional<number> => {
     const n = Number(s);
     return isNaN(n) ? Optional.none : Optional.some(n);
@@ -234,11 +221,6 @@ const parseNumber = (s: string): Optional<number> => {
 
 const result = Optional.flatMap(Optional.some('42'), parseNumber);
 console.log(Optional.unwrap(result)); // 42
-
-// Curried usage for pipe composition
-const parser = Optional.flatMap(parseNumber);
-const result2 = pipe(Optional.some('42')).map(parser).value;
-console.log(Optional.unwrap(result2)); // 42
 ```
 
 ---
@@ -247,7 +229,7 @@ console.log(Optional.unwrap(result2)); // 42
 
 > `const` **map**: `MapFnOverload`
 
-Defined in: [src/functional/optional.mts:425](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L425)
+Defined in: [src/functional/optional.mts:352](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L352)
 
 Maps an [Optional](../README.md#optional)<S> to [Optional](../README.md#optional)<S2> by applying a function to a contained value.
 If the [Optional](../README.md#optional) is [Optional.None](#none), it returns [Optional.none](#none-1).
@@ -283,18 +265,6 @@ console.log(Optional.unwrap(mapped)); // 10
 const noneValue = Optional.none;
 const mappedNone = Optional.map(noneValue, (x) => x * 2);
 console.log(Optional.isNone(mappedNone)); // true
-
-// Chaining maps
-const result = Optional.map(
-    Optional.map(Optional.some('hello'), (s) => s.toUpperCase()),
-    (s) => s.length,
-);
-console.log(Optional.unwrap(result)); // 5
-
-// Curried version for use with pipe
-const doubler = Optional.map((x: number) => x * 2);
-const result2 = pipe(Optional.some(5)).map(doubler).value;
-console.log(Optional.unwrap(result2)); // 10
 ```
 
 ---
@@ -303,7 +273,7 @@ console.log(Optional.unwrap(result2)); // 10
 
 > `const` **none**: [`None`](#none)
 
-Defined in: [src/functional/optional.mts:132](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L132)
+Defined in: [src/functional/optional.mts:127](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L127)
 
 The singleton instance representing [Optional.None](#none) (an empty Optional).
 
@@ -311,9 +281,7 @@ The singleton instance representing [Optional.None](#none) (an empty Optional).
 
 ```typescript
 const emptyValue = Optional.none;
-
 console.log(Optional.isNone(emptyValue)); // true
-console.log(Optional.unwrap(emptyValue)); // undefined
 console.log(Optional.unwrapOr(emptyValue, 'default')); // "default"
 ```
 
@@ -323,7 +291,7 @@ console.log(Optional.unwrapOr(emptyValue, 'default')); // "default"
 
 > `const` **orElse**: `OrElseFnOverload`
 
-Defined in: [src/functional/optional.mts:357](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L357)
+Defined in: [src/functional/optional.mts:296](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L296)
 
 Returns the `Optional` if it is `Some`, otherwise returns the alternative.
 
@@ -350,32 +318,10 @@ The first `Optional` if `Some`, otherwise the alternative.
 #### Example
 
 ```typescript
-// Direct usage - cascading lookups
-const primaryConfig = loadPrimaryConfig(); // Optional<Config>
-const fallbackConfig = loadFallbackConfig(); // Optional<Config>
-const config = Optional.orElse(primaryConfig, fallbackConfig);
-
-// Multiple fallbacks
-const userPreference = getUserPreference(); // Optional<string>
-const systemDefault = Optional.some('default-theme');
-const theme = Optional.orElse(userPreference, systemDefault);
-console.log(Optional.unwrap(theme)); // User's preference or "default-theme"
-
-// Regular usage example
 const primary = Optional.none;
 const fallback = Optional.some('default');
 const result = Optional.orElse(primary, fallback);
 console.log(Optional.unwrap(result)); // "default"
-
-// Curried usage for functional composition
-const withFallback = Optional.orElse(Optional.some('fallback'));
-const result2 = pipe(Optional.none).map(withFallback).value;
-console.log(Optional.unwrap(result2)); // "fallback"
-
-// Chaining multiple orElse operations
-const finalResult = pipe(Optional.none)
-    .map(Optional.orElse(Optional.none)) // Still none
-    .map(Optional.orElse(Optional.some('last resort'))).value;
 ```
 
 ---
@@ -384,7 +330,7 @@ const finalResult = pipe(Optional.none)
 
 > `const` **unwrap**: `UnwrapFnOverload`
 
-Defined in: [src/functional/optional.mts:227](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L227)
+Defined in: [src/functional/optional.mts:205](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L205)
 
 Unwraps an `Optional`, returning the contained value or `undefined` if empty.
 
@@ -409,20 +355,11 @@ The contained value if `Optional.Some`, otherwise `undefined`.
 #### Example
 
 ```typescript
-// With Some - guaranteed to return value
 const some = Optional.some(42);
-const value = Optional.unwrap(some); // Type: number, Value: 42
+const value = Optional.unwrap(some); // 42
 
-// With general Optional - may return undefined
-const maybeValue: Optional<string> = getOptionalString();
-const result = Optional.unwrap(maybeValue); // Type: string | undefined
-
-// Safe pattern for handling both cases
-const optional = Optional.some('hello');
-const unwrapped = Optional.unwrap(optional);
-if (unwrapped !== undefined) {
-    console.log(unwrapped.toUpperCase()); // "HELLO"
-}
+const none = Optional.none;
+const result = Optional.unwrap(none); // undefined
 ```
 
 ---
@@ -431,7 +368,7 @@ if (unwrapped !== undefined) {
 
 > `const` **unwrapOr**: `UnwrapOrFnOverload`
 
-Defined in: [src/functional/optional.mts:283](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L283)
+Defined in: [src/functional/optional.mts:247](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L247)
 
 Unwraps an `Optional`, returning the contained value or a default value if it's `Optional.None`.
 
@@ -462,11 +399,6 @@ The contained value if `Optional.Some`, otherwise `defaultValue`.
 
 ```typescript
 // Direct usage - most common pattern
-const userAge = Optional.fromNullable(user.age);
-const displayAge = Optional.unwrapOr(userAge, 'Unknown');
-console.log(`Age: ${displayAge}`); // "Age: 25" or "Age: Unknown"
-
-// With different Optional types
 const some = Optional.some(42);
 const value1 = Optional.unwrapOr(some, 0);
 console.log(value1); // 42
@@ -475,16 +407,10 @@ const none = Optional.none;
 const value2 = Optional.unwrapOr(none, 0);
 console.log(value2); // 0
 
-// Curried usage for functional composition
+// Curried usage
 const unwrapWithDefault = Optional.unwrapOr('default');
-const result = pipe(Optional.some('hello')).map(unwrapWithDefault).value;
+const result = unwrapWithDefault(Optional.some('hello'));
 console.log(result); // "hello"
-
-// Chaining with other Optional operations
-const processValue = (input: string) =>
-    pipe(Optional.fromNullable(input))
-        .map(Optional.map((s) => s.toUpperCase()))
-        .map(Optional.unwrapOr('NO INPUT')).value;
 ```
 
 ## Functions
@@ -493,7 +419,7 @@ const processValue = (input: string) =>
 
 > **fromNullable**\<`T`\>(`value`): [`Optional`](../README.md#optional)\<`NonNullable`\<`T`\>\>
 
-Defined in: [src/functional/optional.mts:693](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L693)
+Defined in: [src/functional/optional.mts:576](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L576)
 
 Converts a nullable value to an `Optional`.
 
@@ -526,39 +452,13 @@ The nullable value to convert.
 #### Example
 
 ```typescript
-// Basic nullable conversion
 const value: string | null = 'hello';
 const optional = Optional.fromNullable(value);
 console.log(Optional.unwrap(optional)); // "hello"
-console.log(Optional.isSome(optional)); // true
 
-// Handling null values
 const nullValue: string | null = null;
 const noneOptional = Optional.fromNullable(nullValue);
 console.log(Optional.isNone(noneOptional)); // true
-
-// Handling undefined values
-const undefinedValue: number | undefined = undefined;
-const alsoNone = Optional.fromNullable(undefinedValue);
-console.log(Optional.isNone(alsoNone)); // true
-
-// Common use case with API responses
-interface User {
-    name: string;
-    email?: string; // Optional field
-}
-
-const user: User = { name: 'John' };
-const email = Optional.fromNullable(user.email);
-const emailDisplay = Optional.unwrapOr(email, 'No email provided');
-console.log(emailDisplay); // "No email provided"
-
-// Chaining with other Optional operations
-const processNullableInput = (input: string | null) =>
-    Optional.fromNullable(input)
-        .map(Optional.map((s) => s.trim()))
-        .map(Optional.filter((s) => s.length > 0))
-        .map(Optional.unwrapOr('empty input'));
 ```
 
 ---
@@ -567,7 +467,7 @@ const processNullableInput = (input: string | null) =>
 
 > **isNone**\<`O`\>(`optional`): `optional is NarrowToNone<O>`
 
-Defined in: [src/functional/optional.mts:152](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L152)
+Defined in: [src/functional/optional.mts:147](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L147)
 
 Checks if an [Optional](../README.md#optional) is [Optional.None](#none).
 Acts as a type guard.
@@ -624,7 +524,7 @@ The value to check.
 
 > **isSome**\<`O`\>(`optional`): `optional is NarrowToSome<O>`
 
-Defined in: [src/functional/optional.mts:141](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L141)
+Defined in: [src/functional/optional.mts:136](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L136)
 
 Checks if an [Optional](../README.md#optional) is [Optional.Some](#some).
 Acts as a type guard.
@@ -657,7 +557,7 @@ The [Optional](../README.md#optional) to check.
 
 > **some**\<`S`\>(`value`): [`Some`](#some)\<`S`\>
 
-Defined in: [src/functional/optional.mts:116](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L116)
+Defined in: [src/functional/optional.mts:113](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L113)
 
 Creates an [Optional.Some](#some) containing the given value.
 
@@ -687,9 +587,6 @@ An [Optional.Some](#some)<S> containing the value.
 
 ```typescript
 const someValue = Optional.some(42);
-const someString = Optional.some('hello');
-const someObject = Optional.some({ name: 'Alice', age: 30 });
-
 console.log(Optional.isSome(someValue)); // true
 console.log(Optional.unwrap(someValue)); // 42
 ```
@@ -700,7 +597,7 @@ console.log(Optional.unwrap(someValue)); // 42
 
 > **toNullable**\<`O`\>(`optional`): `undefined` \| [`Unwrap`](#unwrap)\<`O`\>
 
-Defined in: [src/functional/optional.mts:743](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L743)
+Defined in: [src/functional/optional.mts:602](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L602)
 
 Converts an `Optional` to a nullable value.
 
@@ -736,35 +633,11 @@ The contained value if `Some`, otherwise `undefined`.
 #### Example
 
 ```typescript
-// Basic conversion
 const some = Optional.some(42);
 console.log(Optional.toNullable(some)); // 42
 
 const none = Optional.none;
 console.log(Optional.toNullable(none)); // undefined
-
-// Interface with nullable APIs
-interface ApiResponse {
-    data?: string;
-}
-
-const optionalData: Optional<string> = processData();
-const response: ApiResponse = {
-    data: Optional.toNullable(optionalData),
-};
-
-// Converting back and forth
-const original: string | undefined = getValue();
-const optional = Optional.fromNullable(original);
-const processed = Optional.map(optional, (s) => s.toUpperCase());
-const result: string | undefined = Optional.toNullable(processed);
-
-// Useful in conditional logic
-const maybeUser = findUser(id);
-const userName = Optional.toNullable(maybeUser);
-if (userName !== undefined) {
-    console.log(`Found user: ${userName}`);
-}
 ```
 
 ---
@@ -773,7 +646,7 @@ if (userName !== undefined) {
 
 > **unwrapThrow**\<`O`\>(`optional`): [`Unwrap`](#unwrap)\<`O`\>
 
-Defined in: [src/functional/optional.mts:189](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L189)
+Defined in: [src/functional/optional.mts:176](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L176)
 
 Unwraps an `Optional`, returning the contained value.
 Throws an error if the `Optional` is `Optional.None`.
@@ -811,14 +684,6 @@ Error with message "`unwrapThrow()` has failed because it is `None`" if the `Opt
 #### Example
 
 ```typescript
-// Safe unwrapping when you know the value exists
-const config = loadConfig(); // returns Optional<Config>
-if (Optional.isSome(config)) {
-    const value = Optional.unwrapThrow(config); // Safe to unwrap
-    console.log(value); // Config object
-}
-
-// Unsafe unwrapping - will throw if empty
 const userInput = Optional.some(42);
 console.log(Optional.unwrapThrow(userInput)); // 42
 
@@ -836,7 +701,7 @@ try {
 
 > **zip**\<`A`, `B`\>(`optionalA`, `optionalB`): [`Optional`](../README.md#optional)\<readonly \[`A`, `B`\]\>
 
-Defined in: [src/functional/optional.mts:638](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L638)
+Defined in: [src/functional/optional.mts:547](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L547)
 
 Combines two `Optional` values into a single `Optional` containing a tuple.
 If either `Optional` is `None`, returns `None`.

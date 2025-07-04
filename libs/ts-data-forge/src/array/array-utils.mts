@@ -2112,72 +2112,15 @@ export namespace Arr {
    *
    * @example
    * ```typescript
-   * // Basic element finding
    * const numbers = [1, 2, 3, 4, 5];
    * const firstEven = Arr.find(numbers, x => x % 2 === 0);
    * if (Optional.isSome(firstEven)) {
-   *   console.log(firstEven.value); // 2 - first even number
+   *   console.log(firstEven.value); // 2
    * }
    *
-   * // Finding with index information
-   * const findLargeAtEnd = Arr.find(numbers, (value, index) => value > 3 && index > 2);
-   * // Optional.Some(4) - first number > 3 after index 2
-   *
-   * // Finding objects by property
-   * const users = [
-   *   { id: 1, name: 'Alice', age: 25 },
-   *   { id: 2, name: 'Bob', age: 30 },
-   *   { id: 3, name: 'Charlie', age: 35 }
-   * ];
-   *
+   * const users = [{ id: 1, name: 'Alice', age: 25 }, { id: 2, name: 'Bob', age: 30 }];
    * const adult = Arr.find(users, user => user.age >= 30);
    * // Optional.Some({ id: 2, name: 'Bob', age: 30 })
-   *
-   * const nonExistent = Arr.find(users, user => user.age > 100);
-   * // Optional.None
-   *
-   * // Empty array handling
-   * const emptyResult = Arr.find([], x => x > 0); // Optional.None
-   *
-   * // Curried usage for functional composition
-   * const findNegative = Arr.find((x: number) => x < 0);
-   * const findLongString = Arr.find((s: string) => s.length > 5);
-   *
-   * const datasets = [
-   *   [1, 2, -3, 4],
-   *   [5, 6, 7, 8],
-   *   [-1, 0, 1]
-   * ];
-   *
-   * const negativeNumbers = datasets.map(findNegative);
-   * // [Optional.Some(-3), Optional.None, Optional.Some(-1)]
-   *
-   * // Pipe composition
-   * const result = pipe(['short', 'medium', 'very long string'])
-   *   .map(findLongString)
-   *   .map(opt => Optional.unwrapOr(opt, 'default'))
-   *   .value; // 'very long string'
-   *
-   * // Complex predicate with all parameters
-   * const findSpecial = (arr: readonly number[]) =>
-   *   Arr.find(arr, (value, index, array) => {
-   *     return value > 10 && index > 0 && index < array.length - 1;
-   *   });
-   *
-   * const hasMiddleSpecial = findSpecial([5, 15, 20, 3]);
-   * // Optional.Some(15) - first value > 10 that's not at start or end
-   *
-   * // Safe unwrapping patterns
-   * const maybeFound = Arr.find(numbers, x => x > 10);
-   * const foundOrDefault = Optional.unwrapOr(maybeFound, 0); // 0 (not found)
-   * const foundOrThrow = Optional.isSome(maybeFound)
-   *   ? maybeFound.value
-   *   : (() => { throw new Error('Not found'); })();
-   *
-   * // Type inference examples
-   * expectType<typeof firstEven, Optional<number>>('=');
-   * expectType<typeof adult, Optional<{id: number, name: string, age: number}>>('=');
-   * expectType<typeof findNegative, (array: readonly number[]) => Optional<number>>('=');
    * ```
    *
    * @see {@link findIndex} for finding the index instead of the element
@@ -2564,13 +2507,8 @@ export namespace Arr {
    * @returns The single value that results from the reduction.
    * @example
    * ```ts
-   * // Regular usage
    * Arr.foldl([1, 2, 3], (sum, n) => sum + n, 0); // 6
-   *
-   * // Curried usage for pipe composition
-   * const sumWithZero = Arr.foldl((sum: number, n: number) => sum + n, 0);
-   * const result = pipe([1, 2, 3, 4]).map(sumWithZero).value;
-   * console.log(result); // 10
+   * Arr.foldl(['a', 'b', 'c'], (acc, str) => acc + str.toUpperCase(), ''); // 'ABC'
    * ```
    */
   export const foldl: FoldlFnOverload = <E, P>(
@@ -3245,13 +3183,8 @@ export namespace Arr {
    * @returns An array of arrays, where each inner array has up to `chunkSize` elements.
    * @example
    * ```ts
-   * // Regular usage
    * Arr.partition([1, 2, 3, 4, 5, 6], 2); // [[1, 2], [3, 4], [5, 6]]
-   *
-   * // Curried usage for pipe composition
-   * const chunkBy3 = Arr.partition(3);
-   * const result = pipe([1, 2, 3, 4, 5, 6, 7]).map(chunkBy3).value;
-   * console.log(result); // [[1, 2, 3], [4, 5, 6], [7]]
+   * Arr.partition([1, 2, 3, 4, 5, 6, 7], 3); // [[1, 2, 3], [4, 5, 6], [7]]
    * ```
    */
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -3762,7 +3695,6 @@ export namespace Arr {
    * @example
    * ```ts
    * Arr.uniq([1, 2, 2, 3, 1, 4]); // [1, 2, 3, 4]
-   * Arr.uniq(['a', 'b', 'a']); // ['a', 'b']
    * ```
    */
   export const uniq = <P extends Primitive>(

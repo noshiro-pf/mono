@@ -300,7 +300,6 @@ export namespace Result {
    * @throws {Error} Error with the stringified error value if the `Result` is `Result.Err`.
    * @example
    * ```typescript
-   * // Basic usage with default string conversion
    * const success = Result.ok(42);
    * console.log(Result.unwrapThrow(success)); // 42
    *
@@ -310,25 +309,6 @@ export namespace Result {
    * } catch (error) {
    *   console.log(error.message); // "Network error"
    * }
-   *
-   * // Custom error string conversion
-   * interface ApiError {
-   *   code: number;
-   *   message: string;
-   * }
-   *
-   * const apiResult = Result.err<ApiError>({ code: 404, message: "Not found" });
-   * try {
-   *   Result.unwrapThrow(apiResult, err => `API Error ${err.code}: ${err.message}`);
-   * } catch (error) {
-   *   console.log(error.message); // "API Error 404: Not found"
-   * }
-   *
-   * // In contexts where failure is unexpected
-   * const configResult = loadConfiguration();
-   * const config = Result.unwrapThrow(configResult, err =>
-   *   `Failed to load configuration: ${err}`
-   * ); // Will throw if config loading fails
    * ```
    */
   export const unwrapThrow = <R extends Base>(
@@ -403,15 +383,9 @@ export namespace Result {
    * @returns The success value if `Result.Ok`, otherwise `defaultValue`.
    * @example
    * ```typescript
-   * // Regular usage
    * const result = Result.ok(42);
    * const value = Result.unwrapOkOr(result, 0);
    * console.log(value); // 42
-   *
-   * // Curried usage for pipe composition
-   * const unwrapWithDefault = Result.unwrapOkOr(0);
-   * const value2 = pipe(Result.err("error")).map(unwrapWithDefault).value;
-   * console.log(value2); // 0
    * ```
    */
   export const unwrapOkOr: UnwrapOkOrFnOverload = (<R extends Base, D>(
@@ -459,34 +433,15 @@ export namespace Result {
    * @throws {Error} Error with message "Expected Err but got Ok: {value}" if the `Result` is `Result.Ok`.
    * @example
    * ```typescript
-   * // Basic usage - extracting error from known failure
    * const failure = Result.err("Network timeout");
    * console.log(Result.unwrapErrThrow(failure)); // "Network timeout"
    *
-   * // Throws when Result is unexpectedly Ok
    * const success = Result.ok(42);
    * try {
    *   Result.unwrapErrThrow(success); // throws Error: "Expected Err but got Ok: 42"
    * } catch (error) {
    *   console.log(error.message); // "Expected Err but got Ok: 42"
    * }
-   *
-   * // Custom success value string conversion
-   * interface User { name: string; id: number; }
-   * const userResult = Result.ok<User>({ name: "John", id: 123 });
-   * try {
-   *   Result.unwrapErrThrow(userResult, user => `User(${user.name}:${user.id})`);
-   * } catch (error) {
-   *   console.log(error.message); // "Expected Err but got Ok: User(John:123)"
-   * }
-   *
-   * // In error handling contexts
-   * const validateAndGetError = (result: Result<any, ValidationError>) => {
-   *   if (Result.isErr(result)) {
-   *     return Result.unwrapErrThrow(result); // Safe to unwrap error
-   *   }
-   *   throw new Error("Validation unexpectedly succeeded");
-   * };
    * ```
    */
   export const unwrapErrThrow = <R extends Base>(
@@ -516,39 +471,11 @@ export namespace Result {
    * @returns The error value if `Result.Err`, otherwise `undefined`.
    * @example
    * ```typescript
-   * // Basic error extraction
    * const failure = Result.err("Connection failed");
    * console.log(Result.unwrapErr(failure)); // "Connection failed"
    *
    * const success = Result.ok(42);
    * console.log(Result.unwrapErr(success)); // undefined
-   *
-   * // Error handling patterns
-   * const handleApiCall = (result: Result<Data, ApiError>) => {
-   *   const error = Result.unwrapErr(result);
-   *   if (error !== undefined) {
-   *     switch (error.type) {
-   *       case "NETWORK_ERROR":
-   *         return retry(result);
-   *       case "AUTH_ERROR":
-   *         return redirectToLogin();
-   *       default:
-   *         return showGenericError(error);
-   *     }
-   *   }
-   *   // Handle success case...
-   * };
-   *
-   * // Collecting errors from multiple operations
-   * const results = await Promise.all([
-   *   operation1(),
-   *   operation2(),
-   *   operation3()
-   * ]);
-   *
-   * const errors = results
-   *   .map(Result.unwrapErr)
-   *   .filter(err => err !== undefined); // Only actual errors
    * ```
    */
   export const unwrapErr = <R extends Base>(
@@ -566,15 +493,9 @@ export namespace Result {
    * @returns The error value if `Result.Err`, otherwise `defaultValue`.
    * @example
    * ```typescript
-   * // Regular usage
    * const result = Result.err("failed");
    * const error = Result.unwrapErrOr(result, "default");
    * console.log(error); // "failed"
-   *
-   * // Curried usage for pipe composition
-   * const unwrapErrorWithDefault = Result.unwrapErrOr("unknown error");
-   * const error2 = pipe(Result.ok(42)).map(unwrapErrorWithDefault).value;
-   * console.log(error2); // "unknown error"
    * ```
    */
   export const unwrapErrOr: UnwrapErrOrFnOverload = (<R extends Base, D>(
@@ -674,15 +595,9 @@ export namespace Result {
    * @returns A new `Result<UnwrapOk<R>, E2>`.
    * @example
    * ```typescript
-   * // Regular usage
    * const result = Result.err("error");
    * const mapped = Result.mapErr(result, e => e.toUpperCase());
    * console.log(Result.unwrapErr(mapped)); // "ERROR"
-   *
-   * // Curried usage for pipe composition
-   * const errorUppercase = Result.mapErr((e: string) => e.toUpperCase());
-   * const result2 = pipe(Result.err("error")).map(errorUppercase).value;
-   * console.log(Result.unwrapErr(result2)); // "ERROR"
    * ```
    */
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -732,15 +647,9 @@ export namespace Result {
    * @returns A new `Result<S2, E2>` based on the applied function.
    * @example
    * ```typescript
-   * // Regular usage
    * const result = Result.ok(42);
    * const folded = Result.fold(result, x => x * 2, () => 0);
    * console.log(Result.unwrapOk(folded)); // 84
-   *
-   * // Curried usage for pipe composition
-   * const folder = Result.fold((x: number) => x * 2, () => 0);
-   * const result2 = pipe(Result.ok(42)).map(folder).value;
-   * console.log(Result.unwrapOk(result2)); // 84
    * ```
    */
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -802,17 +711,11 @@ export namespace Result {
    * @returns The result of applying the function, or the original `Err`.
    * @example
    * ```typescript
-   * // Regular usage
    * const divide = (a: number, b: number): Result<number, string> =>
    *   b === 0 ? Result.err("Division by zero") : Result.ok(a / b);
    *
    * const result = Result.flatMap(Result.ok(10), x => divide(x, 2));
    * console.log(Result.unwrapOk(result)); // 5
-   *
-   * // Curried usage for pipe composition
-   * const divideBy2 = Result.flatMap((x: number) => divide(x, 2));
-   * const result2 = pipe(Result.ok(10)).map(divideBy2).value;
-   * console.log(Result.unwrapOk(result2)); // 5
    * ```
    */
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -862,15 +765,9 @@ export namespace Result {
    * @throws Error with the provided message if the `Result` is `Result.Err`.
    * @example
    * ```typescript
-   * // Regular usage
    * const result = Result.ok(42);
    * const value = Result.expectToBe(result, "Operation must succeed");
    * console.log(value); // 42
-   *
-   * // Curried usage for pipe composition
-   * const mustBeOk = Result.expectToBe("Operation must succeed");
-   * const value2 = pipe(Result.ok(42)).map(mustBeOk).value;
-   * console.log(value2); // 42
    * ```
    */
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -953,39 +850,6 @@ export namespace Result {
    *   console.log(validJson.value.valid); // true
    * }
    *
-   * const invalidJson = parseJson('{invalid json}');
-   * if (Result.isErr(invalidJson)) {
-   *   console.log(invalidJson.value.message); // SyntaxError message
-   * }
-   *
-   * // Using with custom validation
-   * const parsePositiveNumber = (str: string): Result<number, Error> =>
-   *   Result.fromThrowable(() => {
-   *     const num = Number(str);
-   *     if (Number.isNaN(num)) throw new Error(`Not a number: ${str}`);
-   *     if (num <= 0) throw new Error(`Must be positive: ${num}`);
-   *     return num;
-   *   });
-   *
-   * const success = parsePositiveNumber('42');
-   * console.log(Result.unwrapOkOr(success, 0)); // 42
-   *
-   * const failure = parsePositiveNumber('abc');
-   * console.log(Result.unwrapOkOr(failure, 0)); // 0
-   *
-   * // Wrapping DOM operations that might fail
-   * const getElementText = (id: string): Result<string, Error> =>
-   *   Result.fromThrowable(() => {
-   *     const element = document.getElementById(id);
-   *     if (!element) throw new Error(`Element not found: ${id}`);
-   *     return element.textContent || "";
-   *   });
-   *
-   * // Wrapping file operations
-   * const readFileSync = (path: string): Result<string, Error> =>
-   *   Result.fromThrowable(() =>
-   *     require('fs').readFileSync(path, 'utf8')
-   *   );
    * ```
    */
   export const fromThrowable = <T,>(fn: () => T): Result<T, Error> => {
@@ -1048,28 +912,6 @@ export namespace Result {
    * const none = Result.toOptional(errResult);
    * console.log(Optional.isNone(none)); // true
    *
-   * // Use case: when you only care about success, not error details
-   * const fetchUserName = (id: number): Result<string, ApiError> => {
-   *   // ... implementation
-   * };
-   *
-   * const maybeUserName = Result.toOptional(fetchUserName(123));
-   * const displayName = Optional.unwrapOr(maybeUserName, "Unknown User");
-   *
-   * // Converting multiple Results and filtering successes
-   * const userIds = [1, 2, 3, 4];
-   * const userNames = userIds
-   *   .map(fetchUserName)
-   *   .map(Result.toOptional)
-   *   .filter(Optional.isSome)
-   *   .map(Optional.unwrap); // string[]
-   *
-   * // Chaining with Optional operations
-   * const processResult = (r: Result<string, Error>) =>
-   *   pipe(Result.toOptional(r))
-   *     .map(Optional.map(s => s.toUpperCase()))
-   *     .map(Optional.filter(s => s.length > 0))
-   *     .value;
    * ```
    */
   export const toOptional = <R extends Base>(
@@ -1085,16 +927,10 @@ export namespace Result {
    * @returns The first `Result` if `Ok`, otherwise the alternative.
    * @example
    * ```typescript
-   * // Regular usage
    * const primary = Result.err("error");
    * const fallback = Result.ok("default");
    * const result = Result.orElse(primary, fallback);
    * console.log(Result.unwrapOk(result)); // "default"
-   *
-   * // Curried usage for pipe composition
-   * const fallbackTo = Result.orElse(Result.ok("fallback"));
-   * const result2 = pipe(Result.err("error")).map(fallbackTo).value;
-   * console.log(Result.unwrapOk(result2)); // "fallback"
    * ```
    */
   export const orElse: OrElseFnOverload = (<R extends Base, R2 extends Base>(

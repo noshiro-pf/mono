@@ -71,7 +71,7 @@
  * ```
  *
  * @example
- * Combining with other type guards for progressive narrowing:
+ * Basic usage with isRecord for progressive narrowing:
  * ```typescript
  * const data: unknown = parseApiResponse();
  *

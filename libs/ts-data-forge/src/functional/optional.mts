@@ -106,9 +106,6 @@ export namespace Optional {
    * @example
    * ```typescript
    * const someValue = Optional.some(42);
-   * const someString = Optional.some("hello");
-   * const someObject = Optional.some({ name: "Alice", age: 30 });
-   *
    * console.log(Optional.isSome(someValue)); // true
    * console.log(Optional.unwrap(someValue)); // 42
    * ```
@@ -123,9 +120,7 @@ export namespace Optional {
    * @example
    * ```typescript
    * const emptyValue = Optional.none;
-   *
    * console.log(Optional.isNone(emptyValue)); // true
-   * console.log(Optional.unwrap(emptyValue)); // undefined
    * console.log(Optional.unwrapOr(emptyValue, "default")); // "default"
    * ```
    */
@@ -167,14 +162,6 @@ export namespace Optional {
    * @throws {Error} Error with message "`unwrapThrow()` has failed because it is `None`" if the `Optional` is `Optional.None`.
    * @example
    * ```typescript
-   * // Safe unwrapping when you know the value exists
-   * const config = loadConfig(); // returns Optional<Config>
-   * if (Optional.isSome(config)) {
-   *   const value = Optional.unwrapThrow(config); // Safe to unwrap
-   *   console.log(value); // Config object
-   * }
-   *
-   * // Unsafe unwrapping - will throw if empty
    * const userInput = Optional.some(42);
    * console.log(Optional.unwrapThrow(userInput)); // 42
    *
@@ -208,20 +195,11 @@ export namespace Optional {
    * @returns The contained value if `Optional.Some`, otherwise `undefined`.
    * @example
    * ```typescript
-   * // With Some - guaranteed to return value
    * const some = Optional.some(42);
-   * const value = Optional.unwrap(some); // Type: number, Value: 42
+   * const value = Optional.unwrap(some); // 42
    *
-   * // With general Optional - may return undefined
-   * const maybeValue: Optional<string> = getOptionalString();
-   * const result = Optional.unwrap(maybeValue); // Type: string | undefined
-   *
-   * // Safe pattern for handling both cases
-   * const optional = Optional.some("hello");
-   * const unwrapped = Optional.unwrap(optional);
-   * if (unwrapped !== undefined) {
-   *   console.log(unwrapped.toUpperCase()); // "HELLO"
-   * }
+   * const none = Optional.none;
+   * const result = Optional.unwrap(none); // undefined
    * ```
    */
   export const unwrap: UnwrapFnOverload = (<O extends Base>(
@@ -252,11 +230,6 @@ export namespace Optional {
    * @example
    * ```typescript
    * // Direct usage - most common pattern
-   * const userAge = Optional.fromNullable(user.age);
-   * const displayAge = Optional.unwrapOr(userAge, "Unknown");
-   * console.log(`Age: ${displayAge}`); // "Age: 25" or "Age: Unknown"
-   *
-   * // With different Optional types
    * const some = Optional.some(42);
    * const value1 = Optional.unwrapOr(some, 0);
    * console.log(value1); // 42
@@ -265,19 +238,10 @@ export namespace Optional {
    * const value2 = Optional.unwrapOr(none, 0);
    * console.log(value2); // 0
    *
-   * // Curried usage for functional composition
+   * // Curried usage
    * const unwrapWithDefault = Optional.unwrapOr("default");
-   * const result = pipe(Optional.some("hello"))
-   *   .map(unwrapWithDefault)
-   *   .value;
+   * const result = unwrapWithDefault(Optional.some("hello"));
    * console.log(result); // "hello"
-   *
-   * // Chaining with other Optional operations
-   * const processValue = (input: string) =>
-   *   pipe(Optional.fromNullable(input))
-   *     .map(Optional.map(s => s.toUpperCase()))
-   *     .map(Optional.unwrapOr("NO INPUT"))
-   *     .value;
    * ```
    */
   export const unwrapOr: UnwrapOrFnOverload = (<O extends Base, D>(
@@ -323,35 +287,10 @@ export namespace Optional {
    * @returns The first `Optional` if `Some`, otherwise the alternative.
    * @example
    * ```typescript
-   * // Direct usage - cascading lookups
-   * const primaryConfig = loadPrimaryConfig(); // Optional<Config>
-   * const fallbackConfig = loadFallbackConfig(); // Optional<Config>
-   * const config = Optional.orElse(primaryConfig, fallbackConfig);
-   *
-   * // Multiple fallbacks
-   * const userPreference = getUserPreference(); // Optional<string>
-   * const systemDefault = Optional.some("default-theme");
-   * const theme = Optional.orElse(userPreference, systemDefault);
-   * console.log(Optional.unwrap(theme)); // User's preference or "default-theme"
-   *
-   * // Regular usage example
    * const primary = Optional.none;
    * const fallback = Optional.some("default");
    * const result = Optional.orElse(primary, fallback);
    * console.log(Optional.unwrap(result)); // "default"
-   *
-   * // Curried usage for functional composition
-   * const withFallback = Optional.orElse(Optional.some("fallback"));
-   * const result2 = pipe(Optional.none)
-   *   .map(withFallback)
-   *   .value;
-   * console.log(Optional.unwrap(result2)); // "fallback"
-   *
-   * // Chaining multiple orElse operations
-   * const finalResult = pipe(Optional.none)
-   *   .map(Optional.orElse(Optional.none)) // Still none
-   *   .map(Optional.orElse(Optional.some("last resort")))
-   *   .value;
    * ```
    */
   export const orElse: OrElseFnOverload = (<
@@ -407,18 +346,6 @@ export namespace Optional {
    * const noneValue = Optional.none;
    * const mappedNone = Optional.map(noneValue, x => x * 2);
    * console.log(Optional.isNone(mappedNone)); // true
-   *
-   * // Chaining maps
-   * const result = Optional.map(
-   *   Optional.map(Optional.some("hello"), s => s.toUpperCase()),
-   *   s => s.length
-   * );
-   * console.log(Optional.unwrap(result)); // 5
-   *
-   * // Curried version for use with pipe
-   * const doubler = Optional.map((x: number) => x * 2);
-   * const result2 = pipe(Optional.some(5)).map(doubler).value;
-   * console.log(Optional.unwrap(result2)); // 10
    * ```
    */
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -462,7 +389,6 @@ export namespace Optional {
    * @returns The result of applying the function, or `Optional.None`.
    * @example
    * ```typescript
-   * // Regular usage
    * const parseNumber = (s: string): Optional<number> => {
    *   const n = Number(s);
    *   return isNaN(n) ? Optional.none : Optional.some(n);
@@ -470,11 +396,6 @@ export namespace Optional {
    *
    * const result = Optional.flatMap(Optional.some("42"), parseNumber);
    * console.log(Optional.unwrap(result)); // 42
-   *
-   * // Curried usage for pipe composition
-   * const parser = Optional.flatMap(parseNumber);
-   * const result2 = pipe(Optional.some("42")).map(parser).value;
-   * console.log(Optional.unwrap(result2)); // 42
    * ```
    */
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -518,15 +439,9 @@ export namespace Optional {
    * @returns The filtered `Optional`.
    * @example
    * ```typescript
-   * // Regular usage
    * const someEven = Optional.some(4);
    * const filtered = Optional.filter(someEven, x => x % 2 === 0);
    * console.log(Optional.unwrap(filtered)); // 4
-   *
-   * // Curried usage for pipe composition
-   * const evenFilter = Optional.filter((x: number) => x % 2 === 0);
-   * const result = pipe(Optional.some(4)).map(evenFilter).value;
-   * console.log(Optional.unwrap(result)); // 4
    * ```
    */
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -574,15 +489,9 @@ export namespace Optional {
    * @throws Error with the provided message if the `Optional` is `Optional.None`.
    * @example
    * ```typescript
-   * // Regular usage
    * const some = Optional.some(42);
    * const value = Optional.expectToBe(some, "Value must exist");
    * console.log(value); // 42
-   *
-   * // Curried usage for pipe composition
-   * const getValue = Optional.expectToBe("Value must exist");
-   * const value2 = pipe(Optional.some(42)).map(getValue).value;
-   * console.log(value2); // 42
    * ```
    */
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -655,39 +564,13 @@ export namespace Optional {
    * @returns `Optional.Some<NonNullable<T>>` if the value is not null or undefined, otherwise `Optional.None`.
    * @example
    * ```typescript
-   * // Basic nullable conversion
    * const value: string | null = "hello";
    * const optional = Optional.fromNullable(value);
    * console.log(Optional.unwrap(optional)); // "hello"
-   * console.log(Optional.isSome(optional)); // true
    *
-   * // Handling null values
    * const nullValue: string | null = null;
    * const noneOptional = Optional.fromNullable(nullValue);
    * console.log(Optional.isNone(noneOptional)); // true
-   *
-   * // Handling undefined values
-   * const undefinedValue: number | undefined = undefined;
-   * const alsoNone = Optional.fromNullable(undefinedValue);
-   * console.log(Optional.isNone(alsoNone)); // true
-   *
-   * // Common use case with API responses
-   * interface User {
-   *   name: string;
-   *   email?: string; // Optional field
-   * }
-   *
-   * const user: User = { name: "John" };
-   * const email = Optional.fromNullable(user.email);
-   * const emailDisplay = Optional.unwrapOr(email, "No email provided");
-   * console.log(emailDisplay); // "No email provided"
-   *
-   * // Chaining with other Optional operations
-   * const processNullableInput = (input: string | null) =>
-   *   Optional.fromNullable(input)
-   *     .map(Optional.map(s => s.trim()))
-   *     .map(Optional.filter(s => s.length > 0))
-   *     .map(Optional.unwrapOr("empty input"));
    * ```
    */
   export const fromNullable = <T,>(
@@ -709,35 +592,11 @@ export namespace Optional {
    * @returns The contained value if `Some`, otherwise `undefined`.
    * @example
    * ```typescript
-   * // Basic conversion
    * const some = Optional.some(42);
    * console.log(Optional.toNullable(some)); // 42
    *
    * const none = Optional.none;
    * console.log(Optional.toNullable(none)); // undefined
-   *
-   * // Interface with nullable APIs
-   * interface ApiResponse {
-   *   data?: string;
-   * }
-   *
-   * const optionalData: Optional<string> = processData();
-   * const response: ApiResponse = {
-   *   data: Optional.toNullable(optionalData)
-   * };
-   *
-   * // Converting back and forth
-   * const original: string | undefined = getValue();
-   * const optional = Optional.fromNullable(original);
-   * const processed = Optional.map(optional, s => s.toUpperCase());
-   * const result: string | undefined = Optional.toNullable(processed);
-   *
-   * // Useful in conditional logic
-   * const maybeUser = findUser(id);
-   * const userName = Optional.toNullable(maybeUser);
-   * if (userName !== undefined) {
-   *   console.log(`Found user: ${userName}`);
-   * }
    * ```
    */
   export const toNullable = <O extends Base>(

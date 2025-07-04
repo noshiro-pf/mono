@@ -47,7 +47,7 @@ const result = clampFn(150); // 100
 
 > `const` **clamp**: `ClampFnOverload`
 
-Defined in: [src/number/num.mts:335](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L335)
+Defined in: [src/number/num.mts:292](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L292)
 
 Clamps a value within the given range. If the target value is invalid (not finite), returns the lower bound.
 
@@ -56,38 +56,16 @@ Provides two usage patterns for maximum flexibility:
 - **Direct usage**: Pass all three arguments to get the clamped value immediately
 - **Curried usage**: Pass bounds to get a reusable clamping function
 
-#### Examples
-
-Direct usage:
+#### Example
 
 ```typescript
+// Direct usage
 Num.clamp(15, 0, 10); // 10 (clamped to upper bound)
-Num.clamp(-5, 0, 10); // 0 (clamped to lower bound)
 Num.clamp(5, 0, 10); // 5 (within bounds)
-Num.clamp(NaN, 0, 10); // 0 (invalid values default to lower bound)
-```
 
-Curried usage for reusable functions:
-
-```typescript
+// Curried usage
 const clampToPercent = Num.clamp(0, 100);
 clampToPercent(150); // 100
-clampToPercent(-10); // 0
-clampToPercent(75); // 75
-
-// Perfect for pipe composition
-const result = pipe(userInput).map(Number).map(clampToPercent).value;
-```
-
-Working with arrays and functional programming:
-
-```typescript
-const clampTo0_1 = Num.clamp(0, 1);
-const normalizedValues = values.map(clampTo0_1);
-
-// Temperature clamping
-const clampTemperature = Num.clamp(-40, 50);
-const safeTemperatures = readings.map(clampTemperature);
 ```
 
 ---
@@ -96,7 +74,7 @@ const safeTemperatures = readings.map(clampTemperature);
 
 > `const` **from**: (`n`) => `number` = `Number`
 
-Defined in: [src/number/num.mts:51](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L51)
+Defined in: [src/number/num.mts:48](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L48)
 
 Converts an unknown value to a number. Alias for the `Number` constructor.
 
@@ -117,10 +95,7 @@ The numeric representation of `n`.
 #### Example
 
 ```typescript
-Num.from('123'); // 123
 Num.from('123.45'); // 123.45
-Num.from(true); // 1
-Num.from(false); // 0
 Num.from('hello'); // NaN
 ```
 
@@ -130,7 +105,7 @@ Num.from('hello'); // NaN
 
 > **decrement**\<`N`\>(`n`): `Decrement`\<`N`\>
 
-Defined in: [src/number/num.mts:603](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L603)
+Defined in: [src/number/num.mts:506](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L506)
 
 Type-safe decrement operation for positive SmallInt values.
 
@@ -165,16 +140,6 @@ The decremented value with type Decrement<N>
 ```typescript
 const three = 3 as 3;
 const two = Num.decrement(three); // type is 2, value is 2
-
-const one = 1 as 1;
-const zero = Num.decrement(one); // type is 0, value is 0
-
-// Type-safe countdown
-function countdown<N extends PositiveSmallInt>(
-    n: N,
-): N extends 1 ? 0 : Decrement<N> {
-    return Num.decrement(n);
-}
 ```
 
 ---
@@ -183,7 +148,7 @@ function countdown<N extends PositiveSmallInt>(
 
 > **div**(`a`, `b`): `number`
 
-Defined in: [src/number/num.mts:394](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L394)
+Defined in: [src/number/num.mts:347](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L347)
 
 Performs type-safe division with compile-time zero-check.
 
@@ -214,11 +179,7 @@ The quotient of a / b
 #### Example
 
 ```typescript
-// Safe division with literals
-const result1 = Num.div(10, 2); // 5
-const result2 = Num.div(7, 3); // 2.3333...
-
-// Compile-time error prevention
+const result = Num.div(10, 2); // 5
 // Num.div(10, 0); // ❌ TypeScript error: Type '0' is not assignable
 
 // With type guards
@@ -238,7 +199,7 @@ const result3 = Num.div(20, nonZero); // 4
 
 > **divInt**(`a`, `b`): `number`
 
-Defined in: [src/number/num.mts:419](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L419)
+Defined in: [src/number/num.mts:369](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L369)
 
 Performs integer division using floor division.
 
@@ -273,9 +234,6 @@ The integer quotient, or `NaN` if b is zero
 ```typescript
 Num.divInt(10, 3); // 3
 Num.divInt(10, -3); // -4 (floor division)
-Num.divInt(-10, 3); // -4
-Num.divInt(10.7, 3.2); // 3 (floors both inputs first)
-Num.divInt(10, 0); // NaN
 ```
 
 ---
@@ -284,7 +242,7 @@ Num.divInt(10, 0); // NaN
 
 > **increment**\<`N`\>(`n`): `Increment`\<`N`\>
 
-Defined in: [src/number/num.mts:572](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L572)
+Defined in: [src/number/num.mts:485](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L485)
 
 Type-safe increment operation for SmallUint values.
 
@@ -319,15 +277,6 @@ The incremented value with type Increment<N>
 ```typescript
 const zero = 0 as 0;
 const one = Num.increment(zero); // type is 1, value is 1
-
-const five = 5 as 5;
-const six = Num.increment(five); // type is 6, value is 6
-
-// Type-safe counter
-type Counter<N extends SmallUint> = {
-    value: N;
-    next(): Counter<Increment<N>>;
-};
 ```
 
 ---
@@ -336,7 +285,7 @@ type Counter<N extends SmallUint> = {
 
 > **isInRange**(`lowerBound`, `upperBound`): (`x`) => `boolean`
 
-Defined in: [src/number/num.mts:162](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L162)
+Defined in: [src/number/num.mts:159](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L159)
 
 Creates a function that checks if a number `x` is within the range `lowerBound <= x < upperBound`.
 
@@ -386,7 +335,7 @@ isInRange0to10(-1); // false
 
 > **isInRangeInclusive**(`lowerBound`, `upperBound`): (`x`) => `boolean`
 
-Defined in: [src/number/num.mts:181](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L181)
+Defined in: [src/number/num.mts:178](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L178)
 
 Creates a function that checks if a number `x` is within the range `lowerBound <= x <= upperBound`.
 
@@ -436,7 +385,7 @@ console.log(inRange(11)); // false
 
 > **isNonNegative**\<`N`\>(`num`): num is number & \{ \> -2^16: true; \> -2^32: true; \>= -2^15: true; \>= -2^31: true; \>=0: true; NaNValue: false \} & Readonly\<\{ TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3: unknown \}\> & RelaxedExclude\<N, -1024 \| -1023 \| -1022 \| -1021 \| -1020 \| -1019 \| -1018 \| -1017 \| -1016 \| -1015 \| -1014 \| -1013 \| -1012 \| -1011 \| -1010 \| -1009 \| -1008 \| -1007 \| -1006 \| -1005 \| -1004 \| -1003 \| -1002 \| -1001 \| -1000 \| -999 \| -998 \| -997 \| -996 \| -995 \| -994 \| -993 \| -992 \| -991 \| -990 \| -989 \| -988 \| -987 \| -986 \| -985 \| -984 \| -983 \| -982 \| -981 \| -980 \| -979 \| -978 \| -977 \| -976 \| -975 \| -974 \| -973 \| -972 \| -971 \| -970 \| -969 \| -968 \| -967 \| -966 \| -965 \| -964 \| -963 \| -962 \| -961 \| -960 \| -959 \| -958 \| -957 \| -956 \| -955 \| -954 \| -953 \| -952 \| -951 \| -950 \| -949 \| -948 \| -947 \| -946 \| -945 \| -944 \| -943 \| -942 \| -941 \| -940 \| -939 \| -938 \| -937 \| -936 \| -935 \| -934 \| -933 \| -932 \| -931 \| -930 \| -929 \| -928 \| -927 \| -926 \| -925 \| -924 \| -923 \| -922 \| -921 \| -920 \| -919 \| -918 \| -917 \| -916 \| -915 \| -914 \| -913 \| -912 \| -911 \| -910 \| -909 \| -908 \| -907 \| -906 \| -905 \| -904 \| -903 \| -902 \| -901 \| -900 \| -899 \| -898 \| -897 \| -896 \| -895 \| -894 \| -893 \| -892 \| -891 \| -890 \| -889 \| -888 \| -887 \| -886 \| -885 \| -884 \| -883 \| -882 \| -881 \| -880 \| -879 \| -878 \| -877 \| -876 \| -875 \| -874 \| -873 \| -872 \| -871 \| -870 \| -869 \| -868 \| -867 \| -866 \| -865 \| -864 \| -863 \| -862 \| -861 \| -860 \| -859 \| -858 \| -857 \| -856 \| -855 \| -854 \| -853 \| -852 \| -851 \| -850 \| -849 \| -848 \| -847 \| -846 \| -845 \| -844 \| -843 \| -842 \| -841 \| -840 \| -839 \| -838 \| -837 \| -836 \| -835 \| -834 \| -833 \| -832 \| -831 \| -830 \| -829 \| -828 \| -827 \| -826 \| -825 \| -824 \| -823 \| -822 \| -821 \| -820 \| -819 \| -818 \| -817 \| -816 \| -815 \| -814 \| -813 \| -812 \| -811 \| -810 \| -809 \| -808 \| -807 \| -806 \| -805 \| -804 \| -803 \| -802 \| -801 \| -800 \| -799 \| -798 \| -797 \| -796 \| -795 \| -794 \| -793 \| -792 \| -791 \| -790 \| -789 \| -788 \| -787 \| -786 \| -785 \| -784 \| -783 \| -782 \| -781 \| -780 \| -779 \| -778 \| -777 \| -776 \| -775 \| -774 \| -773 \| -772 \| -771 \| -770 \| -769 \| -768 \| -767 \| -766 \| -765 \| -764 \| -763 \| -762 \| -761 \| -760 \| -759 \| -758 \| -757 \| -756 \| -755 \| -754 \| -753 \| -752 \| -751 \| -750 \| -749 \| -748 \| -747 \| -746 \| -745 \| -744 \| -743 \| -742 \| -741 \| -740 \| -739 \| -738 \| -737 \| -736 \| -735 \| -734 \| -733 \| -732 \| -731 \| -730 \| -729 \| -728 \| -727 \| -726 \| -725 \| -724 \| -723 \| -722 \| -721 \| -720 \| -719 \| -718 \| -717 \| -716 \| -715 \| -714 \| -713 \| -712 \| -711 \| -710 \| -709 \| -708 \| -707 \| -706 \| -705 \| -704 \| -703 \| -702 \| -701 \| -700 \| -699 \| -698 \| -697 \| -696 \| -695 \| -694 \| -693 \| -692 \| -691 \| -690 \| -689 \| -688 \| -687 \| -686 \| -685 \| -684 \| -683 \| -682 \| -681 \| -680 \| -679 \| -678 \| -677 \| -676 \| -675 \| -674 \| -673 \| -672 \| -671 \| -670 \| -669 \| -668 \| -667 \| -666 \| -665 \| -664 \| -663 \| -662 \| -661 \| -660 \| -659 \| -658 \| -657 \| -656 \| -655 \| -654 \| -653 \| -652 \| -651 \| -650 \| -649 \| -648 \| -647 \| -646 \| -645 \| -644 \| -643 \| -642 \| -641 \| -640 \| -639 \| -638 \| -637 \| -636 \| -635 \| -634 \| -633 \| -632 \| -631 \| -630 \| -629 \| -628 \| -627 \| -626 \| -625 \| -624 \| -623 \| -622 \| -621 \| -620 \| -619 \| -618 \| -617 \| -616 \| -615 \| -614 \| -613 \| -612 \| -611 \| -610 \| -609 \| -608 \| -607 \| -606 \| -605 \| -604 \| -603 \| -602 \| -601 \| -600 \| -599 \| -598 \| -597 \| -596 \| -595 \| -594 \| -593 \| -592 \| -591 \| -590 \| -589 \| -588 \| -587 \| -586 \| -585 \| -584 \| -583 \| -582 \| -581 \| -580 \| -579 \| -578 \| -577 \| -576 \| -575 \| -574 \| -573 \| -572 \| -571 \| -570 \| -569 \| -568 \| -567 \| -566 \| -565 \| -564 \| -563 \| -562 \| -561 \| -560 \| -559 \| -558 \| -557 \| -556 \| -555 \| -554 \| -553 \| -552 \| -551 \| -550 \| -549 \| -548 \| -547 \| -546 \| -545 \| -544 \| -543 \| -542 \| -541 \| -540 \| -539 \| -538 \| -537 \| -536 \| -535 \| -534 \| -533 \| -532 \| -531 \| -530 \| -529 \| -528 \| -527 \| -526 \| -525 \| -524 \| -523 \| -522 \| -521 \| -520 \| -519 \| -518 \| -517 \| -516 \| -515 \| -514 \| -513 \| -512 \| -511 \| -510 \| -509 \| -508 \| -507 \| -506 \| -505 \| -504 \| -503 \| -502 \| -501 \| -500 \| -499 \| -498 \| -497 \| -496 \| -495 \| -494 \| -493 \| -492 \| -491 \| -490 \| -489 \| -488 \| -487 \| -486 \| -485 \| -484 \| -483 \| -482 \| -481 \| -480 \| -479 \| -478 \| -477 \| -476 \| -475 \| -474 \| -473 \| -472 \| -471 \| -470 \| -469 \| -468 \| -467 \| -466 \| -465 \| -464 \| -463 \| -462 \| -461 \| -460 \| -459 \| -458 \| -457 \| -456 \| -455 \| -454 \| -453 \| -452 \| -451 \| -450 \| -449 \| -448 \| -447 \| -446 \| -445 \| -444 \| -443 \| -442 \| -441 \| -440 \| -439 \| -438 \| -437 \| -436 \| -435 \| -434 \| -433 \| -432 \| -431 \| -430 \| -429 \| -428 \| -427 \| -426 \| -425 \| -424 \| -423 \| -422 \| -421 \| -420 \| -419 \| -418 \| -417 \| -416 \| -415 \| -414 \| -413 \| -412 \| -411 \| -410 \| -409 \| -408 \| -407 \| -406 \| -405 \| -404 \| -403 \| -402 \| -401 \| -400 \| -399 \| -398 \| -397 \| -396 \| -395 \| -394 \| -393 \| -392 \| -391 \| -390 \| -389 \| -388 \| -387 \| -386 \| -385 \| -384 \| -383 \| -382 \| -381 \| -380 \| -379 \| -378 \| -377 \| -376 \| -375 \| -374 \| -373 \| -372 \| -371 \| -370 \| -369 \| -368 \| -367 \| -366 \| -365 \| -364 \| -363 \| -362 \| -361 \| -360 \| -359 \| -358 \| -357 \| -356 \| -355 \| -354 \| -353 \| -352 \| -351 \| -350 \| -349 \| -348 \| -347 \| -346 \| -345 \| -344 \| -343 \| -342 \| -341 \| -340 \| -339 \| -338 \| -337 \| -336 \| -335 \| -334 \| -333 \| -332 \| -331 \| -330 \| -329 \| -328 \| -327 \| -326 \| -325 \| -324 \| -323 \| -322 \| -321 \| -320 \| -319 \| -318 \| -317 \| -316 \| -315 \| -314 \| -313 \| -312 \| -311 \| -310 \| -309 \| -308 \| -307 \| -306 \| -305 \| -304 \| -303 \| -302 \| -301 \| -300 \| -299 \| -298 \| -297 \| -296 \| -295 \| -294 \| -293 \| -292 \| -291 \| -290 \| -289 \| -288 \| -287 \| -286 \| -285 \| -284 \| -283 \| -282 \| -281 \| -280 \| -279 \| -278 \| -277 \| -276 \| -275 \| -274 \| -273 \| -272 \| -271 \| -270 \| -269 \| -268 \| -267 \| -266 \| -265 \| -264 \| -263 \| -262 \| -261 \| -260 \| -259 \| -258 \| -257 \| -256 \| -255 \| -254 \| -253 \| -252 \| -251 \| -250 \| -249 \| -248 \| -247 \| -246 \| -245 \| -244 \| -243 \| -242 \| -241 \| -240 \| -239 \| -238 \| -237 \| -236 \| -235 \| -234 \| -233 \| -232 \| -231 \| -230 \| -229 \| -228 \| -227 \| -226 \| -225 \| -224 \| -223 \| -222 \| -221 \| -220 \| -219 \| -218 \| -217 \| -216 \| -215 \| -214 \| -213 \| -212 \| -211 \| -210 \| -209 \| -208 \| -207 \| -206 \| -205 \| -204 \| -203 \| -202 \| -201 \| -200 \| -199 \| -198 \| -197 \| -196 \| -195 \| -194 \| -193 \| -192 \| -191 \| -190 \| -189 \| -188 \| -187 \| -186 \| -185 \| -184 \| -183 \| -182 \| -181 \| -180 \| -179 \| -178 \| -177 \| -176 \| -175 \| -174 \| -173 \| -172 \| -171 \| -170 \| -169 \| -168 \| -167 \| -166 \| -165 \| -164 \| -163 \| -162 \| -161 \| -160 \| -159 \| -158 \| -157 \| -156 \| -155 \| -154 \| -153 \| -152 \| -151 \| -150 \| -149 \| -148 \| -147 \| -146 \| -145 \| -144 \| -143 \| -142 \| -141 \| -140 \| -139 \| -138 \| -137 \| -136 \| -135 \| -134 \| -133 \| -132 \| -131 \| -130 \| -129 \| -128 \| -127 \| -126 \| -125 \| -124 \| -123 \| -122 \| -121 \| -120 \| -119 \| -118 \| -117 \| -116 \| -115 \| -114 \| -113 \| -112 \| -111 \| -110 \| -109 \| -108 \| -107 \| -106 \| -105 \| -104 \| -103 \| -102 \| -101 \| -100 \| -99 \| -98 \| -97 \| -96 \| -95 \| -94 \| -93 \| -92 \| -91 \| -90 \| -89 \| -88 \| -87 \| -86 \| -85 \| -84 \| -83 \| -82 \| -81 \| -80 \| -79 \| -78 \| -77 \| -76 \| -75 \| -74 \| -73 \| -72 \| -71 \| -70 \| -69 \| -68 \| -67 \| -66 \| -65 \| -64 \| -63 \| -62 \| -61 \| -60 \| -59 \| -58 \| -57 \| -56 \| -55 \| -54 \| -53 \| -52 \| -51 \| -50 \| -49 \| -48 \| -47 \| -46 \| -45 \| -44 \| -43 \| -42 \| -41 \| -40 \| -39 \| -38 \| -37 \| -36 \| -35 \| -34 \| -33 \| -32 \| -31 \| -30 \| -29 \| -28 \| -27 \| -26 \| -25 \| -24 \| -23 \| -22 \| -21 \| -20 \| -19 \| -18 \| -17 \| -16 \| -15 \| -14 \| -13 \| -12 \| -11 \| -10 \| -9 \| -8 \| -7 \| -6 \| -5 \| -4 \| -3 \| -2 \| -1\>
 
-Defined in: [src/number/num.mts:111](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L111)
+Defined in: [src/number/num.mts:108](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L108)
 
 Type guard that checks if a number is non-negative (greater than or equal to zero).
 
@@ -488,7 +437,7 @@ if (Num.isNonNegative(index)) {
 
 > **isNonZero**\<`N`\>(`num`): `num is number & { !=0: true; NaNValue: false } & Readonly<{ TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3: unknown }> & RelaxedExclude<N, 0>`
 
-Defined in: [src/number/num.mts:79](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L79)
+Defined in: [src/number/num.mts:76](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L76)
 
 Type guard that checks if a number is non-zero.
 
@@ -540,7 +489,7 @@ if (Num.isNonZero(literal)) {
 
 > **isPositive**\<`N`\>(`num`): num is number & \{ !=0: true; \> -2^16: true; \> -2^32: true; \>= -2^15: true; \>= -2^31: true; \>=0: true; NaNValue: false \} & Readonly\<\{ TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3: unknown \}\> & RelaxedExclude\<N, -1024 \| -1023 \| -1022 \| -1021 \| -1020 \| -1019 \| -1018 \| -1017 \| -1016 \| -1015 \| -1014 \| -1013 \| -1012 \| -1011 \| -1010 \| -1009 \| -1008 \| -1007 \| -1006 \| -1005 \| -1004 \| -1003 \| -1002 \| -1001 \| -1000 \| -999 \| -998 \| -997 \| -996 \| -995 \| -994 \| -993 \| -992 \| -991 \| -990 \| -989 \| -988 \| -987 \| -986 \| -985 \| -984 \| -983 \| -982 \| -981 \| -980 \| -979 \| -978 \| -977 \| -976 \| -975 \| -974 \| -973 \| -972 \| -971 \| -970 \| -969 \| -968 \| -967 \| -966 \| -965 \| -964 \| -963 \| -962 \| -961 \| -960 \| -959 \| -958 \| -957 \| -956 \| -955 \| -954 \| -953 \| -952 \| -951 \| -950 \| -949 \| -948 \| -947 \| -946 \| -945 \| -944 \| -943 \| -942 \| -941 \| -940 \| -939 \| -938 \| -937 \| -936 \| -935 \| -934 \| -933 \| -932 \| -931 \| -930 \| -929 \| -928 \| -927 \| -926 \| -925 \| -924 \| -923 \| -922 \| -921 \| -920 \| -919 \| -918 \| -917 \| -916 \| -915 \| -914 \| -913 \| -912 \| -911 \| -910 \| -909 \| -908 \| -907 \| -906 \| -905 \| -904 \| -903 \| -902 \| -901 \| -900 \| -899 \| -898 \| -897 \| -896 \| -895 \| -894 \| -893 \| -892 \| -891 \| -890 \| -889 \| -888 \| -887 \| -886 \| -885 \| -884 \| -883 \| -882 \| -881 \| -880 \| -879 \| -878 \| -877 \| -876 \| -875 \| -874 \| -873 \| -872 \| -871 \| -870 \| -869 \| -868 \| -867 \| -866 \| -865 \| -864 \| -863 \| -862 \| -861 \| -860 \| -859 \| -858 \| -857 \| -856 \| -855 \| -854 \| -853 \| -852 \| -851 \| -850 \| -849 \| -848 \| -847 \| -846 \| -845 \| -844 \| -843 \| -842 \| -841 \| -840 \| -839 \| -838 \| -837 \| -836 \| -835 \| -834 \| -833 \| -832 \| -831 \| -830 \| -829 \| -828 \| -827 \| -826 \| -825 \| -824 \| -823 \| -822 \| -821 \| -820 \| -819 \| -818 \| -817 \| -816 \| -815 \| -814 \| -813 \| -812 \| -811 \| -810 \| -809 \| -808 \| -807 \| -806 \| -805 \| -804 \| -803 \| -802 \| -801 \| -800 \| -799 \| -798 \| -797 \| -796 \| -795 \| -794 \| -793 \| -792 \| -791 \| -790 \| -789 \| -788 \| -787 \| -786 \| -785 \| -784 \| -783 \| -782 \| -781 \| -780 \| -779 \| -778 \| -777 \| -776 \| -775 \| -774 \| -773 \| -772 \| -771 \| -770 \| -769 \| -768 \| -767 \| -766 \| -765 \| -764 \| -763 \| -762 \| -761 \| -760 \| -759 \| -758 \| -757 \| -756 \| -755 \| -754 \| -753 \| -752 \| -751 \| -750 \| -749 \| -748 \| -747 \| -746 \| -745 \| -744 \| -743 \| -742 \| -741 \| -740 \| -739 \| -738 \| -737 \| -736 \| -735 \| -734 \| -733 \| -732 \| -731 \| -730 \| -729 \| -728 \| -727 \| -726 \| -725 \| -724 \| -723 \| -722 \| -721 \| -720 \| -719 \| -718 \| -717 \| -716 \| -715 \| -714 \| -713 \| -712 \| -711 \| -710 \| -709 \| -708 \| -707 \| -706 \| -705 \| -704 \| -703 \| -702 \| -701 \| -700 \| -699 \| -698 \| -697 \| -696 \| -695 \| -694 \| -693 \| -692 \| -691 \| -690 \| -689 \| -688 \| -687 \| -686 \| -685 \| -684 \| -683 \| -682 \| -681 \| -680 \| -679 \| -678 \| -677 \| -676 \| -675 \| -674 \| -673 \| -672 \| -671 \| -670 \| -669 \| -668 \| -667 \| -666 \| -665 \| -664 \| -663 \| -662 \| -661 \| -660 \| -659 \| -658 \| -657 \| -656 \| -655 \| -654 \| -653 \| -652 \| -651 \| -650 \| -649 \| -648 \| -647 \| -646 \| -645 \| -644 \| -643 \| -642 \| -641 \| -640 \| -639 \| -638 \| -637 \| -636 \| -635 \| -634 \| -633 \| -632 \| -631 \| -630 \| -629 \| -628 \| -627 \| -626 \| -625 \| -624 \| -623 \| -622 \| -621 \| -620 \| -619 \| -618 \| -617 \| -616 \| -615 \| -614 \| -613 \| -612 \| -611 \| -610 \| -609 \| -608 \| -607 \| -606 \| -605 \| -604 \| -603 \| -602 \| -601 \| -600 \| -599 \| -598 \| -597 \| -596 \| -595 \| -594 \| -593 \| -592 \| -591 \| -590 \| -589 \| -588 \| -587 \| -586 \| -585 \| -584 \| -583 \| -582 \| -581 \| -580 \| -579 \| -578 \| -577 \| -576 \| -575 \| -574 \| -573 \| -572 \| -571 \| -570 \| -569 \| -568 \| -567 \| -566 \| -565 \| -564 \| -563 \| -562 \| -561 \| -560 \| -559 \| -558 \| -557 \| -556 \| -555 \| -554 \| -553 \| -552 \| -551 \| -550 \| -549 \| -548 \| -547 \| -546 \| -545 \| -544 \| -543 \| -542 \| -541 \| -540 \| -539 \| -538 \| -537 \| -536 \| -535 \| -534 \| -533 \| -532 \| -531 \| -530 \| -529 \| -528 \| -527 \| -526 \| -525 \| -524 \| -523 \| -522 \| -521 \| -520 \| -519 \| -518 \| -517 \| -516 \| -515 \| -514 \| -513 \| -512 \| -511 \| -510 \| -509 \| -508 \| -507 \| -506 \| -505 \| -504 \| -503 \| -502 \| -501 \| -500 \| -499 \| -498 \| -497 \| -496 \| -495 \| -494 \| -493 \| -492 \| -491 \| -490 \| -489 \| -488 \| -487 \| -486 \| -485 \| -484 \| -483 \| -482 \| -481 \| -480 \| -479 \| -478 \| -477 \| -476 \| -475 \| -474 \| -473 \| -472 \| -471 \| -470 \| -469 \| -468 \| -467 \| -466 \| -465 \| -464 \| -463 \| -462 \| -461 \| -460 \| -459 \| -458 \| -457 \| -456 \| -455 \| -454 \| -453 \| -452 \| -451 \| -450 \| -449 \| -448 \| -447 \| -446 \| -445 \| -444 \| -443 \| -442 \| -441 \| -440 \| -439 \| -438 \| -437 \| -436 \| -435 \| -434 \| -433 \| -432 \| -431 \| -430 \| -429 \| -428 \| -427 \| -426 \| -425 \| -424 \| -423 \| -422 \| -421 \| -420 \| -419 \| -418 \| -417 \| -416 \| -415 \| -414 \| -413 \| -412 \| -411 \| -410 \| -409 \| -408 \| -407 \| -406 \| -405 \| -404 \| -403 \| -402 \| -401 \| -400 \| -399 \| -398 \| -397 \| -396 \| -395 \| -394 \| -393 \| -392 \| -391 \| -390 \| -389 \| -388 \| -387 \| -386 \| -385 \| -384 \| -383 \| -382 \| -381 \| -380 \| -379 \| -378 \| -377 \| -376 \| -375 \| -374 \| -373 \| -372 \| -371 \| -370 \| -369 \| -368 \| -367 \| -366 \| -365 \| -364 \| -363 \| -362 \| -361 \| -360 \| -359 \| -358 \| -357 \| -356 \| -355 \| -354 \| -353 \| -352 \| -351 \| -350 \| -349 \| -348 \| -347 \| -346 \| -345 \| -344 \| -343 \| -342 \| -341 \| -340 \| -339 \| -338 \| -337 \| -336 \| -335 \| -334 \| -333 \| -332 \| -331 \| -330 \| -329 \| -328 \| -327 \| -326 \| -325 \| -324 \| -323 \| -322 \| -321 \| -320 \| -319 \| -318 \| -317 \| -316 \| -315 \| -314 \| -313 \| -312 \| -311 \| -310 \| -309 \| -308 \| -307 \| -306 \| -305 \| -304 \| -303 \| -302 \| -301 \| -300 \| -299 \| -298 \| -297 \| -296 \| -295 \| -294 \| -293 \| -292 \| -291 \| -290 \| -289 \| -288 \| -287 \| -286 \| -285 \| -284 \| -283 \| -282 \| -281 \| -280 \| -279 \| -278 \| -277 \| -276 \| -275 \| -274 \| -273 \| -272 \| -271 \| -270 \| -269 \| -268 \| -267 \| -266 \| -265 \| -264 \| -263 \| -262 \| -261 \| -260 \| -259 \| -258 \| -257 \| -256 \| -255 \| -254 \| -253 \| -252 \| -251 \| -250 \| -249 \| -248 \| -247 \| -246 \| -245 \| -244 \| -243 \| -242 \| -241 \| -240 \| -239 \| -238 \| -237 \| -236 \| -235 \| -234 \| -233 \| -232 \| -231 \| -230 \| -229 \| -228 \| -227 \| -226 \| -225 \| -224 \| -223 \| -222 \| -221 \| -220 \| -219 \| -218 \| -217 \| -216 \| -215 \| -214 \| -213 \| -212 \| -211 \| -210 \| -209 \| -208 \| -207 \| -206 \| -205 \| -204 \| -203 \| -202 \| -201 \| -200 \| -199 \| -198 \| -197 \| -196 \| -195 \| -194 \| -193 \| -192 \| -191 \| -190 \| -189 \| -188 \| -187 \| -186 \| -185 \| -184 \| -183 \| -182 \| -181 \| -180 \| -179 \| -178 \| -177 \| -176 \| -175 \| -174 \| -173 \| -172 \| -171 \| -170 \| -169 \| -168 \| -167 \| -166 \| -165 \| -164 \| -163 \| -162 \| -161 \| -160 \| -159 \| -158 \| -157 \| -156 \| -155 \| -154 \| -153 \| -152 \| -151 \| -150 \| -149 \| -148 \| -147 \| -146 \| -145 \| -144 \| -143 \| -142 \| -141 \| -140 \| -139 \| -138 \| -137 \| -136 \| -135 \| -134 \| -133 \| -132 \| -131 \| -130 \| -129 \| -128 \| -127 \| -126 \| -125 \| -124 \| -123 \| -122 \| -121 \| -120 \| -119 \| -118 \| -117 \| -116 \| -115 \| -114 \| -113 \| -112 \| -111 \| -110 \| -109 \| -108 \| -107 \| -106 \| -105 \| -104 \| -103 \| -102 \| -101 \| -100 \| -99 \| -98 \| -97 \| -96 \| -95 \| -94 \| -93 \| -92 \| -91 \| -90 \| -89 \| -88 \| -87 \| -86 \| -85 \| -84 \| -83 \| -82 \| -81 \| -80 \| -79 \| -78 \| -77 \| -76 \| -75 \| -74 \| -73 \| -72 \| -71 \| -70 \| -69 \| -68 \| -67 \| -66 \| -65 \| -64 \| -63 \| -62 \| -61 \| -60 \| -59 \| -58 \| -57 \| -56 \| -55 \| -54 \| -53 \| -52 \| -51 \| -50 \| -49 \| -48 \| -47 \| -46 \| -45 \| -44 \| -43 \| -42 \| -41 \| -40 \| -39 \| -38 \| -37 \| -36 \| -35 \| -34 \| -33 \| -32 \| -31 \| -30 \| -29 \| -28 \| -27 \| -26 \| -25 \| -24 \| -23 \| -22 \| -21 \| -20 \| -19 \| -18 \| -17 \| -16 \| -15 \| -14 \| -13 \| -12 \| -11 \| -10 \| -9 \| -8 \| -7 \| -6 \| -5 \| -4 \| -3 \| -2 \| -1 \| 0\>
 
-Defined in: [src/number/num.mts:142](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L142)
+Defined in: [src/number/num.mts:139](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L139)
 
 Type guard that checks if a number is positive (greater than zero).
 
@@ -592,7 +541,7 @@ if (Num.isPositive(value)) {
 
 > **isUintInRange**\<`L`, `U`\>(`lowerBound`, `upperBound`): (`x`) => `x is RelaxedExclude<LT[U], LT[MinImpl<L, []>]>`
 
-Defined in: [src/number/num.mts:250](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L250)
+Defined in: [src/number/num.mts:238](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L238)
 
 Creates a type guard that checks if a number is an unsigned integer within a specified range.
 
@@ -651,15 +600,6 @@ A type guard function that validates and narrows number types
 #### Example
 
 ```typescript
-// Array index validation
-const isValidIndex = Num.isUintInRange(0, 10);
-const index: number = getUserInput();
-
-if (isValidIndex(index)) {
-    // index is typed as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
-    const value = array[index]; // Safe array access
-}
-
 // Custom range validation
 const isValidPercentage = Num.isUintInRange(0, 101);
 if (isValidPercentage(value)) {
@@ -673,7 +613,7 @@ if (isValidPercentage(value)) {
 
 > **isUintInRangeInclusive**\<`L`, `U`\>(`lowerBound`, `upperBound`): (`x`) => `x is RelaxedExclude<LEQ[U], LT[MinImpl<L, []>]>`
 
-Defined in: [src/number/num.mts:289](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L289)
+Defined in: [src/number/num.mts:269](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L269)
 
 Creates a type guard that checks if a number is an unsigned integer within a specified inclusive range.
 
@@ -732,19 +672,11 @@ A type guard function that validates and narrows number types
 #### Example
 
 ```typescript
-// Score validation (0-100)
 const isValidScore = Num.isUintInRangeInclusive(0, 100);
 const score: number = getTestScore();
-
 if (isValidScore(score)) {
     // score is typed as 0 | 1 | 2 | ... | 100
     const grade = calculateGrade(score);
-}
-
-// Day of month validation
-const isValidDay = Num.isUintInRangeInclusive(1, 31);
-if (isValidDay(day)) {
-    // day is typed as 1 | 2 | ... | 31
 }
 ```
 
@@ -754,7 +686,7 @@ if (isValidDay(day)) {
 
 > **mapNaN2Undefined**\<`N`\>(`num`): `undefined` \| `RelaxedExclude`\<`N`, `NaNType`\>
 
-Defined in: [src/number/num.mts:538](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L538)
+Defined in: [src/number/num.mts:460](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L460)
 
 Converts NaN values to undefined while preserving all other numbers.
 
@@ -788,19 +720,7 @@ The original number if not NaN, otherwise undefined
 
 ```typescript
 Num.mapNaN2Undefined(42); // 42
-Num.mapNaN2Undefined(0); // 0
 Num.mapNaN2Undefined(NaN); // undefined
-Num.mapNaN2Undefined(Math.sqrt(-1)); // undefined
-
-// Useful in chains
-const result = Num.mapNaN2Undefined(parseFloat(userInput)) ?? 0;
-
-// Type narrowing
-const value = Math.sqrt(x);
-const safe = Num.mapNaN2Undefined(value);
-if (safe !== undefined) {
-    // safe is typed without NaN
-}
 ```
 
 ---
@@ -809,7 +729,7 @@ if (safe !== undefined) {
 
 > **round**(`digit`): (`num`) => `number`
 
-Defined in: [src/number/num.mts:501](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L501)
+Defined in: [src/number/num.mts:435](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L435)
 
 Creates a reusable rounding function with a fixed precision.
 
@@ -844,19 +764,9 @@ A function that rounds numbers to the specified precision
 #### Example
 
 ```typescript
-// Create specialized rounding functions
 const roundTo2 = Num.round(2);
-const roundTo4 = Num.round(4);
-
 roundTo2(3.14159); // 3.14
 roundTo2(2.71828); // 2.72
-roundTo2(10); // 10
-
-roundTo4(3.14159); // 3.1416
-
-// Use with array operations
-const values = [1.234, 5.678, 9.012];
-const rounded = values.map(roundTo2); // [1.23, 5.68, 9.01]
 ```
 
 ---
@@ -865,7 +775,7 @@ const rounded = values.map(roundTo2); // [1.23, 5.68, 9.01]
 
 > **roundAt**(`num`, `precision`): `number`
 
-Defined in: [src/number/num.mts:443](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L443)
+Defined in: [src/number/num.mts:390](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L390)
 
 Rounds a number to a specified number of decimal places.
 
@@ -896,10 +806,7 @@ The rounded number
 
 ```typescript
 Num.roundAt(3.14159, 2); // 3.14
-Num.roundAt(3.14159, 4); // 3.1416
 Num.roundAt(10.5, 0); // 11
-Num.roundAt(-10.5, 0); // -10
-Num.roundAt(0.005, 2); // 0.01
 ```
 
 ---
@@ -908,7 +815,7 @@ Num.roundAt(0.005, 2); // 0.01
 
 > **roundToInt**(`num`): `Int`
 
-Defined in: [src/number/num.mts:472](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L472)
+Defined in: [src/number/num.mts:416](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L416)
 
 Rounds a number to the nearest integer using bitwise operations.
 
@@ -935,7 +842,4 @@ The rounded integer as an Int branded type
 ```typescript
 Num.roundToInt(3.2); // 3
 Num.roundToInt(3.5); // 4
-Num.roundToInt(3.8); // 4
-Num.roundToInt(-3.2); // -3
-Num.roundToInt(-3.8); // -3
 ```

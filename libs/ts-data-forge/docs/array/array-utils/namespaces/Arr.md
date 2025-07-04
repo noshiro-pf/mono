@@ -153,7 +153,7 @@ expectType<typeof negativeOutOfBounds, Optional<string>>('=');
 
 > `const` **chunk**: `PartitionFnOverload` = `partition`
 
-Defined in: [src/array/array-utils.mts:4034](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4034)
+Defined in: [src/array/array-utils.mts:3966](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3966)
 
 Alias for `partition`. Splits an array into chunks of a specified size.
 
@@ -167,7 +167,7 @@ Alias for `partition`. Splits an array into chunks of a specified size.
 
 > `const` **count**: `CountFnOverload`
 
-Defined in: [src/array/array-utils.mts:2942](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2942)
+Defined in: [src/array/array-utils.mts:2880](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2880)
 
 Counts the number of elements in an array that satisfy a predicate.
 
@@ -205,7 +205,7 @@ console.log(result); // 3
 
 > `const` **countBy**: `CountByFnOverload`
 
-Defined in: [src/array/array-utils.mts:2999](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2999)
+Defined in: [src/array/array-utils.mts:2937](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2937)
 
 Groups elements of an array by a key derived from each element and counts the elements in each group.
 
@@ -323,7 +323,7 @@ expectType<typeof empty, readonly []>('=');
 
 > `const` **drop**: `SkipFnOverload` = `skip`
 
-Defined in: [src/array/array-utils.mts:4016](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4016)
+Defined in: [src/array/array-utils.mts:3948](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3948)
 
 Alias for `skip`. Skips the first N elements of an array.
 
@@ -337,7 +337,7 @@ Alias for `skip`. Skips the first N elements of an array.
 
 > `const` **equal**: \<`E`\>(`array1`, `array2`, `equality`) => `boolean` = `eq`
 
-Defined in: [src/array/array-utils.mts:3852](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3852)
+Defined in: [src/array/array-utils.mts:3784](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3784)
 
 Alias for `eq`.
 
@@ -393,7 +393,7 @@ Arr.eq([{ a: 1 }], [{ a: 1 }], (o1, o2) => o1.a === o2.a); // true
 
 > `const` **filterNot**: `FilterNotFnOverload`
 
-Defined in: [src/array/array-utils.mts:3183](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3183)
+Defined in: [src/array/array-utils.mts:3121](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3121)
 
 Filters an array by excluding elements for which the predicate returns true.
 This is the opposite of `Array.prototype.filter`.
@@ -432,7 +432,7 @@ console.log(result); // [1, 3, 5]
 
 > `const` **find**: `FindFnOverload`
 
-Defined in: [src/array/array-utils.mts:2188](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2188)
+Defined in: [src/array/array-utils.mts:2131](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2131)
 
 Safely finds the first element in an array that satisfies a predicate function.
 
@@ -469,80 +469,18 @@ An `Optional<E>` containing:
 #### Example
 
 ```typescript
-// Basic element finding
 const numbers = [1, 2, 3, 4, 5];
 const firstEven = Arr.find(numbers, (x) => x % 2 === 0);
 if (Optional.isSome(firstEven)) {
-    console.log(firstEven.value); // 2 - first even number
+    console.log(firstEven.value); // 2
 }
 
-// Finding with index information
-const findLargeAtEnd = Arr.find(
-    numbers,
-    (value, index) => value > 3 && index > 2,
-);
-// Optional.Some(4) - first number > 3 after index 2
-
-// Finding objects by property
 const users = [
     { id: 1, name: 'Alice', age: 25 },
     { id: 2, name: 'Bob', age: 30 },
-    { id: 3, name: 'Charlie', age: 35 },
 ];
-
 const adult = Arr.find(users, (user) => user.age >= 30);
 // Optional.Some({ id: 2, name: 'Bob', age: 30 })
-
-const nonExistent = Arr.find(users, (user) => user.age > 100);
-// Optional.None
-
-// Empty array handling
-const emptyResult = Arr.find([], (x) => x > 0); // Optional.None
-
-// Curried usage for functional composition
-const findNegative = Arr.find((x: number) => x < 0);
-const findLongString = Arr.find((s: string) => s.length > 5);
-
-const datasets = [
-    [1, 2, -3, 4],
-    [5, 6, 7, 8],
-    [-1, 0, 1],
-];
-
-const negativeNumbers = datasets.map(findNegative);
-// [Optional.Some(-3), Optional.None, Optional.Some(-1)]
-
-// Pipe composition
-const result = pipe(['short', 'medium', 'very long string'])
-    .map(findLongString)
-    .map((opt) => Optional.unwrapOr(opt, 'default')).value; // 'very long string'
-
-// Complex predicate with all parameters
-const findSpecial = (arr: readonly number[]) =>
-    Arr.find(arr, (value, index, array) => {
-        return value > 10 && index > 0 && index < array.length - 1;
-    });
-
-const hasMiddleSpecial = findSpecial([5, 15, 20, 3]);
-// Optional.Some(15) - first value > 10 that's not at start or end
-
-// Safe unwrapping patterns
-const maybeFound = Arr.find(numbers, (x) => x > 10);
-const foundOrDefault = Optional.unwrapOr(maybeFound, 0); // 0 (not found)
-const foundOrThrow = Optional.isSome(maybeFound)
-    ? maybeFound.value
-    : (() => {
-          throw new Error('Not found');
-      })();
-
-// Type inference examples
-expectType<typeof firstEven, Optional<number>>('=');
-expectType<typeof adult, Optional<{ id: number; name: string; age: number }>>(
-    '=',
-);
-expectType<typeof findNegative, (array: readonly number[]) => Optional<number>>(
-    '=',
-);
 ```
 
 #### See
@@ -557,7 +495,7 @@ expectType<typeof findNegative, (array: readonly number[]) => Optional<number>>(
 
 > `const` **findIndex**: `FindIndexFnOverload`
 
-Defined in: [src/array/array-utils.mts:2344](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2344)
+Defined in: [src/array/array-utils.mts:2287](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2287)
 
 Safely finds the index of the first element in an array that satisfies a predicate function.
 
@@ -691,7 +629,7 @@ expectType<
 
 > `const` **first**: `HeadFnOverload` = `head`
 
-Defined in: [src/array/array-utils.mts:4004](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4004)
+Defined in: [src/array/array-utils.mts:3936](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3936)
 
 Alias for `head`. Returns the first element of an array.
 
@@ -705,7 +643,7 @@ Alias for `head`. Returns the first element of an array.
 
 > `const` **foldl**: `FoldlFnOverload`
 
-Defined in: [src/array/array-utils.mts:2576](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2576)
+Defined in: [src/array/array-utils.mts:2514](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2514)
 
 Applies a function against an accumulator and each element in the array (from left to right) to reduce it to a single value.
 This is an alias for `Array.prototype.reduce`.
@@ -737,13 +675,8 @@ The single value that results from the reduction.
 #### Example
 
 ```ts
-// Regular usage
 Arr.foldl([1, 2, 3], (sum, n) => sum + n, 0); // 6
-
-// Curried usage for pipe composition
-const sumWithZero = Arr.foldl((sum: number, n: number) => sum + n, 0);
-const result = pipe([1, 2, 3, 4]).map(sumWithZero).value;
-console.log(result); // 10
+Arr.foldl(['a', 'b', 'c'], (acc, str) => acc + str.toUpperCase(), ''); // 'ABC'
 ```
 
 ---
@@ -752,7 +685,7 @@ console.log(result); // 10
 
 > `const` **foldr**: `FoldrFnOverload`
 
-Defined in: [src/array/array-utils.mts:2653](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2653)
+Defined in: [src/array/array-utils.mts:2591](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2591)
 
 Applies a function against an accumulator and each element in the array (from right to left) to reduce it to a single value.
 This is an alias for `Array.prototype.reduceRight`.
@@ -799,7 +732,7 @@ console.log(result); // "abc"
 
 > `const` **groupBy**: `GroupByFnOverload`
 
-Defined in: [src/array/array-utils.mts:3712](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3712)
+Defined in: [src/array/array-utils.mts:3645](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3645)
 
 Groups elements of an array by a key derived from each element, returning an immutable [IMap](../../../collections/imap/README.md#imap).
 
@@ -1091,7 +1024,7 @@ expectType<typeof maybeResult, Optional<number>>('=');
 
 > `const` **indexOf**: `IndexOfFnOverload`
 
-Defined in: [src/array/array-utils.mts:2403](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2403)
+Defined in: [src/array/array-utils.mts:2346](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2346)
 
 Gets the index of a value in an array.
 
@@ -1133,7 +1066,7 @@ console.log(Optional.unwrapOr(result2, -1)); // 1
 
 > `const` **indexOfFrom**: `IndexOfFromFnOverload`
 
-Defined in: [src/array/array-utils.mts:2430](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2430)
+Defined in: [src/array/array-utils.mts:2373](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2373)
 
 ---
 
@@ -1141,7 +1074,7 @@ Defined in: [src/array/array-utils.mts:2430](https://github.com/noshiro-pf/ts-da
 
 > `const` **join**: `JoinFnOverload`
 
-Defined in: [src/array/array-utils.mts:3084](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3084)
+Defined in: [src/array/array-utils.mts:3022](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3022)
 
 Joins array elements into a string.
 
@@ -1283,7 +1216,7 @@ expectType<typeof maybeResult, Optional<number>>('=');
 
 > `const` **lastIndexOf**: `LastIndexOfFnOverload`
 
-Defined in: [src/array/array-utils.mts:2489](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2489)
+Defined in: [src/array/array-utils.mts:2432](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2432)
 
 Gets the last index of a value in an array.
 
@@ -1325,7 +1258,7 @@ console.log(Optional.unwrapOr(result2, -1)); // 3
 
 > `const` **lastIndexOfFrom**: `LastIndexOfFromFnOverload`
 
-Defined in: [src/array/array-utils.mts:2515](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2515)
+Defined in: [src/array/array-utils.mts:2458](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2458)
 
 ---
 
@@ -1341,7 +1274,7 @@ Defined in: [src/array/array-utils.mts:119](https://github.com/noshiro-pf/ts-dat
 
 > `const` **max**: `MaxFnOverload`
 
-Defined in: [src/array/array-utils.mts:2781](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2781)
+Defined in: [src/array/array-utils.mts:2719](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2719)
 
 Finds the maximum value in an array.
 
@@ -1379,7 +1312,7 @@ Arr.max([]); // Optional.none
 
 > `const` **maxBy**: `MaxByFnOverload`
 
-Defined in: [src/array/array-utils.mts:2888](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2888)
+Defined in: [src/array/array-utils.mts:2826](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2826)
 
 Finds the element with the maximum value according to a mapped numeric value.
 
@@ -1428,7 +1361,7 @@ Arr.maxBy([], (p) => p.age); // Optional.none
 
 > `const` **min**: `MinFnOverload`
 
-Defined in: [src/array/array-utils.mts:2725](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2725)
+Defined in: [src/array/array-utils.mts:2663](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2663)
 
 Finds the minimum value in an array.
 
@@ -1462,7 +1395,7 @@ Arr.min([]); // Optional.none
 
 > `const` **minBy**: `MinByFnOverload`
 
-Defined in: [src/array/array-utils.mts:2831](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2831)
+Defined in: [src/array/array-utils.mts:2769](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2769)
 
 Finds the element with the minimum value according to a mapped numeric value.
 
@@ -1519,7 +1452,7 @@ Defined in: [src/array/array-utils.mts:583](https://github.com/noshiro-pf/ts-dat
 
 > `const` **partition**: `PartitionFnOverload`
 
-Defined in: [src/array/array-utils.mts:3258](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3258)
+Defined in: [src/array/array-utils.mts:3191](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3191)
 
 Partitions an array into sub-arrays of a specified size.
 The last partition may be smaller if the array length is not a multiple of `chunkSize`.
@@ -1548,13 +1481,8 @@ An array of arrays, where each inner array has up to `chunkSize` elements.
 #### Example
 
 ```ts
-// Regular usage
 Arr.partition([1, 2, 3, 4, 5, 6], 2); // [[1, 2], [3, 4], [5, 6]]
-
-// Curried usage for pipe composition
-const chunkBy3 = Arr.partition(3);
-const result = pipe([1, 2, 3, 4, 5, 6, 7]).map(chunkBy3).value;
-console.log(result); // [[1, 2, 3], [4, 5, 6], [7]]
+Arr.partition([1, 2, 3, 4, 5, 6, 7], 3); // [[1, 2, 3], [4, 5, 6], [7]]
 ```
 
 ---
@@ -1694,7 +1622,7 @@ Never throws - invalid ranges simply return empty arrays
 
 > `const` **reduce**: `FoldlFnOverload` = `foldl`
 
-Defined in: [src/array/array-utils.mts:4022](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4022)
+Defined in: [src/array/array-utils.mts:3954](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3954)
 
 Alias for `foldl`. Applies a function against an accumulator and each element in the array (from left to right) to reduce it to a single value.
 
@@ -1708,7 +1636,7 @@ Alias for `foldl`. Applies a function against an accumulator and each element in
 
 > `const` **reduceRight**: `FoldrFnOverload` = `foldr`
 
-Defined in: [src/array/array-utils.mts:4028](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4028)
+Defined in: [src/array/array-utils.mts:3960](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3960)
 
 Alias for `foldr`. Applies a function against an accumulator and each element in the array (from right to left) to reduce it to a single value.
 
@@ -1722,7 +1650,7 @@ Alias for `foldr`. Applies a function against an accumulator and each element in
 
 > `const` **rest**: \<`Ar`\>(`array`) => `Tail`\<`Ar`\> = `tail`
 
-Defined in: [src/array/array-utils.mts:4010](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4010)
+Defined in: [src/array/array-utils.mts:3942](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3942)
 
 Alias for `tail`. Returns all elements of an array except the first one.
 
@@ -1766,7 +1694,7 @@ Arr.tail([]); // []
 
 > `const` **scan**: `ScanFnOverload`
 
-Defined in: [src/array/array-utils.mts:3497](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3497)
+Defined in: [src/array/array-utils.mts:3430](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3430)
 
 Returns an array of successively reduced values from an array, starting with an initial value.
 
@@ -2348,7 +2276,7 @@ try {
 
 > `const` **sum**: `SumFnOverload`
 
-Defined in: [src/array/array-utils.mts:3052](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3052)
+Defined in: [src/array/array-utils.mts:2990](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2990)
 
 Calculates the sum of numbers in an array.
 
@@ -2642,7 +2570,7 @@ console.log(result); // [20, 30]
 
 > `const` **toSortedBy**: `ToSortedByFnOverload`
 
-Defined in: [src/array/array-utils.mts:3310](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3310)
+Defined in: [src/array/array-utils.mts:3243](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3243)
 
 Sorts an array by a value derived from its elements, using a numeric mapping.
 
@@ -2944,7 +2872,7 @@ expectType<typeof safe1, readonly number[]>('='); // Bounds check preserves type
 
 > `const` **uniqBy**: `UniqByFnOverload`
 
-Defined in: [src/array/array-utils.mts:3794](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3794)
+Defined in: [src/array/array-utils.mts:3726](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3726)
 
 Creates a new array with unique elements from the input array, based on the values returned by `mapFn`.
 
@@ -3080,7 +3008,7 @@ Arr.butLast([]); // []
 
 > **concat**\<`Ar1`, `Ar2`\>(`array1`, `array2`): readonly \[`Ar1`, `Ar2`\]
 
-Defined in: [src/array/array-utils.mts:3229](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3229)
+Defined in: [src/array/array-utils.mts:3167](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3167)
 
 Concatenates two arrays.
 
@@ -3211,7 +3139,7 @@ The underlying implementation uses `slice()` for efficient shallow copying
 
 > **eq**\<`E`\>(`array1`, `array2`, `equality`): `boolean`
 
-Defined in: [src/array/array-utils.mts:3840](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3840)
+Defined in: [src/array/array-utils.mts:3772](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3772)
 
 Checks if two arrays are equal by performing a shallow comparison of their elements.
 
@@ -3749,7 +3677,7 @@ if (Arr.isNonEmpty(testArray)) {
 
 > **isSubset**\<`E1`, `E2`\>(`array1`, `array2`): `boolean`
 
-Defined in: [src/array/array-utils.mts:3872](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3872)
+Defined in: [src/array/array-utils.mts:3804](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3804)
 
 Checks if the first array (`array1`) is a subset of the second array (`array2`).
 An array `A` is a subset of `B` if all elements of `A` are also present in `B`.
@@ -3808,7 +3736,7 @@ Arr.isSubset([1, 5], [1, 2, 3]); // false
 
 > **isSuperset**\<`E1`, `E2`\>(`array1`, `array2`): `boolean`
 
-Defined in: [src/array/array-utils.mts:3898](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3898)
+Defined in: [src/array/array-utils.mts:3830](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3830)
 
 Checks if the first array (`array1`) is a superset of the second array (`array2`).
 An array `A` is a superset of `B` if all elements of `B` are also present in `A`.
@@ -3866,7 +3794,7 @@ Arr.isSuperset([1, 2, 3], []); // true
 
 > **setDifference**\<`E`\>(`array1`, `array2`): readonly `E`[]
 
-Defined in: [src/array/array-utils.mts:3943](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3943)
+Defined in: [src/array/array-utils.mts:3875](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3875)
 
 Returns the set difference of two arrays (`array1` - `array2`).
 The difference contains elements that are in `array1` but not in `array2`. Order is based on `array1`.
@@ -3914,7 +3842,7 @@ Arr.setDifference([1, 2], [3, 4]); // [1, 2]
 
 > **setIntersection**\<`E1`, `E2`\>(`array1`, `array2`): readonly `E1` & `E2`[]
 
-Defined in: [src/array/array-utils.mts:3918](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3918)
+Defined in: [src/array/array-utils.mts:3850](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3850)
 
 Returns the intersection of two arrays of primitive types.
 The intersection contains elements that are present in both arrays. Order is based on `array1`.
@@ -3967,7 +3895,7 @@ Arr.setIntersection([1, 2], [3, 4]); // []
 
 > **sortedNumSetDifference**\<`E`\>(`sortedList1`, `sortedList2`): readonly `E`[]
 
-Defined in: [src/array/array-utils.mts:3963](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3963)
+Defined in: [src/array/array-utils.mts:3895](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3895)
 
 Returns the set difference of two sorted arrays of numbers (`sortedList1` - `sortedList2`).
 This operation is more efficient for sorted arrays than the generic `setDifference`.
@@ -4053,7 +3981,7 @@ Arr.tail([]); // []
 
 > **uniq**\<`P`\>(`array`): readonly `P`[]
 
-Defined in: [src/array/array-utils.mts:3768](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3768)
+Defined in: [src/array/array-utils.mts:3700](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3700)
 
 Creates a new array with unique elements from the input array. Order is preserved from the first occurrence.
 Uses `Set` internally for efficient uniqueness checking.
@@ -4084,7 +4012,6 @@ A new array with unique elements from the input array. Returns `[]` for an empty
 
 ```ts
 Arr.uniq([1, 2, 2, 3, 1, 4]); // [1, 2, 3, 4]
-Arr.uniq(['a', 'b', 'a']); // ['a', 'b']
 ```
 
 ---
@@ -4093,7 +4020,7 @@ Arr.uniq(['a', 'b', 'a']); // ['a', 'b']
 
 > **zip**\<`Ar1`, `Ar2`\>(`array1`, `array2`): `Zip`\<`Ar1`, `Ar2`\>
 
-Defined in: [src/array/array-utils.mts:3150](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3150)
+Defined in: [src/array/array-utils.mts:3088](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3088)
 
 Creates an array of tuples by pairing up corresponding elements from two arrays.
 The resulting array has a length equal to the minimum of the two input array lengths.
