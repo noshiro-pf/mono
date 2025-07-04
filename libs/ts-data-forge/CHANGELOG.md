@@ -1,3 +1,9 @@
+# [1.4.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.3.0...v1.4.0) (2025-07-04)
+
+### Features
+
+- add Arr.generate ([#46](https://github.com/noshiro-pf/ts-data-forge/issues/46)) ([49b5db0](https://github.com/noshiro-pf/ts-data-forge/commit/49b5db0d22d5b295293021a3373f98fd4b4cee6f))
+
 # [1.3.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.2.0...v1.3.0) (2025-07-04)
 
 ### Features
