@@ -7,6 +7,17 @@
 
 **ts-data-forge** is a TypeScript utility library that provides type-safe functional programming utilities with zero runtime dependencies. It aims to enhance development robustness, maintainability, and correctness by leveraging TypeScript's powerful type system.
 
+## Perfect Companion to ts-type-forge
+
+**ts-data-forge** is designed as the ideal runtime companion to [**ts-type-forge**](https://github.com/noshiro-pf/ts-type-forge), a powerful type utility library. While ts-type-forge provides compile-time type utilities for advanced TypeScript type manipulation, ts-data-forge complements it with runtime utilities that maintain the same level of type safety.
+
+Together, they form a complete TypeScript development toolkit:
+
+- **ts-type-forge**: Compile-time type utilities (type manipulation, type inference, advanced type patterns)
+- **ts-data-forge**: Runtime utilities with strong type safety (type guards, branded types, functional programming utilities)
+
+This synergy enables you to build fully type-safe applications from compile-time to runtime, ensuring type correctness throughout your entire codebase.
+
 ## Features
 
 This library offers a range of utilities, including:
@@ -532,7 +543,8 @@ assert.deepStrictEqual(updatedState.items, ['newItem1', 'newItem2']);
 
 **Important Notes:**
 
-- This library **only supports ESM (ES Modules)**. CommonJS is not supported.
+- This library **only supports ESM (ES Modules)** and is designed for native ESM environments. CommonJS is not supported.
+- The library uses `.mts` file extensions and proper ESM exports, making it compatible with modern Node.js ESM resolution and bundlers that support native ESM.
 - This library uses advanced TypeScript features, including branded types for enhanced type safety. Some functions require specific branded types as parameters (such as `Uint32` in `newArray`). The examples above use the small literal numeric values specifically allowed in each function for brevity, but in actual use you should use the provided type conversion functions (such as `asUint32`) or cast to the appropriate branded type, for example `as Uint32`.
 
 ## Removing `expectType` in Production
