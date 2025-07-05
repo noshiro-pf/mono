@@ -1,3 +1,9 @@
+## [1.5.2](https://github.com/noshiro-pf/ts-data-forge/compare/v1.5.1...v1.5.2) (2025-07-05)
+
+### Bug Fixes
+
+- use named function style to implement function overloading ([#59](https://github.com/noshiro-pf/ts-data-forge/issues/59)) ([5df1a35](https://github.com/noshiro-pf/ts-data-forge/commit/5df1a35ecf3caf452eb9ee14cbd6ae4d843127a1))
+
 ## [1.5.1](https://github.com/noshiro-pf/ts-data-forge/compare/v1.5.0...v1.5.1) (2025-07-04)
 
 ### Bug Fixes
