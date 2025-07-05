@@ -410,27 +410,16 @@ export namespace Tpl {
    * // Sorted = readonly [1 | 2 | 3, 1 | 2 | 3, 1 | 2 | 3]
    * ```
    */
-  export const toSorted: ToSortedFnOverload = (<
-    const T extends readonly unknown[],
-  >(
+  export function toSorted<const T extends readonly unknown[]>(
     tpl: T,
     comparator?: (x: T[number], y: T[number]) => number,
-  ): { readonly [K in keyof T]: T[number] } => {
+  ): Readonly<{ [K in keyof T]: T[number] }> {
     const cmp = comparator ?? ((x, y) => Number(x) - Number(y));
 
     return tpl.toSorted(cmp) as {
       readonly [K in keyof T]: T[number];
     };
-  }) as ToSortedFnOverload;
-
-  type ToSortedFnOverload =
-    /**
-     * Sort tuple with optional comparator function.
-     */
-    <const T extends readonly unknown[]>(
-      tpl: T,
-      comparator?: (x: T[number], y: T[number]) => number,
-    ) => { readonly [K in keyof T]: T[number] };
+  }
 
   /**
    * Sorts a tuple by derived values from its elements.
@@ -482,38 +471,28 @@ export namespace Tpl {
    * );
    * ```
    */
-  export const toSortedBy: ToSortedByFnOverload = (<
-    const T extends readonly unknown[],
-    const B,
-  >(
+  export function toSortedBy<const T extends readonly unknown[]>(
+    tpl: T,
+    comparatorValueMapper: (value: T[number]) => number,
+    comparator?: (x: number, y: number) => number,
+  ): Readonly<{ [K in keyof T]: T[number] }>;
+
+  export function toSortedBy<const T extends readonly unknown[], const B>(
+    tpl: T,
+    comparatorValueMapper: (value: T[number]) => B,
+    comparator: (x: B, y: B) => number,
+  ): Readonly<{ [K in keyof T]: T[number] }>;
+
+  export function toSortedBy<const T extends readonly unknown[], const B>(
     tpl: T,
     comparatorValueMapper: (value: T[number]) => B,
     comparator?: (x: B, y: B) => number,
-  ): Readonly<{ [K in keyof T]: T[number] }> =>
-    toSorted(tpl, (x, y) =>
+  ): Readonly<{ [K in keyof T]: T[number] }> {
+    return toSorted(tpl, (x, y) =>
       comparator === undefined
         ? (comparatorValueMapper(x) as number) -
           (comparatorValueMapper(y) as number)
         : comparator(comparatorValueMapper(x), comparatorValueMapper(y)),
-    )) as ToSortedByFnOverload;
-
-  type ToSortedByFnOverload = {
-    /**
-     * Sort by numeric values (default numeric comparison).
-     */
-    <const T extends readonly unknown[]>(
-      tpl: T,
-      comparatorValueMapper: (value: T[number]) => number,
-      comparator?: (x: number, y: number) => number,
-    ): Readonly<{ [K in keyof T]: T[number] }>;
-
-    /**
-     * Sort by any comparable values with required comparator.
-     */
-    <const T extends readonly unknown[], const B>(
-      tpl: T,
-      comparatorValueMapper: (value: T[number]) => B,
-      comparator: (x: B, y: B) => number,
-    ): Readonly<{ [K in keyof T]: T[number] }>;
-  };
+    );
+  }
 }

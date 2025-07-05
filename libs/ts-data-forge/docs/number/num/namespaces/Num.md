@@ -43,33 +43,6 @@ const result = clampFn(150); // 100
 
 ## Variables
 
-### clamp
-
-> `const` **clamp**: `ClampFnOverload`
-
-Defined in: [src/number/num.mts:292](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L292)
-
-Clamps a value within the given range. If the target value is invalid (not finite), returns the lower bound.
-
-Provides two usage patterns for maximum flexibility:
-
-- **Direct usage**: Pass all three arguments to get the clamped value immediately
-- **Curried usage**: Pass bounds to get a reusable clamping function
-
-#### Example
-
-```typescript
-// Direct usage
-Num.clamp(15, 0, 10); // 10 (clamped to upper bound)
-Num.clamp(5, 0, 10); // 5 (within bounds)
-
-// Curried usage
-const clampToPercent = Num.clamp(0, 100);
-clampToPercent(150); // 100
-```
-
----
-
 ### from()
 
 > `const` **from**: (`n`) => `number` = `Number`
@@ -101,11 +74,107 @@ Num.from('hello'); // NaN
 
 ## Functions
 
+### clamp()
+
+#### Call Signature
+
+> **clamp**(`target`, `lowerBound`, `upperBound`): `number`
+
+Defined in: [src/number/num.mts:291](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L291)
+
+Clamps a value within the given range. If the target value is invalid (not finite), returns the lower bound.
+
+Provides two usage patterns for maximum flexibility:
+
+- **Direct usage**: Pass all three arguments to get the clamped value immediately
+- **Curried usage**: Pass bounds to get a reusable clamping function
+
+##### Parameters
+
+###### target
+
+`number`
+
+###### lowerBound
+
+`number`
+
+###### upperBound
+
+`number`
+
+##### Returns
+
+`number`
+
+##### Example
+
+```typescript
+// Direct usage
+Num.clamp(15, 0, 10); // 10 (clamped to upper bound)
+Num.clamp(5, 0, 10); // 5 (within bounds)
+
+// Curried usage
+const clampToPercent = Num.clamp(0, 100);
+clampToPercent(150); // 100
+```
+
+#### Call Signature
+
+> **clamp**(`lowerBound`, `upperBound`): (`target`) => `number`
+
+Defined in: [src/number/num.mts:298](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L298)
+
+Clamps a value within the given range. If the target value is invalid (not finite), returns the lower bound.
+
+Provides two usage patterns for maximum flexibility:
+
+- **Direct usage**: Pass all three arguments to get the clamped value immediately
+- **Curried usage**: Pass bounds to get a reusable clamping function
+
+##### Parameters
+
+###### lowerBound
+
+`number`
+
+###### upperBound
+
+`number`
+
+##### Returns
+
+> (`target`): `number`
+
+###### Parameters
+
+###### target
+
+`number`
+
+###### Returns
+
+`number`
+
+##### Example
+
+```typescript
+// Direct usage
+Num.clamp(15, 0, 10); // 10 (clamped to upper bound)
+Num.clamp(5, 0, 10); // 5 (within bounds)
+
+// Curried usage
+const clampToPercent = Num.clamp(0, 100);
+clampToPercent(150); // 100
+```
+
+---
+
 ### decrement()
 
 > **decrement**\<`N`\>(`n`): `Decrement`\<`N`\>
 
-Defined in: [src/number/num.mts:506](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L506)
+Defined in: [src/number/num.mts:510](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L510)
 
 Type-safe decrement operation for positive SmallInt values.
 
@@ -148,7 +217,7 @@ const two = Num.decrement(three); // type is 2, value is 2
 
 > **div**(`a`, `b`): `number`
 
-Defined in: [src/number/num.mts:347](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L347)
+Defined in: [src/number/num.mts:351](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L351)
 
 Performs type-safe division with compile-time zero-check.
 
@@ -199,7 +268,7 @@ const result3 = Num.div(20, nonZero); // 4
 
 > **divInt**(`a`, `b`): `number`
 
-Defined in: [src/number/num.mts:369](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L369)
+Defined in: [src/number/num.mts:373](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L373)
 
 Performs integer division using floor division.
 
@@ -242,7 +311,7 @@ Num.divInt(10, -3); // -4 (floor division)
 
 > **increment**\<`N`\>(`n`): `Increment`\<`N`\>
 
-Defined in: [src/number/num.mts:485](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L485)
+Defined in: [src/number/num.mts:489](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L489)
 
 Type-safe increment operation for SmallUint values.
 
@@ -686,7 +755,7 @@ if (isValidScore(score)) {
 
 > **mapNaN2Undefined**\<`N`\>(`num`): `undefined` \| `RelaxedExclude`\<`N`, `NaNType`\>
 
-Defined in: [src/number/num.mts:460](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L460)
+Defined in: [src/number/num.mts:464](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L464)
 
 Converts NaN values to undefined while preserving all other numbers.
 
@@ -729,7 +798,7 @@ Num.mapNaN2Undefined(NaN); // undefined
 
 > **round**(`digit`): (`num`) => `number`
 
-Defined in: [src/number/num.mts:435](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L435)
+Defined in: [src/number/num.mts:439](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L439)
 
 Creates a reusable rounding function with a fixed precision.
 
@@ -775,7 +844,7 @@ roundTo2(2.71828); // 2.72
 
 > **roundAt**(`num`, `precision`): `number`
 
-Defined in: [src/number/num.mts:390](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L390)
+Defined in: [src/number/num.mts:394](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L394)
 
 Rounds a number to a specified number of decimal places.
 
@@ -815,7 +884,7 @@ Num.roundAt(10.5, 0); // 11
 
 > **roundToInt**(`num`): `Int`
 
-Defined in: [src/number/num.mts:416](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L416)
+Defined in: [src/number/num.mts:420](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L420)
 
 Rounds a number to the nearest integer using bitwise operations.
 

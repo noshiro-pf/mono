@@ -359,20 +359,16 @@ export namespace Result {
    * };
    * ```
    */
-  export const unwrapOk: UnwrapOkFnOverload = (<R extends Base>(
-    result: R,
-  ): UnwrapOk<R> | undefined =>
-    isErr(result)
+  export function unwrapOk<R extends Ok<unknown>>(result: R): UnwrapOk<R>;
+
+  export function unwrapOk<R extends Base>(result: R): UnwrapOk<R> | undefined;
+
+  export function unwrapOk<R extends Base>(result: R): UnwrapOk<R> | undefined {
+    return isErr(result)
       ? undefined
       : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-        (result.value as UnwrapOk<R>)) as UnwrapOkFnOverload;
-
-  type UnwrapOkFnOverload = {
-    <R extends Ok<unknown>>(result: R): UnwrapOk<R>;
-
-    // Curried version
-    <R extends Base>(result: R): UnwrapOk<R> | undefined;
-  };
+        (result.value as UnwrapOk<R>);
+  }
 
   /**
    * Unwraps a `Result`, returning the success value or a default value if it is `Result.Err`.
@@ -388,12 +384,22 @@ export namespace Result {
    * console.log(value); // 42
    * ```
    */
-  export const unwrapOkOr: UnwrapOkOrFnOverload = (<R extends Base, D>(
+  export function unwrapOkOr<R extends Base, D>(
+    result: R,
+    defaultValue: D,
+  ): D | UnwrapOk<R>;
+
+  // Curried version
+  export function unwrapOkOr<S, D>(
+    defaultValue: D,
+  ): <E>(result: Result<S, E>) => D | S;
+
+  export function unwrapOkOr<R extends Base, D>(
     ...args: readonly [result: R, defaultValue: D] | readonly [defaultValue: D]
   ):
     | D
     | UnwrapOk<R>
-    | (<E>(result: Result<UnwrapOk<R>, E>) => D | UnwrapOk<R>) => {
+    | (<E>(result: Result<UnwrapOk<R>, E>) => D | UnwrapOk<R>) {
     switch (args.length) {
       case 2: {
         // Direct version: first argument is result
@@ -409,14 +415,7 @@ export namespace Result {
           unwrapOkOr(result, defaultValue);
       }
     }
-  }) as UnwrapOkOrFnOverload;
-
-  type UnwrapOkOrFnOverload = {
-    <R extends Base, D>(result: R, defaultValue: D): D | UnwrapOk<R>;
-
-    // Curried version
-    <S, D>(defaultValue: D): <E>(result: Result<S, E>) => D | S;
-  };
+  }
 
   /**
    * Unwraps a `Result`, returning the error value.
@@ -498,12 +497,22 @@ export namespace Result {
    * console.log(error); // "failed"
    * ```
    */
-  export const unwrapErrOr: UnwrapErrOrFnOverload = (<R extends Base, D>(
+  export function unwrapErrOr<R extends Base, D>(
+    result: R,
+    defaultValue: D,
+  ): D | UnwrapErr<R>;
+
+  // Curried version
+  export function unwrapErrOr<E, D>(
+    defaultValue: D,
+  ): <S>(result: Result<S, E>) => D | E;
+
+  export function unwrapErrOr<R extends Base, D>(
     ...args: readonly [result: R, defaultValue: D] | readonly [defaultValue: D]
   ):
     | D
     | UnwrapErr<R>
-    | (<S>(result: Result<S, UnwrapErr<R>>) => D | UnwrapErr<R>) => {
+    | (<S>(result: Result<S, UnwrapErr<R>>) => D | UnwrapErr<R>) {
     switch (args.length) {
       case 2: {
         // Direct version: first argument is result
@@ -519,14 +528,7 @@ export namespace Result {
           unwrapErrOr(result, defaultValue);
       }
     }
-  }) as UnwrapErrOrFnOverload;
-
-  type UnwrapErrOrFnOverload = {
-    <R extends Base, D>(result: R, defaultValue: D): D | UnwrapErr<R>;
-
-    // Curried version
-    <E, D>(defaultValue: D): <S>(result: Result<S, E>) => D | E;
-  };
+  }
 
   /**
    * Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the success value.
@@ -549,12 +551,21 @@ export namespace Result {
    * console.log(Result.unwrap(result2)); // 10
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const map: MapFnOverload = (<R extends Base, S2>(
+  export function map<R extends Base, S2>(
+    result: R,
+    mapFn: (value: UnwrapOk<R>) => S2,
+  ): Result<S2, UnwrapErr<R>>;
+
+  // Curried version
+  export function map<S, S2>(
+    mapFn: (value: S) => S2,
+  ): <E>(result: Result<S, E>) => Result<S2, E>;
+
+  export function map<R extends Base, S2>(
     ...args:
       | readonly [result: R, mapFn: (value: UnwrapOk<R>) => S2]
       | readonly [mapFn: (value: UnwrapOk<R>) => S2]
-  ): Result<S2, UnwrapErr<R>> | ((result: R) => Result<S2, UnwrapErr<R>>) => {
+  ): Result<S2, UnwrapErr<R>> | ((result: R) => Result<S2, UnwrapErr<R>>) {
     switch (args.length) {
       case 2: {
         const [result, mapFn] = args;
@@ -571,19 +582,7 @@ export namespace Result {
         return (result: R) => map(result, mapFn);
       }
     }
-  }) as MapFnOverload;
-
-  type MapFnOverload = {
-    <R extends Base, S2>(
-      result: R,
-      mapFn: (value: UnwrapOk<R>) => S2,
-    ): Result<S2, UnwrapErr<R>>;
-
-    // Curried version
-    <S, S2>(
-      mapFn: (value: S) => S2,
-    ): <E>(result: Result<S, E>) => Result<S2, E>;
-  };
+  }
 
   /**
    * Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the error value.
@@ -600,12 +599,21 @@ export namespace Result {
    * console.log(Result.unwrapErr(mapped)); // "ERROR"
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const mapErr: MapErrFnOverload = (<R extends Base, E2>(
+  export function mapErr<R extends Base, E2>(
+    result: R,
+    mapFn: (error: UnwrapErr<R>) => E2,
+  ): Result<UnwrapOk<R>, E2>;
+
+  // Curried version
+  export function mapErr<E, E2>(
+    mapFn: (error: E) => E2,
+  ): <S>(result: Result<S, E>) => Result<S, E2>;
+
+  export function mapErr<R extends Base, E2>(
     ...args:
       | readonly [result: R, mapFn: (error: UnwrapErr<R>) => E2]
       | readonly [mapFn: (error: UnwrapErr<R>) => E2]
-  ): Result<UnwrapOk<R>, E2> | ((result: R) => Result<UnwrapOk<R>, E2>) => {
+  ): Result<UnwrapOk<R>, E2> | ((result: R) => Result<UnwrapOk<R>, E2>) {
     switch (args.length) {
       case 2: {
         const [result, mapFn] = args;
@@ -622,19 +630,7 @@ export namespace Result {
         return (result: R) => mapErr(result, mapFn);
       }
     }
-  }) as MapErrFnOverload;
-
-  type MapErrFnOverload = {
-    <R extends Base, E2>(
-      result: R,
-      mapFn: (error: UnwrapErr<R>) => E2,
-    ): Result<UnwrapOk<R>, E2>;
-
-    // Curried version
-    <E, E2>(
-      mapFn: (error: E) => E2,
-    ): <S>(result: Result<S, E>) => Result<S, E2>;
-  };
+  }
 
   /**
    * Applies one of two functions depending on whether the `Result` is `Ok` or `Err`.
@@ -652,8 +648,19 @@ export namespace Result {
    * console.log(Result.unwrapOk(folded)); // 84
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const fold: FoldFnOverload = (<R extends Base, S2, E2>(
+  export function fold<R extends Base, S2, E2>(
+    result: R,
+    mapFn: (value: UnwrapOk<R>) => S2,
+    mapErrFn: (error: UnwrapErr<R>) => E2,
+  ): Result<S2, E2>;
+
+  // Curried version
+  export function fold<S, E, S2, E2>(
+    mapFn: (value: S) => S2,
+    mapErrFn: (error: E) => E2,
+  ): (result: Result<S, E>) => Result<S2, E2>;
+
+  export function fold<R extends Base, S2, E2>(
     ...args:
       | readonly [
           result: R,
@@ -666,7 +673,7 @@ export namespace Result {
         ]
   ):
     | Result<S2, E2>
-    | ((result: Result<UnwrapOk<R>, UnwrapErr<R>>) => Result<S2, E2>) => {
+    | ((result: Result<UnwrapOk<R>, UnwrapErr<R>>) => Result<S2, E2>) {
     switch (args.length) {
       case 3: {
         const [result, mapFn, mapErrFn] = args;
@@ -683,21 +690,7 @@ export namespace Result {
           isOk(result) ? ok(mapFn(result.value)) : err(mapErrFn(result.value));
       }
     }
-  }) as FoldFnOverload;
-
-  type FoldFnOverload = {
-    <R extends Base, S2, E2>(
-      result: R,
-      mapFn: (value: UnwrapOk<R>) => S2,
-      mapErrFn: (error: UnwrapErr<R>) => E2,
-    ): Result<S2, E2>;
-
-    // Curried version
-    <S, E, S2, E2>(
-      mapFn: (value: S) => S2,
-      mapErrFn: (error: E) => E2,
-    ): (result: Result<S, E>) => Result<S2, E2>;
-  };
+  }
 
   /**
    * Applies a function that returns a `Result` to the success value of a `Result`.
@@ -718,14 +711,23 @@ export namespace Result {
    * console.log(Result.unwrapOk(result)); // 5
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const flatMap: FlatMapFnOverload = (<R extends Base, S2, E2>(
+  export function flatMap<R extends Base, S2, E2>(
+    result: R,
+    flatMapFn: (value: UnwrapOk<R>) => Result<S2, E2>,
+  ): Result<S2, E2 | UnwrapErr<R>>;
+
+  // Curried version
+  export function flatMap<S, S2, E2>(
+    flatMapFn: (value: S) => Result<S2, E2>,
+  ): <E>(result: Result<S, E>) => Result<S2, E | E2>;
+
+  export function flatMap<R extends Base, S2, E2>(
     ...args:
       | readonly [result: R, flatMapFn: (value: UnwrapOk<R>) => Result<S2, E2>]
       | readonly [flatMapFn: (value: UnwrapOk<R>) => Result<S2, E2>]
   ):
     | Result<S2, E2 | UnwrapErr<R>>
-    | (<E>(result: Result<UnwrapOk<R>, E>) => Result<S2, E | E2>) => {
+    | (<E>(result: Result<UnwrapOk<R>, E>) => Result<S2, E | E2>) {
     switch (args.length) {
       case 2: {
         const [result, flatMapFn] = args;
@@ -742,19 +744,7 @@ export namespace Result {
           isErr(result) ? result : flatMapFn(result.value);
       }
     }
-  }) as FlatMapFnOverload;
-
-  type FlatMapFnOverload = {
-    <R extends Base, S2, E2>(
-      result: R,
-      flatMapFn: (value: UnwrapOk<R>) => Result<S2, E2>,
-    ): Result<S2, E2 | UnwrapErr<R>>;
-
-    // Curried version
-    <S, S2, E2>(
-      flatMapFn: (value: S) => Result<S2, E2>,
-    ): <E>(result: Result<S, E>) => Result<S2, E | E2>;
-  };
+  }
 
   /**
    * Unwraps a `Result`, returning the success value or throwing an error with the provided message.
@@ -770,10 +760,19 @@ export namespace Result {
    * console.log(value); // 42
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const expectToBe: ExpectToBeFnOverload = (<R extends Base>(
+  export function expectToBe<R extends Base>(
+    result: R,
+    message: string,
+  ): UnwrapOk<R>;
+
+  // Curried version
+  export function expectToBe<S>(
+    message: string,
+  ): <E>(result: Result<S, E>) => S;
+
+  export function expectToBe<R extends Base>(
     ...args: readonly [result: R, message: string] | readonly [message: string]
-  ): UnwrapOk<R> | (<E>(result: Result<UnwrapOk<R>, E>) => UnwrapOk<R>) => {
+  ): UnwrapOk<R> | (<E>(result: Result<UnwrapOk<R>, E>) => UnwrapOk<R>) {
     switch (args.length) {
       case 2: {
         // Direct version: first argument is result
@@ -792,14 +791,7 @@ export namespace Result {
           expectToBe(result, message);
       }
     }
-  }) as ExpectToBeFnOverload;
-
-  type ExpectToBeFnOverload = {
-    <R extends Base>(result: R, message: string): UnwrapOk<R>;
-
-    // Curried version
-    <S>(message: string): <E>(result: Result<S, E>) => S;
-  };
+  }
 
   /**
    * @internal
@@ -933,13 +925,23 @@ export namespace Result {
    * console.log(Result.unwrapOk(result)); // "default"
    * ```
    */
-  export const orElse: OrElseFnOverload = (<R extends Base, R2 extends Base>(
+  export function orElse<R extends Base, R2 extends Base>(
+    result: R,
+    alternative: R2,
+  ): NarrowToOk<R> | R2;
+
+  // Curried version
+  export function orElse<S, E, S2, E2>(
+    alternative: Result<S2, E2>,
+  ): (result: Result<S, E>) => Result<S, E> | Result<S2, E2>;
+
+  export function orElse<R extends Base, R2 extends Base>(
     ...args: readonly [result: R, alternative: R2] | readonly [alternative: R2]
   ):
     | (NarrowToOk<R> | R2)
     | ((
         result: Result<UnwrapOk<R>, UnwrapErr<R>>,
-      ) => Result<UnwrapOk<R>, UnwrapErr<R>> | R2) => {
+      ) => Result<UnwrapOk<R>, UnwrapErr<R>> | R2) {
     switch (args.length) {
       case 2: {
         const [result, alternative] = args;
@@ -953,19 +955,7 @@ export namespace Result {
           orElse(result, alternative);
       }
     }
-  }) as OrElseFnOverload;
-
-  type OrElseFnOverload = {
-    <R extends Base, R2 extends Base>(
-      result: R,
-      alternative: R2,
-    ): NarrowToOk<R> | R2;
-
-    // Curried version
-    <S, E, S2, E2>(
-      alternative: Result<S2, E2>,
-    ): (result: Result<S, E>) => Result<S, E> | Result<S2, E2>;
-  };
+  }
 
   /**
    * Combines two `Result` values into a single `Result` containing a tuple.

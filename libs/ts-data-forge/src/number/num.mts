@@ -288,12 +288,23 @@ export namespace Num {
    * clampToPercent(150); // 100
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const clamp: ClampFnOverload = ((
+  export function clamp(
+    target: number,
+    lowerBound: number,
+    upperBound: number,
+  ): number;
+
+  // Curried version
+  export function clamp(
+    lowerBound: number,
+    upperBound: number,
+  ): (target: number) => number;
+
+  export function clamp(
     ...args:
       | readonly [target: number, lowerBound: number, upperBound: number]
       | readonly [lowerBound: number, upperBound: number]
-  ) => {
+  ): number | ((target: number) => number) {
     switch (args.length) {
       case 3: {
         const [target, lowerBound, upperBound] = args;
@@ -308,14 +319,7 @@ export namespace Num {
           clamp(target, lowerBound, upperBound);
       }
     }
-  }) as ClampFnOverload;
-
-  type ClampFnOverload = {
-    (target: number, lowerBound: number, upperBound: number): number;
-
-    // Curried version
-    (lowerBound: number, upperBound: number): (target: number) => number;
-  };
+  }
 
   /**
    * Performs type-safe division with compile-time zero-check.

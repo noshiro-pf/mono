@@ -107,168 +107,6 @@ The [Optional.Base](#base) type to unwrap.
 
 ## Variables
 
-### expectToBe
-
-> `const` **expectToBe**: `ExpectToBeFnOverload`
-
-Defined in: [src/functional/optional.mts:498](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L498)
-
-Unwraps an `Optional`, returning the contained value or throwing an error with the provided message.
-
-#### Template
-
-The `Optional.Base` type to unwrap.
-
-#### Param
-
-The `Optional` to unwrap.
-
-#### Param
-
-The error message to throw if the `Optional` is `Optional.None`.
-
-#### Returns
-
-The contained value if `Optional.Some`.
-
-#### Throws
-
-Error with the provided message if the `Optional` is `Optional.None`.
-
-#### Example
-
-```typescript
-const some = Optional.some(42);
-const value = Optional.expectToBe(some, 'Value must exist');
-console.log(value); // 42
-```
-
----
-
-### filter
-
-> `const` **filter**: `FilterFnOverload`
-
-Defined in: [src/functional/optional.mts:448](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L448)
-
-Filters an `Optional` based on a predicate.
-If the `Optional` is `Some` and the predicate returns true, returns the original `Optional`.
-Otherwise returns `None`.
-
-#### Template
-
-The input `Optional.Base` type.
-
-#### Param
-
-The `Optional` to filter.
-
-#### Param
-
-The predicate function.
-
-#### Returns
-
-The filtered `Optional`.
-
-#### Example
-
-```typescript
-const someEven = Optional.some(4);
-const filtered = Optional.filter(someEven, (x) => x % 2 === 0);
-console.log(Optional.unwrap(filtered)); // 4
-```
-
----
-
-### flatMap
-
-> `const` **flatMap**: `FlatMapFnOverload`
-
-Defined in: [src/functional/optional.mts:402](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L402)
-
-Applies a function that returns an `Optional` to the value in an `Optional.Some`.
-If the input is `Optional.None`, returns `Optional.None`.
-This is the monadic bind operation for `Optional`.
-
-#### Template
-
-The input `Optional.Base` type.
-
-#### Template
-
-The value type of the `Optional` returned by the function.
-
-#### Param
-
-The `Optional` to flat map.
-
-#### Param
-
-The function to apply that returns an `Optional`.
-
-#### Returns
-
-The result of applying the function, or `Optional.None`.
-
-#### Example
-
-```typescript
-const parseNumber = (s: string): Optional<number> => {
-    const n = Number(s);
-    return isNaN(n) ? Optional.none : Optional.some(n);
-};
-
-const result = Optional.flatMap(Optional.some('42'), parseNumber);
-console.log(Optional.unwrap(result)); // 42
-```
-
----
-
-### map
-
-> `const` **map**: `MapFnOverload`
-
-Defined in: [src/functional/optional.mts:352](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L352)
-
-Maps an [Optional](../README.md#optional)<S> to [Optional](../README.md#optional)<S2> by applying a function to a contained value.
-If the [Optional](../README.md#optional) is [Optional.None](#none), it returns [Optional.none](#none-1).
-Otherwise, it applies the `mapFn` to the value in `Optional.Some` and returns a new `Optional.Some` with the result.
-
-#### Template
-
-The input `Optional.Base` type.
-
-#### Template
-
-The type of the value returned by the mapping function.
-
-#### Param
-
-The `Optional` to map.
-
-#### Param
-
-The function to apply to the value if it exists.
-
-#### Returns
-
-A new `Optional<S2>` resulting from the mapping, or `Optional.None` if the input was `Optional.None`.
-
-#### Example
-
-```typescript
-const someNumber = Optional.some(5);
-const mapped = Optional.map(someNumber, (x) => x * 2);
-console.log(Optional.unwrap(mapped)); // 10
-
-const noneValue = Optional.none;
-const mappedNone = Optional.map(noneValue, (x) => x * 2);
-console.log(Optional.isNone(mappedNone)); // true
-```
-
----
-
 ### none
 
 > `const` **none**: [`None`](#none)
@@ -285,141 +123,331 @@ console.log(Optional.isNone(emptyValue)); // true
 console.log(Optional.unwrapOr(emptyValue, 'default')); // "default"
 ```
 
+## Functions
+
+### expectToBe()
+
+#### Call Signature
+
+> **expectToBe**\<`O`\>(`optional`, `message`): [`Unwrap`](#unwrap)\<`O`\>
+
+Defined in: [src/functional/optional.mts:483](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L483)
+
+Unwraps an `Optional`, returning the contained value or throwing an error with the provided message.
+
+##### Type Parameters
+
+###### O
+
+`O` _extends_ [`Base`](#base)
+
+The `Optional.Base` type to unwrap.
+
+##### Parameters
+
+###### optional
+
+`O`
+
+The `Optional` to unwrap.
+
+###### message
+
+`string`
+
+The error message to throw if the `Optional` is `Optional.None`.
+
+##### Returns
+
+[`Unwrap`](#unwrap)\<`O`\>
+
+The contained value if `Optional.Some`.
+
+##### Throws
+
+Error with the provided message if the `Optional` is `Optional.None`.
+
+##### Example
+
+```typescript
+const some = Optional.some(42);
+const value = Optional.expectToBe(some, 'Value must exist');
+console.log(value); // 42
+```
+
+#### Call Signature
+
+> **expectToBe**\<`S`\>(`message`): (`optional`) => `S`
+
+Defined in: [src/functional/optional.mts:489](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L489)
+
+Unwraps an `Optional`, returning the contained value or throwing an error with the provided message.
+
+##### Type Parameters
+
+###### S
+
+`S`
+
+##### Parameters
+
+###### message
+
+`string`
+
+The error message to throw if the `Optional` is `Optional.None`.
+
+##### Returns
+
+The contained value if `Optional.Some`.
+
+> (`optional`): `S`
+
+###### Parameters
+
+###### optional
+
+[`Optional`](../README.md#optional)\<`S`\>
+
+###### Returns
+
+`S`
+
+##### Throws
+
+Error with the provided message if the `Optional` is `Optional.None`.
+
+##### Example
+
+```typescript
+const some = Optional.some(42);
+const value = Optional.expectToBe(some, 'Value must exist');
+console.log(value); // 42
+```
+
 ---
 
-### orElse
+### filter()
 
-> `const` **orElse**: `OrElseFnOverload`
+#### Call Signature
 
-Defined in: [src/functional/optional.mts:296](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L296)
+> **filter**\<`O`\>(`optional`, `predicate`): [`Optional`](../README.md#optional)\<[`Unwrap`](#unwrap)\<`O`\>\>
 
-Returns the `Optional` if it is `Some`, otherwise returns the alternative.
+Defined in: [src/functional/optional.mts:436](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L436)
 
-Provides a way to chain Optional operations with fallback values. This is
-particularly useful for implementing default behavior or cascading lookups.
-Supports both direct usage and curried form for functional composition.
+Filters an `Optional` based on a predicate.
+If the `Optional` is `Some` and the predicate returns true, returns the original `Optional`.
+Otherwise returns `None`.
 
-#### Template
+##### Type Parameters
+
+###### O
+
+`O` _extends_ [`Base`](#base)
 
 The input `Optional.Base` type.
 
-#### Param
+##### Parameters
 
-The `Optional` to check.
+###### optional
 
-#### Param
+`O`
 
-The alternative `Optional` to return if the first is `None`.
+The `Optional` to filter.
 
-#### Returns
+###### predicate
 
-The first `Optional` if `Some`, otherwise the alternative.
+(`value`) => `boolean`
 
-#### Example
+The predicate function.
+
+##### Returns
+
+[`Optional`](../README.md#optional)\<[`Unwrap`](#unwrap)\<`O`\>\>
+
+The filtered `Optional`.
+
+##### Example
 
 ```typescript
-const primary = Optional.none;
-const fallback = Optional.some('default');
-const result = Optional.orElse(primary, fallback);
-console.log(Optional.unwrap(result)); // "default"
+const someEven = Optional.some(4);
+const filtered = Optional.filter(someEven, (x) => x % 2 === 0);
+console.log(Optional.unwrap(filtered)); // 4
+```
+
+#### Call Signature
+
+> **filter**\<`S`\>(`predicate`): (`optional`) => [`Optional`](../README.md#optional)\<`S`\>
+
+Defined in: [src/functional/optional.mts:442](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L442)
+
+Filters an `Optional` based on a predicate.
+If the `Optional` is `Some` and the predicate returns true, returns the original `Optional`.
+Otherwise returns `None`.
+
+##### Type Parameters
+
+###### S
+
+`S`
+
+##### Parameters
+
+###### predicate
+
+(`value`) => `boolean`
+
+The predicate function.
+
+##### Returns
+
+The filtered `Optional`.
+
+> (`optional`): [`Optional`](../README.md#optional)\<`S`\>
+
+###### Parameters
+
+###### optional
+
+[`Optional`](../README.md#optional)\<`S`\>
+
+###### Returns
+
+[`Optional`](../README.md#optional)\<`S`\>
+
+##### Example
+
+```typescript
+const someEven = Optional.some(4);
+const filtered = Optional.filter(someEven, (x) => x % 2 === 0);
+console.log(Optional.unwrap(filtered)); // 4
 ```
 
 ---
 
-### unwrap
+### flatMap()
 
-> `const` **unwrap**: `UnwrapFnOverload`
+#### Call Signature
 
-Defined in: [src/functional/optional.mts:205](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L205)
+> **flatMap**\<`O`, `S2`\>(`optional`, `flatMapFn`): [`Optional`](../README.md#optional)\<`S2`\>
 
-Unwraps an `Optional`, returning the contained value or `undefined` if empty.
+Defined in: [src/functional/optional.mts:393](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L393)
 
-This function provides a safe way to extract values from Optionals without
-throwing exceptions. It has overloaded behavior based on the type:
+Applies a function that returns an `Optional` to the value in an `Optional.Some`.
+If the input is `Optional.None`, returns `Optional.None`.
+This is the monadic bind operation for `Optional`.
 
-- For `Optional.Some<T>`: Always returns `T` (guaranteed by type system)
-- For general `Optional<T>`: Returns `T | undefined`
+##### Type Parameters
 
-#### Template
+###### O
 
-The `Optional.Base` type to unwrap.
+`O` _extends_ [`Base`](#base)
 
-#### Param
+The input `Optional.Base` type.
 
-The `Optional` to unwrap.
+###### S2
 
-#### Returns
+`S2`
 
-The contained value if `Optional.Some`, otherwise `undefined`.
+The value type of the `Optional` returned by the function.
 
-#### Example
+##### Parameters
+
+###### optional
+
+`O`
+
+The `Optional` to flat map.
+
+###### flatMapFn
+
+(`value`) => [`Optional`](../README.md#optional)\<`S2`\>
+
+The function to apply that returns an `Optional`.
+
+##### Returns
+
+[`Optional`](../README.md#optional)\<`S2`\>
+
+The result of applying the function, or `Optional.None`.
+
+##### Example
 
 ```typescript
-const some = Optional.some(42);
-const value = Optional.unwrap(some); // 42
+const parseNumber = (s: string): Optional<number> => {
+    const n = Number(s);
+    return isNaN(n) ? Optional.none : Optional.some(n);
+};
 
-const none = Optional.none;
-const result = Optional.unwrap(none); // undefined
+const result = Optional.flatMap(Optional.some('42'), parseNumber);
+console.log(Optional.unwrap(result)); // 42
+```
+
+#### Call Signature
+
+> **flatMap**\<`S`, `S2`\>(`flatMapFn`): (`optional`) => [`Optional`](../README.md#optional)\<`S2`\>
+
+Defined in: [src/functional/optional.mts:399](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L399)
+
+Applies a function that returns an `Optional` to the value in an `Optional.Some`.
+If the input is `Optional.None`, returns `Optional.None`.
+This is the monadic bind operation for `Optional`.
+
+##### Type Parameters
+
+###### S
+
+`S`
+
+###### S2
+
+`S2`
+
+The value type of the `Optional` returned by the function.
+
+##### Parameters
+
+###### flatMapFn
+
+(`value`) => [`Optional`](../README.md#optional)\<`S2`\>
+
+The function to apply that returns an `Optional`.
+
+##### Returns
+
+The result of applying the function, or `Optional.None`.
+
+> (`optional`): [`Optional`](../README.md#optional)\<`S2`\>
+
+###### Parameters
+
+###### optional
+
+[`Optional`](../README.md#optional)\<`S`\>
+
+###### Returns
+
+[`Optional`](../README.md#optional)\<`S2`\>
+
+##### Example
+
+```typescript
+const parseNumber = (s: string): Optional<number> => {
+    const n = Number(s);
+    return isNaN(n) ? Optional.none : Optional.some(n);
+};
+
+const result = Optional.flatMap(Optional.some('42'), parseNumber);
+console.log(Optional.unwrap(result)); // 42
 ```
 
 ---
-
-### unwrapOr
-
-> `const` **unwrapOr**: `UnwrapOrFnOverload`
-
-Defined in: [src/functional/optional.mts:247](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L247)
-
-Unwraps an `Optional`, returning the contained value or a default value if it's `Optional.None`.
-
-Supports both direct usage and curried form for functional composition.
-This is often preferred over `unwrap()` when you have a sensible fallback value.
-
-#### Template
-
-The `Optional.Base` type to unwrap.
-
-#### Template
-
-The type of the default value.
-
-#### Param
-
-The `Optional` to unwrap.
-
-#### Param
-
-The value to return if `optional` is `Optional.None`.
-
-#### Returns
-
-The contained value if `Optional.Some`, otherwise `defaultValue`.
-
-#### Example
-
-```typescript
-// Direct usage - most common pattern
-const some = Optional.some(42);
-const value1 = Optional.unwrapOr(some, 0);
-console.log(value1); // 42
-
-const none = Optional.none;
-const value2 = Optional.unwrapOr(none, 0);
-console.log(value2); // 0
-
-// Curried usage
-const unwrapWithDefault = Optional.unwrapOr('default');
-const result = unwrapWithDefault(Optional.some('hello'));
-console.log(result); // "hello"
-```
-
-## Functions
 
 ### fromNullable()
 
 > **fromNullable**\<`T`\>(`value`): [`Optional`](../README.md#optional)\<`NonNullable`\<`T`\>\>
 
-Defined in: [src/functional/optional.mts:576](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L576)
+Defined in: [src/functional/optional.mts:562](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L562)
 
 Converts a nullable value to an `Optional`.
 
@@ -553,6 +581,236 @@ The [Optional](../README.md#optional) to check.
 
 ---
 
+### map()
+
+#### Call Signature
+
+> **map**\<`O`, `S2`\>(`optional`, `mapFn`): [`Optional`](../README.md#optional)\<`S2`\>
+
+Defined in: [src/functional/optional.mts:344](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L344)
+
+Maps an [Optional](../README.md#optional)<S> to [Optional](../README.md#optional)<S2> by applying a function to a contained value.
+If the [Optional](../README.md#optional) is [Optional.None](#none), it returns [Optional.none](#none-1).
+Otherwise, it applies the `mapFn` to the value in `Optional.Some` and returns a new `Optional.Some` with the result.
+
+##### Type Parameters
+
+###### O
+
+`O` _extends_ [`Base`](#base)
+
+The input `Optional.Base` type.
+
+###### S2
+
+`S2`
+
+The type of the value returned by the mapping function.
+
+##### Parameters
+
+###### optional
+
+`O`
+
+The `Optional` to map.
+
+###### mapFn
+
+(`value`) => `S2`
+
+The function to apply to the value if it exists.
+
+##### Returns
+
+[`Optional`](../README.md#optional)\<`S2`\>
+
+A new `Optional<S2>` resulting from the mapping, or `Optional.None` if the input was `Optional.None`.
+
+##### Example
+
+```typescript
+const someNumber = Optional.some(5);
+const mapped = Optional.map(someNumber, (x) => x * 2);
+console.log(Optional.unwrap(mapped)); // 10
+
+const noneValue = Optional.none;
+const mappedNone = Optional.map(noneValue, (x) => x * 2);
+console.log(Optional.isNone(mappedNone)); // true
+```
+
+#### Call Signature
+
+> **map**\<`S`, `S2`\>(`mapFn`): (`optional`) => [`Optional`](../README.md#optional)\<`S2`\>
+
+Defined in: [src/functional/optional.mts:350](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L350)
+
+Maps an [Optional](../README.md#optional)<S> to [Optional](../README.md#optional)<S2> by applying a function to a contained value.
+If the [Optional](../README.md#optional) is [Optional.None](#none), it returns [Optional.none](#none-1).
+Otherwise, it applies the `mapFn` to the value in `Optional.Some` and returns a new `Optional.Some` with the result.
+
+##### Type Parameters
+
+###### S
+
+`S`
+
+###### S2
+
+`S2`
+
+The type of the value returned by the mapping function.
+
+##### Parameters
+
+###### mapFn
+
+(`value`) => `S2`
+
+The function to apply to the value if it exists.
+
+##### Returns
+
+A new `Optional<S2>` resulting from the mapping, or `Optional.None` if the input was `Optional.None`.
+
+> (`optional`): [`Optional`](../README.md#optional)\<`S2`\>
+
+###### Parameters
+
+###### optional
+
+[`Optional`](../README.md#optional)\<`S`\>
+
+###### Returns
+
+[`Optional`](../README.md#optional)\<`S2`\>
+
+##### Example
+
+```typescript
+const someNumber = Optional.some(5);
+const mapped = Optional.map(someNumber, (x) => x * 2);
+console.log(Optional.unwrap(mapped)); // 10
+
+const noneValue = Optional.none;
+const mappedNone = Optional.map(noneValue, (x) => x * 2);
+console.log(Optional.isNone(mappedNone)); // true
+```
+
+---
+
+### orElse()
+
+#### Call Signature
+
+> **orElse**\<`O`, `O2`\>(`optional`, `alternative`): `O` \| `O2`
+
+Defined in: [src/functional/optional.mts:296](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L296)
+
+Returns the `Optional` if it is `Some`, otherwise returns the alternative.
+
+Provides a way to chain Optional operations with fallback values. This is
+particularly useful for implementing default behavior or cascading lookups.
+Supports both direct usage and curried form for functional composition.
+
+##### Type Parameters
+
+###### O
+
+`O` _extends_ [`Base`](#base)
+
+The input `Optional.Base` type.
+
+###### O2
+
+`O2` _extends_ [`Base`](#base)
+
+##### Parameters
+
+###### optional
+
+`O`
+
+The `Optional` to check.
+
+###### alternative
+
+`O2`
+
+The alternative `Optional` to return if the first is `None`.
+
+##### Returns
+
+`O` \| `O2`
+
+The first `Optional` if `Some`, otherwise the alternative.
+
+##### Example
+
+```typescript
+const primary = Optional.none;
+const fallback = Optional.some('default');
+const result = Optional.orElse(primary, fallback);
+console.log(Optional.unwrap(result)); // "default"
+```
+
+#### Call Signature
+
+> **orElse**\<`S`, `S2`\>(`alternative`): (`optional`) => `Readonly`\<\{ \}\> \| `Readonly`\<\{ `value`: `S2`; \}\> \| `Readonly`\<\{ `value`: `S`; \}\>
+
+Defined in: [src/functional/optional.mts:302](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L302)
+
+Returns the `Optional` if it is `Some`, otherwise returns the alternative.
+
+Provides a way to chain Optional operations with fallback values. This is
+particularly useful for implementing default behavior or cascading lookups.
+Supports both direct usage and curried form for functional composition.
+
+##### Type Parameters
+
+###### S
+
+`S`
+
+###### S2
+
+`S2`
+
+##### Parameters
+
+###### alternative
+
+[`Optional`](../README.md#optional)\<`S2`\>
+
+The alternative `Optional` to return if the first is `None`.
+
+##### Returns
+
+The first `Optional` if `Some`, otherwise the alternative.
+
+> (`optional`): `Readonly`\<\{ \}\> \| `Readonly`\<\{ `value`: `S2`; \}\> \| `Readonly`\<\{ `value`: `S`; \}\>
+
+###### Parameters
+
+###### optional
+
+[`Optional`](../README.md#optional)\<`S`\>
+
+###### Returns
+
+`Readonly`\<\{ \}\> \| `Readonly`\<\{ `value`: `S2`; \}\> \| `Readonly`\<\{ `value`: `S`; \}\>
+
+##### Example
+
+```typescript
+const primary = Optional.none;
+const fallback = Optional.some('default');
+const result = Optional.orElse(primary, fallback);
+console.log(Optional.unwrap(result)); // "default"
+```
+
+---
+
 ### some()
 
 > **some**\<`S`\>(`value`): [`Some`](#some)\<`S`\>
@@ -597,7 +855,7 @@ console.log(Optional.unwrap(someValue)); // 42
 
 > **toNullable**\<`O`\>(`optional`): `undefined` \| [`Unwrap`](#unwrap)\<`O`\>
 
-Defined in: [src/functional/optional.mts:602](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L602)
+Defined in: [src/functional/optional.mts:588](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L588)
 
 Converts an `Optional` to a nullable value.
 
@@ -638,6 +896,234 @@ console.log(Optional.toNullable(some)); // 42
 
 const none = Optional.none;
 console.log(Optional.toNullable(none)); // undefined
+```
+
+---
+
+### unwrap()
+
+#### Call Signature
+
+> **unwrap**\<`O`\>(`optional`): [`Unwrap`](#unwrap)\<`O`\>
+
+Defined in: [src/functional/optional.mts:205](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L205)
+
+Unwraps an `Optional`, returning the contained value or `undefined` if empty.
+
+This function provides a safe way to extract values from Optionals without
+throwing exceptions. It has overloaded behavior based on the type:
+
+- For `Optional.Some<T>`: Always returns `T` (guaranteed by type system)
+- For general `Optional<T>`: Returns `T | undefined`
+
+##### Type Parameters
+
+###### O
+
+`O` _extends_ `Readonly`\<\{ `value`: `unknown`; \}\>
+
+The `Optional.Base` type to unwrap.
+
+##### Parameters
+
+###### optional
+
+`O`
+
+The `Optional` to unwrap.
+
+##### Returns
+
+[`Unwrap`](#unwrap)\<`O`\>
+
+The contained value if `Optional.Some`, otherwise `undefined`.
+
+##### Example
+
+```typescript
+const some = Optional.some(42);
+const value = Optional.unwrap(some); // 42
+
+const none = Optional.none;
+const result = Optional.unwrap(none); // undefined
+```
+
+#### Call Signature
+
+> **unwrap**\<`O`\>(`optional`): `undefined` \| [`Unwrap`](#unwrap)\<`O`\>
+
+Defined in: [src/functional/optional.mts:207](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L207)
+
+Unwraps an `Optional`, returning the contained value or `undefined` if empty.
+
+This function provides a safe way to extract values from Optionals without
+throwing exceptions. It has overloaded behavior based on the type:
+
+- For `Optional.Some<T>`: Always returns `T` (guaranteed by type system)
+- For general `Optional<T>`: Returns `T | undefined`
+
+##### Type Parameters
+
+###### O
+
+`O` _extends_ [`Base`](#base)
+
+The `Optional.Base` type to unwrap.
+
+##### Parameters
+
+###### optional
+
+`O`
+
+The `Optional` to unwrap.
+
+##### Returns
+
+`undefined` \| [`Unwrap`](#unwrap)\<`O`\>
+
+The contained value if `Optional.Some`, otherwise `undefined`.
+
+##### Example
+
+```typescript
+const some = Optional.some(42);
+const value = Optional.unwrap(some); // 42
+
+const none = Optional.none;
+const result = Optional.unwrap(none); // undefined
+```
+
+---
+
+### unwrapOr()
+
+#### Call Signature
+
+> **unwrapOr**\<`O`, `D`\>(`optional`, `defaultValue`): `D` \| [`Unwrap`](#unwrap)\<`O`\>
+
+Defined in: [src/functional/optional.mts:244](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L244)
+
+Unwraps an `Optional`, returning the contained value or a default value if it's `Optional.None`.
+
+Supports both direct usage and curried form for functional composition.
+This is often preferred over `unwrap()` when you have a sensible fallback value.
+
+##### Type Parameters
+
+###### O
+
+`O` _extends_ [`Base`](#base)
+
+The `Optional.Base` type to unwrap.
+
+###### D
+
+`D`
+
+The type of the default value.
+
+##### Parameters
+
+###### optional
+
+`O`
+
+The `Optional` to unwrap.
+
+###### defaultValue
+
+`D`
+
+The value to return if `optional` is `Optional.None`.
+
+##### Returns
+
+`D` \| [`Unwrap`](#unwrap)\<`O`\>
+
+The contained value if `Optional.Some`, otherwise `defaultValue`.
+
+##### Example
+
+```typescript
+// Direct usage - most common pattern
+const some = Optional.some(42);
+const value1 = Optional.unwrapOr(some, 0);
+console.log(value1); // 42
+
+const none = Optional.none;
+const value2 = Optional.unwrapOr(none, 0);
+console.log(value2); // 0
+
+// Curried usage
+const unwrapWithDefault = Optional.unwrapOr('default');
+const result = unwrapWithDefault(Optional.some('hello'));
+console.log(result); // "hello"
+```
+
+#### Call Signature
+
+> **unwrapOr**\<`S`, `D`\>(`defaultValue`): (`optional`) => `S` \| `D`
+
+Defined in: [src/functional/optional.mts:250](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L250)
+
+Unwraps an `Optional`, returning the contained value or a default value if it's `Optional.None`.
+
+Supports both direct usage and curried form for functional composition.
+This is often preferred over `unwrap()` when you have a sensible fallback value.
+
+##### Type Parameters
+
+###### S
+
+`S`
+
+###### D
+
+`D`
+
+The type of the default value.
+
+##### Parameters
+
+###### defaultValue
+
+`D`
+
+The value to return if `optional` is `Optional.None`.
+
+##### Returns
+
+The contained value if `Optional.Some`, otherwise `defaultValue`.
+
+> (`optional`): `S` \| `D`
+
+###### Parameters
+
+###### optional
+
+[`Optional`](../README.md#optional)\<`S`\>
+
+###### Returns
+
+`S` \| `D`
+
+##### Example
+
+```typescript
+// Direct usage - most common pattern
+const some = Optional.some(42);
+const value1 = Optional.unwrapOr(some, 0);
+console.log(value1); // 42
+
+const none = Optional.none;
+const value2 = Optional.unwrapOr(none, 0);
+console.log(value2); // 0
+
+// Curried usage
+const unwrapWithDefault = Optional.unwrapOr('default');
+const result = unwrapWithDefault(Optional.some('hello'));
+console.log(result); // "hello"
 ```
 
 ---
@@ -701,7 +1187,7 @@ try {
 
 > **zip**\<`A`, `B`\>(`optionalA`, `optionalB`): [`Optional`](../README.md#optional)\<readonly \[`A`, `B`\]\>
 
-Defined in: [src/functional/optional.mts:547](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L547)
+Defined in: [src/functional/optional.mts:533](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/optional.mts#L533)
 
 Combines two `Optional` values into a single `Optional` containing a tuple.
 If either `Optional` is `None`, returns `None`.

@@ -142,11 +142,21 @@
  * @see Optional - For more complex optional value handling
  * @see Result - For error handling with detailed error information
  */
-export const mapNullable: MapNullableFnOverload = (<const A, const B>(
+export function mapNullable<const A, const B>(
+  value: A | null | undefined,
+  mapFn: (v: A) => B,
+): B | undefined;
+
+// Curried version
+export function mapNullable<const A, const B>(
+  mapFn: (v: A) => B,
+): (value: A | null | undefined) => B | undefined;
+
+export function mapNullable<const A, const B>(
   ...args:
     | readonly [value: A | null | undefined, mapFn: (v: A) => B]
     | readonly [mapFn: (v: A) => B]
-): (B | undefined) | ((value: A | null | undefined) => B | undefined) => {
+): (B | undefined) | ((value: A | null | undefined) => B | undefined) {
   switch (args.length) {
     case 2: {
       const [value, mapFn] = args;
@@ -157,16 +167,4 @@ export const mapNullable: MapNullableFnOverload = (<const A, const B>(
       return (value: A | null | undefined) => mapNullable(value, mapFn);
     }
   }
-}) as MapNullableFnOverload;
-
-type MapNullableFnOverload = {
-  <const A, const B>(
-    value: A | null | undefined,
-    mapFn: (v: A) => B,
-  ): B | undefined;
-
-  // Curried version
-  <const A, const B>(
-    mapFn: (v: A) => B,
-  ): (value: A | null | undefined) => B | undefined;
-};
+}

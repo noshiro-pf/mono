@@ -132,388 +132,6 @@ If the `Result` is `Result.Err<E>`, resolves to `never`.
 
 The `Result.Base` type to unwrap.
 
-## Variables
-
-### expectToBe
-
-> `const` **expectToBe**: `ExpectToBeFnOverload`
-
-Defined in: [src/functional/result.mts:774](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L774)
-
-Unwraps a `Result`, returning the success value or throwing an error with the provided message.
-
-#### Template
-
-The `Result.Base` type to unwrap.
-
-#### Param
-
-The `Result` to unwrap.
-
-#### Param
-
-The error message to throw if the `Result` is `Result.Err`.
-
-#### Returns
-
-The success value if `Result.Ok`.
-
-#### Throws
-
-Error with the provided message if the `Result` is `Result.Err`.
-
-#### Example
-
-```typescript
-const result = Result.ok(42);
-const value = Result.expectToBe(result, 'Operation must succeed');
-console.log(value); // 42
-```
-
----
-
-### flatMap
-
-> `const` **flatMap**: `FlatMapFnOverload`
-
-Defined in: [src/functional/result.mts:722](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L722)
-
-Applies a function that returns a `Result` to the success value of a `Result`.
-If the input is `Err`, returns the original `Err`.
-This is the monadic bind operation for `Result`.
-
-#### Template
-
-The input `Result.Base` type.
-
-#### Template
-
-The success type of the `Result` returned by the function.
-
-#### Template
-
-The error type of the `Result` returned by the function.
-
-#### Param
-
-The `Result` to flat map.
-
-#### Param
-
-The function to apply that returns a `Result`.
-
-#### Returns
-
-The result of applying the function, or the original `Err`.
-
-#### Example
-
-```typescript
-const divide = (a: number, b: number): Result<number, string> =>
-    b === 0 ? Result.err('Division by zero') : Result.ok(a / b);
-
-const result = Result.flatMap(Result.ok(10), (x) => divide(x, 2));
-console.log(Result.unwrapOk(result)); // 5
-```
-
----
-
-### fold
-
-> `const` **fold**: `FoldFnOverload`
-
-Defined in: [src/functional/result.mts:656](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L656)
-
-Applies one of two functions depending on whether the `Result` is `Ok` or `Err`.
-
-#### Template
-
-The input `Result.Base` type.
-
-#### Template
-
-The type of the success value returned by `mapFn`.
-
-#### Template
-
-The type of the error value returned by `mapErrFn`.
-
-#### Param
-
-The `Result` to fold.
-
-#### Param
-
-The function to apply if `result` is `Ok`.
-
-#### Param
-
-The function to apply if `result` is `Err`.
-
-#### Returns
-
-A new `Result<S2, E2>` based on the applied function.
-
-#### Example
-
-```typescript
-const result = Result.ok(42);
-const folded = Result.fold(
-    result,
-    (x) => x * 2,
-    () => 0,
-);
-console.log(Result.unwrapOk(folded)); // 84
-```
-
----
-
-### map
-
-> `const` **map**: `MapFnOverload`
-
-Defined in: [src/functional/result.mts:553](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L553)
-
-Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the success value.
-If the `Result` is `Result.Err`, returns the original `Err`.
-
-#### Template
-
-The input `Result.Base` type.
-
-#### Template
-
-The type of the success value returned by the mapping function.
-
-#### Param
-
-The `Result` to map.
-
-#### Param
-
-The function to apply to the success value if present.
-
-#### Returns
-
-A new `Result<S2, UnwrapErr<R>>`.
-
-#### Example
-
-```typescript
-// Regular usage
-const result = Result.ok(5);
-const mapped = Result.map(result, (x) => x * 2);
-console.log(Result.unwrap(mapped)); // 10
-
-// Curried version for use with pipe
-const doubler = Result.map((x: number) => x * 2);
-const result2 = pipe(Result.ok(5)).map(doubler).value;
-console.log(Result.unwrap(result2)); // 10
-```
-
----
-
-### mapErr
-
-> `const` **mapErr**: `MapErrFnOverload`
-
-Defined in: [src/functional/result.mts:604](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L604)
-
-Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the error value.
-If the `Result` is `Result.Ok`, returns the original `Ok`.
-
-#### Template
-
-The input `Result.Base` type.
-
-#### Template
-
-The type of the error value returned by the mapping function.
-
-#### Param
-
-The `Result` to map.
-
-#### Param
-
-The function to apply to the error value if present.
-
-#### Returns
-
-A new `Result<UnwrapOk<R>, E2>`.
-
-#### Example
-
-```typescript
-const result = Result.err('error');
-const mapped = Result.mapErr(result, (e) => e.toUpperCase());
-console.log(Result.unwrapErr(mapped)); // "ERROR"
-```
-
----
-
-### orElse
-
-> `const` **orElse**: `OrElseFnOverload`
-
-Defined in: [src/functional/result.mts:936](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L936)
-
-Returns the `Result` if it is `Ok`, otherwise returns the alternative.
-
-#### Template
-
-The input `Result.Base` type.
-
-#### Param
-
-The `Result` to check.
-
-#### Param
-
-The alternative `Result` to return if the first is `Err`.
-
-#### Returns
-
-The first `Result` if `Ok`, otherwise the alternative.
-
-#### Example
-
-```typescript
-const primary = Result.err('error');
-const fallback = Result.ok('default');
-const result = Result.orElse(primary, fallback);
-console.log(Result.unwrapOk(result)); // "default"
-```
-
----
-
-### unwrapErrOr
-
-> `const` **unwrapErrOr**: `UnwrapErrOrFnOverload`
-
-Defined in: [src/functional/result.mts:501](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L501)
-
-Unwraps a `Result`, returning the error value or a default value if it is `Result.Ok`.
-
-#### Template
-
-The `Result.Base` type to unwrap.
-
-#### Template
-
-The type of the default value.
-
-#### Param
-
-The `Result` to unwrap.
-
-#### Param
-
-The value to return if `result` is `Result.Ok`.
-
-#### Returns
-
-The error value if `Result.Err`, otherwise `defaultValue`.
-
-#### Example
-
-```typescript
-const result = Result.err('failed');
-const error = Result.unwrapErrOr(result, 'default');
-console.log(error); // "failed"
-```
-
----
-
-### unwrapOk
-
-> `const` **unwrapOk**: `UnwrapOkFnOverload`
-
-Defined in: [src/functional/result.mts:362](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L362)
-
-Unwraps a `Result`, returning the success value or `undefined` if it's an error.
-
-This function provides a safe way to extract success values from Results without
-throwing exceptions. It has overloaded behavior based on the type:
-
-- For `Result.Ok<T>`: Always returns `T` (guaranteed by type system)
-- For general `Result<T, E>`: Returns `T | undefined`
-
-#### Template
-
-The `Result.Base` type to unwrap.
-
-#### Param
-
-The `Result` to unwrap.
-
-#### Returns
-
-The success value if `Result.Ok`, otherwise `undefined`.
-
-#### Example
-
-```typescript
-// With guaranteed Ok - returns the value
-const success = Result.ok(42);
-const value = Result.unwrapOk(success); // Type: number, Value: 42
-
-// With general Result - may return undefined
-const maybeResult: Result<string, Error> = fetchData();
-const data = Result.unwrapOk(maybeResult); // Type: string | undefined
-
-// Safe pattern for handling both cases
-const result = Result.ok('hello');
-const unwrapped = Result.unwrapOk(result);
-if (unwrapped !== undefined) {
-    console.log(unwrapped.toUpperCase()); // "HELLO"
-}
-
-// Useful in conditional chains
-const processResult = (r: Result<number, string>) => {
-    const value = Result.unwrapOk(r);
-    return value !== undefined ? value * 2 : 0;
-};
-```
-
----
-
-### unwrapOkOr
-
-> `const` **unwrapOkOr**: `UnwrapOkOrFnOverload`
-
-Defined in: [src/functional/result.mts:391](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L391)
-
-Unwraps a `Result`, returning the success value or a default value if it is `Result.Err`.
-
-#### Template
-
-The `Result.Base` type to unwrap.
-
-#### Template
-
-The type of the default value.
-
-#### Param
-
-The `Result` to unwrap.
-
-#### Param
-
-The value to return if `result` is `Result.Err`.
-
-#### Returns
-
-The success value if `Result.Ok`, otherwise `defaultValue`.
-
-#### Example
-
-```typescript
-const result = Result.ok(42);
-const value = Result.unwrapOkOr(result, 0);
-console.log(value); // 42
-```
-
 ## Functions
 
 ### err()
@@ -583,11 +201,393 @@ const validationError = Result.err<ValidationError>({
 
 ---
 
+### expectToBe()
+
+#### Call Signature
+
+> **expectToBe**\<`R`\>(`result`, `message`): [`UnwrapOk`](#unwrapok)\<`R`\>
+
+Defined in: [src/functional/result.mts:763](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L763)
+
+Unwraps a `Result`, returning the success value or throwing an error with the provided message.
+
+##### Type Parameters
+
+###### R
+
+`R` _extends_ [`Base`](#base)
+
+The `Result.Base` type to unwrap.
+
+##### Parameters
+
+###### result
+
+`R`
+
+The `Result` to unwrap.
+
+###### message
+
+`string`
+
+The error message to throw if the `Result` is `Result.Err`.
+
+##### Returns
+
+[`UnwrapOk`](#unwrapok)\<`R`\>
+
+The success value if `Result.Ok`.
+
+##### Throws
+
+Error with the provided message if the `Result` is `Result.Err`.
+
+##### Example
+
+```typescript
+const result = Result.ok(42);
+const value = Result.expectToBe(result, 'Operation must succeed');
+console.log(value); // 42
+```
+
+#### Call Signature
+
+> **expectToBe**\<`S`\>(`message`): \<`E`\>(`result`) => `S`
+
+Defined in: [src/functional/result.mts:769](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L769)
+
+Unwraps a `Result`, returning the success value or throwing an error with the provided message.
+
+##### Type Parameters
+
+###### S
+
+`S`
+
+##### Parameters
+
+###### message
+
+`string`
+
+The error message to throw if the `Result` is `Result.Err`.
+
+##### Returns
+
+The success value if `Result.Ok`.
+
+> \<`E`\>(`result`): `S`
+
+###### Type Parameters
+
+###### E
+
+`E`
+
+###### Parameters
+
+###### result
+
+[`Result`](../README.md#result)\<`S`, `E`\>
+
+###### Returns
+
+`S`
+
+##### Throws
+
+Error with the provided message if the `Result` is `Result.Err`.
+
+##### Example
+
+```typescript
+const result = Result.ok(42);
+const value = Result.expectToBe(result, 'Operation must succeed');
+console.log(value); // 42
+```
+
+---
+
+### flatMap()
+
+#### Call Signature
+
+> **flatMap**\<`R`, `S2`, `E2`\>(`result`, `flatMapFn`): [`Result`](../README.md#result)\<`S2`, `E2` \| [`UnwrapErr`](#unwraperr)\<`R`\>\>
+
+Defined in: [src/functional/result.mts:714](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L714)
+
+Applies a function that returns a `Result` to the success value of a `Result`.
+If the input is `Err`, returns the original `Err`.
+This is the monadic bind operation for `Result`.
+
+##### Type Parameters
+
+###### R
+
+`R` _extends_ [`Base`](#base)
+
+The input `Result.Base` type.
+
+###### S2
+
+`S2`
+
+The success type of the `Result` returned by the function.
+
+###### E2
+
+`E2`
+
+The error type of the `Result` returned by the function.
+
+##### Parameters
+
+###### result
+
+`R`
+
+The `Result` to flat map.
+
+###### flatMapFn
+
+(`value`) => [`Result`](../README.md#result)\<`S2`, `E2`\>
+
+The function to apply that returns a `Result`.
+
+##### Returns
+
+[`Result`](../README.md#result)\<`S2`, `E2` \| [`UnwrapErr`](#unwraperr)\<`R`\>\>
+
+The result of applying the function, or the original `Err`.
+
+##### Example
+
+```typescript
+const divide = (a: number, b: number): Result<number, string> =>
+    b === 0 ? Result.err('Division by zero') : Result.ok(a / b);
+
+const result = Result.flatMap(Result.ok(10), (x) => divide(x, 2));
+console.log(Result.unwrapOk(result)); // 5
+```
+
+#### Call Signature
+
+> **flatMap**\<`S`, `S2`, `E2`\>(`flatMapFn`): \<`E`\>(`result`) => [`Result`](../README.md#result)\<`S2`, `E2` \| `E`\>
+
+Defined in: [src/functional/result.mts:720](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L720)
+
+Applies a function that returns a `Result` to the success value of a `Result`.
+If the input is `Err`, returns the original `Err`.
+This is the monadic bind operation for `Result`.
+
+##### Type Parameters
+
+###### S
+
+`S`
+
+###### S2
+
+`S2`
+
+The success type of the `Result` returned by the function.
+
+###### E2
+
+`E2`
+
+The error type of the `Result` returned by the function.
+
+##### Parameters
+
+###### flatMapFn
+
+(`value`) => [`Result`](../README.md#result)\<`S2`, `E2`\>
+
+The function to apply that returns a `Result`.
+
+##### Returns
+
+The result of applying the function, or the original `Err`.
+
+> \<`E`\>(`result`): [`Result`](../README.md#result)\<`S2`, `E2` \| `E`\>
+
+###### Type Parameters
+
+###### E
+
+`E`
+
+###### Parameters
+
+###### result
+
+[`Result`](../README.md#result)\<`S`, `E`\>
+
+###### Returns
+
+[`Result`](../README.md#result)\<`S2`, `E2` \| `E`\>
+
+##### Example
+
+```typescript
+const divide = (a: number, b: number): Result<number, string> =>
+    b === 0 ? Result.err('Division by zero') : Result.ok(a / b);
+
+const result = Result.flatMap(Result.ok(10), (x) => divide(x, 2));
+console.log(Result.unwrapOk(result)); // 5
+```
+
+---
+
+### fold()
+
+#### Call Signature
+
+> **fold**\<`R`, `S2`, `E2`\>(`result`, `mapFn`, `mapErrFn`): [`Result`](../README.md#result)\<`S2`, `E2`\>
+
+Defined in: [src/functional/result.mts:651](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L651)
+
+Applies one of two functions depending on whether the `Result` is `Ok` or `Err`.
+
+##### Type Parameters
+
+###### R
+
+`R` _extends_ [`Base`](#base)
+
+The input `Result.Base` type.
+
+###### S2
+
+`S2`
+
+The type of the success value returned by `mapFn`.
+
+###### E2
+
+`E2`
+
+The type of the error value returned by `mapErrFn`.
+
+##### Parameters
+
+###### result
+
+`R`
+
+The `Result` to fold.
+
+###### mapFn
+
+(`value`) => `S2`
+
+The function to apply if `result` is `Ok`.
+
+###### mapErrFn
+
+(`error`) => `E2`
+
+The function to apply if `result` is `Err`.
+
+##### Returns
+
+[`Result`](../README.md#result)\<`S2`, `E2`\>
+
+A new `Result<S2, E2>` based on the applied function.
+
+##### Example
+
+```typescript
+const result = Result.ok(42);
+const folded = Result.fold(
+    result,
+    (x) => x * 2,
+    () => 0,
+);
+console.log(Result.unwrapOk(folded)); // 84
+```
+
+#### Call Signature
+
+> **fold**\<`S`, `E`, `S2`, `E2`\>(`mapFn`, `mapErrFn`): (`result`) => [`Result`](../README.md#result)\<`S2`, `E2`\>
+
+Defined in: [src/functional/result.mts:658](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L658)
+
+Applies one of two functions depending on whether the `Result` is `Ok` or `Err`.
+
+##### Type Parameters
+
+###### S
+
+`S`
+
+###### E
+
+`E`
+
+###### S2
+
+`S2`
+
+The type of the success value returned by `mapFn`.
+
+###### E2
+
+`E2`
+
+The type of the error value returned by `mapErrFn`.
+
+##### Parameters
+
+###### mapFn
+
+(`value`) => `S2`
+
+The function to apply if `result` is `Ok`.
+
+###### mapErrFn
+
+(`error`) => `E2`
+
+The function to apply if `result` is `Err`.
+
+##### Returns
+
+A new `Result<S2, E2>` based on the applied function.
+
+> (`result`): [`Result`](../README.md#result)\<`S2`, `E2`\>
+
+###### Parameters
+
+###### result
+
+[`Result`](../README.md#result)\<`S`, `E`\>
+
+###### Returns
+
+[`Result`](../README.md#result)\<`S2`, `E2`\>
+
+##### Example
+
+```typescript
+const result = Result.ok(42);
+const folded = Result.fold(
+    result,
+    (x) => x * 2,
+    () => 0,
+);
+console.log(Result.unwrapOk(folded)); // 84
+```
+
+---
+
 ### fromPromise()
 
 > **fromPromise**\<`P`\>(`promise`): `Promise`\<[`Result`](../README.md#result)\<`UnwrapPromise`\<`P`\>, `unknown`\>\>
 
-Defined in: [src/functional/result.mts:823](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L823)
+Defined in: [src/functional/result.mts:815](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L815)
 
 Converts a Promise into a Promise that resolves to a `Result`.
 If the input Promise resolves, the `Result` will be `Ok` with the resolved value.
@@ -621,7 +621,7 @@ A Promise that resolves to `Result<UnwrapPromise<P>, unknown>`.
 
 > **fromThrowable**\<`T`\>(`fn`): [`Result`](../README.md#result)\<`T`, `Error`\>
 
-Defined in: [src/functional/result.mts:855](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L855)
+Defined in: [src/functional/result.mts:847](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L847)
 
 Wraps a function that may throw an exception in a `Result`.
 
@@ -828,6 +828,246 @@ The value to check.
 
 ---
 
+### map()
+
+#### Call Signature
+
+> **map**\<`R`, `S2`\>(`result`, `mapFn`): [`Result`](../README.md#result)\<`S2`, [`UnwrapErr`](#unwraperr)\<`R`\>\>
+
+Defined in: [src/functional/result.mts:554](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L554)
+
+Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the success value.
+If the `Result` is `Result.Err`, returns the original `Err`.
+
+##### Type Parameters
+
+###### R
+
+`R` _extends_ [`Base`](#base)
+
+The input `Result.Base` type.
+
+###### S2
+
+`S2`
+
+The type of the success value returned by the mapping function.
+
+##### Parameters
+
+###### result
+
+`R`
+
+The `Result` to map.
+
+###### mapFn
+
+(`value`) => `S2`
+
+The function to apply to the success value if present.
+
+##### Returns
+
+[`Result`](../README.md#result)\<`S2`, [`UnwrapErr`](#unwraperr)\<`R`\>\>
+
+A new `Result<S2, UnwrapErr<R>>`.
+
+##### Example
+
+```typescript
+// Regular usage
+const result = Result.ok(5);
+const mapped = Result.map(result, (x) => x * 2);
+console.log(Result.unwrap(mapped)); // 10
+
+// Curried version for use with pipe
+const doubler = Result.map((x: number) => x * 2);
+const result2 = pipe(Result.ok(5)).map(doubler).value;
+console.log(Result.unwrap(result2)); // 10
+```
+
+#### Call Signature
+
+> **map**\<`S`, `S2`\>(`mapFn`): \<`E`\>(`result`) => [`Result`](../README.md#result)\<`S2`, `E`\>
+
+Defined in: [src/functional/result.mts:560](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L560)
+
+Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the success value.
+If the `Result` is `Result.Err`, returns the original `Err`.
+
+##### Type Parameters
+
+###### S
+
+`S`
+
+###### S2
+
+`S2`
+
+The type of the success value returned by the mapping function.
+
+##### Parameters
+
+###### mapFn
+
+(`value`) => `S2`
+
+The function to apply to the success value if present.
+
+##### Returns
+
+A new `Result<S2, UnwrapErr<R>>`.
+
+> \<`E`\>(`result`): [`Result`](../README.md#result)\<`S2`, `E`\>
+
+###### Type Parameters
+
+###### E
+
+`E`
+
+###### Parameters
+
+###### result
+
+[`Result`](../README.md#result)\<`S`, `E`\>
+
+###### Returns
+
+[`Result`](../README.md#result)\<`S2`, `E`\>
+
+##### Example
+
+```typescript
+// Regular usage
+const result = Result.ok(5);
+const mapped = Result.map(result, (x) => x * 2);
+console.log(Result.unwrap(mapped)); // 10
+
+// Curried version for use with pipe
+const doubler = Result.map((x: number) => x * 2);
+const result2 = pipe(Result.ok(5)).map(doubler).value;
+console.log(Result.unwrap(result2)); // 10
+```
+
+---
+
+### mapErr()
+
+#### Call Signature
+
+> **mapErr**\<`R`, `E2`\>(`result`, `mapFn`): [`Result`](../README.md#result)\<[`UnwrapOk`](#unwrapok)\<`R`\>, `E2`\>
+
+Defined in: [src/functional/result.mts:602](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L602)
+
+Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the error value.
+If the `Result` is `Result.Ok`, returns the original `Ok`.
+
+##### Type Parameters
+
+###### R
+
+`R` _extends_ [`Base`](#base)
+
+The input `Result.Base` type.
+
+###### E2
+
+`E2`
+
+The type of the error value returned by the mapping function.
+
+##### Parameters
+
+###### result
+
+`R`
+
+The `Result` to map.
+
+###### mapFn
+
+(`error`) => `E2`
+
+The function to apply to the error value if present.
+
+##### Returns
+
+[`Result`](../README.md#result)\<[`UnwrapOk`](#unwrapok)\<`R`\>, `E2`\>
+
+A new `Result<UnwrapOk<R>, E2>`.
+
+##### Example
+
+```typescript
+const result = Result.err('error');
+const mapped = Result.mapErr(result, (e) => e.toUpperCase());
+console.log(Result.unwrapErr(mapped)); // "ERROR"
+```
+
+#### Call Signature
+
+> **mapErr**\<`E`, `E2`\>(`mapFn`): \<`S`\>(`result`) => [`Result`](../README.md#result)\<`S`, `E2`\>
+
+Defined in: [src/functional/result.mts:608](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L608)
+
+Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the error value.
+If the `Result` is `Result.Ok`, returns the original `Ok`.
+
+##### Type Parameters
+
+###### E
+
+`E`
+
+###### E2
+
+`E2`
+
+The type of the error value returned by the mapping function.
+
+##### Parameters
+
+###### mapFn
+
+(`error`) => `E2`
+
+The function to apply to the error value if present.
+
+##### Returns
+
+A new `Result<UnwrapOk<R>, E2>`.
+
+> \<`S`\>(`result`): [`Result`](../README.md#result)\<`S`, `E2`\>
+
+###### Type Parameters
+
+###### S
+
+`S`
+
+###### Parameters
+
+###### result
+
+[`Result`](../README.md#result)\<`S`, `E`\>
+
+###### Returns
+
+[`Result`](../README.md#result)\<`S`, `E2`\>
+
+##### Example
+
+```typescript
+const result = Result.err('error');
+const mapped = Result.mapErr(result, (e) => e.toUpperCase());
+console.log(Result.unwrapErr(mapped)); // "ERROR"
+```
+
+---
+
 ### ok()
 
 > **ok**\<`S`\>(`value`): [`Ok`](#ok)\<`S`\>
@@ -883,11 +1123,123 @@ console.log(Result.unwrapOk(result)); // 5
 
 ---
 
+### orElse()
+
+#### Call Signature
+
+> **orElse**\<`R`, `R2`\>(`result`, `alternative`): `R2` \| [`NarrowToOk`](#narrowtook)\<`R`\>
+
+Defined in: [src/functional/result.mts:928](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L928)
+
+Returns the `Result` if it is `Ok`, otherwise returns the alternative.
+
+##### Type Parameters
+
+###### R
+
+`R` _extends_ [`Base`](#base)
+
+The input `Result.Base` type.
+
+###### R2
+
+`R2` _extends_ [`Base`](#base)
+
+##### Parameters
+
+###### result
+
+`R`
+
+The `Result` to check.
+
+###### alternative
+
+`R2`
+
+The alternative `Result` to return if the first is `Err`.
+
+##### Returns
+
+`R2` \| [`NarrowToOk`](#narrowtook)\<`R`\>
+
+The first `Result` if `Ok`, otherwise the alternative.
+
+##### Example
+
+```typescript
+const primary = Result.err('error');
+const fallback = Result.ok('default');
+const result = Result.orElse(primary, fallback);
+console.log(Result.unwrapOk(result)); // "default"
+```
+
+#### Call Signature
+
+> **orElse**\<`S`, `E`, `S2`, `E2`\>(`alternative`): (`result`) => [`Result`](../README.md#result)\<`S2`, `E2`\> \| [`Result`](../README.md#result)\<`S`, `E`\>
+
+Defined in: [src/functional/result.mts:934](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L934)
+
+Returns the `Result` if it is `Ok`, otherwise returns the alternative.
+
+##### Type Parameters
+
+###### S
+
+`S`
+
+###### E
+
+`E`
+
+###### S2
+
+`S2`
+
+###### E2
+
+`E2`
+
+##### Parameters
+
+###### alternative
+
+[`Result`](../README.md#result)\<`S2`, `E2`\>
+
+The alternative `Result` to return if the first is `Err`.
+
+##### Returns
+
+The first `Result` if `Ok`, otherwise the alternative.
+
+> (`result`): [`Result`](../README.md#result)\<`S2`, `E2`\> \| [`Result`](../README.md#result)\<`S`, `E`\>
+
+###### Parameters
+
+###### result
+
+[`Result`](../README.md#result)\<`S`, `E`\>
+
+###### Returns
+
+[`Result`](../README.md#result)\<`S2`, `E2`\> \| [`Result`](../README.md#result)\<`S`, `E`\>
+
+##### Example
+
+```typescript
+const primary = Result.err('error');
+const fallback = Result.ok('default');
+const result = Result.orElse(primary, fallback);
+console.log(Result.unwrapOk(result)); // "default"
+```
+
+---
+
 ### swap()
 
 > **swap**\<`R`\>(`result`): [`Result`](../README.md#result)\<[`UnwrapErr`](#unwraperr)\<`R`\>, [`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-Defined in: [src/functional/result.mts:884](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L884)
+Defined in: [src/functional/result.mts:876](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L876)
 
 Swaps the success and error values of a `Result`.
 
@@ -928,7 +1280,7 @@ console.log(Result.unwrapErr(swapped)); // 42
 
 > **toOptional**\<`R`\>(`result`): [`Optional`](../../optional/README.md#optional)\<[`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-Defined in: [src/functional/result.mts:917](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L917)
+Defined in: [src/functional/result.mts:909](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L909)
 
 Converts a `Result` to an `Optional`.
 
@@ -981,7 +1333,7 @@ console.log(Optional.isNone(none)); // true
 
 > **unwrapErr**\<`R`\>(`result`): `undefined` \| [`UnwrapErr`](#unwraperr)\<`R`\>
 
-Defined in: [src/functional/result.mts:481](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L481)
+Defined in: [src/functional/result.mts:480](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L480)
 
 Unwraps a `Result`, returning the error value or `undefined` if it is `Result.Ok`.
 
@@ -1023,11 +1375,123 @@ console.log(Result.unwrapErr(success)); // undefined
 
 ---
 
+### unwrapErrOr()
+
+#### Call Signature
+
+> **unwrapErrOr**\<`R`, `D`\>(`result`, `defaultValue`): `D` \| [`UnwrapErr`](#unwraperr)\<`R`\>
+
+Defined in: [src/functional/result.mts:500](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L500)
+
+Unwraps a `Result`, returning the error value or a default value if it is `Result.Ok`.
+
+##### Type Parameters
+
+###### R
+
+`R` _extends_ [`Base`](#base)
+
+The `Result.Base` type to unwrap.
+
+###### D
+
+`D`
+
+The type of the default value.
+
+##### Parameters
+
+###### result
+
+`R`
+
+The `Result` to unwrap.
+
+###### defaultValue
+
+`D`
+
+The value to return if `result` is `Result.Ok`.
+
+##### Returns
+
+`D` \| [`UnwrapErr`](#unwraperr)\<`R`\>
+
+The error value if `Result.Err`, otherwise `defaultValue`.
+
+##### Example
+
+```typescript
+const result = Result.err('failed');
+const error = Result.unwrapErrOr(result, 'default');
+console.log(error); // "failed"
+```
+
+#### Call Signature
+
+> **unwrapErrOr**\<`E`, `D`\>(`defaultValue`): \<`S`\>(`result`) => `E` \| `D`
+
+Defined in: [src/functional/result.mts:506](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L506)
+
+Unwraps a `Result`, returning the error value or a default value if it is `Result.Ok`.
+
+##### Type Parameters
+
+###### E
+
+`E`
+
+###### D
+
+`D`
+
+The type of the default value.
+
+##### Parameters
+
+###### defaultValue
+
+`D`
+
+The value to return if `result` is `Result.Ok`.
+
+##### Returns
+
+The error value if `Result.Err`, otherwise `defaultValue`.
+
+> \<`S`\>(`result`): `E` \| `D`
+
+###### Type Parameters
+
+###### S
+
+`S`
+
+###### Parameters
+
+###### result
+
+[`Result`](../README.md#result)\<`S`, `E`\>
+
+###### Returns
+
+`E` \| `D`
+
+##### Example
+
+```typescript
+const result = Result.err('failed');
+const error = Result.unwrapErrOr(result, 'default');
+console.log(error); // "failed"
+```
+
+---
+
 ### unwrapErrThrow()
 
 > **unwrapErrThrow**\<`R`\>(`result`, `toStr`): [`UnwrapErr`](#unwraperr)\<`R`\>
 
-Defined in: [src/functional/result.mts:447](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L447)
+Defined in: [src/functional/result.mts:446](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L446)
 
 Unwraps a `Result`, returning the error value.
 Throws an error if the `Result` is `Result.Ok`.
@@ -1080,6 +1544,244 @@ try {
 } catch (error) {
     console.log(error.message); // "Expected Err but got Ok: 42"
 }
+```
+
+---
+
+### unwrapOk()
+
+#### Call Signature
+
+> **unwrapOk**\<`R`\>(`result`): [`UnwrapOk`](#unwrapok)\<`R`\>
+
+Defined in: [src/functional/result.mts:362](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L362)
+
+Unwraps a `Result`, returning the success value or `undefined` if it's an error.
+
+This function provides a safe way to extract success values from Results without
+throwing exceptions. It has overloaded behavior based on the type:
+
+- For `Result.Ok<T>`: Always returns `T` (guaranteed by type system)
+- For general `Result<T, E>`: Returns `T | undefined`
+
+##### Type Parameters
+
+###### R
+
+`R` _extends_ `Readonly`\<\{ `value`: `unknown`; \}\>
+
+The `Result.Base` type to unwrap.
+
+##### Parameters
+
+###### result
+
+`R`
+
+The `Result` to unwrap.
+
+##### Returns
+
+[`UnwrapOk`](#unwrapok)\<`R`\>
+
+The success value if `Result.Ok`, otherwise `undefined`.
+
+##### Example
+
+```typescript
+// With guaranteed Ok - returns the value
+const success = Result.ok(42);
+const value = Result.unwrapOk(success); // Type: number, Value: 42
+
+// With general Result - may return undefined
+const maybeResult: Result<string, Error> = fetchData();
+const data = Result.unwrapOk(maybeResult); // Type: string | undefined
+
+// Safe pattern for handling both cases
+const result = Result.ok('hello');
+const unwrapped = Result.unwrapOk(result);
+if (unwrapped !== undefined) {
+    console.log(unwrapped.toUpperCase()); // "HELLO"
+}
+
+// Useful in conditional chains
+const processResult = (r: Result<number, string>) => {
+    const value = Result.unwrapOk(r);
+    return value !== undefined ? value * 2 : 0;
+};
+```
+
+#### Call Signature
+
+> **unwrapOk**\<`R`\>(`result`): `undefined` \| [`UnwrapOk`](#unwrapok)\<`R`\>
+
+Defined in: [src/functional/result.mts:364](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L364)
+
+Unwraps a `Result`, returning the success value or `undefined` if it's an error.
+
+This function provides a safe way to extract success values from Results without
+throwing exceptions. It has overloaded behavior based on the type:
+
+- For `Result.Ok<T>`: Always returns `T` (guaranteed by type system)
+- For general `Result<T, E>`: Returns `T | undefined`
+
+##### Type Parameters
+
+###### R
+
+`R` _extends_ [`Base`](#base)
+
+The `Result.Base` type to unwrap.
+
+##### Parameters
+
+###### result
+
+`R`
+
+The `Result` to unwrap.
+
+##### Returns
+
+`undefined` \| [`UnwrapOk`](#unwrapok)\<`R`\>
+
+The success value if `Result.Ok`, otherwise `undefined`.
+
+##### Example
+
+```typescript
+// With guaranteed Ok - returns the value
+const success = Result.ok(42);
+const value = Result.unwrapOk(success); // Type: number, Value: 42
+
+// With general Result - may return undefined
+const maybeResult: Result<string, Error> = fetchData();
+const data = Result.unwrapOk(maybeResult); // Type: string | undefined
+
+// Safe pattern for handling both cases
+const result = Result.ok('hello');
+const unwrapped = Result.unwrapOk(result);
+if (unwrapped !== undefined) {
+    console.log(unwrapped.toUpperCase()); // "HELLO"
+}
+
+// Useful in conditional chains
+const processResult = (r: Result<number, string>) => {
+    const value = Result.unwrapOk(r);
+    return value !== undefined ? value * 2 : 0;
+};
+```
+
+---
+
+### unwrapOkOr()
+
+#### Call Signature
+
+> **unwrapOkOr**\<`R`, `D`\>(`result`, `defaultValue`): `D` \| [`UnwrapOk`](#unwrapok)\<`R`\>
+
+Defined in: [src/functional/result.mts:387](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L387)
+
+Unwraps a `Result`, returning the success value or a default value if it is `Result.Err`.
+
+##### Type Parameters
+
+###### R
+
+`R` _extends_ [`Base`](#base)
+
+The `Result.Base` type to unwrap.
+
+###### D
+
+`D`
+
+The type of the default value.
+
+##### Parameters
+
+###### result
+
+`R`
+
+The `Result` to unwrap.
+
+###### defaultValue
+
+`D`
+
+The value to return if `result` is `Result.Err`.
+
+##### Returns
+
+`D` \| [`UnwrapOk`](#unwrapok)\<`R`\>
+
+The success value if `Result.Ok`, otherwise `defaultValue`.
+
+##### Example
+
+```typescript
+const result = Result.ok(42);
+const value = Result.unwrapOkOr(result, 0);
+console.log(value); // 42
+```
+
+#### Call Signature
+
+> **unwrapOkOr**\<`S`, `D`\>(`defaultValue`): \<`E`\>(`result`) => `S` \| `D`
+
+Defined in: [src/functional/result.mts:393](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L393)
+
+Unwraps a `Result`, returning the success value or a default value if it is `Result.Err`.
+
+##### Type Parameters
+
+###### S
+
+`S`
+
+###### D
+
+`D`
+
+The type of the default value.
+
+##### Parameters
+
+###### defaultValue
+
+`D`
+
+The value to return if `result` is `Result.Err`.
+
+##### Returns
+
+The success value if `Result.Ok`, otherwise `defaultValue`.
+
+> \<`E`\>(`result`): `S` \| `D`
+
+###### Type Parameters
+
+###### E
+
+`E`
+
+###### Parameters
+
+###### result
+
+[`Result`](../README.md#result)\<`S`, `E`\>
+
+###### Returns
+
+`S` \| `D`
+
+##### Example
+
+```typescript
+const result = Result.ok(42);
+const value = Result.unwrapOkOr(result, 0);
+console.log(value); // 42
 ```
 
 ---
@@ -1149,7 +1851,7 @@ try {
 
 > **zip**\<`S1`, `E1`, `S2`, `E2`\>(`resultA`, `resultB`): [`Result`](../README.md#result)\<readonly \[`S1`, `S2`\], `E1` \| `E2`\>
 
-Defined in: [src/functional/result.mts:991](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L991)
+Defined in: [src/functional/result.mts:981](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L981)
 
 Combines two `Result` values into a single `Result` containing a tuple.
 If either `Result` is `Err`, returns the first `Err` encountered.

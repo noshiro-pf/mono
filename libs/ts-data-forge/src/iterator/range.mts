@@ -90,8 +90,19 @@ import { SafeInt, asSafeInt } from '../number/index.mjs';
  * }
  * ```
  */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-export const range: RangeFnOverload = function* (
+export function range(
+  start: SafeUintWithSmallInt,
+  end: SafeUintWithSmallInt,
+  step?: PositiveSafeIntWithSmallInt,
+): Generator<SafeUint, void, unknown>;
+
+export function range(
+  start: SafeIntWithSmallInt,
+  end: SafeIntWithSmallInt,
+  step?: NonZeroSafeIntWithSmallInt,
+): Generator<SafeInt, void, unknown>;
+
+export function* range(
   start: SafeIntWithSmallInt,
   end: SafeIntWithSmallInt,
   step: NonZeroSafeIntWithSmallInt = 1,
@@ -103,18 +114,4 @@ export const range: RangeFnOverload = function* (
   ) {
     yield mut_i;
   }
-} as RangeFnOverload;
-
-type RangeFnOverload = {
-  (
-    start: SafeUintWithSmallInt,
-    end: SafeUintWithSmallInt,
-    step?: PositiveSafeIntWithSmallInt,
-  ): Generator<SafeUint, void, unknown>;
-
-  (
-    start: SafeIntWithSmallInt,
-    end: SafeIntWithSmallInt,
-    step?: NonZeroSafeIntWithSmallInt,
-  ): Generator<SafeInt, void, unknown>;
-};
+}

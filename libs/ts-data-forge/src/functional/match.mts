@@ -155,7 +155,22 @@ type TypeEq<T, U> = [T] extends [U] ? ([U] extends [T] ? true : false) : false;
  * });
  * ```
  */
-export const match: MatchFnOverload = (<
+export function match<
+  const Case extends string,
+  const R extends ReadonlyRecord<Case, unknown>,
+>(target: Case, cases: StrictPropertyCheck<R, Case>): R[Case];
+
+export function match<
+  const Case extends string,
+  const R extends UnknownRecord,
+  const D,
+>(
+  target: Case,
+  cases: StrictPropertyCheck<R, Case>,
+  defaultValue: IsLiteralUnionFullyCovered<Case, R> extends true ? never : D,
+): ValueOf<R> | D;
+
+export function match<
   const Case extends string,
   const R extends UnknownRecord,
   const D,
@@ -163,7 +178,7 @@ export const match: MatchFnOverload = (<
   ...args:
     | readonly [target: Case, cases: R]
     | readonly [target: Case, cases: R, defaultValue: D]
-): ValueOf<R> | D => {
+): ValueOf<R> | D {
   switch (args.length) {
     case 2: {
       const [target, cases] = args;
@@ -178,48 +193,7 @@ export const match: MatchFnOverload = (<
       }
     }
   }
-}) as MatchFnOverload;
-
-/**
- * @internal
- * Overloaded function type for the match function.
- * Provides different signatures based on whether exhaustive matching is possible.
- * @template Case The string literal union type to match against.
- * @template R The record type containing the case mappings.
- * @template D The type of the default value.
- */
-type MatchFnOverload = {
-  /**
-   * Exhaustive matching signature - used when all cases in a literal union are covered.
-   * No default value is required or allowed.
-   * @template Case The string literal union type.
-   * @template R The record type with mappings for all cases.
-   * @param target The value to match.
-   * @param cases Object mapping all possible case values to results.
-   * @returns The matched result value.
-   */
-  <const Case extends string, const R extends ReadonlyRecord<Case, unknown>>(
-    target: Case,
-    cases: StrictPropertyCheck<R, Case>,
-  ): R[Case];
-
-  /**
-   * Partial matching signature - used when not all cases are covered or when dealing with general string types.
-   * A default value is required.
-   * @template Case The string type (may be literal union or general string).
-   * @template R The record type with partial case mappings.
-   * @template D The type of the default value.
-   * @param target The value to match.
-   * @param cases Object mapping some case values to results.
-   * @param defaultValue Required fallback value for unmatched cases.
-   * @returns The matched result value or the default value.
-   */
-  <const Case extends string, const R extends UnknownRecord, const D>(
-    target: Case,
-    cases: StrictPropertyCheck<R, Case>,
-    defaultValue: IsLiteralUnionFullyCovered<Case, R> extends true ? never : D,
-  ): ValueOf<R> | D;
-};
+}
 
 /**
  * @internal

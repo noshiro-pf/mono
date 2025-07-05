@@ -202,19 +202,16 @@ export namespace Optional {
    * const result = Optional.unwrap(none); // undefined
    * ```
    */
-  export const unwrap: UnwrapFnOverload = (<O extends Base>(
-    optional: O,
-  ): Unwrap<O> | undefined =>
-    isNone(optional)
-      ? undefined
-      : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-        ((optional as NarrowToSome<O>).value as Unwrap<O>)) as UnwrapFnOverload;
+  export function unwrap<O extends Some<unknown>>(optional: O): Unwrap<O>;
 
-  type UnwrapFnOverload = {
-    <O extends Some<unknown>>(optional: O): Unwrap<O>;
+  export function unwrap<O extends Base>(optional: O): Unwrap<O> | undefined;
 
-    <O extends Base>(optional: O): Unwrap<O> | undefined;
-  };
+  export function unwrap<O extends Base>(optional: O): Unwrap<O> | undefined {
+    return isSome(optional)
+      ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        (optional.value as Unwrap<O>)
+      : undefined;
+  }
 
   /**
    * Unwraps an `Optional`, returning the contained value or a default value if it's `Optional.None`.
@@ -244,18 +241,28 @@ export namespace Optional {
    * console.log(result); // "hello"
    * ```
    */
-  export const unwrapOr: UnwrapOrFnOverload = (<O extends Base, D>(
+  export function unwrapOr<O extends Base, D>(
+    optional: O,
+    defaultValue: D,
+  ): D | Unwrap<O>;
+
+  // Curried version
+  export function unwrapOr<S, D>(
+    defaultValue: D,
+  ): (optional: Optional<S>) => D | S;
+
+  export function unwrapOr<O extends Base, D>(
     ...args:
       | readonly [optional: O, defaultValue: D]
       | readonly [defaultValue: D]
-  ): (D | Unwrap<O>) | ((optional: Optional<Unwrap<O>>) => D | Unwrap<O>) => {
+  ): (D | Unwrap<O>) | ((optional: Optional<Unwrap<O>>) => D | Unwrap<O>) {
     switch (args.length) {
       case 2: {
         const [optional, defaultValue] = args;
-        return isNone(optional)
-          ? defaultValue
-          : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-            ((optional as NarrowToSome<O>).value as Unwrap<O>);
+        return isSome(optional)
+          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            (optional.value as Unwrap<O>)
+          : defaultValue;
       }
 
       case 1: {
@@ -265,14 +272,7 @@ export namespace Optional {
           unwrapOr(optional, defaultValue);
       }
     }
-  }) as UnwrapOrFnOverload;
-
-  type UnwrapOrFnOverload = {
-    <O extends Base, D>(optional: O, defaultValue: D): D | Unwrap<O>;
-
-    // Curried version
-    <S, D>(defaultValue: D): (optional: Optional<S>) => D | S;
-  };
+  }
 
   /**
    * Returns the `Optional` if it is `Some`, otherwise returns the alternative.
@@ -293,16 +293,21 @@ export namespace Optional {
    * console.log(Optional.unwrap(result)); // "default"
    * ```
    */
-  export const orElse: OrElseFnOverload = (<
-    O extends Base,
-    const O2 extends Base,
-  >(
+  export function orElse<O extends Base, const O2 extends Base>(
+    optional: O,
+    alternative: O2,
+  ): O | O2;
+
+  // Curried version
+  export function orElse<S, S2>(
+    alternative: Optional<S2>,
+  ): (optional: Optional<S>) => Optional<S> | Optional<S2>;
+
+  export function orElse<O extends Base, const O2 extends Base>(
     ...args:
       | readonly [optional: O, alternative: O2]
       | readonly [alternative: O2]
-  ):
-    | (O | O2)
-    | ((optional: Optional<Unwrap<O>>) => Optional<Unwrap<O>> | O2) => {
+  ): (O | O2) | ((optional: Optional<Unwrap<O>>) => Optional<Unwrap<O>> | O2) {
     switch (args.length) {
       case 2: {
         const [optional, alternative] = args;
@@ -314,19 +319,7 @@ export namespace Optional {
         return (optional: Optional<Unwrap<O>>) => orElse(optional, alternative);
       }
     }
-  }) as OrElseFnOverload;
-
-  type OrElseFnOverload = {
-    <O extends Base, const O2 extends Base>(
-      optional: O,
-      alternative: O2,
-    ): O | O2;
-
-    // Curried version
-    <S, S2>(
-      alternative: Optional<S2>,
-    ): (optional: Optional<S>) => Optional<S> | Optional<S2>;
-  };
+  }
 
   /**
    * Maps an {@link Optional}<S> to {@link Optional}<S2> by applying a function to a contained value.
@@ -348,12 +341,21 @@ export namespace Optional {
    * console.log(Optional.isNone(mappedNone)); // true
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const map: MapFnOverload = (<O extends Base, S2>(
+  export function map<O extends Base, S2>(
+    optional: O,
+    mapFn: (value: Unwrap<O>) => S2,
+  ): Optional<S2>;
+
+  // Curried version
+  export function map<S, S2>(
+    mapFn: (value: S) => S2,
+  ): (optional: Optional<S>) => Optional<S2>;
+
+  export function map<O extends Base, S2>(
     ...args:
       | readonly [optional: O, mapFn: (value: Unwrap<O>) => S2]
       | readonly [mapFn: (value: Unwrap<O>) => S2]
-  ): Optional<S2> | ((optional: O) => Optional<S2>) => {
+  ): Optional<S2> | ((optional: O) => Optional<S2>) {
     switch (args.length) {
       case 2: {
         const [optional, mapFn] = args;
@@ -366,17 +368,7 @@ export namespace Optional {
         return (optional: O) => map(optional, mapFn);
       }
     }
-  }) as MapFnOverload;
-
-  type MapFnOverload = {
-    <O extends Base, S2>(
-      optional: O,
-      mapFn: (value: Unwrap<O>) => S2,
-    ): Optional<S2>;
-
-    // Curried version
-    <S, S2>(mapFn: (value: S) => S2): (optional: Optional<S>) => Optional<S2>;
-  };
+  }
 
   /**
    * Applies a function that returns an `Optional` to the value in an `Optional.Some`.
@@ -398,12 +390,21 @@ export namespace Optional {
    * console.log(Optional.unwrap(result)); // 42
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const flatMap: FlatMapFnOverload = (<O extends Base, S2>(
+  export function flatMap<O extends Base, S2>(
+    optional: O,
+    flatMapFn: (value: Unwrap<O>) => Optional<S2>,
+  ): Optional<S2>;
+
+  // Curried version
+  export function flatMap<S, S2>(
+    flatMapFn: (value: S) => Optional<S2>,
+  ): (optional: Optional<S>) => Optional<S2>;
+
+  export function flatMap<O extends Base, S2>(
     ...args:
       | readonly [optional: O, flatMapFn: (value: Unwrap<O>) => Optional<S2>]
       | readonly [flatMapFn: (value: Unwrap<O>) => Optional<S2>]
-  ): Optional<S2> | ((optional: O) => Optional<S2>) => {
+  ): Optional<S2> | ((optional: O) => Optional<S2>) {
     switch (args.length) {
       case 2: {
         const [optional, flatMapFn] = args;
@@ -415,19 +416,7 @@ export namespace Optional {
         return (optional: O) => flatMap(optional, flatMapFn);
       }
     }
-  }) as FlatMapFnOverload;
-
-  type FlatMapFnOverload = {
-    <O extends Base, S2>(
-      optional: O,
-      flatMapFn: (value: Unwrap<O>) => Optional<S2>,
-    ): Optional<S2>;
-
-    // Curried version
-    <S, S2>(
-      flatMapFn: (value: S) => Optional<S2>,
-    ): (optional: Optional<S>) => Optional<S2>;
-  };
+  }
 
   /**
    * Filters an `Optional` based on a predicate.
@@ -444,12 +433,21 @@ export namespace Optional {
    * console.log(Optional.unwrap(filtered)); // 4
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const filter: FilterFnOverload = (<O extends Base>(
+  export function filter<O extends Base>(
+    optional: O,
+    predicate: (value: Unwrap<O>) => boolean,
+  ): Optional<Unwrap<O>>;
+
+  // Curried version
+  export function filter<S>(
+    predicate: (value: S) => boolean,
+  ): (optional: Optional<S>) => Optional<S>;
+
+  export function filter<O extends Base>(
     ...args:
       | readonly [optional: O, predicate: (value: Unwrap<O>) => boolean]
       | readonly [predicate: (value: Unwrap<O>) => boolean]
-  ): Optional<Unwrap<O>> | ((optional: O) => Optional<Unwrap<O>>) => {
+  ): Optional<Unwrap<O>> | ((optional: O) => Optional<Unwrap<O>>) {
     switch (args.length) {
       case 2: {
         const [optional, predicate] = args;
@@ -466,19 +464,7 @@ export namespace Optional {
         return (optional: O) => filter(optional, predicate);
       }
     }
-  }) as FilterFnOverload;
-
-  type FilterFnOverload = {
-    <O extends Base>(
-      optional: O,
-      predicate: (value: Unwrap<O>) => boolean,
-    ): Optional<Unwrap<O>>;
-
-    // Curried version
-    <S>(
-      predicate: (value: S) => boolean,
-    ): (optional: Optional<S>) => Optional<S>;
-  };
+  }
 
   /**
    * Unwraps an `Optional`, returning the contained value or throwing an error with the provided message.
@@ -494,12 +480,19 @@ export namespace Optional {
    * console.log(value); // 42
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const expectToBe: ExpectToBeFnOverload = (<O extends Base>(
+  export function expectToBe<O extends Base>(
+    optional: O,
+    message: string,
+  ): Unwrap<O>;
+
+  // Curried version
+  export function expectToBe<S>(message: string): (optional: Optional<S>) => S;
+
+  export function expectToBe<O extends Base>(
     ...args:
       | readonly [optional: O, message: string]
       | readonly [message: string]
-  ): Unwrap<O> | ((optional: Optional<Unwrap<O>>) => Unwrap<O>) => {
+  ): Unwrap<O> | ((optional: Optional<Unwrap<O>>) => Unwrap<O>) {
     switch (args.length) {
       case 2: {
         const [optional, message] = args;
@@ -516,14 +509,7 @@ export namespace Optional {
           expectToBe(optional, message);
       }
     }
-  }) as ExpectToBeFnOverload;
-
-  type ExpectToBeFnOverload = {
-    <O extends Base>(optional: O, message: string): Unwrap<O>;
-
-    // Curried version
-    <S>(message: string): (optional: Optional<S>) => S;
-  };
+  }
 
   /**
    * Combines two `Optional` values into a single `Optional` containing a tuple.

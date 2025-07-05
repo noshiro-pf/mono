@@ -103,18 +103,15 @@ export namespace Arr {
    * @see {@link isEmpty} for checking if size is 0
    * @see {@link isNonEmpty} for checking if size > 0
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const size: SizeFnOverload = (<Ar extends readonly unknown[]>(
+  export function size<Ar extends NonEmptyArray<unknown>>(
     array: Ar,
-  ): SizeType.Arr => asUint32(array.length)) as SizeFnOverload;
+  ): IntersectBrand<PositiveNumber, SizeType.Arr>;
 
-  type SizeFnOverload = {
-    <Ar extends NonEmptyArray<unknown>>(
-      array: Ar,
-    ): IntersectBrand<PositiveNumber, SizeType.Arr>;
+  export function size<Ar extends readonly unknown[]>(array: Ar): SizeType.Arr;
 
-    <Ar extends readonly unknown[]>(array: Ar): SizeType.Arr;
-  };
+  export function size<Ar extends readonly unknown[]>(array: Ar): SizeType.Arr {
+    return asUint32(array.length);
+  }
 
   export const length = size;
 
@@ -440,27 +437,24 @@ export namespace Arr {
    * expectType<typeof maybeEmpty, readonly 0[]>('=');
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const zeros: ZerosFnOverload = ((
-    len: SizeType.ArgArrNonNegative,
-  ): readonly 0[] => Array.from<0>({ length: len }).fill(0)) as ZerosFnOverload;
+  /**
+   * Create array of zeros with compile-time length.
+   */
+  export function zeros<N extends SmallUint>(len: N): ArrayOfLength<N, 0>;
 
-  type ZerosFnOverload = {
-    /**
-     * Create array of zeros with compile-time length.
-     */
-    <N extends SmallUint>(len: N): ArrayOfLength<N, 0>;
+  /**
+   * Create non-empty array of zeros.
+   */
+  export function zeros(len: SizeType.ArgArrPositive): NonEmptyArray<0>;
 
-    /**
-     * Create non-empty array of zeros.
-     */
-    (len: SizeType.ArgArrPositive): NonEmptyArray<0>;
+  /**
+   * Create array of zeros.
+   */
+  export function zeros(len: SizeType.ArgArrNonNegative): readonly 0[];
 
-    /**
-     * Create array of zeros.
-     */
-    (len: SizeType.ArgArrNonNegative): readonly 0[];
-  };
+  export function zeros(len: SizeType.ArgArrNonNegative): readonly 0[] {
+    return Array.from<0>({ length: len }).fill(0);
+  }
 
   /**
    * Creates a sequence of consecutive integers from 0 to `len-1`.
@@ -503,19 +497,19 @@ export namespace Arr {
    * expectType<typeof single, readonly [0]>('=');
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const seq: SeqFnOverload = ((
+  export function seq<N extends SmallUint>(len: N): Seq<N>;
+
+  export function seq(
+    len: SizeType.ArgArrPositive,
+  ): NonEmptyArray<SizeType.Arr>;
+
+  export function seq(len: SizeType.ArgArrNonNegative): readonly SizeType.Arr[];
+
+  export function seq(
     len: SizeType.ArgArrNonNegative,
-  ): readonly SizeType.Arr[] =>
-    Array.from({ length: len }, (_, i) => asUint32(i))) as SeqFnOverload;
-
-  type SeqFnOverload = {
-    <N extends SmallUint>(len: N): Seq<N>;
-
-    (len: SizeType.ArgArrPositive): NonEmptyArray<SizeType.Arr>;
-
-    (len: SizeType.ArgArrNonNegative): readonly SizeType.Arr[];
-  };
+  ): readonly SizeType.Arr[] {
+    return Array.from({ length: len }, (_, i) => asUint32(i));
+  }
 
   /**
    * Creates a new array of the specified length, with each position filled with the provided initial value.
@@ -565,20 +559,27 @@ export namespace Arr {
    * @see {@link zeros} for creating arrays filled with zeros
    * @see {@link seq} for creating sequences of consecutive integers
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const create: CreateFnOverload = (<const V,>(
+  export function create<const V, N extends SmallUint>(
+    len: N,
+    init: V,
+  ): ArrayOfLength<N, V>;
+
+  export function create<const V>(
+    len: SizeType.ArgArrPositive,
+    init: V,
+  ): NonEmptyArray<V>;
+
+  export function create<const V>(
     len: SizeType.ArgArrNonNegative,
     init: V,
-  ): readonly V[] =>
-    Array.from({ length: Math.max(0, len) }, () => init)) as CreateFnOverload;
+  ): readonly V[];
 
-  type CreateFnOverload = {
-    <const V, N extends SmallUint>(len: N, init: V): ArrayOfLength<N, V>;
-
-    <const V>(len: SizeType.ArgArrPositive, init: V): NonEmptyArray<V>;
-
-    <const V>(len: SizeType.ArgArrNonNegative, init: V): readonly V[];
-  };
+  export function create<const V>(
+    len: SizeType.ArgArrNonNegative,
+    init: V,
+  ): readonly V[] {
+    return Array.from({ length: Math.max(0, len) }, () => init);
+  }
 
   export const newArray = create;
 
@@ -803,33 +804,31 @@ export namespace Arr {
    * @see {@link SmallUint} for understanding the constraint that enables precise typing
    * @see {@link SafeInt} and {@link SafeUint} for the safe integer types used
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const range: RangeFnOverload = ((
+  export function range<S extends SmallUint, E extends SmallUint>(
+    start: S,
+    end: E,
+    step?: 1,
+  ): RangeList<S, E>;
+
+  export function range(
+    start: SafeUintWithSmallInt,
+    end: SafeUintWithSmallInt,
+    step?: PositiveSafeIntWithSmallInt,
+  ): readonly SafeUint[];
+
+  export function range(
+    start: SafeIntWithSmallInt,
+    end: SafeIntWithSmallInt,
+    step?: NonZeroSafeIntWithSmallInt,
+  ): readonly SafeInt[];
+
+  export function range(
     start: SafeIntWithSmallInt,
     end: SafeIntWithSmallInt,
     step: NonZeroSafeIntWithSmallInt = 1,
-  ): readonly SafeInt[] =>
-    Array.from(rangeIterator(start, end, step))) as RangeFnOverload;
-
-  type RangeFnOverload = {
-    <S extends SmallUint, E extends SmallUint>(
-      start: S,
-      end: E,
-      step?: 1,
-    ): RangeList<S, E>;
-
-    (
-      start: SafeUintWithSmallInt,
-      end: SafeUintWithSmallInt,
-      step?: PositiveSafeIntWithSmallInt,
-    ): readonly SafeUint[];
-
-    (
-      start: SafeIntWithSmallInt,
-      end: SafeIntWithSmallInt,
-      step?: NonZeroSafeIntWithSmallInt,
-    ): readonly SafeInt[];
-  };
+  ): readonly SafeInt[] {
+    return Array.from(rangeIterator(start, end, step));
+  }
 
   // element access
 
@@ -943,12 +942,22 @@ export namespace Arr {
    * @see {@link Optional.unwrapOr} for safe unwrapping with defaults
    * @see {@link Optional.map} for transforming Optional values
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const at: AtFnOverload = (<E,>(
+  export function at<E>(
+    array: readonly E[],
+    index: SizeType.ArgArr,
+  ): Optional<E>;
+
+  // Curried version
+
+  export function at(
+    index: SizeType.ArgArr,
+  ): <E>(array: readonly E[]) => Optional<E>;
+
+  export function at<E>(
     ...args:
       | readonly [array: readonly E[], index: SizeType.ArgArr]
       | readonly [index: SizeType.ArgArr]
-  ): Optional<E> | (<E2>(array: readonly E2[]) => Optional<E2>) => {
+  ): Optional<E> | ((array: readonly E[]) => Optional<E>) {
     switch (args.length) {
       case 2: {
         const [array, index] = args;
@@ -962,20 +971,10 @@ export namespace Arr {
       }
       case 1: {
         const [index] = args;
-        return <E2,>(array: readonly E2[]) => at(array, index);
+        return (array: readonly E[]) => at(array, index);
       }
     }
-  }) as AtFnOverload;
-
-  /**
-   * Function type for safely accessing an array element at a given index.
-   */
-  type AtFnOverload = {
-    <E>(array: readonly E[], index: SizeType.ArgArr): Optional<E>;
-
-    // Curried version
-    (index: SizeType.ArgArr): <E>(array: readonly E[]) => Optional<E>;
-  };
+  }
 
   /**
    * Returns the first element of an array wrapped in an Optional.
@@ -1048,35 +1047,20 @@ export namespace Arr {
    * @see {@link at} for accessing elements at specific indices
    * @see {@link tail} for getting all elements except the first
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const head: HeadFnOverload = (<E,>(array: readonly E[]) => {
+  export function head(array: readonly []): Optional.None;
+
+  export function head<E, L extends readonly unknown[]>(
+    array: readonly [E, ...L],
+  ): Optional.Some<E>;
+
+  export function head<E>(array: NonEmptyArray<E>): Optional.Some<E>;
+
+  export function head<E>(array: readonly E[]): Optional<E>;
+
+  export function head<E>(array: readonly E[]): Optional<E> {
     const element = array.at(0);
     return element === undefined ? Optional.none : Optional.some(element);
-  }) as HeadFnOverload;
-
-  type HeadFnOverload = {
-    /**
-     * Get head of empty array.
-     */
-    (array: readonly []): Optional.None;
-
-    /**
-     * Get head of tuple.
-     */
-    <E, L extends readonly unknown[]>(
-      array: readonly [E, ...L],
-    ): Optional.Some<E>;
-
-    /**
-     * Get head of non-empty array.
-     */
-    <E>(array: NonEmptyArray<E>): Optional.Some<E>;
-
-    /**
-     * Get head of any array.
-     */
-    <E>(array: readonly E[]): Optional<E>;
-  };
+  }
 
   /**
    * Returns the last element of an array wrapped in an Optional.
@@ -1158,35 +1142,20 @@ export namespace Arr {
    * @see {@link at} for accessing elements at specific indices with negative indexing support
    * @see {@link butLast} for getting all elements except the last
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const last: LastFnOverload = (<E,>(array: readonly E[]) => {
+  export function last(array: readonly []): Optional.None;
+
+  export function last<Ar extends readonly unknown[], L>(
+    array: readonly [...Ar, L],
+  ): Optional.Some<L>;
+
+  export function last<E>(array: NonEmptyArray<E>): Optional.Some<E>;
+
+  export function last<E>(array: readonly E[]): Optional<E>;
+
+  export function last<E>(array: readonly E[]): Optional<E> {
     const element = array.at(-1);
     return element === undefined ? Optional.none : Optional.some(element);
-  }) as LastFnOverload;
-
-  type LastFnOverload = {
-    /**
-     * Get last of empty array.
-     */
-    (array: readonly []): Optional.None;
-
-    /**
-     * Get last of tuple.
-     */
-    <Ar extends readonly unknown[], L>(
-      array: readonly [...Ar, L],
-    ): Optional.Some<L>;
-
-    /**
-     * Get last of non-empty array.
-     */
-    <E>(array: NonEmptyArray<E>): Optional.Some<E>;
-
-    /**
-     * Get last of any array.
-     */
-    <E>(array: readonly E[]): Optional<E>;
-  };
+  }
 
   // slicing
 
@@ -1273,12 +1242,22 @@ export namespace Arr {
    * @see {@link skip} for skipping the first N elements
    * @see {@link takeLast} for taking the last N elements
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const sliceClamped: SliceClampedFnOverload = (<E,>(
+  export function sliceClamped<E>(
+    array: readonly E[],
+    start: SizeType.ArgArr,
+    end: SizeType.ArgArr,
+  ): readonly E[];
+
+  export function sliceClamped(
+    start: SizeType.ArgArr,
+    end: SizeType.ArgArr,
+  ): <E>(array: readonly E[]) => readonly E[];
+
+  export function sliceClamped<E>(
     ...args:
       | readonly [readonly E[], SizeType.ArgArr, SizeType.ArgArr]
       | readonly [SizeType.ArgArr, SizeType.ArgArr]
-  ) => {
+  ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 3: {
         const [array, start, end] = args;
@@ -1289,24 +1268,10 @@ export namespace Arr {
       }
       case 2: {
         const [start, end] = args;
-        return <E2,>(array: readonly E2[]) => sliceClamped(array, start, end);
+        return (array) => sliceClamped(array, start, end);
       }
     }
-  }) as SliceClampedFnOverload;
-
-  type SliceClampedFnOverload = {
-    <E>(
-      array: readonly E[],
-      start: SizeType.ArgArr,
-      end: SizeType.ArgArr,
-    ): readonly E[];
-
-    // Curried version
-    (
-      start: SizeType.ArgArr,
-      end: SizeType.ArgArr,
-    ): <E>(array: readonly E[]) => readonly E[];
-  };
+  }
 
   /**
    * Returns all elements of an array except the first one.
@@ -1367,12 +1332,41 @@ export namespace Arr {
    * console.log(result); // [1, 2, 3]
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const take: TakeFnOverload = (<Ar extends readonly unknown[]>(
+  export function take<Ar extends readonly unknown[], N extends SmallUint>(
+    array: Ar,
+    num: N,
+  ): List.Take<N, Ar>;
+
+  export function take<N extends SmallUint>(
+    num: N,
+  ): <Ar extends readonly unknown[]>(array: Ar) => List.Take<N, Ar>;
+
+  export function take<E>(
+    array: NonEmptyArray<E>,
+    num: SizeType.ArgArrPositive,
+  ): NonEmptyArray<E>;
+
+  export function take(
+    num: SizeType.ArgArrPositive,
+  ): <E>(array: NonEmptyArray<E>) => NonEmptyArray<E>;
+
+  export function take<E>(
+    array: readonly E[],
+    num: SizeType.ArgArrNonNegative,
+  ): readonly E[];
+
+  export function take(
+    num: SizeType.ArgArrNonNegative,
+  ): <E>(array: readonly E[]) => readonly E[];
+
+  export function take<E>(
     ...args:
-      | readonly [array: Ar, num: SizeType.ArgArrNonNegative]
+      | readonly [array: readonly E[], num: SizeType.ArgArrNonNegative]
       | readonly [num: SizeType.ArgArrNonNegative]
-  ) => {
+  ):
+    | readonly E[]
+    | ((array: NonEmptyArray<E>) => NonEmptyArray<E>)
+    | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 2: {
         const [array, num] = args;
@@ -1380,37 +1374,10 @@ export namespace Arr {
       }
       case 1: {
         const [num] = args;
-        return <E,>(array: readonly E[]) => take(array, num);
+        return (array: readonly E[]) => take(array, num);
       }
     }
-  }) as unknown as TakeFnOverload;
-
-  type TakeFnOverload = {
-    <Ar extends readonly unknown[], N extends SmallUint>(
-      array: Ar,
-      num: N,
-    ): List.Take<N, Ar>;
-
-    // curried version
-    <N extends SmallUint>(
-      num: N,
-    ): <Ar extends readonly unknown[]>(array: Ar) => List.Take<N, Ar>;
-
-    <E>(
-      array: NonEmptyArray<E>,
-      num: SizeType.ArgArrPositive,
-    ): NonEmptyArray<E>;
-
-    // curried version
-    (
-      num: SizeType.ArgArrPositive,
-    ): <E>(array: NonEmptyArray<E>) => NonEmptyArray<E>;
-
-    <E>(array: readonly E[], num: SizeType.ArgArrNonNegative): readonly E[];
-
-    // curried version
-    (num: SizeType.ArgArrNonNegative): <E>(array: readonly E[]) => readonly E[];
-  };
+  }
 
   /**
    * Takes the last N elements from an array.
@@ -1435,12 +1402,41 @@ export namespace Arr {
    * console.log(result); // [4, 5]
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const takeLast: TakeLastFnOverload = (<Ar extends readonly unknown[]>(
+  export function takeLast<Ar extends readonly unknown[], N extends SmallUint>(
+    array: Ar,
+    num: N,
+  ): List.TakeLast<N, Ar>;
+
+  export function takeLast<N extends SmallUint>(
+    num: N,
+  ): <Ar extends readonly unknown[]>(array: Ar) => List.TakeLast<N, Ar>;
+
+  export function takeLast<E>(
+    array: NonEmptyArray<E>,
+    num: SizeType.ArgArrPositive,
+  ): NonEmptyArray<E>;
+
+  export function takeLast(
+    num: SizeType.ArgArrPositive,
+  ): <E>(array: NonEmptyArray<E>) => NonEmptyArray<E>;
+
+  export function takeLast<E>(
+    array: readonly E[],
+    num: SizeType.ArgArrNonNegative,
+  ): readonly E[];
+
+  export function takeLast(
+    num: SizeType.ArgArrNonNegative,
+  ): <E>(array: readonly E[]) => readonly E[];
+
+  export function takeLast<E>(
     ...args:
-      | readonly [array: Ar, num: SizeType.ArgArrNonNegative]
+      | readonly [array: readonly E[], num: SizeType.ArgArrNonNegative]
       | readonly [num: SizeType.ArgArrNonNegative]
-  ) => {
+  ):
+    | readonly E[]
+    | ((array: NonEmptyArray<E>) => NonEmptyArray<E>)
+    | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 2: {
         const [array, num] = args;
@@ -1448,37 +1444,10 @@ export namespace Arr {
       }
       case 1: {
         const [num] = args;
-        return <E,>(array: readonly E[]) => takeLast(array, num);
+        return (array: readonly E[]) => takeLast(array, num);
       }
     }
-  }) as unknown as TakeLastFnOverload;
-
-  type TakeLastFnOverload = {
-    <Ar extends readonly unknown[], N extends SmallUint>(
-      array: Ar,
-      num: N,
-    ): List.TakeLast<N, Ar>;
-
-    // curried version
-    <N extends SmallUint>(
-      num: N,
-    ): <Ar extends readonly unknown[]>(array: Ar) => List.TakeLast<N, Ar>;
-
-    <E>(
-      array: NonEmptyArray<E>,
-      num: SizeType.ArgArrPositive,
-    ): NonEmptyArray<E>;
-
-    // curried version
-    (
-      num: SizeType.ArgArrPositive,
-    ): <E>(array: NonEmptyArray<E>) => NonEmptyArray<E>;
-
-    <E>(array: readonly E[], num: SizeType.ArgArrNonNegative): readonly E[];
-
-    // curried version
-    (num: SizeType.ArgArrNonNegative): <E>(array: readonly E[]) => readonly E[];
-  };
+  }
 
   /**
    * Skips the first N elements of an array.
@@ -1503,12 +1472,41 @@ export namespace Arr {
    * console.log(result); // [3, 4, 5]
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const skip: SkipFnOverload = (<E,>(
+  export function skip<Ar extends readonly unknown[], N extends SmallUint>(
+    array: Ar,
+    num: N,
+  ): List.Skip<N, Ar>;
+
+  export function skip<E>(
+    array: NonEmptyArray<E>,
+    num: SizeType.ArgArrPositive,
+  ): readonly E[];
+
+  export function skip<E>(
+    array: readonly E[],
+    num: SizeType.ArgArrNonNegative,
+  ): readonly E[];
+
+  export function skip<N extends SmallUint>(
+    num: N,
+  ): <Ar extends readonly unknown[]>(array: Ar) => List.Skip<N, Ar>;
+
+  export function skip(
+    num: SizeType.ArgArrPositive,
+  ): <E>(array: NonEmptyArray<E>) => readonly E[];
+
+  export function skip(
+    num: SizeType.ArgArrNonNegative,
+  ): <E>(array: readonly E[]) => readonly E[];
+
+  export function skip<E>(
     ...args:
       | readonly [readonly E[], SizeType.ArgArrNonNegative]
       | readonly [SizeType.ArgArrNonNegative]
-  ) => {
+  ):
+    | readonly E[]
+    | ((array: NonEmptyArray<E>) => readonly E[])
+    | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 2: {
         const [array, num] = args;
@@ -1516,32 +1514,10 @@ export namespace Arr {
       }
       case 1: {
         const [num] = args;
-        return <E2,>(array: readonly E2[]) => skip(array, num);
+        return (array: readonly E[]) => skip(array, num);
       }
     }
-  }) as SkipFnOverload;
-
-  type SkipFnOverload = {
-    <Ar extends readonly unknown[], N extends SmallUint>(
-      array: Ar,
-      num: N,
-    ): List.Skip<N, Ar>;
-
-    <E>(array: NonEmptyArray<E>, num: SizeType.ArgArrPositive): readonly E[];
-
-    <E>(array: readonly E[], num: SizeType.ArgArrNonNegative): readonly E[];
-
-    // curried version
-    <N extends SmallUint>(
-      num: N,
-    ): <Ar extends readonly unknown[]>(array: Ar) => List.Skip<N, Ar>;
-
-    (
-      num: SizeType.ArgArrPositive,
-    ): <E>(array: NonEmptyArray<E>) => readonly E[];
-
-    (num: SizeType.ArgArrNonNegative): <E>(array: readonly E[]) => readonly E[];
-  };
+  }
 
   /**
    * Skips the last N elements of an array.
@@ -1566,12 +1542,29 @@ export namespace Arr {
    * console.log(result); // [1, 2, 3]
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const skipLast: SkipLastFnOverload = (<E,>(
+  export function skipLast<Ar extends readonly unknown[], N extends SmallUint>(
+    array: Ar,
+    num: N,
+  ): List.SkipLast<N, Ar>;
+
+  export function skipLast<N extends SmallUint>(
+    num: N,
+  ): <Ar extends readonly unknown[]>(array: Ar) => List.SkipLast<N, Ar>;
+
+  export function skipLast<E>(
+    array: readonly E[],
+    num: SizeType.ArgArrNonNegative,
+  ): readonly E[];
+
+  export function skipLast(
+    num: SizeType.ArgArrNonNegative,
+  ): <E>(array: readonly E[]) => readonly E[];
+
+  export function skipLast<E>(
     ...args:
       | readonly [array: readonly E[], num: SizeType.ArgArrNonNegative]
       | readonly [num: SizeType.ArgArrNonNegative]
-  ): readonly E[] | ((array: readonly E[]) => readonly E[]) => {
+  ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 2: {
         const [array, num] = args;
@@ -1579,26 +1572,10 @@ export namespace Arr {
       }
       case 1: {
         const [num] = args;
-        return <E2,>(array: readonly E2[]) => skipLast(array, num);
+        return (array: readonly E[]) => skipLast(array, num);
       }
     }
-  }) as SkipLastFnOverload;
-
-  type SkipLastFnOverload = {
-    <Ar extends readonly unknown[], N extends SmallUint>(
-      array: Ar,
-      num: N,
-    ): List.SkipLast<N, Ar>;
-
-    <E>(array: readonly E[], num: SizeType.ArgArrNonNegative): readonly E[];
-
-    // curried version
-    <N extends SmallUint>(
-      num: N,
-    ): <Ar extends readonly unknown[]>(array: Ar) => List.SkipLast<N, Ar>;
-
-    (num: SizeType.ArgArrNonNegative): <E>(array: readonly E[]) => readonly E[];
-  };
+  }
 
   // modification (returns new array)
 
@@ -1756,8 +1733,18 @@ export namespace Arr {
    * @see {@link SizeType.ArgArrNonNegative} for the index type constraint
    * @see Immutable update patterns for functional programming approaches
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const toUpdated: ToUpdatedFnOverload = (<E, U>(
+  export function toUpdated<E, U>(
+    array: readonly E[],
+    index: SizeType.ArgArrNonNegative,
+    updater: (prev: E) => U,
+  ): readonly (E | U)[];
+
+  export function toUpdated<E, U>(
+    index: SizeType.ArgArrNonNegative,
+    updater: (prev: E) => U,
+  ): (array: readonly E[]) => readonly (E | U)[];
+
+  export function toUpdated<E, U>(
     ...args:
       | readonly [
           array: readonly E[],
@@ -1765,7 +1752,7 @@ export namespace Arr {
           updater: (prev: E) => U,
         ]
       | readonly [index: SizeType.ArgArrNonNegative, updater: (prev: E) => U]
-  ) => {
+  ): readonly (E | U)[] | ((array: readonly E[]) => readonly (E | U)[]) {
     switch (args.length) {
       case 3: {
         const [array, index, updater] = args;
@@ -1779,21 +1766,7 @@ export namespace Arr {
         return (array: readonly E[]) => toUpdated(array, index, updater);
       }
     }
-  }) as ToUpdatedFnOverload;
-
-  type ToUpdatedFnOverload = {
-    <E, U>(
-      array: readonly E[],
-      index: SizeType.ArgArrNonNegative,
-      updater: (prev: E) => U,
-    ): readonly (E | U)[];
-
-    // curried version
-    <E, U>(
-      index: SizeType.ArgArrNonNegative,
-      updater: (prev: E) => U,
-    ): (array: readonly E[]) => readonly (E | U)[];
-  };
+  }
 
   /**
    * Returns a new array with a new value inserted at the specified index.
@@ -1814,8 +1787,18 @@ export namespace Arr {
    * console.log(result); // [99, 1, 2, 3]
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const toInserted: ToInsertedFnOverload = (<E, V = E>(
+  export function toInserted<E, const V = E>(
+    array: readonly E[],
+    index: SizeType.ArgArrNonNegative,
+    newValue: V,
+  ): NonEmptyArray<E | V>;
+
+  export function toInserted<E, const V = E>(
+    index: SizeType.ArgArrNonNegative,
+    newValue: V,
+  ): (array: readonly E[]) => NonEmptyArray<E | V>;
+
+  export function toInserted<E, const V = E>(
     ...args:
       | readonly [
           array: readonly E[],
@@ -1823,38 +1806,23 @@ export namespace Arr {
           newValue: V,
         ]
       | readonly [index: SizeType.ArgArrNonNegative, newValue: V]
-  ) => {
+  ): NonEmptyArray<E | V> | ((array: readonly E[]) => NonEmptyArray<E | V>) {
     switch (args.length) {
       case 3: {
         const [array, index, newValue] = args;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-        return (array as (E | V)[]).toSpliced(
+        return (array as readonly (E | V)[]).toSpliced(
           index,
           0,
           newValue,
-        ) as MutableNonEmptyArray<E | V>;
+        ) as unknown as NonEmptyArray<E | V>;
       }
       case 2: {
         const [index, newValue] = args;
-        return <E2,>(array: readonly (E2 | V)[]) =>
-          toInserted(array, index, newValue);
+        return (array: readonly E[]) => toInserted(array, index, newValue);
       }
     }
-  }) as ToInsertedFnOverload;
-
-  type ToInsertedFnOverload = {
-    <E, const V = E>(
-      array: readonly E[],
-      index: SizeType.ArgArrNonNegative,
-      newValue: V,
-    ): NonEmptyArray<E | V>;
-
-    // curried version
-    <E, const V = E>(
-      index: SizeType.ArgArrNonNegative,
-      newValue: V,
-    ): (array: readonly E[]) => NonEmptyArray<E | V>;
-  };
+  }
 
   /**
    * Returns a new array with the element at the specified index removed.
@@ -1874,12 +1842,20 @@ export namespace Arr {
    * console.log(result); // [20, 30]
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const toRemoved: ToRemovedFnOverload = (<E,>(
+  export function toRemoved<E>(
+    array: readonly E[],
+    index: SizeType.ArgArrNonNegative,
+  ): readonly E[];
+
+  export function toRemoved(
+    index: SizeType.ArgArrNonNegative,
+  ): <E>(array: readonly E[]) => readonly E[];
+
+  export function toRemoved<E>(
     ...args:
       | readonly [array: readonly E[], index: SizeType.ArgArrNonNegative]
       | readonly [index: SizeType.ArgArrNonNegative]
-  ) => {
+  ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 2: {
         const [array, index] = args;
@@ -1887,19 +1863,10 @@ export namespace Arr {
       }
       case 1: {
         const [index] = args;
-        return <E2,>(array: readonly E2[]) => toRemoved(array, index);
+        return (array: readonly E[]) => toRemoved(array, index);
       }
     }
-  }) as ToRemovedFnOverload;
-
-  type ToRemovedFnOverload = {
-    <E>(array: readonly E[], index: SizeType.ArgArrNonNegative): readonly E[];
-
-    // curried version
-    (
-      index: SizeType.ArgArrNonNegative,
-    ): <E>(array: readonly E[]) => readonly E[];
-  };
+  }
 
   /**
    * Returns a new array with a value added to the end.
@@ -1919,37 +1886,34 @@ export namespace Arr {
    * console.log(result); // [1, 2, 3, 0]
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const toPushed: ToPushedFnOverload = (<
-    Ar extends readonly unknown[],
-    const V,
-  >(
+  export function toPushed<Ar extends readonly unknown[], const V>(
+    array: Ar,
+    newValue: V,
+  ): readonly [...Ar, V];
+
+  export function toPushed<const V>(
+    newValue: V,
+  ): <Ar extends readonly unknown[]>(array: Ar) => readonly [...Ar, V];
+
+  export function toPushed<Ar extends readonly unknown[], const V>(
     ...args: readonly [array: Ar, newValue: V] | readonly [newValue: V]
-  ) => {
+  ): readonly [...Ar, V] | ((array: Ar) => readonly [...Ar, V]) {
     switch (args.length) {
       case 2: {
         const [array, newValue] = args;
-        return array.toSpliced(array.length, 0, newValue);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        return array.toSpliced(
+          array.length,
+          0,
+          newValue,
+        ) as unknown as readonly [...Ar, V];
       }
       case 1: {
         const [newValue] = args;
-        return <Ar2 extends readonly unknown[]>(array: Ar2) =>
-          toPushed(array, newValue);
+        return (array) => toPushed(array, newValue);
       }
     }
-  }) as unknown as ToPushedFnOverload;
-
-  type ToPushedFnOverload = {
-    <Ar extends readonly unknown[], const V>(
-      array: Ar,
-      newValue: V,
-    ): readonly [...Ar, V];
-
-    // curried version
-    <const V>(
-      newValue: V,
-    ): <Ar extends readonly unknown[]>(array: Ar) => readonly [...Ar, V];
-  };
+  }
 
   /**
    * Returns a new array with a value added to the beginning.
@@ -1969,37 +1933,33 @@ export namespace Arr {
    * console.log(result); // [0, 1, 2, 3]
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const toUnshifted: ToUnshiftedFnOverload = (<
-    Ar extends readonly unknown[],
-    const V,
-  >(
+  export function toUnshifted<Ar extends readonly unknown[], const V>(
+    array: Ar,
+    newValue: V,
+  ): readonly [V, ...Ar];
+
+  export function toUnshifted<const V>(
+    newValue: V,
+  ): <Ar extends readonly unknown[]>(array: Ar) => readonly [V, ...Ar];
+
+  export function toUnshifted<Ar extends readonly unknown[], const V>(
     ...args: readonly [array: Ar, newValue: V] | readonly [newValue: V]
-  ) => {
+  ): readonly [V, ...Ar] | ((array: Ar) => readonly [V, ...Ar]) {
     switch (args.length) {
       case 2: {
         const [array, newValue] = args;
-        return array.toSpliced(0, 0, newValue);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        return array.toSpliced(0, 0, newValue) as unknown as readonly [
+          V,
+          ...Ar,
+        ];
       }
       case 1: {
         const [newValue] = args;
-        return <Ar2 extends readonly unknown[]>(array: Ar2) =>
-          toUnshifted(array, newValue);
+        return (array) => toUnshifted(array, newValue);
       }
     }
-  }) as unknown as ToUnshiftedFnOverload;
-
-  type ToUnshiftedFnOverload = {
-    <Ar extends readonly unknown[], const V>(
-      array: Ar,
-      newValue: V,
-    ): readonly [V, ...Ar];
-
-    // curried version
-    <const V>(
-      newValue: V,
-    ): <Ar extends readonly unknown[]>(array: Ar) => readonly [V, ...Ar];
-  };
+  }
 
   /**
    * Fills an array with a value (creates a new filled array).
@@ -2021,10 +1981,13 @@ export namespace Arr {
    * console.log(result2); // [1, 0, 0, 4]
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const toFilled: ToFilledFnOverload = (<E,>(
+  export function toFilled<E>(array: readonly E[], value: E): readonly E[];
+
+  export function toFilled<E>(value: E): (array: readonly E[]) => readonly E[];
+
+  export function toFilled<E>(
     ...args: readonly [array: readonly E[], value: E] | readonly [value: E]
-  ) => {
+  ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 2: {
         const [array, value] = args;
@@ -2034,20 +1997,23 @@ export namespace Arr {
       }
       case 1: {
         const [value] = args;
-        return (array: readonly E[]) => toFilled(array, value);
+        return (array) => toFilled(array, value);
       }
     }
-  }) as ToFilledFnOverload;
+  }
 
-  type ToFilledFnOverload = {
-    <E>(array: readonly E[], value: E): readonly E[];
+  export function toRangeFilled<E>(
+    array: readonly E[],
+    value: E,
+    fillRange: readonly [start: SizeType.ArgArr, end: SizeType.ArgArr],
+  ): readonly E[];
 
-    // curried version
-    <E>(value: E): (array: readonly E[]) => readonly E[];
-  };
+  export function toRangeFilled<E>(
+    value: E,
+    fillRange: readonly [start: SizeType.ArgArr, end: SizeType.ArgArr],
+  ): (array: readonly E[]) => readonly E[];
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const toRangeFilled: ToRangeFilledFnOverload = (<E,>(
+  export function toRangeFilled<E>(
     ...args:
       | readonly [
           array: readonly E[],
@@ -2058,7 +2024,7 @@ export namespace Arr {
           value: E,
           fillRange: readonly [start: SizeType.ArgArr, end: SizeType.ArgArr],
         ]
-  ) => {
+  ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 3: {
         const [array, value, [start, end]] = args;
@@ -2068,25 +2034,10 @@ export namespace Arr {
       }
       case 2: {
         const [value, fillRange] = args;
-        return (array: readonly unknown[]) =>
-          toRangeFilled(array, value, fillRange);
+        return (array) => toRangeFilled(array, value, fillRange);
       }
     }
-  }) as ToRangeFilledFnOverload;
-
-  type ToRangeFilledFnOverload = {
-    <E>(
-      array: readonly E[],
-      value: E,
-      fillRange: readonly [start: SizeType.ArgArr, end: SizeType.ArgArr],
-    ): readonly E[];
-
-    // curried version
-    <E>(
-      value: E,
-      fillRange: readonly [start: SizeType.ArgArr, end: SizeType.ArgArr],
-    ): (array: readonly E[]) => readonly E[];
-  };
+  }
 
   // searching
 
@@ -2127,8 +2078,16 @@ export namespace Arr {
    * @see {@link indexOf} for finding elements by equality
    * @see {@link Optional} for working with the returned Optional values
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const find: FindFnOverload = (<E,>(
+  export function find<E>(
+    array: readonly E[],
+    predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
+  ): Optional<E>;
+
+  export function find<E>(
+    predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
+  ): (array: readonly E[]) => Optional<E>;
+
+  export function find<E>(
     ...args:
       | readonly [
           array: readonly E[],
@@ -2145,7 +2104,7 @@ export namespace Arr {
             arr: readonly E[],
           ) => boolean,
         ]
-  ) => {
+  ): Optional<E> | ((array: readonly E[]) => Optional<E>) {
     switch (args.length) {
       case 2: {
         const [array, predicate] = args;
@@ -2164,19 +2123,7 @@ export namespace Arr {
         return (array: readonly E[]) => find(array, predicate);
       }
     }
-  }) as FindFnOverload;
-
-  type FindFnOverload = {
-    <E>(
-      array: readonly E[],
-      predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
-    ): Optional<E>;
-
-    // curried version
-    <E>(
-      predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
-    ): (array: readonly E[]) => Optional<E>;
-  };
+  }
 
   /**
    * Safely finds the index of the first element in an array that satisfies a predicate function.
@@ -2283,15 +2230,23 @@ export namespace Arr {
    * @see {@link lastIndexOf} for finding the last occurrence
    * @see {@link Optional} for working with the returned Optional values
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const findIndex: FindIndexFnOverload = (<E,>(
+  export function findIndex<E>(
+    array: readonly E[],
+    predicate: (value: E, index: SizeType.Arr) => boolean,
+  ): SizeType.Arr | -1;
+
+  export function findIndex<E>(
+    predicate: (value: E, index: SizeType.Arr) => boolean,
+  ): (array: readonly E[]) => SizeType.Arr | -1;
+
+  export function findIndex<E>(
     ...args:
       | readonly [
           array: readonly E[],
           predicate: (value: E, index: SizeType.Arr) => boolean,
         ]
       | readonly [predicate: (value: E, index: SizeType.Arr) => boolean]
-  ) => {
+  ): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
     switch (args.length) {
       case 2: {
         const [array, predicate] = args;
@@ -2307,19 +2262,7 @@ export namespace Arr {
         return (array: readonly E[]) => findIndex(array, predicate);
       }
     }
-  }) as FindIndexFnOverload;
-
-  type FindIndexFnOverload = {
-    <E>(
-      array: readonly E[],
-      predicate: (value: E, index: SizeType.Arr) => boolean,
-    ): SizeType.Arr | -1;
-
-    // curried version
-    <E>(
-      predicate: (value: E, index: SizeType.Arr) => boolean,
-    ): (array: readonly E[]) => SizeType.Arr | -1;
-  };
+  }
 
   /**
    * Gets the index of a value in an array.
@@ -2342,12 +2285,20 @@ export namespace Arr {
    * console.log(Optional.unwrapOr(result2, -1)); // 1
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const indexOf: IndexOfFnOverload = (<E,>(
+  export function indexOf<E>(
+    array: readonly E[],
+    searchElement: E,
+  ): SizeType.Arr | -1;
+
+  export function indexOf<E>(
+    searchElement: E,
+  ): (array: readonly E[]) => SizeType.Arr | -1;
+
+  export function indexOf<E>(
     ...args:
       | readonly [array: readonly E[], searchElement: E]
       | readonly [searchElement: E]
-  ) => {
+  ): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
     switch (args.length) {
       case 2: {
         const [array, searchElement] = args;
@@ -2360,17 +2311,20 @@ export namespace Arr {
         return (array: readonly E[]) => indexOf(array, searchElement);
       }
     }
-  }) as IndexOfFnOverload;
+  }
 
-  type IndexOfFnOverload = {
-    <E>(array: readonly E[], searchElement: E): SizeType.Arr | -1;
+  export function indexOfFrom<E>(
+    array: readonly E[],
+    searchElement: E,
+    fromIndex: SizeType.ArgArr,
+  ): SizeType.Arr | -1;
 
-    // curried version
-    <E>(searchElement: E): (array: readonly E[]) => SizeType.Arr | -1;
-  };
+  export function indexOfFrom<E>(
+    searchElement: E,
+    fromIndex: SizeType.ArgArr,
+  ): (array: readonly E[]) => SizeType.Arr | -1;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const indexOfFrom: IndexOfFromFnOverload = (<E,>(
+  export function indexOfFrom<E>(
     ...args:
       | readonly [
           array: readonly E[],
@@ -2378,7 +2332,7 @@ export namespace Arr {
           fromIndex: SizeType.ArgArr,
         ]
       | readonly [searchElement: E, fromIndex: SizeType.ArgArr]
-  ) => {
+  ): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
     switch (args.length) {
       case 3: {
         const [array, searchElement, fromIndex] = args;
@@ -2391,21 +2345,7 @@ export namespace Arr {
           indexOfFrom(array, searchElement, fromIndex);
       }
     }
-  }) as IndexOfFromFnOverload;
-
-  type IndexOfFromFnOverload = {
-    <E>(
-      array: readonly E[],
-      searchElement: E,
-      fromIndex: SizeType.ArgArr,
-    ): SizeType.Arr | -1;
-
-    // curried version
-    <E>(
-      searchElement: E,
-      fromIndex: SizeType.ArgArr,
-    ): (array: readonly E[]) => SizeType.Arr | -1;
-  };
+  }
 
   /**
    * Gets the last index of a value in an array.
@@ -2428,12 +2368,20 @@ export namespace Arr {
    * console.log(Optional.unwrapOr(result2, -1)); // 3
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const lastIndexOf: LastIndexOfFnOverload = (<E,>(
+  export function lastIndexOf<E>(
+    array: readonly E[],
+    searchElement: E,
+  ): SizeType.Arr | -1;
+
+  export function lastIndexOf<E>(
+    searchElement: E,
+  ): (array: readonly E[]) => SizeType.Arr | -1;
+
+  export function lastIndexOf<E>(
     ...args:
       | readonly [array: readonly E[], searchElement: E]
       | readonly [searchElement: E]
-  ) => {
+  ): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
     switch (args.length) {
       case 2: {
         const [array, searchElement] = args;
@@ -2445,17 +2393,20 @@ export namespace Arr {
         return (array: readonly E[]) => lastIndexOf(array, searchElement);
       }
     }
-  }) as LastIndexOfFnOverload;
+  }
 
-  type LastIndexOfFnOverload = {
-    <E>(array: readonly E[], searchElement: E): SizeType.Arr | -1;
+  export function lastIndexOfFrom<E>(
+    array: readonly E[],
+    searchElement: E,
+    fromIndex: SizeType.ArgArr,
+  ): SizeType.Arr | -1;
 
-    // curried version
-    <E>(searchElement: E): (array: readonly E[]) => SizeType.Arr | -1;
-  };
+  export function lastIndexOfFrom<E>(
+    searchElement: E,
+    fromIndex: SizeType.ArgArr,
+  ): (array: readonly E[]) => SizeType.Arr | -1;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const lastIndexOfFrom: LastIndexOfFromFnOverload = (<E,>(
+  export function lastIndexOfFrom<E>(
     ...args:
       | readonly [
           array: readonly E[],
@@ -2463,7 +2414,7 @@ export namespace Arr {
           fromIndex: SizeType.ArgArr,
         ]
       | readonly [searchElement: E, fromIndex: SizeType.ArgArr]
-  ) => {
+  ): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
     switch (args.length) {
       case 3: {
         const [array, searchElement, fromIndex] = args;
@@ -2478,21 +2429,7 @@ export namespace Arr {
           lastIndexOfFrom(array, searchElement, fromIndex);
       }
     }
-  }) as LastIndexOfFromFnOverload;
-
-  type LastIndexOfFromFnOverload = {
-    <E>(
-      array: readonly E[],
-      searchElement: E,
-      fromIndex: SizeType.ArgArr,
-    ): SizeType.Arr | -1;
-
-    // curried version
-    <E>(
-      searchElement: E,
-      fromIndex: SizeType.ArgArr,
-    ): (array: readonly E[]) => SizeType.Arr | -1;
-  };
+  }
 
   // reducing value
 
@@ -2511,7 +2448,26 @@ export namespace Arr {
    * Arr.foldl(['a', 'b', 'c'], (acc, str) => acc + str.toUpperCase(), ''); // 'ABC'
    * ```
    */
-  export const foldl: FoldlFnOverload = <E, P>(
+  export function foldl<E, P>(
+    array: readonly E[],
+    callbackfn: (
+      previousValue: P,
+      currentValue: E,
+      currentIndex: SizeType.Arr,
+    ) => P,
+    initialValue: P,
+  ): P;
+
+  export function foldl<E, P>(
+    callbackfn: (
+      previousValue: P,
+      currentValue: E,
+      currentIndex: SizeType.Arr,
+    ) => P,
+    initialValue: P,
+  ): (array: readonly E[]) => P;
+
+  export function foldl<E, P>(
     ...args:
       | readonly [
           array: readonly E[],
@@ -2530,7 +2486,7 @@ export namespace Arr {
           ) => P,
           initialValue: P,
         ]
-  ) => {
+  ): P | ((array: readonly E[]) => P) {
     switch (args.length) {
       case 3: {
         const [array, callbackfn, initialValue] = args;
@@ -2544,29 +2500,7 @@ export namespace Arr {
         return (array: readonly E[]) => foldl(array, callbackfn, initialValue);
       }
     }
-  };
-
-  type FoldlFnOverload = {
-    <E, P>(
-      array: readonly E[],
-      callbackfn: (
-        previousValue: P,
-        currentValue: E,
-        currentIndex: SizeType.Arr,
-      ) => P,
-      initialValue: P,
-    ): P;
-
-    // curried version
-    <E, P>(
-      callbackfn: (
-        previousValue: P,
-        currentValue: E,
-        currentIndex: SizeType.Arr,
-      ) => P,
-      initialValue: P,
-    ): (array: readonly E[]) => P;
-  };
+  }
 
   /**
    * Applies a function against an accumulator and each element in the array (from right to left) to reduce it to a single value.
@@ -2588,7 +2522,26 @@ export namespace Arr {
    * console.log(result); // "abc"
    * ```
    */
-  export const foldr: FoldrFnOverload = <E, P>(
+  export function foldr<E, P>(
+    array: readonly E[],
+    callbackfn: (
+      previousValue: P,
+      currentValue: E,
+      currentIndex: SizeType.Arr,
+    ) => P,
+    initialValue: P,
+  ): P;
+
+  export function foldr<E, P>(
+    callbackfn: (
+      previousValue: P,
+      currentValue: E,
+      currentIndex: SizeType.Arr,
+    ) => P,
+    initialValue: P,
+  ): (array: readonly E[]) => P;
+
+  export function foldr<E, P>(
     ...args:
       | readonly [
           array: readonly E[],
@@ -2607,7 +2560,7 @@ export namespace Arr {
           ) => P,
           initialValue: P,
         ]
-  ) => {
+  ): P | ((array: readonly E[]) => P) {
     switch (args.length) {
       case 3: {
         const [array, callbackfn, initialValue] = args;
@@ -2621,29 +2574,7 @@ export namespace Arr {
         return (array: readonly E[]) => foldr(array, callbackfn, initialValue);
       }
     }
-  };
-
-  type FoldrFnOverload = {
-    <E, P>(
-      array: readonly E[],
-      callbackfn: (
-        previousValue: P,
-        currentValue: E,
-        currentIndex: SizeType.Arr,
-      ) => P,
-      initialValue: P,
-    ): P;
-
-    // curried version
-    <E, P>(
-      callbackfn: (
-        previousValue: P,
-        currentValue: E,
-        currentIndex: SizeType.Arr,
-      ) => P,
-      initialValue: P,
-    ): (array: readonly E[]) => P;
-  };
+  }
 
   /**
    * Finds the minimum value in an array.
@@ -2658,12 +2589,30 @@ export namespace Arr {
    * Arr.min([]); // Optional.none
    * ```
    */
+  export function min<E extends number>(
+    array: NonEmptyArray<E>,
+    comparator?: (x: E, y: E) => number,
+  ): Optional.Some<E>;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const min: MinFnOverload = (<E extends number>(
+  export function min<E extends number>(
     array: readonly E[],
     comparator?: (x: E, y: E) => number,
-  ): Optional<E> => {
+  ): Optional<E>;
+
+  export function min<E>(
+    array: NonEmptyArray<E>,
+    comparator: (x: E, y: E) => number,
+  ): Optional.Some<E>;
+
+  export function min<E>(
+    array: readonly E[],
+    comparator: (x: E, y: E) => number,
+  ): Optional<E>;
+
+  export function min<E extends number>(
+    array: readonly E[],
+    comparator?: (x: E, y: E) => number,
+  ): Optional<E> {
     if (!isNonEmpty(array)) {
       return Optional.none;
     }
@@ -2676,26 +2625,7 @@ export namespace Arr {
         array[0],
       ),
     );
-  }) as MinFnOverload;
-
-  type MinFnOverload = {
-    <E extends number>(
-      array: NonEmptyArray<E>,
-      comparator?: (x: E, y: E) => number,
-    ): Optional.Some<E>;
-
-    <E extends number>(
-      array: readonly E[],
-      comparator?: (x: E, y: E) => number,
-    ): Optional<E>;
-
-    <E>(
-      array: NonEmptyArray<E>,
-      comparator: (x: E, y: E) => number,
-    ): Optional.Some<E>;
-
-    <E>(array: readonly E[], comparator: (x: E, y: E) => number): Optional<E>;
-  };
+  }
 
   /**
    * Finds the maximum value in an array.
@@ -2715,34 +2645,34 @@ export namespace Arr {
    * Arr.max([]); // Optional.none
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const max: MaxFnOverload = (<E extends number>(
+  export function max<E extends number>(
+    array: NonEmptyArray<E>,
+    comparator?: (x: E, y: E) => number,
+  ): Optional.Some<E>;
+
+  export function max<E extends number>(
     array: readonly E[],
     comparator?: (x: E, y: E) => number,
-  ): Optional<E> => {
+  ): Optional<E>;
+
+  export function max<E>(
+    array: NonEmptyArray<E>,
+    comparator: (x: E, y: E) => number,
+  ): Optional.Some<E>;
+
+  export function max<E>(
+    array: readonly E[],
+    comparator: (x: E, y: E) => number,
+  ): Optional<E>;
+
+  export function max<E extends number>(
+    array: readonly E[],
+    comparator?: (x: E, y: E) => number,
+  ): Optional<E> {
     const cmp = comparator ?? ((x, y) => Num.from(x) - Num.from(y));
     // Find max by finding min with an inverted comparator
     return min(array, (x, y) => -cmp(x, y));
-  }) as MaxFnOverload;
-
-  type MaxFnOverload = {
-    <E extends number>(
-      array: NonEmptyArray<E>,
-      comparator?: (x: E, y: E) => number,
-    ): Optional.Some<E>;
-
-    <E extends number>(
-      array: readonly E[],
-      comparator?: (x: E, y: E) => number,
-    ): Optional<E>;
-
-    <E>(
-      array: NonEmptyArray<E>,
-      comparator: (x: E, y: E) => number,
-    ): Optional.Some<E>;
-
-    <E>(array: readonly E[], comparator: (x: E, y: E) => number): Optional<E>;
-  };
+  }
 
   /**
    * Finds the element with the minimum value according to a mapped numeric value.
@@ -2764,43 +2694,40 @@ export namespace Arr {
    * Arr.minBy([], p => p.age); // Optional.none
    * ```
    */
+  export function minBy<E>(
+    array: NonEmptyArray<E>,
+    comparatorValueMapper: (value: E) => number,
+  ): Optional.Some<E>;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const minBy: MinByFnOverload = (<E, V>(
+  export function minBy<E>(
+    array: readonly E[],
+    comparatorValueMapper: (value: E) => number,
+  ): Optional<E>;
+
+  export function minBy<E, V>(
+    array: NonEmptyArray<E>,
+    comparatorValueMapper: (value: E) => V,
+    comparator: (x: V, y: V) => number,
+  ): Optional.Some<E>;
+
+  export function minBy<E, V>(
+    array: readonly E[],
+    comparatorValueMapper: (value: E) => V,
+    comparator: (x: V, y: V) => number,
+  ): Optional<E>;
+
+  export function minBy<E, V>(
     array: readonly E[],
     comparatorValueMapper: (value: E) => V,
     comparator?: (x: V, y: V) => number,
-  ): Optional<E> =>
-    min(array, (x, y) =>
+  ): Optional<E> {
+    return min(array, (x, y) =>
       comparator === undefined
         ? Num.from(comparatorValueMapper(x)) -
           Num.from(comparatorValueMapper(y))
         : comparator(comparatorValueMapper(x), comparatorValueMapper(y)),
-    )) as MinByFnOverload;
-
-  type MinByFnOverload = {
-    <E>(
-      array: NonEmptyArray<E>,
-      comparatorValueMapper: (value: E) => number,
-    ): Optional.Some<E>;
-
-    <E>(
-      array: readonly E[],
-      comparatorValueMapper: (value: E) => number,
-    ): Optional<E>;
-
-    <E, V>(
-      array: NonEmptyArray<E>,
-      comparatorValueMapper: (value: E) => V,
-      comparator: (x: V, y: V) => number,
-    ): Optional.Some<E>;
-
-    <E, V>(
-      array: readonly E[],
-      comparatorValueMapper: (value: E) => V,
-      comparator: (x: V, y: V) => number,
-    ): Optional<E>;
-  };
+    );
+  }
 
   /**
    * Finds the element with the maximum value according to a mapped numeric value.
@@ -2822,42 +2749,40 @@ export namespace Arr {
    * Arr.maxBy([], p => p.age); // Optional.none
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const maxBy: MaxByFnOverload = (<E, V>(
+  export function maxBy<E>(
+    array: NonEmptyArray<E>,
+    comparatorValueMapper: (value: E) => number,
+  ): Optional.Some<E>;
+
+  export function maxBy<E>(
+    array: readonly E[],
+    comparatorValueMapper: (value: E) => number,
+  ): Optional<E>;
+
+  export function maxBy<E, V>(
+    array: NonEmptyArray<E>,
+    comparatorValueMapper: (value: E) => V,
+    comparator: (x: V, y: V) => number,
+  ): Optional.Some<E>;
+
+  export function maxBy<E, V>(
+    array: readonly E[],
+    comparatorValueMapper: (value: E) => V,
+    comparator: (x: V, y: V) => number,
+  ): Optional<E>;
+
+  export function maxBy<E, V>(
     array: readonly E[],
     comparatorValueMapper: (value: E) => V,
     comparator?: (x: V, y: V) => number,
-  ): Optional<E> =>
-    max(array, (x, y) =>
+  ): Optional<E> {
+    return max(array, (x, y) =>
       comparator === undefined
         ? Num.from(comparatorValueMapper(x)) -
           Num.from(comparatorValueMapper(y))
         : comparator(comparatorValueMapper(x), comparatorValueMapper(y)),
-    )) as MaxByFnOverload;
-
-  type MaxByFnOverload = {
-    <E>(
-      array: NonEmptyArray<E>,
-      comparatorValueMapper: (value: E) => number,
-    ): Optional.Some<E>;
-
-    <E>(
-      array: readonly E[],
-      comparatorValueMapper: (value: E) => number,
-    ): Optional<E>;
-
-    <E, V>(
-      array: NonEmptyArray<E>,
-      comparatorValueMapper: (value: E) => V,
-      comparator: (x: V, y: V) => number,
-    ): Optional.Some<E>;
-
-    <E, V>(
-      array: readonly E[],
-      comparatorValueMapper: (value: E) => V,
-      comparator: (x: V, y: V) => number,
-    ): Optional<E>;
-  };
+    );
+  }
 
   /**
    * Counts the number of elements in an array that satisfy a predicate.
@@ -2876,15 +2801,23 @@ export namespace Arr {
    * console.log(result); // 3
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const count: CountFnOverload = (<E,>(
+  export function count<E>(
+    array: readonly E[],
+    predicate: (value: E, index: SizeType.Arr) => boolean,
+  ): SizeType.Arr;
+
+  export function count<E>(
+    predicate: (value: E, index: SizeType.Arr) => boolean,
+  ): (array: readonly E[]) => SizeType.Arr;
+
+  export function count<E>(
     ...args:
       | readonly [
           array: readonly E[],
           predicate: (value: E, index: SizeType.Arr) => boolean,
         ]
       | readonly [predicate: (value: E, index: SizeType.Arr) => boolean]
-  ) => {
+  ): SizeType.Arr | ((array: readonly E[]) => SizeType.Arr) {
     switch (args.length) {
       case 2: {
         const [array, predicate] = args;
@@ -2899,19 +2832,7 @@ export namespace Arr {
         return (array: readonly E[]) => count(array, predicate);
       }
     }
-  }) as CountFnOverload;
-
-  type CountFnOverload = {
-    <E>(
-      array: readonly E[],
-      predicate: (value: E, index: SizeType.Arr) => boolean,
-    ): SizeType.Arr;
-
-    // curried version
-    <E>(
-      predicate: (value: E, index: SizeType.Arr) => boolean,
-    ): (array: readonly E[]) => SizeType.Arr;
-  };
+  }
 
   /**
    * Groups elements of an array by a key derived from each element and counts the elements in each group.
@@ -2933,19 +2854,27 @@ export namespace Arr {
    * // IMap { 'a' => 2, 'b' => 1 }
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const countBy: CountByFnOverload = (<E, G extends MapSetKeyType>(
+  export function countBy<E, G extends MapSetKeyType>(
+    array: readonly E[],
+    grouper: (value: E, index: SizeType.Arr) => G,
+  ): IMap<G, SizeType.Arr>;
+
+  export function countBy<E, G extends MapSetKeyType>(
+    grouper: (value: E, index: SizeType.Arr) => G,
+  ): (array: readonly E[]) => IMap<G, SizeType.Arr>;
+
+  export function countBy<E, G extends MapSetKeyType>(
     ...args:
       | readonly [
           array: readonly E[],
           grouper: (value: E, index: SizeType.Arr) => G,
         ]
       | readonly [grouper: (value: E, index: SizeType.Arr) => G]
-  ) => {
+  ): IMap<G, SizeType.Arr> | ((array: readonly E[]) => IMap<G, SizeType.Arr>) {
     switch (args.length) {
       case 2: {
         const [array, grouper] = args;
-        const mut_groups = new Map<MapSetKeyType, SizeType.Arr>();
+        const mut_groups = new Map<G, SizeType.Arr>();
 
         for (const [index, e] of array.entries()) {
           const key = grouper(e, asUint32(index));
@@ -2961,19 +2890,7 @@ export namespace Arr {
         return (array: readonly E[]) => countBy(array, grouper);
       }
     }
-  }) as CountByFnOverload;
-
-  type CountByFnOverload = {
-    <E, G extends MapSetKeyType>(
-      array: readonly E[],
-      grouper: (value: E, index: SizeType.Arr) => G,
-    ): IMap<G, SizeType.Arr>;
-
-    // curried version
-    <E, G extends MapSetKeyType>(
-      grouper: (value: E, index: SizeType.Arr) => G,
-    ): (array: readonly E[]) => IMap<G, SizeType.Arr>;
-  };
+  }
 
   /**
    * Calculates the sum of numbers in an array.
@@ -2986,17 +2903,19 @@ export namespace Arr {
    * Arr.sum([-1, 0, 1]); // 0
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const sum: SumFnOverload = ((array: readonly number[]): number =>
-    array.reduce((prev, curr) => prev + curr, 0)) as SumFnOverload;
+  export function sum(array: readonly []): 0;
 
-  type SumFnOverload = {
-    (array: readonly []): 0;
-    <N extends number>(array: readonly [N]): N;
-    (array: readonly Uint[]): Uint;
-    (array: readonly Int[]): Int;
-    (array: readonly number[]): number;
-  };
+  export function sum<N extends number>(array: readonly [N]): N;
+
+  export function sum(array: readonly Uint[]): Uint;
+
+  export function sum(array: readonly Int[]): Int;
+
+  export function sum(array: readonly number[]): number;
+
+  export function sum(array: readonly number[]): number {
+    return array.reduce((prev, curr) => prev + curr, 0);
+  }
 
   /**
    * Joins array elements into a string.
@@ -3018,20 +2937,28 @@ export namespace Arr {
    * console.log(Result.unwrapOr(result2, '')); // "a,b,c"
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const join: JoinFnOverload = (<E,>(
+  export function join<E>(
+    array: readonly E[],
+    separator?: string,
+  ): Result<string, Error>;
+
+  export function join(
+    separator?: string,
+  ): <E>(array: readonly E[]) => Result<string, Error>;
+
+  export function join<E>(
     ...args:
       | readonly [array: readonly E[], separator?: string]
       | readonly [separator?: string]
-  ) => {
+  ): Result<string, Error> | ((array: readonly E[]) => Result<string, Error>) {
     switch (args.length) {
       case 0:
-        return <E2,>(array: readonly E2[]) => joinImpl(array, undefined);
+        return (array: readonly E[]) => joinImpl(array, undefined);
 
       case 1: {
         const [arg] = args;
         if (isString(arg) || isUndefined(arg)) {
-          return <E2,>(array: readonly E2[]) => joinImpl(array, arg);
+          return (array: readonly E[]) => joinImpl(array, arg);
         }
         return joinImpl(arg, undefined);
       }
@@ -3040,7 +2967,7 @@ export namespace Arr {
         return joinImpl(array, separator);
       }
     }
-  }) as JoinFnOverload;
+  }
 
   const joinImpl = <E,>(
     array: readonly E[],
@@ -3058,13 +2985,6 @@ export namespace Arr {
               .map((e) => new Error(e)).value,
       );
     }
-  };
-
-  type JoinFnOverload = {
-    <E>(array: readonly E[], separator?: string): Result<string, Error>;
-
-    // curried version
-    (separator?: string): <E>(array: readonly E[]) => Result<string, Error>;
   };
 
   // transformation
@@ -3117,15 +3037,23 @@ export namespace Arr {
    * console.log(result); // [1, 3, 5]
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const filterNot: FilterNotFnOverload = (<E,>(
+  export function filterNot<E>(
+    array: readonly E[],
+    predicate: (a: E, index: SizeType.Arr) => boolean,
+  ): readonly E[];
+
+  export function filterNot<E>(
+    predicate: (a: E, index: SizeType.Arr) => boolean,
+  ): (array: readonly E[]) => readonly E[];
+
+  export function filterNot<E>(
     ...args:
       | readonly [
           array: readonly E[],
           predicate: (a: E, index: SizeType.Arr) => boolean,
         ]
       | readonly [predicate: (a: E, index: SizeType.Arr) => boolean]
-  ) => {
+  ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 2: {
         const [array, predicate] = args;
@@ -3136,19 +3064,7 @@ export namespace Arr {
         return (array: readonly E[]) => filterNot(array, predicate);
       }
     }
-  }) as FilterNotFnOverload;
-
-  type FilterNotFnOverload = {
-    <E>(
-      array: readonly E[],
-      predicate: (a: E, index: SizeType.Arr) => boolean,
-    ): readonly E[];
-
-    // curried version
-    <E>(
-      predicate: (a: E, index: SizeType.Arr) => boolean,
-    ): (array: readonly E[]) => readonly E[];
-  };
+  }
 
   /**
    * Concatenates two arrays.
@@ -3187,15 +3103,25 @@ export namespace Arr {
    * Arr.partition([1, 2, 3, 4, 5, 6, 7], 3); // [[1, 2, 3], [4, 5, 6], [7]]
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const partition: PartitionFnOverload = (<
+  export function partition<
+    N extends WithSmallInt<PositiveInt & SizeType.Arr>,
+    E,
+  >(array: readonly E[], chunkSize: N): readonly (readonly E[])[];
+
+  export function partition<N extends WithSmallInt<PositiveInt & SizeType.Arr>>(
+    chunkSize: N,
+  ): <E>(array: readonly E[]) => readonly (readonly E[])[];
+
+  export function partition<
     N extends WithSmallInt<PositiveInt & SizeType.Arr>,
     E,
   >(
     ...args:
       | readonly [array: readonly E[], chunkSize: N]
       | readonly [chunkSize: N]
-  ) => {
+  ):
+    | readonly (readonly E[])[]
+    | ((array: readonly E[]) => readonly (readonly E[])[]) {
     switch (args.length) {
       case 2: {
         const [array, chunkSize] = args;
@@ -3210,19 +3136,7 @@ export namespace Arr {
         return (array: readonly E[]) => partition(array, chunkSize);
       }
     }
-  }) as PartitionFnOverload;
-
-  type PartitionFnOverload = {
-    <N extends WithSmallInt<PositiveInt & SizeType.Arr>, E>(
-      array: readonly E[],
-      chunkSize: N,
-    ): readonly (readonly E[])[];
-
-    // curried version
-    <N extends WithSmallInt<PositiveInt & SizeType.Arr>>(
-      chunkSize: N,
-    ): <E>(array: readonly E[]) => readonly (readonly E[])[];
-  };
+  }
 
   /**
    * Sorts an array by a value derived from its elements, using a numeric mapping.
@@ -3240,35 +3154,34 @@ export namespace Arr {
    * // [{ name: 'Adam', score: 90 }, { name: 'Bob', score: 80 }, { name: 'Eve', score: 70 }]
    * ```
    */
-  export const toSortedBy: ToSortedByFnOverload = <E, const V>(
+  export function toSortedBy<E>(
+    array: readonly E[],
+    comparatorValueMapper: (value: E) => number,
+    comparator?: (x: number, y: number) => number,
+  ): readonly E[];
+
+  export function toSortedBy<E, const V>(
+    array: readonly E[],
+    comparatorValueMapper: (value: E) => V,
+    comparator: (x: V, y: V) => number,
+  ): readonly E[];
+
+  export function toSortedBy<E, const V>(
     array: readonly E[],
     comparatorValueMapper: (value: E) => V,
     comparator?: (x: V, y: V) => number,
-  ): readonly E[] =>
-    array.toSorted((x, y) =>
+  ): readonly E[] {
+    return array.toSorted((x, y) =>
       comparator === undefined
-        ? // This branch assumes B is number if comparator is undefined.
-          // The overloads should handle this, but explicit cast might be needed if B is not number.
+        ? // This branch assumes V is number if comparator is undefined.
+          // The overloads should handle this, but explicit cast might be needed if V is not number.
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           (comparatorValueMapper(x) as number) -
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           (comparatorValueMapper(y) as number)
         : comparator(comparatorValueMapper(x), comparatorValueMapper(y)),
     );
-
-  type ToSortedByFnOverload = {
-    <E>(
-      array: readonly E[],
-      comparatorValueMapper: (value: E) => number,
-      comparator?: (x: number, y: number) => number,
-    ): readonly E[];
-
-    <E, const V>(
-      array: readonly E[],
-      comparatorValueMapper: (value: E) => V,
-      comparator: (x: V, y: V) => number,
-    ): readonly E[];
-  };
+  }
 
   /**
    * Returns an array of successively reduced values from an array, starting with an initial value.
@@ -3426,8 +3339,18 @@ export namespace Arr {
    * @see {@link SizeType.Arr} for the index parameter type
    * @see Array.prototype.reduce for the standard reduce function
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const scan: ScanFnOverload = (<E, S>(
+  export function scan<E, S>(
+    array: readonly E[],
+    reducer: (accumulator: S, currentValue: E, currentIndex: SizeType.Arr) => S,
+    init: S,
+  ): NonEmptyArray<S>;
+
+  export function scan<E, S>(
+    reducer: (accumulator: S, currentValue: E, currentIndex: SizeType.Arr) => S,
+    init: S,
+  ): (array: readonly E[]) => NonEmptyArray<S>;
+
+  export function scan<E, S>(
     ...args:
       | readonly [
           array: readonly E[],
@@ -3446,7 +3369,7 @@ export namespace Arr {
           ) => S,
           init: S,
         ]
-  ) => {
+  ): NonEmptyArray<S> | ((array: readonly E[]) => NonEmptyArray<S>) {
     switch (args.length) {
       case 3: {
         const [array, reducer, init] = args;
@@ -3468,29 +3391,7 @@ export namespace Arr {
         return (array: readonly E[]) => scan(array, reducer, init);
       }
     }
-  }) as ScanFnOverload;
-
-  type ScanFnOverload = {
-    <E, S>(
-      array: readonly E[],
-      reducer: (
-        accumulator: S,
-        currentValue: E,
-        currentIndex: SizeType.Arr,
-      ) => S,
-      init: S,
-    ): NonEmptyArray<S>;
-
-    // curried version
-    <E, S>(
-      reducer: (
-        accumulator: S,
-        currentValue: E,
-        currentIndex: SizeType.Arr,
-      ) => S,
-      init: S,
-    ): (array: readonly E[]) => NonEmptyArray<S>;
-  };
+  }
 
   /**
    * Groups elements of an array by a key derived from each element, returning an immutable {@link IMap}.
@@ -3641,15 +3542,23 @@ export namespace Arr {
    * @see {@link IMap.map} for transforming grouped data
    * @see {@link Optional} for handling potentially missing groups
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const groupBy: GroupByFnOverload = (<E, G extends MapSetKeyType>(
+  export function groupBy<E, G extends MapSetKeyType>(
+    array: readonly E[],
+    grouper: (value: E, index: SizeType.Arr) => G,
+  ): IMap<G, readonly E[]>;
+
+  export function groupBy<E, G extends MapSetKeyType>(
+    grouper: (value: E, index: SizeType.Arr) => G,
+  ): (array: readonly E[]) => IMap<G, readonly E[]>;
+
+  export function groupBy<E, G extends MapSetKeyType>(
     ...args:
       | readonly [
           array: readonly E[],
           grouper: (value: E, index: SizeType.Arr) => G,
         ]
       | readonly [grouper: (value: E, index: SizeType.Arr) => G]
-  ) => {
+  ): IMap<G, readonly E[]> | ((array: readonly E[]) => IMap<G, readonly E[]>) {
     switch (args.length) {
       case 2: {
         const [array, grouper] = args;
@@ -3672,19 +3581,7 @@ export namespace Arr {
         return (array: readonly E[]) => groupBy(array, grouper);
       }
     }
-  }) as GroupByFnOverload;
-
-  type GroupByFnOverload = {
-    <E, G extends MapSetKeyType>(
-      array: readonly E[],
-      grouper: (value: E, index: SizeType.Arr) => G,
-    ): IMap<G, readonly E[]>;
-
-    // curried version
-    <E, G extends MapSetKeyType>(
-      grouper: (value: E, index: SizeType.Arr) => G,
-    ): (array: readonly E[]) => IMap<G, readonly E[]>;
-  };
+  }
 
   /**
    * Creates a new array with unique elements from the input array. Order is preserved from the first occurrence.
@@ -3722,11 +3619,20 @@ export namespace Arr {
    * Arr.uniqBy(users, user => user.id); // [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  export const uniqBy: UniqByFnOverload = (<E, P extends Primitive>(
+  export function uniqBy<E, P extends Primitive>(
+    array: NonEmptyArray<E>,
+    mapFn: (value: E) => P,
+  ): NonEmptyArray<E>;
+
+  export function uniqBy<E, P extends Primitive>(
     array: readonly E[],
     mapFn: (value: E) => P,
-  ): readonly E[] => {
+  ): readonly E[];
+
+  export function uniqBy<E, P extends Primitive>(
+    array: readonly E[],
+    mapFn: (value: E) => P,
+  ): readonly E[] {
     const mut_mappedValues = new Set<P>();
 
     return array.filter((val) => {
@@ -3737,19 +3643,7 @@ export namespace Arr {
 
       return true;
     });
-  }) as UniqByFnOverload;
-
-  type UniqByFnOverload = {
-    <E, P extends Primitive>(
-      array: NonEmptyArray<E>,
-      mapFn: (value: E) => P,
-    ): NonEmptyArray<E>;
-
-    <E, P extends Primitive>(
-      array: readonly E[],
-      mapFn: (value: E) => P,
-    ): readonly E[];
-  };
+  }
 
   // set operations & equality
 

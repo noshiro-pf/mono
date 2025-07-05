@@ -81,144 +81,6 @@ const pair = [1, 2] as const;
 // requiresTriple(pair); // Error: length mismatch
 ```
 
----
-
-### toSorted
-
-> `const` **toSorted**: `ToSortedFnOverload`
-
-Defined in: [src/array/tuple-utils.mts:413](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/tuple-utils.mts#L413)
-
-Sorts a tuple's elements, returning a new tuple with the same length.
-
-Unlike array sorting, this preserves the tuple's length but loses
-positional type information (all positions can contain any element
-from the original tuple). Default comparison is numeric ascending.
-
-#### Template
-
-The tuple type to sort
-
-#### Param
-
-The input tuple
-
-#### Param
-
-Optional comparison function (defaults to numeric comparison)
-
-#### Returns
-
-A new tuple with sorted elements
-
-#### Example
-
-```typescript
-// Default numeric sorting
-const nums = [3, 1, 4, 1, 5] as const;
-const sorted = Tpl.toSorted(nums); // readonly [1, 1, 3, 4, 5]
-
-// Custom comparator
-const descending = Tpl.toSorted(nums, (a, b) => b - a);
-// readonly [5, 4, 3, 1, 1]
-
-// String sorting with comparator
-const strs = ['banana', 'apple', 'cherry'] as const;
-const alphaSorted = Tpl.toSorted(strs, (a, b) => a.localeCompare(b));
-// readonly ['apple', 'banana', 'cherry']
-
-// Mixed types require explicit comparator
-const mixed = [3, '2', 1, '4'] as const;
-const mixedSorted = Tpl.toSorted(mixed, (a, b) => Number(a) - Number(b));
-// readonly ['1', '2', '3', '4'] but typed as (3 | '2' | 1 | '4')[]
-
-// Note: Element types become union of all elements
-type Original = readonly [1, 2, 3];
-type Sorted = { readonly [K in keyof Original]: Original[number] };
-// Sorted = readonly [1 | 2 | 3, 1 | 2 | 3, 1 | 2 | 3]
-```
-
----
-
-### toSortedBy
-
-> `const` **toSortedBy**: `ToSortedByFnOverload`
-
-Defined in: [src/array/tuple-utils.mts:485](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/tuple-utils.mts#L485)
-
-Sorts a tuple by derived values from its elements.
-
-Allows sorting complex objects by extracting a sortable value from each.
-Like `toSorted`, this preserves tuple length but element types become
-a union of all possible elements.
-
-#### Template
-
-The tuple type to sort
-
-#### Template
-
-The type of values used for comparison
-
-#### Param
-
-The input tuple
-
-#### Param
-
-Function to extract comparison value from each element
-
-#### Param
-
-Optional comparator for the extracted values
-
-#### Returns
-
-A new sorted tuple
-
-#### Example
-
-```typescript
-// Sort objects by numeric property
-const users = [
-    { name: 'Alice', age: 30 },
-    { name: 'Bob', age: 20 },
-    { name: 'Charlie', age: 25 },
-] as const;
-const byAge = Tpl.toSortedBy(users, (user) => user.age);
-// [{name: 'Bob', age: 20}, {name: 'Charlie', age: 25}, {name: 'Alice', age: 30}]
-
-// Sort by string property with custom comparator
-const byNameDesc = Tpl.toSortedBy(
-    users,
-    (user) => user.name,
-    (a, b) => b.localeCompare(a),
-);
-// Sorted by name in descending order
-
-// Sort by computed values
-const points = [
-    { x: 3, y: 4 },
-    { x: 1, y: 1 },
-    { x: 2, y: 2 },
-] as const;
-const byDistance = Tpl.toSortedBy(points, (p) =>
-    Math.sqrt(p.x ** 2 + p.y ** 2),
-);
-// Sorted by distance from origin
-
-// Custom comparator for complex sorting
-const items = [
-    { priority: 1, name: 'A' },
-    { priority: 1, name: 'B' },
-] as const;
-const sorted = Tpl.toSortedBy(
-    items,
-    (item) => item.priority,
-    (a, b) => b - a, // High priority first
-);
-```
-
 ## Functions
 
 ### findIndex()
@@ -662,6 +524,263 @@ const empty = [] as const;
 const revEmpty = Tpl.toReversed(empty); // readonly []
 const single = [42] as const;
 const revSingle = Tpl.toReversed(single); // readonly [42]
+```
+
+---
+
+### toSorted()
+
+> **toSorted**\<`T`\>(`tpl`, `comparator?`): `Readonly`\<`{ [K in keyof T]: T[number] }`\>
+
+Defined in: [src/array/tuple-utils.mts:413](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/tuple-utils.mts#L413)
+
+Sorts a tuple's elements, returning a new tuple with the same length.
+
+Unlike array sorting, this preserves the tuple's length but loses
+positional type information (all positions can contain any element
+from the original tuple). Default comparison is numeric ascending.
+
+#### Type Parameters
+
+##### T
+
+`T` _extends_ readonly `unknown`[]
+
+The tuple type to sort
+
+#### Parameters
+
+##### tpl
+
+`T`
+
+The input tuple
+
+##### comparator?
+
+(`x`, `y`) => `number`
+
+Optional comparison function (defaults to numeric comparison)
+
+#### Returns
+
+`Readonly`\<`{ [K in keyof T]: T[number] }`\>
+
+A new tuple with sorted elements
+
+#### Example
+
+```typescript
+// Default numeric sorting
+const nums = [3, 1, 4, 1, 5] as const;
+const sorted = Tpl.toSorted(nums); // readonly [1, 1, 3, 4, 5]
+
+// Custom comparator
+const descending = Tpl.toSorted(nums, (a, b) => b - a);
+// readonly [5, 4, 3, 1, 1]
+
+// String sorting with comparator
+const strs = ['banana', 'apple', 'cherry'] as const;
+const alphaSorted = Tpl.toSorted(strs, (a, b) => a.localeCompare(b));
+// readonly ['apple', 'banana', 'cherry']
+
+// Mixed types require explicit comparator
+const mixed = [3, '2', 1, '4'] as const;
+const mixedSorted = Tpl.toSorted(mixed, (a, b) => Number(a) - Number(b));
+// readonly ['1', '2', '3', '4'] but typed as (3 | '2' | 1 | '4')[]
+
+// Note: Element types become union of all elements
+type Original = readonly [1, 2, 3];
+type Sorted = { readonly [K in keyof Original]: Original[number] };
+// Sorted = readonly [1 | 2 | 3, 1 | 2 | 3, 1 | 2 | 3]
+```
+
+---
+
+### toSortedBy()
+
+#### Call Signature
+
+> **toSortedBy**\<`T`\>(`tpl`, `comparatorValueMapper`, `comparator?`): `Readonly`\<`{ [K in keyof T]: T[number] }`\>
+
+Defined in: [src/array/tuple-utils.mts:474](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/tuple-utils.mts#L474)
+
+Sorts a tuple by derived values from its elements.
+
+Allows sorting complex objects by extracting a sortable value from each.
+Like `toSorted`, this preserves tuple length but element types become
+a union of all possible elements.
+
+##### Type Parameters
+
+###### T
+
+`T` _extends_ readonly `unknown`[]
+
+The tuple type to sort
+
+##### Parameters
+
+###### tpl
+
+`T`
+
+The input tuple
+
+###### comparatorValueMapper
+
+(`value`) => `number`
+
+Function to extract comparison value from each element
+
+###### comparator?
+
+(`x`, `y`) => `number`
+
+Optional comparator for the extracted values
+
+##### Returns
+
+`Readonly`\<`{ [K in keyof T]: T[number] }`\>
+
+A new sorted tuple
+
+##### Example
+
+```typescript
+// Sort objects by numeric property
+const users = [
+    { name: 'Alice', age: 30 },
+    { name: 'Bob', age: 20 },
+    { name: 'Charlie', age: 25 },
+] as const;
+const byAge = Tpl.toSortedBy(users, (user) => user.age);
+// [{name: 'Bob', age: 20}, {name: 'Charlie', age: 25}, {name: 'Alice', age: 30}]
+
+// Sort by string property with custom comparator
+const byNameDesc = Tpl.toSortedBy(
+    users,
+    (user) => user.name,
+    (a, b) => b.localeCompare(a),
+);
+// Sorted by name in descending order
+
+// Sort by computed values
+const points = [
+    { x: 3, y: 4 },
+    { x: 1, y: 1 },
+    { x: 2, y: 2 },
+] as const;
+const byDistance = Tpl.toSortedBy(points, (p) =>
+    Math.sqrt(p.x ** 2 + p.y ** 2),
+);
+// Sorted by distance from origin
+
+// Custom comparator for complex sorting
+const items = [
+    { priority: 1, name: 'A' },
+    { priority: 1, name: 'B' },
+] as const;
+const sorted = Tpl.toSortedBy(
+    items,
+    (item) => item.priority,
+    (a, b) => b - a, // High priority first
+);
+```
+
+#### Call Signature
+
+> **toSortedBy**\<`T`, `B`\>(`tpl`, `comparatorValueMapper`, `comparator`): `Readonly`\<`{ [K in keyof T]: T[number] }`\>
+
+Defined in: [src/array/tuple-utils.mts:480](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/tuple-utils.mts#L480)
+
+Sorts a tuple by derived values from its elements.
+
+Allows sorting complex objects by extracting a sortable value from each.
+Like `toSorted`, this preserves tuple length but element types become
+a union of all possible elements.
+
+##### Type Parameters
+
+###### T
+
+`T` _extends_ readonly `unknown`[]
+
+The tuple type to sort
+
+###### B
+
+`B`
+
+The type of values used for comparison
+
+##### Parameters
+
+###### tpl
+
+`T`
+
+The input tuple
+
+###### comparatorValueMapper
+
+(`value`) => `B`
+
+Function to extract comparison value from each element
+
+###### comparator
+
+(`x`, `y`) => `number`
+
+Optional comparator for the extracted values
+
+##### Returns
+
+`Readonly`\<`{ [K in keyof T]: T[number] }`\>
+
+A new sorted tuple
+
+##### Example
+
+```typescript
+// Sort objects by numeric property
+const users = [
+    { name: 'Alice', age: 30 },
+    { name: 'Bob', age: 20 },
+    { name: 'Charlie', age: 25 },
+] as const;
+const byAge = Tpl.toSortedBy(users, (user) => user.age);
+// [{name: 'Bob', age: 20}, {name: 'Charlie', age: 25}, {name: 'Alice', age: 30}]
+
+// Sort by string property with custom comparator
+const byNameDesc = Tpl.toSortedBy(
+    users,
+    (user) => user.name,
+    (a, b) => b.localeCompare(a),
+);
+// Sorted by name in descending order
+
+// Sort by computed values
+const points = [
+    { x: 3, y: 4 },
+    { x: 1, y: 1 },
+    { x: 2, y: 2 },
+] as const;
+const byDistance = Tpl.toSortedBy(points, (p) =>
+    Math.sqrt(p.x ** 2 + p.y ** 2),
+);
+// Sorted by distance from origin
+
+// Custom comparator for complex sorting
+const items = [
+    { priority: 1, name: 'A' },
+    { priority: 1, name: 'B' },
+] as const;
+const sorted = Tpl.toSortedBy(
+    items,
+    (item) => item.priority,
+    (a, b) => b - a, // High priority first
+);
 ```
 
 ---

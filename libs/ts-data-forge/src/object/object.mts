@@ -113,17 +113,26 @@ export namespace Obj {
    * const visible = pickVisible(partialUser); // { name: "Alice" } (age omitted)
    * ```
    */
-  export const pick: // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  PickFnOverload = (<
+  export function pick<
+    const R extends UnknownRecord,
+    const Keys extends readonly (keyof R)[],
+  >(record: R, keys: Keys): Pick<R, ArrayElement<Keys>>;
+
+  // Curried version
+  export function pick<const Keys extends readonly PropertyKey[]>(
+    keys: Keys,
+  ): <const R extends UnknownRecord>(
+    record: R,
+  ) => RelaxedPick<R, ArrayElement<Keys>>;
+
+  export function pick<
     const R extends UnknownRecord,
     const Keys extends readonly (keyof R)[],
   >(
-    ...args:
-      | readonly [record: R, keys: Keys]
-      | readonly [keys: readonly PropertyKey[]]
+    ...args: readonly [record: R, keys: Keys] | readonly [keys: Keys]
   ):
     | Pick<R, ArrayElement<Keys>>
-    | ((record: R) => RelaxedPick<R, ArrayElement<Keys>>) => {
+    | ((record: R) => RelaxedPick<R, ArrayElement<Keys>>) {
     switch (args.length) {
       case 2: {
         const [record, keys] = args;
@@ -139,29 +148,10 @@ export namespace Obj {
 
       case 1: {
         const [keys] = args;
-        return <R2 extends UnknownRecord>(record: R2) =>
-          pick(
-            record,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-            keys as readonly (keyof R2)[],
-          );
+        return (record: R) => pick(record, keys);
       }
     }
-  }) as PickFnOverload;
-
-  type PickFnOverload = {
-    <const R extends UnknownRecord, const Keys extends readonly (keyof R)[]>(
-      record: R,
-      keys: Keys,
-    ): Pick<R, ArrayElement<Keys>>;
-
-    // Curried version
-    <const Keys extends readonly PropertyKey[]>(
-      keys: Keys,
-    ): <const R extends UnknownRecord>(
-      record: R,
-    ) => RelaxedPick<R, ArrayElement<Keys>>;
-  };
+  }
 
   /**
    * Creates a new record that excludes the specified keys from the source record.
@@ -236,8 +226,17 @@ export namespace Obj {
    * const cleaned = omitCredentials(partialUser); // { id: 1, name: "Alice" }
    * ```
    */
-  export const omit: // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  OmitFnOverload = (<
+  export function omit<
+    const R extends UnknownRecord,
+    const Keys extends readonly (keyof R)[],
+  >(record: R, keys: Keys): Omit<R, ArrayElement<Keys>>;
+
+  // Curried version
+  export function omit<const Keys extends readonly PropertyKey[]>(
+    keys: Keys,
+  ): <const R extends UnknownRecord>(record: R) => Omit<R, ArrayElement<Keys>>;
+
+  export function omit<
     const R extends UnknownRecord,
     const Keys extends readonly (keyof R)[],
   >(
@@ -246,7 +245,7 @@ export namespace Obj {
       | readonly [keys: readonly PropertyKey[]]
   ):
     | Omit<R, ArrayElement<Keys>>
-    | ((record: R) => Omit<R, ArrayElement<Keys>>) => {
+    | ((record: R) => Omit<R, ArrayElement<Keys>>) {
     switch (args.length) {
       case 2: {
         const [record, keys] = args;
@@ -272,21 +271,7 @@ export namespace Obj {
         };
       }
     }
-  }) as OmitFnOverload;
-
-  type OmitFnOverload = {
-    <const R extends UnknownRecord, const Keys extends readonly (keyof R)[]>(
-      record: R,
-      keys: Keys,
-    ): Omit<R, ArrayElement<Keys>>;
-
-    // Curried version
-    <const Keys extends readonly PropertyKey[]>(
-      keys: Keys,
-    ): <const R extends UnknownRecord>(
-      record: R,
-    ) => Omit<R, ArrayElement<Keys>>;
-  };
+  }
 
   /**
    * Creates an object from an array of key-value pairs with precise TypeScript typing.
