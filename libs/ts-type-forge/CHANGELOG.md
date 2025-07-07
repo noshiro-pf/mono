@@ -1,3 +1,9 @@
+# [2.1.0](https://github.com/noshiro-pf/ts-type-forge/compare/v2.0.3...v2.1.0) (2025-07-07)
+
+### Features
+
+- NegativeIndexOfTuple ([#103](https://github.com/noshiro-pf/ts-type-forge/issues/103)) ([8a41128](https://github.com/noshiro-pf/ts-type-forge/commit/8a41128d4132639b7d2fe5f384b75bffbede03d8))
+
 ## [2.0.3](https://github.com/noshiro-pf/ts-type-forge/compare/v2.0.2...v2.0.3) (2025-06-15)
 
 ### Bug Fixes
