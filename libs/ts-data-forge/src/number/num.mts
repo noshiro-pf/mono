@@ -507,7 +507,7 @@ export namespace Num {
    * const two = Num.decrement(three); // type is 2, value is 2
    * ```
    */
-  export const decrement = <N extends PositiveSmallInt>(n: N): Decrement<N> =>
+  export const decrement = <N extends SmallPositiveInt>(n: N): Decrement<N> =>
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     (n - 1) as Decrement<N>;
 }

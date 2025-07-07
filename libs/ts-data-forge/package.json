@@ -64,7 +64,7 @@
     "z:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
-    "ts-type-forge": "^2.0.3"
+    "ts-type-forge": "^2.1.0"
   },
   "devDependencies": {
     "@emotion/react": "^11.14.0",

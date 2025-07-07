@@ -15,7 +15,7 @@ describe('Array overloaded functions - type error validation', () => {
       const _result2 = Arr.findIndex(predicate);
       const _result3 = Arr.findIndex(predicate)(testArray);
 
-      expectType<typeof _result1, SizeType.Arr | -1>('=');
+      expectType<typeof _result1, 0 | 1 | 2 | 3 | 4 | -1>('=');
       expectType<
         typeof _result2,
         (array: readonly number[]) => SizeType.Arr | -1
@@ -113,7 +113,7 @@ describe('Array overloaded functions - type error validation', () => {
       const _result1 = Arr.findIndex(...correctArgs1);
       const _result2 = Arr.findIndex(...correctArgs2);
 
-      expectType<typeof _result1, SizeType.Arr | -1>('<=');
+      expectType<typeof _result1, 0 | 1 | 2 | 3 | 4 | -1>('<=');
       expectType<
         typeof _result2,
         (array: readonly number[]) => SizeType.Arr | -1

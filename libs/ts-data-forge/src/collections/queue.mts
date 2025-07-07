@@ -124,7 +124,7 @@ class QueueClass<T> implements Queue<T> {
     );
 
     this.#buffer = castMutable(
-      Arr.create<T | undefined>(initialCapacity, undefined),
+      Arr.create<T | undefined, Uint32>(initialCapacity, undefined),
     );
     this.#head = 0;
     this.#tail = 0;
@@ -260,7 +260,7 @@ class QueueClass<T> implements Queue<T> {
   #resize(): void {
     const newCapacity = asUint32(this.#capacity * 2);
     const newBuffer = castMutable(
-      Arr.create<T | undefined>(newCapacity, undefined),
+      Arr.create<T | undefined, Uint32>(newCapacity, undefined),
     );
 
     // Copy elements in order from head to tail

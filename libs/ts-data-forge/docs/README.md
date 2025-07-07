@@ -8,7 +8,6 @@
 
 - [array](array.md)
 - [array/array-utils](array/array-utils/README.md)
-- [array/tuple-utils](array/tuple-utils/README.md)
 - [collections](collections.md)
 - [collections/imap](collections/imap/README.md)
 - [collections/imap-mapped](collections/imap-mapped/README.md)

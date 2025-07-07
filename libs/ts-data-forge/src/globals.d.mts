@@ -1,7 +1,6 @@
 /// <reference types="ts-type-forge" />
 
-type SmallUint = SmallInt<'>=0'>;
-type PositiveSmallInt = SmallInt<'>0'>;
+type SmallPositiveInt = WithSmallInt<PositiveInt>;
 
 /**
  * Represents the type of keys that can be used in a standard JavaScript Map.
@@ -22,17 +21,19 @@ declare namespace SizeType {
   type TypedArraySearchResult = TypedArray | -1;
   type StrSearchResult = Str | -1;
 
-  type ArgArr = WithSmallInt<NormalizeBrandUnion<NegativeInt32 | Arr>>;
-  type ArgTypedArray = WithSmallInt<SafeInt>;
-  type ArgStr = WithSmallInt<SafeInt>;
+  type ArgArr = WithSmallInt<Arr>;
+  type ArgTypedArray = WithSmallInt<TypedArray>;
+  type ArgStr = WithSmallInt<Str>;
+
+  type ArgArrWithNegative = WithSmallInt<
+    NormalizeBrandUnion<NegativeInt32 | Arr>
+  >;
+  type ArgTypedArrayWithNegative = WithSmallInt<SafeInt>;
+  type ArgStrWithNegative = WithSmallInt<SafeInt>;
 
   type ArgArrPositive = WithSmallInt<IntersectBrand<PositiveNumber, Arr>>;
   type ArgTypedArrayPositive = WithSmallInt<
     IntersectBrand<PositiveNumber, TypedArray>
   >;
   type ArgStrPositive = WithSmallInt<IntersectBrand<PositiveNumber, Str>>;
-
-  type ArgArrNonNegative = WithSmallInt<Arr>;
-  type ArgTypedArrayNonNegative = WithSmallInt<TypedArray>;
-  type ArgStrNonNegative = WithSmallInt<Str>;
 }

@@ -19,7 +19,7 @@ ensuring immutability.
 
 > `const` **chunk**: \{\<`N`, `E`\>(`array`, `chunkSize`): readonly readonly `E`[][]; \<`N`\>(`chunkSize`): \<`E`\>(`array`) => readonly readonly `E`[][]; \} = `partition`
 
-Defined in: [src/array/array-utils.mts:3860](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3860)
+Defined in: [src/array/array-utils.mts:4783](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4783)
 
 Alias for `partition`. Splits an array into chunks of a specified size.
 
@@ -133,15 +133,15 @@ Arr.partition([1, 2, 3, 4, 5, 6, 7], 3); // [[1, 2, 3], [4, 5, 6], [7]]
 
 ### drop()
 
-> `const` **drop**: \{\<`Ar`, `N`\>(`array`, `num`): `Skip`\<`N`, `Ar`\>; \<`E`\>(`array`, `num`): readonly `E`[]; \<`E`\>(`array`, `num`): readonly `E`[]; \<`N`\>(`num`): \<`Ar`\>(`array`) => `Skip`\<`N`, `Ar`\>; (`num`): \<`E`\>(`array`) => readonly `E`[]; (`num`): \<`E`\>(`array`) => readonly `E`[]; \} = `skip`
+> `const` **drop**: \{\<`Ar`, `N`\>(`array`, `num`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]; \<`N`\>(`num`): \<`Ar`\>(`array`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]; \} = `skip`
 
-Defined in: [src/array/array-utils.mts:3842](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3842)
+Defined in: [src/array/array-utils.mts:4765](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4765)
 
 Alias for `skip`. Skips the first N elements of an array.
 
 #### Call Signature
 
-> \<`Ar`, `N`\>(`array`, `num`): `Skip`\<`N`, `Ar`\>
+> \<`Ar`, `N`\>(`array`, `num`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
 Skips the first N elements of an array.
 
@@ -157,7 +157,7 @@ Skips the first N elements of an array.
 
 ###### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The number of elements to skip, constrained to `SmallUint`.
 
@@ -177,7 +177,7 @@ The number of elements to skip.
 
 ##### Returns
 
-`Skip`\<`N`, `Ar`\>
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
 A new array containing the elements after skipping the first N.
 
@@ -195,107 +195,7 @@ console.log(result); // [3, 4, 5]
 
 #### Call Signature
 
-> \<`E`\>(`array`, `num`): readonly `E`[]
-
-Skips the first N elements of an array.
-
-- If the array is a tuple, the return type is inferred as a tuple with the first N elements removed.
-- If the array is a non-empty array and N is a positive integer, returns a readonly array (may be empty).
-- Otherwise, returns a readonly array with the first N elements skipped.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of the array (can be a tuple for more precise typing).
-
-##### Parameters
-
-###### array
-
-readonly \[`E`, `E`\]
-
-The input array.
-
-###### num
-
-`ArgArrPositive`
-
-The number of elements to skip.
-
-##### Returns
-
-readonly `E`[]
-
-A new array containing the elements after skipping the first N.
-
-##### Example
-
-```ts
-// Regular usage
-Arr.skip([1, 2, 3, 4] as const, 2); // [3, 4]
-
-// Curried usage for pipe composition
-const skipFirst2 = Arr.skip(2);
-const result = pipe([1, 2, 3, 4, 5]).map(skipFirst2).value;
-console.log(result); // [3, 4, 5]
-```
-
-#### Call Signature
-
-> \<`E`\>(`array`, `num`): readonly `E`[]
-
-Skips the first N elements of an array.
-
-- If the array is a tuple, the return type is inferred as a tuple with the first N elements removed.
-- If the array is a non-empty array and N is a positive integer, returns a readonly array (may be empty).
-- Otherwise, returns a readonly array with the first N elements skipped.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of the array (can be a tuple for more precise typing).
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### num
-
-`ArgArrNonNegative`
-
-The number of elements to skip.
-
-##### Returns
-
-readonly `E`[]
-
-A new array containing the elements after skipping the first N.
-
-##### Example
-
-```ts
-// Regular usage
-Arr.skip([1, 2, 3, 4] as const, 2); // [3, 4]
-
-// Curried usage for pipe composition
-const skipFirst2 = Arr.skip(2);
-const result = pipe([1, 2, 3, 4, 5]).map(skipFirst2).value;
-console.log(result); // [3, 4, 5]
-```
-
-#### Call Signature
-
-> \<`N`\>(`num`): \<`Ar`\>(`array`) => `Skip`\<`N`, `Ar`\>
+> \<`N`\>(`num`): \<`Ar`\>(`array`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
 Skips the first N elements of an array.
 
@@ -307,7 +207,7 @@ Skips the first N elements of an array.
 
 ###### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The number of elements to skip, constrained to `SmallUint`.
 
@@ -323,7 +223,7 @@ The number of elements to skip.
 
 A new array containing the elements after skipping the first N.
 
-> \<`Ar`\>(`array`): `Skip`\<`N`, `Ar`\>
+> \<`Ar`\>(`array`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
 ###### Type Parameters
 
@@ -339,111 +239,7 @@ A new array containing the elements after skipping the first N.
 
 ###### Returns
 
-`Skip`\<`N`, `Ar`\>
-
-##### Example
-
-```ts
-// Regular usage
-Arr.skip([1, 2, 3, 4] as const, 2); // [3, 4]
-
-// Curried usage for pipe composition
-const skipFirst2 = Arr.skip(2);
-const result = pipe([1, 2, 3, 4, 5]).map(skipFirst2).value;
-console.log(result); // [3, 4, 5]
-```
-
-#### Call Signature
-
-> (`num`): \<`E`\>(`array`) => readonly `E`[]
-
-Skips the first N elements of an array.
-
-- If the array is a tuple, the return type is inferred as a tuple with the first N elements removed.
-- If the array is a non-empty array and N is a positive integer, returns a readonly array (may be empty).
-- Otherwise, returns a readonly array with the first N elements skipped.
-
-##### Parameters
-
-###### num
-
-`ArgArrPositive`
-
-The number of elements to skip.
-
-##### Returns
-
-A new array containing the elements after skipping the first N.
-
-> \<`E`\>(`array`): readonly `E`[]
-
-###### Type Parameters
-
-###### E
-
-`E`
-
-###### Parameters
-
-###### array
-
-readonly \[`E`, `E`\]
-
-###### Returns
-
-readonly `E`[]
-
-##### Example
-
-```ts
-// Regular usage
-Arr.skip([1, 2, 3, 4] as const, 2); // [3, 4]
-
-// Curried usage for pipe composition
-const skipFirst2 = Arr.skip(2);
-const result = pipe([1, 2, 3, 4, 5]).map(skipFirst2).value;
-console.log(result); // [3, 4, 5]
-```
-
-#### Call Signature
-
-> (`num`): \<`E`\>(`array`) => readonly `E`[]
-
-Skips the first N elements of an array.
-
-- If the array is a tuple, the return type is inferred as a tuple with the first N elements removed.
-- If the array is a non-empty array and N is a positive integer, returns a readonly array (may be empty).
-- Otherwise, returns a readonly array with the first N elements skipped.
-
-##### Parameters
-
-###### num
-
-`ArgArrNonNegative`
-
-The number of elements to skip.
-
-##### Returns
-
-A new array containing the elements after skipping the first N.
-
-> \<`E`\>(`array`): readonly `E`[]
-
-###### Type Parameters
-
-###### E
-
-`E`
-
-###### Parameters
-
-###### array
-
-readonly `E`[]
-
-###### Returns
-
-readonly `E`[]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
 ##### Example
 
@@ -467,7 +263,7 @@ console.log(result); // [3, 4, 5]
 
 > `const` **equal**: \<`E`\>(`array1`, `array2`, `equality`) => `boolean` = `eq`
 
-Defined in: [src/array/array-utils.mts:3678](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3678)
+Defined in: [src/array/array-utils.mts:4507](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4507)
 
 Alias for `eq`.
 
@@ -521,16 +317,12 @@ Arr.eq([{ a: 1 }], [{ a: 1 }], (o1, o2) => o1.a === o2.a); // true
 
 ### first()
 
-> `const` **first**: \{(`array`): [`None`](../../../functional/optional/namespaces/Optional.md#none); \<`E`, `L`\>(`array`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>; \<`E`\>(`array`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>; \<`E`\>(`array`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>; \} = `head`
+> `const` **first**: \<`Ar`\>(`array`) => `Ar` _extends_ readonly \[\] ? `Readonly`\<\{ \}\> : `Ar` _extends_ readonly \[`E`, `unknown`\] ? `Readonly`\<\{ `value`: `E`; \}\> : `Ar` _extends_ readonly \[`E`, `E`\] ? `Readonly`\<\{ `value`: `E`; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\> = `head`
 
-Defined in: [src/array/array-utils.mts:3830](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3830)
+Defined in: [src/array/array-utils.mts:4753](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4753)
 
 Alias for `head`. Returns the first element of an array.
 
-#### Call Signature
-
-> (`array`): [`None`](../../../functional/optional/namespaces/Optional.md#none)
-
 Returns the first element of an array wrapped in an Optional.
 
 This function provides type-safe access to the first element with precise return types:
@@ -543,24 +335,30 @@ This function provides type-safe access to the first element with precise return
 The function leverages TypeScript's type system to provide the most precise return type
 based on the input array type, making it safer than direct indexing.
 
-##### Parameters
+#### Type Parameters
 
-###### array
+##### Ar
 
-readonly \[\]
+`Ar` _extends_ readonly `unknown`[]
+
+#### Parameters
+
+##### array
+
+`Ar`
 
 The array to get the first element from.
 
-##### Returns
+#### Returns
 
-[`None`](../../../functional/optional/namespaces/Optional.md#none)
+`Ar` _extends_ readonly \[\] ? `Readonly`\<\{ \}\> : `Ar` _extends_ readonly \[`E`, `unknown`\] ? `Readonly`\<\{ `value`: `E`; \}\> : `Ar` _extends_ readonly \[`E`, `E`\] ? `Readonly`\<\{ `value`: `E`; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 An Optional containing the first element:
 
 - `Optional.None` if the array is empty
 - `Optional.Some<E>` containing the first element if the array is non-empty
 
-##### Example
+#### Example
 
 ```typescript
 // Empty array - precise None type
@@ -613,311 +411,7 @@ expectType<typeof guaranteedResult, Optional.Some<number>>('=');
 expectType<typeof maybeResult, Optional<number>>('=');
 ```
 
-##### See
-
-- [last](#last) for getting the last element
-- [at](#at) for accessing elements at specific indices
-- [tail](#tail) for getting all elements except the first
-
-#### Call Signature
-
-> \<`E`, `L`\>(`array`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-Returns the first element of an array wrapped in an Optional.
-
-This function provides type-safe access to the first element with precise return types:
-
-- For empty arrays: returns `Optional.None`
-- For tuples with known first element: returns `Optional.Some<FirstElementType>`
-- For non-empty arrays: returns `Optional.Some<ElementType>`
-- For general arrays: returns `Optional<ElementType>`
-
-The function leverages TypeScript's type system to provide the most precise return type
-based on the input array type, making it safer than direct indexing.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-###### L
-
-`L` _extends_ readonly `unknown`[]
-
-##### Parameters
-
-###### array
-
-readonly \[`E`, `L`\]
-
-The array to get the first element from.
-
-##### Returns
-
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-An Optional containing the first element:
-
-- `Optional.None` if the array is empty
-- `Optional.Some<E>` containing the first element if the array is non-empty
-
-##### Example
-
-```typescript
-// Empty array - precise None type
-const emptyResult = Arr.head([]); // Optional.None
-console.log(Optional.isNone(emptyResult)); // true
-
-// Tuple with known structure - precise Some type
-const tupleResult = Arr.head(['first', 'second', 'third'] as const);
-// Type: Optional.Some<'first'>
-if (Optional.isSome(tupleResult)) {
-    console.log(tupleResult.value); // 'first' - TypeScript knows exact type
-}
-
-// Non-empty array - guaranteed Some type
-const nonEmpty: NonEmptyArray<number> = [10, 20, 30] as NonEmptyArray<number>;
-const guaranteedResult = Arr.head(nonEmpty); // Optional.Some<number>
-// No need to check - always Some for NonEmptyArray
-
-// General array - may be Some or None
-const generalArray: number[] = [1, 2, 3];
-const maybeResult = Arr.head(generalArray); // Optional<number>
-if (Optional.isSome(maybeResult)) {
-    console.log(`First element: ${maybeResult.value}`);
-} else {
-    console.log('Array is empty');
-}
-
-// Working with different types
-const strings = ['hello', 'world'];
-const firstString = Arr.head(strings); // Optional<string>
-
-const objects = [
-    { id: 1, name: 'Alice' },
-    { id: 2, name: 'Bob' },
-];
-const firstObject = Arr.head(objects); // Optional<{id: number, name: string}>
-
-// Functional composition
-const getFirstElements = (arrays: readonly number[][]) =>
-    arrays.map(Arr.head).filter(Optional.isSome);
-
-const nestedArrays = [[1, 2], [3, 4], [], [5]];
-const firstElements = getFirstElements(nestedArrays);
-// [Optional.Some(1), Optional.Some(3), Optional.Some(5)]
-
-// Type inference examples
-expectType<typeof emptyResult, Optional.None>('=');
-expectType<typeof tupleResult, Optional.Some<'first'>>('=');
-expectType<typeof guaranteedResult, Optional.Some<number>>('=');
-expectType<typeof maybeResult, Optional<number>>('=');
-```
-
-##### See
-
-- [last](#last) for getting the last element
-- [at](#at) for accessing elements at specific indices
-- [tail](#tail) for getting all elements except the first
-
-#### Call Signature
-
-> \<`E`\>(`array`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-Returns the first element of an array wrapped in an Optional.
-
-This function provides type-safe access to the first element with precise return types:
-
-- For empty arrays: returns `Optional.None`
-- For tuples with known first element: returns `Optional.Some<FirstElementType>`
-- For non-empty arrays: returns `Optional.Some<ElementType>`
-- For general arrays: returns `Optional<ElementType>`
-
-The function leverages TypeScript's type system to provide the most precise return type
-based on the input array type, making it safer than direct indexing.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-##### Parameters
-
-###### array
-
-readonly \[`E`, `E`\]
-
-The array to get the first element from.
-
-##### Returns
-
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-An Optional containing the first element:
-
-- `Optional.None` if the array is empty
-- `Optional.Some<E>` containing the first element if the array is non-empty
-
-##### Example
-
-```typescript
-// Empty array - precise None type
-const emptyResult = Arr.head([]); // Optional.None
-console.log(Optional.isNone(emptyResult)); // true
-
-// Tuple with known structure - precise Some type
-const tupleResult = Arr.head(['first', 'second', 'third'] as const);
-// Type: Optional.Some<'first'>
-if (Optional.isSome(tupleResult)) {
-    console.log(tupleResult.value); // 'first' - TypeScript knows exact type
-}
-
-// Non-empty array - guaranteed Some type
-const nonEmpty: NonEmptyArray<number> = [10, 20, 30] as NonEmptyArray<number>;
-const guaranteedResult = Arr.head(nonEmpty); // Optional.Some<number>
-// No need to check - always Some for NonEmptyArray
-
-// General array - may be Some or None
-const generalArray: number[] = [1, 2, 3];
-const maybeResult = Arr.head(generalArray); // Optional<number>
-if (Optional.isSome(maybeResult)) {
-    console.log(`First element: ${maybeResult.value}`);
-} else {
-    console.log('Array is empty');
-}
-
-// Working with different types
-const strings = ['hello', 'world'];
-const firstString = Arr.head(strings); // Optional<string>
-
-const objects = [
-    { id: 1, name: 'Alice' },
-    { id: 2, name: 'Bob' },
-];
-const firstObject = Arr.head(objects); // Optional<{id: number, name: string}>
-
-// Functional composition
-const getFirstElements = (arrays: readonly number[][]) =>
-    arrays.map(Arr.head).filter(Optional.isSome);
-
-const nestedArrays = [[1, 2], [3, 4], [], [5]];
-const firstElements = getFirstElements(nestedArrays);
-// [Optional.Some(1), Optional.Some(3), Optional.Some(5)]
-
-// Type inference examples
-expectType<typeof emptyResult, Optional.None>('=');
-expectType<typeof tupleResult, Optional.Some<'first'>>('=');
-expectType<typeof guaranteedResult, Optional.Some<number>>('=');
-expectType<typeof maybeResult, Optional<number>>('=');
-```
-
-##### See
-
-- [last](#last) for getting the last element
-- [at](#at) for accessing elements at specific indices
-- [tail](#tail) for getting all elements except the first
-
-#### Call Signature
-
-> \<`E`\>(`array`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-Returns the first element of an array wrapped in an Optional.
-
-This function provides type-safe access to the first element with precise return types:
-
-- For empty arrays: returns `Optional.None`
-- For tuples with known first element: returns `Optional.Some<FirstElementType>`
-- For non-empty arrays: returns `Optional.Some<ElementType>`
-- For general arrays: returns `Optional<ElementType>`
-
-The function leverages TypeScript's type system to provide the most precise return type
-based on the input array type, making it safer than direct indexing.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The array to get the first element from.
-
-##### Returns
-
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-An Optional containing the first element:
-
-- `Optional.None` if the array is empty
-- `Optional.Some<E>` containing the first element if the array is non-empty
-
-##### Example
-
-```typescript
-// Empty array - precise None type
-const emptyResult = Arr.head([]); // Optional.None
-console.log(Optional.isNone(emptyResult)); // true
-
-// Tuple with known structure - precise Some type
-const tupleResult = Arr.head(['first', 'second', 'third'] as const);
-// Type: Optional.Some<'first'>
-if (Optional.isSome(tupleResult)) {
-    console.log(tupleResult.value); // 'first' - TypeScript knows exact type
-}
-
-// Non-empty array - guaranteed Some type
-const nonEmpty: NonEmptyArray<number> = [10, 20, 30] as NonEmptyArray<number>;
-const guaranteedResult = Arr.head(nonEmpty); // Optional.Some<number>
-// No need to check - always Some for NonEmptyArray
-
-// General array - may be Some or None
-const generalArray: number[] = [1, 2, 3];
-const maybeResult = Arr.head(generalArray); // Optional<number>
-if (Optional.isSome(maybeResult)) {
-    console.log(`First element: ${maybeResult.value}`);
-} else {
-    console.log('Array is empty');
-}
-
-// Working with different types
-const strings = ['hello', 'world'];
-const firstString = Arr.head(strings); // Optional<string>
-
-const objects = [
-    { id: 1, name: 'Alice' },
-    { id: 2, name: 'Bob' },
-];
-const firstObject = Arr.head(objects); // Optional<{id: number, name: string}>
-
-// Functional composition
-const getFirstElements = (arrays: readonly number[][]) =>
-    arrays.map(Arr.head).filter(Optional.isSome);
-
-const nestedArrays = [[1, 2], [3, 4], [], [5]];
-const firstElements = getFirstElements(nestedArrays);
-// [Optional.Some(1), Optional.Some(3), Optional.Some(5)]
-
-// Type inference examples
-expectType<typeof emptyResult, Optional.None>('=');
-expectType<typeof tupleResult, Optional.Some<'first'>>('=');
-expectType<typeof guaranteedResult, Optional.Some<number>>('=');
-expectType<typeof maybeResult, Optional<number>>('=');
-```
-
-##### See
+#### See
 
 - [last](#last) for getting the last element
 - [at](#at) for accessing elements at specific indices
@@ -929,124 +423,67 @@ expectType<typeof maybeResult, Optional<number>>('=');
 
 ---
 
-### length()
+### keys()
 
-> `const` **length**: \{\<`Ar`\>(`array`): `IntersectBrand`\<`PositiveNumber`, `Uint32`\>; \<`Ar`\>(`array`): `Uint32`; \} = `size`
+> `const` **keys**: \<`E`\>(`array`) => `ArrayIterator`\<`Uint32`\> = `indices`
 
-Defined in: [src/array/array-utils.mts:116](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L116)
+Defined in: [src/array/array-utils.mts:4801](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4801)
 
-#### Call Signature
+Alias for `indices`. Returns an iterable of keys in the array.
 
-> \<`Ar`\>(`array`): `IntersectBrand`\<`PositiveNumber`, `Uint32`\>
+Returns an iterable of keys in the array.
 
-Returns the size (length) of an array as a type-safe branded integer.
+This function returns an array of branded indices (`SizeType.Arr`) for type safety.
 
-This function provides the array length with enhanced type safety through branded types:
+#### Type Parameters
 
-- For arrays known to be non-empty at compile time: returns `PositiveNumber & SizeType.Arr`
-- For general arrays that may be empty: returns `SizeType.Arr` (branded Uint32)
+##### E
 
-The returned value is always a non-negative integer that can be safely used for array indexing
-and size comparisons. The branded type prevents common integer overflow issues and provides
-better type checking than plain numbers.
+`E`
 
-##### Type Parameters
+#### Parameters
 
-###### Ar
+##### array
 
-`Ar` _extends_ readonly \[`unknown`, `unknown`\]
+readonly `E`[]
 
-The exact type of the input array, used for precise return type inference.
+The array to get indices from.
 
-##### Parameters
+#### Returns
 
-###### array
+`ArrayIterator`\<`Uint32`\>
 
-`Ar`
+An array of indices.
 
-The array to measure. Can be any readonly array type.
-
-##### Returns
-
-`IntersectBrand`\<`PositiveNumber`, `Uint32`\>
-
-The length of the array as a branded type:
-
-- `IntersectBrand<PositiveNumber, SizeType.Arr>` for known non-empty arrays
-- `SizeType.Arr` for general arrays (branded Uint32, may be 0)
-
-##### Example
+#### Example
 
 ```typescript
-// Known non-empty arrays get positive branded type
-const tuple = [1, 2, 3] as const;
-const tupleSize = Arr.size(tuple);
-// Type: IntersectBrand<PositiveNumber, SizeType.Arr>
-// Value: 3 (branded, guaranteed positive)
+// Direct usage
+const fruits = ['apple', 'banana', 'cherry'];
+const indices = Arr.indices(fruits); // [0, 1, 2]
 
-const nonEmpty: NonEmptyArray<string> = ['a', 'b'] as NonEmptyArray<string>;
-const nonEmptySize = Arr.size(nonEmpty);
-// Type: IntersectBrand<PositiveNumber, SizeType.Arr>
-// Guaranteed to be > 0
+// Curried usage
+const getIndices = Arr.indices;
+const result = getIndices(['a', 'b']); // [0, 1]
 
-// General arrays may be empty, get regular branded type
-const generalArray: number[] = [1, 2, 3];
-const generalSize = Arr.size(generalArray);
-// Type: SizeType.Arr (branded Uint32)
-// May be 0 or positive
-
-// Empty arrays
-const emptyArray = [] as const;
-const emptySize = Arr.size(emptyArray);
-// Type: SizeType.Arr
-// Value: 0 (branded)
-
-// Runtime arrays with unknown content
-const dynamicArray = Array.from({ length: Math.random() * 10 }, (_, i) => i);
-const dynamicSize = Arr.size(dynamicArray);
-// Type: SizeType.Arr (may be 0)
-
-// Using size for safe operations
-const data = [10, 20, 30];
-const dataSize = Arr.size(data);
-
-// Safe for array creation
-const indices = Arr.seq(dataSize); // Creates [0, 1, 2]
-const zeros = Arr.zeros(dataSize); // Creates [0, 0, 0]
-
-// Safe for bounds checking
-const isValidIndex = (index: number) => index >= 0 && index < dataSize;
-
-// Comparison with other sizes
-const otherArray = ['a', 'b'];
-const sizeDiff = Uint32.sub(Arr.size(data), Arr.size(otherArray)); // 1
-
-// Functional composition
-const arrays = [[1, 2], [3, 4, 5], [], [6]];
-const sizes = arrays.map(Arr.size); // [2, 3, 0, 1] (all branded)
-const totalElements = sizes.reduce(Uint32.add, 0); // 6
-
-// Type guards work with size
-if (Arr.size(data) > 0) {
-    // TypeScript knows data is non-empty here
-    const firstElement = data[0]; // Safe access
-}
-
-// Type inference examples
-expectType<typeof tupleSize, IntersectBrand<PositiveNumber, SizeType.Arr>>('=');
-expectType<typeof generalSize, SizeType.Arr>('=');
-expectType<typeof emptySize, SizeType.Arr>('=');
+// Empty array
+const empty: string[] = [];
+const emptyIndices = Arr.indices(empty); // []
 ```
 
-##### See
+#### See
 
-- [length](#length) - Alias for this function
-- [isEmpty](#isempty) for checking if size is 0
-- [isNonEmpty](#isnonempty) for checking if size > 0
+[indices](#indices)
 
-#### Call Signature
+---
 
-> \<`Ar`\>(`array`): `Uint32`
+### length()
+
+> `const` **length**: \<`Ar`\>(`array`) => `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `IntersectBrand`\<`PositiveNumber`, `Uint32`\> : `Uint32` = `size`
+
+Defined in: [src/array/array-utils.mts:4795](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4795)
+
+Alias for `size`. Returns the length of an array.
 
 Returns the size (length) of an array as a type-safe branded integer.
 
@@ -1059,32 +496,32 @@ The returned value is always a non-negative integer that can be safely used for 
 and size comparisons. The branded type prevents common integer overflow issues and provides
 better type checking than plain numbers.
 
-##### Type Parameters
+#### Type Parameters
 
-###### Ar
+##### Ar
 
 `Ar` _extends_ readonly `unknown`[]
 
 The exact type of the input array, used for precise return type inference.
 
-##### Parameters
+#### Parameters
 
-###### array
+##### array
 
 `Ar`
 
 The array to measure. Can be any readonly array type.
 
-##### Returns
+#### Returns
 
-`Uint32`
+`Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `IntersectBrand`\<`PositiveNumber`, `Uint32`\> : `Uint32`
 
 The length of the array as a branded type:
 
 - `IntersectBrand<PositiveNumber, SizeType.Arr>` for known non-empty arrays
 - `SizeType.Arr` for general arrays (branded Uint32, may be 0)
 
-##### Example
+#### Example
 
 ```typescript
 // Known non-empty arrays get positive branded type
@@ -1093,7 +530,7 @@ const tupleSize = Arr.size(tuple);
 // Type: IntersectBrand<PositiveNumber, SizeType.Arr>
 // Value: 3 (branded, guaranteed positive)
 
-const nonEmpty: NonEmptyArray<string> = ['a', 'b'] as NonEmptyArray<string>;
+const nonEmpty: NonEmptyArray<string> = ['a', 'b'];
 const nonEmptySize = Arr.size(nonEmpty);
 // Type: IntersectBrand<PositiveNumber, SizeType.Arr>
 // Guaranteed to be > 0
@@ -1123,13 +560,6 @@ const dataSize = Arr.size(data);
 const indices = Arr.seq(dataSize); // Creates [0, 1, 2]
 const zeros = Arr.zeros(dataSize); // Creates [0, 0, 0]
 
-// Safe for bounds checking
-const isValidIndex = (index: number) => index >= 0 && index < dataSize;
-
-// Comparison with other sizes
-const otherArray = ['a', 'b'];
-const sizeDiff = Uint32.sub(Arr.size(data), Arr.size(otherArray)); // 1
-
 // Functional composition
 const arrays = [[1, 2], [3, 4, 5], [], [6]];
 const sizes = arrays.map(Arr.size); // [2, 3, 0, 1] (all branded)
@@ -1147,23 +577,25 @@ expectType<typeof generalSize, SizeType.Arr>('=');
 expectType<typeof emptySize, SizeType.Arr>('=');
 ```
 
-##### See
+#### See
 
 - [length](#length) - Alias for this function
 - [isEmpty](#isempty) for checking if size is 0
 - [isNonEmpty](#isnonempty) for checking if size > 0
 
+#### See
+
+[size](#size)
+
 ---
 
 ### newArray()
 
-> `const` **newArray**: \{\<`V`, `N`\>(`len`, `init`): `MakeTupleImpl`\<`V`, `` `${N}` ``\>; \<`V`\>(`len`, `init`): readonly \[`V`, `V`\]; \<`V`\>(`len`, `init`): readonly `V`[]; \} = `create`
+> `const` **newArray**: \<`V`, `N`\>(`len`, `init`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`V`, `V`\] : readonly `V`[] = `create`
 
-Defined in: [src/array/array-utils.mts:584](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L584)
+Defined in: [src/array/array-utils.mts:4789](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4789)
 
-#### Call Signature
-
-> \<`V`, `N`\>(`len`, `init`): `MakeTupleImpl`\<`V`, `` `${N}` ``\>
+Alias for `create`. Creates a new array of the specified length, with each position filled with the provided initial value.
 
 Creates a new array of the specified length, with each position filled with the provided initial value.
 
@@ -1174,37 +606,37 @@ of the initial value (the same reference is used for all positions):
 - When `len` is a positive runtime value, returns a `NonEmptyArray<V>`
 - Otherwise, returns a `readonly V[]` that may be empty
 
-##### Type Parameters
+#### Type Parameters
 
-###### V
+##### V
 
 `V`
 
 The type of the initial value. The `const` constraint preserves literal types.
 
-###### N
+##### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The type of the length parameter when it's a `SmallUint` literal.
 
-##### Parameters
+#### Parameters
 
-###### len
+##### len
 
 `N`
 
 The length of the array to create. Must be a non-negative integer.
 
-###### init
+##### init
 
 `V`
 
 The value to fill each position with. The same reference is used for all positions.
 
-##### Returns
+#### Returns
 
-`MakeTupleImpl`\<`V`, `` `${N}` ``\>
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`V`, `V`\] : readonly `V`[]
 
 An immutable array filled with the initial value. The exact return type depends on the length:
 
@@ -1212,7 +644,7 @@ An immutable array filled with the initial value. The exact return type depends 
 - `NonEmptyArray<V>` when `len` is a positive runtime value
 - `readonly V[]` for general non-negative values
 
-##### Example
+#### Example
 
 ```typescript
 // Compile-time known lengths produce precise tuple types
@@ -1240,191 +672,37 @@ expectType<typeof numbers, readonly [42, 42]>('=');
 expectType<typeof empty, readonly []>('=');
 ```
 
-##### See
+#### See
 
 - [zeros](#zeros) for creating arrays filled with zeros
 - [seq](#seq) for creating sequences of consecutive integers
 
-#### Call Signature
+#### See
 
-> \<`V`\>(`len`, `init`): readonly \[`V`, `V`\]
-
-Creates a new array of the specified length, with each position filled with the provided initial value.
-
-This function provides compile-time type safety with precise return types and performs shallow copying
-of the initial value (the same reference is used for all positions):
-
-- When `len` is a compile-time known `SmallUint` (0-100), returns a tuple of exactly that length
-- When `len` is a positive runtime value, returns a `NonEmptyArray<V>`
-- Otherwise, returns a `readonly V[]` that may be empty
-
-##### Type Parameters
-
-###### V
-
-`V`
-
-The type of the initial value. The `const` constraint preserves literal types.
-
-##### Parameters
-
-###### len
-
-`ArgArrPositive`
-
-The length of the array to create. Must be a non-negative integer.
-
-###### init
-
-`V`
-
-The value to fill each position with. The same reference is used for all positions.
-
-##### Returns
-
-readonly \[`V`, `V`\]
-
-An immutable array filled with the initial value. The exact return type depends on the length:
-
-- `ArrayOfLength<N, V>` when `len` is a `SmallUint` literal
-- `NonEmptyArray<V>` when `len` is a positive runtime value
-- `readonly V[]` for general non-negative values
-
-##### Example
-
-```typescript
-// Compile-time known lengths produce precise tuple types
-const strings = Arr.create(3, 'hello'); // readonly ['hello', 'hello', 'hello']
-const numbers = Arr.create(2, 42); // readonly [42, 42]
-const empty = Arr.create(0, 'unused'); // readonly []
-
-// Object references are shared (shallow copy behavior)
-const obj = { id: 1, name: 'test' };
-const objects = Arr.create(3, obj); // readonly [obj, obj, obj]
-objects[0] === objects[1]; // true - same reference
-objects[0].id = 999; // Mutates the shared object
-console.log(objects[1].id); // 999 - all positions affected
-
-// Runtime positive values produce non-empty arrays
-const count = Math.floor(Math.random() * 5) + 1;
-const nonEmpty = Arr.create(count, 'item'); // NonEmptyArray<string>
-
-// Literal type preservation with const assertion
-const literals = Arr.create(2, 'success' as const); // readonly ['success', 'success']
-
-// Type inference examples
-expectType<typeof strings, readonly ['hello', 'hello', 'hello']>('=');
-expectType<typeof numbers, readonly [42, 42]>('=');
-expectType<typeof empty, readonly []>('=');
-```
-
-##### See
-
-- [zeros](#zeros) for creating arrays filled with zeros
-- [seq](#seq) for creating sequences of consecutive integers
-
-#### Call Signature
-
-> \<`V`\>(`len`, `init`): readonly `V`[]
-
-Creates a new array of the specified length, with each position filled with the provided initial value.
-
-This function provides compile-time type safety with precise return types and performs shallow copying
-of the initial value (the same reference is used for all positions):
-
-- When `len` is a compile-time known `SmallUint` (0-100), returns a tuple of exactly that length
-- When `len` is a positive runtime value, returns a `NonEmptyArray<V>`
-- Otherwise, returns a `readonly V[]` that may be empty
-
-##### Type Parameters
-
-###### V
-
-`V`
-
-The type of the initial value. The `const` constraint preserves literal types.
-
-##### Parameters
-
-###### len
-
-`ArgArrNonNegative`
-
-The length of the array to create. Must be a non-negative integer.
-
-###### init
-
-`V`
-
-The value to fill each position with. The same reference is used for all positions.
-
-##### Returns
-
-readonly `V`[]
-
-An immutable array filled with the initial value. The exact return type depends on the length:
-
-- `ArrayOfLength<N, V>` when `len` is a `SmallUint` literal
-- `NonEmptyArray<V>` when `len` is a positive runtime value
-- `readonly V[]` for general non-negative values
-
-##### Example
-
-```typescript
-// Compile-time known lengths produce precise tuple types
-const strings = Arr.create(3, 'hello'); // readonly ['hello', 'hello', 'hello']
-const numbers = Arr.create(2, 42); // readonly [42, 42]
-const empty = Arr.create(0, 'unused'); // readonly []
-
-// Object references are shared (shallow copy behavior)
-const obj = { id: 1, name: 'test' };
-const objects = Arr.create(3, obj); // readonly [obj, obj, obj]
-objects[0] === objects[1]; // true - same reference
-objects[0].id = 999; // Mutates the shared object
-console.log(objects[1].id); // 999 - all positions affected
-
-// Runtime positive values produce non-empty arrays
-const count = Math.floor(Math.random() * 5) + 1;
-const nonEmpty = Arr.create(count, 'item'); // NonEmptyArray<string>
-
-// Literal type preservation with const assertion
-const literals = Arr.create(2, 'success' as const); // readonly ['success', 'success']
-
-// Type inference examples
-expectType<typeof strings, readonly ['hello', 'hello', 'hello']>('=');
-expectType<typeof numbers, readonly [42, 42]>('=');
-expectType<typeof empty, readonly []>('=');
-```
-
-##### See
-
-- [zeros](#zeros) for creating arrays filled with zeros
-- [seq](#seq) for creating sequences of consecutive integers
+[create](#create)
 
 ---
 
 ### reduce()
 
-> `const` **reduce**: \{\<`E`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`; \<`E`, `P`\>(`callbackfn`, `initialValue`): (`array`) => `P`; \} = `foldl`
+> `const` **reduce**: \{\<`Ar`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`; \<`E`, `P`\>(`callbackfn`, `initialValue`): (`array`) => `P`; \} = `foldl`
 
-Defined in: [src/array/array-utils.mts:3848](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3848)
+Defined in: [src/array/array-utils.mts:4771](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4771)
 
 Alias for `foldl`. Applies a function against an accumulator and each element in the array (from left to right) to reduce it to a single value.
 
 #### Call Signature
 
-> \<`E`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`
+> \<`Ar`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`
 
 Applies a function against an accumulator and each element in the array (from left to right) to reduce it to a single value.
 This is an alias for `Array.prototype.reduce`.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ###### P
 
@@ -1434,7 +712,7 @@ The type of elements in the array.
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array.
 
@@ -1527,26 +805,24 @@ Arr.foldl(['a', 'b', 'c'], (acc, str) => acc + str.toUpperCase(), ''); // 'ABC'
 
 ### reduceRight()
 
-> `const` **reduceRight**: \{\<`E`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`; \<`E`, `P`\>(`callbackfn`, `initialValue`): (`array`) => `P`; \} = `foldr`
+> `const` **reduceRight**: \{\<`Ar`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`; \<`E`, `P`\>(`callbackfn`, `initialValue`): (`array`) => `P`; \} = `foldr`
 
-Defined in: [src/array/array-utils.mts:3854](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3854)
+Defined in: [src/array/array-utils.mts:4777](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4777)
 
 Alias for `foldr`. Applies a function against an accumulator and each element in the array (from right to left) to reduce it to a single value.
 
 #### Call Signature
 
-> \<`E`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`
+> \<`Ar`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`
 
 Applies a function against an accumulator and each element in the array (from right to left) to reduce it to a single value.
 This is an alias for `Array.prototype.reduceRight`.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ###### P
 
@@ -1556,7 +832,7 @@ The type of elements in the array.
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array.
 
@@ -1661,7 +937,7 @@ console.log(result); // "abc"
 
 > `const` **rest**: \<`Ar`\>(`array`) => `Tail`\<`Ar`\> = `tail`
 
-Defined in: [src/array/array-utils.mts:3836](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3836)
+Defined in: [src/array/array-utils.mts:4759](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4759)
 
 Alias for `tail`. Returns all elements of an array except the first one.
 
@@ -1705,9 +981,9 @@ Arr.tail([]); // []
 
 #### Call Signature
 
-> **at**\<`E`\>(`array`, `index`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+> **at**\<`Ar`\>(`array`, `index`): [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
-Defined in: [src/array/array-utils.mts:945](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L945)
+Defined in: [src/array/array-utils.mts:899](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L899)
 
 Safely retrieves an element at a given index from an array, returning an [Optional](../../../functional/optional/README.md#optional).
 
@@ -1732,23 +1008,21 @@ a function that can be applied to arrays, making it ideal for use in pipe operat
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The array to access (when using direct call syntax).
 
 ###### index
 
-`ArgArr`
+`ArgArrayIndexWithNegative`\<`Ar`\>
 
 The index to access. Must be a branded `SizeType.ArgArr` (safe integer). Can be:
 
@@ -1758,7 +1032,7 @@ The index to access. Must be a branded `SizeType.ArgArr` (safe integer). Can be:
 
 ##### Returns
 
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+[`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 An [Optional](../../../functional/optional/README.md#optional)<E> containing:
 
@@ -1851,7 +1125,7 @@ expectType<typeof negativeOutOfBounds, Optional<string>>('=');
 
 > **at**(`index`): \<`E`\>(`array`) => [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
 
-Defined in: [src/array/array-utils.mts:952](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L952)
+Defined in: [src/array/array-utils.mts:906](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L906)
 
 Safely retrieves an element at a given index from an array, returning an [Optional](../../../functional/optional/README.md#optional).
 
@@ -1878,7 +1152,7 @@ a function that can be applied to arrays, making it ideal for use in pipe operat
 
 ###### index
 
-`ArgArr`
+`ArgArrWithNegative`
 
 The index to access. Must be a branded `SizeType.ArgArr` (safe integer). Can be:
 
@@ -1999,7 +1273,7 @@ expectType<typeof negativeOutOfBounds, Optional<string>>('=');
 
 > **butLast**\<`Ar`\>(`array`): `ButLast`\<`Ar`\>
 
-Defined in: [src/array/array-utils.mts:1306](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1306)
+Defined in: [src/array/array-utils.mts:1258](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1258)
 
 Returns all elements of an array except the last one.
 
@@ -2037,7 +1311,7 @@ Arr.butLast([]); // []
 
 > **concat**\<`Ar1`, `Ar2`\>(`array1`, `array2`): readonly \[`Ar1`, `Ar2`\]
 
-Defined in: [src/array/array-utils.mts:3083](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3083)
+Defined in: [src/array/array-utils.mts:3824](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3824)
 
 Concatenates two arrays.
 
@@ -2085,7 +1359,7 @@ Arr.concat([1, 2], []); // [1, 2]
 
 > **copy**\<`Ar`\>(`array`): `Ar`
 
-Defined in: [src/array/array-utils.mts:673](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L673)
+Defined in: [src/array/array-utils.mts:624](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L624)
 
 Creates a shallow copy of an array, preserving the exact type signature.
 
@@ -2168,25 +1442,23 @@ The underlying implementation uses `slice()` for efficient shallow copying
 
 #### Call Signature
 
-> **count**\<`E`\>(`array`, `predicate`): `Uint32`
+> **count**\<`Ar`\>(`array`, `predicate`): `Uint32`
 
-Defined in: [src/array/array-utils.mts:2804](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2804)
+Defined in: [src/array/array-utils.mts:3283](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3283)
 
 Counts the number of elements in an array that satisfy a predicate.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array.
 
@@ -2218,7 +1490,7 @@ console.log(result); // 3
 
 > **count**\<`E`\>(`predicate`): (`array`) => `Uint32`
 
-Defined in: [src/array/array-utils.mts:2809](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2809)
+Defined in: [src/array/array-utils.mts:3288](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3288)
 
 Counts the number of elements in an array that satisfy a predicate.
 
@@ -2272,19 +1544,17 @@ console.log(result); // 3
 
 #### Call Signature
 
-> **countBy**\<`E`, `G`\>(`array`, `grouper`): [`IMap`](../../../collections/imap/README.md#imap)\<`G`, `Uint32`\>
+> **countBy**\<`Ar`, `G`\>(`array`, `grouper`): [`IMap`](../../../collections/imap/README.md#imap)\<`G`, `ArrayIndex`\<`Ar`\>\>
 
-Defined in: [src/array/array-utils.mts:2857](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2857)
+Defined in: [src/array/array-utils.mts:3336](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3336)
 
 Groups elements of an array by a key derived from each element and counts the elements in each group.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ###### G
 
@@ -2296,7 +1566,7 @@ The type of the group key (must be a primitive type: `string`, `number`, `boolea
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array.
 
@@ -2308,7 +1578,7 @@ A function `(value: A, index: number) => G` that maps an element and its index t
 
 ##### Returns
 
-[`IMap`](../../../collections/imap/README.md#imap)\<`G`, `Uint32`\>
+[`IMap`](../../../collections/imap/README.md#imap)\<`G`, `ArrayIndex`\<`Ar`\>\>
 
 An `IMap` where keys are group keys and values are the counts of elements in each group.
 
@@ -2330,7 +1600,7 @@ const result = pipe(data).map(countByType).value;
 
 > **countBy**\<`E`, `G`\>(`grouper`): (`array`) => [`IMap`](../../../collections/imap/README.md#imap)\<`G`, `Uint32`\>
 
-Defined in: [src/array/array-utils.mts:2862](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2862)
+Defined in: [src/array/array-utils.mts:3344](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3344)
 
 Groups elements of an array by a key derived from each element and counts the elements in each group.
 
@@ -2390,11 +1660,9 @@ const result = pipe(data).map(countByType).value;
 
 ### create()
 
-#### Call Signature
+> **create**\<`V`, `N`\>(`len`, `init`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`V`, `V`\] : readonly `V`[]
 
-> **create**\<`V`, `N`\>(`len`, `init`): `MakeTupleImpl`\<`V`, `` `${N}` ``\>
-
-Defined in: [src/array/array-utils.mts:562](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L562)
+Defined in: [src/array/array-utils.mts:526](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L526)
 
 Creates a new array of the specified length, with each position filled with the provided initial value.
 
@@ -2405,37 +1673,37 @@ of the initial value (the same reference is used for all positions):
 - When `len` is a positive runtime value, returns a `NonEmptyArray<V>`
 - Otherwise, returns a `readonly V[]` that may be empty
 
-##### Type Parameters
+#### Type Parameters
 
-###### V
+##### V
 
 `V`
 
 The type of the initial value. The `const` constraint preserves literal types.
 
-###### N
+##### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The type of the length parameter when it's a `SmallUint` literal.
 
-##### Parameters
+#### Parameters
 
-###### len
+##### len
 
 `N`
 
 The length of the array to create. Must be a non-negative integer.
 
-###### init
+##### init
 
 `V`
 
 The value to fill each position with. The same reference is used for all positions.
 
-##### Returns
+#### Returns
 
-`MakeTupleImpl`\<`V`, `` `${N}` ``\>
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`V`, `V`\] : readonly `V`[]
 
 An immutable array filled with the initial value. The exact return type depends on the length:
 
@@ -2443,7 +1711,7 @@ An immutable array filled with the initial value. The exact return type depends 
 - `NonEmptyArray<V>` when `len` is a positive runtime value
 - `readonly V[]` for general non-negative values
 
-##### Example
+#### Example
 
 ```typescript
 // Compile-time known lengths produce precise tuple types
@@ -2471,170 +1739,59 @@ expectType<typeof numbers, readonly [42, 42]>('=');
 expectType<typeof empty, readonly []>('=');
 ```
 
-##### See
+#### See
 
 - [zeros](#zeros) for creating arrays filled with zeros
 - [seq](#seq) for creating sequences of consecutive integers
 
-#### Call Signature
+---
 
-> **create**\<`V`\>(`len`, `init`): readonly \[`V`, `V`\]
+### entries()
 
-Defined in: [src/array/array-utils.mts:567](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L567)
+> **entries**\<`E`\>(`array`): `ArrayIterator`\<readonly \[`Uint32`, `E`\]\>
 
-Creates a new array of the specified length, with each position filled with the provided initial value.
+Defined in: [src/array/array-utils.mts:4680](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4680)
 
-This function provides compile-time type safety with precise return types and performs shallow copying
-of the initial value (the same reference is used for all positions):
+Returns an iterable of key-value pairs for every entry in the array.
 
-- When `len` is a compile-time known `SmallUint` (0-100), returns a tuple of exactly that length
-- When `len` is a positive runtime value, returns a `NonEmptyArray<V>`
-- Otherwise, returns a `readonly V[]` that may be empty
+This function returns an array where each element is a tuple containing the index and value.
+The indices are branded as `SizeType.Arr` for type safety.
 
-##### Type Parameters
+#### Type Parameters
 
-###### V
+##### E
 
-`V`
+`E`
 
-The type of the initial value. The `const` constraint preserves literal types.
+#### Parameters
 
-##### Parameters
+##### array
 
-###### len
+readonly `E`[]
 
-`ArgArrPositive`
+The array to get entries from.
 
-The length of the array to create. Must be a non-negative integer.
+#### Returns
 
-###### init
+`ArrayIterator`\<readonly \[`Uint32`, `E`\]\>
 
-`V`
+An array of `[index, value]` pairs.
 
-The value to fill each position with. The same reference is used for all positions.
-
-##### Returns
-
-readonly \[`V`, `V`\]
-
-An immutable array filled with the initial value. The exact return type depends on the length:
-
-- `ArrayOfLength<N, V>` when `len` is a `SmallUint` literal
-- `NonEmptyArray<V>` when `len` is a positive runtime value
-- `readonly V[]` for general non-negative values
-
-##### Example
+#### Example
 
 ```typescript
-// Compile-time known lengths produce precise tuple types
-const strings = Arr.create(3, 'hello'); // readonly ['hello', 'hello', 'hello']
-const numbers = Arr.create(2, 42); // readonly [42, 42]
-const empty = Arr.create(0, 'unused'); // readonly []
+// Direct usage
+const fruits = ['apple', 'banana', 'cherry'];
+const entries = Arr.entries(fruits); // [[0, 'apple'], [1, 'banana'], [2, 'cherry']]
 
-// Object references are shared (shallow copy behavior)
-const obj = { id: 1, name: 'test' };
-const objects = Arr.create(3, obj); // readonly [obj, obj, obj]
-objects[0] === objects[1]; // true - same reference
-objects[0].id = 999; // Mutates the shared object
-console.log(objects[1].id); // 999 - all positions affected
+// Curried usage
+const getEntries = Arr.entries;
+const result = getEntries(['a', 'b']); // [[0, 'a'], [1, 'b']]
 
-// Runtime positive values produce non-empty arrays
-const count = Math.floor(Math.random() * 5) + 1;
-const nonEmpty = Arr.create(count, 'item'); // NonEmptyArray<string>
-
-// Literal type preservation with const assertion
-const literals = Arr.create(2, 'success' as const); // readonly ['success', 'success']
-
-// Type inference examples
-expectType<typeof strings, readonly ['hello', 'hello', 'hello']>('=');
-expectType<typeof numbers, readonly [42, 42]>('=');
-expectType<typeof empty, readonly []>('=');
+// With tuples
+const tuple = [10, 20, 30] as const;
+const tupleEntries = Arr.entries(tuple); // [[0, 10], [1, 20], [2, 30]]
 ```
-
-##### See
-
-- [zeros](#zeros) for creating arrays filled with zeros
-- [seq](#seq) for creating sequences of consecutive integers
-
-#### Call Signature
-
-> **create**\<`V`\>(`len`, `init`): readonly `V`[]
-
-Defined in: [src/array/array-utils.mts:572](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L572)
-
-Creates a new array of the specified length, with each position filled with the provided initial value.
-
-This function provides compile-time type safety with precise return types and performs shallow copying
-of the initial value (the same reference is used for all positions):
-
-- When `len` is a compile-time known `SmallUint` (0-100), returns a tuple of exactly that length
-- When `len` is a positive runtime value, returns a `NonEmptyArray<V>`
-- Otherwise, returns a `readonly V[]` that may be empty
-
-##### Type Parameters
-
-###### V
-
-`V`
-
-The type of the initial value. The `const` constraint preserves literal types.
-
-##### Parameters
-
-###### len
-
-`ArgArrNonNegative`
-
-The length of the array to create. Must be a non-negative integer.
-
-###### init
-
-`V`
-
-The value to fill each position with. The same reference is used for all positions.
-
-##### Returns
-
-readonly `V`[]
-
-An immutable array filled with the initial value. The exact return type depends on the length:
-
-- `ArrayOfLength<N, V>` when `len` is a `SmallUint` literal
-- `NonEmptyArray<V>` when `len` is a positive runtime value
-- `readonly V[]` for general non-negative values
-
-##### Example
-
-```typescript
-// Compile-time known lengths produce precise tuple types
-const strings = Arr.create(3, 'hello'); // readonly ['hello', 'hello', 'hello']
-const numbers = Arr.create(2, 42); // readonly [42, 42]
-const empty = Arr.create(0, 'unused'); // readonly []
-
-// Object references are shared (shallow copy behavior)
-const obj = { id: 1, name: 'test' };
-const objects = Arr.create(3, obj); // readonly [obj, obj, obj]
-objects[0] === objects[1]; // true - same reference
-objects[0].id = 999; // Mutates the shared object
-console.log(objects[1].id); // 999 - all positions affected
-
-// Runtime positive values produce non-empty arrays
-const count = Math.floor(Math.random() * 5) + 1;
-const nonEmpty = Arr.create(count, 'item'); // NonEmptyArray<string>
-
-// Literal type preservation with const assertion
-const literals = Arr.create(2, 'success' as const); // readonly ['success', 'success']
-
-// Type inference examples
-expectType<typeof strings, readonly ['hello', 'hello', 'hello']>('=');
-expectType<typeof numbers, readonly [42, 42]>('=');
-expectType<typeof empty, readonly []>('=');
-```
-
-##### See
-
-- [zeros](#zeros) for creating arrays filled with zeros
-- [seq](#seq) for creating sequences of consecutive integers
 
 ---
 
@@ -2642,7 +1799,7 @@ expectType<typeof empty, readonly []>('=');
 
 > **eq**\<`E`\>(`array1`, `array2`, `equality`): `boolean`
 
-Defined in: [src/array/array-utils.mts:3666](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3666)
+Defined in: [src/array/array-utils.mts:4495](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4495)
 
 Checks if two arrays are equal by performing a shallow comparison of their elements.
 
@@ -2692,16 +1849,239 @@ Arr.eq([{ a: 1 }], [{ a: 1 }], (o1, o2) => o1.a === o2.a); // true
 
 ---
 
-### filterNot()
+### every()
 
 #### Call Signature
 
-> **filterNot**\<`E`\>(`array`, `predicate`): readonly `E`[]
+> **every**\<`E`, `S`\>(`array`, `predicate`): `array is readonly S[]`
 
-Defined in: [src/array/array-utils.mts:3040](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3040)
+Defined in: [src/array/array-utils.mts:2839](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2839)
 
-Filters an array by excluding elements for which the predicate returns true.
-This is the opposite of `Array.prototype.filter`.
+Tests whether all elements in an array pass a test implemented by a predicate function.
+
+This function returns `true` if all elements satisfy the predicate, `false` otherwise.
+For empty arrays, it returns `true` (vacuous truth).
+Supports type guard predicates for type narrowing of the entire array.
+
+##### Type Parameters
+
+###### E
+
+`E`
+
+The type of elements in the array.
+
+###### S
+
+`S`
+
+The narrowed type when using type guard predicates.
+
+##### Parameters
+
+###### array
+
+readonly `E`[]
+
+The array to test.
+
+###### predicate
+
+(`a`, `index`) => `a is S`
+
+A function that tests each element.
+
+##### Returns
+
+`array is readonly S[]`
+
+`true` if all elements pass the test, `false` otherwise.
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [2, 4, 6, 8];
+const allEven = Arr.every(numbers, (n) => n % 2 === 0); // true
+
+// Type guard usage - narrows entire array type
+const mixed: (string | number)[] = ['hello', 'world'];
+if (Arr.every(mixed, (x): x is string => typeof x === 'string')) {
+    // TypeScript knows mixed is string[] here
+    console.log(mixed.map((s) => s.toUpperCase()));
+}
+
+// Curried usage with type guards
+const isString = (x: unknown): x is string => typeof x === 'string';
+const allStrings = Arr.every(isString);
+const data: unknown[] = ['a', 'b', 'c'];
+if (allStrings(data)) {
+    // TypeScript knows data is string[] here
+    console.log(data.join(''));
+}
+
+// Empty array
+const empty: number[] = [];
+const result2 = Arr.every(empty, (n) => n > 0); // true
+```
+
+#### Call Signature
+
+> **every**\<`E`, `S`\>(`predicate`): (`array`) => `array is readonly S[]`
+
+Defined in: [src/array/array-utils.mts:2844](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2844)
+
+Tests whether all elements in an array pass a test implemented by a predicate function.
+
+This function returns `true` if all elements satisfy the predicate, `false` otherwise.
+For empty arrays, it returns `true` (vacuous truth).
+Supports type guard predicates for type narrowing of the entire array.
+
+##### Type Parameters
+
+###### E
+
+`E`
+
+The type of elements in the array.
+
+###### S
+
+`S`
+
+The narrowed type when using type guard predicates.
+
+##### Parameters
+
+###### predicate
+
+(`a`, `index`) => `a is S`
+
+A function that tests each element.
+
+##### Returns
+
+`true` if all elements pass the test, `false` otherwise.
+
+> (`array`): `array is readonly S[]`
+
+###### Parameters
+
+###### array
+
+readonly `E`[]
+
+###### Returns
+
+`array is readonly S[]`
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [2, 4, 6, 8];
+const allEven = Arr.every(numbers, (n) => n % 2 === 0); // true
+
+// Type guard usage - narrows entire array type
+const mixed: (string | number)[] = ['hello', 'world'];
+if (Arr.every(mixed, (x): x is string => typeof x === 'string')) {
+    // TypeScript knows mixed is string[] here
+    console.log(mixed.map((s) => s.toUpperCase()));
+}
+
+// Curried usage with type guards
+const isString = (x: unknown): x is string => typeof x === 'string';
+const allStrings = Arr.every(isString);
+const data: unknown[] = ['a', 'b', 'c'];
+if (allStrings(data)) {
+    // TypeScript knows data is string[] here
+    console.log(data.join(''));
+}
+
+// Empty array
+const empty: number[] = [];
+const result2 = Arr.every(empty, (n) => n > 0); // true
+```
+
+#### Call Signature
+
+> **every**\<`Ar`\>(`array`, `predicate`): `boolean`
+
+Defined in: [src/array/array-utils.mts:2849](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2849)
+
+Tests whether all elements in an array pass a test implemented by a predicate function.
+
+This function returns `true` if all elements satisfy the predicate, `false` otherwise.
+For empty arrays, it returns `true` (vacuous truth).
+Supports type guard predicates for type narrowing of the entire array.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+The exact type of the input array.
+
+##### Parameters
+
+###### array
+
+`Ar`
+
+The array to test.
+
+###### predicate
+
+(`a`, `index`) => `boolean`
+
+A function that tests each element.
+
+##### Returns
+
+`boolean`
+
+`true` if all elements pass the test, `false` otherwise.
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [2, 4, 6, 8];
+const allEven = Arr.every(numbers, (n) => n % 2 === 0); // true
+
+// Type guard usage - narrows entire array type
+const mixed: (string | number)[] = ['hello', 'world'];
+if (Arr.every(mixed, (x): x is string => typeof x === 'string')) {
+    // TypeScript knows mixed is string[] here
+    console.log(mixed.map((s) => s.toUpperCase()));
+}
+
+// Curried usage with type guards
+const isString = (x: unknown): x is string => typeof x === 'string';
+const allStrings = Arr.every(isString);
+const data: unknown[] = ['a', 'b', 'c'];
+if (allStrings(data)) {
+    // TypeScript knows data is string[] here
+    console.log(data.join(''));
+}
+
+// Empty array
+const empty: number[] = [];
+const result2 = Arr.every(empty, (n) => n > 0); // true
+```
+
+#### Call Signature
+
+> **every**\<`E`\>(`predicate`): (`array`) => `boolean`
+
+Defined in: [src/array/array-utils.mts:2854](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2854)
+
+Tests whether all elements in an array pass a test implemented by a predicate function.
+
+This function returns `true` if all elements satisfy the predicate, `false` otherwise.
+For empty arrays, it returns `true` (vacuous truth).
+Supports type guard predicates for type narrowing of the entire array.
 
 ##### Type Parameters
 
@@ -2713,9 +2093,388 @@ The type of elements in the array.
 
 ##### Parameters
 
+###### predicate
+
+(`a`, `index`) => `boolean`
+
+A function that tests each element.
+
+##### Returns
+
+`true` if all elements pass the test, `false` otherwise.
+
+> (`array`): `boolean`
+
+###### Parameters
+
 ###### array
 
 readonly `E`[]
+
+###### Returns
+
+`boolean`
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [2, 4, 6, 8];
+const allEven = Arr.every(numbers, (n) => n % 2 === 0); // true
+
+// Type guard usage - narrows entire array type
+const mixed: (string | number)[] = ['hello', 'world'];
+if (Arr.every(mixed, (x): x is string => typeof x === 'string')) {
+    // TypeScript knows mixed is string[] here
+    console.log(mixed.map((s) => s.toUpperCase()));
+}
+
+// Curried usage with type guards
+const isString = (x: unknown): x is string => typeof x === 'string';
+const allStrings = Arr.every(isString);
+const data: unknown[] = ['a', 'b', 'c'];
+if (allStrings(data)) {
+    // TypeScript knows data is string[] here
+    console.log(data.join(''));
+}
+
+// Empty array
+const empty: number[] = [];
+const result2 = Arr.every(empty, (n) => n > 0); // true
+```
+
+---
+
+### filter()
+
+#### Call Signature
+
+> **filter**\<`Ar`, `S`\>(`array`, `predicate`): readonly `S`[]
+
+Defined in: [src/array/array-utils.mts:3604](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3604)
+
+Filters an array based on a predicate function.
+
+This function returns a new array containing only the elements that satisfy the predicate.
+It provides both direct usage and curried versions for functional composition.
+Supports type guard predicates for type narrowing.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+The exact type of the input array, used for precise return type inference.
+
+###### S
+
+`S` _extends_ `unknown`
+
+The narrowed type when using type guard predicates.
+
+##### Parameters
+
+###### array
+
+`Ar`
+
+The array to filter.
+
+###### predicate
+
+(`a`, `index`) => `a is S`
+
+A function that tests each element. Returns `true` to keep the element, `false` to filter it out.
+
+##### Returns
+
+readonly `S`[]
+
+A new array containing only the elements that satisfy the predicate.
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [1, 2, 3, 4, 5];
+const evens = Arr.filter(numbers, (n) => n % 2 === 0); // [2, 4]
+
+// Type guard usage
+const mixed: (string | number | null)[] = ['hello', 42, null, 'world'];
+const strings = Arr.filter(mixed, (x): x is string => typeof x === 'string'); // string[]
+const notNull = Arr.filter(mixed, (x): x is NonNullable<typeof x> => x != null); // (string | number)[]
+
+// Curried usage with type guards
+const isString = (x: unknown): x is string => typeof x === 'string';
+const filterStrings = Arr.filter(isString);
+const result = filterStrings(['a', 1, 'b', 2]); // string[]
+
+// Functional composition
+const processNumbers = pipe(
+    Arr.filter((n: number) => n > 0),
+    Arr.map((n) => n * 2),
+);
+```
+
+##### See
+
+- [filterNot](#filternot) for filtering with negated predicate
+- [every](#every) for testing if all elements satisfy a predicate
+- [some](#some) for testing if any elements satisfy a predicate
+- [find](#find) for finding the first element that satisfies a predicate
+
+#### Call Signature
+
+> **filter**\<`E`, `S`\>(`predicate`): (`array`) => readonly `S`[]
+
+Defined in: [src/array/array-utils.mts:3609](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3609)
+
+Filters an array based on a predicate function.
+
+This function returns a new array containing only the elements that satisfy the predicate.
+It provides both direct usage and curried versions for functional composition.
+Supports type guard predicates for type narrowing.
+
+##### Type Parameters
+
+###### E
+
+`E`
+
+The type of elements in the array.
+
+###### S
+
+`S`
+
+The narrowed type when using type guard predicates.
+
+##### Parameters
+
+###### predicate
+
+(`a`, `index`) => `a is S`
+
+A function that tests each element. Returns `true` to keep the element, `false` to filter it out.
+
+##### Returns
+
+A new array containing only the elements that satisfy the predicate.
+
+> (`array`): readonly `S`[]
+
+###### Parameters
+
+###### array
+
+readonly `E`[]
+
+###### Returns
+
+readonly `S`[]
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [1, 2, 3, 4, 5];
+const evens = Arr.filter(numbers, (n) => n % 2 === 0); // [2, 4]
+
+// Type guard usage
+const mixed: (string | number | null)[] = ['hello', 42, null, 'world'];
+const strings = Arr.filter(mixed, (x): x is string => typeof x === 'string'); // string[]
+const notNull = Arr.filter(mixed, (x): x is NonNullable<typeof x> => x != null); // (string | number)[]
+
+// Curried usage with type guards
+const isString = (x: unknown): x is string => typeof x === 'string';
+const filterStrings = Arr.filter(isString);
+const result = filterStrings(['a', 1, 'b', 2]); // string[]
+
+// Functional composition
+const processNumbers = pipe(
+    Arr.filter((n: number) => n > 0),
+    Arr.map((n) => n * 2),
+);
+```
+
+##### See
+
+- [filterNot](#filternot) for filtering with negated predicate
+- [every](#every) for testing if all elements satisfy a predicate
+- [some](#some) for testing if any elements satisfy a predicate
+- [find](#find) for finding the first element that satisfies a predicate
+
+#### Call Signature
+
+> **filter**\<`Ar`\>(`array`, `predicate`): readonly `Ar`\[`number`\][]
+
+Defined in: [src/array/array-utils.mts:3614](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3614)
+
+Filters an array based on a predicate function.
+
+This function returns a new array containing only the elements that satisfy the predicate.
+It provides both direct usage and curried versions for functional composition.
+Supports type guard predicates for type narrowing.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+The exact type of the input array, used for precise return type inference.
+
+##### Parameters
+
+###### array
+
+`Ar`
+
+The array to filter.
+
+###### predicate
+
+(`a`, `index`) => `boolean`
+
+A function that tests each element. Returns `true` to keep the element, `false` to filter it out.
+
+##### Returns
+
+readonly `Ar`\[`number`\][]
+
+A new array containing only the elements that satisfy the predicate.
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [1, 2, 3, 4, 5];
+const evens = Arr.filter(numbers, (n) => n % 2 === 0); // [2, 4]
+
+// Type guard usage
+const mixed: (string | number | null)[] = ['hello', 42, null, 'world'];
+const strings = Arr.filter(mixed, (x): x is string => typeof x === 'string'); // string[]
+const notNull = Arr.filter(mixed, (x): x is NonNullable<typeof x> => x != null); // (string | number)[]
+
+// Curried usage with type guards
+const isString = (x: unknown): x is string => typeof x === 'string';
+const filterStrings = Arr.filter(isString);
+const result = filterStrings(['a', 1, 'b', 2]); // string[]
+
+// Functional composition
+const processNumbers = pipe(
+    Arr.filter((n: number) => n > 0),
+    Arr.map((n) => n * 2),
+);
+```
+
+##### See
+
+- [filterNot](#filternot) for filtering with negated predicate
+- [every](#every) for testing if all elements satisfy a predicate
+- [some](#some) for testing if any elements satisfy a predicate
+- [find](#find) for finding the first element that satisfies a predicate
+
+#### Call Signature
+
+> **filter**\<`E`\>(`predicate`): (`array`) => readonly `E`[]
+
+Defined in: [src/array/array-utils.mts:3619](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3619)
+
+Filters an array based on a predicate function.
+
+This function returns a new array containing only the elements that satisfy the predicate.
+It provides both direct usage and curried versions for functional composition.
+Supports type guard predicates for type narrowing.
+
+##### Type Parameters
+
+###### E
+
+`E`
+
+The type of elements in the array.
+
+##### Parameters
+
+###### predicate
+
+(`a`, `index`) => `boolean`
+
+A function that tests each element. Returns `true` to keep the element, `false` to filter it out.
+
+##### Returns
+
+A new array containing only the elements that satisfy the predicate.
+
+> (`array`): readonly `E`[]
+
+###### Parameters
+
+###### array
+
+readonly `E`[]
+
+###### Returns
+
+readonly `E`[]
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [1, 2, 3, 4, 5];
+const evens = Arr.filter(numbers, (n) => n % 2 === 0); // [2, 4]
+
+// Type guard usage
+const mixed: (string | number | null)[] = ['hello', 42, null, 'world'];
+const strings = Arr.filter(mixed, (x): x is string => typeof x === 'string'); // string[]
+const notNull = Arr.filter(mixed, (x): x is NonNullable<typeof x> => x != null); // (string | number)[]
+
+// Curried usage with type guards
+const isString = (x: unknown): x is string => typeof x === 'string';
+const filterStrings = Arr.filter(isString);
+const result = filterStrings(['a', 1, 'b', 2]); // string[]
+
+// Functional composition
+const processNumbers = pipe(
+    Arr.filter((n: number) => n > 0),
+    Arr.map((n) => n * 2),
+);
+```
+
+##### See
+
+- [filterNot](#filternot) for filtering with negated predicate
+- [every](#every) for testing if all elements satisfy a predicate
+- [some](#some) for testing if any elements satisfy a predicate
+- [find](#find) for finding the first element that satisfies a predicate
+
+---
+
+### filterNot()
+
+#### Call Signature
+
+> **filterNot**\<`Ar`\>(`array`, `predicate`): readonly `Ar`\[`number`\][]
+
+Defined in: [src/array/array-utils.mts:3661](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3661)
+
+Filters an array by excluding elements for which the predicate returns true.
+This is the opposite of `Array.prototype.filter`.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+##### Parameters
+
+###### array
+
+`Ar`
 
 The input array.
 
@@ -2727,7 +2486,7 @@ A function `(a: A, index: number) => boolean` that returns `true` for elements t
 
 ##### Returns
 
-readonly `E`[]
+readonly `Ar`\[`number`\][]
 
 A new array with elements for which the predicate returned `false`.
 
@@ -2747,7 +2506,7 @@ console.log(result); // [1, 3, 5]
 
 > **filterNot**\<`E`\>(`predicate`): (`array`) => readonly `E`[]
 
-Defined in: [src/array/array-utils.mts:3045](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3045)
+Defined in: [src/array/array-utils.mts:3666](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3666)
 
 Filters an array by excluding elements for which the predicate returns true.
 This is the opposite of `Array.prototype.filter`.
@@ -2802,9 +2561,9 @@ console.log(result); // [1, 3, 5]
 
 #### Call Signature
 
-> **find**\<`E`\>(`array`, `predicate`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+> **find**\<`E`, `F`\>(`array`, `predicate`): [`Optional`](../../../functional/optional/README.md#optional)\<`F`\>
 
-Defined in: [src/array/array-utils.mts:2081](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2081)
+Defined in: [src/array/array-utils.mts:2186](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2186)
 
 Safely finds the first element in an array that satisfies a predicate function.
 
@@ -2823,11 +2582,86 @@ it returns a function that can be applied to arrays, making it ideal for functio
 
 The type of elements in the array.
 
+###### F
+
+`F`
+
 ##### Parameters
 
 ###### array
 
 readonly `E`[]
+
+The array to search through (when using direct call syntax).
+
+###### predicate
+
+(`value`, `index`, `arr`) => `value is F`
+
+A function that tests each element. Called with:
+
+- `value`: The current element being tested
+- `index`: The index of the current element (branded as `SizeType.Arr`)
+- `arr`: The entire array being searched
+
+##### Returns
+
+[`Optional`](../../../functional/optional/README.md#optional)\<`F`\>
+
+An `Optional<E>` containing:
+
+- `Optional.Some<E>` with the first matching element if found
+- `Optional.None` if no element satisfies the predicate
+
+##### Example
+
+```typescript
+const numbers = [1, 2, 3, 4, 5];
+const firstEven = Arr.find(numbers, (x) => x % 2 === 0);
+if (Optional.isSome(firstEven)) {
+    console.log(firstEven.value); // 2
+}
+
+const users = [
+    { id: 1, name: 'Alice', age: 25 },
+    { id: 2, name: 'Bob', age: 30 },
+];
+const adult = Arr.find(users, (user) => user.age >= 30);
+// Optional.Some({ id: 2, name: 'Bob', age: 30 })
+```
+
+##### See
+
+- [findIndex](#findindex) for finding the index instead of the element
+- [indexOf](#indexof) for finding elements by equality
+- [Optional](../../../functional/optional/README.md#optional) for working with the returned Optional values
+
+#### Call Signature
+
+> **find**\<`Ar`\>(`array`, `predicate`): [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
+
+Defined in: [src/array/array-utils.mts:2191](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2191)
+
+Safely finds the first element in an array that satisfies a predicate function.
+
+This function provides type-safe searching with no risk of runtime errors. It returns
+the first element that matches the predicate wrapped in an Optional, or Optional.None
+if no element is found. The predicate receives the element, its index, and the entire array.
+
+**Curried Usage:** This function supports currying - when called with only a predicate,
+it returns a function that can be applied to arrays, making it ideal for functional composition.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+##### Parameters
+
+###### array
+
+`Ar`
 
 The array to search through (when using direct call syntax).
 
@@ -2843,7 +2677,7 @@ A function that tests each element. Called with:
 
 ##### Returns
 
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+[`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 An `Optional<E>` containing:
 
@@ -2877,7 +2711,7 @@ const adult = Arr.find(users, (user) => user.age >= 30);
 
 > **find**\<`E`\>(`predicate`): (`array`) => [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
 
-Defined in: [src/array/array-utils.mts:2086](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2086)
+Defined in: [src/array/array-utils.mts:2196](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2196)
 
 Safely finds the first element in an array that satisfies a predicate function.
 
@@ -2956,9 +2790,9 @@ const adult = Arr.find(users, (user) => user.age >= 30);
 
 #### Call Signature
 
-> **findIndex**\<`E`\>(`array`, `predicate`): `-1` \| `Uint32`
+> **findIndex**\<`Ar`\>(`array`, `predicate`): `-1` \| `ArrayIndex`\<`Ar`\>
 
-Defined in: [src/array/array-utils.mts:2233](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2233)
+Defined in: [src/array/array-utils.mts:2454](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2454)
 
 Safely finds the index of the first element in an array that satisfies a predicate function.
 
@@ -2971,23 +2805,21 @@ it returns a function that can be applied to arrays, making it ideal for functio
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The array to search through (when using direct call syntax).
 
 ###### predicate
 
-(`value`, `index`) => `boolean`
+(`value`, `index`, `arr`) => `boolean`
 
 A function that tests each element. Called with:
 
@@ -2996,7 +2828,7 @@ A function that tests each element. Called with:
 
 ##### Returns
 
-`-1` \| `Uint32`
+`-1` \| `ArrayIndex`\<`Ar`\>
 
 An `Optional<SizeType.Arr>` containing:
 
@@ -3102,7 +2934,7 @@ expectType<
 
 > **findIndex**\<`E`\>(`predicate`): (`array`) => `-1` \| `Uint32`
 
-Defined in: [src/array/array-utils.mts:2238](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2238)
+Defined in: [src/array/array-utils.mts:2459](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2459)
 
 Safely finds the index of the first element in an array that satisfies a predicate function.
 
@@ -3125,7 +2957,7 @@ The type of elements in the array.
 
 ###### predicate
 
-(`value`, `index`) => `boolean`
+(`value`, `index`, `arr`) => `boolean`
 
 A function that tests each element. Called with:
 
@@ -3248,16 +3080,18 @@ expectType<
 
 ---
 
-### foldl()
+### findLast()
 
 #### Call Signature
 
-> **foldl**\<`E`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`
+> **findLast**\<`E`, `F`\>(`array`, `predicate`): [`Optional`](../../../functional/optional/README.md#optional)\<`F`\>
 
-Defined in: [src/array/array-utils.mts:2451](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2451)
+Defined in: [src/array/array-utils.mts:2281](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2281)
 
-Applies a function against an accumulator and each element in the array (from left to right) to reduce it to a single value.
-This is an alias for `Array.prototype.reduce`.
+Returns the last element in an array that satisfies a predicate function.
+
+This function searches from the end of the array and returns an Optional containing
+the first element found that satisfies the predicate, or None if no such element exists.
 
 ##### Type Parameters
 
@@ -3267,6 +3101,715 @@ This is an alias for `Array.prototype.reduce`.
 
 The type of elements in the array.
 
+###### F
+
+`F`
+
+##### Parameters
+
+###### array
+
+readonly `E`[]
+
+The array to search.
+
+###### predicate
+
+(`value`, `index`, `arr`) => `value is F`
+
+A function that tests each element.
+
+##### Returns
+
+[`Optional`](../../../functional/optional/README.md#optional)\<`F`\>
+
+An Optional containing the found element, or None if no element satisfies the predicate.
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [1, 2, 3, 4, 5];
+const lastEven = Arr.findLast(numbers, (n) => n % 2 === 0); // Optional.some(4)
+
+// Curried usage
+const isPositive = (n: number) => n > 0;
+const findLastPositive = Arr.findLast(isPositive);
+const result = findLastPositive([-1, 2, -3, 4]); // Optional.some(4)
+
+// No match
+const noMatch = Arr.findLast([1, 3, 5], (n) => n % 2 === 0); // Optional.none
+```
+
+#### Call Signature
+
+> **findLast**\<`Ar`\>(`array`, `predicate`): [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
+
+Defined in: [src/array/array-utils.mts:2286](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2286)
+
+Returns the last element in an array that satisfies a predicate function.
+
+This function searches from the end of the array and returns an Optional containing
+the first element found that satisfies the predicate, or None if no such element exists.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+The exact type of the input array.
+
+##### Parameters
+
+###### array
+
+`Ar`
+
+The array to search.
+
+###### predicate
+
+(`value`, `index`, `arr`) => `boolean`
+
+A function that tests each element.
+
+##### Returns
+
+[`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
+
+An Optional containing the found element, or None if no element satisfies the predicate.
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [1, 2, 3, 4, 5];
+const lastEven = Arr.findLast(numbers, (n) => n % 2 === 0); // Optional.some(4)
+
+// Curried usage
+const isPositive = (n: number) => n > 0;
+const findLastPositive = Arr.findLast(isPositive);
+const result = findLastPositive([-1, 2, -3, 4]); // Optional.some(4)
+
+// No match
+const noMatch = Arr.findLast([1, 3, 5], (n) => n % 2 === 0); // Optional.none
+```
+
+#### Call Signature
+
+> **findLast**\<`E`\>(`predicate`): (`array`) => [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+
+Defined in: [src/array/array-utils.mts:2291](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2291)
+
+Returns the last element in an array that satisfies a predicate function.
+
+This function searches from the end of the array and returns an Optional containing
+the first element found that satisfies the predicate, or None if no such element exists.
+
+##### Type Parameters
+
+###### E
+
+`E`
+
+The type of elements in the array.
+
+##### Parameters
+
+###### predicate
+
+(`value`, `index`, `arr`) => `boolean`
+
+A function that tests each element.
+
+##### Returns
+
+An Optional containing the found element, or None if no element satisfies the predicate.
+
+> (`array`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+
+###### Parameters
+
+###### array
+
+readonly `E`[]
+
+###### Returns
+
+[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [1, 2, 3, 4, 5];
+const lastEven = Arr.findLast(numbers, (n) => n % 2 === 0); // Optional.some(4)
+
+// Curried usage
+const isPositive = (n: number) => n > 0;
+const findLastPositive = Arr.findLast(isPositive);
+const result = findLastPositive([-1, 2, -3, 4]); // Optional.some(4)
+
+// No match
+const noMatch = Arr.findLast([1, 3, 5], (n) => n % 2 === 0); // Optional.none
+```
+
+---
+
+### findLastIndex()
+
+#### Call Signature
+
+> **findLastIndex**\<`Ar`\>(`array`, `predicate`): `-1` \| `ArrayIndex`\<`Ar`\>
+
+Defined in: [src/array/array-utils.mts:2588](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2588)
+
+Safely finds the index of the last element in an array that satisfies a predicate function.
+
+This function provides type-safe index searching with no risk of runtime errors. It searches
+from the end of the array backwards and returns the index of the last element that matches
+the predicate, or -1 if no element is found. The returned index is branded as `SizeType.Arr`
+for type safety.
+
+**Curried Usage:** This function supports currying - when called with only a predicate,
+it returns a function that can be applied to arrays, making it ideal for functional composition.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+The exact type of the input array, used for precise return type inference.
+
+##### Parameters
+
+###### array
+
+`Ar`
+
+The array to search through (when using direct call syntax).
+
+###### predicate
+
+(`value`, `index`, `arr`) => `boolean`
+
+A function that tests each element. Called with:
+
+- `value`: The current element being tested
+- `index`: The index of the current element (branded as `SizeType.Arr`)
+- `arr`: The array being searched
+
+##### Returns
+
+`-1` \| `ArrayIndex`\<`Ar`\>
+
+The index of the last matching element as `SizeType.Arr`, or -1 if no element satisfies the predicate.
+
+##### Example
+
+```typescript
+// Basic last index finding
+const fruits = ['apple', 'banana', 'cherry', 'banana'];
+const lastBananaIndex = Arr.findLastIndex(
+    fruits,
+    (fruit) => fruit === 'banana',
+);
+console.log(lastBananaIndex); // 3 - index of last 'banana'
+
+// Finding with complex conditions
+const numbers = [1, 5, 10, 15, 20, 10, 5];
+const lastLargeIndex = Arr.findLastIndex(
+    numbers,
+    (value, index) => value > 8 && index < 5,
+);
+console.log(lastLargeIndex); // 3 - index of last value > 8 before index 5 (15)
+
+// Finding objects by property
+const users = [
+    { id: 1, active: true },
+    { id: 2, active: false },
+    { id: 3, active: true },
+    { id: 4, active: false },
+];
+
+const lastActiveIndex = Arr.findLastIndex(users, (user) => user.active);
+console.log(lastActiveIndex); // 2 - index of last active user
+
+const lastInactiveIndex = Arr.findLastIndex(users, (user) => !user.active);
+console.log(lastInactiveIndex); // 3 - index of last inactive user
+
+// Empty array handling
+const emptyResult = Arr.findLastIndex([], (x: number) => x > 0); // -1
+
+// Curried usage for functional composition
+const findLastNegativeIndex = Arr.findLastIndex((x: number) => x < 0);
+const findLastLongStringIndex = Arr.findLastIndex((s: string) => s.length > 5);
+
+const datasets = [
+    [1, 2, -3, 4, -5], // last negative at index 4
+    [5, 6, 7, 8], // no negative
+    [-1, 0, 1, -2], // last negative at index 3
+];
+
+const lastNegativeIndices = datasets.map(findLastNegativeIndex);
+// [4, -1, 3]
+
+// Functional composition
+const data = [
+    'short',
+    'medium',
+    'very long string',
+    'tiny',
+    'another long one',
+];
+const lastLongIndex = Arr.findLastIndex(data, (s) => s.length > 8);
+console.log(lastLongIndex); // 4 - index of 'another long one'
+
+// Using with pipe
+const result = pipe(['a', 'bb', 'ccc', 'bb']).map(
+    Arr.findLastIndex((s: string) => s.length === 2),
+).value; // 3 (last occurrence of 'bb')
+
+// Comparing with findIndex
+const values = [1, 2, 3, 2, 4];
+const firstTwo = Arr.findIndex(values, (x) => x === 2); // 1
+const lastTwo = Arr.findLastIndex(values, (x) => x === 2); // 3
+
+// Type safety with tuples
+const tuple = [10, 20, 30, 20] as const;
+const lastTwentyIndex = Arr.findLastIndex(tuple, (x) => x === 20);
+// Type: ArrayIndex<readonly [10, 20, 30, 20]> | -1
+// Value: 3
+```
+
+##### See
+
+- [findLast](#findlast) for finding the element instead of its index
+- [findIndex](#findindex) for finding the first occurrence
+- [lastIndexOf](#lastindexof) for finding elements by equality (not predicate)
+
+#### Call Signature
+
+> **findLastIndex**\<`E`\>(`predicate`): (`array`) => `-1` \| `Uint32`
+
+Defined in: [src/array/array-utils.mts:2593](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2593)
+
+Safely finds the index of the last element in an array that satisfies a predicate function.
+
+This function provides type-safe index searching with no risk of runtime errors. It searches
+from the end of the array backwards and returns the index of the last element that matches
+the predicate, or -1 if no element is found. The returned index is branded as `SizeType.Arr`
+for type safety.
+
+**Curried Usage:** This function supports currying - when called with only a predicate,
+it returns a function that can be applied to arrays, making it ideal for functional composition.
+
+##### Type Parameters
+
+###### E
+
+`E`
+
+The type of elements in the array.
+
+##### Parameters
+
+###### predicate
+
+(`value`, `index`, `arr`) => `boolean`
+
+A function that tests each element. Called with:
+
+- `value`: The current element being tested
+- `index`: The index of the current element (branded as `SizeType.Arr`)
+- `arr`: The array being searched
+
+##### Returns
+
+The index of the last matching element as `SizeType.Arr`, or -1 if no element satisfies the predicate.
+
+> (`array`): `-1` \| `Uint32`
+
+###### Parameters
+
+###### array
+
+readonly `E`[]
+
+###### Returns
+
+`-1` \| `Uint32`
+
+##### Example
+
+```typescript
+// Basic last index finding
+const fruits = ['apple', 'banana', 'cherry', 'banana'];
+const lastBananaIndex = Arr.findLastIndex(
+    fruits,
+    (fruit) => fruit === 'banana',
+);
+console.log(lastBananaIndex); // 3 - index of last 'banana'
+
+// Finding with complex conditions
+const numbers = [1, 5, 10, 15, 20, 10, 5];
+const lastLargeIndex = Arr.findLastIndex(
+    numbers,
+    (value, index) => value > 8 && index < 5,
+);
+console.log(lastLargeIndex); // 3 - index of last value > 8 before index 5 (15)
+
+// Finding objects by property
+const users = [
+    { id: 1, active: true },
+    { id: 2, active: false },
+    { id: 3, active: true },
+    { id: 4, active: false },
+];
+
+const lastActiveIndex = Arr.findLastIndex(users, (user) => user.active);
+console.log(lastActiveIndex); // 2 - index of last active user
+
+const lastInactiveIndex = Arr.findLastIndex(users, (user) => !user.active);
+console.log(lastInactiveIndex); // 3 - index of last inactive user
+
+// Empty array handling
+const emptyResult = Arr.findLastIndex([], (x: number) => x > 0); // -1
+
+// Curried usage for functional composition
+const findLastNegativeIndex = Arr.findLastIndex((x: number) => x < 0);
+const findLastLongStringIndex = Arr.findLastIndex((s: string) => s.length > 5);
+
+const datasets = [
+    [1, 2, -3, 4, -5], // last negative at index 4
+    [5, 6, 7, 8], // no negative
+    [-1, 0, 1, -2], // last negative at index 3
+];
+
+const lastNegativeIndices = datasets.map(findLastNegativeIndex);
+// [4, -1, 3]
+
+// Functional composition
+const data = [
+    'short',
+    'medium',
+    'very long string',
+    'tiny',
+    'another long one',
+];
+const lastLongIndex = Arr.findLastIndex(data, (s) => s.length > 8);
+console.log(lastLongIndex); // 4 - index of 'another long one'
+
+// Using with pipe
+const result = pipe(['a', 'bb', 'ccc', 'bb']).map(
+    Arr.findLastIndex((s: string) => s.length === 2),
+).value; // 3 (last occurrence of 'bb')
+
+// Comparing with findIndex
+const values = [1, 2, 3, 2, 4];
+const firstTwo = Arr.findIndex(values, (x) => x === 2); // 1
+const lastTwo = Arr.findLastIndex(values, (x) => x === 2); // 3
+
+// Type safety with tuples
+const tuple = [10, 20, 30, 20] as const;
+const lastTwentyIndex = Arr.findLastIndex(tuple, (x) => x === 20);
+// Type: ArrayIndex<readonly [10, 20, 30, 20]> | -1
+// Value: 3
+```
+
+##### See
+
+- [findLast](#findlast) for finding the element instead of its index
+- [findIndex](#findindex) for finding the first occurrence
+- [lastIndexOf](#lastindexof) for finding elements by equality (not predicate)
+
+---
+
+### flat()
+
+#### Call Signature
+
+> **flat**\<`Ar`, `D`\>(`array`, `depth?`): readonly `FlatArray`\<`Ar`, `D`\>[]
+
+Defined in: [src/array/array-utils.mts:3718](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3718)
+
+Creates a new array with all sub-array elements concatenated into it recursively up to the specified depth.
+
+This function flattens nested arrays to the specified depth level.
+A depth of 1 flattens one level, Number.POSITIVE_INFINITY flattens all levels.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+The exact type of the input array.
+
+###### D
+
+`D` _extends_ `SafeUintWithSmallInt` = `1`
+
+The depth of flattening.
+
+##### Parameters
+
+###### array
+
+`Ar`
+
+The array to flatten.
+
+###### depth?
+
+`D`
+
+The depth level specifying how deep a nested array structure should be flattened.
+
+##### Returns
+
+readonly `FlatArray`\<`Ar`, `D`\>[]
+
+A new array with the sub-array elements concatenated.
+
+##### Example
+
+```typescript
+// Direct usage
+const nested = [1, [2, [3, 4]], 5];
+const flat1 = Arr.flat(nested, 1); // [1, 2, [3, 4], 5]
+const flat2 = Arr.flat(nested, 2); // [1, 2, 3, 4, 5]
+
+// Curried usage
+const flattenOnceLevel = Arr.flat(1);
+const result = flattenOnceLevel([
+    [1, 2],
+    [3, 4],
+]); // [1, 2, 3, 4]
+
+// Flatten all levels
+const deepNested = [1, [2, [3, [4, 5]]]];
+const allFlat = Arr.flat(deepNested, SafeUint.MAX_VALUE); // [1, 2, 3, 4, 5]
+```
+
+#### Call Signature
+
+> **flat**\<`D`\>(`depth?`): \<`Ar`\>(`array`) => readonly `FlatArray`\<`Ar`, `D`\>[]
+
+Defined in: [src/array/array-utils.mts:3723](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3723)
+
+Creates a new array with all sub-array elements concatenated into it recursively up to the specified depth.
+
+This function flattens nested arrays to the specified depth level.
+A depth of 1 flattens one level, Number.POSITIVE_INFINITY flattens all levels.
+
+##### Type Parameters
+
+###### D
+
+`D` _extends_ `SafeUintWithSmallInt` = `1`
+
+The depth of flattening.
+
+##### Parameters
+
+###### depth?
+
+`number`
+
+The depth level specifying how deep a nested array structure should be flattened.
+
+##### Returns
+
+A new array with the sub-array elements concatenated.
+
+> \<`Ar`\>(`array`): readonly `FlatArray`\<`Ar`, `D`\>[]
+
+###### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+###### Parameters
+
+###### array
+
+`Ar`
+
+###### Returns
+
+readonly `FlatArray`\<`Ar`, `D`\>[]
+
+##### Example
+
+```typescript
+// Direct usage
+const nested = [1, [2, [3, 4]], 5];
+const flat1 = Arr.flat(nested, 1); // [1, 2, [3, 4], 5]
+const flat2 = Arr.flat(nested, 2); // [1, 2, 3, 4, 5]
+
+// Curried usage
+const flattenOnceLevel = Arr.flat(1);
+const result = flattenOnceLevel([
+    [1, 2],
+    [3, 4],
+]); // [1, 2, 3, 4]
+
+// Flatten all levels
+const deepNested = [1, [2, [3, [4, 5]]]];
+const allFlat = Arr.flat(deepNested, SafeUint.MAX_VALUE); // [1, 2, 3, 4, 5]
+```
+
+---
+
+### flatMap()
+
+#### Call Signature
+
+> **flatMap**\<`Ar`, `B`\>(`array`, `mapFn`): readonly `B`[]
+
+Defined in: [src/array/array-utils.mts:3781](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3781)
+
+Creates a new array with all sub-array elements concatenated into it recursively up to the specified depth,
+after first mapping each element using a mapping function.
+
+This function is equivalent to calling `map` followed by `flat` with depth 1.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+The exact type of the input array.
+
+###### B
+
+`B`
+
+The type of elements returned by the mapping function.
+
+##### Parameters
+
+###### array
+
+`Ar`
+
+The array to map and flatten.
+
+###### mapFn
+
+(`a`, `index`) => readonly `B`[]
+
+A function that produces new elements for the new array.
+
+##### Returns
+
+readonly `B`[]
+
+A new array with mapped elements flattened.
+
+##### Example
+
+```typescript
+// Direct usage
+const words = ['hello', 'world'];
+const chars = Arr.flatMap(words, (word) => word.split('')); // ['h','e','l','l','o','w','o','r','l','d']
+
+// Curried usage
+const splitWords = Arr.flatMap((word: string) => word.split(''));
+const result = splitWords(['foo', 'bar']); // ['f','o','o','b','a','r']
+
+// With numbers
+const numbers = [1, 2, 3];
+const doubled = Arr.flatMap(numbers, (n) => [n, n * 2]); // [1, 2, 2, 4, 3, 6]
+```
+
+#### Call Signature
+
+> **flatMap**\<`A`, `B`\>(`mapFn`): (`array`) => readonly `B`[]
+
+Defined in: [src/array/array-utils.mts:3786](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3786)
+
+Creates a new array with all sub-array elements concatenated into it recursively up to the specified depth,
+after first mapping each element using a mapping function.
+
+This function is equivalent to calling `map` followed by `flat` with depth 1.
+
+##### Type Parameters
+
+###### A
+
+`A`
+
+###### B
+
+`B`
+
+The type of elements returned by the mapping function.
+
+##### Parameters
+
+###### mapFn
+
+(`a`, `index`) => readonly `B`[]
+
+A function that produces new elements for the new array.
+
+##### Returns
+
+A new array with mapped elements flattened.
+
+> (`array`): readonly `B`[]
+
+###### Parameters
+
+###### array
+
+readonly `A`[]
+
+###### Returns
+
+readonly `B`[]
+
+##### Example
+
+```typescript
+// Direct usage
+const words = ['hello', 'world'];
+const chars = Arr.flatMap(words, (word) => word.split('')); // ['h','e','l','l','o','w','o','r','l','d']
+
+// Curried usage
+const splitWords = Arr.flatMap((word: string) => word.split(''));
+const result = splitWords(['foo', 'bar']); // ['f','o','o','b','a','r']
+
+// With numbers
+const numbers = [1, 2, 3];
+const doubled = Arr.flatMap(numbers, (n) => [n, n * 2]); // [1, 2, 2, 4, 3, 6]
+```
+
+---
+
+### foldl()
+
+#### Call Signature
+
+> **foldl**\<`Ar`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`
+
+Defined in: [src/array/array-utils.mts:2952](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2952)
+
+Applies a function against an accumulator and each element in the array (from left to right) to reduce it to a single value.
+This is an alias for `Array.prototype.reduce`.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
 ###### P
 
 `P`
@@ -3275,7 +3818,7 @@ The type of elements in the array.
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array.
 
@@ -3308,7 +3851,7 @@ Arr.foldl(['a', 'b', 'c'], (acc, str) => acc + str.toUpperCase(), ''); // 'ABC'
 
 > **foldl**\<`E`, `P`\>(`callbackfn`, `initialValue`): (`array`) => `P`
 
-Defined in: [src/array/array-utils.mts:2461](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2461)
+Defined in: [src/array/array-utils.mts:2962](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2962)
 
 Applies a function against an accumulator and each element in the array (from left to right) to reduce it to a single value.
 This is an alias for `Array.prototype.reduce`.
@@ -3368,20 +3911,18 @@ Arr.foldl(['a', 'b', 'c'], (acc, str) => acc + str.toUpperCase(), ''); // 'ABC'
 
 #### Call Signature
 
-> **foldr**\<`E`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`
+> **foldr**\<`Ar`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`
 
-Defined in: [src/array/array-utils.mts:2525](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2525)
+Defined in: [src/array/array-utils.mts:3026](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3026)
 
 Applies a function against an accumulator and each element in the array (from right to left) to reduce it to a single value.
 This is an alias for `Array.prototype.reduceRight`.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ###### P
 
@@ -3391,7 +3932,7 @@ The type of elements in the array.
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array.
 
@@ -3429,7 +3970,7 @@ console.log(result); // "abc"
 
 > **foldr**\<`E`, `P`\>(`callbackfn`, `initialValue`): (`array`) => `P`
 
-Defined in: [src/array/array-utils.mts:2535](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2535)
+Defined in: [src/array/array-utils.mts:3036](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3036)
 
 Applies a function against an accumulator and each element in the array (from right to left) to reduce it to a single value.
 This is an alias for `Array.prototype.reduceRight`.
@@ -3494,7 +4035,7 @@ console.log(result); // "abc"
 
 > **generate**\<`T`\>(`generatorFn`): readonly `T`[]
 
-Defined in: [src/array/array-utils.mts:617](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L617)
+Defined in: [src/array/array-utils.mts:568](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L568)
 
 Creates an array from a generator function.
 
@@ -3551,9 +4092,9 @@ const nums2 = Arr.generate<number>(function* () {
 
 #### Call Signature
 
-> **groupBy**\<`E`, `G`\>(`array`, `grouper`): [`IMap`](../../../collections/imap/README.md#imap)\<`G`, readonly `E`[]\>
+> **groupBy**\<`Ar`, `G`\>(`array`, `grouper`): [`IMap`](../../../collections/imap/README.md#imap)\<`G`, readonly `Ar`\[`number`\][]\>
 
-Defined in: [src/array/array-utils.mts:3545](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3545)
+Defined in: [src/array/array-utils.mts:4374](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4374)
 
 Groups elements of an array by a key derived from each element, returning an immutable [IMap](../../../collections/imap/README.md#imap).
 
@@ -3577,11 +4118,9 @@ function, returns a reusable function that can be applied to arrays.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the input array.
+`Ar` _extends_ readonly `unknown`[]
 
 ###### G
 
@@ -3594,7 +4133,7 @@ Must be one of: `string | number | boolean | symbol | null | undefined`
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array to group. Can be empty (returns empty [IMap](../../../collections/imap/README.md#imap)).
 
@@ -3610,7 +4149,7 @@ A function `(value: E, index: SizeType.Arr) => G` that computes the group key fo
 
 ##### Returns
 
-[`IMap`](../../../collections/imap/README.md#imap)\<`G`, readonly `E`[]\>
+[`IMap`](../../../collections/imap/README.md#imap)\<`G`, readonly `Ar`\[`number`\][]\>
 
 An [IMap](../../../collections/imap/README.md#imap)<G, readonly E[]> where:
 
@@ -3763,7 +4302,7 @@ expectType<typeof emptyGroup, IMap<never, readonly never[]>>('=');
 
 > **groupBy**\<`E`, `G`\>(`grouper`): (`array`) => [`IMap`](../../../collections/imap/README.md#imap)\<`G`, readonly `E`[]\>
 
-Defined in: [src/array/array-utils.mts:3550](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3550)
+Defined in: [src/array/array-utils.mts:4382](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4382)
 
 Groups elements of an array by a key derived from each element, returning an immutable [IMap](../../../collections/imap/README.md#imap).
 
@@ -3977,11 +4516,9 @@ expectType<typeof emptyGroup, IMap<never, readonly never[]>>('=');
 
 ### head()
 
-#### Call Signature
+> **head**\<`Ar`\>(`array`): `Ar` _extends_ readonly \[\] ? `Readonly`\<\{ \}\> : `Ar` _extends_ readonly \[`E`, `unknown`\] ? `Readonly`\<\{ `value`: `E`; \}\> : `Ar` _extends_ readonly \[`E`, `E`\] ? `Readonly`\<\{ `value`: `E`; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
-> **head**(`array`): [`None`](../../../functional/optional/namespaces/Optional.md#none)
-
-Defined in: [src/array/array-utils.mts:1050](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1050)
+Defined in: [src/array/array-utils.mts:1004](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1004)
 
 Returns the first element of an array wrapped in an Optional.
 
@@ -3995,24 +4532,30 @@ This function provides type-safe access to the first element with precise return
 The function leverages TypeScript's type system to provide the most precise return type
 based on the input array type, making it safer than direct indexing.
 
-##### Parameters
+#### Type Parameters
 
-###### array
+##### Ar
 
-readonly \[\]
+`Ar` _extends_ readonly `unknown`[]
+
+#### Parameters
+
+##### array
+
+`Ar`
 
 The array to get the first element from.
 
-##### Returns
+#### Returns
 
-[`None`](../../../functional/optional/namespaces/Optional.md#none)
+`Ar` _extends_ readonly \[\] ? `Readonly`\<\{ \}\> : `Ar` _extends_ readonly \[`E`, `unknown`\] ? `Readonly`\<\{ `value`: `E`; \}\> : `Ar` _extends_ readonly \[`E`, `E`\] ? `Readonly`\<\{ `value`: `E`; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 An Optional containing the first element:
 
 - `Optional.None` if the array is empty
 - `Optional.Some<E>` containing the first element if the array is non-empty
 
-##### Example
+#### Example
 
 ```typescript
 // Empty array - precise None type
@@ -4065,317 +4608,7 @@ expectType<typeof guaranteedResult, Optional.Some<number>>('=');
 expectType<typeof maybeResult, Optional<number>>('=');
 ```
 
-##### See
-
-- [last](#last) for getting the last element
-- [at](#at) for accessing elements at specific indices
-- [tail](#tail) for getting all elements except the first
-
-#### Call Signature
-
-> **head**\<`E`, `L`\>(`array`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:1052](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1052)
-
-Returns the first element of an array wrapped in an Optional.
-
-This function provides type-safe access to the first element with precise return types:
-
-- For empty arrays: returns `Optional.None`
-- For tuples with known first element: returns `Optional.Some<FirstElementType>`
-- For non-empty arrays: returns `Optional.Some<ElementType>`
-- For general arrays: returns `Optional<ElementType>`
-
-The function leverages TypeScript's type system to provide the most precise return type
-based on the input array type, making it safer than direct indexing.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-###### L
-
-`L` _extends_ readonly `unknown`[]
-
-##### Parameters
-
-###### array
-
-readonly \[`E`, `L`\]
-
-The array to get the first element from.
-
-##### Returns
-
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-An Optional containing the first element:
-
-- `Optional.None` if the array is empty
-- `Optional.Some<E>` containing the first element if the array is non-empty
-
-##### Example
-
-```typescript
-// Empty array - precise None type
-const emptyResult = Arr.head([]); // Optional.None
-console.log(Optional.isNone(emptyResult)); // true
-
-// Tuple with known structure - precise Some type
-const tupleResult = Arr.head(['first', 'second', 'third'] as const);
-// Type: Optional.Some<'first'>
-if (Optional.isSome(tupleResult)) {
-    console.log(tupleResult.value); // 'first' - TypeScript knows exact type
-}
-
-// Non-empty array - guaranteed Some type
-const nonEmpty: NonEmptyArray<number> = [10, 20, 30] as NonEmptyArray<number>;
-const guaranteedResult = Arr.head(nonEmpty); // Optional.Some<number>
-// No need to check - always Some for NonEmptyArray
-
-// General array - may be Some or None
-const generalArray: number[] = [1, 2, 3];
-const maybeResult = Arr.head(generalArray); // Optional<number>
-if (Optional.isSome(maybeResult)) {
-    console.log(`First element: ${maybeResult.value}`);
-} else {
-    console.log('Array is empty');
-}
-
-// Working with different types
-const strings = ['hello', 'world'];
-const firstString = Arr.head(strings); // Optional<string>
-
-const objects = [
-    { id: 1, name: 'Alice' },
-    { id: 2, name: 'Bob' },
-];
-const firstObject = Arr.head(objects); // Optional<{id: number, name: string}>
-
-// Functional composition
-const getFirstElements = (arrays: readonly number[][]) =>
-    arrays.map(Arr.head).filter(Optional.isSome);
-
-const nestedArrays = [[1, 2], [3, 4], [], [5]];
-const firstElements = getFirstElements(nestedArrays);
-// [Optional.Some(1), Optional.Some(3), Optional.Some(5)]
-
-// Type inference examples
-expectType<typeof emptyResult, Optional.None>('=');
-expectType<typeof tupleResult, Optional.Some<'first'>>('=');
-expectType<typeof guaranteedResult, Optional.Some<number>>('=');
-expectType<typeof maybeResult, Optional<number>>('=');
-```
-
-##### See
-
-- [last](#last) for getting the last element
-- [at](#at) for accessing elements at specific indices
-- [tail](#tail) for getting all elements except the first
-
-#### Call Signature
-
-> **head**\<`E`\>(`array`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:1056](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1056)
-
-Returns the first element of an array wrapped in an Optional.
-
-This function provides type-safe access to the first element with precise return types:
-
-- For empty arrays: returns `Optional.None`
-- For tuples with known first element: returns `Optional.Some<FirstElementType>`
-- For non-empty arrays: returns `Optional.Some<ElementType>`
-- For general arrays: returns `Optional<ElementType>`
-
-The function leverages TypeScript's type system to provide the most precise return type
-based on the input array type, making it safer than direct indexing.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-##### Parameters
-
-###### array
-
-readonly \[`E`, `E`\]
-
-The array to get the first element from.
-
-##### Returns
-
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-An Optional containing the first element:
-
-- `Optional.None` if the array is empty
-- `Optional.Some<E>` containing the first element if the array is non-empty
-
-##### Example
-
-```typescript
-// Empty array - precise None type
-const emptyResult = Arr.head([]); // Optional.None
-console.log(Optional.isNone(emptyResult)); // true
-
-// Tuple with known structure - precise Some type
-const tupleResult = Arr.head(['first', 'second', 'third'] as const);
-// Type: Optional.Some<'first'>
-if (Optional.isSome(tupleResult)) {
-    console.log(tupleResult.value); // 'first' - TypeScript knows exact type
-}
-
-// Non-empty array - guaranteed Some type
-const nonEmpty: NonEmptyArray<number> = [10, 20, 30] as NonEmptyArray<number>;
-const guaranteedResult = Arr.head(nonEmpty); // Optional.Some<number>
-// No need to check - always Some for NonEmptyArray
-
-// General array - may be Some or None
-const generalArray: number[] = [1, 2, 3];
-const maybeResult = Arr.head(generalArray); // Optional<number>
-if (Optional.isSome(maybeResult)) {
-    console.log(`First element: ${maybeResult.value}`);
-} else {
-    console.log('Array is empty');
-}
-
-// Working with different types
-const strings = ['hello', 'world'];
-const firstString = Arr.head(strings); // Optional<string>
-
-const objects = [
-    { id: 1, name: 'Alice' },
-    { id: 2, name: 'Bob' },
-];
-const firstObject = Arr.head(objects); // Optional<{id: number, name: string}>
-
-// Functional composition
-const getFirstElements = (arrays: readonly number[][]) =>
-    arrays.map(Arr.head).filter(Optional.isSome);
-
-const nestedArrays = [[1, 2], [3, 4], [], [5]];
-const firstElements = getFirstElements(nestedArrays);
-// [Optional.Some(1), Optional.Some(3), Optional.Some(5)]
-
-// Type inference examples
-expectType<typeof emptyResult, Optional.None>('=');
-expectType<typeof tupleResult, Optional.Some<'first'>>('=');
-expectType<typeof guaranteedResult, Optional.Some<number>>('=');
-expectType<typeof maybeResult, Optional<number>>('=');
-```
-
-##### See
-
-- [last](#last) for getting the last element
-- [at](#at) for accessing elements at specific indices
-- [tail](#tail) for getting all elements except the first
-
-#### Call Signature
-
-> **head**\<`E`\>(`array`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:1058](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1058)
-
-Returns the first element of an array wrapped in an Optional.
-
-This function provides type-safe access to the first element with precise return types:
-
-- For empty arrays: returns `Optional.None`
-- For tuples with known first element: returns `Optional.Some<FirstElementType>`
-- For non-empty arrays: returns `Optional.Some<ElementType>`
-- For general arrays: returns `Optional<ElementType>`
-
-The function leverages TypeScript's type system to provide the most precise return type
-based on the input array type, making it safer than direct indexing.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The array to get the first element from.
-
-##### Returns
-
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-An Optional containing the first element:
-
-- `Optional.None` if the array is empty
-- `Optional.Some<E>` containing the first element if the array is non-empty
-
-##### Example
-
-```typescript
-// Empty array - precise None type
-const emptyResult = Arr.head([]); // Optional.None
-console.log(Optional.isNone(emptyResult)); // true
-
-// Tuple with known structure - precise Some type
-const tupleResult = Arr.head(['first', 'second', 'third'] as const);
-// Type: Optional.Some<'first'>
-if (Optional.isSome(tupleResult)) {
-    console.log(tupleResult.value); // 'first' - TypeScript knows exact type
-}
-
-// Non-empty array - guaranteed Some type
-const nonEmpty: NonEmptyArray<number> = [10, 20, 30] as NonEmptyArray<number>;
-const guaranteedResult = Arr.head(nonEmpty); // Optional.Some<number>
-// No need to check - always Some for NonEmptyArray
-
-// General array - may be Some or None
-const generalArray: number[] = [1, 2, 3];
-const maybeResult = Arr.head(generalArray); // Optional<number>
-if (Optional.isSome(maybeResult)) {
-    console.log(`First element: ${maybeResult.value}`);
-} else {
-    console.log('Array is empty');
-}
-
-// Working with different types
-const strings = ['hello', 'world'];
-const firstString = Arr.head(strings); // Optional<string>
-
-const objects = [
-    { id: 1, name: 'Alice' },
-    { id: 2, name: 'Bob' },
-];
-const firstObject = Arr.head(objects); // Optional<{id: number, name: string}>
-
-// Functional composition
-const getFirstElements = (arrays: readonly number[][]) =>
-    arrays.map(Arr.head).filter(Optional.isSome);
-
-const nestedArrays = [[1, 2], [3, 4], [], [5]];
-const firstElements = getFirstElements(nestedArrays);
-// [Optional.Some(1), Optional.Some(3), Optional.Some(5)]
-
-// Type inference examples
-expectType<typeof emptyResult, Optional.None>('=');
-expectType<typeof tupleResult, Optional.Some<'first'>>('=');
-expectType<typeof guaranteedResult, Optional.Some<number>>('=');
-expectType<typeof maybeResult, Optional<number>>('=');
-```
-
-##### See
+#### See
 
 - [last](#last) for getting the last element
 - [at](#at) for accessing elements at specific indices
@@ -4387,7 +4620,7 @@ expectType<typeof maybeResult, Optional<number>>('=');
 
 > **indexIsInRange**\<`E`\>(`array`, `index`): `boolean`
 
-Defined in: [src/array/array-utils.mts:397](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L397)
+Defined in: [src/array/array-utils.mts:374](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L374)
 
 Checks if an index is within the valid range of an array (i.e., `0 <= index < array.length`).
 
@@ -4409,7 +4642,7 @@ The input array.
 
 ##### index
 
-`ArgArrNonNegative`
+`ArgArr`
 
 The index to check.
 
@@ -4435,35 +4668,35 @@ Arr.indexIsInRange([], 0); // false
 
 #### Call Signature
 
-> **indexOf**\<`E`\>(`array`, `searchElement`): `-1` \| `Uint32`
+> **indexOf**\<`Ar`\>(`array`, `searchElement`): `-1` \| `ArrayIndex`\<`Ar`\>
 
-Defined in: [src/array/array-utils.mts:2288](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2288)
+Defined in: [src/array/array-utils.mts:2653](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2653)
 
 Gets the index of a value in an array.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The array to search.
 
 ###### searchElement
 
-`E`
+`Ar`\[`number`\]
 
 The element to search for.
 
 ##### Returns
 
-`-1` \| `Uint32`
+`-1` \| `ArrayIndex`\<`Ar`\>
 
 The index if found, -1 otherwise.
 
@@ -4487,7 +4720,7 @@ console.log(Optional.unwrapOr(result2, -1)); // 1
 
 > **indexOf**\<`E`\>(`searchElement`): (`array`) => `-1` \| `Uint32`
 
-Defined in: [src/array/array-utils.mts:2293](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2293)
+Defined in: [src/array/array-utils.mts:2658](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2658)
 
 Gets the index of a value in an array.
 
@@ -4543,39 +4776,39 @@ console.log(Optional.unwrapOr(result2, -1)); // 1
 
 #### Call Signature
 
-> **indexOfFrom**\<`E`\>(`array`, `searchElement`, `fromIndex`): `-1` \| `Uint32`
+> **indexOfFrom**\<`Ar`\>(`array`, `searchElement`, `fromIndex`): `-1` \| `ArrayIndex`\<`Ar`\>
 
-Defined in: [src/array/array-utils.mts:2316](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2316)
+Defined in: [src/array/array-utils.mts:2681](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2681)
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 ###### searchElement
 
-`E`
+`Ar`\[`number`\]
 
 ###### fromIndex
 
-`ArgArr`
+`ArgArrayIndexWithNegative`\<`Ar`\>
 
 ##### Returns
 
-`-1` \| `Uint32`
+`-1` \| `ArrayIndex`\<`Ar`\>
 
 #### Call Signature
 
 > **indexOfFrom**\<`E`\>(`searchElement`, `fromIndex`): (`array`) => `-1` \| `Uint32`
 
-Defined in: [src/array/array-utils.mts:2322](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2322)
+Defined in: [src/array/array-utils.mts:2687](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2687)
 
 ##### Type Parameters
 
@@ -4591,7 +4824,7 @@ Defined in: [src/array/array-utils.mts:2322](https://github.com/noshiro-pf/ts-da
 
 ###### fromIndex
 
-`ArgArr`
+`ArgArrWithNegative`
 
 ##### Returns
 
@@ -4606,6 +4839,54 @@ readonly `E`[]
 ###### Returns
 
 `-1` \| `Uint32`
+
+---
+
+### indices()
+
+> **indices**\<`E`\>(`array`): `ArrayIterator`\<`Uint32`\>
+
+Defined in: [src/array/array-utils.mts:4739](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4739)
+
+Returns an iterable of keys in the array.
+
+This function returns an array of branded indices (`SizeType.Arr`) for type safety.
+
+#### Type Parameters
+
+##### E
+
+`E`
+
+#### Parameters
+
+##### array
+
+readonly `E`[]
+
+The array to get indices from.
+
+#### Returns
+
+`ArrayIterator`\<`Uint32`\>
+
+An array of indices.
+
+#### Example
+
+```typescript
+// Direct usage
+const fruits = ['apple', 'banana', 'cherry'];
+const indices = Arr.indices(fruits); // [0, 1, 2]
+
+// Curried usage
+const getIndices = Arr.indices;
+const result = getIndices(['a', 'b']); // [0, 1]
+
+// Empty array
+const empty: string[] = [];
+const emptyIndices = Arr.indices(empty); // []
+```
 
 ---
 
@@ -4661,7 +4942,7 @@ Arr.isArray(null); // false
 
 > **isArrayAtLeastLength**\<`E`, `N`\>(`array`, `len`): ``array is readonly [MakeTupleImpl<E, `${N}`, []>, E]``
 
-Defined in: [src/array/array-utils.mts:377](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L377)
+Defined in: [src/array/array-utils.mts:354](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L354)
 
 Checks if an array has at least a specific length.
 
@@ -4675,7 +4956,7 @@ The type of elements in the array.
 
 ##### N
 
-`N` _extends_ `ArgArrNonNegative`
+`N` _extends_ `ArgArr`
 
 The minimum expected length of the array (must be a number type).
 
@@ -4715,7 +4996,7 @@ Arr.isArrayAtLeastLength([1], 2); // false
 
 > **isArrayOfLength**\<`E`, `N`\>(`array`, `len`): ``array is MakeTupleImpl<E, `${N}`, []>``
 
-Defined in: [src/array/array-utils.mts:356](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L356)
+Defined in: [src/array/array-utils.mts:333](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L333)
 
 Checks if an array has a specific length.
 
@@ -4729,7 +5010,7 @@ The type of elements in the array.
 
 ##### N
 
-`N` _extends_ `ArgArrNonNegative`
+`N` _extends_ `ArgArr`
 
 The expected length of the array (must be a number type).
 
@@ -4769,7 +5050,7 @@ Arr.isArrayOfLength([1, 2], 3); // false
 
 > **isEmpty**\<`E`\>(`array`): `array is readonly []`
 
-Defined in: [src/array/array-utils.mts:222](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L222)
+Defined in: [src/array/array-utils.mts:201](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L201)
 
 Type guard that checks if an array is empty (has no elements).
 
@@ -4815,25 +5096,10 @@ function processArray(arr: readonly number[]) {
     if (Arr.isEmpty(arr)) {
         // arr is now typed as readonly []
         console.log('Array is empty');
+        // arr[0]; // type error!
         return 0;
-    } else {
-        // arr is now typed as NonEmptyArray<number>
-        return arr[0]; // Safe access - TypeScript knows it's non-empty
     }
 }
-
-// Conditional processing
-const data = [10, 20, 30];
-if (!Arr.isEmpty(data)) {
-    // Safe to access elements
-    const firstElement = data[0]; // No undefined risk
-    const lastElement = data[data.length - 1];
-}
-
-// Filtering empty arrays
-const arrayList: readonly number[][] = [[1, 2], [], [3], []];
-const nonEmptyArrays = arrayList.filter((arr) => !Arr.isEmpty(arr));
-// nonEmptyArrays: [[1, 2], [3]]
 
 // Early returns
 function sumArray(numbers: readonly number[]): number {
@@ -4842,13 +5108,6 @@ function sumArray(numbers: readonly number[]): number {
     }
     return numbers.reduce((sum, n) => sum + n, 0);
 }
-
-// Type inference examples
-const testEmpty = [] as const;
-const testNonEmpty = [1, 2] as const;
-
-expectType<Parameters<typeof Arr.isEmpty>[0], readonly unknown[]>('=');
-expectType<ReturnType<typeof Arr.isEmpty>, boolean>('=');
 ```
 
 #### See
@@ -4863,7 +5122,7 @@ expectType<ReturnType<typeof Arr.isEmpty>, boolean>('=');
 
 > **isNonEmpty**\<`E`\>(`array`): `array is readonly [E, E]`
 
-Defined in: [src/array/array-utils.mts:336](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L336)
+Defined in: [src/array/array-utils.mts:313](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L313)
 
 Type guard that checks if an array is non-empty (has at least one element).
 
@@ -4916,16 +5175,13 @@ function getFirstElement(arr: readonly number[]): number | undefined {
 
 // Safe operations on non-empty arrays
 function processData(data: readonly string[]) {
-    if (Arr.isNonEmpty(data)) {
-        // All of these are now safe without undefined checks
-        const first = data[0];
-        const last = data[data.length - 1];
-        const middle = data[Math.floor(data.length / 2)];
+    if (!Arr.isNonEmpty(data)) return; // early return pattern
 
-        // Can safely use non-empty array methods
-        const joined = data.join(', ');
-        const reduced = data.reduce((acc, item) => acc + item.length, 0);
-    }
+    // This is now safe without undefined checks
+    const first = data[0];
+
+    // Can safely use non-empty array methods
+    const lastElement = Arr.last(data);
 }
 
 // Filtering and working with arrays
@@ -4945,7 +5201,7 @@ function calculateAverage(numbers: readonly number[]): number {
     }
 
     // numbers is now NonEmptyArray<number>
-    return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
+    return Arr.sum(numbers) / Arr.size(numbers);
 }
 
 // Functional composition
@@ -4992,7 +5248,7 @@ if (Arr.isNonEmpty(testArray)) {
 
 > **isSubset**\<`E1`, `E2`\>(`array1`, `array2`): `boolean`
 
-Defined in: [src/array/array-utils.mts:3698](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3698)
+Defined in: [src/array/array-utils.mts:4527](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4527)
 
 Checks if the first array (`array1`) is a subset of the second array (`array2`).
 An array `A` is a subset of `B` if all elements of `A` are also present in `B`.
@@ -5051,7 +5307,7 @@ Arr.isSubset([1, 5], [1, 2, 3]); // false
 
 > **isSuperset**\<`E1`, `E2`\>(`array1`, `array2`): `boolean`
 
-Defined in: [src/array/array-utils.mts:3724](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3724)
+Defined in: [src/array/array-utils.mts:4553](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4553)
 
 Checks if the first array (`array1`) is a superset of the second array (`array2`).
 An array `A` is a superset of `B` if all elements of `B` are also present in `A`.
@@ -5111,7 +5367,7 @@ Arr.isSuperset([1, 2, 3], []); // true
 
 > **join**\<`E`\>(`array`, `separator?`): [`Result`](../../../functional/result/README.md#result)\<`string`, `Error`\>
 
-Defined in: [src/array/array-utils.mts:2940](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2940)
+Defined in: [src/array/array-utils.mts:3422](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3422)
 
 Joins array elements into a string.
 
@@ -5161,7 +5417,7 @@ console.log(Result.unwrapOr(result2, '')); // "a,b,c"
 
 > **join**(`separator?`): \<`E`\>(`array`) => [`Result`](../../../functional/result/README.md#result)\<`string`, `Error`\>
 
-Defined in: [src/array/array-utils.mts:2945](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2945)
+Defined in: [src/array/array-utils.mts:3427](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3427)
 
 Joins array elements into a string.
 
@@ -5215,11 +5471,9 @@ console.log(Result.unwrapOr(result2, '')); // "a,b,c"
 
 ### last()
 
-#### Call Signature
+> **last**\<`Ar`\>(`array`): `Ar` _extends_ readonly \[\] ? `Readonly`\<\{ \}\> : `Ar` _extends_ readonly \[`unknown`, `E`\] ? `Readonly`\<\{ `value`: `E`; \}\> : `Ar` _extends_ readonly \[`E`, `E`\] ? `Readonly`\<\{ `value`: `E`; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
-> **last**(`array`): [`None`](../../../functional/optional/namespaces/Optional.md#none)
-
-Defined in: [src/array/array-utils.mts:1145](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1145)
+Defined in: [src/array/array-utils.mts:1096](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1096)
 
 Returns the last element of an array wrapped in an Optional.
 
@@ -5233,138 +5487,30 @@ This function provides type-safe access to the last element with precise return 
 The function leverages TypeScript's type system to provide the most precise return type
 based on the input array type, making it safer than direct indexing.
 
-##### Parameters
+#### Type Parameters
 
-###### array
-
-readonly \[\]
-
-The array to get the last element from.
-
-##### Returns
-
-[`None`](../../../functional/optional/namespaces/Optional.md#none)
-
-An Optional containing the last element:
-
-- `Optional.None` if the array is empty
-- `Optional.Some<E>` containing the last element if the array is non-empty
-
-##### Example
-
-```typescript
-// Empty array - precise None type
-const emptyResult = Arr.last([]); // Optional.None
-console.log(Optional.isNone(emptyResult)); // true
-
-// Tuple with known structure - precise Some type
-const tupleResult = Arr.last(['first', 'middle', 'last'] as const);
-// Type: Optional.Some<'last'>
-if (Optional.isSome(tupleResult)) {
-    console.log(tupleResult.value); // 'last' - TypeScript knows exact type
-}
-
-// Non-empty array - guaranteed Some type
-const nonEmpty: NonEmptyArray<number> = [10, 20, 30] as NonEmptyArray<number>;
-const guaranteedResult = Arr.last(nonEmpty); // Optional.Some<number>
-// No need to check - always Some for NonEmptyArray
-
-// General array - may be Some or None
-const generalArray: number[] = [1, 2, 3];
-const maybeResult = Arr.last(generalArray); // Optional<number>
-if (Optional.isSome(maybeResult)) {
-    console.log(`Last element: ${maybeResult.value}`);
-} else {
-    console.log('Array is empty');
-}
-
-// Working with different types
-const strings = ['hello', 'world', 'example'];
-const lastString = Arr.last(strings); // Optional<string>
-
-const coordinates = [
-    { x: 0, y: 0 },
-    { x: 1, y: 1 },
-    { x: 2, y: 2 },
-];
-const lastCoordinate = Arr.last(coordinates); // Optional<{x: number, y: number}>
-
-// Single element arrays
-const single = [42];
-const singleResult = Arr.last(single); // Optional<number> containing 42
-
-// Functional composition with arrays of arrays
-const getLastElements = (arrays: readonly string[][]) =>
-    arrays.map(Arr.last).filter(Optional.isSome);
-
-const nestedArrays = [['a', 'b'], ['c'], [], ['d', 'e', 'f']];
-const lastElements = getLastElements(nestedArrays);
-// [Optional.Some('b'), Optional.Some('c'), Optional.Some('f')]
-
-// Common pattern: get last element or default
-const data = [10, 20, 30];
-const lastOrDefault = Optional.unwrapOr(Arr.last(data), 0); // 30
-const emptyLastOrDefault = Optional.unwrapOr(Arr.last([]), 0); // 0
-
-// Type inference examples
-expectType<typeof emptyResult, Optional.None>('=');
-expectType<typeof tupleResult, Optional.Some<'last'>>('=');
-expectType<typeof guaranteedResult, Optional.Some<number>>('=');
-expectType<typeof maybeResult, Optional<number>>('=');
-```
-
-##### See
-
-- [head](#head) for getting the first element
-- [at](#at) for accessing elements at specific indices with negative indexing support
-- [butLast](#butlast) for getting all elements except the last
-
-#### Call Signature
-
-> **last**\<`Ar`, `L`\>(`array`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`L`\>
-
-Defined in: [src/array/array-utils.mts:1147](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1147)
-
-Returns the last element of an array wrapped in an Optional.
-
-This function provides type-safe access to the last element with precise return types:
-
-- For empty arrays: returns `Optional.None`
-- For tuples with known last element: returns `Optional.Some<LastElementType>`
-- For non-empty arrays: returns `Optional.Some<ElementType>`
-- For general arrays: returns `Optional<ElementType>`
-
-The function leverages TypeScript's type system to provide the most precise return type
-based on the input array type, making it safer than direct indexing.
-
-##### Type Parameters
-
-###### Ar
+##### Ar
 
 `Ar` _extends_ readonly `unknown`[]
 
-###### L
+#### Parameters
 
-`L`
+##### array
 
-##### Parameters
-
-###### array
-
-readonly \[`Ar`, `L`\]
+`Ar`
 
 The array to get the last element from.
 
-##### Returns
+#### Returns
 
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`L`\>
+`Ar` _extends_ readonly \[\] ? `Readonly`\<\{ \}\> : `Ar` _extends_ readonly \[`unknown`, `E`\] ? `Readonly`\<\{ `value`: `E`; \}\> : `Ar` _extends_ readonly \[`E`, `E`\] ? `Readonly`\<\{ `value`: `E`; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 An Optional containing the last element:
 
 - `Optional.None` if the array is empty
 - `Optional.Some<E>` containing the last element if the array is non-empty
 
-##### Example
+#### Example
 
 ```typescript
 // Empty array - precise None type
@@ -5427,231 +5573,7 @@ expectType<typeof guaranteedResult, Optional.Some<number>>('=');
 expectType<typeof maybeResult, Optional<number>>('=');
 ```
 
-##### See
-
-- [head](#head) for getting the first element
-- [at](#at) for accessing elements at specific indices with negative indexing support
-- [butLast](#butlast) for getting all elements except the last
-
-#### Call Signature
-
-> **last**\<`E`\>(`array`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:1151](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1151)
-
-Returns the last element of an array wrapped in an Optional.
-
-This function provides type-safe access to the last element with precise return types:
-
-- For empty arrays: returns `Optional.None`
-- For tuples with known last element: returns `Optional.Some<LastElementType>`
-- For non-empty arrays: returns `Optional.Some<ElementType>`
-- For general arrays: returns `Optional<ElementType>`
-
-The function leverages TypeScript's type system to provide the most precise return type
-based on the input array type, making it safer than direct indexing.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-##### Parameters
-
-###### array
-
-readonly \[`E`, `E`\]
-
-The array to get the last element from.
-
-##### Returns
-
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-An Optional containing the last element:
-
-- `Optional.None` if the array is empty
-- `Optional.Some<E>` containing the last element if the array is non-empty
-
-##### Example
-
-```typescript
-// Empty array - precise None type
-const emptyResult = Arr.last([]); // Optional.None
-console.log(Optional.isNone(emptyResult)); // true
-
-// Tuple with known structure - precise Some type
-const tupleResult = Arr.last(['first', 'middle', 'last'] as const);
-// Type: Optional.Some<'last'>
-if (Optional.isSome(tupleResult)) {
-    console.log(tupleResult.value); // 'last' - TypeScript knows exact type
-}
-
-// Non-empty array - guaranteed Some type
-const nonEmpty: NonEmptyArray<number> = [10, 20, 30] as NonEmptyArray<number>;
-const guaranteedResult = Arr.last(nonEmpty); // Optional.Some<number>
-// No need to check - always Some for NonEmptyArray
-
-// General array - may be Some or None
-const generalArray: number[] = [1, 2, 3];
-const maybeResult = Arr.last(generalArray); // Optional<number>
-if (Optional.isSome(maybeResult)) {
-    console.log(`Last element: ${maybeResult.value}`);
-} else {
-    console.log('Array is empty');
-}
-
-// Working with different types
-const strings = ['hello', 'world', 'example'];
-const lastString = Arr.last(strings); // Optional<string>
-
-const coordinates = [
-    { x: 0, y: 0 },
-    { x: 1, y: 1 },
-    { x: 2, y: 2 },
-];
-const lastCoordinate = Arr.last(coordinates); // Optional<{x: number, y: number}>
-
-// Single element arrays
-const single = [42];
-const singleResult = Arr.last(single); // Optional<number> containing 42
-
-// Functional composition with arrays of arrays
-const getLastElements = (arrays: readonly string[][]) =>
-    arrays.map(Arr.last).filter(Optional.isSome);
-
-const nestedArrays = [['a', 'b'], ['c'], [], ['d', 'e', 'f']];
-const lastElements = getLastElements(nestedArrays);
-// [Optional.Some('b'), Optional.Some('c'), Optional.Some('f')]
-
-// Common pattern: get last element or default
-const data = [10, 20, 30];
-const lastOrDefault = Optional.unwrapOr(Arr.last(data), 0); // 30
-const emptyLastOrDefault = Optional.unwrapOr(Arr.last([]), 0); // 0
-
-// Type inference examples
-expectType<typeof emptyResult, Optional.None>('=');
-expectType<typeof tupleResult, Optional.Some<'last'>>('=');
-expectType<typeof guaranteedResult, Optional.Some<number>>('=');
-expectType<typeof maybeResult, Optional<number>>('=');
-```
-
-##### See
-
-- [head](#head) for getting the first element
-- [at](#at) for accessing elements at specific indices with negative indexing support
-- [butLast](#butlast) for getting all elements except the last
-
-#### Call Signature
-
-> **last**\<`E`\>(`array`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:1153](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1153)
-
-Returns the last element of an array wrapped in an Optional.
-
-This function provides type-safe access to the last element with precise return types:
-
-- For empty arrays: returns `Optional.None`
-- For tuples with known last element: returns `Optional.Some<LastElementType>`
-- For non-empty arrays: returns `Optional.Some<ElementType>`
-- For general arrays: returns `Optional<ElementType>`
-
-The function leverages TypeScript's type system to provide the most precise return type
-based on the input array type, making it safer than direct indexing.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The array to get the last element from.
-
-##### Returns
-
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-An Optional containing the last element:
-
-- `Optional.None` if the array is empty
-- `Optional.Some<E>` containing the last element if the array is non-empty
-
-##### Example
-
-```typescript
-// Empty array - precise None type
-const emptyResult = Arr.last([]); // Optional.None
-console.log(Optional.isNone(emptyResult)); // true
-
-// Tuple with known structure - precise Some type
-const tupleResult = Arr.last(['first', 'middle', 'last'] as const);
-// Type: Optional.Some<'last'>
-if (Optional.isSome(tupleResult)) {
-    console.log(tupleResult.value); // 'last' - TypeScript knows exact type
-}
-
-// Non-empty array - guaranteed Some type
-const nonEmpty: NonEmptyArray<number> = [10, 20, 30] as NonEmptyArray<number>;
-const guaranteedResult = Arr.last(nonEmpty); // Optional.Some<number>
-// No need to check - always Some for NonEmptyArray
-
-// General array - may be Some or None
-const generalArray: number[] = [1, 2, 3];
-const maybeResult = Arr.last(generalArray); // Optional<number>
-if (Optional.isSome(maybeResult)) {
-    console.log(`Last element: ${maybeResult.value}`);
-} else {
-    console.log('Array is empty');
-}
-
-// Working with different types
-const strings = ['hello', 'world', 'example'];
-const lastString = Arr.last(strings); // Optional<string>
-
-const coordinates = [
-    { x: 0, y: 0 },
-    { x: 1, y: 1 },
-    { x: 2, y: 2 },
-];
-const lastCoordinate = Arr.last(coordinates); // Optional<{x: number, y: number}>
-
-// Single element arrays
-const single = [42];
-const singleResult = Arr.last(single); // Optional<number> containing 42
-
-// Functional composition with arrays of arrays
-const getLastElements = (arrays: readonly string[][]) =>
-    arrays.map(Arr.last).filter(Optional.isSome);
-
-const nestedArrays = [['a', 'b'], ['c'], [], ['d', 'e', 'f']];
-const lastElements = getLastElements(nestedArrays);
-// [Optional.Some('b'), Optional.Some('c'), Optional.Some('f')]
-
-// Common pattern: get last element or default
-const data = [10, 20, 30];
-const lastOrDefault = Optional.unwrapOr(Arr.last(data), 0); // 30
-const emptyLastOrDefault = Optional.unwrapOr(Arr.last([]), 0); // 0
-
-// Type inference examples
-expectType<typeof emptyResult, Optional.None>('=');
-expectType<typeof tupleResult, Optional.Some<'last'>>('=');
-expectType<typeof guaranteedResult, Optional.Some<number>>('=');
-expectType<typeof maybeResult, Optional<number>>('=');
-```
-
-##### See
+#### See
 
 - [head](#head) for getting the first element
 - [at](#at) for accessing elements at specific indices with negative indexing support
@@ -5663,35 +5585,35 @@ expectType<typeof maybeResult, Optional<number>>('=');
 
 #### Call Signature
 
-> **lastIndexOf**\<`E`\>(`array`, `searchElement`): `-1` \| `Uint32`
+> **lastIndexOf**\<`Ar`\>(`array`, `searchElement`): `-1` \| `ArrayIndex`\<`Ar`\>
 
-Defined in: [src/array/array-utils.mts:2371](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2371)
+Defined in: [src/array/array-utils.mts:2735](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2735)
 
 Gets the last index of a value in an array.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The array to search.
 
 ###### searchElement
 
-`E`
+`Ar`\[`number`\]
 
 The element to search for.
 
 ##### Returns
 
-`-1` \| `Uint32`
+`-1` \| `ArrayIndex`\<`Ar`\>
 
 Optional.Some with the index if found, Optional.None otherwise.
 
@@ -5715,7 +5637,7 @@ console.log(Optional.unwrapOr(result2, -1)); // 3
 
 > **lastIndexOf**\<`E`\>(`searchElement`): (`array`) => `-1` \| `Uint32`
 
-Defined in: [src/array/array-utils.mts:2376](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2376)
+Defined in: [src/array/array-utils.mts:2740](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2740)
 
 Gets the last index of a value in an array.
 
@@ -5771,39 +5693,39 @@ console.log(Optional.unwrapOr(result2, -1)); // 3
 
 #### Call Signature
 
-> **lastIndexOfFrom**\<`E`\>(`array`, `searchElement`, `fromIndex`): `-1` \| `Uint32`
+> **lastIndexOfFrom**\<`Ar`\>(`array`, `searchElement`, `fromIndex`): `-1` \| `ArrayIndex`\<`Ar`\>
 
-Defined in: [src/array/array-utils.mts:2398](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2398)
+Defined in: [src/array/array-utils.mts:2762](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2762)
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 ###### searchElement
 
-`E`
+`Ar`\[`number`\]
 
 ###### fromIndex
 
-`ArgArr`
+`ArgArrayIndexWithNegative`\<`Ar`\>
 
 ##### Returns
 
-`-1` \| `Uint32`
+`-1` \| `ArrayIndex`\<`Ar`\>
 
 #### Call Signature
 
 > **lastIndexOfFrom**\<`E`\>(`searchElement`, `fromIndex`): (`array`) => `-1` \| `Uint32`
 
-Defined in: [src/array/array-utils.mts:2404](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2404)
+Defined in: [src/array/array-utils.mts:2768](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2768)
 
 ##### Type Parameters
 
@@ -5819,7 +5741,7 @@ Defined in: [src/array/array-utils.mts:2404](https://github.com/noshiro-pf/ts-da
 
 ###### fromIndex
 
-`ArgArr`
+`ArgArrWithNegative`
 
 ##### Returns
 
@@ -5837,13 +5759,149 @@ readonly `E`[]
 
 ---
 
+### map()
+
+#### Call Signature
+
+> **map**\<`Ar`, `B`\>(`array`, `mapFn`): `Readonly`\<`{ [K in keyof Ar]: B }`\>
+
+Defined in: [src/array/array-utils.mts:3533](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3533)
+
+Creates a new tuple by transforming each element with a mapping function.
+
+Preserves the tuple's length while allowing element type transformation.
+The resulting tuple has the same structure but with transformed element types.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+###### B
+
+`B`
+
+The type that elements will be transformed to
+
+##### Parameters
+
+###### array
+
+`Ar`
+
+The input tuple
+
+###### mapFn
+
+(`a`, `index`) => `B`
+
+Function that transforms each element (receives element and index)
+
+##### Returns
+
+`Readonly`\<`{ [K in keyof Ar]: B }`\>
+
+A new tuple with transformed elements, preserving the original length
+
+##### Example
+
+```typescript
+// Basic transformation
+const nums = [1, 2, 3] as const;
+const doubled = Arr.map(nums, (x) => x * 2); // readonly [2, 4, 6]
+const strings = Arr.map(nums, (x) => String(x)); // readonly ['1', '2', '3']
+
+// With index
+const indexed = Arr.map(nums, (x, i) => `${i}:${x}`);
+// readonly ['0:1', '1:2', '2:3']
+
+// Mixed type tuples
+const mixed = [1, 'hello', true] as const;
+const descriptions = Arr.map(mixed, (x) => `Value: ${x}`);
+// readonly ['Value: 1', 'Value: hello', 'Value: true']
+```
+
+#### Call Signature
+
+> **map**\<`A`, `B`\>(`mapFn`): \<`Ar`\>(`array`) => `Readonly`\<`{ [K in keyof Ar]: B }`\>
+
+Defined in: [src/array/array-utils.mts:3539](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3539)
+
+Creates a new tuple by transforming each element with a mapping function.
+
+Preserves the tuple's length while allowing element type transformation.
+The resulting tuple has the same structure but with transformed element types.
+
+##### Type Parameters
+
+###### A
+
+`A`
+
+###### B
+
+`B`
+
+The type that elements will be transformed to
+
+##### Parameters
+
+###### mapFn
+
+(`a`, `index`) => `B`
+
+Function that transforms each element (receives element and index)
+
+##### Returns
+
+A new tuple with transformed elements, preserving the original length
+
+> \<`Ar`\>(`array`): `Readonly`\<`{ [K in keyof Ar]: B }`\>
+
+###### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `A`[]
+
+###### Parameters
+
+###### array
+
+`Ar`
+
+###### Returns
+
+`Readonly`\<`{ [K in keyof Ar]: B }`\>
+
+##### Example
+
+```typescript
+// Basic transformation
+const nums = [1, 2, 3] as const;
+const doubled = Arr.map(nums, (x) => x * 2); // readonly [2, 4, 6]
+const strings = Arr.map(nums, (x) => String(x)); // readonly ['1', '2', '3']
+
+// With index
+const indexed = Arr.map(nums, (x, i) => `${i}:${x}`);
+// readonly ['0:1', '1:2', '2:3']
+
+// Mixed type tuples
+const mixed = [1, 'hello', true] as const;
+const descriptions = Arr.map(mixed, (x) => `Value: ${x}`);
+// readonly ['Value: 1', 'Value: hello', 'Value: true']
+```
+
+---
+
 ### max()
 
 #### Call Signature
 
-> **max**\<`E`\>(`array`, `comparator?`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
+> **max**\<`Ar`\>(`array`, `comparator?`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
-Defined in: [src/array/array-utils.mts:2648](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2648)
+Defined in: [src/array/array-utils.mts:3144](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3144)
 
 Finds the maximum value in an array.
 
@@ -5853,17 +5911,15 @@ Finds the maximum value in an array.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E` _extends_ `number`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `number`[]
 
 ##### Parameters
 
 ###### array
 
-readonly \[`E`, `E`\]
+`Ar`
 
 The input array.
 
@@ -5875,7 +5931,7 @@ An optional custom comparator function `(x: A, y: A) => number`. Should return <
 
 ##### Returns
 
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
+`Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 The maximum value in the array wrapped in Optional.
 
@@ -5889,57 +5945,9 @@ Arr.max([]); // Optional.none
 
 #### Call Signature
 
-> **max**\<`E`\>(`array`, `comparator?`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+> **max**\<`Ar`\>(`array`, `comparator`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
-Defined in: [src/array/array-utils.mts:2653](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2653)
-
-Finds the maximum value in an array.
-
-- If the array is non-empty, returns the maximum value.
-- If the array is empty, returns `Optional.none`.
-- You can provide a custom comparator for arbitrary types.
-
-##### Type Parameters
-
-###### E
-
-`E` _extends_ `number`
-
-The type of elements in the array.
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### comparator?
-
-(`x`, `y`) => `number`
-
-An optional custom comparator function `(x: A, y: A) => number`. Should return < 0 if x is smaller, 0 if equal, > 0 if x is larger. Defaults to numeric comparison.
-
-##### Returns
-
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-The maximum value in the array wrapped in Optional.
-
-##### Example
-
-```ts
-Arr.max([3, 1, 4, 1, 5] as const); // Optional.some(5)
-Arr.max([{ v: 3 }, { v: 1 }], (a, b) => a.v - b.v); // Optional.some({v:3})
-Arr.max([]); // Optional.none
-```
-
-#### Call Signature
-
-> **max**\<`E`\>(`array`, `comparator`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:2658](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2658)
+Defined in: [src/array/array-utils.mts:3152](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3152)
 
 Finds the maximum value in an array.
 
@@ -5949,17 +5957,15 @@ Finds the maximum value in an array.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly \[`E`, `E`\]
+`Ar`
 
 The input array.
 
@@ -5971,55 +5977,7 @@ An optional custom comparator function `(x: A, y: A) => number`. Should return <
 
 ##### Returns
 
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-The maximum value in the array wrapped in Optional.
-
-##### Example
-
-```ts
-Arr.max([3, 1, 4, 1, 5] as const); // Optional.some(5)
-Arr.max([{ v: 3 }, { v: 1 }], (a, b) => a.v - b.v); // Optional.some({v:3})
-Arr.max([]); // Optional.none
-```
-
-#### Call Signature
-
-> **max**\<`E`\>(`array`, `comparator`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:2663](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2663)
-
-Finds the maximum value in an array.
-
-- If the array is non-empty, returns the maximum value.
-- If the array is empty, returns `Optional.none`.
-- You can provide a custom comparator for arbitrary types.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### comparator
-
-(`x`, `y`) => `number`
-
-An optional custom comparator function `(x: A, y: A) => number`. Should return < 0 if x is smaller, 0 if equal, > 0 if x is larger. Defaults to numeric comparison.
-
-##### Returns
-
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+`Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 The maximum value in the array wrapped in Optional.
 
@@ -6037,9 +5995,9 @@ Arr.max([]); // Optional.none
 
 #### Call Signature
 
-> **maxBy**\<`E`\>(`array`, `comparatorValueMapper`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
+> **maxBy**\<`Ar`\>(`array`, `comparatorValueMapper`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
-Defined in: [src/array/array-utils.mts:2752](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2752)
+Defined in: [src/array/array-utils.mts:3237](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3237)
 
 Finds the element with the maximum value according to a mapped numeric value.
 
@@ -6049,17 +6007,15 @@ Finds the element with the maximum value according to a mapped numeric value.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly \[`E`, `E`\]
+`Ar`
 
 The input array.
 
@@ -6071,7 +6027,7 @@ A function that maps an element to a value for comparison.
 
 ##### Returns
 
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
+`Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 The element with the maximum mapped value wrapped in Optional.
 
@@ -6088,60 +6044,9 @@ Arr.maxBy([], (p) => p.age); // Optional.none
 
 #### Call Signature
 
-> **maxBy**\<`E`\>(`array`, `comparatorValueMapper`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+> **maxBy**\<`Ar`, `V`\>(`array`, `comparatorValueMapper`, `comparator`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
-Defined in: [src/array/array-utils.mts:2757](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2757)
-
-Finds the element with the maximum value according to a mapped numeric value.
-
-- If the array is non-empty, returns the element with the maximum mapped value.
-- If the array is empty, returns `Optional.none`.
-- You can provide a custom comparator for the mapped values.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### comparatorValueMapper
-
-(`value`) => `number`
-
-A function that maps an element to a value for comparison.
-
-##### Returns
-
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-The element with the maximum mapped value wrapped in Optional.
-
-##### Example
-
-```ts
-const people = [
-    { name: 'Alice', age: 30 },
-    { name: 'Bob', age: 20 },
-] as const;
-Arr.maxBy(people, (p) => p.age); // Optional.some({ name: 'Alice', age: 30 })
-Arr.maxBy([], (p) => p.age); // Optional.none
-```
-
-#### Call Signature
-
-> **maxBy**\<`E`, `V`\>(`array`, `comparatorValueMapper`, `comparator`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:2762](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2762)
+Defined in: [src/array/array-utils.mts:3245](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3245)
 
 Finds the element with the maximum value according to a mapped numeric value.
 
@@ -6151,11 +6056,9 @@ Finds the element with the maximum value according to a mapped numeric value.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ###### V
 
@@ -6167,7 +6070,7 @@ The type of the value to compare by.
 
 ###### array
 
-readonly \[`E`, `E`\]
+`Ar`
 
 The input array.
 
@@ -6185,70 +6088,7 @@ An optional custom comparator function for the mapped values.
 
 ##### Returns
 
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-The element with the maximum mapped value wrapped in Optional.
-
-##### Example
-
-```ts
-const people = [
-    { name: 'Alice', age: 30 },
-    { name: 'Bob', age: 20 },
-] as const;
-Arr.maxBy(people, (p) => p.age); // Optional.some({ name: 'Alice', age: 30 })
-Arr.maxBy([], (p) => p.age); // Optional.none
-```
-
-#### Call Signature
-
-> **maxBy**\<`E`, `V`\>(`array`, `comparatorValueMapper`, `comparator`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:2768](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2768)
-
-Finds the element with the maximum value according to a mapped numeric value.
-
-- If the array is non-empty, returns the element with the maximum mapped value.
-- If the array is empty, returns `Optional.none`.
-- You can provide a custom comparator for the mapped values.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-###### V
-
-`V`
-
-The type of the value to compare by.
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### comparatorValueMapper
-
-(`value`) => `V`
-
-A function that maps an element to a value for comparison.
-
-###### comparator
-
-(`x`, `y`) => `number`
-
-An optional custom comparator function for the mapped values.
-
-##### Returns
-
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+`Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 The element with the maximum mapped value wrapped in Optional.
 
@@ -6269,25 +6109,23 @@ Arr.maxBy([], (p) => p.age); // Optional.none
 
 #### Call Signature
 
-> **min**\<`E`\>(`array`, `comparator?`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
+> **min**\<`Ar`\>(`array`, `comparator?`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
-Defined in: [src/array/array-utils.mts:2592](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2592)
+Defined in: [src/array/array-utils.mts:3093](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3093)
 
 Finds the minimum value in an array.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E` _extends_ `number`
-
-The type of numbers in the array (must extend `number`).
+`Ar` _extends_ readonly `number`[]
 
 ##### Parameters
 
 ###### array
 
-readonly \[`E`, `E`\]
+`Ar`
 
 The input array.
 
@@ -6299,7 +6137,7 @@ An optional custom comparator function `(x: N, y: N) => number`. Should return <
 
 ##### Returns
 
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
+`Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 The minimum value in the array wrapped in Optional.
 
@@ -6313,69 +6151,23 @@ Arr.min([]); // Optional.none
 
 #### Call Signature
 
-> **min**\<`E`\>(`array`, `comparator?`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+> **min**\<`Ar`\>(`array`, `comparator`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
-Defined in: [src/array/array-utils.mts:2597](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2597)
-
-Finds the minimum value in an array.
-
-##### Type Parameters
-
-###### E
-
-`E` _extends_ `number`
-
-The type of numbers in the array (must extend `number`).
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### comparator?
-
-(`x`, `y`) => `number`
-
-An optional custom comparator function `(x: N, y: N) => number`. Should return < 0 if x is smaller, 0 if equal, > 0 if x is larger. Defaults to `x - y`.
-
-##### Returns
-
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-The minimum value in the array wrapped in Optional.
-
-##### Example
-
-```ts
-Arr.min([3, 1, 4, 1, 5] as const); // Optional.some(1)
-Arr.min([{ v: 3 }, { v: 1 }], (a, b) => a.v - b.v); // Optional.some({v:1})
-Arr.min([]); // Optional.none
-```
-
-#### Call Signature
-
-> **min**\<`E`\>(`array`, `comparator`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:2602](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2602)
+Defined in: [src/array/array-utils.mts:3101](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3101)
 
 Finds the minimum value in an array.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of numbers in the array (must extend `number`).
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly \[`E`, `E`\]
+`Ar`
 
 The input array.
 
@@ -6387,51 +6179,7 @@ An optional custom comparator function `(x: N, y: N) => number`. Should return <
 
 ##### Returns
 
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-The minimum value in the array wrapped in Optional.
-
-##### Example
-
-```ts
-Arr.min([3, 1, 4, 1, 5] as const); // Optional.some(1)
-Arr.min([{ v: 3 }, { v: 1 }], (a, b) => a.v - b.v); // Optional.some({v:1})
-Arr.min([]); // Optional.none
-```
-
-#### Call Signature
-
-> **min**\<`E`\>(`array`, `comparator`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:2607](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2607)
-
-Finds the minimum value in an array.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of numbers in the array (must extend `number`).
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### comparator
-
-(`x`, `y`) => `number`
-
-An optional custom comparator function `(x: N, y: N) => number`. Should return < 0 if x is smaller, 0 if equal, > 0 if x is larger. Defaults to `x - y`.
-
-##### Returns
-
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+`Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 The minimum value in the array wrapped in Optional.
 
@@ -6449,9 +6197,9 @@ Arr.min([]); // Optional.none
 
 #### Call Signature
 
-> **minBy**\<`E`\>(`array`, `comparatorValueMapper`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
+> **minBy**\<`Ar`\>(`array`, `comparatorValueMapper`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
-Defined in: [src/array/array-utils.mts:2697](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2697)
+Defined in: [src/array/array-utils.mts:3188](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3188)
 
 Finds the element with the minimum value according to a mapped numeric value.
 
@@ -6461,17 +6209,15 @@ Finds the element with the minimum value according to a mapped numeric value.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly \[`E`, `E`\]
+`Ar`
 
 The input array.
 
@@ -6483,7 +6229,7 @@ A function that maps an element to a value for comparison.
 
 ##### Returns
 
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
+`Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 The element with the minimum mapped value wrapped in Optional.
 
@@ -6500,60 +6246,9 @@ Arr.minBy([], (p) => p.age); // Optional.none
 
 #### Call Signature
 
-> **minBy**\<`E`\>(`array`, `comparatorValueMapper`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+> **minBy**\<`Ar`, `V`\>(`array`, `comparatorValueMapper`, `comparator`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
-Defined in: [src/array/array-utils.mts:2702](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2702)
-
-Finds the element with the minimum value according to a mapped numeric value.
-
-- If the array is non-empty, returns the element with the minimum mapped value.
-- If the array is empty, returns `Optional.none`.
-- You can provide a custom comparator for the mapped values.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### comparatorValueMapper
-
-(`value`) => `number`
-
-A function that maps an element to a value for comparison.
-
-##### Returns
-
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-The element with the minimum mapped value wrapped in Optional.
-
-##### Example
-
-```ts
-const people = [
-    { name: 'Alice', age: 30 },
-    { name: 'Bob', age: 20 },
-] as const;
-Arr.minBy(people, (p) => p.age); // Optional.some({ name: 'Bob', age: 20 })
-Arr.minBy([], (p) => p.age); // Optional.none
-```
-
-#### Call Signature
-
-> **minBy**\<`E`, `V`\>(`array`, `comparatorValueMapper`, `comparator`): [`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:2707](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2707)
+Defined in: [src/array/array-utils.mts:3196](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3196)
 
 Finds the element with the minimum value according to a mapped numeric value.
 
@@ -6563,11 +6258,9 @@ Finds the element with the minimum value according to a mapped numeric value.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ###### V
 
@@ -6579,7 +6272,7 @@ The type of the value to compare by.
 
 ###### array
 
-readonly \[`E`, `E`\]
+`Ar`
 
 The input array.
 
@@ -6597,70 +6290,7 @@ An optional custom comparator function for the mapped values.
 
 ##### Returns
 
-[`Some`](../../../functional/optional/namespaces/Optional.md#some)\<`E`\>
-
-The element with the minimum mapped value wrapped in Optional.
-
-##### Example
-
-```ts
-const people = [
-    { name: 'Alice', age: 30 },
-    { name: 'Bob', age: 20 },
-] as const;
-Arr.minBy(people, (p) => p.age); // Optional.some({ name: 'Bob', age: 20 })
-Arr.minBy([], (p) => p.age); // Optional.none
-```
-
-#### Call Signature
-
-> **minBy**\<`E`, `V`\>(`array`, `comparatorValueMapper`, `comparator`): [`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
-
-Defined in: [src/array/array-utils.mts:2713](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2713)
-
-Finds the element with the minimum value according to a mapped numeric value.
-
-- If the array is non-empty, returns the element with the minimum mapped value.
-- If the array is empty, returns `Optional.none`.
-- You can provide a custom comparator for the mapped values.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-###### V
-
-`V`
-
-The type of the value to compare by.
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### comparatorValueMapper
-
-(`value`) => `V`
-
-A function that maps an element to a value for comparison.
-
-###### comparator
-
-(`x`, `y`) => `number`
-
-An optional custom comparator function for the mapped values.
-
-##### Returns
-
-[`Optional`](../../../functional/optional/README.md#optional)\<`E`\>
+`Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `Readonly`\<\{ `value`: `Ar`\<`Ar`\>\[`number`\]; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\>
 
 The element with the minimum mapped value wrapped in Optional.
 
@@ -6683,7 +6313,7 @@ Arr.minBy([], (p) => p.age); // Optional.none
 
 > **partition**\<`N`, `E`\>(`array`, `chunkSize`): readonly readonly `E`[][]
 
-Defined in: [src/array/array-utils.mts:3106](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3106)
+Defined in: [src/array/array-utils.mts:3847](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3847)
 
 Partitions an array into sub-arrays of a specified size.
 The last partition may be smaller if the array length is not a multiple of `chunkSize`.
@@ -6734,7 +6364,7 @@ Arr.partition([1, 2, 3, 4, 5, 6, 7], 3); // [[1, 2, 3], [4, 5, 6], [7]]
 
 > **partition**\<`N`\>(`chunkSize`): \<`E`\>(`array`) => readonly readonly `E`[][]
 
-Defined in: [src/array/array-utils.mts:3111](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3111)
+Defined in: [src/array/array-utils.mts:3852](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3852)
 
 Partitions an array into sub-arrays of a specified size.
 The last partition may be smaller if the array length is not a multiple of `chunkSize`.
@@ -6793,7 +6423,7 @@ Arr.partition([1, 2, 3, 4, 5, 6, 7], 3); // [[1, 2, 3], [4, 5, 6], [7]]
 
 > **range**\<`S`, `E`\>(`start`, `end`, `step?`): `RangeList`\<`S`, `E`\>
 
-Defined in: [src/array/array-utils.mts:807](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L807)
+Defined in: [src/array/array-utils.mts:761](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L761)
 
 Creates an array of numbers within a specified range with optional step increment.
 
@@ -6911,8 +6541,11 @@ const indices = Arr.range(0, 10); // readonly [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 const reversedIndices = Arr.range(9, -1, -1); // readonly SafeInt[] -> [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 
 // Functional programming patterns
-const squares = Arr.range(1, 6).map(x => x * x); // [1, 4, 9, 16, 25]
-const fibonacci = Arr.range(0, 10).reduce((acc, _, i) => {\n   *   if (i <= 1) return [...acc, i];\n   *   return [...acc, acc[i-1] + acc[i-2]];\n   * }, [] as number[]); // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+const squares = Arr.range(1, 6).map((x) => x * x); // [1, 4, 9, 16, 25]
+const fibonacci = Arr.range(0, 10).reduce((acc, _, i) => {
+    if (i <= 1) return [...acc, i];
+    return [...acc, acc[i - 1] + acc[i - 2]];
+}, [] as number[]); // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 
 // Type inference examples showing precise vs general types
 expectType<typeof range1to4, readonly [1, 2, 3, 4]>('='); // Precise tuple
@@ -6938,7 +6571,7 @@ Never throws - invalid ranges simply return empty arrays
 
 > **range**(`start`, `end`, `step?`): readonly `SafeUint`[]
 
-Defined in: [src/array/array-utils.mts:813](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L813)
+Defined in: [src/array/array-utils.mts:767](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L767)
 
 Creates an array of numbers within a specified range with optional step increment.
 
@@ -7042,8 +6675,11 @@ const indices = Arr.range(0, 10); // readonly [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 const reversedIndices = Arr.range(9, -1, -1); // readonly SafeInt[] -> [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 
 // Functional programming patterns
-const squares = Arr.range(1, 6).map(x => x * x); // [1, 4, 9, 16, 25]
-const fibonacci = Arr.range(0, 10).reduce((acc, _, i) => {\n   *   if (i <= 1) return [...acc, i];\n   *   return [...acc, acc[i-1] + acc[i-2]];\n   * }, [] as number[]); // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+const squares = Arr.range(1, 6).map((x) => x * x); // [1, 4, 9, 16, 25]
+const fibonacci = Arr.range(0, 10).reduce((acc, _, i) => {
+    if (i <= 1) return [...acc, i];
+    return [...acc, acc[i - 1] + acc[i - 2]];
+}, [] as number[]); // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 
 // Type inference examples showing precise vs general types
 expectType<typeof range1to4, readonly [1, 2, 3, 4]>('='); // Precise tuple
@@ -7069,7 +6705,7 @@ Never throws - invalid ranges simply return empty arrays
 
 > **range**(`start`, `end`, `step?`): readonly `SafeInt`[]
 
-Defined in: [src/array/array-utils.mts:819](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L819)
+Defined in: [src/array/array-utils.mts:773](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L773)
 
 Creates an array of numbers within a specified range with optional step increment.
 
@@ -7173,8 +6809,11 @@ const indices = Arr.range(0, 10); // readonly [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 const reversedIndices = Arr.range(9, -1, -1); // readonly SafeInt[] -> [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 
 // Functional programming patterns
-const squares = Arr.range(1, 6).map(x => x * x); // [1, 4, 9, 16, 25]
-const fibonacci = Arr.range(0, 10).reduce((acc, _, i) => {\n   *   if (i <= 1) return [...acc, i];\n   *   return [...acc, acc[i-1] + acc[i-2]];\n   * }, [] as number[]); // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+const squares = Arr.range(1, 6).map((x) => x * x); // [1, 4, 9, 16, 25]
+const fibonacci = Arr.range(0, 10).reduce((acc, _, i) => {
+    if (i <= 1) return [...acc, i];
+    return [...acc, acc[i - 1] + acc[i - 2]];
+}, [] as number[]); // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 
 // Type inference examples showing precise vs general types
 expectType<typeof range1to4, readonly [1, 2, 3, 4]>('='); // Precise tuple
@@ -7202,9 +6841,9 @@ Never throws - invalid ranges simply return empty arrays
 
 #### Call Signature
 
-> **scan**\<`E`, `S`\>(`array`, `reducer`, `init`): readonly \[`S`, `S`\]
+> **scan**\<`Ar`, `S`\>(`array`, `reducer`, `init`): readonly \[`S`, `S`\]
 
-Defined in: [src/array/array-utils.mts:3342](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3342)
+Defined in: [src/array/array-utils.mts:4167](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4167)
 
 Returns an array of successively reduced values from an array, starting with an initial value.
 
@@ -7228,11 +6867,9 @@ and initial value, returns a reusable function that can be applied to arrays.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the input array.
+`Ar` _extends_ readonly `unknown`[]
 
 ###### S
 
@@ -7244,7 +6881,7 @@ The type of the accumulated values and the initial value.
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array to scan over. Can be empty (result will still contain the initial value).
 
@@ -7302,9 +6939,9 @@ const temperatures = [20, 25, 18, 30, 22];
 const runningMax = Arr.scan(
     temperatures,
     (max, temp) => Math.max(max, temp),
-    -Infinity,
+    Number.NEGATIVE_INFINITY,
 );
-// [-Infinity, 20, 25, 25, 30, 30]
+// [Number.NEGATIVE_INFINITY, 20, 25, 25, 30, 30]
 
 // Building strings incrementally
 const words = ['Hello', 'beautiful', 'world'];
@@ -7441,7 +7078,7 @@ expectType<typeof stateHistory, NonEmptyArray<State>>('=');
 
 > **scan**\<`E`, `S`\>(`reducer`, `init`): (`array`) => readonly \[`S`, `S`\]
 
-Defined in: [src/array/array-utils.mts:3348](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3348)
+Defined in: [src/array/array-utils.mts:4177](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4177)
 
 Returns an array of successively reduced values from an array, starting with an initial value.
 
@@ -7543,9 +7180,9 @@ const temperatures = [20, 25, 18, 30, 22];
 const runningMax = Arr.scan(
     temperatures,
     (max, temp) => Math.max(max, temp),
-    -Infinity,
+    Number.NEGATIVE_INFINITY,
 );
-// [-Infinity, 20, 25, 25, 30, 30]
+// [Number.NEGATIVE_INFINITY, 20, 25, 25, 30, 30]
 
 // Building strings incrementally
 const words = ['Hello', 'beautiful', 'world'];
@@ -7682,11 +7319,9 @@ expectType<typeof stateHistory, NonEmptyArray<State>>('=');
 
 ### seq()
 
-#### Call Signature
+> **seq**\<`N`\>(`len`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `SeqImpl`\<`MakeTupleImpl`\<`unknown`, `` `${N<N>}` ``, \[\]\>\> : `N` _extends_ `ArgArrPositive` ? readonly \[`Uint32`, `Uint32`\] : readonly `Uint32`[]
 
-> **seq**\<`N`\>(`len`): `Seq`\<`N`\>
-
-Defined in: [src/array/array-utils.mts:500](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L500)
+Defined in: [src/array/array-utils.mts:468](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L468)
 
 Creates a sequence of consecutive integers from 0 to `len-1`.
 
@@ -7696,84 +7331,26 @@ This function generates index sequences with precise compile-time typing:
 - When `len` is a positive runtime value, returns a `NonEmptyArray<SizeType.Arr>`
 - Otherwise, returns a `readonly SizeType.Arr[]` that may be empty
 
-##### Type Parameters
+#### Type Parameters
 
-###### N
+##### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The type of the length parameter. When a `SmallUint` literal is provided,
 the return type will be a tuple containing the sequence [0, 1, 2, ..., N-1].
 
-##### Parameters
+#### Parameters
 
-###### len
+##### len
 
 `N`
 
 The length of the sequence to create. Must be a non-negative integer.
 
-##### Returns
+#### Returns
 
-`Seq`\<`N`\>
-
-An immutable array containing the sequence [0, 1, 2, ..., len-1].
-The exact return type depends on the input:
-
-- `Seq<N>` (precise tuple) when `N` is a `SmallUint` literal
-- `NonEmptyArray<SizeType.Arr>` when `len` is a positive runtime value
-- `readonly SizeType.Arr[]` for general non-negative values
-
-##### Example
-
-```typescript
-// Compile-time known lengths produce precise tuple types
-const indices = Arr.seq(4); // readonly [0, 1, 2, 3]
-const empty = Arr.seq(0); // readonly []
-const single = Arr.seq(1); // readonly [0]
-
-// Runtime positive values produce non-empty arrays
-const count = Math.floor(Math.random() * 5) + 1;
-const nonEmpty = Arr.seq(count); // NonEmptyArray<SizeType.Arr>
-
-// General runtime values may be empty
-const maybeEmpty = Arr.seq(Math.floor(Math.random() * 5)); // readonly SizeType.Arr[]
-
-// Useful for generating array indices
-const data = ['a', 'b', 'c', 'd'];
-const indexSequence = Arr.seq(data.length); // [0, 1, 2, 3]
-
-// Type inference examples
-expectType<typeof indices, readonly [0, 1, 2, 3]>('=');
-expectType<typeof empty, readonly []>('=');
-expectType<typeof single, readonly [0]>('=');
-```
-
-#### Call Signature
-
-> **seq**(`len`): readonly \[`Uint32`, `Uint32`\]
-
-Defined in: [src/array/array-utils.mts:502](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L502)
-
-Creates a sequence of consecutive integers from 0 to `len-1`.
-
-This function generates index sequences with precise compile-time typing:
-
-- When `len` is a compile-time known `SmallUint` (0-100), returns a tuple of consecutive integers
-- When `len` is a positive runtime value, returns a `NonEmptyArray<SizeType.Arr>`
-- Otherwise, returns a `readonly SizeType.Arr[]` that may be empty
-
-##### Parameters
-
-###### len
-
-`ArgArrPositive`
-
-The length of the sequence to create. Must be a non-negative integer.
-
-##### Returns
-
-readonly \[`Uint32`, `Uint32`\]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `SeqImpl`\<`MakeTupleImpl`\<`unknown`, `` `${N<N>}` ``, \[\]\>\> : `N` _extends_ `ArgArrPositive` ? readonly \[`Uint32`, `Uint32`\] : readonly `Uint32`[]
 
 An immutable array containing the sequence [0, 1, 2, ..., len-1].
 The exact return type depends on the input:
@@ -7782,65 +7359,7 @@ The exact return type depends on the input:
 - `NonEmptyArray<SizeType.Arr>` when `len` is a positive runtime value
 - `readonly SizeType.Arr[]` for general non-negative values
 
-##### Example
-
-```typescript
-// Compile-time known lengths produce precise tuple types
-const indices = Arr.seq(4); // readonly [0, 1, 2, 3]
-const empty = Arr.seq(0); // readonly []
-const single = Arr.seq(1); // readonly [0]
-
-// Runtime positive values produce non-empty arrays
-const count = Math.floor(Math.random() * 5) + 1;
-const nonEmpty = Arr.seq(count); // NonEmptyArray<SizeType.Arr>
-
-// General runtime values may be empty
-const maybeEmpty = Arr.seq(Math.floor(Math.random() * 5)); // readonly SizeType.Arr[]
-
-// Useful for generating array indices
-const data = ['a', 'b', 'c', 'd'];
-const indexSequence = Arr.seq(data.length); // [0, 1, 2, 3]
-
-// Type inference examples
-expectType<typeof indices, readonly [0, 1, 2, 3]>('=');
-expectType<typeof empty, readonly []>('=');
-expectType<typeof single, readonly [0]>('=');
-```
-
-#### Call Signature
-
-> **seq**(`len`): readonly `Uint32`[]
-
-Defined in: [src/array/array-utils.mts:506](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L506)
-
-Creates a sequence of consecutive integers from 0 to `len-1`.
-
-This function generates index sequences with precise compile-time typing:
-
-- When `len` is a compile-time known `SmallUint` (0-100), returns a tuple of consecutive integers
-- When `len` is a positive runtime value, returns a `NonEmptyArray<SizeType.Arr>`
-- Otherwise, returns a `readonly SizeType.Arr[]` that may be empty
-
-##### Parameters
-
-###### len
-
-`ArgArrNonNegative`
-
-The length of the sequence to create. Must be a non-negative integer.
-
-##### Returns
-
-readonly `Uint32`[]
-
-An immutable array containing the sequence [0, 1, 2, ..., len-1].
-The exact return type depends on the input:
-
-- `Seq<N>` (precise tuple) when `N` is a `SmallUint` literal
-- `NonEmptyArray<SizeType.Arr>` when `len` is a positive runtime value
-- `readonly SizeType.Arr[]` for general non-negative values
-
-##### Example
+#### Example
 
 ```typescript
 // Compile-time known lengths produce precise tuple types
@@ -7867,11 +7386,159 @@ expectType<typeof single, readonly [0]>('=');
 
 ---
 
+### set()
+
+#### Call Signature
+
+> **set**\<`Ar`, `V`\>(`array`, `index`, `newValue`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `Readonly`\<\{ \[K in string \| number \| symbol\]: V \| Ar\[K\<K\>\] \}\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`Ar`\[`number`\] \| `V`)[]
+
+Defined in: [src/array/array-utils.mts:1543](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1543)
+
+Returns a new tuple with the element at the specified index replaced.
+
+This operation is type-safe with compile-time index validation.
+The resulting tuple type reflects that the element at the given index
+may be either the new type or the original type.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+###### V
+
+`V` = `Ar`\[`number`\]
+
+##### Parameters
+
+###### array
+
+`Ar`
+
+###### index
+
+`ArgArrayIndex`\<`Ar`\>
+
+The index to update (must be valid for the tuple length)
+
+###### newValue
+
+`V`
+
+The new value to place at the index
+
+##### Returns
+
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `Readonly`\<\{ \[K in string \| number \| symbol\]: V \| Ar\[K\<K\>\] \}\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`Ar`\[`number`\] \| `V`)[]
+
+A new tuple with the updated element
+
+##### Example
+
+```typescript
+// Basic usage
+const tpl = ['a', 'b', 'c'] as const;
+const updated = Arr.set(tpl, 1, 'B'); // readonly ['a', 'B', 'c']
+
+// Type changes are reflected
+const mixed = [1, 'hello', true] as const;
+const withNumber = Arr.set(mixed, 1, 42);
+// readonly [1, 42 | 'hello', true]
+
+// Compile-time index validation
+const short = [1, 2] as const;
+// Arr.set(short, 2, 3); // Error: index 2 is out of bounds
+
+// Different value types
+const nums = [1, 2, 3] as const;
+const withString = Arr.set(nums, 0, 'first');
+// readonly ['first' | 1, 2, 3]
+```
+
+#### Call Signature
+
+> **set**\<`V`\>(`index`, `newValue`): \<`Ar`\>(`array`) => `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `Readonly`\<\{ \[K in string \| number \| symbol\]: V \| Ar\[K\<K\>\] \}\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`V` \| `Ar`\[`number`\])[]
+
+Defined in: [src/array/array-utils.mts:1557](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1557)
+
+Returns a new tuple with the element at the specified index replaced.
+
+This operation is type-safe with compile-time index validation.
+The resulting tuple type reflects that the element at the given index
+may be either the new type or the original type.
+
+##### Type Parameters
+
+###### V
+
+`V`
+
+##### Parameters
+
+###### index
+
+`ArgArr`
+
+The index to update (must be valid for the tuple length)
+
+###### newValue
+
+`V`
+
+The new value to place at the index
+
+##### Returns
+
+A new tuple with the updated element
+
+> \<`Ar`\>(`array`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `Readonly`\<\{ \[K in string \| number \| symbol\]: V \| Ar\[K\<K\>\] \}\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`V` \| `Ar`\[`number`\])[]
+
+###### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+###### Parameters
+
+###### array
+
+`Ar`
+
+###### Returns
+
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `Readonly`\<\{ \[K in string \| number \| symbol\]: V \| Ar\[K\<K\>\] \}\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`V` \| `Ar`\[`number`\])[]
+
+##### Example
+
+```typescript
+// Basic usage
+const tpl = ['a', 'b', 'c'] as const;
+const updated = Arr.set(tpl, 1, 'B'); // readonly ['a', 'B', 'c']
+
+// Type changes are reflected
+const mixed = [1, 'hello', true] as const;
+const withNumber = Arr.set(mixed, 1, 42);
+// readonly [1, 42 | 'hello', true]
+
+// Compile-time index validation
+const short = [1, 2] as const;
+// Arr.set(short, 2, 3); // Error: index 2 is out of bounds
+
+// Different value types
+const nums = [1, 2, 3] as const;
+const withString = Arr.set(nums, 0, 'first');
+// readonly ['first' | 1, 2, 3]
+```
+
+---
+
 ### setDifference()
 
 > **setDifference**\<`E`\>(`array1`, `array2`): readonly `E`[]
 
-Defined in: [src/array/array-utils.mts:3769](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3769)
+Defined in: [src/array/array-utils.mts:4598](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4598)
 
 Returns the set difference of two arrays (`array1` - `array2`).
 The difference contains elements that are in `array1` but not in `array2`. Order is based on `array1`.
@@ -7919,7 +7586,7 @@ Arr.setDifference([1, 2], [3, 4]); // [1, 2]
 
 > **setIntersection**\<`E1`, `E2`\>(`array1`, `array2`): readonly `E1` & `E2`[]
 
-Defined in: [src/array/array-utils.mts:3744](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3744)
+Defined in: [src/array/array-utils.mts:4573](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4573)
 
 Returns the intersection of two arrays of primitive types.
 The intersection contains elements that are present in both arrays. Order is based on `array1`.
@@ -7970,120 +7637,7 @@ Arr.setIntersection([1, 2], [3, 4]); // []
 
 ### size()
 
-#### Call Signature
-
-> **size**\<`Ar`\>(`array`): `IntersectBrand`\<`PositiveNumber`, `Uint32`\>
-
-Defined in: [src/array/array-utils.mts:106](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L106)
-
-Returns the size (length) of an array as a type-safe branded integer.
-
-This function provides the array length with enhanced type safety through branded types:
-
-- For arrays known to be non-empty at compile time: returns `PositiveNumber & SizeType.Arr`
-- For general arrays that may be empty: returns `SizeType.Arr` (branded Uint32)
-
-The returned value is always a non-negative integer that can be safely used for array indexing
-and size comparisons. The branded type prevents common integer overflow issues and provides
-better type checking than plain numbers.
-
-##### Type Parameters
-
-###### Ar
-
-`Ar` _extends_ readonly \[`unknown`, `unknown`\]
-
-The exact type of the input array, used for precise return type inference.
-
-##### Parameters
-
-###### array
-
-`Ar`
-
-The array to measure. Can be any readonly array type.
-
-##### Returns
-
-`IntersectBrand`\<`PositiveNumber`, `Uint32`\>
-
-The length of the array as a branded type:
-
-- `IntersectBrand<PositiveNumber, SizeType.Arr>` for known non-empty arrays
-- `SizeType.Arr` for general arrays (branded Uint32, may be 0)
-
-##### Example
-
-```typescript
-// Known non-empty arrays get positive branded type
-const tuple = [1, 2, 3] as const;
-const tupleSize = Arr.size(tuple);
-// Type: IntersectBrand<PositiveNumber, SizeType.Arr>
-// Value: 3 (branded, guaranteed positive)
-
-const nonEmpty: NonEmptyArray<string> = ['a', 'b'] as NonEmptyArray<string>;
-const nonEmptySize = Arr.size(nonEmpty);
-// Type: IntersectBrand<PositiveNumber, SizeType.Arr>
-// Guaranteed to be > 0
-
-// General arrays may be empty, get regular branded type
-const generalArray: number[] = [1, 2, 3];
-const generalSize = Arr.size(generalArray);
-// Type: SizeType.Arr (branded Uint32)
-// May be 0 or positive
-
-// Empty arrays
-const emptyArray = [] as const;
-const emptySize = Arr.size(emptyArray);
-// Type: SizeType.Arr
-// Value: 0 (branded)
-
-// Runtime arrays with unknown content
-const dynamicArray = Array.from({ length: Math.random() * 10 }, (_, i) => i);
-const dynamicSize = Arr.size(dynamicArray);
-// Type: SizeType.Arr (may be 0)
-
-// Using size for safe operations
-const data = [10, 20, 30];
-const dataSize = Arr.size(data);
-
-// Safe for array creation
-const indices = Arr.seq(dataSize); // Creates [0, 1, 2]
-const zeros = Arr.zeros(dataSize); // Creates [0, 0, 0]
-
-// Safe for bounds checking
-const isValidIndex = (index: number) => index >= 0 && index < dataSize;
-
-// Comparison with other sizes
-const otherArray = ['a', 'b'];
-const sizeDiff = Uint32.sub(Arr.size(data), Arr.size(otherArray)); // 1
-
-// Functional composition
-const arrays = [[1, 2], [3, 4, 5], [], [6]];
-const sizes = arrays.map(Arr.size); // [2, 3, 0, 1] (all branded)
-const totalElements = sizes.reduce(Uint32.add, 0); // 6
-
-// Type guards work with size
-if (Arr.size(data) > 0) {
-    // TypeScript knows data is non-empty here
-    const firstElement = data[0]; // Safe access
-}
-
-// Type inference examples
-expectType<typeof tupleSize, IntersectBrand<PositiveNumber, SizeType.Arr>>('=');
-expectType<typeof generalSize, SizeType.Arr>('=');
-expectType<typeof emptySize, SizeType.Arr>('=');
-```
-
-##### See
-
-- [length](#length) - Alias for this function
-- [isEmpty](#isempty) for checking if size is 0
-- [isNonEmpty](#isnonempty) for checking if size > 0
-
-#### Call Signature
-
-> **size**\<`Ar`\>(`array`): `Uint32`
+> **size**\<`Ar`\>(`array`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `IntersectBrand`\<`PositiveNumber`, `Uint32`\> : `Uint32`
 
 Defined in: [src/array/array-utils.mts:110](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L110)
 
@@ -8098,32 +7652,32 @@ The returned value is always a non-negative integer that can be safely used for 
 and size comparisons. The branded type prevents common integer overflow issues and provides
 better type checking than plain numbers.
 
-##### Type Parameters
+#### Type Parameters
 
-###### Ar
+##### Ar
 
 `Ar` _extends_ readonly `unknown`[]
 
 The exact type of the input array, used for precise return type inference.
 
-##### Parameters
+#### Parameters
 
-###### array
+##### array
 
 `Ar`
 
 The array to measure. Can be any readonly array type.
 
-##### Returns
+#### Returns
 
-`Uint32`
+`Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `IntersectBrand`\<`PositiveNumber`, `Uint32`\> : `Uint32`
 
 The length of the array as a branded type:
 
 - `IntersectBrand<PositiveNumber, SizeType.Arr>` for known non-empty arrays
 - `SizeType.Arr` for general arrays (branded Uint32, may be 0)
 
-##### Example
+#### Example
 
 ```typescript
 // Known non-empty arrays get positive branded type
@@ -8132,7 +7686,7 @@ const tupleSize = Arr.size(tuple);
 // Type: IntersectBrand<PositiveNumber, SizeType.Arr>
 // Value: 3 (branded, guaranteed positive)
 
-const nonEmpty: NonEmptyArray<string> = ['a', 'b'] as NonEmptyArray<string>;
+const nonEmpty: NonEmptyArray<string> = ['a', 'b'];
 const nonEmptySize = Arr.size(nonEmpty);
 // Type: IntersectBrand<PositiveNumber, SizeType.Arr>
 // Guaranteed to be > 0
@@ -8162,13 +7716,6 @@ const dataSize = Arr.size(data);
 const indices = Arr.seq(dataSize); // Creates [0, 1, 2]
 const zeros = Arr.zeros(dataSize); // Creates [0, 0, 0]
 
-// Safe for bounds checking
-const isValidIndex = (index: number) => index >= 0 && index < dataSize;
-
-// Comparison with other sizes
-const otherArray = ['a', 'b'];
-const sizeDiff = Uint32.sub(Arr.size(data), Arr.size(otherArray)); // 1
-
 // Functional composition
 const arrays = [[1, 2], [3, 4, 5], [], [6]];
 const sizes = arrays.map(Arr.size); // [2, 3, 0, 1] (all branded)
@@ -8186,7 +7733,7 @@ expectType<typeof generalSize, SizeType.Arr>('=');
 expectType<typeof emptySize, SizeType.Arr>('=');
 ```
 
-##### See
+#### See
 
 - [length](#length) - Alias for this function
 - [isEmpty](#isempty) for checking if size is 0
@@ -8198,9 +7745,9 @@ expectType<typeof emptySize, SizeType.Arr>('=');
 
 #### Call Signature
 
-> **skip**\<`Ar`, `N`\>(`array`, `num`): `Skip`\<`N`, `Ar`\>
+> **skip**\<`Ar`, `N`\>(`array`, `num`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:1475](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1475)
+Defined in: [src/array/array-utils.mts:1419](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1419)
 
 Skips the first N elements of an array.
 
@@ -8216,7 +7763,7 @@ Skips the first N elements of an array.
 
 ###### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The number of elements to skip, constrained to `SmallUint`.
 
@@ -8236,7 +7783,7 @@ The number of elements to skip.
 
 ##### Returns
 
-`Skip`\<`N`, `Ar`\>
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
 A new array containing the elements after skipping the first N.
 
@@ -8254,113 +7801,9 @@ console.log(result); // [3, 4, 5]
 
 #### Call Signature
 
-> **skip**\<`E`\>(`array`, `num`): readonly `E`[]
+> **skip**\<`N`\>(`num`): \<`Ar`\>(`array`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:1480](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1480)
-
-Skips the first N elements of an array.
-
-- If the array is a tuple, the return type is inferred as a tuple with the first N elements removed.
-- If the array is a non-empty array and N is a positive integer, returns a readonly array (may be empty).
-- Otherwise, returns a readonly array with the first N elements skipped.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of the array (can be a tuple for more precise typing).
-
-##### Parameters
-
-###### array
-
-readonly \[`E`, `E`\]
-
-The input array.
-
-###### num
-
-`ArgArrPositive`
-
-The number of elements to skip.
-
-##### Returns
-
-readonly `E`[]
-
-A new array containing the elements after skipping the first N.
-
-##### Example
-
-```ts
-// Regular usage
-Arr.skip([1, 2, 3, 4] as const, 2); // [3, 4]
-
-// Curried usage for pipe composition
-const skipFirst2 = Arr.skip(2);
-const result = pipe([1, 2, 3, 4, 5]).map(skipFirst2).value;
-console.log(result); // [3, 4, 5]
-```
-
-#### Call Signature
-
-> **skip**\<`E`\>(`array`, `num`): readonly `E`[]
-
-Defined in: [src/array/array-utils.mts:1485](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1485)
-
-Skips the first N elements of an array.
-
-- If the array is a tuple, the return type is inferred as a tuple with the first N elements removed.
-- If the array is a non-empty array and N is a positive integer, returns a readonly array (may be empty).
-- Otherwise, returns a readonly array with the first N elements skipped.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of the array (can be a tuple for more precise typing).
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### num
-
-`ArgArrNonNegative`
-
-The number of elements to skip.
-
-##### Returns
-
-readonly `E`[]
-
-A new array containing the elements after skipping the first N.
-
-##### Example
-
-```ts
-// Regular usage
-Arr.skip([1, 2, 3, 4] as const, 2); // [3, 4]
-
-// Curried usage for pipe composition
-const skipFirst2 = Arr.skip(2);
-const result = pipe([1, 2, 3, 4, 5]).map(skipFirst2).value;
-console.log(result); // [3, 4, 5]
-```
-
-#### Call Signature
-
-> **skip**\<`N`\>(`num`): \<`Ar`\>(`array`) => `Skip`\<`N`, `Ar`\>
-
-Defined in: [src/array/array-utils.mts:1490](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1490)
+Defined in: [src/array/array-utils.mts:1428](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1428)
 
 Skips the first N elements of an array.
 
@@ -8372,7 +7815,7 @@ Skips the first N elements of an array.
 
 ###### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The number of elements to skip, constrained to `SmallUint`.
 
@@ -8388,7 +7831,7 @@ The number of elements to skip.
 
 A new array containing the elements after skipping the first N.
 
-> \<`Ar`\>(`array`): `Skip`\<`N`, `Ar`\>
+> \<`Ar`\>(`array`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
 ###### Type Parameters
 
@@ -8404,115 +7847,7 @@ A new array containing the elements after skipping the first N.
 
 ###### Returns
 
-`Skip`\<`N`, `Ar`\>
-
-##### Example
-
-```ts
-// Regular usage
-Arr.skip([1, 2, 3, 4] as const, 2); // [3, 4]
-
-// Curried usage for pipe composition
-const skipFirst2 = Arr.skip(2);
-const result = pipe([1, 2, 3, 4, 5]).map(skipFirst2).value;
-console.log(result); // [3, 4, 5]
-```
-
-#### Call Signature
-
-> **skip**(`num`): \<`E`\>(`array`) => readonly `E`[]
-
-Defined in: [src/array/array-utils.mts:1494](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1494)
-
-Skips the first N elements of an array.
-
-- If the array is a tuple, the return type is inferred as a tuple with the first N elements removed.
-- If the array is a non-empty array and N is a positive integer, returns a readonly array (may be empty).
-- Otherwise, returns a readonly array with the first N elements skipped.
-
-##### Parameters
-
-###### num
-
-`ArgArrPositive`
-
-The number of elements to skip.
-
-##### Returns
-
-A new array containing the elements after skipping the first N.
-
-> \<`E`\>(`array`): readonly `E`[]
-
-###### Type Parameters
-
-###### E
-
-`E`
-
-###### Parameters
-
-###### array
-
-readonly \[`E`, `E`\]
-
-###### Returns
-
-readonly `E`[]
-
-##### Example
-
-```ts
-// Regular usage
-Arr.skip([1, 2, 3, 4] as const, 2); // [3, 4]
-
-// Curried usage for pipe composition
-const skipFirst2 = Arr.skip(2);
-const result = pipe([1, 2, 3, 4, 5]).map(skipFirst2).value;
-console.log(result); // [3, 4, 5]
-```
-
-#### Call Signature
-
-> **skip**(`num`): \<`E`\>(`array`) => readonly `E`[]
-
-Defined in: [src/array/array-utils.mts:1498](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1498)
-
-Skips the first N elements of an array.
-
-- If the array is a tuple, the return type is inferred as a tuple with the first N elements removed.
-- If the array is a non-empty array and N is a positive integer, returns a readonly array (may be empty).
-- Otherwise, returns a readonly array with the first N elements skipped.
-
-##### Parameters
-
-###### num
-
-`ArgArrNonNegative`
-
-The number of elements to skip.
-
-##### Returns
-
-A new array containing the elements after skipping the first N.
-
-> \<`E`\>(`array`): readonly `E`[]
-
-###### Type Parameters
-
-###### E
-
-`E`
-
-###### Parameters
-
-###### array
-
-readonly `E`[]
-
-###### Returns
-
-readonly `E`[]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
 ##### Example
 
@@ -8532,9 +7867,9 @@ console.log(result); // [3, 4, 5]
 
 #### Call Signature
 
-> **skipLast**\<`Ar`, `N`\>(`array`, `num`): `SkipLast`\<`N`, `Ar`\>
+> **skipLast**\<`Ar`, `N`\>(`array`, `num`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `SkipLast`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:1545](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1545)
+Defined in: [src/array/array-utils.mts:1474](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1474)
 
 Skips the last N elements of an array.
 
@@ -8550,7 +7885,7 @@ Skips the last N elements of an array.
 
 ###### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The number of elements to skip, constrained to `SmallUint`.
 
@@ -8570,7 +7905,7 @@ The number of elements to skip from the end.
 
 ##### Returns
 
-`SkipLast`\<`N`, `Ar`\>
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `SkipLast`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
 A new array containing the elements after skipping the last N.
 
@@ -8588,9 +7923,9 @@ console.log(result); // [1, 2, 3]
 
 #### Call Signature
 
-> **skipLast**\<`N`\>(`num`): \<`Ar`\>(`array`) => `SkipLast`\<`N`, `Ar`\>
+> **skipLast**\<`N`\>(`num`): \<`Ar`\>(`array`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `SkipLast`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:1550](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1550)
+Defined in: [src/array/array-utils.mts:1483](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1483)
 
 Skips the last N elements of an array.
 
@@ -8602,7 +7937,7 @@ Skips the last N elements of an array.
 
 ###### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The number of elements to skip, constrained to `SmallUint`.
 
@@ -8618,7 +7953,7 @@ The number of elements to skip from the end.
 
 A new array containing the elements after skipping the last N.
 
-> \<`Ar`\>(`array`): `SkipLast`\<`N`, `Ar`\>
+> \<`Ar`\>(`array`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `SkipLast`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
 ###### Type Parameters
 
@@ -8634,113 +7969,7 @@ A new array containing the elements after skipping the last N.
 
 ###### Returns
 
-`SkipLast`\<`N`, `Ar`\>
-
-##### Example
-
-```ts
-// Regular usage
-Arr.skipLast([1, 2, 3, 4] as const, 2); // [1, 2]
-
-// Curried usage for pipe composition
-const skipLast2 = Arr.skipLast(2);
-const result = pipe([1, 2, 3, 4, 5]).map(skipLast2).value;
-console.log(result); // [1, 2, 3]
-```
-
-#### Call Signature
-
-> **skipLast**\<`E`\>(`array`, `num`): readonly `E`[]
-
-Defined in: [src/array/array-utils.mts:1554](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1554)
-
-Skips the last N elements of an array.
-
-- If the array is a tuple, the return type is inferred as a tuple with the last N elements removed.
-- If the array is a non-empty array and N is a positive integer, returns a readonly array (may be empty).
-- Otherwise, returns a readonly array with the last N elements skipped.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of the array (can be a tuple for more precise typing).
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### num
-
-`ArgArrNonNegative`
-
-The number of elements to skip from the end.
-
-##### Returns
-
-readonly `E`[]
-
-A new array containing the elements after skipping the last N.
-
-##### Example
-
-```ts
-// Regular usage
-Arr.skipLast([1, 2, 3, 4] as const, 2); // [1, 2]
-
-// Curried usage for pipe composition
-const skipLast2 = Arr.skipLast(2);
-const result = pipe([1, 2, 3, 4, 5]).map(skipLast2).value;
-console.log(result); // [1, 2, 3]
-```
-
-#### Call Signature
-
-> **skipLast**(`num`): \<`E`\>(`array`) => readonly `E`[]
-
-Defined in: [src/array/array-utils.mts:1559](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1559)
-
-Skips the last N elements of an array.
-
-- If the array is a tuple, the return type is inferred as a tuple with the last N elements removed.
-- If the array is a non-empty array and N is a positive integer, returns a readonly array (may be empty).
-- Otherwise, returns a readonly array with the last N elements skipped.
-
-##### Parameters
-
-###### num
-
-`ArgArrNonNegative`
-
-The number of elements to skip from the end.
-
-##### Returns
-
-A new array containing the elements after skipping the last N.
-
-> \<`E`\>(`array`): readonly `E`[]
-
-###### Type Parameters
-
-###### E
-
-`E`
-
-###### Parameters
-
-###### array
-
-readonly `E`[]
-
-###### Returns
-
-readonly `E`[]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `SkipLast`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]
 
 ##### Example
 
@@ -8760,9 +7989,9 @@ console.log(result); // [1, 2, 3]
 
 #### Call Signature
 
-> **sliceClamped**\<`E`\>(`array`, `start`, `end`): readonly `E`[]
+> **sliceClamped**\<`Ar`\>(`array`, `start`, `end`): readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:1245](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1245)
+Defined in: [src/array/array-utils.mts:1193](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1193)
 
 Slices an array with automatically clamped start and end indices for safe bounds handling.
 
@@ -8782,35 +8011,33 @@ indices, it returns a function that can be applied to arrays.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The array to slice (when using direct call syntax).
 
 ###### start
 
-`ArgArr`
+`ArgArrayIndexWithNegative`\<`Ar`\>
 
 The start index for the slice (inclusive). Will be clamped to valid bounds.
 
 ###### end
 
-`ArgArr`
+`ArgArrayIndexWithNegative`\<`Ar`\>
 
 The end index for the slice (exclusive). Will be clamped to valid bounds.
 
 ##### Returns
 
-readonly `E`[]
+readonly `Ar`\[`number`\][]
 
 A new immutable array containing the sliced elements. Always returns a valid array,
 never throws for out-of-bounds indices.
@@ -8879,7 +8106,7 @@ try {
 
 > **sliceClamped**(`start`, `end`): \<`E`\>(`array`) => readonly `E`[]
 
-Defined in: [src/array/array-utils.mts:1251](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1251)
+Defined in: [src/array/array-utils.mts:1199](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1199)
 
 Slices an array with automatically clamped start and end indices for safe bounds handling.
 
@@ -8901,13 +8128,13 @@ indices, it returns a function that can be applied to arrays.
 
 ###### start
 
-`ArgArr`
+`ArgArrWithNegative`
 
 The start index for the slice (inclusive). Will be clamped to valid bounds.
 
 ###### end
 
-`ArgArr`
+`ArgArrWithNegative`
 
 The end index for the slice (exclusive). Will be clamped to valid bounds.
 
@@ -8996,11 +8223,131 @@ try {
 
 ---
 
+### some()
+
+#### Call Signature
+
+> **some**\<`Ar`\>(`array`, `predicate`): `boolean`
+
+Defined in: [src/array/array-utils.mts:2906](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2906)
+
+Tests whether at least one element in an array passes a test implemented by a predicate function.
+
+This function returns `true` if at least one element satisfies the predicate, `false` otherwise.
+For empty arrays, it returns `false`.
+
+##### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+The exact type of the input array.
+
+##### Parameters
+
+###### array
+
+`Ar`
+
+The array to test.
+
+###### predicate
+
+(`a`, `index`) => `boolean`
+
+A function that tests each element.
+
+##### Returns
+
+`boolean`
+
+`true` if at least one element passes the test, `false` otherwise.
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [1, 3, 5, 8];
+const hasEven = Arr.some(numbers, (n) => n % 2 === 0); // true
+
+// Curried usage
+const isNegative = (n: number) => n < 0;
+const hasNegative = Arr.some(isNegative);
+const result = hasNegative([1, 2, -3]); // true
+
+// Empty array
+const empty: number[] = [];
+const result2 = Arr.some(empty, (n) => n > 0); // false
+```
+
+#### Call Signature
+
+> **some**\<`E`\>(`predicate`): (`array`) => `boolean`
+
+Defined in: [src/array/array-utils.mts:2911](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2911)
+
+Tests whether at least one element in an array passes a test implemented by a predicate function.
+
+This function returns `true` if at least one element satisfies the predicate, `false` otherwise.
+For empty arrays, it returns `false`.
+
+##### Type Parameters
+
+###### E
+
+`E`
+
+The type of elements in the array.
+
+##### Parameters
+
+###### predicate
+
+(`a`, `index`) => `boolean`
+
+A function that tests each element.
+
+##### Returns
+
+`true` if at least one element passes the test, `false` otherwise.
+
+> (`array`): `boolean`
+
+###### Parameters
+
+###### array
+
+readonly `E`[]
+
+###### Returns
+
+`boolean`
+
+##### Example
+
+```typescript
+// Direct usage
+const numbers = [1, 3, 5, 8];
+const hasEven = Arr.some(numbers, (n) => n % 2 === 0); // true
+
+// Curried usage
+const isNegative = (n: number) => n < 0;
+const hasNegative = Arr.some(isNegative);
+const result = hasNegative([1, 2, -3]); // true
+
+// Empty array
+const empty: number[] = [];
+const result2 = Arr.some(empty, (n) => n > 0); // false
+```
+
+---
+
 ### sortedNumSetDifference()
 
 > **sortedNumSetDifference**\<`E`\>(`sortedList1`, `sortedList2`): readonly `E`[]
 
-Defined in: [src/array/array-utils.mts:3789](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3789)
+Defined in: [src/array/array-utils.mts:4618](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4618)
 
 Returns the set difference of two sorted arrays of numbers (`sortedList1` - `sortedList2`).
 This operation is more efficient for sorted arrays than the generic `setDifference`.
@@ -9050,7 +8397,7 @@ Arr.sortedNumSetDifference([1, 2], [3, 4]); // [1, 2]
 
 > **sum**(`array`): `0`
 
-Defined in: [src/array/array-utils.mts:2906](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2906)
+Defined in: [src/array/array-utils.mts:3388](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3388)
 
 Calculates the sum of numbers in an array.
 
@@ -9080,7 +8427,7 @@ Arr.sum([-1, 0, 1]); // 0
 
 > **sum**\<`N`\>(`array`): `N`
 
-Defined in: [src/array/array-utils.mts:2908](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2908)
+Defined in: [src/array/array-utils.mts:3390](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3390)
 
 Calculates the sum of numbers in an array.
 
@@ -9116,7 +8463,7 @@ Arr.sum([-1, 0, 1]); // 0
 
 > **sum**(`array`): `NonNegativeInt`
 
-Defined in: [src/array/array-utils.mts:2910](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2910)
+Defined in: [src/array/array-utils.mts:3392](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3392)
 
 Calculates the sum of numbers in an array.
 
@@ -9146,7 +8493,7 @@ Arr.sum([-1, 0, 1]); // 0
 
 > **sum**(`array`): `Int`
 
-Defined in: [src/array/array-utils.mts:2912](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2912)
+Defined in: [src/array/array-utils.mts:3394](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3394)
 
 Calculates the sum of numbers in an array.
 
@@ -9176,7 +8523,7 @@ Arr.sum([-1, 0, 1]); // 0
 
 > **sum**(`array`): `number`
 
-Defined in: [src/array/array-utils.mts:2914](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2914)
+Defined in: [src/array/array-utils.mts:3396](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3396)
 
 Calculates the sum of numbers in an array.
 
@@ -9208,7 +8555,7 @@ Arr.sum([-1, 0, 1]); // 0
 
 > **tail**\<`Ar`\>(`array`): `Tail`\<`Ar`\>
 
-Defined in: [src/array/array-utils.mts:1288](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1288)
+Defined in: [src/array/array-utils.mts:1240](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1240)
 
 Returns all elements of an array except the first one.
 
@@ -9246,9 +8593,9 @@ Arr.tail([]); // []
 
 #### Call Signature
 
-> **take**\<`Ar`, `N`\>(`array`, `num`): `Take`\<`N`, `Ar`\>
+> **take**\<`Ar`, `N`\>(`array`, `num`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:1335](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1335)
+Defined in: [src/array/array-utils.mts:1287](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1287)
 
 Takes the first N elements from an array.
 
@@ -9264,7 +8611,7 @@ Takes the first N elements from an array.
 
 ###### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The number of elements to take, constrained to `SmallUint`.
 
@@ -9284,7 +8631,7 @@ The number of elements to take.
 
 ##### Returns
 
-`Take`\<`N`, `Ar`\>
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 A new array containing the first N elements.
 
@@ -9302,9 +8649,9 @@ console.log(result); // [1, 2, 3]
 
 #### Call Signature
 
-> **take**\<`N`\>(`num`): \<`Ar`\>(`array`) => `Take`\<`N`, `Ar`\>
+> **take**\<`N`\>(`num`): \<`Ar`\>(`array`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:1340](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1340)
+Defined in: [src/array/array-utils.mts:1301](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1301)
 
 Takes the first N elements from an array.
 
@@ -9316,7 +8663,7 @@ Takes the first N elements from an array.
 
 ###### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The number of elements to take, constrained to `SmallUint`.
 
@@ -9332,7 +8679,7 @@ The number of elements to take.
 
 A new array containing the first N elements.
 
-> \<`Ar`\>(`array`): `Take`\<`N`, `Ar`\>
+> \<`Ar`\>(`array`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 ###### Type Parameters
 
@@ -9348,219 +8695,7 @@ A new array containing the first N elements.
 
 ###### Returns
 
-`Take`\<`N`, `Ar`\>
-
-##### Example
-
-```ts
-// Regular usage
-Arr.take([1, 2, 3, 4] as const, 2); // [1, 2]
-
-// Curried usage for pipe composition
-const takeFirst3 = Arr.take(3);
-const result = pipe([1, 2, 3, 4, 5]).map(takeFirst3).value;
-console.log(result); // [1, 2, 3]
-```
-
-#### Call Signature
-
-> **take**\<`E`\>(`array`, `num`): readonly \[`E`, `E`\]
-
-Defined in: [src/array/array-utils.mts:1344](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1344)
-
-Takes the first N elements from an array.
-
-- If the array is a tuple, the return type is inferred as a tuple of the first N elements.
-- If the array is a NonEmptyArray and N is a SizeType.ArgArrPositive, returns a NonEmptyArray.
-- Otherwise, returns a readonly array of up to N elements.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of the array (can be a tuple for more precise typing).
-
-##### Parameters
-
-###### array
-
-readonly \[`E`, `E`\]
-
-The input array.
-
-###### num
-
-`ArgArrPositive`
-
-The number of elements to take.
-
-##### Returns
-
-readonly \[`E`, `E`\]
-
-A new array containing the first N elements.
-
-##### Example
-
-```ts
-// Regular usage
-Arr.take([1, 2, 3, 4] as const, 2); // [1, 2]
-
-// Curried usage for pipe composition
-const takeFirst3 = Arr.take(3);
-const result = pipe([1, 2, 3, 4, 5]).map(takeFirst3).value;
-console.log(result); // [1, 2, 3]
-```
-
-#### Call Signature
-
-> **take**(`num`): \<`E`\>(`array`) => readonly \[`E`, `E`\]
-
-Defined in: [src/array/array-utils.mts:1349](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1349)
-
-Takes the first N elements from an array.
-
-- If the array is a tuple, the return type is inferred as a tuple of the first N elements.
-- If the array is a NonEmptyArray and N is a SizeType.ArgArrPositive, returns a NonEmptyArray.
-- Otherwise, returns a readonly array of up to N elements.
-
-##### Parameters
-
-###### num
-
-`ArgArrPositive`
-
-The number of elements to take.
-
-##### Returns
-
-A new array containing the first N elements.
-
-> \<`E`\>(`array`): readonly \[`E`, `E`\]
-
-###### Type Parameters
-
-###### E
-
-`E`
-
-###### Parameters
-
-###### array
-
-readonly \[`E`, `E`\]
-
-###### Returns
-
-readonly \[`E`, `E`\]
-
-##### Example
-
-```ts
-// Regular usage
-Arr.take([1, 2, 3, 4] as const, 2); // [1, 2]
-
-// Curried usage for pipe composition
-const takeFirst3 = Arr.take(3);
-const result = pipe([1, 2, 3, 4, 5]).map(takeFirst3).value;
-console.log(result); // [1, 2, 3]
-```
-
-#### Call Signature
-
-> **take**\<`E`\>(`array`, `num`): readonly `E`[]
-
-Defined in: [src/array/array-utils.mts:1353](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1353)
-
-Takes the first N elements from an array.
-
-- If the array is a tuple, the return type is inferred as a tuple of the first N elements.
-- If the array is a NonEmptyArray and N is a SizeType.ArgArrPositive, returns a NonEmptyArray.
-- Otherwise, returns a readonly array of up to N elements.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of the array (can be a tuple for more precise typing).
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### num
-
-`ArgArrNonNegative`
-
-The number of elements to take.
-
-##### Returns
-
-readonly `E`[]
-
-A new array containing the first N elements.
-
-##### Example
-
-```ts
-// Regular usage
-Arr.take([1, 2, 3, 4] as const, 2); // [1, 2]
-
-// Curried usage for pipe composition
-const takeFirst3 = Arr.take(3);
-const result = pipe([1, 2, 3, 4, 5]).map(takeFirst3).value;
-console.log(result); // [1, 2, 3]
-```
-
-#### Call Signature
-
-> **take**(`num`): \<`E`\>(`array`) => readonly `E`[]
-
-Defined in: [src/array/array-utils.mts:1358](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1358)
-
-Takes the first N elements from an array.
-
-- If the array is a tuple, the return type is inferred as a tuple of the first N elements.
-- If the array is a NonEmptyArray and N is a SizeType.ArgArrPositive, returns a NonEmptyArray.
-- Otherwise, returns a readonly array of up to N elements.
-
-##### Parameters
-
-###### num
-
-`ArgArrNonNegative`
-
-The number of elements to take.
-
-##### Returns
-
-A new array containing the first N elements.
-
-> \<`E`\>(`array`): readonly `E`[]
-
-###### Type Parameters
-
-###### E
-
-`E`
-
-###### Parameters
-
-###### array
-
-readonly `E`[]
-
-###### Returns
-
-readonly `E`[]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 ##### Example
 
@@ -9580,9 +8715,9 @@ console.log(result); // [1, 2, 3]
 
 #### Call Signature
 
-> **takeLast**\<`Ar`, `N`\>(`array`, `num`): `TakeLast`\<`N`, `Ar`\>
+> **takeLast**\<`Ar`, `N`\>(`array`, `num`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:1405](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1405)
+Defined in: [src/array/array-utils.mts:1353](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1353)
 
 Takes the last N elements from an array.
 
@@ -9598,7 +8733,7 @@ Takes the last N elements from an array.
 
 ###### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The number of elements to take, constrained to `SmallUint`.
 
@@ -9618,7 +8753,7 @@ The number of elements to take.
 
 ##### Returns
 
-`TakeLast`\<`N`, `Ar`\>
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 A new array containing the last N elements.
 
@@ -9636,9 +8771,9 @@ console.log(result); // [4, 5]
 
 #### Call Signature
 
-> **takeLast**\<`N`\>(`num`): \<`Ar`\>(`array`) => `TakeLast`\<`N`, `Ar`\>
+> **takeLast**\<`N`\>(`num`): \<`Ar`\>(`array`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:1410](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1410)
+Defined in: [src/array/array-utils.mts:1367](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1367)
 
 Takes the last N elements from an array.
 
@@ -9650,7 +8785,7 @@ Takes the last N elements from an array.
 
 ###### N
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+`N` _extends_ `ArgArr`
 
 The number of elements to take, constrained to `SmallUint`.
 
@@ -9666,7 +8801,7 @@ The number of elements to take.
 
 A new array containing the last N elements.
 
-> \<`Ar`\>(`array`): `TakeLast`\<`N`, `Ar`\>
+> \<`Ar`\>(`array`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 ###### Type Parameters
 
@@ -9682,219 +8817,7 @@ A new array containing the last N elements.
 
 ###### Returns
 
-`TakeLast`\<`N`, `Ar`\>
-
-##### Example
-
-```ts
-// Regular usage
-Arr.takeLast([1, 2, 3, 4] as const, 2); // [3, 4]
-
-// Curried usage for pipe composition
-const takeLast2 = Arr.takeLast(2);
-const result = pipe([1, 2, 3, 4, 5]).map(takeLast2).value;
-console.log(result); // [4, 5]
-```
-
-#### Call Signature
-
-> **takeLast**\<`E`\>(`array`, `num`): readonly \[`E`, `E`\]
-
-Defined in: [src/array/array-utils.mts:1414](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1414)
-
-Takes the last N elements from an array.
-
-- If the array is a tuple, the return type is inferred as a tuple of the last N elements.
-- If the array is a non-empty array and N is a positive integer, returns a non-empty array.
-- Otherwise, returns a readonly array of up to N elements.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of the array (can be a tuple for more precise typing).
-
-##### Parameters
-
-###### array
-
-readonly \[`E`, `E`\]
-
-The input array.
-
-###### num
-
-`ArgArrPositive`
-
-The number of elements to take.
-
-##### Returns
-
-readonly \[`E`, `E`\]
-
-A new array containing the last N elements.
-
-##### Example
-
-```ts
-// Regular usage
-Arr.takeLast([1, 2, 3, 4] as const, 2); // [3, 4]
-
-// Curried usage for pipe composition
-const takeLast2 = Arr.takeLast(2);
-const result = pipe([1, 2, 3, 4, 5]).map(takeLast2).value;
-console.log(result); // [4, 5]
-```
-
-#### Call Signature
-
-> **takeLast**(`num`): \<`E`\>(`array`) => readonly \[`E`, `E`\]
-
-Defined in: [src/array/array-utils.mts:1419](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1419)
-
-Takes the last N elements from an array.
-
-- If the array is a tuple, the return type is inferred as a tuple of the last N elements.
-- If the array is a non-empty array and N is a positive integer, returns a non-empty array.
-- Otherwise, returns a readonly array of up to N elements.
-
-##### Parameters
-
-###### num
-
-`ArgArrPositive`
-
-The number of elements to take.
-
-##### Returns
-
-A new array containing the last N elements.
-
-> \<`E`\>(`array`): readonly \[`E`, `E`\]
-
-###### Type Parameters
-
-###### E
-
-`E`
-
-###### Parameters
-
-###### array
-
-readonly \[`E`, `E`\]
-
-###### Returns
-
-readonly \[`E`, `E`\]
-
-##### Example
-
-```ts
-// Regular usage
-Arr.takeLast([1, 2, 3, 4] as const, 2); // [3, 4]
-
-// Curried usage for pipe composition
-const takeLast2 = Arr.takeLast(2);
-const result = pipe([1, 2, 3, 4, 5]).map(takeLast2).value;
-console.log(result); // [4, 5]
-```
-
-#### Call Signature
-
-> **takeLast**\<`E`\>(`array`, `num`): readonly `E`[]
-
-Defined in: [src/array/array-utils.mts:1423](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1423)
-
-Takes the last N elements from an array.
-
-- If the array is a tuple, the return type is inferred as a tuple of the last N elements.
-- If the array is a non-empty array and N is a positive integer, returns a non-empty array.
-- Otherwise, returns a readonly array of up to N elements.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of the array (can be a tuple for more precise typing).
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### num
-
-`ArgArrNonNegative`
-
-The number of elements to take.
-
-##### Returns
-
-readonly `E`[]
-
-A new array containing the last N elements.
-
-##### Example
-
-```ts
-// Regular usage
-Arr.takeLast([1, 2, 3, 4] as const, 2); // [3, 4]
-
-// Curried usage for pipe composition
-const takeLast2 = Arr.takeLast(2);
-const result = pipe([1, 2, 3, 4, 5]).map(takeLast2).value;
-console.log(result); // [4, 5]
-```
-
-#### Call Signature
-
-> **takeLast**(`num`): \<`E`\>(`array`) => readonly `E`[]
-
-Defined in: [src/array/array-utils.mts:1428](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1428)
-
-Takes the last N elements from an array.
-
-- If the array is a tuple, the return type is inferred as a tuple of the last N elements.
-- If the array is a non-empty array and N is a positive integer, returns a non-empty array.
-- Otherwise, returns a readonly array of up to N elements.
-
-##### Parameters
-
-###### num
-
-`ArgArrNonNegative`
-
-The number of elements to take.
-
-##### Returns
-
-A new array containing the last N elements.
-
-> \<`E`\>(`array`): readonly `E`[]
-
-###### Type Parameters
-
-###### E
-
-`E`
-
-###### Parameters
-
-###### array
-
-readonly `E`[]
-
-###### Returns
-
-readonly `E`[]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 ##### Example
 
@@ -9914,103 +8837,141 @@ console.log(result); // [4, 5]
 
 #### Call Signature
 
-> **toFilled**\<`E`\>(`array`, `value`): readonly `E`[]
+> **toFilled**\<`Ar`, `V`\>(`array`, `value`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V`, `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V`, `V`\] : readonly `V`[]
 
-Defined in: [src/array/array-utils.mts:1984](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1984)
+Defined in: [src/array/array-utils.mts:2022](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2022)
 
-Fills an array with a value (creates a new filled array).
+Creates a new array of the same length filled with a specified value.
+
+This function replaces all elements in the array with the provided value,
+maintaining the original array's length and structure. It provides type-safe
+array filling with precise return types.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
+`Ar` _extends_ readonly `unknown`[]
+
+The exact type of the input array.
+
+###### V
+
+`V`
+
+The type of the fill value.
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
-The array.
+The array to fill.
 
 ###### value
 
-`E`
+`V`
 
-The value to fill with.
+The value to fill the array with.
 
 ##### Returns
 
-readonly `E`[]
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V`, `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V`, `V`\] : readonly `V`[]
 
-A new filled array.
+A new array of the same length filled with the specified value:
+
+- For fixed-length arrays: returns `ArrayOfLength<Ar['length'], V>`
+- For non-empty arrays: returns `NonEmptyArray<V>`
+- For general arrays: returns `readonly V[]`
 
 ##### Example
 
 ```typescript
 // Regular usage
-const arr = [1, 2, 3, 4, 5];
-const result = Arr.toFilled(arr, 0, 1, 4);
-console.log(result); // [1, 0, 0, 0, 5]
+const numbers = [1, 2, 3, 4, 5];
+const zeros = Arr.toFilled(numbers, 0); // [0, 0, 0, 0, 0]
 
 // Curried usage for pipe composition
-const fillWithZeros = Arr.toFilled(0, 1, 3);
-const result2 = pipe([1, 2, 3, 4]).map(fillWithZeros).value;
-console.log(result2); // [1, 0, 0, 4]
+const fillWithX = Arr.toFilled('X');
+const result = pipe(['a', 'b', 'c']).map(fillWithX).value; // ['X', 'X', 'X']
 ```
+
+##### See
+
+- [toRangeFilled](#torangefilled) for filling only a specific range
+- [create](#create) for creating new arrays filled with a value
 
 #### Call Signature
 
-> **toFilled**\<`E`\>(`value`): (`array`) => readonly `E`[]
+> **toFilled**\<`V`\>(`value`): \<`Ar`\>(`array`) => `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V`, `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V`, `V`\] : readonly `V`[]
 
-Defined in: [src/array/array-utils.mts:1986](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1986)
+Defined in: [src/array/array-utils.mts:2032](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2032)
 
-Fills an array with a value (creates a new filled array).
+Creates a new array of the same length filled with a specified value.
+
+This function replaces all elements in the array with the provided value,
+maintaining the original array's length and structure. It provides type-safe
+array filling with precise return types.
 
 ##### Type Parameters
 
-###### E
+###### V
 
-`E`
+`V`
+
+The type of the fill value.
 
 ##### Parameters
 
 ###### value
 
-`E`
+`V`
 
-The value to fill with.
+The value to fill the array with.
 
 ##### Returns
 
-A new filled array.
+A new array of the same length filled with the specified value:
 
-> (`array`): readonly `E`[]
+- For fixed-length arrays: returns `ArrayOfLength<Ar['length'], V>`
+- For non-empty arrays: returns `NonEmptyArray<V>`
+- For general arrays: returns `readonly V[]`
+
+> \<`Ar`\>(`array`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V`, `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V`, `V`\] : readonly `V`[]
+
+###### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
 
 ###### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 ###### Returns
 
-readonly `E`[]
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V`, `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V`, `V`\] : readonly `V`[]
 
 ##### Example
 
 ```typescript
 // Regular usage
-const arr = [1, 2, 3, 4, 5];
-const result = Arr.toFilled(arr, 0, 1, 4);
-console.log(result); // [1, 0, 0, 0, 5]
+const numbers = [1, 2, 3, 4, 5];
+const zeros = Arr.toFilled(numbers, 0); // [0, 0, 0, 0, 0]
 
 // Curried usage for pipe composition
-const fillWithZeros = Arr.toFilled(0, 1, 3);
-const result2 = pipe([1, 2, 3, 4]).map(fillWithZeros).value;
-console.log(result2); // [1, 0, 0, 4]
+const fillWithX = Arr.toFilled('X');
+const result = pipe(['a', 'b', 'c']).map(fillWithX).value; // ['X', 'X', 'X']
 ```
+
+##### See
+
+- [toRangeFilled](#torangefilled) for filling only a specific range
+- [create](#create) for creating new arrays filled with a value
 
 ---
 
@@ -10018,36 +8979,34 @@ console.log(result2); // [1, 0, 0, 4]
 
 #### Call Signature
 
-> **toInserted**\<`E`, `V`\>(`array`, `index`, `newValue`): readonly \[`E` \| `V`, `E` \| `V`\]
+> **toInserted**\<`Ar`, `V`\>(`array`, `index`, `newValue`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`Ar`\[`number`\] \| `V`, `` `${CastToNumber<Increment<Ar["length"]>>}` ``, \[\]\> : readonly \[`Ar`\[`number`\] \| `V`, `Ar`\[`number`\] \| `V`\]
 
-Defined in: [src/array/array-utils.mts:1790](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1790)
+Defined in: [src/array/array-utils.mts:1806](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1806)
 
 Returns a new array with a new value inserted at the specified index.
 Index can be out of bounds (e.g., negative or greater than length), `toSpliced` handles this.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ###### V
 
-`V` = `E`
+`V` = `Ar`\[`number`\]
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array.
 
 ###### index
 
-`ArgArrNonNegative`
+`ArgArrayIndexWithNegative`\<`Ar`\>
 
 The index at which to insert the new value.
 
@@ -10059,7 +9018,7 @@ The value to insert.
 
 ##### Returns
 
-readonly \[`E` \| `V`, `E` \| `V`\]
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`Ar`\[`number`\] \| `V`, `` `${CastToNumber<Increment<Ar["length"]>>}` ``, \[\]\> : readonly \[`Ar`\[`number`\] \| `V`, `Ar`\[`number`\] \| `V`\]
 
 A new array with the value inserted.
 
@@ -10077,30 +9036,24 @@ console.log(result); // [99, 1, 2, 3]
 
 #### Call Signature
 
-> **toInserted**\<`E`, `V`\>(`index`, `newValue`): (`array`) => readonly \[`E` \| `V`, `E` \| `V`\]
+> **toInserted**\<`V`\>(`index`, `newValue`): \<`Ar`\>(`array`) => `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V` \| `Ar`\[`number`\], `` `${CastToNumber<Increment<Ar["length"]>>}` ``, \[\]\> : readonly \[`V` \| `Ar`\[`number`\], `V` \| `Ar`\[`number`\]\]
 
-Defined in: [src/array/array-utils.mts:1796](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1796)
+Defined in: [src/array/array-utils.mts:1818](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1818)
 
 Returns a new array with a new value inserted at the specified index.
 Index can be out of bounds (e.g., negative or greater than length), `toSpliced` handles this.
 
 ##### Type Parameters
 
-###### E
-
-`E`
-
-The type of elements in the array.
-
 ###### V
 
-`V` = `E`
+`V`
 
 ##### Parameters
 
 ###### index
 
-`ArgArrNonNegative`
+`ArgArrWithNegative`
 
 The index at which to insert the new value.
 
@@ -10114,17 +9067,23 @@ The value to insert.
 
 A new array with the value inserted.
 
-> (`array`): readonly \[`E` \| `V`, `E` \| `V`\]
+> \<`Ar`\>(`array`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V` \| `Ar`\[`number`\], `` `${CastToNumber<Increment<Ar["length"]>>}` ``, \[\]\> : readonly \[`V` \| `Ar`\[`number`\], `V` \| `Ar`\[`number`\]\]
+
+###### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
 
 ###### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 ###### Returns
 
-readonly \[`E` \| `V`, `E` \| `V`\]
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V` \| `Ar`\[`number`\], `` `${CastToNumber<Increment<Ar["length"]>>}` ``, \[\]\> : readonly \[`V` \| `Ar`\[`number`\], `V` \| `Ar`\[`number`\]\]
 
 ##### Example
 
@@ -10146,7 +9105,7 @@ console.log(result); // [99, 1, 2, 3]
 
 > **toPushed**\<`Ar`, `V`\>(`array`, `newValue`): readonly \[`Ar`, `V`\]
 
-Defined in: [src/array/array-utils.mts:1889](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1889)
+Defined in: [src/array/array-utils.mts:1917](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1917)
 
 Returns a new array with a value added to the end.
 
@@ -10198,7 +9157,7 @@ console.log(result); // [1, 2, 3, 0]
 
 > **toPushed**\<`V`\>(`newValue`): \<`Ar`\>(`array`) => readonly \[`Ar`, `V`\]
 
-Defined in: [src/array/array-utils.mts:1894](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1894)
+Defined in: [src/array/array-utils.mts:1922](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1922)
 
 Returns a new array with a value added to the end.
 
@@ -10258,69 +9217,151 @@ console.log(result); // [1, 2, 3, 0]
 
 #### Call Signature
 
-> **toRangeFilled**\<`E`\>(`array`, `value`, `fillRange`): readonly `E`[]
+> **toRangeFilled**\<`Ar`, `V`\>(`array`, `value`, `fillRange`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V` \| `Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`V` \| `Ar`\[`number`\])[]
 
-Defined in: [src/array/array-utils.mts:2005](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2005)
+Defined in: [src/array/array-utils.mts:2087](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2087)
+
+Creates a new array with a specific range filled with a specified value.
+
+This function fills only the specified range of indices with the provided value,
+leaving other elements unchanged. It provides type-safe range filling with
+precise return types.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
+`Ar` _extends_ readonly `unknown`[]
+
+The exact type of the input array.
+
+###### V
+
+`V`
+
+The type of the fill value.
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
+
+The array to fill a range of.
 
 ###### value
 
-`E`
+`V`
+
+The value to fill the range with.
 
 ###### fillRange
 
-readonly \[`ArgArr`, `ArgArr`\]
+readonly \[`ArgArrayIndexWithNegative`\<`Ar`\>, `ArgArrayIndexWithNegative`\<`Ar`\>\]
+
+A tuple containing [start, end] indices for the range to fill.
 
 ##### Returns
 
-readonly `E`[]
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V` \| `Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`V` \| `Ar`\[`number`\])[]
+
+A new array with the specified range filled:
+
+- For fixed-length arrays: returns `ArrayOfLength<Ar['length'], V | Ar[number]>`
+- For non-empty arrays: returns `NonEmptyArray<V | Ar[number]>`
+- For general arrays: returns `readonly (V | Ar[number])[]`
+
+##### Example
+
+```typescript
+// Regular usage
+const numbers = [1, 2, 3, 4, 5];
+const result = Arr.toRangeFilled(numbers, 0, [1, 4]); // [1, 0, 0, 0, 5]
+
+// Curried usage for pipe composition
+const fillMiddleWithX = Arr.toRangeFilled('X', [1, 3]);
+const result2 = pipe(['a', 'b', 'c', 'd']).map(fillMiddleWithX).value; // ['a', 'X', 'X', 'd']
+```
+
+##### See
+
+[toFilled](#tofilled) for filling the entire array
 
 #### Call Signature
 
-> **toRangeFilled**\<`E`\>(`value`, `fillRange`): (`array`) => readonly `E`[]
+> **toRangeFilled**\<`V`\>(`value`, `fillRange`): \<`Ar`\>(`array`) => `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V` \| `Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`V` \| `Ar`\[`number`\])[]
 
-Defined in: [src/array/array-utils.mts:2011](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2011)
+Defined in: [src/array/array-utils.mts:2101](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L2101)
+
+Creates a new array with a specific range filled with a specified value.
+
+This function fills only the specified range of indices with the provided value,
+leaving other elements unchanged. It provides type-safe range filling with
+precise return types.
 
 ##### Type Parameters
 
-###### E
+###### V
 
-`E`
+`V`
+
+The type of the fill value.
 
 ##### Parameters
 
 ###### value
 
-`E`
+`V`
+
+The value to fill the range with.
 
 ###### fillRange
 
-readonly \[`ArgArr`, `ArgArr`\]
+readonly \[`ArgArrWithNegative`, `ArgArrWithNegative`\]
+
+A tuple containing [start, end] indices for the range to fill.
 
 ##### Returns
 
-> (`array`): readonly `E`[]
+A new array with the specified range filled:
+
+- For fixed-length arrays: returns `ArrayOfLength<Ar['length'], V | Ar[number]>`
+- For non-empty arrays: returns `NonEmptyArray<V | Ar[number]>`
+- For general arrays: returns `readonly (V | Ar[number])[]`
+
+> \<`Ar`\>(`array`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V` \| `Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`V` \| `Ar`\[`number`\])[]
+
+###### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `unknown`[]
 
 ###### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 ###### Returns
 
-readonly `E`[]
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`V` \| `Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`V` \| `Ar`\[`number`\])[]
+
+##### Example
+
+```typescript
+// Regular usage
+const numbers = [1, 2, 3, 4, 5];
+const result = Arr.toRangeFilled(numbers, 0, [1, 4]); // [1, 0, 0, 0, 5]
+
+// Curried usage for pipe composition
+const fillMiddleWithX = Arr.toRangeFilled('X', [1, 3]);
+const result2 = pipe(['a', 'b', 'c', 'd']).map(fillMiddleWithX).value; // ['a', 'X', 'X', 'd']
+```
+
+##### See
+
+[toFilled](#tofilled) for filling the entire array
 
 ---
 
@@ -10328,38 +9369,36 @@ readonly `E`[]
 
 #### Call Signature
 
-> **toRemoved**\<`E`\>(`array`, `index`): readonly `E`[]
+> **toRemoved**\<`Ar`\>(`array`, `index`): readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:1845](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1845)
+Defined in: [src/array/array-utils.mts:1873](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1873)
 
 Returns a new array with the element at the specified index removed.
 If index is out of bounds, `toSpliced` handles this (usually by returning a copy).
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array.
 
 ###### index
 
-`ArgArrNonNegative`
+`ArgArrayIndexWithNegative`\<`Ar`\>
 
 The index of the element to remove.
 
 ##### Returns
 
-readonly `E`[]
+readonly `Ar`\[`number`\][]
 
 A new array with the element removed.
 
@@ -10379,7 +9418,7 @@ console.log(result); // [20, 30]
 
 > **toRemoved**(`index`): \<`E`\>(`array`) => readonly `E`[]
 
-Defined in: [src/array/array-utils.mts:1850](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1850)
+Defined in: [src/array/array-utils.mts:1878](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1878)
 
 Returns a new array with the element at the specified index removed.
 If index is out of bounds, `toSpliced` handles this (usually by returning a copy).
@@ -10388,7 +9427,7 @@ If index is out of bounds, `toSpliced` handles this (usually by returning a copy
 
 ###### index
 
-`ArgArrNonNegative`
+`ArgArrWithNegative`
 
 The index of the element to remove.
 
@@ -10428,29 +9467,126 @@ console.log(result); // [20, 30]
 
 ---
 
+### toReversed()
+
+> **toReversed**\<`Ar`\>(`array`): `Reverse`\<`Ar`\>
+
+Defined in: [src/array/array-utils.mts:3911](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3911)
+
+Reverses a tuple, preserving element types in their new positions.
+
+The type system precisely tracks the reversal, so the returned tuple
+has its element types in the exact reverse order. This is more precise
+than array reversal which loses positional type information.
+
+#### Type Parameters
+
+##### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+#### Parameters
+
+##### array
+
+`Ar`
+
+The input tuple
+
+#### Returns
+
+`Reverse`\<`Ar`\>
+
+A new tuple with elements in reverse order and precise typing
+
+#### Example
+
+```typescript
+// Basic reversal
+const nums = [1, 2, 3] as const;
+const reversed = Arr.toReversed(nums); // readonly [3, 2, 1]
+
+// Mixed types preserved in reverse positions
+const mixed = [1, 'hello', true, null] as const;
+const revMixed = Arr.toReversed(mixed);
+// readonly [null, true, 'hello', 1]
+
+// Empty and single-element tuples
+const empty = [] as const;
+const revEmpty = Arr.toReversed(empty); // readonly []
+const single = [42] as const;
+const revSingle = Arr.toReversed(single); // readonly [42]
+```
+
+---
+
+### toSorted()
+
+> **toSorted**\<`Ar`\>(...`__namedParameters`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
+
+Defined in: [src/array/array-utils.mts:3933](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3933)
+
+Sorts an array by a value derived from its elements, using a numeric mapping.
+
+#### Type Parameters
+
+##### Ar
+
+`Ar` _extends_ readonly `unknown`[]
+
+#### Parameters
+
+##### \_\_namedParameters
+
+...`Ar` _extends_ readonly `number`[] ? readonly \[`Ar`\<`Ar`\<`Ar`\>\>, `undefined` \| (`x`, `y`) => `number`\] : readonly \[`Ar`, (`x`, `y`) => `number`\]
+
+#### Returns
+
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
+
+A new array sorted by the mapped values.
+
+#### Example
+
+```ts
+const items = [
+    { name: 'Eve', score: 70 },
+    { name: 'Adam', score: 90 },
+    { name: 'Bob', score: 80 },
+];
+Arr.toSortedBy(items, (item) => item.score);
+// [{ name: 'Eve', score: 70 }, { name: 'Bob', score: 80 }, { name: 'Adam', score: 90 }]
+Arr.toSortedBy(
+    items,
+    (item) => item.score,
+    (a, b) => b - a,
+); // Sort descending
+// [{ name: 'Adam', score: 90 }, { name: 'Bob', score: 80 }, { name: 'Eve', score: 70 }]
+```
+
+---
+
 ### toSortedBy()
 
 #### Call Signature
 
-> **toSortedBy**\<`E`\>(`array`, `comparatorValueMapper`, `comparator?`): readonly `E`[]
+> **toSortedBy**\<`Ar`\>(`array`, `comparatorValueMapper`, `comparator?`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:3157](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3157)
+Defined in: [src/array/array-utils.mts:3973](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3973)
 
 Sorts an array by a value derived from its elements, using a numeric mapping.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ##### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array.
 
@@ -10468,7 +9604,7 @@ An optional custom comparator function `(x: number, y: number) => number` for th
 
 ##### Returns
 
-readonly `E`[]
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
 A new array sorted by the mapped values.
 
@@ -10492,19 +9628,17 @@ Arr.toSortedBy(
 
 #### Call Signature
 
-> **toSortedBy**\<`E`, `V`\>(`array`, `comparatorValueMapper`, `comparator`): readonly `E`[]
+> **toSortedBy**\<`Ar`, `V`\>(`array`, `comparatorValueMapper`, `comparator`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:3163](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3163)
+Defined in: [src/array/array-utils.mts:3984](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3984)
 
 Sorts an array by a value derived from its elements, using a numeric mapping.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `unknown`[]
 
 ###### V
 
@@ -10514,7 +9648,7 @@ The type of elements in the array.
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array.
 
@@ -10532,7 +9666,7 @@ An optional custom comparator function `(x: number, y: number) => number` for th
 
 ##### Returns
 
-readonly `E`[]
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
 A new array sorted by the mapped values.
 
@@ -10562,7 +9696,7 @@ Arr.toSortedBy(
 
 > **toUnshifted**\<`Ar`, `V`\>(`array`, `newValue`): readonly \[`V`, `Ar`\]
 
-Defined in: [src/array/array-utils.mts:1936](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1936)
+Defined in: [src/array/array-utils.mts:1964](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1964)
 
 Returns a new array with a value added to the beginning.
 
@@ -10614,7 +9748,7 @@ console.log(result); // [0, 1, 2, 3]
 
 > **toUnshifted**\<`V`\>(`newValue`): \<`Ar`\>(`array`) => readonly \[`V`, `Ar`\]
 
-Defined in: [src/array/array-utils.mts:1941](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1941)
+Defined in: [src/array/array-utils.mts:1969](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1969)
 
 Returns a new array with a value added to the beginning.
 
@@ -10674,9 +9808,9 @@ console.log(result); // [0, 1, 2, 3]
 
 #### Call Signature
 
-> **toUpdated**\<`E`, `U`\>(`array`, `index`, `updater`): readonly (`E` \| `U`)[]
+> **toUpdated**\<`Ar`, `V`\>(`array`, `index`, `updater`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `Readonly`\<\{ \[K in string \| number \| symbol\]: V \| Ar\[K\<K\>\] \}\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`Ar`\[`number`\] \| `V`)[]
 
-Defined in: [src/array/array-utils.mts:1736](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1736)
+Defined in: [src/array/array-utils.mts:1740](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1740)
 
 Returns a new array with the element at the specified index updated by a function.
 
@@ -10700,15 +9834,13 @@ updater, returns a reusable function that can be applied to arrays.
 
 ##### Type Parameters
 
-###### E
+###### Ar
 
-`E`
+`Ar` _extends_ readonly `unknown`[]
 
-The type of elements in the original array.
+###### V
 
-###### U
-
-`U`
+`V` = `Ar`\[`number`\]
 
 The type of the value returned by the updater function.
 
@@ -10716,15 +9848,15 @@ The type of the value returned by the updater function.
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 The input array to update. Can be any readonly array.
 
 ###### index
 
-`ArgArrNonNegative`
+`ArgArrayIndex`\<`Ar`\>
 
-The index of the element to update. Must be a non-negative SizeType.ArgArrNonNegative.
+The index of the element to update. Must be a non-negative SizeType.ArgArr.
 
 - **Valid range:** `0 <= index < array.length`
 - **Out of bounds:** Returns original array unchanged
@@ -10732,7 +9864,7 @@ The index of the element to update. Must be a non-negative SizeType.ArgArrNonNeg
 
 ###### updater
 
-(`prev`) => `U`
+(`prev`) => `V`
 
 A function `(prev: E) => U` that transforms the existing element:
 
@@ -10741,7 +9873,7 @@ A function `(prev: E) => U` that transforms the existing element:
 
 ##### Returns
 
-readonly (`E` \| `U`)[]
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `Readonly`\<\{ \[K in string \| number \| symbol\]: V \| Ar\[K\<K\>\] \}\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`Ar`\[`number`\] \| `V`)[]
 
 A new `readonly (E | U)[]` array where:
 
@@ -10895,14 +10027,14 @@ expectType<typeof safe1, readonly number[]>('='); // Bounds check preserves type
 ##### See
 
 - Array.prototype.with for the native method with different error handling
-- SizeType.ArgArrNonNegative for the index type constraint
+- SizeType.ArgArr for the index type constraint
 - Immutable update patterns for functional programming approaches
 
 #### Call Signature
 
-> **toUpdated**\<`E`, `U`\>(`index`, `updater`): (`array`) => readonly (`E` \| `U`)[]
+> **toUpdated**\<`E`, `V`\>(`index`, `updater`): \<`Ar`\>(`array`) => `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `Readonly`\<\{ \[K in string \| number \| symbol\]: V \| Ar\[K\<K\>\] \}\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`V` \| `Ar`\[`number`\])[]
 
-Defined in: [src/array/array-utils.mts:1742](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1742)
+Defined in: [src/array/array-utils.mts:1754](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1754)
 
 Returns a new array with the element at the specified index updated by a function.
 
@@ -10932,9 +10064,9 @@ updater, returns a reusable function that can be applied to arrays.
 
 The type of elements in the original array.
 
-###### U
+###### V
 
-`U`
+`V` = `E`
 
 The type of the value returned by the updater function.
 
@@ -10942,9 +10074,9 @@ The type of the value returned by the updater function.
 
 ###### index
 
-`ArgArrNonNegative`
+`ArgArr`
 
-The index of the element to update. Must be a non-negative SizeType.ArgArrNonNegative.
+The index of the element to update. Must be a non-negative SizeType.ArgArr.
 
 - **Valid range:** `0 <= index < array.length`
 - **Out of bounds:** Returns original array unchanged
@@ -10952,7 +10084,7 @@ The index of the element to update. Must be a non-negative SizeType.ArgArrNonNeg
 
 ###### updater
 
-(`prev`) => `U`
+(`prev`) => `V`
 
 A function `(prev: E) => U` that transforms the existing element:
 
@@ -10968,17 +10100,23 @@ A new `readonly (E | U)[]` array where:
 - Type union `E | U` accommodates both original and updated element types
 - If index is out of bounds, returns the original array unchanged
 
-> (`array`): readonly (`E` \| `U`)[]
+> \<`Ar`\>(`array`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `Readonly`\<\{ \[K in string \| number \| symbol\]: V \| Ar\[K\<K\>\] \}\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`V` \| `Ar`\[`number`\])[]
+
+###### Type Parameters
+
+###### Ar
+
+`Ar` _extends_ readonly `E`[]
 
 ###### Parameters
 
 ###### array
 
-readonly `E`[]
+`Ar`
 
 ###### Returns
 
-readonly (`E` \| `U`)[]
+`IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `Readonly`\<\{ \[K in string \| number \| symbol\]: V \| Ar\[K\<K\>\] \}\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`V` \| `Ar`\<`Ar`\>\[`number`\], `V` \| `Ar`\<`Ar`\>\[`number`\]\] : readonly (`V` \| `Ar`\[`number`\])[]
 
 ##### Example
 
@@ -11125,39 +10263,37 @@ expectType<typeof safe1, readonly number[]>('='); // Bounds check preserves type
 ##### See
 
 - Array.prototype.with for the native method with different error handling
-- SizeType.ArgArrNonNegative for the index type constraint
+- SizeType.ArgArr for the index type constraint
 - Immutable update patterns for functional programming approaches
 
 ---
 
 ### uniq()
 
-> **uniq**\<`P`\>(`array`): readonly `P`[]
+> **uniq**\<`Ar`\>(`array`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:3597](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3597)
+Defined in: [src/array/array-utils.mts:4429](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4429)
 
 Creates a new array with unique elements from the input array. Order is preserved from the first occurrence.
 Uses `Set` internally for efficient uniqueness checking.
 
 #### Type Parameters
 
-##### P
+##### Ar
 
-`P` _extends_ `Primitive`
-
-The type of elements in the array.
+`Ar` _extends_ readonly `Primitive`[]
 
 #### Parameters
 
 ##### array
 
-readonly `P`[]
+`Ar`
 
 The input array.
 
 #### Returns
 
-readonly `P`[]
+`Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
 A new array with unique elements from the input array. Returns `[]` for an empty input.
 
@@ -11171,108 +10307,48 @@ Arr.uniq([1, 2, 2, 3, 1, 4]); // [1, 2, 3, 4]
 
 ### uniqBy()
 
-#### Call Signature
+> **uniqBy**\<`Ar`, `P`\>(`array`, `mapFn`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
-> **uniqBy**\<`E`, `P`\>(`array`, `mapFn`): readonly \[`E`, `E`\]
-
-Defined in: [src/array/array-utils.mts:3622](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3622)
+Defined in: [src/array/array-utils.mts:4458](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4458)
 
 Creates a new array with unique elements from the input array, based on the values returned by `mapFn`.
 
 - If the input is a non-empty array, returns a non-empty array.
 - Otherwise, returns a readonly array.
 
-##### Type Parameters
+#### Type Parameters
 
-###### E
+##### Ar
 
-`E`
+`Ar` _extends_ readonly `unknown`[]
 
-The type of elements in the array.
-
-###### P
+##### P
 
 `P` _extends_ `Primitive`
 
 The type of the mapped value (used for uniqueness comparison).
 
-##### Parameters
+#### Parameters
 
-###### array
+##### array
 
-readonly \[`E`, `E`\]
+`Ar`
 
 The input array.
 
-###### mapFn
+##### mapFn
 
 (`value`) => `P`
 
 A function `(value: A) => P` to map elements to values for uniqueness comparison.
 
-##### Returns
+#### Returns
 
-readonly \[`E`, `E`\]
-
-A new array with unique elements based on the mapped values.
-
-##### Example
-
-```ts
-const users = [
-    { id: 1, name: 'Alice' },
-    { id: 2, name: 'Bob' },
-    { id: 1, name: 'Alicia' }, // Duplicate id
-];
-Arr.uniqBy(users, (user) => user.id); // [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
-```
-
-#### Call Signature
-
-> **uniqBy**\<`E`, `P`\>(`array`, `mapFn`): readonly `E`[]
-
-Defined in: [src/array/array-utils.mts:3627](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3627)
-
-Creates a new array with unique elements from the input array, based on the values returned by `mapFn`.
-
-- If the input is a non-empty array, returns a non-empty array.
-- Otherwise, returns a readonly array.
-
-##### Type Parameters
-
-###### E
-
-`E`
-
-The type of elements in the array.
-
-###### P
-
-`P` _extends_ `Primitive`
-
-The type of the mapped value (used for uniqueness comparison).
-
-##### Parameters
-
-###### array
-
-readonly `E`[]
-
-The input array.
-
-###### mapFn
-
-(`value`) => `P`
-
-A function `(value: A) => P` to map elements to values for uniqueness comparison.
-
-##### Returns
-
-readonly `E`[]
+`Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
 A new array with unique elements based on the mapped values.
 
-##### Example
+#### Example
 
 ```ts
 const users = [
@@ -11285,67 +10361,112 @@ Arr.uniqBy(users, (user) => user.id); // [{ id: 1, name: 'Alice' }, { id: 2, nam
 
 ---
 
+### values()
+
+> **values**\<`E`\>(`array`): `ArrayIterator`\<`E`\>
+
+Defined in: [src/array/array-utils.mts:4709](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4709)
+
+Returns an iterable of values in the array.
+
+This function is essentially an identity function that returns a copy of the array.
+It's included for API completeness and consistency with native Array methods.
+
+#### Type Parameters
+
+##### E
+
+`E`
+
+#### Parameters
+
+##### array
+
+readonly `E`[]
+
+The array to get values from.
+
+#### Returns
+
+`ArrayIterator`\<`E`\>
+
+A copy of the input array.
+
+#### Example
+
+```typescript
+// Direct usage
+const numbers = [1, 2, 3];
+const values = Arr.values(numbers); // [1, 2, 3]
+
+// Curried usage
+const getValues = Arr.values;
+const result = getValues(['a', 'b']); // ['a', 'b']
+```
+
+---
+
 ### zeros()
 
-#### Call Signature
+> **zeros**\<`N`\>(`len`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`0`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`0`, `0`\] : readonly `0`[]
 
-> **zeros**\<`N`\>(`len`): `MakeTupleImpl`\<`0`, `` `${N}` ``\>
+Defined in: [src/array/array-utils.mts:417](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L417)
 
-Defined in: [src/array/array-utils.mts:443](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L443)
+Creates an array of zeros with the specified length.
 
-Create array of zeros with compile-time length.
+This function provides compile-time type safety with precise return types:
 
-##### Type Parameters
+- When `len` is a compile-time known `SmallUint` (0-100), returns a tuple with exact length
+- When `len` is a positive runtime value, returns a `NonEmptyArray<0>`
+- Otherwise, returns a `readonly 0[]` that may be empty
 
-###### N
+#### Type Parameters
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39`
+##### N
 
-##### Parameters
+`N` _extends_ `ArgArr`
 
-###### len
+The type of the length parameter. When a `SmallUint` literal is provided,
+the return type will be a tuple of exactly that length filled with zeros.
+
+#### Parameters
+
+##### len
 
 `N`
 
-##### Returns
+The length of the array to create. Must be a non-negative integer.
 
-`MakeTupleImpl`\<`0`, `` `${N}` ``\>
+#### Returns
 
-#### Call Signature
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`0`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`0`, `0`\] : readonly `0`[]
 
-> **zeros**(`len`): readonly \[`0`, `0`\]
+An immutable array of zeros. The exact return type depends on the input:
 
-Defined in: [src/array/array-utils.mts:448](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L448)
+- `ArrayOfLength<N, 0>` when `N` is a `SmallUint` literal
+- `NonEmptyArray<0>` when `len` is a positive runtime value
+- `readonly 0[]` for general non-negative values
 
-Create non-empty array of zeros.
+#### Example
 
-##### Parameters
+```typescript
+// Compile-time known lengths produce precise tuple types
+const exactLength = Arr.zeros(3); // readonly [0, 0, 0]
+const empty = Arr.zeros(0); // readonly []
 
-###### len
+// Runtime positive values produce non-empty arrays
+const count = Math.floor(Math.random() * 5) + 1;
+const nonEmpty = Arr.zeros(count); // NonEmptyArray<0>
 
-`ArgArrPositive`
+// General runtime values may be empty
+const maybeEmpty = Arr.zeros(Math.floor(Math.random() * 5)); // readonly 0[]
 
-##### Returns
-
-readonly \[`0`, `0`\]
-
-#### Call Signature
-
-> **zeros**(`len`): readonly `0`[]
-
-Defined in: [src/array/array-utils.mts:453](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L453)
-
-Create array of zeros.
-
-##### Parameters
-
-###### len
-
-`ArgArrNonNegative`
-
-##### Returns
-
-readonly `0`[]
+// Type inference examples
+expectType<typeof exactLength, readonly [0, 0, 0]>('=');
+expectType<typeof empty, readonly []>('=');
+expectType<typeof nonEmpty, NonEmptyArray<0>>('=');
+expectType<typeof maybeEmpty, readonly 0[]>('=');
+```
 
 ---
 
@@ -11353,7 +10474,7 @@ readonly `0`[]
 
 > **zip**\<`Ar1`, `Ar2`\>(`array1`, `array2`): `Zip`\<`Ar1`, `Ar2`\>
 
-Defined in: [src/array/array-utils.mts:3008](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3008)
+Defined in: [src/array/array-utils.mts:3490](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3490)
 
 Creates an array of tuples by pairing up corresponding elements from two arrays.
 The resulting array has a length equal to the minimum of the two input array lengths.

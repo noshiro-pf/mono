@@ -1,6 +1,6 @@
 import { Arr } from '../array/index.mjs';
 import { Optional } from '../functional/index.mjs';
-import { asUint32 } from '../number/index.mjs';
+import { asUint32, Uint32 } from '../number/index.mjs';
 import { castMutable } from '../others/index.mjs';
 
 /**
@@ -99,10 +99,10 @@ class StackClass<T> implements Stack<T> {
   #buffer: (T | undefined)[];
 
   /** @internal Current number of elements in the stack. */
-  #mut_size: number;
+  #mut_size: Uint32;
 
   /** @internal Current capacity of the buffer. */
-  #capacity: number;
+  #capacity: Uint32;
 
   /** @internal Initial capacity for new stacks. */
   static readonly #INITIAL_CAPACITY = 8;
@@ -117,9 +117,9 @@ class StackClass<T> implements Stack<T> {
     );
 
     this.#buffer = castMutable(
-      Arr.create<T | undefined>(initialCapacity, undefined),
+      Arr.create<T | undefined, Uint32>(initialCapacity, undefined),
     );
-    this.#mut_size = 0;
+    this.#mut_size = asUint32(0);
     this.#capacity = initialCapacity;
 
     // Add initial values
@@ -191,7 +191,7 @@ class StackClass<T> implements Stack<T> {
       return Optional.none;
     }
 
-    this.#mut_size -= 1;
+    this.#mut_size = Uint32.sub(this.#mut_size, 1);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const element = this.#buffer[this.#mut_size]!;
     this.#buffer[this.#mut_size] = undefined; // Clear reference for garbage collection
@@ -264,7 +264,7 @@ class StackClass<T> implements Stack<T> {
     }
 
     this.#buffer[this.#mut_size] = value;
-    this.#mut_size += 1;
+    this.#mut_size = Uint32.add(this.#mut_size, 1);
   }
 
   /**
@@ -275,7 +275,7 @@ class StackClass<T> implements Stack<T> {
   #resize(): void {
     const newCapacity = asUint32(this.#capacity * 2);
     const newBuffer = castMutable(
-      Arr.create<T | undefined>(newCapacity, undefined),
+      Arr.create<T | undefined, Uint32>(newCapacity, undefined),
     );
 
     // Copy existing elements

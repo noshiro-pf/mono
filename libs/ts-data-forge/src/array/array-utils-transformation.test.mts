@@ -1,6 +1,7 @@
 import { IMap } from '../collections/index.mjs';
 import { expectType } from '../expect-type.mjs';
 import { Optional } from '../functional/optional.mjs';
+import { SafeUint } from '../number/index.mjs';
 import { Arr } from './array-utils.mjs';
 
 describe('Arr transformations', () => {
@@ -232,11 +233,7 @@ describe('Arr transformations', () => {
 
       expectType<
         typeof sorted,
-        readonly (
-          | Readonly<{ v: 1 }>
-          | Readonly<{ v: 2 }>
-          | Readonly<{ v: 3 }>
-        )[]
+        ArrayOfLength<3, Readonly<{ v: 1 } | { v: 2 } | { v: 3 }>>
       >('=');
 
       test('case 1', () => {
@@ -253,11 +250,7 @@ describe('Arr transformations', () => {
 
       expectType<
         typeof sorted,
-        readonly (
-          | Readonly<{ v: 1 }>
-          | Readonly<{ v: 2 }>
-          | Readonly<{ v: 3 }>
-        )[]
+        ArrayOfLength<3, Readonly<{ v: 1 } | { v: 2 } | { v: 3 }>>
       >('=');
 
       test('case 2', () => {
@@ -785,6 +778,560 @@ describe('Arr transformations', () => {
       const empty: readonly { id: number }[] = [];
       const result = Arr.uniqBy(empty, (item) => item.id);
       expect(result).toStrictEqual([]);
+    });
+  });
+
+  describe('map', () => {
+    const mapped = Arr.map([1, 2, 3], (x, i): number => x * x * i);
+
+    expectType<typeof mapped, ArrayOfLength<3, number>>('=');
+
+    test('case 1', () => {
+      expect(mapped).toStrictEqual([0, 4, 18]);
+    });
+
+    test('should work with empty tuple', () => {
+      const empty = [] as const;
+      const mappedEmpty = Arr.map(empty, (x) => String(x));
+      expectType<typeof mappedEmpty, readonly []>('=');
+      expect(mappedEmpty).toStrictEqual([]);
+    });
+
+    test('should preserve tuple length with different types', () => {
+      const mixed = [1, 'hello', true] as const;
+      const mappedMixed = Arr.map(mixed, (x) => typeof x);
+      expectType<typeof mappedMixed, readonly [string, string, string]>('<=');
+      expect(mappedMixed).toStrictEqual(['number', 'string', 'boolean']);
+    });
+
+    test('should work with index parameter', () => {
+      const tuple = ['a', 'b', 'c'] as const;
+      const mappedWithIndex = Arr.map(tuple, (x, i) => `${i}:${x}`);
+      expectType<typeof mappedWithIndex, readonly [string, string, string]>(
+        '<=',
+      );
+      expect(mappedWithIndex).toStrictEqual(['0:a', '1:b', '2:c']);
+    });
+  });
+
+  describe('toReversed', () => {
+    {
+      const result = Arr.toReversed([1, 2, 3]);
+
+      expectType<typeof result, readonly [3, 2, 1]>('=');
+
+      test('case 1', () => {
+        expect(result).toStrictEqual([3, 2, 1]);
+      });
+    }
+
+    test('should work with empty tuple', () => {
+      const empty = [] as const;
+      const reversed = Arr.toReversed(empty);
+      expectType<typeof reversed, readonly []>('=');
+      expect(reversed).toStrictEqual([]);
+    });
+
+    test('should work with single element', () => {
+      const single = [42] as const;
+      const reversed = Arr.toReversed(single);
+      expectType<typeof reversed, readonly [42]>('=');
+      expect(reversed).toStrictEqual([42]);
+    });
+
+    test('should preserve mixed types in reverse order', () => {
+      const mixed = [1, 'hello', true, null] as const;
+      const reversed = Arr.toReversed(mixed);
+      expectType<typeof reversed, readonly [null, true, 'hello', 1]>('=');
+      expect(reversed).toStrictEqual([null, true, 'hello', 1]);
+    });
+  });
+
+  describe('filter', () => {
+    test('should filter array with predicate', () => {
+      const numbers = [1, 2, 3, 4, 5];
+      const evens = Arr.filter(numbers, (n) => n % 2 === 0);
+      expect(evens).toStrictEqual([2, 4]);
+    });
+
+    test('should work with type guards', () => {
+      const mixed: (string | number | null)[] = [
+        'hello',
+        42,
+        null,
+        'world',
+        123,
+      ];
+      const strings = Arr.filter(
+        mixed,
+        (x): x is string => typeof x === 'string',
+      );
+      expectType<typeof strings, readonly string[]>('=');
+      expect(strings).toStrictEqual(['hello', 'world']);
+    });
+
+    test('should work with curried version', () => {
+      const isPositive = (n: number): boolean => n > 0;
+      const filterPositive = Arr.filter(isPositive);
+      const result = filterPositive([-1, 2, -3, 4]);
+      expect(result).toStrictEqual([2, 4]);
+    });
+
+    test('should work with curried type guards', () => {
+      const isString = (x: unknown): x is string => typeof x === 'string';
+      const filterStrings = Arr.filter(isString);
+      const result = filterStrings(['a', 1, 'b', 2]);
+      expectType<typeof result, readonly string[]>('=');
+      expect(result).toStrictEqual(['a', 'b']);
+    });
+
+    test('should preserve array type with generic predicate', () => {
+      const tuple = [1, 2, 3] as const;
+      const filtered = Arr.filter(tuple, (x) => x > 1);
+      expectType<typeof filtered, readonly (1 | 2 | 3)[]>('=');
+      expect(filtered).toStrictEqual([2, 3]);
+    });
+
+    test('should work with empty array', () => {
+      const empty: number[] = [];
+      const result = Arr.filter(empty, (n) => n > 0);
+      expect(result).toStrictEqual([]);
+    });
+
+    test('should pass index to predicate', () => {
+      const numbers = [10, 20, 30, 40];
+      const evenIndexes = Arr.filter(numbers, (_, i) => i % 2 === 0);
+      expect(evenIndexes).toStrictEqual([10, 30]);
+    });
+  });
+
+  describe('every', () => {
+    test('should return true when all elements satisfy predicate', () => {
+      const evens = [2, 4, 6, 8];
+      const allEven = Arr.every(evens, (n) => n % 2 === 0);
+      expect(allEven).toBe(true);
+    });
+
+    test('should return false when not all elements satisfy predicate', () => {
+      const mixed = [2, 3, 4, 6];
+      const allEven = Arr.every(mixed, (n) => n % 2 === 0);
+      expect(allEven).toBe(false);
+    });
+
+    test('should work as type guard', () => {
+      const mixed: (string | number)[] = ['hello', 'world'];
+      if (Arr.every(mixed, (x): x is string => typeof x === 'string')) {
+        // TypeScript narrows mixed to readonly string[] here
+        expect(mixed.every((s) => typeof s === 'string')).toBe(true);
+      }
+    });
+
+    test('should work with curried version', () => {
+      const isPositive = (n: number): boolean => n > 0;
+      const allPositive = Arr.every(isPositive);
+      expect(allPositive([1, 2, 3])).toBe(true);
+      expect(allPositive([1, -2, 3])).toBe(false);
+    });
+
+    test('should work with curried type guards', () => {
+      const isString = (x: unknown): x is string => typeof x === 'string';
+      const allStrings = Arr.every(isString);
+      const data: unknown[] = ['a', 'b', 'c'];
+      if (allStrings(data)) {
+        // TypeScript narrows data to readonly string[] here
+        expect(data.join('')).toBe('abc');
+      }
+    });
+
+    test('should return true for empty array', () => {
+      const empty: number[] = [];
+      const result = Arr.every(empty, (n) => n > 0);
+      expect(result).toBe(true);
+    });
+
+    test('should pass index to predicate', () => {
+      const numbers = [0, 1, 2, 3];
+      const indexMatchesValue = Arr.every(numbers, (val, idx) => val === idx);
+      expect(indexMatchesValue).toBe(true);
+    });
+  });
+
+  describe('some', () => {
+    test('should return true when at least one element satisfies predicate', () => {
+      const numbers = [1, 3, 5, 8];
+      const hasEven = Arr.some(numbers, (n) => n % 2 === 0);
+      expect(hasEven).toBe(true);
+    });
+
+    test('should return false when no elements satisfy predicate', () => {
+      const odds = [1, 3, 5, 7];
+      const hasEven = Arr.some(odds, (n) => n % 2 === 0);
+      expect(hasEven).toBe(false);
+    });
+
+    test('should work with curried version', () => {
+      const isNegative = (n: number): boolean => n < 0;
+      const hasNegative = Arr.some(isNegative);
+      expect(hasNegative([1, 2, -3])).toBe(true);
+      expect(hasNegative([1, 2, 3])).toBe(false);
+    });
+
+    test('should return false for empty array', () => {
+      const empty: number[] = [];
+      const result = Arr.some(empty, (n) => n > 0);
+      expect(result).toBe(false);
+    });
+
+    test('should pass index to predicate', () => {
+      const numbers = [10, 10, 10, 30];
+      const hasValueMatchingIndex = Arr.some(
+        numbers,
+        (val, idx) => val === idx * 10,
+      );
+      expect(hasValueMatchingIndex).toBe(true);
+    });
+  });
+
+  describe('entries', () => {
+    test('should return array of index-value pairs', () => {
+      const fruits = ['apple', 'banana', 'cherry'];
+      const entries = Array.from(Arr.entries(fruits));
+      expect(entries).toStrictEqual([
+        [0, 'apple'],
+        [1, 'banana'],
+        [2, 'cherry'],
+      ]);
+    });
+
+    test('should work with tuples', () => {
+      const tuple = [10, 20, 30] as const;
+      const entries = Array.from(Arr.entries(tuple));
+      expectType<typeof entries, (readonly [Uint32, 10 | 20 | 30])[]>('=');
+      expect(entries).toStrictEqual([
+        [0, 10],
+        [1, 20],
+        [2, 30],
+      ]);
+    });
+
+    test('should work with empty array', () => {
+      const empty: string[] = [];
+      const entries = Array.from(Arr.entries(empty));
+      expect(entries).toStrictEqual([]);
+    });
+
+    test('should preserve mixed types', () => {
+      const mixed = [1, 'hello', true] as const;
+      const entries = Array.from(Arr.entries(mixed));
+      expectType<typeof entries, (readonly [Uint32, 1 | 'hello' | true])[]>(
+        '=',
+      );
+      expect(entries).toStrictEqual([
+        [0, 1],
+        [1, 'hello'],
+        [2, true],
+      ]);
+    });
+  });
+
+  describe('values', () => {
+    test('should return copy of array values', () => {
+      const numbers = [1, 2, 3];
+      const values = Array.from(Arr.values(numbers));
+      expect(values).toStrictEqual([1, 2, 3]);
+      expect(values).not.toBe(numbers); // Should be a copy
+    });
+
+    test('should work with tuples', () => {
+      const tuple = ['a', 'b', 'c'] as const;
+      const values = Array.from(Arr.values(tuple));
+      expectType<typeof values, ('a' | 'b' | 'c')[]>('=');
+      expect(values).toStrictEqual(['a', 'b', 'c']);
+    });
+
+    test('should work with empty array', () => {
+      const empty: number[] = [];
+      const values = Array.from(Arr.values(empty));
+      expect(values).toStrictEqual([]);
+    });
+
+    test('should preserve mixed types', () => {
+      const mixed = [1, 'hello', null] as const;
+      const values = Array.from(Arr.values(mixed));
+      expectType<typeof values, (1 | 'hello' | null)[]>('=');
+      expect(values).toStrictEqual([1, 'hello', null]);
+    });
+  });
+
+  describe('indices', () => {
+    test('should return array of indices', () => {
+      const fruits = ['apple', 'banana', 'cherry'];
+      const indices = Array.from(Arr.indices(fruits));
+      expect(indices).toStrictEqual([0, 1, 2]);
+    });
+
+    test('should work with tuples', () => {
+      const tuple = ['a', 'b'] as const;
+      const indices = Array.from(Arr.indices(tuple));
+      expectType<typeof indices, Uint32[]>('=');
+      expect(indices).toStrictEqual([0, 1]);
+    });
+
+    test('should work with empty array', () => {
+      const empty: string[] = [];
+      const indices = Array.from(Arr.indices(empty));
+      expect(indices).toStrictEqual([]);
+    });
+
+    test('should work with larger arrays', () => {
+      const large = Array.from({ length: 5 }, () => 'x');
+      const indices = Array.from(Arr.indices(large));
+      expect(indices).toStrictEqual([0, 1, 2, 3, 4]);
+    });
+  });
+
+  describe('findLast', () => {
+    test('should find last element matching predicate', () => {
+      const numbers = [1, 2, 3, 4, 5];
+      const lastEven = Arr.findLast(numbers, (n) => n % 2 === 0);
+      expect(Optional.isSome(lastEven)).toBe(true);
+      expect(Optional.unwrap(lastEven)).toBe(4);
+    });
+
+    test('should return None when no element matches', () => {
+      const odds = [1, 3, 5];
+      const lastEven = Arr.findLast(odds, (n) => n % 2 === 0);
+      expect(Optional.isNone(lastEven)).toBe(true);
+    });
+
+    test('should work with curried version', () => {
+      const isPositive = (n: number): boolean => n > 0;
+      const findLastPositive = Arr.findLast(isPositive);
+      const result = findLastPositive([-1, 2, -3, 4]);
+      expect(Optional.isSome(result)).toBe(true);
+      expect(Optional.unwrap(result)).toBe(4);
+    });
+
+    test('should work with empty array', () => {
+      const empty: number[] = [];
+      const result = Arr.findLast(empty, (n) => n > 0);
+      expect(Optional.isNone(result)).toBe(true);
+    });
+
+    test('should pass index and array to predicate', () => {
+      const numbers = [10, 20, 30, 40];
+      const lastWithIndex2 = Arr.findLast(numbers, (_, idx, arr) => {
+        expect(arr).toBe(numbers);
+        return idx === 2;
+      });
+      expect(Optional.unwrap(lastWithIndex2)).toBe(30);
+    });
+
+    test('should find last occurrence', () => {
+      const numbers = [1, 2, 2, 3, 2, 4];
+      const lastTwo = Arr.findLast(numbers, (n) => n === 2);
+      expect(Optional.unwrap(lastTwo)).toBe(2);
+
+      // Verify it's actually the last occurrence by checking behavior
+      const index = numbers.lastIndexOf(2);
+      expect(index).toBe(4); // Last 2 is at index 4
+    });
+  });
+
+  describe('findLastIndex', () => {
+    test('should find last index matching predicate', () => {
+      const numbers = [1, 2, 3, 4, 2, 5];
+      const lastTwoIndex = Arr.findLastIndex(numbers, (n) => n === 2);
+      expect(lastTwoIndex).toBe(4);
+    });
+
+    test('should return -1 when no element matches', () => {
+      const odds = [1, 3, 5];
+      const lastEvenIndex = Arr.findLastIndex(odds, (n) => n % 2 === 0);
+      expect(lastEvenIndex).toBe(-1);
+    });
+
+    test('should work with curried version', () => {
+      const isPositive = (n: number): boolean => n > 0;
+      const findLastPositiveIndex = Arr.findLastIndex(isPositive);
+      const result = findLastPositiveIndex([-1, 2, -3, 4, -5]);
+      expect(result).toBe(3); // index of last positive number (4)
+    });
+
+    test('should work with empty array', () => {
+      const empty: number[] = [];
+      const result = Arr.findLastIndex(empty, (n) => n > 0);
+      expect(result).toBe(-1);
+    });
+
+    test('should pass index and array to predicate', () => {
+      const numbers = [10, 20, 30, 40];
+      const lastWithIndex2OrHigher = Arr.findLastIndex(
+        numbers,
+        (_, idx, arr) => {
+          expect(arr).toBe(numbers);
+          return idx >= 2;
+        },
+      );
+      expect(lastWithIndex2OrHigher).toBe(3); // last index >= 2
+    });
+
+    test('should find last occurrence with complex conditions', () => {
+      const data = [
+        { id: 1, active: true },
+        { id: 2, active: false },
+        { id: 3, active: true },
+        { id: 4, active: false },
+        { id: 5, active: true },
+      ];
+      const lastActiveIndex = Arr.findLastIndex(data, (item) => item.active);
+      expect(lastActiveIndex).toBe(4); // last active item
+    });
+
+    test('should work with tuples', () => {
+      const tuple = [10, 20, 30, 20, 40] as const;
+      const lastTwentyIndex = Arr.findLastIndex(tuple, (x) => x === 20);
+      expect(lastTwentyIndex).toBe(3); // last occurrence of 20
+    });
+
+    test('should search from end to beginning', () => {
+      // Verify search order by using side effects
+      const numbers = [1, 2, 3, 4, 5];
+      const searchOrder: number[] = [];
+
+      Arr.findLastIndex(numbers, (val, idx) => {
+        searchOrder.push(idx);
+        return val === 3;
+      });
+
+      // Should search from end: 4, 3, 2 (stops at 2 when found)
+      expect(searchOrder).toStrictEqual([4, 3, 2]);
+    });
+
+    test('should handle single element array', () => {
+      const single = [42];
+      const foundIndex = Arr.findLastIndex(single, (n) => n === 42);
+      const notFoundIndex = Arr.findLastIndex(single, (n) => n === 0);
+
+      expect(foundIndex).toBe(0);
+      expect(notFoundIndex).toBe(-1);
+    });
+
+    test('should work with string arrays', () => {
+      const words = ['hello', 'world', 'test', 'hello', 'end'];
+      const lastHelloIndex = Arr.findLastIndex(
+        words,
+        (word) => word === 'hello',
+      );
+      expect(lastHelloIndex).toBe(3);
+    });
+  });
+
+  describe('flat', () => {
+    test('should flatten nested arrays with default depth 1', () => {
+      const nested = [
+        [1, 2],
+        [3, 4],
+        [5, 6],
+      ];
+      const flattened = Arr.flat(nested);
+      expect(flattened).toStrictEqual([1, 2, 3, 4, 5, 6]);
+    });
+
+    test('should flatten with specified depth', () => {
+      const deepNested = [1, [2, [3, 4]], 5];
+      const flat1 = Arr.flat(deepNested, 1);
+      const flat2 = Arr.flat(deepNested, 2);
+      expect(flat1).toStrictEqual([1, 2, [3, 4], 5]);
+      expect(flat2).toStrictEqual([1, 2, 3, 4, 5]);
+    });
+
+    test('should work with curried version', () => {
+      const flattenOnce = Arr.flat(1);
+      const result = flattenOnce([
+        [1, 2],
+        [3, 4],
+      ]);
+      expect(result).toStrictEqual([1, 2, 3, 4]);
+    });
+
+    test('should work with empty arrays', () => {
+      const withEmpties = [[1], [], [2, 3]];
+      const flattened = Arr.flat(withEmpties);
+      expect(flattened).toStrictEqual([1, 2, 3]);
+    });
+
+    test('should work with depth 0', () => {
+      const nested = [
+        [1, 2],
+        [3, 4],
+      ];
+      const unflattened = Arr.flat(nested, 0);
+      expect(unflattened).toStrictEqual([
+        [1, 2],
+        [3, 4],
+      ]);
+    });
+
+    test('should work with infinite depth', () => {
+      const veryDeep = [1, [2, [3, [4, [5]]]]];
+      const allFlat = Arr.flat(veryDeep, SafeUint.MAX_VALUE);
+      expect(allFlat).toStrictEqual([1, 2, 3, 4, 5]);
+    });
+  });
+
+  describe('flatMap', () => {
+    test('should map and flatten results', () => {
+      const words = ['hello', 'world'];
+      const chars = Arr.flatMap(words, (word) => word.split(''));
+      expect(chars).toStrictEqual([
+        'h',
+        'e',
+        'l',
+        'l',
+        'o',
+        'w',
+        'o',
+        'r',
+        'l',
+        'd',
+      ]);
+    });
+
+    test('should work with curried version', () => {
+      const splitWords = Arr.flatMap((word: string) => word.split(''));
+      const result = splitWords(['foo', 'bar']);
+      expect(result).toStrictEqual(['f', 'o', 'o', 'b', 'a', 'r']);
+    });
+
+    test('should work with numbers', () => {
+      const numbers = [1, 2, 3];
+      const doubled = Arr.flatMap(numbers, (n) => [n, n * 2]);
+      expect(doubled).toStrictEqual([1, 2, 2, 4, 3, 6]);
+    });
+
+    test('should pass index to mapping function', () => {
+      const numbers = [10, 20];
+      const result = Arr.flatMap(numbers, (n, i) => [n, i]);
+      expect(result).toStrictEqual([10, 0, 20, 1]);
+    });
+
+    test('should work with empty arrays', () => {
+      const empty: string[] = [];
+      const result = Arr.flatMap(empty, (s) => s.split(''));
+      expect(result).toStrictEqual([]);
+    });
+
+    test('should handle mapping to empty arrays', () => {
+      const numbers = [1, 2, 3];
+      const result = Arr.flatMap(numbers, (n) => (n % 2 === 0 ? [n] : []));
+      expect(result).toStrictEqual([2]);
+    });
+
+    test('should work with tuples', () => {
+      const tuple = [1, 2] as const;
+      const result = Arr.flatMap(tuple, (n) => [n, n]);
+      expect(result).toStrictEqual([1, 1, 2, 2]);
     });
   });
 });

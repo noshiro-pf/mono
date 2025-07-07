@@ -11,9 +11,3 @@
 ### Arr
 
 Re-exports [Arr](array/array-utils/namespaces/Arr.md)
-
----
-
-### Tpl
-
-Re-exports [Tpl](array/tuple-utils/namespaces/Tpl.md)

@@ -15,6 +15,17 @@ import { castMutable, tp, unknownToString } from '../others/index.mjs';
  * ensuring immutability.
  */
 export namespace Arr {
+  type ArrayIndex<Ar extends readonly unknown[]> =
+    IsFixedLengthList<Ar> extends true ? IndexOfTuple<Ar> : SizeType.Arr;
+
+  type ArgArrayIndex<Ar extends readonly unknown[]> =
+    IsFixedLengthList<Ar> extends true ? IndexOfTuple<Ar> : SizeType.ArgArr;
+
+  type ArgArrayIndexWithNegative<Ar extends readonly unknown[]> =
+    IsFixedLengthList<Ar> extends true
+      ? IndexOfTuple<[...Ar, 0]> | NegativeIndexOfTuple<Ar>
+      : SizeType.ArgArrWithNegative;
+
   /**
    * Returns the size (length) of an array as a type-safe branded integer.
    *
@@ -40,7 +51,7 @@ export namespace Arr {
    * // Type: IntersectBrand<PositiveNumber, SizeType.Arr>
    * // Value: 3 (branded, guaranteed positive)
    *
-   * const nonEmpty: NonEmptyArray<string> = ['a', 'b'] as NonEmptyArray<string>;
+   * const nonEmpty: NonEmptyArray<string> = ['a', 'b'];
    * const nonEmptySize = Arr.size(nonEmpty);
    * // Type: IntersectBrand<PositiveNumber, SizeType.Arr>
    * // Guaranteed to be > 0
@@ -70,13 +81,6 @@ export namespace Arr {
    * const indices = Arr.seq(dataSize); // Creates [0, 1, 2]
    * const zeros = Arr.zeros(dataSize); // Creates [0, 0, 0]
    *
-   * // Safe for bounds checking
-   * const isValidIndex = (index: number) => index >= 0 && index < dataSize;
-   *
-   * // Comparison with other sizes
-   * const otherArray = ['a', 'b'];
-   * const sizeDiff = Uint32.sub(Arr.size(data), Arr.size(otherArray)); // 1
-   *
    * // Functional composition
    * const arrays = [
    *   [1, 2],
@@ -103,17 +107,13 @@ export namespace Arr {
    * @see {@link isEmpty} for checking if size is 0
    * @see {@link isNonEmpty} for checking if size > 0
    */
-  export function size<Ar extends NonEmptyArray<unknown>>(
+  export const size = <Ar extends readonly unknown[]>(
     array: Ar,
-  ): IntersectBrand<PositiveNumber, SizeType.Arr>;
-
-  export function size<Ar extends readonly unknown[]>(array: Ar): SizeType.Arr;
-
-  export function size<Ar extends readonly unknown[]>(array: Ar): SizeType.Arr {
-    return asUint32(array.length);
-  }
-
-  export const length = size;
+  ): Ar extends NonEmptyArray<unknown>
+    ? IntersectBrand<PositiveNumber, SizeType.Arr>
+    : SizeType.Arr =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    array.length as never;
 
   // type guard
 
@@ -179,25 +179,10 @@ export namespace Arr {
    *   if (Arr.isEmpty(arr)) {
    *     // arr is now typed as readonly []
    *     console.log('Array is empty');
+   *     // arr[0]; // type error!
    *     return 0;
-   *   } else {
-   *     // arr is now typed as NonEmptyArray<number>
-   *     return arr[0]; // Safe access - TypeScript knows it's non-empty
    *   }
    * }
-   *
-   * // Conditional processing
-   * const data = [10, 20, 30];
-   * if (!Arr.isEmpty(data)) {
-   *   // Safe to access elements
-   *   const firstElement = data[0]; // No undefined risk
-   *   const lastElement = data[data.length - 1];
-   * }
-   *
-   * // Filtering empty arrays
-   * const arrayList: readonly number[][] = [[1, 2], [], [3], []];
-   * const nonEmptyArrays = arrayList.filter(arr => !Arr.isEmpty(arr));
-   * // nonEmptyArrays: [[1, 2], [3]]
    *
    * // Early returns
    * function sumArray(numbers: readonly number[]): number {
@@ -207,12 +192,6 @@ export namespace Arr {
    *   return numbers.reduce((sum, n) => sum + n, 0);
    * }
    *
-   * // Type inference examples
-   * const testEmpty = [] as const;
-   * const testNonEmpty = [1, 2] as const;
-   *
-   * expectType<Parameters<typeof Arr.isEmpty>[0], readonly unknown[]>('=');
-   * expectType<ReturnType<typeof Arr.isEmpty>, boolean>('=');
    * ```
    *
    * @see {@link isNonEmpty} for the opposite check (non-empty arrays)
@@ -255,16 +234,14 @@ export namespace Arr {
    *
    * // Safe operations on non-empty arrays
    * function processData(data: readonly string[]) {
-   *   if (Arr.isNonEmpty(data)) {
-   *     // All of these are now safe without undefined checks
-   *     const first = data[0];
-   *     const last = data[data.length - 1];
-   *     const middle = data[Math.floor(data.length / 2)];
+   *   if (!Arr.isNonEmpty(data)) return;  // early return pattern
    *
-   *     // Can safely use non-empty array methods
-   *     const joined = data.join(', ');
-   *     const reduced = data.reduce((acc, item) => acc + item.length, 0);
-   *   }
+   *   // This is now safe without undefined checks
+   *   const first = data[0];
+   *
+   *   // Can safely use non-empty array methods
+   *   const lastElement = Arr.last(data);
+   *
    * }
    *
    * // Filtering and working with arrays
@@ -289,7 +266,7 @@ export namespace Arr {
    *   }
    *
    *   // numbers is now NonEmptyArray<number>
-   *   return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
+   *   return Arr.sum(numbers) / Arr.size(numbers);
    * }
    *
    * // Functional composition
@@ -353,7 +330,7 @@ export namespace Arr {
    * Arr.isArrayOfLength([1, 2], 3); // false
    * ```
    */
-  export const isArrayOfLength = <E, N extends SizeType.ArgArrNonNegative>(
+  export const isArrayOfLength = <E, N extends SizeType.ArgArr>(
     array: readonly E[],
     len: N,
   ): array is ArrayOfLength<N, E> => array.length === len;
@@ -374,7 +351,7 @@ export namespace Arr {
    * Arr.isArrayAtLeastLength([1], 2); // false
    * ```
    */
-  export const isArrayAtLeastLength = <E, N extends SizeType.ArgArrNonNegative>(
+  export const isArrayAtLeastLength = <E, N extends SizeType.ArgArr>(
     array: readonly E[],
     len: N,
   ): array is ArrayAtLeastLen<N, E> => array.length >= len;
@@ -396,7 +373,7 @@ export namespace Arr {
    */
   export const indexIsInRange = <E,>(
     array: readonly E[],
-    index: SizeType.ArgArrNonNegative,
+    index: SizeType.ArgArr,
   ): boolean => Num.isInRange(0, array.length)(index);
 
   // array creation
@@ -437,24 +414,15 @@ export namespace Arr {
    * expectType<typeof maybeEmpty, readonly 0[]>('=');
    * ```
    */
-  /**
-   * Create array of zeros with compile-time length.
-   */
-  export function zeros<N extends SmallUint>(len: N): ArrayOfLength<N, 0>;
-
-  /**
-   * Create non-empty array of zeros.
-   */
-  export function zeros(len: SizeType.ArgArrPositive): NonEmptyArray<0>;
-
-  /**
-   * Create array of zeros.
-   */
-  export function zeros(len: SizeType.ArgArrNonNegative): readonly 0[];
-
-  export function zeros(len: SizeType.ArgArrNonNegative): readonly 0[] {
-    return Array.from<0>({ length: len }).fill(0);
-  }
+  export const zeros = <N extends SizeType.ArgArr>(
+    len: N,
+  ): N extends SmallUint
+    ? ArrayOfLength<N, 0>
+    : N extends SizeType.ArgArrPositive
+      ? NonEmptyArray<0>
+      : readonly 0[] =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    Array.from<0>({ length: len }).fill(0) as never;
 
   /**
    * Creates a sequence of consecutive integers from 0 to `len-1`.
@@ -497,19 +465,15 @@ export namespace Arr {
    * expectType<typeof single, readonly [0]>('=');
    * ```
    */
-  export function seq<N extends SmallUint>(len: N): Seq<N>;
-
-  export function seq(
-    len: SizeType.ArgArrPositive,
-  ): NonEmptyArray<SizeType.Arr>;
-
-  export function seq(len: SizeType.ArgArrNonNegative): readonly SizeType.Arr[];
-
-  export function seq(
-    len: SizeType.ArgArrNonNegative,
-  ): readonly SizeType.Arr[] {
-    return Array.from({ length: len }, (_, i) => asUint32(i));
-  }
+  export const seq = <N extends SizeType.ArgArr>(
+    len: N,
+  ): N extends SmallUint
+    ? Seq<N>
+    : N extends SizeType.ArgArrPositive
+      ? NonEmptyArray<SizeType.Arr>
+      : readonly SizeType.Arr[] =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    Array.from({ length: len }, (_, i) => i) as never;
 
   /**
    * Creates a new array of the specified length, with each position filled with the provided initial value.
@@ -559,29 +523,16 @@ export namespace Arr {
    * @see {@link zeros} for creating arrays filled with zeros
    * @see {@link seq} for creating sequences of consecutive integers
    */
-  export function create<const V, N extends SmallUint>(
+  export const create = <const V, N extends SizeType.ArgArr>(
     len: N,
     init: V,
-  ): ArrayOfLength<N, V>;
-
-  export function create<const V>(
-    len: SizeType.ArgArrPositive,
-    init: V,
-  ): NonEmptyArray<V>;
-
-  export function create<const V>(
-    len: SizeType.ArgArrNonNegative,
-    init: V,
-  ): readonly V[];
-
-  export function create<const V>(
-    len: SizeType.ArgArrNonNegative,
-    init: V,
-  ): readonly V[] {
-    return Array.from({ length: Math.max(0, len) }, () => init);
-  }
-
-  export const newArray = create;
+  ): N extends SmallUint
+    ? ArrayOfLength<N, V>
+    : N extends SizeType.ArgArrPositive
+      ? NonEmptyArray<V>
+      : readonly V[] =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    Array.from({ length: Math.max(0, len) }, () => init) as never;
 
   /**
    * Creates an array from a generator function.
@@ -787,7 +738,10 @@ export namespace Arr {
    *
    * // Functional programming patterns
    * const squares = Arr.range(1, 6).map(x => x * x); // [1, 4, 9, 16, 25]
-   * const fibonacci = Arr.range(0, 10).reduce((acc, _, i) => {\n   *   if (i <= 1) return [...acc, i];\n   *   return [...acc, acc[i-1] + acc[i-2]];\n   * }, [] as number[]); // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+   * const fibonacci = Arr.range(0, 10).reduce((acc, _, i) => {
+   *   if (i <= 1) return [...acc, i];
+   *   return [...acc, acc[i-1] + acc[i-2]];
+   * }, [] as number[]); // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
    *
    * // Type inference examples showing precise vs general types
    * expectType<typeof range1to4, readonly [1, 2, 3, 4]>('='); // Precise tuple
@@ -942,21 +896,21 @@ export namespace Arr {
    * @see {@link Optional.unwrapOr} for safe unwrapping with defaults
    * @see {@link Optional.map} for transforming Optional values
    */
-  export function at<E>(
-    array: readonly E[],
-    index: SizeType.ArgArr,
-  ): Optional<E>;
+  export function at<Ar extends readonly unknown[]>(
+    array: Ar,
+    index: ArgArrayIndexWithNegative<Ar>,
+  ): Optional<Ar[number]>;
 
   // Curried version
 
   export function at(
-    index: SizeType.ArgArr,
+    index: SizeType.ArgArrWithNegative,
   ): <E>(array: readonly E[]) => Optional<E>;
 
   export function at<E>(
     ...args:
-      | readonly [array: readonly E[], index: SizeType.ArgArr]
-      | readonly [index: SizeType.ArgArr]
+      | readonly [array: readonly E[], index: SizeType.ArgArrWithNegative]
+      | readonly [index: SizeType.ArgArrWithNegative]
   ): Optional<E> | ((array: readonly E[]) => Optional<E>) {
     switch (args.length) {
       case 2: {
@@ -971,7 +925,7 @@ export namespace Arr {
       }
       case 1: {
         const [index] = args;
-        return (array: readonly E[]) => at(array, index);
+        return (array) => at(array, index);
       }
     }
   }
@@ -1047,20 +1001,17 @@ export namespace Arr {
    * @see {@link at} for accessing elements at specific indices
    * @see {@link tail} for getting all elements except the first
    */
-  export function head(array: readonly []): Optional.None;
-
-  export function head<E, L extends readonly unknown[]>(
-    array: readonly [E, ...L],
-  ): Optional.Some<E>;
-
-  export function head<E>(array: NonEmptyArray<E>): Optional.Some<E>;
-
-  export function head<E>(array: readonly E[]): Optional<E>;
-
-  export function head<E>(array: readonly E[]): Optional<E> {
-    const element = array.at(0);
-    return element === undefined ? Optional.none : Optional.some(element);
-  }
+  export const head = <Ar extends readonly unknown[]>(
+    array: Ar,
+  ): Ar extends readonly []
+    ? Optional.None
+    : Ar extends readonly [infer E, ...unknown[]]
+      ? Optional.Some<E>
+      : Ar extends NonEmptyArray<infer E>
+        ? Optional.Some<E>
+        : Optional<Ar[number]> =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    (array.length === 0 ? Optional.none : Optional.some(array.at(0))) as never;
 
   /**
    * Returns the last element of an array wrapped in an Optional.
@@ -1142,20 +1093,17 @@ export namespace Arr {
    * @see {@link at} for accessing elements at specific indices with negative indexing support
    * @see {@link butLast} for getting all elements except the last
    */
-  export function last(array: readonly []): Optional.None;
-
-  export function last<Ar extends readonly unknown[], L>(
-    array: readonly [...Ar, L],
-  ): Optional.Some<L>;
-
-  export function last<E>(array: NonEmptyArray<E>): Optional.Some<E>;
-
-  export function last<E>(array: readonly E[]): Optional<E>;
-
-  export function last<E>(array: readonly E[]): Optional<E> {
-    const element = array.at(-1);
-    return element === undefined ? Optional.none : Optional.some(element);
-  }
+  export const last = <Ar extends readonly unknown[]>(
+    array: Ar,
+  ): Ar extends readonly []
+    ? Optional.None
+    : Ar extends readonly [...unknown[], infer E]
+      ? Optional.Some<E>
+      : Ar extends NonEmptyArray<infer E>
+        ? Optional.Some<E>
+        : Optional<Ar[number]> =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    (array.length === 0 ? Optional.none : Optional.some(array.at(-1))) as never;
 
   // slicing
 
@@ -1242,21 +1190,25 @@ export namespace Arr {
    * @see {@link skip} for skipping the first N elements
    * @see {@link takeLast} for taking the last N elements
    */
-  export function sliceClamped<E>(
-    array: readonly E[],
-    start: SizeType.ArgArr,
-    end: SizeType.ArgArr,
-  ): readonly E[];
+  export function sliceClamped<Ar extends readonly unknown[]>(
+    array: Ar,
+    start: ArgArrayIndexWithNegative<Ar>,
+    end: ArgArrayIndexWithNegative<Ar>,
+  ): readonly Ar[number][];
 
   export function sliceClamped(
-    start: SizeType.ArgArr,
-    end: SizeType.ArgArr,
+    start: SizeType.ArgArrWithNegative,
+    end: SizeType.ArgArrWithNegative,
   ): <E>(array: readonly E[]) => readonly E[];
 
   export function sliceClamped<E>(
     ...args:
-      | readonly [readonly E[], SizeType.ArgArr, SizeType.ArgArr]
-      | readonly [SizeType.ArgArr, SizeType.ArgArr]
+      | readonly [
+          readonly E[],
+          SizeType.ArgArrWithNegative,
+          SizeType.ArgArrWithNegative,
+        ]
+      | readonly [SizeType.ArgArrWithNegative, SizeType.ArgArrWithNegative]
   ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 3: {
@@ -1332,41 +1284,37 @@ export namespace Arr {
    * console.log(result); // [1, 2, 3]
    * ```
    */
-  export function take<Ar extends readonly unknown[], N extends SmallUint>(
+  export function take<
+    Ar extends readonly unknown[],
+    N extends SizeType.ArgArr,
+  >(
     array: Ar,
     num: N,
-  ): List.Take<N, Ar>;
+  ): N extends SmallUint
+    ? List.Take<N, Ar>
+    : N extends SizeType.ArgArrPositive
+      ? Ar extends NonEmptyArray<unknown>
+        ? NonEmptyArray<Ar[number]>
+        : readonly Ar[number][]
+      : readonly Ar[number][];
 
-  export function take<N extends SmallUint>(
+  export function take<N extends SizeType.ArgArr>(
     num: N,
-  ): <Ar extends readonly unknown[]>(array: Ar) => List.Take<N, Ar>;
-
-  export function take<E>(
-    array: NonEmptyArray<E>,
-    num: SizeType.ArgArrPositive,
-  ): NonEmptyArray<E>;
-
-  export function take(
-    num: SizeType.ArgArrPositive,
-  ): <E>(array: NonEmptyArray<E>) => NonEmptyArray<E>;
-
-  export function take<E>(
-    array: readonly E[],
-    num: SizeType.ArgArrNonNegative,
-  ): readonly E[];
-
-  export function take(
-    num: SizeType.ArgArrNonNegative,
-  ): <E>(array: readonly E[]) => readonly E[];
+  ): <Ar extends readonly unknown[]>(
+    array: Ar,
+  ) => N extends SmallUint
+    ? List.Take<N, Ar>
+    : N extends SizeType.ArgArrPositive
+      ? Ar extends NonEmptyArray<unknown>
+        ? NonEmptyArray<Ar[number]>
+        : readonly Ar[number][]
+      : readonly Ar[number][];
 
   export function take<E>(
     ...args:
-      | readonly [array: readonly E[], num: SizeType.ArgArrNonNegative]
-      | readonly [num: SizeType.ArgArrNonNegative]
-  ):
-    | readonly E[]
-    | ((array: NonEmptyArray<E>) => NonEmptyArray<E>)
-    | ((array: readonly E[]) => readonly E[]) {
+      | readonly [array: readonly E[], num: SizeType.ArgArr]
+      | readonly [num: SizeType.ArgArr]
+  ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 2: {
         const [array, num] = args;
@@ -1374,7 +1322,7 @@ export namespace Arr {
       }
       case 1: {
         const [num] = args;
-        return (array: readonly E[]) => take(array, num);
+        return (array) => take(array, num);
       }
     }
   }
@@ -1402,41 +1350,37 @@ export namespace Arr {
    * console.log(result); // [4, 5]
    * ```
    */
-  export function takeLast<Ar extends readonly unknown[], N extends SmallUint>(
+  export function takeLast<
+    Ar extends readonly unknown[],
+    N extends SizeType.ArgArr,
+  >(
     array: Ar,
     num: N,
-  ): List.TakeLast<N, Ar>;
+  ): N extends SmallUint
+    ? List.TakeLast<N, Ar>
+    : N extends SizeType.ArgArrPositive
+      ? Ar extends NonEmptyArray<unknown>
+        ? NonEmptyArray<Ar[number]>
+        : readonly Ar[number][]
+      : readonly Ar[number][];
 
-  export function takeLast<N extends SmallUint>(
+  export function takeLast<N extends SizeType.ArgArr>(
     num: N,
-  ): <Ar extends readonly unknown[]>(array: Ar) => List.TakeLast<N, Ar>;
-
-  export function takeLast<E>(
-    array: NonEmptyArray<E>,
-    num: SizeType.ArgArrPositive,
-  ): NonEmptyArray<E>;
-
-  export function takeLast(
-    num: SizeType.ArgArrPositive,
-  ): <E>(array: NonEmptyArray<E>) => NonEmptyArray<E>;
-
-  export function takeLast<E>(
-    array: readonly E[],
-    num: SizeType.ArgArrNonNegative,
-  ): readonly E[];
-
-  export function takeLast(
-    num: SizeType.ArgArrNonNegative,
-  ): <E>(array: readonly E[]) => readonly E[];
+  ): <Ar extends readonly unknown[]>(
+    array: Ar,
+  ) => N extends SmallUint
+    ? List.TakeLast<N, Ar>
+    : N extends SizeType.ArgArrPositive
+      ? Ar extends NonEmptyArray<unknown>
+        ? NonEmptyArray<Ar[number]>
+        : readonly Ar[number][]
+      : readonly Ar[number][];
 
   export function takeLast<E>(
     ...args:
-      | readonly [array: readonly E[], num: SizeType.ArgArrNonNegative]
-      | readonly [num: SizeType.ArgArrNonNegative]
-  ):
-    | readonly E[]
-    | ((array: NonEmptyArray<E>) => NonEmptyArray<E>)
-    | ((array: readonly E[]) => readonly E[]) {
+      | readonly [array: readonly E[], num: SizeType.ArgArr]
+      | readonly [num: SizeType.ArgArr]
+  ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 2: {
         const [array, num] = args;
@@ -1444,7 +1388,7 @@ export namespace Arr {
       }
       case 1: {
         const [num] = args;
-        return (array: readonly E[]) => takeLast(array, num);
+        return (array) => takeLast(array, num);
       }
     }
   }
@@ -1472,41 +1416,26 @@ export namespace Arr {
    * console.log(result); // [3, 4, 5]
    * ```
    */
-  export function skip<Ar extends readonly unknown[], N extends SmallUint>(
+  export function skip<
+    Ar extends readonly unknown[],
+    N extends SizeType.ArgArr,
+  >(
     array: Ar,
     num: N,
-  ): List.Skip<N, Ar>;
+  ): N extends SmallUint ? List.Skip<N, Ar> : readonly Ar[number][];
 
-  export function skip<E>(
-    array: NonEmptyArray<E>,
-    num: SizeType.ArgArrPositive,
-  ): readonly E[];
-
-  export function skip<E>(
-    array: readonly E[],
-    num: SizeType.ArgArrNonNegative,
-  ): readonly E[];
-
-  export function skip<N extends SmallUint>(
+  // curried version
+  export function skip<N extends SizeType.ArgArr>(
     num: N,
-  ): <Ar extends readonly unknown[]>(array: Ar) => List.Skip<N, Ar>;
-
-  export function skip(
-    num: SizeType.ArgArrPositive,
-  ): <E>(array: NonEmptyArray<E>) => readonly E[];
-
-  export function skip(
-    num: SizeType.ArgArrNonNegative,
-  ): <E>(array: readonly E[]) => readonly E[];
+  ): <Ar extends readonly unknown[]>(
+    array: Ar,
+  ) => N extends SmallUint ? List.Skip<N, Ar> : readonly Ar[number][];
 
   export function skip<E>(
     ...args:
-      | readonly [readonly E[], SizeType.ArgArrNonNegative]
-      | readonly [SizeType.ArgArrNonNegative]
-  ):
-    | readonly E[]
-    | ((array: NonEmptyArray<E>) => readonly E[])
-    | ((array: readonly E[]) => readonly E[]) {
+      | readonly [readonly E[], SizeType.ArgArr]
+      | readonly [SizeType.ArgArr]
+  ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 2: {
         const [array, num] = args;
@@ -1514,7 +1443,7 @@ export namespace Arr {
       }
       case 1: {
         const [num] = args;
-        return (array: readonly E[]) => skip(array, num);
+        return (array) => skip(array, num);
       }
     }
   }
@@ -1542,28 +1471,25 @@ export namespace Arr {
    * console.log(result); // [1, 2, 3]
    * ```
    */
-  export function skipLast<Ar extends readonly unknown[], N extends SmallUint>(
+  export function skipLast<
+    Ar extends readonly unknown[],
+    N extends SizeType.ArgArr,
+  >(
     array: Ar,
     num: N,
-  ): List.SkipLast<N, Ar>;
+  ): N extends SmallUint ? List.SkipLast<N, Ar> : readonly Ar[number][];
 
-  export function skipLast<N extends SmallUint>(
+  // curried version
+  export function skipLast<N extends SizeType.ArgArr>(
     num: N,
-  ): <Ar extends readonly unknown[]>(array: Ar) => List.SkipLast<N, Ar>;
-
-  export function skipLast<E>(
-    array: readonly E[],
-    num: SizeType.ArgArrNonNegative,
-  ): readonly E[];
-
-  export function skipLast(
-    num: SizeType.ArgArrNonNegative,
-  ): <E>(array: readonly E[]) => readonly E[];
+  ): <Ar extends readonly unknown[]>(
+    array: Ar,
+  ) => N extends SmallUint ? List.SkipLast<N, Ar> : readonly Ar[number][];
 
   export function skipLast<E>(
     ...args:
-      | readonly [array: readonly E[], num: SizeType.ArgArrNonNegative]
-      | readonly [num: SizeType.ArgArrNonNegative]
+      | readonly [array: readonly E[], num: SizeType.ArgArr]
+      | readonly [num: SizeType.ArgArr]
   ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 2: {
@@ -1572,12 +1498,90 @@ export namespace Arr {
       }
       case 1: {
         const [num] = args;
-        return (array: readonly E[]) => skipLast(array, num);
+        return (array) => skipLast(array, num);
       }
     }
   }
 
   // modification (returns new array)
+
+  /**
+   * Returns a new tuple with the element at the specified index replaced.
+   *
+   * This operation is type-safe with compile-time index validation.
+   * The resulting tuple type reflects that the element at the given index
+   * may be either the new type or the original type.
+   *
+   * @template T - The type of the input tuple
+   * @template N - The type of the new value to set
+   * @param tpl - The input tuple
+   * @param index - The index to update (must be valid for the tuple length)
+   * @param newValue - The new value to place at the index
+   * @returns A new tuple with the updated element
+   *
+   * @example
+   * ```typescript
+   * // Basic usage
+   * const tpl = ['a', 'b', 'c'] as const;
+   * const updated = Arr.set(tpl, 1, 'B'); // readonly ['a', 'B', 'c']
+   *
+   * // Type changes are reflected
+   * const mixed = [1, 'hello', true] as const;
+   * const withNumber = Arr.set(mixed, 1, 42);
+   * // readonly [1, 42 | 'hello', true]
+   *
+   * // Compile-time index validation
+   * const short = [1, 2] as const;
+   * // Arr.set(short, 2, 3); // Error: index 2 is out of bounds
+   *
+   * // Different value types
+   * const nums = [1, 2, 3] as const;
+   * const withString = Arr.set(nums, 0, 'first');
+   * // readonly ['first' | 1, 2, 3]
+   * ```
+   */
+  export function set<
+    const Ar extends readonly unknown[],
+    const V = Ar[number],
+  >(
+    array: Ar,
+    index: ArgArrayIndex<Ar>,
+    newValue: V,
+  ): IsFixedLengthList<Ar> extends true
+    ? Readonly<{ [K in keyof Ar]: Ar[K] | V }>
+    : Ar extends NonEmptyArray<unknown>
+      ? NonEmptyArray<Ar[number] | V>
+      : readonly (Ar[number] | V)[];
+
+  // curried version
+  export function set<const V>(
+    index: SizeType.ArgArr,
+    newValue: V,
+  ): <const Ar extends readonly unknown[]>(
+    array: Ar,
+  ) => IsFixedLengthList<Ar> extends true
+    ? Readonly<{ [K in keyof Ar]: Ar[K] | V }>
+    : Ar extends NonEmptyArray<unknown>
+      ? NonEmptyArray<Ar[number] | V>
+      : readonly (Ar[number] | V)[];
+
+  export function set<E, const V = E>(
+    ...args:
+      | readonly [array: readonly E[], index: SizeType.ArgArr, newValue: V]
+      | readonly [index: SizeType.ArgArr, newValue: V]
+  ): readonly (E | V)[] | ((array: readonly E[]) => readonly (E | V)[]) {
+    switch (args.length) {
+      case 3: {
+        const [array, index, newValue] = args;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        return (array as (E | V)[]).with(index, newValue);
+      }
+      case 2: {
+        const [index, newValue] = args;
+        return (array) => set(array, index, newValue);
+      }
+    }
+  }
 
   /**
    * Returns a new array with the element at the specified index updated by a function.
@@ -1600,9 +1604,9 @@ export namespace Arr {
    * updater, returns a reusable function that can be applied to arrays.
    *
    * @template E The type of elements in the original array.
-   * @template U The type of the value returned by the updater function.
+   * @template V The type of the value returned by the updater function.
    * @param array The input array to update. Can be any readonly array.
-   * @param index The index of the element to update. Must be a non-negative {@link SizeType.ArgArrNonNegative}.
+   * @param index The index of the element to update. Must be a non-negative {@link SizeType.ArgArr}.
    *   - **Valid range:** `0 <= index < array.length`
    *   - **Out of bounds:** Returns original array unchanged
    *   - **Negative values:** Not allowed by type system (non-negative constraint)
@@ -1730,40 +1734,52 @@ export namespace Arr {
    * ```
    *
    * @see {@link Array.prototype.with} for the native method with different error handling
-   * @see {@link SizeType.ArgArrNonNegative} for the index type constraint
+   * @see {@link SizeType.ArgArr} for the index type constraint
    * @see Immutable update patterns for functional programming approaches
    */
-  export function toUpdated<E, U>(
-    array: readonly E[],
-    index: SizeType.ArgArrNonNegative,
-    updater: (prev: E) => U,
-  ): readonly (E | U)[];
+  export function toUpdated<
+    const Ar extends readonly unknown[],
+    const V = Ar[number],
+  >(
+    array: Ar,
+    index: ArgArrayIndex<Ar>,
+    updater: (prev: Ar[number]) => V,
+  ): IsFixedLengthList<Ar> extends true
+    ? Readonly<{ [K in keyof Ar]: Ar[K] | V }>
+    : Ar extends NonEmptyArray<unknown>
+      ? NonEmptyArray<Ar[number] | V>
+      : readonly (Ar[number] | V)[];
 
-  export function toUpdated<E, U>(
-    index: SizeType.ArgArrNonNegative,
-    updater: (prev: E) => U,
-  ): (array: readonly E[]) => readonly (E | U)[];
+  // curried version
+  export function toUpdated<E, const V = E>(
+    index: SizeType.ArgArr,
+    updater: (prev: E) => V,
+  ): <const Ar extends readonly E[]>(
+    array: Ar,
+  ) => IsFixedLengthList<Ar> extends true
+    ? Readonly<{ [K in keyof Ar]: Ar[K] | V }>
+    : Ar extends NonEmptyArray<unknown>
+      ? NonEmptyArray<Ar[number] | V>
+      : readonly (Ar[number] | V)[];
 
-  export function toUpdated<E, U>(
+  export function toUpdated<E, V = E>(
     ...args:
       | readonly [
           array: readonly E[],
-          index: SizeType.ArgArrNonNegative,
-          updater: (prev: E) => U,
+          index: SizeType.ArgArr,
+          updater: (prev: E) => V,
         ]
-      | readonly [index: SizeType.ArgArrNonNegative, updater: (prev: E) => U]
-  ): readonly (E | U)[] | ((array: readonly E[]) => readonly (E | U)[]) {
+      | readonly [index: SizeType.ArgArr, updater: (prev: E) => V]
+  ): readonly (E | V)[] | ((array: readonly E[]) => readonly (E | V)[]) {
     switch (args.length) {
       case 3: {
         const [array, index, updater] = args;
-        return index < 0 || index >= array.length
-          ? array // Return a copy if index is out of bounds
-          : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-unsafe-type-assertion
-            (array as (E | U)[]).with(index, updater(array[index]!));
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-unsafe-type-assertion
+        return (array as (E | V)[]).with(index, updater(array[index]!));
       }
       case 2: {
         const [index, updater] = args;
-        return (array: readonly E[]) => toUpdated(array, index, updater);
+        return (array) => toUpdated(array, index, updater);
       }
     }
   }
@@ -1787,25 +1803,35 @@ export namespace Arr {
    * console.log(result); // [99, 1, 2, 3]
    * ```
    */
-  export function toInserted<E, const V = E>(
-    array: readonly E[],
-    index: SizeType.ArgArrNonNegative,
+  export function toInserted<
+    Ar extends readonly unknown[],
+    const V = Ar[number],
+  >(
+    array: Ar,
+    index: ArgArrayIndexWithNegative<Ar>,
     newValue: V,
-  ): NonEmptyArray<E | V>;
+  ): IsFixedLengthList<Ar> extends true
+    ? ArrayOfLength<CastToNumber<Increment<Ar['length']>>, Ar[number] | V>
+    : NonEmptyArray<Ar[number] | V>;
 
-  export function toInserted<E, const V = E>(
-    index: SizeType.ArgArrNonNegative,
+  // curried version
+  export function toInserted<const V>(
+    index: SizeType.ArgArrWithNegative,
     newValue: V,
-  ): (array: readonly E[]) => NonEmptyArray<E | V>;
+  ): <Ar extends readonly unknown[]>(
+    array: Ar,
+  ) => IsFixedLengthList<Ar> extends true
+    ? ArrayOfLength<CastToNumber<Increment<Ar['length']>>, Ar[number] | V>
+    : NonEmptyArray<Ar[number] | V>;
 
   export function toInserted<E, const V = E>(
     ...args:
       | readonly [
           array: readonly E[],
-          index: SizeType.ArgArrNonNegative,
+          index: SizeType.ArgArrWithNegative,
           newValue: V,
         ]
-      | readonly [index: SizeType.ArgArrNonNegative, newValue: V]
+      | readonly [index: SizeType.ArgArrWithNegative, newValue: V]
   ): NonEmptyArray<E | V> | ((array: readonly E[]) => NonEmptyArray<E | V>) {
     switch (args.length) {
       case 3: {
@@ -1819,10 +1845,12 @@ export namespace Arr {
       }
       case 2: {
         const [index, newValue] = args;
-        return (array: readonly E[]) => toInserted(array, index, newValue);
+        return (array) => toInserted(array, index, newValue);
       }
     }
   }
+
+  type CastToNumber<T> = T extends number ? T : never;
 
   /**
    * Returns a new array with the element at the specified index removed.
@@ -1842,19 +1870,19 @@ export namespace Arr {
    * console.log(result); // [20, 30]
    * ```
    */
-  export function toRemoved<E>(
-    array: readonly E[],
-    index: SizeType.ArgArrNonNegative,
-  ): readonly E[];
+  export function toRemoved<Ar extends readonly unknown[]>(
+    array: Ar,
+    index: ArgArrayIndexWithNegative<Ar>,
+  ): readonly Ar[number][];
 
   export function toRemoved(
-    index: SizeType.ArgArrNonNegative,
+    index: SizeType.ArgArrWithNegative,
   ): <E>(array: readonly E[]) => readonly E[];
 
   export function toRemoved<E>(
     ...args:
-      | readonly [array: readonly E[], index: SizeType.ArgArrNonNegative]
-      | readonly [index: SizeType.ArgArrNonNegative]
+      | readonly [array: readonly E[], index: SizeType.ArgArrWithNegative]
+      | readonly [index: SizeType.ArgArrWithNegative]
   ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
     switch (args.length) {
       case 2: {
@@ -1863,7 +1891,7 @@ export namespace Arr {
       }
       case 1: {
         const [index] = args;
-        return (array: readonly E[]) => toRemoved(array, index);
+        return (array) => toRemoved(array, index);
       }
     }
   }
@@ -1962,28 +1990,54 @@ export namespace Arr {
   }
 
   /**
-   * Fills an array with a value (creates a new filled array).
-   * @param array The array.
-   * @param value The value to fill with.
-   * @param start The start index.
-   * @param end The end index.
-   * @returns A new filled array.
+   * Creates a new array of the same length filled with a specified value.
+   *
+   * This function replaces all elements in the array with the provided value,
+   * maintaining the original array's length and structure. It provides type-safe
+   * array filling with precise return types.
+   *
+   * @template Ar The exact type of the input array.
+   * @template V The type of the fill value.
+   * @param array The array to fill.
+   * @param value The value to fill the array with.
+   * @returns A new array of the same length filled with the specified value:
+   *   - For fixed-length arrays: returns `ArrayOfLength<Ar['length'], V>`
+   *   - For non-empty arrays: returns `NonEmptyArray<V>`
+   *   - For general arrays: returns `readonly V[]`
+   *
    * @example
    * ```typescript
    * // Regular usage
-   * const arr = [1, 2, 3, 4, 5];
-   * const result = Arr.toFilled(arr, 0, 1, 4);
-   * console.log(result); // [1, 0, 0, 0, 5]
+   * const numbers = [1, 2, 3, 4, 5];
+   * const zeros = Arr.toFilled(numbers, 0); // [0, 0, 0, 0, 0]
    *
    * // Curried usage for pipe composition
-   * const fillWithZeros = Arr.toFilled(0, 1, 3);
-   * const result2 = pipe([1, 2, 3, 4]).map(fillWithZeros).value;
-   * console.log(result2); // [1, 0, 0, 4]
+   * const fillWithX = Arr.toFilled('X');
+   * const result = pipe(['a', 'b', 'c']).map(fillWithX).value; // ['X', 'X', 'X']
    * ```
+   *
+   * @see {@link toRangeFilled} for filling only a specific range
+   * @see {@link create} for creating new arrays filled with a value
    */
-  export function toFilled<E>(array: readonly E[], value: E): readonly E[];
+  export function toFilled<Ar extends readonly unknown[], const V>(
+    array: Ar,
+    value: V,
+  ): IsFixedLengthList<Ar> extends true
+    ? ArrayOfLength<Ar['length'], V>
+    : Ar extends NonEmptyArray<unknown>
+      ? NonEmptyArray<V>
+      : readonly V[];
 
-  export function toFilled<E>(value: E): (array: readonly E[]) => readonly E[];
+  // curried version
+  export function toFilled<const V>(
+    value: V,
+  ): <Ar extends readonly unknown[]>(
+    array: Ar,
+  ) => IsFixedLengthList<Ar> extends true
+    ? ArrayOfLength<Ar['length'], V>
+    : Ar extends NonEmptyArray<unknown>
+      ? NonEmptyArray<V>
+      : readonly V[];
 
   export function toFilled<E>(
     ...args: readonly [array: readonly E[], value: E] | readonly [value: E]
@@ -1991,9 +2045,7 @@ export namespace Arr {
     switch (args.length) {
       case 2: {
         const [array, value] = args;
-        const cp = castMutable(copy(array));
-        cp.fill(value);
-        return cp;
+        return create(asPositiveUint32(array.length), value);
       }
       case 1: {
         const [value] = args;
@@ -2002,33 +2054,86 @@ export namespace Arr {
     }
   }
 
-  export function toRangeFilled<E>(
-    array: readonly E[],
-    value: E,
-    fillRange: readonly [start: SizeType.ArgArr, end: SizeType.ArgArr],
-  ): readonly E[];
+  /**
+   * Creates a new array with a specific range filled with a specified value.
+   *
+   * This function fills only the specified range of indices with the provided value,
+   * leaving other elements unchanged. It provides type-safe range filling with
+   * precise return types.
+   *
+   * @template Ar The exact type of the input array.
+   * @template V The type of the fill value.
+   * @param array The array to fill a range of.
+   * @param value The value to fill the range with.
+   * @param fillRange A tuple containing [start, end] indices for the range to fill.
+   * @returns A new array with the specified range filled:
+   *   - For fixed-length arrays: returns `ArrayOfLength<Ar['length'], V | Ar[number]>`
+   *   - For non-empty arrays: returns `NonEmptyArray<V | Ar[number]>`
+   *   - For general arrays: returns `readonly (V | Ar[number])[]`
+   *
+   * @example
+   * ```typescript
+   * // Regular usage
+   * const numbers = [1, 2, 3, 4, 5];
+   * const result = Arr.toRangeFilled(numbers, 0, [1, 4]); // [1, 0, 0, 0, 5]
+   *
+   * // Curried usage for pipe composition
+   * const fillMiddleWithX = Arr.toRangeFilled('X', [1, 3]);
+   * const result2 = pipe(['a', 'b', 'c', 'd']).map(fillMiddleWithX).value; // ['a', 'X', 'X', 'd']
+   * ```
+   *
+   * @see {@link toFilled} for filling the entire array
+   */
+  export function toRangeFilled<Ar extends readonly unknown[], const V>(
+    array: Ar,
+    value: V,
+    fillRange: readonly [
+      start: ArgArrayIndexWithNegative<Ar>,
+      end: ArgArrayIndexWithNegative<Ar>,
+    ],
+  ): IsFixedLengthList<Ar> extends true
+    ? ArrayOfLength<Ar['length'], V | Ar[number]>
+    : Ar extends NonEmptyArray<unknown>
+      ? NonEmptyArray<V | Ar[number]>
+      : readonly (V | Ar[number])[];
 
-  export function toRangeFilled<E>(
-    value: E,
-    fillRange: readonly [start: SizeType.ArgArr, end: SizeType.ArgArr],
-  ): (array: readonly E[]) => readonly E[];
+  // curried version
+  export function toRangeFilled<const V>(
+    value: V,
+    fillRange: readonly [
+      start: SizeType.ArgArrWithNegative,
+      end: SizeType.ArgArrWithNegative,
+    ],
+  ): <Ar extends readonly unknown[]>(
+    array: Ar,
+  ) => IsFixedLengthList<Ar> extends true
+    ? ArrayOfLength<Ar['length'], V | Ar[number]>
+    : Ar extends NonEmptyArray<unknown>
+      ? NonEmptyArray<V | Ar[number]>
+      : readonly (V | Ar[number])[];
 
-  export function toRangeFilled<E>(
+  export function toRangeFilled<E, const V>(
     ...args:
       | readonly [
           array: readonly E[],
-          value: E,
-          fillRange: readonly [start: SizeType.ArgArr, end: SizeType.ArgArr],
+          value: V,
+          fillRange: readonly [
+            start: SizeType.ArgArrWithNegative,
+            end: SizeType.ArgArrWithNegative,
+          ],
         ]
       | readonly [
-          value: E,
-          fillRange: readonly [start: SizeType.ArgArr, end: SizeType.ArgArr],
+          value: V,
+          fillRange: readonly [
+            start: SizeType.ArgArrWithNegative,
+            end: SizeType.ArgArrWithNegative,
+          ],
         ]
-  ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
+  ): readonly (E | V)[] | ((array: readonly E[]) => readonly (E | V)[]) {
     switch (args.length) {
       case 3: {
         const [array, value, [start, end]] = args;
-        const cp = castMutable(copy(array));
+        const cp: (E | V)[] = castMutable(copy(array));
         cp.fill(value, start, end);
         return cp;
       }
@@ -2078,10 +2183,15 @@ export namespace Arr {
    * @see {@link indexOf} for finding elements by equality
    * @see {@link Optional} for working with the returned Optional values
    */
-  export function find<E>(
+  export function find<E, F extends E>(
     array: readonly E[],
-    predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
-  ): Optional<E>;
+    predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => value is F,
+  ): Optional<F>;
+
+  export function find<Ar extends readonly unknown[]>(
+    array: Ar,
+    predicate: (value: Ar[number], index: ArrayIndex<Ar>, arr: Ar) => boolean,
+  ): Optional<Ar[number]>;
 
   export function find<E>(
     predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
@@ -2110,8 +2220,18 @@ export namespace Arr {
         const [array, predicate] = args;
         const foundIndex = array.findIndex(
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-          predicate as (value: E, index: number, arr: readonly E[]) => boolean,
+          predicate as () => boolean,
         );
+
+        expectType<
+          Parameters<typeof array.findIndex>[0],
+          (value: E, index: number, arr: readonly E[]) => unknown
+        >('=');
+
+        expectType<
+          typeof predicate,
+          (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean
+        >('=');
 
         return foundIndex === -1
           ? Optional.none
@@ -2120,7 +2240,108 @@ export namespace Arr {
       }
       case 1: {
         const [predicate] = args;
-        return (array: readonly E[]) => find(array, predicate);
+
+        expectType<
+          typeof predicate,
+          (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean
+        >('=');
+
+        return (array) => find(array, predicate);
+      }
+    }
+  }
+
+  /**
+   * Returns the last element in an array that satisfies a predicate function.
+   *
+   * This function searches from the end of the array and returns an Optional containing
+   * the first element found that satisfies the predicate, or None if no such element exists.
+   *
+   * @template Ar The exact type of the input array.
+   * @template E The type of elements in the array.
+   * @param array The array to search.
+   * @param predicate A function that tests each element.
+   * @returns An Optional containing the found element, or None if no element satisfies the predicate.
+   *
+   * @example
+   * ```typescript
+   * // Direct usage
+   * const numbers = [1, 2, 3, 4, 5];
+   * const lastEven = Arr.findLast(numbers, n => n % 2 === 0); // Optional.some(4)
+   *
+   * // Curried usage
+   * const isPositive = (n: number) => n > 0;
+   * const findLastPositive = Arr.findLast(isPositive);
+   * const result = findLastPositive([-1, 2, -3, 4]); // Optional.some(4)
+   *
+   * // No match
+   * const noMatch = Arr.findLast([1, 3, 5], n => n % 2 === 0); // Optional.none
+   * ```
+   */
+  export function findLast<E, F extends E>(
+    array: readonly E[],
+    predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => value is F,
+  ): Optional<F>;
+
+  export function findLast<Ar extends readonly unknown[]>(
+    array: Ar,
+    predicate: (value: Ar[number], index: ArrayIndex<Ar>, arr: Ar) => boolean,
+  ): Optional<Ar[number]>;
+
+  export function findLast<E>(
+    predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
+  ): (array: readonly E[]) => Optional<E>;
+
+  export function findLast<E>(
+    ...args:
+      | readonly [
+          array: readonly E[],
+          predicate: (
+            value: E,
+            index: SizeType.Arr,
+            arr: readonly E[],
+          ) => boolean,
+        ]
+      | readonly [
+          predicate: (
+            value: E,
+            index: SizeType.Arr,
+            arr: readonly E[],
+          ) => boolean,
+        ]
+  ): Optional<E> | ((array: readonly E[]) => Optional<E>) {
+    switch (args.length) {
+      case 2: {
+        const [array, predicate] = args;
+        const foundIndex = array.findLastIndex(
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          predicate as () => boolean,
+        );
+
+        expectType<
+          Parameters<typeof array.findIndex>[0],
+          (value: E, index: number, arr: readonly E[]) => unknown
+        >('=');
+
+        expectType<
+          typeof predicate,
+          (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean
+        >('=');
+
+        return foundIndex === -1
+          ? Optional.none
+          : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            Optional.some(array[foundIndex]!);
+      }
+      case 1: {
+        const [predicate] = args;
+
+        expectType<
+          typeof predicate,
+          (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean
+        >('=');
+
+        return (array) => findLast(array, predicate);
       }
     }
   }
@@ -2230,22 +2451,32 @@ export namespace Arr {
    * @see {@link lastIndexOf} for finding the last occurrence
    * @see {@link Optional} for working with the returned Optional values
    */
-  export function findIndex<E>(
-    array: readonly E[],
-    predicate: (value: E, index: SizeType.Arr) => boolean,
-  ): SizeType.Arr | -1;
+  export function findIndex<Ar extends readonly unknown[]>(
+    array: Ar,
+    predicate: (value: Ar[number], index: ArrayIndex<Ar>, arr: Ar) => boolean,
+  ): ArrayIndex<Ar> | -1;
 
   export function findIndex<E>(
-    predicate: (value: E, index: SizeType.Arr) => boolean,
+    predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
   ): (array: readonly E[]) => SizeType.Arr | -1;
 
   export function findIndex<E>(
     ...args:
       | readonly [
           array: readonly E[],
-          predicate: (value: E, index: SizeType.Arr) => boolean,
+          predicate: (
+            value: E,
+            index: SizeType.Arr,
+            arr: readonly E[],
+          ) => boolean,
         ]
-      | readonly [predicate: (value: E, index: SizeType.Arr) => boolean]
+      | readonly [
+          predicate: (
+            value: E,
+            index: SizeType.Arr,
+            arr: readonly E[],
+          ) => boolean,
+        ]
   ): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
     switch (args.length) {
       case 2: {
@@ -2259,7 +2490,141 @@ export namespace Arr {
       }
       case 1: {
         const [predicate] = args;
-        return (array: readonly E[]) => findIndex(array, predicate);
+        return (array) => findIndex(array, predicate);
+      }
+    }
+  }
+
+  /**
+   * Safely finds the index of the last element in an array that satisfies a predicate function.
+   *
+   * This function provides type-safe index searching with no risk of runtime errors. It searches
+   * from the end of the array backwards and returns the index of the last element that matches
+   * the predicate, or -1 if no element is found. The returned index is branded as `SizeType.Arr`
+   * for type safety.
+   *
+   * **Curried Usage:** This function supports currying - when called with only a predicate,
+   * it returns a function that can be applied to arrays, making it ideal for functional composition.
+   *
+   * @template Ar The exact type of the input array, used for precise return type inference.
+   * @template E The type of elements in the array.
+   * @param array The array to search through (when using direct call syntax).
+   * @param predicate A function that tests each element. Called with:
+   *   - `value`: The current element being tested
+   *   - `index`: The index of the current element (branded as `SizeType.Arr`)
+   *   - `arr`: The array being searched
+   * @returns The index of the last matching element as `SizeType.Arr`, or -1 if no element satisfies the predicate.
+   *
+   * @example
+   * ```typescript
+   * // Basic last index finding
+   * const fruits = ['apple', 'banana', 'cherry', 'banana'];
+   * const lastBananaIndex = Arr.findLastIndex(fruits, fruit => fruit === 'banana');
+   * console.log(lastBananaIndex); // 3 - index of last 'banana'
+   *
+   * // Finding with complex conditions
+   * const numbers = [1, 5, 10, 15, 20, 10, 5];
+   * const lastLargeIndex = Arr.findLastIndex(numbers, (value, index) =>
+   *   value > 8 && index < 5
+   * );
+   * console.log(lastLargeIndex); // 3 - index of last value > 8 before index 5 (15)
+   *
+   * // Finding objects by property
+   * const users = [
+   *   { id: 1, active: true },
+   *   { id: 2, active: false },
+   *   { id: 3, active: true },
+   *   { id: 4, active: false }
+   * ];
+   *
+   * const lastActiveIndex = Arr.findLastIndex(users, user => user.active);
+   * console.log(lastActiveIndex); // 2 - index of last active user
+   *
+   * const lastInactiveIndex = Arr.findLastIndex(users, user => !user.active);
+   * console.log(lastInactiveIndex); // 3 - index of last inactive user
+   *
+   * // Empty array handling
+   * const emptyResult = Arr.findLastIndex([], (x: number) => x > 0); // -1
+   *
+   * // Curried usage for functional composition
+   * const findLastNegativeIndex = Arr.findLastIndex((x: number) => x < 0);
+   * const findLastLongStringIndex = Arr.findLastIndex((s: string) => s.length > 5);
+   *
+   * const datasets = [
+   *   [1, 2, -3, 4, -5],    // last negative at index 4
+   *   [5, 6, 7, 8],         // no negative
+   *   [-1, 0, 1, -2]        // last negative at index 3
+   * ];
+   *
+   * const lastNegativeIndices = datasets.map(findLastNegativeIndex);
+   * // [4, -1, 3]
+   *
+   * // Functional composition
+   * const data = ['short', 'medium', 'very long string', 'tiny', 'another long one'];
+   * const lastLongIndex = Arr.findLastIndex(data, s => s.length > 8);
+   * console.log(lastLongIndex); // 4 - index of 'another long one'
+   *
+   * // Using with pipe
+   * const result = pipe(['a', 'bb', 'ccc', 'bb'])
+   *   .map(Arr.findLastIndex((s: string) => s.length === 2))
+   *   .value; // 3 (last occurrence of 'bb')
+   *
+   * // Comparing with findIndex
+   * const values = [1, 2, 3, 2, 4];
+   * const firstTwo = Arr.findIndex(values, x => x === 2);   // 1
+   * const lastTwo = Arr.findLastIndex(values, x => x === 2); // 3
+   *
+   * // Type safety with tuples
+   * const tuple = [10, 20, 30, 20] as const;
+   * const lastTwentyIndex = Arr.findLastIndex(tuple, x => x === 20);
+   * // Type: ArrayIndex<readonly [10, 20, 30, 20]> | -1
+   * // Value: 3
+   * ```
+   *
+   * @see {@link findLast} for finding the element instead of its index
+   * @see {@link findIndex} for finding the first occurrence
+   * @see {@link lastIndexOf} for finding elements by equality (not predicate)
+   */
+  export function findLastIndex<Ar extends readonly unknown[]>(
+    array: Ar,
+    predicate: (value: Ar[number], index: ArrayIndex<Ar>, arr: Ar) => boolean,
+  ): ArrayIndex<Ar> | -1;
+
+  export function findLastIndex<E>(
+    predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
+  ): (array: readonly E[]) => SizeType.Arr | -1;
+
+  export function findLastIndex<E>(
+    ...args:
+      | readonly [
+          array: readonly E[],
+          predicate: (
+            value: E,
+            index: SizeType.Arr,
+            arr: readonly E[],
+          ) => boolean,
+        ]
+      | readonly [
+          predicate: (
+            value: E,
+            index: SizeType.Arr,
+            arr: readonly E[],
+          ) => boolean,
+        ]
+  ): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
+    switch (args.length) {
+      case 2: {
+        const [array, predicate] = args;
+        return pipe(
+          array.findLastIndex(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            predicate as (value: E, index: number) => boolean,
+          ),
+        ).map((idx) => (idx >= 0 ? asUint32(idx) : -1)).value;
+      }
+      case 1: {
+        const [predicate] = args;
+        return (array) => findLastIndex(array, predicate);
       }
     }
   }
@@ -2285,10 +2650,10 @@ export namespace Arr {
    * console.log(Optional.unwrapOr(result2, -1)); // 1
    * ```
    */
-  export function indexOf<E>(
-    array: readonly E[],
-    searchElement: E,
-  ): SizeType.Arr | -1;
+  export function indexOf<Ar extends readonly unknown[]>(
+    array: Ar,
+    searchElement: Ar[number],
+  ): ArrayIndex<Ar> | -1;
 
   export function indexOf<E>(
     searchElement: E,
@@ -2308,20 +2673,20 @@ export namespace Arr {
       }
       case 1: {
         const [searchElement] = args;
-        return (array: readonly E[]) => indexOf(array, searchElement);
+        return (array) => indexOf(array, searchElement);
       }
     }
   }
 
-  export function indexOfFrom<E>(
-    array: readonly E[],
-    searchElement: E,
-    fromIndex: SizeType.ArgArr,
-  ): SizeType.Arr | -1;
+  export function indexOfFrom<Ar extends readonly unknown[]>(
+    array: Ar,
+    searchElement: Ar[number],
+    fromIndex: ArgArrayIndexWithNegative<Ar>,
+  ): ArrayIndex<Ar> | -1;
 
   export function indexOfFrom<E>(
     searchElement: E,
-    fromIndex: SizeType.ArgArr,
+    fromIndex: SizeType.ArgArrWithNegative,
   ): (array: readonly E[]) => SizeType.Arr | -1;
 
   export function indexOfFrom<E>(
@@ -2329,9 +2694,9 @@ export namespace Arr {
       | readonly [
           array: readonly E[],
           searchElement: E,
-          fromIndex: SizeType.ArgArr,
+          fromIndex: SizeType.ArgArrWithNegative,
         ]
-      | readonly [searchElement: E, fromIndex: SizeType.ArgArr]
+      | readonly [searchElement: E, fromIndex: SizeType.ArgArrWithNegative]
   ): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
     switch (args.length) {
       case 3: {
@@ -2341,8 +2706,7 @@ export namespace Arr {
       }
       case 2: {
         const [searchElement, fromIndex] = args;
-        return (array: readonly E[]) =>
-          indexOfFrom(array, searchElement, fromIndex);
+        return (array) => indexOfFrom(array, searchElement, fromIndex);
       }
     }
   }
@@ -2368,10 +2732,10 @@ export namespace Arr {
    * console.log(Optional.unwrapOr(result2, -1)); // 3
    * ```
    */
-  export function lastIndexOf<E>(
-    array: readonly E[],
-    searchElement: E,
-  ): SizeType.Arr | -1;
+  export function lastIndexOf<Ar extends readonly unknown[]>(
+    array: Ar,
+    searchElement: Ar[number],
+  ): ArrayIndex<Ar> | -1;
 
   export function lastIndexOf<E>(
     searchElement: E,
@@ -2390,20 +2754,20 @@ export namespace Arr {
       }
       case 1: {
         const [searchElement] = args;
-        return (array: readonly E[]) => lastIndexOf(array, searchElement);
+        return (array) => lastIndexOf(array, searchElement);
       }
     }
   }
 
-  export function lastIndexOfFrom<E>(
-    array: readonly E[],
-    searchElement: E,
-    fromIndex: SizeType.ArgArr,
-  ): SizeType.Arr | -1;
+  export function lastIndexOfFrom<Ar extends readonly unknown[]>(
+    array: Ar,
+    searchElement: Ar[number],
+    fromIndex: ArgArrayIndexWithNegative<Ar>,
+  ): ArrayIndex<Ar> | -1;
 
   export function lastIndexOfFrom<E>(
     searchElement: E,
-    fromIndex: SizeType.ArgArr,
+    fromIndex: SizeType.ArgArrWithNegative,
   ): (array: readonly E[]) => SizeType.Arr | -1;
 
   export function lastIndexOfFrom<E>(
@@ -2411,9 +2775,9 @@ export namespace Arr {
       | readonly [
           array: readonly E[],
           searchElement: E,
-          fromIndex: SizeType.ArgArr,
+          fromIndex: SizeType.ArgArrWithNegative,
         ]
-      | readonly [searchElement: E, fromIndex: SizeType.ArgArr]
+      | readonly [searchElement: E, fromIndex: SizeType.ArgArrWithNegative]
   ): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
     switch (args.length) {
       case 3: {
@@ -2425,8 +2789,145 @@ export namespace Arr {
       }
       case 2: {
         const [searchElement, fromIndex] = args;
-        return (array: readonly E[]) =>
-          lastIndexOfFrom(array, searchElement, fromIndex);
+        return (array) => lastIndexOfFrom(array, searchElement, fromIndex);
+      }
+    }
+  }
+
+  /**
+   * Tests whether all elements in an array pass a test implemented by a predicate function.
+   *
+   * This function returns `true` if all elements satisfy the predicate, `false` otherwise.
+   * For empty arrays, it returns `true` (vacuous truth).
+   * Supports type guard predicates for type narrowing of the entire array.
+   *
+   * @template Ar The exact type of the input array.
+   * @template E The type of elements in the array.
+   * @template S The narrowed type when using type guard predicates.
+   * @param array The array to test.
+   * @param predicate A function that tests each element.
+   * @returns `true` if all elements pass the test, `false` otherwise.
+   *
+   * @example
+   * ```typescript
+   * // Direct usage
+   * const numbers = [2, 4, 6, 8];
+   * const allEven = Arr.every(numbers, n => n % 2 === 0); // true
+   *
+   * // Type guard usage - narrows entire array type
+   * const mixed: (string | number)[] = ['hello', 'world'];
+   * if (Arr.every(mixed, (x): x is string => typeof x === 'string')) {
+   *   // TypeScript knows mixed is string[] here
+   *   console.log(mixed.map(s => s.toUpperCase()));
+   * }
+   *
+   * // Curried usage with type guards
+   * const isString = (x: unknown): x is string => typeof x === 'string';
+   * const allStrings = Arr.every(isString);
+   * const data: unknown[] = ['a', 'b', 'c'];
+   * if (allStrings(data)) {
+   *   // TypeScript knows data is string[] here
+   *   console.log(data.join(''));
+   * }
+   *
+   * // Empty array
+   * const empty: number[] = [];
+   * const result2 = Arr.every(empty, n => n > 0); // true
+   * ```
+   */
+  // Type guard overloads - narrow the entire array type
+  export function every<E, S extends E>(
+    array: readonly E[],
+    predicate: (a: E, index: SizeType.Arr) => a is S,
+  ): array is readonly S[];
+
+  export function every<E, S extends E>(
+    predicate: (a: E, index: SizeType.Arr) => a is S,
+  ): (array: readonly E[]) => array is readonly S[];
+
+  // Regular boolean predicate overloads
+  export function every<Ar extends readonly unknown[]>(
+    array: Ar,
+    predicate: (a: Ar[number], index: ArrayIndex<Ar>) => boolean,
+  ): boolean;
+
+  export function every<E>(
+    predicate: (a: E, index: SizeType.Arr) => boolean,
+  ): (array: readonly E[]) => boolean;
+
+  export function every<E>(
+    ...args:
+      | readonly [
+          array: readonly E[],
+          predicate: (a: E, index: SizeType.Arr) => boolean,
+        ]
+      | readonly [predicate: (a: E, index: SizeType.Arr) => boolean]
+  ): boolean | ((array: readonly E[]) => boolean) {
+    switch (args.length) {
+      case 2: {
+        const [array, predicate] = args;
+        return array.every((a, i) => predicate(a, asUint32(i)));
+      }
+      case 1: {
+        const [predicate] = args;
+        return (array) => every(array, predicate);
+      }
+    }
+  }
+
+  /**
+   * Tests whether at least one element in an array passes a test implemented by a predicate function.
+   *
+   * This function returns `true` if at least one element satisfies the predicate, `false` otherwise.
+   * For empty arrays, it returns `false`.
+   *
+   * @template Ar The exact type of the input array.
+   * @template E The type of elements in the array.
+   * @param array The array to test.
+   * @param predicate A function that tests each element.
+   * @returns `true` if at least one element passes the test, `false` otherwise.
+   *
+   * @example
+   * ```typescript
+   * // Direct usage
+   * const numbers = [1, 3, 5, 8];
+   * const hasEven = Arr.some(numbers, n => n % 2 === 0); // true
+   *
+   * // Curried usage
+   * const isNegative = (n: number) => n < 0;
+   * const hasNegative = Arr.some(isNegative);
+   * const result = hasNegative([1, 2, -3]); // true
+   *
+   * // Empty array
+   * const empty: number[] = [];
+   * const result2 = Arr.some(empty, n => n > 0); // false
+   * ```
+   */
+  export function some<Ar extends readonly unknown[]>(
+    array: Ar,
+    predicate: (a: Ar[number], index: ArrayIndex<Ar>) => boolean,
+  ): boolean;
+
+  export function some<E>(
+    predicate: (a: E, index: SizeType.Arr) => boolean,
+  ): (array: readonly E[]) => boolean;
+
+  export function some<E>(
+    ...args:
+      | readonly [
+          array: readonly E[],
+          predicate: (a: E, index: SizeType.Arr) => boolean,
+        ]
+      | readonly [predicate: (a: E, index: SizeType.Arr) => boolean]
+  ): boolean | ((array: readonly E[]) => boolean) {
+    switch (args.length) {
+      case 2: {
+        const [array, predicate] = args;
+        return array.some((a, i) => predicate(a, asUint32(i)));
+      }
+      case 1: {
+        const [predicate] = args;
+        return (array) => some(array, predicate);
       }
     }
   }
@@ -2448,12 +2949,12 @@ export namespace Arr {
    * Arr.foldl(['a', 'b', 'c'], (acc, str) => acc + str.toUpperCase(), ''); // 'ABC'
    * ```
    */
-  export function foldl<E, P>(
-    array: readonly E[],
+  export function foldl<Ar extends readonly unknown[], P>(
+    array: Ar,
     callbackfn: (
       previousValue: P,
-      currentValue: E,
-      currentIndex: SizeType.Arr,
+      currentValue: Ar[number],
+      currentIndex: ArrayIndex<Ar>,
     ) => P,
     initialValue: P,
   ): P;
@@ -2497,7 +2998,7 @@ export namespace Arr {
       }
       case 2: {
         const [callbackfn, initialValue] = args;
-        return (array: readonly E[]) => foldl(array, callbackfn, initialValue);
+        return (array) => foldl(array, callbackfn, initialValue);
       }
     }
   }
@@ -2522,12 +3023,12 @@ export namespace Arr {
    * console.log(result); // "abc"
    * ```
    */
-  export function foldr<E, P>(
-    array: readonly E[],
+  export function foldr<Ar extends readonly unknown[], P>(
+    array: Ar,
     callbackfn: (
       previousValue: P,
-      currentValue: E,
-      currentIndex: SizeType.Arr,
+      currentValue: Ar[number],
+      currentIndex: ArrayIndex<Ar>,
     ) => P,
     initialValue: P,
   ): P;
@@ -2571,7 +3072,7 @@ export namespace Arr {
       }
       case 2: {
         const [callbackfn, initialValue] = args;
-        return (array: readonly E[]) => foldr(array, callbackfn, initialValue);
+        return (array) => foldr(array, callbackfn, initialValue);
       }
     }
   }
@@ -2589,25 +3090,20 @@ export namespace Arr {
    * Arr.min([]); // Optional.none
    * ```
    */
-  export function min<E extends number>(
-    array: NonEmptyArray<E>,
-    comparator?: (x: E, y: E) => number,
-  ): Optional.Some<E>;
+  export function min<Ar extends readonly number[]>(
+    array: Ar,
+    // If the array elements are numbers, comparator is optional.
+    comparator?: (x: Ar[number], y: Ar[number]) => number,
+  ): Ar extends NonEmptyArray<unknown>
+    ? Optional.Some<Ar[number]>
+    : Optional<Ar[number]>;
 
-  export function min<E extends number>(
-    array: readonly E[],
-    comparator?: (x: E, y: E) => number,
-  ): Optional<E>;
-
-  export function min<E>(
-    array: NonEmptyArray<E>,
-    comparator: (x: E, y: E) => number,
-  ): Optional.Some<E>;
-
-  export function min<E>(
-    array: readonly E[],
-    comparator: (x: E, y: E) => number,
-  ): Optional<E>;
+  export function min<Ar extends readonly unknown[]>(
+    array: Ar,
+    comparator: (x: Ar[number], y: Ar[number]) => number,
+  ): Ar extends NonEmptyArray<unknown>
+    ? Optional.Some<Ar[number]>
+    : Optional<Ar[number]>;
 
   export function min<E extends number>(
     array: readonly E[],
@@ -2645,25 +3141,20 @@ export namespace Arr {
    * Arr.max([]); // Optional.none
    * ```
    */
-  export function max<E extends number>(
-    array: NonEmptyArray<E>,
-    comparator?: (x: E, y: E) => number,
-  ): Optional.Some<E>;
+  export function max<Ar extends readonly number[]>(
+    array: Ar,
+    // If the array elements are numbers, comparator is optional.
+    comparator?: (x: Ar[number], y: Ar[number]) => number,
+  ): Ar extends NonEmptyArray<unknown>
+    ? Optional.Some<Ar[number]>
+    : Optional<Ar[number]>;
 
-  export function max<E extends number>(
-    array: readonly E[],
-    comparator?: (x: E, y: E) => number,
-  ): Optional<E>;
-
-  export function max<E>(
-    array: NonEmptyArray<E>,
-    comparator: (x: E, y: E) => number,
-  ): Optional.Some<E>;
-
-  export function max<E>(
-    array: readonly E[],
-    comparator: (x: E, y: E) => number,
-  ): Optional<E>;
+  export function max<Ar extends readonly unknown[]>(
+    array: Ar,
+    comparator: (x: Ar[number], y: Ar[number]) => number,
+  ): Ar extends NonEmptyArray<unknown>
+    ? Optional.Some<Ar[number]>
+    : Optional<Ar[number]>;
 
   export function max<E extends number>(
     array: readonly E[],
@@ -2694,27 +3185,21 @@ export namespace Arr {
    * Arr.minBy([], p => p.age); // Optional.none
    * ```
    */
-  export function minBy<E>(
-    array: NonEmptyArray<E>,
-    comparatorValueMapper: (value: E) => number,
-  ): Optional.Some<E>;
+  export function minBy<Ar extends readonly unknown[]>(
+    array: Ar,
+    // If the array elements are mapped to numbers, comparator is optional.
+    comparatorValueMapper: (value: Ar[number]) => number,
+  ): Ar extends NonEmptyArray<unknown>
+    ? Optional.Some<Ar[number]>
+    : Optional<Ar[number]>;
 
-  export function minBy<E>(
-    array: readonly E[],
-    comparatorValueMapper: (value: E) => number,
-  ): Optional<E>;
-
-  export function minBy<E, V>(
-    array: NonEmptyArray<E>,
-    comparatorValueMapper: (value: E) => V,
+  export function minBy<Ar extends readonly unknown[], V>(
+    array: Ar,
+    comparatorValueMapper: (value: Ar[number]) => V,
     comparator: (x: V, y: V) => number,
-  ): Optional.Some<E>;
-
-  export function minBy<E, V>(
-    array: readonly E[],
-    comparatorValueMapper: (value: E) => V,
-    comparator: (x: V, y: V) => number,
-  ): Optional<E>;
+  ): Ar extends NonEmptyArray<unknown>
+    ? Optional.Some<Ar[number]>
+    : Optional<Ar[number]>;
 
   export function minBy<E, V>(
     array: readonly E[],
@@ -2749,27 +3234,21 @@ export namespace Arr {
    * Arr.maxBy([], p => p.age); // Optional.none
    * ```
    */
-  export function maxBy<E>(
-    array: NonEmptyArray<E>,
-    comparatorValueMapper: (value: E) => number,
-  ): Optional.Some<E>;
+  export function maxBy<Ar extends readonly unknown[]>(
+    array: Ar,
+    // If the array elements are mapped to numbers, comparator is optional.
+    comparatorValueMapper: (value: Ar[number]) => number,
+  ): Ar extends NonEmptyArray<unknown>
+    ? Optional.Some<Ar[number]>
+    : Optional<Ar[number]>;
 
-  export function maxBy<E>(
-    array: readonly E[],
-    comparatorValueMapper: (value: E) => number,
-  ): Optional<E>;
-
-  export function maxBy<E, V>(
-    array: NonEmptyArray<E>,
-    comparatorValueMapper: (value: E) => V,
+  export function maxBy<Ar extends readonly unknown[], V>(
+    array: Ar,
+    comparatorValueMapper: (value: Ar[number]) => V,
     comparator: (x: V, y: V) => number,
-  ): Optional.Some<E>;
-
-  export function maxBy<E, V>(
-    array: readonly E[],
-    comparatorValueMapper: (value: E) => V,
-    comparator: (x: V, y: V) => number,
-  ): Optional<E>;
+  ): Ar extends NonEmptyArray<unknown>
+    ? Optional.Some<Ar[number]>
+    : Optional<Ar[number]>;
 
   export function maxBy<E, V>(
     array: readonly E[],
@@ -2801,9 +3280,9 @@ export namespace Arr {
    * console.log(result); // 3
    * ```
    */
-  export function count<E>(
-    array: readonly E[],
-    predicate: (value: E, index: SizeType.Arr) => boolean,
+  export function count<Ar extends readonly unknown[]>(
+    array: Ar,
+    predicate: (value: Ar[number], index: ArrayIndex<Ar>) => boolean,
   ): SizeType.Arr;
 
   export function count<E>(
@@ -2829,7 +3308,7 @@ export namespace Arr {
       }
       case 1: {
         const [predicate] = args;
-        return (array: readonly E[]) => count(array, predicate);
+        return (array) => count(array, predicate);
       }
     }
   }
@@ -2854,10 +3333,13 @@ export namespace Arr {
    * // IMap { 'a' => 2, 'b' => 1 }
    * ```
    */
-  export function countBy<E, G extends MapSetKeyType>(
-    array: readonly E[],
-    grouper: (value: E, index: SizeType.Arr) => G,
-  ): IMap<G, SizeType.Arr>;
+  export function countBy<
+    Ar extends readonly unknown[],
+    G extends MapSetKeyType,
+  >(
+    array: Ar,
+    grouper: (value: Ar[number], index: ArrayIndex<Ar>) => G,
+  ): IMap<G, ArrayIndex<Ar>>;
 
   export function countBy<E, G extends MapSetKeyType>(
     grouper: (value: E, index: SizeType.Arr) => G,
@@ -2887,7 +3369,7 @@ export namespace Arr {
       }
       case 1: {
         const [grouper] = args;
-        return (array: readonly E[]) => countBy(array, grouper);
+        return (array) => countBy(array, grouper);
       }
     }
   }
@@ -2953,12 +3435,12 @@ export namespace Arr {
   ): Result<string, Error> | ((array: readonly E[]) => Result<string, Error>) {
     switch (args.length) {
       case 0:
-        return (array: readonly E[]) => joinImpl(array, undefined);
+        return (array) => joinImpl(array, undefined);
 
       case 1: {
         const [arg] = args;
         if (isString(arg) || isUndefined(arg)) {
-          return (array: readonly E[]) => joinImpl(array, arg);
+          return (array) => joinImpl(array, arg);
         }
         return joinImpl(arg, undefined);
       }
@@ -3020,6 +3502,145 @@ export namespace Arr {
     ) as unknown as List.Zip<Ar1, Ar2>;
 
   /**
+   * Creates a new tuple by transforming each element with a mapping function.
+   *
+   * Preserves the tuple's length while allowing element type transformation.
+   * The resulting tuple has the same structure but with transformed element types.
+   *
+   * @template T - The type of the input tuple
+   * @template B - The type that elements will be transformed to
+   * @param array - The input tuple
+   * @param mapFn - Function that transforms each element (receives element and index)
+   * @returns A new tuple with transformed elements, preserving the original length
+   *
+   * @example
+   * ```typescript
+   * // Basic transformation
+   * const nums = [1, 2, 3] as const;
+   * const doubled = Arr.map(nums, (x) => x * 2); // readonly [2, 4, 6]
+   * const strings = Arr.map(nums, (x) => String(x)); // readonly ['1', '2', '3']
+   *
+   * // With index
+   * const indexed = Arr.map(nums, (x, i) => `${i}:${x}`);
+   * // readonly ['0:1', '1:2', '2:3']
+   *
+   * // Mixed type tuples
+   * const mixed = [1, 'hello', true] as const;
+   * const descriptions = Arr.map(mixed, (x) => `Value: ${x}`);
+   * // readonly ['Value: 1', 'Value: hello', 'Value: true']
+   * ```
+   */
+  export function map<const Ar extends readonly unknown[], B>(
+    array: Ar,
+    mapFn: (a: Ar[number], index: ArrayIndex<Ar>) => B,
+  ): Readonly<{ [K in keyof Ar]: B }>;
+
+  // curried version
+  export function map<A, B>(
+    mapFn: (a: A, index: SizeType.Arr) => B,
+  ): <Ar extends readonly A[]>(array: Ar) => Readonly<{ [K in keyof Ar]: B }>;
+
+  export function map<A, B>(
+    ...args:
+      | readonly [array: readonly A[], mapFn: (a: A, index: SizeType.Arr) => B]
+      | readonly [mapFn: (a: A, index: SizeType.Arr) => B]
+  ): readonly B[] | ((array: readonly A[]) => readonly B[]) {
+    switch (args.length) {
+      case 2: {
+        const [array, mapFn] = args;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        return array.map(mapFn as never);
+      }
+      case 1: {
+        const [mapFn] = args;
+        return (array: readonly A[]) => map(array, mapFn);
+      }
+    }
+  }
+
+  /**
+   * Filters an array based on a predicate function.
+   *
+   * This function returns a new array containing only the elements that satisfy the predicate.
+   * It provides both direct usage and curried versions for functional composition.
+   * Supports type guard predicates for type narrowing.
+   *
+   * @template Ar The exact type of the input array, used for precise return type inference.
+   * @template E The type of elements in the array.
+   * @template S The narrowed type when using type guard predicates.
+   * @param array The array to filter.
+   * @param predicate A function that tests each element. Returns `true` to keep the element, `false` to filter it out.
+   * @returns A new array containing only the elements that satisfy the predicate.
+   *
+   * @example
+   * ```typescript
+   * // Direct usage
+   * const numbers = [1, 2, 3, 4, 5];
+   * const evens = Arr.filter(numbers, n => n % 2 === 0); // [2, 4]
+   *
+   * // Type guard usage
+   * const mixed: (string | number | null)[] = ['hello', 42, null, 'world'];
+   * const strings = Arr.filter(mixed, (x): x is string => typeof x === 'string'); // string[]
+   * const notNull = Arr.filter(mixed, (x): x is NonNullable<typeof x> => x != null); // (string | number)[]
+   *
+   * // Curried usage with type guards
+   * const isString = (x: unknown): x is string => typeof x === 'string';
+   * const filterStrings = Arr.filter(isString);
+   * const result = filterStrings(['a', 1, 'b', 2]); // string[]
+   *
+   * // Functional composition
+   * const processNumbers = pipe(
+   *   Arr.filter((n: number) => n > 0),
+   *   Arr.map(n => n * 2)
+   * );
+   * ```
+   *
+   * @see {@link filterNot} for filtering with negated predicate
+   * @see {@link every} for testing if all elements satisfy a predicate
+   * @see {@link some} for testing if any elements satisfy a predicate
+   * @see {@link find} for finding the first element that satisfies a predicate
+   */
+  // Type guard overloads
+  export function filter<Ar extends readonly unknown[], S extends Ar[number]>(
+    array: Ar,
+    predicate: (a: Ar[number], index: ArrayIndex<Ar>) => a is S,
+  ): readonly S[];
+
+  export function filter<E, S extends E>(
+    predicate: (a: E, index: SizeType.Arr) => a is S,
+  ): (array: readonly E[]) => readonly S[];
+
+  // Regular boolean predicate overloads
+  export function filter<Ar extends readonly unknown[]>(
+    array: Ar,
+    predicate: (a: Ar[number], index: ArrayIndex<Ar>) => boolean,
+  ): readonly Ar[number][];
+
+  export function filter<E>(
+    predicate: (a: E, index: SizeType.Arr) => boolean,
+  ): (array: readonly E[]) => readonly E[];
+
+  export function filter<E>(
+    ...args:
+      | readonly [
+          array: readonly E[],
+          predicate: (a: E, index: SizeType.Arr) => boolean,
+        ]
+      | readonly [predicate: (a: E, index: SizeType.Arr) => boolean]
+  ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
+    switch (args.length) {
+      case 2: {
+        const [array, predicate] = args;
+        return array.filter((a, i) => predicate(a, asUint32(i)));
+      }
+      case 1: {
+        const [predicate] = args;
+        return (array) => filter(array, predicate);
+      }
+    }
+  }
+
+  /**
    * Filters an array by excluding elements for which the predicate returns true.
    * This is the opposite of `Array.prototype.filter`.
    * @template E The type of elements in the array.
@@ -3037,10 +3658,10 @@ export namespace Arr {
    * console.log(result); // [1, 3, 5]
    * ```
    */
-  export function filterNot<E>(
-    array: readonly E[],
-    predicate: (a: E, index: SizeType.Arr) => boolean,
-  ): readonly E[];
+  export function filterNot<Ar extends readonly unknown[]>(
+    array: Ar,
+    predicate: (a: Ar[number], index: ArrayIndex<Ar>) => boolean,
+  ): readonly Ar[number][];
 
   export function filterNot<E>(
     predicate: (a: E, index: SizeType.Arr) => boolean,
@@ -3061,7 +3682,127 @@ export namespace Arr {
       }
       case 1: {
         const [predicate] = args;
-        return (array: readonly E[]) => filterNot(array, predicate);
+        return (array) => filterNot(array, predicate);
+      }
+    }
+  }
+
+  /**
+   * Creates a new array with all sub-array elements concatenated into it recursively up to the specified depth.
+   *
+   * This function flattens nested arrays to the specified depth level.
+   * A depth of 1 flattens one level, Number.POSITIVE_INFINITY flattens all levels.
+   *
+   * @template Ar The exact type of the input array.
+   * @template D The depth of flattening.
+   * @param array The array to flatten.
+   * @param depth The depth level specifying how deep a nested array structure should be flattened.
+   * @returns A new array with the sub-array elements concatenated.
+   *
+   * @example
+   * ```typescript
+   * // Direct usage
+   * const nested = [1, [2, [3, 4]], 5];
+   * const flat1 = Arr.flat(nested, 1); // [1, 2, [3, 4], 5]
+   * const flat2 = Arr.flat(nested, 2); // [1, 2, 3, 4, 5]
+   *
+   * // Curried usage
+   * const flattenOnceLevel = Arr.flat(1);
+   * const result = flattenOnceLevel([[1, 2], [3, 4]]); // [1, 2, 3, 4]
+   *
+   * // Flatten all levels
+   * const deepNested = [1, [2, [3, [4, 5]]]];
+   * const allFlat = Arr.flat(deepNested, SafeUint.MAX_VALUE); // [1, 2, 3, 4, 5]
+   * ```
+   */
+  export function flat<
+    Ar extends readonly unknown[],
+    D extends SafeUintWithSmallInt = 1,
+  >(array: Ar, depth?: D): readonly FlatArray<Ar, D>[];
+
+  export function flat<D extends SafeUintWithSmallInt = 1>(
+    depth?: number,
+  ): <Ar extends readonly unknown[]>(array: Ar) => readonly FlatArray<Ar, D>[];
+
+  export function flat<E, D extends SafeUintWithSmallInt = 1>(
+    ...args: readonly [array: readonly E[], depth?: D] | readonly [depth?: D]
+  ): readonly unknown[] | ((array: readonly unknown[]) => readonly unknown[]) {
+    switch (args.length) {
+      case 2: {
+        const [array, depth] = args;
+        return array.flat(depth);
+      }
+      case 1: {
+        const [arrayOrDepth] = args;
+        if (typeof arrayOrDepth === 'number') {
+          const depth = arrayOrDepth as SafeUintWithSmallInt | undefined;
+          return (array) => flat(array, depth);
+        } else if (arrayOrDepth === undefined) {
+          return (array) => flat(array, 1);
+        } else {
+          expectType<typeof arrayOrDepth, readonly E[]>('=');
+          return arrayOrDepth.flat(1);
+        }
+      }
+
+      case 0:
+        return (array) => flat(array, 1);
+    }
+  }
+
+  /**
+   * Creates a new array with all sub-array elements concatenated into it recursively up to the specified depth,
+   * after first mapping each element using a mapping function.
+   *
+   * This function is equivalent to calling `map` followed by `flat` with depth 1.
+   *
+   * @template Ar The exact type of the input array.
+   * @template E The type of elements in the array.
+   * @template B The type of elements returned by the mapping function.
+   * @param array The array to map and flatten.
+   * @param mapFn A function that produces new elements for the new array.
+   * @returns A new array with mapped elements flattened.
+   *
+   * @example
+   * ```typescript
+   * // Direct usage
+   * const words = ['hello', 'world'];
+   * const chars = Arr.flatMap(words, word => word.split('')); // ['h','e','l','l','o','w','o','r','l','d']
+   *
+   * // Curried usage
+   * const splitWords = Arr.flatMap((word: string) => word.split(''));
+   * const result = splitWords(['foo', 'bar']); // ['f','o','o','b','a','r']
+   *
+   * // With numbers
+   * const numbers = [1, 2, 3];
+   * const doubled = Arr.flatMap(numbers, n => [n, n * 2]); // [1, 2, 2, 4, 3, 6]
+   * ```
+   */
+  export function flatMap<const Ar extends readonly unknown[], B>(
+    array: Ar,
+    mapFn: (a: Ar[number], index: ArrayIndex<Ar>) => readonly B[],
+  ): readonly B[];
+
+  export function flatMap<A, B>(
+    mapFn: (a: A, index: SizeType.Arr) => readonly B[],
+  ): (array: readonly A[]) => readonly B[];
+
+  export function flatMap<A, B>(
+    ...args:
+      | readonly [
+          array: readonly A[],
+          mapFn: (a: A, index: SizeType.Arr) => readonly B[],
+        ]
+      | readonly [mapFn: (a: A, index: SizeType.Arr) => readonly B[]]
+  ): readonly B[] | ((array: readonly A[]) => readonly B[]) {
+    switch (args.length) {
+      case 2: {
+        const [array, mapFn] = args;
+        return array.flatMap((a, i) => mapFn(a, asUint32(i)));
+      }
+      case 1: {
+        const [mapFn] = args;
+        return (array: readonly A[]) => flatMap(array, mapFn);
       }
     }
   }
@@ -3133,10 +3874,45 @@ export namespace Arr {
       }
       case 1: {
         const [chunkSize] = args;
-        return (array: readonly E[]) => partition(array, chunkSize);
+        return (array) => partition(array, chunkSize);
       }
     }
   }
+
+  /**
+   * Reverses a tuple, preserving element types in their new positions.
+   *
+   * The type system precisely tracks the reversal, so the returned tuple
+   * has its element types in the exact reverse order. This is more precise
+   * than array reversal which loses positional type information.
+   *
+   * @template T - The tuple type to reverse
+   * @param array - The input tuple
+   * @returns A new tuple with elements in reverse order and precise typing
+   *
+   * @example
+   * ```typescript
+   * // Basic reversal
+   * const nums = [1, 2, 3] as const;
+   * const reversed = Arr.toReversed(nums); // readonly [3, 2, 1]
+   *
+   * // Mixed types preserved in reverse positions
+   * const mixed = [1, 'hello', true, null] as const;
+   * const revMixed = Arr.toReversed(mixed);
+   * // readonly [null, true, 'hello', 1]
+   *
+   * // Empty and single-element tuples
+   * const empty = [] as const;
+   * const revEmpty = Arr.toReversed(empty); // readonly []
+   * const single = [42] as const;
+   * const revSingle = Arr.toReversed(single); // readonly [42]
+   * ```
+   */
+  export const toReversed = <const Ar extends readonly unknown[]>(
+    array: Ar,
+  ): List.Reverse<Ar> =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    array.toReversed() as never;
 
   /**
    * Sorts an array by a value derived from its elements, using a numeric mapping.
@@ -3154,17 +3930,66 @@ export namespace Arr {
    * // [{ name: 'Adam', score: 90 }, { name: 'Bob', score: 80 }, { name: 'Eve', score: 70 }]
    * ```
    */
-  export function toSortedBy<E>(
-    array: readonly E[],
-    comparatorValueMapper: (value: E) => number,
-    comparator?: (x: number, y: number) => number,
-  ): readonly E[];
+  export const toSorted = <Ar extends readonly unknown[]>(
+    ...[array, comparator]: Ar extends readonly number[]
+      ? readonly [
+          array: Ar,
+          // If the array elements are mapped to numbers, comparator is optional.
+          comparator?: (x: Ar[number], y: Ar[number]) => number,
+        ]
+      : readonly [
+          array: Ar,
+          comparator: (x: Ar[number], y: Ar[number]) => number,
+        ]
+  ): IsFixedLengthList<Ar> extends true
+    ? ArrayOfLength<Ar['length'], Ar[number]>
+    : Ar extends NonEmptyArray<unknown>
+      ? NonEmptyArray<Ar[number]>
+      : readonly Ar[number][] =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    array.toSorted(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      (comparator as ((x: unknown, y: unknown) => number) | undefined) ??
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        ((x, y) => (x as number) - (y as number)),
+    ) as never;
 
-  export function toSortedBy<E, const V>(
-    array: readonly E[],
-    comparatorValueMapper: (value: E) => V,
+  /**
+   * Sorts an array by a value derived from its elements, using a numeric mapping.
+   * @template E The type of elements in the array.
+   * @param array The input array.
+   * @param comparatorValueMapper A function `(value: A) => number` that maps an element to a number for comparison.
+   * @param comparator An optional custom comparator function `(x: number, y: number) => number` for the mapped numbers. Defaults to ascending sort (x - y).
+   * @returns A new array sorted by the mapped values.
+   * @example
+   * ```ts
+   * const items = [{ name: 'Eve', score: 70 }, { name: 'Adam', score: 90 }, { name: 'Bob', score: 80 }];
+   * Arr.toSortedBy(items, item => item.score);
+   * // [{ name: 'Eve', score: 70 }, { name: 'Bob', score: 80 }, { name: 'Adam', score: 90 }]
+   * Arr.toSortedBy(items, item => item.score, (a, b) => b - a); // Sort descending
+   * // [{ name: 'Adam', score: 90 }, { name: 'Bob', score: 80 }, { name: 'Eve', score: 70 }]
+   * ```
+   */
+  export function toSortedBy<Ar extends readonly unknown[]>(
+    array: Ar,
+    comparatorValueMapper: (value: Ar[number]) => number,
+    // If the array elements are mapped to numbers, comparator is optional.
+    comparator?: (x: number, y: number) => number,
+  ): IsFixedLengthList<Ar> extends true
+    ? ArrayOfLength<Ar['length'], Ar[number]>
+    : Ar extends NonEmptyArray<unknown>
+      ? NonEmptyArray<Ar[number]>
+      : readonly Ar[number][];
+
+  export function toSortedBy<Ar extends readonly unknown[], const V>(
+    array: Ar,
+    comparatorValueMapper: (value: Ar[number]) => V,
     comparator: (x: V, y: V) => number,
-  ): readonly E[];
+  ): IsFixedLengthList<Ar> extends true
+    ? ArrayOfLength<Ar['length'], Ar[number]>
+    : Ar extends NonEmptyArray<unknown>
+      ? NonEmptyArray<Ar[number]>
+      : readonly Ar[number][];
 
   export function toSortedBy<E, const V>(
     array: readonly E[],
@@ -3240,8 +4065,8 @@ export namespace Arr {
    *
    * // Running maximum
    * const temperatures = [20, 25, 18, 30, 22];
-   * const runningMax = Arr.scan(temperatures, (max, temp) => Math.max(max, temp), -Infinity);
-   * // [-Infinity, 20, 25, 25, 30, 30]
+   * const runningMax = Arr.scan(temperatures, (max, temp) => Math.max(max, temp), Number.NEGATIVE_INFINITY);
+   * // [Number.NEGATIVE_INFINITY, 20, 25, 25, 30, 30]
    *
    * // Building strings incrementally
    * const words = ['Hello', 'beautiful', 'world'];
@@ -3339,9 +4164,13 @@ export namespace Arr {
    * @see {@link SizeType.Arr} for the index parameter type
    * @see Array.prototype.reduce for the standard reduce function
    */
-  export function scan<E, S>(
-    array: readonly E[],
-    reducer: (accumulator: S, currentValue: E, currentIndex: SizeType.Arr) => S,
+  export function scan<Ar extends readonly unknown[], S>(
+    array: Ar,
+    reducer: (
+      accumulator: S,
+      currentValue: Ar[number],
+      currentIndex: ArrayIndex<Ar>,
+    ) => S,
     init: S,
   ): NonEmptyArray<S>;
 
@@ -3374,7 +4203,7 @@ export namespace Arr {
       case 3: {
         const [array, reducer, init] = args;
         const mut_result: MutableNonEmptyArray<S> = castMutable(
-          newArray<S>(asPositiveUint32(array.length + 1), init),
+          newArray<S, PositiveUint32>(asPositiveUint32(array.length + 1), init),
         );
 
         let mut_acc = init;
@@ -3388,7 +4217,7 @@ export namespace Arr {
       }
       case 2: {
         const [reducer, init] = args;
-        return (array: readonly E[]) => scan(array, reducer, init);
+        return (array) => scan(array, reducer, init);
       }
     }
   }
@@ -3542,10 +4371,13 @@ export namespace Arr {
    * @see {@link IMap.map} for transforming grouped data
    * @see {@link Optional} for handling potentially missing groups
    */
-  export function groupBy<E, G extends MapSetKeyType>(
-    array: readonly E[],
-    grouper: (value: E, index: SizeType.Arr) => G,
-  ): IMap<G, readonly E[]>;
+  export function groupBy<
+    Ar extends readonly unknown[],
+    G extends MapSetKeyType,
+  >(
+    array: Ar,
+    grouper: (value: Ar[number], index: ArrayIndex<Ar>) => G,
+  ): IMap<G, readonly Ar[number][]>;
 
   export function groupBy<E, G extends MapSetKeyType>(
     grouper: (value: E, index: SizeType.Arr) => G,
@@ -3578,7 +4410,7 @@ export namespace Arr {
       }
       case 1: {
         const [grouper] = args;
-        return (array: readonly E[]) => groupBy(array, grouper);
+        return (array) => groupBy(array, grouper);
       }
     }
   }
@@ -3594,9 +4426,13 @@ export namespace Arr {
    * Arr.uniq([1, 2, 2, 3, 1, 4]); // [1, 2, 3, 4]
    * ```
    */
-  export const uniq = <P extends Primitive>(
-    array: readonly P[],
-  ): readonly P[] => Array.from(new Set(array));
+  export const uniq = <Ar extends readonly Primitive[]>(
+    array: Ar,
+  ): Ar extends NonEmptyArray<unknown>
+    ? NonEmptyArray<Ar[number]>
+    : readonly Ar[number][] =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    Array.from(new Set(array)) as never;
 
   /**
    * Creates a new array with unique elements from the input array, based on the values returned by `mapFn`.
@@ -3619,22 +4455,15 @@ export namespace Arr {
    * Arr.uniqBy(users, user => user.id); // [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
    * ```
    */
-  export function uniqBy<E, P extends Primitive>(
-    array: NonEmptyArray<E>,
-    mapFn: (value: E) => P,
-  ): NonEmptyArray<E>;
-
-  export function uniqBy<E, P extends Primitive>(
-    array: readonly E[],
-    mapFn: (value: E) => P,
-  ): readonly E[];
-
-  export function uniqBy<E, P extends Primitive>(
-    array: readonly E[],
-    mapFn: (value: E) => P,
-  ): readonly E[] {
+  export const uniqBy = <Ar extends readonly unknown[], P extends Primitive>(
+    array: Ar,
+    mapFn: (value: Ar[number]) => P,
+  ): Ar extends NonEmptyArray<unknown>
+    ? NonEmptyArray<Ar[number]>
+    : readonly Ar[number][] => {
     const mut_mappedValues = new Set<P>();
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     return array.filter((val) => {
       const mappedValue = mapFn(val);
 
@@ -3642,8 +4471,8 @@ export namespace Arr {
       mut_mappedValues.add(mappedValue);
 
       return true;
-    });
-  }
+    }) satisfies readonly Ar[number][] as never;
+  };
 
   // set operations & equality
 
@@ -3821,6 +4650,100 @@ export namespace Arr {
     return mut_result;
   };
 
+  // iterators
+
+  /**
+   * Returns an iterable of key-value pairs for every entry in the array.
+   *
+   * This function returns an array where each element is a tuple containing the index and value.
+   * The indices are branded as `SizeType.Arr` for type safety.
+   *
+   * @template Ar The exact type of the input array.
+   * @param array The array to get entries from.
+   * @returns An array of `[index, value]` pairs.
+   *
+   * @example
+   * ```typescript
+   * // Direct usage
+   * const fruits = ['apple', 'banana', 'cherry'];
+   * const entries = Arr.entries(fruits); // [[0, 'apple'], [1, 'banana'], [2, 'cherry']]
+   *
+   * // Curried usage
+   * const getEntries = Arr.entries;
+   * const result = getEntries(['a', 'b']); // [[0, 'a'], [1, 'b']]
+   *
+   * // With tuples
+   * const tuple = [10, 20, 30] as const;
+   * const tupleEntries = Arr.entries(tuple); // [[0, 10], [1, 20], [2, 30]]
+   * ```
+   */
+  export function* entries<E>(
+    array: readonly E[],
+  ): ArrayIterator<readonly [SizeType.Arr, E]> {
+    for (const [index, value] of array.entries()) {
+      yield [asUint32(index), value] as const;
+    }
+  }
+
+  /**
+   * Returns an iterable of values in the array.
+   *
+   * This function is essentially an identity function that returns a copy of the array.
+   * It's included for API completeness and consistency with native Array methods.
+   *
+   * @template Ar The exact type of the input array.
+   * @param array The array to get values from.
+   * @returns A copy of the input array.
+   *
+   * @example
+   * ```typescript
+   * // Direct usage
+   * const numbers = [1, 2, 3];
+   * const values = Arr.values(numbers); // [1, 2, 3]
+   *
+   * // Curried usage
+   * const getValues = Arr.values;
+   * const result = getValues(['a', 'b']); // ['a', 'b']
+   * ```
+   */
+  export function* values<E>(array: readonly E[]): ArrayIterator<E> {
+    for (const value of array.values()) {
+      yield value;
+    }
+  }
+
+  /**
+   * Returns an iterable of keys in the array.
+   *
+   * This function returns an array of branded indices (`SizeType.Arr`) for type safety.
+   *
+   * @template Ar The exact type of the input array.
+   * @param array The array to get indices from.
+   * @returns An array of indices.
+   *
+   * @example
+   * ```typescript
+   * // Direct usage
+   * const fruits = ['apple', 'banana', 'cherry'];
+   * const indices = Arr.indices(fruits); // [0, 1, 2]
+   *
+   * // Curried usage
+   * const getIndices = Arr.indices;
+   * const result = getIndices(['a', 'b']); // [0, 1]
+   *
+   * // Empty array
+   * const empty: string[] = [];
+   * const emptyIndices = Arr.indices(empty); // []
+   * ```
+   */
+  export function* indices<E>(
+    array: readonly E[],
+  ): ArrayIterator<SizeType.Arr> {
+    for (const key of array.keys()) {
+      yield asUint32(key);
+    }
+  }
+
   // aliases
 
   /**
@@ -3858,4 +4781,22 @@ export namespace Arr {
    * @see {@link partition}
    */
   export const chunk = partition;
+
+  /**
+   * Alias for `create`. Creates a new array of the specified length, with each position filled with the provided initial value.
+   * @see {@link create}
+   */
+  export const newArray = create;
+
+  /**
+   * Alias for `size`. Returns the length of an array.
+   * @see {@link size}
+   */
+  export const length = size;
+
+  /**
+   * Alias for `indices`. Returns an iterable of keys in the array.
+   * @see {@link indices}
+   */
+  export const keys = indices;
 }

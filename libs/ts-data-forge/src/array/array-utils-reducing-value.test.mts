@@ -87,14 +87,7 @@ describe('Arr reducing value', () => {
   });
 
   describe('minBy', () => {
-    const xs: NonEmptyArray<
-      | Readonly<{ x: 1; y: 2 }>
-      | Readonly<{ x: 2; y: 3 }>
-      | Readonly<{ x: 3; y: 2 }>
-      | Readonly<{ x: 4; y: 1 }>
-      | Readonly<{ x: 5; y: 1 }>
-      | Readonly<{ x: 6; y: 1 }>
-    > = [
+    const xs = [
       { x: 5, y: 1 },
       { x: 4, y: 1 },
       { x: 6, y: 1 },
@@ -108,12 +101,14 @@ describe('Arr reducing value', () => {
     expectType<
       typeof result,
       Optional.Some<
-        | Readonly<{ x: 1; y: 2 }>
-        | Readonly<{ x: 2; y: 3 }>
-        | Readonly<{ x: 3; y: 2 }>
-        | Readonly<{ x: 4; y: 1 }>
-        | Readonly<{ x: 5; y: 1 }>
-        | Readonly<{ x: 6; y: 1 }>
+        Readonly<
+          | { x: 1; y: 2 }
+          | { x: 2; y: 3 }
+          | { x: 3; y: 2 }
+          | { x: 4; y: 1 }
+          | { x: 5; y: 1 }
+          | { x: 6; y: 1 }
+        >
       >
     >('=');
 
@@ -146,10 +141,12 @@ describe('Arr reducing value', () => {
 
       expectType<
         typeof res,
-        Optional<
-          | Readonly<{ name: 'apple'; score: 10 }>
-          | Readonly<{ name: 'banana'; score: 5 }>
-          | Readonly<{ name: 'cherry'; score: 12 }>
+        Optional.Some<
+          Readonly<
+            | { name: 'apple'; score: 10 }
+            | { name: 'banana'; score: 5 }
+            | { name: 'cherry'; score: 12 }
+          >
         >
       >('=');
 
@@ -161,14 +158,7 @@ describe('Arr reducing value', () => {
   });
 
   describe('maxBy', () => {
-    const xs: NonEmptyArray<
-      | Readonly<{ x: 1; y: 2 }>
-      | Readonly<{ x: 2; y: 3 }>
-      | Readonly<{ x: 3; y: 2 }>
-      | Readonly<{ x: 4; y: 1 }>
-      | Readonly<{ x: 5; y: 1 }>
-      | Readonly<{ x: 6; y: 1 }>
-    > = [
+    const xs = [
       { x: 5, y: 1 },
       { x: 4, y: 1 },
       { x: 6, y: 1 },
@@ -182,12 +172,14 @@ describe('Arr reducing value', () => {
     expectType<
       typeof result,
       Optional.Some<
-        | Readonly<{ x: 1; y: 2 }>
-        | Readonly<{ x: 2; y: 3 }>
-        | Readonly<{ x: 3; y: 2 }>
-        | Readonly<{ x: 4; y: 1 }>
-        | Readonly<{ x: 5; y: 1 }>
-        | Readonly<{ x: 6; y: 1 }>
+        Readonly<
+          | { x: 1; y: 2 }
+          | { x: 2; y: 3 }
+          | { x: 3; y: 2 }
+          | { x: 4; y: 1 }
+          | { x: 5; y: 1 }
+          | { x: 6; y: 1 }
+        >
       >
     >('=');
 
@@ -220,10 +212,12 @@ describe('Arr reducing value', () => {
 
       expectType<
         typeof res,
-        Optional<
-          | Readonly<{ name: 'apple'; score: 10 }>
-          | Readonly<{ name: 'banana'; score: 5 }>
-          | Readonly<{ name: 'cherry'; score: 12 }>
+        Optional.Some<
+          Readonly<
+            | { name: 'apple'; score: 10 }
+            | { name: 'banana'; score: 5 }
+            | { name: 'cherry'; score: 12 }
+          >
         >
       >('=');
 
@@ -272,7 +266,7 @@ describe('Arr reducing value', () => {
 
     const result = Arr.countBy(xs, (a) => a.x);
 
-    expectType<typeof result, IMap<1 | 2 | 3, Uint32>>('=');
+    expectType<typeof result, IMap<1 | 2 | 3, 0 | 1 | 2 | 3 | 4 | 5>>('=');
 
     test('case 1', () => {
       expect(result).toStrictEqual(
