@@ -14,6 +14,23 @@
 type IndexOfTuple<T extends readonly unknown[]> =
   TSTypeForgeInternals.IndexOfTupleImpl<T, keyof T>;
 
+/**
+ * Extracts the negative index type from a readonly array or tuple type `T`.
+ * Negative indices allow accessing elements from the end of the array (e.g., `-1` for last element).
+ * If `T` is a tuple (fixed length), it returns a union of its negative index literals (e.g., `-1 | -2 | -3`).
+ * If `T` is a regular array (variable length), it returns `number`.
+ *
+ * @template T - The readonly array or tuple type.
+ * @returns A union of negative number literals representing the indices if `T` is a tuple, otherwise `number`.
+ * @example
+ * type TupleNegativeIndices = NegativeIndexOfTuple<[string, boolean, number]>; // -1 | -2 | -3
+ * type ArrayNegativeIndices = NegativeIndexOfTuple<string[]>; // number
+ * type EmptyTupleNegativeIndices = NegativeIndexOfTuple<[]>; // never
+ * type ReadonlyArrayNegativeIndices = NegativeIndexOfTuple<readonly number[]>; // number
+ */
+type NegativeIndexOfTuple<T extends readonly unknown[]> =
+  TSTypeForgeInternals.MapIdx<RelaxedExclude<IndexOfTuple<[...T, 0]>, 0>>;
+
 declare namespace TSTypeForgeInternals {
   /**
    * Internal implementation detail for `IndexOfTuple`.
