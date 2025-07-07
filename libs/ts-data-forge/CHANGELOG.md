@@ -1,3 +1,31 @@
+# [2.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.5.2...v2.0.0) (2025-07-07)
+
+### Features
+
+- improve typing of Arr functions ([#61](https://github.com/noshiro-pf/ts-data-forge/issues/61)) ([3828c77](https://github.com/noshiro-pf/ts-data-forge/commit/3828c77e169a89e3908ffcbacfc01ce85f6f63d3))
+
+### BREAKING CHANGES
+
+- Tpl is removed and merged into Arr.
+
+* The following functions have been added to `Arr`:
+    - `set`
+    - `findLast`
+    - `findLastIndex`
+    - `every`
+    - `some`
+    - `map`
+    - `filter`
+    - `flat`
+    - `flatMap`
+    - `toReversed`
+    - `toSorted`
+    - Iterators
+        - `entries`
+        - `values`
+        - `indices`
+        - `keys` (an alias for `indices`)
+
 ## [1.5.2](https://github.com/noshiro-pf/ts-data-forge/compare/v1.5.1...v1.5.2) (2025-07-05)
 
 ### Bug Fixes
