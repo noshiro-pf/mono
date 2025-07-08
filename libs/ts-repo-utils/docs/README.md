@@ -15,4 +15,8 @@
 - [functions/format](functions/format.md)
 - [functions/gen-index](functions/gen-index.md)
 - [functions/should-run](functions/should-run.md)
+- [functions/workspace-utils](functions/workspace-utils.md)
+- [functions/workspace-utils/get-workspace-packages](functions/workspace-utils/get-workspace-packages.md)
+- [functions/workspace-utils/run-cmd-in-parallel](functions/workspace-utils/run-cmd-in-parallel.md)
+- [functions/workspace-utils/run-cmd-in-stages](functions/workspace-utils/run-cmd-in-stages.md)
 - [node-global](node-global.md)

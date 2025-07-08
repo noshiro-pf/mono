@@ -58,7 +58,7 @@
     "fast-glob": "^3.3.3",
     "micromatch": "^4.0.8",
     "prettier": "^3.6.2",
-    "ts-data-forge": "^1.2.0"
+    "ts-data-forge": "^2.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.0",

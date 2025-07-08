@@ -44,6 +44,18 @@ Re-exports [checkShouldRunTypeChecks](functions/should-run.md#checkshouldruntype
 
 ---
 
+### executeParallel
+
+Re-exports [executeParallel](functions/workspace-utils/get-workspace-packages.md#executeparallel)
+
+---
+
+### executeStages
+
+Re-exports [executeStages](functions/workspace-utils/get-workspace-packages.md#executestages)
+
+---
+
 ### formatDiffFrom
 
 Re-exports [formatDiffFrom](functions/format.md#formatdifffrom)
@@ -92,6 +104,12 @@ Re-exports [getUntrackedFiles](functions/diff.md#getuntrackedfiles)
 
 ---
 
+### getWorkspacePackages
+
+Re-exports [getWorkspacePackages](functions/workspace-utils/get-workspace-packages.md#getworkspacepackages)
+
+---
+
 ### pathExists
 
 Re-exports [pathExists](functions/assert-path-exists.md#pathexists)
@@ -101,3 +119,15 @@ Re-exports [pathExists](functions/assert-path-exists.md#pathexists)
 ### repoIsDirty
 
 Re-exports [repoIsDirty](functions/assert-repo-is-clean.md#repoisdirty)
+
+---
+
+### runCmdInParallelAcrossWorkspaces
+
+Re-exports [runCmdInParallelAcrossWorkspaces](functions/workspace-utils/run-cmd-in-parallel.md#runcmdinparallelacrossworkspaces)
+
+---
+
+### runCmdInStagesAcrossWorkspaces
+
+Re-exports [runCmdInStagesAcrossWorkspaces](functions/workspace-utils/run-cmd-in-stages.md#runcmdinstagesacrossworkspaces)
