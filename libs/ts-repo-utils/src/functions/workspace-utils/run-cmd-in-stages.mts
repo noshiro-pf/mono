@@ -1,9 +1,7 @@
 #!/usr/bin/env tsx
 
-import {
-  executeStages,
-  getWorkspacePackages,
-} from './get-workspace-packages.mjs';
+import { executeStages } from './execute-parallel.mjs';
+import { getWorkspacePackages } from './get-workspace-packages.mjs';
 
 /**
  * Executes a npm script command across all workspace packages in dependency order stages.

@@ -46,13 +46,13 @@ Re-exports [checkShouldRunTypeChecks](functions/should-run.md#checkshouldruntype
 
 ### executeParallel
 
-Re-exports [executeParallel](functions/workspace-utils/get-workspace-packages.md#executeparallel)
+Re-exports [executeParallel](functions/workspace-utils/execute-parallel.md#executeparallel)
 
 ---
 
 ### executeStages
 
-Re-exports [executeStages](functions/workspace-utils/get-workspace-packages.md#executestages)
+Re-exports [executeStages](functions/workspace-utils/execute-parallel.md#executestages)
 
 ---
 
@@ -107,6 +107,12 @@ Re-exports [getUntrackedFiles](functions/diff.md#getuntrackedfiles)
 ### getWorkspacePackages
 
 Re-exports [getWorkspacePackages](functions/workspace-utils/get-workspace-packages.md#getworkspacepackages)
+
+---
+
+### Package
+
+Re-exports [Package](functions/workspace-utils/types.md#package)
 
 ---
 

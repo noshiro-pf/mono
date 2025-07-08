@@ -10,19 +10,25 @@
 
 ### executeParallel
 
-Re-exports [executeParallel](workspace-utils/get-workspace-packages.md#executeparallel)
+Re-exports [executeParallel](workspace-utils/execute-parallel.md#executeparallel)
 
 ---
 
 ### executeStages
 
-Re-exports [executeStages](workspace-utils/get-workspace-packages.md#executestages)
+Re-exports [executeStages](workspace-utils/execute-parallel.md#executestages)
 
 ---
 
 ### getWorkspacePackages
 
 Re-exports [getWorkspacePackages](workspace-utils/get-workspace-packages.md#getworkspacepackages)
+
+---
+
+### Package
+
+Re-exports [Package](workspace-utils/types.md#package)
 
 ---
 

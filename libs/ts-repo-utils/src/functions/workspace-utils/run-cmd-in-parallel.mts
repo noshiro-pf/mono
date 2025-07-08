@@ -1,9 +1,7 @@
 #!/usr/bin/env tsx
 
-import {
-  executeParallel,
-  getWorkspacePackages,
-} from './get-workspace-packages.mjs';
+import { executeParallel } from './execute-parallel.mjs';
+import { getWorkspacePackages } from './get-workspace-packages.mjs';
 
 /**
  * Executes a npm script command across all workspace packages in parallel.
