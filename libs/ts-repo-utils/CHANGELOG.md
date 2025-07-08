@@ -1,3 +1,9 @@
+# [3.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v3.0.1...v3.1.0) (2025-07-08)
+
+### Features
+
+- add workspace-utils functions ([#39](https://github.com/noshiro-pf/ts-repo-utils/issues/39)) ([4e8d9e4](https://github.com/noshiro-pf/ts-repo-utils/commit/4e8d9e4c7096bdcf3ece5a2d815922d72225f337))
+
 ## [3.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v3.0.0...v3.0.1) (2025-07-01)
 
 ### Bug Fixes
