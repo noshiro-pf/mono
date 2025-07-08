@@ -1,3 +1,9 @@
+## [3.1.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v3.1.0...v3.1.1) (2025-07-08)
+
+### Bug Fixes
+
+- update getWorkspacePackages to support glob workspace patterns ([#46](https://github.com/noshiro-pf/ts-repo-utils/issues/46)) ([9d6632a](https://github.com/noshiro-pf/ts-repo-utils/commit/9d6632a2c7fcf005f096981c3abc87b54a73befd))
+
 # [3.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v3.0.1...v3.1.0) (2025-07-08)
 
 ### Features
