@@ -14,7 +14,7 @@
 
 > **pipe**\<`A`\>(`a`): `PipeWithMapOptional`\<`A`\>
 
-Defined in: [src/functional/pipe.mts:120](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/pipe.mts#L120)
+Defined in: [src/functional/pipe.mts:121](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/pipe.mts#L121)
 
 Creates a new pipe object that allows for chaining operations on a value.
 
@@ -54,12 +54,13 @@ A pipe object with chaining methods appropriate for the value type.
 
 Basic value transformation chaining:
 
-```typescript
+```ts
 // Simple sequential transformations
 const result = pipe(10)
     .map((x) => x * 2) // 20
     .map((x) => x + 5) // 25
     .map((x) => x.toString()).value; // '25'
+assert(result === '25');
 
 // String processing pipeline
 const processed = pipe('  Hello World  ')
@@ -67,78 +68,85 @@ const processed = pipe('  Hello World  ')
     .map((s) => s.toLowerCase()) // "hello world"
     .map((s) => s.split(' ')) // ["hello", "world"]
     .map((arr) => arr.join('-')).value; // "hello-world"
+assert(processed === 'hello-world');
 ```
 
 Nullable value handling with automatic null checking:
 
-```typescript
-// Safe operations on potentially null values
-const maybeNumber: number | null = getNumberFromAPI();
+```ts
+// Safe operations on potentially nullish values
+const maybeNumber: number | undefined = 10;
 const result = pipe(maybeNumber)
     .mapNullable((x) => x * 2) // Only applies if not null
     .mapNullable((x) => `Result: ${x}`).value; // Only applies if previous step succeeded // 'Result: 20' or undefined
+assert(result === 'Result: 20');
 
-// Handling undefined values
-const maybeUser: User | undefined = findUser(id);
-const userName = pipe(maybeUser)
-    .mapNullable((user) => user.name)
-    .mapNullable((name) => name.toUpperCase()).value; // string or undefined
+// Handling null values
+const nullValue: number | null = null;
+const nullResult = pipe(nullValue).mapNullable((x) => x * 2).value;
+assert(nullResult === undefined);
 ```
 
 Optional value handling with monadic operations:
 
-```typescript
+```ts
 // Working with Optional types
 const optional = Optional.some(42);
 const result = pipe(optional)
     .mapOptional((x) => x / 2) // Optional.some(21)
     .mapOptional((x) => Math.sqrt(x)).value; // Optional.some(~4.58) // Optional.some(4.58...)
+assert(Optional.isSome(result) === true);
+assert(Math.abs(Optional.unwrap(result)! - Math.sqrt(21)) < 0.01);
 
-// Optional chains that can become None
-const parseAndProcess = (input: string) =>
-    pipe(Optional.fromNullable(input))
-        .mapOptional((s) => s.trim())
-        .mapOptional((s) => (s.length > 0 ? s : null)) // Could become None
-        .mapOptional((s) => parseInt(s, 10))
-        .mapOptional((n) => (isNaN(n) ? null : n)).value; // Optional<number>
+// Optional with None
+const noneOptional = Optional.none;
+const noneResult = pipe(noneOptional).mapOptional((x) => x * 2).value;
+assert(Optional.isNone(noneResult) === true);
 ```
 
 Mixed type transformations:
 
-```typescript
+```ts
 // Starting with a string, transforming through different types
 const complex = pipe('hello')
     .map((s) => s.length) // number: 5
-    .map((n) => (n > 3 ? n : null)) // number | null: 5
-    .mapNullable((n) => n * 10).value; // number: 50 (or undefined if null) // 50 or undefined
+    .map((n) => (n > 3 ? n : undefined)) // number | undefined: 5
+    .mapNullable((n) => n * 10).value; // number: 50 (or undefined if undefined) // 50 or undefined
+assert(complex === 50);
 
-// API response processing
-const processApiResponse = (response: ApiResponse) =>
-    pipe(response)
-        .map((r) => r.data) // Extract data
-        .mapNullable((data) => data.user) // Safe user access
-        .mapNullable((user) => user.profile) // Safe profile access
-        .mapNullable((profile) => profile.avatar).value; // Safe avatar access // string | undefined
+// Short string case
+const shortString = pipe('hi')
+    .map((s) => s.length) // number: 2
+    .map((n) => (n > 3 ? n : undefined)) // number | undefined: undefined
+    .mapNullable((n) => n * 10).value; // undefined
+assert(shortString === undefined);
 ```
 
 Error-safe computation chains:
 
-```typescript
+```ts
 // Building complex computations safely
-const safeCalculation = (input: unknown) =>
-    pipe(input)
-        .map((val) => (typeof val === 'number' ? val : null))
-        .mapNullable((n) => (n > 0 ? n : null)) // Positive numbers only
-        .mapNullable((n) => Math.sqrt(n)) // Safe square root
-        .mapNullable((n) => (n < 100 ? n : null)) // Limit result
-        .mapNullable((n) => Math.round(n * 100) / 100).value; // Round to 2 decimals // number | undefined
+const maybeNumber: number | undefined = 25;
+const result = pipe(maybeNumber)
+    .mapNullable((n) => (n > 0 ? n : undefined)) // Positive numbers only
+    .mapNullable((n) => Math.sqrt(n)) // Safe square root
+    .mapNullable((n) => (n < 100 ? n : undefined)) // Limit result
+    .mapNullable((n) => Math.round(n * 100) / 100).value; // Round to 2 decimals // number | undefined
+
+assert(result === 5); // sqrt(25) = 5
+
+const negativeNumber: number | undefined = -5;
+const negativeResult = pipe(negativeNumber).mapNullable((n) =>
+    n > 0 ? n : undefined,
+).value;
+assert(negativeResult === undefined); // negative number
 ```
 
 #### Call Signature
 
-> **pipe**\<`A`\>(`a`): `PipeWithMapNullable`\<`A`\>
+> **pipe**\<`A`\>(`a`): `PipeBase`\<`A`\>
 
-Defined in: [src/functional/pipe.mts:124](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/pipe.mts#L124)
+Defined in: [src/functional/pipe.mts:125](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/pipe.mts#L125)
 
 Creates a new pipe object that allows for chaining operations on a value.
 
@@ -170,7 +178,7 @@ The initial value to wrap in a pipe.
 
 ##### Returns
 
-`PipeWithMapNullable`\<`A`\>
+`PipeBase`\<`A`\>
 
 A pipe object with chaining methods appropriate for the value type.
 
@@ -178,12 +186,13 @@ A pipe object with chaining methods appropriate for the value type.
 
 Basic value transformation chaining:
 
-```typescript
+```ts
 // Simple sequential transformations
 const result = pipe(10)
     .map((x) => x * 2) // 20
     .map((x) => x + 5) // 25
     .map((x) => x.toString()).value; // '25'
+assert(result === '25');
 
 // String processing pipeline
 const processed = pipe('  Hello World  ')
@@ -191,69 +200,76 @@ const processed = pipe('  Hello World  ')
     .map((s) => s.toLowerCase()) // "hello world"
     .map((s) => s.split(' ')) // ["hello", "world"]
     .map((arr) => arr.join('-')).value; // "hello-world"
+assert(processed === 'hello-world');
 ```
 
 Nullable value handling with automatic null checking:
 
-```typescript
-// Safe operations on potentially null values
-const maybeNumber: number | null = getNumberFromAPI();
+```ts
+// Safe operations on potentially nullish values
+const maybeNumber: number | undefined = 10;
 const result = pipe(maybeNumber)
     .mapNullable((x) => x * 2) // Only applies if not null
     .mapNullable((x) => `Result: ${x}`).value; // Only applies if previous step succeeded // 'Result: 20' or undefined
+assert(result === 'Result: 20');
 
-// Handling undefined values
-const maybeUser: User | undefined = findUser(id);
-const userName = pipe(maybeUser)
-    .mapNullable((user) => user.name)
-    .mapNullable((name) => name.toUpperCase()).value; // string or undefined
+// Handling null values
+const nullValue: number | null = null;
+const nullResult = pipe(nullValue).mapNullable((x) => x * 2).value;
+assert(nullResult === undefined);
 ```
 
 Optional value handling with monadic operations:
 
-```typescript
+```ts
 // Working with Optional types
 const optional = Optional.some(42);
 const result = pipe(optional)
     .mapOptional((x) => x / 2) // Optional.some(21)
     .mapOptional((x) => Math.sqrt(x)).value; // Optional.some(~4.58) // Optional.some(4.58...)
+assert(Optional.isSome(result) === true);
+assert(Math.abs(Optional.unwrap(result)! - Math.sqrt(21)) < 0.01);
 
-// Optional chains that can become None
-const parseAndProcess = (input: string) =>
-    pipe(Optional.fromNullable(input))
-        .mapOptional((s) => s.trim())
-        .mapOptional((s) => (s.length > 0 ? s : null)) // Could become None
-        .mapOptional((s) => parseInt(s, 10))
-        .mapOptional((n) => (isNaN(n) ? null : n)).value; // Optional<number>
+// Optional with None
+const noneOptional = Optional.none;
+const noneResult = pipe(noneOptional).mapOptional((x) => x * 2).value;
+assert(Optional.isNone(noneResult) === true);
 ```
 
 Mixed type transformations:
 
-```typescript
+```ts
 // Starting with a string, transforming through different types
 const complex = pipe('hello')
     .map((s) => s.length) // number: 5
-    .map((n) => (n > 3 ? n : null)) // number | null: 5
-    .mapNullable((n) => n * 10).value; // number: 50 (or undefined if null) // 50 or undefined
+    .map((n) => (n > 3 ? n : undefined)) // number | undefined: 5
+    .mapNullable((n) => n * 10).value; // number: 50 (or undefined if undefined) // 50 or undefined
+assert(complex === 50);
 
-// API response processing
-const processApiResponse = (response: ApiResponse) =>
-    pipe(response)
-        .map((r) => r.data) // Extract data
-        .mapNullable((data) => data.user) // Safe user access
-        .mapNullable((user) => user.profile) // Safe profile access
-        .mapNullable((profile) => profile.avatar).value; // Safe avatar access // string | undefined
+// Short string case
+const shortString = pipe('hi')
+    .map((s) => s.length) // number: 2
+    .map((n) => (n > 3 ? n : undefined)) // number | undefined: undefined
+    .mapNullable((n) => n * 10).value; // undefined
+assert(shortString === undefined);
 ```
 
 Error-safe computation chains:
 
-```typescript
+```ts
 // Building complex computations safely
-const safeCalculation = (input: unknown) =>
-    pipe(input)
-        .map((val) => (typeof val === 'number' ? val : null))
-        .mapNullable((n) => (n > 0 ? n : null)) // Positive numbers only
-        .mapNullable((n) => Math.sqrt(n)) // Safe square root
-        .mapNullable((n) => (n < 100 ? n : null)) // Limit result
-        .mapNullable((n) => Math.round(n * 100) / 100).value; // Round to 2 decimals // number | undefined
+const maybeNumber: number | undefined = 25;
+const result = pipe(maybeNumber)
+    .mapNullable((n) => (n > 0 ? n : undefined)) // Positive numbers only
+    .mapNullable((n) => Math.sqrt(n)) // Safe square root
+    .mapNullable((n) => (n < 100 ? n : undefined)) // Limit result
+    .mapNullable((n) => Math.round(n * 100) / 100).value; // Round to 2 decimals // number | undefined
+
+assert(result === 5); // sqrt(25) = 5
+
+const negativeNumber: number | undefined = -5;
+const negativeResult = pipe(negativeNumber).mapNullable((n) =>
+    n > 0 ? n : undefined,
+).value;
+assert(negativeResult === undefined); // negative number
 ```
