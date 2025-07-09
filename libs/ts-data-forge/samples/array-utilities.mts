@@ -5,13 +5,13 @@ const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3];
 // Reduction
 const sum = Arr.sum(numbers);
 
-assert.strictEqual(sum, 20);
+assert(sum === 20);
 
 // Type-safe length checking
 if (Arr.isArrayAtLeastLength(numbers, 2)) {
   // numbers is now guaranteed to have at least 2 elements
   expectType<typeof numbers, readonly [number, number, ...number[]]>('=');
-  assert.strictEqual(numbers[1], 2); // Safe access to index 1
+  assert(numbers[1] === 2); // Safe access to index 1
 }
 
 // Take first n elements
@@ -44,5 +44,5 @@ assert.deepStrictEqual(
   Optional.some({ name: 'Charlie', age: 35 } as const),
 );
 if (Optional.isSome(oldestPerson)) {
-  assert.strictEqual(oldestPerson.value.name, 'Charlie');
+  assert(oldestPerson.value.name === 'Charlie');
 }

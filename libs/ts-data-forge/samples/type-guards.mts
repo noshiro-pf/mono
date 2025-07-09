@@ -23,6 +23,6 @@ if (isNonNullObject(value)) {
 }
 
 // Example usage
-assert.strictEqual(processData({ name: 'Alice' }), 'Hello, Alice!');
-assert.strictEqual(processData({ age: 30 }), undefined);
-assert.strictEqual(processData('not an object'), undefined);
+assert(processData({ name: 'Alice' }) === 'Hello, Alice!');
+assert(processData({ age: 30 }) === undefined);
+assert(processData('not an object') === undefined);

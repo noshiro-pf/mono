@@ -5,7 +5,7 @@ const maybeValue = Optional.some(42);
 
 const doubled = Optional.map(maybeValue, (x) => x * 2);
 
-assert.strictEqual(Optional.unwrapOr(doubled, 0), 84);
+assert(Optional.unwrapOr(doubled, 0) === 84);
 
 // Result for error handling
 const success = Result.ok(42);
@@ -35,13 +35,13 @@ const handleStatus = (status: Status, data?: string): string =>
     error: 'An error occurred',
   });
 
-assert.strictEqual(handleStatus('loading'), 'Please wait...');
-assert.strictEqual(handleStatus('success', 'Hello'), 'Data: Hello');
-assert.strictEqual(handleStatus('error'), 'An error occurred');
+assert(handleStatus('loading') === 'Please wait...');
+assert(handleStatus('success', 'Hello') === 'Data: Hello');
+assert(handleStatus('error') === 'An error occurred');
 
 // Pattern matching with Result
 const processResult = (result: Result<number, string>): string =>
   Result.isOk(result) ? `Success: ${result.value}` : `Error: ${result.value}`;
 
-assert.strictEqual(processResult(Result.ok(42)), 'Success: 42');
-assert.strictEqual(processResult(Result.err('Failed')), 'Error: Failed');
+assert(processResult(Result.ok(42)) === 'Success: 42');
+assert(processResult(Result.err('Failed')) === 'Error: Failed');
