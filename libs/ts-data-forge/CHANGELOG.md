@@ -1,3 +1,9 @@
+## [2.0.2](https://github.com/noshiro-pf/ts-data-forge/compare/v2.0.1...v2.0.2) (2025-07-09)
+
+### Bug Fixes
+
+- use ReadonlyRecord in the return type of Obj.fromEntries ([#64](https://github.com/noshiro-pf/ts-data-forge/issues/64)) ([2760559](https://github.com/noshiro-pf/ts-data-forge/commit/276055949ca19f554265b452c6c5057dd16897d4))
+
 ## [2.0.1](https://github.com/noshiro-pf/ts-data-forge/compare/v2.0.0...v2.0.1) (2025-07-09)
 
 ### Bug Fixes
