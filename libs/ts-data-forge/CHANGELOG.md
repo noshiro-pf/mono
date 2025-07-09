@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/noshiro-pf/ts-data-forge/compare/v2.0.0...v2.0.1) (2025-07-09)
+
+### Bug Fixes
+
+- fix type annotation of pipe ([#63](https://github.com/noshiro-pf/ts-data-forge/issues/63)) ([1babcff](https://github.com/noshiro-pf/ts-data-forge/commit/1babcffc5820aab5df8523fb29306b9702038978))
+
 # [2.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.5.2...v2.0.0) (2025-07-07)
 
 ### Features
