@@ -361,7 +361,7 @@ export namespace Obj {
     ? TsDataForgeInternals.EntriesToObject<Entries>
     : TsDataForgeInternals.PartialIfKeyIsUnion<
         TsDataForgeInternals.KeysOfEntries<Entries>,
-        Record<
+        ReadonlyRecord<
           TsDataForgeInternals.KeysOfEntries<Entries>,
           TsDataForgeInternals.ValuesOfEntries<Entries>
         >
