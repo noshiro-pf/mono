@@ -1,3 +1,13 @@
+# [4.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v3.1.2...v4.0.0) (2025-07-14)
+
+### Bug Fixes
+
+- fix jsdoc of genIndex ([#54](https://github.com/noshiro-pf/ts-repo-utils/issues/54)) ([82bc959](https://github.com/noshiro-pf/ts-repo-utils/commit/82bc9593825193e7da1417ac68f7c54ec8506e12))
+
+### BREAKING CHANGES
+
+- added required option to genIndex
+
 ## [3.1.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v3.1.1...v3.1.2) (2025-07-14)
 
 ### Bug Fixes
