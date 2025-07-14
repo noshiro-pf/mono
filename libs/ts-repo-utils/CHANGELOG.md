@@ -1,3 +1,9 @@
+## [3.1.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v3.1.1...v3.1.2) (2025-07-14)
+
+### Bug Fixes
+
+- add formatCommand option to GenIndexConfig ([#53](https://github.com/noshiro-pf/ts-repo-utils/issues/53)) ([1859bd0](https://github.com/noshiro-pf/ts-repo-utils/commit/1859bd07de5612cef7fa2854797ee44f037c1c95))
+
 ## [3.1.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v3.1.0...v3.1.1) (2025-07-08)
 
 ### Bug Fixes
