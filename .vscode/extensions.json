@@ -1,6 +1,5 @@
 {
   "recommendations": [
-    "google.wireit",
     "timonwong.shellcheck",
     "unional.vscode-sort-package-json",
     "redhat.vscode-yaml",
