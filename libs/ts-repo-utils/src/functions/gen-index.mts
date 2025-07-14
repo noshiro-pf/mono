@@ -22,6 +22,7 @@ export type GenIndexConfig = DeepReadonly<{
   /** Glob patterns of files to exclude from exports (default: excludes .d.* and .test.* files) */
   excludePatterns?: string[];
 
+  /** Whether to suppress output during execution (default: false) */
   silent?: boolean;
 }>;
 
@@ -76,6 +77,11 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
   }
 };
 
+/**
+ * Fills the configuration with default values.
+ * @param config - The input configuration object.
+ * @returns The configuration object with all required properties filled with defaults.
+ */
 const fillConfig = (config: GenIndexConfig): DeepRequired<GenIndexConfig> => {
   const sourceExtension = config.sourceExtension ?? '.mts';
   const exportExtension = config.exportExtension ?? '.mjs'; // For ESM imports, .mts resolves to .mjs

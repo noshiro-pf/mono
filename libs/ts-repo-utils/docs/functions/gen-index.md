@@ -22,7 +22,7 @@ Configuration for index file generation.
 
 > **genIndex**(`config`): `Promise`\<`void`\>
 
-Defined in: [src/functions/gen-index.mts:33](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L33)
+Defined in: [src/functions/gen-index.mts:34](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L34)
 
 Generates index.mts files recursively in `config.targetDirectory`.
 
@@ -53,6 +53,8 @@ Command to run for formatting generated files (default: 'npm run fmt')
 ###### silent?
 
 `boolean`
+
+Whether to suppress output during execution (default: false)
 
 ###### sourceExtension?
 
