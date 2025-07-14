@@ -7,6 +7,9 @@ import { assertPathExists } from './assert-path-exists.mjs';
  * Configuration for index file generation.
  */
 export type GenIndexConfig = DeepReadonly<{
+  /** Command to run for formatting generated files (default: 'npm run fmt') */
+  formatCommand: string;
+
   /** Target directories to generate index files for (string or array of strings) */
   targetDirectory: string | string[];
 
@@ -18,18 +21,16 @@ export type GenIndexConfig = DeepReadonly<{
 
   /** Glob patterns of files to exclude from exports (default: excludes .d.* and .test.* files) */
   excludePatterns?: string[];
+
+  silent?: boolean;
 }>;
 
 /**
  * Generates index.mts files recursively in `config.targetDirectory`.
  * @param config - Configuration for index file generation
- * @param options - Additional options
  * @throws Error if any step fails.
  */
-export const genIndex = async (
-  config: GenIndexConfig,
-  options?: Readonly<{ silent?: boolean }>,
-): Promise<void> => {
+export const genIndex = async (config: GenIndexConfig): Promise<void> => {
   echo('Starting index file generation...\n');
 
   // Merge config with defaults
@@ -60,8 +61,8 @@ export const genIndex = async (
 
     // Step 3: Format generated files
     echo('3. Formatting generated files...');
-    const fmtResult = await $('npm run fmt', {
-      silent: options?.silent ?? false,
+    const fmtResult = await $(filledConfig.formatCommand, {
+      silent: filledConfig.silent,
     });
     if (Result.isErr(fmtResult)) {
       throw new Error(`Formatting failed: ${fmtResult.value.message}`);
@@ -80,6 +81,7 @@ const fillConfig = (config: GenIndexConfig): DeepRequired<GenIndexConfig> => {
   const exportExtension = config.exportExtension ?? '.mjs'; // For ESM imports, .mts resolves to .mjs
 
   return {
+    formatCommand: config.formatCommand,
     targetDirectory: config.targetDirectory,
     sourceExtension,
     exportExtension,
@@ -87,6 +89,7 @@ const fillConfig = (config: GenIndexConfig): DeepRequired<GenIndexConfig> => {
       `*.d${sourceExtension}`,
       `*.test${sourceExtension}`,
     ],
+    silent: config.silent ?? false,
   };
 };
 

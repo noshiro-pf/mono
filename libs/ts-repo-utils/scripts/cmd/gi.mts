@@ -5,6 +5,7 @@ import { projectRootPath } from '../project-root-path.mjs';
 try {
   await genIndex({
     targetDirectory: path.resolve(projectRootPath, './src/functions'),
+    formatCommand: 'npm run fmt',
   });
 } catch (error) {
   console.error(`Error: ${String(error)}`);

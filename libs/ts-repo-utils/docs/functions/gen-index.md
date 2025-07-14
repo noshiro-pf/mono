@@ -10,7 +10,7 @@
 
 ### GenIndexConfig
 
-> **GenIndexConfig** = `DeepReadonly`\<\{ `excludePatterns?`: `string`[]; `exportExtension?`: `` `.${string}` ``; `sourceExtension?`: `` `.${string}` ``; `targetDirectory`: `string` \| `string`[]; \}\>
+> **GenIndexConfig** = `DeepReadonly`\<\{ `excludePatterns?`: `string`[]; `exportExtension?`: `` `.${string}` ``; `formatCommand`: `string`; `silent?`: `boolean`; `sourceExtension?`: `` `.${string}` ``; `targetDirectory`: `string` \| `string`[]; \}\>
 
 Defined in: [src/functions/gen-index.mts:9](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L9)
 
@@ -20,9 +20,9 @@ Configuration for index file generation.
 
 ### genIndex()
 
-> **genIndex**(`config`, `options?`): `Promise`\<`void`\>
+> **genIndex**(`config`): `Promise`\<`void`\>
 
-Defined in: [src/functions/gen-index.mts:29](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L29)
+Defined in: [src/functions/gen-index.mts:33](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L33)
 
 Generates index.mts files recursively in `config.targetDirectory`.
 
@@ -44,6 +44,16 @@ Glob patterns of files to exclude from exports (default: excludes .d._ and .test
 
 File extension to use in export statements (default: '.mjs')
 
+###### formatCommand
+
+`string`
+
+Command to run for formatting generated files (default: 'npm run fmt')
+
+###### silent?
+
+`boolean`
+
 ###### sourceExtension?
 
 `` `.${string}` ``
@@ -55,12 +65,6 @@ File extension of source files to export (default: '.mts')
 `string` \| readonly `string`[]
 
 Target directories to generate index files for (string or array of strings)
-
-##### options?
-
-`Readonly`\<\{ `silent?`: `boolean`; \}\>
-
-Additional options
 
 #### Returns
 
