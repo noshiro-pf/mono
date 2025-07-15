@@ -1,3 +1,9 @@
+## [4.0.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v4.0.1...v4.0.2) (2025-07-15)
+
+### Bug Fixes
+
+- fix entry points ([#56](https://github.com/noshiro-pf/ts-repo-utils/issues/56)) ([40b686f](https://github.com/noshiro-pf/ts-repo-utils/commit/40b686f40bad1e415c5da483c7000a20600bd5ab))
+
 ## [4.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v4.0.0...v4.0.1) (2025-07-15)
 
 ### Bug Fixes
