@@ -6,8 +6,7 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "paths": {
-      "ts-data-forge": ["../src/index.mts"],
-      "types": ["../src/globals.d.mts"]
+      "ts-data-forge": ["../src/entry-point.mts"]
     }
   },
   "include": ["./**/*.mts", "./**/*.tsx"]

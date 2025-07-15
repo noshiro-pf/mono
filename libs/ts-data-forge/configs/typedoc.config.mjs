@@ -9,7 +9,7 @@ const config = {
   plugin: ['typedoc-plugin-markdown'],
   router: 'module',
   entryPoints: [`${srcDir}/**/*.mts`],
-  exclude: ['./index.mts', './globals.d.mts', './**/*.test.mts'].map((p) =>
+  exclude: ['./index.mts', './entry-point.mts', './**/*.test.mts'].map((p) =>
     path.resolve(srcDir, p),
   ),
   out: outDir,

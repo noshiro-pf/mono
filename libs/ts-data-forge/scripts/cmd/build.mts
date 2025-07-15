@@ -5,7 +5,6 @@ import { projectRootPath } from '../project-root-path.mjs';
 // Build configuration
 const BUILD_CONFIG = {
   distDir: path.resolve(projectRootPath, './dist'),
-  srcGlobalsFile: path.resolve(projectRootPath, './src/globals.d.mts'),
   rollupConfig: path.resolve(projectRootPath, './configs/rollup.config.ts'),
   distTsConfig: { include: ['.'] },
 } as const;
@@ -65,22 +64,9 @@ const build = async (): Promise<void> => {
     echo('✓ Rollup build completed\n');
   }
 
-  // Step 6: Copy globals
+  // Step 6: Generate dist tsconfig
   {
-    echo('6. Copying global type definitions...');
-    await assertPathExists(BUILD_CONFIG.srcGlobalsFile, 'Global types file');
-
-    const destFile = path.resolve(BUILD_CONFIG.distDir, 'globals.d.mts');
-    await runCmdStep(
-      `cp "${BUILD_CONFIG.srcGlobalsFile}" "${destFile}"`,
-      'Failed to copy globals',
-    );
-    echo('✓ Copied globals.d.mts to dist\n');
-  }
-
-  // Step 7: Generate dist tsconfig
-  {
-    echo('7. Generating dist TypeScript config...');
+    echo('6. Generating dist TypeScript config...');
     const configContent = JSON.stringify(BUILD_CONFIG.distTsConfig);
     const configFile = path.resolve(BUILD_CONFIG.distDir, 'tsconfig.json');
     await runStep(
