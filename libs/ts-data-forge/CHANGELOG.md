@@ -1,3 +1,9 @@
+## [2.1.2](https://github.com/noshiro-pf/ts-data-forge/compare/v2.1.1...v2.1.2) (2025-07-15)
+
+### Bug Fixes
+
+- add eslint rules and fix errors ([#73](https://github.com/noshiro-pf/ts-data-forge/issues/73)) ([4c87ae0](https://github.com/noshiro-pf/ts-data-forge/commit/4c87ae0e1f67416da7eefb7019724fc145471ea2))
+
 ## [2.1.1](https://github.com/noshiro-pf/ts-data-forge/compare/v2.1.0...v2.1.1) (2025-07-15)
 
 ### Bug Fixes
