@@ -26,8 +26,8 @@
       }
     }
   },
-  "module": "./dist/entry-point.js",
-  "types": "./dist/entry-point.d.ts",
+  "module": "./dist/entry-point.mjs",
+  "types": "./dist/entry-point.d.mts",
   "files": [
     "src",
     "dist",
