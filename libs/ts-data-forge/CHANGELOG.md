@@ -1,3 +1,9 @@
+# [3.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v2.1.3...v3.0.0) (2025-07-15)
+
+### Bug Fixes
+
+- **breaking:** change unknownToString to return string instead of Result<string, Error> ([#76](https://github.com/noshiro-pf/ts-data-forge/issues/76)) ([466497f](https://github.com/noshiro-pf/ts-data-forge/commit/466497f9edf4f38d7267ea4a462467d90fedb8d7))
+
 ## [2.1.3](https://github.com/noshiro-pf/ts-data-forge/compare/v2.1.2...v2.1.3) (2025-07-15)
 
 ### Bug Fixes
