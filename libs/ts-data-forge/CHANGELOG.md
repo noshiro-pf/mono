@@ -1,3 +1,9 @@
+## [3.0.2](https://github.com/noshiro-pf/ts-data-forge/compare/v3.0.1...v3.0.2) (2025-07-15)
+
+### Bug Fixes
+
+- fix genIndex settings ([#78](https://github.com/noshiro-pf/ts-data-forge/issues/78)) ([c58d370](https://github.com/noshiro-pf/ts-data-forge/commit/c58d3709d5ab36da6cfbf6ff6dfd5bb2d75cb7a1))
+
 ## [3.0.1](https://github.com/noshiro-pf/ts-data-forge/compare/v3.0.0...v3.0.1) (2025-07-15)
 
 ### Bug Fixes
