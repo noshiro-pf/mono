@@ -78,3 +78,4 @@
 - [others/unknown-to-string](others/unknown-to-string.md)
 - [promise](promise.md)
 - [promise/promise](promise/promise.md)
+- [type](type.md)

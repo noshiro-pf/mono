@@ -21,13 +21,13 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/entry-point.d.mts",
-        "default": "./dist/entry-point.mjs"
+        "types": "./dist/type.d.mts",
+        "default": "./dist/index.mjs"
       }
     }
   },
-  "module": "./dist/entry-point.mjs",
-  "types": "./dist/entry-point.d.mts",
+  "module": "./dist/index.mjs",
+  "types": "./dist/type.d.mts",
   "files": [
     "src",
     "dist",
