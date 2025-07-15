@@ -1,3 +1,9 @@
+## [2.1.3](https://github.com/noshiro-pf/ts-data-forge/compare/v2.1.2...v2.1.3) (2025-07-15)
+
+### Bug Fixes
+
+- fix circular imports ([#75](https://github.com/noshiro-pf/ts-data-forge/issues/75)) ([d179eca](https://github.com/noshiro-pf/ts-data-forge/commit/d179eca10d6903f292c857f0671ff66a657d8a0d))
+
 ## [2.1.2](https://github.com/noshiro-pf/ts-data-forge/compare/v2.1.1...v2.1.2) (2025-07-15)
 
 ### Bug Fixes
