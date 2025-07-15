@@ -7,6 +7,19 @@ describe('range', () => {
     ]);
   });
 
+  test('range(10)', () => {
+    expect(Array.from(range(10))).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  });
+
+  test('range(0)', () => {
+    expect(Array.from(range(0))).toStrictEqual([]);
+  });
+
+  test('range(0)', () => {
+    // @ts-expect-error negative end is not allowed
+    expect(Array.from(range(-1))).toStrictEqual([]);
+  });
+
   test('range(10, 0, -1)', () => {
     expect(Array.from(range(10, 0, -1))).toStrictEqual([
       10, 9, 8, 7, 6, 5, 4, 3, 2, 1,

@@ -91,27 +91,52 @@ import { SafeInt, asSafeInt } from '../number/index.mjs';
  * ```
  */
 export function range(
-  start: SafeUintWithSmallInt,
-  end: SafeUintWithSmallInt,
-  step?: PositiveSafeIntWithSmallInt,
+  end: WithSmallInt<SafeUint, MaxInt>,
 ): Generator<SafeUint, void, unknown>;
 
 export function range(
-  start: SafeIntWithSmallInt,
-  end: SafeIntWithSmallInt,
-  step?: NonZeroSafeIntWithSmallInt,
+  start: WithSmallInt<SafeUint, MaxInt>,
+  end: WithSmallInt<SafeUint, MaxInt>,
+  // eslint-disable-next-line @typescript-eslint/unified-signatures
+  step?: WithSmallInt<PositiveSafeInt, MaxInt>,
+): Generator<SafeUint, void, unknown>;
+
+export function range(
+  start: WithSmallInt<SafeInt, MaxInt>,
+  end: WithSmallInt<SafeInt, MaxInt>,
+  step?: WithSmallInt<NonZeroSafeInt, MaxInt>,
 ): Generator<SafeInt, void, unknown>;
 
 export function* range(
-  start: SafeIntWithSmallInt,
-  end: SafeIntWithSmallInt,
-  step: NonZeroSafeIntWithSmallInt = 1,
+  ...args:
+    | readonly [end: WithSmallInt<SafeInt, MaxInt>]
+    | readonly [
+        start: WithSmallInt<SafeInt, MaxInt>,
+        end: WithSmallInt<SafeInt, MaxInt>,
+        step?: WithSmallInt<NonZeroSafeInt, MaxInt>,
+      ]
 ): Generator<SafeInt, void, unknown> {
-  for (
-    let mut_i: SafeInt = asSafeInt(start);
-    step > 0 ? mut_i < end : mut_i > end;
-    mut_i = SafeInt.add(mut_i, step)
-  ) {
-    yield mut_i;
+  switch (args.length) {
+    case 1: {
+      const [end] = args;
+      for (const i of range(0, end, 1)) {
+        yield i;
+      }
+      break;
+    }
+
+    case 2:
+    case 3: {
+      const [start, end, step = 1] = args;
+      for (
+        let mut_i: SafeInt = asSafeInt(start);
+        step > 0 ? mut_i < end : mut_i > end;
+        mut_i = SafeInt.add(mut_i, asSafeInt(step))
+      ) {
+        yield mut_i;
+      }
+    }
   }
 }
+
+type MaxInt = 512;
