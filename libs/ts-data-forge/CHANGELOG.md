@@ -1,3 +1,9 @@
+# [2.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v2.0.3...v2.1.0) (2025-07-15)
+
+### Features
+
+- add overload to range iterator utility ([#72](https://github.com/noshiro-pf/ts-data-forge/issues/72)) ([ebd25cf](https://github.com/noshiro-pf/ts-data-forge/commit/ebd25cf4ad097c93b90de2b9e35af35a32b1b3de))
+
 ## [2.0.3](https://github.com/noshiro-pf/ts-data-forge/compare/v2.0.2...v2.0.3) (2025-07-15)
 
 ### Bug Fixes
