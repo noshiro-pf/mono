@@ -1,3 +1,9 @@
+## [2.1.1](https://github.com/noshiro-pf/ts-data-forge/compare/v2.1.0...v2.1.1) (2025-07-15)
+
+### Bug Fixes
+
+- fix package.json ([#74](https://github.com/noshiro-pf/ts-data-forge/issues/74)) ([dfb261d](https://github.com/noshiro-pf/ts-data-forge/commit/dfb261dafa35449000b5af2192dbed1231044e55))
+
 # [2.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v2.0.3...v2.1.0) (2025-07-15)
 
 ### Features
