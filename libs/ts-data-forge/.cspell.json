@@ -24,5 +24,10 @@
     "XNOR"
   ],
   "flagWords": [],
-  "ignorePaths": ["eslint.config.js", "./package-lock.json", "docs/**"]
+  "ignorePaths": [
+    "eslint.config.js",
+    "./package-lock.json",
+    "docs/**",
+    "BREAKING_CHANGE_GUIDE.md"
+  ]
 }

@@ -2,7 +2,37 @@ export default {
   branches: ['main'],
   plugins: [
     // 1. Determine the next version number from commit history.
-    '@semantic-release/commit-analyzer',
+    [
+      '@semantic-release/commit-analyzer',
+      {
+        preset: 'conventionalcommits',
+        releaseRules: [
+          // Standard rules
+          { type: 'feat', release: 'minor' },
+          { type: 'fix', release: 'patch' },
+          { type: 'perf', release: 'patch' },
+
+          // Custom rules for BREAKING CHANGE variations
+          { breaking: true, release: 'major' },
+
+          // Additional patterns for major version bumps
+          { type: 'feat', scope: 'breaking', release: 'major' },
+          { type: 'fix', scope: 'breaking', release: 'major' },
+          { type: 'refactor', scope: 'breaking', release: 'major' },
+
+          // Custom notes patterns that should trigger major release
+          { type: '*', notes: { breaking: true }, release: 'major' },
+        ],
+        parserOpts: {
+          noteKeywords: [
+            'BREAKING CHANGE',
+            'BREAKING CHANGES', // Allow plural
+            'BREAKING-CHANGE', // Allow hyphen
+            'BREAKING_CHANGE', // Allow underscore
+          ],
+        },
+      },
+    ],
 
     // 2. Generate release notes content (text).
     '@semantic-release/release-notes-generator',
