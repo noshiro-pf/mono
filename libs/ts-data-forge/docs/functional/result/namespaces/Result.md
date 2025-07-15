@@ -1129,7 +1129,7 @@ console.log(Result.unwrapOk(result)); // 5
 
 > **orElse**\<`R`, `R2`\>(`result`, `alternative`): `R2` \| [`NarrowToOk`](#narrowtook)\<`R`\>
 
-Defined in: [src/functional/result.mts:926](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L926)
+Defined in: [src/functional/result.mts:924](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L924)
 
 Returns the `Result` if it is `Ok`, otherwise returns the alternative.
 
@@ -1178,7 +1178,7 @@ console.log(Result.unwrapOk(result)); // "default"
 
 > **orElse**\<`S`, `E`, `S2`, `E2`\>(`alternative`): (`result`) => [`Result`](../README.md#result)\<`S2`, `E2`\> \| [`Result`](../README.md#result)\<`S`, `E`\>
 
-Defined in: [src/functional/result.mts:932](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L932)
+Defined in: [src/functional/result.mts:930](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L930)
 
 Returns the `Result` if it is `Ok`, otherwise returns the alternative.
 
@@ -1239,7 +1239,7 @@ console.log(Result.unwrapOk(result)); // "default"
 
 > **swap**\<`R`\>(`result`): [`Result`](../README.md#result)\<[`UnwrapErr`](#unwraperr)\<`R`\>, [`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-Defined in: [src/functional/result.mts:874](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L874)
+Defined in: [src/functional/result.mts:872](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L872)
 
 Swaps the success and error values of a `Result`.
 
@@ -1280,7 +1280,7 @@ console.log(Result.unwrapErr(swapped)); // 42
 
 > **toOptional**\<`R`\>(`result`): [`Optional`](../../optional/README.md#optional)\<[`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-Defined in: [src/functional/result.mts:907](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L907)
+Defined in: [src/functional/result.mts:905](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L905)
 
 Converts a `Result` to an `Optional`.
 
@@ -1851,7 +1851,7 @@ try {
 
 > **zip**\<`S1`, `E1`, `S2`, `E2`\>(`resultA`, `resultB`): [`Result`](../README.md#result)\<readonly \[`S1`, `S2`\], `E1` \| `E2`\>
 
-Defined in: [src/functional/result.mts:979](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L979)
+Defined in: [src/functional/result.mts:977](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/functional/result.mts#L977)
 
 Combines two `Result` values into a single `Result` containing a tuple.
 If either `Result` is `Err`, returns the first `Err` encountered.

@@ -19,7 +19,7 @@ ensuring immutability.
 
 > `const` **chunk**: \{\<`N`, `E`\>(`array`, `chunkSize`): readonly readonly `E`[][]; \<`N`\>(`chunkSize`): \<`E`\>(`array`) => readonly readonly `E`[][]; \} = `partition`
 
-Defined in: [src/array/array-utils.mts:4783](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4783)
+Defined in: [src/array/array-utils.mts:4779](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4779)
 
 Alias for `partition`. Splits an array into chunks of a specified size.
 
@@ -135,7 +135,7 @@ Arr.partition([1, 2, 3, 4, 5, 6, 7], 3); // [[1, 2, 3], [4, 5, 6], [7]]
 
 > `const` **drop**: \{\<`Ar`, `N`\>(`array`, `num`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]; \<`N`\>(`num`): \<`Ar`\>(`array`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Skip`\<`N`\<`N`\>, `Ar`\> : readonly `Ar`\[`number`\][]; \} = `skip`
 
-Defined in: [src/array/array-utils.mts:4765](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4765)
+Defined in: [src/array/array-utils.mts:4761](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4761)
 
 Alias for `skip`. Skips the first N elements of an array.
 
@@ -263,7 +263,7 @@ console.log(result); // [3, 4, 5]
 
 > `const` **equal**: \<`E`\>(`array1`, `array2`, `equality`) => `boolean` = `eq`
 
-Defined in: [src/array/array-utils.mts:4507](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4507)
+Defined in: [src/array/array-utils.mts:4503](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4503)
 
 Alias for `eq`.
 
@@ -319,7 +319,7 @@ Arr.eq([{ a: 1 }], [{ a: 1 }], (o1, o2) => o1.a === o2.a); // true
 
 > `const` **first**: \<`Ar`\>(`array`) => `Ar` _extends_ readonly \[\] ? `Readonly`\<\{ \}\> : `Ar` _extends_ readonly \[`E`, `unknown`\] ? `Readonly`\<\{ `value`: `E`; \}\> : `Ar` _extends_ readonly \[`E`, `E`\] ? `Readonly`\<\{ `value`: `E`; \}\> : [`Optional`](../../../functional/optional/README.md#optional)\<`Ar`\[`number`\]\> = `head`
 
-Defined in: [src/array/array-utils.mts:4753](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4753)
+Defined in: [src/array/array-utils.mts:4749](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4749)
 
 Alias for `head`. Returns the first element of an array.
 
@@ -427,7 +427,7 @@ expectType<typeof maybeResult, Optional<number>>('=');
 
 > `const` **keys**: \<`E`\>(`array`) => `ArrayIterator`\<`Uint32`\> = `indices`
 
-Defined in: [src/array/array-utils.mts:4801](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4801)
+Defined in: [src/array/array-utils.mts:4797](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4797)
 
 Alias for `indices`. Returns an iterable of keys in the array.
 
@@ -481,7 +481,7 @@ const emptyIndices = Arr.indices(empty); // []
 
 > `const` **length**: \<`Ar`\>(`array`) => `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? `IntersectBrand`\<`PositiveNumber`, `Uint32`\> : `Uint32` = `size`
 
-Defined in: [src/array/array-utils.mts:4795](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4795)
+Defined in: [src/array/array-utils.mts:4791](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4791)
 
 Alias for `size`. Returns the length of an array.
 
@@ -593,7 +593,7 @@ expectType<typeof emptySize, SizeType.Arr>('=');
 
 > `const` **newArray**: \<`V`, `N`\>(`len`, `init`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`V`, `V`\] : readonly `V`[] = `create`
 
-Defined in: [src/array/array-utils.mts:4789](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4789)
+Defined in: [src/array/array-utils.mts:4785](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4785)
 
 Alias for `create`. Creates a new array of the specified length, with each position filled with the provided initial value.
 
@@ -687,7 +687,7 @@ expectType<typeof empty, readonly []>('=');
 
 > `const` **reduce**: \{\<`Ar`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`; \<`E`, `P`\>(`callbackfn`, `initialValue`): (`array`) => `P`; \} = `foldl`
 
-Defined in: [src/array/array-utils.mts:4771](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4771)
+Defined in: [src/array/array-utils.mts:4767](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4767)
 
 Alias for `foldl`. Applies a function against an accumulator and each element in the array (from left to right) to reduce it to a single value.
 
@@ -807,7 +807,7 @@ Arr.foldl(['a', 'b', 'c'], (acc, str) => acc + str.toUpperCase(), ''); // 'ABC'
 
 > `const` **reduceRight**: \{\<`Ar`, `P`\>(`array`, `callbackfn`, `initialValue`): `P`; \<`E`, `P`\>(`callbackfn`, `initialValue`): (`array`) => `P`; \} = `foldr`
 
-Defined in: [src/array/array-utils.mts:4777](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4777)
+Defined in: [src/array/array-utils.mts:4773](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4773)
 
 Alias for `foldr`. Applies a function against an accumulator and each element in the array (from right to left) to reduce it to a single value.
 
@@ -937,7 +937,7 @@ console.log(result); // "abc"
 
 > `const` **rest**: \<`Ar`\>(`array`) => `Tail`\<`Ar`\> = `tail`
 
-Defined in: [src/array/array-utils.mts:4759](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4759)
+Defined in: [src/array/array-utils.mts:4755](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4755)
 
 Alias for `tail`. Returns all elements of an array except the first one.
 
@@ -1311,7 +1311,7 @@ Arr.butLast([]); // []
 
 > **concat**\<`Ar1`, `Ar2`\>(`array1`, `array2`): readonly \[`Ar1`, `Ar2`\]
 
-Defined in: [src/array/array-utils.mts:3824](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3824)
+Defined in: [src/array/array-utils.mts:3820](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3820)
 
 Concatenates two arrays.
 
@@ -1750,7 +1750,7 @@ expectType<typeof empty, readonly []>('=');
 
 > **entries**\<`E`\>(`array`): `ArrayIterator`\<readonly \[`Uint32`, `E`\]\>
 
-Defined in: [src/array/array-utils.mts:4680](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4680)
+Defined in: [src/array/array-utils.mts:4676](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4676)
 
 Returns an iterable of key-value pairs for every entry in the array.
 
@@ -1799,7 +1799,7 @@ const tupleEntries = Arr.entries(tuple); // [[0, 10], [1, 20], [2, 30]]
 
 > **eq**\<`E`\>(`array1`, `array2`, `equality`): `boolean`
 
-Defined in: [src/array/array-utils.mts:4495](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4495)
+Defined in: [src/array/array-utils.mts:4491](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4491)
 
 Checks if two arrays are equal by performing a shallow comparison of their elements.
 
@@ -2151,7 +2151,7 @@ const result2 = Arr.every(empty, (n) => n > 0); // true
 
 > **filter**\<`Ar`, `S`\>(`array`, `predicate`): readonly `S`[]
 
-Defined in: [src/array/array-utils.mts:3604](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3604)
+Defined in: [src/array/array-utils.mts:3600](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3600)
 
 Filters an array based on a predicate function.
 
@@ -2228,7 +2228,7 @@ const processNumbers = pipe(
 
 > **filter**\<`E`, `S`\>(`predicate`): (`array`) => readonly `S`[]
 
-Defined in: [src/array/array-utils.mts:3609](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3609)
+Defined in: [src/array/array-utils.mts:3605](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3605)
 
 Filters an array based on a predicate function.
 
@@ -2309,7 +2309,7 @@ const processNumbers = pipe(
 
 > **filter**\<`Ar`\>(`array`, `predicate`): readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:3614](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3614)
+Defined in: [src/array/array-utils.mts:3610](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3610)
 
 Filters an array based on a predicate function.
 
@@ -2380,7 +2380,7 @@ const processNumbers = pipe(
 
 > **filter**\<`E`\>(`predicate`): (`array`) => readonly `E`[]
 
-Defined in: [src/array/array-utils.mts:3619](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3619)
+Defined in: [src/array/array-utils.mts:3615](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3615)
 
 Filters an array based on a predicate function.
 
@@ -2459,7 +2459,7 @@ const processNumbers = pipe(
 
 > **filterNot**\<`Ar`\>(`array`, `predicate`): readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:3661](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3661)
+Defined in: [src/array/array-utils.mts:3657](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3657)
 
 Filters an array by excluding elements for which the predicate returns true.
 This is the opposite of `Array.prototype.filter`.
@@ -2506,7 +2506,7 @@ console.log(result); // [1, 3, 5]
 
 > **filterNot**\<`E`\>(`predicate`): (`array`) => readonly `E`[]
 
-Defined in: [src/array/array-utils.mts:3666](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3666)
+Defined in: [src/array/array-utils.mts:3662](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3662)
 
 Filters an array by excluding elements for which the predicate returns true.
 This is the opposite of `Array.prototype.filter`.
@@ -3533,7 +3533,7 @@ const lastTwentyIndex = Arr.findLastIndex(tuple, (x) => x === 20);
 
 > **flat**\<`Ar`, `D`\>(`array`, `depth?`): readonly `FlatArray`\<`Ar`, `D`\>[]
 
-Defined in: [src/array/array-utils.mts:3718](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3718)
+Defined in: [src/array/array-utils.mts:3714](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3714)
 
 Creates a new array with all sub-array elements concatenated into it recursively up to the specified depth.
 
@@ -3598,7 +3598,7 @@ const allFlat = Arr.flat(deepNested, SafeUint.MAX_VALUE); // [1, 2, 3, 4, 5]
 
 > **flat**\<`D`\>(`depth?`): \<`Ar`\>(`array`) => readonly `FlatArray`\<`Ar`, `D`\>[]
 
-Defined in: [src/array/array-utils.mts:3723](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3723)
+Defined in: [src/array/array-utils.mts:3719](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3719)
 
 Creates a new array with all sub-array elements concatenated into it recursively up to the specified depth.
 
@@ -3671,7 +3671,7 @@ const allFlat = Arr.flat(deepNested, SafeUint.MAX_VALUE); // [1, 2, 3, 4, 5]
 
 > **flatMap**\<`Ar`, `B`\>(`array`, `mapFn`): readonly `B`[]
 
-Defined in: [src/array/array-utils.mts:3781](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3781)
+Defined in: [src/array/array-utils.mts:3777](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3777)
 
 Creates a new array with all sub-array elements concatenated into it recursively up to the specified depth,
 after first mapping each element using a mapping function.
@@ -3732,7 +3732,7 @@ const doubled = Arr.flatMap(numbers, (n) => [n, n * 2]); // [1, 2, 2, 4, 3, 6]
 
 > **flatMap**\<`A`, `B`\>(`mapFn`): (`array`) => readonly `B`[]
 
-Defined in: [src/array/array-utils.mts:3786](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3786)
+Defined in: [src/array/array-utils.mts:3782](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3782)
 
 Creates a new array with all sub-array elements concatenated into it recursively up to the specified depth,
 after first mapping each element using a mapping function.
@@ -4094,7 +4094,7 @@ const nums2 = Arr.generate<number>(function* () {
 
 > **groupBy**\<`Ar`, `G`\>(`array`, `grouper`): [`IMap`](../../../collections/imap/README.md#imap)\<`G`, readonly `Ar`\[`number`\][]\>
 
-Defined in: [src/array/array-utils.mts:4374](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4374)
+Defined in: [src/array/array-utils.mts:4370](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4370)
 
 Groups elements of an array by a key derived from each element, returning an immutable [IMap](../../../collections/imap/README.md#imap).
 
@@ -4302,7 +4302,7 @@ expectType<typeof emptyGroup, IMap<never, readonly never[]>>('=');
 
 > **groupBy**\<`E`, `G`\>(`grouper`): (`array`) => [`IMap`](../../../collections/imap/README.md#imap)\<`G`, readonly `E`[]\>
 
-Defined in: [src/array/array-utils.mts:4382](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4382)
+Defined in: [src/array/array-utils.mts:4378](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4378)
 
 Groups elements of an array by a key derived from each element, returning an immutable [IMap](../../../collections/imap/README.md#imap).
 
@@ -4846,7 +4846,7 @@ readonly `E`[]
 
 > **indices**\<`E`\>(`array`): `ArrayIterator`\<`Uint32`\>
 
-Defined in: [src/array/array-utils.mts:4739](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4739)
+Defined in: [src/array/array-utils.mts:4735](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4735)
 
 Returns an iterable of keys in the array.
 
@@ -5248,7 +5248,7 @@ if (Arr.isNonEmpty(testArray)) {
 
 > **isSubset**\<`E1`, `E2`\>(`array1`, `array2`): `boolean`
 
-Defined in: [src/array/array-utils.mts:4527](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4527)
+Defined in: [src/array/array-utils.mts:4523](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4523)
 
 Checks if the first array (`array1`) is a subset of the second array (`array2`).
 An array `A` is a subset of `B` if all elements of `A` are also present in `B`.
@@ -5307,7 +5307,7 @@ Arr.isSubset([1, 5], [1, 2, 3]); // false
 
 > **isSuperset**\<`E1`, `E2`\>(`array1`, `array2`): `boolean`
 
-Defined in: [src/array/array-utils.mts:4553](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4553)
+Defined in: [src/array/array-utils.mts:4549](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4549)
 
 Checks if the first array (`array1`) is a superset of the second array (`array2`).
 An array `A` is a superset of `B` if all elements of `B` are also present in `A`.
@@ -5765,7 +5765,7 @@ readonly `E`[]
 
 > **map**\<`Ar`, `B`\>(`array`, `mapFn`): `Readonly`\<`{ [K in keyof Ar]: B }`\>
 
-Defined in: [src/array/array-utils.mts:3533](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3533)
+Defined in: [src/array/array-utils.mts:3529](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3529)
 
 Creates a new tuple by transforming each element with a mapping function.
 
@@ -5826,7 +5826,7 @@ const descriptions = Arr.map(mixed, (x) => `Value: ${x}`);
 
 > **map**\<`A`, `B`\>(`mapFn`): \<`Ar`\>(`array`) => `Readonly`\<`{ [K in keyof Ar]: B }`\>
 
-Defined in: [src/array/array-utils.mts:3539](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3539)
+Defined in: [src/array/array-utils.mts:3535](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3535)
 
 Creates a new tuple by transforming each element with a mapping function.
 
@@ -6313,7 +6313,7 @@ Arr.minBy([], (p) => p.age); // Optional.none
 
 > **partition**\<`N`, `E`\>(`array`, `chunkSize`): readonly readonly `E`[][]
 
-Defined in: [src/array/array-utils.mts:3847](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3847)
+Defined in: [src/array/array-utils.mts:3843](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3843)
 
 Partitions an array into sub-arrays of a specified size.
 The last partition may be smaller if the array length is not a multiple of `chunkSize`.
@@ -6364,7 +6364,7 @@ Arr.partition([1, 2, 3, 4, 5, 6, 7], 3); // [[1, 2, 3], [4, 5, 6], [7]]
 
 > **partition**\<`N`\>(`chunkSize`): \<`E`\>(`array`) => readonly readonly `E`[][]
 
-Defined in: [src/array/array-utils.mts:3852](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3852)
+Defined in: [src/array/array-utils.mts:3848](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3848)
 
 Partitions an array into sub-arrays of a specified size.
 The last partition may be smaller if the array length is not a multiple of `chunkSize`.
@@ -6843,7 +6843,7 @@ Never throws - invalid ranges simply return empty arrays
 
 > **scan**\<`Ar`, `S`\>(`array`, `reducer`, `init`): readonly \[`S`, `S`\]
 
-Defined in: [src/array/array-utils.mts:4167](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4167)
+Defined in: [src/array/array-utils.mts:4163](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4163)
 
 Returns an array of successively reduced values from an array, starting with an initial value.
 
@@ -7078,7 +7078,7 @@ expectType<typeof stateHistory, NonEmptyArray<State>>('=');
 
 > **scan**\<`E`, `S`\>(`reducer`, `init`): (`array`) => readonly \[`S`, `S`\]
 
-Defined in: [src/array/array-utils.mts:4177](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4177)
+Defined in: [src/array/array-utils.mts:4173](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4173)
 
 Returns an array of successively reduced values from an array, starting with an initial value.
 
@@ -7538,7 +7538,7 @@ const withString = Arr.set(nums, 0, 'first');
 
 > **setDifference**\<`E`\>(`array1`, `array2`): readonly `E`[]
 
-Defined in: [src/array/array-utils.mts:4598](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4598)
+Defined in: [src/array/array-utils.mts:4594](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4594)
 
 Returns the set difference of two arrays (`array1` - `array2`).
 The difference contains elements that are in `array1` but not in `array2`. Order is based on `array1`.
@@ -7586,7 +7586,7 @@ Arr.setDifference([1, 2], [3, 4]); // [1, 2]
 
 > **setIntersection**\<`E1`, `E2`\>(`array1`, `array2`): readonly `E1` & `E2`[]
 
-Defined in: [src/array/array-utils.mts:4573](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4573)
+Defined in: [src/array/array-utils.mts:4569](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4569)
 
 Returns the intersection of two arrays of primitive types.
 The intersection contains elements that are present in both arrays. Order is based on `array1`.
@@ -8347,7 +8347,7 @@ const result2 = Arr.some(empty, (n) => n > 0); // false
 
 > **sortedNumSetDifference**\<`E`\>(`sortedList1`, `sortedList2`): readonly `E`[]
 
-Defined in: [src/array/array-utils.mts:4618](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4618)
+Defined in: [src/array/array-utils.mts:4614](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4614)
 
 Returns the set difference of two sorted arrays of numbers (`sortedList1` - `sortedList2`).
 This operation is more efficient for sorted arrays than the generic `setDifference`.
@@ -9471,7 +9471,7 @@ console.log(result); // [20, 30]
 
 > **toReversed**\<`Ar`\>(`array`): `Reverse`\<`Ar`\>
 
-Defined in: [src/array/array-utils.mts:3911](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3911)
+Defined in: [src/array/array-utils.mts:3907](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3907)
 
 Reverses a tuple, preserving element types in their new positions.
 
@@ -9524,7 +9524,7 @@ const revSingle = Arr.toReversed(single); // readonly [42]
 
 > **toSorted**\<`Ar`\>(...`__namedParameters`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:3933](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3933)
+Defined in: [src/array/array-utils.mts:3929](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3929)
 
 Sorts an array by a value derived from its elements, using a numeric mapping.
 
@@ -9572,7 +9572,7 @@ Arr.toSortedBy(
 
 > **toSortedBy**\<`Ar`\>(`array`, `comparatorValueMapper`, `comparator?`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:3973](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3973)
+Defined in: [src/array/array-utils.mts:3969](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3969)
 
 Sorts an array by a value derived from its elements, using a numeric mapping.
 
@@ -9630,7 +9630,7 @@ Arr.toSortedBy(
 
 > **toSortedBy**\<`Ar`, `V`\>(`array`, `comparatorValueMapper`, `comparator`): `IsFixedLengthList`\<`Ar`\> _extends_ `true` ? `MakeTupleImpl`\<`Ar`\[`number`\], `` `${Ar["length"]}` ``, \[\]\> : `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:3984](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3984)
+Defined in: [src/array/array-utils.mts:3980](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3980)
 
 Sorts an array by a value derived from its elements, using a numeric mapping.
 
@@ -10272,7 +10272,7 @@ expectType<typeof safe1, readonly number[]>('='); // Bounds check preserves type
 
 > **uniq**\<`Ar`\>(`array`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:4429](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4429)
+Defined in: [src/array/array-utils.mts:4425](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4425)
 
 Creates a new array with unique elements from the input array. Order is preserved from the first occurrence.
 Uses `Set` internally for efficient uniqueness checking.
@@ -10309,7 +10309,7 @@ Arr.uniq([1, 2, 2, 3, 1, 4]); // [1, 2, 3, 4]
 
 > **uniqBy**\<`Ar`, `P`\>(`array`, `mapFn`): `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][]
 
-Defined in: [src/array/array-utils.mts:4458](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4458)
+Defined in: [src/array/array-utils.mts:4454](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4454)
 
 Creates a new array with unique elements from the input array, based on the values returned by `mapFn`.
 
@@ -10365,7 +10365,7 @@ Arr.uniqBy(users, (user) => user.id); // [{ id: 1, name: 'Alice' }, { id: 2, nam
 
 > **values**\<`E`\>(`array`): `ArrayIterator`\<`E`\>
 
-Defined in: [src/array/array-utils.mts:4709](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4709)
+Defined in: [src/array/array-utils.mts:4705](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4705)
 
 Returns an iterable of values in the array.
 
@@ -10474,7 +10474,7 @@ expectType<typeof maybeEmpty, readonly 0[]>('=');
 
 > **zip**\<`Ar1`, `Ar2`\>(`array1`, `array2`): `Zip`\<`Ar1`, `Ar2`\>
 
-Defined in: [src/array/array-utils.mts:3490](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3490)
+Defined in: [src/array/array-utils.mts:3486](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L3486)
 
 Creates an array of tuples by pairing up corresponding elements from two arrays.
 The resulting array has a length equal to the minimum of the two input array lengths.

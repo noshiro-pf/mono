@@ -1,5 +1,4 @@
 import { isRecord } from '../guard/index.mjs';
-import { pipe } from './pipe.mjs';
 
 /** @internal String literal tag to identify the 'Some' variant of Optional. */
 const SomeTypeTagName = 'ts-data-forge::Optional.some';
@@ -451,11 +450,12 @@ export namespace Optional {
     switch (args.length) {
       case 2: {
         const [optional, predicate] = args;
-        return isSome(optional)
-          ? pipe(unwrap(optional)).map((value) =>
-              predicate(value) ? some(value) : none,
-            ).value
-          : none;
+        if (isSome(optional)) {
+          const value = unwrap(optional);
+          return predicate(value) ? some(value) : none;
+        }
+        // If the optional is None, return None
+        return none;
       }
 
       case 1: {

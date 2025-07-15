@@ -852,9 +852,7 @@ export namespace Result {
         return err(error);
       }
       const msg = unknownToString(error);
-      return isErr(msg)
-        ? err(new Error(String(error)))
-        : err(new Error(msg.value));
+      return err(new Error(msg));
     }
   };
 

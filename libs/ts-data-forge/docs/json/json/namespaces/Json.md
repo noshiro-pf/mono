@@ -91,7 +91,7 @@ if (Result.isErr(invalid)) {
 
 > **stringify**(`value`, `replacer?`, `space?`): [`Result`](../../../functional/result/README.md#result)\<`string`, `string`\>
 
-Defined in: [src/json/json.mts:122](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/json/json.mts#L122)
+Defined in: [src/json/json.mts:120](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/json/json.mts#L120)
 
 Safely converts a JavaScript value to a JSON string without throwing exceptions.
 
@@ -161,7 +161,7 @@ if (Result.isErr(error)) {
 
 > **stringifySelected**(`value`, `propertiesToBeSelected?`, `space?`): [`Result`](../../../functional/result/README.md#result)\<`string`, `string`\>
 
-Defined in: [src/json/json.mts:173](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/json/json.mts#L173)
+Defined in: [src/json/json.mts:169](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/json/json.mts#L169)
 
 Safely converts a JavaScript value to a JSON string, including only the specified properties.
 
@@ -228,7 +228,7 @@ if (Result.isOk(publicFields)) {
 
 > **stringifySortedKey**(`value`, `space?`): [`Result`](../../../functional/result/README.md#result)\<`string`, `string`\>
 
-Defined in: [src/json/json.mts:224](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/json/json.mts#L224)
+Defined in: [src/json/json.mts:218](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/json/json.mts#L218)
 
 Safely converts a JavaScript record to a JSON string with keys sorted alphabetically at all levels.
 

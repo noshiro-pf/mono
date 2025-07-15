@@ -902,7 +902,7 @@ export default tseslint.config(
       ],
       'import/no-webpack-loader-syntax': 'error',
       'import/no-self-import': 'error',
-      'import/no-cycle': 'warn', // TODO
+      'import/no-cycle': 'error',
       'import/no-useless-path-segments': 'error',
       'import/no-relative-parent-imports': 'off',
 

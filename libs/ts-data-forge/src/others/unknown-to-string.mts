@@ -1,4 +1,3 @@
-import { Result } from '../functional/index.mjs';
 import { isNonNullish } from '../guard/index.mjs';
 
 /**
@@ -20,22 +19,22 @@ import { isNonNullish } from '../guard/index.mjs';
  * @param value - The unknown value to convert to string
  * @param options - Optional configuration for the conversion
  * @param options.prettyPrintObject - If true, objects are formatted with 2-space indentation
- * @returns A Result containing either the string representation or an Error for failures
+ * @returns The string representation of the value. For circular references or non-serializable objects, returns an error message string
  *
  * @example Basic type conversions
  * ```typescript
  * // Primitive types
- * unknownToString('hello');        // Ok('hello')
- * unknownToString(123);            // Ok('123')
- * unknownToString(true);           // Ok('true')
- * unknownToString(null);           // Ok('null')
- * unknownToString(undefined);      // Ok('undefined')
- * unknownToString(Symbol('test')); // Ok('Symbol(test)')
- * unknownToString(123n);           // Ok('123')
+ * unknownToString('hello');        // 'hello'
+ * unknownToString(123);            // '123'
+ * unknownToString(true);           // 'true'
+ * unknownToString(null);           // 'null'
+ * unknownToString(undefined);      // 'undefined'
+ * unknownToString(Symbol('test')); // 'Symbol(test)'
+ * unknownToString(123n);           // '123'
  *
  * // Function conversion
  * const fn = () => 'test';
- * unknownToString(fn); // Ok('() => 'test'')
+ * unknownToString(fn); // "() => 'test'"
  * ```
  *
  * @example Object stringification
@@ -43,24 +42,20 @@ import { isNonNullish } from '../guard/index.mjs';
  * // Simple object
  * const obj = { a: 1, b: 'hello', c: [1, 2, 3] };
  * const result = unknownToString(obj);
- * if (Result.isOk(result)) {
- *   console.log(result.value); // '{"a":1,"b":"hello","c":[1,2,3]}'
- * }
+ * console.log(result); // '{"a":1,"b":"hello","c":[1,2,3]}'
  *
  * // Pretty printing
  * const prettyResult = unknownToString(obj, { prettyPrintObject: true });
- * if (Result.isOk(prettyResult)) {
- *   console.log(prettyResult.value);
- *   // {
- *   //   "a": 1,
- *   //   "b": "hello",
- *   //   "c": [
- *   //     1,
- *   //     2,
- *   //     3
- *   //   ]
- *   // }
- * }
+ * console.log(prettyResult);
+ * // {
+ * //   "a": 1,
+ * //   "b": "hello",
+ * //   "c": [
+ * //     1,
+ * //     2,
+ * //     3
+ * //   ]
+ * // }
  * ```
  *
  * @example Error handling for circular references
@@ -70,19 +65,7 @@ import { isNonNullish } from '../guard/index.mjs';
  * circular.self = circular;
  *
  * const result = unknownToString(circular);
- * if (Result.isErr(result)) {
- *   console.log(result.value.message);
- *   // "Converting circular structure to JSON"
- * }
- *
- * // Handle with custom serialization
- * const safeStringify = (value: unknown): string => {
- *   const result = unknownToString(value);
- *   return Result.isOk(result)
- *     ? result.value
- *     : `[Error: ${result.value.message}]`;
- * };
- * ```
+ * console.log(result); // "Converting circular structure to JSON"
  *
  * @example Logging and debugging utilities
  * ```typescript
@@ -92,13 +75,9 @@ import { isNonNullish } from '../guard/index.mjs';
  *     const timestamp = new Date().toISOString();
  *     const dataStr = data !== undefined
  *       ? unknownToString(data, { prettyPrintObject: true })
- *       : Result.ok('');
+ *       : '';
  *
- *     if (Result.isOk(dataStr)) {
- *       console.log(`[${timestamp}] ${message}`, dataStr.value);
- *     } else {
- *       console.log(`[${timestamp}] ${message} [Unstringifiable data]`);
- *     }
+ *     console.log(`[${timestamp}] ${message}`, dataStr);
  *   }
  * }
  *
@@ -110,19 +89,11 @@ import { isNonNullish } from '../guard/index.mjs';
  * ```typescript
  * // Safe error response formatting
  * function formatErrorResponse(error: unknown): string {
- *   const result = unknownToString(error, { prettyPrintObject: true });
+ *   const errorStr = unknownToString(error, { prettyPrintObject: true });
  *
- *   if (Result.isOk(result)) {
- *     return JSON.stringify({
- *       success: false,
- *       error: result.value
- *     });
- *   }
- *
- *   // Fallback for unstringifiable errors
  *   return JSON.stringify({
  *     success: false,
- *     error: 'An unknown error occurred'
+ *     error: errorStr
  *   });
  * }
  *
@@ -138,78 +109,72 @@ import { isNonNullish } from '../guard/index.mjs';
  * ```typescript
  * // Date objects
  * unknownToString(new Date('2023-01-01'));
- * // Ok('"2023-01-01T00:00:00.000Z"') - JSON stringified
+ * // '"2023-01-01T00:00:00.000Z"' - JSON stringified
  *
  * // Regular expressions
  * unknownToString(/test/gi);
- * // Ok('{}') - RegExp has no enumerable properties
+ * // '{}' - RegExp has no enumerable properties
  *
  * // Arrays
  * unknownToString([1, 'two', { three: 3 }]);
- * // Ok('[1,"two",{"three":3}]')
+ * // '[1,"two",{"three":3}]'
  *
  * // Map and Set (converted to empty objects by JSON.stringify)
- * unknownToString(new Map([['a', 1]])); // Ok('{}')
- * unknownToString(new Set([1, 2, 3]));   // Ok('{}')
+ * unknownToString(new Map([['a', 1]])); // '{}'
+ * unknownToString(new Set([1, 2, 3]));   // '{}'
  * ```
  *
- * @example Integration with Result type
+ * @example Using with validation
  * ```typescript
- * import { Result, pipe } from '../functional';
+ * // Simple validation helper
+ * function validateAndStringify(input: unknown): string {
+ *   const str = unknownToString(input);
+ *   const trimmed = str.trim();
  *
- * // Chain with other Result operations
- * function processUserInput(input: unknown): Result<string, Error> {
- *   return pipe(input)
- *     .map(val => unknownToString(val))
- *     .map(Result.flatten) // Flatten Result<Result<string, Error>, never>
- *     .map(str => Result.map(str, s => s.trim()))
- *     .map(Result.flatten)
- *     .map(str => Result.flatMap(str, s =>
- *       s.length > 0
- *         ? Result.ok(s)
- *         : Result.err(new Error('Empty string'))
- *     ))
- *     .value;
+ *   if (trimmed.length === 0) {
+ *     throw new Error('Empty string');
+ *   }
+ *
+ *   return trimmed;
  * }
  * ```
  *
- * @see Result - For error handling pattern used by this function
+ * **Error Handling:**
+ * Circular references and non-serializable objects return descriptive error messages instead of throwing
  * @see JSON.stringify - Underlying serialization for objects
  */
 export const unknownToString = (
   value: unknown,
   options?: Partial<Readonly<{ prettyPrintObject: boolean }>>,
-): Result<string, Error> => {
+): string => {
   switch (typeof value) {
     case 'string':
-      return Result.ok(value);
+      return value;
 
     case 'number':
     case 'bigint':
     case 'boolean':
     case 'symbol':
     case 'function':
-      return Result.ok(value.toString());
+      return value.toString();
 
     case 'object':
       if (!isNonNullish(value)) {
-        return Result.ok('null');
+        return 'null';
       }
       try {
         const stringified =
           options?.prettyPrintObject === true
             ? JSON.stringify(value, undefined, 2)
             : JSON.stringify(value);
-        return Result.ok(stringified);
+        return stringified;
       } catch (error) {
-        return Result.err(
-          error instanceof Error
-            ? error
-            : new Error('Failed to stringify object'),
-        );
+        return error instanceof Error
+          ? error.message
+          : '[Circular or Non-serializable]';
       }
 
     case 'undefined':
-      return Result.ok('undefined');
+      return 'undefined';
   }
 };

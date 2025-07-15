@@ -1,4 +1,4 @@
-import { Result } from '../functional/index.mjs';
+// No imports from functional needed anymore
 import { asUint32 } from '../number/index.mjs';
 import { unknownToString } from '../others/index.mjs';
 
@@ -560,9 +560,7 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
     if (!this.has(key)) {
       if (this.#showNotFoundMessage) {
         const keyStr = unknownToString(key);
-        console.warn(
-          `ISet.delete: key not found: ${Result.isOk(keyStr) ? keyStr.value : '<error converting key to string>'}`,
-        );
+        console.warn(`ISet.delete: key not found: ${keyStr}`);
       }
       return this;
     }

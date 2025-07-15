@@ -3460,11 +3460,7 @@ export namespace Arr {
       return Result.ok(result);
     } catch (error) {
       return Result.err(
-        error instanceof Error
-          ? error
-          : pipe(unknownToString(error))
-              .map(Result.unwrapOkOr('Failed to join array'))
-              .map((e) => new Error(e)).value,
+        error instanceof Error ? error : new Error(unknownToString(error)),
       );
     }
   };

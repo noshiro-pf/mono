@@ -73,9 +73,7 @@ export namespace Json {
       );
     } catch (error: unknown) {
       const errStr = unknownToString(error);
-      return Result.err(
-        Result.isOk(errStr) ? errStr.value : 'Failed to parse JSON',
-      );
+      return Result.err(errStr);
     }
   };
 
@@ -128,9 +126,7 @@ export namespace Json {
       return Result.ok(JSON.stringify(value, replacer, space));
     } catch (error) {
       const errStr = unknownToString(error);
-      return Result.err(
-        Result.isOk(errStr) ? errStr.value : 'Failed to stringify JSON',
-      );
+      return Result.err(errStr);
     }
   };
 
@@ -181,9 +177,7 @@ export namespace Json {
       );
     } catch (error) {
       const errStr = unknownToString(error);
-      return Result.err(
-        Result.isOk(errStr) ? errStr.value : 'Failed to stringify JSON',
-      );
+      return Result.err(errStr);
     }
   };
 

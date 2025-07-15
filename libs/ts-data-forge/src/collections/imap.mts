@@ -1,4 +1,4 @@
-import { Optional, Result } from '../functional/index.mjs';
+import { Optional } from '../functional/index.mjs';
 import { asUint32 } from '../number/index.mjs';
 import { tp, unknownToString } from '../others/index.mjs';
 
@@ -487,9 +487,7 @@ class IMapClass<K extends MapSetKeyType, V>
     if (!this.has(key)) {
       if (this.#showNotFoundMessage) {
         const keyStr = unknownToString(key);
-        console.warn(
-          `IMap.delete: key not found: ${Result.isOk(keyStr) ? keyStr.value : '<error converting key to string>'}`,
-        );
+        console.warn(`IMap.delete: key not found: ${keyStr}`);
       }
       return this;
     }
@@ -518,9 +516,7 @@ class IMapClass<K extends MapSetKeyType, V>
     if (Optional.isNone(curr)) {
       if (this.#showNotFoundMessage) {
         const keyStr = unknownToString(key);
-        console.warn(
-          `IMap.update: key not found: ${Result.isOk(keyStr) ? keyStr.value : '<error converting key to string>'}`,
-        );
+        console.warn(`IMap.update: key not found: ${keyStr}`);
       }
       return this;
     }
@@ -560,9 +556,7 @@ class IMapClass<K extends MapSetKeyType, V>
           if (!mut_result.has(key) || curr === undefined) {
             if (this.#showNotFoundMessage) {
               const keyStr = unknownToString(key);
-              console.warn(
-                `IMap.withMutations: key not found: ${Result.isOk(keyStr) ? keyStr.value : '<error converting key to string>'}`,
-              );
+              console.warn(`IMap.withMutations: key not found: ${keyStr}`);
             }
             break;
           }
