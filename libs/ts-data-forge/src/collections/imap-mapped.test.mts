@@ -83,10 +83,12 @@ describe('IMapMapped.create', () => {
 
   test('should handle complex key transformations', () => {
     type ComplexKey = { nested: { id: number }; arr: number[] };
-    const complexKeyToString = (key: {
-      readonly nested: { readonly id: number };
-      readonly arr: readonly number[];
-    }): string => `${key.nested.id}_${key.arr.join(',')}`;
+    const complexKeyToString = (
+      key: DeepReadonly<{
+        nested: { id: number };
+        arr: number[];
+      }>,
+    ): string => `${key.nested.id}_${key.arr.join(',')}`;
     const stringToComplexKey = (str: string): ComplexKey => {
       const [idStr, arrStr] = str.split('_');
       return {
@@ -527,6 +529,7 @@ describe('IMapMapped.some', () => {
       testKeyToString,
       stringToTestKey,
     );
+    // eslint-disable-next-line unicorn/prefer-includes
     expect(map.some((value) => value === 'Alice')).toBe(true);
   });
 
@@ -539,6 +542,7 @@ describe('IMapMapped.some', () => {
       testKeyToString,
       stringToTestKey,
     );
+    // eslint-disable-next-line unicorn/prefer-includes
     expect(map.some((value) => value === 'Charlie')).toBe(false);
   });
 
@@ -704,15 +708,15 @@ describe('IMapMapped.forEach', () => {
       testKeyToString,
       stringToTestKey,
     );
-    const collected: [TestKey, string][] = [];
+    const mut_collected: [TestKey, string][] = [];
 
-    map.forEach((value, key) => {
-      collected.push([key, value]);
-    });
+    for (const [key, value] of map.entries()) {
+      mut_collected.push([key, value]);
+    }
 
-    expect(collected).toHaveLength(2);
-    expect(collected).toContainEqual([{ id: 1, type: 'user' }, 'Alice']);
-    expect(collected).toContainEqual([{ id: 2, type: 'admin' }, 'Bob']);
+    expect(mut_collected).toHaveLength(2);
+    expect(mut_collected).toContainEqual([{ id: 1, type: 'user' }, 'Alice']);
+    expect(mut_collected).toContainEqual([{ id: 2, type: 'admin' }, 'Bob']);
   });
 });
 

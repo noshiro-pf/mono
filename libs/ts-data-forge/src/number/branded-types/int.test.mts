@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import { asInt, Int, isInt } from './int.mjs';
 import { asNonZeroInt } from './non-zero-int.mjs';
 
@@ -120,7 +121,7 @@ describe('Int', () => {
       const min = -5;
       const max = 10;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = Int.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);

@@ -186,11 +186,7 @@ export function match<
     }
     case 3: {
       const [target, cases, defaultValue] = args;
-      if (keyIsIn(target, cases)) {
-        return cases[target];
-      } else {
-        return defaultValue;
-      }
+      return keyIsIn(target, cases) ? cases[target] : defaultValue;
     }
   }
 }

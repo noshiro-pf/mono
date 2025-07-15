@@ -212,96 +212,6 @@ describe('ISetMapped.entries', () => {
   });
 });
 
-describe('ISetMapped.union', () => {
-  test('case 1', () => {
-    const s0 = ISetMapped.create(
-      [{ v: 1 }, { v: 2 }, { v: 3 }],
-      toKey,
-      fromKey,
-    );
-    const s1 = ISetMapped.create(
-      [{ v: 3 }, { v: 4 }, { v: 5 }],
-      toKey,
-      fromKey,
-    );
-
-    expect(s0.union(s1)).toStrictEqual(
-      ISetMapped.create(
-        [{ v: 1 }, { v: 2 }, { v: 3 }, { v: 4 }, { v: 5 }],
-        toKey,
-        fromKey,
-      ),
-    );
-  });
-  test('case 2', () => {
-    const s0 = ISetMapped.create(
-      [{ v: 1 }, { v: 2 }, { v: 3 }],
-      toKey,
-      fromKey,
-    );
-    const s1 = ISetMapped.create([], toKey, fromKey);
-
-    expect(s0.union(s1)).toStrictEqual(
-      ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
-    );
-  });
-  test('case 3', () => {
-    const s0 = ISetMapped.create([], toKey, fromKey);
-    const s1 = ISetMapped.create(
-      [{ v: 1 }, { v: 2 }, { v: 3 }],
-      toKey,
-      fromKey,
-    );
-
-    expect(s0.union(s1)).toStrictEqual(
-      ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
-    );
-  });
-});
-
-describe('ISetMapped.intersect', () => {
-  test('case 1', () => {
-    const s0 = ISetMapped.create(
-      [{ v: 1 }, { v: 2 }, { v: 3 }],
-      toKey,
-      fromKey,
-    );
-    const s1 = ISetMapped.create(
-      [{ v: 2 }, { v: 3 }, { v: 4 }],
-      toKey,
-      fromKey,
-    );
-
-    expect(s0.intersect(s1)).toStrictEqual(
-      ISetMapped.create([{ v: 2 }, { v: 3 }], toKey, fromKey),
-    );
-  });
-  test('case 2', () => {
-    const s0 = ISetMapped.create(
-      [{ v: 1 }, { v: 2 }, { v: 3 }],
-      toKey,
-      fromKey,
-    );
-    const s1 = ISetMapped.create([], toKey, fromKey);
-
-    expect(s0.intersect(s1)).toStrictEqual(
-      ISetMapped.create([], toKey, fromKey),
-    );
-  });
-  test('case 3', () => {
-    const s0 = ISetMapped.create([], toKey, fromKey);
-    const s1 = ISetMapped.create(
-      [{ v: 1 }, { v: 2 }, { v: 3 }],
-      toKey,
-      fromKey,
-    );
-
-    expect(s0.intersect(s1)).toStrictEqual(
-      ISetMapped.create([], toKey, fromKey),
-    );
-  });
-});
-
 describe('ISetMapped.subtract', () => {
   test('case 1', () => {
     const s0 = ISetMapped.create(
@@ -901,15 +811,15 @@ describe('ISetMapped additional functionality with complex types', () => {
         testElementToString,
         stringToTestElement,
       );
-      const collected: TestElement[] = [];
+      const mut_collected: TestElement[] = [];
 
-      set.forEach((el) => {
-        collected.push(el);
-      });
+      for (const el of set) {
+        mut_collected.push(el);
+      }
 
-      expect(collected).toHaveLength(2);
-      expect(collected).toContainEqual({ id: 1, type: 'user' });
-      expect(collected).toContainEqual({ id: 2, type: 'admin' });
+      expect(mut_collected).toHaveLength(2);
+      expect(mut_collected).toContainEqual({ id: 1, type: 'user' });
+      expect(mut_collected).toContainEqual({ id: 2, type: 'admin' });
     });
   });
 
@@ -1125,9 +1035,9 @@ describe('ISetMapped additional functionality with complex types', () => {
       const entries = Array.from(set.entries());
 
       expect(entries).toHaveLength(2);
-      entries.forEach(([key, value]) => {
+      for (const [key, value] of entries) {
         expect(key).toStrictEqual(value);
-      });
+      }
     });
 
     test('should work with for-of loop', () => {
@@ -1139,15 +1049,15 @@ describe('ISetMapped additional functionality with complex types', () => {
         testElementToString,
         stringToTestElement,
       );
-      const collected: TestElement[] = [];
+      const mut_collected: TestElement[] = [];
 
       for (const element of set) {
-        collected.push(element);
+        mut_collected.push(element);
       }
 
-      expect(collected).toHaveLength(2);
-      expect(collected).toContainEqual({ id: 1, type: 'user' });
-      expect(collected).toContainEqual({ id: 2, type: 'admin' });
+      expect(mut_collected).toHaveLength(2);
+      expect(mut_collected).toContainEqual({ id: 1, type: 'user' });
+      expect(mut_collected).toContainEqual({ id: 2, type: 'admin' });
     });
   });
 

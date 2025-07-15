@@ -146,27 +146,6 @@ describe('Arr slicing', () => {
       expectType<typeof result, readonly []>('=');
       expect(result).toStrictEqual([]);
     });
-
-    test('should return all elements except the first', () => {
-      const array = [1, 2, 3, 4] as const;
-      const result = Arr.tail(array);
-      expectType<typeof result, readonly [2, 3, 4]>('=');
-      expect(result).toStrictEqual([2, 3, 4]);
-    });
-
-    test('should work with single element array', () => {
-      const array = [1] as const;
-      const result = Arr.tail(array);
-      expectType<typeof result, readonly []>('=');
-      expect(result).toStrictEqual([]);
-    });
-
-    test('should work with empty array', () => {
-      const array = [] as const;
-      const result = Arr.tail(array);
-      expectType<typeof result, readonly []>('=');
-      expect(result).toStrictEqual([]);
-    });
   });
 
   describe('butLast', () => {
@@ -177,27 +156,6 @@ describe('Arr slicing', () => {
       expectType<typeof butLast, readonly number[]>('=');
 
       expect(butLast).toStrictEqual([1, 2]);
-    });
-
-    test('should return all elements except the last', () => {
-      const array = [1, 2, 3, 4] as const;
-      const result = Arr.butLast(array);
-      expectType<typeof result, readonly [1, 2, 3]>('=');
-      expect(result).toStrictEqual([1, 2, 3]);
-    });
-
-    test('should work with single element array', () => {
-      const array = [1] as const;
-      const result = Arr.butLast(array);
-      expectType<typeof result, readonly []>('=');
-      expect(result).toStrictEqual([]);
-    });
-
-    test('should work with empty array', () => {
-      const array = [] as const;
-      const result = Arr.butLast(array);
-      expectType<typeof result, readonly []>('=');
-      expect(result).toStrictEqual([]);
     });
 
     test('should return all elements except the last', () => {

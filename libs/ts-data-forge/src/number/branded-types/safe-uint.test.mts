@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import { asSafeUint, isSafeUint, SafeUint } from './safe-uint.mjs';
 
 describe('SafeUint', () => {
@@ -147,7 +148,7 @@ describe('SafeUint', () => {
       const min = 0;
       const max = 20;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = SafeUint.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -158,7 +159,7 @@ describe('SafeUint', () => {
     });
 
     test('generates values within safe uint range', () => {
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = SafeUint.random(0, 30);
         expect(result).toBeGreaterThanOrEqual(0);
         expect(result).toBeLessThanOrEqual(Number.MAX_SAFE_INTEGER);

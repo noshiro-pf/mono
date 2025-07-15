@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import {
   asNonZeroInt16,
   isNonZeroInt16,
@@ -166,7 +167,7 @@ describe('NonZeroInt16', () => {
       const min = -10;
       const max = 10;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = NonZeroInt16.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -177,7 +178,7 @@ describe('NonZeroInt16', () => {
     });
 
     test('generates values within NonZeroInt16 range', () => {
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = NonZeroInt16.random(-20, 20);
         expect(result).toBeGreaterThanOrEqual(-32768);
         expect(result).toBeLessThanOrEqual(32767);

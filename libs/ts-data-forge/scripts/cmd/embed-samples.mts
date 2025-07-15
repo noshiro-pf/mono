@@ -64,7 +64,7 @@ const embedSamples = async (): Promise<void> => {
 
   try {
     // Read current README
-    let readmeContent = await fs.readFile(readmePath, 'utf-8');
+    let mut_readmeContent = await fs.readFile(readmePath, 'utf8');
 
     // Process each sample file
     for (const [sampleFile, mapping] of Object.entries(SAMPLE_MAPPINGS)) {
@@ -73,10 +73,10 @@ const embedSamples = async (): Promise<void> => {
       try {
         // Read sample file content
         // eslint-disable-next-line no-await-in-loop
-        const sampleContent = await fs.readFile(samplePath, 'utf-8');
+        const sampleContent = await fs.readFile(samplePath, 'utf8');
 
         // Find the section in README
-        const sectionStartIndex = readmeContent.indexOf(mapping.start);
+        const sectionStartIndex = mut_readmeContent.indexOf(mapping.start);
         if (sectionStartIndex === -1) {
           console.warn(
             `⚠️  Section not found for ${sampleFile}: ${mapping.start}`,
@@ -86,7 +86,7 @@ const embedSamples = async (): Promise<void> => {
 
         // Find the code block within that section
         const searchStart = sectionStartIndex;
-        const codeBlockStartIndex = readmeContent.indexOf(
+        const codeBlockStartIndex = mut_readmeContent.indexOf(
           mapping.codeBlockStart,
           searchStart,
         );
@@ -96,7 +96,7 @@ const embedSamples = async (): Promise<void> => {
         }
 
         // Find the end of the code block
-        const codeBlockEndIndex = readmeContent.indexOf(
+        const codeBlockEndIndex = mut_readmeContent.indexOf(
           mapping.codeBlockEnd,
           codeBlockStartIndex + mapping.codeBlockStart.length,
         );
@@ -106,13 +106,15 @@ const embedSamples = async (): Promise<void> => {
         }
 
         // Replace the code block content
-        const beforeBlock = readmeContent.substring(
+        const beforeBlock = mut_readmeContent.slice(
           0,
-          codeBlockStartIndex + mapping.codeBlockStart.length,
+          Math.max(0, codeBlockStartIndex + mapping.codeBlockStart.length),
         );
-        const afterBlock = readmeContent.substring(codeBlockEndIndex);
+        const afterBlock = mut_readmeContent.slice(
+          Math.max(0, codeBlockEndIndex),
+        );
 
-        readmeContent = `${beforeBlock}\n${sampleContent}\n${afterBlock}`;
+        mut_readmeContent = `${beforeBlock}\n${sampleContent}\n${afterBlock}`;
 
         console.log(`✓ Updated code block for ${sampleFile}`);
       } catch (error) {
@@ -124,7 +126,7 @@ const embedSamples = async (): Promise<void> => {
     }
 
     // Write updated README
-    await fs.writeFile(readmePath, readmeContent, 'utf-8');
+    await fs.writeFile(readmePath, mut_readmeContent, 'utf8');
     console.log('\n✅ Successfully embedded all sample code into README.md!');
   } catch (error) {
     console.error(`❌ Failed to embed samples: ${String(error)}`);

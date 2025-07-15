@@ -325,7 +325,7 @@ describe('ISet.map', () => {
     const set = ISet.create([1, 2, 3]);
     const doubled = set.map((x) => x * 2);
 
-    expect([...doubled.toArray()].sort((a, b) => a - b)).toStrictEqual([
+    expect(doubled.toArray().toSorted((a, b) => a - b)).toStrictEqual([
       2, 4, 6,
     ]);
   });
@@ -711,34 +711,35 @@ describe('ISet.forEach', () => {
       (callback: (value: 1 | 2 | 3) => void) => void
     >('<=');
 
-    const result: (1 | 2 | 3)[] = [];
-    s0.forEach((x) => {
-      result.push(x);
-    });
+    const mut_result: (1 | 2 | 3)[] = [];
+    for (const x of s0) {
+      mut_result.push(x);
+    }
 
-    expect(result.sort((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    expect(mut_result.toSorted((a, b) => a - b)).toStrictEqual([1, 2, 3]);
   });
 
   test('should execute callback for each element', () => {
     const set = ISet.create([1, 2, 3]);
-    const collected: number[] = [];
+    const mut_collected: number[] = [];
 
-    set.forEach((value) => {
-      collected.push(value);
-    });
+    for (const value of set) {
+      mut_collected.push(value);
+    }
 
-    expect(collected.sort((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    expect(mut_collected.toSorted((a, b) => a - b)).toStrictEqual([1, 2, 3]);
   });
 
   test('should not call callback for empty set', () => {
     const set = ISet.create<number>([]);
-    let callCount = 0;
+    let mut_callCount = 0;
 
+    // eslint-disable-next-line unicorn/no-array-for-each
     set.forEach(() => {
-      callCount += 1;
+      mut_callCount += 1;
     });
 
-    expect(callCount).toBe(0);
+    expect(mut_callCount).toBe(0);
   });
 });
 
@@ -748,12 +749,12 @@ describe('ISet.keys', () => {
 
     expectType<typeof s0.keys, () => IterableIterator<1 | 2 | 3>>('<=');
 
-    const result: (1 | 2 | 3)[] = [];
+    const mut_result: (1 | 2 | 3)[] = [];
     for (const x of s0.keys()) {
-      result.push(x);
+      mut_result.push(x);
     }
 
-    expect(result.sort((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    expect(mut_result.toSorted((a, b) => a - b)).toStrictEqual([1, 2, 3]);
   });
 });
 
@@ -763,12 +764,12 @@ describe('ISet.values', () => {
 
     expectType<typeof s0.values, () => IterableIterator<1 | 2 | 3>>('<=');
 
-    const result: (1 | 2 | 3)[] = [];
+    const mut_result: (1 | 2 | 3)[] = [];
     for (const x of s0.values()) {
-      result.push(x);
+      mut_result.push(x);
     }
 
-    expect(result.sort((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    expect(mut_result.toSorted((a, b) => a - b)).toStrictEqual([1, 2, 3]);
   });
 });
 
@@ -781,12 +782,12 @@ describe('ISet.entries', () => {
       () => IterableIterator<readonly [1 | 2 | 3, 1 | 2 | 3]>
     >('<=');
 
-    const result: [1 | 2 | 3, 1 | 2 | 3][] = [];
+    const mut_result: [1 | 2 | 3, 1 | 2 | 3][] = [];
     for (const x of s0.entries()) {
-      result.push([x[0], x[1]]);
+      mut_result.push([x[0], x[1]]);
     }
 
-    expect(result.sort((a, b) => a[0] - b[0])).toStrictEqual([
+    expect(mut_result.toSorted((a, b) => a[0] - b[0])).toStrictEqual([
       [1, 1],
       [2, 2],
       [3, 3],
@@ -799,7 +800,9 @@ describe('ISet.toArray', () => {
     const s0 = ISet.create([1, 2, 3] as const);
 
     expectType<typeof s0.toArray, () => readonly (1 | 2 | 3)[]>('<=');
-    expect([...s0.toArray()].sort((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    expect(Array.from(s0.toArray()).toSorted((a, b) => a - b)).toStrictEqual([
+      1, 2, 3,
+    ]);
   });
 
   test('case 2', () => {
@@ -812,8 +815,10 @@ describe('ISet.toArray', () => {
     const set = ISet.create([1, 3, 2]);
     const array = set.toArray();
 
-    expect(array.length).toBe(3);
-    expect([...array].sort((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    expect(array).toHaveLength(3);
+    expect(Array.from(array).toSorted((a, b) => a - b)).toStrictEqual([
+      1, 2, 3,
+    ]);
   });
 });
 
@@ -961,34 +966,38 @@ describe('ISet.withMutations', () => {
 describe('iterable functionality', () => {
   test('should work with for-of loops', () => {
     const set = ISet.create([1, 2, 3]);
-    const collected: number[] = [];
+    const mut_collected: number[] = [];
 
     for (const value of set) {
-      collected.push(value);
+      mut_collected.push(value);
     }
 
-    expect(collected.sort((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    expect(mut_collected.toSorted((a, b) => a - b)).toStrictEqual([1, 2, 3]);
   });
 
   test('should work with spread operator', () => {
     const set = ISet.create([1, 2, 3]);
-    const array = [...set];
+    const array = Array.from(set);
 
-    expect([...array].sort((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    expect(Array.from(array).toSorted((a, b) => a - b)).toStrictEqual([
+      1, 2, 3,
+    ]);
   });
 
   test('should work with Array.from', () => {
     const set = ISet.create([1, 2, 3]);
     const array = Array.from(set);
 
-    expect([...array].sort((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    expect(Array.from(array).toSorted((a, b) => a - b)).toStrictEqual([
+      1, 2, 3,
+    ]);
   });
 
   test('should work with destructuring', () => {
     const set = ISet.create([1, 2]);
-    const values = [...set];
+    const values = Array.from(set);
 
-    expect(values.sort((a, b) => a - b)).toStrictEqual([1, 2]);
+    expect(values.toSorted((a, b) => a - b)).toStrictEqual([1, 2]);
   });
 });
 

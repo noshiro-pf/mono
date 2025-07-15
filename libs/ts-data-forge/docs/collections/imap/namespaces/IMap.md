@@ -14,7 +14,7 @@ Provides utility functions for IMap.
 
 > **create**\<`K`, `V`\>(`iterable`): [`IMap`](../README.md#imap)\<`K`, `V`\>
 
-Defined in: [src/collections/imap.mts:334](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/imap.mts#L334)
+Defined in: [src/collections/imap.mts:333](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/imap.mts#L333)
 
 Creates a new IMap instance from an iterable of key-value pairs.
 
@@ -82,7 +82,7 @@ console.log(emptyMap.size); // Output: 0
 
 // From custom iterable
 function* generateEntries(): Generator<[string, number]> {
-    for (let i = 0; i < 3; i++) {
+    for (const i of range(3)) {
         yield [`item${i}`, i * 10];
     }
 }
@@ -96,7 +96,7 @@ console.log(generatedMap.size); // Output: 3
 
 > **equal**\<`K`, `V`\>(`a`, `b`): `boolean`
 
-Defined in: [src/collections/imap.mts:397](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/imap.mts#L397)
+Defined in: [src/collections/imap.mts:396](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/imap.mts#L396)
 
 Checks if two IMap instances are structurally equal.
 

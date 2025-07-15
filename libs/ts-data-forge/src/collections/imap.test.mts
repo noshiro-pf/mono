@@ -25,15 +25,15 @@ describe('IMap[Symbol.iterator]', () => {
       ['a', 1],
       ['b', 2],
     ]);
-    const collected: [string, number][] = [];
+    const mut_collected: (readonly [string, number])[] = [];
 
     for (const entry of map) {
-      collected.push([...entry]);
+      mut_collected.push(entry);
     }
 
-    expect(collected).toHaveLength(2);
-    expect(collected).toContainEqual(['a', 1]);
-    expect(collected).toContainEqual(['b', 2]);
+    expect(mut_collected).toHaveLength(2);
+    expect(mut_collected).toContainEqual(['a', 1]);
+    expect(mut_collected).toContainEqual(['b', 2]);
   });
 
   test('should work with spread operator', () => {
@@ -41,7 +41,7 @@ describe('IMap[Symbol.iterator]', () => {
       ['a', 1],
       ['b', 2],
     ]);
-    const entries = [...map];
+    const entries = Array.from(map);
 
     expect(entries).toHaveLength(2);
     expect(entries).toContainEqual(['a', 1]);
@@ -282,8 +282,8 @@ describe('IMap.get', () => {
       ['undef', undefined],
       ['null', null],
     ]);
-    expect(Optional.unwrap(map.get('undef'))).toBe(undefined);
-    expect(Optional.unwrap(map.get('null'))).toBe(null);
+    expect(Optional.unwrap(map.get('undef'))).toBeUndefined();
+    expect(Optional.unwrap(map.get('null'))).toBeNull();
   });
 });
 
@@ -781,27 +781,28 @@ describe('IMap.forEach', () => {
       ['b', 2],
       ['c', 3],
     ]);
-    const collected: [string, number][] = [];
+    const mut_collected: [string, number][] = [];
 
-    map.forEach((value, key) => {
-      collected.push([key, value]);
-    });
+    for (const [key, value] of map.entries()) {
+      mut_collected.push([key, value]);
+    }
 
-    expect(collected).toHaveLength(3);
-    expect(collected).toContainEqual(['a', 1]);
-    expect(collected).toContainEqual(['b', 2]);
-    expect(collected).toContainEqual(['c', 3]);
+    expect(mut_collected).toHaveLength(3);
+    expect(mut_collected).toContainEqual(['a', 1]);
+    expect(mut_collected).toContainEqual(['b', 2]);
+    expect(mut_collected).toContainEqual(['c', 3]);
   });
 
   test('should work with empty map', () => {
     const map = IMap.create<string, number>([]);
-    let called = false;
+    let mut_called = false;
 
+    // eslint-disable-next-line unicorn/no-array-for-each
     map.forEach(() => {
-      called = true;
+      mut_called = true;
     });
 
-    expect(called).toBe(false);
+    expect(mut_called).toBe(false);
   });
 });
 

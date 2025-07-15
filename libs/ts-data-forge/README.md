@@ -419,15 +419,13 @@ Safe type narrowing with comprehensive type guards.
 import { hasKey, isNonNullObject, isRecord } from 'ts-data-forge';
 
 const processData = (data: unknown): string | undefined => {
-    if (isRecord(data)) {
-        // data is now UnknownRecord (= Readonly<Record<string, unknown>>)
-        if (
-            hasKey(data, 'name') &&
-            // data is now ReadonlyRecord<"name", unknown> & UnknownRecord
-            typeof data.name === 'string'
-        ) {
-            return `Hello, ${data.name}!`;
-        }
+    if (
+        isRecord(data) && // data is now UnknownRecord (= Readonly<Record<string, unknown>>)
+        hasKey(data, 'name') &&
+        // data is now ReadonlyRecord<"name", unknown> & UnknownRecord
+        typeof data.name === 'string'
+    ) {
+        return `Hello, ${data.name}!`;
     }
     return undefined;
 };
@@ -454,12 +452,12 @@ Generate ranges for iteration and array creation.
 import { range } from 'ts-data-forge';
 
 // Traditional for loop using range
-const values: number[] = [];
+const mut_values: number[] = [];
 for (const i of range(0, 5)) {
-    values.push(i);
+    mut_values.push(i);
 }
 
-assert.deepStrictEqual(values, [0, 1, 2, 3, 4]);
+assert.deepStrictEqual(mut_values, [0, 1, 2, 3, 4]);
 
 // Create arrays from ranges
 const numbers = Array.from(range(1, 4));
@@ -469,12 +467,12 @@ assert.deepStrictEqual(numbers, [1, 2, 3]);
 assert.deepStrictEqual(squares, [1, 4, 9, 16, 25]);
 
 // Step ranges
-const stepValues: number[] = [];
+const mut_stepValues: number[] = [];
 for (const i of range(0, 10, 2)) {
-    stepValues.push(i);
+    mut_stepValues.push(i);
 }
 
-assert.deepStrictEqual(stepValues, [0, 2, 4, 6, 8]);
+assert.deepStrictEqual(mut_stepValues, [0, 2, 4, 6, 8]);
 ```
 
 ### 8. Mutability Utilities with `castMutable`

@@ -1,5 +1,5 @@
 import { Arr } from '../array/index.mjs';
-import { Result } from '../functional/result.mjs';
+import { Result } from '../functional/index.mjs';
 import { hasKey, isRecord } from '../guard/index.mjs';
 import { Json } from './json.mjs';
 
@@ -105,15 +105,14 @@ describe('parse', () => {
     const result = Json.parse(jsonString, dateReviver);
 
     expect(Result.isOk(result)).toBe(true);
-    if (Result.isOk(result)) {
-      if (
-        isRecord(result.value) &&
-        hasKey(result.value, 'name') &&
-        hasKey(result.value, 'created')
-      ) {
-        expect(result.value.name).toBe('test');
-        expect(result.value.created).toBeInstanceOf(Date);
-      }
+    if (
+      Result.isOk(result) &&
+      isRecord(result.value) &&
+      hasKey(result.value, 'name') &&
+      hasKey(result.value, 'created')
+    ) {
+      expect(result.value.name).toBe('test');
+      expect(result.value.created).toBeInstanceOf(Date);
     }
   });
 
@@ -193,13 +192,13 @@ describe('stringify', () => {
 
   test('should handle special string values', () => {
     expect(Json.stringify('with "quotes"')).toStrictEqual(
-      Result.ok('"with \\"quotes\\""'),
+      Result.ok(String.raw`"with \"quotes\""`),
     );
     expect(Json.stringify('with\nnewline')).toStrictEqual(
-      Result.ok('"with\\nnewline"'),
+      Result.ok(String.raw`"with\nnewline"`),
     );
     expect(Json.stringify('with\ttab')).toStrictEqual(
-      Result.ok('"with\\ttab"'),
+      Result.ok(String.raw`"with\ttab"`),
     );
   });
 
@@ -222,17 +221,15 @@ describe('stringify', () => {
 
   test('should handle circular references', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const obj: any = { a: 1 };
+    const mut_obj: any = { a: 1 };
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    obj.circular = obj;
-    expect(Result.isErr(Json.stringify(obj))).toBe(true);
+    mut_obj.circular = mut_obj;
+    expect(Result.isErr(Json.stringify(mut_obj))).toBe(true);
   });
 
   test('should handle objects with toJSON method', () => {
     const obj = {
-      toJSON() {
-        return { custom: 'value' };
-      },
+      toJSON: () => ({ custom: 'value' }),
     };
     expect(Json.stringify(obj)).toStrictEqual(Result.ok('{"custom":"value"}'));
   });
@@ -246,10 +243,10 @@ describe('stringify', () => {
 
   test('should not throw errors', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const circularArray: any[] = [];
-    circularArray.push(circularArray);
+    const mut_circularArray: any[] = [];
+    mut_circularArray.push(mut_circularArray);
 
-    expect(() => Json.stringify(circularArray)).not.toThrow();
+    expect(() => Json.stringify(mut_circularArray)).not.toThrow();
     expect(() => Json.stringify({ fn: () => {} })).not.toThrow();
   });
 
@@ -411,10 +408,10 @@ describe('stringifySelected', () => {
 
   test('should handle circular references with error', () => {
     type CircularType = { name: string; self?: CircularType };
-    const circular: CircularType = { name: 'test' };
-    circular.self = circular;
+    const mut_circular: CircularType = { name: 'test' };
+    mut_circular.self = mut_circular;
 
-    const result = Json.stringifySelected(circular, ['name', 'self']);
+    const result = Json.stringifySelected(mut_circular, ['name', 'self']);
 
     // Note: JSON.stringify may handle circular references differently depending on the replacer
     expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
@@ -561,13 +558,13 @@ describe('stringifySortedKey', () => {
         normal: string;
         circular: { self?: CircularObj };
       };
-      const problematicObj: CircularObj = {
+      const mut_problematicObj: CircularObj = {
         normal: 'value',
         circular: {},
       };
-      problematicObj.circular.self = problematicObj;
+      mut_problematicObj.circular.self = mut_problematicObj;
 
-      const result = Json.stringifySortedKey(problematicObj);
+      const result = Json.stringifySortedKey(mut_problematicObj);
 
       // This may throw due to circular reference during key extraction
       expect(Result.isErr(result)).toBe(true);

@@ -1,8 +1,7 @@
 import { Arr } from '../array/index.mjs';
 import { pipe, Result } from '../functional/index.mjs';
 import { isRecord } from '../guard/index.mjs';
-import { castMutable } from '../others/index.mjs';
-import { unknownToString } from '../others/unknown-to-string.mjs';
+import { castMutable, unknownToString } from '../others/index.mjs';
 
 /**
  * A collection of type-safe JSON utility functions that provide safe parsing,

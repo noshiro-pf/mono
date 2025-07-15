@@ -1,15 +1,13 @@
 import { hasKey, isNonNullObject, isRecord } from 'ts-data-forge';
 
 const processData = (data: unknown): string | undefined => {
-  if (isRecord(data)) {
-    // data is now UnknownRecord (= Readonly<Record<string, unknown>>)
-    if (
-      hasKey(data, 'name') &&
-      // data is now ReadonlyRecord<"name", unknown> & UnknownRecord
-      typeof data.name === 'string'
-    ) {
-      return `Hello, ${data.name}!`;
-    }
+  if (
+    isRecord(data) && // data is now UnknownRecord (= Readonly<Record<string, unknown>>)
+    hasKey(data, 'name') &&
+    // data is now ReadonlyRecord<"name", unknown> & UnknownRecord
+    typeof data.name === 'string'
+  ) {
+    return `Hello, ${data.name}!`;
   }
   return undefined;
 };

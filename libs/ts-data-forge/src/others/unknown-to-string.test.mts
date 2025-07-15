@@ -95,9 +95,9 @@ describe('unknownToString', () => {
   });
 
   test('circular reference returns error', () => {
-    const circular: { a: number; self?: unknown } = { a: 1 };
-    circular.self = circular;
-    const result = unknownToString(circular);
+    const mut_circular: { a: number; self?: unknown } = { a: 1 };
+    mut_circular.self = mut_circular;
+    const result = unknownToString(mut_circular);
     expect(Result.isErr(result)).toBe(true);
     if (Result.isErr(result)) {
       expect(result.value.message).toContain('circular');

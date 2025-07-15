@@ -78,7 +78,9 @@ describe('Array overloaded functions - type error validation', () => {
 
     test('partition type constraints work correctly', () => {
       // @ts-expect-error - Partition size should be number, not string
-      expect(() => Arr.partition(testArray, 'invalid')).toThrowError();
+      expect(() => Arr.partition(testArray, 'invalid')).toThrow(
+        'Expected a non-negative integer less than 2^32, got: NaN',
+      );
 
       // @ts-expect-error - Negative partition size should not be allowed
       Arr.partition(testArray, -1);
@@ -97,7 +99,9 @@ describe('Array overloaded functions - type error validation', () => {
 
     test('range type constraints work correctly', () => {
       // @ts-expect-error - Range bounds should be numbers, not strings
-      expect(() => Arr.range('1', '5')).toThrowError();
+      expect(() => Arr.range('1', '5')).toThrow(
+        'Expected a safe integer, got: 1',
+      );
 
       // @ts-expect-error - Step should be number, not string
       Arr.range(1, 5, 'invalid');

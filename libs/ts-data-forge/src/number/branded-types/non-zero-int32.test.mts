@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import {
   asNonZeroInt32,
   isNonZeroInt32,
@@ -168,7 +169,7 @@ describe('NonZeroInt32', () => {
       const min = -10;
       const max = 10;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = NonZeroInt32.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -179,7 +180,7 @@ describe('NonZeroInt32', () => {
     });
 
     test('generates values within NonZeroInt32 range', () => {
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = NonZeroInt32.random(-20, 20);
         expect(result).toBeGreaterThanOrEqual(-2147483648);
         expect(result).toBeLessThanOrEqual(2147483647);

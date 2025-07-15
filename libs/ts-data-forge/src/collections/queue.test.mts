@@ -1,5 +1,6 @@
 import { Arr } from '../array/index.mjs';
 import { Optional } from '../functional/index.mjs';
+import { range } from '../iterator/index.mjs';
 import { asUint32 } from '../number/index.mjs';
 import { createQueue, type Queue } from './queue.mjs';
 
@@ -19,22 +20,23 @@ describe('Queue', () => {
   });
 
   describe('enqueue', () => {
-    let q: Queue<number>;
+    let mut_q: Queue<number>;
 
+    // eslint-disable-next-line vitest/no-hooks
     beforeEach(() => {
-      q = createQueue();
+      mut_q = createQueue();
     });
 
     test('should increase size and not be empty after enqueueing to an empty queue', () => {
-      q.enqueue(1);
-      expect(q.isEmpty).toBe(false);
-      expect(q.size).toBe(1);
+      mut_q.enqueue(1);
+      expect(mut_q.isEmpty).toBe(false);
+      expect(mut_q.size).toBe(1);
     });
 
     test('should increase size when enqueueing to a non-empty queue', () => {
-      q.enqueue(1);
-      q.enqueue(2);
-      expect(q.size).toBe(2);
+      mut_q.enqueue(1);
+      mut_q.enqueue(2);
+      expect(mut_q.size).toBe(2);
     });
   });
 
@@ -86,35 +88,35 @@ describe('Queue', () => {
 
       expect(q.size).toBe(3);
 
-      let result = q.dequeue(); // Dequeues 1 (first in)
-      expect(Optional.isSome(result) && result.value === 1).toBe(true);
+      let mut_result = q.dequeue(); // Dequeues 1 (first in)
+      expect(Optional.isSome(mut_result) && mut_result.value === 1).toBe(true);
       expect(q.size).toBe(2);
 
-      result = q.dequeue(); // Dequeues 2
-      expect(Optional.isSome(result) && result.value === 2).toBe(true);
+      mut_result = q.dequeue(); // Dequeues 2
+      expect(Optional.isSome(mut_result) && mut_result.value === 2).toBe(true);
       expect(q.size).toBe(1);
 
-      result = q.dequeue(); // Dequeues 3
-      expect(Optional.isSome(result) && result.value === 3).toBe(true);
+      mut_result = q.dequeue(); // Dequeues 3
+      expect(Optional.isSome(mut_result) && mut_result.value === 3).toBe(true);
       expect(q.size).toBe(0);
       expect(q.isEmpty).toBe(true);
 
-      result = q.dequeue();
-      expect(Optional.isNone(result)).toBe(true);
+      mut_result = q.dequeue();
+      expect(Optional.isNone(mut_result)).toBe(true);
     });
 
     test('initial values are dequeued in the same order (FIFO)', () => {
       const q = createQueue([1, 2, 3]); // Internal: [1, 2, 3]
       expect(q.size).toBe(3);
 
-      let result = q.dequeue(); // Dequeues 1 (first element)
-      expect(Optional.isSome(result) && result.value === 1).toBe(true);
+      const result1 = q.dequeue(); // Dequeues 1 (first element)
+      expect(Optional.isSome(result1) && result1.value === 1).toBe(true);
 
-      result = q.dequeue(); // Dequeues 2
-      expect(Optional.isSome(result) && result.value === 2).toBe(true);
+      const result2 = q.dequeue(); // Dequeues 2
+      expect(Optional.isSome(result2) && result2.value === 2).toBe(true);
 
-      result = q.dequeue(); // Dequeues 3
-      expect(Optional.isSome(result) && result.value === 3).toBe(true);
+      const result3 = q.dequeue(); // Dequeues 3
+      expect(Optional.isSome(result3) && result3.value === 3).toBe(true);
 
       expect(q.isEmpty).toBe(true);
     });
@@ -125,20 +127,20 @@ describe('Queue', () => {
       q.enqueue('A');
       q.enqueue('B');
 
-      let result = q.dequeue();
-      expect(Optional.isSome(result) && result.value === 'A').toBe(true);
+      const result1 = q.dequeue();
+      expect(Optional.isSome(result1) && result1.value === 'A').toBe(true);
 
       q.enqueue('C');
       q.enqueue('D');
 
-      result = q.dequeue();
-      expect(Optional.isSome(result) && result.value === 'B').toBe(true);
+      const result2 = q.dequeue();
+      expect(Optional.isSome(result2) && result2.value === 'B').toBe(true);
 
-      result = q.dequeue();
-      expect(Optional.isSome(result) && result.value === 'C').toBe(true);
+      const result3 = q.dequeue();
+      expect(Optional.isSome(result3) && result3.value === 'C').toBe(true);
 
-      result = q.dequeue();
-      expect(Optional.isSome(result) && result.value === 'D').toBe(true);
+      const result4 = q.dequeue();
+      expect(Optional.isSome(result4) && result4.value === 'D').toBe(true);
 
       expect(q.isEmpty).toBe(true);
     });
@@ -149,7 +151,7 @@ describe('Queue', () => {
       const q = createQueue<number>();
 
       // Fill and partially empty the queue to create wraparound conditions
-      for (let i = 1; i <= 5; i++) {
+      for (const i of range(1, 6)) {
         q.enqueue(i);
       }
 
@@ -177,14 +179,14 @@ describe('Queue', () => {
       const q = createQueue<number>();
 
       // Add more elements than initial capacity (8) to trigger resize
-      for (let i = 1; i <= 20; i++) {
+      for (const i of range(1, 21)) {
         q.enqueue(i);
       }
 
       expect(q.size).toBe(20);
 
       // Verify all elements can be dequeued in correct order
-      for (let i = 1; i <= 20; i++) {
+      for (const i of range(1, 21)) {
         const result = q.dequeue();
         expect(Optional.isSome(result) && result.value === i).toBe(true);
       }
@@ -196,29 +198,29 @@ describe('Queue', () => {
       const q = createQueue<number>();
 
       // Add many elements to trigger multiple resizes
-      for (let i = 1; i <= 100; i++) {
+      for (const i of range(1, 101)) {
         q.enqueue(i);
       }
 
       expect(q.size).toBe(100);
 
       // Remove half
-      for (let i = 1; i <= 50; i++) {
+      for (const i of range(1, 51)) {
         expect(Optional.unwrap(q.dequeue())).toBe(i);
       }
 
       // Add more to trigger another resize
-      for (let i = 101; i <= 150; i++) {
+      for (const i of range(101, 151)) {
         q.enqueue(i);
       }
 
       expect(q.size).toBe(100); // 50 remaining + 50 new
 
       // Verify correct order
-      for (let i = 51; i <= 100; i++) {
+      for (const i of range(51, 101)) {
         expect(Optional.unwrap(q.dequeue())).toBe(i);
       }
-      for (let i = 101; i <= 150; i++) {
+      for (const i of range(101, 151)) {
         expect(Optional.unwrap(q.dequeue())).toBe(i);
       }
 
@@ -229,7 +231,7 @@ describe('Queue', () => {
       const q = createQueue<string>();
 
       // Test single element enqueue/dequeue cycles
-      for (let i = 0; i < 10; i++) {
+      for (const i of range(10)) {
         q.enqueue(`item-${i}`);
         expect(q.size).toBe(1);
 
@@ -248,7 +250,7 @@ describe('Queue', () => {
       expect(q.size).toBe(50);
 
       // Verify all elements are in correct order
-      for (let i = 1; i <= 50; i++) {
+      for (const i of range(1, 51)) {
         expect(Optional.unwrap(q.dequeue())).toBe(i);
       }
 
@@ -260,18 +262,18 @@ describe('Queue', () => {
       const objects = Arr.seq(10).map((i) => ({ id: i }));
 
       // Add all objects
-      objects.forEach((obj) => {
+      for (const obj of objects) {
         q.enqueue(obj);
-      });
+      }
 
       // Remove first 5 objects
-      for (let i = 0; i < 5; i++) {
+      for (const i of range(0, 5)) {
         const result = q.dequeue();
         expect(Optional.isSome(result) && result.value.id === i).toBe(true);
       }
 
       // Remaining objects should still be accessible
-      for (let i = 5; i < 10; i++) {
+      for (const i of range(5, 10)) {
         const result = q.dequeue();
         expect(Optional.isSome(result) && result.value.id === i).toBe(true);
       }

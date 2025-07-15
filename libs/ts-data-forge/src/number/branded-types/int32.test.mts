@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import { asInt32, Int32, isInt32 } from './int32.mjs';
 import { asNonZeroInt32 } from './non-zero-int32.mjs';
 
@@ -142,7 +143,7 @@ describe('Int32', () => {
       const min = -10;
       const max = 10;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = Int32.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -152,7 +153,7 @@ describe('Int32', () => {
     });
 
     test('generates values within Int32 range', () => {
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = Int32.random(-20, 20);
         expect(result).toBeGreaterThanOrEqual(Int32.MIN_VALUE);
         expect(result).toBeLessThanOrEqual(Int32.MAX_VALUE);

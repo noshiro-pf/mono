@@ -25,16 +25,16 @@ describe('castReadonly', () => {
     expect(Object.is(readonly, original)).toBe(true);
   });
 
-  test('should work with primitives', () => {
+  test('castReadonly should work with primitives', () => {
     expect(castReadonly(42)).toBe(42);
     expect(castReadonly('hello')).toBe('hello');
     expect(castReadonly(true)).toBe(true);
   });
 
-  test('should work with null and undefined', () => {
-    expect(castReadonly(null)).toBe(null);
+  test('castReadonly should work with null and undefined', () => {
+    expect(castReadonly(null)).toBeNull();
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-    expect(castReadonly(undefined)).toBe(undefined);
+    expect(castReadonly(undefined)).toBeUndefined();
   });
 });
 
@@ -75,15 +75,15 @@ describe('castDeepReadonly', () => {
     expect(readonly[1]?.meta.active).toBe(false);
   });
 
-  test('should work with primitives', () => {
+  test('castDeepReadonly should work with primitives', () => {
     expect(castDeepReadonly(42)).toBe(42);
     expect(castDeepReadonly('hello')).toBe('hello');
     expect(castDeepReadonly(true)).toBe(true);
   });
 
-  test('should work with null and undefined', () => {
-    expect(castDeepReadonly(null)).toBe(null);
+  test('castDeepReadonly should work with null and undefined', () => {
+    expect(castDeepReadonly(null)).toBeNull();
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-    expect(castDeepReadonly(undefined)).toBe(undefined);
+    expect(castDeepReadonly(undefined)).toBeUndefined();
   });
 });

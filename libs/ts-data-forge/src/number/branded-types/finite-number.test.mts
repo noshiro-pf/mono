@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import { asFiniteNumber, FiniteNumber } from './finite-number.mjs';
 import { asNonZeroFiniteNumber } from './non-zero-finite-number.mjs';
 
@@ -116,7 +117,7 @@ describe('FiniteNumber', () => {
       const min = asFiniteNumber(-5.5);
       const max = asFiniteNumber(10.3);
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = FiniteNumber.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);

@@ -162,7 +162,7 @@ const findPaths = (
 const memoizedFindPaths = memoizeFunction(
     findPaths,
     (start, end, visited = new Set()) =>
-        `${start}->${end}:[${[...visited].sort().join(',')}]`,
+        `${start}->${end}:[${[...visited].toSorted().join(',')}]`,
 );
 ```
 

@@ -1,7 +1,6 @@
 import { Optional, Result } from '../functional/index.mjs';
 import { asUint32 } from '../number/index.mjs';
-import { tp } from '../others/index.mjs';
-import { unknownToString } from '../others/unknown-to-string.mjs';
+import { tp, unknownToString } from '../others/index.mjs';
 
 /**
  * Interface for an immutable map with O(1) lookup performance and functional programming patterns.
@@ -323,7 +322,7 @@ export namespace IMap {
    *
    * // From custom iterable
    * function* generateEntries(): Generator<[string, number]> {
-   *   for (let i = 0; i < 3; i++) {
+   *   for (const i of range(3)) {
    *     yield [`item${i}`, i * 10];
    *   }
    * }

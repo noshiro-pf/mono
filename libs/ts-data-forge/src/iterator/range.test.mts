@@ -15,7 +15,7 @@ describe('range', () => {
     expect(Array.from(range(0))).toStrictEqual([]);
   });
 
-  test('range(0)', () => {
+  test('range(-1)', () => {
     // @ts-expect-error negative end is not allowed
     expect(Array.from(range(-1))).toStrictEqual([]);
   });

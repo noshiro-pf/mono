@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import {
   asPositiveInt16,
   isPositiveInt16,
@@ -168,7 +169,7 @@ describe('PositiveInt16', () => {
       const min = 1;
       const max = 20;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = PositiveInt16.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -179,7 +180,7 @@ describe('PositiveInt16', () => {
     });
 
     test('generates values within PositiveInt16 range', () => {
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = PositiveInt16.random(1, 30);
         expect(result).toBeGreaterThanOrEqual(1);
         expect(result).toBeLessThanOrEqual(32767);

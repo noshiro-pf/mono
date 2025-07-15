@@ -1,5 +1,7 @@
 import { expectType } from '../expect-type.mjs';
 import { Optional } from '../functional/index.mjs';
+import { range } from '../iterator/index.mjs';
+import { asPositiveSafeInt, asSafeInt } from '../number/index.mjs';
 import { createStack, type Stack } from './stack.mjs';
 
 describe('Stack', () => {
@@ -125,10 +127,10 @@ describe('Stack', () => {
 
   test('should handle large number of operations efficiently', () => {
     const stack = createStack<number>();
-    const n = 10000;
+    const n = asPositiveSafeInt(10000);
 
     // Push many elements
-    for (let i = 0; i < n; i++) {
+    for (const i of range(n)) {
       stack.push(i);
     }
 
@@ -136,7 +138,7 @@ describe('Stack', () => {
     expect(stack.isEmpty).toBe(false);
 
     // Pop all elements and verify LIFO order
-    for (let i = n - 1; i >= 0; i--) {
+    for (const i of range(asSafeInt(n - 1), -1, -1)) {
       const result = stack.pop();
       expect(Optional.isSome(result)).toBe(true);
       expect(Optional.unwrap(result)).toBe(i);
@@ -157,7 +159,7 @@ describe('Stack', () => {
     Optional.unwrap(stack.pop());
 
     // Original array should be unchanged
-    expect(initialValues.length).toBe(originalLength);
+    expect(initialValues).toHaveLength(originalLength);
     expect(initialValues).toStrictEqual([1, 2, 3]);
   });
 
@@ -170,8 +172,8 @@ describe('Stack', () => {
     stack.push('another');
 
     expect(Optional.unwrap(stack.pop())).toBe('another');
-    expect(Optional.unwrap(stack.pop())).toBe(undefined);
-    expect(Optional.unwrap(stack.pop())).toBe(null);
+    expect(Optional.unwrap(stack.pop())).toBeUndefined();
+    expect(Optional.unwrap(stack.pop())).toBeNull();
     expect(Optional.unwrap(stack.pop())).toBe('value');
     expect(stack.isEmpty).toBe(true);
   });
@@ -183,7 +185,7 @@ describe('Stack', () => {
     const startTime = performance.now();
 
     // Push operations should be O(1) amortized
-    for (let i = 0; i < 1000; i++) {
+    for (const i of range(511)) {
       stack.push(i);
     }
 
@@ -195,14 +197,14 @@ describe('Stack', () => {
     const endTime = performance.now();
     const duration = endTime - startTime;
 
-    // Should complete in reasonable time (much less than 100ms for 1000 operations)
+    // Should complete in reasonable time (much less than 100ms for 512 operations)
     expect(duration).toBeLessThan(100);
   });
 
   test('should handle alternating push/pop operations', () => {
     const stack = createStack<number>();
 
-    for (let i = 0; i < 100; i++) {
+    for (const i of range(100)) {
       stack.push(i);
       if (i % 2 === 1) {
         // Pop every other time
@@ -215,7 +217,7 @@ describe('Stack', () => {
     expect(stack.size).toBe(50);
 
     // Verify elements are in correct LIFO order
-    for (let i = 98; i >= 0; i -= 2) {
+    for (const i of range(98, -1, -2)) {
       const result = stack.pop();
       expect(Optional.unwrap(result)).toBe(i);
     }

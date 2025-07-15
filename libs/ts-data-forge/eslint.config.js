@@ -1,5 +1,13 @@
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import typescriptEslintParser from '@typescript-eslint/parser';
+import eslintPluginArrayFunc from 'eslint-plugin-array-func';
+import eslintPluginFunctional from 'eslint-plugin-functional';
+import eslintPluginImport from 'eslint-plugin-import';
+import eslintPluginPreferArrowFunctions from 'eslint-plugin-prefer-arrow-functions';
+import eslintPluginPromise from 'eslint-plugin-promise';
+import eslintPluginSecurity from 'eslint-plugin-security';
+import eslintPluginUnicorn from 'eslint-plugin-unicorn';
+import eslintPluginVitest from 'eslint-plugin-vitest';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -76,6 +84,38 @@ const restrictedImportsOption = {
   ],
 };
 
+const ignoredMutablePattern = [
+  '^draft', // allow immer.js draft object
+  '^mut_',
+  '^_mut_',
+  '^#mut_',
+];
+const immutableDataOptions = {
+  ignoreClasses: true,
+  ignoreImmediateMutation: true,
+  ignoreIdentifierPattern: [
+    ...ignoredMutablePattern,
+    'this',
+    'super',
+    'window.location.href',
+  ],
+  ignoreNonConstDeclarations: false,
+  ignoreAccessorPattern: [
+    '**.mut_**',
+    'this.**',
+    'super.**',
+    '**.current.**', // allow React Ref object
+    '**.displayName', // allow React component displayName
+    '**.scrollTop', // allow modifying scrollTop
+  ],
+};
+
+const noLetOptions = {
+  allowInForLoopInit: false,
+  allowInFunctions: false,
+  ignoreIdentifierPattern: ignoredMutablePattern.filter((p) => p !== '^draft'),
+};
+
 export default tseslint.config(
   {
     languageOptions: {
@@ -97,6 +137,61 @@ export default tseslint.config(
 
     plugins: {
       '@typescript-eslint': typescriptEslint,
+      'array-func': eslintPluginArrayFunc,
+      'prefer-arrow-functions': eslintPluginPreferArrowFunctions,
+      functional: eslintPluginFunctional,
+      import: eslintPluginImport,
+      promise: eslintPluginPromise,
+      security: eslintPluginSecurity,
+      unicorn: eslintPluginUnicorn,
+      vitest: eslintPluginVitest,
+    },
+    settings: {
+      'import/parsers': {
+        '@typescript-eslint/parser': [
+          '.test.ts',
+          '.js',
+          '.ts',
+          '.mjs',
+          '.mts',
+          '.cjs',
+          '.cts',
+          '.jsx',
+          '.tsx',
+        ],
+      },
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+          project: ['packages/**/tsconfig.json'],
+        },
+        // copied from default config
+        node: {
+          extensions: [
+            '.test.ts',
+            '.js',
+            '.ts',
+            '.mjs',
+            '.mts',
+            '.cjs',
+            '.cts',
+            '.jsx',
+            '.tsx',
+          ],
+        },
+      },
+      // copied from default config
+      'import/extensions': [
+        '.js',
+        '.ts',
+        '.mjs',
+        '.mts',
+        '.cjs',
+        '.cts',
+        '.jsx',
+        '.tsx',
+      ],
+      'import/external-module-folders': ['node_modules', 'node_modules/@types'],
     },
   },
   {
@@ -766,6 +861,427 @@ export default tseslint.config(
       '@typescript-eslint/no-var-requires': 0,
       '@typescript-eslint/no-empty-interface': 0,
       '@typescript-eslint/no-loss-of-precision': 0,
+
+      'array-func/from-map': 'error',
+      'array-func/no-unnecessary-this-arg': 'error',
+      'array-func/prefer-array-from': 'error',
+      'array-func/avoid-reverse': 'error',
+      'array-func/prefer-flat-map': 'error',
+      'array-func/prefer-flat': 'error',
+
+      'functional/immutable-data': ['error', immutableDataOptions],
+      'functional/no-let': ['error', noLetOptions],
+      'functional/prefer-property-signatures': 'error',
+      'functional/no-classes': 'off',
+      'functional/no-mixed-types': 'off',
+      'functional/no-this-expressions': 'off',
+      'functional/no-conditional-statements': 'off',
+      'functional/no-expression-statements': 'off',
+      'functional/no-loop-statements': 'off',
+      'functional/no-return-void': 'off',
+      'functional/no-promise-reject': 'off',
+      'functional/no-throw-statements': 'off',
+      'functional/no-try-statements': 'off',
+      'functional/functional-parameters': 'off',
+      'functional/prefer-tacit': 'off', // false positives
+      'functional/readonly-type': ['error', 'generic'],
+      'functional/type-declaration-immutability': 'off',
+      'functional/no-class-inheritance': 'error',
+
+      'import/named': 'off',
+      'import/default': 'error',
+      'import/namespace': 'error',
+      'import/no-restricted-paths': 'off', // TODO
+      'import/no-absolute-path': 'error',
+      'import/no-dynamic-require': 'error',
+      'import/no-internal-modules': [
+        'error',
+        {
+          allow: ['vitest/config', '*/index.mjs', '*/index.js'],
+        },
+      ],
+      'import/no-webpack-loader-syntax': 'error',
+      'import/no-self-import': 'error',
+      'import/no-cycle': 'warn', // TODO
+      'import/no-useless-path-segments': 'error',
+      'import/no-relative-parent-imports': 'off',
+
+      // relates to @typescript-eslint/consistent-type-imports rule
+      'import/consistent-type-specifier-style': ['error', 'prefer-inline'],
+
+      'import/no-relative-packages': 'error',
+
+      // helpfulWarnings
+      'import/export': 'error',
+      'import/no-named-as-default': 'error',
+      'import/no-named-as-default-member': 'error',
+
+      // prefer @typescript-eslint/no-deprecated
+      // https://github.com/import-js/eslint-plugin-import/issues/1532
+      'import/no-deprecated': 'off',
+
+      'import/no-mutable-exports': 'error',
+      'import/no-unused-modules': 'off',
+
+      'import/unambiguous': 'error',
+      'import/no-commonjs': 'off',
+      'import/no-amd': 'error',
+      'import/no-nodejs-modules': 'off',
+      'import/no-import-module-exports': 'off',
+
+      'import/first': ['error', 'absolute-first'],
+      'import/exports-last': 'off',
+      'import/no-duplicates': 'error',
+      'import/no-namespace': 'off',
+      'import/extensions': [
+        'error',
+        'never',
+        {
+          pattern: { json: 'always', mjs: 'always' },
+        },
+      ],
+
+      'import/order': 'off',
+      'import/newline-after-import': [
+        'error',
+        {
+          considerComments: true,
+          count: 1,
+        },
+      ],
+      'import/prefer-default-export': 'off',
+      'import/max-dependencies': 'off',
+      'import/no-unassigned-import': [
+        'error',
+        {
+          allow: [
+            '**/*.css',
+            '@testing-library/jest-dom/**',
+            'solid-js',
+            'zx/globals',
+          ],
+        },
+      ],
+      'import/no-named-default': 'off',
+
+      'import/no-default-export': 'error',
+
+      'import/no-named-export': 'off',
+      'import/no-anonymous-default-export': 'error',
+      'import/group-exports': 'off',
+      'import/dynamic-import-chunkname': 'error',
+      'import/no-empty-named-blocks': 'error',
+
+      'import/no-extraneous-dependencies': [
+        'error',
+        {
+          packageDir: import.meta.dirname,
+        },
+      ],
+
+      'prefer-arrow-functions/prefer-arrow-functions': [
+        'error',
+        {
+          allowedNames: [],
+          allowObjectProperties: false,
+          allowNamedFunctions: false,
+          classPropertiesAllowed: false,
+          disallowPrototype: true,
+          returnStyle: 'implicit',
+          singleReturnOnly: false,
+        },
+      ],
+
+      'promise/catch-or-return': ['error', { allowFinally: true }],
+      'promise/no-return-wrap': 'error',
+      'promise/param-names': 'error',
+      'promise/always-return': 'off',
+      'promise/no-native': 'off',
+      'promise/no-nesting': 'error',
+      'promise/no-promise-in-callback': 'error',
+      'promise/avoid-new': 'off',
+      'promise/no-new-statics': 'error',
+      'promise/no-return-in-finally': 'error',
+      'promise/valid-params': 'error',
+      'promise/prefer-await-to-then': 'off',
+      'promise/prefer-await-to-callbacks': 'off',
+      'promise/no-multiple-resolved': 'error',
+      'promise/spec-only': 'error',
+      'promise/prefer-catch': 'error',
+
+      'security/detect-unsafe-regex': 'error',
+      'security/detect-non-literal-regexp': 'error',
+      'security/detect-non-literal-require': 'error',
+      'security/detect-non-literal-fs-filename': 'error',
+      'security/detect-eval-with-expression': 'error',
+      'security/detect-pseudoRandomBytes': 'error',
+      'security/detect-possible-timing-attacks': 'error',
+      'security/detect-no-csrf-before-method-override': 'error',
+      'security/detect-buffer-noassert': 'error',
+      'security/detect-child-process': 'error',
+      'security/detect-disable-mustache-escape': 'error',
+      'security/detect-object-injection': 'off', // too many false positives
+      'security/detect-new-buffer': 'error',
+      'security/detect-bidi-characters': 'error',
+
+      /**
+       * Disable in favor of prettier
+       *
+       * @link https://github.com/prettier/eslint-config-prettier/blob/main/index.js
+       */
+      'unicorn/empty-brace-spaces': 'off',
+      'unicorn/no-nested-ternary': 'off',
+      'unicorn/number-literal-case': 'off',
+
+      'unicorn/better-regex': 'error',
+      'unicorn/catch-error-name': 'error',
+
+      /** Enforce consistent destructuring usage for props */
+      'unicorn/consistent-destructuring': 'error',
+
+      'unicorn/consistent-function-scoping': 'error',
+      'unicorn/custom-error-definition': 'off',
+      'unicorn/error-message': 'error',
+      'unicorn/escape-case': 'error',
+      'unicorn/expiring-todo-comments': 'error',
+      'unicorn/explicit-length-check': 'off',
+
+      /** Enforce consistent filename casing */
+      'unicorn/filename-case': [
+        'error',
+        {
+          case: 'kebabCase',
+          ignore: ['serviceWorker.ts', 'setupTests.ts'],
+        },
+      ],
+
+      'unicorn/import-style': [
+        'error',
+        {
+          styles: {
+            util: {
+              namespace: true,
+              named: false,
+            },
+            'node:util': {
+              namespace: true,
+              named: false,
+            },
+            path: {
+              namespace: true,
+              named: false,
+            },
+            'node:path': {
+              namespace: true,
+              named: false,
+            },
+          },
+        },
+      ],
+      'unicorn/new-for-builtins': 'error',
+      'unicorn/no-abusive-eslint-disable': 'error',
+      'unicorn/no-array-callback-reference': 'off',
+      'unicorn/no-array-for-each': 'error',
+      'unicorn/no-array-method-this-argument': 'off', // not compatible with my Arr.map utility
+      'unicorn/no-array-push-push': 'off',
+      'unicorn/no-array-reduce': 'off',
+      'unicorn/no-await-expression-member': 'error',
+      'unicorn/no-console-spaces': 'off', // turned off to enable aligning output
+      'unicorn/no-document-cookie': 'error',
+      'unicorn/no-empty-file': 'error',
+      'unicorn/no-for-loop': 'error',
+      'unicorn/no-hex-escape': 'error',
+      'unicorn/no-instanceof-array': 'error',
+      'unicorn/no-invalid-remove-event-listener': 'error',
+      'unicorn/no-keyword-prefix': 'off', // {"onlyCamelCase": false}
+      'unicorn/no-lonely-if': 'error',
+      'unicorn/no-negated-condition': 'off',
+      'unicorn/no-new-array': 'error',
+      'unicorn/no-new-buffer': 'error',
+      'unicorn/no-null': 'off',
+      'unicorn/no-object-as-default-parameter': 'error',
+      'unicorn/no-process-exit': 'error',
+      'unicorn/no-static-only-class': 'error',
+      'unicorn/no-thenable': 'error',
+      'unicorn/no-this-assignment': 'error',
+      'unicorn/no-typeof-undefined': 'error',
+      'unicorn/no-unnecessary-await': 'error',
+      'unicorn/no-unreadable-array-destructuring': 'error',
+      'unicorn/no-unsafe-regex': 0, // dup of "security/detect-unsafe-regex"
+      'unicorn/no-unused-properties': 'error',
+      'unicorn/no-useless-fallback-in-spread': 'error',
+      'unicorn/no-useless-length-check': 'error',
+      'unicorn/no-useless-promise-resolve-reject': 'error',
+      'unicorn/no-useless-spread': 'error',
+      'unicorn/no-useless-undefined': 'off', // this conflicts with @typescript-eslint/init-declarations
+      'unicorn/no-zero-fractions': 'error',
+      'unicorn/numeric-separators-style': 'off',
+      'unicorn/prefer-add-event-listener': 'error',
+      'unicorn/prefer-array-find': 'error',
+      'unicorn/prefer-array-flat': 'error',
+      'unicorn/prefer-array-flat-map': 'error',
+      'unicorn/prefer-array-index-of': 'error',
+      'unicorn/prefer-array-some': 'error',
+      // TODO: Enable this by default when targeting a Node.js version that supports `Array#at`.
+      'unicorn/prefer-at': [
+        'error',
+        {
+          checkAllIndexAccess: false,
+        },
+      ],
+      'unicorn/prefer-code-point': 'error',
+      'unicorn/prefer-date-now': 'error',
+      'unicorn/prefer-default-parameters': 'error',
+      'unicorn/prefer-dom-node-append': 'error',
+      'unicorn/prefer-dom-node-dataset': 'error',
+      'unicorn/prefer-dom-node-remove': 'error',
+      'unicorn/prefer-dom-node-text-content': 'error',
+      'unicorn/prefer-export-from': 'error',
+      'unicorn/prefer-includes': 'error',
+      'unicorn/prefer-json-parse-buffer': 'off',
+      'unicorn/prefer-keyboard-event-key': 'error',
+      'unicorn/prefer-math-trunc': 'error',
+      'unicorn/prefer-modern-dom-apis': 'error',
+      'unicorn/prefer-module': 'error',
+      'unicorn/prefer-negative-index': 'error',
+      'unicorn/prefer-node-protocol': 'off', // TODO: enable this
+      'unicorn/prefer-number-properties': 'error',
+      'unicorn/prefer-object-from-entries': 'error',
+      'unicorn/prefer-optional-catch-binding': 'error',
+      'unicorn/prefer-prototype-methods': 'error',
+      'unicorn/prefer-query-selector': 'error',
+      'unicorn/prefer-reflect-apply': 'error',
+      'unicorn/prefer-regexp-test': 'error',
+      'unicorn/prefer-set-has': 'error',
+      'unicorn/prefer-set-size': 'error',
+      'unicorn/prefer-spread': 'off', // prefer array-func/prefer-array-from
+      // TODO: Enable this by default when targeting Node.js 16.
+      'unicorn/prefer-string-replace-all': 'error',
+      'unicorn/prefer-string-slice': 'error',
+      'unicorn/prefer-string-starts-ends-with': 'error',
+      'unicorn/prefer-string-trim-start-end': 'error',
+      'unicorn/prefer-switch': [
+        'error',
+        { minimumCases: 2, emptyDefaultCase: 'no-default-case' },
+      ],
+      'unicorn/prefer-ternary': ['error', 'only-single-line'],
+      // TODO: Enable this by default when targeting Node.js 14.
+      'unicorn/prefer-top-level-await': 'off',
+      'unicorn/prefer-type-error': 'error',
+      'unicorn/prevent-abbreviations': 'off',
+      'unicorn/relative-url-style': 'error',
+      'unicorn/require-array-join-separator': 'error',
+      'unicorn/require-number-to-fixed-digits-argument': 'error',
+      // Turned off because we can't distinguish `widow.postMessage` and `{Worker,MessagePort,Client,BroadcastChannel}#postMessage()`
+      // See #1396
+      'unicorn/require-post-message-target-origin': 'off',
+      'unicorn/string-content': 'error',
+      'unicorn/switch-case-braces': 'off', // TODO: Enable this
+      'unicorn/template-indent': 'error',
+      'unicorn/text-encoding-identifier-case': 'error',
+      'unicorn/throw-new-error': 'error',
+      'unicorn/no-unreadable-iife': 'error',
+      'unicorn/no-useless-switch-case': 'error',
+      'unicorn/prefer-modern-math-apis': 'error',
+
+      /**
+       * `.some(b => b)` is better than `.some(Boolean)` because `Boolean` coerce
+       * non-boolean type to boolean.
+       *
+       * Related rules:
+       *
+       * - `@typescript-eslint/strict-boolean-expressions`
+       */
+      'unicorn/prefer-native-coercion-functions': 'off',
+
+      'unicorn/prefer-event-target': 'error',
+      'unicorn/prefer-logical-operator-over-ternary': 'error',
+      'unicorn/prefer-blob-reading-methods': 'error',
+      'unicorn/no-unnecessary-polyfills': 'error',
+      'unicorn/no-anonymous-default-export': 'error',
+      'unicorn/no-await-in-promise-methods': 'error',
+      'unicorn/no-single-promise-in-promise-methods': 'error',
+      'unicorn/consistent-empty-array-spread': 'error',
+      'unicorn/no-invalid-fetch-options': 'error',
+      'unicorn/no-magic-array-flat-depth': 'error',
+      'unicorn/prefer-string-raw': 'error',
+      'unicorn/prefer-structured-clone': 'error',
+      'unicorn/no-length-as-slice-end': 'error',
+      'unicorn/no-negation-in-equality-check': 'error',
+      'unicorn/consistent-existence-index-check': 'error',
+      'unicorn/prefer-global-this': 'error',
+      'unicorn/prefer-math-min-max': 'error',
+
+      'vitest/expect-expect': 'off',
+      'vitest/max-expects': 'off',
+      'vitest/max-nested-describe': 'error',
+      'vitest/no-commented-out-tests': 'off',
+      'vitest/no-conditional-expect': 'off',
+      'vitest/no-conditional-in-test': 'off',
+      'vitest/no-duplicate-hooks': 'error',
+      'vitest/no-hooks': 'error',
+      'vitest/no-restricted-matchers': [
+        'error',
+        {
+          toBeTruthy: 'Use `.toBe(true)` instead.',
+          toBeFalsy: 'Use `.toBe(false)` instead.',
+        },
+      ],
+      'vitest/no-standalone-expect': 'error',
+      'vitest/prefer-comparison-matcher': 'error',
+      'vitest/prefer-equality-matcher': 'error',
+      'vitest/prefer-hooks-in-order': 'error',
+      'vitest/prefer-hooks-on-top': 'error',
+      'vitest/prefer-strict-equal': 'error',
+      'vitest/prefer-to-be': 'error',
+      'vitest/prefer-to-contain': 'error',
+      'vitest/prefer-to-have-length': 'error',
+      'vitest/require-hook': 'off',
+      'vitest/require-to-throw-message': 'error',
+      'vitest/require-top-level-describe': 'off',
+      'vitest/valid-describe-callback': 'error',
+      'vitest/valid-expect': 'error',
+      'vitest/valid-title': 'off',
+
+      'vitest/consistent-test-it': ['error', { fn: 'test' }],
+      'vitest/no-alias-methods': 'error',
+      'vitest/no-disabled-tests': 'error',
+      'vitest/no-focused-tests': 'error',
+      'vitest/no-identical-title': 'error',
+      'vitest/no-interpolation-in-snapshots': 'error',
+      'vitest/no-large-snapshots': 'error',
+      'vitest/no-mocks-import': 'error',
+      'vitest/no-restricted-vi-methods': [
+        'error',
+        {
+          advanceTimersByTime: null,
+          spyOn: null,
+        },
+      ],
+      'vitest/no-test-prefixes': 'error',
+      'vitest/no-test-return-statement': 'error',
+      'vitest/prefer-called-with': 'error',
+      'vitest/prefer-each': 'error',
+      'vitest/prefer-expect-assertions': 'off',
+      'vitest/prefer-expect-resolves': 'error',
+      'vitest/prefer-lowercase-title': 'off',
+      'vitest/prefer-mock-promise-shorthand': 'error',
+      'vitest/prefer-snapshot-hint': 'error',
+      'vitest/prefer-spy-on': 'error',
+      'vitest/prefer-todo': 'error',
+
+      // Turned off because it prevents writing inline tests
+      'vitest/no-conditional-tests': 'off',
+
+      'vitest/consistent-test-filename': 'error',
+      'vitest/no-import-node-test': 'error',
+
+      // toBeFalsy() is looser than toBe(false), so these rules are rejected
+      'vitest/prefer-to-be-falsy': 'off',
+      'vitest/prefer-to-be-truthy': 'off',
+
+      'vitest/prefer-to-be-object': 'error',
+      'vitest/require-local-test-context-for-concurrent-snapshots': 'error',
     },
   },
   {
@@ -780,10 +1296,26 @@ export default tseslint.config(
     },
   },
   {
-    files: ['scripts/**/*.mjs'],
+    files: ['scripts/**/*'],
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'off',
+      'unicorn/no-process-exit': 'off',
+      'import/no-unassigned-import': 'off',
     },
+  },
+  {
+    files: ['configs/**/*', '.markdownlint-cli2.mjs'],
+    rules: { 'import/no-default-export': 'off' },
+  },
+  {
+    files: ['**/*.test.mts'],
+    rules: {
+      'unicorn/consistent-function-scoping': 'off',
+    },
+  },
+  {
+    files: ['samples/**/*'],
+    rules: { 'import/no-extraneous-dependencies': 'off' },
   },
   {
     files: ['**/*.d.mts'],

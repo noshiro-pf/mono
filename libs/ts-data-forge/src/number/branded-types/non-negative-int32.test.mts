@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import {
   asNonNegativeInt32,
   isNonNegativeInt32,
@@ -175,7 +176,7 @@ describe('NonNegativeInt32', () => {
       const min = 0;
       const max = 20;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = NonNegativeInt32.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -186,7 +187,7 @@ describe('NonNegativeInt32', () => {
     });
 
     test('generates values within NonNegativeInt32 range', () => {
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = NonNegativeInt32.random(0, 30);
         expect(result).toBeGreaterThanOrEqual(0);
         expect(result).toBeLessThanOrEqual(2147483647);

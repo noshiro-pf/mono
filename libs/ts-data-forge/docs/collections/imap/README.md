@@ -16,7 +16,7 @@
 
 > **IMap**\<`K`, `V`\> = `Iterable`\<readonly \[`K`, `V`\]\> & `IMapInterface`\<`K`, `V`\>
 
-Defined in: [src/collections/imap.mts:279](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/imap.mts#L279)
+Defined in: [src/collections/imap.mts:278](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/imap.mts#L278)
 
 Represents an immutable map with high-performance operations and functional programming support.
 

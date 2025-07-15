@@ -2133,9 +2133,9 @@ export namespace Arr {
     switch (args.length) {
       case 3: {
         const [array, value, [start, end]] = args;
-        const cp: (E | V)[] = castMutable(copy(array));
-        cp.fill(value, start, end);
-        return cp;
+        const mut_cp: (E | V)[] = castMutable(copy(array));
+        mut_cp.fill(value, start, end);
+        return mut_cp;
       }
       case 2: {
         const [value, fillRange] = args;
@@ -2669,7 +2669,7 @@ export namespace Arr {
         const [array, searchElement] = args;
 
         const index = array.indexOf(searchElement);
-        return index >= 0 ? asUint32(index) : -1;
+        return index !== -1 ? asUint32(index) : -1;
       }
       case 1: {
         const [searchElement] = args;
@@ -2702,7 +2702,7 @@ export namespace Arr {
       case 3: {
         const [array, searchElement, fromIndex] = args;
         const index = array.indexOf(searchElement, fromIndex);
-        return index >= 0 ? asUint32(index) : -1;
+        return index !== -1 ? asUint32(index) : -1;
       }
       case 2: {
         const [searchElement, fromIndex] = args;
@@ -2750,7 +2750,7 @@ export namespace Arr {
       case 2: {
         const [array, searchElement] = args;
         const index = array.lastIndexOf(searchElement);
-        return index >= 0 ? asUint32(index) : -1;
+        return index !== -1 ? asUint32(index) : -1;
       }
       case 1: {
         const [searchElement] = args;
@@ -2785,7 +2785,7 @@ export namespace Arr {
 
         const index = array.lastIndexOf(searchElement, fromIndex);
 
-        return index >= 0 ? asUint32(index) : -1;
+        return index !== -1 ? asUint32(index) : -1;
       }
       case 2: {
         const [searchElement, fromIndex] = args;

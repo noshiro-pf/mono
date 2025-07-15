@@ -12,7 +12,7 @@
 
 > **Stack**\<`T`\> = `Readonly`\<\{ `isEmpty`: `boolean`; `pop`: () => [`Optional`](../functional/optional/README.md#optional)\<`T`\>; `push`: (`value`) => `void`; `size`: `SizeType.Arr`; \}\>
 
-Defined in: [src/collections/stack.mts:66](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/stack.mts#L66)
+Defined in: [src/collections/stack.mts:65](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/stack.mts#L65)
 
 Interface for a high-performance stack with LIFO (Last-In, First-Out) behavior.
 
@@ -93,7 +93,7 @@ if (!undoStack.isEmpty) {
 
 > **createStack**\<`T`\>(`initialValues?`): [`Stack`](#stack)\<`T`\>
 
-Defined in: [src/collections/stack.mts:422](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/stack.mts#L422)
+Defined in: [src/collections/stack.mts:423](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/stack.mts#L423)
 
 Creates a new Stack instance with LIFO (Last-In, First-Out) behavior using a high-performance dynamic array.
 
@@ -221,7 +221,7 @@ if (!undoStack.isEmpty) {
 const processingStack = createStack<number>();
 
 // Add large amount of data (demonstrates amortized O(1) performance)
-for (let i = 0; i < 100000; i++) {
+for (const i of range(100000)) {
     processingStack.push(i); // Each push is O(1) amortized
 }
 

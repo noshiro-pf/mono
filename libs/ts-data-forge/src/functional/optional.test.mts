@@ -55,7 +55,7 @@ describe('Optional', () => {
       expect(Optional.isNone(Optional.none)).toBe(true);
       expect(Optional.isSome(Optional.none)).toBe(false);
       // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-      expect(Optional.unwrapOr(Optional.none, undefined)).toBe(undefined);
+      expect(Optional.unwrapOr(Optional.none, undefined)).toBeUndefined();
     });
 
     test('should always reference the same instance', () => {
@@ -158,12 +158,12 @@ describe('Optional', () => {
     test('should return the value for Some', () => {
       expect(Optional.unwrap(Optional.some(42))).toBe(42);
       expect(Optional.unwrap(Optional.some('hello'))).toBe('hello');
-      expect(Optional.unwrap(Optional.some(null))).toBe(null);
+      expect(Optional.unwrap(Optional.some(null))).toBeNull();
     });
 
     test('should return undefined for None', () => {
       // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-      expect(Optional.unwrapOr(Optional.none, undefined)).toBe(undefined);
+      expect(Optional.unwrapOr(Optional.none, undefined)).toBeUndefined();
     });
 
     test('should have correct return types', () => {
@@ -579,12 +579,12 @@ describe('Optional', () => {
     test('should convert Some to its value', () => {
       expect(Optional.toNullable(Optional.some(42))).toBe(42);
       expect(Optional.toNullable(Optional.some('hello'))).toBe('hello');
-      expect(Optional.toNullable(Optional.some(null))).toBe(null);
+      expect(Optional.toNullable(Optional.some(null))).toBeNull();
     });
 
     test('should convert None to null', () => {
       // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-      expect(Optional.toNullable(Optional.none)).toBe(undefined);
+      expect(Optional.toNullable(Optional.none)).toBeUndefined();
     });
 
     test('should have correct return type', () => {
@@ -598,7 +598,7 @@ describe('Optional', () => {
       const someUndefined = Optional.some(undefined);
       expect(Optional.isSome(someUndefined)).toBe(true);
       // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-      expect(Optional.unwrap(someUndefined)).toBe(undefined);
+      expect(Optional.unwrap(someUndefined)).toBeUndefined();
 
       // This is different from None
       expect(someUndefined).not.toBe(Optional.none);
@@ -607,7 +607,7 @@ describe('Optional', () => {
     test('should handle null as a Some value', () => {
       const someNull = Optional.some(null);
       expect(Optional.isSome(someNull)).toBe(true);
-      expect(Optional.unwrap(someNull)).toBe(null);
+      expect(Optional.unwrap(someNull)).toBeNull();
     });
 
     test('should handle nested Optionals', () => {

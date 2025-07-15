@@ -37,12 +37,12 @@ describe('memoizeFunction', () => {
     const memoized = memoizeFunction(mockFn, (x) => x);
 
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-    expect(memoized(5)).toBe(undefined);
+    expect(memoized(5)).toBeUndefined();
     expect(mockFn).toHaveBeenCalledTimes(1);
 
     // Should use cache even for undefined
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-    expect(memoized(5)).toBe(undefined);
+    expect(memoized(5)).toBeUndefined();
     expect(mockFn).toHaveBeenCalledTimes(1);
   });
 

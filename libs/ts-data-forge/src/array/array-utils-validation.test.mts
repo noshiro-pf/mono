@@ -19,14 +19,16 @@ describe('Arr validations', () => {
     });
 
     test('should refine union types correctly', () => {
-      function processValue(value: string | readonly number[] | null): number {
+      const processValue = (
+        value: string | readonly number[] | null,
+      ): number => {
         if (Arr.isArray(value)) {
           // value should be typed as number[]
           expectType<typeof value, readonly number[]>('=');
           return value.length;
         }
         return 0;
-      }
+      };
 
       expect(processValue([1, 2, 3])).toBe(3);
       expect(processValue('hello')).toBe(0);
@@ -37,7 +39,7 @@ describe('Arr validations', () => {
       const readonlyArray: readonly number[] = [1, 2, 3];
       if (Arr.isArray(readonlyArray)) {
         expectType<typeof readonlyArray, readonly number[]>('=');
-        expect(readonlyArray.length).toBe(3);
+        expect(readonlyArray).toHaveLength(3);
       }
     });
 
@@ -45,25 +47,25 @@ describe('Arr validations', () => {
       const mutableArray: number[] = [1, 2, 3];
       if (Arr.isArray(mutableArray)) {
         expectType<typeof mutableArray, number[]>('=');
-        expect(mutableArray.length).toBe(3);
+        expect(mutableArray).toHaveLength(3);
       }
     });
 
     test('should exclude impossible array types from unions', () => {
-      function checkUnion(
-        value: string | boolean | readonly number[] | { readonly a: number },
-      ): number {
+      const checkUnion = (
+        value: string | boolean | readonly number[] | Readonly<{ a: number }>,
+      ): number => {
         if (Arr.isArray(value)) {
           // Only number[] should remain
           expectType<typeof value, readonly number[]>('=');
           return value.length;
         }
         // Non-array types
-        expectType<typeof value, string | boolean | { readonly a: number }>(
+        expectType<typeof value, string | boolean | Readonly<{ a: number }>>(
           '=',
         );
         return -1;
-      }
+      };
 
       expect(checkUnion([1, 2])).toBe(2);
       expect(checkUnion('test')).toBe(-1);
@@ -72,17 +74,17 @@ describe('Arr validations', () => {
     });
 
     test('should exclude impossible array types from unions (including unknown)', () => {
-      function checkUnion(
+      const checkUnion = (
         value:
           | string
           | boolean
           | readonly number[]
-          | { readonly a: number }
+          | Readonly<{ a: number }>
           // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
           | unknown
           // eslint-disable-next-line @typescript-eslint/no-restricted-types
           | object,
-      ): number {
+      ): number => {
         if (Arr.isArray(value)) {
           // Only number[] should remain
           expectType<typeof value, readonly unknown[]>('=');
@@ -93,14 +95,14 @@ describe('Arr validations', () => {
           typeof value,
           | string
           | boolean
-          | { readonly a: number }
+          | Readonly<{ a: number }>
           // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
           | unknown
           // eslint-disable-next-line @typescript-eslint/no-restricted-types
           | object
         >('=');
         return -1;
-      }
+      };
 
       expect(checkUnion([1, 2])).toBe(2);
       expect(checkUnion('test')).toBe(-1);
@@ -126,7 +128,7 @@ describe('Arr validations', () => {
       const value: unknown = [1, 2, 3];
       if (Arr.isArray(value)) {
         expectType<typeof value, readonly unknown[]>('=');
-        expect(value.length).toBe(3);
+        expect(value).toHaveLength(3);
       }
     });
 
@@ -186,13 +188,13 @@ describe('Arr validations', () => {
       });
 
       test('should work with generic function', () => {
-        function processGeneric<T>(value: T | readonly number[]): number {
+        const processGeneric = <T,>(value: T | readonly number[]): number => {
           if (Arr.isArray(value)) {
             // Type is narrowed to array type within this block
             return value.length;
           }
           return 0;
-        }
+        };
         expect(processGeneric([1, 2, 3])).toBe(3);
         expect(processGeneric('hello')).toBe(0);
       });
@@ -207,14 +209,14 @@ describe('Arr validations', () => {
 
       test('should work with conditional types', () => {
         type ArrayOrValue<T> = T extends readonly unknown[] ? T : readonly T[];
-        function makeArray<T>(value: T): ArrayOrValue<T> {
+        const makeArray = <T,>(value: T): ArrayOrValue<T> => {
           if (Arr.isArray(value)) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
             return value as ArrayOrValue<T>;
           }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           return [value] as ArrayOrValue<T>;
-        }
+        };
         expect(makeArray([1, 2, 3])).toStrictEqual([1, 2, 3]);
         expect(makeArray(5)).toStrictEqual([5]);
       });
@@ -229,9 +231,7 @@ describe('Arr validations', () => {
       });
 
       test('should work with branded types', () => {
-        type BrandedArray = readonly number[] & {
-          readonly __brand: unique symbol;
-        };
+        type BrandedArray = readonly number[] & Readonly<{ __brand: unknown }>;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         const branded = [1, 2, 3] as unknown as BrandedArray;
         if (Arr.isArray(branded)) {
@@ -248,7 +248,7 @@ describe('Arr validations', () => {
           | null;
 
         // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-        function processComplex(value: ComplexUnion): number {
+        const processComplex = (value: ComplexUnion): number => {
           if (Arr.isArray(value)) {
             expectType<typeof value, readonly number[]>('=');
             return value.length;
@@ -267,7 +267,7 @@ describe('Arr validations', () => {
             | { type: 'object'; data: Record<string, unknown> }
           >('=');
           return -1;
-        }
+        };
 
         expect(processComplex([1, 2, 3])).toBe(3);
         expect(processComplex('test')).toBe(4);
@@ -293,7 +293,7 @@ describe('Arr validations', () => {
         const sym = Symbol('test');
         const arrWithSymbol = Object.assign([1, 2, 3], { [sym]: 'value' });
         if (Arr.isArray(arrWithSymbol)) {
-          expect(arrWithSymbol.length).toBe(3);
+          expect(arrWithSymbol).toHaveLength(3);
         }
       });
     });
@@ -390,7 +390,7 @@ describe('Arr validations', () => {
       const array: readonly number[] = [1, 2, 3];
       if (Arr.isArrayOfLength(array, 3)) {
         expectType<typeof array, ArrayOfLength<3, number>>('=');
-        expect(array.length).toBe(3);
+        expect(array).toHaveLength(3);
       }
     });
   });
@@ -455,7 +455,7 @@ describe('Arr validations', () => {
       const array: readonly number[] = [1, 2, 3];
       if (Arr.isArrayAtLeastLength(array, 2)) {
         expectType<typeof array, ArrayAtLeastLen<2, number>>('=');
-        expect(array.length >= 2).toBe(true);
+        expect(array.length).toBeGreaterThanOrEqual(2);
       }
     });
   });

@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import { asUint, isUint, Uint } from './uint.mjs';
 
 describe('Uint', () => {
@@ -129,7 +130,7 @@ describe('Uint', () => {
       const min = 0;
       const max = 20;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = Uint.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -140,7 +141,7 @@ describe('Uint', () => {
     });
 
     test('generates values starting from 0', () => {
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = Uint.random(0, 30);
         expect(result).toBeGreaterThanOrEqual(0);
         expect(result).toBeLessThanOrEqual(30);

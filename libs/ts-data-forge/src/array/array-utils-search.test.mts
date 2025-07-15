@@ -1,5 +1,5 @@
 import { expectType } from '../expect-type.mjs';
-import { Optional } from '../functional/optional.mjs';
+import { Optional } from '../functional/index.mjs';
 import { asInt32, asUint32 } from '../number/index.mjs';
 import { Arr } from './array-utils.mjs';
 

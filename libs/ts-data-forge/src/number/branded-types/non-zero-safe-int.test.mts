@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import {
   asNonZeroSafeInt,
   isNonZeroSafeInt,
@@ -183,7 +184,7 @@ describe('NonZeroSafeInt', () => {
       const min = 1;
       const max = 20;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = NonZeroSafeInt.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -197,7 +198,7 @@ describe('NonZeroSafeInt', () => {
       const min = -20;
       const max = -1;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = NonZeroSafeInt.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -211,7 +212,7 @@ describe('NonZeroSafeInt', () => {
       const min = -5;
       const max = 5;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = NonZeroSafeInt.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);

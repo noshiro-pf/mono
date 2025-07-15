@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import {
   asNonZeroFiniteNumber,
   isNonZeroFiniteNumber,
@@ -152,7 +153,7 @@ describe('NonZeroFiniteNumber', () => {
       const min = asNonZeroFiniteNumber(1.5);
       const max = asNonZeroFiniteNumber(10.3);
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = NonZeroFiniteNumber.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -165,7 +166,7 @@ describe('NonZeroFiniteNumber', () => {
       const min = asNonZeroFiniteNumber(-10.3);
       const max = asNonZeroFiniteNumber(-1.5);
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = NonZeroFiniteNumber.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -178,7 +179,7 @@ describe('NonZeroFiniteNumber', () => {
       const min = asNonZeroFiniteNumber(-5.5);
       const max = asNonZeroFiniteNumber(5.5);
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = NonZeroFiniteNumber.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);

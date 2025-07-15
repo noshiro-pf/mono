@@ -611,7 +611,7 @@ export namespace ISetMapped {
    *
    * const combinedFlags = ISetMapped.union(setA, setB);
    * // The order might vary as sets are unordered internally.
-   * console.log(combinedFlags.toArray().map(f => f.flagName).sort());
+   * console.log(combinedFlags.toArray().map(f => f.flagName).toSorted());
    * // Output: ["betaFeature", "darkMode", "newUI"]
    * ```
    */

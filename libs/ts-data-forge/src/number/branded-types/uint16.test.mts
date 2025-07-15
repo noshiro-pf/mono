@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import { asNonZeroUint16 } from './non-zero-uint16.mjs';
 import { asUint16, isUint16, Uint16 } from './uint16.mjs';
 
@@ -141,7 +142,7 @@ describe('Uint16', () => {
       const min = 0;
       const max = 20;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = Uint16.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -152,7 +153,7 @@ describe('Uint16', () => {
     });
 
     test('generates values within Uint16 range', () => {
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = Uint16.random(0, 30);
         expect(result).toBeGreaterThanOrEqual(0);
         expect(result).toBeLessThanOrEqual(65535);

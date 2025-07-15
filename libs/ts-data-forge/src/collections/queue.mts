@@ -1,7 +1,6 @@
-import { Arr } from '../array/index.mjs';
 import { Optional } from '../functional/index.mjs';
-import { asUint32 } from '../number/index.mjs';
-import { castMutable } from '../others/index.mjs';
+import { range } from '../iterator/index.mjs';
+import { asSafeUint, asUint32 } from '../number/index.mjs';
 
 /**
  * Interface for a high-performance queue with FIFO (First-In, First-Out) behavior.
@@ -123,9 +122,11 @@ class QueueClass<T> implements Queue<T> {
       Math.max(QueueClass.#INITIAL_CAPACITY, initialValues.length * 2),
     );
 
-    this.#buffer = castMutable(
-      Arr.create<T | undefined, Uint32>(initialCapacity, undefined),
+    this.#buffer = Array.from<unknown, T | undefined>(
+      { length: initialCapacity },
+      () => undefined,
     );
+
     this.#head = 0;
     this.#tail = 0;
     this.#mut_size = 0;
@@ -234,7 +235,7 @@ class QueueClass<T> implements Queue<T> {
    * // High-volume enqueueing (demonstrates amortized O(1) performance)
    * const dataQueue = createQueue<number>();
    *
-   * for (let i = 0; i < 1000000; i++) {
+   * for (const i of range(1000000)) {
    *   dataQueue.enqueue(i); // Each operation is O(1) amortized
    * }
    *
@@ -259,12 +260,13 @@ class QueueClass<T> implements Queue<T> {
    */
   #resize(): void {
     const newCapacity = asUint32(this.#capacity * 2);
-    const newBuffer = castMutable(
-      Arr.create<T | undefined, Uint32>(newCapacity, undefined),
+    const newBuffer = Array.from<unknown, T | undefined>(
+      { length: newCapacity },
+      () => undefined,
     );
 
     // Copy elements in order from head to tail
-    for (let i = 0; i < this.#mut_size; i++) {
+    for (const i of range(asSafeUint(this.#mut_size))) {
       const sourceIndex = (this.#head + i) % this.#capacity;
       newBuffer[i] = this.#buffer[sourceIndex];
     }
@@ -329,7 +331,7 @@ class QueueClass<T> implements Queue<T> {
  * const eventQueue = createQueue<Event>();
  *
  * // Simulate high-volume event ingestion
- * for (let i = 0; i < 10000; i++) {
+ * for (const i of range(10000)) {
  *   eventQueue.enqueue({
  *     timestamp: Date.now(),
  *     type: `event-${i % 5}`,

@@ -1,4 +1,5 @@
 import { expectType } from '../expect-type.mjs';
+import { range } from '../iterator/index.mjs';
 import { asNonZeroSafeInt, asUint32 } from '../number/index.mjs';
 import { Arr } from './array-utils.mjs';
 
@@ -26,7 +27,7 @@ describe('Arr creations', () => {
     test('should create array with zero length', () => {
       const result = Arr.zeros(0);
       expect(result).toStrictEqual([]);
-      expect(result.length).toBe(0);
+      expect(result).toHaveLength(0);
     });
 
     test('should create large arrays', () => {
@@ -185,14 +186,14 @@ describe('Arr creations', () => {
     });
 
     test('should handle unknown array type', () => {
-      const original: number[] = [1, 2, 3];
-      const copied = Arr.copy(original);
+      const mut_original: number[] = [1, 2, 3];
+      const copied = Arr.copy(mut_original);
       expectType<typeof copied, number[]>('=');
-      expect(copied).toStrictEqual(original);
-      expect(copied).not.toBe(original);
+      expect(copied).toStrictEqual(mut_original);
+      expect(copied).not.toBe(mut_original);
       // Modify original to ensure copy is shallow
-      original.push(4);
-      expect(original).toStrictEqual([1, 2, 3, 4]);
+      mut_original.push(4);
+      expect(mut_original).toStrictEqual([1, 2, 3, 4]);
       expect(copied).toStrictEqual([1, 2, 3]);
     });
 
@@ -519,7 +520,7 @@ describe('Arr creations', () => {
 
     test('generator with loops', () => {
       const result = Arr.generate<number>(function* () {
-        for (let i = 0; i < 3; i++) {
+        for (const i of range(3)) {
           yield i;
         }
       });

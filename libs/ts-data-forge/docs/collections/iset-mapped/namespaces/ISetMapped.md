@@ -541,7 +541,7 @@ console.log(
     combinedFlags
         .toArray()
         .map((f) => f.flagName)
-        .sort(),
+        .toSorted(),
 );
 // Output: ["betaFeature", "darkMode", "newUI"]
 ```

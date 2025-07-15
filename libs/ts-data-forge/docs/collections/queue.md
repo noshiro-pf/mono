@@ -12,7 +12,7 @@
 
 > **Queue**\<`T`\> = `Readonly`\<\{ `dequeue`: () => [`Optional`](../functional/optional/README.md#optional)\<`T`\>; `enqueue`: (`value`) => `void`; `isEmpty`: `boolean`; `size`: `SizeType.Arr`; \}\>
 
-Defined in: [src/collections/queue.mts:67](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/queue.mts#L67)
+Defined in: [src/collections/queue.mts:66](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/queue.mts#L66)
 
 Interface for a high-performance queue with FIFO (First-In, First-Out) behavior.
 
@@ -98,7 +98,7 @@ while (!taskQueue.isEmpty) {
 
 > **createQueue**\<`T`\>(`initialValues?`): [`Queue`](#queue)\<`T`\>
 
-Defined in: [src/collections/queue.mts:389](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/queue.mts#L389)
+Defined in: [src/collections/queue.mts:391](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/queue.mts#L391)
 
 Creates a new Queue instance with FIFO (First-In, First-Out) behavior using a high-performance circular buffer.
 
@@ -173,7 +173,7 @@ type Event = { timestamp: number; type: string; data: any };
 const eventQueue = createQueue<Event>();
 
 // Simulate high-volume event ingestion
-for (let i = 0; i < 10000; i++) {
+for (const i of range(10000)) {
     eventQueue.enqueue({
         timestamp: Date.now(),
         type: `event-${i % 5}`,

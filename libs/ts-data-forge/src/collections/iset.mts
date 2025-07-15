@@ -1,6 +1,6 @@
 import { Result } from '../functional/index.mjs';
 import { asUint32 } from '../number/index.mjs';
-import { unknownToString } from '../others/unknown-to-string.mjs';
+import { unknownToString } from '../others/index.mjs';
 
 /**
  * Interface for an immutable set with O(1) lookup performance and set operation support.
@@ -258,7 +258,7 @@ export namespace ISet {
    *   .filter(x => x % 2 === 0)  // Keep even numbers: 2, 4
    *   .add(6)                    // Add 6: 2, 4, 6
    *   .delete(2);                // Remove 2: 4, 6
-   * console.log(processedNumbers.toArray().sort()); // Output: [4, 6]
+   * console.log(processedNumbers.toArray().toSorted()); // Output: [4, 6]
    *
    * // From generator function
    * function* generatePrimes(): Generator<number> {
@@ -445,7 +445,7 @@ export namespace ISet {
    * const rolePermissions = ISet.create(["write", "execute", "admin"]);
    *
    * const allPermissions = ISet.union(userPermissions, rolePermissions);
-   * console.log(allPermissions.toArray().sort());
+   * console.log(allPermissions.toArray().toSorted());
    * // Output: ["admin", "execute", "read", "write"]
    *
    * // Union with different types (type widening)

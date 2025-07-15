@@ -1,7 +1,6 @@
-import { Arr } from '../array/index.mjs';
 import { Optional } from '../functional/index.mjs';
+import { range } from '../iterator/index.mjs';
 import { asUint32, Uint32 } from '../number/index.mjs';
-import { castMutable } from '../others/index.mjs';
 
 /**
  * Interface for a high-performance stack with LIFO (Last-In, First-Out) behavior.
@@ -116,8 +115,9 @@ class StackClass<T> implements Stack<T> {
       Math.max(StackClass.#INITIAL_CAPACITY, initialValues.length * 2),
     );
 
-    this.#buffer = castMutable(
-      Arr.create<T | undefined, Uint32>(initialCapacity, undefined),
+    this.#buffer = Array.from<unknown, T | undefined>(
+      { length: initialCapacity },
+      () => undefined,
     );
     this.#mut_size = asUint32(0);
     this.#capacity = initialCapacity;
@@ -238,7 +238,7 @@ class StackClass<T> implements Stack<T> {
    * // High-volume pushing (demonstrates amortized O(1) performance)
    * const dataStack = createStack<number>();
    *
-   * for (let i = 0; i < 1000000; i++) {
+   * for (const i of range(1000000)) {
    *   dataStack.push(i); // Each operation is O(1) amortized
    * }
    *
@@ -274,12 +274,13 @@ class StackClass<T> implements Stack<T> {
    */
   #resize(): void {
     const newCapacity = asUint32(this.#capacity * 2);
-    const newBuffer = castMutable(
-      Arr.create<T | undefined, Uint32>(newCapacity, undefined),
+    const newBuffer = Array.from<unknown, T | undefined>(
+      { length: newCapacity },
+      () => undefined,
     );
 
     // Copy existing elements
-    for (let i = 0; i < this.#mut_size; i++) {
+    for (const i of range(this.#mut_size)) {
       newBuffer[i] = this.#buffer[i];
     }
 
@@ -384,7 +385,7 @@ class StackClass<T> implements Stack<T> {
  * const processingStack = createStack<number>();
  *
  * // Add large amount of data (demonstrates amortized O(1) performance)
- * for (let i = 0; i < 100000; i++) {
+ * for (const i of range(100000)) {
  *   processingStack.push(i); // Each push is O(1) amortized
  * }
  *

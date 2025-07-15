@@ -1,4 +1,5 @@
 import { expectType } from '../../expect-type.mjs';
+import { range } from '../../iterator/index.mjs';
 import {
   asPositiveSafeInt,
   isPositiveSafeInt,
@@ -181,7 +182,7 @@ describe('PositiveSafeInt', () => {
       const min = 1;
       const max = 20;
 
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = PositiveSafeInt.random(min, max);
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
@@ -192,7 +193,7 @@ describe('PositiveSafeInt', () => {
     });
 
     test('generates values within positive safe int range', () => {
-      for (let i = 0; i < 10; i++) {
+      for (const _ of range(10)) {
         const result = PositiveSafeInt.random(1, 30);
         expect(result).toBeGreaterThanOrEqual(1);
         expect(result).toBeLessThanOrEqual(Number.MAX_SAFE_INTEGER);

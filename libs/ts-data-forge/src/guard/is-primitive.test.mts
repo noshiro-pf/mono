@@ -66,11 +66,11 @@ describe('isPrimitive', () => {
   });
 
   test('should return false for boxed primitives', () => {
-    // eslint-disable-next-line no-new-wrappers
+    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
     expect(isPrimitive(new String('hello'))).toBe(false);
-    // eslint-disable-next-line no-new-wrappers
+    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
     expect(isPrimitive(new Number(42))).toBe(false);
-    // eslint-disable-next-line no-new-wrappers
+    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
     expect(isPrimitive(new Boolean(true))).toBe(false);
   });
 
@@ -89,12 +89,12 @@ describe('isPrimitive', () => {
     const primitives = values.filter(isPrimitive);
     const nonPrimitives = values.filter((v) => !isPrimitive(v));
 
-    expect(primitives.length).toBe(6); // string, 42, true, null, undefined, symbol
+    expect(primitives).toHaveLength(6); // string, 42, true, null, undefined, symbol
     expect(primitives[0]).toBe('string');
     expect(primitives[1]).toBe(42);
     expect(primitives[2]).toBe(true);
-    expect(primitives[3]).toBe(null);
-    expect(primitives[4]).toBe(undefined);
+    expect(primitives[3]).toBeNull();
+    expect(primitives[4]).toBeUndefined();
     expect(typeof primitives[5]).toBe('symbol');
 
     expect(nonPrimitives).toStrictEqual([{}, []]);

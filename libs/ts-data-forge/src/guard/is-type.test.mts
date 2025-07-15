@@ -112,7 +112,7 @@ describe('isString', () => {
     expect(isString(true)).toBe(false);
     expect(isString(null)).toBe(false);
     expect(isString(undefined)).toBe(false);
-    // eslint-disable-next-line no-new-wrappers
+    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
     expect(isString(new String('hello'))).toBe(false);
   });
 
@@ -120,7 +120,7 @@ describe('isString', () => {
     const value: unknown = 'test';
     if (isString(value)) {
       expectType<typeof value, string>('=');
-      expect(value.length).toBe(4);
+      expect(value).toHaveLength(4);
     }
   });
 });
@@ -140,7 +140,7 @@ describe('isNumber', () => {
     expect(isNumber(true)).toBe(false);
     expect(isNumber(null)).toBe(false);
     expect(isNumber(BigInt(123))).toBe(false);
-    // eslint-disable-next-line no-new-wrappers
+    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
     expect(isNumber(new Number(42))).toBe(false);
   });
 
@@ -187,7 +187,7 @@ describe('isBoolean', () => {
     expect(isBoolean(0)).toBe(false);
     expect(isBoolean('true')).toBe(false);
     expect(isBoolean(null)).toBe(false);
-    // eslint-disable-next-line no-new-wrappers
+    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
     expect(isBoolean(new Boolean(true))).toBe(false);
   });
 
@@ -424,7 +424,7 @@ describe('isNonNullish', () => {
     const value: string | null | undefined = 'test';
     if (isNonNullish(value)) {
       expectType<typeof value, string>('<=');
-      expect(value.length).toBe(4);
+      expect(value).toHaveLength(4);
     }
   });
 
@@ -460,13 +460,9 @@ describe('type guard behavior in complex scenarios', () => {
   test('should work with nested conditions', () => {
     const value: string | number | boolean | null | undefined = 'test';
 
-    if (isNonNullish(value)) {
-      if (isNotBoolean(value)) {
-        if (isNotNumber(value)) {
-          expectType<typeof value, string>('<=');
-          expect(typeof value).toBe('string');
-        }
-      }
+    if (isNonNullish(value) && isNotBoolean(value) && isNotNumber(value)) {
+      expectType<typeof value, string>('<=');
+      expect(typeof value).toBe('string');
     }
   });
 

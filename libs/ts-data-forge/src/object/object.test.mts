@@ -28,20 +28,20 @@ describe('shallowEq', () => {
 });
 
 describe('pick', () => {
-  test('truthy case 1', () => {
+  test('should pick specified keys', () => {
     expect(Obj.pick({ a: 1, b: 2, c: 3 }, ['a', 'b'])).toStrictEqual({
       a: 1,
       b: 2,
     });
   });
 
-  test('should support curried form', () => {
+  test('pick should support curried form', () => {
     const pickAB = Obj.pick(['a', 'b']);
     const result = pickAB({ a: 1, b: 2, c: 3, d: 4 });
     expect(result).toStrictEqual({ a: 1, b: 2 });
   });
 
-  test('should work with pipe when curried', () => {
+  test('pick should work with pipe when curried', () => {
     const pickIdAndName = Obj.pick(['id', 'name']);
     const user = { id: 1, name: 'Alice', email: 'alice@example.com', age: 30 };
 
@@ -49,13 +49,13 @@ describe('pick', () => {
     expect(result).toStrictEqual({ id: 1, name: 'Alice' });
   });
 
-  test('should handle empty keys in curried form', () => {
+  test('pick should handle empty keys in curried form', () => {
     const pickNone = Obj.pick([]);
     const result = pickNone({ a: 1, b: 2 });
     expect(result).toStrictEqual({});
   });
 
-  test('should work for records that only partially contain the key in curried form', () => {
+  test('pick should work for records that only partially contain the key in curried form', () => {
     const pickVisible = Obj.pick(['name', 'age']);
     const user = {
       id: 1,
@@ -71,17 +71,17 @@ describe('pick', () => {
 });
 
 describe('omit', () => {
-  test('truthy case 1', () => {
+  test('should omit specified keys', () => {
     expect(Obj.omit({ a: 1, b: 2, c: 3 }, ['c'])).toStrictEqual({ a: 1, b: 2 });
   });
 
-  test('should support curried form', () => {
+  test('omit should support curried form', () => {
     const omitC = Obj.omit(['c']);
     const result = omitC({ a: 1, b: 2, c: 3, d: 4 });
     expect(result).toStrictEqual({ a: 1, b: 2, d: 4 });
   });
 
-  test('should work with pipe when curried', () => {
+  test('omit should work with pipe when curried', () => {
     const omitSensitive = Obj.omit(['password', 'email']);
     const user = {
       id: 1,
@@ -94,7 +94,7 @@ describe('omit', () => {
     expect(result).toStrictEqual({ id: 1, name: 'Alice' });
   });
 
-  test('should handle empty keys in curried form', () => {
+  test('omit should handle empty keys in curried form', () => {
     const omitNone = Obj.omit([]);
     const original = { a: 1, b: 2, c: 3 };
     const result = omitNone(original);
@@ -107,7 +107,7 @@ describe('omit', () => {
     expect(result).toStrictEqual({ a: 1, c: 3, e: 5 });
   });
 
-  test('should work for records that only partially contain the key in curried form', () => {
+  test('omit should work for records that only partially contain the key in curried form', () => {
     const omitSensitive = Obj.omit(['password', 'email']);
     const user = {
       id: 1,
