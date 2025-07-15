@@ -1,3 +1,9 @@
+## [2.0.3](https://github.com/noshiro-pf/ts-data-forge/compare/v2.0.2...v2.0.3) (2025-07-15)
+
+### Bug Fixes
+
+- add entry-point.mts ([#71](https://github.com/noshiro-pf/ts-data-forge/issues/71)) ([1ec8e53](https://github.com/noshiro-pf/ts-data-forge/commit/1ec8e53ffa1a42fe84f550628a5ac157fc2b50b6))
+
 ## [2.0.2](https://github.com/noshiro-pf/ts-data-forge/compare/v2.0.1...v2.0.2) (2025-07-09)
 
 ### Bug Fixes
