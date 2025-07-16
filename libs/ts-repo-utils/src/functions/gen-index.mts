@@ -154,6 +154,16 @@ const generateIndexFileForDir = async (
       const entryPath = path.join(dirPath, entryName);
       const relativePath = path.relative(actualBaseDir, entryPath);
 
+      if (
+        config.excludePatterns.some(
+          (pat) =>
+            micromatch.isMatch(relativePath, pat) ||
+            micromatch.isMatch(entryName, pat),
+        )
+      ) {
+        continue; // Skip excluded directories/files
+      }
+
       if (entry.isDirectory()) {
         subDirectories.push(entryName);
         // Recursively call for subdirectories first
@@ -212,7 +222,7 @@ const shouldExportFile = (
   }
 
   // Check against exclusion patterns
-  for (const pattern of config.excludePatterns) {
+  for (const pattern of config.excludePatterns.values()) {
     if (
       micromatch.isMatch(filePath, pattern) ||
       micromatch.isMatch(fileName, pattern)
