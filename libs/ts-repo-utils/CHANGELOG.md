@@ -1,3 +1,9 @@
+## [5.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v5.0.0...v5.0.1) (2025-07-16)
+
+### Bug Fixes
+
+- exclude directory in genIndex ([#59](https://github.com/noshiro-pf/ts-repo-utils/issues/59)) ([452a543](https://github.com/noshiro-pf/ts-repo-utils/commit/452a543d4534b8705500faaaa090f4905e73cd38))
+
 # [5.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v4.0.2...v5.0.0) (2025-07-16)
 
 ### Features
