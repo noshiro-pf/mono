@@ -1,3 +1,9 @@
+# [5.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v4.0.2...v5.0.0) (2025-07-16)
+
+### Features
+
+- **breaking:** change the interface of genIndex ([#58](https://github.com/noshiro-pf/ts-repo-utils/issues/58)) ([6340752](https://github.com/noshiro-pf/ts-repo-utils/commit/634075258dbec50ded37dbd1046714ef62bf3a81))
+
 ## [4.0.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v4.0.1...v4.0.2) (2025-07-15)
 
 ### Bug Fixes
