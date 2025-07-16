@@ -10,7 +10,7 @@
 
 ### GenIndexConfig
 
-> **GenIndexConfig** = `DeepReadonly`\<\{ `excludePatterns?`: `string`[]; `exportExtension?`: `` `.${string}` ``; `formatCommand`: `string`; `silent?`: `boolean`; `sourceExtension?`: `` `.${string}` ``; `targetDirectory`: `string` \| `string`[]; \}\>
+> **GenIndexConfig** = `DeepReadonly`\<\{ `excludePatterns?`: readonly `string`[]; `exportExtension?`: `` `.${string}` ``; `formatCommand?`: `string`; `indexExtension?`: `` `.${string}` ``; `silent?`: `boolean`; `sourceExtensions?`: readonly `` `.${string}` ``[]; `targetDirectory`: `string` \| readonly `string`[]; \}\>
 
 Defined in: [src/functions/gen-index.mts:9](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L9)
 
@@ -22,9 +22,9 @@ Configuration for index file generation.
 
 > **genIndex**(`config`): `Promise`\<`void`\>
 
-Defined in: [src/functions/gen-index.mts:34](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L34)
+Defined in: [src/functions/gen-index.mts:47](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L47)
 
-Generates index.mts files recursively in `config.targetDirectory`.
+Generates index.ts files recursively in `config.targetDirectory`.
 
 #### Parameters
 
@@ -36,19 +36,25 @@ Configuration for index file generation
 
 readonly `string`[]
 
-Glob patterns of files to exclude from exports (default: excludes .d._ and .test._ files)
+Glob patterns of files to exclude from exports (default: excludes `'**/*.{test,spec}.?(c|m)[jt]s?(x)'`)
 
 ###### exportExtension?
 
 `` `.${string}` ``
 
-File extension to use in export statements (default: '.mjs')
+File extension to use in export statements (default: '.js')
 
-###### formatCommand
+###### formatCommand?
 
 `string`
 
 Command to run for formatting generated files (default: 'npm run fmt')
+
+###### indexExtension?
+
+`` `.${string}` ``
+
+File extension of index files to generate (default: '.ts')
 
 ###### silent?
 
@@ -56,11 +62,11 @@ Command to run for formatting generated files (default: 'npm run fmt')
 
 Whether to suppress output during execution (default: false)
 
-###### sourceExtension?
+###### sourceExtensions?
 
-`` `.${string}` ``
+readonly `` `.${string}` ``[]
 
-File extension of source files to export (default: '.mts')
+File extensions of source files to export (default: ['.ts', '.tsx'])
 
 ###### targetDirectory
 

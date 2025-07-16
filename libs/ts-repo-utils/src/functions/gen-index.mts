@@ -1,5 +1,5 @@
 import micromatch from 'micromatch';
-import { Result } from 'ts-data-forge';
+import { Arr, ISet, isString, Result } from 'ts-data-forge';
 import '../node-global.mjs';
 import { assertPathExists } from './assert-path-exists.mjs';
 
@@ -7,27 +7,40 @@ import { assertPathExists } from './assert-path-exists.mjs';
  * Configuration for index file generation.
  */
 export type GenIndexConfig = DeepReadonly<{
-  /** Command to run for formatting generated files (default: 'npm run fmt') */
-  formatCommand: string;
-
   /** Target directories to generate index files for (string or array of strings) */
-  targetDirectory: string | string[];
+  targetDirectory: string | readonly string[];
 
-  /** File extension of source files to export (default: '.mts') */
-  sourceExtension?: `.${string}`;
+  /** Glob patterns of files to exclude from exports (default: excludes `'**\/*.{test,spec}.?(c|m)[jt]s?(x)'`) */
+  excludePatterns?: readonly string[];
 
-  /** File extension to use in export statements (default: '.mjs') */
+  /** File extensions of source files to export (default: ['.ts', '.tsx']) */
+  sourceExtensions?: readonly `.${string}`[];
+
+  /** File extension of index files to generate (default: '.ts') */
+  indexExtension?: `.${string}`;
+
+  /** File extension to use in export statements (default: '.js') */
   exportExtension?: `.${string}`;
 
-  /** Glob patterns of files to exclude from exports (default: excludes .d.* and .test.* files) */
-  excludePatterns?: string[];
+  /** Command to run for formatting generated files (default: 'npm run fmt') */
+  formatCommand?: string;
 
   /** Whether to suppress output during execution (default: false) */
   silent?: boolean;
 }>;
 
+type GenIndexConfigInternal = DeepReadonly<{
+  formatCommand: string | undefined;
+  targetDirectory: ISet<string>;
+  excludePatterns: ISet<string>;
+  sourceExtensions: ISet<`.${string}`>;
+  indexExtension: `.${string}`;
+  exportExtension: `.${string}`;
+  silent: boolean;
+}>;
+
 /**
- * Generates index.mts files recursively in `config.targetDirectory`.
+ * Generates index.ts files recursively in `config.targetDirectory`.
  * @param config - Configuration for index file generation
  * @throws Error if any step fails.
  */
@@ -35,7 +48,7 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
   echo('Starting index file generation...\n');
 
   // Merge config with defaults
-  const filledConfig: DeepRequired<GenIndexConfig> = fillConfig(config);
+  const filledConfig: GenIndexConfigInternal = fillConfig(config);
 
   // Normalize target directories to array
   const targetDirs =
@@ -61,14 +74,16 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
     echo('✓ Index files generated\n');
 
     // Step 3: Format generated files
-    echo('3. Formatting generated files...');
-    const fmtResult = await $(filledConfig.formatCommand, {
-      silent: filledConfig.silent,
-    });
-    if (Result.isErr(fmtResult)) {
-      throw new Error(`Formatting failed: ${fmtResult.value.message}`);
+    if (filledConfig.formatCommand !== undefined) {
+      echo('3. Formatting generated files...');
+      const fmtResult = await $(filledConfig.formatCommand, {
+        silent: filledConfig.silent,
+      });
+      if (Result.isErr(fmtResult)) {
+        throw new Error(`Formatting failed: ${fmtResult.value.message}`);
+      }
+      echo('✓ Formatting completed\n');
     }
-    echo('✓ Formatting completed\n');
 
     echo('✅ Index file generation completed successfully!\n');
   } catch (error) {
@@ -79,28 +94,43 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
 
 /**
  * Fills the configuration with default values.
+ * Default values:
+ * - sourceExtensions: ['.ts']
+ * - indexExtension: '.ts'
+ * - exportExtension: '.js'
+ * - excludePatterns: ['**\/*.{test,spec}.?(c|m)[jt]s?(x)']
+ * - silent: false
  * @param config - The input configuration object.
  * @returns The configuration object with all required properties filled with defaults.
  */
-const fillConfig = (config: GenIndexConfig): DeepRequired<GenIndexConfig> => {
-  const sourceExtension = config.sourceExtension ?? '.mts';
-  const exportExtension = config.exportExtension ?? '.mjs'; // For ESM imports, .mts resolves to .mjs
+const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
+  const sourceExtensions = config.sourceExtensions ?? ['.ts'];
+  const exportExtension = config.exportExtension ?? '.js'; // For ESM imports, .mts resolves to .mjs
 
   return {
     formatCommand: config.formatCommand,
-    targetDirectory: config.targetDirectory,
-    sourceExtension,
+    targetDirectory: ISet.create(
+      isString(config.targetDirectory)
+        ? [config.targetDirectory]
+        : config.targetDirectory,
+    ),
+    excludePatterns: ISet.create(
+      Arr.generate(function* () {
+        if (config.excludePatterns !== undefined) {
+          yield* config.excludePatterns;
+        }
+        yield '**/*.{test,spec}.?(c|m)[jt]s?(x)';
+      }),
+    ),
+    sourceExtensions: ISet.create(sourceExtensions),
+    indexExtension: config.indexExtension ?? '.ts',
     exportExtension,
-    excludePatterns: config.excludePatterns ?? [
-      `*.d${sourceExtension}`,
-      `*.test${sourceExtension}`,
-    ],
     silent: config.silent ?? false,
   };
 };
 
 /**
- * Generates an index.mts file for the given directory.
+ * Generates an index.ts file for the given directory.
  * Recursively calls itself for subdirectories.
  * @param dirPath - The absolute path to the directory to process.
  * @param config - The merged configuration object.
@@ -109,11 +139,7 @@ const fillConfig = (config: GenIndexConfig): DeepRequired<GenIndexConfig> => {
  */
 const generateIndexFileForDir = async (
   dirPath: string,
-  config: DeepReadonly<{
-    sourceExtension: `.${string}`;
-    exportExtension: `.${string}`;
-    excludePatterns: string[];
-  }>,
+  config: GenIndexConfigInternal,
   baseDir?: string,
 ): Promise<void> => {
   try {
@@ -144,7 +170,7 @@ const generateIndexFileForDir = async (
       config,
     );
 
-    const indexPath = path.join(dirPath, `index${config.sourceExtension}`);
+    const indexPath = path.join(dirPath, `index${config.indexExtension}`);
 
     await fs.writeFile(indexPath, indexContent);
     echo(`Generated: ${path.relative(process.cwd(), indexPath)}`);
@@ -157,26 +183,31 @@ const generateIndexFileForDir = async (
 
 /**
  * Determines if a file should be exported in the index file.
+ * A file is exported if:
+ * - It has one of the configured source extensions
+ * - It's not an index file itself
+ * - It doesn't match any exclusion patterns
  * @param filePath - The relative path to the file from the target directory.
  * @param config - The merged configuration object.
  * @returns True if the file should be exported.
  */
 const shouldExportFile = (
   filePath: string,
-  config: DeepReadonly<{
-    sourceExtension: `.${string}`;
-    excludePatterns: string[];
-  }>,
+  config: GenIndexConfigInternal,
 ): boolean => {
   const fileName = path.basename(filePath);
 
+  const ext = path.extname(fileName);
+
   // Must have the correct source extension
-  if (!fileName.endsWith(config.sourceExtension)) {
+  if (!config.sourceExtensions.has(ext)) {
     return false;
   }
 
   // Don't export the index file itself
-  if (fileName === `index${config.sourceExtension}`) {
+  if (
+    /^index\.[cm]?[jt]s[x]?$/u.test(fileName) // Matches index.ts, index.mts, index.js, index.tsx
+  ) {
     return false;
   }
 
@@ -203,17 +234,14 @@ const shouldExportFile = (
 const generateIndexContent = (
   subDirectories: readonly string[],
   filesToExport: readonly string[],
-  config: DeepReadonly<{
-    sourceExtension: string;
-    exportExtension: `.${string}`;
-  }>,
+  config: GenIndexConfigInternal,
 ): string => {
   const exportStatements = [
     ...subDirectories.map(
       (subDir) => `export * from "./${subDir}/index${config.exportExtension}";`,
     ),
     ...filesToExport.map((file) => {
-      const fileNameWithoutExt = path.basename(file, config.sourceExtension);
+      const fileNameWithoutExt = path.basename(file, path.extname(file));
 
       return `export * from "./${fileNameWithoutExt}${config.exportExtension}";`;
     }),
