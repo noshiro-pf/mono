@@ -27,7 +27,8 @@ type DeepReadonly<T> = T extends Primitive
           ? ReadonlySet<DeepReadonly<V>>
           : T extends ReadonlySet<infer V>
             ? ReadonlySet<DeepReadonly<V>>
-            : T extends UnknownRecord | readonly unknown[]
+            : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              T extends Record<string, any> | readonly unknown[]
               ? {
                   readonly [K in keyof T]: DeepReadonly<T[K]>;
                 }
@@ -56,7 +57,8 @@ type DeepMutable<T> = T extends Primitive
           ? MutableSet<DeepMutable<V>>
           : T extends ReadonlySet<infer V>
             ? MutableSet<DeepMutable<V>>
-            : T extends UnknownRecord | readonly unknown[]
+            : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              T extends Record<string, any> | readonly unknown[]
               ? {
                   -readonly [K in keyof T]: DeepMutable<T[K]>;
                 }
@@ -92,7 +94,8 @@ type DeepPartial<T> = T extends Primitive
           ? MutableSet<DeepPartial<V>>
           : T extends ReadonlySet<infer V>
             ? ReadonlySet<DeepPartial<V>>
-            : T extends UnknownRecord | readonly unknown[]
+            : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              T extends Record<string, any> | readonly unknown[]
               ? {
                   [K in keyof T]?: DeepPartial<T[K]>;
                 }
@@ -122,7 +125,8 @@ type DeepRequired<T> = T extends Primitive
           ? MutableSet<DeepRequired<V>>
           : T extends ReadonlySet<infer V>
             ? ReadonlySet<DeepRequired<V>>
-            : T extends UnknownRecord | readonly unknown[]
+            : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              T extends Record<string, any> | readonly unknown[]
               ? {
                   [K in keyof T]-?: DeepRequired<T[K]>;
                 }

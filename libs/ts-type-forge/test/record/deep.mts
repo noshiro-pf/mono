@@ -1,3 +1,4 @@
+import { type ExecOptions } from 'child_process';
 import { expectType } from '../expect-type.mjs';
 
 // Base types for testing
@@ -99,6 +100,41 @@ type RequiredBase = {
 
   // Already Readonly
   expectType<DeepReadonly<ReadonlyBase>, ReadonlyBase>('=');
+
+  expectType<
+    Pick<
+      DeepReadonly<ExecOptions & { silent?: boolean }>,
+      | 'shell'
+      | 'signal'
+      | 'maxBuffer'
+      | 'killSignal'
+      | 'windowsHide'
+      | 'timeout'
+      | 'uid'
+      | 'gid'
+      | 'cwd'
+      | 'env'
+      | 'silent'
+    >,
+    Readonly<{
+      shell?: string | undefined;
+      signal?: DeepReadonly<AbortSignal> | undefined;
+      maxBuffer?: number | undefined;
+      killSignal?: DeepReadonly<NodeJS.Signals> | number | undefined;
+
+      // CommonOptions
+      windowsHide?: boolean | undefined;
+      timeout?: number | undefined;
+
+      // ProcessEnvOptions
+      uid?: number | undefined;
+      gid?: number | undefined;
+      cwd?: string | DeepReadonly<URL> | undefined;
+      env?: DeepReadonly<NodeJS.ProcessEnv> | undefined;
+
+      silent?: boolean;
+    }>
+  >('=');
 }
 
 // --- DeepMutable ---
