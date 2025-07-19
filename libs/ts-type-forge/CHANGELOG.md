@@ -1,3 +1,9 @@
+## [2.1.1](https://github.com/noshiro-pf/ts-type-forge/compare/v2.1.0...v2.1.1) (2025-07-19)
+
+### Bug Fixes
+
+- fix DeepX types ([#111](https://github.com/noshiro-pf/ts-type-forge/issues/111)) ([ec2b8f7](https://github.com/noshiro-pf/ts-type-forge/commit/ec2b8f7469bf235051c983169f5ef854a74e6c58))
+
 # [2.1.0](https://github.com/noshiro-pf/ts-type-forge/compare/v2.0.3...v2.1.0) (2025-07-07)
 
 ### Features
