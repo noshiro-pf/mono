@@ -1,3 +1,9 @@
+## [3.0.3](https://github.com/noshiro-pf/ts-data-forge/compare/v3.0.2...v3.0.3) (2025-07-19)
+
+### Bug Fixes
+
+- bump ts-type-forge from 2.1.0 to 2.1.1 ([#79](https://github.com/noshiro-pf/ts-data-forge/issues/79)) ([2c949fc](https://github.com/noshiro-pf/ts-data-forge/commit/2c949fc788524700bd50fd842c9709f7bce910c9))
+
 ## [3.0.2](https://github.com/noshiro-pf/ts-data-forge/compare/v3.0.1...v3.0.2) (2025-07-15)
 
 ### Bug Fixes
