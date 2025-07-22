@@ -49,7 +49,7 @@
     "tsc": "tsc --noEmit",
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit",
-    "update-packages": "npx npm-check-updates -u --install always --reject @types/node",
+    "update-packages": "npx npm-check-updates -u --install always",
     "z:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
