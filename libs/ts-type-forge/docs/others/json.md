@@ -32,7 +32,7 @@ const jsonNull: JsonPrimitive = null; // ✓ valid
 
 ### MutableJsonValue
 
-> **MutableJsonValue** = [`JsonPrimitive`](#jsonprimitive) \| [`MutableJsonValue`](#mutablejsonvalue)[] \| \{[`k`: `string`]: [`MutableJsonValue`](#mutablejsonvalue); \}
+> **MutableJsonValue** = [`JsonPrimitive`](#jsonprimitive) \| [`MutableJsonValue`](#mutablejsonvalue)[] \| \{\[`k`: `string`\]: [`MutableJsonValue`](#mutablejsonvalue); \}
 
 Defined in: [others/json.d.mts:44](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/json.d.mts#L44)
 
@@ -71,7 +71,7 @@ if (
 
 ### JsonValue
 
-> **JsonValue** = [`JsonPrimitive`](#jsonprimitive) \| `Readonly`\<\{[`k`: `string`]: [`JsonValue`](#jsonvalue); \}\> \| readonly [`JsonValue`](#jsonvalue)[]
+> **JsonValue** = [`JsonPrimitive`](#jsonprimitive) \| `Readonly`\<\{\[`k`: `string`\]: [`JsonValue`](#jsonvalue); \}\> \| readonly [`JsonValue`](#jsonvalue)[]
 
 Defined in: [others/json.d.mts:81](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/json.d.mts#L81)
 
