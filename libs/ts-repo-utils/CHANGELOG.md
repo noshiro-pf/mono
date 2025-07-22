@@ -1,3 +1,9 @@
+## [5.0.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v5.0.1...v5.0.2) (2025-07-22)
+
+### Bug Fixes
+
+- fix build output ([#74](https://github.com/noshiro-pf/ts-repo-utils/issues/74)) ([85653f4](https://github.com/noshiro-pf/ts-repo-utils/commit/85653f44d27a1763dafc5dbe45b5c402b271a62d))
+
 ## [5.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v5.0.0...v5.0.1) (2025-07-16)
 
 ### Bug Fixes
