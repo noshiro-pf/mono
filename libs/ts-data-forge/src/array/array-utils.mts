@@ -4673,13 +4673,13 @@ export namespace Arr {
    * const tupleEntries = Arr.entries(tuple); // [[0, 10], [1, 20], [2, 30]]
    * ```
    */
-  export function* entries<E>(
+  export const entries = function* <E>(
     array: readonly E[],
   ): ArrayIterator<readonly [SizeType.Arr, E]> {
     for (const [index, value] of array.entries()) {
       yield [asUint32(index), value] as const;
     }
-  }
+  };
 
   /**
    * Returns an iterable of values in the array.
@@ -4702,11 +4702,11 @@ export namespace Arr {
    * const result = getValues(['a', 'b']); // ['a', 'b']
    * ```
    */
-  export function* values<E>(array: readonly E[]): ArrayIterator<E> {
+  export const values = function* <E>(array: readonly E[]): ArrayIterator<E> {
     for (const value of array.values()) {
       yield value;
     }
-  }
+  };
 
   /**
    * Returns an iterable of keys in the array.
@@ -4732,13 +4732,13 @@ export namespace Arr {
    * const emptyIndices = Arr.indices(empty); // []
    * ```
    */
-  export function* indices<E>(
+  export const indices = function* <E>(
     array: readonly E[],
   ): ArrayIterator<SizeType.Arr> {
     for (const key of array.keys()) {
       yield asUint32(key);
     }
-  }
+  };
 
   // aliases
 
