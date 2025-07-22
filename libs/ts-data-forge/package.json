@@ -59,7 +59,7 @@
     "tscw:samples": "tsc --noEmit --watch -p ./samples/tsconfig.json",
     "type-check": "tsc --noEmit",
     "type-check:samples": "tsc --noEmit -p ./samples/tsconfig.json",
-    "update-packages": "npx npm-check-updates -u --install always --reject @types/node",
+    "update-packages": "npx npm-check-updates -u --install always",
     "z:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
