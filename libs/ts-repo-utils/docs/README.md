@@ -21,4 +21,5 @@
 - [functions/workspace-utils/run-cmd-in-parallel](functions/workspace-utils/run-cmd-in-parallel.md)
 - [functions/workspace-utils/run-cmd-in-stages](functions/workspace-utils/run-cmd-in-stages.md)
 - [functions/workspace-utils/types](functions/workspace-utils/types.md)
+- [globals](globals.md)
 - [node-global](node-global.md)
