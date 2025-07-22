@@ -79,7 +79,7 @@
     "dedent": "^1.6.0",
     "eslint": "^9.31.0",
     "markdownlint-cli2": "^0.18.1",
-    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-organize-imports": "^4.2.0",
     "prettier-plugin-packagejson": "^2.5.19",
     "rollup": "^4.45.1",
     "semantic-release": "^24.2.7",
