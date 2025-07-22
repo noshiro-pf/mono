@@ -1,4 +1,4 @@
-export default {
+const config = {
   globs: [
     '**/*.md',
     '!node_modules',
@@ -20,3 +20,5 @@ export default {
     'ul-indent': false, // prefer Prettier's setting
   },
 };
+
+export default config;

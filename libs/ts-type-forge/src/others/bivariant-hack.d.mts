@@ -24,6 +24,6 @@
  * bivariantFunc1 = func2; // OK
  */
 type BivariantHack<F extends (...args: readonly never[]) => unknown> = {
-  // eslint-disable-next-line @typescript-eslint/method-signature-style
+  // eslint-disable-next-line @typescript-eslint/method-signature-style, functional/prefer-property-signatures
   bivariantHack(...args: Parameters<F>): ReturnType<F>;
 }['bivariantHack'];

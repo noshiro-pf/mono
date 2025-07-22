@@ -17,20 +17,20 @@ type Base = {
   l: null;
 };
 
-type ReadonlyBase = {
-  readonly a: number;
-  readonly b: string | undefined;
-  readonly c: {
-    readonly d: boolean;
-    readonly e: readonly number[];
-    readonly f?: string;
-    readonly g: ReadonlyMap<string, number>;
-    readonly h: ReadonlySet<boolean>;
-  };
-  readonly i: readonly [number, string, { readonly j: bigint }];
-  readonly k: (x: number) => string;
-  readonly l: null;
-};
+type ReadonlyBase = Readonly<{
+  a: number;
+  b: string | undefined;
+  c: Readonly<{
+    d: boolean;
+    e: readonly number[];
+    f?: string;
+    g: ReadonlyMap<string, number>;
+    h: ReadonlySet<boolean>;
+  }>;
+  i: readonly [number, string, Readonly<{ j: bigint }>];
+  k: (x: number) => string;
+  l: null;
+}>;
 
 type PartialBase = {
   a?: number;
@@ -79,7 +79,7 @@ type RequiredBase = {
   expectType<DeepReadonly<(a: number) => string>, (a: number) => string>('=');
 
   // Simple Object
-  expectType<DeepReadonly<{ a: number }>, { readonly a: number }>('=');
+  expectType<DeepReadonly<{ a: number }>, Readonly<{ a: number }>>('=');
 
   // Simple Array
   expectType<DeepReadonly<string[]>, readonly string[]>('=');
@@ -152,7 +152,7 @@ type RequiredBase = {
   expectType<DeepMutable<(a: number) => string>, (a: number) => string>('=');
 
   // Simple Readonly Object
-  expectType<DeepMutable<{ readonly a: number }>, { a: number }>('=');
+  expectType<DeepMutable<Readonly<{ a: number }>>, { a: number }>('=');
 
   // Simple Readonly Array
   expectType<DeepMutable<readonly string[]>, string[]>('=');

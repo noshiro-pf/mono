@@ -31,7 +31,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsx ./scripts/cmd/gen-root-index.mjs",
+    "build": "tsx ./scripts/cmd/build.mjs",
     "check-all": "tsx ./scripts/cmd/check-all.mjs",
     "check:ext": "tsx ./scripts/cmd/check-ext.mjs",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
@@ -42,7 +42,7 @@
     "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",
     "tsc": "tsc --noEmit",
-    "tscw": "tsc --noEmit --watch",
+    "tscw": "tsc --noEmit --watch -p ./tsconfig.json",
     "type-check": "tsc --noEmit",
     "update-packages": "npx npm-check-updates -u --install always"
   },
@@ -55,10 +55,19 @@
     "@semantic-release/github": "^11.0.3",
     "@semantic-release/npm": "^12.0.2",
     "@semantic-release/release-notes-generator": "^14.0.3",
-    "@types/node": "^20.19.9",
+    "@types/node": "^24.1.0",
     "conventional-changelog-conventionalcommits": "^9.1.0",
     "cspell": "^9.2.0",
     "eslint": "^9.31.0",
+    "eslint-import-resolver-typescript": "4.4.4",
+    "eslint-plugin-array-func": "5.0.2",
+    "eslint-plugin-functional": "7.1.0",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-prefer-arrow-functions": "3.6.2",
+    "eslint-plugin-promise": "7.2.1",
+    "eslint-plugin-security": "3.0.1",
+    "eslint-plugin-unicorn": "60.0.0",
+    "eslint-plugin-vitest": "0.5.4",
     "fast-glob": "^3.3.3",
     "markdownlint-cli2": "^0.18.1",
     "prettier": "^3.6.2",
@@ -67,14 +76,12 @@
     "semantic-release": "^24.2.7",
     "ts-data-forge": "^3.0.4",
     "ts-repo-utils": "^5.0.1",
+    "ts-type-forge": "^2.1.0",
     "tsx": "^4.20.3",
     "typedoc": "^0.28.7",
-    "typedoc-plugin-markdown": "^4.7.1",
+    "typedoc-plugin-markdown": "^4.7.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0"
-  },
-  "peerDependencies": {
-    "typescript": ">=4.8"
   },
   "engines": {
     "node": ">=20.11.0"

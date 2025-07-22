@@ -3,18 +3,18 @@ import { expectType } from '../expect-type.mjs';
 // Test Mutable utility type
 
 // Test basic readonly to mutable conversion
-type ReadonlyUser = {
-  readonly id: number;
-  readonly name: string;
-  readonly email: string;
-};
+type ReadonlyUser = Readonly<{
+  id: number;
+  name: string;
+  email: string;
+}>;
 
 type MutableUser = Mutable<ReadonlyUser>;
 
 expectType<MutableUser, { id: number; name: string; email: string }>('=');
 
 // Test that Mutable removes readonly modifiers
-expectType<Mutable<{ readonly a: string }>, { a: string }>('=');
+expectType<Mutable<Readonly<{ a: string }>>, { a: string }>('=');
 expectType<
   Mutable<{ readonly a: string; b: number }>,
   { a: string; b: number }
@@ -28,18 +28,18 @@ expectType<
 expectType<Mutable<{ a: string; b: number }>, { a: string; b: number }>('=');
 
 // Test with complex types
-type ComplexReadonly = {
-  readonly data: { readonly nested: string };
-  readonly list: readonly string[];
-  readonly func: () => void;
-};
+type ComplexReadonly = Readonly<{
+  data: Readonly<{ nested: string }>;
+  list: readonly string[];
+  func: () => void;
+}>;
 
 type ComplexMutable = Mutable<ComplexReadonly>;
 
 expectType<
   ComplexMutable,
   {
-    data: { readonly nested: string }; // Note: nested readonly is preserved
+    data: Readonly<{ nested: string }>; // Note: nested readonly is preserved
     list: readonly string[]; // Note: readonly array is preserved
     func: () => void;
   }
@@ -75,11 +75,11 @@ expectType<MutableMap<any, any>, Map<any, any>>('=');
 expectType<Mutable<{}>, {}>('=');
 
 // Object with optional properties
-expectType<Mutable<{ readonly a?: string }>, { a?: string }>('=');
+expectType<Mutable<Readonly<{ a?: string }>>, { a?: string }>('=');
 
 // Object with index signature
 expectType<
-  Mutable<{ readonly [key: string]: number }>,
+  Mutable<Readonly<{ [key: string]: number }>>,
   { [key: string]: number }
 >('=');
 
@@ -93,12 +93,12 @@ expectType<Mutable<AlreadyMutable>, AlreadyMutable>('=');
 
 // Test with union types
 expectType<
-  Mutable<{ readonly a: string } | { readonly b: number }>,
+  Mutable<Readonly<{ a: string }> | Readonly<{ b: number }>>,
   { a: string } | { b: number }
 >('=');
 
 // Test with intersection types
 expectType<
-  Mutable<{ readonly a: string } & { readonly b: number }>,
+  Mutable<Readonly<{ a: string }> & Readonly<{ b: number }>>,
   { a: string } & { b: number }
 >('~=');

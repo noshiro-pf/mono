@@ -25,7 +25,7 @@ const processFile = async (
     types: { typeName: string; line: number }[];
   }>
 > => {
-  const results: Readonly<{
+  const mut_results: Readonly<{
     typeName: string;
     line: number;
   }>[] = [];
@@ -33,7 +33,7 @@ const processFile = async (
   const relativePath = path.relative(projectRootPath, filePath);
 
   try {
-    const content = await fs.readFile(filePath, 'utf-8');
+    const content = await fs.readFile(filePath, 'utf8');
     const lines = content.split('\n');
 
     for (const [index, line] of lines.entries()) {
@@ -42,7 +42,7 @@ const processFile = async (
         if (match?.[1] !== undefined) {
           // Exclude internal namespace helper types if needed (adjust regex if necessary)
           // For now, just matching the pattern
-          results.push({
+          mut_results.push({
             typeName: match[1],
             line: index + 1,
           });
@@ -59,7 +59,7 @@ const processFile = async (
             if (typeMatch?.[1] !== undefined) {
               // Exclude internal namespace helper types if needed (adjust regex if necessary)
               // For now, just matching the pattern
-              results.push({
+              mut_results.push({
                 typeName: `${namespaceMatch[1]}.${typeMatch[1]}`,
                 line: idx + 1,
               });
@@ -68,12 +68,12 @@ const processFile = async (
         }
       }
     }
-  } catch (err) {
-    console.error(`Error processing file ${filePath}:`, err);
+  } catch (error) {
+    console.error(`Error processing file ${filePath}:`, error);
   }
   return {
     relativePath,
-    types: results,
+    types: mut_results,
   };
 };
 
@@ -96,13 +96,14 @@ export const genTypeDefinitions = async (): Promise<void> => {
     ])
     .join('\n');
 
-  const content = await fs.readFile(readmePath, 'utf-8');
+  const content = await fs.readFile(readmePath, 'utf8');
 
-  const newContent = content.replace(
+  const newContent = content.replaceAll(
+    // eslint-disable-next-line security/detect-non-literal-regexp
     new RegExp(`${markers.start}[.\\s\\S]*${markers.end}`, 'gu'),
     `${markers.start}\n${result}\n\n${markers.end}`,
   );
 
   // Write the updated content back to the README file
-  await fs.writeFile(readmePath, newContent, 'utf-8');
+  await fs.writeFile(readmePath, newContent, 'utf8');
 };

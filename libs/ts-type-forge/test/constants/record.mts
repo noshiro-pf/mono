@@ -38,11 +38,11 @@ expectType<Record<string, any>, UnknownRecord>('<=');
 expectType<Record<string, never>, UnknownRecord>('<=');
 
 // Test compatibility with specific object types
-type TestConfig = {
-  readonly apiUrl: string;
-  readonly timeout: number;
-  readonly retries: number;
-};
+type TestConfig = Readonly<{
+  apiUrl: string;
+  timeout: number;
+  retries: number;
+}>;
 
 // TestConfig can be used where UnknownRecord is expected with proper handling
 expectType<TestConfig, UnknownRecord>('!='); // They're different but related types
@@ -56,10 +56,10 @@ type IsUnknownStricter =
 expectType<IsUnknownStricter, true>('=');
 
 // Test intersection with other types
-type UnknownRecordWithId = UnknownRecord & { readonly id: string };
+type UnknownRecordWithId = UnknownRecord & Readonly<{ id: string }>;
 expectType<
   UnknownRecordWithId,
-  ReadonlyRecord<string, unknown> & { readonly id: string }
+  ReadonlyRecord<string, unknown> & Readonly<{ id: string }>
 >('=');
 
 // Test union with other types
