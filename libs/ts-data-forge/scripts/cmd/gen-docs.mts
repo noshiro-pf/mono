@@ -23,10 +23,7 @@ const genDocs = async (): Promise<void> => {
 
   // Step 0: Embed sample code into README
   echo('0. Embedding sample code into README...');
-  await runStep(
-    `npm run z:node-esm -- "${EMBED_SAMPLES_SCRIPT}"`,
-    'Sample embedding failed',
-  );
+  await runStep(`tsx "${EMBED_SAMPLES_SCRIPT}"`, 'Sample embedding failed');
   echo('✓ Sample code embedded into README\n');
 
   // Step 1: Generate docs with TypeDoc

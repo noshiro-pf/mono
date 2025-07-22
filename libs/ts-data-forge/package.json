@@ -35,14 +35,14 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npm run z:node-esm -- ./scripts/cmd/build.mjs",
-    "check-all": "npm run z:node-esm -- ./scripts/cmd/check-all.mjs",
-    "check:ext": "npm run z:node-esm -- ./scripts/cmd/check-ext.mjs",
+    "build": "tsx ./scripts/cmd/build.mjs",
+    "check-all": "tsx ./scripts/cmd/check-all.mjs",
+    "check:ext": "tsx ./scripts/cmd/check-ext.mjs",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
-    "doc": "npm run z:node-esm -- ./scripts/cmd/gen-docs.mjs",
-    "fmt": "npm run z:node-esm -- ./scripts/cmd/fmt-diff.mjs",
+    "doc": "tsx ./scripts/cmd/gen-docs.mjs",
+    "fmt": "tsx ./scripts/cmd/fmt-diff.mjs",
     "fmt:full": "prettier --write .",
-    "gi": "npm run z:node-esm -- ./scripts/cmd/gi.mjs",
+    "gi": "tsx ./scripts/cmd/gi.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:samples": "eslint ./samples",
@@ -60,7 +60,6 @@
     "type-check": "tsc --noEmit",
     "type-check:samples": "tsc --noEmit -p ./samples/tsconfig.json",
     "update-packages": "npx npm-check-updates -u --install always --reject @types/node",
-    "z:node-esm": "node --import tsx/esm",
     "z:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
