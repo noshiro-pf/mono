@@ -21,6 +21,7 @@
 - [functional/optional](functional/optional/README.md)
 - [functional/pipe](functional/pipe.md)
 - [functional/result](functional/result/README.md)
+- [globals](globals/README.md)
 - [guard](guard.md)
 - [guard/has-key](guard/has-key.md)
 - [guard/is-non-empty-string](guard/is-non-empty-string.md)

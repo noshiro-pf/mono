@@ -44,6 +44,6 @@ return new ISet instances, making it safe for functional programming and concurr
 
 ##### K
 
-`K` _extends_ `MapSetKeyType`
+`K` _extends_ [`MapSetKeyType`](../../globals/README.md#mapsetkeytype)
 
 The type of the elements in the set. Must extend MapSetKeyType.

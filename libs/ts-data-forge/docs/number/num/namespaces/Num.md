@@ -186,7 +186,7 @@ integers, useful for type-safe countdown operations.
 
 ##### N
 
-`N` _extends_ `SmallPositiveInt`
+`N` _extends_ [`SmallPositiveInt`](../../../globals/README.md#smallpositiveint)
 
 A positive SmallInt literal type (1-40)
 

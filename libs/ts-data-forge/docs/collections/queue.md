@@ -10,7 +10,7 @@
 
 ### Queue\<T\>
 
-> **Queue**\<`T`\> = `Readonly`\<\{ `dequeue`: () => [`Optional`](../functional/optional/README.md#optional)\<`T`\>; `enqueue`: (`value`) => `void`; `isEmpty`: `boolean`; `size`: `SizeType.Arr`; \}\>
+> **Queue**\<`T`\> = `Readonly`\<\{ `dequeue`: () => [`Optional`](../functional/optional/README.md#optional)\<`T`\>; `enqueue`: (`value`) => `void`; `isEmpty`: `boolean`; `size`: [`Arr`](../globals/namespaces/SizeType.md#arr); \}\>
 
 Defined in: [src/collections/queue.mts:66](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/queue.mts#L66)
 

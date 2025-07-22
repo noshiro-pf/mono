@@ -43,7 +43,7 @@ return new IMap instances, making it safe for functional programming and concurr
 
 ##### K
 
-`K` _extends_ `MapSetKeyType`
+`K` _extends_ [`MapSetKeyType`](../../globals/README.md#mapsetkeytype)
 
 The type of the keys in the map. Must extend MapSetKeyType.
 

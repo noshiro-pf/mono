@@ -56,7 +56,7 @@ The type of the values in the map.
 
 ##### KM
 
-`KM` _extends_ `MapSetKeyType`
+`KM` _extends_ [`MapSetKeyType`](../../globals/README.md#mapsetkeytype)
 
 The type of the mapped primitive keys (string, number, etc.).
 

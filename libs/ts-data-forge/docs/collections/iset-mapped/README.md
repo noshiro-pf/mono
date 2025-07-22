@@ -51,7 +51,7 @@ The type of the custom elements in the set.
 
 ##### KM
 
-`KM` _extends_ `MapSetKeyType`
+`KM` _extends_ [`MapSetKeyType`](../../globals/README.md#mapsetkeytype)
 
 The type of the mapped primitive keys (string, number, etc.).
 

@@ -157,7 +157,7 @@ Skips the first N elements of an array.
 
 ###### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The number of elements to skip, constrained to `SmallUint`.
 
@@ -207,7 +207,7 @@ Skips the first N elements of an array.
 
 ###### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The number of elements to skip, constrained to `SmallUint`.
 
@@ -591,7 +591,7 @@ expectType<typeof emptySize, SizeType.Arr>('=');
 
 ### newArray()
 
-> `const` **newArray**: \<`V`, `N`\>(`len`, `init`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`V`, `V`\] : readonly `V`[] = `create`
+> `const` **newArray**: \<`V`, `N`\>(`len`, `init`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? readonly \[`V`, `V`\] : readonly `V`[] = `create`
 
 Defined in: [src/array/array-utils.mts:4785](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L4785)
 
@@ -616,7 +616,7 @@ The type of the initial value. The `const` constraint preserves literal types.
 
 ##### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The type of the length parameter when it's a `SmallUint` literal.
 
@@ -636,7 +636,7 @@ The value to fill each position with. The same reference is used for all positio
 
 #### Returns
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`V`, `V`\] : readonly `V`[]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? readonly \[`V`, `V`\] : readonly `V`[]
 
 An immutable array filled with the initial value. The exact return type depends on the length:
 
@@ -1152,7 +1152,7 @@ a function that can be applied to arrays, making it ideal for use in pipe operat
 
 ###### index
 
-`ArgArrWithNegative`
+[`ArgArrWithNegative`](../../../globals/namespaces/SizeType.md#argarrwithnegative)
 
 The index to access. Must be a branded `SizeType.ArgArr` (safe integer). Can be:
 
@@ -1660,7 +1660,7 @@ const result = pipe(data).map(countByType).value;
 
 ### create()
 
-> **create**\<`V`, `N`\>(`len`, `init`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`V`, `V`\] : readonly `V`[]
+> **create**\<`V`, `N`\>(`len`, `init`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? readonly \[`V`, `V`\] : readonly `V`[]
 
 Defined in: [src/array/array-utils.mts:526](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L526)
 
@@ -1683,7 +1683,7 @@ The type of the initial value. The `const` constraint preserves literal types.
 
 ##### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The type of the length parameter when it's a `SmallUint` literal.
 
@@ -1703,7 +1703,7 @@ The value to fill each position with. The same reference is used for all positio
 
 #### Returns
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`V`, `V`\] : readonly `V`[]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`V`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? readonly \[`V`, `V`\] : readonly `V`[]
 
 An immutable array filled with the initial value. The exact return type depends on the length:
 
@@ -4102,7 +4102,7 @@ This function categorizes array elements into groups based on a computed key, us
 [IMap](../../../collections/imap/README.md#imap) data structure for the result. The grouper function receives both the element and its
 index, enabling flexible grouping strategies.
 
-**MapSetKeyType Constraint:** The group key type `G` must extend MapSetKeyType, which includes
+**MapSetKeyType Constraint:** The group key type `G` must extend [MapSetKeyType](../../../globals/README.md#mapsetkeytype), which includes
 primitive types that can be used as Map keys (string, number, boolean, symbol, null, undefined).
 This constraint ensures type safety and efficient key-based operations.
 
@@ -4126,7 +4126,7 @@ function, returns a reusable function that can be applied to arrays.
 
 `G` _extends_ `Primitive`
 
-The type of the group key, constrained to MapSetKeyType (primitives usable as Map keys).
+The type of the group key, constrained to [MapSetKeyType](../../../globals/README.md#mapsetkeytype) (primitives usable as Map keys).
 Must be one of: `string | number | boolean | symbol | null | undefined`
 
 ##### Parameters
@@ -4144,8 +4144,8 @@ The input array to group. Can be empty (returns empty [IMap](../../../collection
 A function `(value: E, index: SizeType.Arr) => G` that computes the group key for each element.
 
 - **value:** The current array element
-- **index:** The 0-based index of the element (typed as SizeType.Arr)
-- **returns:** The group key (must be MapSetKeyType)
+- **index:** The 0-based index of the element (typed as [SizeType.Arr](../../../globals/namespaces/SizeType.md#arr))
+- **returns:** The group key (must be [MapSetKeyType](../../../globals/README.md#mapsetkeytype))
 
 ##### Returns
 
@@ -4293,7 +4293,7 @@ expectType<typeof emptyGroup, IMap<never, readonly never[]>>('=');
 ##### See
 
 - [IMap](../../../collections/imap/README.md#imap) for working with the returned immutable map
-- MapSetKeyType for understanding valid key types
+- [MapSetKeyType](../../../globals/README.md#mapsetkeytype) for understanding valid key types
 - IMap.get for safely accessing grouped results
 - IMap.map for transforming grouped data
 - [Optional](../../../functional/optional/README.md#optional) for handling potentially missing groups
@@ -4310,7 +4310,7 @@ This function categorizes array elements into groups based on a computed key, us
 [IMap](../../../collections/imap/README.md#imap) data structure for the result. The grouper function receives both the element and its
 index, enabling flexible grouping strategies.
 
-**MapSetKeyType Constraint:** The group key type `G` must extend MapSetKeyType, which includes
+**MapSetKeyType Constraint:** The group key type `G` must extend [MapSetKeyType](../../../globals/README.md#mapsetkeytype), which includes
 primitive types that can be used as Map keys (string, number, boolean, symbol, null, undefined).
 This constraint ensures type safety and efficient key-based operations.
 
@@ -4336,7 +4336,7 @@ The type of elements in the input array.
 
 `G` _extends_ `Primitive`
 
-The type of the group key, constrained to MapSetKeyType (primitives usable as Map keys).
+The type of the group key, constrained to [MapSetKeyType](../../../globals/README.md#mapsetkeytype) (primitives usable as Map keys).
 Must be one of: `string | number | boolean | symbol | null | undefined`
 
 ##### Parameters
@@ -4348,8 +4348,8 @@ Must be one of: `string | number | boolean | symbol | null | undefined`
 A function `(value: E, index: SizeType.Arr) => G` that computes the group key for each element.
 
 - **value:** The current array element
-- **index:** The 0-based index of the element (typed as SizeType.Arr)
-- **returns:** The group key (must be MapSetKeyType)
+- **index:** The 0-based index of the element (typed as [SizeType.Arr](../../../globals/namespaces/SizeType.md#arr))
+- **returns:** The group key (must be [MapSetKeyType](../../../globals/README.md#mapsetkeytype))
 
 ##### Returns
 
@@ -4507,7 +4507,7 @@ expectType<typeof emptyGroup, IMap<never, readonly never[]>>('=');
 ##### See
 
 - [IMap](../../../collections/imap/README.md#imap) for working with the returned immutable map
-- MapSetKeyType for understanding valid key types
+- [MapSetKeyType](../../../globals/README.md#mapsetkeytype) for understanding valid key types
 - IMap.get for safely accessing grouped results
 - IMap.map for transforming grouped data
 - [Optional](../../../functional/optional/README.md#optional) for handling potentially missing groups
@@ -4642,7 +4642,7 @@ The input array.
 
 ##### index
 
-`ArgArr`
+[`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The index to check.
 
@@ -4824,7 +4824,7 @@ Defined in: [src/array/array-utils.mts:2687](https://github.com/noshiro-pf/ts-da
 
 ###### fromIndex
 
-`ArgArrWithNegative`
+[`ArgArrWithNegative`](../../../globals/namespaces/SizeType.md#argarrwithnegative)
 
 ##### Returns
 
@@ -4956,7 +4956,7 @@ The type of elements in the array.
 
 ##### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The minimum expected length of the array (must be a number type).
 
@@ -5010,7 +5010,7 @@ The type of elements in the array.
 
 ##### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The expected length of the array (must be a number type).
 
@@ -5741,7 +5741,7 @@ Defined in: [src/array/array-utils.mts:2768](https://github.com/noshiro-pf/ts-da
 
 ###### fromIndex
 
-`ArgArrWithNegative`
+[`ArgArrWithNegative`](../../../globals/namespaces/SizeType.md#argarrwithnegative)
 
 ##### Returns
 
@@ -6893,7 +6893,7 @@ A function `(accumulator: S, currentValue: E, currentIndex: SizeType.Arr) => S` 
 
 - **accumulator:** The current accumulated value (starts with `init`, then previous results)
 - **currentValue:** The current array element being processed
-- **currentIndex:** The 0-based index of the current element (typed as SizeType.Arr)
+- **currentIndex:** The 0-based index of the current element (typed as [SizeType.Arr](../../../globals/namespaces/SizeType.md#arr))
 - **returns:** The new accumulated value to include in the result array
 
 ###### init
@@ -7071,7 +7071,7 @@ expectType<typeof stateHistory, NonEmptyArray<State>>('=');
 
 - [reduce](#reduce) for getting only the final accumulated value
 - NonEmptyArray for understanding the guaranteed non-empty return type
-- SizeType.Arr for the index parameter type
+- [SizeType.Arr](../../../globals/namespaces/SizeType.md#arr) for the index parameter type
 - Array.prototype.reduce for the standard reduce function
 
 #### Call Signature
@@ -7124,7 +7124,7 @@ A function `(accumulator: S, currentValue: E, currentIndex: SizeType.Arr) => S` 
 
 - **accumulator:** The current accumulated value (starts with `init`, then previous results)
 - **currentValue:** The current array element being processed
-- **currentIndex:** The 0-based index of the current element (typed as SizeType.Arr)
+- **currentIndex:** The 0-based index of the current element (typed as [SizeType.Arr](../../../globals/namespaces/SizeType.md#arr))
 - **returns:** The new accumulated value to include in the result array
 
 ###### init
@@ -7312,14 +7312,14 @@ expectType<typeof stateHistory, NonEmptyArray<State>>('=');
 
 - [reduce](#reduce) for getting only the final accumulated value
 - NonEmptyArray for understanding the guaranteed non-empty return type
-- SizeType.Arr for the index parameter type
+- [SizeType.Arr](../../../globals/namespaces/SizeType.md#arr) for the index parameter type
 - Array.prototype.reduce for the standard reduce function
 
 ---
 
 ### seq()
 
-> **seq**\<`N`\>(`len`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `SeqImpl`\<`MakeTupleImpl`\<`unknown`, `` `${N<N>}` ``, \[\]\>\> : `N` _extends_ `ArgArrPositive` ? readonly \[`Uint32`, `Uint32`\] : readonly `Uint32`[]
+> **seq**\<`N`\>(`len`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `SeqImpl`\<`MakeTupleImpl`\<`unknown`, `` `${N<N>}` ``, \[\]\>\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? readonly \[`Uint32`, `Uint32`\] : readonly `Uint32`[]
 
 Defined in: [src/array/array-utils.mts:468](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L468)
 
@@ -7335,7 +7335,7 @@ This function generates index sequences with precise compile-time typing:
 
 ##### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The type of the length parameter. When a `SmallUint` literal is provided,
 the return type will be a tuple containing the sequence [0, 1, 2, ..., N-1].
@@ -7350,7 +7350,7 @@ The length of the sequence to create. Must be a non-negative integer.
 
 #### Returns
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `SeqImpl`\<`MakeTupleImpl`\<`unknown`, `` `${N<N>}` ``, \[\]\>\> : `N` _extends_ `ArgArrPositive` ? readonly \[`Uint32`, `Uint32`\] : readonly `Uint32`[]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `SeqImpl`\<`MakeTupleImpl`\<`unknown`, `` `${N<N>}` ``, \[\]\>\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? readonly \[`Uint32`, `Uint32`\] : readonly `Uint32`[]
 
 An immutable array containing the sequence [0, 1, 2, ..., len-1].
 The exact return type depends on the input:
@@ -7478,7 +7478,7 @@ may be either the new type or the original type.
 
 ###### index
 
-`ArgArr`
+[`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The index to update (must be valid for the tuple length)
 
@@ -7763,7 +7763,7 @@ Skips the first N elements of an array.
 
 ###### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The number of elements to skip, constrained to `SmallUint`.
 
@@ -7815,7 +7815,7 @@ Skips the first N elements of an array.
 
 ###### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The number of elements to skip, constrained to `SmallUint`.
 
@@ -7885,7 +7885,7 @@ Skips the last N elements of an array.
 
 ###### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The number of elements to skip, constrained to `SmallUint`.
 
@@ -7937,7 +7937,7 @@ Skips the last N elements of an array.
 
 ###### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The number of elements to skip, constrained to `SmallUint`.
 
@@ -8128,13 +8128,13 @@ indices, it returns a function that can be applied to arrays.
 
 ###### start
 
-`ArgArrWithNegative`
+[`ArgArrWithNegative`](../../../globals/namespaces/SizeType.md#argarrwithnegative)
 
 The start index for the slice (inclusive). Will be clamped to valid bounds.
 
 ###### end
 
-`ArgArrWithNegative`
+[`ArgArrWithNegative`](../../../globals/namespaces/SizeType.md#argarrwithnegative)
 
 The end index for the slice (exclusive). Will be clamped to valid bounds.
 
@@ -8593,7 +8593,7 @@ Arr.tail([]); // []
 
 #### Call Signature
 
-> **take**\<`Ar`, `N`\>(`array`, `num`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
+> **take**\<`Ar`, `N`\>(`array`, `num`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 Defined in: [src/array/array-utils.mts:1287](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1287)
 
@@ -8611,7 +8611,7 @@ Takes the first N elements from an array.
 
 ###### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The number of elements to take, constrained to `SmallUint`.
 
@@ -8631,7 +8631,7 @@ The number of elements to take.
 
 ##### Returns
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 A new array containing the first N elements.
 
@@ -8649,7 +8649,7 @@ console.log(result); // [1, 2, 3]
 
 #### Call Signature
 
-> **take**\<`N`\>(`num`): \<`Ar`\>(`array`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
+> **take**\<`N`\>(`num`): \<`Ar`\>(`array`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 Defined in: [src/array/array-utils.mts:1301](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1301)
 
@@ -8663,7 +8663,7 @@ Takes the first N elements from an array.
 
 ###### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The number of elements to take, constrained to `SmallUint`.
 
@@ -8679,7 +8679,7 @@ The number of elements to take.
 
 A new array containing the first N elements.
 
-> \<`Ar`\>(`array`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
+> \<`Ar`\>(`array`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 ###### Type Parameters
 
@@ -8695,7 +8695,7 @@ A new array containing the first N elements.
 
 ###### Returns
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `Take`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 ##### Example
 
@@ -8715,7 +8715,7 @@ console.log(result); // [1, 2, 3]
 
 #### Call Signature
 
-> **takeLast**\<`Ar`, `N`\>(`array`, `num`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
+> **takeLast**\<`Ar`, `N`\>(`array`, `num`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 Defined in: [src/array/array-utils.mts:1353](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1353)
 
@@ -8733,7 +8733,7 @@ Takes the last N elements from an array.
 
 ###### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The number of elements to take, constrained to `SmallUint`.
 
@@ -8753,7 +8753,7 @@ The number of elements to take.
 
 ##### Returns
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 A new array containing the last N elements.
 
@@ -8771,7 +8771,7 @@ console.log(result); // [4, 5]
 
 #### Call Signature
 
-> **takeLast**\<`N`\>(`num`): \<`Ar`\>(`array`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
+> **takeLast**\<`N`\>(`num`): \<`Ar`\>(`array`) => `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 Defined in: [src/array/array-utils.mts:1367](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L1367)
 
@@ -8785,7 +8785,7 @@ Takes the last N elements from an array.
 
 ###### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The number of elements to take, constrained to `SmallUint`.
 
@@ -8801,7 +8801,7 @@ The number of elements to take.
 
 A new array containing the last N elements.
 
-> \<`Ar`\>(`array`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
+> \<`Ar`\>(`array`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 ###### Type Parameters
 
@@ -8817,7 +8817,7 @@ A new array containing the last N elements.
 
 ###### Returns
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ `ArgArrPositive` ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `TakeLast`\<`N`\<`N`\>, `Ar`\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? `Ar` _extends_ readonly \[`unknown`, `unknown`\] ? readonly \[`Ar`\<`Ar`\>\[`number`\], `Ar`\<`Ar`\>\[`number`\]\] : readonly `Ar`\[`number`\][] : readonly `Ar`\[`number`\][]
 
 ##### Example
 
@@ -9053,7 +9053,7 @@ Index can be out of bounds (e.g., negative or greater than length), `toSpliced` 
 
 ###### index
 
-`ArgArrWithNegative`
+[`ArgArrWithNegative`](../../../globals/namespaces/SizeType.md#argarrwithnegative)
 
 The index at which to insert the new value.
 
@@ -9317,7 +9317,7 @@ The value to fill the range with.
 
 ###### fillRange
 
-readonly \[`ArgArrWithNegative`, `ArgArrWithNegative`\]
+readonly \[[`ArgArrWithNegative`](../../../globals/namespaces/SizeType.md#argarrwithnegative), [`ArgArrWithNegative`](../../../globals/namespaces/SizeType.md#argarrwithnegative)\]
 
 A tuple containing [start, end] indices for the range to fill.
 
@@ -9427,7 +9427,7 @@ If index is out of bounds, `toSpliced` handles this (usually by returning a copy
 
 ###### index
 
-`ArgArrWithNegative`
+[`ArgArrWithNegative`](../../../globals/namespaces/SizeType.md#argarrwithnegative)
 
 The index of the element to remove.
 
@@ -9856,7 +9856,7 @@ The input array to update. Can be any readonly array.
 
 `ArgArrayIndex`\<`Ar`\>
 
-The index of the element to update. Must be a non-negative SizeType.ArgArr.
+The index of the element to update. Must be a non-negative [SizeType.ArgArr](../../../globals/namespaces/SizeType.md#argarr).
 
 - **Valid range:** `0 <= index < array.length`
 - **Out of bounds:** Returns original array unchanged
@@ -10027,7 +10027,7 @@ expectType<typeof safe1, readonly number[]>('='); // Bounds check preserves type
 ##### See
 
 - Array.prototype.with for the native method with different error handling
-- SizeType.ArgArr for the index type constraint
+- [SizeType.ArgArr](../../../globals/namespaces/SizeType.md#argarr) for the index type constraint
 - Immutable update patterns for functional programming approaches
 
 #### Call Signature
@@ -10074,9 +10074,9 @@ The type of the value returned by the updater function.
 
 ###### index
 
-`ArgArr`
+[`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
-The index of the element to update. Must be a non-negative SizeType.ArgArr.
+The index of the element to update. Must be a non-negative [SizeType.ArgArr](../../../globals/namespaces/SizeType.md#argarr).
 
 - **Valid range:** `0 <= index < array.length`
 - **Out of bounds:** Returns original array unchanged
@@ -10263,7 +10263,7 @@ expectType<typeof safe1, readonly number[]>('='); // Bounds check preserves type
 ##### See
 
 - Array.prototype.with for the native method with different error handling
-- SizeType.ArgArr for the index type constraint
+- [SizeType.ArgArr](../../../globals/namespaces/SizeType.md#argarr) for the index type constraint
 - Immutable update patterns for functional programming approaches
 
 ---
@@ -10408,7 +10408,7 @@ const result = getValues(['a', 'b']); // ['a', 'b']
 
 ### zeros()
 
-> **zeros**\<`N`\>(`len`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`0`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`0`, `0`\] : readonly `0`[]
+> **zeros**\<`N`\>(`len`): `N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`0`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? readonly \[`0`, `0`\] : readonly `0`[]
 
 Defined in: [src/array/array-utils.mts:417](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/array/array-utils.mts#L417)
 
@@ -10424,7 +10424,7 @@ This function provides compile-time type safety with precise return types:
 
 ##### N
 
-`N` _extends_ `ArgArr`
+`N` _extends_ [`ArgArr`](../../../globals/namespaces/SizeType.md#argarr)
 
 The type of the length parameter. When a `SmallUint` literal is provided,
 the return type will be a tuple of exactly that length filled with zeros.
@@ -10439,7 +10439,7 @@ The length of the array to create. Must be a non-negative integer.
 
 #### Returns
 
-`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`0`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ `ArgArrPositive` ? readonly \[`0`, `0`\] : readonly `0`[]
+`N` _extends_ `0` \| `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `7` \| `8` \| `9` \| `10` \| `11` \| `12` \| `13` \| `14` \| `15` \| `16` \| `17` \| `18` \| `19` \| `20` \| `21` \| `22` \| `23` \| `24` \| `25` \| `26` \| `27` \| `28` \| `29` \| `30` \| `31` \| `32` \| `33` \| `34` \| `35` \| `36` \| `37` \| `38` \| `39` ? `MakeTupleImpl`\<`0`, `` `${N<N>}` ``, \[\]\> : `N` _extends_ [`ArgArrPositive`](../../../globals/namespaces/SizeType.md#argarrpositive) ? readonly \[`0`, `0`\] : readonly `0`[]
 
 An immutable array of zeros. The exact return type depends on the input:
 

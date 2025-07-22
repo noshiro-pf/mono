@@ -2,12 +2,7 @@ import { assertPathExists } from 'ts-repo-utils';
 import { Result } from '../../src/index.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
-// Build configuration
-const BUILD_CONFIG = {
-  distDir: path.resolve(projectRootPath, './dist'),
-  rollupConfig: path.resolve(projectRootPath, './configs/rollup.config.ts'),
-  distTsConfig: { include: ['.'] },
-} as const;
+const distDir = path.resolve(projectRootPath, './dist');
 
 /**
  * Builds the entire project.
@@ -24,7 +19,7 @@ const build = async (): Promise<void> => {
     echo('2. Cleaning dist directory...');
     await runStep(
       Result.fromPromise(
-        fs.rm(BUILD_CONFIG.distDir, {
+        fs.rm(distDir, {
           recursive: true,
           force: true,
         }),
@@ -50,12 +45,17 @@ const build = async (): Promise<void> => {
 
   // Step 5: Build with Rollup
   {
+    const rollupConfig = path.resolve(
+      projectRootPath,
+      './configs/rollup.config.ts',
+    );
+
     echo('5. Building with Rollup...');
-    await assertPathExists(BUILD_CONFIG.rollupConfig, 'Rollup config');
+    await assertPathExists(rollupConfig, 'Rollup config');
     await runCmdStep(
       [
         'rollup',
-        `--config ${BUILD_CONFIG.rollupConfig}`,
+        `--config ${rollupConfig}`,
         '--configPlugin typescript',
         '--configImportAttributesKey with',
       ].join(' '),
@@ -64,11 +64,41 @@ const build = async (): Promise<void> => {
     echo('✓ Rollup build completed\n');
   }
 
-  // Step 6: Generate dist tsconfig
+  // Step 6: Copy globals
   {
-    echo('6. Generating dist TypeScript config...');
-    const configContent = JSON.stringify(BUILD_CONFIG.distTsConfig);
-    const configFile = path.resolve(BUILD_CONFIG.distDir, 'tsconfig.json');
+    const srcGlobalsFile = path.resolve(projectRootPath, './src/globals.d.mts');
+    echo('6. Copying global type definitions...');
+    await assertPathExists(srcGlobalsFile, 'Global types file');
+
+    const destFile = path.resolve(distDir, 'globals.d.mts');
+    await runCmdStep(
+      `cp "${srcGlobalsFile}" "${destFile}"`,
+      'Failed to copy globals',
+    );
+    echo('✓ Copied globals.d.mts to dist\n');
+  }
+
+  // Step 7: Generate dist/types.d.mts
+  {
+    echo('7. Generating dist/types.d.mts...');
+    const content = [
+      "import './globals.d.mts';",
+      "export * from './index.mjs';",
+    ].join('\n');
+
+    const typesFile = path.resolve(distDir, 'types.d.mts');
+    await runStep(
+      Result.fromPromise(fs.writeFile(typesFile, content)),
+      'Failed to generate dist/types.d.mts',
+    );
+    echo('✓ Generated dist/types.d.mts\n');
+  }
+
+  // Step 8: Generate dist tsconfig
+  {
+    echo('8. Generating dist TypeScript config...');
+    const configContent = JSON.stringify({ include: ['.'] });
+    const configFile = path.resolve(distDir, 'tsconfig.json');
     await runStep(
       Result.fromPromise(fs.writeFile(configFile, configContent)),
       'Failed to generate tsconfig',

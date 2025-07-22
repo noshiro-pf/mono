@@ -10,7 +10,7 @@
 
 ### Stack\<T\>
 
-> **Stack**\<`T`\> = `Readonly`\<\{ `isEmpty`: `boolean`; `pop`: () => [`Optional`](../functional/optional/README.md#optional)\<`T`\>; `push`: (`value`) => `void`; `size`: `SizeType.Arr`; \}\>
+> **Stack**\<`T`\> = `Readonly`\<\{ `isEmpty`: `boolean`; `pop`: () => [`Optional`](../functional/optional/README.md#optional)\<`T`\>; `push`: (`value`) => `void`; `size`: [`Arr`](../globals/namespaces/SizeType.md#arr); \}\>
 
 Defined in: [src/collections/stack.mts:65](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/collections/stack.mts#L65)
 
