@@ -94,6 +94,7 @@ expect(result).toStrictEqual([0, 0, 0]);
 - **YOU MUST**: Use `.toStrictEqual()` instead of `.toEqual()` in Vitest tests
 - **YOU MUST**: Use `test()` instead of `it()` in Vitest tests
 - **YOU MUST**: Use named exports unless restricted by libraries or frameworks
+- **YOU MUST**: Avoid using file scope `/* eslint disable */`.
 - **IMPORTANT**: Use arrow functions in all cases
 - **PREFER**: Type-safe operations over unsafe type assertions
 - **PREFER**: Readonly parameter types for complex objects
@@ -119,6 +120,19 @@ When implementing new features, follow TDD workflow:
 5. **Repeat**: Continue cycle for additional functionality
 
 **Important**: During implementation, avoid modifying tests unless requirements change
+
+## Script Organization Rules
+
+For scripts in the `scripts/` directory, functions should be organized in call hierarchy order from top to bottom:
+
+1. **main function** - Entry point at the top
+2. **Functions directly called by main** - In order of call
+3. **Functions called by level 2 functions** - Following the call chain
+4. **Helper functions and utilities** - At the bottom
+5. **Type definitions** - Before the functions that use them
+6. **Constants and configuration** - Near the top, after imports
+
+This organization makes scripts easier to read and understand the execution flow.
 
 ## Testing Checklist
 
