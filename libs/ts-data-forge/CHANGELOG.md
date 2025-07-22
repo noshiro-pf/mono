@@ -1,3 +1,9 @@
+## [3.0.4](https://github.com/noshiro-pf/ts-data-forge/compare/v3.0.3...v3.0.4) (2025-07-22)
+
+### Bug Fixes
+
+- fix build output ([#86](https://github.com/noshiro-pf/ts-data-forge/issues/86)) ([778efd8](https://github.com/noshiro-pf/ts-data-forge/commit/778efd8315a84fc36ac8358a9ad0f69c605c1997))
+
 ## [3.0.3](https://github.com/noshiro-pf/ts-data-forge/compare/v3.0.2...v3.0.3) (2025-07-19)
 
 ### Bug Fixes
