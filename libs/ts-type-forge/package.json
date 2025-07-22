@@ -44,7 +44,7 @@
     "tsc": "tsc --noEmit",
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit",
-    "update-packages": "npx npm-check-updates -u --install always --reject @types/node"
+    "update-packages": "npx npm-check-updates -u --install always"
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",
