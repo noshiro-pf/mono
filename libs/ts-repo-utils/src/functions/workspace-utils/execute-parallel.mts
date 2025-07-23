@@ -78,11 +78,11 @@ export const executeStages = async (
 
   const sorted = topologicalSortPackages(packages, dependencyGraph);
 
-  const stages: (readonly Package[])[] = [];
+  const mut_stages: (readonly Package[])[] = [];
   const completed = new Set<string>();
 
   while (completed.size < sorted.length) {
-    const stage: Package[] = [];
+    const mut_stage: Package[] = [];
 
     for (const pkg of sorted) {
       if (completed.has(pkg.name)) continue;
@@ -91,21 +91,21 @@ export const executeStages = async (
       const depsCompleted = deps.every((dep) => completed.has(dep));
 
       if (depsCompleted) {
-        stage.push(pkg);
+        mut_stage.push(pkg);
       }
     }
 
-    if (stage.length === 0) {
+    if (mut_stage.length === 0) {
       throw new Error('Circular dependency detected');
     }
 
-    stages.push(stage);
-    for (const pkg of stage) completed.add(pkg.name);
+    mut_stages.push(mut_stage);
+    for (const pkg of mut_stage) completed.add(pkg.name);
   }
 
-  console.log(`\nExecuting ${scriptName} in ${stages.length} stages...\n`);
+  console.log(`\nExecuting ${scriptName} in ${mut_stages.length} stages...\n`);
 
-  for (const [i, stage] of stages.entries()) {
+  for (const [i, stage] of mut_stages.entries()) {
     if (stage.length > 0) {
       console.log(`Stage ${i + 1}: ${stage.map((p) => p.name).join(', ')}`);
       // eslint-disable-next-line no-await-in-loop
@@ -199,7 +199,7 @@ const topologicalSortPackages = (
   dependencyGraph: ReadonlyMap<string, readonly string[]>,
 ): readonly Package[] => {
   const visited = new Set<string>();
-  const result: string[] = [];
+  const mut_result: string[] = [];
 
   const packageMap = new Map(packages.map((p) => [p.name, p]));
 
@@ -212,14 +212,14 @@ const topologicalSortPackages = (
       visit(dep);
     }
 
-    result.push(pkgName);
+    mut_result.push(pkgName);
   };
 
   for (const pkg of packages) {
     visit(pkg.name);
   }
 
-  return result
+  return mut_result
     .map((pkgName) => packageMap.get(pkgName))
     .filter(isNotUndefined);
 };

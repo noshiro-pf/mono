@@ -3,12 +3,9 @@ import '../node-global.mjs';
 import { getDiffFrom, getUntrackedFiles } from './diff.mjs';
 
 describe('diff', () => {
-  // Use project root for test files to ensure git tracking
-  const testFiles: string[] = [];
-
-  afterEach(async () => {
-    // Clean up test files
-    for (const file of testFiles) {
+  // Helper function to clean up test files
+  const cleanupTestFiles = async (files: Set<string>): Promise<void> => {
+    for (const file of files) {
       try {
         // eslint-disable-next-line no-await-in-loop
         await fs.rm(file, { force: true });
@@ -16,8 +13,7 @@ describe('diff', () => {
         // Ignore cleanup errors
       }
     }
-    testFiles.length = 0;
-  });
+  };
 
   describe('getUntrackedFiles', () => {
     test('should return empty array when no files are changed', async () => {
@@ -30,10 +26,12 @@ describe('diff', () => {
     });
 
     test('should detect newly created files', async () => {
+      const testFiles = new Set<string>();
+
       // Create a new file in project root
       const testFileName = 'test-new-file.tmp';
       const testFilePath = path.join(process.cwd(), testFileName);
-      testFiles.push(testFilePath);
+      testFiles.add(testFilePath);
 
       await fs.writeFile(testFilePath, 'test content');
 
@@ -42,15 +40,19 @@ describe('diff', () => {
       expect(Result.isOk(result)).toBe(true);
       if (Result.isOk(result)) {
         const files = result.value;
-        expect(files.some((file) => file === testFileName)).toBe(true);
+        expect(files).toContain(testFileName);
       }
+
+      await cleanupTestFiles(testFiles);
     });
 
     test('should detect modified existing files', async () => {
+      const testFiles = new Set<string>();
+
       // Use an existing file in the project that we can modify safely
       const testFileName = 'test-modify-file.tmp';
       const testFilePath = path.join(process.cwd(), testFileName);
-      testFiles.push(testFilePath);
+      testFiles.add(testFilePath);
 
       // Create and commit the file first
       await fs.writeFile(testFilePath, 'initial content');
@@ -66,18 +68,23 @@ describe('diff', () => {
       expect(Result.isOk(result)).toBe(true);
       if (Result.isOk(result)) {
         const files = result.value;
-        expect(files.some((file) => file === testFileName)).toBe(false);
+        expect(files).not.toContain(testFileName);
       }
 
       // Reset git state
       await $(`git reset HEAD ${testFileName}`, { silent: true });
+
+      await cleanupTestFiles(testFiles);
     });
 
     test('should detect multiple types of changes', async () => {
+      const testFiles = new Set<string>();
+
       // Create multiple test files
       const newFile = path.join(process.cwd(), 'test-new-file.tmp');
       const modifyFile = path.join(process.cwd(), 'test-modify-file.tmp');
-      testFiles.push(newFile, modifyFile);
+      testFiles.add(newFile);
+      testFiles.add(modifyFile);
 
       // Create new file
       await fs.writeFile(newFile, 'new file content');
@@ -94,14 +101,14 @@ describe('diff', () => {
       expect(Result.isOk(result)).toBe(true);
       if (Result.isOk(result)) {
         const files = result.value;
-        expect(files.some((file) => file === 'test-new-file.tmp')).toBe(true);
-        expect(files.some((file) => file === 'test-modify-file.tmp')).toBe(
-          false,
-        );
+        expect(files).toContain('test-new-file.tmp');
+        expect(files).not.toContain('test-modify-file.tmp');
       }
 
       // Reset git state
       await $(`git reset HEAD test-modify-file.tmp`, { silent: true });
+
+      await cleanupTestFiles(testFiles);
     });
 
     test('should exclude deleted files from results', async () => {
@@ -113,10 +120,10 @@ describe('diff', () => {
       if (Result.isOk(result)) {
         const files = result.value;
         // Verify no deleted files are included (status 'D')
-        files.forEach((file) => {
+        for (const file of files) {
           expect(typeof file).toBe('string');
           expect(file.length).toBeGreaterThan(0);
-        });
+        }
       }
     });
 
@@ -137,11 +144,11 @@ describe('diff', () => {
         const files = result.value;
 
         // Each file should be a non-empty string
-        files.forEach((file) => {
+        for (const file of files) {
           expect(typeof file).toBe('string');
           expect(file.trim()).toBe(file); // No leading/trailing whitespace
           expect(file.length).toBeGreaterThan(0);
-        });
+        }
       }
     });
 

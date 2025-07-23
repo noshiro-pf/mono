@@ -27,6 +27,7 @@ describe('formatFiles', () => {
     fs.readFile(filePath, 'utf8');
 
   test('should format files matching glob pattern', async () => {
+    vi.clearAllMocks();
     // Setup test directory
     await fs.mkdir(testDir, { recursive: true });
 
@@ -84,6 +85,7 @@ describe('formatFiles', () => {
   });
 
   test('should return ok when no files match pattern', async () => {
+    vi.clearAllMocks();
     const result = await formatFiles('/non-existent-path/*.ts', {
       silent: true,
     });
@@ -91,6 +93,7 @@ describe('formatFiles', () => {
   });
 
   test('should handle nested directories with glob pattern', async () => {
+    vi.clearAllMocks();
     // Setup test directory with nested structure
     await fs.mkdir(path.join(testDir, 'src', 'utils'), { recursive: true });
 
@@ -143,6 +146,7 @@ describe('formatFilesList', () => {
     fs.readFile(filePath, 'utf8');
 
   test('should format a list of files', async () => {
+    vi.clearAllMocks();
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -189,6 +193,7 @@ describe('formatFilesList', () => {
   });
 
   test('should return ok for empty file list', async () => {
+    vi.clearAllMocks();
     const result = await formatFilesList([], {
       silent: true,
     });
@@ -211,11 +216,8 @@ describe('formatDiffFrom', () => {
   const readTestFile = async (filePath: string): Promise<string> =>
     fs.readFile(filePath, 'utf8');
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   test('should format files from diff', async () => {
+    vi.clearAllMocks();
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -250,6 +252,7 @@ describe('formatDiffFrom', () => {
   });
 
   test('should include untracked files when option is set', async () => {
+    vi.clearAllMocks();
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -302,6 +305,7 @@ describe('formatDiffFrom', () => {
   });
 
   test('should deduplicate files when including untracked', async () => {
+    vi.clearAllMocks();
     await fs.mkdir(testDir, { recursive: true });
 
     try {

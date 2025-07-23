@@ -1,14 +1,14 @@
-import { genIndex } from '../../src/functions/gen-index.mjs';
-import '../../src/node-global.mjs';
+import { genIndex } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
 try {
   await genIndex({
-    formatCommand: 'npm run fmt',
     targetDirectory: path.resolve(projectRootPath, './src/functions'),
-    sourceExtensions: ['.mts'],
+    excludePatterns: ['*.d.mts', '*.test.mts'],
     indexExtension: '.mts',
     exportExtension: '.mjs',
+    sourceExtensions: ['.mts'],
+    formatCommand: 'npm run fmt',
   });
 } catch (error) {
   console.error(`Error: ${String(error)}`);

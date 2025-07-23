@@ -1,4 +1,4 @@
-import { isString } from 'ts-data-forge';
+import { Arr, type IMap, isString } from 'ts-data-forge';
 import '../node-global.mjs';
 import { assertPathExists } from './assert-path-exists.mjs';
 
@@ -47,22 +47,35 @@ export const assertExt = async (config: CheckExtConfig): Promise<void> => {
   if (allIncorrectFiles.length > 0) {
     const generateErrorMessage = (): string => {
       // Group directories by extension for a cleaner message
-      const extensionGroups = new Map<string, string[]>();
+      const extensionGroups: IMap<
+        string,
+        readonly Readonly<{
+          relativePath: string;
+          extKey: string;
+        }>[]
+      > = Arr.groupBy(
+        config.directories.map(({ path: dirPath, extension }) => {
+          const relativePath = path.relative(process.cwd(), dirPath);
+          const extKey = isString(extension)
+            ? extension
+            : extension.join(' or ');
 
-      for (const { path: dirPath, extension } of config.directories) {
-        const relativePath = path.relative(process.cwd(), dirPath);
-        const extKey = isString(extension) ? extension : extension.join(' or ');
-        if (!extensionGroups.has(extKey)) {
-          extensionGroups.set(extKey, []);
-        }
-        extensionGroups.get(extKey)?.push(relativePath);
-      }
+          return {
+            relativePath,
+            extKey,
+          };
+        }),
+        ({ extKey }) => extKey,
+      );
 
       // Generate message parts for each extension
       const messageParts = Array.from(
         extensionGroups.entries(),
         ([ext, dirs]) => {
-          const dirList = dirs.length === 1 ? dirs[0] : dirs.join(', ');
+          const dirList =
+            dirs.length === 1
+              ? dirs[0]?.relativePath
+              : dirs.map((d) => d.relativePath).join(', ');
           return `${dirList} should have ${ext} extension`;
         },
       );

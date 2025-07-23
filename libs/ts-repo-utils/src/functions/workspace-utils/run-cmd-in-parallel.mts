@@ -33,10 +33,10 @@ export const runCmdInParallelAcrossWorkspaces = async ({
 
     await executeParallel(filteredPackages, cmd, concurrency);
     console.log(`\n✅ ${cmd} completed successfully`);
-  } catch (err) {
+  } catch (error) {
     console.error(
       `\n❌ ${cmd} failed:`,
-      err instanceof Error ? err.message : (err?.toString() ?? ''),
+      error instanceof Error ? error.message : (error?.toString() ?? ''),
     );
     process.exit(1);
   }

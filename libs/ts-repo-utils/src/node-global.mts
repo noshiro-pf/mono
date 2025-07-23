@@ -1,6 +1,8 @@
 import { default as glob_ } from 'fast-glob';
 import * as fs_ from 'node:fs/promises';
 import * as path_ from 'node:path';
+
+// eslint-disable-next-line import/no-internal-modules
 import { $ as $_ } from './functions/exec-async.mjs';
 
 const globalsDef = {
@@ -12,6 +14,7 @@ const globalsDef = {
   glob: glob_,
 } as const;
 
+// eslint-disable-next-line functional/immutable-data
 Object.assign(globalThis, globalsDef);
 
 declare global {

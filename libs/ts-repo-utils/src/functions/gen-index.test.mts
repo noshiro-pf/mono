@@ -1,3 +1,5 @@
+export {}; // Make this file a module
+
 describe('index file regex', () => {
   const reg = /^index\.[cm]?[jt]s[x]?$/u;
 

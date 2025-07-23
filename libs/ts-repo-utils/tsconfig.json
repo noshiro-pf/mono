@@ -3,6 +3,11 @@
     "./configs/tsconfig/tsconfig.type-check.json",
     "./configs/tsconfig/tsconfig.vite.json"
   ],
+  "compilerOptions": {
+    "paths": {
+      "ts-repo-utils": ["./src/index.mts"]
+    }
+  },
   "include": [
     "./src",
     "./scripts",

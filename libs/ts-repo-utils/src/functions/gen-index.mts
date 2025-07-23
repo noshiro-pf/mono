@@ -146,8 +146,8 @@ const generateIndexFileForDir = async (
     const actualBaseDir = baseDir ?? dirPath;
     const entries = await fs.readdir(dirPath, { withFileTypes: true });
 
-    const subDirectories: string[] = [];
-    const filesToExport: string[] = [];
+    const mut_subDirectories: string[] = [];
+    const mut_filesToExport: string[] = [];
 
     for (const entry of entries) {
       const entryName = entry.name;
@@ -165,18 +165,18 @@ const generateIndexFileForDir = async (
       }
 
       if (entry.isDirectory()) {
-        subDirectories.push(entryName);
+        mut_subDirectories.push(entryName);
         // Recursively call for subdirectories first
         // eslint-disable-next-line no-await-in-loop
         await generateIndexFileForDir(entryPath, config, actualBaseDir);
       } else if (entry.isFile() && shouldExportFile(relativePath, config)) {
-        filesToExport.push(entryName);
+        mut_filesToExport.push(entryName);
       }
     }
 
     const indexContent = generateIndexContent(
-      subDirectories,
-      filesToExport,
+      mut_subDirectories,
+      mut_filesToExport,
       config,
     );
 

@@ -22,6 +22,7 @@ export const $ = (
   return new Promise((resolve) => {
     const execOptions = { timeout };
 
+    // eslint-disable-next-line security/detect-child-process
     exec(cmd, execOptions, (error, stdout, stderr) => {
       if (!silent) {
         if (stdout !== '') {

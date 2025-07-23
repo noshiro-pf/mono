@@ -1,3 +1,3 @@
-import { checkShouldRunTypeChecks } from '../../src/index.mjs';
+import { checkShouldRunTypeChecks } from 'ts-repo-utils';
 
 await checkShouldRunTypeChecks();

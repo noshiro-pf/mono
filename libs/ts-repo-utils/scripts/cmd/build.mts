@@ -1,6 +1,5 @@
 import { Result } from 'ts-data-forge';
-import { assertPathExists } from '../../src/index.mjs';
-import '../../src/node-global.mjs';
+import { assertPathExists } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const distDir = path.resolve(projectRootPath, './dist');

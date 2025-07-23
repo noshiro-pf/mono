@@ -25,7 +25,6 @@ export default {
     sourcemap: true,
     entryFileNames: '[name].mjs',
   },
-  external: (id: string) => !id.startsWith('.') && !path.isAbsolute(id),
   plugins: [
     rollupPluginReplace.default({
       'import.meta.vitest': 'undefined',

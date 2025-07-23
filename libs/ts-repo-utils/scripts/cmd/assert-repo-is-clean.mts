@@ -1,3 +1,3 @@
-import { assertRepoIsClean } from '../../src/index.mjs';
+import { assertRepoIsClean } from 'ts-repo-utils';
 
 await assertRepoIsClean();
