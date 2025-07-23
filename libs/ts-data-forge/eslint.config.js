@@ -1304,6 +1304,7 @@ export default tseslint.config(
       '@typescript-eslint/explicit-function-return-type': 'off',
       'unicorn/no-process-exit': 'off',
       'import/no-unassigned-import': 'off',
+      'import/no-extraneous-dependencies': 'off',
     },
   },
   {

@@ -94,7 +94,7 @@ expect(result).toStrictEqual([0, 0, 0]);
 - **YOU MUST**: Use `.toStrictEqual()` instead of `.toEqual()` in Vitest tests
 - **YOU MUST**: Use `test()` instead of `it()` in Vitest tests
 - **YOU MUST**: Use named exports unless restricted by libraries or frameworks
-- **YOU MUST**: Avoid using file scope `/* eslint disable */`.
+- **YOU MUST**: Avoid using file scope `/* eslint-disable */`.
 - **IMPORTANT**: Use arrow functions in all cases
 - **PREFER**: Type-safe operations over unsafe type assertions
 - **PREFER**: Readonly parameter types for complex objects

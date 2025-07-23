@@ -54,7 +54,7 @@ jobs:
         run: npm ci --engine-strict
 
       # NOTE: To include this workflow in the branch protection rule status check,
-      # skip each steps instead of skipping the entire workflow with paths-ignore.
+      # skip each step instead of skipping the entire workflow with paths-ignore.
       - name: Check diff
         id: check_diff_type
         run: npx tsx ./scripts/github-actions/should-run.mjs

@@ -1,5 +1,5 @@
+import { Result } from 'ts-data-forge';
 import { assertRepoIsClean } from 'ts-repo-utils';
-import { Result } from '../../src/index.mjs';
 
 /**
  * Runs all validation and build steps for the project.

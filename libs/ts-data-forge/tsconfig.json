@@ -3,6 +3,11 @@
     "./configs/tsconfig/tsconfig.type-check.json",
     "./configs/tsconfig/tsconfig.vite.json"
   ],
+  "compilerOptions": {
+    "paths": {
+      "ts-data-forge": ["./src/index.mts"]
+    }
+  },
   "include": [
     "./src",
     "./scripts",

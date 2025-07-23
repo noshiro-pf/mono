@@ -4,7 +4,7 @@ import { projectRootPath } from '../project-root-path.mjs';
 try {
   await genIndex({
     targetDirectory: path.resolve(projectRootPath, './src'),
-    excludePatterns: ['*.d.mts', '*.test.mts', 'type.mts'],
+    excludePatterns: ['*.d.mts', '*.test.mts'],
     indexExtension: '.mts',
     exportExtension: '.mjs',
     sourceExtensions: ['.mts'],
