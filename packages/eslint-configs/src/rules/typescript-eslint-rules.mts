@@ -408,7 +408,7 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/switch-exhaustiveness-check': [
     'error',
     {
-      allowDefaultCaseForExhaustiveSwitch: true,
+      allowDefaultCaseForExhaustiveSwitch: false,
       requireDefaultForNonUnion: true,
     },
   ],

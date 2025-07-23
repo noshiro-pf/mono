@@ -14,14 +14,14 @@ const isInRangeInclusive =
   (x: number): boolean =>
     lowerBound <= x && x <= upperBound;
 
-type LEQ = {
-  readonly [N in SmallUint]: Index<N>;
-};
+type LEQ = Readonly<{
+  [N in SmallUint]: Index<N>;
+}>;
 
 /* cspell:disable-next-line */
-type LEQC = {
-  readonly [N in SmallUint]: Index<N> | N;
-};
+type LEQC = Readonly<{
+  [N in SmallUint]: Index<N> | N;
+}>;
 
 /** `lowerBound <= x < upperBound` */
 const isUintInRange =
@@ -74,6 +74,21 @@ const isPositive = <N extends number>(
 const div = (a: number, b: NonZeroNumber | SmallInt<'!=0'>): number =>
   // eslint-disable-next-line total-functions/no-partial-division
   a / b;
+
+// TODO: generate code
+function add(
+  a: PositiveFiniteNumber,
+  b: NonNegativeFiniteNumber,
+): PositiveFiniteNumber;
+function add(
+  a: NonNegativeFiniteNumber,
+  b: PositiveFiniteNumber,
+): PositiveFiniteNumber;
+function add(a: FiniteNumber, b: FiniteNumber): FiniteNumber;
+function add(a: FiniteNumber, b: FiniteNumber): FiniteNumber {
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  return (a + b) as FiniteNumber;
+}
 
 // ValidNumber
 // FiniteNumber
@@ -152,6 +167,7 @@ export const Num = {
   isNonNegative,
   isPositive,
   div,
+  add,
   clamp,
   roundAt,
   roundBy,
