@@ -10,7 +10,7 @@
 
 ### GenIndexConfig
 
-> **GenIndexConfig** = `DeepReadonly`\<\{ `excludePatterns?`: readonly `string`[]; `exportExtension?`: `` `.${string}` ``; `formatCommand?`: `string`; `indexExtension?`: `` `.${string}` ``; `silent?`: `boolean`; `sourceExtensions?`: readonly `` `.${string}` ``[]; `targetDirectory`: `string` \| readonly `string`[]; \}\>
+> **GenIndexConfig** = `DeepReadonly`\<\{ `excludePatterns?`: readonly `string`[]; `exportExtension?`: `` `.${string}` `` \| `"none"`; `formatCommand?`: `string`; `indexExtension?`: `` `.${string}` ``; `silent?`: `boolean`; `sourceExtensions?`: readonly `` `.${string}` ``[]; `targetDirectory`: `string` \| readonly `string`[]; \}\>
 
 Defined in: [src/functions/gen-index.mts:9](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L9)
 
@@ -40,7 +40,7 @@ Glob patterns of files to exclude from exports (default: excludes `'**/*.{test,s
 
 ###### exportExtension?
 
-`` `.${string}` ``
+`` `.${string}` `` \| `"none"`
 
 File extension to use in export statements (default: '.js')
 

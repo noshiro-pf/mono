@@ -20,7 +20,7 @@ export type GenIndexConfig = DeepReadonly<{
   indexExtension?: `.${string}`;
 
   /** File extension to use in export statements (default: '.js') */
-  exportExtension?: `.${string}`;
+  exportExtension?: `.${string}` | 'none';
 
   /** Command to run for formatting generated files (default: 'npm run fmt') */
   formatCommand?: string;
@@ -35,7 +35,7 @@ type GenIndexConfigInternal = DeepReadonly<{
   excludePatterns: ISet<string>;
   sourceExtensions: ISet<`.${string}`>;
   indexExtension: `.${string}`;
-  exportExtension: `.${string}`;
+  exportExtension: `.${string}` | 'none';
   silent: boolean;
 }>;
 
@@ -65,7 +65,7 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
     }
 
     // Step 2: Generate index files
-    echo('2. Generating index files...');
+    echo('Generating index files...');
     for (const dir of targetDirs) {
       const resolvedDir = path.resolve(dir);
       // eslint-disable-next-line no-await-in-loop
@@ -75,7 +75,7 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
 
     // Step 3: Format generated files
     if (filledConfig.formatCommand !== undefined) {
-      echo('3. Formatting generated files...');
+      echo('Formatting generated files...');
       const fmtResult = await $(filledConfig.formatCommand, {
         silent: filledConfig.silent,
       });
@@ -191,6 +191,8 @@ const generateIndexFileForDir = async (
   }
 };
 
+const indexRegex = /^index\.[cm]?[jt]s[x]?$/u;
+
 /**
  * Determines if a file should be exported in the index file.
  * A file is exported if:
@@ -216,7 +218,7 @@ const shouldExportFile = (
 
   // Don't export the index file itself
   if (
-    /^index\.[cm]?[jt]s[x]?$/u.test(fileName) // Matches index.ts, index.mts, index.js, index.tsx
+    indexRegex.test(fileName) // Matches index.ts, index.mts, index.js, index.tsx
   ) {
     return false;
   }
@@ -234,6 +236,25 @@ const shouldExportFile = (
   return true;
 };
 
+if (import.meta.vitest !== undefined) {
+  describe('index file regex', () => {
+    test.each([
+      ['index.ts', true],
+      ['index.js', true],
+      ['index.mts', true],
+      ['index.mjs', true],
+      ['index.cts', true],
+      ['index.cjs', true],
+      ['index.tsx', true],
+      ['index.jsx', true],
+      ['not-index.ts', false],
+      ['index.txt', false],
+    ] as const)('indexRegex.test($0) to be $1', (fileName, expected) => {
+      expect(indexRegex.test(fileName)).toBe(expected);
+    });
+  });
+}
+
 /**
  * Generates the content for an index file.
  * @param subDirectories - Array of subdirectory names.
@@ -247,13 +268,17 @@ const generateIndexContent = (
   config: GenIndexConfigInternal,
 ): string => {
   const exportStatements = [
-    ...subDirectories.map(
-      (subDir) => `export * from "./${subDir}/index${config.exportExtension}";`,
+    ...subDirectories.map((subDir) =>
+      config.exportExtension === 'none'
+        ? `export * from "./${subDir}";`
+        : `export * from "./${subDir}/index${config.exportExtension}";`,
     ),
     ...filesToExport.map((file) => {
       const fileNameWithoutExt = path.basename(file, path.extname(file));
 
-      return `export * from "./${fileNameWithoutExt}${config.exportExtension}";`;
+      return config.exportExtension === 'none'
+        ? `export * from "./${fileNameWithoutExt}";`
+        : `export * from "./${fileNameWithoutExt}${config.exportExtension}";`;
     }),
   ];
 
