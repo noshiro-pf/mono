@@ -1,3 +1,9 @@
+# [5.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v5.0.2...v5.1.0) (2025-07-26)
+
+### Features
+
+- support "none" for exportExtension of genIndex ([#79](https://github.com/noshiro-pf/ts-repo-utils/issues/79)) ([86de329](https://github.com/noshiro-pf/ts-repo-utils/commit/86de329282d80e861f6990a29528a49592e6adb3))
+
 ## [5.0.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v5.0.1...v5.0.2) (2025-07-22)
 
 ### Bug Fixes
