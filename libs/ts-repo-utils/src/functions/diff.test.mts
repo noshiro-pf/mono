@@ -26,12 +26,12 @@ describe('diff', () => {
     });
 
     test('should detect newly created files', async () => {
-      const testFiles = new Set<string>();
+      const mut_testFiles = new Set<string>();
 
       // Create a new file in project root
       const testFileName = 'test-new-file.tmp';
       const testFilePath = path.join(process.cwd(), testFileName);
-      testFiles.add(testFilePath);
+      mut_testFiles.add(testFilePath);
 
       await fs.writeFile(testFilePath, 'test content');
 
@@ -43,25 +43,25 @@ describe('diff', () => {
         expect(files).toContain(testFileName);
       }
 
-      await cleanupTestFiles(testFiles);
+      await cleanupTestFiles(mut_testFiles);
     });
 
     test('should detect modified existing files', async () => {
-      const testFiles = new Set<string>();
+      const mut_testFiles = new Set<string>();
 
       // Use an existing file in the project that we can modify safely
       const testFileName = 'test-modify-file.tmp';
-      const testFilePath = path.join(process.cwd(), testFileName);
-      testFiles.add(testFilePath);
+      const mut_testFilePath = path.join(process.cwd(), testFileName);
+      mut_testFiles.add(mut_testFilePath);
 
       // Create and commit the file first
-      await fs.writeFile(testFilePath, 'initial content');
+      await fs.writeFile(mut_testFilePath, 'initial content');
 
       // Add to git to track it
       await $(`git add ${testFileName}`, { silent: true });
 
       // Modify the file
-      await fs.writeFile(testFilePath, 'modified content');
+      await fs.writeFile(mut_testFilePath, 'modified content');
 
       const result = await getUntrackedFiles({ silent: true });
 
@@ -74,17 +74,17 @@ describe('diff', () => {
       // Reset git state
       await $(`git reset HEAD ${testFileName}`, { silent: true });
 
-      await cleanupTestFiles(testFiles);
+      await cleanupTestFiles(mut_testFiles);
     });
 
     test('should detect multiple types of changes', async () => {
-      const testFiles = new Set<string>();
+      const mut_testFiles = new Set<string>();
 
       // Create multiple test files
       const newFile = path.join(process.cwd(), 'test-new-file.tmp');
       const modifyFile = path.join(process.cwd(), 'test-modify-file.tmp');
-      testFiles.add(newFile);
-      testFiles.add(modifyFile);
+      mut_testFiles.add(newFile);
+      mut_testFiles.add(modifyFile);
 
       // Create new file
       await fs.writeFile(newFile, 'new file content');
@@ -108,7 +108,7 @@ describe('diff', () => {
       // Reset git state
       await $(`git reset HEAD test-modify-file.tmp`, { silent: true });
 
-      await cleanupTestFiles(testFiles);
+      await cleanupTestFiles(mut_testFiles);
     });
 
     test('should exclude deleted files from results', async () => {

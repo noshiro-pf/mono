@@ -30,7 +30,7 @@ export const executeParallel = async (
     Result<Readonly<{ code?: number; skipped?: boolean }>, Error>
   >[] = [];
 
-  const executing = new Set<Promise<unknown>>();
+  const mut_executing = new Set<Promise<unknown>>();
 
   for (const pkg of packages) {
     const promise = executeScript(pkg, scriptName);
@@ -38,22 +38,22 @@ export const executeParallel = async (
     mut_resultPromises.push(promise);
 
     const wrappedPromise = promise.finally(() => {
-      executing.delete(wrappedPromise);
+      mut_executing.delete(wrappedPromise);
       if (DEBUG) {
-        console.debug('executing size', executing.size);
+        console.debug('executing size', mut_executing.size);
       }
     });
 
-    executing.add(wrappedPromise);
+    mut_executing.add(wrappedPromise);
 
     if (DEBUG) {
-      console.debug('executing size', executing.size);
+      console.debug('executing size', mut_executing.size);
     }
 
     // If we reach concurrency limit, wait for one to finish
-    if (executing.size >= concurrency) {
+    if (mut_executing.size >= concurrency) {
       // eslint-disable-next-line no-await-in-loop
-      await Promise.race(executing);
+      await Promise.race(mut_executing);
     }
   }
 
@@ -79,16 +79,16 @@ export const executeStages = async (
   const sorted = topologicalSortPackages(packages, dependencyGraph);
 
   const mut_stages: (readonly Package[])[] = [];
-  const completed = new Set<string>();
+  const mut_completed = new Set<string>();
 
-  while (completed.size < sorted.length) {
+  while (mut_completed.size < sorted.length) {
     const mut_stage: Package[] = [];
 
     for (const pkg of sorted) {
-      if (completed.has(pkg.name)) continue;
+      if (mut_completed.has(pkg.name)) continue;
 
       const deps = dependencyGraph.get(pkg.name) ?? [];
-      const depsCompleted = deps.every((dep) => completed.has(dep));
+      const depsCompleted = deps.every((dep) => mut_completed.has(dep));
 
       if (depsCompleted) {
         mut_stage.push(pkg);
@@ -100,7 +100,9 @@ export const executeStages = async (
     }
 
     mut_stages.push(mut_stage);
-    for (const pkg of mut_stage) completed.add(pkg.name);
+    for (const pkg of mut_stage) {
+      mut_completed.add(pkg.name);
+    }
   }
 
   console.log(`\nExecuting ${scriptName} in ${mut_stages.length} stages...\n`);
@@ -198,14 +200,14 @@ const topologicalSortPackages = (
   packages: readonly Package[],
   dependencyGraph: ReadonlyMap<string, readonly string[]>,
 ): readonly Package[] => {
-  const visited = new Set<string>();
+  const mut_visited = new Set<string>();
   const mut_result: string[] = [];
 
   const packageMap = new Map(packages.map((p) => [p.name, p]));
 
   const visit = (pkgName: string): void => {
-    if (visited.has(pkgName)) return;
-    visited.add(pkgName);
+    if (mut_visited.has(pkgName)) return;
+    mut_visited.add(pkgName);
 
     const deps = dependencyGraph.get(pkgName) ?? [];
     for (const dep of deps) {
@@ -234,14 +236,14 @@ const buildDependencyGraph = (
   packages: readonly Package[],
 ): ReadonlyMap<string, readonly string[]> => {
   const packageMap = new Map(packages.map((p) => [p.name, p]));
-  const graph = new Map<string, readonly string[]>();
+  const mut_graph = new Map<string, readonly string[]>();
 
   for (const pkg of packages) {
     const deps = Object.keys(pkg.dependencies).filter((depName) =>
       packageMap.has(depName),
     );
-    graph.set(pkg.name, deps);
+    mut_graph.set(pkg.name, deps);
   }
 
-  return graph;
+  return mut_graph;
 };
