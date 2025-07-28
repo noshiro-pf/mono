@@ -1,5 +1,5 @@
 import micromatch from 'micromatch';
-import { Arr, ISet, isString, Result } from 'ts-data-forge';
+import { Arr, ISet, isString, pipe, Result } from 'ts-data-forge';
 import '../node-global.mjs';
 import { assertPathExists } from './assert-path-exists.mjs';
 
@@ -9,8 +9,24 @@ export type GenIndexConfig = DeepReadonly<{
   targetDirectory: string | readonly string[];
 
   /**
-   * Glob patterns of files to exclude from exports (default: excludes
-   * `'**\/*.{test,spec}.?(c|m)[jt]s?(x)'`)
+   * Glob patterns of files or predicate function to exclude from exports
+   * (default: excludes `'**\/*.{test,spec}.?(c|m)[jt]s?(x)'`)
+   */
+  exclude?:
+    | readonly string[]
+    | ((
+        args: Readonly<{
+          absolutePath: string;
+          relativePath: string;
+          fileName: string;
+        }>,
+      ) => boolean);
+
+  /**
+   * Glob patterns of files or predicate function to exclude from exports
+   * (default: excludes `'**\/*.{test,spec}.?(c|m)[jt]s?(x)'`)
+   *
+   * @deprecated Use `exclude` instead.
    */
   excludePatterns?: readonly string[];
 
@@ -23,7 +39,7 @@ export type GenIndexConfig = DeepReadonly<{
   /** File extension to use in export statements (default: '.js') */
   exportExtension?: `.${string}` | 'none';
 
-  /** Command to run for formatting generated files (default: 'npm run fmt') */
+  /** Command to run for formatting generated files (optional) */
   formatCommand?: string;
 
   /** Whether to suppress output during execution (default: false) */
@@ -33,7 +49,13 @@ export type GenIndexConfig = DeepReadonly<{
 type GenIndexConfigInternal = DeepReadonly<{
   formatCommand: string | undefined;
   targetDirectory: ISet<string>;
-  excludePatterns: ISet<string>;
+  exclude: (
+    args: Readonly<{
+      absolutePath: string;
+      relativePath: string;
+      fileName: string;
+    }>,
+  ) => boolean;
   sourceExtensions: ISet<`.${string}`>;
   indexExtension: `.${string}`;
   exportExtension: `.${string}` | 'none';
@@ -105,14 +127,41 @@ const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
         ? [config.targetDirectory]
         : config.targetDirectory,
     ),
-    excludePatterns: ISet.create(
-      Arr.generate(function* () {
-        if (config.excludePatterns !== undefined) {
-          yield* config.excludePatterns;
-        }
-        yield '**/*.{test,spec}.?(c|m)[jt]s?(x)';
-      }),
-    ),
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    exclude: pipe(config.exclude ?? config.excludePatterns).map((exclude) =>
+      typeof exclude === 'function'
+        ? exclude
+        : pipe(
+            ISet.create<string>(
+              Arr.generate(function* () {
+                if (exclude !== undefined && Array.isArray(exclude)) {
+                  yield* exclude;
+                }
+                yield '**/*.{test,spec}.?(c|m)[jt]s?(x)';
+              }),
+            ),
+          ).map(
+            (set) =>
+              ({
+                relativePath,
+                fileName,
+              }: Readonly<{
+                absolutePath: string;
+                relativePath: string;
+                fileName: string;
+              }>) => {
+                for (const pattern of set.values()) {
+                  if (
+                    micromatch.isMatch(relativePath, pattern) ||
+                    micromatch.isMatch(fileName, pattern)
+                  ) {
+                    return true;
+                  }
+                }
+                return false;
+              },
+          ).value,
+    ).value,
     sourceExtensions: ISet.create(sourceExtensions),
     indexExtension: config.indexExtension ?? '.ts',
     exportExtension,
@@ -148,11 +197,11 @@ const generateIndexFileForDir = async (
       const relativePath = path.relative(actualBaseDir, entryPath);
 
       if (
-        config.excludePatterns.some(
-          (pat) =>
-            micromatch.isMatch(relativePath, pat) ||
-            micromatch.isMatch(entryName, pat),
-        )
+        config.exclude({
+          absolutePath: entryPath,
+          relativePath,
+          fileName: entryName,
+        })
       ) {
         continue; // Skip excluded directories/files
       }
@@ -162,7 +211,14 @@ const generateIndexFileForDir = async (
         // Recursively call for subdirectories first
         // eslint-disable-next-line no-await-in-loop
         await generateIndexFileForDir(entryPath, config, actualBaseDir);
-      } else if (entry.isFile() && shouldExportFile(relativePath, config)) {
+      } else if (
+        entry.isFile() &&
+        shouldExportFile({
+          absolutePath: entryPath,
+          filePath: relativePath,
+          config,
+        })
+      ) {
         mut_filesToExport.push(entryName);
       }
     }
@@ -195,13 +251,19 @@ const indexRegex = /^index\.[cm]?[jt]s[x]?$/u;
  * - It doesn't match any exclusion patterns
  *
  * @param filePath - The relative path to the file from the target directory.
+ * @param absolutePath - The absolute path to the file.
  * @param config - The merged configuration object.
  * @returns True if the file should be exported.
  */
-const shouldExportFile = (
-  filePath: string,
-  config: GenIndexConfigInternal,
-): boolean => {
+const shouldExportFile = ({
+  absolutePath,
+  filePath,
+  config,
+}: Readonly<{
+  absolutePath: string;
+  filePath: string;
+  config: GenIndexConfigInternal;
+}>): boolean => {
   const fileName = path.basename(filePath);
 
   const ext = path.extname(fileName);
@@ -219,13 +281,14 @@ const shouldExportFile = (
   }
 
   // Check against exclusion patterns
-  for (const pattern of config.excludePatterns.values()) {
-    if (
-      micromatch.isMatch(filePath, pattern) ||
-      micromatch.isMatch(fileName, pattern)
-    ) {
-      return false;
-    }
+  if (
+    config.exclude({
+      absolutePath,
+      relativePath: filePath,
+      fileName,
+    })
+  ) {
+    return false;
   }
 
   return true;

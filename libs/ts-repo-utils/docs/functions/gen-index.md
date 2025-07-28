@@ -10,7 +10,7 @@
 
 ### GenIndexConfig
 
-> **GenIndexConfig** = `DeepReadonly`\<\{ `excludePatterns?`: readonly `string`[]; `exportExtension?`: `` `.${string}` `` \| `"none"`; `formatCommand?`: `string`; `indexExtension?`: `` `.${string}` ``; `silent?`: `boolean`; `sourceExtensions?`: readonly `` `.${string}` ``[]; `targetDirectory`: `string` \| readonly `string`[]; \}\>
+> **GenIndexConfig** = `DeepReadonly`\<\{ `exclude?`: readonly `string`[] \| (`args`) => `boolean`; `excludePatterns?`: readonly `string`[]; `exportExtension?`: `` `.${string}` `` \| `"none"`; `formatCommand?`: `string`; `indexExtension?`: `` `.${string}` ``; `silent?`: `boolean`; `sourceExtensions?`: readonly `` `.${string}` ``[]; `targetDirectory`: `string` \| readonly `string`[]; \}\>
 
 Defined in: [src/functions/gen-index.mts:7](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L7)
 
@@ -22,7 +22,7 @@ Configuration for index file generation.
 
 > **genIndex**(`config`): `Promise`\<`void`\>
 
-Defined in: [src/functions/gen-index.mts:49](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L49)
+Defined in: [src/functions/gen-index.mts:71](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L71)
 
 Generates index.ts files recursively in `config.targetDirectory`.
 
@@ -32,12 +32,23 @@ Generates index.ts files recursively in `config.targetDirectory`.
 
 Configuration for index file generation
 
+###### exclude?
+
+readonly `string`[] \| (`args`) => `boolean`
+
+Glob patterns of files or predicate function to exclude from exports
+(default: excludes `'**/*.{test,spec}.?(c|m)[jt]s?(x)'`)
+
 ###### excludePatterns?
 
 readonly `string`[]
 
-Glob patterns of files to exclude from exports (default: excludes
-`'**/*.{test,spec}.?(c|m)[jt]s?(x)'`)
+Glob patterns of files or predicate function to exclude from exports
+(default: excludes `'**/*.{test,spec}.?(c|m)[jt]s?(x)'`)
+
+**Deprecated**
+
+Use `exclude` instead.
 
 ###### exportExtension?
 
@@ -49,7 +60,7 @@ File extension to use in export statements (default: '.js')
 
 `string`
 
-Command to run for formatting generated files (default: 'npm run fmt')
+Command to run for formatting generated files (optional)
 
 ###### indexExtension?
 
