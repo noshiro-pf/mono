@@ -13,10 +13,13 @@ import { type Package } from './types.mjs';
 const DEBUG = false as boolean;
 
 /**
- * Executes a npm script across multiple packages in parallel with a concurrency limit.
+ * Executes a npm script across multiple packages in parallel with a concurrency
+ * limit.
+ *
  * @param packages - Array of Package objects to execute the script in
  * @param scriptName - The name of the npm script to execute
- * @param concurrency - Maximum number of packages to process simultaneously (default: 3)
+ * @param concurrency - Maximum number of packages to process simultaneously
+ *   (default: 3)
  * @returns A promise that resolves to an array of execution results
  */
 export const executeParallel = async (
@@ -61,12 +64,14 @@ export const executeParallel = async (
 };
 
 /**
- * Executes a npm script across packages in dependency order stages.
- * Packages are grouped into stages where each stage contains packages whose
- * dependencies have been completed in previous stages.
+ * Executes a npm script across packages in dependency order stages. Packages
+ * are grouped into stages where each stage contains packages whose dependencies
+ * have been completed in previous stages.
+ *
  * @param packages - Array of Package objects to execute the script in
  * @param scriptName - The name of the npm script to execute
- * @param concurrency - Maximum number of packages to process simultaneously within each stage (default: 3)
+ * @param concurrency - Maximum number of packages to process simultaneously
+ *   within each stage (default: 3)
  * @returns A promise that resolves when all stages are complete
  */
 export const executeStages = async (
@@ -118,11 +123,14 @@ export const executeStages = async (
 
 /**
  * Executes a npm script in a specific package directory.
+ *
  * @param pkg - The package object containing path and metadata
  * @param scriptName - The name of the npm script to execute
  * @param options - Configuration options
- * @param options.prefix - Whether to prefix output with package name (default: true)
- * @returns A promise that resolves to execution result with exit code or skipped flag
+ * @param options.prefix - Whether to prefix output with package name (default:
+ *   true)
+ * @returns A promise that resolves to execution result with exit code or
+ *   skipped flag
  */
 const executeScript = (
   pkg: Package,
@@ -191,8 +199,9 @@ const executeScript = (
   ).value;
 
 /**
- * Performs a topological sort on packages based on their dependencies,
- * ensuring dependencies are ordered before their dependents.
+ * Performs a topological sort on packages based on their dependencies, ensuring
+ * dependencies are ordered before their dependents.
+ *
  * @param packages - Array of Package objects to sort
  * @returns An array of packages in dependency order (dependencies first)
  */
@@ -229,8 +238,10 @@ const topologicalSortPackages = (
 /**
  * Builds a dependency graph from the given packages, mapping each package name
  * to its internal workspace dependencies.
+ *
  * @param packages - Array of Package objects to analyze
- * @returns A readonly map where keys are package names and values are arrays of their dependency package names
+ * @returns A readonly map where keys are package names and values are arrays of
+ *   their dependency package names
  */
 const buildDependencyGraph = (
   packages: readonly Package[],

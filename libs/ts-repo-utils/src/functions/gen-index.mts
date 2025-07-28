@@ -3,14 +3,15 @@ import { Arr, ISet, isString, Result } from 'ts-data-forge';
 import '../node-global.mjs';
 import { assertPathExists } from './assert-path-exists.mjs';
 
-/**
- * Configuration for index file generation.
- */
+/** Configuration for index file generation. */
 export type GenIndexConfig = DeepReadonly<{
   /** Target directories to generate index files for (string or array of strings) */
   targetDirectory: string | readonly string[];
 
-  /** Glob patterns of files to exclude from exports (default: excludes `'**\/*.{test,spec}.?(c|m)[jt]s?(x)'`) */
+  /**
+   * Glob patterns of files to exclude from exports (default: excludes
+   * `'**\/*.{test,spec}.?(c|m)[jt]s?(x)'`)
+   */
   excludePatterns?: readonly string[];
 
   /** File extensions of source files to export (default: ['.ts', '.tsx']) */
@@ -41,6 +42,7 @@ type GenIndexConfigInternal = DeepReadonly<{
 
 /**
  * Generates index.ts files recursively in `config.targetDirectory`.
+ *
  * @param config - Configuration for index file generation
  * @throws Error if any step fails.
  */
@@ -92,17 +94,6 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
   }
 };
 
-/**
- * Fills the configuration with default values.
- * Default values:
- * - sourceExtensions: ['.ts']
- * - indexExtension: '.ts'
- * - exportExtension: '.js'
- * - excludePatterns: ['**\/*.{test,spec}.?(c|m)[jt]s?(x)']
- * - silent: false
- * @param config - The input configuration object.
- * @returns The configuration object with all required properties filled with defaults.
- */
 const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
   const sourceExtensions = config.sourceExtensions ?? ['.ts'];
   const exportExtension = config.exportExtension ?? '.js'; // For ESM imports, .mts resolves to .mjs
@@ -130,11 +121,13 @@ const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
 };
 
 /**
- * Generates an index.ts file for the given directory.
- * Recursively calls itself for subdirectories.
+ * Generates an index.ts file for the given directory. Recursively calls itself
+ * for subdirectories.
+ *
  * @param dirPath - The absolute path to the directory to process.
  * @param config - The merged configuration object.
- * @param baseDir - The base directory path for calculating relative paths (optional, defaults to dirPath).
+ * @param baseDir - The base directory path for calculating relative paths
+ *   (optional, defaults to dirPath).
  * @throws Error if directory processing fails.
  */
 const generateIndexFileForDir = async (
@@ -194,11 +187,13 @@ const generateIndexFileForDir = async (
 const indexRegex = /^index\.[cm]?[jt]s[x]?$/u;
 
 /**
- * Determines if a file should be exported in the index file.
- * A file is exported if:
+ * Determines if a file should be exported in the index file. A file is exported
+ * if:
+ *
  * - It has one of the configured source extensions
  * - It's not an index file itself
  * - It doesn't match any exclusion patterns
+ *
  * @param filePath - The relative path to the file from the target directory.
  * @param config - The merged configuration object.
  * @returns True if the file should be exported.
@@ -257,6 +252,7 @@ if (import.meta.vitest !== undefined) {
 
 /**
  * Generates the content for an index file.
+ *
  * @param subDirectories - Array of subdirectory names.
  * @param filesToExport - Array of file names to export.
  * @param config - The merged configuration object.

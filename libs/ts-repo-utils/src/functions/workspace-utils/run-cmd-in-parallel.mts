@@ -5,11 +5,15 @@ import { getWorkspacePackages } from './get-workspace-packages.mjs';
 
 /**
  * Executes a npm script command across all workspace packages in parallel.
+ *
  * @param options - Configuration options for the parallel execution
- * @param options.rootPackageJsonDir - The directory containing the root package.json file
+ * @param options.rootPackageJsonDir - The directory containing the root
+ *   package.json file
  * @param options.cmd - The npm script command to execute in each package
- * @param options.concurrency - Maximum number of packages to process simultaneously (default: 3)
- * @param options.filterWorkspacePattern - Optional function to filter packages by name
+ * @param options.concurrency - Maximum number of packages to process
+ *   simultaneously (default: 3)
+ * @param options.filterWorkspacePattern - Optional function to filter packages
+ *   by name
  * @returns A promise that resolves when all packages have completed execution
  */
 export const runCmdInParallelAcrossWorkspaces = async ({

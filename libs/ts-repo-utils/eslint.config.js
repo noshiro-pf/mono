@@ -1188,8 +1188,8 @@ export default tseslint.config(
       'unicorn/prefer-modern-math-apis': 'error',
 
       /**
-       * `.some(b => b)` is better than `.some(Boolean)` because `Boolean` coerce
-       * non-boolean type to boolean.
+       * `.some(b => b)` is better than `.some(Boolean)` because `Boolean`
+       * coerce non-boolean type to boolean.
        *
        * Related rules:
        *

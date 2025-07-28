@@ -12,10 +12,10 @@
 
 > **assertRepoIsClean**(`options?`): `Promise`\<`void`\>
 
-Defined in: [src/functions/assert-repo-is-clean.mts:20](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-repo-is-clean.mts#L20)
+Defined in: [src/functions/assert-repo-is-clean.mts:21](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-repo-is-clean.mts#L21)
 
-Checks if the repository is clean and exits with code 1 if it is dirty.
-Shows git status and diff output before exiting.
+Checks if the repository is clean and exits with code 1 if it is dirty. Shows
+git status and diff output before exiting.
 
 #### Parameters
 
@@ -33,7 +33,7 @@ Shows git status and diff output before exiting.
 
 > **repoIsDirty**(`options?`): `Promise`\<`boolean`\>
 
-Defined in: [src/functions/assert-repo-is-clean.mts:9](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-repo-is-clean.mts#L9)
+Defined in: [src/functions/assert-repo-is-clean.mts:10](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-repo-is-clean.mts#L10)
 
 Checks if the repository has uncommitted changes.
 

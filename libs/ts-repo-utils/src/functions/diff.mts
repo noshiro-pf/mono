@@ -2,9 +2,7 @@ import { type ExecException } from 'node:child_process';
 import { Result } from 'ts-data-forge';
 import '../node-global.mjs';
 
-/**
- * Get files that have been changed (git status).
- */
+/** Get files that have been changed (git status). */
 export const getUntrackedFiles = async (
   options?: Readonly<{
     /** @default true */
@@ -42,9 +40,7 @@ export const getUntrackedFiles = async (
   return Result.ok(files);
 };
 
-/**
- * Get files that differ from the specified base branch or commit
- */
+/** Get files that differ from the specified base branch or commit */
 export const getDiffFrom = async (
   base: string,
   options?: Readonly<{

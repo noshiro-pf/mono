@@ -12,7 +12,7 @@
 
 > **$**(`cmd`, `options`): `Promise`\<`Result`\<`Readonly`\<\{ `stderr`: `string`; `stdout`: `string`; \}\>, `ExecException`\>\>
 
-Defined in: [src/functions/exec-async.mts:10](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L10)
+Defined in: [src/functions/exec-async.mts:11](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L11)
 
 Executes a shell command asynchronously.
 

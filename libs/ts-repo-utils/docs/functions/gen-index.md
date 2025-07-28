@@ -12,7 +12,7 @@
 
 > **GenIndexConfig** = `DeepReadonly`\<\{ `excludePatterns?`: readonly `string`[]; `exportExtension?`: `` `.${string}` `` \| `"none"`; `formatCommand?`: `string`; `indexExtension?`: `` `.${string}` ``; `silent?`: `boolean`; `sourceExtensions?`: readonly `` `.${string}` ``[]; `targetDirectory`: `string` \| readonly `string`[]; \}\>
 
-Defined in: [src/functions/gen-index.mts:9](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L9)
+Defined in: [src/functions/gen-index.mts:7](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L7)
 
 Configuration for index file generation.
 
@@ -22,7 +22,7 @@ Configuration for index file generation.
 
 > **genIndex**(`config`): `Promise`\<`void`\>
 
-Defined in: [src/functions/gen-index.mts:47](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L47)
+Defined in: [src/functions/gen-index.mts:49](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L49)
 
 Generates index.ts files recursively in `config.targetDirectory`.
 
@@ -36,7 +36,8 @@ Configuration for index file generation
 
 readonly `string`[]
 
-Glob patterns of files to exclude from exports (default: excludes `'**/*.{test,spec}.?(c|m)[jt]s?(x)'`)
+Glob patterns of files to exclude from exports (default: excludes
+`'**/*.{test,spec}.?(c|m)[jt]s?(x)'`)
 
 ###### exportExtension?
 

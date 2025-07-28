@@ -1,7 +1,8 @@
 {
   "plugins": [
     "prettier-plugin-organize-imports",
-    "prettier-plugin-packagejson"
+    "prettier-plugin-packagejson",
+    "prettier-plugin-jsdoc"
   ],
   "semi": true,
   "endOfLine": "lf",

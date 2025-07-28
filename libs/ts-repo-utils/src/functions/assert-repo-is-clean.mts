@@ -3,6 +3,7 @@ import '../node-global.mjs';
 
 /**
  * Checks if the repository has uncommitted changes.
+ *
  * @returns True if the repo is dirty, false otherwise.
  * @throws Error if git command fails.
  */
@@ -14,8 +15,8 @@ export const repoIsDirty = async (
 };
 
 /**
- * Checks if the repository is clean and exits with code 1 if it is dirty.
- * Shows git status and diff output before exiting.
+ * Checks if the repository is clean and exits with code 1 if it is dirty. Shows
+ * git status and diff output before exiting.
  */
 export const assertRepoIsClean = async (
   options?: Readonly<{ silent?: boolean }>,
@@ -56,6 +57,7 @@ export const assertRepoIsClean = async (
 
 /**
  * Gets the git status of the repository.
+ *
  * @returns An object containing status information.
  */
 const getGitStatus = async (

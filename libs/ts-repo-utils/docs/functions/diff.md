@@ -12,7 +12,7 @@
 
 > **getDiffFrom**(`base`, `options?`): `Promise`\<`Result`\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-Defined in: [src/functions/diff.mts:48](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/diff.mts#L48)
+Defined in: [src/functions/diff.mts:44](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/diff.mts#L44)
 
 Get files that differ from the specified base branch or commit
 
@@ -36,7 +36,7 @@ Get files that differ from the specified base branch or commit
 
 > **getUntrackedFiles**(`options?`): `Promise`\<`Result`\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-Defined in: [src/functions/diff.mts:8](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/diff.mts#L8)
+Defined in: [src/functions/diff.mts:6](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/diff.mts#L6)
 
 Get files that have been changed (git status).
 

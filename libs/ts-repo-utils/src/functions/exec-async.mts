@@ -3,6 +3,7 @@ import { Result } from 'ts-data-forge';
 
 /**
  * Executes a shell command asynchronously.
+ *
  * @param cmd - The command to execute.
  * @param options - Optional configuration for command execution.
  * @returns A promise that resolves with the command result.

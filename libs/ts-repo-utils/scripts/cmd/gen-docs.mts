@@ -7,9 +7,7 @@ const TYPEDOC_CONFIG = path.resolve(
   './configs/typedoc.config.mjs',
 );
 
-/**
- * Generates documentation using TypeDoc and formats the output.
- */
+/** Generates documentation using TypeDoc and formats the output. */
 const genDocs = async (): Promise<void> => {
   echo('Starting documentation generation...\n');
 

@@ -3,7 +3,12 @@ import * as path from 'node:path';
 const srcDir = path.resolve(import.meta.dirname, '../src');
 const outDir = path.resolve(import.meta.dirname, '../docs');
 
-/** @type { Partial<import("typedoc").TypeDocOptions & import("typedoc-plugin-markdown").PluginOptions>} */
+/**
+ * @type {Partial<
+ *   import('typedoc').TypeDocOptions &
+ *     import('typedoc-plugin-markdown').PluginOptions
+ * >}
+ */
 const config = {
   plugin: ['typedoc-plugin-markdown'],
   router: 'module',

@@ -12,9 +12,10 @@
 
 > **executeParallel**(`packages`, `scriptName`, `concurrency`): `Promise`\<readonly `Result`\<`Readonly`\<\{ `code?`: `number`; `skipped?`: `boolean`; \}\>, `Error`\>[]\>
 
-Defined in: [src/functions/workspace-utils/execute-parallel.mts:22](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L22)
+Defined in: [src/functions/workspace-utils/execute-parallel.mts:25](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L25)
 
-Executes a npm script across multiple packages in parallel with a concurrency limit.
+Executes a npm script across multiple packages in parallel with a concurrency
+limit.
 
 #### Parameters
 
@@ -34,7 +35,8 @@ The name of the npm script to execute
 
 `number` = `3`
 
-Maximum number of packages to process simultaneously (default: 3)
+Maximum number of packages to process simultaneously
+(default: 3)
 
 #### Returns
 
@@ -48,11 +50,11 @@ A promise that resolves to an array of execution results
 
 > **executeStages**(`packages`, `scriptName`, `concurrency`): `Promise`\<`void`\>
 
-Defined in: [src/functions/workspace-utils/execute-parallel.mts:72](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L72)
+Defined in: [src/functions/workspace-utils/execute-parallel.mts:77](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L77)
 
-Executes a npm script across packages in dependency order stages.
-Packages are grouped into stages where each stage contains packages whose
-dependencies have been completed in previous stages.
+Executes a npm script across packages in dependency order stages. Packages
+are grouped into stages where each stage contains packages whose dependencies
+have been completed in previous stages.
 
 #### Parameters
 
@@ -72,7 +74,8 @@ The name of the npm script to execute
 
 `number` = `3`
 
-Maximum number of packages to process simultaneously within each stage (default: 3)
+Maximum number of packages to process simultaneously
+within each stage (default: 3)
 
 #### Returns
 
