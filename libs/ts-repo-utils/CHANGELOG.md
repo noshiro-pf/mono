@@ -1,3 +1,9 @@
+# [5.2.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v5.1.0...v5.2.0) (2025-07-28)
+
+### Features
+
+- enhance genIndex configuration ([#81](https://github.com/noshiro-pf/ts-repo-utils/issues/81)) ([9326319](https://github.com/noshiro-pf/ts-repo-utils/commit/9326319caf7252e56a4f2654fab7f0b31356c898))
+
 # [5.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v5.0.2...v5.1.0) (2025-07-26)
 
 ### Features
