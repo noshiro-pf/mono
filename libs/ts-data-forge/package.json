@@ -21,13 +21,13 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/type.d.mts",
+        "types": "./dist/types.d.mts",
         "default": "./dist/index.mjs"
       }
     }
   },
   "module": "./dist/index.mjs",
-  "types": "./dist/type.d.mts",
+  "types": "./dist/types.d.mts",
   "files": [
     "src",
     "dist",
