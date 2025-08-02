@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / condition/extends
+[ts-type-forge](../README.md) / condition/extends
 
 # condition/extends
 

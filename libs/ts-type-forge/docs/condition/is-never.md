@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / condition/is-never
+[ts-type-forge](../README.md) / condition/is-never
 
 # condition/is-never
 

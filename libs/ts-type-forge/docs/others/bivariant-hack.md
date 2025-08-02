@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / others/bivariant-hack
+[ts-type-forge](../README.md) / others/bivariant-hack
 
 # others/bivariant-hack
 

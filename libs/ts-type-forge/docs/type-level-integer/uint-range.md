@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / type-level-integer/uint-range
+[ts-type-forge](../README.md) / type-level-integer/uint-range
 
 # type-level-integer/uint-range
 

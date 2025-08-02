@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / type-level-integer/increment
+[ts-type-forge](../README.md) / type-level-integer/increment
 
 # type-level-integer/increment
 

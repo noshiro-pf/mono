@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / constants/falsy-value
+[ts-type-forge](../README.md) / constants/falsy-value
 
 # constants/falsy-value
 

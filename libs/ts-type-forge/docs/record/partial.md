@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / record/partial
+[ts-type-forge](../README.md) / record/partial
 
 # record/partial
 

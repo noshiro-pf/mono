@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / condition/is-union
+[ts-type-forge](../README.md) / condition/is-union
 
 # condition/is-union
 

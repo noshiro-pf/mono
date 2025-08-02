@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / tuple-and-list/index-of-tuple
+[ts-type-forge](../README.md) / tuple-and-list/index-of-tuple
 
 # tuple-and-list/index-of-tuple
 

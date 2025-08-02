@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / constants/int-enum
+[ts-type-forge](../README.md) / constants/int-enum
 
 # constants/int-enum
 

@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / branded-types/int32
+[ts-type-forge](../README.md) / branded-types/int32
 
 # branded-types/int32
 

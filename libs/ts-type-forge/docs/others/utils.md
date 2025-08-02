@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / others/utils
+[ts-type-forge](../README.md) / others/utils
 
 # others/utils
 

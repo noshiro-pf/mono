@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / constants/web
+[ts-type-forge](../README.md) / constants/web
 
 # constants/web
 

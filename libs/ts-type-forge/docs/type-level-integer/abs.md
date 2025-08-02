@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / type-level-integer/abs
+[ts-type-forge](../README.md) / type-level-integer/abs
 
 # type-level-integer/abs
 

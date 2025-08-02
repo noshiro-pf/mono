@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / branded-types/finite-number
+[ts-type-forge](../README.md) / branded-types/finite-number
 
 # branded-types/finite-number
 

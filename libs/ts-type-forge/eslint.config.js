@@ -195,7 +195,7 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['eslint.config.js', 'dist', 'coverage'],
+    ignores: ['eslint.config.js', 'dist', 'coverage', 'docs/_media'],
   },
   {
     files: ['**/*.mjs', '**/*.mts'],

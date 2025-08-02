@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / condition/is-fixed-length-list
+[ts-type-forge](../README.md) / condition/is-fixed-length-list
 
 # condition/is-fixed-length-list
 

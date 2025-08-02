@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-type-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / tuple-and-list/array
+[ts-type-forge](../README.md) / tuple-and-list/array
 
 # tuple-and-list/array
 
