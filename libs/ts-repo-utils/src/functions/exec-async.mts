@@ -1,44 +1,79 @@
-import { exec, type ExecException } from 'node:child_process';
+import {
+  exec,
+  type ExecException,
+  type ExecOptions as ExecOptions_,
+} from 'node:child_process';
 import { Result } from 'ts-data-forge';
+
+type ExecOptionsCustom = Readonly<{
+  silent?: boolean;
+}>;
+
+type ExecOptions = DeepReadonly<ExecOptions_ & ExecOptionsCustom>;
+
+type ExecResult<T extends string | Buffer> = Result<
+  Readonly<{ stdout: T; stderr: T }>,
+  ExecException
+>;
 
 /**
  * Executes a shell command asynchronously.
  *
- * @param cmd - The command to execute.
+ * @param command - The command to execute.
  * @param options - Optional configuration for command execution.
  * @returns A promise that resolves with the command result.
  */
-export const $ = (
-  cmd: string,
-  options: Readonly<{ silent?: boolean; timeout?: number }> = {},
-): Promise<
-  Result<Readonly<{ stdout: string; stderr: string }>, ExecException>
-> => {
-  const { silent = false, timeout = 30000 } = options;
+export function $(
+  command: string,
+  options?: ExecOptionsCustom,
+): Promise<ExecResult<string>>;
+
+export function $(
+  command: string,
+  options: Readonly<{ encoding: 'buffer' | null } & ExecOptions>,
+): Promise<ExecResult<Buffer>>;
+
+export function $(
+  command: string,
+  options: Readonly<{ encoding: BufferEncoding } & ExecOptions>,
+): Promise<ExecResult<string>>;
+
+export function $(
+  command: string,
+  options?: Readonly<
+    { encoding?: BufferEncoding | 'buffer' | null } & ExecOptions
+  >,
+): Promise<ExecResult<string | Buffer>> {
+  const { silent = false, ...restOptions } = options ?? {};
 
   if (!silent) {
-    echo(`$ ${cmd}`);
+    echo(`$ ${command}`);
   }
 
   return new Promise((resolve) => {
-    const execOptions = { timeout };
-
     // eslint-disable-next-line security/detect-child-process
-    exec(cmd, execOptions, (error, stdout, stderr) => {
-      if (!silent) {
-        if (stdout !== '') {
-          echo(stdout);
+    exec(
+      command,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      restOptions as {
+        encoding?: 'buffer' | null | BufferEncoding;
+      } & ExecOptions_,
+      (error, stdout, stderr) => {
+        if (!silent) {
+          if (stdout !== '') {
+            echo(stdout);
+          }
+          if (stderr !== '') {
+            console.error(stderr);
+          }
         }
-        if (stderr !== '') {
-          console.error(stderr);
-        }
-      }
 
-      if (error !== null) {
-        resolve(Result.err(error));
-      } else {
-        resolve(Result.ok({ stdout, stderr }));
-      }
-    });
+        if (error !== null) {
+          resolve(Result.err(error));
+        } else {
+          resolve(Result.ok({ stdout, stderr }));
+        }
+      },
+    );
   });
-};
+}

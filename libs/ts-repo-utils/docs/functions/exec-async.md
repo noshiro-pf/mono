@@ -10,28 +10,86 @@
 
 ### $()
 
-> **$**(`cmd`, `options`): `Promise`\<`Result`\<`Readonly`\<\{ `stderr`: `string`; `stdout`: `string`; \}\>, `ExecException`\>\>
+#### Call Signature
 
-Defined in: [src/functions/exec-async.mts:11](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L11)
+> **$**(`command`, `options?`): `Promise`\<`ExecResult`\<`string`\>\>
+
+Defined in: [src/functions/exec-async.mts:26](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L26)
 
 Executes a shell command asynchronously.
 
-#### Parameters
+##### Parameters
 
-##### cmd
+###### command
 
 `string`
 
 The command to execute.
 
-##### options
+###### options?
 
-`Readonly`\<\{ `silent?`: `boolean`; `timeout?`: `number`; \}\> = `{}`
+`Readonly`\<\{ `silent?`: `boolean`; \}\>
 
 Optional configuration for command execution.
 
-#### Returns
+##### Returns
 
-`Promise`\<`Result`\<`Readonly`\<\{ `stderr`: `string`; `stdout`: `string`; \}\>, `ExecException`\>\>
+`Promise`\<`ExecResult`\<`string`\>\>
+
+A promise that resolves with the command result.
+
+#### Call Signature
+
+> **$**(`command`, `options`): `Promise`\<`ExecResult`\<`Buffer`\<`ArrayBufferLike`\>\>\>
+
+Defined in: [src/functions/exec-async.mts:31](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L31)
+
+Executes a shell command asynchronously.
+
+##### Parameters
+
+###### command
+
+`string`
+
+The command to execute.
+
+###### options
+
+`Readonly`\<`object` & `ExecOptions`\>
+
+Optional configuration for command execution.
+
+##### Returns
+
+`Promise`\<`ExecResult`\<`Buffer`\<`ArrayBufferLike`\>\>\>
+
+A promise that resolves with the command result.
+
+#### Call Signature
+
+> **$**(`command`, `options`): `Promise`\<`ExecResult`\<`string`\>\>
+
+Defined in: [src/functions/exec-async.mts:36](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L36)
+
+Executes a shell command asynchronously.
+
+##### Parameters
+
+###### command
+
+`string`
+
+The command to execute.
+
+###### options
+
+`Readonly`\<`object` & `ExecOptions`\>
+
+Optional configuration for command execution.
+
+##### Returns
+
+`Promise`\<`ExecResult`\<`string`\>\>
 
 A promise that resolves with the command result.
