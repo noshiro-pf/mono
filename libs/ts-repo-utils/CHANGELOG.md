@@ -1,3 +1,9 @@
+# [5.3.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v5.2.1...v5.3.0) (2025-08-02)
+
+### Features
+
+- add ExecOptions to $ ([#87](https://github.com/noshiro-pf/ts-repo-utils/issues/87)) ([a72a98d](https://github.com/noshiro-pf/ts-repo-utils/commit/a72a98d508d0efabc627260b63df4a0bb8c7b327))
+
 ## [5.2.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v5.2.0...v5.2.1) (2025-08-02)
 
 ### Bug Fixes
