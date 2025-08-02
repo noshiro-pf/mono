@@ -74,7 +74,7 @@
     "prettier-plugin-organize-imports": "^4.2.0",
     "prettier-plugin-packagejson": "^2.5.19",
     "semantic-release": "^24.2.7",
-    "ts-data-forge": "^3.0.4",
+    "ts-data-forge": "^3.0.5",
     "ts-repo-utils": "^5.0.2",
     "ts-type-forge": "^2.1.0",
     "tsx": "^4.20.3",

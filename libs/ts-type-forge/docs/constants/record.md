@@ -12,7 +12,7 @@
 
 > **UnknownRecord** = [`ReadonlyRecord`](../record/std.md#readonlyrecord)\<`string`, `unknown`\>
 
-Defined in: [constants/record.d.mts:34](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/record.d.mts#L34)
+Defined in: [src/constants/record.d.mts:34](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/record.d.mts#L34)
 
 Represents a generic readonly record (object) type where keys are strings
 and values are of type `unknown`.

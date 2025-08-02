@@ -12,7 +12,7 @@
 
 > **TypeEq**\<`A`, `B`\> = \<`T`\>() => `T` _extends_ `A` ? `1` : `2` _extends_ \<`T`\>() => `T` _extends_ `B` ? `1` : `2` ? `true` : `false`
 
-Defined in: [condition/eq.d.mts:23](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/eq.d.mts#L23)
+Defined in: [src/condition/eq.d.mts:23](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/eq.d.mts#L23)
 
 Checks if two types `A` and `B` are exactly the same.
 

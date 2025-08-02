@@ -12,7 +12,7 @@
 
 > **IndexOfTuple**\<`T`\> = `TSTypeForgeInternals.IndexOfTupleImpl`\<`T`, keyof `T`\>
 
-Defined in: [tuple-and-list/index-of-tuple.d.mts:14](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/index-of-tuple.d.mts#L14)
+Defined in: [src/tuple-and-list/index-of-tuple.d.mts:14](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/index-of-tuple.d.mts#L14)
 
 Extracts the numeric index type from a readonly array or tuple type `T`.
 If `T` is a tuple (fixed length), it returns a union of its numeric index literals (e.g., `0 | 1 | 2`).
@@ -45,7 +45,7 @@ type ReadonlyArrayIndices = IndexOfTuple<readonly number[]>; // number
 
 > **NegativeIndexOfTuple**\<`T`\> = `TSTypeForgeInternals.MapIdx`\<[`RelaxedExclude`](../record/std.md#relaxedexclude)\<[`IndexOfTuple`](#indexoftuple)\<\[`...T`, `0`\]\>, `0`\>\>
 
-Defined in: [tuple-and-list/index-of-tuple.d.mts:31](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/index-of-tuple.d.mts#L31)
+Defined in: [src/tuple-and-list/index-of-tuple.d.mts:31](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/index-of-tuple.d.mts#L31)
 
 Extracts the negative index type from a readonly array or tuple type `T`.
 Negative indices allow accessing elements from the end of the array (e.g., `-1` for last element).

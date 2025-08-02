@@ -12,7 +12,7 @@
 
 > **IsUnion**\<`U`\> = `TSTypeForgeInternals.IsUnionImpl`\<`U`, `U`\>
 
-Defined in: [condition/is-union.d.mts:26](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/is-union.d.mts#L26)
+Defined in: [src/condition/is-union.d.mts:26](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/is-union.d.mts#L26)
 
 Checks if a given type `U` is a union type (contains more than one distinct type member).
 

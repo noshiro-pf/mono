@@ -12,7 +12,7 @@
 
 > **AbsoluteValue**\<`N`\> = `N` _extends_ `N` ? `` `${N}` `` _extends_ `` `-${infer P}` `` ? `P` _extends_ `` `${number}` `` ? [`ToNumber`](../others/utils.md#tonumber)\<`P`\> : `never` : `N` : `never`
 
-Defined in: [type-level-integer/abs.d.mts:15](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/abs.d.mts#L15)
+Defined in: [src/type-level-integer/abs.d.mts:15](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/abs.d.mts#L15)
 
 Calculates the absolute value of a number literal type `N`.
 If `N` is a negative number literal, it returns its positive counterpart.
@@ -46,7 +46,7 @@ type Union = AbsoluteValue<-1 | 2>; // 1 | 2
 
 > **Abs**\<`N`\> = [`AbsoluteValue`](#absolutevalue)\<`N`\>
 
-Defined in: [type-level-integer/abs.d.mts:32](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/abs.d.mts#L32)
+Defined in: [src/type-level-integer/abs.d.mts:32](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/abs.d.mts#L32)
 
 Shorter alias for `AbsoluteValue<N>`.
 Calculates the absolute value of a number literal type `N`.

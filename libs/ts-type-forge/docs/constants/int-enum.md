@@ -12,7 +12,7 @@
 
 > **Uint8** = [`Index`](../type-level-integer/index-type.md#index)\<`256`\>
 
-Defined in: [constants/int-enum.d.mts:18](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L18)
+Defined in: [src/constants/int-enum.d.mts:18](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L18)
 
 Represents an unsigned 8-bit integer.
 A union of integer literals from `0` to `255` (2^8 - 1).
@@ -37,7 +37,7 @@ const isValidUint8 = (value: number): value is Uint8 => {
 
 > **Uint9** = [`Index`](../type-level-integer/index-type.md#index)\<`512`\>
 
-Defined in: [constants/int-enum.d.mts:36](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L36)
+Defined in: [src/constants/int-enum.d.mts:36](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L36)
 
 Represents an unsigned 9-bit integer.
 A union of integer literals from `0` to `511` (2^9 - 1).
@@ -61,7 +61,7 @@ const validate9Bit = (value: number): value is Uint9 => {
 
 > **Uint10** = [`Index`](../type-level-integer/index-type.md#index)\<`1024`\>
 
-Defined in: [constants/int-enum.d.mts:55](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L55)
+Defined in: [src/constants/int-enum.d.mts:55](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L55)
 
 Represents an unsigned 10-bit integer.
 A union of integer literals from `0` to `1023` (2^10 - 1).
@@ -86,7 +86,7 @@ const isValid10Bit = (value: number): value is Uint10 => {
 
 > **Int8** = `Readonly`\<[`Index`](../type-level-integer/index-type.md#index)\<`128`\> \| [`NegativeIndex`](../type-level-integer/index-type.md#negativeindex)\<`128`\>\>
 
-Defined in: [constants/int-enum.d.mts:61](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L61)
+Defined in: [src/constants/int-enum.d.mts:61](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L61)
 
 Represents a signed 8-bit integer.
 A union of integer literals from `-128` to `127`.
@@ -97,7 +97,7 @@ A union of integer literals from `-128` to `127`.
 
 > **Int9** = `Readonly`\<[`Index`](../type-level-integer/index-type.md#index)\<`256`\> \| [`NegativeIndex`](../type-level-integer/index-type.md#negativeindex)\<`256`\>\>
 
-Defined in: [constants/int-enum.d.mts:67](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L67)
+Defined in: [src/constants/int-enum.d.mts:67](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L67)
 
 Represents a signed 9-bit integer.
 A union of integer literals from `-256` to `255`.
@@ -108,7 +108,7 @@ A union of integer literals from `-256` to `255`.
 
 > **Int10** = `Readonly`\<[`Index`](../type-level-integer/index-type.md#index)\<`512`\> \| [`NegativeIndex`](../type-level-integer/index-type.md#negativeindex)\<`512`\>\>
 
-Defined in: [constants/int-enum.d.mts:73](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L73)
+Defined in: [src/constants/int-enum.d.mts:73](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L73)
 
 Represents a signed 10-bit integer.
 A union of integer literals from `-512` to `511`.
@@ -119,7 +119,7 @@ A union of integer literals from `-512` to `511`.
 
 > **MonthEnum** = `Exclude`\<[`Index`](../type-level-integer/index-type.md#index)\<`13`\>, `0`\>
 
-Defined in: [constants/int-enum.d.mts:95](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L95)
+Defined in: [src/constants/int-enum.d.mts:95](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L95)
 
 Represents the months of the year using 1-based indexing.
 A union of integer literals from `1` (January) to `12` (December).
@@ -147,7 +147,7 @@ type December = 12 satisfies MonthEnum;
 
 > **MonthIndexEnum** = [`Index`](../type-level-integer/index-type.md#index)\<`12`\>
 
-Defined in: [constants/int-enum.d.mts:117](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L117)
+Defined in: [src/constants/int-enum.d.mts:117](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L117)
 
 Represents the zero-based index for months of the year.
 A union of integer literals from `0` (January) to `11` (December).
@@ -176,7 +176,7 @@ const toMonthIndex = (month: MonthEnum): MonthIndexEnum =>
 
 > **DateEnum** = `Exclude`\<[`Index`](../type-level-integer/index-type.md#index)\<`32`\>, `0`\>
 
-Defined in: [constants/int-enum.d.mts:123](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L123)
+Defined in: [src/constants/int-enum.d.mts:123](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L123)
 
 Represents the day of the month.
 A union of integer literals from `1` to `31`.
@@ -187,7 +187,7 @@ A union of integer literals from `1` to `31`.
 
 > **DayOfWeekIndex** = [`Index`](../type-level-integer/index-type.md#index)\<`7`\>
 
-Defined in: [constants/int-enum.d.mts:129](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L129)
+Defined in: [src/constants/int-enum.d.mts:129](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L129)
 
 Represents the zero-based index for the day of the week.
 A union of integer literals from `0` (typically Sunday) to `6` (typically Saturday).
@@ -198,7 +198,7 @@ A union of integer literals from `0` (typically Sunday) to `6` (typically Saturd
 
 > **DayOfWeekName** = `"Sun"` \| `"Mon"` \| `"Tue"` \| `"Wed"` \| `"Thr"` \| `"Fri"` \| `"Sat"`
 
-Defined in: [constants/int-enum.d.mts:135](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L135)
+Defined in: [src/constants/int-enum.d.mts:135](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L135)
 
 Represents the names of the days of the week.
 A union of string literals: `'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thr' | 'Fri' | 'Sat'`.
@@ -209,7 +209,7 @@ A union of string literals: `'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thr' | 'Fri' | 'Sa
 
 > **HoursEnum** = [`Index`](../type-level-integer/index-type.md#index)\<`24`\>
 
-Defined in: [constants/int-enum.d.mts:164](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L164)
+Defined in: [src/constants/int-enum.d.mts:164](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L164)
 
 Represents the hours in a day using 24-hour format.
 A union of integer literals from `0` (midnight) to `23` (11 PM).
@@ -245,7 +245,7 @@ type ElevenPM = 23 satisfies HoursEnum;
 
 > **MinutesEnum** = [`Sexagesimal`](#sexagesimal)
 
-Defined in: [constants/int-enum.d.mts:170](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L170)
+Defined in: [src/constants/int-enum.d.mts:170](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L170)
 
 Represents the minutes in an hour.
 A union of integer literals from `0` to `59`.
@@ -256,7 +256,7 @@ A union of integer literals from `0` to `59`.
 
 > **SecondsEnum** = [`Sexagesimal`](#sexagesimal)
 
-Defined in: [constants/int-enum.d.mts:176](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L176)
+Defined in: [src/constants/int-enum.d.mts:176](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L176)
 
 Represents the seconds in a minute.
 A union of integer literals from `0` to `59`.
@@ -267,7 +267,7 @@ A union of integer literals from `0` to `59`.
 
 > **MillisecondsEnum** = [`Index`](../type-level-integer/index-type.md#index)\<`1000`\>
 
-Defined in: [constants/int-enum.d.mts:182](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L182)
+Defined in: [src/constants/int-enum.d.mts:182](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L182)
 
 Represents the milliseconds in a second.
 A union of integer literals from `0` to `999`.
@@ -278,7 +278,7 @@ A union of integer literals from `0` to `999`.
 
 > **Sexagesimal** = [`Index`](../type-level-integer/index-type.md#index)\<`60`\>
 
-Defined in: [constants/int-enum.d.mts:188](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L188)
+Defined in: [src/constants/int-enum.d.mts:188](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L188)
 
 Represents a value in the sexagesimal system (base 60), commonly used for minutes and seconds.
 A union of integer literals from `0` to `59`.
@@ -289,7 +289,7 @@ A union of integer literals from `0` to `59`.
 
 > **Percent** = [`Index`](../type-level-integer/index-type.md#index)\<`101`\>
 
-Defined in: [constants/int-enum.d.mts:217](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L217)
+Defined in: [src/constants/int-enum.d.mts:217](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/int-enum.d.mts#L217)
 
 Represents a percentage value as an integer.
 A union of integer literals from `0` to `100`.

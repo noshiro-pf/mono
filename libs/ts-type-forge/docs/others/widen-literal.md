@@ -12,7 +12,7 @@
 
 > **WidenLiteral**\<`T`\> = `T` _extends_ `string` ? `string` : `T` _extends_ `number` ? `number` : `T` _extends_ `boolean` ? `boolean` : `T` _extends_ `bigint` ? `bigint` : `T` _extends_ `symbol` ? `symbol` : `T`
 
-Defined in: [others/widen-literal.d.mts:47](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/widen-literal.d.mts#L47)
+Defined in: [src/others/widen-literal.d.mts:47](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/widen-literal.d.mts#L47)
 
 Widens a literal type `T` to its corresponding primitive type.
 

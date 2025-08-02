@@ -12,7 +12,7 @@
 
 > **UintRange**\<`Start`, `End`\> = [`RelaxedExclude`](../record/std.md#relaxedexclude)\<[`Index`](index-type.md#index)\<`End`\>, [`Index`](index-type.md#index)\<`Start`\>\>
 
-Defined in: [type-level-integer/uint-range.d.mts:13](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/uint-range.d.mts#L13)
+Defined in: [src/type-level-integer/uint-range.d.mts:13](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/uint-range.d.mts#L13)
 
 Creates a union of non-negative integer literals starting from `Start` (inclusive) up to `End` (exclusive).
 Requires `Start` and `End` to be non-negative integer literals where `Start <= End`.
@@ -49,7 +49,7 @@ type R3 = UintRange<5, 5>; // never
 
 > **UintRangeInclusive**\<`MinValue`, `MaxValue`\> = [`RelaxedExclude`](../record/std.md#relaxedexclude)\<[`IndexInclusive`](index-type.md#indexinclusive)\<`MaxValue`\>, [`Index`](index-type.md#index)\<`MinValue`\>\>
 
-Defined in: [type-level-integer/uint-range.d.mts:30](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/uint-range.d.mts#L30)
+Defined in: [src/type-level-integer/uint-range.d.mts:30](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/uint-range.d.mts#L30)
 
 Creates a union of non-negative integer literals starting from `MinValue` (inclusive) up to `MaxValue` (inclusive).
 Requires `MinValue` and `MaxValue` to be non-negative integer literals where `MinValue <= MaxValue`.

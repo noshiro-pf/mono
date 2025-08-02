@@ -12,7 +12,7 @@
 
 > **Index**\<`N`\> = [`IndexOfTuple`](../tuple-and-list/index-of-tuple.md#indexoftuple)\<[`MakeTuple`](../tuple-and-list/make-tuple.md#maketuple)\<`0`, `N`\>\>
 
-Defined in: [type-level-integer/index-type.d.mts:13](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/index-type.d.mts#L13)
+Defined in: [src/type-level-integer/index-type.d.mts:13](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/index-type.d.mts#L13)
 
 Creates a union of non-negative integer literals from 0 up to (but not including) `N`.
 Equivalent to `0 | 1 | ... | N-1`.
@@ -44,7 +44,7 @@ type Idx1 = Index<1>; // 0
 
 > **IndexInclusive**\<`N`\> = [`IndexOfTuple`](../tuple-and-list/index-of-tuple.md#indexoftuple)\<\[`...MakeTuple<0, N>`, `0`\]\>
 
-Defined in: [type-level-integer/index-type.d.mts:26](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/index-type.d.mts#L26)
+Defined in: [src/type-level-integer/index-type.d.mts:26](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/index-type.d.mts#L26)
 
 Creates a union of non-negative integer literals from 0 up to (and including) `N`.
 Equivalent to `0 | 1 | ... | N`.
@@ -75,7 +75,7 @@ type IdxInc0 = IndexInclusive<0>; // 0
 
 > **NegativeIndex**\<`N`\> = `TSTypeForgeInternals.MapIdx`\<[`RelaxedExclude`](../record/std.md#relaxedexclude)\<[`IndexInclusive`](#indexinclusive)\<`N`\>, `0`\>\>
 
-Defined in: [type-level-integer/index-type.d.mts:40](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/index-type.d.mts#L40)
+Defined in: [src/type-level-integer/index-type.d.mts:40](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/index-type.d.mts#L40)
 
 Creates a union of negative integer literals from -1 down to (and including) `-N`.
 Equivalent to `-1 | -2 | ... | -N`.

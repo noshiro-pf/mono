@@ -12,7 +12,7 @@
 
 > **Mutable**\<`T`\> = `{ -readonly [P in keyof T]: T[P] }`
 
-Defined in: [others/mutable.d.mts:30](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L30)
+Defined in: [src/others/mutable.d.mts:30](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L30)
 
 Makes all properties of an object type `T` mutable by removing the `readonly` modifier.
 This utility is the opposite of TypeScript's built-in `Readonly<T>` utility type.
@@ -58,7 +58,7 @@ type EditableConfig = Mutable<Config>; // { host: string; port: number; ssl: boo
 
 > **ToMutableMap**\<`T`\> = `T` _extends_ `ReadonlyMap`\<infer K, infer V\> ? `Map`\<`K`, `V`\> : `never`
 
-Defined in: [others/mutable.d.mts:51](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L51)
+Defined in: [src/others/mutable.d.mts:51](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L51)
 
 Converts a `ReadonlyMap<K, V>` type to its mutable counterpart `Map<K, V>`.
 Extracts the key and value types from the readonly map and creates a standard mutable Map.
@@ -95,7 +95,7 @@ const convertToMutable = (
 
 > **ToMutableSet**\<`T`\> = `T` _extends_ `ReadonlySet`\<infer V\> ? `Set`\<`V`\> : `never`
 
-Defined in: [others/mutable.d.mts:73](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L73)
+Defined in: [src/others/mutable.d.mts:73](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L73)
 
 Converts a `ReadonlySet<V>` type to its mutable counterpart `Set<V>`.
 Extracts the value type from the readonly set and creates a standard mutable Set.
@@ -130,7 +130,7 @@ const convertToMutable = (readonlySet: ReadonlySet<string>): Set<string> => {
 
 > **MutableSet**\<`K`\> = `Set`\<`K`\>
 
-Defined in: [others/mutable.d.mts:90](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L90)
+Defined in: [src/others/mutable.d.mts:90](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L90)
 
 Alias for the standard `Set<K>` type. Represents a mutable set collection.
 Provided for consistency with naming conventions and to make intent explicit.
@@ -158,7 +158,7 @@ tags.delete('react'); // ✓ allowed
 
 > **MutableMap**\<`K`, `V`\> = `Map`\<`K`, `V`\>
 
-Defined in: [others/mutable.d.mts:107](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L107)
+Defined in: [src/others/mutable.d.mts:107](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L107)
 
 Alias for the standard `Map<K, V>` type. Represents a mutable map collection.
 Provided for consistency with naming conventions and to make intent explicit.

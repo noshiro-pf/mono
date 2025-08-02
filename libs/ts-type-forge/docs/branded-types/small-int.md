@@ -12,7 +12,7 @@
 
 > **SmallInt**\<`T`, `MaxIndex`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"<=0"`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| `0` : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"<0"`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `">=0"`\> _extends_ `true` ? [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> \| `0` : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `">0"`\> _extends_ `true` ? [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"!=0"`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `""`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> \| `0` : `never`
 
-Defined in: [branded-types/small-int.d.mts:22](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L22)
+Defined in: [src/branded-types/small-int.d.mts:22](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L22)
 
 Union type of small integer literals for type-level operations.
 Provides literal integer types within a small range for precise typing.
@@ -53,7 +53,7 @@ type Offset = SmallInt<'!=0', 6>; // -5 | -4 | -3 | -2 | -1 | 1 | 2 | 3 | 4 | 5
 
 > **SmallUint** = [`SmallInt`](#smallint)\<`">=0"`\>
 
-Defined in: [branded-types/small-int.d.mts:55](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L55)
+Defined in: [src/branded-types/small-int.d.mts:55](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L55)
 
 Union type of small non-negative integer literals.
 Convenience type for `SmallInt<'>=0'>`.
@@ -71,7 +71,7 @@ const getItem = <T>(arr: readonly T[], i: Index) => arr[i];
 
 > **WithSmallInt**\<`N`, `MaxIndex`\> = [`WithSmallIntImpl`](brand/namespaces/TSTypeForgeInternals/README.md#withsmallintimpl)\<[`CastToInt`](brand/namespaces/TSTypeForgeInternals/README.md#casttoint)\<[`NormalizeBrandUnion`](brand/README.md#normalizebrandunion)\<`N`\>\>, `MaxIndex`\>
 
-Defined in: [branded-types/small-int.d.mts:84](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L84)
+Defined in: [src/branded-types/small-int.d.mts:84](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L84)
 
 Enhances an integer brand type with literal values for small integers.
 This enables more precise typing for small integer values while maintaining
@@ -120,7 +120,7 @@ type SmallPositiveInt = WithSmallInt<PositiveInt>; // 1 to 39 | PositiveInt
 
 > **ExcludeSmallInt**\<`N`, `MaxIndex`\> = [`RelaxedExclude`](../record/std.md#relaxedexclude)\<`N`, [`SmallInt`](#smallint)\<`""`, `MaxIndex`\>\>
 
-Defined in: [branded-types/small-int.d.mts:113](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L113)
+Defined in: [src/branded-types/small-int.d.mts:113](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L113)
 
 Removes small integer literals from an integer type enhanced with WithSmallInt.
 Useful for converting back to pure branded types.

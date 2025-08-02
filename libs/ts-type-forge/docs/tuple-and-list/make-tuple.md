@@ -12,7 +12,7 @@
 
 > **MakeTuple**\<`Elm`, `N`\> = `TSTypeForgeInternals.MakeTupleInternals.MakeTupleImpl`\<`Elm`, `` `${N}` ``, \[\]\>
 
-Defined in: [tuple-and-list/make-tuple.d.mts:13](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/make-tuple.d.mts#L13)
+Defined in: [src/tuple-and-list/make-tuple.d.mts:13](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/make-tuple.d.mts#L13)
 
 Creates a readonly tuple type of a specific length `N` with elements of type `Elm`.
 

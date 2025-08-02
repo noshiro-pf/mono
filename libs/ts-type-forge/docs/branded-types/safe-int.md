@@ -12,7 +12,7 @@
 
 > **SafeInt** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`Int`](int.md#int), `"SafeInt"`\>
 
-Defined in: [branded-types/safe-int.d.mts:17](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L17)
+Defined in: [src/branded-types/safe-int.d.mts:17](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L17)
 
 Branded numeric type for safe integers.
 Represents integers that can be exactly represented in JavaScript (±2^53 - 1).
@@ -36,7 +36,7 @@ const safeMath = {
 
 > **NonZeroSafeInt** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`SafeInt`](#safeint), [`NonZeroNumber`](core.md#nonzeronumber)\>
 
-Defined in: [branded-types/safe-int.d.mts:32](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L32)
+Defined in: [src/branded-types/safe-int.d.mts:32](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L32)
 
 Branded numeric type for non-zero safe integers.
 Represents safe integers that are not equal to zero.
@@ -57,7 +57,7 @@ const step = (current: SafeInt, increment: NonZeroSafeInt): SafeInt =>
 
 > **SafeUint** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`SafeInt`](#safeint), [`NonNegativeNumber`](core.md#nonnegativenumber)\>
 
-Defined in: [branded-types/safe-int.d.mts:47](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L47)
+Defined in: [src/branded-types/safe-int.d.mts:47](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L47)
 
 Branded numeric type for safe unsigned integers.
 Represents non-negative integers within the safe integer range.
@@ -78,7 +78,7 @@ const timestamp = (): SafeUint => Date.now() as SafeUint;
 
 > **PositiveSafeInt** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`SafeInt`](#safeint), [`PositiveNumber`](core.md#positivenumber)\>
 
-Defined in: [branded-types/safe-int.d.mts:62](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L62)
+Defined in: [src/branded-types/safe-int.d.mts:62](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L62)
 
 Branded numeric type for positive safe integers.
 Represents positive integers within the safe integer range.
@@ -99,7 +99,7 @@ const port = (num: PositiveSafeInt & Uint16) => ({ port: num });
 
 > **NegativeSafeInt** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`SafeInt`](#safeint), [`NegativeNumber`](core.md#negativenumber)\>
 
-Defined in: [branded-types/safe-int.d.mts:76](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L76)
+Defined in: [src/branded-types/safe-int.d.mts:76](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L76)
 
 Branded numeric type for negative safe integers.
 Represents negative integers within the safe integer range.
@@ -119,7 +119,7 @@ const priority = (level: NegativeSafeInt) => ({ priority: -level });
 
 > **NonNegativeSafeInt** = [`SafeUint`](#safeuint)
 
-Defined in: [branded-types/safe-int.d.mts:83](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L83)
+Defined in: [src/branded-types/safe-int.d.mts:83](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L83)
 
 Alias for `SafeUint`.
 Branded numeric type for non-negative safe integers.
@@ -131,7 +131,7 @@ Represents non-negative integers within the safe integer range.
 
 > **SafeIntWithSmallInt** = [`WithSmallInt`](small-int.md#withsmallint)\<[`SafeInt`](#safeint)\>
 
-Defined in: [branded-types/safe-int.d.mts:89](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L89)
+Defined in: [src/branded-types/safe-int.d.mts:89](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L89)
 
 Safe integer type with small literal values included.
 Type: `-40 | -39 | ... | 39 | SafeInt`
@@ -142,7 +142,7 @@ Type: `-40 | -39 | ... | 39 | SafeInt`
 
 > **NonZeroSafeIntWithSmallInt** = [`WithSmallInt`](small-int.md#withsmallint)\<[`NonZeroSafeInt`](#nonzerosafeint)\>
 
-Defined in: [branded-types/safe-int.d.mts:95](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L95)
+Defined in: [src/branded-types/safe-int.d.mts:95](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L95)
 
 Non-zero safe integer type with small literal values included.
 Type: `-40 | ... | -1 | 1 | ... | 39 | NonZeroSafeInt`
@@ -153,7 +153,7 @@ Type: `-40 | ... | -1 | 1 | ... | 39 | NonZeroSafeInt`
 
 > **NonNegativeSafeIntWithSmallInt** = [`WithSmallInt`](small-int.md#withsmallint)\<[`NonNegativeSafeInt`](#nonnegativesafeint)\>
 
-Defined in: [branded-types/safe-int.d.mts:101](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L101)
+Defined in: [src/branded-types/safe-int.d.mts:101](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L101)
 
 Non-negative safe integer type with small literal values included.
 Type: `0 | 1 | ... | 39 | NonNegativeSafeInt`
@@ -164,7 +164,7 @@ Type: `0 | 1 | ... | 39 | NonNegativeSafeInt`
 
 > **SafeUintWithSmallInt** = [`WithSmallInt`](small-int.md#withsmallint)\<[`SafeUint`](#safeuint)\>
 
-Defined in: [branded-types/safe-int.d.mts:108](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L108)
+Defined in: [src/branded-types/safe-int.d.mts:108](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L108)
 
 Alias for `NonNegativeSafeIntWithSmallInt`.
 Safe unsigned integer type with small literal values included.
@@ -176,7 +176,7 @@ Type: `0 | 1 | ... | 39 | SafeUint`
 
 > **PositiveSafeIntWithSmallInt** = [`WithSmallInt`](small-int.md#withsmallint)\<[`PositiveSafeInt`](#positivesafeint)\>
 
-Defined in: [branded-types/safe-int.d.mts:114](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L114)
+Defined in: [src/branded-types/safe-int.d.mts:114](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L114)
 
 Positive safe integer type with small literal values included.
 Type: `1 | 2 | ... | 39 | PositiveSafeInt`
@@ -187,7 +187,7 @@ Type: `1 | 2 | ... | 39 | PositiveSafeInt`
 
 > **NegativeSafeIntWithSmallInt** = [`WithSmallInt`](small-int.md#withsmallint)\<[`NegativeSafeInt`](#negativesafeint)\>
 
-Defined in: [branded-types/safe-int.d.mts:120](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L120)
+Defined in: [src/branded-types/safe-int.d.mts:120](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/safe-int.d.mts#L120)
 
 Negative safe integer type with small literal values included.
 Type: `-40 | -39 | ... | -1 | NegativeSafeInt`

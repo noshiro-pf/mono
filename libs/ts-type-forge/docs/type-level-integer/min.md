@@ -12,7 +12,7 @@
 
 > **Min**\<`N`\> = `TSTypeForgeInternals.MinImpl`\<`N`, \[\]\>
 
-Defined in: [type-level-integer/min.d.mts:12](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/min.d.mts#L12)
+Defined in: [src/type-level-integer/min.d.mts:12](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/min.d.mts#L12)
 
 Calculates the minimum value within a union of non-negative integer literals `N` (which must extend `Uint10`).
 

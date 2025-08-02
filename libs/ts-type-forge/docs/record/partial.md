@@ -12,7 +12,7 @@
 
 > **PartiallyPartial**\<`T`, `K`\> = [`MergeIntersection`](../others/utils.md#mergeintersection)\<`Omit`\<`T`, `K`\> & `Partial`\<`Pick`\<`T`, `K`\>\>\>
 
-Defined in: [record/partial.d.mts:12](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L12)
+Defined in: [src/record/partial.d.mts:12](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L12)
 
 Creates a type where specified keys `K` of `T` are made optional.
 The resulting type is a merged intersection for better readability.
@@ -49,7 +49,7 @@ type PartiallyPartialData = PartiallyPartial<Data, 'a' | 'b'>;
 
 > **PartiallyOptional**\<`T`, `K`\> = [`PartiallyPartial`](#partiallypartial)\<`T`, `K`\>
 
-Defined in: [record/partial.d.mts:26](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L26)
+Defined in: [src/record/partial.d.mts:26](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L26)
 
 Alias for `PartiallyPartial`. Creates a type where specified keys `K` of `T` are made optional.
 
@@ -85,7 +85,7 @@ type PartiallyOptionalData = PartiallyOptional<Data, 'a' | 'b'>;
 
 > **PartiallyNullable**\<`T`, `K`\> = [`MergeIntersection`](../others/utils.md#mergeintersection)\<`Omit`\<`T`, `K`\> & \{ \[P in K\]: T\[P\] \| undefined \}\>
 
-Defined in: [record/partial.d.mts:39](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L39)
+Defined in: [src/record/partial.d.mts:39](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L39)
 
 Creates a type where specified keys `K` of `T` are made nullable (i.e., `| undefined` is added to their type).
 The resulting type is a merged intersection for better readability.
@@ -122,7 +122,7 @@ type PartiallyNullableData = PartiallyNullable<Data, 'a' | 'b'>;
 
 > **PartiallyRequired**\<`T`, `K`\> = [`MergeIntersection`](../others/utils.md#mergeintersection)\<`Omit`\<`T`, `K`\> & `Required`\<`Pick`\<`T`, `K`\>\>\>
 
-Defined in: [record/partial.d.mts:54](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L54)
+Defined in: [src/record/partial.d.mts:54](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L54)
 
 Creates a type where specified keys `K` of `T` are made required (removing the optional `?` modifier).
 The resulting type is a merged intersection for better readability.
@@ -159,7 +159,7 @@ type PartiallyRequiredData = PartiallyRequired<Data, 'a' | 'b'>;
 
 > **OptionalKeys**\<`R`\> = `PickUndefined`\<`MapToNever`\<`R`\>\>
 
-Defined in: [record/partial.d.mts:98](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L98)
+Defined in: [src/record/partial.d.mts:98](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L98)
 
 Extracts keys from a record `R` that are explicitly marked as optional using the `?` modifier.
 It works by creating a mapped type where all values are `never` and then using `PickUndefined`
@@ -196,7 +196,7 @@ type K = OptionalKeys<{
 
 > **RequiredKeys**\<`R`\> = `Exclude`\<keyof `R`, [`OptionalKeys`](#optionalkeys)\<`R`\>\>
 
-Defined in: [record/partial.d.mts:116](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L116)
+Defined in: [src/record/partial.d.mts:116](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L116)
 
 Extracts keys from a record `R` that are _not_ explicitly marked as optional using the `?` modifier.
 It calculates this by taking all keys of `R` and excluding the optional keys identified by `OptionalKeys<R>`.

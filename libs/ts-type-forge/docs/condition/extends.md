@@ -12,7 +12,7 @@
 
 > **TypeExtends**\<`A`, `B`\> = \[`A`\] _extends_ \[`B`\] ? `true` : `false`
 
-Defined in: [condition/extends.d.mts:45](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/extends.d.mts#L45)
+Defined in: [src/condition/extends.d.mts:45](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/extends.d.mts#L45)
 
 Checks if type `A` is assignable to (extends) type `B`.
 

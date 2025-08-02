@@ -12,7 +12,7 @@
 
 > **Primitive** = `bigint` \| `boolean` \| `number` \| `string` \| `symbol` \| `null` \| `undefined`
 
-Defined in: [constants/primitive.d.mts:24](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/primitive.d.mts#L24)
+Defined in: [src/constants/primitive.d.mts:24](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/primitive.d.mts#L24)
 
 Represents the set of all JavaScript primitive types.
 Includes `bigint`, `boolean`, `number`, `string`, `symbol`, `null`, and `undefined`.

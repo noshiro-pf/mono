@@ -12,7 +12,7 @@
 
 > **BigInt64** = [`ExtendBrand`](brand/README.md#extendbrand)\<[`ChangeBaseBrand`](brand/README.md#changebasebrand)\<[`Int`](int.md#int), `bigint`\>, `"BigInt64"`\>
 
-Defined in: [branded-types/bigint.d.mts:15](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/bigint.d.mts#L15)
+Defined in: [src/branded-types/bigint.d.mts:15](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/bigint.d.mts#L15)
 
 Branded bigint type for 64-bit signed integers.
 Represents values that can be stored in a BigInt64Array.
@@ -34,7 +34,7 @@ const toBigInt64 = (x: bigint): BigInt64 => {
 
 > **BigUint64** = [`ExtendBrand`](brand/README.md#extendbrand)\<[`ChangeBaseBrand`](brand/README.md#changebasebrand)\<[`Int`](int.md#int), `bigint`\>, `"BigUint64"`\>
 
-Defined in: [branded-types/bigint.d.mts:30](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/bigint.d.mts#L30)
+Defined in: [src/branded-types/bigint.d.mts:30](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/bigint.d.mts#L30)
 
 Branded bigint type for 64-bit unsigned integers.
 Represents values that can be stored in a BigUint64Array.

@@ -12,7 +12,7 @@
 
 > **MutableNonEmptyArray**\<`A`\> = \[`A`, `...A[]`\]
 
-Defined in: [tuple-and-list/array.d.mts:12](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L12)
+Defined in: [src/tuple-and-list/array.d.mts:12](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L12)
 
 Represents a mutable array that is guaranteed to have at least one element.
 
@@ -39,7 +39,7 @@ const alsoValid: NA = ['hello', 'world'];
 
 > **NonEmptyArray**\<`A`\> = readonly \[`A`, `...readonly A[]`\]
 
-Defined in: [tuple-and-list/array.d.mts:24](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L24)
+Defined in: [src/tuple-and-list/array.d.mts:24](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L24)
 
 Represents a readonly array that is guaranteed to have at least one element.
 
@@ -67,7 +67,7 @@ const alsoValid: NA = [1, 2, 3];
 
 > **ArrayElement**\<`S`\> = `S` _extends_ readonly infer T[] ? `T` : `never`
 
-Defined in: [tuple-and-list/array.d.mts:37](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L37)
+Defined in: [src/tuple-and-list/array.d.mts:37](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L37)
 
 Extracts the element type from a readonly array or tuple type `S`.
 If `S` is not an array or tuple type, it resolves to `never`.
@@ -99,7 +99,7 @@ type NotArray = ArrayElement<{ a: number }>; // never
 
 > **ArrayOfLength**\<`N`, `Elm`\> = [`MakeTuple`](make-tuple.md#maketuple)\<`Elm`, `N`\>
 
-Defined in: [tuple-and-list/array.d.mts:51](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L51)
+Defined in: [src/tuple-and-list/array.d.mts:51](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L51)
 
 Creates a readonly tuple type of a specific length `N` with elements of type `Elm`.
 Alias for `MakeTuple<Elm, N>`.
@@ -135,7 +135,7 @@ type TupleOf0Numbers = ArrayOfLength<0, number>; // readonly []
 
 > **MutableArrayOfLength**\<`N`, `Elm`\> = [`Mutable`](../others/mutable.md#mutable)\<[`ArrayOfLength`](#arrayoflength)\<`N`, `Elm`\>\>
 
-Defined in: [tuple-and-list/array.d.mts:61](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L61)
+Defined in: [src/tuple-and-list/array.d.mts:61](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L61)
 
 Creates a mutable tuple type of a specific length `N` with elements of type `Elm`.
 
@@ -169,7 +169,7 @@ type MutableTupleOf2Booleans = MutableArrayOfLength<2, boolean>; // [boolean, bo
 
 > **MutableArrayAtLeastLen**\<`N`, `Elm`\> = [`Mutable`](../others/mutable.md#mutable)\<[`ArrayAtLeastLen`](#arrayatleastlen)\<`N`, `Elm`\>\>
 
-Defined in: [tuple-and-list/array.d.mts:80](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L80)
+Defined in: [src/tuple-and-list/array.d.mts:80](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L80)
 
 Creates a mutable array type that is guaranteed to have at least `N` elements of type `Elm`.
 
@@ -206,7 +206,7 @@ const alsoValid: AtLeast2Numbers = [1, 2, 3, 4];
 
 > **ArrayAtLeastLen**\<`N`, `Elm`\> = readonly \[`...MakeTuple<Elm, N>`, `...Elm[]`\]
 
-Defined in: [tuple-and-list/array.d.mts:95](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L95)
+Defined in: [src/tuple-and-list/array.d.mts:95](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L95)
 
 Creates a readonly array type that is guaranteed to have at least `N` elements of type `Elm`.
 

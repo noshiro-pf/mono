@@ -12,7 +12,7 @@
 
 > **Increment**\<`N`\> = readonly \[`0`, `...MakeTuple<0, N>`\]\[`"length"`\]
 
-Defined in: [type-level-integer/increment.d.mts:35](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/increment.d.mts#L35)
+Defined in: [src/type-level-integer/increment.d.mts:35](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/increment.d.mts#L35)
 
 Increments a non-negative integer literal type `N` by 1.
 
@@ -63,7 +63,7 @@ type OneToFive = Range<1, 5>; // 1 | 2 | 3 | 4 | 5
 
 > **Decrement**\<`N`\> = [`Tail`](../tuple-and-list/list/namespaces/List.md#tail)\<[`MakeTuple`](../tuple-and-list/make-tuple.md#maketuple)\<`0`, `N`\>\>\[`"length"`\]
 
-Defined in: [type-level-integer/increment.d.mts:69](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/increment.d.mts#L69)
+Defined in: [src/type-level-integer/increment.d.mts:69](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/increment.d.mts#L69)
 
 Decrements a positive integer literal type `N` by 1.
 

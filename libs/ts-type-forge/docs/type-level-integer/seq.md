@@ -12,7 +12,7 @@
 
 > **Seq**\<`N`\> = `TSTypeForgeInternals.SeqImpl`\<[`MakeTuple`](../tuple-and-list/make-tuple.md#maketuple)\<`unknown`, `N`\>\>
 
-Defined in: [type-level-integer/seq.d.mts:12](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/seq.d.mts#L12)
+Defined in: [src/type-level-integer/seq.d.mts:12](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/seq.d.mts#L12)
 
 Creates a readonly tuple containing a sequence of number literals from 0 up to (but not including) `N`.
 Requires `N` to be a non-negative integer literal for which `MakeTuple<unknown, N>` can be computed.

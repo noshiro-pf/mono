@@ -12,7 +12,7 @@
 
 > **FalsyValue** = `0` \| `""` \| `0` \| `0n` \| `false` \| `null` \| `undefined`
 
-Defined in: [constants/falsy-value.d.mts:45](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/falsy-value.d.mts#L45)
+Defined in: [src/constants/falsy-value.d.mts:45](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/falsy-value.d.mts#L45)
 
 Represents the set of JavaScript values that are considered "falsy" in boolean contexts.
 

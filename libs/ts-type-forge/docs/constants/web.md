@@ -12,7 +12,7 @@
 
 > **HTTPRequestMethod** = `"CONNECT"` \| `"DELETE"` \| `"GET"` \| `"HEAD"` \| `"OPTIONS"` \| `"PATCH"` \| `"POST"` \| `"PUT"` \| `"TRACE"`
 
-Defined in: [constants/web.d.mts:45](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/web.d.mts#L45)
+Defined in: [src/constants/web.d.mts:45](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/constants/web.d.mts#L45)
 
 Represents the standard HTTP request methods.
 This is a union of string literals corresponding to the nine standard HTTP verbs

@@ -12,7 +12,7 @@
 
 > **BivariantHack**\<`F`\> = `object`\[`"bivariantHack"`\]
 
-Defined in: [others/bivariant-hack.d.mts:26](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/bivariant-hack.d.mts#L26)
+Defined in: [src/others/bivariant-hack.d.mts:26](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/bivariant-hack.d.mts#L26)
 
 A type utility that makes the parameters of a function type `F` bivariant.
 

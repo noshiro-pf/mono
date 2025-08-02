@@ -16,7 +16,7 @@
 
 > **UnknownBrand** = [`Brand`](#brand)\<`unknown`, `never`, `never`\>
 
-Defined in: [branded-types/brand.d.mts:9](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L9)
+Defined in: [src/branded-types/brand.d.mts:9](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L9)
 
 Base type for all branded types. Represents a brand with unknown value type and no keys.
 
@@ -32,7 +32,7 @@ type MyBrand = Brand<string, 'validated', never>;
 
 > **Brand**\<`T`, `TrueKeys`, `FalseKeys`\> = `T` & `TSTypeForgeInternals.BrandEncapsulated`\<\{ readonly \[key in FalseKeys \| TrueKeys\]: key extends TrueKeys ? true : false \}\>
 
-Defined in: [branded-types/brand.d.mts:75](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L75)
+Defined in: [src/branded-types/brand.d.mts:75](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L75)
 
 Creates a branded type (nominal type) to distinguish values at the type level.
 Branded types prevent accidental type compatibility even when the underlying types are the same.
@@ -79,7 +79,7 @@ type NonZeroInt = Brand<number, 'integer', 'zero'>;
 
 > **UnwrapBrandTrueKeys**\<`B`\> = [`ExtractTrueKeys`](namespaces/TSTypeForgeInternals/README.md#extracttruekeys)\<`B`\>
 
-Defined in: [branded-types/brand.d.mts:92](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L92)
+Defined in: [src/branded-types/brand.d.mts:92](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L92)
 
 Extracts all keys marked as `true` from a branded type.
 
@@ -108,7 +108,7 @@ type TrueKeys = UnwrapBrandTrueKeys<NonZeroInt>; // 'integer'
 
 > **UnwrapBrandFalseKeys**\<`B`\> = [`ExtractFalseKeys`](namespaces/TSTypeForgeInternals/README.md#extractfalsekeys)\<`B`\>
 
-Defined in: [branded-types/brand.d.mts:107](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L107)
+Defined in: [src/branded-types/brand.d.mts:107](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L107)
 
 Extracts all keys marked as `false` from a branded type.
 
@@ -137,7 +137,7 @@ type FalseKeys = UnwrapBrandFalseKeys<NonZeroInt>; // 'zero'
 
 > **UnwrapBrandBooleanKeys**\<`B`\> = [`ExtractBooleanKeys`](namespaces/TSTypeForgeInternals/README.md#extractbooleankeys)\<`B`\>
 
-Defined in: [branded-types/brand.d.mts:125](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L125)
+Defined in: [src/branded-types/brand.d.mts:125](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L125)
 
 Extracts all keys that have boolean values (not specifically true or false) from a branded type.
 This occurs when a brand union normalizes and a key becomes `true | false`.
@@ -169,7 +169,7 @@ type BooleanKeys = UnwrapBrandBooleanKeys<UnionBrand>; // 'key1' (since it's tru
 
 > **UnwrapBrandKeys**\<`B`\> = [`UnwrapBrandBooleanKeys`](#unwrapbrandbooleankeys)\<`B`\> \| [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> \| [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\>
 
-Defined in: [branded-types/brand.d.mts:140](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L140)
+Defined in: [src/branded-types/brand.d.mts:140](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L140)
 
 Extracts all brand keys (true, false, and boolean) from a branded type.
 
@@ -198,7 +198,7 @@ type AllKeys = UnwrapBrandKeys<MyBrand>; // 'validated' | 'normalized' | 'empty'
 
 > **GetBrandKeysPart**\<`B`\> = `Pick`\<`B`, [`UnwrapBrandKeys`](#unwrapbrandkeys)\<`B`\>\>
 
-Defined in: [branded-types/brand.d.mts:157](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L157)
+Defined in: [src/branded-types/brand.d.mts:157](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L157)
 
 Extracts only the brand keys part of a branded type (without the underlying value).
 
@@ -227,7 +227,7 @@ type KeysPart = GetBrandKeysPart<MyBrand>; // { validated: true }
 
 > **GetBrandValuePart**\<`B`\> = `B` _extends_ [`Brand`](#brand)\<infer T, [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\> ? `T` : `never`
 
-Defined in: [branded-types/brand.d.mts:174](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L174)
+Defined in: [src/branded-types/brand.d.mts:174](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L174)
 
 Extracts the underlying value type from a branded type.
 
@@ -259,7 +259,7 @@ type AgeValue = GetBrandValuePart<Age>; // number
 
 > **ExtendBrand**\<`B`, `T`, `F`\> = [`IsNever`](../../condition/is-never.md#isnever)\<`F` & `T`\> _extends_ `true` ? [`Brand`](#brand)\<[`GetBrandValuePart`](#getbrandvaluepart)\<`B`\>, `T` \| [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, `F` \| [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\> : `never`
 
-Defined in: [branded-types/brand.d.mts:205](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L205)
+Defined in: [src/branded-types/brand.d.mts:205](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L205)
 
 Extends an existing brand with additional true/false keys.
 Fails if the same key would be marked as both true and false.
@@ -308,7 +308,7 @@ type OptionalEmail = ExtendBrand<Email, 'optional', 'required'>;
 
 > **ChangeBaseBrand**\<`B`, `T`\> = [`Brand`](#brand)\<`T`, [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\>
 
-Defined in: [branded-types/brand.d.mts:236](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L236)
+Defined in: [src/branded-types/brand.d.mts:236](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L236)
 
 Changes the underlying value type of a brand while preserving all brand keys.
 
@@ -348,7 +348,7 @@ type ParsedData = ChangeBaseBrand<SerializedData, object>;
 
 > **IntersectBrand**\<`B1`, `B2`\> = [`Brand`](#brand)\<[`GetBrandValuePart`](#getbrandvaluepart)\<`B1`\> & [`GetBrandValuePart`](#getbrandvaluepart)\<`B2`\>, `string` & [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B1`\> \| [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B2`\>, `string` & [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B1`\> \| [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B2`\>\>
 
-Defined in: [branded-types/brand.d.mts:263](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L263)
+Defined in: [src/branded-types/brand.d.mts:263](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L263)
 
 Creates an intersection of two branded types.
 The result has the intersection of value types and the union of all keys.
@@ -391,7 +391,7 @@ type Person = IntersectBrand<Named, Aged>;
 
 > **NormalizeBrandUnion**\<`B`\> = [`GetBrandValuePart`](#getbrandvaluepart)\<`B`\> & `TSTypeForgeInternals.BrandEncapsulated`\<`{ readonly [key in Exclude<UnwrapBrandKeys<B>, UnwrapBrandBooleanKeys<B>>]: B[key] }`\>
 
-Defined in: [branded-types/brand.d.mts:285](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L285)
+Defined in: [src/branded-types/brand.d.mts:285](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L285)
 
 Normalizes a union of branded types by removing keys that have become `true | false`.
 This happens when different brands in a union have the same key with different boolean values.

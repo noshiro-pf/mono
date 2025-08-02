@@ -12,7 +12,7 @@
 
 > **IsNever**\<`T`\> = \[`T`\] _extends_ \[`never`\] ? `true` : `false`
 
-Defined in: [condition/is-never.d.mts:18](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/is-never.d.mts#L18)
+Defined in: [src/condition/is-never.d.mts:18](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/is-never.d.mts#L18)
 
 Checks if a given type `T` is exactly the `never` type.
 

@@ -12,7 +12,7 @@
 
 > **IsFixedLengthList**\<`T`\> = `number` _extends_ `T`\[`"length"`\] ? `false` : `true`
 
-Defined in: [condition/is-fixed-length-list.d.mts:19](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/is-fixed-length-list.d.mts#L19)
+Defined in: [src/condition/is-fixed-length-list.d.mts:19](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/is-fixed-length-list.d.mts#L19)
 
 Checks if a given readonly array type `T` has a fixed length (i.e., is a tuple).
 Returns `true` if `T` is a tuple, `false` if it's a regular array (`Type[]`).
@@ -49,7 +49,7 @@ type IsTupleWithRest = IsFixedLengthList<[number, ...string[]]>; // false
 
 > **IsNotFixedLengthList**\<`T`\> = `number` _extends_ `T`\[`"length"`\] ? `true` : `false`
 
-Defined in: [condition/is-fixed-length-list.d.mts:37](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/is-fixed-length-list.d.mts#L37)
+Defined in: [src/condition/is-fixed-length-list.d.mts:37](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/is-fixed-length-list.d.mts#L37)
 
 Checks if a given readonly array type `T` does _not_ have a fixed length (i.e., is a regular array).
 Returns `true` if `T` is a regular array (`Type[]`), `false` if it's a tuple.

@@ -12,7 +12,7 @@
 
 > **NaNType** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`BrandedNumberBaseType`](brand/namespaces/TSTypeForgeInternals/README.md#brandednumberbasetype), `"!=0"` \| `"NaNValue"`, [`IntRangeKeys`](brand/namespaces/TSTypeForgeInternals/README.md#intrangekeys) \| `"Finite"` \| `"Int"` \| `"SafeInt"` \| `"Float32"` \| `"Float64"`\>
 
-Defined in: [branded-types/core.d.mts:76](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L76)
+Defined in: [src/branded-types/core.d.mts:76](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L76)
 
 Branded numeric type representing the `NaN` value.
 This type is branded to ensure type safety when handling NaN values.
@@ -35,7 +35,7 @@ if (checkNaN(value)) {
 
 > **ValidNumber** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`BrandedNumberBaseType`](brand/namespaces/TSTypeForgeInternals/README.md#brandednumberbasetype), `never`, `"NaNValue"`\>
 
-Defined in: [branded-types/core.d.mts:101](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L101)
+Defined in: [src/branded-types/core.d.mts:101](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L101)
 
 Branded numeric type for all valid numbers (excluding `NaN`).
 This is the base type for most numeric brands.
@@ -57,7 +57,7 @@ const process = (n: ValidNumber) => {
 
 > **NonZeroNumber** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`ValidNumber`](#validnumber), `"!=0"`\>
 
-Defined in: [branded-types/core.d.mts:121](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L121)
+Defined in: [src/branded-types/core.d.mts:121](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L121)
 
 Branded numeric type for non-zero numbers.
 Represents values that are not equal to zero (including -0).
@@ -79,7 +79,7 @@ const reciprocal = (x: NonZeroNumber) => 1 / x;
 
 > **NonNegativeNumber** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`ValidNumber`](#validnumber), `"> -2^16"` \| `"> -2^32"` \| `">= -2^15"` \| `">= -2^31"` \| `">=0"`\>
 
-Defined in: [branded-types/core.d.mts:137](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L137)
+Defined in: [src/branded-types/core.d.mts:137](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L137)
 
 Branded numeric type for non-negative numbers (x >= 0).
 Includes zero and all positive numbers.
@@ -102,7 +102,7 @@ const arrayIndex = (arr: readonly unknown[], i: NonNegativeNumber & Int) =>
 
 > **PositiveNumber** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`NonZeroNumber`](#nonzeronumber), [`NonNegativeNumber`](#nonnegativenumber)\>
 
-Defined in: [branded-types/core.d.mts:156](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L156)
+Defined in: [src/branded-types/core.d.mts:156](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L156)
 
 Branded numeric type for positive numbers (x > 0).
 Excludes zero, includes only strictly positive values.
@@ -124,7 +124,7 @@ const scale = (value: number, factor: PositiveNumber) => value * factor;
 
 > **NegativeNumber** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`NonZeroNumber`](#nonzeronumber), `"< 2^15"` \| `"< 2^16"` \| `"< 2^31"` \| `"< 2^32"`, `">=0"`\>
 
-Defined in: [branded-types/core.d.mts:172](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L172)
+Defined in: [src/branded-types/core.d.mts:172](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L172)
 
 Branded numeric type for negative numbers (x < 0).
 Excludes zero, includes only strictly negative values.

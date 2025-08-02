@@ -12,7 +12,7 @@
 
 > **Int32** = [`ExtendNumberBrand`](brand/namespaces/TSTypeForgeInternals/README.md#extendnumberbrand)\<[`SafeInt`](safe-int.md#safeint), `"< 2^31"` \| `"< 2^32"` \| `"> -2^32"` \| `">= -2^31"`\>
 
-Defined in: [branded-types/int32.d.mts:18](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L18)
+Defined in: [src/branded-types/int32.d.mts:18](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L18)
 
 Branded numeric type for 32-bit signed integers.
 Range: [-2^31, 2^31 - 1] or [-2,147,483,648, 2,147,483,647]
@@ -37,7 +37,7 @@ const bitwiseOr = (a: Int32, b: Int32): Int32 => (a | b) as Int32;
 
 > **NonZeroInt32** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`Int32`](#int32), [`NonZeroNumber`](core.md#nonzeronumber)\>
 
-Defined in: [branded-types/int32.d.mts:35](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L35)
+Defined in: [src/branded-types/int32.d.mts:35](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L35)
 
 Branded numeric type for non-zero 32-bit signed integers.
 Range: [-2^31, -1] ∪ [1, 2^31 - 1]
@@ -57,7 +57,7 @@ const delta = (change: NonZeroInt32) => ({ delta: change });
 
 > **NonNegativeInt32** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`Int32`](#int32), [`NonNegativeNumber`](core.md#nonnegativenumber)\>
 
-Defined in: [branded-types/int32.d.mts:49](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L49)
+Defined in: [src/branded-types/int32.d.mts:49](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L49)
 
 Branded numeric type for non-negative 32-bit signed integers.
 Range: [0, 2^31 - 1] or [0, 2,147,483,647]
@@ -77,7 +77,7 @@ const score = (points: NonNegativeInt32) => ({ score: points });
 
 > **PositiveInt32** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`Int32`](#int32), [`PositiveNumber`](core.md#positivenumber)\>
 
-Defined in: [branded-types/int32.d.mts:63](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L63)
+Defined in: [src/branded-types/int32.d.mts:63](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L63)
 
 Branded numeric type for positive 32-bit signed integers.
 Range: [1, 2^31 - 1] or [1, 2,147,483,647]
@@ -97,7 +97,7 @@ const userId = (id: PositiveInt32) => ({ userId: id });
 
 > **NegativeInt32** = [`IntersectBrand`](brand/README.md#intersectbrand)\<[`Int32`](#int32), [`NegativeNumber`](core.md#negativenumber)\>
 
-Defined in: [branded-types/int32.d.mts:77](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L77)
+Defined in: [src/branded-types/int32.d.mts:77](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L77)
 
 Branded numeric type for negative 32-bit integers.
 Range: [-2^31, -1] or [-2,147,483,648, -1]
@@ -117,7 +117,7 @@ const offset = (value: NegativeInt32) => ({ offset: value });
 
 > **Int32WithSmallInt** = [`WithSmallInt`](small-int.md#withsmallint)\<[`Int32`](#int32)\>
 
-Defined in: [branded-types/int32.d.mts:83](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L83)
+Defined in: [src/branded-types/int32.d.mts:83](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L83)
 
 32-bit integer type with small literal values included.
 Type: `-40 | -39 | ... | 39 | Int32`
@@ -128,7 +128,7 @@ Type: `-40 | -39 | ... | 39 | Int32`
 
 > **NonZeroInt32WithSmallInt** = [`WithSmallInt`](small-int.md#withsmallint)\<[`NonZeroInt32`](#nonzeroint32)\>
 
-Defined in: [branded-types/int32.d.mts:89](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L89)
+Defined in: [src/branded-types/int32.d.mts:89](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L89)
 
 Non-zero 32-bit integer type with small literal values included.
 Type: `-40 | ... | -1 | 1 | ... | 39 | NonZeroInt32`
@@ -139,7 +139,7 @@ Type: `-40 | ... | -1 | 1 | ... | 39 | NonZeroInt32`
 
 > **NonNegativeInt32WithSmallInt** = [`WithSmallInt`](small-int.md#withsmallint)\<[`NonNegativeInt32`](#nonnegativeint32)\>
 
-Defined in: [branded-types/int32.d.mts:95](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L95)
+Defined in: [src/branded-types/int32.d.mts:95](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L95)
 
 Non-negative 32-bit integer type with small literal values included.
 Type: `0 | 1 | ... | 39 | NonNegativeInt32`
@@ -150,7 +150,7 @@ Type: `0 | 1 | ... | 39 | NonNegativeInt32`
 
 > **PositiveInt32WithSmallInt** = [`WithSmallInt`](small-int.md#withsmallint)\<[`PositiveInt32`](#positiveint32)\>
 
-Defined in: [branded-types/int32.d.mts:101](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L101)
+Defined in: [src/branded-types/int32.d.mts:101](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L101)
 
 Positive 32-bit integer type with small literal values included.
 Type: `1 | 2 | ... | 39 | PositiveInt32`
@@ -161,7 +161,7 @@ Type: `1 | 2 | ... | 39 | PositiveInt32`
 
 > **NegativeInt32WithSmallInt** = [`WithSmallInt`](small-int.md#withsmallint)\<[`NegativeInt32`](#negativeint32)\>
 
-Defined in: [branded-types/int32.d.mts:107](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L107)
+Defined in: [src/branded-types/int32.d.mts:107](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/int32.d.mts#L107)
 
 Negative 32-bit integer type with small literal values included.
 Type: `-40 | -39 | ... | -1 | NegativeInt32`

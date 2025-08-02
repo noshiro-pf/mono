@@ -12,7 +12,7 @@
 
 > **Max**\<`N`\> = `TSTypeForgeInternals.MaxImpl`\<`N`, \[\]\>
 
-Defined in: [type-level-integer/max.d.mts:13](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/max.d.mts#L13)
+Defined in: [src/type-level-integer/max.d.mts:13](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/max.d.mts#L13)
 
 Calculates the smallest integer `M` such that all numbers in the union `N` (which must extend `Uint10`) are less than `M`.
 Effectively, this calculates `max(N)`.
