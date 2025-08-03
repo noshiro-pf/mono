@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-repo-utils**](../README.md)
 
 ---
 
-[Documentation](../README.md) / functions/assert-repo-is-clean
+[ts-repo-utils](../README.md) / functions/assert-repo-is-clean
 
 # functions/assert-repo-is-clean
 

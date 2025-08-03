@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-repo-utils**](../README.md)
 
 ---
 
-[Documentation](../README.md) / functions/assert-ext
+[ts-repo-utils](../README.md) / functions/assert-ext
 
 # functions/assert-ext
 

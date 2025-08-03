@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-repo-utils**](../README.md)
 
 ---
 
-[Documentation](../README.md) / functions/assert-path-exists
+[ts-repo-utils](../README.md) / functions/assert-path-exists
 
 # functions/assert-path-exists
 

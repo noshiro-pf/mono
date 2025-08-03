@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-repo-utils**](../README.md)
 
 ---
 
-[Documentation](../README.md) / functions/gen-index
+[ts-repo-utils](../README.md) / functions/gen-index
 
 # functions/gen-index
 

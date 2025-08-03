@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-repo-utils**](../README.md)
 
 ---
 
-[Documentation](../README.md) / functions/should-run
+[ts-repo-utils](../README.md) / functions/should-run
 
 # functions/should-run
 

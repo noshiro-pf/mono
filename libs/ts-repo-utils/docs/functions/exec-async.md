@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-repo-utils**](../README.md)
 
 ---
 
-[Documentation](../README.md) / functions/exec-async
+[ts-repo-utils](../README.md) / functions/exec-async
 
 # functions/exec-async
 

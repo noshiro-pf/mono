@@ -1,7 +1,7 @@
-[**Documentation**](../README.md)
+[**ts-repo-utils**](../README.md)
 
 ---
 
-[Documentation](../README.md) / cmd/format-untracked
+[ts-repo-utils](../README.md) / cmd/format-untracked
 
 # cmd/format-untracked

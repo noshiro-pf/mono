@@ -1,8 +1,8 @@
-[**Documentation**](README.md)
+[**ts-repo-utils**](README.md)
 
 ---
 
-[Documentation](README.md) / functions
+[ts-repo-utils](README.md) / functions
 
 # functions
 

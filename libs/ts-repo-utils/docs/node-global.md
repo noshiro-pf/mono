@@ -1,8 +1,8 @@
-[**Documentation**](README.md)
+[**ts-repo-utils**](README.md)
 
 ---
 
-[Documentation](README.md) / node-global
+[ts-repo-utils](README.md) / node-global
 
 # node-global
 

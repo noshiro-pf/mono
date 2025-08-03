@@ -1,8 +1,8 @@
-[**Documentation**](../../README.md)
+[**ts-repo-utils**](../../README.md)
 
 ---
 
-[Documentation](../../README.md) / functions/workspace-utils/run-cmd-in-stages
+[ts-repo-utils](../../README.md) / functions/workspace-utils/run-cmd-in-stages
 
 # functions/workspace-utils/run-cmd-in-stages
 

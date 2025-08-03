@@ -1,8 +1,8 @@
-[**Documentation**](../../README.md)
+[**ts-repo-utils**](../../README.md)
 
 ---
 
-[Documentation](../../README.md) / functions/workspace-utils/execute-parallel
+[ts-repo-utils](../../README.md) / functions/workspace-utils/execute-parallel
 
 # functions/workspace-utils/execute-parallel
 

@@ -1,7 +1,7 @@
-[**Documentation**](README.md)
+[**ts-repo-utils**](README.md)
 
 ---
 
-[Documentation](README.md) / globals
+[ts-repo-utils](README.md) / globals
 
 # globals
