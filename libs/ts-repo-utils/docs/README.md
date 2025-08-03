@@ -29,19 +29,19 @@ Generates index.ts files recursively in target directories with automatic barrel
 
 ```bash
 # Basic usage with required options
-npx gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs
+npm exec -- gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs
 
 # With formatting command
-npx gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs --fmt 'npm run fmt'
+npm exec -- gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs --fmt 'npm run fmt'
 
 # Multiple target extensions
-npx gen-index-ts ./src --target-ext .mts --target-ext .tsx --index-ext .mts --export-ext .mjs
+npm exec -- gen-index-ts ./src --target-ext .mts --target-ext .tsx --index-ext .mts --export-ext .mjs
 
 # With exclude patterns
-npx gen-index-ts ./src --target-ext .ts --index-ext .ts --export-ext .js --exclude '*.test.ts' --exclude '*.spec.ts'
+npm exec -- gen-index-ts ./src --target-ext .ts --index-ext .ts --export-ext .js --exclude '*.test.ts' --exclude '*.spec.ts'
 
 # Example in npm scripts
-"gi": "gen-index-ts ./src/functions --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'"
+"gi": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'"
 ```
 
 **Options:**
@@ -60,16 +60,16 @@ Checks if repository is clean and exits with code 1 if it has uncommitted change
 
 ```bash
 # Basic usage
-npx assert-repo-is-clean
+npm exec -- assert-repo-is-clean
 
 # Silent mode
-npx assert-repo-is-clean --silent
+npm exec -- assert-repo-is-clean --silent
 ```
 
 ```yaml
 # Example in GitHub Actions
 - name: Check if there is no file diff
-  run: npx tsx ./src/cmd/assert-repo-is-clean.mts
+  run: npm exec -- assert-repo-is-clean
 ```
 
 **Options:**
@@ -82,10 +82,10 @@ Formats only untracked/modified files using Prettier.
 
 ```bash
 # Basic usage
-npx format-untracked
+npm exec -- format-untracked
 
 # Silent mode
-npx format-untracked --silent
+npm exec -- format-untracked --silent
 ```
 
 **Options:**
@@ -98,16 +98,16 @@ Formats only files that differ from the specified base branch or commit.
 
 ```bash
 # Format files different from main branch
-npx format-diff-from main
+npm exec -- format-diff-from main
 
 # Format files different from origin/main
-npx format-diff-from origin/main
+npm exec -- format-diff-from origin/main
 
 # Exclude untracked files
-npx format-diff-from main --exclude-untracked
+npm exec -- format-diff-from main --exclude-untracked
 
 # Silent mode
-npx format-diff-from main --silent
+npm exec -- format-diff-from main --silent
 
 # Example in npm scripts
 "fmt": "format-diff-from origin/main"
@@ -120,6 +120,49 @@ npx format-diff-from main --silent
 - `--exclude-untracked` - Exclude untracked files, only format diff files (optional)
 - `--silent` - Suppress output messages (optional)
 
+### `check-should-run-type-checks`
+
+Checks if TypeScript type checks should run based on the diff from a base branch. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files are changed.
+
+```bash
+# Basic usage (compares against origin/main)
+npm exec -- check-should-run-type-checks
+
+# Custom base branch
+npm exec -- check-should-run-type-checks --base-branch origin/develop
+
+# Custom ignore patterns
+npm exec -- check-should-run-type-checks \
+  --paths-ignore '.github/' \
+  --paths-ignore 'docs/' \
+  --paths-ignore '**.md' \
+  --paths-ignore '**.yml'
+```
+
+```yaml
+# Example in GitHub Actions
+- name: Check if type checks should run
+  id: check_diff
+  run: npm exec -- check-should-run-type-checks
+
+- name: Run type checks
+  if: steps.check_diff.outputs.should_run == 'true'
+  run: npm run type-check
+```
+
+**Options:**
+
+- `--paths-ignore` - Patterns to ignore when checking if type checks should run (optional, can be specified multiple times)
+    - Supports exact file matches: `.cspell.json`
+    - Directory prefixes: `docs/` (matches any file in docs directory)
+    - File extensions: `**.md` (matches any markdown file)
+    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
+- `--base-branch` - Base branch to compare against for determining changed files (default: `origin/main`)
+
+**GitHub Actions Integration:**
+
+When running in GitHub Actions, the command sets the `GITHUB_OUTPUT` environment variable with `should_run=true` or `should_run=false`, which can be used in subsequent steps.
+
 ### Usage in npm scripts
 
 The CLI commands are commonly used in npm scripts for automation:
@@ -128,7 +171,7 @@ The CLI commands are commonly used in npm scripts for automation:
 {
     "scripts": {
         "fmt": "format-diff-from origin/main",
-        "gi": "gen-index-ts ./src/functions --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'",
+        "gi": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'",
         "check:clean": "assert-repo-is-clean"
     }
 }
@@ -143,13 +186,13 @@ These commands are particularly useful in CI/CD pipelines:
 - name: Format check
   run: |
       npm run fmt
-      npx assert-repo-is-clean
+      npm exec -- assert-repo-is-clean
 
 # Check for uncommitted changes after build
 - name: Build
   run: npm run build
 - name: Check if there is no file diff
-  run: npx tsx ./src/cmd/assert-repo-is-clean.mts
+  run: npm exec -- assert-repo-is-clean
 ```
 
 ## API Reference
