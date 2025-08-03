@@ -52,4 +52,4 @@ jobs:
         run: npm run ${{ matrix.command }}
 
       - name: Check if there is no file diff
-        run: npx tsx ./scripts/cmd/assert-repo-is-clean.mjs
+        run: npm exec assert-repo-is-clean

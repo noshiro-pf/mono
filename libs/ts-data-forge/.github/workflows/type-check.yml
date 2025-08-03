@@ -57,7 +57,7 @@ jobs:
       # skip each step instead of skipping the entire workflow with paths-ignore.
       - name: Check diff
         id: check_diff_type
-        run: npx tsx ./scripts/github-actions/should-run.mjs
+        run: npm exec check-should-run-type-checks
 
       - name: Run "${{ matrix.command }}"
         if: steps.check_diff_type.outputs.should_run == 'true'
