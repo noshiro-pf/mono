@@ -10,7 +10,8 @@ export type GenIndexConfig = DeepReadonly<{
 
   /**
    * Glob patterns of files or predicate function to exclude from exports
-   * (default: excludes `'**\/*.{test,spec}.?(c|m)[jt]s?(x)'`)
+   * (default: excludes `'**\/*.{test,spec}.?(c|m)[jt]s?(x)'` and
+   * `'**\/*.d.?(c|m)ts'`)
    */
   exclude?:
     | readonly string[]
@@ -22,22 +23,14 @@ export type GenIndexConfig = DeepReadonly<{
         }>,
       ) => boolean);
 
-  /**
-   * Glob patterns of files or predicate function to exclude from exports
-   * (default: excludes `'**\/*.{test,spec}.?(c|m)[jt]s?(x)'`)
-   *
-   * @deprecated Use `exclude` instead.
-   */
-  excludePatterns?: readonly string[];
-
   /** File extensions of source files to export (default: ['.ts', '.tsx']) */
-  sourceExtensions?: readonly `.${string}`[];
+  targetExtensions?: readonly `.${string}`[];
 
   /** File extension of index files to generate (default: '.ts') */
-  indexExtension?: `.${string}`;
+  indexFileExtension?: `.${string}`;
 
   /** File extension to use in export statements (default: '.js') */
-  exportExtension?: `.${string}` | 'none';
+  exportStatementExtension?: `.${string}` | 'none';
 
   /** Command to run for formatting generated files (optional) */
   formatCommand?: string;
@@ -45,6 +38,16 @@ export type GenIndexConfig = DeepReadonly<{
   /** Whether to suppress output during execution (default: false) */
   silent?: boolean;
 }>;
+
+const defaultConfig = {
+  exclude: ['**/*.{test,spec}.?(c|m)[jt]s?(x)', '**/*.d.?(c|m)ts'],
+  targetExtensions: ['.ts', '.tsx'],
+  indexFileExtension: '.ts',
+  exportStatementExtension: '.js', // For ESM imports, .mts resolves to .mjs
+  silent: false,
+} as const satisfies Required<
+  StrictOmit<GenIndexConfig, 'targetDirectory' | 'formatCommand'>
+>;
 
 type GenIndexConfigInternal = DeepReadonly<{
   formatCommand: string | undefined;
@@ -56,9 +59,9 @@ type GenIndexConfigInternal = DeepReadonly<{
       fileName: string;
     }>,
   ) => boolean;
-  sourceExtensions: ISet<`.${string}`>;
-  indexExtension: `.${string}`;
-  exportExtension: `.${string}` | 'none';
+  targetExtensions: ISet<`.${string}`>;
+  indexFileExtension: `.${string}`;
+  exportStatementExtension: `.${string}` | 'none';
   silent: boolean;
 }>;
 
@@ -117,8 +120,11 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
 };
 
 const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
-  const sourceExtensions = config.sourceExtensions ?? ['.ts'];
-  const exportExtension = config.exportExtension ?? '.js'; // For ESM imports, .mts resolves to .mjs
+  const targetExtensions =
+    config.targetExtensions ?? defaultConfig.targetExtensions;
+
+  const exportExtension =
+    config.exportStatementExtension ?? defaultConfig.exportStatementExtension;
 
   return {
     formatCommand: config.formatCommand,
@@ -127,8 +133,7 @@ const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
         ? [config.targetDirectory]
         : config.targetDirectory,
     ),
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    exclude: pipe(config.exclude ?? config.excludePatterns).map((exclude) =>
+    exclude: pipe(config.exclude).map((exclude) =>
       typeof exclude === 'function'
         ? exclude
         : pipe(
@@ -137,7 +142,7 @@ const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
                 if (exclude !== undefined && Array.isArray(exclude)) {
                   yield* exclude;
                 }
-                yield '**/*.{test,spec}.?(c|m)[jt]s?(x)';
+                yield* defaultConfig.exclude;
               }),
             ),
           ).map(
@@ -162,10 +167,11 @@ const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
               },
           ).value,
     ).value,
-    sourceExtensions: ISet.create(sourceExtensions),
-    indexExtension: config.indexExtension ?? '.ts',
-    exportExtension,
-    silent: config.silent ?? false,
+    targetExtensions: ISet.create(targetExtensions),
+    indexFileExtension:
+      config.indexFileExtension ?? defaultConfig.indexFileExtension,
+    exportStatementExtension: exportExtension,
+    silent: config.silent ?? defaultConfig.silent,
   };
 };
 
@@ -229,7 +235,7 @@ const generateIndexFileForDir = async (
       config,
     );
 
-    const indexPath = path.join(dirPath, `index${config.indexExtension}`);
+    const indexPath = path.join(dirPath, `index${config.indexFileExtension}`);
 
     await fs.writeFile(indexPath, indexContent);
     echo(`Generated: ${path.relative(process.cwd(), indexPath)}`);
@@ -269,7 +275,7 @@ const shouldExportFile = ({
   const ext = path.extname(fileName);
 
   // Must have the correct source extension
-  if (!config.sourceExtensions.has(ext)) {
+  if (!config.targetExtensions.has(ext)) {
     return false;
   }
 
@@ -328,16 +334,16 @@ const generateIndexContent = (
 ): string => {
   const exportStatements = [
     ...subDirectories.map((subDir) =>
-      config.exportExtension === 'none'
+      config.exportStatementExtension === 'none'
         ? `export * from "./${subDir}";`
-        : `export * from "./${subDir}/index${config.exportExtension}";`,
+        : `export * from "./${subDir}/index${config.exportStatementExtension}";`,
     ),
     ...filesToExport.map((file) => {
       const fileNameWithoutExt = path.basename(file, path.extname(file));
 
-      return config.exportExtension === 'none'
+      return config.exportStatementExtension === 'none'
         ? `export * from "./${fileNameWithoutExt}";`
-        : `export * from "./${fileNameWithoutExt}${config.exportExtension}";`;
+        : `export * from "./${fileNameWithoutExt}${config.exportStatementExtension}";`;
     }),
   ];
 

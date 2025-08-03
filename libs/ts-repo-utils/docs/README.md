@@ -6,6 +6,11 @@
 
 ## Modules
 
+- [cmd/assert-repo-is-clean](cmd/assert-repo-is-clean.md)
+- [cmd/check-should-run-type-checks](cmd/check-should-run-type-checks.md)
+- [cmd/format-diff-from](cmd/format-diff-from.md)
+- [cmd/format-untracked](cmd/format-untracked.md)
+- [cmd/gen-index-ts](cmd/gen-index-ts.md)
 - [functions](functions.md)
 - [functions/assert-ext](functions/assert-ext.md)
 - [functions/assert-path-exists](functions/assert-path-exists.md)

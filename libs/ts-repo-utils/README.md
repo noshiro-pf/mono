@@ -15,6 +15,139 @@ A comprehensive toolkit for managing TypeScript projects with strict ESM support
 npm install ts-repo-utils
 ```
 
+## CLI Commands
+
+`ts-repo-utils` provides several CLI commands that can be used directly or through npm scripts.
+
+### `gen-index-ts`
+
+Generates index.ts files recursively in target directories with automatic barrel exports.
+
+```bash
+# Basic usage with required options
+npx gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs
+
+# With formatting command
+npx gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs --fmt 'npm run fmt'
+
+# Multiple target extensions
+npx gen-index-ts ./src --target-ext .mts --target-ext .tsx --index-ext .mts --export-ext .mjs
+
+# With exclude patterns
+npx gen-index-ts ./src --target-ext .ts --index-ext .ts --export-ext .js --exclude '*.test.ts' --exclude '*.spec.ts'
+
+# Example in npm scripts
+"gi": "gen-index-ts ./src/functions --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'"
+```
+
+**Options:**
+
+- `<target-directory>` - Directory where the index file will be generated (comma-separated list can be used)
+- `--target-ext` - File extensions to include in the index file (required, can be specified multiple times)
+- `--index-ext` - Extension of the index file to be generated (required)
+- `--export-ext` - Extension of the export statements in the index file (required, or 'none')
+- `--exclude` - Glob patterns of files to exclude (optional, can be specified multiple times)
+- `--fmt` - Command to format after generating the index file (optional)
+- `--silent` - Suppress output messages (optional)
+
+### `assert-repo-is-clean`
+
+Checks if repository is clean and exits with code 1 if it has uncommitted changes.
+
+```bash
+# Basic usage
+npx assert-repo-is-clean
+
+# Silent mode
+npx assert-repo-is-clean --silent
+```
+
+```yaml
+# Example in GitHub Actions
+- name: Check if there is no file diff
+  run: npx tsx ./src/cmd/assert-repo-is-clean.mts
+```
+
+**Options:**
+
+- `--silent` - Suppress output messages (optional)
+
+### `format-untracked`
+
+Formats only untracked/modified files using Prettier.
+
+```bash
+# Basic usage
+npx format-untracked
+
+# Silent mode
+npx format-untracked --silent
+```
+
+**Options:**
+
+- `--silent` - Suppress output messages (optional)
+
+### `format-diff-from`
+
+Formats only files that differ from the specified base branch or commit.
+
+```bash
+# Format files different from main branch
+npx format-diff-from main
+
+# Format files different from origin/main
+npx format-diff-from origin/main
+
+# Exclude untracked files
+npx format-diff-from main --exclude-untracked
+
+# Silent mode
+npx format-diff-from main --silent
+
+# Example in npm scripts
+"fmt": "format-diff-from origin/main"
+```
+
+**Options:**
+
+- `<base>` - Base branch name or commit hash to compare against (required)
+- `--include-untracked` - Include untracked files in addition to diff files (default: true)
+- `--exclude-untracked` - Exclude untracked files, only format diff files (optional)
+- `--silent` - Suppress output messages (optional)
+
+### Usage in npm scripts
+
+The CLI commands are commonly used in npm scripts for automation:
+
+```json
+{
+    "scripts": {
+        "fmt": "format-diff-from origin/main",
+        "gi": "gen-index-ts ./src/functions --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'",
+        "check:clean": "assert-repo-is-clean"
+    }
+}
+```
+
+### Usage in CI/CD
+
+These commands are particularly useful in CI/CD pipelines:
+
+```yaml
+# GitHub Actions example
+- name: Format check
+  run: |
+      npm run fmt
+      npx assert-repo-is-clean
+
+# Check for uncommitted changes after build
+- name: Build
+  run: npm run build
+- name: Check if there is no file diff
+  run: npx tsx ./src/cmd/assert-repo-is-clean.mts
+```
+
 ## API Reference
 
 ### Path and File System Utilities

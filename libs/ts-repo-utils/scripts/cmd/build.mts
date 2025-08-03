@@ -27,28 +27,38 @@ const build = async (): Promise<void> => {
     echo('✓ Cleaned dist directory\n');
   }
 
-  // Step 3: Generate index files
+  // Step 3: Sync CLI command versions
   {
-    echo('3. Generating index files...');
+    echo('3. Synchronizing CLI command versions...');
+    await runCmdStep(
+      'tsx ./scripts/cmd/sync-cli-versions.mts',
+      'CLI version sync failed',
+    );
+    echo('✓ CLI version sync completed\n');
+  }
+
+  // Step 4: Generate index files
+  {
+    echo('4. Generating index files...');
     await runCmdStep('npm run gi', 'Generating index files failed');
     echo('✓ Generating index files completed\n');
   }
 
-  // Step 4: Type checking
+  // Step 5: Type checking
   {
-    echo('4. Running type checking...');
+    echo('5. Running type checking...');
     await runCmdStep('tsc --noEmit', 'Type checking failed');
     echo('✓ Type checking passed\n');
   }
 
-  // Step 5: Build with Rollup
+  // Step 6: Build with Rollup
   {
     const rollupConfig = path.resolve(
       projectRootPath,
       './configs/rollup.config.ts',
     );
 
-    echo('5. Building with Rollup...');
+    echo('6. Building with Rollup...');
     await assertPathExists(rollupConfig, 'Rollup config');
     await runCmdStep(
       [
@@ -62,10 +72,10 @@ const build = async (): Promise<void> => {
     echo('✓ Rollup build completed\n');
   }
 
-  // Step 6: Copy globals
+  // Step 7: Copy globals
   {
     const srcGlobalsFile = path.resolve(projectRootPath, './src/globals.d.mts');
-    echo('6. Copying global type definitions...');
+    echo('7. Copying global type definitions...');
     await assertPathExists(srcGlobalsFile, 'Global types file');
 
     const destFile = path.resolve(distDir, 'globals.d.mts');
@@ -76,9 +86,9 @@ const build = async (): Promise<void> => {
     echo('✓ Copied globals.d.mts to dist\n');
   }
 
-  // Step 7: Generate dist/types.d.mts
+  // Step 8: Generate dist/types.d.mts
   {
-    echo('7. Generating dist/types.d.mts...');
+    echo('8. Generating dist/types.d.mts...');
     const content = [
       "import './globals.d.mts';",
       "export * from './index.mjs';",
@@ -92,9 +102,9 @@ const build = async (): Promise<void> => {
     echo('✓ Generated dist/types.d.mts\n');
   }
 
-  // Step 8: Generate dist tsconfig
+  // Step 9: Generate dist tsconfig
   {
-    echo('8. Generating dist TypeScript config...');
+    echo('9. Generating dist TypeScript config...');
     const configContent = JSON.stringify({ include: ['.'] });
     const configFile = path.resolve(distDir, 'tsconfig.json');
     await runStep(

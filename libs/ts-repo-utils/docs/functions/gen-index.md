@@ -10,7 +10,7 @@
 
 ### GenIndexConfig
 
-> **GenIndexConfig** = `DeepReadonly`\<\{ `exclude?`: readonly `string`[] \| (`args`) => `boolean`; `excludePatterns?`: readonly `string`[]; `exportExtension?`: `` `.${string}` `` \| `"none"`; `formatCommand?`: `string`; `indexExtension?`: `` `.${string}` ``; `silent?`: `boolean`; `sourceExtensions?`: readonly `` `.${string}` ``[]; `targetDirectory`: `string` \| readonly `string`[]; \}\>
+> **GenIndexConfig** = `DeepReadonly`\<\{ `exclude?`: readonly `string`[] \| (`args`) => `boolean`; `exportStatementExtension?`: `` `.${string}` `` \| `"none"`; `formatCommand?`: `string`; `indexFileExtension?`: `` `.${string}` ``; `silent?`: `boolean`; `targetDirectory`: `string` \| readonly `string`[]; `targetExtensions?`: readonly `` `.${string}` ``[]; \}\>
 
 Defined in: [src/functions/gen-index.mts:7](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L7)
 
@@ -22,7 +22,7 @@ Configuration for index file generation.
 
 > **genIndex**(`config`): `Promise`\<`void`\>
 
-Defined in: [src/functions/gen-index.mts:71](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L71)
+Defined in: [src/functions/gen-index.mts:74](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L74)
 
 Generates index.ts files recursively in `config.targetDirectory`.
 
@@ -37,20 +37,10 @@ Configuration for index file generation
 readonly `string`[] \| (`args`) => `boolean`
 
 Glob patterns of files or predicate function to exclude from exports
-(default: excludes `'**/*.{test,spec}.?(c|m)[jt]s?(x)'`)
+(default: excludes `'**/*.{test,spec}.?(c|m)[jt]s?(x)'` and
+`'**/*.d.?(c|m)ts'`)
 
-###### excludePatterns?
-
-readonly `string`[]
-
-Glob patterns of files or predicate function to exclude from exports
-(default: excludes `'**/*.{test,spec}.?(c|m)[jt]s?(x)'`)
-
-**Deprecated**
-
-Use `exclude` instead.
-
-###### exportExtension?
+###### exportStatementExtension?
 
 `` `.${string}` `` \| `"none"`
 
@@ -62,7 +52,7 @@ File extension to use in export statements (default: '.js')
 
 Command to run for formatting generated files (optional)
 
-###### indexExtension?
+###### indexFileExtension?
 
 `` `.${string}` ``
 
@@ -74,17 +64,17 @@ File extension of index files to generate (default: '.ts')
 
 Whether to suppress output during execution (default: false)
 
-###### sourceExtensions?
-
-readonly `` `.${string}` ``[]
-
-File extensions of source files to export (default: ['.ts', '.tsx'])
-
 ###### targetDirectory
 
 `string` \| readonly `string`[]
 
 Target directories to generate index files for (string or array of strings)
+
+###### targetExtensions?
+
+readonly `` `.${string}` ``[]
+
+File extensions of source files to export (default: ['.ts', '.tsx'])
 
 #### Returns
 
