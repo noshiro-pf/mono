@@ -1,3 +1,9 @@
+# [6.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v5.3.0...v6.0.0) (2025-08-03)
+
+### Features
+
+- **breaking:** provide CLI commands ([#88](https://github.com/noshiro-pf/ts-repo-utils/issues/88)) ([cf6b87b](https://github.com/noshiro-pf/ts-repo-utils/commit/cf6b87b56ee29923b9f8e94110fc1aaeaf57338c))
+
 # [5.3.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v5.2.1...v5.3.0) (2025-08-02)
 
 ### Features

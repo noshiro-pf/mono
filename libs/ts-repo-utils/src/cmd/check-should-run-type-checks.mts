@@ -5,7 +5,7 @@ import { checkShouldRunTypeChecks } from '../functions/index.mjs';
 
 const cmdDef = cmd.command({
   name: 'check-should-run-type-checks-cli',
-  version: '5.3.0',
+  version: '6.0.0',
   args: {
     pathsIgnore: cmd.multioption({
       long: 'paths-ignore',
