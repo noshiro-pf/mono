@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-data-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / others/memoize-function
+[ts-data-forge](../README.md) / others/memoize-function
 
 # others/memoize-function
 

@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-data-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / promise/promise
+[ts-data-forge](../README.md) / promise/promise
 
 # promise/promise
 

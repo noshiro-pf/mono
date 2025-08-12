@@ -1,8 +1,8 @@
-[**Documentation**](README.md)
+[**ts-data-forge**](README.md)
 
 ---
 
-[Documentation](README.md) / object
+[ts-data-forge](README.md) / object
 
 # object
 

@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-data-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / collections/queue
+[ts-data-forge](../README.md) / collections/queue
 
 # collections/queue
 

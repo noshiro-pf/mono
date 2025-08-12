@@ -1,8 +1,8 @@
-[**Documentation**](../../README.md)
+[**ts-data-forge**](../../README.md)
 
 ---
 
-[Documentation](../../README.md) / array/array-utils
+[ts-data-forge](../../README.md) / array/array-utils
 
 # array/array-utils
 

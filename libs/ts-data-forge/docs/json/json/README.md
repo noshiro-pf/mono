@@ -1,8 +1,8 @@
-[**Documentation**](../../README.md)
+[**ts-data-forge**](../../README.md)
 
 ---
 
-[Documentation](../../README.md) / json/json
+[ts-data-forge](../../README.md) / json/json
 
 # json/json
 

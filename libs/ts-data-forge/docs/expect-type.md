@@ -1,8 +1,8 @@
-[**Documentation**](README.md)
+[**ts-data-forge**](README.md)
 
 ---
 
-[Documentation](README.md) / expect-type
+[ts-data-forge](README.md) / expect-type
 
 # expect-type
 

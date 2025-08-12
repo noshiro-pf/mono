@@ -1,8 +1,8 @@
-[**Documentation**](../../README.md)
+[**ts-data-forge**](../../README.md)
 
 ---
 
-[Documentation](../../README.md) / number/branded-types/non-zero-safe-int
+[ts-data-forge](../../README.md) / number/branded-types/non-zero-safe-int
 
 # number/branded-types/non-zero-safe-int
 

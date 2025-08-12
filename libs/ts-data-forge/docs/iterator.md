@@ -1,8 +1,8 @@
-[**Documentation**](README.md)
+[**ts-data-forge**](README.md)
 
 ---
 
-[Documentation](README.md) / iterator
+[ts-data-forge](README.md) / iterator
 
 # iterator
 

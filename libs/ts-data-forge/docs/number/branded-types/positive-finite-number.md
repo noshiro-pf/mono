@@ -1,8 +1,8 @@
-[**Documentation**](../../README.md)
+[**ts-data-forge**](../../README.md)
 
 ---
 
-[Documentation](../../README.md) / number/branded-types/positive-finite-number
+[ts-data-forge](../../README.md) / number/branded-types/positive-finite-number
 
 # number/branded-types/positive-finite-number
 

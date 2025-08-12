@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-data-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / globals
+[ts-data-forge](../README.md) / globals
 
 # globals
 

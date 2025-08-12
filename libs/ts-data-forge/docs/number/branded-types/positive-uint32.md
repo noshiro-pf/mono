@@ -1,8 +1,8 @@
-[**Documentation**](../../README.md)
+[**ts-data-forge**](../../README.md)
 
 ---
 
-[Documentation](../../README.md) / number/branded-types/positive-uint32
+[ts-data-forge](../../README.md) / number/branded-types/positive-uint32
 
 # number/branded-types/positive-uint32
 

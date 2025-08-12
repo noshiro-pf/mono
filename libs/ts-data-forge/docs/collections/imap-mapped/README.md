@@ -1,8 +1,8 @@
-[**Documentation**](../../README.md)
+[**ts-data-forge**](../../README.md)
 
 ---
 
-[Documentation](../../README.md) / collections/imap-mapped
+[ts-data-forge](../../README.md) / collections/imap-mapped
 
 # collections/imap-mapped
 

@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-data-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / others/cast-readonly
+[ts-data-forge](../README.md) / others/cast-readonly
 
 # others/cast-readonly
 

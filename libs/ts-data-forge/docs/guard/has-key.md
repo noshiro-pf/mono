@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-data-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / guard/has-key
+[ts-data-forge](../README.md) / guard/has-key
 
 # guard/has-key
 

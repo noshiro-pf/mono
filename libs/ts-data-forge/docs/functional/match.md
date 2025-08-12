@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-data-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / functional/match
+[ts-data-forge](../README.md) / functional/match
 
 # functional/match
 

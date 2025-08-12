@@ -1,8 +1,8 @@
-[**Documentation**](../../README.md)
+[**ts-data-forge**](../../README.md)
 
 ---
 
-[Documentation](../../README.md) / number/enum/int8
+[ts-data-forge](../../README.md) / number/enum/int8
 
 # number/enum/int8
 

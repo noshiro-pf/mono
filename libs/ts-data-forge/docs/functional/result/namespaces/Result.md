@@ -1,8 +1,8 @@
-[**Documentation**](../../../README.md)
+[**ts-data-forge**](../../../README.md)
 
 ---
 
-[Documentation](../../../README.md) / [functional/result](../README.md) / Result
+[ts-data-forge](../../../README.md) / [functional/result](../README.md) / Result
 
 # Result
 

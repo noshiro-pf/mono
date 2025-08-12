@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-data-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / others/if-then
+[ts-data-forge](../README.md) / others/if-then
 
 # others/if-then
 

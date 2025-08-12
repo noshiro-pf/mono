@@ -1,8 +1,8 @@
-[**Documentation**](../../../README.md)
+[**ts-data-forge**](../../../README.md)
 
 ---
 
-[Documentation](../../../README.md) / [collections/iset-mapped](../README.md) / ISetMapped
+[ts-data-forge](../../../README.md) / [collections/iset-mapped](../README.md) / ISetMapped
 
 # ISetMapped
 

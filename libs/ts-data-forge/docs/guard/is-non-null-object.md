@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-data-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / guard/is-non-null-object
+[ts-data-forge](../README.md) / guard/is-non-null-object
 
 # guard/is-non-null-object
 

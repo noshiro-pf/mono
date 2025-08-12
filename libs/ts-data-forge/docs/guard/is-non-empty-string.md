@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-data-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / guard/is-non-empty-string
+[ts-data-forge](../README.md) / guard/is-non-empty-string
 
 # guard/is-non-empty-string
 

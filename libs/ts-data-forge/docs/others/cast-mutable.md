@@ -1,8 +1,8 @@
-[**Documentation**](../README.md)
+[**ts-data-forge**](../README.md)
 
 ---
 
-[Documentation](../README.md) / others/cast-mutable
+[ts-data-forge](../README.md) / others/cast-mutable
 
 # others/cast-mutable
 
