@@ -211,6 +211,34 @@ type C = CastToInt<SafeInt>; // SafeInt (since SafeInt extends Int)
 
 ---
 
+### IntersectionImplSub\<Types\>
+
+> **IntersectionImplSub**\<`Types`\> = `Types` _extends_ readonly \[\] ? `unknown` : `Types` _extends_ readonly \[infer Head, `...(infer Tail)`\] ? `Head` & [`IntersectionImplSub`](#intersectionimplsub)\<`Tail`\> : `never`
+
+Defined in: [src/others/utils.d.mts:119](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L119)
+
+#### Type Parameters
+
+##### Types
+
+`Types` _extends_ readonly `unknown`[]
+
+---
+
+### MergeIfRecords\<R\>
+
+> **MergeIfRecords**\<`R`\> = \[`R`\] _extends_ \[[`UnknownRecord`](../../../../constants/record.md#unknownrecord)\] ? [`MergeIntersection`](../../../../others/utils.md#mergeintersection)\<`R`\> : `R`
+
+Defined in: [src/others/utils.d.mts:126](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L126)
+
+#### Type Parameters
+
+##### R
+
+`R`
+
+---
+
 ### RecordPathPrefixes\<L\>
 
 > **RecordPathPrefixes**\<`L`\> = `L` _extends_ readonly \[infer Head, `...(infer Rest)`\] ? readonly \[\] \| readonly \[`Head`, `...RecordPathPrefixes<Rest>`\] : readonly \[\]
