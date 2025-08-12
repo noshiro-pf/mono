@@ -1,3 +1,9 @@
+# [2.2.0](https://github.com/noshiro-pf/ts-type-forge/compare/v2.1.1...v2.2.0) (2025-08-12)
+
+### Features
+
+- update Intersection type implementation ([#143](https://github.com/noshiro-pf/ts-type-forge/issues/143)) ([2bc1464](https://github.com/noshiro-pf/ts-type-forge/commit/2bc1464e84320f212e0415cb090663143bd44e0a))
+
 ## [2.1.1](https://github.com/noshiro-pf/ts-type-forge/compare/v2.1.0...v2.1.1) (2025-07-19)
 
 ### Bug Fixes
