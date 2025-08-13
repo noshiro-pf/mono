@@ -16,13 +16,13 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/type.d.mts",
+        "types": "./dist/types.d.mts",
         "default": "./dist/index.mjs"
       }
     }
   },
   "module": "./dist/index.mjs",
-  "types": "./dist/type.d.mts",
+  "types": "./dist/types.d.mts",
   "bin": {
     "assert-repo-is-clean": "./src/cmd/assert-repo-is-clean.mts",
     "check-should-run-type-checks": "./src/cmd/check-should-run-type-checks.mts",
