@@ -16,6 +16,7 @@ const config = {
     'list-indent': false, // prefer Prettier's setting
     'code-block-style': false, // prefer Prettier's setting
     MD041: false,
+    MD024: false, // no-duplicate-heading
     indentation: false, // prefer Prettier's setting
     'ul-indent': false, // prefer Prettier's setting
   },

@@ -32,19 +32,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Uses **Vitest** with dual testing strategy:
 
-1. **Compile-time type testing** via `expectType` utility
+1. **Compile-time type testing** via `expectType` utility from `ts-data-forge`
 2. **Runtime behavioral testing** with standard assertions
 
 Example pattern:
 
 ```typescript
-import { expectType } from '../expect-type.mjs';
+import { expectType } from 'ts-data-forge';
 
 // Type-level assertion
 expectType<typeof result, readonly [0, 0, 0]>('=');
 // Runtime assertion
 expect(result).toStrictEqual([0, 0, 0]);
 ```
+
+**Testing Structure**: Tests are co-located with source files using `.test.mts` suffix and follow the pattern of testing both the TypeScript type inference and runtime behavior of validators.
 
 ## Configuration Notes
 
@@ -57,10 +59,28 @@ expect(result).toStrictEqual([0, 0, 0]);
 - **Tests**: Co-located with source files using `.test.mts` suffix
 - **Module Resolution**: `NodeNext` for proper ESM support
 
-## Important Patterns
+## Core Architecture
+
+ts-fortress is a **TypeScript-first schema validation library** with static type inference. The architecture follows these key patterns:
+
+### Type System Foundation
+
+- **Central Type Interface**: All validators implement `Type<A>` interface with `typeName`, `defaultValue`, `is`, `assertIs`, `cast`, `fill`, and `validate` methods
+- **Result-based Validation**: Uses `ts-data-forge.Result<A, string[]>` for composable error handling
+- **Type-level Inference**: TypeScript types are inferred statically from validators using `TypeOf<T>` utility
+
+### Module Organization
+
+- **Categorical Structure**: Organized by data type categories (`primitives/`, `array/`, `record/`, `branded/`, `compose/`, `enum/`)
+- **Index File Generation**: All exports flow through auto-generated index files using `gen-index-ts`
+- **Hierarchical Exports**: Main exports re-export from category indexes for clean API surface
+
+### Key Architectural Patterns
 
 - **Immutability**: Functions return immutable data structures
-- **Type Safety**: Leverage `ts-type-forge` for advanced TypeScript patterns
+- **Type Safety**: Leverages `ts-type-forge` and `ts-data-forge` for advanced TypeScript patterns
+- **Composability**: Types can be combined using intersection, union, and merge operations
+- **Brand Types**: Extensive use of branded number types for domain-specific validation (Int, SafeInt, PositiveInt, etc.)
 - **Export Strategy**: All exports go through generated index files
 - **Documentation**: Auto-generated from TSDoc comments using TypeDoc
 - **File Extensions**: Use `.mts` for TypeScript files to ensure ESM compatibility

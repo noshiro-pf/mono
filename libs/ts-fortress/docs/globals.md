@@ -1,7 +1,7 @@
-[**typescript-template**](README.md)
+[**ts-fortress**](README.md)
 
 ---
 
-[typescript-template](README.md) / globals
+[ts-fortress](README.md) / globals
 
 # globals
