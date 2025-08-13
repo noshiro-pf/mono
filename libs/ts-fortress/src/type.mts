@@ -1,4 +1,5 @@
 import { type Result } from 'ts-data-forge';
+import { type ValidationError } from './validation-error.mjs';
 
 /**
  * - `typeName` : Name for this type
@@ -8,7 +9,7 @@ import { type Result } from 'ts-data-forge';
  * - `fill` : Default value filling function
  * - `validate` : A base function to be used in `is` and `assertIs`. `validate`
  *   returns Result.Ok if the value is of Type A, otherwise returns Result.Err
- *   with error message stack as the value.
+ *   with structured validation error information.
  */
 export type Type<A> = Readonly<{
   typeName: string;
@@ -17,7 +18,7 @@ export type Type<A> = Readonly<{
   assertIs: (a: unknown) => asserts a is A;
   cast: (a: unknown) => A;
   fill: (a: unknown) => A;
-  validate: (a: unknown) => Result<A, readonly string[]>;
+  validate: (a: unknown) => Result<A, readonly ValidationError[]>;
 
   /** Used in record type */
   optional?: true;

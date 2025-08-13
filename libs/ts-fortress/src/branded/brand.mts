@@ -1,6 +1,10 @@
 import { pipe, Result } from 'ts-data-forge';
 import { type Type } from '../type.mjs';
-import { createType, validationErrorMessage } from '../utils/index.mjs';
+import { createType } from '../utils/index.mjs';
+import {
+  type ValidationError,
+  type ValidationErrorWithMessage,
+} from '../validation-error.mjs';
 
 type ArrayToUnion<A extends readonly unknown[]> = A extends readonly []
   ? never
@@ -42,16 +46,19 @@ export const brand = <
     pipe(a)
       .map(codec.validate)
       .map(
-        (v): Result<T, readonly string[]> =>
+        (v): Result<T, readonly ValidationError[]> =>
           Result.isErr(v)
             ? v
             : is(v.value)
               ? Result.ok(v.value)
               : Result.err([
-                  validationErrorMessage(
-                    v.value,
-                    `The value must satisfy the constraint corresponding to the brand keys: <${brandKeysStr}>`,
-                  ),
+                  {
+                    path: [],
+                    actualValue: v.value,
+                    expectedType: brandKeysStr,
+                    typeName: brandKeysStr,
+                    message: `The value must satisfy the constraint corresponding to the brand keys: <${brandKeysStr}>`,
+                  } satisfies ValidationErrorWithMessage,
                 ]),
       ).value;
 

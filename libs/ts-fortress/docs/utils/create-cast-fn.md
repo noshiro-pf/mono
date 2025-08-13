@@ -12,7 +12,7 @@
 
 > **createCastFn**\<`T`\>(`validate`): (`a`) => `T`
 
-Defined in: [utils/create-cast-fn.mts:8](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-cast-fn.mts#L8)
+Defined in: [utils/create-cast-fn.mts:12](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-cast-fn.mts#L12)
 
 #### Type Parameters
 
@@ -24,7 +24,7 @@ Defined in: [utils/create-cast-fn.mts:8](https://github.com/noshiro-pf/ts-fortre
 
 ##### validate
 
-(`a`) => `Result`\<`T`, readonly `string`[]\>
+(`a`) => `Result`\<`T`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>
 
 #### Returns
 

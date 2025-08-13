@@ -1,8 +1,8 @@
 import { Result } from 'ts-data-forge';
 import { type Type } from '../type.mjs';
+import { createPrimitiveValidationError } from '../validation-error.mjs';
 import { createAssertFn } from './create-assert-fn.mjs';
 import { createCastFn } from './create-cast-fn.mjs';
-import { validationErrorMessage } from './validation-error-message.mjs';
 
 export const createPrimitiveType = <A extends Primitive>({
   typeName,
@@ -17,10 +17,11 @@ export const createPrimitiveType = <A extends Primitive>({
     is(a)
       ? Result.ok(a)
       : Result.err([
-          validationErrorMessage(
-            a,
-            `The value is expected to be <${typeName}>`,
-          ),
+          createPrimitiveValidationError({
+            actualValue: a,
+            expectedType: typeName,
+            typeName,
+          }),
         ]);
 
   return {

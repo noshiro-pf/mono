@@ -1,6 +1,7 @@
-import { expectType } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { number, string } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../validation-error.mjs';
 import { keyValueRecord } from './key-value-record.mjs';
 
 describe('keyValueRecord', () => {
@@ -54,10 +55,47 @@ describe('keyValueRecord', () => {
         date: 'cd',
       };
 
-      expect(strNumRecord.validate(x).value).toStrictEqual([
-        `The value of the record is expected to be <number>, but it is actually '"ab"'.`,
-        `The value is expected to be <number>, but it is actually '"ab"'.`,
-      ]);
+      const result = strNumRecord.validate(x);
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        expect(result.value).toStrictEqual([
+          {
+            path: [],
+            actualValue: 'ab',
+            expectedType: 'key-value-record',
+            typeName: 'key-value-record',
+            message: 'The value of the record is expected to be <number>',
+          },
+          {
+            path: ['month'],
+            actualValue: 'ab',
+            expectedType: 'number',
+            typeName: 'number',
+            message: undefined,
+          },
+          {
+            path: [],
+            actualValue: 'cd',
+            expectedType: 'key-value-record',
+            typeName: 'key-value-record',
+            message: 'The value of the record is expected to be <number>',
+          },
+          {
+            path: ['date'],
+            actualValue: 'cd',
+            expectedType: 'number',
+            typeName: 'number',
+            message: undefined,
+          },
+        ]);
+        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+          'The value of the record is expected to be <number>',
+          'Expected number at month, got string',
+          'The value of the record is expected to be <number>',
+          'Expected number at date, got string',
+        ]);
+      }
     });
   });
 

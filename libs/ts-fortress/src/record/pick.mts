@@ -1,11 +1,7 @@
 import { expectType, isRecord, Obj, Result } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
-import {
-  createAssertFn,
-  createCastFn,
-  createIsFn,
-  validationErrorMessage,
-} from '../utils/index.mjs';
+import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
+import { createPrimitiveValidationError } from '../validation-error.mjs';
 
 /** Creates a record type with keys picked. */
 export const pick = <
@@ -31,7 +27,11 @@ export const pick = <
   const validate: Type<V>['validate'] = (a) => {
     if (!isRecord(a)) {
       return Result.err([
-        validationErrorMessage(a, 'The value is expected to be a record'),
+        createPrimitiveValidationError({
+          actualValue: a,
+          expectedType: 'record',
+          typeName: typeNameFilled,
+        }),
       ]);
     }
 

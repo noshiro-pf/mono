@@ -1,5 +1,6 @@
-import { expectType } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../validation-error.mjs';
 import { uintRange } from './uint-range.mjs';
 
 describe('uintRange', () => {
@@ -44,9 +45,23 @@ describe('uintRange', () => {
 
   describe('validate', () => {
     test('falsy case', () => {
-      expect(month.validate(13).value).toStrictEqual([
-        "The value is expected to be an integer between 1 and 12, but it is actually '13'.",
-      ]);
+      const result = month.validate(13);
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        expect(result.value[0]).toStrictEqual({
+          path: [],
+          actualValue: 13,
+          expectedType: 'month',
+          typeName: 'month',
+          message: 'The value is expected to be an integer between 1 and 12',
+        });
+        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+          'The value is expected to be an integer between 1 and 12',
+        ]);
+      } else {
+        throw new Error('Expected validation to fail');
+      }
     });
   });
 

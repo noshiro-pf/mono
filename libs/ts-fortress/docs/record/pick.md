@@ -12,7 +12,7 @@
 
 > **pick**\<`R`, `KeysToPick`\>(`recordType`, `keysToPick`, `options?`): `PickedType`\<`R`, `KeysToPick`\>
 
-Defined in: [record/pick.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L11)
+Defined in: [record/pick.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L7)
 
 Creates a record type with keys picked.
 
@@ -20,7 +20,7 @@ Creates a record type with keys picked.
 
 ##### R
 
-`R` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`UnknownRecord`, readonly `string`[]\>; \}\>
+`R` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`UnknownRecord`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
 
 ##### KeysToPick
 

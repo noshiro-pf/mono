@@ -1,11 +1,13 @@
 import { asInt, expectType, Result } from 'ts-data-forge';
 import { array } from './array/index.mjs';
 import { int } from './branded/index.mjs';
+import { union } from './compose/index.mjs';
 import { uintRange } from './enum/index.mjs';
-import { number } from './primitives/index.mjs';
-import { optional, pick, record } from './record/index.mjs';
+import { nullType, number, undefinedType } from './primitives/index.mjs';
+import { keyof, optional, partial, pick, record } from './record/index.mjs';
 import { type TypeOf } from './type.mjs';
 import { unknown } from './unknown.mjs';
+import { validationErrorsToMessages } from './validation-error.mjs';
 
 describe('nested record', () => {
   const nestedRecord = record({
@@ -98,11 +100,49 @@ describe('nested record', () => {
         u: undefined,
       };
 
-      expect(nestedRecord.validate(x).value).toStrictEqual([
-        `The value at record key "xs" is expected to be <(Finite & Int & not(NaNValue))[]>, but it is actually '[-1,2.2,3.3]'.`,
-        `The array element is expected to be <Finite & Int & not(NaNValue)>, but the actual value at index 1 is '2.2'.`,
-        `The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & not(NaNValue)>, but it is actually '2.2'.`,
-      ]);
+      const result = nestedRecord.validate(x);
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        expect(result.value).toStrictEqual([
+          {
+            path: ['xs', '1'],
+            actualValue: 2.2,
+            expectedType: 'Finite & Int & not(NaNValue)',
+            typeName: 'Finite & Int & not(NaNValue)',
+            message:
+              'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & not(NaNValue)>',
+          },
+          {
+            path: ['xs', '2'],
+            actualValue: 3.3,
+            expectedType: 'Finite & Int & not(NaNValue)',
+            typeName: 'Finite & Int & not(NaNValue)',
+            message:
+              'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & not(NaNValue)>',
+          },
+          {
+            path: ['rec', 'a'],
+            actualValue: 123,
+            expectedType: 'uintRange(0, 11)',
+            typeName: 'uintRange(0, 11)',
+            message: 'The value is expected to be an integer between 0 and 10',
+          },
+          {
+            path: ['rec', 'b'],
+            actualValue: 234,
+            expectedType: 'uintRange(0, 11)',
+            typeName: 'uintRange(0, 11)',
+            message: 'The value is expected to be an integer between 0 and 10',
+          },
+        ]);
+        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+          'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & not(NaNValue)> at xs.1',
+          'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & not(NaNValue)> at xs.2',
+          'The value is expected to be an integer between 0 and 10 at rec.a',
+          'The value is expected to be an integer between 0 and 10 at rec.b',
+        ]);
+      }
     });
   });
 
@@ -238,7 +278,9 @@ describe('ymd', () => {
       expectType<typeof x.month, number>('='); // no type error
     };
 
-    expect(f).toThrow('The record is expected to have the key "month".');
+    expect(f).toThrow(
+      '\nMissing required key "month" at month,\nMissing required key "date" at date',
+    );
   });
 
   test('validation function', () => {
@@ -250,9 +292,28 @@ describe('ymd', () => {
 
     expect(Result.isErr(result)).toBe(true);
 
-    expect(result.value).toStrictEqual([
-      'The record is expected to have the key "month".',
-    ]);
+    if (Result.isErr(result)) {
+      expect(result.value).toStrictEqual([
+        {
+          path: ['month'],
+          actualValue: x,
+          expectedType: '{ year: number, month: number, date: number }',
+          typeName: '{ year: number, month: number, date: number }',
+          message: 'Missing required key "month"',
+        },
+        {
+          path: ['date'],
+          actualValue: x,
+          expectedType: '{ year: number, month: number, date: number }',
+          typeName: '{ year: number, month: number, date: number }',
+          message: 'Missing required key "date"',
+        },
+      ]);
+      expect(validationErrorsToMessages(result.value)).toStrictEqual([
+        'Missing required key "month" at month',
+        'Missing required key "date" at date',
+      ]);
+    }
   });
 });
 
@@ -283,5 +344,201 @@ describe('ymd2', () => {
     };
 
     expect(ymd2.is(x)).toBe(false);
+  });
+});
+
+// Tests demonstrating ts-fortress correct behavior for io-ts bugs mentioned in README
+describe('io-ts bug examples - correct behavior in ts-fortress', () => {
+  describe('keyof type consistency (io-ts issue #697)', () => {
+    test('keyof with numeric keys produces correct types and runtime behavior', () => {
+      // ts-fortress: Runtime and types always match
+      const T = keyof(
+        record({
+          0: undefinedType,
+          1: undefinedType,
+          2: undefinedType,
+          3: undefinedType,
+          4: undefinedType,
+        }),
+      );
+
+      type T = TypeOf<typeof T>;
+      // TypeScript correctly infers: "0" | "1" | "2" | "3" | "4" (string literals)
+      expectType<T, '0' | '1' | '2' | '3' | '4'>('=');
+
+      // Runtime behavior matches TypeScript types exactly
+      expect(Result.isErr(T.validate(0))).toBe(true); // number 0 is rejected
+      expect(Result.isOk(T.validate('0'))).toBe(true); // string "0" is accepted
+
+      expect(Result.isOk(T.validate('1'))).toBe(true);
+      expect(Result.isOk(T.validate('2'))).toBe(true);
+      expect(Result.isOk(T.validate('3'))).toBe(true);
+      expect(Result.isOk(T.validate('4'))).toBe(true);
+
+      expect(Result.isErr(T.validate('5'))).toBe(true); // invalid key
+      expect(Result.isErr(T.validate(1))).toBe(true); // number literal rejected
+      expect(Result.isErr(T.validate('invalid'))).toBe(true); // invalid string
+    });
+  });
+
+  describe('union validation consistency (io-ts issue #677)', () => {
+    test('union validation produces predictable results without unexpected fields', () => {
+      const A = record({
+        A: union([number(0), undefinedType, nullType]),
+      });
+
+      const B = record({
+        B: union([number(0), undefinedType, nullType]),
+      });
+
+      const C = partial(
+        record({
+          C: union([number(0), nullType]),
+        }),
+      );
+
+      // Case 1: Union validation is predictable and correct
+      {
+        const UnionBA = union([B, A]);
+        const result = UnionBA.validate({ A: 1 });
+
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          // No unexpected fields added
+          expect(result.value).toStrictEqual({ A: 1 });
+
+          // Type guards behave correctly
+          expect(A.is(result.value)).toBe(true); // Correct
+          expect(B.is(result.value)).toBe(false); // Correct! B requires field B
+        }
+      }
+
+      // Case 2: Consistent validation behavior
+      {
+        const UnionCA = union([C, A]);
+        const result = UnionCA.validate({ A: 1 });
+
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          // Correct and consistent result
+          expect(result.value).toStrictEqual({ A: 1 });
+
+          // Type guards work as expected
+          expect(A.is(result.value)).toBe(true); // Correct
+          // Note: In ts-fortress, partial types are more permissive and can accept
+          // objects with additional fields, so C.is() returns true here.
+          // This is different from io-ts behavior and shows ts-fortress's
+          // consistent approach to partial type validation.
+          expect(C.is(result.value)).toBe(true); // ts-fortress allows extra fields in partial
+        }
+      }
+    });
+
+    test('union validation handles partial types correctly', () => {
+      const FullRecord = record({
+        name: number(0),
+        value: number(0),
+      });
+
+      const PartialRecord = partial(
+        record({
+          name: number(0),
+          optional: number(0),
+        }),
+      );
+
+      const UnionType = union([PartialRecord, FullRecord]);
+
+      // Test with data that matches FullRecord
+      {
+        const result = UnionType.validate({ name: 42, value: 100 });
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          expect(result.value).toStrictEqual({ name: 42, value: 100 });
+          expect(FullRecord.is(result.value)).toBe(true);
+          // Note: In ts-fortress, partial types accept objects with extra fields
+          // so PartialRecord.is() returns true even with the 'value' field
+          expect(PartialRecord.is(result.value)).toBe(true); // ts-fortress partial allows extra fields
+        }
+      }
+
+      // Test with data that matches PartialRecord
+      {
+        const result = UnionType.validate({ name: 42 });
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          expect(result.value).toStrictEqual({ name: 42 });
+          expect(FullRecord.is(result.value)).toBe(false); // Missing 'value' field
+          expect(PartialRecord.is(result.value)).toBe(true);
+        }
+      }
+    });
+
+    test('union validation with complex nested structures', () => {
+      const TypeA = record({
+        type: union([undefinedType]), // Only accepts undefined
+        data: record({
+          valueA: number(0),
+        }),
+      });
+
+      const TypeB = record({
+        type: nullType, // Only accepts null
+        data: record({
+          valueB: number(0),
+        }),
+      });
+
+      const UnionAB = union([TypeA, TypeB]);
+
+      // Test TypeA validation
+      {
+        const input = {
+          type: undefined,
+          data: { valueA: 42 },
+        };
+
+        const result = UnionAB.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          expect(result.value).toStrictEqual(input);
+          expect(TypeA.is(result.value)).toBe(true);
+          expect(TypeB.is(result.value)).toBe(false);
+        }
+      }
+
+      // Test TypeB validation
+      {
+        const input = {
+          type: null,
+          data: { valueB: 99 },
+        };
+
+        const result = UnionAB.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          expect(result.value).toStrictEqual(input);
+          expect(TypeA.is(result.value)).toBe(false);
+          expect(TypeB.is(result.value)).toBe(true);
+        }
+      }
+
+      // Test invalid data
+      {
+        const input = {
+          type: 'invalid',
+          data: { someField: 123 },
+        };
+
+        const result = UnionAB.validate(input);
+        expect(Result.isErr(result)).toBe(true);
+      }
+    });
   });
 });

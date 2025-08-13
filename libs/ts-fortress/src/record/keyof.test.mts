@@ -1,6 +1,7 @@
-import { expectType } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { number } from '../primitives/index.mjs';
 import { type Type, type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../validation-error.mjs';
 import { keyof } from './keyof.mjs';
 import { record } from './record.mjs';
 
@@ -51,9 +52,24 @@ describe('keyof', () => {
     test('falsy case', () => {
       const x: unknown = 'minutes';
 
-      expect(ymdKey.validate(x).value).toStrictEqual([
-        `The value is expected to be one of the elements contained in { year, month, date }, but it is actually '"minutes"'.`,
-      ]);
+      const result = ymdKey.validate(x);
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        expect(result.value).toStrictEqual([
+          {
+            path: [],
+            actualValue: 'minutes',
+            expectedType: 'keyof { year: number, month: number, date: number }',
+            typeName: 'keyof { year: number, month: number, date: number }',
+            message:
+              'The value is expected to be one of the elements contained in { year, month, date }',
+          },
+        ]);
+        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+          'The value is expected to be one of the elements contained in { year, month, date }',
+        ]);
+      }
     });
   });
 

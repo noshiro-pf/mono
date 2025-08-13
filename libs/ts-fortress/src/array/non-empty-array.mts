@@ -1,11 +1,12 @@
 import { Arr, Result } from 'ts-data-forge';
 import { type Type } from '../type.mjs';
+import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
 import {
-  createAssertFn,
-  createCastFn,
-  createIsFn,
-  validationErrorMessage,
-} from '../utils/index.mjs';
+  createPrimitiveValidationError,
+  prependIndexToValidationErrors,
+  type ValidationError,
+  type ValidationErrorWithMessage,
+} from '../validation-error.mjs';
 
 export const nonEmptyArray = <A,>(
   elementType: Type<A>,
@@ -25,28 +26,35 @@ export const nonEmptyArray = <A,>(
   const validate: Type<T>['validate'] = (a) => {
     if (!Arr.isArray(a)) {
       return Result.err([
-        validationErrorMessage(a, 'The value is expected to be an array'),
+        createPrimitiveValidationError({
+          actualValue: a,
+          expectedType: 'array',
+          typeName: typeNameFilled,
+        }),
       ]);
     }
 
     if (Arr.isEmpty(a)) {
       return Result.err([
-        'The value is expected to be a non-empty array, but it is empty.',
+        {
+          path: [],
+          actualValue: a,
+          expectedType: typeNameFilled,
+          typeName: typeNameFilled,
+          message: 'Expected non-empty array, got empty array',
+        } satisfies ValidationErrorWithMessage,
       ]);
     }
 
-    for (const [index, el] of a.entries()) {
+    const errors: readonly ValidationError[] = a.flatMap((el, index) => {
       const res = elementType.validate(el);
+      return Result.isErr(res)
+        ? prependIndexToValidationErrors(res.value, index)
+        : [];
+    });
 
-      if (Result.isErr(res)) {
-        const message = validationErrorMessage(
-          el,
-          `The array element is expected to be <${elementType.typeName}>`,
-          (str) => `but the actual value at index ${index} is '${str}'`,
-        );
-
-        return Result.err([message, ...res.value]);
-      }
+    if (errors.length > 0) {
+      return Result.err(errors);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion

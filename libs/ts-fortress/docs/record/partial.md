@@ -12,7 +12,7 @@
 
 > **partial**\<`R`, `KeysToBeOptional`\>(`recordType`, `options?`): `PartialType`\<`R`, `KeysToBeOptional`\>
 
-Defined in: [record/partial.mts:14](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/partial.mts#L14)
+Defined in: [record/partial.mts:10](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/partial.mts#L10)
 
 Creates a Partial type. If keysToBeOptional is set, only those keys are
 optional, otherwise, all properties are optional.
@@ -21,7 +21,7 @@ optional, otherwise, all properties are optional.
 
 ##### R
 
-`R` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`UnknownRecord`, readonly `string`[]\>; \}\>
+`R` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`UnknownRecord`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
 
 ##### KeysToBeOptional
 

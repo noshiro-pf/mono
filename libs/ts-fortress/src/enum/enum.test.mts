@@ -1,5 +1,6 @@
-import { expectType } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../validation-error.mjs';
 import { enumType } from './enum.mjs';
 
 describe('enumType', () => {
@@ -41,9 +42,24 @@ describe('enumType', () => {
 
   describe('validate', () => {
     test('falsy case', () => {
-      expect(targetType.validate(5).value).toStrictEqual([
-        "The value is expected to be one of the elements contained in { 3, 2, a }, but it is actually '5'.",
-      ]);
+      const result = targetType.validate(5);
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        expect(result.value[0]).toStrictEqual({
+          path: [],
+          actualValue: 5,
+          expectedType: 'enum',
+          typeName: 'enum',
+          message:
+            'The value is expected to be one of the elements contained in { 3, 2, a }',
+        });
+        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+          'The value is expected to be one of the elements contained in { 3, 2, a }',
+        ]);
+      } else {
+        throw new Error('Expected validation to fail');
+      }
     });
   });
 

@@ -1,11 +1,7 @@
 import { Result, expectType } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
-import {
-  createAssertFn,
-  createCastFn,
-  createIsFn,
-  validationErrorMessage,
-} from '../utils/index.mjs';
+import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
+import { type ValidationErrorWithMessage } from '../validation-error.mjs';
 
 export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
   types: Types,
@@ -29,12 +25,15 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
       ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         Result.ok(a as T)
       : Result.err([
-          validationErrorMessage(
-            a,
-            `The type of value is expected to be one of the elements contained in { ${types
+          {
+            path: [],
+            actualValue: a,
+            expectedType: typeNameFilled,
+            message: `The type of value is expected to be one of the elements contained in { ${types
               .map((t) => t.typeName)
               .join(', ')} }`,
-          ),
+            typeName: typeNameFilled,
+          } satisfies ValidationErrorWithMessage,
         ]);
 
   const is = createIsFn<T>(validate);

@@ -1,6 +1,7 @@
-import { expectType } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { number } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../validation-error.mjs';
 import { arrayOfLength } from './array-of-length.mjs';
 
 describe('arrayOfLength', () => {
@@ -76,18 +77,55 @@ describe('arrayOfLength', () => {
     test('falsy case 1', () => {
       const ys: unknown = [];
 
-      expect(xs.validate(ys).value).toStrictEqual([
-        'The value is expected to be an array of length 4, but it is 0.',
-      ]);
+      const result = xs.validate(ys);
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        expect(result.value).toStrictEqual([
+          {
+            path: [],
+            actualValue: ys,
+            expectedType: 'xs',
+            typeName: 'xs',
+            message: 'Expected array of length 4, got length 0',
+          },
+        ]);
+
+        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+          'Expected array of length 4, got length 0',
+        ]);
+      }
     });
 
     test('falsy case 2', () => {
       const ys: unknown = [0, '1', '', 3];
 
-      expect(xs.validate(ys).value).toStrictEqual([
-        `The array element is expected to be <number>, but the actual value at index 1 is '"1"'.`,
-        `The value is expected to be <number>, but it is actually '"1"'.`,
-      ]);
+      const result = xs.validate(ys);
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        expect(result.value).toStrictEqual([
+          {
+            path: ['1'],
+            actualValue: '1',
+            expectedType: 'number',
+            typeName: 'number',
+            message: undefined,
+          },
+          {
+            path: ['2'],
+            actualValue: '',
+            expectedType: 'number',
+            typeName: 'number',
+            message: undefined,
+          },
+        ]);
+
+        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+          'Expected number at 1, got string',
+          'Expected number at 2, got string',
+        ]);
+      }
     });
   });
 

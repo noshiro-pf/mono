@@ -1,6 +1,7 @@
-import { expectType } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { number } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../validation-error.mjs';
 import { array } from './array.mjs';
 
 describe('array', () => {
@@ -61,10 +62,36 @@ describe('array', () => {
       const ys: unknown = ['1', '', 3];
 
       expect(xs.is(ys)).toBe(false);
-      expect(xs.validate(ys).value).toStrictEqual([
-        `The array element is expected to be <number>, but the actual value at index 0 is '"1"'.`,
-        `The value is expected to be <number>, but it is actually '"1"'.`,
-      ]);
+      const result = xs.validate(ys);
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        // Test that we have structured ValidationError objects
+        expect(result.value).toStrictEqual([
+          {
+            path: ['0'],
+            actualValue: '1',
+            expectedType: 'number',
+            typeName: 'number',
+            message: undefined,
+          },
+          {
+            path: ['1'],
+            actualValue: '',
+            expectedType: 'number',
+            typeName: 'number',
+            message: undefined,
+          },
+        ]);
+
+        // Test that we can convert to legacy string format for backward compatibility
+        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+          'Expected number at 0, got string',
+          'Expected number at 1, got string',
+        ]);
+      } else {
+        throw new Error('Expected validation to fail');
+      }
     });
   });
 

@@ -12,7 +12,7 @@
 
 > **createAssertFn**\<`T`\>(`validate`): (`a`) => `asserts a is T`
 
-Defined in: [utils/create-assert-fn.mts:8](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-assert-fn.mts#L8)
+Defined in: [utils/create-assert-fn.mts:12](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-assert-fn.mts#L12)
 
 #### Type Parameters
 
@@ -24,7 +24,7 @@ Defined in: [utils/create-assert-fn.mts:8](https://github.com/noshiro-pf/ts-fort
 
 ##### validate
 
-(`a`) => `Result`\<`T`, readonly `string`[]\>
+(`a`) => `Result`\<`T`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>
 
 #### Returns
 

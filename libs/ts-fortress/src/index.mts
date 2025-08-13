@@ -7,3 +7,4 @@ export * from './record/index.mjs';
 export * from './type.mjs';
 export * from './unknown.mjs';
 export * from './utils/index.mjs';
+export * from './validation-error.mjs';

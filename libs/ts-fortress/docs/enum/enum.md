@@ -12,7 +12,7 @@
 
 > **enumType**\<`Values`\>(`values`, `options?`): [`Type`](../type.md#type)\<`ArrayElement`\<`Values`\>\>
 
-Defined in: [enum/enum.mts:10](https://github.com/noshiro-pf/ts-fortress/blob/main/src/enum/enum.mts#L10)
+Defined in: [enum/enum.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/enum/enum.mts#L6)
 
 #### Type Parameters
 

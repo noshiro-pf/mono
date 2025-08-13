@@ -1,7 +1,8 @@
-import { expectType } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { number } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../validation-error.mjs';
 import { mergeRecords } from './merge-records.mjs';
 
 describe('mergeRecords', () => {
@@ -67,10 +68,42 @@ describe('mergeRecords', () => {
 
   describe('validate', () => {
     test('falsy case', () => {
-      expect(targetType.validate({ x: 0, y: 1 }).value).toStrictEqual([
-        'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }, but it is actually \'{"x":0,"y":1}\'.',
-        'The record is expected to have the key "z".',
-      ]);
+      const result = targetType.validate({ x: 0, y: 1 });
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        expect(result.value).toStrictEqual([
+          {
+            path: [],
+            actualValue: { x: 0, y: 1 },
+            expectedType:
+              'Intersection<{ x: number, y: number }, { z: number, w: number }>',
+            typeName:
+              'Intersection<{ x: number, y: number }, { z: number, w: number }>',
+            message:
+              'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
+          },
+          {
+            path: ['z'],
+            actualValue: { x: 0, y: 1 },
+            expectedType: '{ z: number, w: number }',
+            typeName: '{ z: number, w: number }',
+            message: 'Missing required key "z"',
+          },
+          {
+            path: ['w'],
+            actualValue: { x: 0, y: 1 },
+            expectedType: '{ z: number, w: number }',
+            typeName: '{ z: number, w: number }',
+            message: 'Missing required key "w"',
+          },
+        ]);
+        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+          'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
+          'Missing required key "z" at z',
+          'Missing required key "w" at w',
+        ]);
+      }
     });
   });
 

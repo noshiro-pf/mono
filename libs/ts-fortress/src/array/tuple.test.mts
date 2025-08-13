@@ -1,7 +1,8 @@
-import { expectType } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { number, numberLiteral, stringLiteral } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../validation-error.mjs';
 import { tuple } from './tuple.mjs';
 
 describe('tuple', () => {
@@ -71,14 +72,74 @@ describe('tuple', () => {
   });
 
   describe('validate', () => {
-    test('falsy case', () => {
+    test('falsy case - not array', () => {
+      const x: unknown = 'not an array';
+
+      const result = targetType.validate(x);
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        expect(result.value).toStrictEqual([
+          {
+            path: [],
+            actualValue: 'not an array',
+            expectedType: 'array',
+            typeName: 'tuple',
+            message: undefined,
+          },
+        ]);
+      }
+    });
+
+    test('falsy case - wrong length', () => {
+      const x: unknown = [{ x: 1, y: 2 }];
+
+      const result = targetType.validate(x);
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        expect(result.value).toStrictEqual([
+          {
+            path: [],
+            actualValue: x,
+            expectedType: 'tuple',
+            typeName: 'tuple',
+            message:
+              'The length of tuple is expected to be 3, but it is actually 1',
+          },
+        ]);
+      }
+    });
+
+    test('falsy case - element validation errors', () => {
       const x: unknown = [{ x: 'str', y: 'str' }, 3, '2'];
 
-      expect(targetType.validate(x).value).toStrictEqual([
-        `The tuple element at 0 is expected to be <{ x: number, y: number }>, but it is actually '{"x":"str","y":"str"}'.`,
-        `The value at record key "x" is expected to be <number>, but it is actually '"str"'.`,
-        `The value is expected to be <number>, but it is actually '"str"'.`,
-      ]);
+      const result = targetType.validate(x);
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        expect(result.value).toStrictEqual([
+          {
+            path: ['0', 'x'],
+            actualValue: 'str',
+            expectedType: 'number',
+            typeName: 'number',
+            message: undefined,
+          },
+          {
+            path: ['0', 'y'],
+            actualValue: 'str',
+            expectedType: 'number',
+            typeName: 'number',
+            message: undefined,
+          },
+        ]);
+
+        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+          'Expected number at 0.x, got string',
+          'Expected number at 0.y, got string',
+        ]);
+      }
     });
   });
 

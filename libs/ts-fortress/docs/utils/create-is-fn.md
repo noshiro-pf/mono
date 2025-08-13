@@ -24,7 +24,7 @@ Defined in: [utils/create-is-fn.mts:5](https://github.com/noshiro-pf/ts-fortress
 
 ##### validate
 
-(`a`) => `Result`\<`T`, readonly `string`[]\>
+(`a`) => `Result`\<`T`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>
 
 #### Returns
 

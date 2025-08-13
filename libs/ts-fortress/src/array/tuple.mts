@@ -1,11 +1,12 @@
 import { Arr, Result } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
+import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
 import {
-  createAssertFn,
-  createCastFn,
-  createIsFn,
-  validationErrorMessage,
-} from '../utils/index.mjs';
+  createPrimitiveValidationError,
+  prependIndexToValidationErrors,
+  type ValidationError,
+  type ValidationErrorWithMessage,
+} from '../validation-error.mjs';
 
 type MapTuple<T extends readonly Type<unknown>[]> = {
   readonly [K in keyof T]: TypeOf<T[K]>;
@@ -27,27 +28,37 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
   const validate: Type<T>['validate'] = (a) => {
     if (!Arr.isArray(a)) {
       return Result.err([
-        validationErrorMessage(a, 'The value is expected to be an array'),
+        createPrimitiveValidationError({
+          actualValue: a,
+          expectedType: 'array',
+          typeName,
+        }),
       ]);
     }
 
     if (a.length !== types.length) {
       return Result.err([
-        `The length of tuple is expected to be ${types.length}, but it is actually ${a.length}.`,
+        {
+          path: [],
+          actualValue: a,
+          expectedType: typeName,
+          typeName,
+          message: `The length of tuple is expected to be ${types.length}, but it is actually ${a.length}`,
+        } satisfies ValidationErrorWithMessage,
       ]);
     }
 
-    for (const [index, [typeDef, el]] of Arr.zip(types, a).entries()) {
-      const res = typeDef.validate(el);
+    const errors: readonly ValidationError[] = Arr.zip(types, a).flatMap(
+      ([typeDef, el], index) => {
+        const res = typeDef.validate(el);
+        return Result.isErr(res)
+          ? prependIndexToValidationErrors(res.value, index)
+          : [];
+      },
+    );
 
-      if (Result.isErr(res)) {
-        const message = validationErrorMessage(
-          el,
-          `The tuple element at ${index} is expected to be <${typeDef.typeName}>`,
-        );
-
-        return Result.err([message, ...res.value]);
-      }
+    if (errors.length > 0) {
+      return Result.err(errors);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion

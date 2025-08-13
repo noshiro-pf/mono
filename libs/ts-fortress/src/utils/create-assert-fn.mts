@@ -1,8 +1,12 @@
 import { Result } from 'ts-data-forge';
 import { type Type } from '../type.mjs';
+import {
+  validationErrorsToMessages,
+  type ValidationError,
+} from '../validation-error.mjs';
 
-const validationResultToString = (result: readonly string[]): string =>
-  `\n${result.join(',\n')}`;
+const validationResultToString = (result: readonly ValidationError[]): string =>
+  `\n${validationErrorsToMessages(result).join(',\n')}`;
 
 export const createAssertFn =
   <T,>(validate: Type<T>['validate']) =>

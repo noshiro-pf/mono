@@ -12,7 +12,7 @@
 
 > **array**\<`A`\>(`elementType`, `options?`): [`Type`](../type.md#type)\<readonly `A`[]\>
 
-Defined in: [array/array.mts:10](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/array.mts#L10)
+Defined in: [array/array.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/array.mts#L9)
 
 #### Type Parameters
 

@@ -1,6 +1,7 @@
-import { expectType } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { number } from '../primitives/index.mjs';
 import { type Type, type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../validation-error.mjs';
 import { optional } from './optional.mjs';
 import { partial } from './partial.mjs';
 import { record } from './record.mjs';
@@ -71,10 +72,31 @@ describe('partial', () => {
           date: 'cd',
         };
 
-        expect(ymd.validate(x).value).toStrictEqual([
-          `The value at record key "month" is expected to be <number>, but it is actually '"ab"'.`,
-          `The value is expected to be <number>, but it is actually '"ab"'.`,
-        ]);
+        const result = ymd.validate(x);
+        expect(Result.isErr(result)).toBe(true);
+
+        if (Result.isErr(result)) {
+          expect(result.value).toStrictEqual([
+            {
+              path: ['month'],
+              actualValue: 'ab',
+              expectedType: 'number',
+              typeName: 'number',
+              message: undefined,
+            },
+            {
+              path: ['date'],
+              actualValue: 'cd',
+              expectedType: 'number',
+              typeName: 'number',
+              message: undefined,
+            },
+          ]);
+          expect(validationErrorsToMessages(result.value)).toStrictEqual([
+            'Expected number at month, got string',
+            'Expected number at date, got string',
+          ]);
+        }
       });
 
       test('falsy case 2', () => {
@@ -83,10 +105,23 @@ describe('partial', () => {
           month: 'ab',
         };
 
-        expect(ymd.validate(x).value).toStrictEqual([
-          `The value at record key "month" is expected to be <number>, but it is actually '"ab"'.`,
-          `The value is expected to be <number>, but it is actually '"ab"'.`,
-        ]);
+        const result = ymd.validate(x);
+        expect(Result.isErr(result)).toBe(true);
+
+        if (Result.isErr(result)) {
+          expect(result.value).toStrictEqual([
+            {
+              path: ['month'],
+              actualValue: 'ab',
+              expectedType: 'number',
+              typeName: 'number',
+              message: undefined,
+            },
+          ]);
+          expect(validationErrorsToMessages(result.value)).toStrictEqual([
+            'Expected number at month, got string',
+          ]);
+        }
       });
     });
 
@@ -206,10 +241,31 @@ describe('partial', () => {
           date: 'cd',
         };
 
-        expect(ymd.validate(x).value).toStrictEqual([
-          `The value at record key "month" is expected to be <number>, but it is actually '"ab"'.`,
-          `The value is expected to be <number>, but it is actually '"ab"'.`,
-        ]);
+        const result = ymd.validate(x);
+        expect(Result.isErr(result)).toBe(true);
+
+        if (Result.isErr(result)) {
+          expect(result.value).toStrictEqual([
+            {
+              path: ['month'],
+              actualValue: 'ab',
+              expectedType: 'number',
+              typeName: 'number',
+              message: undefined,
+            },
+            {
+              path: ['date'],
+              actualValue: 'cd',
+              expectedType: 'number',
+              typeName: 'number',
+              message: undefined,
+            },
+          ]);
+          expect(validationErrorsToMessages(result.value)).toStrictEqual([
+            'Expected number at month, got string',
+            'Expected number at date, got string',
+          ]);
+        }
       });
     });
 

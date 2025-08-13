@@ -35,9 +35,3 @@ Re-exports [createPrimitiveType](utils/create-primitive-type.md#createprimitivet
 ### createType
 
 Re-exports [createType](utils/create-type.md#createtype)
-
----
-
-### validationErrorMessage
-
-Re-exports [validationErrorMessage](utils/validation-error-message.md#validationerrormessage)

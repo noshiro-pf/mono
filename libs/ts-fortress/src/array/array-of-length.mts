@@ -1,11 +1,11 @@
 import { Arr, Result } from 'ts-data-forge';
 import { type Type } from '../type.mjs';
+import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
 import {
-  createAssertFn,
-  createCastFn,
-  createIsFn,
-  validationErrorMessage,
-} from '../utils/index.mjs';
+  createPrimitiveValidationError,
+  prependIndexToValidationErrors,
+  type ValidationErrorWithMessage,
+} from '../validation-error.mjs';
 
 export const arrayOfLength = <A, N extends SmallUint>(
   size: N,
@@ -29,28 +29,35 @@ export const arrayOfLength = <A, N extends SmallUint>(
   const validate: Type<T>['validate'] = (a) => {
     if (!Arr.isArray(a)) {
       return Result.err([
-        validationErrorMessage(a, 'The value is expected to be an array'),
+        createPrimitiveValidationError({
+          actualValue: a,
+          expectedType: 'array',
+          typeName: typeNameFilled,
+        }),
       ]);
     }
 
     if (a.length !== size) {
       return Result.err([
-        `The value is expected to be an array of length ${size}, but it is ${a.length}.`,
+        {
+          path: [],
+          actualValue: a,
+          expectedType: typeNameFilled,
+          message: `Expected array of length ${size}, got length ${a.length}`,
+          typeName: typeNameFilled,
+        } satisfies ValidationErrorWithMessage,
       ]);
     }
 
-    for (const [index, el] of a.entries()) {
+    const errors = a.flatMap((el, index) => {
       const res = elementType.validate(el);
+      return Result.isErr(res)
+        ? prependIndexToValidationErrors(res.value, index)
+        : [];
+    });
 
-      if (Result.isErr(res)) {
-        const message = validationErrorMessage(
-          el,
-          `The array element is expected to be <${elementType.typeName}>`,
-          (str) => `but the actual value at index ${index} is '${str}'`,
-        );
-
-        return Result.err([message, ...res.value]);
-      }
+    if (errors.length > 0) {
+      return Result.err(errors);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion

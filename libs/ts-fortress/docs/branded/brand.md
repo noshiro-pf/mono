@@ -12,7 +12,7 @@
 
 > **brand**\<`A`, `BrandTrueKeys`, `BrandFalseKeys`\>(`__namedParameters`): [`Type`](../type.md#type)\<`Brand`\<`A`, `ArrayToUnion`\<`BrandTrueKeys`\>, `ArrayToUnion`\<`BrandFalseKeys`\>\>\>
 
-Defined in: [branded/brand.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/brand.mts#L9)
+Defined in: [branded/brand.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/brand.mts#L13)
 
 #### Type Parameters
 

@@ -1,11 +1,12 @@
 import { isRecord, Result, tp } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
+import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
 import {
-  createAssertFn,
-  createCastFn,
-  createIsFn,
-  validationErrorMessage,
-} from '../utils/index.mjs';
+  createPrimitiveValidationError,
+  prependPathToValidationErrors,
+  type ValidationError,
+  type ValidationErrorWithMessage,
+} from '../validation-error.mjs';
 
 export const record = <const R extends Record<string, Type<unknown>>>(
   source: R,
@@ -32,28 +33,43 @@ export const record = <const R extends Record<string, Type<unknown>>>(
   const validate: Type<T>['validate'] = (a) => {
     if (!isRecord(a)) {
       return Result.err([
-        validationErrorMessage(a, 'The value is expected to be a record'),
+        createPrimitiveValidationError({
+          actualValue: a,
+          expectedType: 'record',
+          typeName: typeNameFilled,
+        }),
       ]);
     }
 
-    for (const [k, valueType] of Object.entries(source)) {
-      if (!Object.hasOwn(a, k)) {
-        if (source[k]?.optional === true) continue;
+    const errors: readonly ValidationError[] = Object.entries(source).flatMap(
+      ([k, valueType]) => {
+        if (!Object.hasOwn(a, k)) {
+          if (source[k]?.optional === true) return [];
 
-        return Result.err([`The record is expected to have the key "${k}".`]);
-      }
+          return [
+            {
+              path: [k],
+              actualValue: a,
+              typeName: typeNameFilled,
+              expectedType: typeNameFilled,
+              message: `Missing required key "${k}"`,
+            } satisfies ValidationErrorWithMessage,
+          ];
+        }
 
-      const v = a[k];
-      const res = valueType.validate(v);
+        const v = a[k];
+        const res = valueType.validate(v);
 
-      if (Result.isErr(res)) {
-        const message = validationErrorMessage(
-          v,
-          `The value at record key "${k}" is expected to be <${valueType.typeName}>`,
-        );
+        if (Result.isErr(res)) {
+          return prependPathToValidationErrors(res.value, k);
+        }
 
-        return Result.err([message, ...res.value]);
-      }
+        return [];
+      },
+    );
+
+    if (errors.length > 0) {
+      return Result.err(errors);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
