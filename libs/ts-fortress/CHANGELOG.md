@@ -1,3 +1,9 @@
+# [2.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v1.0.0...v2.0.0) (2025-08-13)
+
+### Features
+
+- **breaking:** use ValidationError object ([#10](https://github.com/noshiro-pf/ts-fortress/issues/10)) ([9c20f9d](https://github.com/noshiro-pf/ts-fortress/commit/9c20f9d1e572fe068a579a8c955e807fbfb75e42))
+
 # 1.0.0 (2025-08-13)
 
 ### Bug Fixes
