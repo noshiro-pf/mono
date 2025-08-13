@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/noshiro-pf/ts-fortress/compare/v2.0.0...v2.0.1) (2025-08-13)
+
+### Bug Fixes
+
+- fix entry point ([#11](https://github.com/noshiro-pf/ts-fortress/issues/11)) ([71de0b2](https://github.com/noshiro-pf/ts-fortress/commit/71de0b20443ca3814f208e99e4c2a932866da4eb))
+
 # [2.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v1.0.0...v2.0.0) (2025-08-13)
 
 ### Features
