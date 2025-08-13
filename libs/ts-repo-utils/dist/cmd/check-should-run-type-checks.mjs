@@ -1,40 +1,42 @@
 #!/usr/bin/env -S npx tsx
+import 'child_process';
 import * as cmd from 'cmd-ts';
-import 'ts-data-forge';
-import '../node-global.mjs';
+import 'micromatch';
 import 'node:child_process';
 import 'prettier';
-import 'micromatch';
+import 'ts-data-forge';
 import { checkShouldRunTypeChecks } from '../functions/should-run.mjs';
-import 'child_process';
+import '../node-global.mjs';
 
 const cmdDef = cmd.command({
-    name: 'check-should-run-type-checks-cli',
-    version: '6.0.0',
-    args: {
-        pathsIgnore: cmd.multioption({
-            long: 'paths-ignore',
-            type: cmd.optional(cmd.array(cmd.string)),
-            description: 'Patterns to ignore when checking if type checks should run. Supports exact file matches, directory prefixes (ending with "/"), and file extensions (starting with "**.")',
-        }),
-        baseBranch: cmd.option({
-            long: 'base-branch',
-            type: cmd.optional(cmd.string),
-            description: 'Base branch to compare against for determining changed files. Defaults to "origin/main"',
-        }),
-    },
-    handler: (args) => {
-        main(args).catch((error) => {
-            console.error('An error occurred:', error);
-            process.exit(1);
-        });
-    },
+  name: 'check-should-run-type-checks-cli',
+  version: '6.0.1',
+  args: {
+    pathsIgnore: cmd.multioption({
+      long: 'paths-ignore',
+      type: cmd.optional(cmd.array(cmd.string)),
+      description:
+        'Patterns to ignore when checking if type checks should run. Supports exact file matches, directory prefixes (ending with "/"), and file extensions (starting with "**.")',
+    }),
+    baseBranch: cmd.option({
+      long: 'base-branch',
+      type: cmd.optional(cmd.string),
+      description:
+        'Base branch to compare against for determining changed files. Defaults to "origin/main"',
+    }),
+  },
+  handler: (args) => {
+    main(args).catch((error) => {
+      console.error('An error occurred:', error);
+      process.exit(1);
+    });
+  },
 });
 const main = async (args) => {
-    await checkShouldRunTypeChecks({
-        pathsIgnore: args.pathsIgnore,
-        baseBranch: args.baseBranch,
-    });
+  await checkShouldRunTypeChecks({
+    pathsIgnore: args.pathsIgnore,
+    baseBranch: args.baseBranch,
+  });
 };
 await cmd.run(cmdDef, process.argv.slice(2));
 //# sourceMappingURL=check-should-run-type-checks.mjs.map

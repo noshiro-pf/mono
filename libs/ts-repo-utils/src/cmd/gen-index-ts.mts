@@ -38,7 +38,7 @@ const nonEmptyArray = <T extends cmd.Type<any, any>>(
 
 const cmdDef = cmd.command({
   name: 'gen-index-ts-cli',
-  version: '6.0.0',
+  version: '6.0.1',
   args: {
     // required args
     targetDirectory: cmd.positional({

@@ -1,3 +1,9 @@
+## [6.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.0.0...v6.0.1) (2025-08-13)
+
+### Bug Fixes
+
+- fix entry point ([#95](https://github.com/noshiro-pf/ts-repo-utils/issues/95)) ([e0bba13](https://github.com/noshiro-pf/ts-repo-utils/commit/e0bba139710c1e7749c78b71a006d3e27320f508))
+
 # [6.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v5.3.0...v6.0.0) (2025-08-03)
 
 ### Features
