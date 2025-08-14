@@ -1,7 +1,10 @@
 import { expectType, Result } from 'ts-data-forge';
 import { number } from '../primitives/index.mjs';
 import { type Type, type TypeOf } from '../type.mjs';
-import { validationErrorsToMessages } from '../validation-error.mjs';
+import {
+  type ValidationError,
+  validationErrorsToMessages,
+} from '../validation-error.mjs';
 import { optional } from './optional.mjs';
 import { partial } from './partial.mjs';
 import { record } from './record.mjs';
@@ -65,6 +68,38 @@ describe('partial', () => {
     });
 
     describe('validate', () => {
+      test('truthy case', () => {
+        const x: UnknownRecord = {
+          year: 2000,
+          month: 12,
+          date: 25,
+        };
+
+        const result = ymd.validate(x);
+        expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          expect(result.value).toStrictEqual({
+            year: 2000,
+            month: 12,
+            date: 25,
+          });
+        }
+      });
+
+      test('truthy case optional keys', () => {
+        const x: UnknownRecord = {};
+
+        const result = ymd.validate(x);
+        expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          expect(result.value).toStrictEqual({});
+        }
+      });
+
       test('falsy case 1', () => {
         const x: UnknownRecord = {
           year: 2000,
