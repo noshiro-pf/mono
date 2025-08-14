@@ -17,10 +17,9 @@ TypeScript-first schema validation library with static type inference.
 
 - 🔒 **Type-safe validation** - Full TypeScript support with static type inference
 - 🏗️ **Composable schemas** - Build complex validation schemas from simple building blocks
-- 🎯 **Zero-runtime overhead** - Type information is inferred at compile time
 - 🔄 **Result-based error handling** - Structured error reporting with `Result<T, readonly ValidationError[]>`
 - 🏷️ **Branded types** - Rich collection of branded number types (Int, SafeInt, PositiveInt, etc.)
-- ⚡ **Performance focused** - Minimal runtime overhead and optimized validation
+- ⚡ **Performance focused** - Optimized validation with minimal runtime overhead (negligible impact on application performance)
 - 🧩 **Functional composition** - Union, intersection, and merge operations for schema composition
 - 🛠️ **Required default values** - All schemas require explicit default values, enabling automatic data filling via `fill()` function
 
@@ -54,7 +53,13 @@ const User = t.record({
 
 // Infer TypeScript type
 type User = t.TypeOf<typeof User>;
-// ↑ { id: string; name: string; age: number; email: string; isActive: boolean }
+// ↑ Readonly<{
+//     id: string;
+//     name: string;
+//     age: number;
+//     email: string;
+//     isActive: boolean
+//   }>
 
 // Validate data
 const userData = {
@@ -70,12 +75,14 @@ if (User.is(userData)) {
     console.log(`User: ${userData.name}, Age: ${userData.age}`);
 }
 
+import { Result } from 'ts-data-forge';
+
 // Get validation result with error details
 const result = User.validate(userData);
-if (result.isOk()) {
+if (Result.isOk(result)) {
     const user = result.value; // typed as User
 } else {
-    console.error('Validation errors:', result.value); // string[] of error messages
+    console.error('Validation errors:', result.value); // readonly ValidationError[] showing error information
 }
 ```
 
@@ -124,6 +131,14 @@ console.log(filledData);
 // fill() is type-safe and always returns a complete object
 type UserProfile = t.TypeOf<typeof UserProfile>;
 const completeUser: UserProfile = UserProfile.fill(anyPartialData);
+
+// Important: Default value filling only occurs when fill() is called
+// The is() and validate() functions can still detect missing keys
+console.log(UserProfile.is(partialData)); // false - missing required keys
+const result = UserProfile.validate(partialData);
+if (Result.isErr(result)) {
+    console.log(result.value); // ValidationError[] showing missing keys
+}
 ```
 
 ### Benefits of Required Default Values
@@ -173,7 +188,7 @@ export const SomeObject = z.object({
     key2: 'string', // Should be z.string()
 });
 
-export type SomeObject = z.infer<typeof SomeObject>;
+export type SomeObject = z.infer<typeof SomeObject>; // inferred as { key1: unknown, key2: unknown }
 ```
 
 The above Zod schema will fail at runtime because raw values (`1`, `'string'`) are not valid Zod validators.
@@ -286,7 +301,6 @@ user.tags[0] = 'modified'; // No error
 - **Immutability by default**: Prevents accidental mutations that can lead to bugs
 - **Functional programming support**: Encourages functional programming patterns
 - **Predictable data flow**: Ensures data integrity throughout your application
-- **Better optimization**: Enables better compiler optimizations and reasoning about code
 - **Thread safety**: Immutable data is inherently safe to share between contexts
 
 ### Runtime-Type Consistency Issues in io-ts
@@ -403,7 +417,7 @@ const C = t.partial(
     const UnionBA = t.union([B, A]);
     const result = UnionBA.validate({ A: 1 });
 
-    if (result.isOk()) {
+    if (Result.isOk(result)) {
         console.log(result.value); // { A: 1 } <- ✅ Correct! No unexpected fields
         console.log(A.is(result.value)); // true  <- ✅ Correct
         console.log(B.is(result.value)); // false <- ✅ Correct! B requires field B
@@ -415,7 +429,7 @@ const C = t.partial(
     const UnionCA = t.union([C, A]);
     const result = UnionCA.validate({ A: 1 });
 
-    if (result.isOk()) {
+    if (Result.isOk(result)) {
         console.log(result.value); // { A: 1 } <- ✅ Correct and consistent
         console.log(A.is(result.value)); // true  <- ✅ Correct
         console.log(C.is(result.value)); // true  <- ✅ Consistent! ts-fortress partial types allow extra fields
@@ -425,7 +439,7 @@ const C = t.partial(
 
 This makes ts-fortress especially valuable in large codebases where schema correctness is critical and runtime failures need to be minimized.
 
-## Migration from io-ts
+### Migration from io-ts
 
 If you're coming from io-ts, here's how common patterns translate:
 
@@ -457,7 +471,7 @@ Key differences:
 
 - **Default values**: ts-fortress requires explicit default values for better type safety
 - **Naming**: `record` instead of `type`, more explicit function names
-- **Error handling**: Built-in `Result` type instead of `Either`
+- **Error handling**: `Result` type instead of `Either`
 - **Branded types**: Rich collection of pre-built branded number types
 
 ## Core Concepts
@@ -552,7 +566,7 @@ const UInt16 = t.uint16(0);
 
 // Usage
 const userIdResult = UserId.validate('user_123');
-if (userIdResult.isOk()) {
+if (Result.isOk(userIdResult)) {
     const id: UserId = userIdResult.value;
 }
 ```
@@ -593,11 +607,15 @@ const ExtendedUserType = t.mergeRecords([
 
 ```typescript
 // String enums
-const ColorEnum = t.enum(['red', 'green', 'blue'] as const);
+const ColorEnum = t.enumType(['red', 'green', 'blue']);
 type Color = t.TypeOf<typeof ColorEnum>; // 'red' | 'green' | 'blue'
 
 // Numeric ranges
-const DiceRoll = t.uintRange(1, 6, 1); // integers from 1 to 6
+const DiceRoll = t.uintRange({
+    start: 1,
+    end: 7,
+    defaultValue: 1,
+}); // integers from 1 to 6
 type DiceRoll = t.TypeOf<typeof DiceRoll>; // 1 | 2 | 3 | 4 | 5 | 6
 ```
 
@@ -616,14 +634,14 @@ const invalidData = { name: 123, age: 'not a number' };
 const result = UserType.validate(invalidData);
 if (Result.isErr(result)) {
     // result.value is an array of ValidationError objects
-    result.value.forEach((error) => {
+    for (const error of result.value) {
         console.log('Path:', error.path); // ['name'] or ['age']
         console.log('Expected:', error.expectedType); // 'string' or 'number'
         console.log('Actual:', error.actualValue); // 123 or 'not a number'
         console.log('Type:', error.typeName); // type being validated
-    });
+    }
 
-    // Convert to legacy string messages for backward compatibility
+    // Convert to string messages
     const messages = t.validationErrorsToMessages(result.value);
     console.log(messages);
     // ['Expected string at name, got number', 'Expected number at age, got string']
@@ -642,34 +660,13 @@ try {
 Each validation error provides detailed information:
 
 ```typescript
-interface ValidationError {
-    path: readonly string[]; // Path to the field that failed
+type ValidationError = Readonly<{
+    path: readonly string[];
     actualValue: unknown; // The actual value that failed validation
     expectedType: string; // The expected type or constraint
-    message?: string; // Optional custom error message
+    message: string | undefined; // Optional custom error message
     typeName: string; // Name of the type being validated
-}
-```
-
-### Error Utilities
-
-```typescript
-import * as t from 'ts-fortress';
-
-// Convert ValidationError objects to string messages
-const messages = t.validationErrorsToMessages(errors);
-
-// Convert single ValidationError to message
-const message = t.validationErrorToMessage(error);
-
-// Create custom validation errors
-const customError = t.createValidationError({
-    path: ['user', 'email'],
-    actualValue: 'invalid-email',
-    expectedType: 'valid email address',
-    typeName: 'EmailAddress',
-    message: 'Please provide a valid email address',
-});
+}>;
 ```
 
 ## API Reference
@@ -684,23 +681,25 @@ const customError = t.createValidationError({
 
 ### Collections
 
-- `t.array(elementType, options?)` - Array validation
-- `t.nonEmptyArray(elementType, options?)` - Non-empty array validation
-- `t.tuple([...types])` - Fixed-length tuple validation
-- `t.arrayOfLength(elementType, length, options?)` - Fixed-length array validation
+- `t.array(elementType)` - Array validation
+- `t.nonEmptyArray(elementType)` - Non-empty array validation
+- `t.tuple([t1, t2, ..., tN])` - Fixed-length tuple validation
+- `t.arrayOfLength(size, elementType)` - Fixed-length array validation
 
 ### Objects
 
-- `t.record(schema, options?)` - Object validation
+- `t.record(schema)` - Object validation
+- `t.keyValueRecord(keyType, valueType)` - Corresponding to the `Record<K, V>` type
 - `t.partial(recordType)` - Make all fields optional
 - `t.optional(type)` - Optional field wrapper
 - `t.pick(recordType, keys)` - Pick specific fields
 - `t.omit(recordType, keys)` - Omit specific fields
+- `t.keyof(recordType)` - Key of the record type.
 
 ### Composition
 
-- `t.union(types, options?)` - Union type validation
-- `t.intersection(types)` - Intersection type validation
+- `t.union(types)` - Union type validation
+- `t.intersection(types, defaultType)` - Intersection type validation
 - `t.mergeRecords(recordTypes)` - Merge multiple record types
 
 ### Branded Types
@@ -712,8 +711,9 @@ const customError = t.createValidationError({
 ### Utilities
 
 - `t.TypeOf<T>` - Extract TypeScript type from validator
-- `t.enum(values)` - Enum validation
-- `t.uintRange(min, max, defaultValue)` - Integer range validation
+- `t.enumType(values)` - Enum validation
+- `t.uintRange({ start, end, defaultValue? })` - Integer range validation
+- `t.unknown` - Unknown Type
 
 ## Contributing
 
