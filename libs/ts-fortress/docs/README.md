@@ -545,6 +545,35 @@ const UserProfileType = t.record({
         }),
     ),
 });
+
+// Strict validation (disallow excess properties)
+const StrictUserType = t.record(
+    {
+        id: t.string(''),
+        name: t.string(''),
+    },
+    {
+        allowExcessProperties: false, // Reject any properties not defined in schema
+    },
+);
+
+// Permissive validation (allow excess properties) - this is the default
+const PermissiveUserType = t.record(
+    {
+        id: t.string(''),
+        name: t.string(''),
+    },
+    {
+        allowExcessProperties: true, // Allow additional properties (default behavior)
+    },
+);
+
+// Example usage
+const strictData = { id: '123', name: 'John', extra: 'not allowed' };
+console.log(StrictUserType.is(strictData)); // false - 'extra' property causes rejection
+
+const permissiveData = { id: '123', name: 'John', extra: 'allowed' };
+console.log(PermissiveUserType.is(permissiveData)); // true - 'extra' property is allowed
 ```
 
 ### Branded Types
@@ -653,6 +682,31 @@ try {
 } catch (error) {
     console.error('Validation failed:', error.message);
 }
+
+// Excess property validation example
+const StrictType = t.record(
+    {
+        name: t.string(''),
+        age: t.number(0),
+    },
+    {
+        allowExcessProperties: false,
+    },
+);
+
+const dataWithExcess = { name: 'John', age: 30, extra: 'not allowed' };
+const strictResult = StrictType.validate(dataWithExcess);
+
+if (Result.isErr(strictResult)) {
+    console.log(strictResult.value);
+    // [{
+    //   path: ['extra'],
+    //   actualValue: 'not allowed',
+    //   expectedType: '{ name: string, age: number }',
+    //   message: 'Excess property "extra" is not allowed',
+    //   typeName: '{ name: string, age: number }'
+    // }]
+}
 ```
 
 ### ValidationError Structure
@@ -688,7 +742,8 @@ type ValidationError = Readonly<{
 
 ### Objects
 
-- `t.record(schema)` - Object validation
+- `t.record(schema, options?)` - Object validation
+    - `options.allowExcessProperties?: boolean` - Allow properties not defined in schema (default: true)
 - `t.keyValueRecord(keyType, valueType)` - Corresponding to the `Record<K, V>` type
 - `t.partial(recordType)` - Make all fields optional
 - `t.optional(type)` - Optional field wrapper

@@ -13,16 +13,23 @@ export const record = <const R extends Record<string, Type<unknown>>>(
   options?: Partial<
     Readonly<{
       typeName: string;
+
+      /** @default true */
+      allowExcessProperties: boolean;
     }>
   >,
 ): Type<RecordTypeValue<R>> => {
   type T = RecordTypeValue<R>;
+
+  const sourceKeys = new Set(Object.keys(source));
 
   const typeNameFilled: string =
     options?.typeName ??
     `{ ${Object.entries(source)
       .map(([k, v]) => `${k}: ${v.typeName}`)
       .join(', ')} }`;
+
+  const allowExcessProperties = options?.allowExcessProperties ?? true;
 
   const defaultValue: Type<T>['defaultValue'] =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -41,35 +48,55 @@ export const record = <const R extends Record<string, Type<unknown>>>(
       ]);
     }
 
-    const errors: readonly ValidationError[] = Object.entries(source).flatMap(
-      ([k, valueType]) => {
-        if (!Object.hasOwn(a, k)) {
-          if (source[k]?.optional === true) return [];
+    const defaultErrors: readonly ValidationError[] = Object.entries(
+      source,
+    ).flatMap(([k, valueType]) => {
+      if (!Object.hasOwn(a, k)) {
+        if (source[k]?.optional === true) return [];
 
-          return [
-            {
-              path: [k],
-              actualValue: a,
+        return [
+          {
+            path: [k],
+            actualValue: a,
+            typeName: typeNameFilled,
+            expectedType: typeNameFilled,
+            message: `Missing required key "${k}"`,
+          } satisfies ValidationErrorWithMessage,
+        ];
+      }
+
+      const v = a[k];
+      const res = valueType.validate(v);
+
+      if (Result.isErr(res)) {
+        return prependPathToValidationErrors(res.value, k);
+      }
+
+      return [];
+    });
+
+    // Check for excess properties if allowExcessProperties is false
+    if (!allowExcessProperties) {
+      const excessKeys = Object.keys(a).filter((key) => !sourceKeys.has(key));
+
+      if (excessKeys.length > 0) {
+        const excessErrors: readonly ValidationError[] = excessKeys.map(
+          (key) =>
+            ({
+              path: [key],
+              actualValue: a[key],
               typeName: typeNameFilled,
               expectedType: typeNameFilled,
-              message: `Missing required key "${k}"`,
-            } satisfies ValidationErrorWithMessage,
-          ];
-        }
+              message: `Excess property "${key}" is not allowed`,
+            }) satisfies ValidationErrorWithMessage,
+        );
 
-        const v = a[k];
-        const res = valueType.validate(v);
+        return Result.err([...defaultErrors, ...excessErrors]);
+      }
+    }
 
-        if (Result.isErr(res)) {
-          return prependPathToValidationErrors(res.value, k);
-        }
-
-        return [];
-      },
-    );
-
-    if (errors.length > 0) {
-      return Result.err(errors);
+    if (defaultErrors.length > 0) {
+      return Result.err(defaultErrors);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion

@@ -28,7 +28,7 @@ Defined in: [record/record.mts:11](https://github.com/noshiro-pf/ts-fortress/blo
 
 ##### options?
 
-`Partial`\<`Readonly`\<\{ `typeName`: `string`; \}\>\>
+`Partial`\<`Readonly`\<\{ `allowExcessProperties`: `boolean`; `typeName`: `string`; \}\>\>
 
 #### Returns
 
