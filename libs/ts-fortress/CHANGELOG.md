@@ -1,3 +1,9 @@
+## [2.0.4](https://github.com/noshiro-pf/ts-fortress/compare/v2.0.3...v2.0.4) (2025-08-14)
+
+### Bug Fixes
+
+- fix validation result of partial ([#15](https://github.com/noshiro-pf/ts-fortress/issues/15)) ([b45e09a](https://github.com/noshiro-pf/ts-fortress/commit/b45e09acfe7009fb5649770c1f5842dd61d3af73))
+
 ## [2.0.3](https://github.com/noshiro-pf/ts-fortress/compare/v2.0.2...v2.0.3) (2025-08-14)
 
 ### Bug Fixes
