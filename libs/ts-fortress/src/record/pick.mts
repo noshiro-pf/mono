@@ -41,8 +41,12 @@ export const pick = <
       ...a,
     } as TypeOf<R>;
 
+    const baseValidationResult = recordType.validate(objectFilled);
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    return recordType.validate(objectFilled) as ReturnType<Type<V>['validate']>;
+    return Result.map(baseValidationResult, Obj.pick(keysToPick)) as ReturnType<
+      Type<V>['validate']
+    >;
   };
 
   const fill: Type<V>['fill'] = (a) =>

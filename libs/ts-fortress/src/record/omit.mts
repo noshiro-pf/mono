@@ -41,8 +41,11 @@ export const omit = <
       ...a,
     } as TypeOf<R>;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    return recordType.validate(objectFilled) as ReturnType<Type<V>['validate']>;
+    const baseValidationResult = recordType.validate(objectFilled);
+
+    return Result.map(baseValidationResult, Obj.omit(keysToOmit)) as ReturnType<
+      Type<V>['validate']
+    >;
   };
 
   const fill: Type<V>['fill'] = (a) => Obj.omit(recordType.fill(a), keysToOmit);

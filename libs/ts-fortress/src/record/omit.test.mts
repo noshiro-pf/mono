@@ -6,14 +6,13 @@ import { omit } from './omit.mjs';
 import { record } from './record.mjs';
 
 describe('omit', () => {
-  const ym = omit(
-    record({
-      year: number(1900),
-      month: number(1),
-      date: number(1),
-    }),
-    ['date'],
-  );
+  const ymd = record({
+    year: number(1900),
+    month: number(1),
+    date: number(1),
+  });
+
+  const ym = omit(ymd, ['date']);
 
   expectType<typeof ym, Type<Readonly<{ year: number; month: number }>>>('=');
 
@@ -56,6 +55,24 @@ describe('omit', () => {
   });
 
   describe('validate', () => {
+    test('truthy case', () => {
+      const x: UnknownRecord = {
+        year: 2000,
+        month: 12,
+      };
+
+      const result = ym.validate(x);
+      expect(Result.isOk(result)).toBe(true);
+
+      if (Result.isOk(result)) {
+        expectType<typeof result.value, Ym>('=');
+        expect(result.value).toStrictEqual({
+          year: 2000,
+          month: 12,
+        });
+      }
+    });
+
     test('falsy case', () => {
       const x: UnknownRecord = {
         year: 2000,
