@@ -553,6 +553,12 @@ const StrictUserType = t.record(
     },
 );
 
+// Alternatively, use the strictRecord alias for cleaner syntax
+const StrictUserTypeAlias = t.strictRecord({
+    id: t.string(''),
+    name: t.string(''),
+});
+
 // Permissive validation (allow excess properties) - this is the default
 const PermissiveUserType = t.record(
     {
@@ -564,12 +570,29 @@ const PermissiveUserType = t.record(
     },
 );
 
-// Example usage
+// Example usage - both StrictUserType and StrictUserTypeAlias behave identically
 const strictData = { id: '123', name: 'John', extra: 'not allowed' };
 console.log(StrictUserType.is(strictData)); // false - 'extra' property causes rejection
+console.log(StrictUserTypeAlias.is(strictData)); // false - same as above
 
 const permissiveData = { id: '123', name: 'John', extra: 'allowed' };
 console.log(PermissiveUserType.is(permissiveData)); // true - 'extra' property is allowed
+
+// strictRecord provides cleaner syntax for strict validation
+const UserSchema = t.strictRecord({
+    name: t.string(''),
+    email: t.string(''),
+    age: t.number(0),
+});
+
+// Validation examples
+UserSchema.is({ name: 'John', email: 'john@example.com', age: 30 }); // ✅ true
+UserSchema.is({
+    name: 'John',
+    email: 'john@example.com',
+    age: 30,
+    role: 'admin',
+}); // ❌ false - excess property
 ```
 
 ### Branded Types
@@ -740,6 +763,7 @@ type ValidationError = Readonly<{
 
 - `t.record(schema, options?)` - Object validation
     - `options.allowExcessProperties?: boolean` - Allow properties not defined in schema (default: true)
+- `t.strictRecord(schema, options?)` - Object validation with strict mode (alias for `record` with `allowExcessProperties: false`)
 - `t.keyValueRecord(keyType, valueType)` - Corresponding to the `Record<K, V>` type
 - `t.partial(recordType)` - Make all fields optional
 - `t.optional(type)` - Optional field wrapper

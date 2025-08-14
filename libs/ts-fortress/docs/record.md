@@ -59,3 +59,9 @@ Re-exports [pick](record/pick.md#pick)
 ### record
 
 Re-exports [record](record/record.md#record)
+
+---
+
+### strictRecord
+
+Re-exports [strictRecord](record/record.md#strictrecord)

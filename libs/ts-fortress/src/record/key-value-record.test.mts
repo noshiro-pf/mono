@@ -12,7 +12,7 @@ describe('keyValueRecord', () => {
 
   type StrNumRecord = TypeOf<typeof strNumRecord>;
 
-  expectType<StrNumRecord, Record<string, number>>('=');
+  expectType<StrNumRecord, ReadonlyRecord<string, number>>('=');
 
   expectType<typeof strNumRecord.defaultValue, StrNumRecord>('=');
 

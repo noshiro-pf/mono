@@ -8,7 +8,7 @@ import {
   type ValidationErrorWithMessage,
 } from '../validation-error.mjs';
 
-export const record = <const R extends Record<string, Type<unknown>>>(
+export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
   source: R,
   options?: Partial<
     Readonly<{
@@ -124,15 +124,16 @@ export const record = <const R extends Record<string, Type<unknown>>>(
   };
 };
 
-type RecordTypeValue<R extends Record<string, Type<unknown>>> =
+type RecordTypeValue<R extends ReadonlyRecord<string, Type<unknown>>> =
   TsFortressInternal.RecordTypeValueImpl<R>;
 
 namespace TsFortressInternal {
-  export type RecordTypeValueImpl<R extends Record<string, Type<unknown>>> =
-    RecordTypeValueImplSub<R, OptionalTypeKeys<R>>;
+  export type RecordTypeValueImpl<
+    R extends ReadonlyRecord<string, Type<unknown>>,
+  > = RecordTypeValueImplSub<R, OptionalTypeKeys<R>>;
 
   type RecordTypeValueImplSub<
-    A extends Record<string, Type<unknown>>,
+    A extends ReadonlyRecord<string, Type<unknown>>,
     OptionalKeys extends keyof A,
   > = Readonly<
     {
@@ -142,7 +143,40 @@ namespace TsFortressInternal {
     }
   >;
 
-  type OptionalTypeKeys<A extends Record<string, Type<unknown>>> = {
+  type OptionalTypeKeys<A extends ReadonlyRecord<string, Type<unknown>>> = {
     [K in keyof A]: A[K] extends { optional: true } ? K : never;
   }[keyof A];
 }
+
+/**
+ * Creates a strict record type that does not allow excess properties.
+ * This is an alias for `record(source, { allowExcessProperties: false })`.
+ *
+ * @param source - The record schema definition
+ * @param options - Optional configuration (allowExcessProperties will be overridden to false)
+ * @returns A Type that validates records without allowing excess properties
+ *
+ * @example
+ * ```typescript
+ * import { strictRecord, string, number } from 'ts-fortress';
+ *
+ * const User = strictRecord({
+ *   name: string(),
+ *   age: number()
+ * });
+ *
+ * User.is({ name: "John", age: 30 }); // true
+ * User.is({ name: "John", age: 30, extra: "not allowed" }); // false
+ * ```
+ */
+export const strictRecord = <
+  const R extends ReadonlyRecord<string, Type<unknown>>,
+>(
+  source: R,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+    }>
+  >,
+): Type<RecordTypeValue<R>> =>
+  record(source, { ...options, allowExcessProperties: false });

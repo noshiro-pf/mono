@@ -8,10 +8,10 @@ import {
   type ValidationErrorWithMessage,
 } from '../validation-error.mjs';
 
-type RecordResultType<K extends Type<string>, V extends Type<unknown>> = Record<
-  TypeOf<K>,
-  TypeOf<V>
->;
+type RecordResultType<
+  K extends Type<string>,
+  V extends Type<unknown>,
+> = ReadonlyRecord<TypeOf<K>, TypeOf<V>>;
 
 export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
   keyType: K,

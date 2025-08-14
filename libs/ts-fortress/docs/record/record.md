@@ -18,7 +18,7 @@ Defined in: [record/record.mts:11](https://github.com/noshiro-pf/ts-fortress/blo
 
 ##### R
 
-`R` _extends_ `Record`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
+`R` _extends_ `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
 
 #### Parameters
 
@@ -33,3 +33,54 @@ Defined in: [record/record.mts:11](https://github.com/noshiro-pf/ts-fortress/blo
 #### Returns
 
 [`Type`](../type.md#type)\<`RecordTypeValue`\<`R`\>\>
+
+---
+
+### strictRecord()
+
+> **strictRecord**\<`R`\>(`source`, `options?`): [`Type`](../type.md#type)\<`RecordTypeValue`\<`R`\>\>
+
+Defined in: [record/record.mts:172](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L172)
+
+Creates a strict record type that does not allow excess properties.
+This is an alias for `record(source, { allowExcessProperties: false })`.
+
+#### Type Parameters
+
+##### R
+
+`R` _extends_ `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
+
+#### Parameters
+
+##### source
+
+`R`
+
+The record schema definition
+
+##### options?
+
+`Partial`\<`Readonly`\<\{ `typeName`: `string`; \}\>\>
+
+Optional configuration (allowExcessProperties will be overridden to false)
+
+#### Returns
+
+[`Type`](../type.md#type)\<`RecordTypeValue`\<`R`\>\>
+
+A Type that validates records without allowing excess properties
+
+#### Example
+
+```typescript
+import { strictRecord, string, number } from 'ts-fortress';
+
+const User = strictRecord({
+    name: string(),
+    age: number(),
+});
+
+User.is({ name: 'John', age: 30 }); // true
+User.is({ name: 'John', age: 30, extra: 'not allowed' }); // false
+```
