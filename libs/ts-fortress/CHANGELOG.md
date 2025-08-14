@@ -1,3 +1,9 @@
+## [2.0.3](https://github.com/noshiro-pf/ts-fortress/compare/v2.0.2...v2.0.3) (2025-08-14)
+
+### Bug Fixes
+
+- fix validation result of omit and pick ([#14](https://github.com/noshiro-pf/ts-fortress/issues/14)) ([01303f2](https://github.com/noshiro-pf/ts-fortress/commit/01303f236cbc8fe147e121d9b9e33e0e0367e513))
+
 ## [2.0.2](https://github.com/noshiro-pf/ts-fortress/compare/v2.0.1...v2.0.2) (2025-08-14)
 
 ### Bug Fixes
