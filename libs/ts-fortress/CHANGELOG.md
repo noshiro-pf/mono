@@ -1,3 +1,9 @@
+# [2.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.1.0...v2.2.0) (2025-08-14)
+
+### Features
+
+- add strictRecord ([#17](https://github.com/noshiro-pf/ts-fortress/issues/17)) ([6f40a71](https://github.com/noshiro-pf/ts-fortress/commit/6f40a71c0bd64f510ff2b3d0a63ac7724f3e3eec))
+
 # [2.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.0.4...v2.1.0) (2025-08-14)
 
 ### Features
