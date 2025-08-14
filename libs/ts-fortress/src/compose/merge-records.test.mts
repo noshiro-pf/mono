@@ -2,7 +2,10 @@ import { expectType, Result } from 'ts-data-forge';
 import { number } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
-import { validationErrorsToMessages } from '../validation-error.mjs';
+import {
+  type ValidationError,
+  validationErrorsToMessages,
+} from '../validation-error.mjs';
 import { mergeRecords } from './merge-records.mjs';
 
 describe('mergeRecords', () => {
@@ -67,6 +70,18 @@ describe('mergeRecords', () => {
   });
 
   describe('validate', () => {
+    test('truthy case', () => {
+      const result = targetType.validate({ x: 0, y: 1, z: 2, w: 3 });
+      expectType<typeof result, Result<TargetType, readonly ValidationError[]>>(
+        '=',
+      );
+      expect(Result.isOk(result)).toBe(true);
+
+      if (Result.isOk(result)) {
+        expect(result.value).toStrictEqual({ x: 0, y: 1, z: 2, w: 3 });
+      }
+    });
+
     test('falsy case', () => {
       const result = targetType.validate({ x: 0, y: 1 });
       expect(Result.isErr(result)).toBe(true);

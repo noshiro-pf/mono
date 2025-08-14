@@ -2,7 +2,10 @@ import { expectType, Result } from 'ts-data-forge';
 import { number, numberLiteral, stringLiteral } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
-import { validationErrorsToMessages } from '../validation-error.mjs';
+import {
+  type ValidationError,
+  validationErrorsToMessages,
+} from '../validation-error.mjs';
 import { union } from './union.mjs';
 
 describe('union', () => {
@@ -70,6 +73,18 @@ describe('union', () => {
   });
 
   describe('validate', () => {
+    test('truthy case', () => {
+      const result = targetType.validate(3);
+      expectType<typeof result, Result<TargetType, readonly ValidationError[]>>(
+        '=',
+      );
+      expect(Result.isOk(result)).toBe(true);
+
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(3);
+      }
+    });
+
     test('falsy case', () => {
       const result = targetType.validate(5);
       expect(Result.isErr(result)).toBe(true);

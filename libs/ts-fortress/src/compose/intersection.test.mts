@@ -3,7 +3,10 @@ import { uintRange } from '../enum/index.mjs';
 import { number } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
-import { validationErrorsToMessages } from '../validation-error.mjs';
+import {
+  type ValidationError,
+  validationErrorsToMessages,
+} from '../validation-error.mjs';
 import { intersection } from './intersection.mjs';
 
 describe('intersection', () => {
@@ -74,6 +77,19 @@ describe('intersection', () => {
     });
 
     describe('validate', () => {
+      test('truthy case', () => {
+        const result = targetType.validate({ x: 0, y: 1, z: 2, w: 3 });
+        expectType<
+          typeof result,
+          Result<TargetType, readonly ValidationError[]>
+        >('=');
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          expect(result.value).toStrictEqual({ x: 0, y: 1, z: 2, w: 3 });
+        }
+      });
+
       test('falsy case', () => {
         const result = targetType.validate({ x: 0, y: 1 });
         expect(Result.isErr(result)).toBe(true);
@@ -165,6 +181,19 @@ describe('intersection', () => {
     });
 
     describe('validate', () => {
+      test('truthy case', () => {
+        const result = targetType.validate(0);
+        expectType<
+          typeof result,
+          Result<TargetType, readonly ValidationError[]>
+        >('=');
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(0);
+        }
+      });
+
       test('falsy case', () => {
         const result = targetType.validate('aaa');
         expect(Result.isErr(result)).toBe(true);
@@ -278,6 +307,19 @@ describe('intersection', () => {
     });
 
     describe('validate', () => {
+      test('truthy case', () => {
+        const result = targetType.validate(3);
+        expectType<
+          typeof result,
+          Result<TargetType, readonly ValidationError[]>
+        >('=');
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(3);
+        }
+      });
+
       test('falsy case', () => {
         const result = targetType.validate(7);
         expect(Result.isErr(result)).toBe(true);

@@ -2,7 +2,10 @@ import { expectType, Result } from 'ts-data-forge';
 import { number, numberLiteral, stringLiteral } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
-import { validationErrorsToMessages } from '../validation-error.mjs';
+import {
+  type ValidationError,
+  validationErrorsToMessages,
+} from '../validation-error.mjs';
 import { tuple } from './tuple.mjs';
 
 describe('tuple', () => {
@@ -72,6 +75,20 @@ describe('tuple', () => {
   });
 
   describe('validate', () => {
+    test('truthy case', () => {
+      const x: unknown = [{ x: 1, y: 2 }, 3, '2'];
+
+      const result = targetType.validate(x);
+      expectType<typeof result, Result<TargetType, readonly ValidationError[]>>(
+        '=',
+      );
+      expect(Result.isOk(result)).toBe(true);
+
+      if (Result.isOk(result)) {
+        expect(result.value).toStrictEqual([{ x: 1, y: 2 }, 3, '2']);
+      }
+    });
+
     test('falsy case - not array', () => {
       const x: unknown = 'not an array';
 

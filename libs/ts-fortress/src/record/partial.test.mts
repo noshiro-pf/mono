@@ -269,6 +269,24 @@ describe('partial', () => {
     });
 
     describe('validate', () => {
+      test('truthy case', () => {
+        const x: UnknownRecord = {
+          year: 2000,
+          month: 12,
+        };
+
+        const result = ymd.validate(x);
+        expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          expect(result.value).toStrictEqual({
+            year: 2000,
+            month: 12,
+          });
+        }
+      });
+
       test('falsy case', () => {
         const x: UnknownRecord = {
           year: 2000,

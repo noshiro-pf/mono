@@ -58,7 +58,27 @@ describe('record', () => {
   });
 
   describe('validate', () => {
-    test('falsy case', () => {
+    test('truthy case', () => {
+      const x: UnknownRecord = {
+        year: 2000,
+        month: 12,
+        date: 25,
+      };
+
+      const result = ymd.validate(x);
+      expect(Result.isOk(result)).toBe(true);
+
+      if (Result.isOk(result)) {
+        expectType<typeof result.value, Ymd>('=');
+        expect(result.value).toStrictEqual({
+          year: 2000,
+          month: 12,
+          date: 25,
+        });
+      }
+    });
+
+    test('falsy case 1', () => {
       const x: UnknownRecord = {
         year: 2000,
         month: 'ab',
@@ -88,6 +108,38 @@ describe('record', () => {
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
           'Expected number at month, got string',
           'Expected number at date, got string',
+        ]);
+      }
+    });
+
+    test('falsy case 2', () => {
+      const x: UnknownRecord = {
+        year: 2000,
+      };
+
+      const result = ymd.validate(x);
+      expect(Result.isErr(result)).toBe(true);
+
+      if (Result.isErr(result)) {
+        expect(result.value).toStrictEqual([
+          {
+            path: ['month'],
+            actualValue: { year: 2000 },
+            typeName: '{ year: number, month: number, date: number }',
+            expectedType: '{ year: number, month: number, date: number }',
+            message: 'Missing required key "month"',
+          },
+          {
+            path: ['date'],
+            actualValue: { year: 2000 },
+            typeName: '{ year: number, month: number, date: number }',
+            expectedType: '{ year: number, month: number, date: number }',
+            message: 'Missing required key "date"',
+          },
+        ]);
+        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+          'Missing required key "month" at month',
+          'Missing required key "date" at date',
         ]);
       }
     });
@@ -208,6 +260,24 @@ describe('partial record', () => {
   });
 
   describe('validate', () => {
+    test('truthy case', () => {
+      const x: UnknownRecord = {
+        year: 2000,
+        month: 12,
+      };
+
+      const result = ymd.validate(x);
+      expect(Result.isOk(result)).toBe(true);
+
+      if (Result.isOk(result)) {
+        expectType<typeof result.value, Ymd>('=');
+        expect(result.value).toStrictEqual({
+          year: 2000,
+          month: 12,
+        });
+      }
+    });
+
     test('falsy case', () => {
       const x: UnknownRecord = {
         year: 2000,

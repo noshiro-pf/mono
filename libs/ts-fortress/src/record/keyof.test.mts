@@ -49,6 +49,18 @@ describe('keyof', () => {
   });
 
   describe('validate', () => {
+    test('truthy case', () => {
+      const x: unknown = 'year';
+
+      const result = ymdKey.validate(x);
+      expect(Result.isOk(result)).toBe(true);
+
+      if (Result.isOk(result)) {
+        expectType<typeof result.value, Ymd>('=');
+        expect(result.value).toBe('year');
+      }
+    });
+
     test('falsy case', () => {
       const x: unknown = 'minutes';
 

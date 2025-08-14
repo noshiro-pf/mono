@@ -1,6 +1,9 @@
 import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
-import { validationErrorsToMessages } from '../validation-error.mjs';
+import {
+  type ValidationError,
+  validationErrorsToMessages,
+} from '../validation-error.mjs';
 import { uintRange } from './uint-range.mjs';
 
 describe('uintRange', () => {
@@ -44,6 +47,16 @@ describe('uintRange', () => {
   });
 
   describe('validate', () => {
+    test('truthy case', () => {
+      const result = month.validate(5);
+      expectType<typeof result, Result<Month, readonly ValidationError[]>>('=');
+      expect(Result.isOk(result)).toBe(true);
+
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(5);
+      }
+    });
+
     test('falsy case', () => {
       const result = month.validate(13);
       expect(Result.isErr(result)).toBe(true);

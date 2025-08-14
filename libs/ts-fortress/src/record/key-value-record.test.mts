@@ -1,7 +1,10 @@
 import { expectType, Result } from 'ts-data-forge';
 import { number, string } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
-import { validationErrorsToMessages } from '../validation-error.mjs';
+import {
+  type ValidationError,
+  validationErrorsToMessages,
+} from '../validation-error.mjs';
 import { keyValueRecord } from './key-value-record.mjs';
 
 describe('keyValueRecord', () => {
@@ -48,6 +51,29 @@ describe('keyValueRecord', () => {
   });
 
   describe('validate', () => {
+    test('truthy case', () => {
+      const x: UnknownRecord = {
+        year: 2000,
+        month: 12,
+        date: 25,
+      };
+
+      const result = strNumRecord.validate(x);
+      expectType<
+        typeof result,
+        Result<StrNumRecord, readonly ValidationError[]>
+      >('=');
+      expect(Result.isOk(result)).toBe(true);
+
+      if (Result.isOk(result)) {
+        expect(result.value).toStrictEqual({
+          year: 2000,
+          month: 12,
+          date: 25,
+        });
+      }
+    });
+
     test('falsy case', () => {
       const x: UnknownRecord = {
         year: 2000,

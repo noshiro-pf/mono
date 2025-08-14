@@ -1,7 +1,10 @@
 import { expectType, Result } from 'ts-data-forge';
 import { number } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
-import { validationErrorsToMessages } from '../validation-error.mjs';
+import {
+  type ValidationError,
+  validationErrorsToMessages,
+} from '../validation-error.mjs';
 import { arrayOfLength } from './array-of-length.mjs';
 
 describe('arrayOfLength', () => {
@@ -74,6 +77,18 @@ describe('arrayOfLength', () => {
   });
 
   describe('validate', () => {
+    test('truthy case', () => {
+      const ys: unknown = [5, 6, 7, 8];
+
+      const result = xs.validate(ys);
+      expectType<typeof result, Result<Xs, readonly ValidationError[]>>('=');
+      expect(Result.isOk(result)).toBe(true);
+
+      if (Result.isOk(result)) {
+        expect(result.value).toStrictEqual([5, 6, 7, 8]);
+      }
+    });
+
     test('falsy case 1', () => {
       const ys: unknown = [];
 

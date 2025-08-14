@@ -1314,6 +1314,7 @@ export default tseslint.config(
   {
     files: ['**/*.test.mts'],
     rules: {
+      '@typescript-eslint/no-empty-object-type': 'off',
       'unicorn/consistent-function-scoping': 'off',
     },
   },
