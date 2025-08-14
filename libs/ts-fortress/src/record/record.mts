@@ -135,13 +135,26 @@ namespace TsFortressInternal {
   type RecordTypeValueImplSub<
     A extends ReadonlyRecord<string, Type<unknown>>,
     OptionalKeys extends keyof A,
-  > = Readonly<
-    {
-      [key in OptionalKeys]?: TypeOf<A[key]>;
-    } & {
-      [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]>;
-    }
-  >;
+  > =
+    TypeEq<OptionalKeys, never> extends true
+      ? Readonly<{
+          [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]>;
+        }>
+      : TypeEq<keyof A, OptionalKeys> extends true
+        ? Readonly<
+            MergeIntersection<{
+              [key in OptionalKeys]?: TypeOf<A[key]>;
+            }>
+          >
+        : Readonly<
+            MergeIntersection<
+              {
+                [key in OptionalKeys]?: TypeOf<A[key]>;
+              } & {
+                [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]>;
+              }
+            >
+          >;
 
   type OptionalTypeKeys<A extends ReadonlyRecord<string, Type<unknown>>> = {
     [K in keyof A]: A[K] extends { optional: true } ? K : never;
