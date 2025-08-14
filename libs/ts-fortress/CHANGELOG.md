@@ -1,3 +1,9 @@
+## [2.2.1](https://github.com/noshiro-pf/ts-fortress/compare/v2.2.0...v2.2.1) (2025-08-14)
+
+### Bug Fixes
+
+- improve type annotation for record ([#18](https://github.com/noshiro-pf/ts-fortress/issues/18)) ([b2c774a](https://github.com/noshiro-pf/ts-fortress/commit/b2c774a2c5f42bf193dc1d2e8e915cd5fa4f5859))
+
 # [2.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.1.0...v2.2.0) (2025-08-14)
 
 ### Features
