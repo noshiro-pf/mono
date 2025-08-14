@@ -1,3 +1,9 @@
+# [2.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.0.4...v2.1.0) (2025-08-14)
+
+### Features
+
+- add allowExcessProperties option to record ([#13](https://github.com/noshiro-pf/ts-fortress/issues/13)) ([026022e](https://github.com/noshiro-pf/ts-fortress/commit/026022ee144a7a5eaf059d4ed44039bab56dc657))
+
 ## [2.0.4](https://github.com/noshiro-pf/ts-fortress/compare/v2.0.3...v2.0.4) (2025-08-14)
 
 ### Bug Fixes
