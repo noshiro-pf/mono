@@ -1,3 +1,9 @@
+## [2.2.2](https://github.com/noshiro-pf/ts-fortress/compare/v2.2.1...v2.2.2) (2025-08-15)
+
+### Bug Fixes
+
+- return original object as ok value of validate function ([#23](https://github.com/noshiro-pf/ts-fortress/issues/23)) ([828bd7b](https://github.com/noshiro-pf/ts-fortress/commit/828bd7b82d50594a05072b0c678159d639e9f737))
+
 ## [2.2.1](https://github.com/noshiro-pf/ts-fortress/compare/v2.2.0...v2.2.1) (2025-08-14)
 
 ### Bug Fixes
