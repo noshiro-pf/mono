@@ -12,7 +12,7 @@
 
 > **omit**\<`R`, `KeysToOmit`\>(`recordType`, `keysToOmit`, `options?`): `OmittedType`\<`R`, `KeysToOmit`\>
 
-Defined in: [record/omit.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/omit.mts#L7)
+Defined in: [record/omit.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/omit.mts#L11)
 
 Creates a record type with keys omitted.
 

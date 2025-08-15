@@ -12,7 +12,7 @@
 
 > **record**\<`R`\>(`source`, `options?`): [`Type`](../type.md#type)\<`RecordTypeValue`\<`R`\>\>
 
-Defined in: [record/record.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L11)
+Defined in: [record/record.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L13)
 
 #### Type Parameters
 
@@ -40,7 +40,7 @@ Defined in: [record/record.mts:11](https://github.com/noshiro-pf/ts-fortress/blo
 
 > **strictRecord**\<`R`\>(`source`, `options?`): [`Type`](../type.md#type)\<`RecordTypeValue`\<`R`\>\>
 
-Defined in: [record/record.mts:185](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L185)
+Defined in: [record/record.mts:187](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L187)
 
 Creates a strict record type that does not allow excess properties.
 This is an alias for `record(source, { allowExcessProperties: false })`.

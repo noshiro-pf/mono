@@ -1,7 +1,11 @@
 import { Result, expectType } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
-import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
-import { type ValidationErrorWithMessage } from '../validation-error.mjs';
+import {
+  createAssertFn,
+  createCastFn,
+  createIsFn,
+  type ValidationErrorWithMessage,
+} from '../utils/index.mjs';
 
 export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
   types: Types,

@@ -1,6 +1,6 @@
 import { Result } from 'ts-data-forge';
 import { number } from '../primitives/index.mjs';
-import { validationErrorsToMessages } from '../validation-error.mjs';
+import { validationErrorsToMessages } from '../utils/index.mjs';
 import { record } from './record.mjs';
 
 describe('record allowExcessProperties option', () => {

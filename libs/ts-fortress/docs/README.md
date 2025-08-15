@@ -862,4 +862,4 @@ This project is licensed under the Apache-2.0 License - see the [LICENSE](_media
 - [utils/create-is-fn](utils/create-is-fn.md)
 - [utils/create-primitive-type](utils/create-primitive-type.md)
 - [utils/create-type](utils/create-type.md)
-- [validation-error](validation-error.md)
+- [utils/validation-error](utils/validation-error.md)

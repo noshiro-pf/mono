@@ -3,7 +3,7 @@ import { type TypeOf } from '../type.mjs';
 import {
   type ValidationError,
   validationErrorsToMessages,
-} from '../validation-error.mjs';
+} from '../utils/index.mjs';
 import { enumType } from './enum.mjs';
 
 describe('enumType', () => {

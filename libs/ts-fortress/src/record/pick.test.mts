@@ -1,7 +1,7 @@
 import { expectType, Result } from 'ts-data-forge';
 import { number } from '../primitives/index.mjs';
 import { type Type, type TypeOf } from '../type.mjs';
-import { validationErrorsToMessages } from '../validation-error.mjs';
+import { validationErrorsToMessages } from '../utils/index.mjs';
 import { pick } from './pick.mjs';
 import { record } from './record.mjs';
 

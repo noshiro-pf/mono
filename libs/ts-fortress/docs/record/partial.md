@@ -12,7 +12,7 @@
 
 > **partial**\<`R`, `KeysToBeOptional`\>(`recordType`, `options?`): `PartialType`\<`R`, `KeysToBeOptional`\>
 
-Defined in: [record/partial.mts:10](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/partial.mts#L10)
+Defined in: [record/partial.mts:14](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/partial.mts#L14)
 
 Creates a Partial type. If keysToBeOptional is set, only those keys are
 optional, otherwise, all properties are optional.

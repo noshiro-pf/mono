@@ -1,6 +1,6 @@
 import { asFiniteNumber, expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../type.mjs';
-import { validationErrorsToMessages } from '../../validation-error.mjs';
+import { validationErrorsToMessages } from '../../utils/index.mjs';
 import { finiteNumber } from './finite-number.mjs';
 
 describe('finiteNumber', () => {

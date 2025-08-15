@@ -7,7 +7,7 @@ import { nullType, number, undefinedType } from './primitives/index.mjs';
 import { keyof, optional, partial, pick, record } from './record/index.mjs';
 import { type TypeOf } from './type.mjs';
 import { unknown } from './unknown.mjs';
-import { validationErrorsToMessages } from './validation-error.mjs';
+import { validationErrorsToMessages } from './utils/index.mjs';
 
 describe('nested record', () => {
   const nestedRecord = record({

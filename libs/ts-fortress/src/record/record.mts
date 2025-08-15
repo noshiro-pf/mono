@@ -1,12 +1,14 @@
 import { isRecord, Result, tp } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
-import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
 import {
+  createAssertFn,
+  createCastFn,
+  createIsFn,
   createPrimitiveValidationError,
   prependPathToValidationErrors,
   type ValidationError,
   type ValidationErrorWithMessage,
-} from '../validation-error.mjs';
+} from '../utils/index.mjs';
 
 export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
   source: R,

@@ -1,6 +1,6 @@
 import { asUint, expectType, isUint, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../type.mjs';
-import { validationErrorsToMessages } from '../../validation-error.mjs';
+import { validationErrorsToMessages } from '../../utils/index.mjs';
 import { uint } from './uint.mjs';
 
 describe('uint', () => {

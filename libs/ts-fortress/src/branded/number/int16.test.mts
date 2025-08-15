@@ -1,6 +1,6 @@
 import { asInt16, expectType, isInt16, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../type.mjs';
-import { validationErrorsToMessages } from '../../validation-error.mjs';
+import { validationErrorsToMessages } from '../../utils/index.mjs';
 import { int16 } from './int16.mjs';
 
 describe('int16', () => {

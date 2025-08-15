@@ -12,7 +12,7 @@
 
 > **nonEmptyArray**\<`A`\>(`elementType`, `options?`): [`Type`](../type.md#type)\<`NonEmptyArray`\<`A`\>\>
 
-Defined in: [array/non-empty-array.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/non-empty-array.mts#L11)
+Defined in: [array/non-empty-array.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/non-empty-array.mts#L13)
 
 #### Type Parameters
 

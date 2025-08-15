@@ -1,6 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
-import { validationErrorsToMessages } from '../validation-error.mjs';
+import { validationErrorsToMessages } from '../utils/index.mjs';
 import { bigint, bigintLiteral } from './bigint.mjs';
 
 describe('bigint', () => {

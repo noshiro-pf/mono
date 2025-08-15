@@ -1,10 +1,12 @@
 import { expectType, Result } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
-import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
 import {
+  createAssertFn,
+  createCastFn,
+  createIsFn,
   type ValidationError,
   type ValidationErrorWithMessage,
-} from '../validation-error.mjs';
+} from '../utils/index.mjs';
 
 export const intersection = <const Types extends NonEmptyArray<Type<unknown>>>(
   types: Types,

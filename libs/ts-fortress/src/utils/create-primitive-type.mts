@@ -1,8 +1,8 @@
 import { Result } from 'ts-data-forge';
 import { type Type } from '../type.mjs';
-import { createPrimitiveValidationError } from '../validation-error.mjs';
 import { createAssertFn } from './create-assert-fn.mjs';
 import { createCastFn } from './create-cast-fn.mjs';
+import { createPrimitiveValidationError } from './validation-error.mjs';
 
 export const createPrimitiveType = <A extends Primitive>({
   typeName,

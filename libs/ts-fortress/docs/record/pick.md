@@ -12,7 +12,7 @@
 
 > **pick**\<`R`, `KeysToPick`\>(`recordType`, `keysToPick`, `options?`): `PickedType`\<`R`, `KeysToPick`\>
 
-Defined in: [record/pick.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L7)
+Defined in: [record/pick.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L11)
 
 Creates a record type with keys picked.
 

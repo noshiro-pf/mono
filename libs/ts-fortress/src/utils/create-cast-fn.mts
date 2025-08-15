@@ -3,7 +3,7 @@ import { type Type } from '../type.mjs';
 import {
   validationErrorsToMessages,
   type ValidationError,
-} from '../validation-error.mjs';
+} from './validation-error.mjs';
 
 const validationResultToString = (result: readonly ValidationError[]): string =>
   `\n${validationErrorsToMessages(result).join(',\n')}`;

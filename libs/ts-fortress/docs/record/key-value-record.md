@@ -12,7 +12,7 @@
 
 > **keyValueRecord**\<`K`, `V`\>(`keyType`, `valueType`, `options?`): [`Type`](../type.md#type)\<`RecordResultType`\<`K`, `V`\>\>
 
-Defined in: [record/key-value-record.mts:16](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/key-value-record.mts#L16)
+Defined in: [record/key-value-record.mts:18](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/key-value-record.mts#L18)
 
 #### Type Parameters
 

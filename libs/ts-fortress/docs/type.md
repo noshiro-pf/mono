@@ -24,7 +24,7 @@ Defined in: [type.mts:29](https://github.com/noshiro-pf/ts-fortress/blob/main/sr
 
 ### Type\<A\>
 
-> **Type**\<`A`\> = `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is A`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is A`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`A`, readonly [`ValidationError`](validation-error.md#validationerror)[]\>; \}\>
+> **Type**\<`A`\> = `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is A`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is A`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`A`, readonly [`ValidationError`](utils/validation-error.md#validationerror)[]\>; \}\>
 
 Defined in: [type.mts:14](https://github.com/noshiro-pf/ts-fortress/blob/main/src/type.mts#L14)
 

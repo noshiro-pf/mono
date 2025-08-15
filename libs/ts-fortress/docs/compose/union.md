@@ -12,7 +12,7 @@
 
 > **union**\<`Types`\>(`types`, `options?`): `UnionType`\<`Types`\>
 
-Defined in: [compose/union.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/compose/union.mts#L6)
+Defined in: [compose/union.mts:10](https://github.com/noshiro-pf/ts-fortress/blob/main/src/compose/union.mts#L10)
 
 #### Type Parameters
 

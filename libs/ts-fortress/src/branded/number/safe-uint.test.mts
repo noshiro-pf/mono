@@ -1,6 +1,6 @@
 import { asSafeUint, expectType, isSafeUint, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../type.mjs';
-import { validationErrorsToMessages } from '../../validation-error.mjs';
+import { validationErrorsToMessages } from '../../utils/index.mjs';
 import { safeUint } from './safe-uint.mjs';
 
 describe('safeUint', () => {

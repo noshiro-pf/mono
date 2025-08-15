@@ -12,7 +12,7 @@
 
 > **tuple**\<`A`\>(`types`, `options?`): [`Type`](../type.md#type)\<`MapTuple`\<`A`\>\>
 
-Defined in: [array/tuple.mts:15](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/tuple.mts#L15)
+Defined in: [array/tuple.mts:17](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/tuple.mts#L17)
 
 #### Type Parameters
 

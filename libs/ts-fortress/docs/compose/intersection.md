@@ -12,7 +12,7 @@
 
 > **intersection**\<`Types`\>(`types`, `defaultType`, `options?`): `IntersectionType`\<`Types`\>
 
-Defined in: [compose/intersection.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/compose/intersection.mts#L9)
+Defined in: [compose/intersection.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/compose/intersection.mts#L11)
 
 #### Type Parameters
 

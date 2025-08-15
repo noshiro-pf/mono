@@ -12,7 +12,7 @@
 
 > **mergeRecords**\<`Types`\>(`types`, `options?`): `IntersectionType`\<`Types`\>
 
-Defined in: [compose/merge-records.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/compose/merge-records.mts#L9)
+Defined in: [compose/merge-records.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/compose/merge-records.mts#L11)
 
 #### Type Parameters
 

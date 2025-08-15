@@ -1,7 +1,11 @@
 import { expectType, ISet, isRecord, Obj, Result } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
-import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
-import { createPrimitiveValidationError } from '../validation-error.mjs';
+import {
+  createAssertFn,
+  createCastFn,
+  createIsFn,
+  createPrimitiveValidationError,
+} from '../utils/index.mjs';
 
 /**
  * Creates a Partial type. If keysToBeOptional is set, only those keys are

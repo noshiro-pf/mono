@@ -5,7 +5,7 @@ import { type TypeOf } from '../type.mjs';
 import {
   type ValidationError,
   validationErrorsToMessages,
-} from '../validation-error.mjs';
+} from '../utils/index.mjs';
 import { mergeRecords } from './merge-records.mjs';
 
 describe('mergeRecords', () => {

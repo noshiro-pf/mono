@@ -1,5 +1,5 @@
 import { type Result } from 'ts-data-forge';
-import { type ValidationError } from './validation-error.mjs';
+import { type ValidationError } from './utils/index.mjs';
 
 /**
  * - `typeName` : Name for this type
