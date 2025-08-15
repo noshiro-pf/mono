@@ -166,5 +166,14 @@ describe('nullType', () => {
         ]);
       }
     });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = null;
+      const result = nullType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
   });
 });

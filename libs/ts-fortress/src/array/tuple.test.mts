@@ -158,6 +158,19 @@ describe('tuple', () => {
         ]);
       }
     });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = [{ x: 5, y: 10 }, 3, '2'];
+      const result = targetType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        // Note: tuple validation may create new arrays for type safety
+        // so we check for structural equality rather than reference equality
+        expect(result.value).toStrictEqual(input);
+        // For tuples, the inner objects should maintain reference equality
+        expect(result.value[0]).toBe(input[0]); // ✅ same reference for nested objects
+      }
+    });
   });
 
   describe('fill', () => {

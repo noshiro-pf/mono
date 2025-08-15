@@ -36,6 +36,15 @@ describe('simpleBrandedNumber', () => {
     });
 
     describe('validate', () => {
+      test('validate returns input as-is for OK cases', () => {
+        const input = 42;
+        const result = userIdType.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
+        }
+      });
+
       test('succeeds for valid numbers', () => {
         const result = userIdType.validate(42);
         expect(Result.isOk(result)).toBe(true);
@@ -100,6 +109,15 @@ describe('simpleBrandedNumber', () => {
     });
 
     describe('validate', () => {
+      test('validate returns input as-is for OK cases', () => {
+        const input = 85;
+        const result = scoreType.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
+        }
+      });
+
       test('succeeds for valid numbers', () => {
         const result = scoreType.validate(85);
         expect(Result.isOk(result)).toBe(true);

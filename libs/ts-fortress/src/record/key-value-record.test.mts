@@ -74,6 +74,19 @@ describe('keyValueRecord', () => {
       }
     });
 
+    test('validate returns input as-is for OK cases', () => {
+      const input: UnknownRecord = {
+        year: 2000,
+        month: 12,
+        date: 25,
+      };
+      const result = strNumRecord.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('falsy case', () => {
       const x: UnknownRecord = {
         year: 2000,

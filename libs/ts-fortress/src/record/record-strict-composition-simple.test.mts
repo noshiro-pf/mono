@@ -48,6 +48,16 @@ describe('record strict composition - simple tests', () => {
         expect(result.value).toStrictEqual({ id: '123', name: 'John' });
       }
     });
+
+    test('pickedType validate returns input as-is for OK cases', () => {
+      const pickedType = pick(strictRecord, ['id', 'name']);
+      const input = { id: '123', name: 'John' };
+      const result = pickedType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
   });
 
   describe('omit behavior with strict record', () => {
@@ -108,11 +118,29 @@ describe('record strict composition - simple tests', () => {
       expect(Result.isErr(result)).toBe(true);
     });
 
+    test('strictRecord validate returns input as-is for OK cases', () => {
+      const input = { id: '123', name: 'John', age: 25 };
+      const result = strictRecord.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('permissive record accepts excess properties', () => {
       const data = { id: '123', name: 'John', age: 25, extra: 'allowed' };
 
       const result = permissiveRecord.validate(data);
       expect(Result.isOk(result)).toBe(true);
+    });
+
+    test('permissiveRecord validate returns input as-is for OK cases', () => {
+      const input = { id: '123', name: 'John', age: 25, extra: 'allowed' };
+      const result = permissiveRecord.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
     });
 
     test('pick from strict record rejects excess properties', () => {
@@ -129,6 +157,16 @@ describe('record strict composition - simple tests', () => {
 
       const result = permissivePicked.validate(data);
       expect(Result.isOk(result)).toBe(true);
+    });
+
+    test('permissivePicked validate returns input as-is for OK cases', () => {
+      const permissivePicked = pick(permissiveRecord, ['id', 'name']);
+      const input = { id: '123', name: 'John', extra: 'allowed' };
+      const result = permissivePicked.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
     });
   });
 });

@@ -73,6 +73,51 @@ describe('omit', () => {
       }
     });
 
+    test('validate returns input as-is for OK cases', () => {
+      const input: UnknownRecord = {
+        year: 2000,
+        month: 12,
+      };
+      const result = ym.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
+    test('truthy case with additional keys', () => {
+      const x: UnknownRecord = {
+        year: 2000,
+        month: 12,
+        aaa: 999,
+      };
+
+      const result = ym.validate(x);
+      expect(Result.isOk(result)).toBe(true);
+
+      if (Result.isOk(result)) {
+        expectType<typeof result.value, Ym>('=');
+        expect(result.value).toStrictEqual({
+          year: 2000,
+          month: 12,
+          aaa: 999,
+        });
+      }
+    });
+
+    test('validate returns input as-is for OK cases with additional keys', () => {
+      const input: UnknownRecord = {
+        year: 2000,
+        month: 12,
+        aaa: 999,
+      };
+      const result = ym.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('falsy case', () => {
       const x: UnknownRecord = {
         year: 2000,

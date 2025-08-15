@@ -39,6 +39,15 @@ describe('record strict composition tests', () => {
       }
     });
 
+    test('pickedType validate returns input as-is for OK cases', () => {
+      const input = { id: '123', name: 'John' };
+      const result = pickedType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('rejects data with excess properties (inherits strict behavior)', () => {
       const dataWithExcess = { id: '123', name: 'John', extra: 'not allowed' };
 
@@ -94,6 +103,15 @@ describe('record strict composition tests', () => {
       }
     });
 
+    test('omittedType validate returns input as-is for OK cases', () => {
+      const input = { id: '123', name: 'John' };
+      const result = omittedType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('rejects data with excess properties (inherits strict behavior)', () => {
       const dataWithExcess = { id: '123', name: 'John', extra: 'not allowed' };
 
@@ -123,6 +141,7 @@ describe('record strict composition tests', () => {
 
       if (Result.isOk(result)) {
         expect(result.value).toStrictEqual({
+          age: 25,
           id: '123',
           name: 'John',
         });
@@ -150,6 +169,15 @@ describe('record strict composition tests', () => {
       }
     });
 
+    test('partialType validate returns input as-is for OK cases', () => {
+      const input = { id: '123', name: 'John' };
+      const result = partialType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('accepts empty object (all fields optional)', () => {
       const emptyData = {};
 
@@ -161,6 +189,15 @@ describe('record strict composition tests', () => {
       if (Result.isOk(result)) {
         // partial with empty object returns empty object
         expect(result.value).toStrictEqual({});
+      }
+    });
+
+    test('partialType validate returns input as-is for empty object', () => {
+      const input = {};
+      const result = partialType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
       }
     });
 
@@ -203,6 +240,18 @@ describe('record strict composition tests', () => {
           id: '123',
           name: 'John',
         });
+      }
+    });
+
+    test('partiallyPartialType validate returns input as-is for OK cases', () => {
+      const partiallyPartialType = partial(strictBaseRecord, {
+        keysToBeOptional: ['age', 'email'],
+      });
+      const input = { id: '123', name: 'John' };
+      const result = partiallyPartialType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
       }
     });
 
@@ -362,6 +411,17 @@ describe('record strict composition tests', () => {
       }
     });
 
+    test('pickedPartialType validate returns input as-is for OK cases', () => {
+      const partialType = partial(strictBaseRecord);
+      const pickedPartialType = pick(partialType, ['id', 'name']);
+      const input = { id: '123', name: 'John' };
+      const result = pickedPartialType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('partial of pick of strict record', () => {
       const pickedType = pick(strictBaseRecord, ['id', 'name']);
       const partialPickedType = partial(pickedType);
@@ -378,6 +438,17 @@ describe('record strict composition tests', () => {
         expect(result.value).toStrictEqual({
           id: '123',
         });
+      }
+    });
+
+    test('partialPickedType validate returns input as-is for OK cases', () => {
+      const pickedType = pick(strictBaseRecord, ['id', 'name']);
+      const partialPickedType = partial(pickedType);
+      const input = { id: '123' };
+      const result = partialPickedType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
       }
     });
 

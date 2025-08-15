@@ -68,6 +68,15 @@ describe('bigint', () => {
         ]);
       }
     });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = 999n;
+      const result = targetType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
   });
 
   describe('assertIs', () => {
@@ -213,6 +222,15 @@ describe('bigintLiteral', () => {
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
           'Expected bigintLiteral(42), got string',
         ]);
+      }
+    });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = 42n;
+      const result = targetType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
       }
     });
   });

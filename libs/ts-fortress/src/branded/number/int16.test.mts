@@ -61,6 +61,15 @@ describe('int16', () => {
       }
     });
 
+    test('validate returns input as-is for OK cases', () => {
+      const input = 15000;
+      const result = targetType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('falsy case - out of range', () => {
       const result = targetType.validate(50000);
       expect(Result.isErr(result)).toBe(true);

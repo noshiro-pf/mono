@@ -76,6 +76,15 @@ describe('enumType', () => {
         throw new Error('Expected validation to fail');
       }
     });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = 'a';
+      const result = targetType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
   });
 
   describe('fill', () => {

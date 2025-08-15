@@ -175,5 +175,14 @@ describe('undefinedType', () => {
         ]);
       }
     });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = undefined;
+      const result = undefinedType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
   });
 });

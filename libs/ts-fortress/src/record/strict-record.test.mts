@@ -49,6 +49,15 @@ describe('strictRecord', () => {
       }
     });
 
+    test('validate returns input as-is for OK cases', () => {
+      const input = { name: 'John', age: 30 };
+      const result = userType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('falsy case - excess properties', () => {
       const userWithExtra = { name: 'John', age: 30, extra: 'not allowed' };
 

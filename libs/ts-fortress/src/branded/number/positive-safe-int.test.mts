@@ -72,6 +72,15 @@ describe('positiveSafeInt', () => {
       }
     });
 
+    test('validate returns input as-is for OK cases', () => {
+      const input = 123456;
+      const result = targetType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('falsy case - zero', () => {
       const result = targetType.validate(0);
       expect(Result.isErr(result)).toBe(true);

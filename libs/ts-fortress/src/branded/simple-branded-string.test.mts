@@ -37,6 +37,15 @@ describe('simpleBrandedString', () => {
     });
 
     describe('validate', () => {
+      test('validate returns input as-is for OK cases', () => {
+        const input = 'john_doe';
+        const result = userNameType.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
+        }
+      });
+
       test('succeeds for valid strings', () => {
         const result = userNameType.validate('john_doe');
         expect(Result.isOk(result)).toBe(true);
@@ -101,6 +110,15 @@ describe('simpleBrandedString', () => {
     });
 
     describe('validate', () => {
+      test('validate returns input as-is for OK cases', () => {
+        const input = 'technology';
+        const result = categoryType.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
+        }
+      });
+
       test('succeeds for valid strings', () => {
         const result = categoryType.validate('technology');
         expect(Result.isOk(result)).toBe(true);

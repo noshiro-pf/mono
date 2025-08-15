@@ -90,6 +90,15 @@ describe('intersection', () => {
         }
       });
 
+      test('validate returns input as-is for OK cases', () => {
+        const input = { x: 0, y: 1, z: 2, w: 3 };
+        const result = targetType.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
+        }
+      });
+
       test('falsy case', () => {
         const result = targetType.validate({ x: 0, y: 1 });
         expect(Result.isErr(result)).toBe(true);
@@ -191,6 +200,15 @@ describe('intersection', () => {
 
         if (Result.isOk(result)) {
           expect(result.value).toBe(0);
+        }
+      });
+
+      test('validate returns input as-is for OK cases', () => {
+        const input = 0;
+        const result = targetType.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
         }
       });
 
@@ -317,6 +335,15 @@ describe('intersection', () => {
 
         if (Result.isOk(result)) {
           expect(result.value).toBe(3);
+        }
+      });
+
+      test('validate returns input as-is for OK cases', () => {
+        const input = 3;
+        const result = targetType.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
         }
       });
 

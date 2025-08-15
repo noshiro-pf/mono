@@ -187,6 +187,15 @@ describe('string', () => {
         ]);
       }
     });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = 'hello world';
+      const result = str.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
   });
 });
 
@@ -300,6 +309,15 @@ describe('stringLiteral', () => {
             message: undefined,
           },
         ]);
+      }
+    });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = 'hello';
+      const result = hello.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
       }
     });
   });

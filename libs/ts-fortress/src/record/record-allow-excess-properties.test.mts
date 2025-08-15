@@ -73,6 +73,15 @@ describe('record allowExcessProperties option', () => {
     }
   });
 
+  test('strictRecord validate returns input as-is for OK cases', () => {
+    const input = { name: 42, age: 25 };
+    const result = strictRecord.validate(input);
+    expect(Result.isOk(result)).toBe(true);
+    if (Result.isOk(result)) {
+      expect(result.value).toBe(input); // ✅ same reference
+    }
+  });
+
   test('allowExcessProperties: true - accepts excess properties', () => {
     const dataWithExcess = {
       name: 42,
@@ -94,6 +103,15 @@ describe('record allowExcessProperties option', () => {
     }
   });
 
+  test('permissiveRecord validate returns input as-is for OK cases', () => {
+    const input = { name: 42, age: 25, extra: 'allowed' };
+    const result = permissiveRecord.validate(input);
+    expect(Result.isOk(result)).toBe(true);
+    if (Result.isOk(result)) {
+      expect(result.value).toBe(input); // ✅ same reference
+    }
+  });
+
   test('default behavior - allows excess properties (allowExcessProperties defaults to true)', () => {
     const dataWithExcess = {
       name: 42,
@@ -112,6 +130,15 @@ describe('record allowExcessProperties option', () => {
         age: 25,
         extra: 'allowed by default',
       });
+    }
+  });
+
+  test('defaultRecord validate returns input as-is for OK cases', () => {
+    const input = { name: 42, age: 25, extra: 'allowed by default' };
+    const result = defaultRecord.validate(input);
+    expect(Result.isOk(result)).toBe(true);
+    if (Result.isOk(result)) {
+      expect(result.value).toBe(input); // ✅ same reference
     }
   });
 

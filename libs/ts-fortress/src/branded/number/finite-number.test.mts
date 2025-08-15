@@ -72,6 +72,15 @@ describe('finiteNumber', () => {
       }
     });
 
+    test('validate returns input as-is for OK cases', () => {
+      const input = 123.456;
+      const result = targetType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('falsy case - infinity', () => {
       const result = targetType.validate(Number.POSITIVE_INFINITY);
       expect(Result.isErr(result)).toBe(true);

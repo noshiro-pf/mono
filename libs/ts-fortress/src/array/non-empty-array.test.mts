@@ -89,6 +89,15 @@ describe('nonEmptyArray', () => {
       }
     });
 
+    test('validate returns input as-is for OK cases', () => {
+      const input = [1, 2, 3];
+      const result = xs.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('falsy case 1', () => {
       const ys: unknown = [];
 

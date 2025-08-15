@@ -88,6 +88,19 @@ describe('partial', () => {
         }
       });
 
+      test('validate returns input as-is for OK cases', () => {
+        const input: UnknownRecord = {
+          year: 2000,
+          month: 12,
+          date: 25,
+        };
+        const result = ymd.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
+        }
+      });
+
       test('truthy case optional keys', () => {
         const x: UnknownRecord = {};
 
@@ -97,6 +110,51 @@ describe('partial', () => {
 
         if (Result.isOk(result)) {
           expect(result.value).toStrictEqual({});
+        }
+      });
+
+      test('validate returns input as-is for empty object', () => {
+        const input: UnknownRecord = {};
+        const result = ymd.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
+        }
+      });
+
+      test('truthy case with additional keys', () => {
+        const x: UnknownRecord = {
+          year: 2000,
+          month: 12,
+          date: 25,
+          aaa: 999,
+        };
+
+        const result = ymd.validate(x);
+        expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
+        expect(Result.isOk(result)).toBe(true);
+
+        if (Result.isOk(result)) {
+          expect(result.value).toStrictEqual({
+            year: 2000,
+            month: 12,
+            date: 25,
+            aaa: 999,
+          });
+        }
+      });
+
+      test('validate returns input as-is for OK cases with additional keys', () => {
+        const input: UnknownRecord = {
+          year: 2000,
+          month: 12,
+          date: 25,
+          aaa: 999,
+        };
+        const result = ymd.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
         }
       });
 
@@ -284,6 +342,18 @@ describe('partial', () => {
             year: 2000,
             month: 12,
           });
+        }
+      });
+
+      test('partiallyPartialType validate returns input as-is for OK cases', () => {
+        const input: UnknownRecord = {
+          year: 2000,
+          month: 12,
+        };
+        const result = ymd.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
         }
       });
 

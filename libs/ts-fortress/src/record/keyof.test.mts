@@ -61,6 +61,15 @@ describe('keyof', () => {
       }
     });
 
+    test('validate returns input as-is for OK cases', () => {
+      const input = 'year';
+      const result = ymdKey.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
+
     test('falsy case', () => {
       const x: unknown = 'minutes';
 

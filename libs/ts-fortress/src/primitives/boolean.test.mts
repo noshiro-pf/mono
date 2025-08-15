@@ -68,6 +68,15 @@ describe('boolean', () => {
         ]);
       }
     });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = false;
+      const result = targetType.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
   });
 
   describe('assertIs', () => {
@@ -218,6 +227,15 @@ describe('booleanLiteral', () => {
           ]);
         }
       });
+
+      test('validate returns input as-is for OK cases', () => {
+        const input = true;
+        const result = targetType.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
+        }
+      });
     });
 
     describe('cast', () => {
@@ -302,6 +320,15 @@ describe('booleanLiteral', () => {
           expect(validationErrorsToMessages(result.value)).toStrictEqual([
             'Expected booleanLiteral(false), got boolean',
           ]);
+        }
+      });
+
+      test('validate returns input as-is for OK cases', () => {
+        const input = false;
+        const result = targetType.validate(input);
+        expect(Result.isOk(result)).toBe(true);
+        if (Result.isOk(result)) {
+          expect(result.value).toBe(input); // ✅ same reference
         }
       });
     });

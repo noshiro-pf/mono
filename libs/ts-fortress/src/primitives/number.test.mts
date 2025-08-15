@@ -174,6 +174,15 @@ describe('number', () => {
         ]);
       }
     });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = 123.456;
+      const result = num.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
   });
 });
 
@@ -278,6 +287,15 @@ describe('numberLiteral', () => {
             message: undefined,
           },
         ]);
+      }
+    });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = 42;
+      const result = literal42.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
       }
     });
   });

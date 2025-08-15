@@ -143,6 +143,19 @@ describe('record', () => {
         ]);
       }
     });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = {
+        year: 2023,
+        month: 6,
+        date: 15,
+      };
+      const result = ymd.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
+      }
+    });
   });
 
   describe('fill', () => {
@@ -309,6 +322,18 @@ describe('partial record', () => {
           'Expected number at month, got string',
           'Expected number at date, got string',
         ]);
+      }
+    });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = {
+        year: 2024,
+        month: 8,
+      };
+      const result = ymd.validate(input);
+      expect(Result.isOk(result)).toBe(true);
+      if (Result.isOk(result)) {
+        expect(result.value).toBe(input); // ✅ same reference
       }
     });
   });

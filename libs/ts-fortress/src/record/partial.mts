@@ -62,9 +62,7 @@ export const partial = <
     const validationResult = recordType.validate(objectFilled);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    return Result.map(validationResult, Obj.pick(Object.keys(a))) as ReturnType<
-      Type<V>['validate']
-    >;
+    return Result.map(validationResult, () => a as V);
   };
 
   const fill: Type<V>['fill'] = (a) => {
