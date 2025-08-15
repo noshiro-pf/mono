@@ -968,6 +968,7 @@ This project is licensed under the Apache-2.0 License - see the [LICENSE](_media
 - [compose](compose.md)
 - [compose/intersection](compose/intersection.md)
 - [compose/merge-records](compose/merge-records.md)
+- [compose/recursion](compose/recursion.md)
 - [compose/union](compose/union.md)
 - [enum](enum.md)
 - [enum/enum](enum/enum.md)
