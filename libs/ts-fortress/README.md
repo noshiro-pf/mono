@@ -488,6 +488,141 @@ type Type<A> = Readonly<{
 }>;
 ```
 
+#### API Method Usage
+
+##### `validate` - Detailed validation with error reporting
+
+The `validate` method performs comprehensive validation and returns a `Result` type. **When validation succeeds, it returns the original input object (same reference)**, preserving object identity:
+
+```typescript
+import * as t from 'ts-fortress';
+import { Result } from 'ts-data-forge';
+
+const User = t.record({
+    name: t.string(''),
+    age: t.number(0),
+});
+
+// Success case - returns the same object reference
+const validData = { name: 'Alice', age: 30 };
+const result = User.validate(validData);
+
+if (Result.isOk(result)) {
+    console.log(result.value === validData); // true - same reference!
+    console.log(result.value); // { name: 'Alice', age: 30 }
+}
+
+// Error case - provides detailed error information
+const invalidData = { name: 'Bob', age: 'thirty' };
+const errorResult = User.validate(invalidData);
+
+if (Result.isErr(errorResult)) {
+    console.log(errorResult.value);
+    // [
+    //   {
+    //     path: ['age'],
+    //     actualValue: 'thirty',
+    //     expectedType: 'number',
+    //     typeName: 'number'
+    //   }
+    // ]
+}
+```
+
+##### `assertIs` - Type assertion with runtime checking
+
+When using `assertIs`, you must assign it to a typed variable with an explicit type annotation due to TypeScript's limitations with assertion functions:
+
+```typescript
+import * as t from 'ts-fortress';
+
+const numberType = t.number(0);
+
+// ✅ Correct usage - explicit type annotation required
+const assertIsNumber: (a: unknown) => asserts a is number = numberType.assertIs;
+
+function processValue(value: unknown) {
+    // After assertion, TypeScript knows value is a number
+    assertIsNumber(value);
+    console.log(value.toFixed(2)); // TypeScript knows this is safe
+}
+
+try {
+    processValue(42); // Works
+    processValue('not a number'); // Throws error
+} catch (error) {
+    console.error('Assertion failed:', error);
+}
+
+// Example with complex types
+const User = t.record({
+    id: t.string(''),
+    name: t.string(''),
+});
+
+type User = t.TypeOf<typeof User>;
+
+// Explicit type annotation for the assertion function
+const assertIsUser: (a: unknown) => asserts a is User = User.assertIs;
+
+function processUser(data: unknown) {
+    assertIsUser(data);
+    // TypeScript now knows data is User type
+    console.log(`User ${data.name} has ID ${data.id}`);
+}
+```
+
+##### `cast` - Type casting with validation
+
+The `cast` method validates the input and returns it if valid, otherwise **throws an Error** with validation details:
+
+```typescript
+import * as t from 'ts-fortress';
+
+const Port = t.number(8080);
+
+console.log(Port.cast(3000)); // 3000 - valid number
+
+try {
+    console.log(Port.cast('invalid')); // Throws Error!
+} catch (error) {
+    console.error(error.message); // "Expected number, got string"
+}
+```
+
+##### `fill` - Intelligent default value filling
+
+The `fill` method attempts to preserve valid parts of the input while filling in missing or invalid values with defaults:
+
+See [Default Values and Data Filling](#default-values-and-data-filling)
+
+##### `defaultValue` - Accessing the default value
+
+Every type has a `defaultValue` property that can be used for initialization:
+
+```typescript
+import * as t from 'ts-fortress';
+
+const User = t.record({
+    id: t.string(''),
+    name: t.string('Guest'),
+    score: t.number(0),
+});
+
+type User = t.TypeOf<typeof User>;
+
+// Use defaultValue for initialization
+const newUser: User = { ...User.defaultValue, id: 'user-123' };
+console.log(newUser);
+// { id: 'user-123', name: 'Guest', score: 0 }
+
+// Useful for React state initialization
+function UserForm() {
+    const [formData, setFormData] = useState<User>(User.defaultValue);
+    // ...
+}
+```
+
 ### Primitive Types
 
 ```typescript
