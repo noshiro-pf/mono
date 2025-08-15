@@ -1,3 +1,9 @@
+# [2.3.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.2.2...v2.3.0) (2025-08-15)
+
+### Features
+
+- add recursion type ([#24](https://github.com/noshiro-pf/ts-fortress/issues/24)) ([92ddab0](https://github.com/noshiro-pf/ts-fortress/commit/92ddab0d6bf506f1f9412e53202f1f946a3cbfa8))
+
 ## [2.2.2](https://github.com/noshiro-pf/ts-fortress/compare/v2.2.1...v2.2.2) (2025-08-15)
 
 ### Bug Fixes
