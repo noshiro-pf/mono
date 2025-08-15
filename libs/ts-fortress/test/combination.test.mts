@@ -1,13 +1,21 @@
 import { asInt, expectType, Result } from 'ts-data-forge';
-import { array } from './array/index.mjs';
-import { int } from './branded/index.mjs';
-import { union } from './compose/index.mjs';
-import { uintRange } from './enum/index.mjs';
-import { nullType, number, undefinedType } from './primitives/index.mjs';
-import { keyof, optional, partial, pick, record } from './record/index.mjs';
-import { type TypeOf } from './type.mjs';
-import { unknown } from './unknown.mjs';
-import { validationErrorsToMessages } from './utils/index.mjs';
+import {
+  array,
+  int,
+  keyof,
+  nullType,
+  number,
+  optional,
+  partial,
+  pick,
+  record,
+  uintRange,
+  undefinedType,
+  union,
+  unknown,
+  validationErrorsToMessages,
+  type TypeOf,
+} from '../src/index.mjs';
 
 describe('nested record', () => {
   const nestedRecord = record({

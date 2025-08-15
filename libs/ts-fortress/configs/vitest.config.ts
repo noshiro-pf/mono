@@ -6,7 +6,8 @@ import { projectRootPath } from '../scripts/project-root-path.mjs';
 export default defineConfig({
   test: {
     globals: true,
-    dir: path.resolve(projectRootPath, './src'),
+    dir: projectRootPath,
+    include: ['src/**/*.mts', 'test/**/*.mts'],
     includeSource: [path.resolve(projectRootPath, './src/**/*.mts')],
     typecheck: {
       tsconfig: path.resolve(projectRootPath, './configs/tsconfig.test.json'),

@@ -5,6 +5,7 @@
   ],
   "include": [
     "./src",
+    "./test",
     "./scripts",
     "./configs",
     "./release.config.js",
