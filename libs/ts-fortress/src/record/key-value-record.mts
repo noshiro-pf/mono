@@ -1,4 +1,4 @@
-import { isRecord, Result } from 'ts-data-forge';
+import { Arr, isRecord, Result } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -38,43 +38,39 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
       ]);
     }
 
-    const errors: readonly ValidationError[] = Object.entries(a).flatMap(
-      ([k, v]) => {
-        const keyErrors = (() => {
+    const errors: readonly ValidationError[] = Arr.generate(function* () {
+      for (const [k, v] of Object.entries(a)) {
+        {
           const res = keyType.validate(k);
-          return Result.isErr(res)
-            ? [
-                {
-                  path: [],
-                  actualValue: k,
-                  expectedType: typeName,
-                  message: `The key of the record is expected to be <${keyType.typeName}>`,
-                  typeName,
-                } satisfies ValidationErrorWithMessage,
-                ...res.value,
-              ]
-            : [];
-        })();
 
-        const valueErrors = (() => {
+          if (Result.isErr(res)) {
+            yield {
+              path: [],
+              actualValue: k,
+              expectedType: typeName,
+              message: `The key of the record is expected to be <${keyType.typeName}>`,
+              typeName,
+            } satisfies ValidationErrorWithMessage;
+
+            yield* res.value;
+          }
+        }
+        {
           const res = valueType.validate(v);
-          return Result.isErr(res)
-            ? [
-                {
-                  path: [],
-                  actualValue: v,
-                  expectedType: typeName,
-                  message: `The value of the record is expected to be <${valueType.typeName}>`,
-                  typeName,
-                } satisfies ValidationErrorWithMessage,
-                ...prependPathToValidationErrors(res.value, k),
-              ]
-            : [];
-        })();
+          if (Result.isErr(res)) {
+            yield {
+              path: [],
+              actualValue: v,
+              expectedType: typeName,
+              message: `The value of the record is expected to be <${valueType.typeName}>`,
+              typeName,
+            } satisfies ValidationErrorWithMessage;
 
-        return [...keyErrors, ...valueErrors];
-      },
-    );
+            yield* prependPathToValidationErrors(res.value, k);
+          }
+        }
+      }
+    });
 
     if (errors.length > 0) {
       return Result.err(errors);

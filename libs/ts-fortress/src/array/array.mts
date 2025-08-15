@@ -6,6 +6,7 @@ import {
   createIsFn,
   createPrimitiveValidationError,
   prependIndexToValidationErrors,
+  type ValidationError,
 } from '../utils/index.mjs';
 
 export const array = <A,>(
@@ -34,11 +35,13 @@ export const array = <A,>(
       ]);
     }
 
-    const errors = a.flatMap((el, index) => {
-      const res = elementType.validate(el);
-      return Result.isErr(res)
-        ? prependIndexToValidationErrors(res.value, index)
-        : [];
+    const errors: readonly ValidationError[] = Arr.generate(function* () {
+      for (const [index, el] of a.entries()) {
+        const res = elementType.validate(el);
+        if (Result.isErr(res)) {
+          yield* prependIndexToValidationErrors(res.value, index);
+        }
+      }
     });
 
     if (errors.length > 0) {

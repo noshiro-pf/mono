@@ -1,4 +1,4 @@
-import { isRecord, Result, tp } from 'ts-data-forge';
+import { Arr, isRecord, Result, tp } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -50,32 +50,31 @@ export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
       ]);
     }
 
-    const defaultErrors: readonly ValidationError[] = Object.entries(
-      source,
-    ).flatMap(([k, valueType]) => {
-      if (!Object.hasOwn(a, k)) {
-        if (source[k]?.optional === true) return [];
+    const defaultErrors: readonly ValidationError[] = Arr.generate(
+      function* () {
+        for (const [k, valueType] of Object.entries(source)) {
+          if (!Object.hasOwn(a, k)) {
+            if (source[k]?.optional !== true) {
+              yield {
+                path: [k],
+                actualValue: a,
+                typeName: typeNameFilled,
+                expectedType: typeNameFilled,
+                message: `Missing required key "${k}"`,
+              } satisfies ValidationErrorWithMessage;
+            }
+          } else {
+            // The case where the key exists in the object
+            const v = a[k];
+            const res = valueType.validate(v);
 
-        return [
-          {
-            path: [k],
-            actualValue: a,
-            typeName: typeNameFilled,
-            expectedType: typeNameFilled,
-            message: `Missing required key "${k}"`,
-          } satisfies ValidationErrorWithMessage,
-        ];
-      }
-
-      const v = a[k];
-      const res = valueType.validate(v);
-
-      if (Result.isErr(res)) {
-        return prependPathToValidationErrors(res.value, k);
-      }
-
-      return [];
-    });
+            if (Result.isErr(res)) {
+              yield* prependPathToValidationErrors(res.value, k);
+            }
+          }
+        }
+      },
+    );
 
     // Check for excess properties if allowExcessProperties is false
     if (!allowExcessProperties) {

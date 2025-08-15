@@ -12,7 +12,7 @@
 
 > **arrayOfLength**\<`A`, `N`\>(`size`, `elementType`, `options?`): [`Type`](../type.md#type)\<`ArrayOfLength`\<`N`, `A`\>\>
 
-Defined in: [array/array-of-length.mts:12](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/array-of-length.mts#L12)
+Defined in: [array/array-of-length.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/array-of-length.mts#L13)
 
 #### Type Parameters
 

@@ -1,4 +1,4 @@
-import { expectType, isRecord, Result } from 'ts-data-forge';
+import { Arr, expectType, isRecord, Result } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -26,22 +26,23 @@ export const mergeRecords = <
     `Intersection<${types.map((a) => a.typeName).join(', ')}>`;
 
   const validate: Type<T>['validate'] = (a) => {
-    const errors: readonly ValidationError[] = types.flatMap((type) => {
-      const r = type.validate(a);
-      return Result.isErr(r)
-        ? [
-            {
-              path: [],
-              actualValue: a,
-              expectedType: typeNameFilled,
-              message: `The type of value is expected to match all types of { ${types
-                .map((t) => t.typeName)
-                .join(', ')} }`,
-              typeName: typeNameFilled,
-            } satisfies ValidationErrorWithMessage,
-            ...r.value,
-          ]
-        : [];
+    const errors: readonly ValidationError[] = Arr.generate(function* () {
+      for (const type of types) {
+        const res = type.validate(a);
+        if (Result.isErr(res)) {
+          yield {
+            path: [],
+            actualValue: a,
+            expectedType: typeNameFilled,
+            message: `The type of value is expected to match all types of { ${types
+              .map((t) => t.typeName)
+              .join(', ')} }`,
+            typeName: typeNameFilled,
+          } satisfies ValidationErrorWithMessage;
+
+          yield* res.value;
+        }
+      }
     });
 
     if (errors.length > 0) {
