@@ -68,7 +68,7 @@
     "micromatch": "^4.0.8",
     "prettier": "^3.6.2",
     "ts-data-forge": "^3.0.5",
-    "tsx": "^4.20.3"
+    "tsx": "^4.20.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",
