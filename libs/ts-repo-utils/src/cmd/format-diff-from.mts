@@ -5,7 +5,7 @@ import { formatDiffFrom } from '../functions/index.mjs';
 
 const cmdDef = cmd.command({
   name: 'format-diff-from-cli',
-  version: '6.0.2',
+  version: '6.0.3',
   args: {
     base: cmd.positional({
       type: cmd.string,
