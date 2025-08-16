@@ -1,3 +1,9 @@
+## [6.0.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.0.1...v6.0.2) (2025-08-16)
+
+### Bug Fixes
+
+- bump tsx from 4.20.3 to 4.20.4 ([#96](https://github.com/noshiro-pf/ts-repo-utils/issues/96)) ([d17d6f7](https://github.com/noshiro-pf/ts-repo-utils/commit/d17d6f7a4a58c4faf8ba85ce44a0375fa5b9f788))
+
 ## [6.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.0.0...v6.0.1) (2025-08-13)
 
 ### Bug Fixes

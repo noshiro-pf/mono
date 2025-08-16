@@ -9,7 +9,7 @@ import '../node-global.mjs';
 
 const cmdDef = cmd.command({
   name: 'format-diff-from-cli',
-  version: '6.0.1',
+  version: '6.0.2',
   args: {
     base: cmd.positional({
       type: cmd.string,

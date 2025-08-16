@@ -10,7 +10,7 @@ import '../node-global.mjs';
 
 const cmdDef = cmd.command({
   name: 'check-should-run-type-checks-cli',
-  version: '6.0.1',
+  version: '6.0.2',
   args: {
     pathsIgnore: cmd.multioption({
       long: 'paths-ignore',
