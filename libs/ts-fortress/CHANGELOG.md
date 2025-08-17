@@ -1,3 +1,9 @@
+# [2.4.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.3.0...v2.4.0) (2025-08-17)
+
+### Features
+
+- add JsonType ([#30](https://github.com/noshiro-pf/ts-fortress/issues/30)) ([cc1ea52](https://github.com/noshiro-pf/ts-fortress/commit/cc1ea5265aa83e1513f3513611ec224164689aee))
+
 # [2.3.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.2.2...v2.3.0) (2025-08-15)
 
 ### Features
