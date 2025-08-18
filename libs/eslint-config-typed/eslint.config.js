@@ -735,14 +735,7 @@ export default tseslint.config(
       ],
       '@typescript-eslint/prefer-optional-chain': 'error',
       '@typescript-eslint/prefer-readonly': 'error',
-      '@typescript-eslint/prefer-readonly-parameter-types': [
-        'error',
-        {
-          checkParameterProperties: true,
-          ignoreInferredTypes: true,
-          treatMethodsAsReadonly: true,
-        },
-      ],
+      '@typescript-eslint/prefer-readonly-parameter-types': 'off',
       '@typescript-eslint/prefer-reduce-type-parameter': 'error',
       '@typescript-eslint/prefer-regexp-exec': 'error',
       '@typescript-eslint/prefer-return-this-type': 'error',
@@ -900,7 +893,13 @@ export default tseslint.config(
       'import/no-internal-modules': [
         'error',
         {
-          allow: ['vitest/config', '*/index.mjs', '*/index.js'],
+          allow: [
+            'vitest/config',
+            '*/index.mjs',
+            '*/index.js',
+            '@typescript-eslint/utils/ts-eslint',
+            'eslint/use-at-your-own-risk',
+          ],
         },
       ],
       'import/no-webpack-loader-syntax': 'error',
@@ -1188,8 +1187,8 @@ export default tseslint.config(
       'unicorn/prefer-modern-math-apis': 'error',
 
       /**
-       * `.some(b => b)` is better than `.some(Boolean)` because `Boolean` coerce
-       * non-boolean type to boolean.
+       * `.some(b => b)` is better than `.some(Boolean)` because `Boolean`
+       * coerce non-boolean type to boolean.
        *
        * Related rules:
        *
@@ -1305,6 +1304,7 @@ export default tseslint.config(
       'unicorn/no-process-exit': 'off',
       'import/no-unassigned-import': 'off',
       'import/no-extraneous-dependencies': 'off',
+      'no-await-in-loop': 'off',
     },
   },
   {
@@ -1325,6 +1325,23 @@ export default tseslint.config(
     files: ['**/*.d.mts'],
     rules: {
       '@typescript-eslint/triple-slash-reference': 'off',
+    },
+  },
+  {
+    files: ['src/types/rules/*.mts'],
+    rules: {
+      // TODO
+      // https://github.com/jonaskello/eslint-plugin-functional/blob/master/docs/rules/prefer-readonly-type.md
+      'functional/prefer-readonly-type': [
+        'warn',
+        {
+          ignoreCollections: false,
+          ignoreClass: 'fieldsOnly',
+          // allowMutableReturnType: true,
+          // ignorePattern: [],
+        },
+      ],
+      'functional/readonly-type': ['error', 'keyword'],
     },
   },
 );

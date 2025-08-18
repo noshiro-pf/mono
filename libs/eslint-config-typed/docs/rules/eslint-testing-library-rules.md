@@ -1,0 +1,15 @@
+[**typescript-template**](../README.md)
+
+---
+
+[typescript-template](../README.md) / rules/eslint-testing-library-rules
+
+# rules/eslint-testing-library-rules
+
+## Variables
+
+### eslintTestingLibraryRules
+
+> `const` **eslintTestingLibraryRules**: [`EslintTestingLibraryRules`](../types/rules/eslint-testing-library-rules.md#eslinttestinglibraryrules)
+
+Defined in: [src/rules/eslint-testing-library-rules.mts:3](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-testing-library-rules.mts#L3)

@@ -11,7 +11,7 @@ await assertExt({
     {
       path: path.resolve(projectRootPath, './scripts'),
       extension: '.mts',
-      ignorePatterns: [],
+      ignorePatterns: ['eslint.config.gen.mjs', 'tsconfig.gen.json'],
     },
   ],
 });

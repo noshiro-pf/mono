@@ -1,0 +1,15 @@
+[**typescript-template**](../README.md)
+
+---
+
+[typescript-template](../README.md) / rules/eslint-react-perf-rules
+
+# rules/eslint-react-perf-rules
+
+## Variables
+
+### eslintReactPerfRules
+
+> `const` **eslintReactPerfRules**: [`EslintReactPerfRules`](../types/rules/eslint-react-perf-rules.md#eslintreactperfrules)
+
+Defined in: [src/rules/eslint-react-perf-rules.mts:3](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-react-perf-rules.mts#L3)

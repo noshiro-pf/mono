@@ -1,0 +1,8 @@
+{
+  "extends": [
+    "./configs/tsconfig/tsconfig.vite.json",
+    "./configs/tsconfig/tsconfig.type-check.json"
+  ],
+  "files": ["file.ts"],
+  "compilerOptions": {}
+}

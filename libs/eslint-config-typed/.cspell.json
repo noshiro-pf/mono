@@ -1,7 +1,18 @@
 {
   "version": "0.2",
   "language": "en",
-  "words": ["noshiro", "testw", "tscw"],
+  "allowCompoundWords": true,
+  "caseSensitive": false,
+  "ignoreRandomStrings": true,
+  "words": [
+    "blueprintjs",
+    "noshiro",
+    "pikachu",
+    "testw",
+    "tscw",
+    "TSES",
+    "tsutils"
+  ],
   "flagWords": [],
   "ignorePaths": [
     "eslint.config.js",
