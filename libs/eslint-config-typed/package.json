@@ -54,7 +54,7 @@
     "z:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
-    "@eslint/js": "^9.31.0",
+    "@eslint/js": "^9.33.0",
     "@types/eslint": "9.6.1",
     "@typescript-eslint/eslint-plugin": "8.31.1",
     "@typescript-eslint/parser": "8.31.1",
