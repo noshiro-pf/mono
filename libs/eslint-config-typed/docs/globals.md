@@ -1,7 +1,7 @@
-[**typescript-template**](README.md)
+[**eslint-config-typed**](README.md)
 
 ---
 
-[typescript-template](README.md) / globals
+[eslint-config-typed](README.md) / globals
 
 # globals

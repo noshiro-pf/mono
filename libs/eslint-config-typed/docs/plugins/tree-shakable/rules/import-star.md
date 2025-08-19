@@ -1,8 +1,8 @@
-[**typescript-template**](../../../README.md)
+[**eslint-config-typed**](../../../README.md)
 
 ---
 
-[typescript-template](../../../README.md) / plugins/tree-shakable/rules/import-star
+[eslint-config-typed](../../../README.md) / plugins/tree-shakable/rules/import-star
 
 # plugins/tree-shakable/rules/import-star
 

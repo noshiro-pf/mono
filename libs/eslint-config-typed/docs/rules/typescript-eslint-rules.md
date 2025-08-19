@@ -1,8 +1,8 @@
-[**typescript-template**](../README.md)
+[**eslint-config-typed**](../README.md)
 
 ---
 
-[typescript-template](../README.md) / rules/typescript-eslint-rules
+[eslint-config-typed](../README.md) / rules/typescript-eslint-rules
 
 # rules/typescript-eslint-rules
 

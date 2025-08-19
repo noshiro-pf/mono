@@ -1,8 +1,8 @@
-[**typescript-template**](../../../README.md)
+[**eslint-config-typed**](../../../README.md)
 
 ---
 
-[typescript-template](../../../README.md) / plugins/total-functions/rules/no-unsafe-type-assertion
+[eslint-config-typed](../../../README.md) / plugins/total-functions/rules/no-unsafe-type-assertion
 
 # plugins/total-functions/rules/no-unsafe-type-assertion
 

@@ -1,8 +1,8 @@
-[**typescript-template**](../README.md)
+[**eslint-config-typed**](../README.md)
 
 ---
 
-[typescript-template](../README.md) / configs/react
+[eslint-config-typed](../README.md) / configs/react
 
 # configs/react
 

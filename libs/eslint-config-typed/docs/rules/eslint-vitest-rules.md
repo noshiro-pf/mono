@@ -1,8 +1,8 @@
-[**typescript-template**](../README.md)
+[**eslint-config-typed**](../README.md)
 
 ---
 
-[typescript-template](../README.md) / rules/eslint-vitest-rules
+[eslint-config-typed](../README.md) / rules/eslint-vitest-rules
 
 # rules/eslint-vitest-rules
 

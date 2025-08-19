@@ -1,8 +1,8 @@
-[**typescript-template**](../../README.md)
+[**eslint-config-typed**](../../README.md)
 
 ---
 
-[typescript-template](../../README.md) / plugins/total-functions/plugin
+[eslint-config-typed](../../README.md) / plugins/total-functions/plugin
 
 # plugins/total-functions/plugin
 

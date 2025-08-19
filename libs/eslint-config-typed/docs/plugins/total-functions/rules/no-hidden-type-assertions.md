@@ -1,8 +1,8 @@
-[**typescript-template**](../../../README.md)
+[**eslint-config-typed**](../../../README.md)
 
 ---
 
-[typescript-template](../../../README.md) / plugins/total-functions/rules/no-hidden-type-assertions
+[eslint-config-typed](../../../README.md) / plugins/total-functions/rules/no-hidden-type-assertions
 
 # plugins/total-functions/rules/no-hidden-type-assertions
 

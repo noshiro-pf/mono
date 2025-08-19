@@ -1,8 +1,8 @@
-[**typescript-template**](../README.md)
+[**eslint-config-typed**](../README.md)
 
 ---
 
-[typescript-template](../README.md) / rules/eslint-react-refresh-rules
+[eslint-config-typed](../README.md) / rules/eslint-react-refresh-rules
 
 # rules/eslint-react-refresh-rules
 

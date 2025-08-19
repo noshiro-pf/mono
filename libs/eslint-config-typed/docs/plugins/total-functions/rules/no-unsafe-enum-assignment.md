@@ -1,8 +1,8 @@
-[**typescript-template**](../../../README.md)
+[**eslint-config-typed**](../../../README.md)
 
 ---
 
-[typescript-template](../../../README.md) / plugins/total-functions/rules/no-unsafe-enum-assignment
+[eslint-config-typed](../../../README.md) / plugins/total-functions/rules/no-unsafe-enum-assignment
 
 # plugins/total-functions/rules/no-unsafe-enum-assignment
 

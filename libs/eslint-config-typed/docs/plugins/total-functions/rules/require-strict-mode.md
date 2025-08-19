@@ -1,8 +1,8 @@
-[**typescript-template**](../../../README.md)
+[**eslint-config-typed**](../../../README.md)
 
 ---
 
-[typescript-template](../../../README.md) / plugins/total-functions/rules/require-strict-mode
+[eslint-config-typed](../../../README.md) / plugins/total-functions/rules/require-strict-mode
 
 # plugins/total-functions/rules/require-strict-mode
 

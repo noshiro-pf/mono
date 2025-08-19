@@ -1,8 +1,8 @@
-[**typescript-template**](../../../README.md)
+[**eslint-config-typed**](../../../README.md)
 
 ---
 
-[typescript-template](../../../README.md) / plugins/total-functions/rules/unsafe-assignment-rule
+[eslint-config-typed](../../../README.md) / plugins/total-functions/rules/unsafe-assignment-rule
 
 # plugins/total-functions/rules/unsafe-assignment-rule
 

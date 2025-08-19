@@ -1,8 +1,8 @@
-[**typescript-template**](../README.md)
+[**eslint-config-typed**](../README.md)
 
 ---
 
-[typescript-template](../README.md) / rules/eslint-prefer-arrow-functions-rules
+[eslint-config-typed](../README.md) / rules/eslint-prefer-arrow-functions-rules
 
 # rules/eslint-prefer-arrow-functions-rules
 

@@ -1,8 +1,8 @@
-[**typescript-template**](../../README.md)
+[**eslint-config-typed**](../../README.md)
 
 ---
 
-[typescript-template](../../README.md) / plugins/tree-shakable/plugin
+[eslint-config-typed](../../README.md) / plugins/tree-shakable/plugin
 
 # plugins/tree-shakable/plugin
 

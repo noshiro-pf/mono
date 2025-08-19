@@ -1,8 +1,8 @@
-[**typescript-template**](../README.md)
+[**eslint-config-typed**](../README.md)
 
 ---
 
-[typescript-template](../README.md) / rules/eslint-testing-library-rules
+[eslint-config-typed](../README.md) / rules/eslint-testing-library-rules
 
 # rules/eslint-testing-library-rules
 
