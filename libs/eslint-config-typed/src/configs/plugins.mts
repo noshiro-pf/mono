@@ -82,7 +82,7 @@ export const plugins: Record<
   | 'unicorn'
   | 'tree-shakable'
   | 'eslint-plugin'
-  | 'tier4',
+  | 'custom',
   Omit<ESLintPlugin, 'configs'>
 > = {
   '@typescript-eslint': typescriptEslint,
@@ -119,5 +119,5 @@ export const plugins: Record<
   'tree-shakable': eslintPluginTreeShakable,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'eslint-plugin': eslintPluginEslintPlugin,
-  tier4: eslintPluginCustom,
+  custom: eslintPluginCustom,
 } as const satisfies FlatConfig['plugins'];
