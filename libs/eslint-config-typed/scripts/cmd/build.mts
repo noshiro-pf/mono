@@ -4,9 +4,7 @@ import { projectRootPath } from '../project-root-path.mjs';
 
 const distDir = path.resolve(projectRootPath, './dist');
 
-/**
- * Builds the entire project.
- */
+/** Builds the entire project. */
 const build = async (): Promise<void> => {
   echo('Starting build process...\n');
 
@@ -29,9 +27,15 @@ const build = async (): Promise<void> => {
     echo('✓ Cleaned dist directory\n');
   }
 
+  {
+    echo('3.1 Generating rules types...');
+    await runCmdStep('npm run gen-rules-type', 'Generating rules types failed');
+    echo('✓ Generated rules types\n');
+  }
+
   // Step 3: Generate index files
   {
-    echo('3. Generating index files...');
+    echo('3-2. Generating index files...');
     await runCmdStep('npm run gi', 'Generating index files failed');
     echo('✓ Generating index files completed\n');
   }

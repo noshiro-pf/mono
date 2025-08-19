@@ -2,7 +2,7 @@ import { type DeprecatedInfo } from '@eslint/core';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { type JSONSchema4 } from 'json-schema';
 import { compile, type Options } from 'json-schema-to-typescript';
-import { Arr } from 'ts-data-forge';
+import { Arr, isBoolean, isString } from 'ts-data-forge';
 import {
   totalFunctionsRules,
   treeShakableRules,
@@ -65,7 +65,10 @@ const metaToString = (meta: DeepReadonly<Rule['meta']>): string => {
     ['deprecated', isDeprecated(deprecated)],
     ['fixable', fixable],
     ['hasSuggestions', hasSuggestions],
-    ['recommended', recommended],
+    [
+      'recommended',
+      isString(recommended) || isBoolean(recommended) ? recommended : undefined,
+    ],
     [
       'requiresTypeChecking',
       // eslint-disable-next-line no-restricted-syntax

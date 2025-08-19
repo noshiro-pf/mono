@@ -108,12 +108,11 @@ namespace AwaitThenable {
  * @link https://typescript-eslint.io/rules/ban-ts-comment
  *
  *  ```md
- *  | key            | value           |
- *  | :------------- | :-------------- |
- *  | type           | problem         |
- *  | deprecated     | false           |
- *  | hasSuggestions | true            |
- *  | recommended    | [object Object] |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | hasSuggestions | true    |
  *  ```
  */
 namespace BanTsComment {
@@ -8914,12 +8913,11 @@ namespace RequireAwait {
  * @link https://typescript-eslint.io/rules/restrict-plus-operands
  *
  *  ```md
- *  | key                  | value           |
- *  | :------------------- | :-------------- |
- *  | type                 | problem         |
- *  | deprecated           | false           |
- *  | recommended          | [object Object] |
- *  | requiresTypeChecking | true            |
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | requiresTypeChecking | true    |
  *  ```
  */
 namespace RestrictPlusOperands {
@@ -8990,12 +8988,11 @@ namespace RestrictPlusOperands {
  * @link https://typescript-eslint.io/rules/restrict-template-expressions
  *
  *  ```md
- *  | key                  | value           |
- *  | :------------------- | :-------------- |
- *  | type                 | problem         |
- *  | deprecated           | false           |
- *  | recommended          | [object Object] |
- *  | requiresTypeChecking | true            |
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | requiresTypeChecking | true    |
  *  ```
  */
 namespace RestrictTemplateExpressions {
@@ -9198,14 +9195,13 @@ namespace RestrictTemplateExpressions {
  * @link https://typescript-eslint.io/rules/return-await
  *
  *  ```md
- *  | key                  | value           |
- *  | :------------------- | :-------------- |
- *  | type                 | problem         |
- *  | deprecated           | false           |
- *  | fixable              | code            |
- *  | hasSuggestions       | true            |
- *  | recommended          | [object Object] |
- *  | requiresTypeChecking | true            |
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | fixable              | code    |
+ *  | hasSuggestions       | true    |
+ *  | requiresTypeChecking | true    |
  *  ```
  */
 namespace ReturnAwait {

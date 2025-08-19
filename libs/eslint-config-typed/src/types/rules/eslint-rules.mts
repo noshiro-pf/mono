@@ -34,6 +34,9 @@ namespace AccessorPairs {
    *       },
    *       "enforceForClassMembers": {
    *         "type": "boolean"
+   *       },
+   *       "enforceForTSTypes": {
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -45,6 +48,7 @@ namespace AccessorPairs {
     readonly getWithoutSet?: boolean;
     readonly setWithoutGet?: boolean;
     readonly enforceForClassMembers?: boolean;
+    readonly enforceForTSTypes?: boolean;
   };
 
   export type RuleEntry =
@@ -2022,15 +2026,29 @@ namespace GroupedAccessorPairs {
    *       "getBeforeSet",
    *       "setBeforeGet"
    *     ]
+   *   },
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "enforceForTSTypes": {
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
    *   }
    * ]
    * ```
    */
-  export type Options = 'anyOrder' | 'getBeforeSet' | 'setBeforeGet';
+  export type Options0 = 'anyOrder' | 'getBeforeSet' | 'setBeforeGet';
+
+  export type Options1 = {
+    readonly enforceForTSTypes?: boolean;
+  };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.RuleSeverity
+    | readonly [Linter.RuleSeverity, Options0, Options1]
+    | readonly [Linter.RuleSeverity, Options0];
 }
 
 /**
@@ -8257,40 +8275,107 @@ namespace NoRestrictedGlobals {
    *
    * ```json
    * {
-   *   "type": "array",
-   *   "items": {
-   *     "oneOf": [
-   *       {
-   *         "type": "string"
-   *       },
-   *       {
-   *         "type": "object",
-   *         "properties": {
-   *           "name": {
+   *   "anyOf": [
+   *     {
+   *       "type": "array",
+   *       "items": {
+   *         "oneOf": [
+   *           {
    *             "type": "string"
    *           },
-   *           "message": {
-   *             "type": "string"
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "name": {
+   *                 "type": "string"
+   *               },
+   *               "message": {
+   *                 "type": "string"
+   *               }
+   *             },
+   *             "required": ["name"],
+   *             "additionalProperties": false
    *           }
-   *         },
-   *         "required": ["name"],
-   *         "additionalProperties": false
-   *       }
-   *     ]
-   *   },
-   *   "uniqueItems": true,
-   *   "minItems": 0
+   *         ]
+   *       },
+   *       "uniqueItems": true,
+   *       "minItems": 0
+   *     },
+   *     {
+   *       "type": "array",
+   *       "items": [
+   *         {
+   *           "type": "object",
+   *           "properties": {
+   *             "globals": {
+   *               "type": "array",
+   *               "items": {
+   *                 "oneOf": [
+   *                   {
+   *                     "type": "string"
+   *                   },
+   *                   {
+   *                     "type": "object",
+   *                     "properties": {
+   *                       "name": {
+   *                         "type": "string"
+   *                       },
+   *                       "message": {
+   *                         "type": "string"
+   *                       }
+   *                     },
+   *                     "required": ["name"],
+   *                     "additionalProperties": false
+   *                   }
+   *                 ]
+   *               },
+   *               "uniqueItems": true,
+   *               "minItems": 0
+   *             },
+   *             "checkGlobalObject": {
+   *               "type": "boolean"
+   *             },
+   *             "globalObjects": {
+   *               "type": "array",
+   *               "items": {
+   *                 "type": "string"
+   *               },
+   *               "uniqueItems": true
+   *             }
+   *           },
+   *           "required": ["globals"],
+   *           "additionalProperties": false
+   *         }
+   *       ],
+   *       "additionalItems": false
+   *     }
+   *   ]
    * }
    * ```
    */
-  /** @minItems 0 */
-  export type Options = readonly (
-    | string
-    | {
-        readonly name: string;
-        readonly message?: string;
-      }
-  )[];
+  export type Options =
+    | readonly (
+        | string
+        | {
+            readonly name: string;
+            readonly message?: string;
+          }
+      )[]
+    | readonly [
+        {
+          /** @minItems 0 */
+          readonly globals: readonly (
+            | string
+            | {
+                readonly name: string;
+                readonly message?: string;
+              }
+          )[];
+          readonly checkGlobalObject?: boolean;
+          readonly globalObjects?: readonly string[];
+        },
+      ]
+    | readonly [];
 
   export type RuleEntry =
     | Linter.StringSeverity
@@ -9866,6 +9951,9 @@ namespace NoUnusedVars {
    *           "ignoreClassWithStaticInitBlock": {
    *             "type": "boolean"
    *           },
+   *           "ignoreUsingDeclarations": {
+   *             "type": "boolean"
+   *           },
    *           "reportUsedIgnorePattern": {
    *             "type": "boolean"
    *           }
@@ -9890,6 +9978,7 @@ namespace NoUnusedVars {
         readonly caughtErrorsIgnorePattern?: string;
         readonly destructuredArrayIgnorePattern?: string;
         readonly ignoreClassWithStaticInitBlock?: boolean;
+        readonly ignoreUsingDeclarations?: boolean;
         readonly reportUsedIgnorePattern?: boolean;
       };
 
@@ -10895,6 +10984,20 @@ namespace OneVar {
    *               "never",
    *               "consecutive"
    *             ]
+   *           },
+   *           "using": {
+   *             "enum": [
+   *               "always",
+   *               "never",
+   *               "consecutive"
+   *             ]
+   *           },
+   *           "awaitUsing": {
+   *             "enum": [
+   *               "always",
+   *               "never",
+   *               "consecutive"
+   *             ]
    *           }
    *         },
    *         "additionalProperties": false
@@ -10937,6 +11040,8 @@ namespace OneVar {
         readonly var?: 'always' | 'consecutive' | 'never';
         readonly let?: 'always' | 'consecutive' | 'never';
         readonly const?: 'always' | 'consecutive' | 'never';
+        readonly using?: 'always' | 'consecutive' | 'never';
+        readonly awaitUsing?: 'always' | 'consecutive' | 'never';
       };
 
   export type RuleEntry =
@@ -13516,7 +13621,10 @@ export type EslintRulesOption = {
   readonly 'func-names': FuncNames.Options;
   readonly 'func-style': readonly [FuncStyle.Options0, FuncStyle.Options1];
   readonly 'getter-return': GetterReturn.Options;
-  readonly 'grouped-accessor-pairs': GroupedAccessorPairs.Options;
+  readonly 'grouped-accessor-pairs': readonly [
+    GroupedAccessorPairs.Options0,
+    GroupedAccessorPairs.Options1,
+  ];
   readonly 'id-denylist': IdDenylist.Options;
   readonly 'id-length': IdLength.Options;
   readonly 'id-match': readonly [IdMatch.Options0, IdMatch.Options1];
