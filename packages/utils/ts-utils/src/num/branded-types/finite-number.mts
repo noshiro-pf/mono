@@ -89,3 +89,9 @@ if (import.meta.vitest !== undefined) {
   >('=');
   expectType<typeof FiniteNumber, U.NumberClass<ElementType, never>>('<=');
 }
+
+const positiveBrand = Symbol();
+
+export type Positive = number & { [positiveBrand]: true };
+export type Negative = number & { [positiveBrand]: false };
+type T = Positive & Negative;
