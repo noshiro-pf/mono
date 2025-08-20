@@ -581,7 +581,6 @@ This project is licensed under the [Apache License 2.0](_media/LICENSE).
 - [types/rules](types/rules.md)
 - [types/rules/eslint-array-func-rules](types/rules/eslint-array-func-rules.md)
 - [types/rules/eslint-cypress-rules](types/rules/eslint-cypress-rules.md)
-- [types/rules/eslint-deprecation-rules](types/rules/eslint-deprecation-rules.md)
 - [types/rules/eslint-functional-rules](types/rules/eslint-functional-rules.md)
 - [types/rules/eslint-import-rules](types/rules/eslint-import-rules.md)
 - [types/rules/eslint-jest-rules](types/rules/eslint-jest-rules.md)

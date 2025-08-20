@@ -26,12 +26,6 @@ Re-exports [EslintCypressRulesOption](types/rules/eslint-cypress-rules.md#eslint
 
 ---
 
-### EslintDeprecationRules
-
-Re-exports [EslintDeprecationRules](types/rules/eslint-deprecation-rules.md#eslintdeprecationrules)
-
----
-
 ### EslintFunctionalRules
 
 Re-exports [EslintFunctionalRules](types/rules/eslint-functional-rules.md#eslintfunctionalrules)

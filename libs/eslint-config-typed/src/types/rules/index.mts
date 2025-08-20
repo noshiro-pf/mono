@@ -1,6 +1,5 @@
 export * from './eslint-array-func-rules.mjs';
 export * from './eslint-cypress-rules.mjs';
-export * from './eslint-deprecation-rules.mjs';
 export * from './eslint-functional-rules.mjs';
 export * from './eslint-import-rules.mjs';
 export * from './eslint-jest-rules.mjs';
