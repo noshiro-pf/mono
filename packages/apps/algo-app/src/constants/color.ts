@@ -1,5 +1,7 @@
 export type CustomColor = '#383838' | 'red' | 'rgb(48, 255, 135)';
 
+export const playerHolderCardColor = '#808080';
+
 export const outlineColorDef = {
   green: 'rgb(48, 255, 135)',
   red: 'red',

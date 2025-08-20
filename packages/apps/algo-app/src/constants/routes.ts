@@ -1,37 +1,50 @@
-import { Router } from '../router';
-
-export const routes = {
-  main: '/',
-  createRoom: '/create',
-  rooms: '/rooms',
+const pathToken = {
+  main: 'main',
+  createRoom: 'create',
+  rooms: 'rooms',
 } as const;
 
-export const params = {
+const queryParamKeys = {
   playerId: 'player-id',
   replay: 'replay',
-  observe: 'observe',
+  spectator: 'spectator',
+  test: 'test',
 } as const;
 
-// eslint-disable-next-line security/detect-non-literal-regexp
-const getRoomIdRegexp = new RegExp(
-  `^${routes.rooms}/(?<roomId>[^/]+)/.*$`,
-  'u',
-);
+const routes = {
+  main: `/${pathToken.main}/`,
+  createRoom: `/${pathToken.createRoom}/`,
+  rooms: `/${pathToken.rooms}/`,
+  room: (roomId: string) => `/${pathToken.rooms}/${roomId}/`,
+  roomWithPlayerId: (roomId: string, playerId: string) =>
+    `/${pathToken.rooms}/${roomId}/?${queryParamKeys.playerId}=${playerId}`,
+} as const;
 
-export const getRoomId = (path: string): string | undefined =>
-  getRoomIdRegexp.exec(path)?.groups?.['roomId'];
+const isRoute = {
+  mainPage: (pathnameTokens: readonly string[]): boolean =>
+    Arr.isArrayOfLength1(pathnameTokens) &&
+    pathnameTokens[0] === pathToken.main,
 
-export const isMainPage = (path: string): boolean =>
-  path === routes.main || path === Router.utils.withSlash(routes.createRoom);
+  createRoomPage: (pathnameTokens: readonly string[]): boolean =>
+    Arr.isArrayOfLength1(pathnameTokens) &&
+    pathnameTokens[0] === pathToken.createRoom,
 
-export const getParams = (
-  queryParams: ReadonlyURLSearchParams,
-): DeepReadonly<{
-  playerId: string | undefined;
-  replay: boolean;
-  observe: boolean;
-}> => ({
-  playerId: queryParams.get(params.playerId) ?? undefined,
-  replay: queryParams.get(params.replay) === 'true',
-  observe: queryParams.get(params.observe) === 'true',
-});
+  /** PathnameTokens[1] is `room-id` */
+  roomsPage: (pathnameTokens: readonly string[]): boolean =>
+    Arr.isArrayOfLength2(pathnameTokens) &&
+    pathnameTokens[0] === pathToken.rooms,
+} as const;
+
+const redirectRules = IMap.new<string, string>([['/', routes.main]]);
+
+const getRoomIdFromPathname = (
+  pathnameTokens: readonly string[],
+): string | undefined => pathnameTokens[1];
+
+export const Routes = {
+  queryParamKeys,
+  routes,
+  isRoute,
+  redirectRules,
+  getRoomIdFromPathname,
+};
