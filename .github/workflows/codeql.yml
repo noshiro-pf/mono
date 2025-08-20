@@ -18,6 +18,7 @@ on:
       - 'develop*'
       - 'archive/**'
       - 'deploy/**'
+      - 'create-codemod-lib'
     paths-ignore:
       - '.gitignore'
       - '.cspell.json'
