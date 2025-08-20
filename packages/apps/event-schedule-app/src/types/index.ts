@@ -4,6 +4,7 @@ export * from './answer-table-cell-position';
 export * from './answers-rank';
 export * from './answers-score';
 export * from './assert-is-credential-error';
+export * from './batch-update-table';
 export * from './detailed-filter-icon';
 export * from './event-schedule-settings-common-state';
 export * from './event-schedule-validation';
