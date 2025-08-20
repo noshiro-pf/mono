@@ -1,0 +1,50 @@
+{
+  "name": "building-puzzle",
+  "version": "1.0.0",
+  "private": false,
+  "license": "ISC",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "build": "wireit",
+    "clean:dist": "rimraf dist",
+    "clean:wireit": "rimraf ./.wireit",
+    "fmt": "yarn zz:prettier .",
+    "gen-index-ts": "../../../scripts/index_ts_generator.sh ./src --min-depth 1 --ext .ts",
+    "lint": "yarn zz:eslint:src",
+    "lint:fix": "yarn zz:eslint:src --fix",
+    "start": "wireit",
+    "test": "yarn zz:vitest run",
+    "testw": "yarn zz:vitest watch",
+    "tsc": "tsc --noEmit",
+    "tscw": "tsc --noEmit --watch",
+    "type-check": "tsc --noEmit",
+    "zz:eslint:src": "yarn eslint --config eslint.config.js './src/**/*' --cache --cache-location ./src/.eslintcache",
+    "zz:prettier": "prettier --ignore-path ../../../.prettierignore --ignore-unknown --no-error-on-unmatched-pattern --write",
+    "zz:vitest": "vitest --config ./configs/vite.config.ts"
+  },
+  "dependencies": {
+    "@tier4/ts-type-utils": "^0.1.6",
+    "@tier4/ts-utils": "*"
+  },
+  "devDependencies": {
+    "@tier4/eslint": "*",
+    "@tier4/node-utils": "*"
+  },
+  "wireit": {
+    "build": {
+      "dependencies": [
+        "clean:dist",
+        "gen-index-ts"
+      ],
+      "command": "rollup --config ./configs/rollup.config.ts --configPlugin typescript"
+    },
+    "start": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "node ./dist/index.js"
+    }
+  }
+}
