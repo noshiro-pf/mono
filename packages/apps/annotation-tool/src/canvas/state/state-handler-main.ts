@@ -1,4 +1,5 @@
 import { type Point, type Rgba } from '@noshiro/ts-utils-additional';
+import { type Application } from 'pixi.js';
 import {
   turnOffHighlight,
   turnOnHighlight,
@@ -7,8 +8,8 @@ import {
 import {
   type AnnotationCanvasStyle,
   type IdType,
-  type PixiApp,
   type PixiBbox,
+  type PixiGlobalObjects,
 } from '../types';
 import { type CanvasAppState } from './canvas-state-type';
 import {
@@ -35,7 +36,8 @@ export type CanvasAppStateHandler = (
 ) => void;
 
 export const canvasAppStateHandlerGenerator = (
-  pixiApp: PixiApp,
+  pixiApp: Application,
+  pixiGlobalObjects: PixiGlobalObjects,
   idMaker: () => IdType,
   canvasStyles: AnnotationCanvasStyle,
   newBboxColor: Readonly<{ border: Rgba; face: Rgba }>,
@@ -43,7 +45,7 @@ export const canvasAppStateHandlerGenerator = (
   function canvasAppStateHandler(mut_state, action) {
     switch (action.type) {
       case 'pointerMove':
-        onPointerMove(mut_state, action.pointerPos, pixiApp);
+        onPointerMove(mut_state, action.pointerPos, pixiGlobalObjects);
         break;
 
       case 'pointerUp':
@@ -53,6 +55,7 @@ export const canvasAppStateHandlerGenerator = (
           newBboxColor,
           canvasStyles,
           pixiApp,
+          pixiGlobalObjects,
           canvasAppStateHandler,
         );
         break;
@@ -60,7 +63,7 @@ export const canvasAppStateHandlerGenerator = (
       case 'backgroundPointerDown':
         mut_state.grabbingObject = { type: 'background' };
         onPointerDown(mut_state);
-        onPointerDownOnBackground(mut_state, canvasStyles, pixiApp);
+        onPointerDownOnBackground(mut_state, canvasStyles, pixiGlobalObjects);
         break;
 
       case 'bboxFacePointerOver':
