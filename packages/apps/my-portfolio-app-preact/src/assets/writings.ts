@@ -88,7 +88,9 @@ export const writings: readonly WritingsInfo[] = [
   {
     id: 'typescript-codemod-development',
     link: 'https://zenn.dev/articles/typescript-codemod-development',
-    title: `${zennArticleTitle.get('typescript-codemod-development') ?? 'TypeScript の codemod ツール開発時の失敗談と得た知見メモ'}`,
+    title:
+      zennArticleTitle.get('typescript-codemod-development') ??
+      'TypeScript の codemod ツール開発時の失敗談と得た知見メモ',
     subtitle: '',
     body: 'ts-morph などの codemod ツールを色々比較し、実際に開発してみた経験から得た知見をまとめました。',
   },
