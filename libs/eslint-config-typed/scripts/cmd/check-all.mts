@@ -27,7 +27,7 @@ const checkAll = async (): Promise<void> => {
 
   // Step 5: Lint and check repo status
   echo('5. Running lint fixes...');
-  await runCmdStep('npm run lint', 'Linting failed');
+  await runCmdStep('npm run lint:fix', 'Linting failed');
   echo('✓ Lint fixes applied\n');
 
   // Step 6: Build and check repo status

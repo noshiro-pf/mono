@@ -10,7 +10,6 @@ import eslintPluginSecurity from 'eslint-plugin-security';
 
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 
-// @ts-expect-error no type definition
 import eslintPluginImport from 'eslint-plugin-import';
 
 // @ts-expect-error no type definition
@@ -92,7 +91,6 @@ export const plugins: Record<
   cypress: eslintPluginCypress,
   playwright: eslintPluginPlaywright,
   functional: eslintPluginFunctional,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   import: eslintPluginImport,
   jest: eslintPluginJest,
   vitest: eslintPluginVitest,

@@ -118,6 +118,7 @@ export const eslintImportsRules: EslintImportsRules = {
   'import/group-exports': 'off',
   'import/dynamic-import-chunkname': 'error',
   'import/no-empty-named-blocks': 'error',
+  'import/enforce-node-protocol-usage': 'error',
 
   // deprecated rules
   'import/imports-first': 0,
