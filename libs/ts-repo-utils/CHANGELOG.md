@@ -1,3 +1,9 @@
+## [6.0.4](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.0.3...v6.0.4) (2025-08-27)
+
+### Bug Fixes
+
+- move prettier from dependencies to peerDependencies ([#111](https://github.com/noshiro-pf/ts-repo-utils/issues/111)) ([649c287](https://github.com/noshiro-pf/ts-repo-utils/commit/649c2873ed61aae0f4234485af7e9afc5b33cd84))
+
 ## [6.0.3](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.0.2...v6.0.3) (2025-08-16)
 
 ### Bug Fixes

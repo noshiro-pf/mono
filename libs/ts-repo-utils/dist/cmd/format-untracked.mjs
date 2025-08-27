@@ -9,7 +9,7 @@ import '../node-global.mjs';
 
 const cmdDef = cmd.command({
   name: 'format-untracked-cli',
-  version: '6.0.3',
+  version: '6.0.4',
   args: {
     silent: cmd.flag({
       long: 'silent',
