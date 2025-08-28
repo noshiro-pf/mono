@@ -570,6 +570,42 @@ export namespace Arr {
   ): readonly T[] => Array.from(generatorFn());
 
   /**
+   * Asynchronously creates an array from an async generator function.
+   *
+   * This utility function provides enhanced type safety by constraining the async generator function
+   * to prevent incorrect return values. The generator can only yield values of type T and
+   * must return `void`, which helps catch common mistakes like returning values instead of yielding.
+   *
+   * @template T The type of elements in the generated array.
+   * @param generatorFn A function that returns an async generator yielding elements of type `T`.
+   * @returns A promise that resolves to a readonly array containing all yielded values from the async generator.
+   *
+   * @example
+   * ```typescript
+   * const nums: readonly number[] = await Arr.generateAsync<number>(async function* () {
+   *   yield 1;
+   *   await new Promise(resolve => setTimeout(resolve, 10));
+   *   yield* [2, 3];
+   * });
+   *
+   * assert.deepStrictEqual(nums, [1, 2, 3]);
+   *
+   * // Type safety - prevents incorrect returns:
+   * const nums2 = await Arr.generateAsync<number>(async function* () {
+   *   yield 1;
+   *   if (someCondition) {
+   *     return; // OK - returning is allowed, but must be void
+   *   }
+   *   yield* [2, 3];
+   *   // return 1; // NG - TypeScript error, cannot return T
+   * });
+   * ```
+   */
+  export const generateAsync = <T,>(
+    generatorFn: () => AsyncGenerator<T, void, unknown>,
+  ): Promise<readonly T[]> => Array.fromAsync(generatorFn());
+
+  /**
    * Creates a shallow copy of an array, preserving the exact type signature.
    *
    * This function creates a new array with the same elements as the input, but with a new array reference.
