@@ -9,7 +9,7 @@ import {
 
 export const uintRange = <
   Start extends Uint8,
-  End extends Exclude<Uint8, Start>,
+  End extends Exclude<Uint8 | 256, Start>,
 >({
   start,
   end,
