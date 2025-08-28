@@ -60,7 +60,6 @@ export default {
           'package.json',
           'package-lock.json',
           'src/cmd/*.mts', // CLI commands with updated versions
-          'dist/**/*', // Built files
           'docs/**/*.md', // Generated documentation
         ],
         message:
