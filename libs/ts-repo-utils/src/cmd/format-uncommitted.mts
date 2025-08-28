@@ -6,7 +6,7 @@ import { formatUncommittedFiles } from '../functions/index.mjs';
 
 const cmdDef = cmd.command({
   name: 'format-uncommitted-cli',
-  version: '6.0.5',
+  version: '6.2.0',
   args: {
     excludeUntracked: cmd.flag({
       long: 'exclude-untracked',

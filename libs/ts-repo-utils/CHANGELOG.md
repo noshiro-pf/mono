@@ -1,3 +1,9 @@
+# [6.2.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.1.0...v6.2.0) (2025-08-28)
+
+### Features
+
+- add getStagedFiles and formatStaged ([#113](https://github.com/noshiro-pf/ts-repo-utils/issues/113)) ([5d31a5d](https://github.com/noshiro-pf/ts-repo-utils/commit/5d31a5dfb2faf771c19121c2fdffabf384ba9e7b))
+
 # [6.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.0.5...v6.1.0) (2025-08-28)
 
 ### Features
