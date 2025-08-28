@@ -1,3 +1,9 @@
+## [6.0.5](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.0.4...v6.0.5) (2025-08-28)
+
+### Bug Fixes
+
+- make executeParallel fail gracefully if cmd exits with code 1 ([#117](https://github.com/noshiro-pf/ts-repo-utils/issues/117)) ([9c80333](https://github.com/noshiro-pf/ts-repo-utils/commit/9c80333d40bd591dc9a9be59ac81623ee00809fd))
+
 ## [6.0.4](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.0.3...v6.0.4) (2025-08-27)
 
 ### Bug Fixes

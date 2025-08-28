@@ -1,0 +1,1 @@
+{"version":3,"file":"node-global.mjs","sources":["../src/node-global.mts"],"sourcesContent":[null],"names":["$_"],"mappings":";;;;;AAOA,MAAM,UAAU,GAAG;AACjB,IAAA,CAAC,EAAEA,CAAE;IACL,IAAI,EAAE,OAAO,CAAC,GAAG;AAEjB,IAAA,IAAI,EAAE,KAAK;AACX,IAAA,EAAE,EAAE,GAAG;AACP,IAAA,IAAI,EAAE,KAAK;CACH;AAEV;AACA,MAAM,CAAC,MAAM,CAAC,UAAU,EAAE,UAAU,CAAC"}
