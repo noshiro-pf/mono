@@ -14,10 +14,7 @@ const checkAll = async (): Promise<void> => {
 
   // Step 2: Spell check
   echo('2. Running spell check...');
-  await runCmdStep(
-    'cspell "**" --gitignore --gitignore-root ./ --no-progress --fail-fast',
-    'Spell check failed',
-  );
+  await runCmdStep('npm run cspell -- --fail-fast', 'Spell check failed');
   echo('✓ Spell check passed\n');
 
   // Step 3: Check file extensions
