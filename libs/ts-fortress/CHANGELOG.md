@@ -1,3 +1,9 @@
+# [2.6.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.5.0...v2.6.0) (2025-08-28)
+
+### Features
+
+- re-export ts-data-forge utilities ([#40](https://github.com/noshiro-pf/ts-fortress/issues/40)) ([e915648](https://github.com/noshiro-pf/ts-fortress/commit/e9156482ac58523cc27bbd3bf7fb71e01abec651))
+
 # [2.5.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.4.0...v2.5.0) (2025-08-28)
 
 ### Features
