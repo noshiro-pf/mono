@@ -1,3 +1,9 @@
+# [2.5.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.4.0...v2.5.0) (2025-08-28)
+
+### Features
+
+- add intRange, int8, uint8 type ([#39](https://github.com/noshiro-pf/ts-fortress/issues/39)) ([086ff03](https://github.com/noshiro-pf/ts-fortress/commit/086ff035ea4d1f7404ed7d00dd1480b34f21b4cf))
+
 # [2.4.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.3.0...v2.4.0) (2025-08-17)
 
 ### Features
