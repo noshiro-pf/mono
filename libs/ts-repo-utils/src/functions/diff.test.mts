@@ -2,7 +2,11 @@ import { Result } from 'ts-data-forge';
 import '../node-global.mjs';
 import { getDiffFrom, getUntrackedFiles } from './diff.mjs';
 
-describe('diff', () => {
+// Check if running in CI environment (GitHub Actions or other CI)
+const isCI =
+  process.env['CI'] === 'true' || process.env['GITHUB_ACTIONS'] === 'true';
+
+describe.skipIf(!isCI)('diff', () => {
   // Helper function to clean up test files
   const cleanupTestFiles = async (files: Set<string>): Promise<void> => {
     for (const file of files) {
