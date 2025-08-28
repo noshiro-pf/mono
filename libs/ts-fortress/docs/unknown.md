@@ -12,7 +12,7 @@
 
 > **unknown**(`defaultValue?`): [`Type`](type.md#type)\<`unknown`\>
 
-Defined in: [unknown.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/unknown.mts#L5)
+Defined in: [src/unknown.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/unknown.mts#L5)
 
 #### Parameters
 

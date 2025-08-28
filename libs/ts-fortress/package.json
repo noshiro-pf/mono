@@ -17,11 +17,11 @@
     ".": {
       "import": {
         "types": "./dist/types.d.mts",
-        "default": "./dist/index.mjs"
+        "default": "./dist/entry-point.mjs"
       }
     }
   },
-  "module": "./dist/index.mjs",
+  "module": "./dist/entry-point.mjs",
   "types": "./dist/types.d.mts",
   "files": [
     "src",
@@ -37,7 +37,7 @@
     "doc": "tsx ./scripts/cmd/gen-docs.mjs",
     "fmt": "format-diff-from origin/main",
     "fmt:full": "prettier --write .",
-    "gi": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'",
+    "gi": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --fmt 'npm run fmt'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",

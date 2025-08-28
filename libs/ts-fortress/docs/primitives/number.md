@@ -12,7 +12,7 @@
 
 > **number**(`defaultValue`): [`Type`](../type.md#type)\<`number`\>
 
-Defined in: [primitives/number.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/number.mts#L5)
+Defined in: [src/primitives/number.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/number.mts#L5)
 
 #### Parameters
 
@@ -30,7 +30,7 @@ Defined in: [primitives/number.mts:5](https://github.com/noshiro-pf/ts-fortress/
 
 > **numberLiteral**\<`L`\>(`literal`): [`Type`](../type.md#type)\<`L`\>
 
-Defined in: [primitives/number.mts:8](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/number.mts#L8)
+Defined in: [src/primitives/number.mts:8](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/number.mts#L8)
 
 #### Type Parameters
 

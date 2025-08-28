@@ -12,13 +12,13 @@
 
 > **keyof**\<`R`\>(`recordType`, `options?`): `KeyofType`\<`R`\>
 
-Defined in: [record/keyof.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/keyof.mts#L6)
+Defined in: [src/record/keyof.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/keyof.mts#L6)
 
 #### Type Parameters
 
 ##### R
 
-`R` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`UnknownRecord`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
+`R` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`UnknownRecord`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
 
 #### Parameters
 

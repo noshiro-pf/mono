@@ -12,7 +12,7 @@
 
 > **createIsFn**\<`T`\>(`validate`): (`a`) => `a is T`
 
-Defined in: [utils/create-is-fn.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-is-fn.mts#L5)
+Defined in: [src/utils/create-is-fn.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-is-fn.mts#L5)
 
 #### Type Parameters
 
@@ -24,7 +24,7 @@ Defined in: [utils/create-is-fn.mts:5](https://github.com/noshiro-pf/ts-fortress
 
 ##### validate
 
-(`a`) => `Result`\<`T`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>
+(`a`) => [`Result`](../entry-point/README.md#result)\<`T`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>
 
 #### Returns
 

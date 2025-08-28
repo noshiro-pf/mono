@@ -12,7 +12,7 @@
 
 > **uint**(`defaultValue`): [`Type`](../../type.md#type)\<`Uint`\>
 
-Defined in: [branded/number/uint.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/uint.mts#L6)
+Defined in: [src/branded/number/uint.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/uint.mts#L6)
 
 #### Parameters
 

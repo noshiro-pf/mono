@@ -12,7 +12,7 @@
 
 > **uint8**(`defaultValue`): [`Type`](../type.md#type)\<`Uint8`\>
 
-Defined in: [predefined/uint8.mts:4](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/uint8.mts#L4)
+Defined in: [src/predefined/uint8.mts:4](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/uint8.mts#L4)
 
 #### Parameters
 

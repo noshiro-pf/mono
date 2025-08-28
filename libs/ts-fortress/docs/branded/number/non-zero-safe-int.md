@@ -12,7 +12,7 @@
 
 > **nonZeroSafeInt**(`defaultValue`): [`Type`](../../type.md#type)\<`NonZeroSafeInt`\>
 
-Defined in: [branded/number/non-zero-safe-int.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/non-zero-safe-int.mts#L6)
+Defined in: [src/branded/number/non-zero-safe-int.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/non-zero-safe-int.mts#L6)
 
 #### Parameters
 

@@ -12,7 +12,7 @@
 
 > **uint32**(`defaultValue`): [`Type`](../../type.md#type)\<`Uint32`\>
 
-Defined in: [branded/number/uint32.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/uint32.mts#L6)
+Defined in: [src/branded/number/uint32.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/uint32.mts#L6)
 
 #### Parameters
 

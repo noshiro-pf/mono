@@ -12,7 +12,7 @@
 
 > **simpleBrandedString**\<`S`\>(`typeName`, `defaultValue`): [`Type`](../type.md#type)\<`Brand`\<`string`, `S`\>\>
 
-Defined in: [branded/simple-branded-string.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/simple-branded-string.mts#L5)
+Defined in: [src/branded/simple-branded-string.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/simple-branded-string.mts#L5)
 
 #### Type Parameters
 

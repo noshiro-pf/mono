@@ -12,7 +12,7 @@
 
 > **intRange**\<`Start`, `End`\>(`__namedParameters`): [`Type`](../type.md#type)\<`IntRange`\<`Start`, `End`\>\>
 
-Defined in: [enum/int-range.mts:10](https://github.com/noshiro-pf/ts-fortress/blob/main/src/enum/int-range.mts#L10)
+Defined in: [src/enum/int-range.mts:10](https://github.com/noshiro-pf/ts-fortress/blob/main/src/enum/int-range.mts#L10)
 
 #### Type Parameters
 

@@ -12,7 +12,7 @@
 
 > **bigint**(`defaultValue`): [`Type`](../type.md#type)\<`bigint`\>
 
-Defined in: [primitives/bigint.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/bigint.mts#L5)
+Defined in: [src/primitives/bigint.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/bigint.mts#L5)
 
 #### Parameters
 
@@ -30,7 +30,7 @@ Defined in: [primitives/bigint.mts:5](https://github.com/noshiro-pf/ts-fortress/
 
 > **bigintLiteral**\<`L`\>(`literal`): [`Type`](../type.md#type)\<`L`\>
 
-Defined in: [primitives/bigint.mts:8](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/bigint.mts#L8)
+Defined in: [src/primitives/bigint.mts:8](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/bigint.mts#L8)
 
 #### Type Parameters
 

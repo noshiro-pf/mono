@@ -12,7 +12,7 @@
 
 > **simpleBrandedNumber**\<`S`\>(`typeName`, `defaultValue`): [`Type`](../type.md#type)\<`Brand`\<`number`, `S`\>\>
 
-Defined in: [branded/simple-branded-number.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/simple-branded-number.mts#L5)
+Defined in: [src/branded/simple-branded-number.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/simple-branded-number.mts#L5)
 
 #### Type Parameters
 

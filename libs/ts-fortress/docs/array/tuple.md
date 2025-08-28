@@ -12,13 +12,13 @@
 
 > **tuple**\<`A`\>(`types`, `options?`): [`Type`](../type.md#type)\<`MapTuple`\<`A`\>\>
 
-Defined in: [array/tuple.mts:17](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/tuple.mts#L17)
+Defined in: [src/array/tuple.mts:17](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/tuple.mts#L17)
 
 #### Type Parameters
 
 ##### A
 
-`A` _extends_ readonly `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>[]
+`A` _extends_ readonly `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>[]
 
 #### Parameters
 

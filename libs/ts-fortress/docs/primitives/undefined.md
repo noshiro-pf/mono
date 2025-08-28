@@ -12,4 +12,4 @@
 
 > `const` **undefinedType**: [`Type`](../type.md#type)\<`undefined`\>
 
-Defined in: [primitives/undefined.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/undefined.mts#L5)
+Defined in: [src/primitives/undefined.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/undefined.mts#L5)

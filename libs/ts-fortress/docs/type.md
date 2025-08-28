@@ -12,7 +12,7 @@
 
 > **OptionalType**\<`A`\> = `MergeIntersection`\<[`Type`](#type)\<`A`\> & `Readonly`\<\{ `optional`: `true`; \}\>\>
 
-Defined in: [type.mts:29](https://github.com/noshiro-pf/ts-fortress/blob/main/src/type.mts#L29)
+Defined in: [src/type.mts:29](https://github.com/noshiro-pf/ts-fortress/blob/main/src/type.mts#L29)
 
 #### Type Parameters
 
@@ -24,9 +24,9 @@ Defined in: [type.mts:29](https://github.com/noshiro-pf/ts-fortress/blob/main/sr
 
 ### Type\<A\>
 
-> **Type**\<`A`\> = `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is A`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is A`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`A`, readonly [`ValidationError`](utils/validation-error.md#validationerror)[]\>; \}\>
+> **Type**\<`A`\> = `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is A`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is A`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => [`Result`](entry-point/README.md#result)\<`A`, readonly [`ValidationError`](utils/validation-error.md#validationerror)[]\>; \}\>
 
-Defined in: [type.mts:14](https://github.com/noshiro-pf/ts-fortress/blob/main/src/type.mts#L14)
+Defined in: [src/type.mts:14](https://github.com/noshiro-pf/ts-fortress/blob/main/src/type.mts#L14)
 
 - `typeName` : Name for this type
 - `is` : Type guard function
@@ -49,7 +49,7 @@ Defined in: [type.mts:14](https://github.com/noshiro-pf/ts-fortress/blob/main/sr
 
 > **TypeOf**\<`A`\> = `A`\[`"defaultValue"`\]
 
-Defined in: [type.mts:27](https://github.com/noshiro-pf/ts-fortress/blob/main/src/type.mts#L27)
+Defined in: [src/type.mts:27](https://github.com/noshiro-pf/ts-fortress/blob/main/src/type.mts#L27)
 
 #### Type Parameters
 

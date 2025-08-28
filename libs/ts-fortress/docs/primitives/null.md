@@ -12,4 +12,4 @@
 
 > `const` **nullType**: [`Type`](../type.md#type)\<`null`\>
 
-Defined in: [primitives/null.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/null.mts#L5)
+Defined in: [src/primitives/null.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/null.mts#L5)

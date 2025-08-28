@@ -12,7 +12,7 @@
 
 > **string**(`defaultValue`): [`Type`](../type.md#type)\<`string`\>
 
-Defined in: [primitives/string.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/string.mts#L5)
+Defined in: [src/primitives/string.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/string.mts#L5)
 
 #### Parameters
 
@@ -30,7 +30,7 @@ Defined in: [primitives/string.mts:5](https://github.com/noshiro-pf/ts-fortress/
 
 > **stringLiteral**\<`L`\>(`literal`): [`Type`](../type.md#type)\<`L`\>
 
-Defined in: [primitives/string.mts:8](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/string.mts#L8)
+Defined in: [src/primitives/string.mts:8](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/string.mts#L8)
 
 #### Type Parameters
 

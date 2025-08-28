@@ -12,7 +12,7 @@
 
 > **createPrimitiveType**\<`A`\>(`__namedParameters`): [`Type`](../type.md#type)\<`A`\>
 
-Defined in: [utils/create-primitive-type.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-primitive-type.mts#L7)
+Defined in: [src/utils/create-primitive-type.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-primitive-type.mts#L7)
 
 #### Type Parameters
 

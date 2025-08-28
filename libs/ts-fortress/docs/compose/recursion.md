@@ -12,7 +12,7 @@
 
 > **recursion**\<`A`\>(`typeName`, `definition`, `options?`): [`Type`](../type.md#type)\<`A`\>
 
-Defined in: [compose/recursion.mts:4](https://github.com/noshiro-pf/ts-fortress/blob/main/src/compose/recursion.mts#L4)
+Defined in: [src/compose/recursion.mts:4](https://github.com/noshiro-pf/ts-fortress/blob/main/src/compose/recursion.mts#L4)
 
 #### Type Parameters
 

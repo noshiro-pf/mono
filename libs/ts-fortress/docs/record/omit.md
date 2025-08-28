@@ -12,7 +12,7 @@
 
 > **omit**\<`R`, `KeysToOmit`\>(`recordType`, `keysToOmit`, `options?`): `OmittedType`\<`R`, `KeysToOmit`\>
 
-Defined in: [record/omit.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/omit.mts#L11)
+Defined in: [src/record/omit.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/omit.mts#L11)
 
 Creates a record type with keys omitted.
 
@@ -20,7 +20,7 @@ Creates a record type with keys omitted.
 
 ##### R
 
-`R` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`UnknownRecord`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
+`R` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`UnknownRecord`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
 
 ##### KeysToOmit
 

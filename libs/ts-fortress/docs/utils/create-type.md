@@ -12,7 +12,7 @@
 
 > **createType**\<`A`\>(`__namedParameters`): [`Type`](../type.md#type)\<`A`\>
 
-Defined in: [utils/create-type.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-type.mts#L6)
+Defined in: [src/utils/create-type.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-type.mts#L6)
 
 #### Type Parameters
 

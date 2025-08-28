@@ -12,7 +12,7 @@
 
 > **int8**(`defaultValue`): [`Type`](../type.md#type)\<`Int8`\>
 
-Defined in: [predefined/int8.mts:4](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/int8.mts#L4)
+Defined in: [src/predefined/int8.mts:4](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/int8.mts#L4)
 
 #### Parameters
 

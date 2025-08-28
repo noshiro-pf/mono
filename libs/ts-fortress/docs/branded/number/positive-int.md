@@ -12,7 +12,7 @@
 
 > **positiveInt**(`defaultValue`): [`Type`](../../type.md#type)\<`PositiveInt`\>
 
-Defined in: [branded/number/positive-int.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/positive-int.mts#L6)
+Defined in: [src/branded/number/positive-int.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/positive-int.mts#L6)
 
 #### Parameters
 

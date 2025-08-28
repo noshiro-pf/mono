@@ -12,7 +12,7 @@
 
 > **finiteNumber**(`defaultValue`): [`Type`](../../type.md#type)\<`FiniteNumber`\>
 
-Defined in: [branded/number/finite-number.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/finite-number.mts#L6)
+Defined in: [src/branded/number/finite-number.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/finite-number.mts#L6)
 
 #### Parameters
 

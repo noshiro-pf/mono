@@ -12,7 +12,7 @@
 
 > **positiveFiniteNumber**(`defaultValue`): [`Type`](../../type.md#type)\<`PositiveFiniteNumber`\>
 
-Defined in: [branded/number/positive-finite-number.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/positive-finite-number.mts#L6)
+Defined in: [src/branded/number/positive-finite-number.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/positive-finite-number.mts#L6)
 
 #### Parameters
 

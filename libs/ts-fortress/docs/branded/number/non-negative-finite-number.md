@@ -12,7 +12,7 @@
 
 > **nonNegativeFiniteNumber**(`defaultValue`): [`Type`](../../type.md#type)\<`NonNegativeFiniteNumber`\>
 
-Defined in: [branded/number/non-negative-finite-number.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/non-negative-finite-number.mts#L9)
+Defined in: [src/branded/number/non-negative-finite-number.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/non-negative-finite-number.mts#L9)
 
 #### Parameters
 

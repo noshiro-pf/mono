@@ -12,7 +12,7 @@
 
 > **nonZeroFiniteNumber**(`defaultValue`): [`Type`](../../type.md#type)\<`NonZeroFiniteNumber`\>
 
-Defined in: [branded/number/non-zero-finite-number.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/non-zero-finite-number.mts#L6)
+Defined in: [src/branded/number/non-zero-finite-number.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/non-zero-finite-number.mts#L6)
 
 #### Parameters
 

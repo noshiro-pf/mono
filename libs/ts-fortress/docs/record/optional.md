@@ -12,7 +12,7 @@
 
 > **OptionalPropertyType**\<`T`\> = `T` & `PartiallyRequired`\<`T`, `"optional"`\>
 
-Defined in: [record/optional.mts:3](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/optional.mts#L3)
+Defined in: [src/record/optional.mts:3](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/optional.mts#L3)
 
 #### Type Parameters
 
@@ -26,13 +26,13 @@ Defined in: [record/optional.mts:3](https://github.com/noshiro-pf/ts-fortress/bl
 
 > **isOptionalProperty**\<`T`\>(`t`): `t is OptionalPropertyType<T>`
 
-Defined in: [record/optional.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/optional.mts#L13)
+Defined in: [src/record/optional.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/optional.mts#L13)
 
 #### Type Parameters
 
 ##### T
 
-`T` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
+`T` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
 
 #### Parameters
 
@@ -50,13 +50,13 @@ Defined in: [record/optional.mts:13](https://github.com/noshiro-pf/ts-fortress/b
 
 > **optional**\<`T`\>(`t`): [`OptionalPropertyType`](#optionalpropertytype)\<`T`\>
 
-Defined in: [record/optional.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/optional.mts#L6)
+Defined in: [src/record/optional.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/optional.mts#L6)
 
 #### Type Parameters
 
 ##### T
 
-`T` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
+`T` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
 
 #### Parameters
 

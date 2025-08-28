@@ -71,11 +71,9 @@ if (User.is(userData)) {
     console.log(`User: ${userData.name}, Age: ${userData.age}`);
 }
 
-import { Result } from 'ts-data-forge';
-
 // Get validation result with error details
 const result = User.validate(userData);
-if (Result.isOk(result)) {
+if (t.Result.isOk(result)) {
     const user = result.value; // typed as User
 } else {
     console.error('Validation errors:', result.value); // readonly ValidationError[] showing error information
@@ -132,7 +130,7 @@ const completeUser: UserProfile = UserProfile.fill(anyPartialData);
 // The is() and validate() functions can still detect missing keys
 console.log(UserProfile.is(partialData)); // false - missing required keys
 const result = UserProfile.validate(partialData);
-if (Result.isErr(result)) {
+if (t.Result.isErr(result)) {
     console.log(result.value); // ValidationError[] showing missing keys
 }
 ```
@@ -413,7 +411,7 @@ const C = t.partial(
     const UnionBA = t.union([B, A]);
     const result = UnionBA.validate({ A: 1 });
 
-    if (Result.isOk(result)) {
+    if (t.Result.isOk(result)) {
         console.log(result.value); // { A: 1 } <- ✅ Correct! No unexpected fields
         console.log(A.is(result.value)); // true  <- ✅ Correct
         console.log(B.is(result.value)); // false <- ✅ Correct! B requires field B
@@ -425,7 +423,7 @@ const C = t.partial(
     const UnionCA = t.union([C, A]);
     const result = UnionCA.validate({ A: 1 });
 
-    if (Result.isOk(result)) {
+    if (t.Result.isOk(result)) {
         console.log(result.value); // { A: 1 } <- ✅ Correct and consistent
         console.log(A.is(result.value)); // true  <- ✅ Correct
         console.log(C.is(result.value)); // true  <- ✅ Consistent! ts-fortress partial types allow extra fields
@@ -496,7 +494,6 @@ The `validate` method performs comprehensive validation and returns a `Result` t
 
 ```typescript
 import * as t from 'ts-fortress';
-import { Result } from 'ts-data-forge';
 
 const User = t.record({
     name: t.string(''),
@@ -507,7 +504,7 @@ const User = t.record({
 const validData = { name: 'Alice', age: 30 };
 const result = User.validate(validData);
 
-if (Result.isOk(result)) {
+if (t.Result.isOk(result)) {
     console.log(result.value === validData); // true - same reference!
     console.log(result.value); // { name: 'Alice', age: 30 }
 }
@@ -516,7 +513,7 @@ if (Result.isOk(result)) {
 const invalidData = { name: 'Bob', age: 'thirty' };
 const errorResult = User.validate(invalidData);
 
-if (Result.isErr(errorResult)) {
+if (t.Result.isErr(errorResult)) {
     console.log(errorResult.value);
     // [
     //   {
@@ -749,7 +746,7 @@ const UInt16 = t.uint16(0);
 
 // Usage
 const userIdResult = UserId.validate('user_123');
-if (Result.isOk(userIdResult)) {
+if (t.Result.isOk(userIdResult)) {
     const id: UserId = userIdResult.value;
 }
 ```
@@ -815,7 +812,7 @@ const UserType = t.record({
 const invalidData = { name: 123, age: 'not a number' };
 
 const result = UserType.validate(invalidData);
-if (Result.isErr(result)) {
+if (t.Result.isErr(result)) {
     // result.value is an array of ValidationError objects
     for (const error of result.value) {
         console.log('Path:', error.path); // ['name'] or ['age']
@@ -851,7 +848,7 @@ const StrictType = t.record(
 const dataWithExcess = { name: 'John', age: 30, extra: 'not allowed' };
 const strictResult = StrictType.validate(dataWithExcess);
 
-if (Result.isErr(strictResult)) {
+if (t.Result.isErr(strictResult)) {
     console.log(strictResult.value);
     // [{
     //   path: ['extra'],
