@@ -1,4 +1,5 @@
 import { Result } from 'ts-data-forge';
+import 'ts-repo-utils';
 
 /** Runs all validation and build steps for the project. */
 const checkAll = async (): Promise<void> => {
