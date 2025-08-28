@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../README.md)
 
----
+***
 
 [ts-repo-utils](../README.md) / functions/format
 
@@ -10,9 +10,9 @@
 
 ### formatDiffFrom()
 
-> **formatDiffFrom**(`base`, `options?`): `Promise`\<`"ok"` \| `"err"`\>
+> **formatDiffFrom**(`base`, `options?`): `Promise`\<`Result`\<`undefined`, readonly `unknown`[] \| `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-Defined in: [src/functions/format.mts:185](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L185)
+Defined in: [src/functions/format.mts:237](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L237)
 
 Format only files that differ from the specified base branch or commit
 
@@ -23,55 +23,25 @@ Format only files that differ from the specified base branch or commit
 `string`
 
 Base branch name or commit hash to compare against (defaults to
-'main')
+  'main')
 
 ##### options?
 
-`Readonly`\<\{ `includeUntracked?`: `boolean`; `silent?`: `boolean`; \}\>
+`Readonly`\<\{ `includeModified?`: `boolean`; `includeStaged?`: `boolean`; `includeUntracked?`: `boolean`; `silent?`: `boolean`; \}\>
 
 Options for formatting
 
 #### Returns
 
-`Promise`\<`"ok"` \| `"err"`\>
+`Promise`\<`Result`\<`undefined`, readonly `unknown`[] \| `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-'ok' if successful, 'err' if any errors occurred
-
----
+***
 
 ### formatFiles()
 
-> **formatFiles**(`pathGlob`, `options?`): `Promise`\<`"ok"` \| `"err"`\>
+> **formatFiles**(`files`, `options?`): `Promise`\<`Result`\<`undefined`, readonly `unknown`[]\>\>
 
-Defined in: [src/functions/format.mts:82](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L82)
-
-Format files matching the given glob pattern using Prettier
-
-#### Parameters
-
-##### pathGlob
-
-`string`
-
-Glob pattern to match files
-
-##### options?
-
-`Readonly`\<\{ `silent?`: `boolean`; \}\>
-
-#### Returns
-
-`Promise`\<`"ok"` \| `"err"`\>
-
-'ok' if successful, 'err' if any errors occurred
-
----
-
-### formatFilesList()
-
-> **formatFilesList**(`files`, `options?`): `Promise`\<`"ok"` \| `"err"`\>
-
-Defined in: [src/functions/format.mts:12](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L12)
+Defined in: [src/functions/format.mts:17](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L17)
 
 Format a list of files using Prettier
 
@@ -89,17 +59,41 @@ Array of file paths to format
 
 #### Returns
 
-`Promise`\<`"ok"` \| `"err"`\>
+`Promise`\<`Result`\<`undefined`, readonly `unknown`[]\>\>
 
-'ok' if successful, 'err' if any errors occurred
+***
 
----
+### formatFilesGlob()
 
-### formatUntracked()
+> **formatFilesGlob**(`pathGlob`, `options?`): `Promise`\<`Result`\<`undefined`, `unknown`\>\>
 
-> **formatUntracked**(`options?`): `Promise`\<`"ok"` \| `"err"`\>
+Defined in: [src/functions/format.mts:122](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L122)
 
-Defined in: [src/functions/format.mts:116](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L116)
+Format files matching the given glob pattern using Prettier
+
+#### Parameters
+
+##### pathGlob
+
+`string`
+
+Glob pattern to match files
+
+##### options?
+
+`Readonly`\<\{ `silent?`: `boolean`; \}\>
+
+#### Returns
+
+`Promise`\<`Result`\<`undefined`, `unknown`\>\>
+
+***
+
+### formatUncommittedFiles()
+
+> **formatUncommittedFiles**(`options?`): `Promise`\<`Result`\<`undefined`, readonly `unknown`[] \| `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+
+Defined in: [src/functions/format.mts:157](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L157)
 
 Format only files that have been changed (git status)
 
@@ -107,12 +101,10 @@ Format only files that have been changed (git status)
 
 ##### options?
 
-`Readonly`\<\{ `silent?`: `boolean`; \}\>
+`Readonly`\<\{ `modified?`: `boolean`; `silent?`: `boolean`; `staged?`: `boolean`; `untracked?`: `boolean`; \}\>
 
 Options for formatting
 
 #### Returns
 
-`Promise`\<`"ok"` \| `"err"`\>
-
-'ok' if successful, 'err' if any errors occurred
+`Promise`\<`Result`\<`undefined`, readonly `unknown`[] \| `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>

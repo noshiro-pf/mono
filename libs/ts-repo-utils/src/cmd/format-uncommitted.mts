@@ -2,17 +2,12 @@
 
 import * as cmd from 'cmd-ts';
 import { Result } from 'ts-data-forge';
-import { formatDiffFrom } from '../functions/index.mjs';
+import { formatUncommittedFiles } from '../functions/index.mjs';
 
 const cmdDef = cmd.command({
-  name: 'format-diff-from-cli',
-  version: '6.1.0',
+  name: 'format-uncommitted-cli',
+  version: '6.0.5',
   args: {
-    base: cmd.positional({
-      type: cmd.string,
-      displayName: 'base',
-      description: 'Base branch name or commit hash to compare against',
-    }),
     excludeUntracked: cmd.flag({
       long: 'exclude-untracked',
       type: cmd.optional(cmd.boolean),
@@ -39,7 +34,6 @@ const cmdDef = cmd.command({
   },
   handler: (args) => {
     main({
-      base: args.base,
       excludeUntracked: args.excludeUntracked ?? false,
       excludeModified: args.excludeModified ?? false,
       excludeStaged: args.excludeStaged ?? false,
@@ -53,20 +47,18 @@ const cmdDef = cmd.command({
 
 const main = async (
   args: Readonly<{
-    base: string;
     excludeUntracked: boolean;
     excludeModified: boolean;
     excludeStaged: boolean;
     silent: boolean;
   }>,
 ): Promise<void> => {
-  const result = await formatDiffFrom(args.base, {
-    includeUntracked: !args.excludeUntracked,
-    includeModified: !args.excludeModified,
-    includeStaged: !args.excludeStaged,
+  const result = await formatUncommittedFiles({
+    untracked: !args.excludeUntracked,
+    modified: !args.excludeModified,
+    staged: !args.excludeStaged,
     silent: args.silent,
   });
-
   if (Result.isErr(result)) {
     process.exit(1);
   }

@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../README.md)
 
----
+***
 
 [ts-repo-utils](../README.md) / functions/assert-path-exists
 
@@ -34,7 +34,7 @@ Description for error message (defaults to 'Path').
 
 `Promise`\<`void`\>
 
----
+***
 
 ### pathExists()
 

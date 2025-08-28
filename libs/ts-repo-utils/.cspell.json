@@ -1,7 +1,7 @@
 {
   "version": "0.2",
   "language": "en",
-  "words": ["multioption", "noshiro", "testw", "tscw"],
+  "words": ["multioption", "noshiro", "testw", "tscw", "unstub"],
   "flagWords": [],
   "ignorePaths": [
     "eslint.config.js",

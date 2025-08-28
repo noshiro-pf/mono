@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../../README.md)
 
----
+***
 
 [ts-repo-utils](../../README.md) / functions/workspace-utils/run-cmd-in-parallel
 
@@ -30,4 +30,4 @@ Configuration options for the parallel execution
 `Promise`\<`void`\>
 
 A promise that resolves when all packages have completed execution
-successfully, or rejects immediately on first failure
+  successfully, or rejects immediately on first failure

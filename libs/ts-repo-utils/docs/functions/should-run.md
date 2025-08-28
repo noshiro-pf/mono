@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../README.md)
 
----
+***
 
 [ts-repo-utils](../README.md) / functions/should-run
 
@@ -35,12 +35,12 @@ Configuration options
 `Promise`\<`void`\>
 
 A promise that resolves when the check is complete. The function
-will set the GITHUB_OUTPUT environment variable with `should_run=true` or
-`should_run=false` if running in GitHub Actions environment.
+  will set the GITHUB_OUTPUT environment variable with `should_run=true` or
+  `should_run=false` if running in GitHub Actions environment.
 
 #### Examples
 
-````typescript
+```typescript
   // Use default settings (compare against origin/main, ignore docs/md/txt files)
   await checkShouldRunTypeChecks();
 
@@ -64,4 +64,4 @@ GitHub Actions usage
   - name: Run type checks
   if: steps.check_diff.outputs.should_run == 'true'
   run: npm run type-check
-````
+  ```

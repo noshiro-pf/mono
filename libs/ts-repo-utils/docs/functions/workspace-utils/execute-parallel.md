@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../../README.md)
 
----
+***
 
 [ts-repo-utils](../../README.md) / functions/workspace-utils/execute-parallel
 
@@ -37,16 +37,16 @@ The name of the npm script to execute
 `number` = `3`
 
 Maximum number of packages to process simultaneously
-(default: 3)
+  (default: 3)
 
 #### Returns
 
 `Promise`\<readonly `Readonly`\<\{ `code?`: `number`; `skipped?`: `boolean`; \}\>[]\>
 
 A promise that resolves to an array of execution results, or rejects
-immediately on first failure
+  immediately on first failure
 
----
+***
 
 ### executeStages()
 
@@ -78,11 +78,11 @@ The name of the npm script to execute
 `number` = `3`
 
 Maximum number of packages to process simultaneously
-within each stage (default: 3)
+  within each stage (default: 3)
 
 #### Returns
 
 `Promise`\<`void`\>
 
 A promise that resolves when all stages are complete, or rejects
-immediately on first failure
+  immediately on first failure

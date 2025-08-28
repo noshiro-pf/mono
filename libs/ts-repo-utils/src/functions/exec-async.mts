@@ -9,9 +9,9 @@ type ExecOptionsCustom = Readonly<{
   silent?: boolean;
 }>;
 
-type ExecOptions = DeepReadonly<ExecOptions_ & ExecOptionsCustom>;
+export type ExecOptions = DeepReadonly<ExecOptions_ & ExecOptionsCustom>;
 
-type ExecResult<T extends string | Buffer> = Result<
+export type ExecResult<T extends string | Buffer> = Result<
   Readonly<{ stdout: T; stderr: T }>,
   ExecException
 >;

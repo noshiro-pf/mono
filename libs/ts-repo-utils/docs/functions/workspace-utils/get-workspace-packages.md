@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../../README.md)
 
----
+***
 
 [ts-repo-utils](../../README.md) / functions/workspace-utils/get-workspace-packages
 
@@ -24,11 +24,11 @@ patterns defined in the root package.json file.
 `string`
 
 The directory containing the root package.json
-file
+  file
 
 #### Returns
 
 `Promise`\<readonly `Readonly`\<\{ `dependencies`: `ReadonlyRecord`\<`string`, `string`\>; `name`: `string`; `packageJson`: `JsonValue`; `path`: `string`; \}\>[]\>
 
 A promise that resolves to an array of Package objects containing
-package metadata
+  package metadata

@@ -72,21 +72,24 @@ npm exec -- assert-repo-is-clean --silent
 
 - `--silent` - Suppress output messages (optional)
 
-### `format-untracked`
+### `format-uncommitted`
 
 Formats only untracked/modified files using Prettier.
 
 ```bash
 # Basic usage
-npm exec -- format-untracked
+npm exec -- format-uncommitted
 
 # Silent mode
-npm exec -- format-untracked --silent
+npm exec -- format-uncommitted --silent
 ```
 
 **Options:**
 
-- `--silent` - Suppress output messages (optional)
+- `--exclude-untracked` - Exclude untracked files in addition to diff files (default: false)
+- `--exclude-modified` - Exclude modified files in addition to diff files (default: false)
+- `--exclude-staged` - Exclude staged files in addition to diff files (default: false)
+- `--silent` - Suppress output messages (default: false)
 
 ### `format-diff-from`
 
@@ -112,9 +115,10 @@ npm exec -- format-diff-from main --silent
 **Options:**
 
 - `<base>` - Base branch name or commit hash to compare against (required)
-- `--include-untracked` - Include untracked files in addition to diff files (default: true)
-- `--exclude-untracked` - Exclude untracked files, only format diff files (optional)
-- `--silent` - Suppress output messages (optional)
+- `--exclude-untracked` - Exclude untracked files in addition to diff files (default: false)
+- `--exclude-modified` - Exclude modified files in addition to diff files (default: false)
+- `--exclude-staged` - Exclude staged files in addition to diff files (default: false)
+- `--silent` - Suppress output messages (default: false)
 
 ### `check-should-run-type-checks`
 

@@ -448,53 +448,83 @@ describe('exec-async', () => {
     });
 
     test('should demonstrate type equivalence with runtime comparison', async () => {
-      // Create a type that represents what exec callback receives
-      type ExecCallbackParams<T extends string | Buffer> = {
-        error: ExecException | null;
-        stdout: T;
-        stderr: T;
-      };
+      // Mock console functions to suppress output
+      const consoleLogSpy = vi
+        // eslint-disable-next-line vitest/no-restricted-vi-methods
+        .spyOn(console, 'log')
+        .mockImplementation(() => {});
 
-      // Helper to capture exec callback types
-      const captureExecTypes = <T extends string | Buffer>(
-        _encoding?: BufferEncoding | 'buffer' | null,
-      ): ExecCallbackParams<T> => {
-        const emptyParams: ExecCallbackParams<T> = {
-          error: null,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-          stdout: undefined as unknown as T,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-          stderr: undefined as unknown as T,
-        };
-        return emptyParams;
-      };
+      const consoleErrorSpy = vi
+        // eslint-disable-next-line vitest/no-restricted-vi-methods
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
 
-      // Default encoding comparison
-      const _execDefault = captureExecTypes<string>();
-      const $Default = await $('echo "test"', { silent: true });
-      if (Result.isOk($Default)) {
-        expectType<typeof _execDefault.stdout, typeof $Default.value.stdout>(
-          '=',
-        );
-        expectType<typeof _execDefault.stderr, typeof $Default.value.stderr>(
-          '=',
-        );
-      }
+      const stderrWriteSpy = vi
+        // eslint-disable-next-line vitest/no-restricted-vi-methods
+        .spyOn(process.stderr, 'write')
+        .mockImplementation(() => true);
 
-      // Buffer encoding comparison
-      const _execBuffer = captureExecTypes<Buffer>('buffer');
-      const $Buffer = await $('echo "test"', {
-        encoding: 'buffer',
-        silent: true,
-      });
-      if (Result.isOk($Buffer)) {
-        expectType<typeof _execBuffer.stdout, typeof $Buffer.value.stdout>('=');
-        expectType<typeof _execBuffer.stderr, typeof $Buffer.value.stderr>('=');
-      }
+      try {
+        await withSilentEcho(async () => {
+          // Create a type that represents what exec callback receives
+          type ExecCallbackParams<T extends string | Buffer> = {
+            error: ExecException | null;
+            stdout: T;
+            stderr: T;
+          };
 
-      // Error type comparison
-      if (Result.isErr($Default)) {
-        expectType<ExecException, typeof $Default.value>('=');
+          // Helper to capture exec callback types
+          const captureExecTypes = <T extends string | Buffer>(
+            _encoding?: BufferEncoding | 'buffer' | null,
+          ): ExecCallbackParams<T> => {
+            const emptyParams: ExecCallbackParams<T> = {
+              error: null,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+              stdout: undefined as unknown as T,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+              stderr: undefined as unknown as T,
+            };
+            return emptyParams;
+          };
+
+          // Default encoding comparison
+          const _execDefault = captureExecTypes<string>();
+          const $Default = await $('echo "test"', { silent: true });
+          if (Result.isOk($Default)) {
+            expectType<
+              typeof _execDefault.stdout,
+              typeof $Default.value.stdout
+            >('=');
+            expectType<
+              typeof _execDefault.stderr,
+              typeof $Default.value.stderr
+            >('=');
+          }
+
+          // Buffer encoding comparison
+          const _execBuffer = captureExecTypes<Buffer>('buffer');
+          const $Buffer = await $('echo "test"', {
+            encoding: 'buffer',
+            silent: true,
+          });
+          if (Result.isOk($Buffer)) {
+            expectType<typeof _execBuffer.stdout, typeof $Buffer.value.stdout>(
+              '=',
+            );
+            expectType<typeof _execBuffer.stderr, typeof $Buffer.value.stderr>(
+              '=',
+            );
+          }
+
+          // Error type comparison
+          if (Result.isErr($Default)) {
+            expectType<ExecException, typeof $Default.value>('=');
+          }
+        });
+      } finally {
+        consoleLogSpy.mockRestore();
+        consoleErrorSpy.mockRestore();
+        stderrWriteSpy.mockRestore();
       }
     });
   });

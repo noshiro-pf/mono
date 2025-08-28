@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../../README.md)
 
----
+***
 
 [ts-repo-utils](../../README.md) / functions/workspace-utils/run-cmd-in-stages
 
@@ -32,4 +32,4 @@ Configuration options for the staged execution
 `Promise`\<`void`\>
 
 A promise that resolves when all stages have completed execution
-successfully, or rejects immediately on first failure
+  successfully, or rejects immediately on first failure

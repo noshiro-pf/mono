@@ -2,7 +2,10 @@ import { type ExecException } from 'node:child_process';
 import { Result } from 'ts-data-forge';
 import '../node-global.mjs';
 
-/** Get files that have been changed (git status). */
+/**
+ * Get untracked files from the working tree (files not added to git). Runs `git
+ * ls-files --others --exclude-standard [--deleted]`
+ */
 export const getUntrackedFiles = async (
   options?: Readonly<{
     /** @default true */
@@ -12,35 +15,60 @@ export const getUntrackedFiles = async (
   }>,
 ): Promise<
   Result<readonly string[], ExecException | Readonly<{ message: string }>>
-> => {
-  // Get changed files from git status
-  const result = await $(
-    [
-      `git ls-files --others --exclude-standard`,
-      // Append '--deleted' to include deleted files only if excludeDeleted is explicitly false
-      (options?.excludeDeleted ?? true) ? '' : '--deleted',
-    ]
-      .filter((s) => s !== '')
-      .join(' '),
-    { silent: options?.silent ?? false },
-  );
+> =>
+  cmdResultToFiles({
+    cmd: `git ls-files --others --exclude-standard`,
+    cmdOptionToExcludeDeleted: '',
+    cmdOptionToIncludeDeleted: '--deleted',
+    options,
+  });
 
-  if (Result.isErr(result)) {
-    return result;
-  }
+/**
+ * Get untracked files from the working tree (files not added to git). Runs `git
+ * git diff --staged --name-only [--diff-filter=d]`
+ */
+export const getModifiedFiles = async (
+  options?: Readonly<{
+    /** @default true */
+    excludeDeleted?: boolean;
+    /** @default false */
+    silent?: boolean;
+  }>,
+): Promise<
+  Result<readonly string[], ExecException | Readonly<{ message: string }>>
+> =>
+  cmdResultToFiles({
+    cmd: `git diff --name-only`,
+    cmdOptionToExcludeDeleted: '--diff-filter=d',
+    cmdOptionToIncludeDeleted: '',
+    options,
+  });
 
-  const { stdout } = result.value;
+/**
+ * Get files that are staged for commit (files added with git add). Runs `git
+ * diff --staged --name-only [--diff-filter=d]`
+ */
+export const getStagedFiles = async (
+  options?: Readonly<{
+    /** @default true */
+    excludeDeleted?: boolean;
+    /** @default false */
+    silent?: boolean;
+  }>,
+): Promise<
+  Result<readonly string[], ExecException | Readonly<{ message: string }>>
+> =>
+  cmdResultToFiles({
+    cmd: `git diff --staged --name-only`,
+    cmdOptionToExcludeDeleted: '--diff-filter=d',
+    cmdOptionToIncludeDeleted: '',
+    options,
+  });
 
-  // Parse git status output
-  const files = stdout
-    .split('\n')
-    .map((s) => s.trim())
-    .filter((s) => s !== '');
-
-  return Result.ok(files);
-};
-
-/** Get files that differ from the specified base branch or commit */
+/**
+ * Get files that differ from the specified base branch or commit. Runs `git
+ * diff --name-only <base> [--diff-filter=d]`
+ */
 export const getDiffFrom = async (
   base: string,
   options?: Readonly<{
@@ -51,13 +79,38 @@ export const getDiffFrom = async (
   }>,
 ): Promise<
   Result<readonly string[], ExecException | Readonly<{ message: string }>>
+> =>
+  cmdResultToFiles({
+    cmd: `git diff --name-only ${base}`,
+    cmdOptionToExcludeDeleted: '--diff-filter=d',
+    cmdOptionToIncludeDeleted: '',
+    options,
+  });
+
+const cmdResultToFiles = async ({
+  cmd,
+  cmdOptionToExcludeDeleted,
+  cmdOptionToIncludeDeleted,
+  options,
+}: Readonly<{
+  cmd: string;
+  cmdOptionToExcludeDeleted: string;
+  cmdOptionToIncludeDeleted: string;
+  options?: Readonly<{
+    /** @default true */
+    excludeDeleted?: boolean;
+    /** @default false */
+    silent?: boolean;
+  }>;
+}>): Promise<
+  Result<readonly string[], ExecException | Readonly<{ message: string }>>
 > => {
-  // Get files that differ from base branch/commit (excluding deleted files)
   const result = await $(
     [
-      `git diff --name-only`,
-      base,
-      (options?.excludeDeleted ?? true) ? '--diff-filter=d' : '',
+      cmd,
+      (options?.excludeDeleted ?? true)
+        ? cmdOptionToExcludeDeleted
+        : cmdOptionToIncludeDeleted,
     ]
       .filter((s) => s !== '')
       .join(' '),
@@ -70,7 +123,7 @@ export const getDiffFrom = async (
 
   const { stdout } = result.value;
 
-  // Parse git diff output
+  // Parse git output
   const files = stdout
     .split('\n')
     .map((line) => line.trim())

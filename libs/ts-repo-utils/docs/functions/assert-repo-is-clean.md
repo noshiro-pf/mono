@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../README.md)
 
----
+***
 
 [ts-repo-utils](../README.md) / functions/assert-repo-is-clean
 
@@ -27,7 +27,7 @@ git status and diff output before exiting.
 
 `Promise`\<`void`\>
 
----
+***
 
 ### repoIsDirty()
 
