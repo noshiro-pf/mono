@@ -5,7 +5,7 @@ import { formatUntracked } from '../functions/index.mjs';
 
 const cmdDef = cmd.command({
   name: 'format-untracked-cli',
-  version: '6.0.5',
+  version: '6.1.0',
   args: {
     silent: cmd.flag({
       long: 'silent',

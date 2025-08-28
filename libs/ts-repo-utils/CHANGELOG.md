@@ -1,3 +1,9 @@
+# [6.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.0.5...v6.1.0) (2025-08-28)
+
+### Features
+
+- re-export Result from ts-data-forge ([#119](https://github.com/noshiro-pf/ts-repo-utils/issues/119)) ([7fb9948](https://github.com/noshiro-pf/ts-repo-utils/commit/7fb994859beb170233719bf5ead529153c2d25da))
+
 ## [6.0.5](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.0.4...v6.0.5) (2025-08-28)
 
 ### Bug Fixes
