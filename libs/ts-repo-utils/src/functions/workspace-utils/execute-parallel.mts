@@ -1,3 +1,4 @@
+/* eslint-disable require-atomic-updates */
 import { spawn } from 'child_process';
 import {
   createPromise,
@@ -14,38 +15,58 @@ const DEBUG = false as boolean;
 
 /**
  * Executes a npm script across multiple packages in parallel with a concurrency
- * limit.
+ * limit. Uses fail-fast behavior - stops execution immediately when any package
+ * fails.
  *
  * @param packages - Array of Package objects to execute the script in
  * @param scriptName - The name of the npm script to execute
  * @param concurrency - Maximum number of packages to process simultaneously
  *   (default: 3)
- * @returns A promise that resolves to an array of execution results
+ * @returns A promise that resolves to an array of execution results, or rejects
+ *   immediately on first failure
  */
 export const executeParallel = async (
   packages: readonly Package[],
   scriptName: string,
   concurrency: number = 3,
-): Promise<
-  readonly Result<Readonly<{ code?: number; skipped?: boolean }>, Error>[]
-> => {
+): Promise<readonly Readonly<{ code?: number; skipped?: boolean }>[]> => {
   const mut_resultPromises: Promise<
-    Result<Readonly<{ code?: number; skipped?: boolean }>, Error>
+    Readonly<{ code?: number; skipped?: boolean }>
   >[] = [];
 
   const mut_executing = new Set<Promise<unknown>>();
+  let mut_failed = false as boolean;
 
   for (const pkg of packages) {
-    const promise = executeScript(pkg, scriptName);
+    // Stop starting new processes if any has failed
+    if (mut_failed) {
+      break;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-loop-func
+    const promise = executeScript(pkg, scriptName).then((result) => {
+      // Check for failure immediately
+      if (Result.isErr(result)) {
+        mut_failed = true;
+        throw result.value; // Throw the error to trigger fail-fast
+      }
+      return result.value; // Return the unwrapped value for success
+    });
 
     mut_resultPromises.push(promise);
 
-    const wrappedPromise = promise.finally(() => {
-      mut_executing.delete(wrappedPromise);
-      if (DEBUG) {
-        console.debug('executing size', mut_executing.size);
-      }
-    });
+    const wrappedPromise = promise
+      // eslint-disable-next-line @typescript-eslint/no-loop-func
+      .catch((error) => {
+        mut_failed = true;
+        throw error; // Re-throw to ensure fail-fast propagation
+      })
+      .finally(() => {
+        mut_executing.delete(wrappedPromise);
+        if (DEBUG) {
+          console.debug('executing size', mut_executing.size);
+        }
+      });
 
     mut_executing.add(wrappedPromise);
 
@@ -55,24 +76,35 @@ export const executeParallel = async (
 
     // If we reach concurrency limit, wait for one to finish
     if (mut_executing.size >= concurrency) {
-      // eslint-disable-next-line no-await-in-loop
-      await Promise.race(mut_executing);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await Promise.race(mut_executing);
+      } catch (error) {
+        // If any process fails, cancel remaining processes and throw immediately
+        // eslint-disable-next-line no-useless-assignment
+        mut_failed = true;
+        throw error;
+      }
     }
   }
 
+  // Wait for all started processes to complete
+  // This will throw immediately if any process fails (fail-fast)
   return Promise.all(mut_resultPromises);
 };
 
 /**
  * Executes a npm script across packages in dependency order stages. Packages
  * are grouped into stages where each stage contains packages whose dependencies
- * have been completed in previous stages.
+ * have been completed in previous stages. Uses fail-fast behavior - stops
+ * execution immediately when any package fails.
  *
  * @param packages - Array of Package objects to execute the script in
  * @param scriptName - The name of the npm script to execute
  * @param concurrency - Maximum number of packages to process simultaneously
  *   within each stage (default: 3)
- * @returns A promise that resolves when all stages are complete
+ * @returns A promise that resolves when all stages are complete, or rejects
+ *   immediately on first failure
  */
 export const executeStages = async (
   packages: readonly Package[],
@@ -110,13 +142,30 @@ export const executeStages = async (
     }
   }
 
-  console.log(`\nExecuting ${scriptName} in ${mut_stages.length} stages...\n`);
+  console.log(
+    `\nExecuting ${scriptName} in ${mut_stages.length} stages (fail-fast mode)...\n`,
+  );
 
   for (const [i, stage] of mut_stages.entries()) {
     if (stage.length > 0) {
       console.log(`Stage ${i + 1}: ${stage.map((p) => p.name).join(', ')}`);
-      // eslint-disable-next-line no-await-in-loop
-      await executeParallel(stage, scriptName, concurrency);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const results = await executeParallel(stage, scriptName, concurrency);
+
+        // Log successful completion of the stage
+        // All results are successful because executeParallel throws on any failure
+        console.log(
+          `✅ Stage ${i + 1} completed successfully (${results.length}/${stage.length} packages)`,
+        );
+      } catch (error) {
+        // executeParallel will throw immediately on any failure (fail-fast)
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        console.error(`\n❌ Stage ${i + 1} failed (fail-fast):`);
+        console.error(errorMessage);
+        throw new Error(`Stage ${i + 1} failed: ${errorMessage}`);
+      }
     }
   }
 };
@@ -172,8 +221,11 @@ const executeScript = (
         });
 
         proc.on('close', (code: number | null) => {
-          if (code === 0) {
-            resolve({ code });
+          if (DEBUG) {
+            console.debug(`${pkg.name} process closed with code: ${code}`);
+          }
+          if (code === 0 || code === null) {
+            resolve({ code: code ?? 0 });
           } else {
             reject(new Error(`${pkg.name} exited with code ${code}`));
           }

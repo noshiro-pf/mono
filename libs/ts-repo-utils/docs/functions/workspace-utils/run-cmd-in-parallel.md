@@ -12,9 +12,10 @@
 
 > **runCmdInParallelAcrossWorkspaces**(`options`): `Promise`\<`void`\>
 
-Defined in: [src/functions/workspace-utils/run-cmd-in-parallel.mts:19](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/run-cmd-in-parallel.mts#L19)
+Defined in: [src/functions/workspace-utils/run-cmd-in-parallel.mts:21](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/run-cmd-in-parallel.mts#L21)
 
-Executes a npm script command across all workspace packages in parallel.
+Executes a npm script command across all workspace packages in parallel. Uses
+fail-fast behavior - stops execution immediately when any package fails.
 
 #### Parameters
 
@@ -29,3 +30,4 @@ Configuration options for the parallel execution
 `Promise`\<`void`\>
 
 A promise that resolves when all packages have completed execution
+successfully, or rejects immediately on first failure

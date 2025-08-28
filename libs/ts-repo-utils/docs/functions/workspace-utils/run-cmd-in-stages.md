@@ -12,11 +12,12 @@
 
 > **runCmdInStagesAcrossWorkspaces**(`options`): `Promise`\<`void`\>
 
-Defined in: [src/functions/workspace-utils/run-cmd-in-stages.mts:21](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/run-cmd-in-stages.mts#L21)
+Defined in: [src/functions/workspace-utils/run-cmd-in-stages.mts:23](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/run-cmd-in-stages.mts#L23)
 
 Executes a npm script command across all workspace packages in dependency
 order stages. Packages are grouped into stages where each stage contains
-packages whose dependencies have been completed in previous stages.
+packages whose dependencies have been completed in previous stages. Uses
+fail-fast behavior - stops execution immediately when any package fails.
 
 #### Parameters
 
@@ -31,3 +32,4 @@ Configuration options for the staged execution
 `Promise`\<`void`\>
 
 A promise that resolves when all stages have completed execution
+successfully, or rejects immediately on first failure

@@ -10,12 +10,13 @@
 
 ### executeParallel()
 
-> **executeParallel**(`packages`, `scriptName`, `concurrency`): `Promise`\<readonly `Result`\<`Readonly`\<\{ `code?`: `number`; `skipped?`: `boolean`; \}\>, `Error`\>[]\>
+> **executeParallel**(`packages`, `scriptName`, `concurrency`): `Promise`\<readonly `Readonly`\<\{ `code?`: `number`; `skipped?`: `boolean`; \}\>[]\>
 
-Defined in: [src/functions/workspace-utils/execute-parallel.mts:25](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L25)
+Defined in: [src/functions/workspace-utils/execute-parallel.mts:28](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L28)
 
 Executes a npm script across multiple packages in parallel with a concurrency
-limit.
+limit. Uses fail-fast behavior - stops execution immediately when any package
+fails.
 
 #### Parameters
 
@@ -40,9 +41,10 @@ Maximum number of packages to process simultaneously
 
 #### Returns
 
-`Promise`\<readonly `Result`\<`Readonly`\<\{ `code?`: `number`; `skipped?`: `boolean`; \}\>, `Error`\>[]\>
+`Promise`\<readonly `Readonly`\<\{ `code?`: `number`; `skipped?`: `boolean`; \}\>[]\>
 
-A promise that resolves to an array of execution results
+A promise that resolves to an array of execution results, or rejects
+immediately on first failure
 
 ---
 
@@ -50,11 +52,12 @@ A promise that resolves to an array of execution results
 
 > **executeStages**(`packages`, `scriptName`, `concurrency`): `Promise`\<`void`\>
 
-Defined in: [src/functions/workspace-utils/execute-parallel.mts:77](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L77)
+Defined in: [src/functions/workspace-utils/execute-parallel.mts:109](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L109)
 
 Executes a npm script across packages in dependency order stages. Packages
 are grouped into stages where each stage contains packages whose dependencies
-have been completed in previous stages.
+have been completed in previous stages. Uses fail-fast behavior - stops
+execution immediately when any package fails.
 
 #### Parameters
 
@@ -81,4 +84,5 @@ within each stage (default: 3)
 
 `Promise`\<`void`\>
 
-A promise that resolves when all stages are complete
+A promise that resolves when all stages are complete, or rejects
+immediately on first failure
