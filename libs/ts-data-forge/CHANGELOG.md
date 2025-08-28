@@ -1,3 +1,9 @@
+# [3.2.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.1.0...v3.2.0) (2025-08-28)
+
+### Features
+
+- add Arr.generateAsync ([#128](https://github.com/noshiro-pf/ts-data-forge/issues/128)) ([cb6b2d1](https://github.com/noshiro-pf/ts-data-forge/commit/cb6b2d1babf1958456bc1a3f9cf7a8ddae1b0e27))
+
 # [3.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.0.5...v3.1.0) (2025-08-12)
 
 ### Features
