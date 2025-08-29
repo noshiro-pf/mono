@@ -36,7 +36,7 @@ Defined in: [src/functions/exec-async.mts:10](https://github.com/noshiro-pf/ts-r
 
 > **$**(`command`, `options?`): `Promise`\<[`ExecResult`](#execresult)\<`string`\>\>
 
-Defined in: [src/functions/exec-async.mts:22](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L22)
+Defined in: [src/functions/exec-async.mts:23](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L23)
 
 Executes a shell command asynchronously.
 
@@ -50,9 +50,9 @@ The command to execute.
 
 ###### options?
 
-`Readonly`\<\{ `silent?`: `boolean`; \}\>
-
 Optional configuration for command execution.
+
+`Readonly`\<\{ `silent?`: `boolean`; \}\> | `Readonly`\<`object` & `ExecOptions` & `Readonly`\<\{ `silent?`: `boolean`; \}\>\>
 
 ##### Returns
 
@@ -62,9 +62,9 @@ A promise that resolves with the command result.
 
 #### Call Signature
 
-> **$**(`command`, `options`): `Promise`\<[`ExecResult`](#execresult)\<`Buffer`\<`ArrayBufferLike`\>\>\>
+> **$**(`command`, `options?`): `Promise`\<[`ExecResult`](#execresult)\<`Buffer`\<`ArrayBufferLike`\>\>\>
 
-Defined in: [src/functions/exec-async.mts:27](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L27)
+Defined in: [src/functions/exec-async.mts:31](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L31)
 
 Executes a shell command asynchronously.
 
@@ -76,42 +76,14 @@ Executes a shell command asynchronously.
 
 The command to execute.
 
-###### options
+###### options?
 
-`Readonly`\<`object` & [`ExecOptions`](#execoptions)\>
+`Readonly`\<`object` & `ExecOptions` & `Readonly`\<\{ `silent?`: `boolean`; \}\>\>
 
 Optional configuration for command execution.
 
 ##### Returns
 
 `Promise`\<[`ExecResult`](#execresult)\<`Buffer`\<`ArrayBufferLike`\>\>\>
-
-A promise that resolves with the command result.
-
-#### Call Signature
-
-> **$**(`command`, `options`): `Promise`\<[`ExecResult`](#execresult)\<`string`\>\>
-
-Defined in: [src/functions/exec-async.mts:33](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L33)
-
-Executes a shell command asynchronously.
-
-##### Parameters
-
-###### command
-
-`string`
-
-The command to execute.
-
-###### options
-
-`Readonly`\<`object` & [`ExecOptions`](#execoptions)\>
-
-Optional configuration for command execution.
-
-##### Returns
-
-`Promise`\<[`ExecResult`](#execresult)\<`string`\>\>
 
 A promise that resolves with the command result.
