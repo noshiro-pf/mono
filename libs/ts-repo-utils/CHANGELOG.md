@@ -1,3 +1,23 @@
+# [7.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.2.0...v7.0.0) (2025-08-29)
+
+### Features
+
+- **breaking:** add getStagedFiles, getModifiedFiles and updated format utilities ([#120](https://github.com/noshiro-pf/ts-repo-utils/issues/120)) ([a69a838](https://github.com/noshiro-pf/ts-repo-utils/commit/a69a838f774b2b6f183a555c1f142334ceb7acda))
+
+### BREAKING CHANGES
+
+- **breaking:** - Renamed CLI command format-untracked to format-uncommitted
+    - Also added CLI options --exclude-untracked, --exclude-modified, --exclude-staged
+
+* Changed CLI options of format-diff-from
+    - Removed --include-untracked option
+    - Added --exclude-untracked, --exclude-modified, --exclude-staged options
+* Renamed formatFiles to formatFilesGlob
+* Renamed formatFilesList to formatFiles
+* Renamed formatUntracked to formatUncommittedFiles and changed options
+* Added includeModified option to formatDiffFrom
+*
+
 # [6.2.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.1.0...v6.2.0) (2025-08-28)
 
 ### Features
