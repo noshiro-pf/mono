@@ -83,7 +83,7 @@ const build = async (): Promise<void> => {
     echo('7. Generating dist/types.d.mts...');
     const content = [
       "import './globals.d.mts';",
-      "export * from './index.mjs';",
+      "export * from './entry-point.mjs';",
     ].join('\n');
 
     const typesFile = path.resolve(distDir, 'types.d.mts');
