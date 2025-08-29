@@ -1,3 +1,9 @@
+## [2.6.1](https://github.com/noshiro-pf/ts-fortress/compare/v2.6.0...v2.6.1) (2025-08-29)
+
+### Bug Fixes
+
+- fix build script to support new entry-point ([#41](https://github.com/noshiro-pf/ts-fortress/issues/41)) ([773e61b](https://github.com/noshiro-pf/ts-fortress/commit/773e61be4f1b071b144a98476a00f30d11549c12))
+
 # [2.6.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.5.0...v2.6.0) (2025-08-28)
 
 ### Features
