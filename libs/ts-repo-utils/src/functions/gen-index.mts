@@ -71,11 +71,15 @@ type GenIndexConfigInternal = DeepReadonly<{
  * @param config - Configuration for index file generation
  * @throws Error if any step fails.
  */
-export const genIndex = async (config: GenIndexConfig): Promise<void> => {
-  echo('Starting index file generation...\n');
-
+export const genIndex = async (
+  config: GenIndexConfig,
+): Promise<Result<undefined, unknown>> => {
   // Merge config with defaults
   const filledConfig: GenIndexConfigInternal = fillConfig(config);
+
+  const conditionalEcho = filledConfig.silent ? () => {} : echo;
+
+  conditionalEcho('Starting index file generation...\n');
 
   // Normalize target directories to array
   const targetDirs =
@@ -92,30 +96,32 @@ export const genIndex = async (config: GenIndexConfig): Promise<void> => {
     }
 
     // Step 2: Generate index files
-    echo('Generating index files...');
+    conditionalEcho('Generating index files...');
     for (const dir of targetDirs) {
       const resolvedDir = path.resolve(dir);
       // eslint-disable-next-line no-await-in-loop
       await generateIndexFileForDir(resolvedDir, filledConfig);
     }
-    echo('✓ Index files generated\n');
+    conditionalEcho('✓ Index files generated\n');
 
     // Step 3: Format generated files
     if (filledConfig.formatCommand !== undefined) {
-      echo('Formatting generated files...');
+      conditionalEcho('Formatting generated files...');
       const fmtResult = await $(filledConfig.formatCommand, {
         silent: filledConfig.silent,
       });
       if (Result.isErr(fmtResult)) {
         throw new Error(`Formatting failed: ${fmtResult.value.message}`);
       }
-      echo('✓ Formatting completed\n');
+      conditionalEcho('✓ Formatting completed\n');
     }
 
-    echo('✅ Index file generation completed successfully!\n');
+    conditionalEcho('✅ Index file generation completed successfully!\n');
+
+    return Result.ok(undefined);
   } catch (error) {
-    echo(`❌ Index generation failed: ${String(error)}\n`);
-    throw error;
+    conditionalEcho(`❌ Index generation failed: ${String(error)}\n`);
+    return Result.err(error);
   }
 };
 

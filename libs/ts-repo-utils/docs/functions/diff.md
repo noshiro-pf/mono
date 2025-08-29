@@ -39,8 +39,8 @@ diff --name-only <base> [--diff-filter=d]`
 
 Defined in: [src/functions/diff.mts:30](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/diff.mts#L30)
 
-Get untracked files from the working tree (files not added to git). Runs `git
-git diff --staged --name-only [--diff-filter=d]`
+Get modified files from the working tree (files that have been changed but
+not staged). Runs `git diff --name-only [--diff-filter=d]`
 
 #### Parameters
 

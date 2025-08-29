@@ -20,16 +20,14 @@ export const formatFiles = async (
 ): Promise<Result<undefined, readonly unknown[]>> => {
   const silent = options?.silent ?? false;
 
+  const conditionalEcho = silent ? () => {} : echo;
+
   if (files.length === 0) {
-    if (!silent) {
-      echo('No files to format');
-    }
+    conditionalEcho('No files to format');
     return Result.ok(undefined);
   }
 
-  if (!silent) {
-    echo(`Formatting ${files.length} files...`);
-  }
+  conditionalEcho(`Formatting ${files.length} files...`);
 
   // Format each file
   const results: readonly PromiseSettledResult<Result<undefined, unknown>>[] =
@@ -42,9 +40,7 @@ export const formatFiles = async (
             await fs.access(filePath);
           } catch {
             // File doesn't exist, skip it
-            if (!silent) {
-              echo(`Skipping non-existent file: ${filePath}`);
-            }
+            conditionalEcho(`Skipping non-existent file: ${filePath}`);
             return Result.ok(undefined);
           }
 
@@ -60,9 +56,7 @@ export const formatFiles = async (
           });
 
           if (fileInfo.ignored) {
-            if (!silent) {
-              echo(`Skipping ignored file: ${filePath}`);
-            }
+            conditionalEcho(`Skipping ignored file: ${filePath}`);
             return Result.ok(undefined);
           }
 
@@ -74,14 +68,10 @@ export const formatFiles = async (
 
           // Only write if content changed
           if (formatted === content) {
-            if (!silent) {
-              echo(`Unchanged: ${filePath}`);
-            }
+            conditionalEcho(`Unchanged: ${filePath}`);
           } else {
             await fs.writeFile(filePath, formatted, 'utf8');
-            if (!silent) {
-              echo(`Formatted: ${filePath}`);
-            }
+            conditionalEcho(`Formatted: ${filePath}`);
           }
 
           return Result.ok(undefined);
@@ -124,6 +114,7 @@ export const formatFilesGlob = async (
   options?: Readonly<{ silent?: boolean }>,
 ): Promise<Result<undefined, unknown>> => {
   const silent = options?.silent ?? false;
+  const conditionalEcho = silent ? () => {} : echo;
 
   try {
     // Find all files matching the glob
@@ -134,9 +125,7 @@ export const formatFilesGlob = async (
     });
 
     if (files.length === 0) {
-      if (!silent) {
-        echo('No files found matching pattern:', pathGlob);
-      }
+      conditionalEcho('No files found matching pattern:', pathGlob);
       return Result.ok(undefined);
     }
 
@@ -260,6 +249,8 @@ export const formatDiffFrom = async (
     includeStaged = true,
   } = options ?? {};
 
+  const conditionalEcho = silent ? () => {} : echo;
+
   // Get files that differ from base branch/commit (excluding deleted files)
   const diffFromBaseResult = await getDiffFrom(base, {
     silent,
@@ -317,13 +308,11 @@ export const formatDiffFrom = async (
         .join(''),
     ].join('');
 
-    echo(`${message}:`, allFiles);
+    conditionalEcho(`${message}:`, allFiles);
   }
 
   if (allFiles.length === 0) {
-    if (!silent) {
-      echo('No files to format');
-    }
+    conditionalEcho('No files to format');
     return Result.ok(undefined);
   }
 

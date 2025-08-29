@@ -10,17 +10,17 @@
 
 ### ExecOptions
 
-> **ExecOptions** = `DeepReadonly`\<`ExecOptions_` & `ExecOptionsCustom`\>
+> **ExecOptions** = `childProcess.ExecOptions` & `ExecOptionsCustom`
 
-Defined in: [src/functions/exec-async.mts:12](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L12)
+Defined in: [src/functions/exec-async.mts:8](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L8)
 
 ***
 
 ### ExecResult\<T\>
 
-> **ExecResult**\<`T`\> = `Result`\<`Readonly`\<\{ `stderr`: `T`; `stdout`: `T`; \}\>, `ExecException`\>
+> **ExecResult**\<`T`\> = `Result`\<`Readonly`\<\{ `stderr`: `T`; `stdout`: `T`; \}\>, `childProcess.ExecException`\>
 
-Defined in: [src/functions/exec-async.mts:14](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L14)
+Defined in: [src/functions/exec-async.mts:10](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L10)
 
 #### Type Parameters
 
@@ -36,7 +36,7 @@ Defined in: [src/functions/exec-async.mts:14](https://github.com/noshiro-pf/ts-r
 
 > **$**(`command`, `options?`): `Promise`\<[`ExecResult`](#execresult)\<`string`\>\>
 
-Defined in: [src/functions/exec-async.mts:26](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L26)
+Defined in: [src/functions/exec-async.mts:22](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L22)
 
 Executes a shell command asynchronously.
 
@@ -64,7 +64,7 @@ A promise that resolves with the command result.
 
 > **$**(`command`, `options`): `Promise`\<[`ExecResult`](#execresult)\<`Buffer`\<`ArrayBufferLike`\>\>\>
 
-Defined in: [src/functions/exec-async.mts:31](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L31)
+Defined in: [src/functions/exec-async.mts:27](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L27)
 
 Executes a shell command asynchronously.
 
@@ -92,7 +92,7 @@ A promise that resolves with the command result.
 
 > **$**(`command`, `options`): `Promise`\<[`ExecResult`](#execresult)\<`string`\>\>
 
-Defined in: [src/functions/exec-async.mts:36](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L36)
+Defined in: [src/functions/exec-async.mts:33](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L33)
 
 Executes a shell command asynchronously.
 

@@ -11,7 +11,10 @@ export const repoIsDirty = async (
   options?: Readonly<{ silent?: boolean }>,
 ): Promise<boolean> => {
   const status = await getGitStatus({ silent: options?.silent ?? false });
-  return status.isDirty;
+  if (Result.isErr(status)) {
+    throw new Error(`Failed to get git status: ${status.value}`);
+  }
+  return status.value.isDirty;
 };
 
 /**
@@ -21,38 +24,39 @@ export const repoIsDirty = async (
 export const assertRepoIsClean = async (
   options?: Readonly<{ silent?: boolean }>,
 ): Promise<void> => {
-  try {
-    const status = await getGitStatus({ silent: options?.silent ?? false });
+  const silent = options?.silent ?? false;
+  const conditionalEcho = silent ? () => {} : echo;
 
-    if (!status.isDirty) {
-      echo('Repo is clean\n');
-      return;
-    }
+  const gitStatusResult = await getGitStatus({ silent });
 
-    echo('Repo is dirty\n');
-    echo('Changed files:\n');
-    echo(status.stdout);
-
-    // Show files not tracked by git and unstaged changes
-    const addResult = await $('git add -N .', {
-      silent: options?.silent ?? false,
-    });
-    if (Result.isErr(addResult)) {
-      echo('Warning: Failed to add untracked files for diff\n');
-    }
-
-    const diffResult = await $('git diff', {
-      silent: options?.silent ?? false,
-    });
-    if (Result.isErr(diffResult)) {
-      echo('Warning: Failed to show diff\n');
-    }
-
-    process.exit(1);
-  } catch (error) {
-    echo(`Error checking repository status: ${String(error)}\n`);
-    process.exit(1);
+  if (Result.isErr(gitStatusResult)) {
+    conditionalEcho(gitStatusResult.value);
+    return;
   }
+
+  const gitStatus = gitStatusResult.value;
+
+  if (!gitStatus.isDirty) {
+    conditionalEcho('Repo is clean\n');
+    return;
+  }
+
+  conditionalEcho('Repo is dirty\n');
+  conditionalEcho('Changed files:\n');
+  conditionalEcho(gitStatus.stdout);
+
+  // Show files not tracked by git and unstaged changes
+  const addResult = await $('git add -N .', { silent });
+  if (Result.isErr(addResult)) {
+    conditionalEcho('Warning: Failed to add untracked files for diff\n');
+  }
+
+  const diffResult = await $('git diff', { silent });
+  if (Result.isErr(diffResult)) {
+    conditionalEcho('Warning: Failed to show diff\n');
+  }
+
+  process.exit(1);
 };
 
 /**
@@ -62,22 +66,27 @@ export const assertRepoIsClean = async (
  */
 const getGitStatus = async (
   options?: Readonly<{ silent?: boolean }>,
-): Promise<{
-  isDirty: boolean;
-  stdout: string;
-}> => {
+): Promise<
+  Result<
+    Readonly<{
+      isDirty: boolean;
+      stdout: string;
+    }>,
+    string
+  >
+> => {
   const res = await $('git status --porcelain', {
     silent: options?.silent ?? false,
   });
 
   if (Result.isErr(res)) {
-    throw new Error(`Failed to get git status: ${res.value.message}`);
+    return Result.err(`Failed to get git status: ${res.value.message}`);
   }
 
   const { stdout } = res.value;
 
-  return {
+  return Result.ok({
     isDirty: stdout.trim() !== '',
     stdout,
-  };
+  });
 };

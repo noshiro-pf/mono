@@ -86,9 +86,9 @@ npm exec -- format-uncommitted --silent
 
 **Options:**
 
-- `--exclude-untracked` - Exclude untracked files in addition to diff files (default: false)
-- `--exclude-modified` - Exclude modified files in addition to diff files (default: false)
-- `--exclude-staged` - Exclude staged files in addition to diff files (default: false)
+- `--exclude-untracked` - Exclude untracked files (default: false)
+- `--exclude-modified` - Exclude modified files (default: false)
+- `--exclude-staged` - Exclude staged files (default: false)
 - `--silent` - Suppress output messages (default: false)
 
 ### `format-diff-from`
@@ -115,9 +115,9 @@ npm exec -- format-diff-from main --silent
 **Options:**
 
 - `<base>` - Base branch name or commit hash to compare against (required)
-- `--exclude-untracked` - Exclude untracked files in addition to diff files (default: false)
-- `--exclude-modified` - Exclude modified files in addition to diff files (default: false)
-- `--exclude-staged` - Exclude staged files in addition to diff files (default: false)
+- `--exclude-untracked` - Exclude untracked files (default: false)
+- `--exclude-modified` - Exclude modified files (default: false)
+- `--exclude-staged` - Exclude staged files (default: false)
 - `--silent` - Suppress output messages (default: false)
 
 ### `check-should-run-type-checks`
@@ -283,9 +283,49 @@ import { assertRepoIsClean } from 'ts-repo-utils';
 await assertRepoIsClean();
 ```
 
+**Options:**
+
+- `silent?` - Suppress output messages (default: false)
+
+#### Getting Git diff files
+
+##### `getUntrackedFiles(options?)`
+
+Get untracked files from the working tree (files not added to git).  
+Runs `git ls-files --others --exclude-standard [--deleted]`
+
+##### `getModifiedFiles(options?)`
+
+Get modified files from the working tree (files that have been changed but not staged).  
+Runs `git diff --name-only [--diff-filter=d]`
+
+##### `getStagedFiles(options?)`
+
+Get files that are staged for commit (files added with git add).  
+Runs `git diff --staged --name-only [--diff-filter=d]`
+
+##### `getDiffFrom(base: string, options?)`
+
+Get files that differ from the specified base branch or commit.  
+Runs `git diff --name-only <base> [--diff-filter=d]`
+
+**Common options:**
+
+- `excludeDeleted?: boolean` - Exclude deleted files (for formatters etc.) (default: true)
+- `silent?: boolean` - Don't log command/output (default: false)
+
+**Common Return Type:**
+
+```typescript
+type Ret = Result<
+    readonly string[],
+    ExecException | Readonly<{ message: string }>
+>;
+```
+
 ### Command Execution
 
-#### `$(command: string, options?: { silent?: boolean; timeout?: number }): Promise<ExecResult>`
+#### `$(command: string, options?: ExecOptions): Promise<ExecResult>`
 
 Executes a shell command asynchronously with timeout support and type-safe results.
 
@@ -304,45 +344,69 @@ if (result.type === 'ok') {
 **Options:**
 
 - `silent?: boolean` - Don't log command/output (default: false)
-- `timeout?: number` - Timeout in milliseconds (default: 30000)
+- `'node:child_process'` `exec` function options
 
 **Return Type:**
 
 ```typescript
-type ExecResult = Readonly<
-    | { type: 'ok'; stdout: string; stderr: string }
-    | { type: 'error'; exception: ExecException }
+type Ret = Promise<
+    Result<
+        Readonly<{ stdout: string | Buffer; stderr: string | Buffer }>,
+        import('node:child_process').ExecException
+    >
 >;
 ```
 
 ### Code Formatting Utilities
 
-#### `formatFiles(pathGlob: string): Promise<'ok' | 'err'>`
+#### `formatFilesGlob(pathGlob: string): Promise<Result<undefined, unknown>>`
 
 Format files matching a glob pattern using Prettier.
 
 ```typescript
-import { formatFiles } from 'ts-repo-utils';
+import { formatFilesGlob } from 'ts-repo-utils';
 
 // Format all TypeScript files in src
-await formatFiles('src/**/*.ts');
+await formatFilesGlob('src/**/*.ts');
 
 // Format specific files
-await formatFiles('src/{index,utils}.ts');
+await formatFilesGlob('src/{index,utils}.ts');
 ```
 
-#### `formatUntracked(): Promise<'ok' | 'err'>`
+**Options:**
+
+- `silent?` - Suppress output messages (default: false)
+
+#### `formatUncommittedFiles(): Promise<Result>`
 
 Format only files that have been changed according to git status.
 
 ```typescript
-import { formatUntracked } from 'ts-repo-utils';
+import { formatUncommittedFiles } from 'ts-repo-utils';
 
 // Format only modified files
-await formatUntracked();
+await formatUncommittedFiles();
 ```
 
-#### `formatDiffFrom(base: string): Promise<'ok' | 'err'>`
+**Options:**
+
+- `untracked?` - Format untracked files (default: true)
+- `modified?` - Format modified files (default: true)
+- `staged?` - Format staged files (default: true)
+- `silent?` - Suppress output messages (default: false)
+
+**Return Type:**
+
+```typescript
+type Ret = Promise<
+    Result<
+        undefined,
+        ExecException | Readonly<{ message: string }> | readonly unknown[]
+    >
+>;
+```
+
+#### `formatDiffFrom(base: string): Promise<Result>`
 
 Format only files that differ from the specified base branch or commit.
 
@@ -356,9 +420,27 @@ await formatDiffFrom('main');
 await formatDiffFrom('abc123');
 ```
 
+**Options:**
+
+- `includeUntracked?` - Include untracked files in addition to diff files (default: true)
+- `includeModified?` - Include modified files in addition to diff files (default: true)
+- `includeStaged?` - Include staged files in addition to diff files (default: true)
+- `silent?` - Suppress output messages (default: false)
+
+**Return Type:**
+
+```typescript
+type Ret = Promise<
+    Result<
+        undefined,
+        ExecException | Readonly<{ message: string }> | readonly unknown[]
+    >
+>;
+```
+
 ### Index File Generation
 
-#### `genIndex(config: GenIndexConfig): Promise<void>`
+#### `genIndex(config: GenIndexConfig): Promise<Result<undefined, unknown>>`
 
 Generates index files recursively in target directories with automatic barrel exports.
 
@@ -367,9 +449,7 @@ import { genIndex } from 'ts-repo-utils';
 
 await genIndex({
     targetDirectory: './src',
-    sourceExtension: '.ts',
-    exportExtension: '.js',
-    excludePatterns: ['*.test.ts', '*.spec.ts'],
+    exclude: ['*.test.ts', '*.spec.ts'],
 });
 ```
 
@@ -377,10 +457,41 @@ await genIndex({
 
 ```typescript
 type GenIndexConfig = DeepReadonly<{
-    targetDirectory: string | string[]; // Target directories to generate index files for
-    sourceExtension?: `.${string}`; // File extension of source files (default: '.mts')
-    exportExtension?: `.${string}`; // Extension to use in exports (default: '.mjs')
-    excludePatterns?: string[]; // Glob patterns to exclude (default: excludes .d.* and .test.*)
+    /**
+     * Target directories to generate index files for (string or array of
+     * strings)
+     */
+    targetDirectory: string | readonly string[];
+
+    /**
+     * Glob patterns of files or predicate function to exclude from exports
+     * (default: excludes `'**\/*.{test,spec}.?(c|m)[jt]s?(x)'` and
+     * `'**\/*.d.?(c|m)ts'`)
+     */
+    exclude?:
+        | readonly string[]
+        | ((
+              args: Readonly<{
+                  absolutePath: string;
+                  relativePath: string;
+                  fileName: string;
+              }>,
+          ) => boolean);
+
+    /** File extensions of source files to export (default: ['.ts', '.tsx']) */
+    targetExtensions?: readonly `.${string}`[];
+
+    /** File extension of index files to generate (default: '.ts') */
+    indexFileExtension?: `.${string}`;
+
+    /** File extension to use in export statements (default: '.js') */
+    exportStatementExtension?: `.${string}` | 'none';
+
+    /** Command to run for formatting generated files (optional) */
+    formatCommand?: string;
+
+    /** Whether to suppress output during execution (default: false) */
+    silent?: boolean;
 }>;
 ```
 
@@ -391,6 +502,11 @@ type GenIndexConfig = DeepReadonly<{
 - Automatically formats generated files using project's prettier config
 - Works with both single directories and directory arrays
 - Respects source and export extension configuration
+
+**Benefits:**
+
+- Prevents forgetting to export libraries
+- tsc can detect duplicate variables, type names, etc.
 
 ## Key Features
 
@@ -410,13 +526,13 @@ type GenIndexConfig = DeepReadonly<{
 ```typescript
 import { formatUntracked, assertExt, assertRepoIsClean } from 'ts-repo-utils';
 
-// Format changed files
-await formatUntracked();
-
 // Validate file extensions
 await assertExt({
     directories: [{ path: './src', extension: '.ts' }],
 });
+
+// Format changed files
+await formatUncommittedFiles();
 
 // Ensure repository is clean (exits if dirty)
 await assertRepoIsClean();
@@ -425,7 +541,7 @@ await assertRepoIsClean();
 ### Build Pipeline
 
 ```typescript
-import { assertExt, genIndex, $, formatFiles } from 'ts-repo-utils';
+import { assertExt, genIndex, $, formatFilesGlob } from 'ts-repo-utils';
 
 // Validate extensions
 await assertExt({
@@ -445,7 +561,7 @@ await $('tsc --noEmit');
 await $('rollup -c');
 
 // Format output
-await formatFiles('dist/**/*.js');
+await formatFilesGlob('dist/**/*.js');
 ```
 
 ### Project Validation

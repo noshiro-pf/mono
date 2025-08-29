@@ -20,7 +20,7 @@ Configuration for index file generation.
 
 ### genIndex()
 
-> **genIndex**(`config`): `Promise`\<`void`\>
+> **genIndex**(`config`): `Promise`\<`Result`\<`undefined`, `unknown`\>\>
 
 Defined in: [src/functions/gen-index.mts:74](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/gen-index.mts#L74)
 
@@ -78,7 +78,7 @@ File extensions of source files to export (default: ['.ts', '.tsx'])
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\<`Result`\<`undefined`, `unknown`\>\>
 
 #### Throws
 

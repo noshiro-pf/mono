@@ -24,8 +24,8 @@ export const getUntrackedFiles = async (
   });
 
 /**
- * Get untracked files from the working tree (files not added to git). Runs `git
- * git diff --staged --name-only [--diff-filter=d]`
+ * Get modified files from the working tree (files that have been changed but
+ * not staged). Runs `git diff --name-only [--diff-filter=d]`
  */
 export const getModifiedFiles = async (
   options?: Readonly<{
@@ -39,7 +39,7 @@ export const getModifiedFiles = async (
 > =>
   cmdResultToFiles({
     cmd: `git diff --name-only`,
-    cmdOptionToExcludeDeleted: '--diff-filter=d',
+    cmdOptionToExcludeDeleted: '--diff-filter=d', // lower case 'd' means exclude deleted files
     cmdOptionToIncludeDeleted: '',
     options,
   });
@@ -60,7 +60,7 @@ export const getStagedFiles = async (
 > =>
   cmdResultToFiles({
     cmd: `git diff --staged --name-only`,
-    cmdOptionToExcludeDeleted: '--diff-filter=d',
+    cmdOptionToExcludeDeleted: '--diff-filter=d', // lower case 'd' means exclude deleted files
     cmdOptionToIncludeDeleted: '',
     options,
   });

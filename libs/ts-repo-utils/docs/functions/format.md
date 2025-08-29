@@ -10,9 +10,9 @@
 
 ### formatDiffFrom()
 
-> **formatDiffFrom**(`base`, `options?`): `Promise`\<`Result`\<`undefined`, readonly `unknown`[] \| `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+> **formatDiffFrom**(`base`, `options?`): `Promise`\<`Result`\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-Defined in: [src/functions/format.mts:237](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L237)
+Defined in: [src/functions/format.mts:226](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L226)
 
 Format only files that differ from the specified base branch or commit
 
@@ -33,7 +33,7 @@ Options for formatting
 
 #### Returns
 
-`Promise`\<`Result`\<`undefined`, readonly `unknown`[] \| `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+`Promise`\<`Result`\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
 ***
 
@@ -67,7 +67,7 @@ Array of file paths to format
 
 > **formatFilesGlob**(`pathGlob`, `options?`): `Promise`\<`Result`\<`undefined`, `unknown`\>\>
 
-Defined in: [src/functions/format.mts:122](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L122)
+Defined in: [src/functions/format.mts:112](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L112)
 
 Format files matching the given glob pattern using Prettier
 
@@ -91,9 +91,9 @@ Glob pattern to match files
 
 ### formatUncommittedFiles()
 
-> **formatUncommittedFiles**(`options?`): `Promise`\<`Result`\<`undefined`, readonly `unknown`[] \| `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+> **formatUncommittedFiles**(`options?`): `Promise`\<`Result`\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-Defined in: [src/functions/format.mts:157](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L157)
+Defined in: [src/functions/format.mts:146](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L146)
 
 Format only files that have been changed (git status)
 
@@ -107,4 +107,4 @@ Options for formatting
 
 #### Returns
 
-`Promise`\<`Result`\<`undefined`, readonly `unknown`[] \| `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+`Promise`\<`Result`\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
