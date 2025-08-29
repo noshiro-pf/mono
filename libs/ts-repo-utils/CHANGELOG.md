@@ -1,3 +1,9 @@
+## [7.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.0.0...v7.0.1) (2025-08-29)
+
+### Bug Fixes
+
+- fix type annotation of execAsync ([#121](https://github.com/noshiro-pf/ts-repo-utils/issues/121)) ([150933d](https://github.com/noshiro-pf/ts-repo-utils/commit/150933dadad94ddff3e9a2b601472446c5943867))
+
 # [7.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v6.2.0...v7.0.0) (2025-08-29)
 
 ### Features
