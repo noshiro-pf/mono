@@ -63,7 +63,7 @@
   },
   "dependencies": {
     "@types/micromatch": "^4.0.9",
-    "cmd-ts": "^0.13.0",
+    "cmd-ts": "^0.14.1",
     "fast-glob": "^3.3.3",
     "micromatch": "^4.0.8",
     "prettier": "^3.6.2",
