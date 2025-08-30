@@ -1,3 +1,9 @@
+# [2.9.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.8.0...v2.9.0) (2025-08-30)
+
+### Features
+
+- add literal function and deprecate stringLiteral, numberLiteral, booleanLiteral, bigintLiteral ([#52](https://github.com/noshiro-pf/ts-fortress/issues/52)) ([71aff0f](https://github.com/noshiro-pf/ts-fortress/commit/71aff0f5ba6e629ec928841cad0332ae8387669d))
+
 # [2.8.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.7.0...v2.8.0) (2025-08-30)
 
 ### Features
