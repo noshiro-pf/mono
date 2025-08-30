@@ -1,3 +1,9 @@
+## [2.6.2](https://github.com/noshiro-pf/ts-fortress/compare/v2.6.1...v2.6.2) (2025-08-30)
+
+### Bug Fixes
+
+- fix validation error message for stringLiteral ([#48](https://github.com/noshiro-pf/ts-fortress/issues/48)) ([e4c28b6](https://github.com/noshiro-pf/ts-fortress/commit/e4c28b6666c308b066a6a6ee23afefc3f0802dc9))
+
 ## [2.6.1](https://github.com/noshiro-pf/ts-fortress/compare/v2.6.0...v2.6.1) (2025-08-29)
 
 ### Bug Fixes
