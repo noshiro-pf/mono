@@ -1,3 +1,9 @@
+## [7.0.4](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.0.3...v7.0.4) (2025-08-30)
+
+### Bug Fixes
+
+- bump cmd-ts from 0.13.0 to 0.14.1 ([#127](https://github.com/noshiro-pf/ts-repo-utils/issues/127)) ([3fab622](https://github.com/noshiro-pf/ts-repo-utils/commit/3fab622027344aa447da47232b706bfa426e98ec))
+
 ## [7.0.3](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.0.2...v7.0.3) (2025-08-30)
 
 ### Bug Fixes
