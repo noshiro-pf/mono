@@ -1,3 +1,9 @@
+# [2.10.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.9.0...v2.10.0) (2025-08-30)
+
+### Features
+
+- add refine type utility ([#53](https://github.com/noshiro-pf/ts-fortress/issues/53)) ([89c1ab3](https://github.com/noshiro-pf/ts-fortress/commit/89c1ab31b4696a902260e7cd1f6b84d9ff50f689))
+
 # [2.9.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.8.0...v2.9.0) (2025-08-30)
 
 ### Features
