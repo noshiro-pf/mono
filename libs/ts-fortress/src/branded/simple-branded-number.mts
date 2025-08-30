@@ -2,17 +2,22 @@ import { number } from '../primitives/index.mjs';
 import { type Type } from '../type.mjs';
 import { brand } from './brand.mjs';
 
-export const simpleBrandedNumber = <S extends string>(
-  typeName: S,
-  defaultValue: number = 0,
-): Type<Brand<number, S>> =>
+export const simpleBrandedNumber = <K extends string>({
+  typeName,
+  defaultValue,
+  is = (_u): _u is Brand<number, K> => true,
+}: Readonly<{
+  typeName: K;
+  defaultValue: number;
+  is?: (u: number) => u is Brand<number, K>;
+}>): Type<Brand<number, K>> =>
   brand({
-    codec: number(defaultValue),
+    baseType: number(defaultValue),
 
     defaultValue:
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      defaultValue as Brand<number, S>,
+      defaultValue as Brand<number, K>,
 
-    is: (_id: number): _id is Brand<number, S> => true,
+    is,
     brandKeys: [typeName],
   });

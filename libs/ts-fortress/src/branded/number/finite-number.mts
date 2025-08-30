@@ -7,7 +7,7 @@ export const finiteNumber = (
   defaultValue: FiniteNumber = asFiniteNumber(0),
 ): Type<FiniteNumber> =>
   brand({
-    codec: number(defaultValue),
+    baseType: number(defaultValue),
     is: FiniteNumber.is,
     defaultValue,
     brandKeys: ['Finite'],

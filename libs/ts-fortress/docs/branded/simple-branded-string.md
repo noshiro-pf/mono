@@ -10,26 +10,22 @@
 
 ### simpleBrandedString()
 
-> **simpleBrandedString**\<`S`\>(`typeName`, `defaultValue`): [`Type`](../type.md#type)\<`Brand`\<`string`, `S`\>\>
+> **simpleBrandedString**\<`K`\>(`__namedParameters`): [`Type`](../type.md#type)\<`Brand`\<`string`, `K`\>\>
 
 Defined in: [src/branded/simple-branded-string.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/simple-branded-string.mts#L5)
 
 #### Type Parameters
 
-##### S
+##### K
 
-`S` _extends_ `string`
+`K` _extends_ `string`
 
 #### Parameters
 
-##### typeName
+##### \_\_namedParameters
 
-`S`
-
-##### defaultValue
-
-`string` = `''`
+`Readonly`\<\{ `defaultValue`: `string`; `is?`: (`u`) => `u is Brand<string, K>`; `typeName`: `K`; \}\>
 
 #### Returns
 
-[`Type`](../type.md#type)\<`Brand`\<`string`, `S`\>\>
+[`Type`](../type.md#type)\<`Brand`\<`string`, `K`\>\>

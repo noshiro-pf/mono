@@ -7,7 +7,7 @@ export const positiveSafeInt = (
   defaultValue: PositiveSafeInt = asPositiveSafeInt(1),
 ): Type<PositiveSafeInt> =>
   brand({
-    codec: number(defaultValue),
+    baseType: number(defaultValue),
     is: isPositiveSafeInt,
     defaultValue,
     brandKeys: [

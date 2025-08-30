@@ -5,7 +5,7 @@ import { brand } from '../brand.mjs';
 
 export const safeInt = (defaultValue: SafeInt = asSafeInt(0)): Type<SafeInt> =>
   brand({
-    codec: number(defaultValue),
+    baseType: number(defaultValue),
     is: SafeInt.is,
     defaultValue,
     brandKeys: ['Finite', 'Int', 'SafeInt'],

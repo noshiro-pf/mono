@@ -5,7 +5,10 @@ import { simpleBrandedNumber } from './simple-branded-number.mjs';
 
 describe('simpleBrandedNumber', () => {
   describe('with default value', () => {
-    const userIdType = simpleBrandedNumber('UserId');
+    const userIdType = simpleBrandedNumber({
+      typeName: 'UserId',
+      defaultValue: 0,
+    });
 
     type UserId = TypeOf<typeof userIdType>;
 
@@ -97,7 +100,10 @@ describe('simpleBrandedNumber', () => {
   });
 
   describe('with custom default value', () => {
-    const scoreType = simpleBrandedNumber('Score', 100);
+    const scoreType = simpleBrandedNumber({
+      typeName: 'Score',
+      defaultValue: 100,
+    });
 
     type Score = TypeOf<typeof scoreType>;
 
@@ -160,7 +166,10 @@ describe('simpleBrandedNumber', () => {
   });
 
   describe('type assertions and narrowing', () => {
-    const priceType = simpleBrandedNumber('Price', 0);
+    const priceType = simpleBrandedNumber({
+      typeName: 'Price',
+      defaultValue: 0,
+    });
 
     test('type narrowing works correctly', () => {
       const x: unknown = 29.99;

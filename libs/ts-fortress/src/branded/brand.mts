@@ -11,14 +11,14 @@ export const brand = <
   const BrandTrueKeys extends readonly string[],
   const BrandFalseKeys extends readonly string[] = [],
 >({
-  codec,
+  baseType,
   is,
   defaultValue,
   typeName,
   brandKeys,
   brandFalseKeys,
 }: Readonly<{
-  codec: Type<A>;
+  baseType: Type<A>;
   is: (
     a: A,
   ) => a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>;
@@ -44,17 +44,17 @@ export const brand = <
 
   const validate: Type<T>['validate'] = (a) =>
     pipe(a)
-      .map(codec.validate)
+      .map(baseType.validate)
       .map(
-        (v): Result<T, readonly ValidationError[]> =>
-          Result.isErr(v)
-            ? v
-            : is(v.value)
-              ? Result.ok(v.value)
+        (res): Result<T, readonly ValidationError[]> =>
+          Result.isErr(res)
+            ? res
+            : is(res.value)
+              ? Result.ok(res.value satisfies T)
               : Result.err([
                   {
                     path: [],
-                    actualValue: v.value,
+                    actualValue: res.value,
                     expectedType: typeNameFilled,
                     typeName: brandKeysStr,
                     message:

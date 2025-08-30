@@ -7,7 +7,7 @@ export const positiveInt = (
   defaultValue: PositiveInt = asPositiveInt(1),
 ): Type<PositiveInt> =>
   brand({
-    codec: number(defaultValue),
+    baseType: number(defaultValue),
     is: isPositiveInt,
     defaultValue,
     brandKeys: [

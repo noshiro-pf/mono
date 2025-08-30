@@ -5,7 +5,7 @@ import { brand } from '../brand.mjs';
 
 export const int32 = (defaultValue: Int32 = asInt32(0)): Type<Int32> =>
   brand({
-    codec: number(defaultValue),
+    baseType: number(defaultValue),
     is: isInt32,
     defaultValue,
     brandKeys: [

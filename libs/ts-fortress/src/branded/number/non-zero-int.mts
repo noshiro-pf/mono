@@ -7,7 +7,7 @@ export const nonZeroInt = (
   defaultValue: NonZeroInt = asNonZeroInt(0),
 ): Type<NonZeroInt> =>
   brand({
-    codec: number(defaultValue),
+    baseType: number(defaultValue),
     is: isNonZeroInt,
     defaultValue,
     brandKeys: ['Finite', 'Int', '!=0'],

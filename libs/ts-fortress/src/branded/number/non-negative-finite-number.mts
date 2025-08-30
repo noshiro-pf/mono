@@ -10,7 +10,7 @@ export const nonNegativeFiniteNumber = (
   defaultValue: NonNegativeFiniteNumber = asNonNegativeFiniteNumber(0),
 ): Type<NonNegativeFiniteNumber> =>
   brand({
-    codec: number(defaultValue),
+    baseType: number(defaultValue),
     is: isNonNegativeFiniteNumber,
     defaultValue,
     brandKeys: ['>=0', '> -2^16', '> -2^32', '>= -2^15', '>= -2^31', 'Finite'],

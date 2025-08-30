@@ -7,7 +7,7 @@ export const safeUint = (
   defaultValue: SafeUint = asSafeUint(0),
 ): Type<SafeUint> =>
   brand({
-    codec: number(defaultValue),
+    baseType: number(defaultValue),
     is: isSafeUint,
     defaultValue,
     brandKeys: [

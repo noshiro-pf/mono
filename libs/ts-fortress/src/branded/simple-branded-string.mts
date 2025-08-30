@@ -2,17 +2,22 @@ import { string } from '../primitives/index.mjs';
 import { type Type } from '../type.mjs';
 import { brand } from './brand.mjs';
 
-export const simpleBrandedString = <S extends string>(
-  typeName: S,
-  defaultValue: string = '',
-): Type<Brand<string, S>> =>
+export const simpleBrandedString = <K extends string>({
+  typeName,
+  defaultValue,
+  is = (_u): _u is Brand<string, K> => true,
+}: Readonly<{
+  typeName: K;
+  defaultValue: string;
+  is?: (u: string) => u is Brand<string, K>;
+}>): Type<Brand<string, K>> =>
   brand({
-    codec: string(defaultValue),
+    baseType: string(defaultValue),
 
     defaultValue:
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      defaultValue as Brand<string, S>,
+      defaultValue as Brand<string, K>,
 
-    is: (_id: string): _id is Brand<string, S> => true,
+    is,
     brandKeys: [typeName],
   });

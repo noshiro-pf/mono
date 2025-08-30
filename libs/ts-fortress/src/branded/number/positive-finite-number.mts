@@ -7,7 +7,7 @@ export const positiveFiniteNumber = (
   defaultValue: PositiveFiniteNumber,
 ): Type<PositiveFiniteNumber> =>
   brand({
-    codec: number(defaultValue),
+    baseType: number(defaultValue),
     is: isPositiveFiniteNumber,
     defaultValue,
     brandKeys: [

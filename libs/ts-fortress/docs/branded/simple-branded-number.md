@@ -10,26 +10,22 @@
 
 ### simpleBrandedNumber()
 
-> **simpleBrandedNumber**\<`S`\>(`typeName`, `defaultValue`): [`Type`](../type.md#type)\<`Brand`\<`number`, `S`\>\>
+> **simpleBrandedNumber**\<`K`\>(`__namedParameters`): [`Type`](../type.md#type)\<`Brand`\<`number`, `K`\>\>
 
 Defined in: [src/branded/simple-branded-number.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/simple-branded-number.mts#L5)
 
 #### Type Parameters
 
-##### S
+##### K
 
-`S` _extends_ `string`
+`K` _extends_ `string`
 
 #### Parameters
 
-##### typeName
+##### \_\_namedParameters
 
-`S`
-
-##### defaultValue
-
-`number` = `0`
+`Readonly`\<\{ `defaultValue`: `number`; `is?`: (`u`) => `u is Brand<number, K>`; `typeName`: `K`; \}\>
 
 #### Returns
 
-[`Type`](../type.md#type)\<`Brand`\<`number`, `S`\>\>
+[`Type`](../type.md#type)\<`Brand`\<`number`, `K`\>\>

@@ -5,7 +5,10 @@ import { simpleBrandedString } from './simple-branded-string.mjs';
 
 describe('simpleBrandedString', () => {
   describe('with default value', () => {
-    const userNameType = simpleBrandedString('UserName');
+    const userNameType = simpleBrandedString({
+      typeName: 'UserName',
+      defaultValue: '',
+    });
 
     type UserName = TypeOf<typeof userNameType>;
 
@@ -98,7 +101,10 @@ describe('simpleBrandedString', () => {
   });
 
   describe('with custom default value', () => {
-    const categoryType = simpleBrandedString('Category', 'general');
+    const categoryType = simpleBrandedString({
+      typeName: 'Category',
+      defaultValue: 'general',
+    });
 
     type Category = TypeOf<typeof categoryType>;
 
@@ -161,7 +167,10 @@ describe('simpleBrandedString', () => {
   });
 
   describe('type assertions and narrowing', () => {
-    const emailType = simpleBrandedString('Email', '');
+    const emailType = simpleBrandedString({
+      typeName: 'Email',
+      defaultValue: '',
+    });
 
     test('type narrowing works correctly', () => {
       const x: unknown = 'user@example.com';
@@ -178,8 +187,14 @@ describe('simpleBrandedString', () => {
   });
 
   describe('different brand types', () => {
-    const firstNameType = simpleBrandedString('FirstName', '');
-    const lastNameType = simpleBrandedString('LastName', '');
+    const firstNameType = simpleBrandedString({
+      typeName: 'FirstName',
+      defaultValue: '',
+    });
+    const lastNameType = simpleBrandedString({
+      typeName: 'LastName',
+      defaultValue: '',
+    });
 
     test('creates distinct branded types', () => {
       type FirstName = TypeOf<typeof firstNameType>;

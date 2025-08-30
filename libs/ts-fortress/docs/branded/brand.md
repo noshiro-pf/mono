@@ -32,7 +32,7 @@ Defined in: [src/branded/brand.mts:9](https://github.com/noshiro-pf/ts-fortress/
 
 ##### \_\_namedParameters
 
-`Readonly`\<\{ `brandFalseKeys?`: `BrandFalseKeys`; `brandKeys`: `BrandTrueKeys`; `codec`: [`Type`](../type.md#type)\<`A`\>; `defaultValue`: `Brand`\<`A`, `ArrayToUnion`\<`BrandTrueKeys`\>, `ArrayToUnion`\<`BrandFalseKeys`\>\>; `is`: (`a`) => `a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>`; `typeName?`: `string`; \}\>
+`Readonly`\<\{ `baseType`: [`Type`](../type.md#type)\<`A`\>; `brandFalseKeys?`: `BrandFalseKeys`; `brandKeys`: `BrandTrueKeys`; `defaultValue`: `Brand`\<`A`, `ArrayToUnion`\<`BrandTrueKeys`\>, `ArrayToUnion`\<`BrandFalseKeys`\>\>; `is`: (`a`) => `a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>`; `typeName?`: `string`; \}\>
 
 #### Returns
 
