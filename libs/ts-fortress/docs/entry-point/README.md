@@ -1240,7 +1240,7 @@ This type is essential for:
 - Preventing NaN/Infinity propagation in calculations
 - Ensuring numeric stability in algorithms
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 
@@ -1678,7 +1678,7 @@ Unlike SafeInt, Int allows values outside the safe integer range
 (±2^53 - 1), but be aware that very large integers may lose precision
 in JavaScript's number type.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 
@@ -2018,7 +2018,7 @@ Namespace providing type-safe arithmetic operations for 16-bit signed integers.
 All operations automatically clamp results to the valid Int16 range [-32768, 32767].
 This ensures that all arithmetic maintains the 16-bit signed integer constraint.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 
@@ -2287,7 +2287,7 @@ Namespace providing type-safe arithmetic operations for 32-bit signed integers.
 All operations automatically clamp results to the valid Int32 range [-2147483648, 2147483647].
 This ensures that all arithmetic maintains the 32-bit signed integer constraint, preventing overflow.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 
@@ -2566,7 +2566,7 @@ This type is useful for:
 - Memory-efficient integer storage
 - Image processing (signed pixel offsets)
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 
@@ -3619,7 +3619,7 @@ All operations maintain the non-negative constraint by clamping negative results
 while ensuring results remain finite (excluding NaN and Infinity). This type is useful
 for representing measurements, distances, weights, and other inherently non-negative values.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -3928,7 +3928,7 @@ All operations automatically clamp results to the valid NonNegativeInt16 range [
 This ensures that all arithmetic maintains the 16-bit non-negative integer constraint,
 with negative results clamped to 0 and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -4185,7 +4185,7 @@ All operations automatically clamp results to the valid NonNegativeInt32 range [
 This ensures that all arithmetic maintains the 32-bit non-negative integer constraint,
 with negative results clamped to 0 and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -4442,7 +4442,7 @@ All operations maintain the non-zero constraint while ensuring results remain fi
 (excluding NaN and Infinity). This type is useful for values that must never be zero,
 such as denominators, scaling factors, and ratios.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 
@@ -4747,7 +4747,7 @@ Namespace providing type-safe arithmetic operations for non-zero integers.
 All operations maintain the non-zero constraint, ensuring that results are always valid NonZeroInt values.
 Division operations return floor division results, and all arithmetic maintains integer precision.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 
@@ -4989,7 +4989,7 @@ All operations automatically clamp results to the valid NonZeroInt16 range [-327
 excluding 0. This ensures that all arithmetic maintains the 16-bit non-zero signed integer
 constraint, preventing zero results and overflow.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 
@@ -5261,7 +5261,7 @@ All operations automatically clamp results to the valid NonZeroInt32 range [-214
 excluding 0. This ensures that all arithmetic maintains the 32-bit non-zero signed integer
 constraint, preventing zero results and overflow.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 
@@ -5533,7 +5533,7 @@ All operations automatically clamp results to the non-zero safe integer range, e
 This ensures that all arithmetic maintains both the non-zero constraint and IEEE 754 precision guarantees,
 preventing precision loss while ensuring results are never zero.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 
@@ -5803,7 +5803,7 @@ All operations automatically clamp results to the valid NonZeroUint16 range [1, 
 This ensures that all arithmetic maintains the 16-bit non-zero unsigned integer constraint,
 with results below 1 clamped to MIN_VALUE and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -6057,7 +6057,7 @@ All operations automatically clamp results to the valid NonZeroUint32 range [1, 
 This ensures that all arithmetic maintains the 32-bit non-zero unsigned integer constraint,
 with results below 1 clamped to MIN_VALUE and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -6312,7 +6312,7 @@ while ensuring results remain finite (excluding NaN and Infinity). This type is 
 for representing quantities that must always be positive, such as probabilities, magnitudes,
 and physical measurements.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -6633,7 +6633,7 @@ This type is essential for:
 - Loop counters and iteration counts
 - Database primary keys and IDs
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -6988,7 +6988,7 @@ All operations automatically clamp results to the valid PositiveInt16 range [1, 
 This ensures that all arithmetic maintains the 16-bit positive integer constraint,
 with results below 1 clamped to MIN_VALUE and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -7242,7 +7242,7 @@ All operations automatically clamp results to the valid PositiveInt32 range [1, 
 This ensures that all arithmetic maintains the 32-bit positive integer constraint,
 with results below 1 clamped to MIN_VALUE and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -7496,7 +7496,7 @@ All operations automatically clamp results to the positive safe integer range [1
 This ensures that all arithmetic maintains both the positive constraint and IEEE 754 precision guarantees,
 preventing precision loss and ensuring results are always positive.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -7749,7 +7749,7 @@ All operations automatically clamp results to the valid PositiveUint16 range [1,
 This ensures that all arithmetic maintains the 16-bit positive unsigned integer constraint,
 with results below 1 clamped to MIN_VALUE and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -8003,7 +8003,7 @@ All operations automatically clamp results to the valid PositiveUint32 range [1,
 This ensures that all arithmetic maintains the 32-bit positive unsigned integer constraint,
 with results below 1 clamped to MIN_VALUE and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -8266,7 +8266,7 @@ ideal for:
 - Array indices and sizes
 - Any integer arithmetic requiring precision guarantees
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 
@@ -8610,7 +8610,7 @@ All operations automatically clamp results to the safe unsigned integer range [0
 This ensures that all arithmetic maintains both the non-negative constraint and IEEE 754 precision guarantees,
 preventing precision loss while ensuring results are never negative.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -8862,7 +8862,7 @@ Namespace providing type-safe arithmetic operations for unsigned integers.
 All operations maintain the non-negative constraint by clamping negative results to 0.
 This ensures that all arithmetic preserves the unsigned integer property.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -9110,7 +9110,7 @@ All operations automatically clamp results to the valid Uint16 range [0, 65535].
 This ensures that all arithmetic maintains the 16-bit unsigned integer constraint,
 with negative results clamped to 0 and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -9361,7 +9361,7 @@ Utility functions for working with Uint32 (32-bit unsigned integer) branded type
 Provides type-safe operations that ensure results remain within the valid range [0, 2^32).
 All arithmetic operations are clamped to maintain the Uint32 constraint.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
@@ -9664,7 +9664,7 @@ All operations automatically clamp results to the valid Uint8 range [0, 255].
 This ensures that all arithmetic maintains the 8-bit unsigned integer constraint,
 with negative results clamped to 0 and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 
