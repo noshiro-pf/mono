@@ -20,4 +20,5 @@ export const uint32 = (defaultValue: Uint32 = asUint32(0)): Type<Uint32> =>
       '< 2^32',
     ],
     brandFalseKeys: ['NaNValue'],
+    typeName: 'Uint32',
   });

@@ -79,14 +79,13 @@ describe('nonZeroInt', () => {
           {
             path: [],
             actualValue: 0,
-            expectedType: 'Finite & Int & !=0 & not(NaNValue)',
-            typeName: 'Finite & Int & !=0 & not(NaNValue)',
-            message:
-              'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & !=0 & not(NaNValue)>',
+            expectedType: 'NonZeroInt',
+            typeName: '"Finite" & "Int" & "!=0" & not("NaNValue")',
+            message: undefined,
           },
         ]);
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & !=0 & not(NaNValue)>',
+          'Expected <NonZeroInt>, got <number> type value `0`.',
         ]);
       }
     });

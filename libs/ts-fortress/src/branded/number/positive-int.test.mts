@@ -96,16 +96,14 @@ describe('positiveInt', () => {
           {
             path: [],
             actualValue: -5,
-            expectedType:
-              'Finite & Int & > -2^32 & >= -2^31 & > -2^16 & >= -2^15 & >=0 & !=0 & not(NaNValue)',
+            expectedType: 'PositiveInt',
             typeName:
-              'Finite & Int & > -2^32 & >= -2^31 & > -2^16 & >= -2^15 & >=0 & !=0 & not(NaNValue)',
-            message:
-              'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & > -2^32 & >= -2^31 & > -2^16 & >= -2^15 & >=0 & !=0 & not(NaNValue)>',
+              '"Finite" & "Int" & "> -2^32" & ">= -2^31" & "> -2^16" & ">= -2^15" & ">=0" & "!=0" & not("NaNValue")',
+            message: undefined,
           },
         ]);
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & > -2^32 & >= -2^31 & > -2^16 & >= -2^15 & >=0 & !=0 & not(NaNValue)>',
+          'Expected <PositiveInt>, got <number> type value `-5`.',
         ]);
       }
     });
@@ -149,7 +147,7 @@ describe('positiveInt', () => {
         targetType.assertIs;
       expect(() => {
         assertIs(x);
-      }).toThrow('The value must satisfy the constraint');
+      }).toThrow('Expected <PositiveInt>');
     });
   });
 

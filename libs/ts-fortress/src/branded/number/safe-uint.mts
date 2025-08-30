@@ -21,4 +21,5 @@ export const safeUint = (
       '>=0',
     ],
     brandFalseKeys: ['NaNValue'],
+    typeName: 'SafeUint',
   });

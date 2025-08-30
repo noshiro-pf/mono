@@ -22,4 +22,5 @@ export const positiveSafeInt = (
       '!=0',
     ],
     brandFalseKeys: ['NaNValue'],
+    typeName: 'PositiveSafeInt',
   });

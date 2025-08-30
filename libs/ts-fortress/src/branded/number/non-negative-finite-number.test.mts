@@ -90,16 +90,14 @@ describe('nonNegativeFiniteNumber', () => {
           {
             path: [],
             actualValue: -5.5,
-            expectedType:
-              '>=0 & > -2^16 & > -2^32 & >= -2^15 & >= -2^31 & Finite & not(NaNValue)',
+            expectedType: 'NonNegativeFiniteNumber',
             typeName:
-              '>=0 & > -2^16 & > -2^32 & >= -2^15 & >= -2^31 & Finite & not(NaNValue)',
-            message:
-              'The value must satisfy the constraint corresponding to the brand keys: <>=0 & > -2^16 & > -2^32 & >= -2^15 & >= -2^31 & Finite & not(NaNValue)>',
+              '">=0" & "> -2^16" & "> -2^32" & ">= -2^15" & ">= -2^31" & "Finite" & not("NaNValue")',
+            message: undefined,
           },
         ]);
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value must satisfy the constraint corresponding to the brand keys: <>=0 & > -2^16 & > -2^32 & >= -2^15 & >= -2^31 & Finite & not(NaNValue)>',
+          'Expected <NonNegativeFiniteNumber>, got <number> type value `-5.5`.',
         ]);
       }
     });

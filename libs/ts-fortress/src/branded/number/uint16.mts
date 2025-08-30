@@ -22,4 +22,5 @@ export const uint16 = (defaultValue: Uint16 = asUint16(0)): Type<Uint16> =>
       '< 2^31',
     ],
     brandFalseKeys: ['NaNValue'],
+    typeName: 'Uint16',
   });

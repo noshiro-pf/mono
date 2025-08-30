@@ -73,16 +73,14 @@ describe('int32', () => {
           {
             path: [],
             actualValue: 3000000000,
-            expectedType:
-              'Finite & Int & SafeInt & > -2^32 & >= -2^31 & < 2^32 & < 2^31 & not(NaNValue)',
+            expectedType: 'Int32',
             typeName:
-              'Finite & Int & SafeInt & > -2^32 & >= -2^31 & < 2^32 & < 2^31 & not(NaNValue)',
-            message:
-              'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & SafeInt & > -2^32 & >= -2^31 & < 2^32 & < 2^31 & not(NaNValue)>',
+              '"Finite" & "Int" & "SafeInt" & "> -2^32" & ">= -2^31" & "< 2^32" & "< 2^31" & not("NaNValue")',
+            message: undefined,
           },
         ]);
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & SafeInt & > -2^32 & >= -2^31 & < 2^32 & < 2^31 & not(NaNValue)>',
+          'Expected <Int32>, got <number> type value `3000000000`.',
         ]);
       }
     });

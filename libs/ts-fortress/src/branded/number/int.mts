@@ -10,4 +10,5 @@ export const int = (defaultValue: Int = asInt(0)): Type<Int> =>
     defaultValue,
     brandKeys: ['Finite', 'Int'],
     brandFalseKeys: ['NaNValue'],
+    typeName: 'Int',
   });

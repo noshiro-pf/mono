@@ -12,4 +12,5 @@ export const nonZeroSafeInt = (
     defaultValue,
     brandKeys: ['Finite', 'Int', 'SafeInt', '!=0'],
     brandFalseKeys: ['NaNValue'],
+    typeName: 'NonZeroSafeInt',
   });

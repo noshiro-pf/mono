@@ -12,7 +12,7 @@
 
 > **brand**\<`A`, `BrandTrueKeys`, `BrandFalseKeys`\>(`__namedParameters`): [`Type`](../type.md#type)\<`Brand`\<`A`, `ArrayToUnion`\<`BrandTrueKeys`\>, `ArrayToUnion`\<`BrandFalseKeys`\>\>\>
 
-Defined in: [src/branded/brand.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/brand.mts#L13)
+Defined in: [src/branded/brand.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/brand.mts#L9)
 
 #### Type Parameters
 
@@ -32,7 +32,7 @@ Defined in: [src/branded/brand.mts:13](https://github.com/noshiro-pf/ts-fortress
 
 ##### \_\_namedParameters
 
-`Readonly`\<\{ `brandFalseKeys?`: `BrandFalseKeys`; `brandKeys`: `BrandTrueKeys`; `codec`: [`Type`](../type.md#type)\<`A`\>; `defaultValue`: `Brand`\<`A`, `ArrayToUnion`\<`BrandTrueKeys`\>, `ArrayToUnion`\<`BrandFalseKeys`\>\>; `is`: (`a`) => `a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>`; \}\>
+`Readonly`\<\{ `brandFalseKeys?`: `BrandFalseKeys`; `brandKeys`: `BrandTrueKeys`; `codec`: [`Type`](../type.md#type)\<`A`\>; `defaultValue`: `Brand`\<`A`, `ArrayToUnion`\<`BrandTrueKeys`\>, `ArrayToUnion`\<`BrandFalseKeys`\>\>; `is`: (`a`) => `a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>`; `typeName?`: `string`; \}\>
 
 #### Returns
 

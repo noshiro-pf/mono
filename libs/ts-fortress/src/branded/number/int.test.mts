@@ -69,15 +69,14 @@ describe('int', () => {
           {
             path: [],
             actualValue: 42.5,
-            expectedType: 'Finite & Int & not(NaNValue)',
-            typeName: 'Finite & Int & not(NaNValue)',
-            message:
-              'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & not(NaNValue)>',
+            expectedType: 'Int',
+            typeName: '"Finite" & "Int" & not("NaNValue")',
+            message: undefined,
           },
         ]);
 
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & not(NaNValue)>',
+          'Expected <Int>, got <number> type value `42.5`.',
         ]);
       }
     });
@@ -131,7 +130,7 @@ describe('int', () => {
         targetType.assertIs;
       expect(() => {
         assertIs(x);
-      }).toThrow('The value must satisfy the constraint');
+      }).toThrow('Expected <Int>');
     });
   });
 

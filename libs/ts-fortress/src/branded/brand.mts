@@ -1,10 +1,6 @@
 import { pipe, Result } from 'ts-data-forge';
 import { type Type } from '../type.mjs';
-import {
-  createType,
-  type ValidationError,
-  type ValidationErrorWithMessage,
-} from '../utils/index.mjs';
+import { createType, type ValidationError } from '../utils/index.mjs';
 
 type ArrayToUnion<A extends readonly unknown[]> = A extends readonly []
   ? never
@@ -17,30 +13,34 @@ export const brand = <
 >({
   codec,
   is,
+  defaultValue,
+  typeName,
   brandKeys,
   brandFalseKeys,
-  defaultValue,
 }: Readonly<{
   codec: Type<A>;
   is: (
     a: A,
   ) => a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>;
-  brandKeys: BrandTrueKeys;
-  brandFalseKeys?: BrandFalseKeys;
   defaultValue: Brand<
     A,
     ArrayToUnion<BrandTrueKeys>,
     ArrayToUnion<BrandFalseKeys>
   >;
+  typeName?: string;
+  brandKeys: BrandTrueKeys;
+  brandFalseKeys?: BrandFalseKeys;
 }>): Type<
   Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>
 > => {
   type T = Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>;
 
   const brandKeysStr = [
-    ...brandKeys,
-    ...(brandFalseKeys?.map((s) => `not(${s})`) ?? []),
+    ...brandKeys.map((s) => `"${s}"`),
+    ...(brandFalseKeys?.map((s) => `not("${s}")`) ?? []),
   ].join(' & ');
+
+  const typeNameFilled = typeName ?? brandKeysStr;
 
   const validate: Type<T>['validate'] = (a) =>
     pipe(a)
@@ -55,23 +55,19 @@ export const brand = <
                   {
                     path: [],
                     actualValue: v.value,
-                    expectedType: brandKeysStr,
+                    expectedType: typeNameFilled,
                     typeName: brandKeysStr,
-                    message: `The value must satisfy the constraint corresponding to the brand keys: <${brandKeysStr}>`,
-                  } satisfies ValidationErrorWithMessage,
+                    message:
+                      typeName === undefined
+                        ? `The value must satisfy the constraint corresponding to the brand keys: <${brandKeysStr}>`
+                        : undefined,
+                  } satisfies ValidationError,
                 ]),
       ).value;
-
-  const fill: Type<T>['fill'] = (a) =>
-    Result.unwrapOkOr(
-      validate(a) satisfies Result<T, unknown>,
-      defaultValue satisfies T,
-    ) satisfies T;
 
   return createType({
     typeName: brandKeysStr,
     defaultValue,
     validate,
-    fill,
   });
 };

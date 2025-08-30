@@ -79,16 +79,14 @@ describe('int16', () => {
           {
             path: [],
             actualValue: 50000,
-            expectedType:
-              'Finite & Int & SafeInt & > -2^32 & >= -2^31 & < 2^32 & < 2^31 & < 2^15 & < 2^16 & > -2^16 & >= -2^15 & not(NaNValue)',
+            expectedType: 'Int16',
             typeName:
-              'Finite & Int & SafeInt & > -2^32 & >= -2^31 & < 2^32 & < 2^31 & < 2^15 & < 2^16 & > -2^16 & >= -2^15 & not(NaNValue)',
-            message:
-              'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & SafeInt & > -2^32 & >= -2^31 & < 2^32 & < 2^31 & < 2^15 & < 2^16 & > -2^16 & >= -2^15 & not(NaNValue)>',
+              '"Finite" & "Int" & "SafeInt" & "> -2^32" & ">= -2^31" & "< 2^32" & "< 2^31" & "< 2^15" & "< 2^16" & "> -2^16" & ">= -2^15" & not("NaNValue")',
+            message: undefined,
           },
         ]);
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & SafeInt & > -2^32 & >= -2^31 & < 2^32 & < 2^31 & < 2^15 & < 2^16 & > -2^16 & >= -2^15 & not(NaNValue)>',
+          'Expected <Int16>, got <number> type value `50000`.',
         ]);
       }
     });

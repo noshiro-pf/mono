@@ -20,4 +20,5 @@ export const positiveFiniteNumber = (
       '!=0',
     ],
     brandFalseKeys: ['NaNValue'],
+    typeName: 'PositiveFiniteNumber',
   });

@@ -78,15 +78,14 @@ describe('safeInt', () => {
           {
             path: [],
             actualValue: Number.MAX_SAFE_INTEGER + 1,
-            expectedType: 'Finite & Int & SafeInt & not(NaNValue)',
-            typeName: 'Finite & Int & SafeInt & not(NaNValue)',
-            message:
-              'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & SafeInt & not(NaNValue)>',
+            expectedType: 'SafeInt',
+            typeName: '"Finite" & "Int" & "SafeInt" & not("NaNValue")',
+            message: undefined,
           },
         ]);
 
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & SafeInt & not(NaNValue)>',
+          'Expected <SafeInt>, got <number> type value `9007199254740992`.',
         ]);
       }
     });

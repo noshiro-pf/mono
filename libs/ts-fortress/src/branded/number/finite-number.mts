@@ -12,4 +12,5 @@ export const finiteNumber = (
     defaultValue,
     brandKeys: ['Finite'],
     brandFalseKeys: ['NaNValue'],
+    typeName: 'FiniteNumber',
   });

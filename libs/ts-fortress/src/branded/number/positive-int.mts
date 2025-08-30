@@ -21,4 +21,5 @@ export const positiveInt = (
       '!=0',
     ],
     brandFalseKeys: ['NaNValue'],
+    typeName: 'PositiveInt',
   });

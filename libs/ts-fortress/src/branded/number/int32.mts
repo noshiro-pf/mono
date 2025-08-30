@@ -18,4 +18,5 @@ export const int32 = (defaultValue: Int32 = asInt32(0)): Type<Int32> =>
       '< 2^31',
     ],
     brandFalseKeys: ['NaNValue'],
+    typeName: 'Int32',
   });

@@ -22,4 +22,5 @@ export const int16 = (defaultValue: Int16 = asInt16(0)): Type<Int16> =>
       '>= -2^15',
     ],
     brandFalseKeys: ['NaNValue'],
+    typeName: 'Int16',
   });

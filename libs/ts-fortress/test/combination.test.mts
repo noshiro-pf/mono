@@ -116,18 +116,16 @@ describe('nested record', () => {
           {
             path: ['xs', '1'],
             actualValue: 2.2,
-            expectedType: 'Finite & Int & not(NaNValue)',
-            typeName: 'Finite & Int & not(NaNValue)',
-            message:
-              'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & not(NaNValue)>',
+            expectedType: 'Int',
+            typeName: '"Finite" & "Int" & not("NaNValue")',
+            message: undefined,
           },
           {
             path: ['xs', '2'],
             actualValue: 3.3,
-            expectedType: 'Finite & Int & not(NaNValue)',
-            typeName: 'Finite & Int & not(NaNValue)',
-            message:
-              'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & not(NaNValue)>',
+            expectedType: 'Int',
+            typeName: '"Finite" & "Int" & not("NaNValue")',
+            message: undefined,
           },
           {
             path: ['rec', 'a'],
@@ -145,8 +143,8 @@ describe('nested record', () => {
           },
         ]);
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & not(NaNValue)> at xs.1',
-          'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & not(NaNValue)> at xs.2',
+          'Expected <Int> at xs.1, got <number> type value `2.2`.',
+          'Expected <Int> at xs.2, got <number> type value `3.3`.',
           'The value is expected to be an integer between 0 and 10 at rec.a',
           'The value is expected to be an integer between 0 and 10 at rec.b',
         ]);

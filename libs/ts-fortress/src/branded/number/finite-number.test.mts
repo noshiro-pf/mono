@@ -90,10 +90,9 @@ describe('finiteNumber', () => {
           {
             path: [],
             actualValue: Number.POSITIVE_INFINITY,
-            expectedType: 'Finite & not(NaNValue)',
-            typeName: 'Finite & not(NaNValue)',
-            message:
-              'The value must satisfy the constraint corresponding to the brand keys: <Finite & not(NaNValue)>',
+            expectedType: 'FiniteNumber',
+            typeName: '"Finite" & not("NaNValue")',
+            message: undefined,
           },
         ]);
       }
@@ -139,7 +138,7 @@ describe('finiteNumber', () => {
         targetType.assertIs;
       expect(() => {
         assertIs(x);
-      }).toThrow('The value must satisfy the constraint');
+      }).toThrow('Expected <FiniteNumber>');
     });
   });
 

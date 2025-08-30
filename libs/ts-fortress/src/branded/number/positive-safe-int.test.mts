@@ -90,16 +90,14 @@ describe('positiveSafeInt', () => {
           {
             path: [],
             actualValue: 0,
-            expectedType:
-              'Finite & Int & SafeInt & > -2^32 & >= -2^31 & > -2^16 & >= -2^15 & >=0 & !=0 & not(NaNValue)',
+            expectedType: 'PositiveSafeInt',
             typeName:
-              'Finite & Int & SafeInt & > -2^32 & >= -2^31 & > -2^16 & >= -2^15 & >=0 & !=0 & not(NaNValue)',
-            message:
-              'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & SafeInt & > -2^32 & >= -2^31 & > -2^16 & >= -2^15 & >=0 & !=0 & not(NaNValue)>',
+              '"Finite" & "Int" & "SafeInt" & "> -2^32" & ">= -2^31" & "> -2^16" & ">= -2^15" & ">=0" & "!=0" & not("NaNValue")',
+            message: undefined,
           },
         ]);
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value must satisfy the constraint corresponding to the brand keys: <Finite & Int & SafeInt & > -2^32 & >= -2^31 & > -2^16 & >= -2^15 & >=0 & !=0 & not(NaNValue)>',
+          'Expected <PositiveSafeInt>, got <number> type value `0`.',
         ]);
       }
     });

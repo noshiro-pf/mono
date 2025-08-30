@@ -12,4 +12,5 @@ export const nonZeroFiniteNumber = (
     defaultValue,
     brandKeys: ['!=0', 'Finite'],
     brandFalseKeys: ['NaNValue'],
+    typeName: 'NonZeroFiniteNumber',
   });
