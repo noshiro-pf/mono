@@ -94,14 +94,14 @@ describe('union', () => {
           path: [],
           actualValue: 5,
           expectedType:
-            'Union<{ x: number, y: number }, numberLiteral(3), stringLiteral(2)>',
+            'Union<{ x: number, y: number }, numberLiteral(3), stringLiteral("2")>',
           typeName:
-            'Union<{ x: number, y: number }, numberLiteral(3), stringLiteral(2)>',
+            'Union<{ x: number, y: number }, numberLiteral(3), stringLiteral("2")>',
           message:
-            'The type of value is expected to be one of the elements contained in { { x: number, y: number }, numberLiteral(3), stringLiteral(2) }',
+            'The type of value is expected to be one of the elements contained in { { x: number, y: number }, numberLiteral(3), stringLiteral("2") }',
         });
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The type of value is expected to be one of the elements contained in { { x: number, y: number }, numberLiteral(3), stringLiteral(2) }',
+          'The type of value is expected to be one of the elements contained in { { x: number, y: number }, numberLiteral(3), stringLiteral("2") }',
         ]);
       }
     });

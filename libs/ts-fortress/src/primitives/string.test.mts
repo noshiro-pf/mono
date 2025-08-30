@@ -304,8 +304,8 @@ describe('stringLiteral', () => {
           {
             path: [],
             actualValue: 'world',
-            expectedType: 'stringLiteral(hello)',
-            typeName: 'stringLiteral(hello)',
+            expectedType: 'stringLiteral("hello")',
+            typeName: 'stringLiteral("hello")',
             message: undefined,
           },
         ]);
@@ -332,7 +332,7 @@ describe('stringLiteral', () => {
     test('invalid value throws error', () => {
       const value: unknown = 'world';
       expect(() => hello.cast(value)).toThrow(
-        'Expected stringLiteral(hello), got string',
+        'Expected stringLiteral("hello"), got string',
       );
     });
   });

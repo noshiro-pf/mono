@@ -7,7 +7,7 @@ export const string = (defaultValue: string = ''): Type<string> =>
 
 export const stringLiteral = <L extends string>(literal: L): Type<L> =>
   createPrimitiveType({
-    typeName: `stringLiteral(${literal})`,
+    typeName: `stringLiteral("${literal}")`,
     defaultValue: literal,
     is: (value: unknown): value is L => value === literal,
   });
