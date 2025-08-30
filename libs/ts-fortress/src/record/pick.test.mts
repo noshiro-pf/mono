@@ -138,7 +138,7 @@ describe('pick', () => {
           },
         ]);
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected number at month, got string',
+          'Expected <number> at month, got <string> type value "ab".',
         ]);
       }
     });

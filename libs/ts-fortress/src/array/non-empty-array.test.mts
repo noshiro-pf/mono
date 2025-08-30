@@ -146,8 +146,8 @@ describe('nonEmptyArray', () => {
         ]);
 
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected number at 0, got string',
-          'Expected number at 1, got string',
+          'Expected <number> at 0, got <string> type value "1".',
+          'Expected <number> at 1, got <string> type value "".',
         ]);
       }
     });

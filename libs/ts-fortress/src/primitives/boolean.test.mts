@@ -64,7 +64,7 @@ describe('boolean', () => {
         ]);
 
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected boolean, got string',
+          'Expected <boolean>, got <string> type value "not a boolean".',
         ]);
       }
     });
@@ -202,7 +202,7 @@ describe('booleanLiteral', () => {
           ]);
 
           expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected booleanLiteral(true), got boolean',
+            'Expected <booleanLiteral(true)>, got <boolean> type value `false`.',
           ]);
         }
       });
@@ -223,7 +223,7 @@ describe('booleanLiteral', () => {
           ]);
 
           expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected booleanLiteral(true), got string',
+            'Expected <booleanLiteral(true)>, got <string> type value "not a boolean".',
           ]);
         }
       });
@@ -318,7 +318,7 @@ describe('booleanLiteral', () => {
           ]);
 
           expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected booleanLiteral(false), got boolean',
+            'Expected <booleanLiteral(false)>, got <boolean> type value `true`.',
           ]);
         }
       });

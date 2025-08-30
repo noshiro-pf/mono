@@ -144,9 +144,9 @@ describe('validation-error', () => {
       ];
 
       expect(validationErrorsToMessages(errors)).toStrictEqual([
-        'Expected string at user.name, got number',
-        'Expected number at items.0, got string',
-        'Expected boolean, got object',
+        'Expected <string> at user.name, got <number> type value `123`.',
+        'Expected <number> at items.0, got <string> type value "invalid".',
+        'Expected <boolean>, got <object> type value `null`.',
       ]);
     });
 

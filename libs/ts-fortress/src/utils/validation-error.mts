@@ -1,3 +1,5 @@
+import { isString, pipe, unknownToString } from 'ts-data-forge';
+
 /**
  * Represents a validation error with structured information
  */
@@ -21,7 +23,10 @@ export type ValidationErrorWithMessage = MergeIntersection<
 /**
  * Converts a validation error to a human-readable string message
  */
-export const validationErrorToMessage = (error: ValidationError): string => {
+export const validationErrorToMessage = (
+  error: ValidationError,
+  maxLengthToPrintActualValue: number = 20,
+): string => {
   const pathStr = error.path.length > 0 ? ` at ${error.path.join('.')}` : '';
   const actualTypeStr = typeof error.actualValue;
 
@@ -29,7 +34,15 @@ export const validationErrorToMessage = (error: ValidationError): string => {
     return `${error.message}${pathStr}`;
   }
 
-  return `Expected ${error.expectedType}${pathStr}, got ${actualTypeStr}`;
+  const actualValueStr: string = isString(error.actualValue)
+    ? error.actualValue.length <= maxLengthToPrintActualValue
+      ? ` "${error.actualValue}"`
+      : ''
+    : pipe(unknownToString(error.actualValue)).map((s) =>
+        s.length <= maxLengthToPrintActualValue ? ` \`${s}\`` : '',
+      ).value;
+
+  return `Expected <${error.expectedType}>${pathStr}, got <${actualTypeStr}> type value${actualValueStr}.`;
 };
 
 /**
@@ -38,7 +51,9 @@ export const validationErrorToMessage = (error: ValidationError): string => {
  */
 export const validationErrorsToMessages = (
   errors: readonly ValidationError[],
-): readonly string[] => errors.map(validationErrorToMessage);
+  maxLengthToPrintActualValue: number = 20,
+): readonly string[] =>
+  errors.map((e) => validationErrorToMessage(e, maxLengthToPrintActualValue));
 
 /**
  * Prepends a path segment to all validation errors

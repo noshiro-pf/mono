@@ -153,8 +153,8 @@ describe('tuple', () => {
         ]);
 
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected number at 0.x, got string',
-          'Expected number at 0.y, got string',
+          'Expected <number> at 0.x, got <string> type value "str".',
+          'Expected <number> at 0.y, got <string> type value "str".',
         ]);
       }
     });

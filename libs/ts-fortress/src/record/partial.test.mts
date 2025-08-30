@@ -186,8 +186,8 @@ describe('partial', () => {
             },
           ]);
           expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected number at month, got string',
-            'Expected number at date, got string',
+            'Expected <number> at month, got <string> type value "ab".',
+            'Expected <number> at date, got <string> type value "cd".',
           ]);
         }
       });
@@ -212,7 +212,7 @@ describe('partial', () => {
             },
           ]);
           expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected number at month, got string',
+            'Expected <number> at month, got <string> type value "ab".',
           ]);
         }
       });
@@ -385,8 +385,8 @@ describe('partial', () => {
             },
           ]);
           expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected number at month, got string',
-            'Expected number at date, got string',
+            'Expected <number> at month, got <string> type value "ab".',
+            'Expected <number> at date, got <string> type value "cd".',
           ]);
         }
       });

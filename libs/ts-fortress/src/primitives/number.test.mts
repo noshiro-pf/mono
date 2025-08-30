@@ -88,7 +88,7 @@ describe('number', () => {
       const value: unknown = '42';
       expect(() => {
         assertIs(value);
-      }).toThrow(/Expected number/u);
+      }).toThrow(/Expected <number>/u);
     });
   });
 
@@ -101,14 +101,16 @@ describe('number', () => {
 
     test('invalid value throws error', () => {
       const value: unknown = 'not a number';
-      expect(() => num.cast(value)).toThrow('Expected number, got string');
+      expect(() => num.cast(value)).toThrow(
+        'Expected <number>, got <string> type value "not a number".',
+      );
     });
 
     test('throws error with type mismatch', () => {
       const numWithDefault = number(100);
       const value: unknown = 'not a number';
       expect(() => numWithDefault.cast(value)).toThrow(
-        'Expected number, got string',
+        'Expected <number>, got <string> type value "not a number".',
       );
     });
   });

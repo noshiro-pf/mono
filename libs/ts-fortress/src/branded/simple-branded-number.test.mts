@@ -69,7 +69,7 @@ describe('simpleBrandedNumber', () => {
             },
           ]);
           expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected number, got string',
+            'Expected <number>, got <string> type value "not a number".',
           ]);
         }
       });
@@ -142,7 +142,7 @@ describe('simpleBrandedNumber', () => {
             },
           ]);
           expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected number, got string',
+            'Expected <number>, got <string> type value "invalid".',
           ]);
         }
       });

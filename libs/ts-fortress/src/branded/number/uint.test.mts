@@ -120,7 +120,7 @@ describe('uint', () => {
           },
         ]);
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected number, got string',
+          'Expected <number>, got <string> type value "not a number".',
         ]);
       }
     });

@@ -130,9 +130,9 @@ describe('keyValueRecord', () => {
         ]);
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
           'The value of the record is expected to be <number>',
-          'Expected number at month, got string',
+          'Expected <number> at month, got <string> type value "ab".',
           'The value of the record is expected to be <number>',
-          'Expected number at date, got string',
+          'Expected <number> at date, got <string> type value "cd".',
         ]);
       }
     });

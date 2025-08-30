@@ -91,7 +91,7 @@ describe('string', () => {
       const value: unknown = 42;
       expect(() => {
         assertIs(value);
-      }).toThrow(/Expected string/u);
+      }).toThrow(/Expected <string>/u);
     });
   });
 
@@ -104,14 +104,16 @@ describe('string', () => {
 
     test('invalid value throws error', () => {
       const value: unknown = 42;
-      expect(() => str.cast(value)).toThrow('Expected string, got number');
+      expect(() => str.cast(value)).toThrow(
+        'Expected <string>, got <number> type value `42`.',
+      );
     });
 
     test('throws error with type mismatch', () => {
       const strWithDefault = string('default');
       const value: unknown = 42;
       expect(() => strWithDefault.cast(value)).toThrow(
-        'Expected string, got number',
+        'Expected <string>, got <number> type value `42`.',
       );
     });
   });
@@ -332,7 +334,7 @@ describe('stringLiteral', () => {
     test('invalid value throws error', () => {
       const value: unknown = 'world';
       expect(() => hello.cast(value)).toThrow(
-        'Expected stringLiteral("hello"), got string',
+        'Expected <stringLiteral("hello")>, got <string> type value "world".',
       );
     });
   });

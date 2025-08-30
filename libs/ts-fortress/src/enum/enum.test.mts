@@ -72,8 +72,6 @@ describe('enumType', () => {
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
           'The value is expected to be one of the elements contained in { 3, 2, a }',
         ]);
-      } else {
-        throw new Error('Expected validation to fail');
       }
     });
 

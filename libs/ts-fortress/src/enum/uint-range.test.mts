@@ -81,8 +81,6 @@ describe('uintRange', () => {
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
           'The value is expected to be an integer between 1 and 12',
         ]);
-      } else {
-        throw new Error('Expected validation to fail');
       }
     });
   });

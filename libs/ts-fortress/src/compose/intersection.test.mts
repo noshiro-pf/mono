@@ -251,9 +251,9 @@ describe('intersection', () => {
           ]);
           expect(validationErrorsToMessages(result.value)).toStrictEqual([
             'The type of value is expected to match all types of { number, number }',
-            'Expected number, got string',
+            'Expected <number>, got <string> type value "aaa".',
             'The type of value is expected to match all types of { number, number }',
-            'Expected number, got string',
+            'Expected <number>, got <string> type value "aaa".',
           ]);
         }
       });

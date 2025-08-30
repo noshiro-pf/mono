@@ -64,7 +64,7 @@ describe('bigint', () => {
         ]);
 
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected bigint, got number',
+          'Expected <bigint>, got <number> type value `123`.',
         ]);
       }
     });
@@ -199,7 +199,7 @@ describe('bigintLiteral', () => {
         ]);
 
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected bigintLiteral(42), got bigint',
+          'Expected <bigintLiteral(42)>, got <bigint> type value `99`.',
         ]);
       }
     });
@@ -220,7 +220,7 @@ describe('bigintLiteral', () => {
         ]);
 
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected bigintLiteral(42), got string',
+          'Expected <bigintLiteral(42)>, got <string> type value "not a bigint".',
         ]);
       }
     });

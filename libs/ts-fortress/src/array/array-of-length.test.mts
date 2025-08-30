@@ -146,8 +146,8 @@ describe('arrayOfLength', () => {
         ]);
 
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected number at 1, got string',
-          'Expected number at 2, got string',
+          'Expected <number> at 1, got <string> type value "1".',
+          'Expected <number> at 2, got <string> type value "".',
         ]);
       }
     });

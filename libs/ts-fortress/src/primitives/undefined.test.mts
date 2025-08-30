@@ -77,7 +77,7 @@ describe('undefinedType', () => {
       const value: unknown = null;
       expect(() => {
         undefinedType.assertIs(value);
-      }).toThrow(`Expected undefined, got ${typeof value}`);
+      }).toThrow('Expected <undefined>, got <object> type value `null`.');
     });
   });
 
@@ -92,7 +92,7 @@ describe('undefinedType', () => {
       const value: unknown = null;
       expect(() => {
         undefinedType.cast(value);
-      }).toThrow('Expected undefined, got object');
+      }).toThrow('Expected <undefined>, got <object> type value `null`.');
     });
 
     test('any non-undefined value throws error', () => {
@@ -101,7 +101,7 @@ describe('undefinedType', () => {
       for (const value of values) {
         expect(() => {
           undefinedType.cast(value);
-        }).toThrow(`Expected undefined, got ${typeof value}`);
+        }).toThrow(/^Expected <undefined>, got <.*> type value .+\.$/u);
       }
     });
   });

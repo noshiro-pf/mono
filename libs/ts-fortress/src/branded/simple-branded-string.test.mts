@@ -70,7 +70,7 @@ describe('simpleBrandedString', () => {
             },
           ]);
           expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected string, got number',
+            'Expected <string>, got <number> type value `42`.',
           ]);
         }
       });
@@ -143,7 +143,7 @@ describe('simpleBrandedString', () => {
             },
           ]);
           expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected string, got object',
+            'Expected <string>, got <object> type value `null`.',
           ]);
         }
       });

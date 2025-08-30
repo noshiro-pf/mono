@@ -66,7 +66,7 @@ describe('symbol', () => {
         ]);
 
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected symbol, got string',
+          'Expected <symbol>, got <string> type value "not a symbol".',
         ]);
       }
     });

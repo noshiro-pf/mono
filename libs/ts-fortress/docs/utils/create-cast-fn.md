@@ -12,7 +12,7 @@
 
 > **createCastFn**\<`T`\>(`validate`): (`a`) => `T`
 
-Defined in: [src/utils/create-cast-fn.mts:12](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-cast-fn.mts#L12)
+Defined in: [src/utils/create-cast-fn.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-cast-fn.mts#L6)
 
 #### Type Parameters
 

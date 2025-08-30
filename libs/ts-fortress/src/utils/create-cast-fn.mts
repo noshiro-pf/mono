@@ -1,19 +1,13 @@
 import { Result } from 'ts-data-forge';
 import { type Type } from '../type.mjs';
-import {
-  validationErrorsToMessages,
-  type ValidationError,
-} from './validation-error.mjs';
-
-const validationResultToString = (result: readonly ValidationError[]): string =>
-  `\n${validationErrorsToMessages(result).join(',\n')}`;
+import { validationErrorsToMessages } from './validation-error.mjs';
 
 export const createCastFn =
   <T,>(validate: Type<T>['validate']) =>
   (a: unknown): T => {
     const res = validate(a);
     if (Result.isErr(res)) {
-      throw new Error(validationResultToString(res.value));
+      throw new Error(validationErrorsToMessages(res.value).join('\n'));
     }
     return res.value;
   };

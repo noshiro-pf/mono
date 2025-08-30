@@ -68,7 +68,7 @@ describe('nullType', () => {
       const value: unknown = undefined;
       expect(() => {
         nullType.assertIs(value);
-      }).toThrow('Expected null, got undefined');
+      }).toThrow('Expected <null>, got <undefined> type value `undefined`.');
     });
   });
 
@@ -82,7 +82,7 @@ describe('nullType', () => {
     test('non-null throws error', () => {
       const value: unknown = undefined;
       expect(() => nullType.cast(value)).toThrow(
-        'Expected null, got undefined',
+        'Expected <null>, got <undefined> type value `undefined`.',
       );
     });
 
@@ -91,7 +91,7 @@ describe('nullType', () => {
 
       for (const value of values) {
         expect(() => nullType.cast(value)).toThrow(
-          /Expected null, got (number|string|boolean|undefined)/u,
+          /Expected <null>, got <(number|string|boolean|undefined)> type value/u,
         );
       }
     });
