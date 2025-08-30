@@ -10214,6 +10214,12 @@ Re-exports [recursion](../compose/recursion.md#recursion)
 
 ---
 
+### refine
+
+Re-exports [refine](../other-types/refine.md#refine)
+
+---
+
 ### safeInt
 
 Re-exports [safeInt](../branded/number/safe-int.md#safeint)

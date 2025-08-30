@@ -975,6 +975,7 @@ This project is licensed under the Apache-2.0 License - see the [LICENSE](_media
 - [globals](globals.md)
 - [other-types](other-types.md)
 - [other-types/literal](other-types/literal.md)
+- [other-types/refine](other-types/refine.md)
 - [other-types/unknown](other-types/unknown.md)
 - [predefined](predefined.md)
 - [predefined/int8](predefined/int8.md)
