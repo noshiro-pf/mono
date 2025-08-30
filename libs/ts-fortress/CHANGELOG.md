@@ -1,3 +1,9 @@
+# [2.8.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.7.0...v2.8.0) (2025-08-30)
+
+### Features
+
+- support optional typeName argument in brand function and add ty… ([#51](https://github.com/noshiro-pf/ts-fortress/issues/51)) ([c64f6a1](https://github.com/noshiro-pf/ts-fortress/commit/c64f6a1f29737c0d2940b4461db5c81cabc22eb6))
+
 # [2.7.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.6.2...v2.7.0) (2025-08-30)
 
 ### Features
