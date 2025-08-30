@@ -10,10 +10,16 @@ export type ValidationError = Readonly<{
   actualValue: unknown;
   /** The expected type or constraint */
   expectedType: string;
-  /** Additional context about the validation failure */
-  message: string | undefined;
   /** The name of the type that was being validated */
   typeName: string;
+
+  /**
+   * Additional context about the validation failure
+   * @note This field is for internal implementation purposes and may be undefined.
+   * Use `validationErrorToMessage` to stringify the error.
+   * @internal
+   */
+  message: string | undefined;
 }>;
 
 export type ValidationErrorWithMessage = MergeIntersection<

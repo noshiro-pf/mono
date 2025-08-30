@@ -24,7 +24,7 @@ Defined in: [src/utils/create-assert-fn.mts:12](https://github.com/noshiro-pf/ts
 
 ##### validate
 
-(`a`) => [`Result`](../entry-point/README.md#result)\<`T`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `message`: `undefined` \| `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>
+(`a`) => [`Result`](../entry-point/README.md#result)\<`T`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>
 
 #### Returns
 
