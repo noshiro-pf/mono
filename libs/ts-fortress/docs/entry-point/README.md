@@ -10318,7 +10318,7 @@ Re-exports [union](../compose/union.md#union)
 
 ### unknown
 
-Re-exports [unknown](../unknown.md#unknown)
+Re-exports [unknown](../other-types/unknown.md#unknown)
 
 ---
 
