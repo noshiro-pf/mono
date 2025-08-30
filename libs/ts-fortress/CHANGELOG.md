@@ -1,3 +1,9 @@
+# [2.7.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.6.2...v2.7.0) (2025-08-30)
+
+### Features
+
+- improve validation error messages to be more human readable ([#50](https://github.com/noshiro-pf/ts-fortress/issues/50)) ([c56c68e](https://github.com/noshiro-pf/ts-fortress/commit/c56c68e355ed8554ca15e744709cc83dad2e18d7))
+
 ## [2.6.2](https://github.com/noshiro-pf/ts-fortress/compare/v2.6.1...v2.6.2) (2025-08-30)
 
 ### Bug Fixes
