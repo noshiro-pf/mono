@@ -1,3 +1,9 @@
+# [3.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.10.0...v3.0.0) (2025-08-30)
+
+### Features
+
+- **breaking:** change the interface of brand function ([#54](https://github.com/noshiro-pf/ts-fortress/issues/54)) ([3420611](https://github.com/noshiro-pf/ts-fortress/commit/34206119bcb34129744df6e916089aa534888f60))
+
 # [2.10.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.9.0...v2.10.0) (2025-08-30)
 
 ### Features
