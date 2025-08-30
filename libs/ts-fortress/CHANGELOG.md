@@ -1,3 +1,9 @@
+## [3.0.1](https://github.com/noshiro-pf/ts-fortress/compare/v3.0.0...v3.0.1) (2025-08-30)
+
+### Bug Fixes
+
+- fix JSDoc of ValidationError ([#55](https://github.com/noshiro-pf/ts-fortress/issues/55)) ([89a3a01](https://github.com/noshiro-pf/ts-fortress/commit/89a3a01d6b233dee776e791ce4d31a40c483d78c))
+
 # [3.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v2.10.0...v3.0.0) (2025-08-30)
 
 ### Features
