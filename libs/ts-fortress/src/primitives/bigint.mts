@@ -5,6 +5,7 @@ import { createPrimitiveType } from '../utils/index.mjs';
 export const bigint = (defaultValue: bigint = 0n): Type<bigint> =>
   createPrimitiveType({ typeName: 'bigint', defaultValue, is: isBigint });
 
+/** @deprecated Use `literal` instead. */
 export const bigintLiteral = <L extends bigint>(literal: L): Type<L> =>
   createPrimitiveType({
     typeName: `bigintLiteral(${literal})`,

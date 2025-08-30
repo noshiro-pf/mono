@@ -8,6 +8,12 @@
 
 ## References
 
+### literal
+
+Re-exports [literal](other-types/literal.md#literal)
+
+---
+
 ### unknown
 
 Re-exports [unknown](other-types/unknown.md#unknown)

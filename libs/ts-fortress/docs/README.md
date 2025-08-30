@@ -974,6 +974,7 @@ This project is licensed under the Apache-2.0 License - see the [LICENSE](_media
 - [enum/uint-range](enum/uint-range.md)
 - [globals](globals.md)
 - [other-types](other-types.md)
+- [other-types/literal](other-types/literal.md)
 - [other-types/unknown](other-types/unknown.md)
 - [predefined](predefined.md)
 - [predefined/int8](predefined/int8.md)

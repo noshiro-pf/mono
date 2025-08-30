@@ -5,6 +5,7 @@ import { createPrimitiveType } from '../utils/index.mjs';
 export const boolean = (defaultValue: boolean = false): Type<boolean> =>
   createPrimitiveType({ typeName: 'boolean', defaultValue, is: isBoolean });
 
+/** @deprecated Use `literal` instead. */
 export const booleanLiteral = <L extends boolean>(literal: L): Type<L> =>
   createPrimitiveType({
     typeName: `booleanLiteral(${String(literal)})`,

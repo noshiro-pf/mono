@@ -10076,6 +10076,12 @@ Re-exports [keyValueRecord](../record/key-value-record.md#keyvaluerecord)
 
 ---
 
+### literal
+
+Re-exports [literal](../other-types/literal.md#literal)
+
+---
+
 ### mergeRecords
 
 Re-exports [mergeRecords](../compose/merge-records.md#mergerecords)

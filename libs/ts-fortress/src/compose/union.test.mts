@@ -1,5 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
-import { number, numberLiteral, stringLiteral } from '../primitives/index.mjs';
+import { literal } from '../other-types/index.mjs';
+import { number } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
 import {
@@ -10,13 +11,9 @@ import { union } from './union.mjs';
 
 describe('union', () => {
   const targetType = union(
-    [
-      record({ x: number(0), y: number(0) }),
-      numberLiteral(3),
-      stringLiteral('2'),
-    ],
+    [record({ x: number(0), y: number(0) }), literal(3), literal('2')],
     {
-      defaultType: numberLiteral(3),
+      defaultType: literal(3),
     },
   );
 
@@ -94,14 +91,13 @@ describe('union', () => {
           path: [],
           actualValue: 5,
           expectedType:
-            'Union<{ x: number, y: number }, numberLiteral(3), stringLiteral("2")>',
-          typeName:
-            'Union<{ x: number, y: number }, numberLiteral(3), stringLiteral("2")>',
+            'Union<{ x: number, y: number }, literal(3), literal("2")>',
+          typeName: 'Union<{ x: number, y: number }, literal(3), literal("2")>',
           message:
-            'The type of value is expected to be one of the elements contained in { { x: number, y: number }, numberLiteral(3), stringLiteral("2") }',
+            'The type of value is expected to be one of the elements contained in { { x: number, y: number }, literal(3), literal("2") }',
         });
         expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The type of value is expected to be one of the elements contained in { { x: number, y: number }, numberLiteral(3), stringLiteral("2") }',
+          'The type of value is expected to be one of the elements contained in { { x: number, y: number }, literal(3), literal("2") }',
         ]);
       }
     });

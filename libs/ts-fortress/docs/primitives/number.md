@@ -26,11 +26,11 @@ Defined in: [src/primitives/number.mts:5](https://github.com/noshiro-pf/ts-fortr
 
 ---
 
-### numberLiteral()
+### ~~numberLiteral()~~
 
 > **numberLiteral**\<`L`\>(`literal`): [`Type`](../type.md#type)\<`L`\>
 
-Defined in: [src/primitives/number.mts:8](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/number.mts#L8)
+Defined in: [src/primitives/number.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/number.mts#L9)
 
 #### Type Parameters
 
@@ -47,3 +47,7 @@ Defined in: [src/primitives/number.mts:8](https://github.com/noshiro-pf/ts-fortr
 #### Returns
 
 [`Type`](../type.md#type)\<`L`\>
+
+#### Deprecated
+
+Use `literal` instead.

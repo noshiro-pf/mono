@@ -1,5 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
-import { number, numberLiteral, stringLiteral } from '../primitives/index.mjs';
+import { literal } from '../other-types/index.mjs';
+import { number } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
 import {
@@ -12,14 +13,13 @@ describe('tuple', () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
       expect(
-        tuple([numberLiteral(1), numberLiteral(2), numberLiteral(3)])
-          .defaultValue,
+        tuple([literal(1), literal(2), literal(3)]).defaultValue,
       ).toStrictEqual([1, 2, 3]);
     });
 
     test('with explicit default value', () => {
       expect(
-        tuple([numberLiteral(1), numberLiteral(2), numberLiteral(3)], {
+        tuple([literal(1), literal(2), literal(3)], {
           typeName: 'tpl',
         }).typeName,
       ).toBe('tpl');
@@ -28,8 +28,8 @@ describe('tuple', () => {
 
   const targetType = tuple([
     record({ x: number(0), y: number(0) }),
-    numberLiteral(3),
-    stringLiteral('2'),
+    literal(3),
+    literal('2'),
   ]);
 
   type TargetType = TypeOf<typeof targetType>;

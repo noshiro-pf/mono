@@ -1,6 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
-import { number, numberLiteral } from './number.mjs';
+import { number } from './number.mjs';
 
 describe('number', () => {
   describe('default value', () => {
@@ -180,121 +180,6 @@ describe('number', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = 123.456;
       const result = num.validate(input);
-      expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
-    });
-  });
-});
-
-describe('numberLiteral', () => {
-  const literal42 = numberLiteral(42);
-  type Literal42 = TypeOf<typeof literal42>;
-
-  expectType<Literal42, 42>('=');
-  expectType<typeof literal42.defaultValue, Literal42>('=');
-
-  describe('default value', () => {
-    test('uses literal as default', () => {
-      expect(literal42.defaultValue).toBe(42);
-    });
-  });
-
-  describe('is', () => {
-    test('exact match returns true', () => {
-      const value: unknown = 42;
-
-      if (literal42.is(value)) {
-        expectType<typeof value, Literal42>('=');
-      } else {
-        expectType<typeof value, unknown>('=');
-      }
-
-      expect(literal42.is(value)).toBe(true);
-    });
-
-    test('different number returns false', () => {
-      const value: unknown = 43;
-
-      if (literal42.is(value)) {
-        expectType<typeof value, Literal42>('=');
-      } else {
-        expectType<typeof value, unknown>('=');
-      }
-
-      expect(literal42.is(value)).toBe(false);
-    });
-
-    test('non-number returns false', () => {
-      const value: unknown = '42';
-
-      expect(literal42.is(value)).toBe(false);
-    });
-  });
-
-  describe('special number literals', () => {
-    test('zero literal', () => {
-      const zero = numberLiteral(0);
-      type Zero = TypeOf<typeof zero>;
-      expectType<Zero, 0>('=');
-
-      expect(zero.is(0)).toBe(true);
-      expect(zero.is(-0)).toBe(true); // JavaScript treats 0 and -0 as equal
-      expect(zero.is(1)).toBe(false);
-    });
-
-    test('negative literal', () => {
-      const negative = numberLiteral(-100);
-      type Negative = TypeOf<typeof negative>;
-      expectType<Negative, -100>('=');
-
-      expect(negative.is(-100)).toBe(true);
-      expect(negative.is(100)).toBe(false);
-    });
-
-    test('decimal literal', () => {
-      const pi = numberLiteral(3.14);
-      type Pi = TypeOf<typeof pi>;
-      expectType<Pi, 3.14>('=');
-
-      expect(pi.is(3.14)).toBe(true);
-      expect(pi.is(3.141)).toBe(false);
-    });
-  });
-
-  describe('validate', () => {
-    test('exact match', () => {
-      const value: unknown = 42;
-      const result = literal42.validate(value);
-
-      expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(42);
-      }
-    });
-
-    test('different value', () => {
-      const value: unknown = 43;
-      const result = literal42.validate(value);
-
-      expect(Result.isErr(result)).toBe(true);
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 43,
-            expectedType: 'numberLiteral(42)',
-            typeName: 'numberLiteral(42)',
-            message: undefined,
-          },
-        ]);
-      }
-    });
-
-    test('validate returns input as-is for OK cases', () => {
-      const input = 42;
-      const result = literal42.validate(input);
       expect(Result.isOk(result)).toBe(true);
       if (Result.isOk(result)) {
         expect(result.value).toBe(input); // ✅ same reference

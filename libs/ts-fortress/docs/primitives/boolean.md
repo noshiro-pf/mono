@@ -26,11 +26,11 @@ Defined in: [src/primitives/boolean.mts:5](https://github.com/noshiro-pf/ts-fort
 
 ---
 
-### booleanLiteral()
+### ~~booleanLiteral()~~
 
 > **booleanLiteral**\<`L`\>(`literal`): [`Type`](../type.md#type)\<`L`\>
 
-Defined in: [src/primitives/boolean.mts:8](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/boolean.mts#L8)
+Defined in: [src/primitives/boolean.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/boolean.mts#L9)
 
 #### Type Parameters
 
@@ -47,3 +47,7 @@ Defined in: [src/primitives/boolean.mts:8](https://github.com/noshiro-pf/ts-fort
 #### Returns
 
 [`Type`](../type.md#type)\<`L`\>
+
+#### Deprecated
+
+Use `literal` instead.
