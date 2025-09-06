@@ -32,6 +32,12 @@ Re-exports [JsonValue](predefined/json.md#jsonvalue)
 
 ---
 
+### nullable
+
+Re-exports [nullable](predefined/nullable.md#nullable)
+
+---
+
 ### uint8
 
 Re-exports [uint8](predefined/uint8.md#uint8)

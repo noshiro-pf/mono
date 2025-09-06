@@ -10118,6 +10118,12 @@ Re-exports [nonZeroSafeInt](../branded/number/non-zero-safe-int.md#nonzerosafein
 
 ---
 
+### nullable
+
+Re-exports [nullable](../predefined/nullable.md#nullable)
+
+---
+
 ### nullType
 
 Re-exports [nullType](../primitives/null.md#nulltype)

@@ -980,6 +980,7 @@ This project is licensed under the Apache-2.0 License - see the [LICENSE](_media
 - [predefined](predefined.md)
 - [predefined/int8](predefined/int8.md)
 - [predefined/json](predefined/json.md)
+- [predefined/nullable](predefined/nullable.md)
 - [predefined/uint8](predefined/uint8.md)
 - [primitives](primitives.md)
 - [primitives/bigint](primitives/bigint.md)
