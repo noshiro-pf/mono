@@ -10082,6 +10082,12 @@ Re-exports [literal](../other-types/literal.md#literal)
 
 ---
 
+### MapType
+
+Re-exports [MapType](../other-types/map.md#maptype)
+
+---
+
 ### mergeRecords
 
 Re-exports [mergeRecords](../compose/merge-records.md#mergerecords)
@@ -10235,6 +10241,12 @@ Re-exports [safeInt](../branded/number/safe-int.md#safeint)
 ### safeUint
 
 Re-exports [safeUint](../branded/number/safe-uint.md#safeuint)
+
+---
+
+### SetType
+
+Re-exports [SetType](../other-types/set.md#settype)
 
 ---
 

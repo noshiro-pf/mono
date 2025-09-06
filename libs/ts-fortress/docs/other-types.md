@@ -14,9 +14,21 @@ Re-exports [literal](other-types/literal.md#literal)
 
 ---
 
+### MapType
+
+Re-exports [MapType](other-types/map.md#maptype)
+
+---
+
 ### refine
 
 Re-exports [refine](other-types/refine.md#refine)
+
+---
+
+### SetType
+
+Re-exports [SetType](other-types/set.md#settype)
 
 ---
 

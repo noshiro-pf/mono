@@ -1,0 +1,74 @@
+import { Arr, Result, unknownToString } from 'ts-data-forge';
+import { type Type, type TypeOf } from '../type.mjs';
+import {
+  createAssertFn,
+  createCastFn,
+  createIsFn,
+  createPrimitiveValidationError,
+  type ValidationError,
+  type ValidationErrorWithMessage,
+} from '../utils/index.mjs';
+
+type SetResultType<T extends Type<unknown>> = ReadonlySet<TypeOf<T>>;
+
+export const SetType = <T extends Type<unknown>>(
+  elementType: T,
+  options?: Readonly<{ typeName?: string }>,
+): Type<SetResultType<T>> => {
+  type S = SetResultType<T>;
+
+  const typeName = options?.typeName ?? 'Set';
+
+  const defaultValue: S = new Set();
+
+  const validate: Type<S>['validate'] = (a) => {
+    if (!(a instanceof Set)) {
+      return Result.err([
+        createPrimitiveValidationError({
+          actualValue: a,
+          expectedType: 'Set',
+          typeName,
+        }),
+      ]);
+    }
+
+    const errors: readonly ValidationError[] = Arr.generate(function* () {
+      for (const element of (a as ReadonlySet<unknown>).values()) {
+        const res = elementType.validate(element);
+
+        if (Result.isErr(res)) {
+          yield {
+            path: [],
+            actualValue: element,
+            expectedType: typeName,
+            message: `The element of the Set is expected to be <${elementType.typeName}>, but got <${typeof element}> type value \`${unknownToString(element)}\``,
+            typeName,
+          } satisfies ValidationErrorWithMessage;
+
+          yield* res.value;
+        }
+      }
+    });
+
+    if (errors.length > 0) {
+      return Result.err(errors);
+    }
+
+    return Result.ok(a as S);
+  };
+
+  const fill: Type<S>['fill'] = (a) =>
+    a instanceof Set
+      ? (new Set(Array.from(a.values()).filter((v) => elementType.is(v))) as S)
+      : defaultValue;
+
+  return {
+    typeName,
+    defaultValue,
+    fill,
+    validate,
+    is: createIsFn(validate),
+    assertIs: createAssertFn(validate),
+    cast: createCastFn(validate),
+  };
+};
