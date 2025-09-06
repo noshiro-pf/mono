@@ -1,3 +1,9 @@
+# [3.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v3.1.0...v3.2.0) (2025-09-06)
+
+### Features
+
+- add MapType and SetType ([#65](https://github.com/noshiro-pf/ts-fortress/issues/65)) ([08c2210](https://github.com/noshiro-pf/ts-fortress/commit/08c221058abb9a627fe2b0c82f9851865c3cdad3))
+
 # [3.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v3.0.1...v3.1.0) (2025-09-06)
 
 ### Features
