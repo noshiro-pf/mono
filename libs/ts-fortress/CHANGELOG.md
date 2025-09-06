@@ -1,3 +1,9 @@
+# [3.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v3.0.1...v3.1.0) (2025-09-06)
+
+### Features
+
+- add nullable type ([#63](https://github.com/noshiro-pf/ts-fortress/issues/63)) ([f2e5f93](https://github.com/noshiro-pf/ts-fortress/commit/f2e5f937fc7ae412b6cc5921901dcf3b07272ece))
+
 ## [3.0.1](https://github.com/noshiro-pf/ts-fortress/compare/v3.0.0...v3.0.1) (2025-08-30)
 
 ### Bug Fixes
