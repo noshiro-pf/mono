@@ -7,11 +7,12 @@ TypeScript-first schema validation library with static type inference.
 [![License](https://img.shields.io/npm/l/ts-fortress.svg)](./LICENSE)
 [![codecov](https://codecov.io/gh/noshiro-pf/ts-fortress/graph/badge.svg?token=Y522SWQTPB)](https://codecov.io/gh/noshiro-pf/ts-fortress)
 
-**ts-fortress** is a runtime validation library similar to [io-ts](https://github.com/gcanti/io-ts) and [zod](https://github.com/colinhacks/zod), designed to provide type-safe schema validation with excellent TypeScript integration and static type inference.
+**ts-fortress** is a runtime validation library similar to [io-ts](https://github.com/gcanti/io-ts) and [zod/mini](https://zod.dev/packages/mini), designed to provide type-safe schema validation with excellent TypeScript integration and static type inference.
 
 ## Features
 
 - 🔒 **Type-safe validation** - Full TypeScript support with static type inference
+- 📖 **Readonly by default** - All constructed types are fully readonly, preventing accidental mutations and promoting immutability
 - 🏗️ **Composable schemas** - Build complex validation schemas from simple building blocks
 - 🔄 **Result-based error handling** - Structured error reporting with `Result<T, readonly ValidationError[]>`
 - 🏷️ **Branded types** - Rich collection of branded number types (Int, SafeInt, PositiveInt, etc.)
@@ -210,7 +211,7 @@ export const SomeObject = t.record({
 
 // ✅ Correct ts-fortress usage - enforced by TypeScript
 export const SomeObject = t.record({
-    key1: t.numberLiteral(1), // or t.number(1) with default
+    key1: t.literal(1), // or t.number(1) with default
     key2: t.string(''),
 });
 ```
@@ -633,8 +634,8 @@ const nullType = t.nullType;
 const undefinedType = t.undefinedType;
 
 // Literal types
-const statusType = t.stringLiteral('active');
-const versionType = t.number(1);
+const statusType = t.literal('active');
+const versionType = t.literal(1);
 
 // Arrays
 const stringArrayType = t.array(t.string(''));
@@ -647,6 +648,8 @@ const coordinateType = t.tuple([t.number(0), t.number(0)]);
 ### Record Types
 
 ```typescript
+import * as t from 'ts-fortress';
+
 // Define object schemas
 const PersonType = t.record({
     firstName: t.string(''),
@@ -732,9 +735,11 @@ UserSchema.is({
 ts-fortress provides extensive support for branded types to create domain-specific validation:
 
 ```typescript
+import * as t from 'ts-fortress';
+
 // Simple branded types
-const UserId = t.simpleBrandedString('UserId', '');
-const Weight = t.simpleBrandedNumber('Weight', 0);
+const UserId = t.simpleBrandedString({ typeName: 'UserId', defaultValue: '' });
+const Weight = t.simpleBrandedNumber({ typeName: 'Weight', defaultValue: 0 });
 
 type UserId = t.TypeOf<typeof UserId>; // Brand<string, 'UserId'>
 type Weight = t.TypeOf<typeof Weight>; // Brand<number, 'Weight'>
@@ -754,14 +759,9 @@ if (t.Result.isOk(userIdResult)) {
 ### Union and Intersection Types
 
 ```typescript
-// Union types
-const StatusType = t.union([
-    t.stringLiteral('pending'),
-    t.stringLiteral('completed'),
-    t.stringLiteral('failed'),
-]);
+import * as t from 'ts-fortress';
 
-// Complex unions
+// Union types
 const IdType = t.union([t.string(''), t.number(0)]);
 
 // Intersection types
@@ -786,6 +786,8 @@ const ExtendedUserType = t.mergeRecords([
 ### Enums
 
 ```typescript
+import * as t from 'ts-fortress';
+
 // String enums
 const ColorEnum = t.enumType(['red', 'green', 'blue']);
 type Color = t.TypeOf<typeof ColorEnum>; // 'red' | 'green' | 'blue'
@@ -804,6 +806,8 @@ type DiceRoll = t.TypeOf<typeof DiceRoll>; // 1 | 2 | 3 | 4 | 5 | 6
 ts-fortress uses `Result<T, readonly ValidationError[]>` for structured error handling with detailed error information:
 
 ```typescript
+import * as t from 'ts-fortress';
+
 const UserType = t.record({
     name: t.string(''),
     age: t.number(0),
@@ -882,7 +886,7 @@ type ValidationError = Readonly<{
 - `t.number(defaultValue)` - Number validation
 - `t.boolean(defaultValue)` - Boolean validation
 - `t.nullType` / `t.undefinedType` - Null/undefined validation
-- `t.stringLiteral(value)` - Literal string types
+- `t.literal(value)` - Literal types (string, number, or boolean)
 
 ### Collections
 
@@ -909,18 +913,27 @@ type ValidationError = Readonly<{
 - `t.intersection(types, defaultType)` - Intersection type validation
 - `t.mergeRecords(recordTypes)` - Merge multiple record types
 
-### Branded Types
+### Refinement
 
-- `t.simpleBrandedString(brandName, defaultValue)` - Simple string branding
-- `t.simpleBrandedNumber(brandName, defaultValue)` - Simple number branding
+- `t.refine({ baseType, is, defaultValue })` - Refine `baseType` by `is` function
+- `t.simpleBrandedString({ typeName, defaultValue, is? })` - Simple string branding
+- `t.simpleBrandedNumber({ typeName, defaultValue, is? })` - Simple number branding
 - Number types: `t.int()`, `t.safeInt()`, `t.positiveInt()`, `t.uint16()`, etc.
 
 ### Utilities
 
 - `t.TypeOf<T>` - Extract TypeScript type from validator
 - `t.enumType(values)` - Enum validation
-- `t.uintRange({ start, end, defaultValue? })` - Integer range validation
+- `t.uintRange({ start, end, defaultValue? })` - Non-negative integer range validation
+- `t.intRange({ start, end, defaultValue? })` - Integer range validation
 - `t.unknown` - Unknown Type
+- `t.recursion(typeName, definition)` - Define recursive type
+
+### Pre-defined types
+
+- `t.int8` / `t.uint8` - Int8 / Uint8
+- `t.JsonValue` / `t.JsonPrimitive` / `t.JsonObject`
+- `t.nullable(T)` - An alias of `t.union([T, t.undefinedType])`
 
 ## Contributing
 
