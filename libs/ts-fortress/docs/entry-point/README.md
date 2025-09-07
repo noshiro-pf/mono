@@ -10409,3 +10409,9 @@ Re-exports [validationErrorToMessage](../utils/validation-error.md#validationerr
 ### ValidationErrorWithMessage
 
 Re-exports [ValidationErrorWithMessage](../utils/validation-error.md#validationerrorwithmessage)
+
+---
+
+### valueof
+
+Re-exports [valueof](../record/valueof.md#valueof)

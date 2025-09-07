@@ -1013,6 +1013,7 @@ This project is licensed under the Apache-2.0 License - see the [LICENSE](_media
 - [record/partial](record/partial.md)
 - [record/pick](record/pick.md)
 - [record/record](record/record.md)
+- [record/valueof](record/valueof.md)
 - [type](type/README.md)
 - [utils](utils.md)
 - [utils/create-assert-fn](utils/create-assert-fn.md)
