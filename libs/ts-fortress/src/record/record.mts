@@ -161,5 +161,5 @@ export const strictRecord = <
       typeName: string;
     }>
   >,
-): Type<TsFortressInternal.RecordTypeValue<R>> =>
+): RecordType<R> =>
   record(source, { ...options, allowExcessProperties: false });

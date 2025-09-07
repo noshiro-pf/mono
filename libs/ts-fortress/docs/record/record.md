@@ -38,7 +38,7 @@ Defined in: [src/record/record.mts:17](https://github.com/noshiro-pf/ts-fortress
 
 ### strictRecord()
 
-> **strictRecord**\<`R`\>(`source`, `options?`): [`Type`](../type/README.md#type)\<[`RecordTypeValue`](../type/namespaces/TsFortressInternal.md#recordtypevalue)\<`R`\>\>
+> **strictRecord**\<`R`\>(`source`, `options?`): [`RecordType`](../type/README.md#recordtype)\<`R`\>
 
 Defined in: [src/record/record.mts:155](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L155)
 
@@ -67,7 +67,7 @@ Optional configuration (allowExcessProperties will be overridden to false)
 
 #### Returns
 
-[`Type`](../type/README.md#type)\<[`RecordTypeValue`](../type/namespaces/TsFortressInternal.md#recordtypevalue)\<`R`\>\>
+[`RecordType`](../type/README.md#recordtype)\<`R`\>
 
 A Type that validates records without allowing excess properties
 
