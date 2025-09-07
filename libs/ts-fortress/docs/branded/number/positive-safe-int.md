@@ -10,7 +10,7 @@
 
 ### positiveSafeInt()
 
-> **positiveSafeInt**(`defaultValue`): [`Type`](../../type.md#type)\<`PositiveSafeInt`\>
+> **positiveSafeInt**(`defaultValue`): [`Type`](../../type/README.md#type)\<`PositiveSafeInt`\>
 
 Defined in: [src/branded/number/positive-safe-int.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/positive-safe-int.mts#L6)
 
@@ -22,4 +22,4 @@ Defined in: [src/branded/number/positive-safe-int.mts:6](https://github.com/nosh
 
 #### Returns
 
-[`Type`](../../type.md#type)\<`PositiveSafeInt`\>
+[`Type`](../../type/README.md#type)\<`PositiveSafeInt`\>

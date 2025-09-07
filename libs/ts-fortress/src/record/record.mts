@@ -1,5 +1,9 @@
 import { Arr, isRecord, Result, tp } from 'ts-data-forge';
-import { type Type, type TypeOf } from '../type.mjs';
+import {
+  type RecordType,
+  type TsFortressInternal,
+  type Type,
+} from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,
@@ -11,7 +15,7 @@ import {
 } from '../utils/index.mjs';
 
 export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
-  source: R,
+  shape: R,
   options?: Partial<
     Readonly<{
       typeName: string;
@@ -20,14 +24,14 @@ export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
       allowExcessProperties: boolean;
     }>
   >,
-): Type<RecordTypeValue<R>> => {
-  type T = RecordTypeValue<R>;
+): RecordType<R> => {
+  type T = TsFortressInternal.RecordTypeValue<R>;
 
-  const sourceKeys = new Set(Object.keys(source));
+  const sourceKeys = new Set(Object.keys(shape));
 
   const typeNameFilled: string =
     options?.typeName ??
-    `{ ${Object.entries(source)
+    `{ ${Object.entries(shape)
       .map(([k, v]) => `${k}: ${v.typeName}`)
       .join(', ')} }`;
 
@@ -36,7 +40,7 @@ export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
   const defaultValue: Type<T>['defaultValue'] =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     Object.fromEntries(
-      Object.entries(source).map(([key, value]) => tp(key, value.defaultValue)),
+      Object.entries(shape).map(([key, value]) => tp(key, value.defaultValue)),
     ) as T;
 
   const validate: Type<T>['validate'] = (a) => {
@@ -52,9 +56,9 @@ export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
 
     const defaultErrors: readonly ValidationError[] = Arr.generate(
       function* () {
-        for (const [k, valueType] of Object.entries(source)) {
+        for (const [k, valueType] of Object.entries(shape)) {
           if (!Object.hasOwn(a, k)) {
-            if (source[k]?.optional !== true) {
+            if (shape[k]?.optional !== true) {
               yield {
                 path: [k],
                 actualValue: a,
@@ -108,7 +112,7 @@ export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
     isRecord(a)
       ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         (Object.fromEntries(
-          Object.entries(source).map(([k, v]) =>
+          Object.entries(shape).map(([k, v]) =>
             tp(k, Object.hasOwn(a, k) ? v.fill(a[k]) : v.defaultValue),
           ),
         ) as T)
@@ -122,45 +126,10 @@ export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    shape,
+    allowExcessProperties,
   };
 };
-
-type RecordTypeValue<R extends ReadonlyRecord<string, Type<unknown>>> =
-  TsFortressInternal.RecordTypeValueImpl<R>;
-
-namespace TsFortressInternal {
-  export type RecordTypeValueImpl<
-    R extends ReadonlyRecord<string, Type<unknown>>,
-  > = RecordTypeValueImplSub<R, OptionalTypeKeys<R>>;
-
-  type RecordTypeValueImplSub<
-    A extends ReadonlyRecord<string, Type<unknown>>,
-    OptionalKeys extends keyof A,
-  > =
-    TypeEq<OptionalKeys, never> extends true
-      ? Readonly<{
-          [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]>;
-        }>
-      : TypeEq<keyof A, OptionalKeys> extends true
-        ? Readonly<
-            MergeIntersection<{
-              [key in OptionalKeys]?: TypeOf<A[key]>;
-            }>
-          >
-        : Readonly<
-            MergeIntersection<
-              {
-                [key in OptionalKeys]?: TypeOf<A[key]>;
-              } & {
-                [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]>;
-              }
-            >
-          >;
-
-  type OptionalTypeKeys<A extends ReadonlyRecord<string, Type<unknown>>> = {
-    [K in keyof A]: A[K] extends { optional: true } ? K : never;
-  }[keyof A];
-}
 
 /**
  * Creates a strict record type that does not allow excess properties.
@@ -192,5 +161,5 @@ export const strictRecord = <
       typeName: string;
     }>
   >,
-): Type<RecordTypeValue<R>> =>
+): Type<TsFortressInternal.RecordTypeValue<R>> =>
   record(source, { ...options, allowExcessProperties: false });

@@ -10,7 +10,7 @@
 
 ### int8()
 
-> **int8**(`defaultValue`): [`Type`](../type.md#type)\<`Int8`\>
+> **int8**(`defaultValue`): [`Type`](../type/README.md#type)\<`Int8`\>
 
 Defined in: [src/predefined/int8.mts:4](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/int8.mts#L4)
 
@@ -22,4 +22,4 @@ Defined in: [src/predefined/int8.mts:4](https://github.com/noshiro-pf/ts-fortres
 
 #### Returns
 
-[`Type`](../type.md#type)\<`Int8`\>
+[`Type`](../type/README.md#type)\<`Int8`\>

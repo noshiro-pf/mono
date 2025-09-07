@@ -10,7 +10,7 @@
 
 ### recursion()
 
-> **recursion**\<`A`\>(`typeName`, `definition`, `options?`): [`Type`](../type.md#type)\<`A`\>
+> **recursion**\<`A`\>(`typeName`, `definition`, `options?`): [`Type`](../type/README.md#type)\<`A`\>
 
 Defined in: [src/compose/recursion.mts:4](https://github.com/noshiro-pf/ts-fortress/blob/main/src/compose/recursion.mts#L4)
 
@@ -28,7 +28,7 @@ Defined in: [src/compose/recursion.mts:4](https://github.com/noshiro-pf/ts-fortr
 
 ##### definition
 
-() => [`Type`](../type.md#type)\<`A`\>
+() => [`Type`](../type/README.md#type)\<`A`\>
 
 ##### options?
 
@@ -36,4 +36,4 @@ Defined in: [src/compose/recursion.mts:4](https://github.com/noshiro-pf/ts-fortr
 
 #### Returns
 
-[`Type`](../type.md#type)\<`A`\>
+[`Type`](../type/README.md#type)\<`A`\>

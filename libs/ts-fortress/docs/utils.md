@@ -56,6 +56,12 @@ Re-exports [prependPathToValidationErrors](utils/validation-error.md#prependpath
 
 ---
 
+### toUnionString
+
+Re-exports [toUnionString](utils/to-union-string.md#tounionstring)
+
+---
+
 ### ValidationError
 
 Re-exports [ValidationError](utils/validation-error.md#validationerror)

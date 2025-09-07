@@ -1,10 +1,10 @@
 import { Arr, expectType, pipe } from 'ts-data-forge';
 import { enumType } from '../enum/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
-import { type Type, type TypeOf } from '../type.mjs';
+import { type RecordType, type Type } from '../type.mjs';
 
-export const keyof = <const R extends Type<UnknownRecord>>(
-  recordType: R,
+export const keyof = <const R extends ReadonlyRecord<string, Type<unknown>>>(
+  recordType: RecordType<R>,
   options?: Partial<
     Readonly<{
       typeName: string;
@@ -12,25 +12,47 @@ export const keyof = <const R extends Type<UnknownRecord>>(
   >,
 ): KeyofType<R> =>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  pipe(Object.keys(recordType.defaultValue)).map((keys) =>
+  pipe(getKeys(recordType)).map((keys) =>
     Arr.isNonEmpty(keys)
-      ? enumType(keys, {
+      ? (enumType(keys, {
           typeName: options?.typeName ?? `keyof ${recordType.typeName}`,
-        })
-      : undefinedType,
+        }) satisfies KeyofTypeSub<R>)
+      : (undefinedType satisfies Type<undefined>),
   ).value as KeyofType<R>;
 
-type KeyofType<R extends Type<UnknownRecord>> = Type<ToString<keyof TypeOf<R>>>;
+const getKeys = <const R extends ReadonlyRecord<string, Type<unknown>>>(
+  recordType: RecordType<R>,
+): readonly ToString<keyof R>[] =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  Object.keys(recordType.shape) satisfies string[] as ToString<keyof R>[];
+
+type KeyofTypeSub<R extends ReadonlyRecord<string, Type<unknown>>> = Type<
+  ToString<keyof R>
+>;
+
+type KeyofType<R extends ReadonlyRecord<string, Type<unknown>>> =
+  IsNever<keyof R> extends true ? Type<undefined> : KeyofTypeSub<R>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-expectType<KeyofType<Type<{}>>, Type<never>>('=');
+expectType<keyof {}, never>('=');
+expectType<ToString<keyof { 1: 1; 2: 2; 3: 3 }>, '1' | '2' | '3'>('=');
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+expectType<KeyofType<{}>, Type<undefined>>('=');
 
 expectType<
-  KeyofType<Type<{ a: Type<0>; b: Type<0>; c: Type<0> }>>,
+  KeyofType<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
   Type<'a' | 'b' | 'c'>
 >('=');
 
 expectType<
-  KeyofType<Type<{ 1: Type<0>; 2: Type<0>; 3: Type<0> }>>,
-  Type<'1' | '2' | '3'>
+  KeyofType<{ x: Type<string>; y: Type<number>; z: Type<boolean> }>,
+  Type<'x' | 'y' | 'z'>
 >('=');
+
+expectType<
+  KeyofType<{ same: Type<string>; value: Type<string> }>,
+  Type<'same' | 'value'>
+>('=');
+
+expectType<KeyofType<{ never: Type<never> }>, Type<'never'>>('=');

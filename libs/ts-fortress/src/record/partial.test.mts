@@ -5,8 +5,8 @@ import {
   type ValidationError,
   validationErrorsToMessages,
 } from '../utils/index.mjs';
-import { optional } from './optional.mjs';
-import { partial } from './partial.mjs';
+import { optional, type OptionalPropertyType } from './optional.mjs';
+import { partial, type PartialType } from './partial.mjs';
 import { record } from './record.mjs';
 
 describe('partial', () => {
@@ -21,7 +21,33 @@ describe('partial', () => {
 
     expectType<
       typeof ymd,
-      Type<Partial<Readonly<{ year: number; month: number; date: number }>>>
+      PartialType<
+        Readonly<{
+          year: Type<number>;
+          month: Type<number>;
+          date: Type<number>;
+        }>,
+        undefined
+      >
+    >('=');
+
+    expectType<
+      typeof ymd,
+      Type<
+        Readonly<{
+          year?: number;
+          month?: number;
+          date?: number;
+        }>
+      > &
+        Readonly<{
+          shape: Readonly<{
+            year: OptionalPropertyType<Type<number>>;
+            month: OptionalPropertyType<Type<number>>;
+            date: OptionalPropertyType<Type<number>>;
+          }>;
+          allowExcessProperties: boolean;
+        }>
     >('=');
 
     type Ymd = TypeOf<typeof ymd>;
@@ -222,7 +248,11 @@ describe('partial', () => {
       test('from an empty record', () => {
         const x: UnknownRecord = {};
 
-        expect(ymd.fill(x)).toStrictEqual({});
+        expect(ymd.fill(x)).toStrictEqual({
+          year: 1900,
+          month: 1,
+          date: 1,
+        });
       });
 
       test('from a filled record', () => {
@@ -246,6 +276,8 @@ describe('partial', () => {
 
         expect(ymd.fill(x)).toStrictEqual({
           year: 2000,
+          month: 1,
+          date: 1,
         });
       });
 
@@ -257,6 +289,8 @@ describe('partial', () => {
 
         expect(ymd.fill(x)).toStrictEqual({
           year: 2000,
+          month: 1,
+          date: 1,
         });
       });
     });
@@ -398,6 +432,8 @@ describe('partial', () => {
 
         expect(ymd.fill(x)).toStrictEqual({
           year: 1900,
+          month: 1,
+          date: 1,
         });
       });
 
@@ -422,6 +458,8 @@ describe('partial', () => {
 
         expect(ymd.fill(x)).toStrictEqual({
           year: 2000,
+          month: 1,
+          date: 1,
         });
       });
 
@@ -433,6 +471,8 @@ describe('partial', () => {
 
         expect(ymd.fill(x)).toStrictEqual({
           year: 2000,
+          month: 1,
+          date: 1,
         });
       });
     });

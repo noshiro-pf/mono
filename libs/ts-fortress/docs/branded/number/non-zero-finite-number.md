@@ -10,7 +10,7 @@
 
 ### nonZeroFiniteNumber()
 
-> **nonZeroFiniteNumber**(`defaultValue`): [`Type`](../../type.md#type)\<`NonZeroFiniteNumber`\>
+> **nonZeroFiniteNumber**(`defaultValue`): [`Type`](../../type/README.md#type)\<`NonZeroFiniteNumber`\>
 
 Defined in: [src/branded/number/non-zero-finite-number.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/non-zero-finite-number.mts#L6)
 
@@ -22,4 +22,4 @@ Defined in: [src/branded/number/non-zero-finite-number.mts:6](https://github.com
 
 #### Returns
 
-[`Type`](../../type.md#type)\<`NonZeroFiniteNumber`\>
+[`Type`](../../type/README.md#type)\<`NonZeroFiniteNumber`\>

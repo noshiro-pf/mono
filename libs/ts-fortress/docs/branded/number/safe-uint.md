@@ -10,7 +10,7 @@
 
 ### safeUint()
 
-> **safeUint**(`defaultValue`): [`Type`](../../type.md#type)\<`SafeUint`\>
+> **safeUint**(`defaultValue`): [`Type`](../../type/README.md#type)\<`SafeUint`\>
 
 Defined in: [src/branded/number/safe-uint.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/safe-uint.mts#L6)
 
@@ -22,4 +22,4 @@ Defined in: [src/branded/number/safe-uint.mts:6](https://github.com/noshiro-pf/t
 
 #### Returns
 
-[`Type`](../../type.md#type)\<`SafeUint`\>
+[`Type`](../../type/README.md#type)\<`SafeUint`\>

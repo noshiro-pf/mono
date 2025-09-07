@@ -10,7 +10,7 @@
 
 ### simpleBrandedNumber()
 
-> **simpleBrandedNumber**\<`K`\>(`__namedParameters`): [`Type`](../type.md#type)\<`Brand`\<`number`, `K`\>\>
+> **simpleBrandedNumber**\<`K`\>(`__namedParameters`): [`Type`](../type/README.md#type)\<`Brand`\<`number`, `K`\>\>
 
 Defined in: [src/branded/simple-branded-number.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/simple-branded-number.mts#L5)
 
@@ -28,4 +28,4 @@ Defined in: [src/branded/simple-branded-number.mts:5](https://github.com/noshiro
 
 #### Returns
 
-[`Type`](../type.md#type)\<`Brand`\<`number`, `K`\>\>
+[`Type`](../type/README.md#type)\<`Brand`\<`number`, `K`\>\>

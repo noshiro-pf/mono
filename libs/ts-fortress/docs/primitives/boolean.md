@@ -10,7 +10,7 @@
 
 ### boolean()
 
-> **boolean**(`defaultValue`): [`Type`](../type.md#type)\<`boolean`\>
+> **boolean**(`defaultValue`): [`Type`](../type/README.md#type)\<`boolean`\>
 
 Defined in: [src/primitives/boolean.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/boolean.mts#L5)
 
@@ -22,13 +22,13 @@ Defined in: [src/primitives/boolean.mts:5](https://github.com/noshiro-pf/ts-fort
 
 #### Returns
 
-[`Type`](../type.md#type)\<`boolean`\>
+[`Type`](../type/README.md#type)\<`boolean`\>
 
 ---
 
 ### ~~booleanLiteral()~~
 
-> **booleanLiteral**\<`L`\>(`literal`): [`Type`](../type.md#type)\<`L`\>
+> **booleanLiteral**\<`L`\>(`literal`): [`Type`](../type/README.md#type)\<`L`\>
 
 Defined in: [src/primitives/boolean.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/boolean.mts#L9)
 
@@ -46,7 +46,7 @@ Defined in: [src/primitives/boolean.mts:9](https://github.com/noshiro-pf/ts-fort
 
 #### Returns
 
-[`Type`](../type.md#type)\<`L`\>
+[`Type`](../type/README.md#type)\<`L`\>
 
 #### Deprecated
 

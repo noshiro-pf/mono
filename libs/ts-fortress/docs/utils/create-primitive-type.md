@@ -10,7 +10,7 @@
 
 ### createPrimitiveType()
 
-> **createPrimitiveType**\<`A`\>(`__namedParameters`): [`Type`](../type.md#type)\<`A`\>
+> **createPrimitiveType**\<`A`\>(`__namedParameters`): [`Type`](../type/README.md#type)\<`A`\>
 
 Defined in: [src/utils/create-primitive-type.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/create-primitive-type.mts#L7)
 
@@ -28,4 +28,4 @@ Defined in: [src/utils/create-primitive-type.mts:7](https://github.com/noshiro-p
 
 #### Returns
 
-[`Type`](../type.md#type)\<`A`\>
+[`Type`](../type/README.md#type)\<`A`\>

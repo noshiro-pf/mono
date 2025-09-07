@@ -10,7 +10,7 @@
 
 ### uintRange()
 
-> **uintRange**\<`Start`, `End`\>(`__namedParameters`): [`Type`](../type.md#type)\<`UintRange`\<`Start`, `End`\>\>
+> **uintRange**\<`Start`, `End`\>(`__namedParameters`): [`Type`](../type/README.md#type)\<`UintRange`\<`Start`, `End`\>\>
 
 Defined in: [src/enum/uint-range.mts:10](https://github.com/noshiro-pf/ts-fortress/blob/main/src/enum/uint-range.mts#L10)
 
@@ -32,4 +32,4 @@ Defined in: [src/enum/uint-range.mts:10](https://github.com/noshiro-pf/ts-fortre
 
 #### Returns
 
-[`Type`](../type.md#type)\<`UintRange`\<`Start`, `End`\>\>
+[`Type`](../type/README.md#type)\<`UintRange`\<`Start`, `End`\>\>

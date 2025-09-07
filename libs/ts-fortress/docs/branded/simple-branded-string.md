@@ -10,7 +10,7 @@
 
 ### simpleBrandedString()
 
-> **simpleBrandedString**\<`K`\>(`__namedParameters`): [`Type`](../type.md#type)\<`Brand`\<`string`, `K`\>\>
+> **simpleBrandedString**\<`K`\>(`__namedParameters`): [`Type`](../type/README.md#type)\<`Brand`\<`string`, `K`\>\>
 
 Defined in: [src/branded/simple-branded-string.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/simple-branded-string.mts#L5)
 
@@ -28,4 +28,4 @@ Defined in: [src/branded/simple-branded-string.mts:5](https://github.com/noshiro
 
 #### Returns
 
-[`Type`](../type.md#type)\<`Brand`\<`string`, `K`\>\>
+[`Type`](../type/README.md#type)\<`Brand`\<`string`, `K`\>\>

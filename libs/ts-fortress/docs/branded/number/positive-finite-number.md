@@ -10,7 +10,7 @@
 
 ### positiveFiniteNumber()
 
-> **positiveFiniteNumber**(`defaultValue`): [`Type`](../../type.md#type)\<`PositiveFiniteNumber`\>
+> **positiveFiniteNumber**(`defaultValue`): [`Type`](../../type/README.md#type)\<`PositiveFiniteNumber`\>
 
 Defined in: [src/branded/number/positive-finite-number.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/positive-finite-number.mts#L6)
 
@@ -22,4 +22,4 @@ Defined in: [src/branded/number/positive-finite-number.mts:6](https://github.com
 
 #### Returns
 
-[`Type`](../../type.md#type)\<`PositiveFiniteNumber`\>
+[`Type`](../../type/README.md#type)\<`PositiveFiniteNumber`\>

@@ -10,7 +10,7 @@
 
 ### int()
 
-> **int**(`defaultValue`): [`Type`](../../type.md#type)\<`Int`\>
+> **int**(`defaultValue`): [`Type`](../../type/README.md#type)\<`Int`\>
 
 Defined in: [src/branded/number/int.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/int.mts#L6)
 
@@ -22,4 +22,4 @@ Defined in: [src/branded/number/int.mts:6](https://github.com/noshiro-pf/ts-fort
 
 #### Returns
 
-[`Type`](../../type.md#type)\<`Int`\>
+[`Type`](../../type/README.md#type)\<`Int`\>

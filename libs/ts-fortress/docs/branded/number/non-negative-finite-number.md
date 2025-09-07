@@ -10,7 +10,7 @@
 
 ### nonNegativeFiniteNumber()
 
-> **nonNegativeFiniteNumber**(`defaultValue`): [`Type`](../../type.md#type)\<`NonNegativeFiniteNumber`\>
+> **nonNegativeFiniteNumber**(`defaultValue`): [`Type`](../../type/README.md#type)\<`NonNegativeFiniteNumber`\>
 
 Defined in: [src/branded/number/non-negative-finite-number.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/non-negative-finite-number.mts#L9)
 
@@ -22,4 +22,4 @@ Defined in: [src/branded/number/non-negative-finite-number.mts:9](https://github
 
 #### Returns
 
-[`Type`](../../type.md#type)\<`NonNegativeFiniteNumber`\>
+[`Type`](../../type/README.md#type)\<`NonNegativeFiniteNumber`\>

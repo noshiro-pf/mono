@@ -10,19 +10,19 @@
 
 ### record()
 
-> **record**\<`R`\>(`source`, `options?`): [`Type`](../type.md#type)\<`RecordTypeValue`\<`R`\>\>
+> **record**\<`R`\>(`shape`, `options?`): [`RecordType`](../type/README.md#recordtype)\<`R`\>
 
-Defined in: [src/record/record.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L13)
+Defined in: [src/record/record.mts:17](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L17)
 
 #### Type Parameters
 
 ##### R
 
-`R` _extends_ `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
+`R` _extends_ `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
 
 #### Parameters
 
-##### source
+##### shape
 
 `R`
 
@@ -32,15 +32,15 @@ Defined in: [src/record/record.mts:13](https://github.com/noshiro-pf/ts-fortress
 
 #### Returns
 
-[`Type`](../type.md#type)\<`RecordTypeValue`\<`R`\>\>
+[`RecordType`](../type/README.md#recordtype)\<`R`\>
 
 ---
 
 ### strictRecord()
 
-> **strictRecord**\<`R`\>(`source`, `options?`): [`Type`](../type.md#type)\<`RecordTypeValue`\<`R`\>\>
+> **strictRecord**\<`R`\>(`source`, `options?`): [`Type`](../type/README.md#type)\<[`RecordTypeValue`](../type/namespaces/TsFortressInternal.md#recordtypevalue)\<`R`\>\>
 
-Defined in: [src/record/record.mts:186](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L186)
+Defined in: [src/record/record.mts:155](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L155)
 
 Creates a strict record type that does not allow excess properties.
 This is an alias for `record(source, { allowExcessProperties: false })`.
@@ -49,7 +49,7 @@ This is an alias for `record(source, { allowExcessProperties: false })`.
 
 ##### R
 
-`R` _extends_ `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
+`R` _extends_ `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
 
 #### Parameters
 
@@ -67,7 +67,7 @@ Optional configuration (allowExcessProperties will be overridden to false)
 
 #### Returns
 
-[`Type`](../type.md#type)\<`RecordTypeValue`\<`R`\>\>
+[`Type`](../type/README.md#type)\<[`RecordTypeValue`](../type/namespaces/TsFortressInternal.md#recordtypevalue)\<`R`\>\>
 
 A Type that validates records without allowing excess properties
 

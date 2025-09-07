@@ -10,7 +10,7 @@
 
 ### array()
 
-> **array**\<`A`\>(`elementType`, `options?`): [`Type`](../type.md#type)\<readonly `A`[]\>
+> **array**\<`A`\>(`elementType`, `options?`): [`Type`](../type/README.md#type)\<readonly `A`[]\>
 
 Defined in: [src/array/array.mts:12](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/array.mts#L12)
 
@@ -24,7 +24,7 @@ Defined in: [src/array/array.mts:12](https://github.com/noshiro-pf/ts-fortress/b
 
 ##### elementType
 
-[`Type`](../type.md#type)\<`A`\>
+[`Type`](../type/README.md#type)\<`A`\>
 
 ##### options?
 
@@ -32,4 +32,4 @@ Defined in: [src/array/array.mts:12](https://github.com/noshiro-pf/ts-fortress/b
 
 #### Returns
 
-[`Type`](../type.md#type)\<readonly `A`[]\>
+[`Type`](../type/README.md#type)\<readonly `A`[]\>

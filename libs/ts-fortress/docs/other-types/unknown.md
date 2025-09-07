@@ -10,7 +10,7 @@
 
 ### unknown()
 
-> **unknown**(`defaultValue?`): [`Type`](../type.md#type)\<`unknown`\>
+> **unknown**(`defaultValue?`): [`Type`](../type/README.md#type)\<`unknown`\>
 
 Defined in: [src/other-types/unknown.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/other-types/unknown.mts#L5)
 
@@ -22,4 +22,4 @@ Defined in: [src/other-types/unknown.mts:5](https://github.com/noshiro-pf/ts-for
 
 #### Returns
 
-[`Type`](../type.md#type)\<`unknown`\>
+[`Type`](../type/README.md#type)\<`unknown`\>

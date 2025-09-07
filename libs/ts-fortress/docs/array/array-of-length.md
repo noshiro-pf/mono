@@ -10,7 +10,7 @@
 
 ### arrayOfLength()
 
-> **arrayOfLength**\<`A`, `N`\>(`size`, `elementType`, `options?`): [`Type`](../type.md#type)\<`ArrayOfLength`\<`N`, `A`\>\>
+> **arrayOfLength**\<`A`, `N`\>(`size`, `elementType`, `options?`): [`Type`](../type/README.md#type)\<`ArrayOfLength`\<`N`, `A`\>\>
 
 Defined in: [src/array/array-of-length.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/array-of-length.mts#L13)
 
@@ -32,7 +32,7 @@ Defined in: [src/array/array-of-length.mts:13](https://github.com/noshiro-pf/ts-
 
 ##### elementType
 
-[`Type`](../type.md#type)\<`A`\>
+[`Type`](../type/README.md#type)\<`A`\>
 
 ##### options?
 
@@ -40,4 +40,4 @@ Defined in: [src/array/array-of-length.mts:13](https://github.com/noshiro-pf/ts-
 
 #### Returns
 
-[`Type`](../type.md#type)\<`ArrayOfLength`\<`N`, `A`\>\>
+[`Type`](../type/README.md#type)\<`ArrayOfLength`\<`N`, `A`\>\>

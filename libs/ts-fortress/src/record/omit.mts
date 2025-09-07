@@ -1,98 +1,65 @@
-import { expectType, isRecord, Obj, Result } from 'ts-data-forge';
-import { type Type, type TypeOf } from '../type.mjs';
-import {
-  createAssertFn,
-  createCastFn,
-  createIsFn,
-  createPrimitiveValidationError,
-} from '../utils/index.mjs';
+import { expectType, Obj } from 'ts-data-forge';
+import { type RecordType, type Type } from '../type.mjs';
+import { toUnionString } from '../utils/index.mjs';
+import { record } from './record.mjs';
 
 /** Creates a record type with keys omitted. */
 export const omit = <
-  const R extends Type<UnknownRecord>,
-  const KeysToOmit extends readonly (keyof TypeOf<R> & string)[],
+  const R extends ReadonlyRecord<string, Type<unknown>>,
+  const KeysToOmit extends readonly (keyof R & string)[],
 >(
-  recordType: R,
+  recordType: RecordType<R>,
   keysToOmit: KeysToOmit,
   options?: Partial<
     Readonly<{
       typeName: string;
+
+      /** @default true */
+      allowExcessProperties: boolean;
     }>
   >,
-): OmittedType<R, KeysToOmit> => {
-  type V = Omit<TypeOf<R>, ArrayElement<KeysToOmit>>;
+): OmittedType<R, KeysToOmit> =>
+  record(Obj.omit(recordType.shape, keysToOmit), {
+    typeName:
+      options?.typeName ??
+      `Omit<${recordType.typeName}, ${toUnionString(keysToOmit)}>`,
+    allowExcessProperties:
+      options?.allowExcessProperties ?? recordType.allowExcessProperties,
+  });
 
-  const typeNameFilled: string =
-    options?.typeName ??
-    `Omit<${recordType.typeName}, ${keysToOmit.join('|')}>`;
-
-  const defaultValue: V = Obj.omit(recordType.defaultValue, keysToOmit);
-
-  const validate: Type<V>['validate'] = (a) => {
-    if (!isRecord(a)) {
-      return Result.err([
-        createPrimitiveValidationError({
-          actualValue: a,
-          expectedType: 'record',
-          typeName: typeNameFilled,
-        }),
-      ]);
-    }
-
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const objectFilled = {
-      ...Obj.pick(recordType.fill(a), keysToOmit),
-      ...a,
-    } as TypeOf<R>;
-
-    const baseValidationResult = recordType.validate(objectFilled);
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    return Result.map(baseValidationResult, () => a as V);
-  };
-
-  const fill: Type<V>['fill'] = (a) => Obj.omit(recordType.fill(a), keysToOmit);
-
-  return {
-    typeName: typeNameFilled,
-    defaultValue,
-    fill,
-    validate,
-    is: createIsFn(validate),
-    assertIs: createAssertFn(validate),
-    cast: createCastFn(validate),
-  };
-};
-
-type OmittedType<
-  R extends Type<UnknownRecord>,
-  KeysToOmit extends readonly (keyof TypeOf<R>)[],
-> = Type<Omit<TypeOf<R>, ArrayElement<KeysToOmit>>>;
+export type OmittedType<
+  R extends ReadonlyRecord<string, Type<unknown>>,
+  KeysToOmit extends readonly (keyof R)[],
+> = RecordType<Omit<R, ArrayElement<KeysToOmit>>>;
 
 expectType<
-  Omit<TypeOf<Type<{ a: Type<0>; b: Type<0>; c: Type<0> }>>, 'a' | 'b'>,
+  Omit<{ a: Type<0>; b: Type<1>; c: Type<2> }, 'a' | 'b'>,
   {
-    c: Type<0>;
+    c: Type<2>;
   }
 >('=');
 
 expectType<
-  Type<Omit<TypeOf<Type<{ a: Type<0>; b: Type<0>; c: Type<0> }>>, 'a' | 'b'>>,
-  Type<{
-    c: Type<0>;
-  }>
+  RecordType<Omit<{ a: Type<0>; b: Type<1>; c: Type<2> }, 'a' | 'b'>>,
+  Type<Readonly<{ c: 2 }>> &
+    Readonly<{
+      shape: { c: Type<2> };
+      allowExcessProperties: boolean;
+    }>
 >('=');
 
 expectType<
-  OmittedType<Type<{ a: Type<0>; b: Type<0>; c: Type<0> }>, ['a', 'b']>,
-  Type<{
-    c: Type<0>;
-  }>
+  OmittedType<{ a: Type<0>; b: Type<1>; c: Type<2> }, ['a', 'b']>,
+  Type<Readonly<{ c: 2 }>> &
+    Readonly<{
+      shape: { c: Type<2> };
+      allowExcessProperties: boolean;
+    }>
 >('=');
 
 expectType<
   OmittedType<
-    Type<{ a: Type<0>; b: Type<0>; c: Type<0> }>,
+    { a: Type<0>; b: Type<1>; c: Type<2> },
     // @ts-expect-error key "d" doesn't exist
     ['a', 'd']
   >,

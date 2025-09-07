@@ -10154,6 +10154,12 @@ Re-exports [omit](../record/omit.md#omit)
 
 ---
 
+### OmittedType
+
+Re-exports [OmittedType](../record/omit.md#omittedtype)
+
+---
+
 ### optional
 
 Re-exports [optional](../record/optional.md#optional)
@@ -10168,7 +10174,7 @@ Re-exports [OptionalPropertyType](../record/optional.md#optionalpropertytype)
 
 ### OptionalType
 
-Re-exports [OptionalType](../type.md#optionaltype)
+Re-exports [OptionalType](../type/README.md#optionaltype)
 
 ---
 
@@ -10178,9 +10184,21 @@ Re-exports [partial](../record/partial.md#partial)
 
 ---
 
+### PartialType
+
+Re-exports [PartialType](../record/partial.md#partialtype)
+
+---
+
 ### pick
 
 Re-exports [pick](../record/pick.md#pick)
+
+---
+
+### PickedType
+
+Re-exports [PickedType](../record/pick.md#pickedtype)
 
 ---
 
@@ -10217,6 +10235,12 @@ Re-exports [prependPathToValidationErrors](../utils/validation-error.md#prependp
 ### record
 
 Re-exports [record](../record/record.md#record)
+
+---
+
+### RecordType
+
+Re-exports [RecordType](../type/README.md#recordtype)
 
 ---
 
@@ -10286,6 +10310,18 @@ Re-exports [symbol](../primitives/symbol.md#symbol)
 
 ---
 
+### toUnionString
+
+Re-exports [toUnionString](../utils/to-union-string.md#tounionstring)
+
+---
+
+### TsFortressInternal
+
+Re-exports [TsFortressInternal](../type/namespaces/TsFortressInternal.md)
+
+---
+
 ### tuple
 
 Re-exports [tuple](../array/tuple.md#tuple)
@@ -10294,13 +10330,13 @@ Re-exports [tuple](../array/tuple.md#tuple)
 
 ### Type
 
-Re-exports [Type](../type.md#type)
+Re-exports [Type](../type/README.md#type)
 
 ---
 
 ### TypeOf
 
-Re-exports [TypeOf](../type.md#typeof)
+Re-exports [TypeOf](../type/README.md#typeof)
 
 ---
 

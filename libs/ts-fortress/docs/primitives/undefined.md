@@ -10,6 +10,6 @@
 
 ### undefinedType
 
-> `const` **undefinedType**: [`Type`](../type.md#type)\<`undefined`\>
+> `const` **undefinedType**: [`Type`](../type/README.md#type)\<`undefined`\>
 
 Defined in: [src/primitives/undefined.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/undefined.mts#L5)

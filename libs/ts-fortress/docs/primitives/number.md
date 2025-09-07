@@ -10,7 +10,7 @@
 
 ### number()
 
-> **number**(`defaultValue`): [`Type`](../type.md#type)\<`number`\>
+> **number**(`defaultValue`): [`Type`](../type/README.md#type)\<`number`\>
 
 Defined in: [src/primitives/number.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/number.mts#L5)
 
@@ -22,13 +22,13 @@ Defined in: [src/primitives/number.mts:5](https://github.com/noshiro-pf/ts-fortr
 
 #### Returns
 
-[`Type`](../type.md#type)\<`number`\>
+[`Type`](../type/README.md#type)\<`number`\>
 
 ---
 
 ### ~~numberLiteral()~~
 
-> **numberLiteral**\<`L`\>(`literal`): [`Type`](../type.md#type)\<`L`\>
+> **numberLiteral**\<`L`\>(`literal`): [`Type`](../type/README.md#type)\<`L`\>
 
 Defined in: [src/primitives/number.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/number.mts#L9)
 
@@ -46,7 +46,7 @@ Defined in: [src/primitives/number.mts:9](https://github.com/noshiro-pf/ts-fortr
 
 #### Returns
 
-[`Type`](../type.md#type)\<`L`\>
+[`Type`](../type/README.md#type)\<`L`\>
 
 #### Deprecated
 

@@ -10,7 +10,7 @@
 
 ### bigint()
 
-> **bigint**(`defaultValue`): [`Type`](../type.md#type)\<`bigint`\>
+> **bigint**(`defaultValue`): [`Type`](../type/README.md#type)\<`bigint`\>
 
 Defined in: [src/primitives/bigint.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/bigint.mts#L5)
 
@@ -22,13 +22,13 @@ Defined in: [src/primitives/bigint.mts:5](https://github.com/noshiro-pf/ts-fortr
 
 #### Returns
 
-[`Type`](../type.md#type)\<`bigint`\>
+[`Type`](../type/README.md#type)\<`bigint`\>
 
 ---
 
 ### ~~bigintLiteral()~~
 
-> **bigintLiteral**\<`L`\>(`literal`): [`Type`](../type.md#type)\<`L`\>
+> **bigintLiteral**\<`L`\>(`literal`): [`Type`](../type/README.md#type)\<`L`\>
 
 Defined in: [src/primitives/bigint.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/bigint.mts#L9)
 
@@ -46,7 +46,7 @@ Defined in: [src/primitives/bigint.mts:9](https://github.com/noshiro-pf/ts-fortr
 
 #### Returns
 
-[`Type`](../type.md#type)\<`L`\>
+[`Type`](../type/README.md#type)\<`L`\>
 
 #### Deprecated
 

@@ -10,7 +10,7 @@
 
 ### string()
 
-> **string**(`defaultValue`): [`Type`](../type.md#type)\<`string`\>
+> **string**(`defaultValue`): [`Type`](../type/README.md#type)\<`string`\>
 
 Defined in: [src/primitives/string.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/string.mts#L5)
 
@@ -22,13 +22,13 @@ Defined in: [src/primitives/string.mts:5](https://github.com/noshiro-pf/ts-fortr
 
 #### Returns
 
-[`Type`](../type.md#type)\<`string`\>
+[`Type`](../type/README.md#type)\<`string`\>
 
 ---
 
 ### ~~stringLiteral()~~
 
-> **stringLiteral**\<`L`\>(`literal`): [`Type`](../type.md#type)\<`L`\>
+> **stringLiteral**\<`L`\>(`literal`): [`Type`](../type/README.md#type)\<`L`\>
 
 Defined in: [src/primitives/string.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/string.mts#L9)
 
@@ -46,7 +46,7 @@ Defined in: [src/primitives/string.mts:9](https://github.com/noshiro-pf/ts-fortr
 
 #### Returns
 
-[`Type`](../type.md#type)\<`L`\>
+[`Type`](../type/README.md#type)\<`L`\>
 
 #### Deprecated
 

@@ -10,7 +10,7 @@
 
 ### finiteNumber()
 
-> **finiteNumber**(`defaultValue`): [`Type`](../../type.md#type)\<`FiniteNumber`\>
+> **finiteNumber**(`defaultValue`): [`Type`](../../type/README.md#type)\<`FiniteNumber`\>
 
 Defined in: [src/branded/number/finite-number.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/finite-number.mts#L6)
 
@@ -22,4 +22,4 @@ Defined in: [src/branded/number/finite-number.mts:6](https://github.com/noshiro-
 
 #### Returns
 
-[`Type`](../../type.md#type)\<`FiniteNumber`\>
+[`Type`](../../type/README.md#type)\<`FiniteNumber`\>

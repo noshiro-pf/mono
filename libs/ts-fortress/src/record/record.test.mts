@@ -14,7 +14,15 @@ describe('record', () => {
 
   expectType<
     typeof ymd,
-    Type<Readonly<{ year: number; month: number; date: number }>>
+    Type<Readonly<{ year: number; month: number; date: number }>> &
+      Readonly<{
+        shape: Readonly<{
+          year: Type<number>;
+          month: Type<number>;
+          date: Type<number>;
+        }>;
+        allowExcessProperties: boolean;
+      }>
   >('=');
 
   type Ymd = TypeOf<typeof ymd>;

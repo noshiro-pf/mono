@@ -32,6 +32,12 @@ Re-exports [omit](record/omit.md#omit)
 
 ---
 
+### OmittedType
+
+Re-exports [OmittedType](record/omit.md#omittedtype)
+
+---
+
 ### optional
 
 Re-exports [optional](record/optional.md#optional)
@@ -50,9 +56,21 @@ Re-exports [partial](record/partial.md#partial)
 
 ---
 
+### PartialType
+
+Re-exports [PartialType](record/partial.md#partialtype)
+
+---
+
 ### pick
 
 Re-exports [pick](record/pick.md#pick)
+
+---
+
+### PickedType
+
+Re-exports [PickedType](record/pick.md#pickedtype)
 
 ---
 

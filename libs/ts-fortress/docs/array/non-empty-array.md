@@ -10,7 +10,7 @@
 
 ### nonEmptyArray()
 
-> **nonEmptyArray**\<`A`\>(`elementType`, `options?`): [`Type`](../type.md#type)\<`NonEmptyArray`\<`A`\>\>
+> **nonEmptyArray**\<`A`\>(`elementType`, `options?`): [`Type`](../type/README.md#type)\<`NonEmptyArray`\<`A`\>\>
 
 Defined in: [src/array/non-empty-array.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/non-empty-array.mts#L13)
 
@@ -24,7 +24,7 @@ Defined in: [src/array/non-empty-array.mts:13](https://github.com/noshiro-pf/ts-
 
 ##### elementType
 
-[`Type`](../type.md#type)\<`A`\>
+[`Type`](../type/README.md#type)\<`A`\>
 
 ##### options?
 
@@ -32,4 +32,4 @@ Defined in: [src/array/non-empty-array.mts:13](https://github.com/noshiro-pf/ts-
 
 #### Returns
 
-[`Type`](../type.md#type)\<`NonEmptyArray`\<`A`\>\>
+[`Type`](../type/README.md#type)\<`NonEmptyArray`\<`A`\>\>

@@ -10,7 +10,7 @@
 
 ### enumType()
 
-> **enumType**\<`Values`\>(`values`, `options?`): [`Type`](../type.md#type)\<`ArrayElement`\<`Values`\>\>
+> **enumType**\<`Values`\>(`values`, `options?`): [`Type`](../type/README.md#type)\<`ArrayElement`\<`Values`\>\>
 
 Defined in: [src/enum/enum.mts:10](https://github.com/noshiro-pf/ts-fortress/blob/main/src/enum/enum.mts#L10)
 
@@ -32,4 +32,4 @@ Defined in: [src/enum/enum.mts:10](https://github.com/noshiro-pf/ts-fortress/blo
 
 #### Returns
 
-[`Type`](../type.md#type)\<`ArrayElement`\<`Values`\>\>
+[`Type`](../type/README.md#type)\<`ArrayElement`\<`Values`\>\>

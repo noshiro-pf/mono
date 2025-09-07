@@ -10,7 +10,7 @@
 
 ### uint16()
 
-> **uint16**(`defaultValue`): [`Type`](../../type.md#type)\<`Uint16`\>
+> **uint16**(`defaultValue`): [`Type`](../../type/README.md#type)\<`Uint16`\>
 
 Defined in: [src/branded/number/uint16.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/uint16.mts#L6)
 
@@ -22,4 +22,4 @@ Defined in: [src/branded/number/uint16.mts:6](https://github.com/noshiro-pf/ts-f
 
 #### Returns
 
-[`Type`](../../type.md#type)\<`Uint16`\>
+[`Type`](../../type/README.md#type)\<`Uint16`\>

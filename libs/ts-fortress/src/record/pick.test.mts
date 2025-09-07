@@ -14,7 +14,14 @@ describe('pick', () => {
 
   const ym = pick(ymd, ['year', 'month']);
 
-  expectType<typeof ym, Type<Readonly<{ year: number; month: number }>>>('=');
+  expectType<
+    typeof ym,
+    Type<Readonly<{ year: number; month: number }>> &
+      Readonly<{
+        shape: Readonly<{ year: Type<number>; month: Type<number> }>;
+        allowExcessProperties: boolean;
+      }>
+  >('=');
 
   type Ym = TypeOf<typeof ym>;
 

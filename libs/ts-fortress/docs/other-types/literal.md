@@ -10,7 +10,7 @@
 
 ### literal()
 
-> **literal**\<`L`\>(`value`): [`Type`](../type.md#type)\<`L`\>
+> **literal**\<`L`\>(`value`): [`Type`](../type/README.md#type)\<`L`\>
 
 Defined in: [src/other-types/literal.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/other-types/literal.mts#L5)
 
@@ -28,4 +28,4 @@ Defined in: [src/other-types/literal.mts:5](https://github.com/noshiro-pf/ts-for
 
 #### Returns
 
-[`Type`](../type.md#type)\<`L`\>
+[`Type`](../type/README.md#type)\<`L`\>

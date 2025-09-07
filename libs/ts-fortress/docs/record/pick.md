@@ -6,13 +6,31 @@
 
 # record/pick
 
+## Type Aliases
+
+### PickedType\<R, KeysToPick\>
+
+> **PickedType**\<`R`, `KeysToPick`\> = [`RecordType`](../type/README.md#recordtype)\<`Pick`\<`R`, `ArrayElement`\<`KeysToPick`\>\>\>
+
+Defined in: [src/record/pick.mts:30](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L30)
+
+#### Type Parameters
+
+##### R
+
+`R` _extends_ `ReadonlyRecord`\<`string`, [`Type`](../type/README.md#type)\<`unknown`\>\>
+
+##### KeysToPick
+
+`KeysToPick` _extends_ readonly keyof `R`[]
+
 ## Functions
 
 ### pick()
 
-> **pick**\<`R`, `KeysToPick`\>(`recordType`, `keysToPick`, `options?`): `PickedType`\<`R`, `KeysToPick`\>
+> **pick**\<`R`, `KeysToPick`\>(`recordType`, `keysToPick`, `options?`): [`PickedType`](#pickedtype)\<`R`, `KeysToPick`\>
 
-Defined in: [src/record/pick.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L11)
+Defined in: [src/record/pick.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L7)
 
 Creates a record type with keys picked.
 
@@ -20,17 +38,17 @@ Creates a record type with keys picked.
 
 ##### R
 
-`R` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`UnknownRecord`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
+`R` _extends_ `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
 
 ##### KeysToPick
 
-`KeysToPick` _extends_ readonly keyof [`TypeOf`](../type.md#typeof)\<`R`\> & `string`[]
+`KeysToPick` _extends_ readonly keyof `R` & `string`[]
 
 #### Parameters
 
 ##### recordType
 
-`R`
+[`RecordType`](../type/README.md#recordtype)\<`R`\>
 
 ##### keysToPick
 
@@ -38,8 +56,8 @@ Creates a record type with keys picked.
 
 ##### options?
 
-`Partial`\<`Readonly`\<\{ `typeName`: `string`; \}\>\>
+`Partial`\<`Readonly`\<\{ `allowExcessProperties`: `boolean`; `typeName`: `string`; \}\>\>
 
 #### Returns
 
-`PickedType`\<`R`, `KeysToPick`\>
+[`PickedType`](#pickedtype)\<`R`, `KeysToPick`\>

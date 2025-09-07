@@ -10,7 +10,7 @@
 
 ### nonZeroInt()
 
-> **nonZeroInt**(`defaultValue`): [`Type`](../../type.md#type)\<`NonZeroInt`\>
+> **nonZeroInt**(`defaultValue`): [`Type`](../../type/README.md#type)\<`NonZeroInt`\>
 
 Defined in: [src/branded/number/non-zero-int.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/non-zero-int.mts#L6)
 
@@ -22,4 +22,4 @@ Defined in: [src/branded/number/non-zero-int.mts:6](https://github.com/noshiro-p
 
 #### Returns
 
-[`Type`](../../type.md#type)\<`NonZeroInt`\>
+[`Type`](../../type/README.md#type)\<`NonZeroInt`\>

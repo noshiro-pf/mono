@@ -10,7 +10,7 @@
 
 ### int32()
 
-> **int32**(`defaultValue`): [`Type`](../../type.md#type)\<`Int32`\>
+> **int32**(`defaultValue`): [`Type`](../../type/README.md#type)\<`Int32`\>
 
 Defined in: [src/branded/number/int32.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/int32.mts#L6)
 
@@ -22,4 +22,4 @@ Defined in: [src/branded/number/int32.mts:6](https://github.com/noshiro-pf/ts-fo
 
 #### Returns
 
-[`Type`](../../type.md#type)\<`Int32`\>
+[`Type`](../../type/README.md#type)\<`Int32`\>

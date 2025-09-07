@@ -10,7 +10,7 @@
 
 ### uint()
 
-> **uint**(`defaultValue`): [`Type`](../../type.md#type)\<`Uint`\>
+> **uint**(`defaultValue`): [`Type`](../../type/README.md#type)\<`Uint`\>
 
 Defined in: [src/branded/number/uint.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/branded/number/uint.mts#L6)
 
@@ -22,4 +22,4 @@ Defined in: [src/branded/number/uint.mts:6](https://github.com/noshiro-pf/ts-for
 
 #### Returns
 
-[`Type`](../../type.md#type)\<`Uint`\>
+[`Type`](../../type/README.md#type)\<`Uint`\>

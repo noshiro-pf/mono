@@ -6,13 +6,31 @@
 
 # record/omit
 
+## Type Aliases
+
+### OmittedType\<R, KeysToOmit\>
+
+> **OmittedType**\<`R`, `KeysToOmit`\> = [`RecordType`](../type/README.md#recordtype)\<`Omit`\<`R`, `ArrayElement`\<`KeysToOmit`\>\>\>
+
+Defined in: [src/record/omit.mts:30](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/omit.mts#L30)
+
+#### Type Parameters
+
+##### R
+
+`R` _extends_ `ReadonlyRecord`\<`string`, [`Type`](../type/README.md#type)\<`unknown`\>\>
+
+##### KeysToOmit
+
+`KeysToOmit` _extends_ readonly keyof `R`[]
+
 ## Functions
 
 ### omit()
 
-> **omit**\<`R`, `KeysToOmit`\>(`recordType`, `keysToOmit`, `options?`): `OmittedType`\<`R`, `KeysToOmit`\>
+> **omit**\<`R`, `KeysToOmit`\>(`recordType`, `keysToOmit`, `options?`): [`OmittedType`](#omittedtype)\<`R`, `KeysToOmit`\>
 
-Defined in: [src/record/omit.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/omit.mts#L11)
+Defined in: [src/record/omit.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/omit.mts#L7)
 
 Creates a record type with keys omitted.
 
@@ -20,17 +38,17 @@ Creates a record type with keys omitted.
 
 ##### R
 
-`R` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `optional?`: `true`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`UnknownRecord`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
+`R` _extends_ `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
 
 ##### KeysToOmit
 
-`KeysToOmit` _extends_ readonly keyof [`TypeOf`](../type.md#typeof)\<`R`\> & `string`[]
+`KeysToOmit` _extends_ readonly keyof `R` & `string`[]
 
 #### Parameters
 
 ##### recordType
 
-`R`
+[`RecordType`](../type/README.md#recordtype)\<`R`\>
 
 ##### keysToOmit
 
@@ -38,8 +56,8 @@ Creates a record type with keys omitted.
 
 ##### options?
 
-`Partial`\<`Readonly`\<\{ `typeName`: `string`; \}\>\>
+`Partial`\<`Readonly`\<\{ `allowExcessProperties`: `boolean`; `typeName`: `string`; \}\>\>
 
 #### Returns
 
-`OmittedType`\<`R`, `KeysToOmit`\>
+[`OmittedType`](#omittedtype)\<`R`, `KeysToOmit`\>

@@ -10,7 +10,7 @@
 
 ### refine()
 
-> **refine**\<`Base`, `R`\>(`__namedParameters`): [`Type`](../type.md#type)\<`R`\>
+> **refine**\<`Base`, `R`\>(`__namedParameters`): [`Type`](../type/README.md#type)\<`R`\>
 
 Defined in: [src/other-types/refine.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/other-types/refine.mts#L9)
 
@@ -28,8 +28,8 @@ Defined in: [src/other-types/refine.mts:9](https://github.com/noshiro-pf/ts-fort
 
 ##### \_\_namedParameters
 
-`Readonly`\<\{ `baseType`: [`Type`](../type.md#type)\<`Base`\>; `defaultValue`: `R`; `is`: (`a`) => `a is R`; `typeName?`: `string`; \}\>
+`Readonly`\<\{ `baseType`: [`Type`](../type/README.md#type)\<`Base`\>; `defaultValue`: `R`; `is`: (`a`) => `a is R`; `typeName?`: `string`; \}\>
 
 #### Returns
 
-[`Type`](../type.md#type)\<`R`\>
+[`Type`](../type/README.md#type)\<`R`\>

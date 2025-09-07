@@ -10,7 +10,7 @@
 
 ### nullable()
 
-> **nullable**\<`T`\>(`type`): [`Type`](../type.md#type)\<`T` \| `undefined`\>
+> **nullable**\<`T`\>(`type`): [`Type`](../type/README.md#type)\<`T` \| `undefined`\>
 
 Defined in: [src/predefined/nullable.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/nullable.mts#L5)
 
@@ -24,8 +24,8 @@ Defined in: [src/predefined/nullable.mts:5](https://github.com/noshiro-pf/ts-for
 
 ##### type
 
-[`Type`](../type.md#type)\<`T`\>
+[`Type`](../type/README.md#type)\<`T`\>
 
 #### Returns
 
-[`Type`](../type.md#type)\<`T` \| `undefined`\>
+[`Type`](../type/README.md#type)\<`T` \| `undefined`\>
