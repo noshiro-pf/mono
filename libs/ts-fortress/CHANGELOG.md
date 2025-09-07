@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v3.2.0...v4.0.0) (2025-09-07)
+
+### Features
+
+- **breaking:** Shape can now be extracted from record type definitions ([#66](https://github.com/noshiro-pf/ts-fortress/issues/66)) ([ba7d6f3](https://github.com/noshiro-pf/ts-fortress/commit/ba7d6f34c39655af36cd34de0d37585a87f8cdc0))
+
+### BREAKING CHANGES
+
+- **breaking:** - `partial` type now fills missing keys with default values from the original type.
+
+* `pick`, `omit` and `partial` now inherits `allowExcessProperties` option from the original type.
+
 # [3.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v3.1.0...v3.2.0) (2025-09-06)
 
 ### Features
