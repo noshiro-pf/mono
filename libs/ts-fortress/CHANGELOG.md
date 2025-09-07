@@ -1,3 +1,9 @@
+# [4.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v4.0.0...v4.1.0) (2025-09-07)
+
+### Features
+
+- add valueof type ([#67](https://github.com/noshiro-pf/ts-fortress/issues/67)) ([c9b44e2](https://github.com/noshiro-pf/ts-fortress/commit/c9b44e2e09f0e52f07440b071635a45da428fef3))
+
 # [4.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v3.2.0...v4.0.0) (2025-09-07)
 
 ### Features
