@@ -1,3 +1,9 @@
+## [4.1.1](https://github.com/noshiro-pf/ts-fortress/compare/v4.1.0...v4.1.1) (2025-09-07)
+
+### Bug Fixes
+
+- fix type annotation of strictRecord ([#68](https://github.com/noshiro-pf/ts-fortress/issues/68)) ([bbf57a0](https://github.com/noshiro-pf/ts-fortress/commit/bbf57a0ea6ac0d48d3e837c195a646494c2c1814))
+
 # [4.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v4.0.0...v4.1.0) (2025-09-07)
 
 ### Features
