@@ -1,3 +1,9 @@
+# [7.2.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.1.1...v7.2.0) (2025-09-08)
+
+### Features
+
+- add ignoreUnknown option to format functions ([#137](https://github.com/noshiro-pf/ts-repo-utils/issues/137)) ([60c38b8](https://github.com/noshiro-pf/ts-repo-utils/commit/60c38b874ecb003e1bfc3107bde91c55c1d85b5c))
+
 ## [7.1.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.1.0...v7.1.1) (2025-09-08)
 
 ### Bug Fixes
