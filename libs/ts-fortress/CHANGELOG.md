@@ -1,3 +1,9 @@
+## [4.1.2](https://github.com/noshiro-pf/ts-fortress/compare/v4.1.1...v4.1.2) (2025-09-08)
+
+### Bug Fixes
+
+- update README about comparison ([#69](https://github.com/noshiro-pf/ts-fortress/issues/69)) ([7febfbc](https://github.com/noshiro-pf/ts-fortress/commit/7febfbcd717a215acd2d795059fbf6c9e7293327))
+
 ## [4.1.1](https://github.com/noshiro-pf/ts-fortress/compare/v4.1.0...v4.1.1) (2025-09-07)
 
 ### Bug Fixes
