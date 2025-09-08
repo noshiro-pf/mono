@@ -1,11 +1,12 @@
 {
   "version": "0.2",
   "language": "en",
-  "words": ["multioption", "noshiro", "testw", "tscw", "unstub"],
+  "words": ["multioption", "myorg", "noshiro", "testw", "tscw", "unstub"],
   "flagWords": [],
   "ignorePaths": [
     "eslint.config.js",
     "./package-lock.json",
-    "BREAKING_CHANGE_GUIDE.md"
+    "BREAKING_CHANGE_GUIDE.md",
+    "docs/**"
   ]
 }

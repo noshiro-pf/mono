@@ -128,6 +128,7 @@ const ignoreFiles: ReadonlySet<string> = new Set([
   '.prettierignore',
   '.editorconfig',
   '.gitignore',
+  '.npmignore',
 ]);
 
 const ignoreExtensions: readonly string[] = [

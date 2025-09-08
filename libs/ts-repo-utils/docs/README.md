@@ -327,6 +327,52 @@ type Ret = Result<
 >;
 ```
 
+### Build Optimization Utilities
+
+#### `checkShouldRunTypeChecks(options?): Promise<boolean>`
+
+Checks if TypeScript type checks should run based on the diff from a base branch. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files are changed.
+
+```typescript
+import { checkShouldRunTypeChecks } from 'ts-repo-utils';
+
+// Use default settings (compare against origin/main)
+const shouldRun = await checkShouldRunTypeChecks();
+
+if (shouldRun) {
+    await $('npm run type-check');
+}
+
+// Custom ignore patterns and base branch
+const shouldRun = await checkShouldRunTypeChecks({
+    pathsIgnore: ['.eslintrc.json', 'docs/', '**.md', 'scripts/'],
+    baseBranch: 'origin/develop',
+});
+```
+
+**Options:**
+
+- `pathsIgnore?` - Patterns to ignore when checking if type checks should run:
+    - Exact file matches: `.cspell.json`
+    - Directory prefixes: `docs/` (matches any file in docs directory)
+    - File extensions: `**.md` (matches any markdown file)
+    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
+- `baseBranch?` - Base branch to compare against (default: `origin/main`)
+
+**GitHub Actions Integration:**
+
+When running in GitHub Actions, sets `GITHUB_OUTPUT` with `should_run=true/false`:
+
+```yaml
+- name: Check if type checks should run
+  id: check_diff
+  run: npx check-should-run-type-checks
+
+- name: Run type checks
+  if: steps.check_diff.outputs.should_run == 'true'
+  run: npm run type-check
+```
+
 ### Command Execution
 
 #### `$(command: string, options?: ExecOptions): Promise<ExecResult>`
@@ -441,6 +487,106 @@ type Ret = Promise<
     >
 >;
 ```
+
+### Workspace Management Utilities
+
+#### `runCmdInStagesAcrossWorkspaces(options): Promise<void>`
+
+Executes a npm script command across all workspace packages in dependency order stages. Packages are grouped into stages where each stage contains packages whose dependencies have been completed in previous stages. Uses fail-fast behavior.
+
+```typescript
+import { runCmdInStagesAcrossWorkspaces } from 'ts-repo-utils';
+
+// Run build in dependency order
+await runCmdInStagesAcrossWorkspaces({
+    rootPackageJsonDir: '.',
+    cmd: 'build',
+    concurrency: 3,
+    filterWorkspacePattern: (name) => !name.includes('deprecated'),
+});
+```
+
+**Options:**
+
+- `rootPackageJsonDir` - Directory containing the root package.json file
+- `cmd` - The npm script command to execute in each package
+- `concurrency?` - Maximum packages to process simultaneously within each stage (default: 3)
+- `filterWorkspacePattern?` - Optional function to filter packages by name
+
+#### `runCmdInParallelAcrossWorkspaces(options): Promise<void>`
+
+Executes a npm script command across all workspace packages in parallel. Uses fail-fast behavior - stops execution immediately when any package fails.
+
+```typescript
+import { runCmdInParallelAcrossWorkspaces } from 'ts-repo-utils';
+
+// Run tests in parallel across all packages
+await runCmdInParallelAcrossWorkspaces({
+    rootPackageJsonDir: '.',
+    cmd: 'test',
+    concurrency: 5,
+});
+```
+
+**Options:**
+
+- `rootPackageJsonDir` - Directory containing the root package.json file
+- `cmd` - The npm script command to execute in each package
+- `concurrency?` - Maximum packages to process simultaneously (default: 3)
+- `filterWorkspacePattern?` - Optional function to filter packages by name
+
+#### `getWorkspacePackages(rootPackageJsonDir): Promise<readonly Package[]>`
+
+Retrieves all workspace packages from a monorepo based on the workspace patterns defined in the root package.json file.
+
+```typescript
+import { getWorkspacePackages } from 'ts-repo-utils';
+
+const packages = await getWorkspacePackages('.');
+console.log(packages.map((pkg) => pkg.name));
+// ['@myorg/package-a', '@myorg/package-b', ...]
+```
+
+**Return Type:**
+
+```typescript
+type Package = {
+    name: string;
+    path: string;
+    packageJson: JsonValue;
+    dependencies: Record<string, string>;
+};
+```
+
+#### `executeParallel(packages, scriptName, concurrency?): Promise<readonly Result[]>`
+
+Executes a npm script across multiple packages in parallel with a concurrency limit. Lower-level function used by `runCmdInParallelAcrossWorkspaces`.
+
+```typescript
+import { executeParallel, getWorkspacePackages } from 'ts-repo-utils';
+
+const packages = await getWorkspacePackages('.');
+await executeParallel(packages, 'lint', 4);
+```
+
+#### `executeStages(packages, scriptName, concurrency?): Promise<void>`
+
+Executes a npm script across packages in dependency order stages. Lower-level function used by `runCmdInStagesAcrossWorkspaces`.
+
+```typescript
+import { executeStages, getWorkspacePackages } from 'ts-repo-utils';
+
+const packages = await getWorkspacePackages('.');
+await executeStages(packages, 'build', 3);
+```
+
+**Features:**
+
+- Automatic dependency graph construction
+- Topological sorting for correct build order
+- Parallel execution within each stage
+- Fail-fast behavior on errors
+- Circular dependency detection
 
 ### Index File Generation
 
