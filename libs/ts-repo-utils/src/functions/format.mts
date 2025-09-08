@@ -16,7 +16,10 @@ import {
  */
 export const formatFiles = async (
   files: readonly string[],
-  options?: Readonly<{ silent?: boolean }>,
+  options?: Readonly<{
+    silent?: boolean;
+    ignore?: (filePath: string) => boolean;
+  }>,
 ): Promise<Result<undefined, readonly unknown[]>> => {
   const silent = options?.silent ?? false;
 
@@ -55,7 +58,10 @@ export const formatFiles = async (
             ignorePath: '.prettierignore',
           });
 
-          if (fileInfo.ignored) {
+          if (
+            fileInfo.ignored ||
+            (options?.ignore ?? defaultIgnoreFn)(filePath)
+          ) {
             conditionalEcho(`Skipping ignored file: ${filePath}`);
             return Result.ok(undefined);
           }
@@ -103,6 +109,58 @@ export const formatFiles = async (
     return Result.err(errors);
   }
 };
+
+const defaultIgnoreFn = (filePath: string): boolean => {
+  const filename = path.basename(filePath);
+
+  return (
+    ignoreFiles.has(filename) ||
+    filename.startsWith('.env') ||
+    ignoreExtensions.some((ext) => filePath.endsWith(ext)) ||
+    ignoreDirs.some((dir) => filename.startsWith(dir))
+  );
+};
+
+const ignoreFiles: ReadonlySet<string> = new Set([
+  '.DS_Store',
+  'package-lock.json',
+  'LICENSE',
+  '.prettierignore',
+  '.editorconfig',
+  '.gitignore',
+]);
+
+const ignoreExtensions: readonly string[] = [
+  '.svg',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.bmp',
+  '.tiff',
+  '.bak',
+  '.log',
+  '.zip',
+  '.tar',
+  '.gz',
+  '.7z',
+  '.mp3',
+  '.mp4',
+  '.avi',
+  '.mkv',
+  '.tsbuildinfo',
+] as const;
+
+const ignoreDirs: readonly string[] = [
+  'node_modules',
+  '.git',
+  'dist',
+  'build',
+  'out',
+  '.cache',
+  '.vscode',
+  '.yarn',
+] as const;
 
 /**
  * Format files matching the given glob pattern using Prettier
