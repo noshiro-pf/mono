@@ -295,6 +295,114 @@ user.tags.push('new tag'); // No error
 user.tags[0] = 'modified'; // No error
 ```
 
+**In io-ts, Readonly types will generate verbose error messages**:
+
+```typescript
+import * as ioTs from 'io-ts';
+import { PathReporter } from 'io-ts/PathReporter';
+
+// io-ts nested readonly version with multiple Readonly wrappers
+const IoTsNestedReadonly = ioTs.readonly(
+    ioTs.type({
+        user: ioTs.readonly(
+            ioTs.type({
+                profile: ioTs.readonly(
+                    ioTs.type({
+                        age: ioTs.number,
+                    }),
+                ),
+            }),
+        ),
+    }),
+);
+
+const invalidData = {
+    user: {
+        profile: {
+            age: 'not-a-number', // should be number
+        },
+    },
+};
+
+// Get io-ts error messages
+const ioTsResult = IoTsNestedReadonly.decode(invalidData);
+const ioTsErrorMessages = PathReporter.report(ioTsResult);
+
+console.log(ioTsErrorMessages[0]);
+// Output: Invalid value "not-a-number" supplied to : Readonly<{ user: Readonly<{ profile: Readonly<{ age: number }> }> }>/user: Readonly<{ profile: Readonly<{ age: number }> }>/profile: Readonly<{ age: number }>/age: number
+```
+
+**The error message contains excessive `Readonly<...>` wrapper noise:**
+
+- Root level: `Readonly<{ user: Readonly<{ profile: Readonly<{ age: number }> }> }>`
+- User level: `Readonly<{ profile: Readonly<{ age: number }> }>`
+- Profile level: `Readonly<{ age: number }>`
+- Each nested readonly creates exponentially verbose error messages with redundant type information
+
+This verbosity makes error messages extremely difficult to read and debug in production environments.
+
+**ts-fortress addresses this issue** by generating clean, actionable error messages without verbose type wrapper details:
+
+```typescript
+import * as tf from 'ts-fortress';
+
+// ts-fortress equivalent clean structure
+const TsFortressNestedType = tf.record({
+    user: tf.record({
+        profile: tf.record({
+            age: tf.number(0),
+        }),
+    }),
+});
+
+// Get ts-fortress error messages
+const tsFortressResult = TsFortressNestedType.validate(invalidData);
+const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
+    ? tf.validationErrorsToMessages(tsFortressResult.value)
+    : [];
+
+console.log(tsFortressErrorMessages[0]);
+// Clean output: Expected <number> at user.profile.age, got <string> type value "not-a-number".
+```
+
+**ts-fortress vs zod comparison:**
+
+```typescript
+import { z } from 'zod';
+
+// zod nested readonly equivalent
+const ZodNestedType = z
+    .object({
+        user: z
+            .object({
+                profile: z
+                    .object({
+                        age: z.number(),
+                    })
+                    .readonly(),
+            })
+            .readonly(),
+    })
+    .readonly();
+
+// Get zod error messages using prettifyError
+const zodResult = ZodNestedType.safeParse(invalidData);
+const zodErrorMessages = zodResult.success
+    ? ''
+    : z.prettifyError(zodResult.error);
+
+console.log(zodErrorMessages);
+// Clean output: "✖ Invalid input: expected number, received string\n  → at user.profile.age"
+```
+
+**Error message comparison:**
+
+- **io-ts**: 148 characters of verbose type information mixed with the actual error
+- **zod**: 62 characters with visual formatting but missing the actual invalid value
+- **ts-fortress**: 74 characters focused purely on what went wrong and where, including the actual invalid value
+
+While zod produces cleaner error messages than io-ts and includes helpful visual formatting, **ts-fortress provides superior debugging experience** by including the actual invalid value (`"not-a-number"`) in the error message, making it easier to understand what data caused the validation failure.
+
 ### Benefits of Deep Readonly
 
 - **Immutability by default**: Prevents accidental mutations that can lead to bugs

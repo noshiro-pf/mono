@@ -1,6 +1,6 @@
 import * as rollupPluginReplace from '@rollup/plugin-replace';
 import * as rollupPluginStrip from '@rollup/plugin-strip';
-import * as pluginTypescript from '@rollup/plugin-typescript';
+import * as rollupPluginTypescript from '@rollup/plugin-typescript';
 import 'ts-repo-utils';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 import tsconfig from './tsconfig.build.json' with { type: 'json' };
@@ -30,7 +30,7 @@ export default {
       'import.meta.vitest': 'undefined',
       preventAssignment: true,
     }),
-    pluginTypescript.default({
+    rollupPluginTypescript.default({
       tsconfig: path.resolve(configDir, './tsconfig.build.json'),
       compilerOptions: {
         // Override module settings for bundling
