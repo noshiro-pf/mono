@@ -1,3 +1,9 @@
+## [7.1.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.1.0...v7.1.1) (2025-09-08)
+
+### Bug Fixes
+
+- fix formatter ignore settings and update README ([#136](https://github.com/noshiro-pf/ts-repo-utils/issues/136)) ([f6d6632](https://github.com/noshiro-pf/ts-repo-utils/commit/f6d66323c3cd7ca9ecb2c9be3c0f09510593b934))
+
 # [7.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.0.4...v7.1.0) (2025-09-08)
 
 ### Features
