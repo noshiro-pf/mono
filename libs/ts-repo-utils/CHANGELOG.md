@@ -1,3 +1,9 @@
+# [7.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.0.4...v7.1.0) (2025-09-08)
+
+### Features
+
+- add defaultIgnoreFn for format ([#135](https://github.com/noshiro-pf/ts-repo-utils/issues/135)) ([d780b1d](https://github.com/noshiro-pf/ts-repo-utils/commit/d780b1dee7261e7332d8893146d4696852a6762b))
+
 ## [7.0.4](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.0.3...v7.0.4) (2025-08-30)
 
 ### Bug Fixes
