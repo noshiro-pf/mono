@@ -19,6 +19,7 @@ export const formatFiles = async (
   options?: Readonly<{
     silent?: boolean;
     ignore?: (filePath: string) => boolean;
+    ignoreUnknown?: boolean;
   }>,
 ): Promise<Result<undefined, readonly unknown[]>> => {
   const silent = options?.silent ?? false;
@@ -63,6 +64,15 @@ export const formatFiles = async (
             (options?.ignore ?? defaultIgnoreFn)(filePath)
           ) {
             conditionalEcho(`Skipping ignored file: ${filePath}`);
+            return Result.ok(undefined);
+          }
+
+          if (
+            (options?.ignoreUnknown ?? true) &&
+            fileInfo.inferredParser === null
+          ) {
+            // Silently skip files with no parser
+            conditionalEcho(`Skipping file (no parser): ${filePath}`);
             return Result.ok(undefined);
           }
 
@@ -170,9 +180,15 @@ const ignoreDirs: readonly string[] = [
  */
 export const formatFilesGlob = async (
   pathGlob: string,
-  options?: Readonly<{ silent?: boolean }>,
+  options?: Readonly<{
+    silent?: boolean;
+    ignoreUnknown?: boolean;
+    ignore?: (filePath: string) => boolean;
+  }>,
 ): Promise<Result<undefined, unknown>> => {
   const silent = options?.silent ?? false;
+  const ignoreUnknown = options?.ignoreUnknown ?? true;
+  const ignore = options?.ignore;
   const conditionalEcho = silent ? () => {} : echo;
 
   try {
@@ -188,7 +204,7 @@ export const formatFilesGlob = async (
       return Result.ok(undefined);
     }
 
-    return await formatFiles(files, { silent });
+    return await formatFiles(files, { silent, ignoreUnknown, ignore });
   } catch (error) {
     if (!silent) {
       console.error('Error in formatFiles:', error);
@@ -208,6 +224,8 @@ export const formatUncommittedFiles = async (
     modified?: boolean;
     staged?: boolean;
     silent?: boolean;
+    ignoreUnknown?: boolean;
+    ignore?: (filePath: string) => boolean;
   }>,
 ): Promise<
   Result<
@@ -220,6 +238,8 @@ export const formatUncommittedFiles = async (
     modified = true,
     staged = true,
     silent = false,
+    ignoreUnknown = true,
+    ignore,
   } = options ?? {};
 
   const mut_files: string[] = [];
@@ -266,7 +286,11 @@ export const formatUncommittedFiles = async (
     mut_files.push(...stagedFilesResult.value);
   }
 
-  return formatFiles(Arr.uniq(mut_files), { silent });
+  return formatFiles(Arr.uniq(mut_files), {
+    silent,
+    ignoreUnknown,
+    ignore,
+  });
 };
 
 /**
@@ -289,6 +313,8 @@ export const formatDiffFrom = async (
     includeModified?: boolean;
     includeStaged?: boolean;
     silent?: boolean;
+    ignoreUnknown?: boolean;
+    ignore?: (filePath: string) => boolean;
   }>,
 ): Promise<
   Result<
@@ -306,6 +332,8 @@ export const formatDiffFrom = async (
     includeUntracked = true,
     includeModified = true,
     includeStaged = true,
+    ignoreUnknown = true,
+    ignore,
   } = options ?? {};
 
   const conditionalEcho = silent ? () => {} : echo;
@@ -375,5 +403,9 @@ export const formatDiffFrom = async (
     return Result.ok(undefined);
   }
 
-  return formatFiles(allFiles, { silent });
+  return formatFiles(allFiles, {
+    silent,
+    ignoreUnknown,
+    ignore,
+  });
 };

@@ -12,7 +12,7 @@
 
 > **formatDiffFrom**(`base`, `options?`): `Promise`\<`Result`\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-Defined in: [src/functions/format.mts:285](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L285)
+Defined in: [src/functions/format.mts:309](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L309)
 
 Format only files that differ from the specified base branch or commit
 
@@ -27,7 +27,7 @@ Base branch name or commit hash to compare against (defaults to
 
 ##### options?
 
-`Readonly`\<\{ `includeModified?`: `boolean`; `includeStaged?`: `boolean`; `includeUntracked?`: `boolean`; `silent?`: `boolean`; \}\>
+`Readonly`\<\{ `ignore?`: (`filePath`) => `boolean`; `ignoreUnknown?`: `boolean`; `includeModified?`: `boolean`; `includeStaged?`: `boolean`; `includeUntracked?`: `boolean`; `silent?`: `boolean`; \}\>
 
 Options for formatting
 
@@ -55,7 +55,7 @@ Array of file paths to format
 
 ##### options?
 
-`Readonly`\<\{ `ignore?`: (`filePath`) => `boolean`; `silent?`: `boolean`; \}\>
+`Readonly`\<\{ `ignore?`: (`filePath`) => `boolean`; `ignoreUnknown?`: `boolean`; `silent?`: `boolean`; \}\>
 
 #### Returns
 
@@ -67,7 +67,7 @@ Array of file paths to format
 
 > **formatFilesGlob**(`pathGlob`, `options?`): `Promise`\<`Result`\<`undefined`, `unknown`\>\>
 
-Defined in: [src/functions/format.mts:171](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L171)
+Defined in: [src/functions/format.mts:181](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L181)
 
 Format files matching the given glob pattern using Prettier
 
@@ -81,7 +81,7 @@ Glob pattern to match files
 
 ##### options?
 
-`Readonly`\<\{ `silent?`: `boolean`; \}\>
+`Readonly`\<\{ `ignore?`: (`filePath`) => `boolean`; `ignoreUnknown?`: `boolean`; `silent?`: `boolean`; \}\>
 
 #### Returns
 
@@ -93,7 +93,7 @@ Glob pattern to match files
 
 > **formatUncommittedFiles**(`options?`): `Promise`\<`Result`\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-Defined in: [src/functions/format.mts:205](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L205)
+Defined in: [src/functions/format.mts:221](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L221)
 
 Format only files that have been changed (git status)
 
@@ -101,7 +101,7 @@ Format only files that have been changed (git status)
 
 ##### options?
 
-`Readonly`\<\{ `modified?`: `boolean`; `silent?`: `boolean`; `staged?`: `boolean`; `untracked?`: `boolean`; \}\>
+`Readonly`\<\{ `ignore?`: (`filePath`) => `boolean`; `ignoreUnknown?`: `boolean`; `modified?`: `boolean`; `silent?`: `boolean`; `staged?`: `boolean`; `untracked?`: `boolean`; \}\>
 
 Options for formatting
 

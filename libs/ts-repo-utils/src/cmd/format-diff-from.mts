@@ -31,6 +31,11 @@ const cmdDef = cmd.command({
       description:
         'Exclude staged files in addition to diff files (default: false)',
     }),
+    ignoreUnknown: cmd.flag({
+      long: 'ignore-unknown',
+      type: cmd.optional(cmd.boolean),
+      description: 'Ignore unknown files (default: true)',
+    }),
     silent: cmd.flag({
       long: 'silent',
       type: cmd.optional(cmd.boolean),
@@ -43,6 +48,7 @@ const cmdDef = cmd.command({
       excludeUntracked: args.excludeUntracked ?? false,
       excludeModified: args.excludeModified ?? false,
       excludeStaged: args.excludeStaged ?? false,
+      ignoreUnknown: args.ignoreUnknown ?? true,
       silent: args.silent ?? false,
     }).catch((error) => {
       console.error('An error occurred:', error);
@@ -57,6 +63,7 @@ const main = async (
     excludeUntracked: boolean;
     excludeModified: boolean;
     excludeStaged: boolean;
+    ignoreUnknown: boolean;
     silent: boolean;
   }>,
 ): Promise<void> => {
@@ -64,6 +71,7 @@ const main = async (
     includeUntracked: !args.excludeUntracked,
     includeModified: !args.excludeModified,
     includeStaged: !args.excludeStaged,
+    ignoreUnknown: args.ignoreUnknown,
     silent: args.silent,
   });
 

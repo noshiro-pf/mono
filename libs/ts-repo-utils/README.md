@@ -90,6 +90,7 @@ npm exec -- format-uncommitted --silent
 - `--exclude-modified` - Exclude modified files (default: false)
 - `--exclude-staged` - Exclude staged files (default: false)
 - `--silent` - Suppress output messages (default: false)
+- `--ignore-unknown` - Skip files without a Prettier parser instead of erroring (default: true)
 
 ### `format-diff-from`
 
@@ -119,6 +120,7 @@ npm exec -- format-diff-from main --silent
 - `--exclude-modified` - Exclude modified files (default: false)
 - `--exclude-staged` - Exclude staged files (default: false)
 - `--silent` - Suppress output messages (default: false)
+- `--ignore-unknown` - Skip files without a Prettier parser instead of erroring (default: true)
 
 ### `check-should-run-type-checks`
 
@@ -405,7 +407,7 @@ type Ret = Promise<
 
 ### Code Formatting Utilities
 
-#### `formatFilesGlob(pathGlob: string): Promise<Result<undefined, unknown>>`
+#### `formatFilesGlob(pathGlob: string, options?): Promise<Result<undefined, unknown>>`
 
 Format files matching a glob pattern using Prettier.
 
@@ -417,13 +419,21 @@ await formatFilesGlob('src/**/*.ts');
 
 // Format specific files
 await formatFilesGlob('src/{index,utils}.ts');
+
+// With custom ignore function
+await formatFilesGlob('src/**/*.ts', {
+    ignore: (filePath) => filePath.includes('generated'),
+    ignoreUnknown: false, // Error on files without parser
+});
 ```
 
 **Options:**
 
 - `silent?` - Suppress output messages (default: false)
+- `ignoreUnknown?` - Skip files without a Prettier parser instead of erroring (default: true)
+- `ignore?` - Custom function to ignore files (default: built-in ignore list)
 
-#### `formatUncommittedFiles(): Promise<Result>`
+#### `formatUncommittedFiles(options?): Promise<Result>`
 
 Format only files that have been changed according to git status.
 
@@ -432,6 +442,12 @@ import { formatUncommittedFiles } from 'ts-repo-utils';
 
 // Format only modified files
 await formatUncommittedFiles();
+
+// With custom options
+await formatUncommittedFiles({
+    untracked: false, // Skip untracked files
+    ignore: (filePath) => filePath.includes('test'),
+});
 ```
 
 **Options:**
@@ -440,6 +456,8 @@ await formatUncommittedFiles();
 - `modified?` - Format modified files (default: true)
 - `staged?` - Format staged files (default: true)
 - `silent?` - Suppress output messages (default: false)
+- `ignoreUnknown?` - Skip files without a Prettier parser instead of erroring (default: true)
+- `ignore?` - Custom function to ignore files (default: built-in ignore list)
 
 **Return Type:**
 
@@ -452,7 +470,7 @@ type Ret = Promise<
 >;
 ```
 
-#### `formatDiffFrom(base: string): Promise<Result>`
+#### `formatDiffFrom(base: string, options?): Promise<Result>`
 
 Format only files that differ from the specified base branch or commit.
 
@@ -464,6 +482,13 @@ await formatDiffFrom('main');
 
 // Format files different from specific commit
 await formatDiffFrom('abc123');
+
+// With custom options
+await formatDiffFrom('main', {
+    includeUntracked: false,
+    ignore: (filePath) => filePath.includes('vendor'),
+    ignoreUnknown: false, // Error on files without parser
+});
 ```
 
 **Options:**
@@ -472,6 +497,8 @@ await formatDiffFrom('abc123');
 - `includeModified?` - Include modified files in addition to diff files (default: true)
 - `includeStaged?` - Include staged files in addition to diff files (default: true)
 - `silent?` - Suppress output messages (default: false)
+- `ignoreUnknown?` - Skip files without a Prettier parser instead of erroring (default: true)
+- `ignore?` - Custom function to ignore files (default: built-in ignore list)
 
 **Return Type:**
 
