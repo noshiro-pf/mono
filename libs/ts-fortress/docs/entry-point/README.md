@@ -10316,6 +10316,12 @@ Re-exports [toIntersectionString](../utils/to-union-string.md#tointersectionstri
 
 ---
 
+### toUnionKeyString
+
+Re-exports [toUnionKeyString](../utils/to-union-string.md#tounionkeystring)
+
+---
+
 ### toUnionString
 
 Re-exports [toUnionString](../utils/to-union-string.md#tounionstring)

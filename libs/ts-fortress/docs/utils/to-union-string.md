@@ -12,7 +12,25 @@
 
 > **toIntersectionString**(`members`): `string`
 
-Defined in: [src/utils/to-union-string.mts:4](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/to-union-string.mts#L4)
+Defined in: [src/utils/to-union-string.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/to-union-string.mts#L7)
+
+#### Parameters
+
+##### members
+
+readonly `string`[]
+
+#### Returns
+
+`string`
+
+---
+
+### toUnionKeyString()
+
+> **toUnionKeyString**(`members`): `string`
+
+Defined in: [src/utils/to-union-string.mts:1](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/to-union-string.mts#L1)
 
 #### Parameters
 
@@ -30,7 +48,7 @@ readonly `string`[]
 
 > **toUnionString**(`members`): `string`
 
-Defined in: [src/utils/to-union-string.mts:1](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/to-union-string.mts#L1)
+Defined in: [src/utils/to-union-string.mts:4](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/to-union-string.mts#L4)
 
 #### Parameters
 

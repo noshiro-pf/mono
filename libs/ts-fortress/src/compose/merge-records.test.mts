@@ -101,9 +101,8 @@ describe('mergeRecords', () => {
             path: [],
             actualValue: { x: 0, y: 1 },
             expectedType:
-              '("{ x: number, y: number }" & "{ z: number, w: number }")',
-            typeName:
-              '("{ x: number, y: number }" & "{ z: number, w: number }")',
+              '({ x: number, y: number } & { z: number, w: number })',
+            typeName: '({ x: number, y: number } & { z: number, w: number })',
             message:
               'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
           },

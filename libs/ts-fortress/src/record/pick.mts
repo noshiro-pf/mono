@@ -1,6 +1,6 @@
 import { expectType, Obj } from 'ts-data-forge';
 import { type RecordType, type Type } from '../type.mjs';
-import { toUnionString } from '../utils/index.mjs';
+import { toUnionKeyString } from '../utils/index.mjs';
 import { record } from './record.mjs';
 
 /** Creates a record type with keys picked. */
@@ -20,7 +20,7 @@ export const pick = <
   record(Obj.pick(recordType.shape, keysToPick), {
     typeName:
       options?.typeName ??
-      `Pick<${recordType.typeName}, ${toUnionString(keysToPick)}>`,
+      `Pick<${recordType.typeName}, ${toUnionKeyString(keysToPick)}>`,
     allowExcessProperties:
       options?.allowExcessProperties ?? recordType.allowExcessProperties,
   });

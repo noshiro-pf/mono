@@ -62,6 +62,12 @@ Re-exports [toIntersectionString](utils/to-union-string.md#tointersectionstring)
 
 ---
 
+### toUnionKeyString
+
+Re-exports [toUnionKeyString](utils/to-union-string.md#tounionkeystring)
+
+---
+
 ### toUnionString
 
 Re-exports [toUnionString](utils/to-union-string.md#tounionstring)

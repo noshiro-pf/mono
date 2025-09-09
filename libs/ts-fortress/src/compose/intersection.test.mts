@@ -109,9 +109,8 @@ describe('intersection', () => {
               path: [],
               actualValue: { x: 0, y: 1 },
               expectedType:
-                '("{ x: number, y: number }" & "{ z: number, w: number }")',
-              typeName:
-                '("{ x: number, y: number }" & "{ z: number, w: number }")',
+                '({ x: number, y: number } & { z: number, w: number })',
+              typeName: '({ x: number, y: number } & { z: number, w: number })',
               message:
                 'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
             },
@@ -221,10 +220,10 @@ describe('intersection', () => {
             {
               path: [],
               actualValue: 'aaa',
-              expectedType: '("number" & "number")',
+              expectedType: '(number & number)',
               message:
                 'The type of value is expected to match all types of { number, number }',
-              typeName: '("number" & "number")',
+              typeName: '(number & number)',
             },
             {
               path: [],
@@ -236,10 +235,10 @@ describe('intersection', () => {
             {
               path: [],
               actualValue: 'aaa',
-              expectedType: '("number" & "number")',
+              expectedType: '(number & number)',
               message:
                 'The type of value is expected to match all types of { number, number }',
-              typeName: '("number" & "number")',
+              typeName: '(number & number)',
             },
             {
               path: [],
@@ -356,10 +355,10 @@ describe('intersection', () => {
             {
               path: [],
               actualValue: 7,
-              expectedType: '("uintRange(0, 5)" & "uintRange(1, 7)")',
+              expectedType: '(uintRange(0, 5) & uintRange(1, 7))',
               message:
                 'The type of value is expected to match all types of { uintRange(0, 5), uintRange(1, 7) }',
-              typeName: '("uintRange(0, 5)" & "uintRange(1, 7)")',
+              typeName: '(uintRange(0, 5) & uintRange(1, 7))',
             },
             {
               path: [],
@@ -371,10 +370,10 @@ describe('intersection', () => {
             {
               path: [],
               actualValue: 7,
-              expectedType: '("uintRange(0, 5)" & "uintRange(1, 7)")',
+              expectedType: '(uintRange(0, 5) & uintRange(1, 7))',
               message:
                 'The type of value is expected to match all types of { uintRange(0, 5), uintRange(1, 7) }',
-              typeName: '("uintRange(0, 5)" & "uintRange(1, 7)")',
+              typeName: '(uintRange(0, 5) & uintRange(1, 7))',
             },
             {
               path: [],

@@ -1,6 +1,6 @@
 import { expectType, Obj } from 'ts-data-forge';
 import { type RecordType, type Type } from '../type.mjs';
-import { toUnionString } from '../utils/index.mjs';
+import { toUnionKeyString } from '../utils/index.mjs';
 import { record } from './record.mjs';
 
 /** Creates a record type with keys omitted. */
@@ -20,7 +20,7 @@ export const omit = <
   record(Obj.omit(recordType.shape, keysToOmit), {
     typeName:
       options?.typeName ??
-      `Omit<${recordType.typeName}, ${toUnionString(keysToOmit)}>`,
+      `Omit<${recordType.typeName}, ${toUnionKeyString(keysToOmit)}>`,
     allowExcessProperties:
       options?.allowExcessProperties ?? recordType.allowExcessProperties,
   });

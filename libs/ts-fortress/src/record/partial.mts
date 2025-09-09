@@ -1,6 +1,6 @@
 import { expectType } from 'ts-data-forge';
 import { type RecordType, type Type } from '../type.mjs';
-import { toUnionString } from '../utils/index.mjs';
+import { toUnionKeyString } from '../utils/index.mjs';
 import { optional, type OptionalPropertyType } from './optional.mjs';
 import { record } from './record.mjs';
 
@@ -25,7 +25,7 @@ export const partial = <
     options?.typeName ??
     (options?.keysToBeOptional === undefined
       ? `Partial<${recordType.typeName}>`
-      : `PartiallyPartial<${recordType.typeName}, ${toUnionString(options.keysToBeOptional)}>`);
+      : `PartiallyPartial<${recordType.typeName}, ${toUnionKeyString(options.keysToBeOptional)}>`);
 
   const keysToBeOptional: ReadonlySet<string> = new Set(
     options?.keysToBeOptional ?? Object.keys(recordType.shape),
