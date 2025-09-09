@@ -1,3 +1,9 @@
+# [4.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v4.1.2...v4.2.0) (2025-09-09)
+
+### Features
+
+- changed default typeName of some types ([#71](https://github.com/noshiro-pf/ts-fortress/issues/71)) ([d1c6dbb](https://github.com/noshiro-pf/ts-fortress/commit/d1c6dbb422ff880d5f446af319ec299e0d5e7b03))
+
 ## [4.1.2](https://github.com/noshiro-pf/ts-fortress/compare/v4.1.1...v4.1.2) (2025-09-08)
 
 ### Bug Fixes
