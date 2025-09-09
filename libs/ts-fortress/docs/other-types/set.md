@@ -28,7 +28,7 @@ Defined in: [src/other-types/set.mts:14](https://github.com/noshiro-pf/ts-fortre
 
 ##### options?
 
-`Readonly`\<\{ `typeName?`: `string`; \}\>
+`Partial`\<`Readonly`\<\{ `typeName`: `string`; \}\>\>
 
 #### Returns
 

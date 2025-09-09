@@ -36,7 +36,7 @@ Defined in: [src/array/array-of-length.mts:13](https://github.com/noshiro-pf/ts-
 
 ##### options?
 
-`Readonly`\<\{ `defaultValue?`: `MakeTupleImpl`\<`A`, `` `${N}` ``, \[\]\>; `typeName?`: `string`; \}\>
+`Partial`\<`Readonly`\<\{ `defaultValue`: `MakeTupleImpl`\<`A`, `` `${N}` ``\>; `typeName`: `string`; \}\>\>
 
 #### Returns
 

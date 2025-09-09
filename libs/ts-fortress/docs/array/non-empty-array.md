@@ -28,7 +28,7 @@ Defined in: [src/array/non-empty-array.mts:13](https://github.com/noshiro-pf/ts-
 
 ##### options?
 
-`Readonly`\<\{ `defaultValue?`: readonly \[`A`, `A`\]; `typeName?`: `string`; \}\>
+`Partial`\<`Readonly`\<\{ `defaultValue`: readonly \[`A`, `A`\]; `typeName`: `string`; \}\>\>
 
 #### Returns
 

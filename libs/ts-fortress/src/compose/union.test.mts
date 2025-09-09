@@ -91,8 +91,9 @@ describe('union', () => {
           path: [],
           actualValue: 5,
           expectedType:
-            'Union<{ x: number, y: number }, literal(3), literal("2")>',
-          typeName: 'Union<{ x: number, y: number }, literal(3), literal("2")>',
+            '("{ x: number, y: number }" | "literal(3)" | "literal("2")")',
+          typeName:
+            '("{ x: number, y: number }" | "literal(3)" | "literal("2")")',
           message:
             'The type of value is expected to be one of the elements contained in { { x: number, y: number }, literal(3), literal("2") }',
         });

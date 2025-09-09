@@ -40,7 +40,7 @@ Defined in: [src/record/record.mts:17](https://github.com/noshiro-pf/ts-fortress
 
 > **strictRecord**\<`R`\>(`source`, `options?`): [`RecordType`](../type/README.md#recordtype)\<`R`\>
 
-Defined in: [src/record/record.mts:155](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L155)
+Defined in: [src/record/record.mts:153](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L153)
 
 Creates a strict record type that does not allow excess properties.
 This is an alias for `record(source, { allowExcessProperties: false })`.

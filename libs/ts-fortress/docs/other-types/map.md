@@ -36,7 +36,7 @@ Defined in: [src/other-types/map.mts:18](https://github.com/noshiro-pf/ts-fortre
 
 ##### options?
 
-`Readonly`\<\{ `typeName?`: `string`; \}\>
+`Partial`\<`Readonly`\<\{ `typeName`: `string`; \}\>\>
 
 #### Returns
 

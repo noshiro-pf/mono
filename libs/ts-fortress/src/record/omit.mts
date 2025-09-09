@@ -10,14 +10,12 @@ export const omit = <
 >(
   recordType: RecordType<R>,
   keysToOmit: KeysToOmit,
-  options?: Partial<
-    Readonly<{
-      typeName: string;
+  options?: PartialReadonly<{
+    typeName: string;
 
-      /** @default true */
-      allowExcessProperties: boolean;
-    }>
-  >,
+    /** @default true */
+    allowExcessProperties: boolean;
+  }>,
 ): OmittedType<R, KeysToOmit> =>
   record(Obj.omit(recordType.shape, keysToOmit), {
     typeName:

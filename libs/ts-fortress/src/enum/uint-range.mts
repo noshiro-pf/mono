@@ -15,9 +15,9 @@ export const uintRange = <
   end,
   ...options
 }: Readonly<{
-  typeName?: string;
   start: Start;
   end: End;
+  typeName?: string;
   defaultValue?: UintRange<Start, End>;
 }>): Type<UintRange<Start, End>> => {
   type T = UintRange<Start, End>;

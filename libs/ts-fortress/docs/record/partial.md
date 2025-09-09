@@ -12,7 +12,7 @@
 
 > **PartialType**\<`R`, `KeysToBeOptional`\> = [`RecordType`](../type/README.md#recordtype)\<`PartialTypeShape`\<`R`, `KeysToBeOptional`\>\>
 
-Defined in: [src/record/partial.mts:73](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/partial.mts#L73)
+Defined in: [src/record/partial.mts:71](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/partial.mts#L71)
 
 #### Type Parameters
 

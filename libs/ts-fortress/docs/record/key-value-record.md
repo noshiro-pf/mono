@@ -36,7 +36,7 @@ Defined in: [src/record/key-value-record.mts:18](https://github.com/noshiro-pf/t
 
 ##### options?
 
-`Readonly`\<\{ `typeName?`: `string`; \}\>
+`Partial`\<`Readonly`\<\{ `typeName`: `string`; \}\>\>
 
 #### Returns
 

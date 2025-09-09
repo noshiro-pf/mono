@@ -13,15 +13,13 @@ export const partial = <
   const KeysToBeOptional extends NonEmptyArray<keyof R & string>,
 >(
   recordType: RecordType<R>,
-  options?: Partial<
-    Readonly<{
-      keysToBeOptional: KeysToBeOptional;
-      typeName: string;
+  options?: PartialReadonly<{
+    keysToBeOptional: KeysToBeOptional;
+    typeName: string;
 
-      /** @default true */
-      allowExcessProperties: boolean;
-    }>
-  >,
+    /** @default true */
+    allowExcessProperties: boolean;
+  }>,
 ): PartialType<R, KeysToBeOptional> => {
   const typeNameFilled: string =
     options?.typeName ??

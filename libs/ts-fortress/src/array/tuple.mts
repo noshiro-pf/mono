@@ -16,7 +16,9 @@ type MapTuple<T extends readonly Type<unknown>[]> = {
 
 export const tuple = <const A extends readonly Type<unknown>[]>(
   types: A,
-  options?: Partial<Readonly<{ typeName?: string }>>,
+  options?: PartialReadonly<{
+    typeName: string;
+  }>,
 ): Type<MapTuple<A>> => {
   type T = MapTuple<A>;
 

@@ -4,6 +4,7 @@ import {
   createAssertFn,
   createCastFn,
   createIsFn,
+  toIntersectionString,
   type ValidationError,
   type ValidationErrorWithMessage,
 } from '../utils/index.mjs';
@@ -12,18 +13,16 @@ export const mergeRecords = <
   const Types extends NonEmptyArray<Type<UnknownRecord>>,
 >(
   types: Types,
-  options?: Partial<
-    Readonly<{
-      defaultType: IntersectionType<Types>;
-      typeName: string;
-    }>
-  >,
+  options?: PartialReadonly<{
+    typeName: string;
+    defaultType: IntersectionType<Types>;
+  }>,
 ): IntersectionType<Types> => {
   type T = IntersectionTypeValue<Types>;
 
   const typeNameFilled: string =
     options?.typeName ??
-    `Intersection<${types.map((a) => a.typeName).join(', ')}>`;
+    `(${toIntersectionString(types.map((a) => a.typeName))})`;
 
   const validate: Type<T>['validate'] = (a) => {
     const errors: readonly ValidationError[] = Arr.generate(function* () {

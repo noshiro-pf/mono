@@ -28,7 +28,7 @@ Defined in: [src/array/tuple.mts:17](https://github.com/noshiro-pf/ts-fortress/b
 
 ##### options?
 
-`Partial`\<`Readonly`\<\{ `typeName?`: `string`; \}\>\>
+`Partial`\<`Readonly`\<\{ `typeName`: `string`; \}\>\>
 
 #### Returns
 

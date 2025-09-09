@@ -5,11 +5,9 @@ import { type RecordType, type Type } from '../type.mjs';
 
 export const valueof = <const R extends ReadonlyRecord<string, Type<unknown>>>(
   recordType: RecordType<R>,
-  options?: Partial<
-    Readonly<{
-      typeName: string;
-    }>
-  >,
+  options?: PartialReadonly<{
+    typeName: string;
+  }>,
 ): ValueOfType<R> => {
   const types = Object.values(recordType.shape);
 

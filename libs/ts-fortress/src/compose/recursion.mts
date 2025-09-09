@@ -4,11 +4,9 @@ import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
 export const recursion = <A,>(
   typeName: string,
   definition: () => Type<A>,
-  options?: Partial<
-    Readonly<{
-      defaultValue: A;
-    }>
-  >,
+  options?: PartialReadonly<{
+    defaultValue: A;
+  }>,
 ): Type<A> => {
   const cache: {
     innerType: Type<A> | undefined;

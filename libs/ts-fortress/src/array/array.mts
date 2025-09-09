@@ -11,18 +11,15 @@ import {
 
 export const array = <A,>(
   elementType: Type<A>,
-  options?: Partial<
-    Readonly<{
-      typeName: string;
-      defaultValue: readonly A[];
-    }>
-  >,
+  options?: PartialReadonly<{
+    typeName: string;
+    defaultValue: readonly A[];
+  }>,
 ): Type<readonly A[]> => {
   type T = readonly A[];
 
-  const { typeName, defaultValue = [] } = options ?? {};
-
-  const typeNameFilled: string = typeName ?? `(${elementType.typeName})[]`;
+  const { typeName = `${elementType.typeName}[]`, defaultValue = [] } =
+    options ?? {};
 
   const validate: Type<T>['validate'] = (a) => {
     if (!Arr.isArray(a)) {
@@ -30,7 +27,7 @@ export const array = <A,>(
         createPrimitiveValidationError({
           actualValue: a,
           expectedType: 'array',
-          typeName: typeNameFilled,
+          typeName,
         }),
       ]);
     }
@@ -56,7 +53,7 @@ export const array = <A,>(
     Arr.isArray(a) ? a.map((e) => elementType.fill(e)) : defaultValue;
 
   return {
-    typeName: typeNameFilled,
+    typeName,
     defaultValue,
     fill,
     validate,

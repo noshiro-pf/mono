@@ -10,14 +10,12 @@ export const pick = <
 >(
   recordType: RecordType<R>,
   keysToPick: KeysToPick,
-  options?: Partial<
-    Readonly<{
-      typeName: string;
+  options?: PartialReadonly<{
+    typeName: string;
 
-      /** @default true */
-      allowExcessProperties: boolean;
-    }>
-  >,
+    /** @default true */
+    allowExcessProperties: boolean;
+  }>,
 ): PickedType<R, KeysToPick> =>
   record(Obj.pick(recordType.shape, keysToPick), {
     typeName:

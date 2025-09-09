@@ -12,9 +12,9 @@ export const intRange = <Start extends Int8 | -128, End extends Int8 | 128>({
   end,
   ...options
 }: Readonly<{
-  typeName?: string;
   start: Start;
   end: End;
+  typeName?: string;
   defaultValue?: IntRange<Start, End>;
 }>): Type<IntRange<Start, End>> => {
   type T = IntRange<Start, End>;

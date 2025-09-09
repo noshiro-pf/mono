@@ -12,18 +12,17 @@ import {
 
 export const nonEmptyArray = <A,>(
   elementType: Type<A>,
-  options?: Readonly<{
-    typeName?: string;
-    defaultValue?: NonEmptyArray<A>;
+  options?: PartialReadonly<{
+    typeName: string;
+    defaultValue: NonEmptyArray<A>;
   }>,
 ): Type<NonEmptyArray<A>> => {
   type T = NonEmptyArray<A>;
 
-  const { typeName, defaultValue = Arr.newArray(1, elementType.defaultValue) } =
-    options ?? {};
-
-  const typeNameFilled: string =
-    typeName ?? `NonEmptyArray<${elementType.typeName}>`;
+  const {
+    typeName = `NonEmptyArray<${elementType.typeName}>`,
+    defaultValue = Arr.newArray(1, elementType.defaultValue),
+  } = options ?? {};
 
   const validate: Type<T>['validate'] = (a) => {
     if (!Arr.isArray(a)) {
@@ -31,7 +30,7 @@ export const nonEmptyArray = <A,>(
         createPrimitiveValidationError({
           actualValue: a,
           expectedType: 'array',
-          typeName: typeNameFilled,
+          typeName,
         }),
       ]);
     }
@@ -41,8 +40,8 @@ export const nonEmptyArray = <A,>(
         {
           path: [],
           actualValue: a,
-          expectedType: typeNameFilled,
-          typeName: typeNameFilled,
+          expectedType: typeName,
+          typeName,
           message: 'Expected non-empty array, got empty array',
         } satisfies ValidationErrorWithMessage,
       ]);
@@ -71,7 +70,7 @@ export const nonEmptyArray = <A,>(
       : defaultValue;
 
   return {
-    typeName: typeNameFilled,
+    typeName,
     defaultValue,
     fill,
     validate,

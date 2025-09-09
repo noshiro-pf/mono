@@ -12,7 +12,7 @@
 
 > **PickedType**\<`R`, `KeysToPick`\> = [`RecordType`](../type/README.md#recordtype)\<`Pick`\<`R`, `ArrayElement`\<`KeysToPick`\>\>\>
 
-Defined in: [src/record/pick.mts:30](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L30)
+Defined in: [src/record/pick.mts:28](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L28)
 
 #### Type Parameters
 

@@ -13,21 +13,18 @@ import {
 export const arrayOfLength = <A, N extends SmallUint>(
   size: N,
   elementType: Type<A>,
-  options?: Readonly<{
-    typeName?: string;
-    defaultValue?: ArrayOfLength<N, A>;
+  options?: PartialReadonly<{
+    typeName: string;
+    defaultValue: ArrayOfLength<N, A>;
   }>,
 ): Type<ArrayOfLength<N, A>> => {
   type T = ArrayOfLength<N, A>;
 
   const {
-    typeName,
+    typeName = `ArrayOfLength<${size}, ${elementType.typeName}>`,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     defaultValue = Arr.create(size, elementType.defaultValue) as T,
   } = options ?? {};
-
-  const typeNameFilled: string =
-    typeName ?? `[${Arr.create(size, elementType.typeName).join(', ')}]`;
 
   const validate: Type<T>['validate'] = (a) => {
     if (!Arr.isArray(a)) {
@@ -35,7 +32,7 @@ export const arrayOfLength = <A, N extends SmallUint>(
         createPrimitiveValidationError({
           actualValue: a,
           expectedType: 'array',
-          typeName: typeNameFilled,
+          typeName,
         }),
       ]);
     }
@@ -45,9 +42,9 @@ export const arrayOfLength = <A, N extends SmallUint>(
         {
           path: [],
           actualValue: a,
-          expectedType: typeNameFilled,
+          expectedType: typeName,
           message: `Expected array of length ${size}, got length ${a.length}`,
-          typeName: typeNameFilled,
+          typeName,
         } satisfies ValidationErrorWithMessage,
       ]);
     }
@@ -77,7 +74,7 @@ export const arrayOfLength = <A, N extends SmallUint>(
       : defaultValue;
 
   return {
-    typeName: typeNameFilled,
+    typeName,
     defaultValue,
     fill,
     validate,

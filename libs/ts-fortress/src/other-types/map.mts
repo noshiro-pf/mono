@@ -18,7 +18,9 @@ type MapResultType<
 export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
   keyType: K,
   valueType: V,
-  options?: Readonly<{ typeName?: string }>,
+  options?: PartialReadonly<{
+    typeName: string;
+  }>,
 ): Type<MapResultType<K, V>> => {
   type M = MapResultType<K, V>;
 

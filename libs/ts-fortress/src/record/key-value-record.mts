@@ -18,7 +18,9 @@ type RecordResultType<
 export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
   keyType: K,
   valueType: V,
-  options?: Readonly<{ typeName?: string }>,
+  options?: PartialReadonly<{
+    typeName: string;
+  }>,
 ): Type<RecordResultType<K, V>> => {
   type T = RecordResultType<K, V>;
 

@@ -5,11 +5,9 @@ import { type RecordType, type Type } from '../type.mjs';
 
 export const keyof = <const R extends ReadonlyRecord<string, Type<unknown>>>(
   recordType: RecordType<R>,
-  options?: Partial<
-    Readonly<{
-      typeName: string;
-    }>
-  >,
+  options?: PartialReadonly<{
+    typeName: string;
+  }>,
 ): KeyofType<R> =>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   pipe(getKeys(recordType)).map((keys) =>

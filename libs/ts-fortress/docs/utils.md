@@ -56,6 +56,12 @@ Re-exports [prependPathToValidationErrors](utils/validation-error.md#prependpath
 
 ---
 
+### toIntersectionString
+
+Re-exports [toIntersectionString](utils/to-union-string.md#tointersectionstring)
+
+---
+
 ### toUnionString
 
 Re-exports [toUnionString](utils/to-union-string.md#tounionstring)

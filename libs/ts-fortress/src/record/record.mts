@@ -16,14 +16,12 @@ import {
 
 export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
   shape: R,
-  options?: Partial<
-    Readonly<{
-      typeName: string;
+  options?: PartialReadonly<{
+    typeName: string;
 
-      /** @default true */
-      allowExcessProperties: boolean;
-    }>
-  >,
+    /** @default true */
+    allowExcessProperties: boolean;
+  }>,
 ): RecordType<R> => {
   type T = TsFortressInternal.RecordTypeValue<R>;
 
@@ -156,10 +154,8 @@ export const strictRecord = <
   const R extends ReadonlyRecord<string, Type<unknown>>,
 >(
   source: R,
-  options?: Partial<
-    Readonly<{
-      typeName: string;
-    }>
-  >,
+  options?: PartialReadonly<{
+    typeName: string;
+  }>,
 ): RecordType<R> =>
   record(source, { ...options, allowExcessProperties: false });

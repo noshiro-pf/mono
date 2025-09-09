@@ -4,17 +4,16 @@ import {
   createAssertFn,
   createCastFn,
   createIsFn,
+  toUnionString,
   type ValidationErrorWithMessage,
 } from '../utils/index.mjs';
 
 export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
   types: Types,
-  options?: Partial<
-    Readonly<{
-      typeName: string;
-      defaultType: UnionType<Types>;
-    }>
-  >,
+  options?: PartialReadonly<{
+    typeName: string;
+    defaultType: UnionType<Types>;
+  }>,
 ): UnionType<Types> => {
   type T = UnionTypeValue<Types>;
 
@@ -22,7 +21,7 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
   const defaultType = options?.defaultType ?? (types[0] as UnionType<Types>);
 
   const typeNameFilled: string =
-    options?.typeName ?? `Union<${types.map((a) => a.typeName).join(', ')}>`;
+    options?.typeName ?? `(${toUnionString(types.map((a) => a.typeName))})`;
 
   const validate: Type<T>['validate'] = (a) =>
     types.some((t) => t.is(a))

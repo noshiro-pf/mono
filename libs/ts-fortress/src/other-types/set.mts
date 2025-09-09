@@ -13,7 +13,9 @@ type SetResultType<T extends Type<unknown>> = ReadonlySet<TypeOf<T>>;
 
 export const SetType = <T extends Type<unknown>>(
   elementType: T,
-  options?: Readonly<{ typeName?: string }>,
+  options?: PartialReadonly<{
+    typeName: string;
+  }>,
 ): Type<SetResultType<T>> => {
   type S = SetResultType<T>;
 

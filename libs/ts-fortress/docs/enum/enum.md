@@ -28,7 +28,7 @@ Defined in: [src/enum/enum.mts:10](https://github.com/noshiro-pf/ts-fortress/blo
 
 ##### options?
 
-`Readonly`\<\{ `defaultValue?`: `ArrayElement`\<`Values`\>; `typeName?`: `string`; \}\>
+`Partial`\<`Readonly`\<\{ `defaultValue`: `ArrayElement`\<`Values`\>; `typeName`: `string`; \}\>\>
 
 #### Returns
 

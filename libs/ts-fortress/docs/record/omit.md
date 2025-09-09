@@ -12,7 +12,7 @@
 
 > **OmittedType**\<`R`, `KeysToOmit`\> = [`RecordType`](../type/README.md#recordtype)\<`Omit`\<`R`, `ArrayElement`\<`KeysToOmit`\>\>\>
 
-Defined in: [src/record/omit.mts:30](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/omit.mts#L30)
+Defined in: [src/record/omit.mts:28](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/omit.mts#L28)
 
 #### Type Parameters
 
