@@ -7,18 +7,17 @@ TypeScript-first schema validation library with static type inference.
 [![License](https://img.shields.io/npm/l/ts-fortress.svg)](./LICENSE)
 [![codecov](https://codecov.io/gh/noshiro-pf/ts-fortress/graph/badge.svg?token=Y522SWQTPB)](https://codecov.io/gh/noshiro-pf/ts-fortress)
 
-**ts-fortress** is a runtime validation library similar to [io-ts](https://github.com/gcanti/io-ts) and [zod/mini](https://zod.dev/packages/mini), designed to provide type-safe schema validation with excellent TypeScript integration and static type inference.
+**ts-fortress** is a runtime validation library similar to [io-ts](https://github.com/gcanti/io-ts) and [Zod](https://zod.dev/), designed to provide type-safe schema validation with excellent TypeScript integration and static type inference.
 
 ## Features
 
+- 🔗 **Unified type and validator definition** - Define TypeScript types and corresponding runtime validators in a single declaration, ensuring consistency between compile-time types and runtime validation logic
 - 🔒 **Type-safe validation** - Full TypeScript support with static type inference
 - 📖 **Readonly by default** - All constructed types are fully readonly, preventing accidental mutations and promoting immutability
-- 🏗️ **Composable schemas** - Build complex validation schemas from simple building blocks
-- 🔄 **Result-based error handling** - Structured error reporting with `Result<T, readonly ValidationError[]>`
-- 🏷️ **Branded types** - Rich collection of branded number types (Int, SafeInt, PositiveInt, etc.)
 - ⚡ **Performance focused** - Optimized validation with minimal runtime overhead (negligible impact on application performance)
-- 🧩 **Functional composition** - Union, intersection, and merge operations for schema composition
 - 🛠️ **Required default values** - All schemas require explicit default values, enabling automatic data filling via `fill()` function
+- 🏷️ **Branded types** - Rich collection of branded number types (Int, SafeInt, PositiveInt, etc.)
+- 🔄 **Result-based error handling** - Structured error reporting with `Result<T, readonly ValidationError[]>`
 
 ## Installation
 
@@ -41,11 +40,11 @@ import * as t from 'ts-fortress';
 
 // Define a schema
 const User = t.record({
-    id: t.string(''),
-    name: t.string(''),
-    age: t.number(0),
-    email: t.string(''),
-    isActive: t.boolean(true),
+    id: t.string(),
+    name: t.string(),
+    age: t.number(),
+    email: t.string(),
+    isActive: t.boolean(),
 });
 
 // Infer TypeScript type
@@ -83,7 +82,7 @@ if (t.Result.isOk(result)) {
 
 ## Default Values and Data Filling
 
-One of ts-fortress's key design decisions is **requiring explicit default values** for all schema types. This enables powerful data filling capabilities:
+One of the key design decisions in ts-fortress is that **all schema types have explicit default values**, which allows for powerful data entry capabilities:
 
 ```typescript
 import * as t from 'ts-fortress';
@@ -136,7 +135,7 @@ if (t.Result.isErr(result)) {
 }
 ```
 
-### Benefits of Required Default Values
+### Benefits of Default Values
 
 - **Consolidated definitions**: Type definitions and default values are defined in one place, eliminating the need to maintain separate default objects
 - **Data integrity**: Never worry about missing required fields
@@ -145,32 +144,67 @@ if (t.Result.isErr(result)) {
 - **Configuration**: Provide sensible defaults for optional configuration
 - **Testing**: Generate complete test data from partial fixtures
 
+### Convenient default values
+
+Most ts-fortress types provide sensible defaults automatically, so you rarely need to specify explicit default values:
+
 ```typescript
-// Real-world example: API response handling
-const ApiResponse = t.record({
-    data: t.array(t.string('')),
-    pagination: t.record({
-        page: t.number(1),
-        limit: t.number(10),
-        total: t.number(0),
-    }),
-    meta: t.record({
-        timestamp: t.number(Date.now()),
-        version: t.string('1.0.0'),
-    }),
+// Most common types have built-in defaults
+const Schema = t.record({
+    name: t.string(), // defaults to ""
+    age: t.number(), // defaults to 0
+    active: t.boolean(), // defaults to false
+    tags: t.array(t.string()), // defaults to []
+    config: t.record({
+        debug: t.boolean(), // defaults to false
+    }), // defaults to { debug: false }
+});
+```
+
+You only need to specify explicit default values in two cases: when you want custom values, or when using `intersection` types:
+
+```typescript
+// Custom default values
+const ServerConfig = t.record({
+    port: t.number(3000), // custom default: 3000
+    host: t.string('localhost'), // custom default: 'localhost'
+    retries: t.number(5), // custom default: 5
 });
 
-// Handle incomplete API responses gracefully
-const incompleteResponse = { data: ['item1', 'item2'] };
-const completeResponse = ApiResponse.fill(incompleteResponse);
-// All missing fields are automatically filled with their defaults
+const JobStatus = t.enumType(['started', 'scheduled', 'succeeded', 'failed']);
+
+const JobFulfilledStatus = t.enumType(['succeeded', 'failed', 'cancelled']);
+
+// Intersection types require explicit defaults
+const ReportStatus = t.intersection(
+    [JobStatus, JobFulfilledStatus],
+    t.enumType(['success', 'failed']), // must provide combined default
+);
+```
+
+This is because intersection types can be created from arbitrary types, making it impossible to automatically determine appropriate default values. However, when all constituent types are record types, you can use the `mergeRecords` function to avoid specifying defaults:
+
+```typescript
+// Using mergeRecords for record-only intersections
+const UserWithMetadata = t.mergeRecords(
+    t.record({
+        id: t.string(),
+        name: t.string(),
+    }),
+    t.record({
+        createdAt: t.number(),
+        updatedAt: t.number(),
+    }),
+);
+// No explicit default needed - automatically combines defaults from both records
+// Default: { id: '', name: '', createdAt: 0, updatedAt: 0 }
 ```
 
 ## Why ts-fortress over Zod and io-ts?
 
-While ts-fortress, [Zod](https://github.com/colinhacks/zod), and [io-ts](https://github.com/gcanti/io-ts) are all excellent TypeScript validation libraries, ts-fortress provides enhanced type safety during validator construction and addresses critical runtime consistency issues found in io-ts.
+While ts-fortress, [Zod](https://github.com/colinhacks/zod), and [io-ts](https://github.com/gcanti/io-ts) are all excellent TypeScript validation libraries, ts-fortress offers more readable and informative error messages than both, a more type-safe way of building validators than Zod, and addresses some critical runtime consistency issues found in io-ts.
 
-### Type Safety in Schema Definition
+### Type Safety when Building Schemas
 
 **Problem with Zod**: The following code compiles without errors but creates an invalid schema:
 
@@ -361,12 +395,12 @@ console.log(tsFortressErrorMessages[0]);
 // Clean output: Expected <number> at user.profile.age, got <string> type value "not-a-number".
 ```
 
-**ts-fortress vs zod comparison:**
+**ts-fortress vs Zod comparison:**
 
 ```typescript
 import { z } from 'zod';
 
-// zod nested readonly equivalent
+// Zod nested readonly equivalent
 const ZodNestedType = z
     .object({
         user: z
@@ -381,7 +415,7 @@ const ZodNestedType = z
     })
     .readonly();
 
-// Get zod error messages using prettifyError
+// Get Zod error messages using prettifyError
 const zodResult = ZodNestedType.safeParse(invalidData);
 const zodErrorMessages = zodResult.success
     ? ''
@@ -394,10 +428,10 @@ console.log(zodErrorMessages);
 **Error message comparison:**
 
 - **io-ts**: 148 characters of verbose type information mixed with the actual error
-- **zod**: 62 characters with visual formatting but missing the actual invalid value
+- **Zod**: 62 characters with visual formatting but missing the actual invalid value
 - **ts-fortress**: 74 characters focused purely on what went wrong and where, including the actual invalid value
 
-While zod produces cleaner error messages than io-ts and includes helpful visual formatting, **ts-fortress provides superior debugging experience** by including the actual invalid value (`"not-a-number"`) in the error message, making it easier to understand what data caused the validation failure.
+While Zod produces cleaner error messages than io-ts and includes helpful visual formatting, **ts-fortress provides superior debugging experience** by including the actual invalid value (`"not-a-number"`) in the error message, making it easier to understand what data caused the validation failure.
 
 ### Benefits of Deep Readonly
 
@@ -433,6 +467,8 @@ type T = t.TypeOf<typeof T>;
 
 // The runtime validator only accepts strings, but TypeScript thinks it accepts numbers!
 ```
+
+For this reason, the [io-ts documentation](https://github.com/gcanti/io-ts/blob/master/index.md#implemented-types--combinators) states that `t.keyof` only supports string keys (although this is somewhat dangerous, as the TypeScript type definition does not prevent the use of keys other than string).
 
 #### 2. Union + Undefined Decode Issues ([Issue #677](https://github.com/gcanti/io-ts/issues/677))
 
@@ -479,6 +515,8 @@ const C = t.partial({
 
 **ts-fortress eliminates these problems** by ensuring strict runtime-type consistency:
 
+Keyof Type Mismatch:
+
 ```typescript
 import * as t from 'ts-fortress';
 
@@ -499,6 +537,22 @@ type T = t.TypeOf<typeof T>;
 // ✅ Runtime behavior matches TypeScript types exactly
 console.log(T.validate(0)); // ❌ Fails correctly - number 0 is rejected
 console.log(T.validate('0')); // ✅ Success - string "0" is accepted
+
+// For this use case, if you want to define a union type of numeric literals, you can use `uintRange` from ts-fortress:
+
+const U = t.uintRange({ start: 0, end: 5 });
+
+type U = t.TypeOf<typeof U>;
+// ↑ TypeScript correctly infers: 0 | 1 | 2 | 3 | 4 (number literals)
+
+console.log(U.validate('0')); // ❌ Fails - string "0" is rejected
+console.log(U.validate(0)); // ✅ Success - number 0 is accepted
+```
+
+Union + Undefined Decode Issues:
+
+```ts
+import * as t from 'ts-fortress';
 
 // ✅ Complex union types work reliably without unexpected behavior
 const A = t.record({
