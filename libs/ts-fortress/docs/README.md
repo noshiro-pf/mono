@@ -1175,6 +1175,7 @@ This project is licensed under the Apache-2.0 License - see the [LICENSE](_media
 - [record/partial](record/partial.md)
 - [record/pick](record/pick.md)
 - [record/record](record/record.md)
+- [record/required](record/required.md)
 - [record/valueof](record/valueof.md)
 - [type](type/README.md)
 - [utils](utils.md)

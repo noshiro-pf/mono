@@ -105,7 +105,7 @@ expectType<
       }>;
       allowExcessProperties: boolean;
     }>
->('~=');
+>('=');
 
 expectType<
   RecordType<

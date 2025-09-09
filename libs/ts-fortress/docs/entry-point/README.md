@@ -10256,6 +10256,24 @@ Re-exports [refine](../other-types/refine.md#refine)
 
 ---
 
+### required
+
+Re-exports [required](../record/required.md#required)
+
+---
+
+### RequiredPropertyType
+
+Re-exports [RequiredPropertyType](../record/optional.md#requiredpropertytype)
+
+---
+
+### RequiredType
+
+Re-exports [RequiredType](../record/required.md#requiredtype)
+
+---
+
 ### safeInt
 
 Re-exports [safeInt](../branded/number/safe-int.md#safeint)

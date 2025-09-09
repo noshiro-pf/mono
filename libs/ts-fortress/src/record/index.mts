@@ -5,4 +5,5 @@ export * from './optional.mjs';
 export * from './partial.mjs';
 export * from './pick.mjs';
 export * from './record.mjs';
+export * from './required.mjs';
 export * from './valueof.mjs';

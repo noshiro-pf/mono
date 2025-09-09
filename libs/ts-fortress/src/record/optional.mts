@@ -3,6 +3,11 @@ import { type Type } from '../type.mjs';
 export type OptionalPropertyType<T extends Type<unknown>> = T &
   PartiallyRequired<T, 'optional'>;
 
+export type RequiredPropertyType<T extends Type<unknown>> = PartiallyOptional<
+  T,
+  'optional'
+>;
+
 export const optional = <T extends Type<unknown>>(
   t: T,
 ): OptionalPropertyType<T> => ({

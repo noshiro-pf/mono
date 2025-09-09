@@ -80,6 +80,24 @@ Re-exports [record](record/record.md#record)
 
 ---
 
+### required
+
+Re-exports [required](record/required.md#required)
+
+---
+
+### RequiredPropertyType
+
+Re-exports [RequiredPropertyType](record/optional.md#requiredpropertytype)
+
+---
+
+### RequiredType
+
+Re-exports [RequiredType](record/required.md#requiredtype)
+
+---
+
 ### strictRecord
 
 Re-exports [strictRecord](record/record.md#strictrecord)

@@ -20,13 +20,27 @@ Defined in: [src/record/optional.mts:3](https://github.com/noshiro-pf/ts-fortres
 
 `T` _extends_ [`Type`](../type/README.md#type)\<`unknown`\>
 
+---
+
+### RequiredPropertyType\<T\>
+
+> **RequiredPropertyType**\<`T`\> = `PartiallyOptional`\<`T`, `"optional"`\>
+
+Defined in: [src/record/optional.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/optional.mts#L6)
+
+#### Type Parameters
+
+##### T
+
+`T` _extends_ [`Type`](../type/README.md#type)\<`unknown`\>
+
 ## Functions
 
 ### isOptionalProperty()
 
 > **isOptionalProperty**\<`T`\>(`t`): `t is OptionalPropertyType<T>`
 
-Defined in: [src/record/optional.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/optional.mts#L13)
+Defined in: [src/record/optional.mts:18](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/optional.mts#L18)
 
 #### Type Parameters
 
@@ -50,7 +64,7 @@ Defined in: [src/record/optional.mts:13](https://github.com/noshiro-pf/ts-fortre
 
 > **optional**\<`T`\>(`t`): [`OptionalPropertyType`](#optionalpropertytype)\<`T`\>
 
-Defined in: [src/record/optional.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/optional.mts#L6)
+Defined in: [src/record/optional.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/optional.mts#L11)
 
 #### Type Parameters
 
