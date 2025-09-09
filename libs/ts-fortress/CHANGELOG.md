@@ -1,3 +1,9 @@
+## [4.2.1](https://github.com/noshiro-pf/ts-fortress/compare/v4.2.0...v4.2.1) (2025-09-09)
+
+### Bug Fixes
+
+- fix default type name of union and intersection ([#72](https://github.com/noshiro-pf/ts-fortress/issues/72)) ([ea90f78](https://github.com/noshiro-pf/ts-fortress/commit/ea90f787edf17c5457b92e1cd1d31415c70d5ceb))
+
 # [4.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v4.1.2...v4.2.0) (2025-09-09)
 
 ### Features
