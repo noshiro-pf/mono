@@ -1,8 +1,13 @@
+/* eslint-disable import/no-internal-modules */
+import {
+  type RuleListener,
+  type RuleModule,
+} from '@typescript-eslint/utils/ts-eslint';
 import { createRule } from './common.mjs';
 
 /** An ESLint rule to ban enums. */
 
-export const noEnums = createRule({
+export const noEnums = createRule<readonly [], 'errorStringGeneric'>({
   name: 'no-enums',
   meta: {
     type: 'problem',
@@ -23,4 +28,9 @@ export const noEnums = createRule({
     },
   }),
   defaultOptions: [],
-} as const);
+} as const) satisfies RuleModule<
+  string,
+  readonly unknown[],
+  unknown,
+  RuleListener
+>;

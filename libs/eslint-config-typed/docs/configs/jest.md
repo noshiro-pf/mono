@@ -22,6 +22,16 @@ readonly `string`[]
 
 #### Returns
 
+##### basePath?
+
+> `readonly` `optional` **basePath**: `string`
+
+The base path for files and ignores.
+
+Note that this is not permitted inside an `extends` array.
+
+Since ESLint 9.30.0
+
 ##### files?
 
 > `readonly` `optional` **files**: readonly (`string` \| readonly `string`[])[]
@@ -259,7 +269,7 @@ is equivalent to `"warn"` and `false` is equivalent to `"off"`.
 ###### Default
 
 ```ts
-'off';
+'warn';
 ```
 
 ###### linterOptions.reportUnusedInlineConfigs?

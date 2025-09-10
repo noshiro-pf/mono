@@ -152,7 +152,6 @@ namespace BanTsComment {
    *     "properties": {
    *       "minimumDescriptionLength": {
    *         "type": "number",
-   *         "default": 3,
    *         "description": "A minimum character length for descriptions when `allow-with-description` is enabled."
    *       },
    *       "ts-check": {
@@ -278,7 +277,6 @@ namespace ClassMethodsUseThis {
    *     "properties": {
    *       "enforceForClassFields": {
    *         "type": "boolean",
-   *         "default": true,
    *         "description": "Enforces that functions used as instance field initializers utilize `this`."
    *       },
    *       "exceptMethods": {
@@ -755,27 +753,22 @@ namespace DotNotation {
    *     "properties": {
    *       "allowIndexSignaturePropertyAccess": {
    *         "type": "boolean",
-   *         "default": false,
    *         "description": "Whether to allow accessing properties matching an index signature with array notation."
    *       },
    *       "allowKeywords": {
    *         "type": "boolean",
-   *         "default": true,
    *         "description": "Whether to allow keywords such as [\"class\"]`."
    *       },
    *       "allowPattern": {
    *         "type": "string",
-   *         "default": "",
    *         "description": "Regular expression of names to allow."
    *       },
    *       "allowPrivateClassPropertyAccess": {
    *         "type": "boolean",
-   *         "default": false,
    *         "description": "Whether to allow accessing class members marked as `private` with array notation."
    *       },
    *       "allowProtectedClassPropertyAccess": {
    *         "type": "boolean",
-   *         "default": false,
    *         "description": "Whether to allow accessing class members marked as `protected` with array notation."
    *       }
    *     }
@@ -4150,6 +4143,10 @@ namespace NoBaseToString {
    *     "type": "object",
    *     "additionalProperties": false,
    *     "properties": {
+   *       "checkUnknown": {
+   *         "type": "boolean",
+   *         "description": "Whether to also check values of type `unknown`"
+   *       },
    *       "ignoredTypeNames": {
    *         "type": "array",
    *         "description": "Stringified regular expressions of type names to ignore.",
@@ -4163,6 +4160,8 @@ namespace NoBaseToString {
    * ```
    */
   export type Options = {
+    /** Whether to also check values of type `unknown` */
+    readonly checkUnknown?: boolean;
     /** Stringified regular expressions of type names to ignore. */
     readonly ignoredTypeNames?: readonly string[];
   };
@@ -5520,7 +5519,6 @@ namespace NoMeaninglessVoidOperator {
    *     "properties": {
    *       "checkNever": {
    *         "type": "boolean",
-   *         "default": false,
    *         "description": "Whether to suggest removing `void` when the argument has type `never`."
    *       }
    *     }
@@ -6949,6 +6947,26 @@ namespace NoUnnecessaryTypeConstraint {
 }
 
 /**
+ * Disallow conversion idioms when they do not change the type or value of the
+ * expression
+ *
+ * @link https://typescript-eslint.io/rules/no-unnecessary-type-conversion
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | deprecated           | false      |
+ *  | hasSuggestions       | true       |
+ *  | recommended          | strict     |
+ *  | requiresTypeChecking | true       |
+ *  ```
+ */
+namespace NoUnnecessaryTypeConversion {
+  export type RuleEntry = Linter.RuleSeverity;
+}
+
+/**
  * Disallow type parameters that aren't used multiple times
  *
  * @link https://typescript-eslint.io/rules/no-unnecessary-type-parameters
@@ -7674,6 +7692,10 @@ namespace OnlyThrowError {
    *         "type": "array",
    *         "description": "Type specifiers that can be thrown."
    *       },
+   *       "allowRethrowing": {
+   *         "type": "boolean",
+   *         "description": "Whether to allow rethrowing caught values that are not `Error` objects."
+   *       },
    *       "allowThrowingAny": {
    *         "type": "boolean",
    *         "description": "Whether to always allow throwing values typed as `any`."
@@ -7706,6 +7728,8 @@ namespace OnlyThrowError {
           readonly package: string;
         }
     )[];
+    /** Whether to allow rethrowing caught values that are not `Error` objects. */
+    readonly allowRethrowing?: boolean;
     /** Whether to always allow throwing values typed as `any`. */
     readonly allowThrowingAny?: boolean;
     /** Whether to always allow throwing values typed as `unknown`. */
@@ -7881,6 +7905,7 @@ namespace PreferDestructuring {
    *   },
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "enforceForDeclarationWithTypeAnnotation": {
    *         "type": "boolean",
@@ -7922,7 +7947,6 @@ namespace PreferDestructuring {
      * the property name.
      */
     readonly enforceForRenamedProperties?: boolean;
-    readonly [k: string]: unknown;
   };
 
   export type RuleEntry =
@@ -8135,6 +8159,7 @@ namespace PreferNullishCoalescing {
    *         "oneOf": [
    *           {
    *             "type": "object",
+   *             "additionalProperties": false,
    *             "description": "Which primitives types may be ignored.",
    *             "properties": {
    *               "bigint": {
@@ -8209,7 +8234,6 @@ namespace PreferNullishCoalescing {
           readonly number?: boolean;
           /** Ignore string primitive types. */
           readonly string?: boolean;
-          readonly [k: string]: unknown;
         };
     /**
      * Whether to ignore any ternary expressions that could be simplified by
@@ -9567,7 +9591,7 @@ namespace TripleSlashReference {
  *  | key        | value      |
  *  | :--------- | :--------- |
  *  | type       | suggestion |
- *  | deprecated | false      |
+ *  | deprecated | true       |
  *  ```
  */
 namespace Typedef {
@@ -9617,46 +9641,7 @@ namespace Typedef {
    * ]
    * ```
    */
-  export type Options = {
-    /**
-     * Whether to enforce type annotations on variables declared using array
-     * destructuring.
-     */
-    readonly arrayDestructuring?: boolean;
-    /** Whether to enforce type annotations for parameters of arrow functions. */
-    readonly arrowParameter?: boolean;
-    /** Whether to enforce type annotations on member variables of classes. */
-    readonly memberVariableDeclaration?: boolean;
-    /**
-     * Whether to enforce type annotations on variables declared using object
-     * destructuring.
-     */
-    readonly objectDestructuring?: boolean;
-    /**
-     * Whether to enforce type annotations for parameters of functions and
-     * methods.
-     */
-    readonly parameter?: boolean;
-    /**
-     * Whether to enforce type annotations for properties of interfaces and
-     * types.
-     */
-    readonly propertyDeclaration?: boolean;
-    /**
-     * Whether to enforce type annotations for variable declarations, excluding
-     * array and object destructuring.
-     */
-    readonly variableDeclaration?: boolean;
-    /**
-     * Whether to ignore variable declarations for non-arrow and arrow
-     * functions.
-     */
-    readonly variableDeclarationIgnoreFunction?: boolean;
-  };
-
-  export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -9849,6 +9834,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-unnecessary-type-arguments': NoUnnecessaryTypeArguments.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-type-assertion': NoUnnecessaryTypeAssertion.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-type-constraint': NoUnnecessaryTypeConstraint.RuleEntry;
+  readonly '@typescript-eslint/no-unnecessary-type-conversion': NoUnnecessaryTypeConversion.RuleEntry;
   readonly '@typescript-eslint/no-unnecessary-type-parameters': NoUnnecessaryTypeParameters.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-argument': NoUnsafeArgument.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-assignment': NoUnsafeAssignment.RuleEntry;
@@ -9897,7 +9883,6 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/strict-boolean-expressions': StrictBooleanExpressions.RuleEntry;
   readonly '@typescript-eslint/switch-exhaustiveness-check': SwitchExhaustivenessCheck.RuleEntry;
   readonly '@typescript-eslint/triple-slash-reference': TripleSlashReference.RuleEntry;
-  readonly '@typescript-eslint/typedef': Typedef.RuleEntry;
   readonly '@typescript-eslint/unbound-method': UnboundMethod.RuleEntry;
   readonly '@typescript-eslint/unified-signatures': UnifiedSignatures.RuleEntry;
   readonly '@typescript-eslint/use-unknown-in-catch-callback-variable': UseUnknownInCatchCallbackVariable.RuleEntry;
@@ -9909,6 +9894,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-var-requires': NoVarRequires.RuleEntry;
   readonly '@typescript-eslint/prefer-ts-expect-error': PreferTsExpectError.RuleEntry;
   readonly '@typescript-eslint/sort-type-constituents': SortTypeConstituents.RuleEntry;
+  readonly '@typescript-eslint/typedef': Typedef.RuleEntry;
 };
 
 export type TypeScriptEslintRulesOption = {
@@ -9982,7 +9968,6 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/strict-boolean-expressions': StrictBooleanExpressions.Options;
   readonly '@typescript-eslint/switch-exhaustiveness-check': SwitchExhaustivenessCheck.Options;
   readonly '@typescript-eslint/triple-slash-reference': TripleSlashReference.Options;
-  readonly '@typescript-eslint/typedef': Typedef.Options;
   readonly '@typescript-eslint/unbound-method': UnboundMethod.Options;
   readonly '@typescript-eslint/unified-signatures': UnifiedSignatures.Options;
 };

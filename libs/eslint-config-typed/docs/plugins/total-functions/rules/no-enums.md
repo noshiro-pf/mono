@@ -10,8 +10,8 @@
 
 ### noEnums
 
-> `const` **noEnums**: `RuleModule`\<`string`, readonly `unknown`[], `unknown`, `RuleListener`\>
+> `const` **noEnums**: `RuleModule`\<`"errorStringGeneric"`, readonly \[\], `unknown`, `RuleListener`\>
 
-Defined in: [src/plugins/total-functions/rules/no-enums.mts:5](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/total-functions/rules/no-enums.mts#L5)
+Defined in: [src/plugins/total-functions/rules/no-enums.mts:10](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/total-functions/rules/no-enums.mts#L10)
 
 An ESLint rule to ban enums.

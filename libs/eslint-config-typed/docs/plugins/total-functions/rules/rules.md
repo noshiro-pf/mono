@@ -18,7 +18,7 @@ Defined in: [src/plugins/total-functions/rules/rules.mts:15](https://github.com/
 
 ##### no-enums
 
-> `readonly` **no-enums**: `RuleModule`\<`string`, readonly `unknown`[], `unknown`, `RuleListener`\> = `noEnums`
+> `readonly` **no-enums**: `RuleModule`\<`"errorStringGeneric"`, readonly \[\], `unknown`, `RuleListener`\> = `noEnums`
 
 ##### no-hidden-type-assertions
 

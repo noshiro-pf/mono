@@ -13,7 +13,7 @@ const ruleTester = new RuleTester({
   },
 });
 
-ruleTester.run('no-enums', noEnums, {
+ruleTester.run<'errorStringGeneric', readonly []>('no-enums', noEnums, {
   valid: [],
   invalid: [
     {

@@ -353,7 +353,6 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     'error',
     { lib: 'never', types: 'always', path: 'always' },
   ],
-  '@typescript-eslint/typedef': 'error',
   '@typescript-eslint/unbound-method': 'error',
   '@typescript-eslint/unified-signatures': 'error',
 
@@ -407,6 +406,8 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
 
   '@typescript-eslint/no-misused-spread': 'error',
 
+  '@typescript-eslint/no-unnecessary-type-conversion': 'error',
+
   // deprecated
   '@typescript-eslint/no-type-alias': 0,
   '@typescript-eslint/prefer-ts-expect-error': 0,
@@ -414,4 +415,5 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-var-requires': 0,
   '@typescript-eslint/no-empty-interface': 0,
   '@typescript-eslint/no-loss-of-precision': 0,
+  '@typescript-eslint/typedef': 0,
 } as const;
