@@ -12,7 +12,7 @@
 
 > **EslintUnicornRules** = `object`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3620](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3620)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3829](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3829)
 
 #### Properties
 
@@ -20,841 +20,847 @@ Defined in: [src/types/rules/eslint-unicorn-rules.mts:3620](https://github.com/n
 
 > `readonly` **unicorn/better-regex**: `BetterRegex.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3621](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3621)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3830](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3830)
 
 ##### unicorn/catch-error-name
 
 > `readonly` **unicorn/catch-error-name**: `CatchErrorName.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3622](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3622)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3831](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3831)
+
+##### unicorn/consistent-assert
+
+> `readonly` **unicorn/consistent-assert**: `ConsistentAssert.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3832](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3832)
+
+##### unicorn/consistent-date-clone
+
+> `readonly` **unicorn/consistent-date-clone**: `ConsistentDateClone.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3833](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3833)
 
 ##### unicorn/consistent-destructuring
 
 > `readonly` **unicorn/consistent-destructuring**: `ConsistentDestructuring.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3623](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3623)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3834](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3834)
 
 ##### unicorn/consistent-empty-array-spread
 
 > `readonly` **unicorn/consistent-empty-array-spread**: `ConsistentEmptyArraySpread.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3624](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3624)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3835](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3835)
 
 ##### unicorn/consistent-existence-index-check
 
 > `readonly` **unicorn/consistent-existence-index-check**: `ConsistentExistenceIndexCheck.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3625](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3625)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3836](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3836)
 
 ##### unicorn/consistent-function-scoping
 
 > `readonly` **unicorn/consistent-function-scoping**: `ConsistentFunctionScoping.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3626](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3626)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3837](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3837)
 
 ##### unicorn/custom-error-definition
 
 > `readonly` **unicorn/custom-error-definition**: `CustomErrorDefinition.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3627](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3627)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3838](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3838)
 
 ##### unicorn/empty-brace-spaces
 
 > `readonly` **unicorn/empty-brace-spaces**: `EmptyBraceSpaces.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3628](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3628)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3839](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3839)
 
 ##### unicorn/error-message
 
 > `readonly` **unicorn/error-message**: `ErrorMessage.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3629](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3629)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3840](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3840)
 
 ##### unicorn/escape-case
 
 > `readonly` **unicorn/escape-case**: `EscapeCase.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3630](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3630)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3841](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3841)
 
 ##### unicorn/expiring-todo-comments
 
 > `readonly` **unicorn/expiring-todo-comments**: `ExpiringTodoComments.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3631](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3631)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3842](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3842)
 
 ##### unicorn/explicit-length-check
 
 > `readonly` **unicorn/explicit-length-check**: `ExplicitLengthCheck.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3632](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3632)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3843](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3843)
 
 ##### unicorn/filename-case
 
 > `readonly` **unicorn/filename-case**: `FilenameCase.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3633](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3633)
-
-##### unicorn/import-index
-
-> `readonly` **unicorn/import-index**: `ImportIndex.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3746](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3746)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3844](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3844)
 
 ##### unicorn/import-style
 
 > `readonly` **unicorn/import-style**: `ImportStyle.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3634](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3634)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3845](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3845)
 
 ##### unicorn/new-for-builtins
 
 > `readonly` **unicorn/new-for-builtins**: `NewForBuiltins.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3635](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3635)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3846](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3846)
 
 ##### unicorn/no-abusive-eslint-disable
 
 > `readonly` **unicorn/no-abusive-eslint-disable**: `NoAbusiveEslintDisable.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3636](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3636)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3847](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3847)
+
+##### unicorn/no-accessor-recursion
+
+> `readonly` **unicorn/no-accessor-recursion**: `NoAccessorRecursion.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3848](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3848)
 
 ##### unicorn/no-anonymous-default-export
 
 > `readonly` **unicorn/no-anonymous-default-export**: `NoAnonymousDefaultExport.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3637](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3637)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3849](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3849)
 
 ##### unicorn/no-array-callback-reference
 
 > `readonly` **unicorn/no-array-callback-reference**: `NoArrayCallbackReference.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3638](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3638)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3850](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3850)
 
 ##### unicorn/no-array-for-each
 
 > `readonly` **unicorn/no-array-for-each**: `NoArrayForEach.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3639](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3639)
-
-##### unicorn/no-array-instanceof
-
-> `readonly` **unicorn/no-array-instanceof**: `NoArrayInstanceof.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3747](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3747)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3851](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3851)
 
 ##### unicorn/no-array-method-this-argument
 
 > `readonly` **unicorn/no-array-method-this-argument**: `NoArrayMethodThisArgument.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3640](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3640)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3852](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3852)
 
 ##### unicorn/no-array-push-push
 
 > `readonly` **unicorn/no-array-push-push**: `NoArrayPushPush.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3641](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3641)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3972](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3972)
 
 ##### unicorn/no-array-reduce
 
 > `readonly` **unicorn/no-array-reduce**: `NoArrayReduce.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3642](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3642)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3853](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3853)
+
+##### unicorn/no-array-reverse
+
+> `readonly` **unicorn/no-array-reverse**: `NoArrayReverse.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3854](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3854)
+
+##### unicorn/no-array-sort
+
+> `readonly` **unicorn/no-array-sort**: `NoArraySort.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3855](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3855)
 
 ##### unicorn/no-await-expression-member
 
 > `readonly` **unicorn/no-await-expression-member**: `NoAwaitExpressionMember.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3643](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3643)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3856](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3856)
 
 ##### unicorn/no-await-in-promise-methods
 
 > `readonly` **unicorn/no-await-in-promise-methods**: `NoAwaitInPromiseMethods.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3644](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3644)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3857](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3857)
 
 ##### unicorn/no-console-spaces
 
 > `readonly` **unicorn/no-console-spaces**: `NoConsoleSpaces.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3645](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3645)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3858](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3858)
 
 ##### unicorn/no-document-cookie
 
 > `readonly` **unicorn/no-document-cookie**: `NoDocumentCookie.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3646](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3646)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3859](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3859)
 
 ##### unicorn/no-empty-file
 
 > `readonly` **unicorn/no-empty-file**: `NoEmptyFile.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3647](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3647)
-
-##### unicorn/no-fn-reference-in-iterator
-
-> `readonly` **unicorn/no-fn-reference-in-iterator**: `NoFnReferenceInIterator.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3748](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3748)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3860](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3860)
 
 ##### unicorn/no-for-loop
 
 > `readonly` **unicorn/no-for-loop**: `NoForLoop.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3648](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3648)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3861](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3861)
 
 ##### unicorn/no-hex-escape
 
 > `readonly` **unicorn/no-hex-escape**: `NoHexEscape.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3649](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3649)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3862](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3862)
 
 ##### unicorn/no-instanceof-array
 
 > `readonly` **unicorn/no-instanceof-array**: `NoInstanceofArray.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3650](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3650)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3970](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3970)
+
+##### unicorn/no-instanceof-builtins
+
+> `readonly` **unicorn/no-instanceof-builtins**: `NoInstanceofBuiltins.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3863](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3863)
 
 ##### unicorn/no-invalid-fetch-options
 
 > `readonly` **unicorn/no-invalid-fetch-options**: `NoInvalidFetchOptions.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3651](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3651)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3864](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3864)
 
 ##### unicorn/no-invalid-remove-event-listener
 
 > `readonly` **unicorn/no-invalid-remove-event-listener**: `NoInvalidRemoveEventListener.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3652](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3652)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3865](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3865)
 
 ##### unicorn/no-keyword-prefix
 
 > `readonly` **unicorn/no-keyword-prefix**: `NoKeywordPrefix.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3653](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3653)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3866](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3866)
 
 ##### unicorn/no-length-as-slice-end
 
 > `readonly` **unicorn/no-length-as-slice-end**: `NoLengthAsSliceEnd.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3654](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3654)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3971](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3971)
 
 ##### unicorn/no-lonely-if
 
 > `readonly` **unicorn/no-lonely-if**: `NoLonelyIf.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3655](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3655)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3867](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3867)
 
 ##### unicorn/no-magic-array-flat-depth
 
 > `readonly` **unicorn/no-magic-array-flat-depth**: `NoMagicArrayFlatDepth.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3656](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3656)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3868](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3868)
+
+##### unicorn/no-named-default
+
+> `readonly` **unicorn/no-named-default**: `NoNamedDefault.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3869](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3869)
 
 ##### unicorn/no-negated-condition
 
 > `readonly` **unicorn/no-negated-condition**: `NoNegatedCondition.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3657](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3657)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3870](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3870)
 
 ##### unicorn/no-negation-in-equality-check
 
 > `readonly` **unicorn/no-negation-in-equality-check**: `NoNegationInEqualityCheck.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3658](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3658)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3871](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3871)
 
 ##### unicorn/no-nested-ternary
 
 > `readonly` **unicorn/no-nested-ternary**: `NoNestedTernary.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3659](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3659)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3872](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3872)
 
 ##### unicorn/no-new-array
 
 > `readonly` **unicorn/no-new-array**: `NoNewArray.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3660](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3660)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3873](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3873)
 
 ##### unicorn/no-new-buffer
 
 > `readonly` **unicorn/no-new-buffer**: `NoNewBuffer.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3661](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3661)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3874](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3874)
 
 ##### unicorn/no-null
 
 > `readonly` **unicorn/no-null**: `NoNull.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3662](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3662)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3875](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3875)
 
 ##### unicorn/no-object-as-default-parameter
 
 > `readonly` **unicorn/no-object-as-default-parameter**: `NoObjectAsDefaultParameter.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3663](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3663)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3876](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3876)
 
 ##### unicorn/no-process-exit
 
 > `readonly` **unicorn/no-process-exit**: `NoProcessExit.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3664](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3664)
-
-##### unicorn/no-reduce
-
-> `readonly` **unicorn/no-reduce**: `NoReduce.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3749](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3749)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3877](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3877)
 
 ##### unicorn/no-single-promise-in-promise-methods
 
 > `readonly` **unicorn/no-single-promise-in-promise-methods**: `NoSinglePromiseInPromiseMethods.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3665](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3665)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3878](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3878)
 
 ##### unicorn/no-static-only-class
 
 > `readonly` **unicorn/no-static-only-class**: `NoStaticOnlyClass.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3666](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3666)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3879](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3879)
 
 ##### unicorn/no-thenable
 
 > `readonly` **unicorn/no-thenable**: `NoThenable.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3667](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3667)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3880](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3880)
 
 ##### unicorn/no-this-assignment
 
 > `readonly` **unicorn/no-this-assignment**: `NoThisAssignment.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3668](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3668)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3881](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3881)
 
 ##### unicorn/no-typeof-undefined
 
 > `readonly` **unicorn/no-typeof-undefined**: `NoTypeofUndefined.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3669](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3669)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3882](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3882)
+
+##### unicorn/no-unnecessary-array-flat-depth
+
+> `readonly` **unicorn/no-unnecessary-array-flat-depth**: `NoUnnecessaryArrayFlatDepth.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3883](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3883)
+
+##### unicorn/no-unnecessary-array-splice-count
+
+> `readonly` **unicorn/no-unnecessary-array-splice-count**: `NoUnnecessaryArraySpliceCount.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3884](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3884)
 
 ##### unicorn/no-unnecessary-await
 
 > `readonly` **unicorn/no-unnecessary-await**: `NoUnnecessaryAwait.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3670](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3670)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3885](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3885)
 
 ##### unicorn/no-unnecessary-polyfills
 
 > `readonly` **unicorn/no-unnecessary-polyfills**: `NoUnnecessaryPolyfills.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3671](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3671)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3886](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3886)
+
+##### unicorn/no-unnecessary-slice-end
+
+> `readonly` **unicorn/no-unnecessary-slice-end**: `NoUnnecessarySliceEnd.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3887](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3887)
 
 ##### unicorn/no-unreadable-array-destructuring
 
 > `readonly` **unicorn/no-unreadable-array-destructuring**: `NoUnreadableArrayDestructuring.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3672](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3672)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3888](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3888)
 
 ##### unicorn/no-unreadable-iife
 
 > `readonly` **unicorn/no-unreadable-iife**: `NoUnreadableIife.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3673](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3673)
-
-##### unicorn/no-unsafe-regex
-
-> `readonly` **unicorn/no-unsafe-regex**: `NoUnsafeRegex.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3750](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3750)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3889](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3889)
 
 ##### unicorn/no-unused-properties
 
 > `readonly` **unicorn/no-unused-properties**: `NoUnusedProperties.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3674](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3674)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3890](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3890)
+
+##### unicorn/no-useless-error-capture-stack-trace
+
+> `readonly` **unicorn/no-useless-error-capture-stack-trace**: `NoUselessErrorCaptureStackTrace.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3891](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3891)
 
 ##### unicorn/no-useless-fallback-in-spread
 
 > `readonly` **unicorn/no-useless-fallback-in-spread**: `NoUselessFallbackInSpread.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3675](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3675)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3892](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3892)
 
 ##### unicorn/no-useless-length-check
 
 > `readonly` **unicorn/no-useless-length-check**: `NoUselessLengthCheck.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3676](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3676)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3893](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3893)
 
 ##### unicorn/no-useless-promise-resolve-reject
 
 > `readonly` **unicorn/no-useless-promise-resolve-reject**: `NoUselessPromiseResolveReject.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3677](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3677)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3894](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3894)
 
 ##### unicorn/no-useless-spread
 
 > `readonly` **unicorn/no-useless-spread**: `NoUselessSpread.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3678](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3678)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3895](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3895)
 
 ##### unicorn/no-useless-switch-case
 
 > `readonly` **unicorn/no-useless-switch-case**: `NoUselessSwitchCase.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3679](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3679)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3896](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3896)
 
 ##### unicorn/no-useless-undefined
 
 > `readonly` **unicorn/no-useless-undefined**: `NoUselessUndefined.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3680](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3680)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3897](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3897)
 
 ##### unicorn/no-zero-fractions
 
 > `readonly` **unicorn/no-zero-fractions**: `NoZeroFractions.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3681](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3681)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3898](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3898)
 
 ##### unicorn/number-literal-case
 
 > `readonly` **unicorn/number-literal-case**: `NumberLiteralCase.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3682](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3682)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3899](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3899)
 
 ##### unicorn/numeric-separators-style
 
 > `readonly` **unicorn/numeric-separators-style**: `NumericSeparatorsStyle.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3683](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3683)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3900](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3900)
 
 ##### unicorn/prefer-add-event-listener
 
 > `readonly` **unicorn/prefer-add-event-listener**: `PreferAddEventListener.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3684](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3684)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3901](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3901)
 
 ##### unicorn/prefer-array-find
 
 > `readonly` **unicorn/prefer-array-find**: `PreferArrayFind.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3685](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3685)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3902](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3902)
 
 ##### unicorn/prefer-array-flat
 
 > `readonly` **unicorn/prefer-array-flat**: `PreferArrayFlat.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3687](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3687)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3903](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3903)
 
 ##### unicorn/prefer-array-flat-map
 
 > `readonly` **unicorn/prefer-array-flat-map**: `PreferArrayFlatMap.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3686](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3686)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3904](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3904)
 
 ##### unicorn/prefer-array-index-of
 
 > `readonly` **unicorn/prefer-array-index-of**: `PreferArrayIndexOf.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3688](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3688)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3905](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3905)
 
 ##### unicorn/prefer-array-some
 
 > `readonly` **unicorn/prefer-array-some**: `PreferArraySome.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3689](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3689)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3906](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3906)
 
 ##### unicorn/prefer-at
 
 > `readonly` **unicorn/prefer-at**: `PreferAt.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3690](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3690)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3907](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3907)
+
+##### unicorn/prefer-bigint-literals
+
+> `readonly` **unicorn/prefer-bigint-literals**: `PreferBigintLiterals.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3908](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3908)
 
 ##### unicorn/prefer-blob-reading-methods
 
 > `readonly` **unicorn/prefer-blob-reading-methods**: `PreferBlobReadingMethods.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3691](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3691)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3909](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3909)
+
+##### unicorn/prefer-class-fields
+
+> `readonly` **unicorn/prefer-class-fields**: `PreferClassFields.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3910](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3910)
+
+##### unicorn/prefer-classlist-toggle
+
+> `readonly` **unicorn/prefer-classlist-toggle**: `PreferClasslistToggle.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3911](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3911)
 
 ##### unicorn/prefer-code-point
 
 > `readonly` **unicorn/prefer-code-point**: `PreferCodePoint.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3692](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3692)
-
-##### unicorn/prefer-dataset
-
-> `readonly` **unicorn/prefer-dataset**: `PreferDataset.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3751](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3751)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3912](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3912)
 
 ##### unicorn/prefer-date-now
 
 > `readonly` **unicorn/prefer-date-now**: `PreferDateNow.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3693](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3693)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3913](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3913)
 
 ##### unicorn/prefer-default-parameters
 
 > `readonly` **unicorn/prefer-default-parameters**: `PreferDefaultParameters.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3694](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3694)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3914](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3914)
 
 ##### unicorn/prefer-dom-node-append
 
 > `readonly` **unicorn/prefer-dom-node-append**: `PreferDomNodeAppend.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3695](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3695)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3915](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3915)
 
 ##### unicorn/prefer-dom-node-dataset
 
 > `readonly` **unicorn/prefer-dom-node-dataset**: `PreferDomNodeDataset.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3696](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3696)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3916](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3916)
 
 ##### unicorn/prefer-dom-node-remove
 
 > `readonly` **unicorn/prefer-dom-node-remove**: `PreferDomNodeRemove.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3697](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3697)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3917](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3917)
 
 ##### unicorn/prefer-dom-node-text-content
 
 > `readonly` **unicorn/prefer-dom-node-text-content**: `PreferDomNodeTextContent.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3698](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3698)
-
-##### unicorn/prefer-event-key
-
-> `readonly` **unicorn/prefer-event-key**: `PreferEventKey.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3752](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3752)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3918](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3918)
 
 ##### unicorn/prefer-event-target
 
 > `readonly` **unicorn/prefer-event-target**: `PreferEventTarget.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3699](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3699)
-
-##### unicorn/prefer-exponentiation-operator
-
-> `readonly` **unicorn/prefer-exponentiation-operator**: `PreferExponentiationOperator.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3753](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3753)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3919](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3919)
 
 ##### unicorn/prefer-export-from
 
 > `readonly` **unicorn/prefer-export-from**: `PreferExportFrom.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3700](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3700)
-
-##### unicorn/prefer-flat-map
-
-> `readonly` **unicorn/prefer-flat-map**: `PreferFlatMap.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3754](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3754)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3920](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3920)
 
 ##### unicorn/prefer-global-this
 
 > `readonly` **unicorn/prefer-global-this**: `PreferGlobalThis.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3701](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3701)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3921](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3921)
+
+##### unicorn/prefer-import-meta-properties
+
+> `readonly` **unicorn/prefer-import-meta-properties**: `PreferImportMetaProperties.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3922](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3922)
 
 ##### unicorn/prefer-includes
 
 > `readonly` **unicorn/prefer-includes**: `PreferIncludes.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3702](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3702)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3923](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3923)
 
 ##### unicorn/prefer-json-parse-buffer
 
 > `readonly` **unicorn/prefer-json-parse-buffer**: `PreferJsonParseBuffer.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3703](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3703)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3924](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3924)
 
 ##### unicorn/prefer-keyboard-event-key
 
 > `readonly` **unicorn/prefer-keyboard-event-key**: `PreferKeyboardEventKey.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3704](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3704)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3925](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3925)
 
 ##### unicorn/prefer-logical-operator-over-ternary
 
 > `readonly` **unicorn/prefer-logical-operator-over-ternary**: `PreferLogicalOperatorOverTernary.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3705](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3705)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3926](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3926)
 
 ##### unicorn/prefer-math-min-max
 
 > `readonly` **unicorn/prefer-math-min-max**: `PreferMathMinMax.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3706](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3706)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3927](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3927)
 
 ##### unicorn/prefer-math-trunc
 
 > `readonly` **unicorn/prefer-math-trunc**: `PreferMathTrunc.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3707](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3707)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3928](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3928)
 
 ##### unicorn/prefer-modern-dom-apis
 
 > `readonly` **unicorn/prefer-modern-dom-apis**: `PreferModernDomApis.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3708](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3708)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3929](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3929)
 
 ##### unicorn/prefer-modern-math-apis
 
 > `readonly` **unicorn/prefer-modern-math-apis**: `PreferModernMathApis.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3709](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3709)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3930](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3930)
 
 ##### unicorn/prefer-module
 
 > `readonly` **unicorn/prefer-module**: `PreferModule.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3710](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3710)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3931](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3931)
 
 ##### unicorn/prefer-native-coercion-functions
 
 > `readonly` **unicorn/prefer-native-coercion-functions**: `PreferNativeCoercionFunctions.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3711](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3711)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3932](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3932)
 
 ##### unicorn/prefer-negative-index
 
 > `readonly` **unicorn/prefer-negative-index**: `PreferNegativeIndex.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3712](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3712)
-
-##### unicorn/prefer-node-append
-
-> `readonly` **unicorn/prefer-node-append**: `PreferNodeAppend.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3755](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3755)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3933](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3933)
 
 ##### unicorn/prefer-node-protocol
 
 > `readonly` **unicorn/prefer-node-protocol**: `PreferNodeProtocol.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3713](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3713)
-
-##### unicorn/prefer-node-remove
-
-> `readonly` **unicorn/prefer-node-remove**: `PreferNodeRemove.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3756](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3756)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3934](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3934)
 
 ##### unicorn/prefer-number-properties
 
 > `readonly` **unicorn/prefer-number-properties**: `PreferNumberProperties.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3714](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3714)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3935](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3935)
 
 ##### unicorn/prefer-object-from-entries
 
 > `readonly` **unicorn/prefer-object-from-entries**: `PreferObjectFromEntries.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3715](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3715)
-
-##### unicorn/prefer-object-has-own
-
-> `readonly` **unicorn/prefer-object-has-own**: `PreferObjectHasOwn.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3757](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3757)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3936](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3936)
 
 ##### unicorn/prefer-optional-catch-binding
 
 > `readonly` **unicorn/prefer-optional-catch-binding**: `PreferOptionalCatchBinding.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3716](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3716)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3937](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3937)
 
 ##### unicorn/prefer-prototype-methods
 
 > `readonly` **unicorn/prefer-prototype-methods**: `PreferPrototypeMethods.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3717](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3717)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3938](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3938)
 
 ##### unicorn/prefer-query-selector
 
 > `readonly` **unicorn/prefer-query-selector**: `PreferQuerySelector.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3718](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3718)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3939](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3939)
 
 ##### unicorn/prefer-reflect-apply
 
 > `readonly` **unicorn/prefer-reflect-apply**: `PreferReflectApply.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3719](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3719)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3940](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3940)
 
 ##### unicorn/prefer-regexp-test
 
 > `readonly` **unicorn/prefer-regexp-test**: `PreferRegexpTest.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3720](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3720)
-
-##### unicorn/prefer-replace-all
-
-> `readonly` **unicorn/prefer-replace-all**: `PreferReplaceAll.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3758](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3758)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3941](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3941)
 
 ##### unicorn/prefer-set-has
 
 > `readonly` **unicorn/prefer-set-has**: `PreferSetHas.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3721](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3721)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3942](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3942)
 
 ##### unicorn/prefer-set-size
 
 > `readonly` **unicorn/prefer-set-size**: `PreferSetSize.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3722](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3722)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3943](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3943)
+
+##### unicorn/prefer-single-call
+
+> `readonly` **unicorn/prefer-single-call**: `PreferSingleCall.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3944](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3944)
 
 ##### unicorn/prefer-spread
 
 > `readonly` **unicorn/prefer-spread**: `PreferSpread.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3723](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3723)
-
-##### unicorn/prefer-starts-ends-with
-
-> `readonly` **unicorn/prefer-starts-ends-with**: `PreferStartsEndsWith.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3759](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3759)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3945](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3945)
 
 ##### unicorn/prefer-string-raw
 
 > `readonly` **unicorn/prefer-string-raw**: `PreferStringRaw.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3724](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3724)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3946](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3946)
 
 ##### unicorn/prefer-string-replace-all
 
 > `readonly` **unicorn/prefer-string-replace-all**: `PreferStringReplaceAll.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3725](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3725)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3947](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3947)
 
 ##### unicorn/prefer-string-slice
 
 > `readonly` **unicorn/prefer-string-slice**: `PreferStringSlice.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3726](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3726)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3948](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3948)
 
 ##### unicorn/prefer-string-starts-ends-with
 
 > `readonly` **unicorn/prefer-string-starts-ends-with**: `PreferStringStartsEndsWith.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3727](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3727)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3949](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3949)
 
 ##### unicorn/prefer-string-trim-start-end
 
 > `readonly` **unicorn/prefer-string-trim-start-end**: `PreferStringTrimStartEnd.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3728](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3728)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3950](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3950)
 
 ##### unicorn/prefer-structured-clone
 
 > `readonly` **unicorn/prefer-structured-clone**: `PreferStructuredClone.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3729](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3729)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3951](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3951)
 
 ##### unicorn/prefer-switch
 
 > `readonly` **unicorn/prefer-switch**: `PreferSwitch.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3730](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3730)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3952](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3952)
 
 ##### unicorn/prefer-ternary
 
 > `readonly` **unicorn/prefer-ternary**: `PreferTernary.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3731](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3731)
-
-##### unicorn/prefer-text-content
-
-> `readonly` **unicorn/prefer-text-content**: `PreferTextContent.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3760](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3760)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3953](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3953)
 
 ##### unicorn/prefer-top-level-await
 
 > `readonly` **unicorn/prefer-top-level-await**: `PreferTopLevelAwait.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3732](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3732)
-
-##### unicorn/prefer-trim-start-end
-
-> `readonly` **unicorn/prefer-trim-start-end**: `PreferTrimStartEnd.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3761](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3761)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3954](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3954)
 
 ##### unicorn/prefer-type-error
 
 > `readonly` **unicorn/prefer-type-error**: `PreferTypeError.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3733](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3733)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3955](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3955)
 
 ##### unicorn/prevent-abbreviations
 
 > `readonly` **unicorn/prevent-abbreviations**: `PreventAbbreviations.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3734](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3734)
-
-##### unicorn/regex-shorthand
-
-> `readonly` **unicorn/regex-shorthand**: `RegexShorthand.RuleEntry`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3762](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3762)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3956](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3956)
 
 ##### unicorn/relative-url-style
 
 > `readonly` **unicorn/relative-url-style**: `RelativeUrlStyle.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3735](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3735)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3957](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3957)
 
 ##### unicorn/require-array-join-separator
 
 > `readonly` **unicorn/require-array-join-separator**: `RequireArrayJoinSeparator.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3736](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3736)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3958](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3958)
+
+##### unicorn/require-module-attributes
+
+> `readonly` **unicorn/require-module-attributes**: `RequireModuleAttributes.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3959](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3959)
+
+##### unicorn/require-module-specifiers
+
+> `readonly` **unicorn/require-module-specifiers**: `RequireModuleSpecifiers.RuleEntry`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3960](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3960)
 
 ##### unicorn/require-number-to-fixed-digits-argument
 
 > `readonly` **unicorn/require-number-to-fixed-digits-argument**: `RequireNumberToFixedDigitsArgument.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3737](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3737)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3961](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3961)
 
 ##### unicorn/require-post-message-target-origin
 
 > `readonly` **unicorn/require-post-message-target-origin**: `RequirePostMessageTargetOrigin.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3738](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3738)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3962](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3962)
 
 ##### unicorn/string-content
 
 > `readonly` **unicorn/string-content**: `StringContent.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3739](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3739)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3963](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3963)
 
 ##### unicorn/switch-case-braces
 
 > `readonly` **unicorn/switch-case-braces**: `SwitchCaseBraces.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3740](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3740)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3964](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3964)
 
 ##### unicorn/template-indent
 
 > `readonly` **unicorn/template-indent**: `TemplateIndent.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3741](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3741)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3965](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3965)
 
 ##### unicorn/text-encoding-identifier-case
 
 > `readonly` **unicorn/text-encoding-identifier-case**: `TextEncodingIdentifierCase.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3742](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3742)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3966](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3966)
 
 ##### unicorn/throw-new-error
 
 > `readonly` **unicorn/throw-new-error**: `ThrowNewError.RuleEntry`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3743](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3743)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3967](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3967)
 
 ---
 
@@ -862,7 +868,7 @@ Defined in: [src/types/rules/eslint-unicorn-rules.mts:3743](https://github.com/n
 
 > **EslintUnicornRulesOption** = `object`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3765](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3765)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3975](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3975)
 
 #### Properties
 
@@ -870,178 +876,208 @@ Defined in: [src/types/rules/eslint-unicorn-rules.mts:3765](https://github.com/n
 
 > `readonly` **unicorn/better-regex**: `BetterRegex.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3766](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3766)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3976](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3976)
 
 ##### unicorn/catch-error-name
 
 > `readonly` **unicorn/catch-error-name**: `CatchErrorName.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3767](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3767)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3977](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3977)
 
 ##### unicorn/consistent-function-scoping
 
 > `readonly` **unicorn/consistent-function-scoping**: `ConsistentFunctionScoping.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3768](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3768)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3978](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3978)
+
+##### unicorn/escape-case
+
+> `readonly` **unicorn/escape-case**: `EscapeCase.Options`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3979](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3979)
 
 ##### unicorn/expiring-todo-comments
 
 > `readonly` **unicorn/expiring-todo-comments**: `ExpiringTodoComments.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3769](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3769)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3980](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3980)
 
 ##### unicorn/explicit-length-check
 
 > `readonly` **unicorn/explicit-length-check**: `ExplicitLengthCheck.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3770](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3770)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3981](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3981)
 
 ##### unicorn/filename-case
 
 > `readonly` **unicorn/filename-case**: `FilenameCase.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3771](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3771)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3982](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3982)
 
 ##### unicorn/import-style
 
 > `readonly` **unicorn/import-style**: `ImportStyle.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3772](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3772)
-
-##### unicorn/no-array-push-push
-
-> `readonly` **unicorn/no-array-push-push**: `NoArrayPushPush.Options`
-
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3773](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3773)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3983](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3983)
 
 ##### unicorn/no-array-reduce
 
 > `readonly` **unicorn/no-array-reduce**: `NoArrayReduce.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3774](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3774)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3984](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3984)
+
+##### unicorn/no-array-reverse
+
+> `readonly` **unicorn/no-array-reverse**: `NoArrayReverse.Options`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3985](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3985)
+
+##### unicorn/no-array-sort
+
+> `readonly` **unicorn/no-array-sort**: `NoArraySort.Options`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3986](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3986)
+
+##### unicorn/no-instanceof-builtins
+
+> `readonly` **unicorn/no-instanceof-builtins**: `NoInstanceofBuiltins.Options`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3987](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3987)
 
 ##### unicorn/no-keyword-prefix
 
 > `readonly` **unicorn/no-keyword-prefix**: `NoKeywordPrefix.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3775](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3775)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3988](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3988)
 
 ##### unicorn/no-null
 
 > `readonly` **unicorn/no-null**: `NoNull.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3776](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3776)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3989](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3989)
 
 ##### unicorn/no-typeof-undefined
 
 > `readonly` **unicorn/no-typeof-undefined**: `NoTypeofUndefined.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3777](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3777)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3990](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3990)
 
 ##### unicorn/no-unnecessary-polyfills
 
 > `readonly` **unicorn/no-unnecessary-polyfills**: `NoUnnecessaryPolyfills.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3778](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3778)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3991](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3991)
 
 ##### unicorn/no-useless-undefined
 
 > `readonly` **unicorn/no-useless-undefined**: `NoUselessUndefined.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3779](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3779)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3992](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3992)
+
+##### unicorn/number-literal-case
+
+> `readonly` **unicorn/number-literal-case**: `NumberLiteralCase.Options`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3993](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3993)
 
 ##### unicorn/numeric-separators-style
 
 > `readonly` **unicorn/numeric-separators-style**: `NumericSeparatorsStyle.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3780](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3780)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3994](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3994)
 
 ##### unicorn/prefer-add-event-listener
 
 > `readonly` **unicorn/prefer-add-event-listener**: `PreferAddEventListener.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3781](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3781)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3995](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3995)
 
 ##### unicorn/prefer-array-find
 
 > `readonly` **unicorn/prefer-array-find**: `PreferArrayFind.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3782](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3782)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3996](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3996)
 
 ##### unicorn/prefer-array-flat
 
 > `readonly` **unicorn/prefer-array-flat**: `PreferArrayFlat.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3783](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3783)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3997](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3997)
 
 ##### unicorn/prefer-at
 
 > `readonly` **unicorn/prefer-at**: `PreferAt.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3784](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3784)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3998](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3998)
 
 ##### unicorn/prefer-export-from
 
 > `readonly` **unicorn/prefer-export-from**: `PreferExportFrom.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3785](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3785)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:3999](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3999)
 
 ##### unicorn/prefer-number-properties
 
 > `readonly` **unicorn/prefer-number-properties**: `PreferNumberProperties.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3786](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3786)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:4000](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L4000)
 
 ##### unicorn/prefer-object-from-entries
 
 > `readonly` **unicorn/prefer-object-from-entries**: `PreferObjectFromEntries.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3787](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3787)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:4001](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L4001)
+
+##### unicorn/prefer-single-call
+
+> `readonly` **unicorn/prefer-single-call**: `PreferSingleCall.Options`
+
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:4002](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L4002)
 
 ##### unicorn/prefer-structured-clone
 
 > `readonly` **unicorn/prefer-structured-clone**: `PreferStructuredClone.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3788](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3788)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:4003](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L4003)
 
 ##### unicorn/prefer-switch
 
 > `readonly` **unicorn/prefer-switch**: `PreferSwitch.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3789](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3789)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:4004](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L4004)
 
 ##### unicorn/prefer-ternary
 
 > `readonly` **unicorn/prefer-ternary**: `PreferTernary.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3790](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3790)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:4005](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L4005)
 
 ##### unicorn/prevent-abbreviations
 
 > `readonly` **unicorn/prevent-abbreviations**: `PreventAbbreviations.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3791](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3791)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:4006](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L4006)
 
 ##### unicorn/relative-url-style
 
 > `readonly` **unicorn/relative-url-style**: `RelativeUrlStyle.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3792](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3792)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:4007](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L4007)
 
 ##### unicorn/string-content
 
 > `readonly` **unicorn/string-content**: `StringContent.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3793](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3793)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:4008](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L4008)
 
 ##### unicorn/switch-case-braces
 
 > `readonly` **unicorn/switch-case-braces**: `SwitchCaseBraces.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3794](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3794)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:4009](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L4009)
 
 ##### unicorn/template-indent
 
 > `readonly` **unicorn/template-indent**: `TemplateIndent.Options`
 
-Defined in: [src/types/rules/eslint-unicorn-rules.mts:3795](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L3795)
+Defined in: [src/types/rules/eslint-unicorn-rules.mts:4010](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L4010)
