@@ -1,3 +1,9 @@
+# [1.2.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.1.2...v1.2.0) (2025-09-10)
+
+### Features
+
+- update rule setting of unicorn/no-instanceof-builtins ([#32](https://github.com/noshiro-pf/eslint-config-typed/issues/32)) ([f8df2d0](https://github.com/noshiro-pf/eslint-config-typed/commit/f8df2d092d3eb11a0a64d9e204e4e8d22fa91552))
+
 ## [1.1.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.1.1...v1.1.2) (2025-09-10)
 
 ### Bug Fixes
