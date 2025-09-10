@@ -185,7 +185,13 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/prefer-global-this': 'error',
   'unicorn/prefer-math-min-max': 'error',
 
-  'unicorn/no-instanceof-builtins': 'error',
+  'unicorn/no-instanceof-builtins': [
+    'error',
+    {
+      strategy: 'strict',
+      useErrorIsError: true,
+    },
+  ],
   'unicorn/consistent-assert': 'error',
   'unicorn/consistent-date-clone': 'error',
   'unicorn/no-accessor-recursion': 'error',
