@@ -1,3 +1,9 @@
+# [1.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.0.3...v1.1.0) (2025-09-10)
+
+### Features
+
+- fix rule settings and enable @typescript-eslint/dot-notation ([#31](https://github.com/noshiro-pf/eslint-config-typed/issues/31)) ([324481a](https://github.com/noshiro-pf/eslint-config-typed/commit/324481a55c9fa6ab4d0f7de6a919b6ec44a98eee))
+
 ## [1.0.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.0.2...v1.0.3) (2025-08-24)
 
 ### Bug Fixes
