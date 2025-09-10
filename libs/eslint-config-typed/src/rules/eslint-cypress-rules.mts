@@ -11,4 +11,6 @@ export const eslintCypressRules: EslintCypressRules = {
   'cypress/unsafe-to-chain-command': 'error',
   'cypress/no-async-before': 'error',
   'cypress/no-debug': 'error',
+  'cypress/no-chained-get': 'error',
+  'cypress/no-xpath': 'error',
 } as const;
