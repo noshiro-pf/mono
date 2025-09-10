@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.1.0...v1.1.1) (2025-09-10)
+
+### Bug Fixes
+
+- bump eslint-plugin-unicorn from 56.0.1 to 61.0.1 ([#29](https://github.com/noshiro-pf/eslint-config-typed/issues/29)) ([606f9a7](https://github.com/noshiro-pf/eslint-config-typed/commit/606f9a71ed2525a9fe614db932d1a75b099f7770))
+
 # [1.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.0.3...v1.1.0) (2025-09-10)
 
 ### Features
