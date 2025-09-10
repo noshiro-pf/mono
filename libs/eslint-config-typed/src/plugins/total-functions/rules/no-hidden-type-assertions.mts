@@ -197,7 +197,7 @@ const hasTypeNode = (
   typeElement: TypeElement,
 ): typeElement is TypeElement & Readonly<{ type: TypeNode }> => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     const typeAttr = (typeElement as Partial<Readonly<{ type: TypeNode }>>)
       .type;
     return typeAttr !== undefined && isTypeNode(typeAttr);

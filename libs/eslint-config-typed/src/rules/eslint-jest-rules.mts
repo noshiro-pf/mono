@@ -1,7 +1,7 @@
 import { type EslintJestRules } from '../types/index.mjs';
 
 export const eslintJestRules: EslintJestRules = {
-  /* vitest, playwright と共通のルール（設定値をなるべく合わせる） */
+  /* Rules common with vitest and playwright (keep settings aligned) */
   'jest/expect-expect': 'error',
   'jest/max-expects': 'off',
   'jest/max-nested-describe': 'error',
@@ -33,7 +33,7 @@ export const eslintJestRules: EslintJestRules = {
   'jest/valid-expect': 'error',
   'jest/valid-title': 'off',
 
-  /* vitest と共通のルール（設定値をなるべく合わせる） */
+  /* Rules common with vitest (keep settings aligned) */
   'jest/consistent-test-it': ['error', { fn: 'test' }],
   'jest/no-alias-methods': 'error',
   'jest/no-disabled-tests': 'error',
@@ -61,7 +61,7 @@ export const eslintJestRules: EslintJestRules = {
   'jest/prefer-spy-on': 'error',
   'jest/prefer-todo': 'error',
 
-  /* eslint-plugin-jest 独自ルール */
+  /* eslint-plugin-jest specific rules */
 
   'jest/no-confusing-set-timeout': 'error',
   'jest/no-deprecated-functions': 'error',

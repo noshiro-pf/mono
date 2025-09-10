@@ -88,9 +88,11 @@ const defineConfig = () => [
     ...eslintFlatConfigForTypeScript({
         tsconfigRootDir: thisDir,
         tsconfigFileName: './tsconfig.json',
-        packageDirs: [path.resolve(thisDir, '../../..'), thisDir],
+        packageDirs: [thisDir],
+
+        // If you are using mono repo and the root package.json is in ../../../ :
+        // packageDirs: [path.resolve(thisDir, '../../..'), thisDir],
     }),
-    ...eslintFlatConfigForReact(),
     eslintFlatConfigForVitest(),
 
     // You can override per-rule settings if necessary.

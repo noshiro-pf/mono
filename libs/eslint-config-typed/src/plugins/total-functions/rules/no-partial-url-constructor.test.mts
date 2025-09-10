@@ -98,7 +98,7 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
         },
       ],
     },
-    // TODO: テストケース復元する
+    // TODO: Restore test cases
     // {
     //   filename: 'file.ts',
     //   code: `

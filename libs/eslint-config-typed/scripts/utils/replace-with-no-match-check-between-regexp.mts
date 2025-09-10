@@ -9,36 +9,37 @@ import { sliceByMatch } from './slice-by-match.mjs';
  * @throws {Error} If no match is found.
  */
 export const replaceWithNoMatchCheckBetweenRegexp =
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   ({
-    startRegexp,
-    endRegexp,
-    mapFn,
-    options,
-  }: Readonly<{
-    startRegexp: RegExp | string;
-    endRegexp: RegExp | string | undefined;
-    mapFn: (slice: string) => string;
-    options?: Readonly<
-      | {
-          onNotFound: 'off';
-          onNoChange: 'off';
-        }
-      | {
-          onNotFound: 'warn';
-          onNoChange: 'off' | 'warn';
-        }
-      | {
-          onNotFound: 'throw';
-          onNoChange: 'off' | 'throw' | 'warn';
-        }
-    >;
-  }>) =>
-  (target: string): string => {
-    const slice = sliceByMatch({
-      target,
       startRegexp,
       endRegexp,
-    });
+      mapFn,
+      options,
+    }: Readonly<{
+      startRegexp: RegExp | string;
+      endRegexp: RegExp | string | undefined;
+      mapFn: (slice: string) => string;
+      options?: Readonly<
+        | {
+            onNotFound: 'off';
+            onNoChange: 'off';
+          }
+        | {
+            onNotFound: 'warn';
+            onNoChange: 'off' | 'warn';
+          }
+        | {
+            onNotFound: 'throw';
+            onNoChange: 'off' | 'throw' | 'warn';
+          }
+      >;
+    }>) =>
+    (target: string): string => {
+      const slice = sliceByMatch({
+        target,
+        startRegexp,
+        endRegexp,
+      });
 
-    return replaceWithNoMatchCheck(slice, mapFn(slice), options)(target);
-  };
+      return replaceWithNoMatchCheck(slice, mapFn(slice), options)(target);
+    };

@@ -1,7 +1,7 @@
 import { type EslintVitestRules } from '../types/index.mjs';
 
 export const eslintVitestRules: EslintVitestRules = {
-  /* jest, playwright と共通のルール（設定値をなるべく合わせる） */
+  /* Rules common with jest and playwright (keep settings aligned) */
   'vitest/expect-expect': 'error',
   'vitest/max-expects': 'off',
   'vitest/max-nested-describe': 'error',
@@ -33,7 +33,7 @@ export const eslintVitestRules: EslintVitestRules = {
   'vitest/valid-expect': 'error',
   'vitest/valid-title': 'off',
 
-  /* jest と共通のルール（設定値をなるべく合わせる） */
+  /* Rules common with jest (keep settings aligned) */
 
   'vitest/consistent-test-it': ['error', { fn: 'test' }],
   'vitest/no-alias-methods': 'error',
@@ -62,15 +62,15 @@ export const eslintVitestRules: EslintVitestRules = {
   'vitest/prefer-spy-on': 'error',
   'vitest/prefer-todo': 'error',
 
-  /* eslint-plugin-vitest 独自ルール */
+  /* eslint-plugin-vitest specific rules */
 
-  // inline test を書けなくなるのでオフ
+  // Off to allow writing inline tests
   'vitest/no-conditional-tests': 'off',
 
   'vitest/consistent-test-filename': 'error',
   'vitest/no-import-node-test': 'error',
 
-  // toBeFalsy() は toBe(false) より緩いのでこれらのルールは却下
+  // Reject these rules because toBeFalsy() is looser than toBe(false)
   'vitest/prefer-to-be-falsy': 'off',
   'vitest/prefer-to-be-truthy': 'off',
 

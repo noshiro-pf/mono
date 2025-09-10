@@ -3,6 +3,11 @@
     "./configs/tsconfig/tsconfig.type-check.json",
     "./configs/tsconfig/tsconfig.vite.json"
   ],
+  "compilerOptions": {
+    "paths": {
+      "eslint-config-typed": ["./dist/index.mjs"]
+    }
+  },
   "include": [
     "./src",
     "./scripts",

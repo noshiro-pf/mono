@@ -41,7 +41,7 @@ export const noRestrictedSyntax: Rule.RuleModule = {
   create: (context: DeepReadonly<Rule.RuleContext>) =>
     context.options.reduce(
       (result: UnknownRecord, selectorOrObject: unknown) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         const selectorOrObjectCasted = selectorOrObject as
           | string
           | Readonly<{ selector: string; message?: string }>;
@@ -61,7 +61,7 @@ export const noRestrictedSyntax: Rule.RuleModule = {
 
         // eslint-disable-next-line functional/immutable-data
         return Object.assign(result, {
-          // eslint-disable-next-line prefer-arrow-functions/prefer-arrow-functions
+          // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
           [selector](node: ESTree.Node) {
             context.report({
               node,

@@ -1,7 +1,7 @@
 import { type EslintPlaywrightRules } from '../types/index.mjs';
 
 export const eslintPlaywrightRules: EslintPlaywrightRules = {
-  /* vitest と共通のルール（設定値をなるべく合わせる） */
+  /* Rules common with vitest (keep settings aligned) */
   'playwright/expect-expect': 'error',
   'playwright/max-expects': 'off',
   'playwright/max-nested-describe': 'error',
@@ -33,7 +33,7 @@ export const eslintPlaywrightRules: EslintPlaywrightRules = {
   'playwright/valid-expect': 'error',
   'playwright/valid-title': 'off',
 
-  /* eslint-plugin-playwright 独自ルール */
+  /* eslint-plugin-playwright specific rules */
 
   'playwright/missing-playwright-await': 'error',
   'playwright/no-element-handle': 'error',

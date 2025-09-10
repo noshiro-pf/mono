@@ -1,4 +1,5 @@
 import { type DeprecatedInfo } from '@eslint/core';
+
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { type JSONSchema4 } from 'json-schema';
 import { compile, type Options } from 'json-schema-to-typescript';
@@ -197,7 +198,7 @@ const createResult = async (
           /* e.g. "export type Options = { ... };" */
 
           const optionsType = await compile(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             sc as JSONSchema4,
             'Options',
             compilerConfig,
@@ -224,12 +225,8 @@ const createResult = async (
 
           const optionsTypeList: readonly string[] = await Promise.all(
             schema.map((s, index) =>
-              compile(
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-                s as JSONSchema4,
-                `Options${index}`,
-                compilerConfig,
-              ),
+              // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+              compile(s as JSONSchema4, `Options${index}`, compilerConfig),
             ),
           ).catch((error) => {
             throw new Error(toStr(error));
@@ -339,18 +336,18 @@ export const generateRulesTypeCore = async (
 ): Promise<string> => {
   const rules: DeepReadonly<[string, Rule][]> =
     pluginName === 'eslint'
-      ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (deepCopy(
           // eslint-disable-next-line @typescript-eslint/no-deprecated
           Array.from(builtinRules.entries()),
         ) as unknown as DeepReadonly<[string, Rule][]>)
       : pluginName === eslintPlugins.EslintTotalFunctions.pluginName
-        ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           (Object.entries(totalFunctionsRules) as unknown as DeepReadonly<
             [string, Rule][]
           >)
         : pluginName === eslintPlugins.EslintTreeShakable.pluginName
-          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             (Object.entries(treeShakableRules) as unknown as DeepReadonly<
               [string, Rule][]
             >)
@@ -358,11 +355,11 @@ export const generateRulesTypeCore = async (
                 eslintPlugins.EslintPreferArrowFunctionRules.pluginName ||
               pluginName === eslintPlugins.EslintImportsRules.pluginName
             ? (Object.entries(
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-member-access, import/dynamic-import-chunkname, unicorn/no-await-expression-member
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, import/dynamic-import-chunkname, unicorn/no-await-expression-member, total-functions/no-unsafe-type-assertion
                 (await import(pluginName)).rules as Rules,
               ) satisfies DeepReadonly<[string, Rule][]>)
             : (Object.entries(
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-member-access, import/dynamic-import-chunkname, unicorn/no-await-expression-member
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, import/dynamic-import-chunkname, unicorn/no-await-expression-member, total-functions/no-unsafe-type-assertion
                 (await import(pluginName)).default.rules as Rules,
               ) satisfies DeepReadonly<[string, Rule][]>);
 

@@ -26,7 +26,7 @@ export const eslintReactRules: EslintReactRules = {
   'react/button-has-type': 'error',
   'react/default-props-match-prop-types': 'error',
 
-  /** Props を展開して使うかどうかを統一する。 */
+  /** Enforce consistent usage of props destructuring. */
   'react/destructuring-assignment': 'error',
 
   'react/display-name': 'error',
@@ -42,9 +42,11 @@ export const eslintReactRules: EslintReactRules = {
   'react/hook-use-state': 'off',
   'react/iframe-missing-sandbox': 'error',
   'react/jsx-boolean-value': ['error', 'never'],
+
+  // Enable to avoid rendering differences with characters like \n
   'react/jsx-curly-brace-presence': ['error', 'always'],
 
-  /** ファイル名の統一 */
+  /** Enforce consistent file naming */
   'react/jsx-filename-extension': ['error', { extensions: ['.tsx'] }],
 
   'react/jsx-fragments': 'error',
@@ -52,7 +54,7 @@ export const eslintReactRules: EslintReactRules = {
   'react/jsx-key': 'error',
   'react/jsx-max-depth': 'off', // disabled
 
-  /** JSXに直接コールバック関数を書くのを禁止する。 修正方法： React.useCallback を使うようにする。 */
+  /** Prohibit inline callback functions in JSX. Fix: Use React.useCallback. */
   'react/jsx-no-bind': 'error',
 
   'react/jsx-no-comment-textnodes': 'error',
@@ -60,8 +62,9 @@ export const eslintReactRules: EslintReactRules = {
   'react/jsx-no-duplicate-props': 'error',
 
   /**
-   * JSXに文字列を直接書くのを避け `<div>{"aaa"}</div>` のように書くことを強制する。 変数に `{}`
-   * を付け忘れるミスに気づきやすくなったり syntax highlighting で読みやすくなるなどのメリットがある。
+   * Avoid writing strings directly in JSX, enforce using `<div>{"aaa"}</div>`
+   * format. Benefits: Easier to catch missing `{}` around variables, better
+   * syntax highlighting for readability.
    */
   'react/jsx-no-literals': 'error',
 
@@ -71,7 +74,10 @@ export const eslintReactRules: EslintReactRules = {
   'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }],
   'react/jsx-pascal-case': 'error',
 
-  /** `{...props}` 形式でpropsを渡すと props の過不足のチェックが甘くなるため */
+  /**
+   * Avoid `{...props}` spread as it weakens type checking for props
+   * excess/shortage
+   */
   'react/jsx-props-no-spreading': 'error',
 
   'react/jsx-sort-props': [
@@ -81,7 +87,7 @@ export const eslintReactRules: EslintReactRules = {
 
   'react/jsx-uses-react': 'off', // disabled
 
-  /** ファイル名の統一 */
+  /** Enforce consistent file naming */
   'react/jsx-uses-vars': 'error',
 
   'react/no-access-state-in-setstate': 'error',
@@ -113,7 +119,7 @@ export const eslintReactRules: EslintReactRules = {
   'react/no-typos': 'error',
   'react/no-unescaped-entities': 'error',
 
-  // @emotion/react の css prop を使用するため
+  // Allow css prop for @emotion/react
   'react/no-unknown-property': ['error', { ignore: ['css'] }],
 
   'react/no-unsafe': 'error',
@@ -128,7 +134,7 @@ export const eslintReactRules: EslintReactRules = {
   'react/prefer-read-only-props': 'error',
   'react/prefer-stateless-function': 'error',
 
-  /** TypeScript では不要 */
+  /** Not needed with TypeScript */
   'react/prop-types': 'off',
 
   'react/react-in-jsx-scope': 'off', // disabled

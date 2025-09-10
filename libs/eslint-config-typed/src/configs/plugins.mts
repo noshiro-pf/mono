@@ -99,11 +99,11 @@ export const plugins: Record<
   'prefer-arrow-functions': eslintPluginPreferArrowFunctions,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   promise: eslintPluginPromise,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   react: eslintPluginReact as unknown as ESLintPlugin,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'react-hooks': eslintPluginReactHooks,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   'react-refresh': eslintPluginReactRefresh as unknown as ESLintPlugin,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'react-perf': eslintPluginReactPerf,

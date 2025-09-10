@@ -1,4 +1,6 @@
 import { type RuleDefinition } from '@eslint/core';
+
+// eslint-disable-next-line import/no-internal-modules
 import { type FlatConfig as FlatConfig_ } from '@typescript-eslint/utils/ts-eslint';
 
 export type FlatConfig = DeepReadonly<FlatConfig_.Config>;

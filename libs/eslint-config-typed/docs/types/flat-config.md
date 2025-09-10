@@ -12,7 +12,7 @@
 
 > **ESLintPlugin** = `DeepReadonly`\<`FlatConfig_.Plugin`\>
 
-Defined in: [src/types/flat-config.mts:7](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L7)
+Defined in: [src/types/flat-config.mts:9](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L9)
 
 ---
 
@@ -20,7 +20,7 @@ Defined in: [src/types/flat-config.mts:7](https://github.com/noshiro-pf/eslint-c
 
 > **FlatConfig** = `DeepReadonly`\<`FlatConfig_.Config`\>
 
-Defined in: [src/types/flat-config.mts:4](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L4)
+Defined in: [src/types/flat-config.mts:6](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L6)
 
 ---
 
@@ -28,7 +28,7 @@ Defined in: [src/types/flat-config.mts:4](https://github.com/noshiro-pf/eslint-c
 
 > **Rule** = `DeepReadonly`\<`RuleDefinition`\>
 
-Defined in: [src/types/flat-config.mts:9](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L9)
+Defined in: [src/types/flat-config.mts:11](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L11)
 
 ---
 
@@ -36,4 +36,4 @@ Defined in: [src/types/flat-config.mts:9](https://github.com/noshiro-pf/eslint-c
 
 > **Rules** = `Record`\<`string`, [`Rule`](#rule)\>
 
-Defined in: [src/types/flat-config.mts:13](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L13)
+Defined in: [src/types/flat-config.mts:15](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L15)

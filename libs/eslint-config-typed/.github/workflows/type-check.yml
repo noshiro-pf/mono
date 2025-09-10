@@ -24,14 +24,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    strategy:
-      fail-fast: true
-      matrix:
-        command:
-          - test:cov
-          - lint:fix
-          - build
-
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Checkout
@@ -56,9 +48,17 @@ jobs:
         id: check_diff_type
         run: npm exec check-should-run-type-checks
 
-      - name: Run "${{ matrix.command }}"
+      - name: Run build
         if: steps.check_diff_type.outputs.should_run == 'true'
-        run: npm run ${{ matrix.command }}
+        run: npm run build
+
+      - name: Run lint
+        if: steps.check_diff_type.outputs.should_run == 'true'
+        run: npm run lint
+
+      - name: Run tests
+        if: steps.check_diff_type.outputs.should_run == 'true'
+        run: npm run test
 
       - name: Check if there is no file diff
         run: npm exec assert-repo-is-clean

@@ -12,7 +12,7 @@ export const banTypes: TypeScriptEslintRulesOption['@typescript-eslint/no-restri
     },
   } as const;
 
-// Note: 同名の name の path を複数回定義すると後から定義したもので上書きされている可能性あり
+// Note: If paths with the same name are defined multiple times, later definitions may overwrite earlier ones
 export const restrictedImportsOption: RestrictedImportsOption = {
   paths: [
     {
@@ -66,12 +66,11 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   ],
   '@typescript-eslint/default-param-last': 'error',
 
-  /** Prefer noPropertyAccessFromIndexSignature */
-  '@typescript-eslint/dot-notation': 'off',
-  // '@typescript-eslint/dot-notation': [
-  //   'error',
-  //   { allowIndexSignaturePropertyAccess: true },
-  // ],
+  /** Related to noPropertyAccessFromIndexSignature tsc option */
+  '@typescript-eslint/dot-notation': [
+    'error',
+    { allowIndexSignaturePropertyAccess: true },
+  ],
 
   '@typescript-eslint/explicit-function-return-type': [
     'error',
@@ -95,7 +94,8 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/member-ordering': 'off', // disabled
 
   /**
-   * 関数メンバーをメソッド記法で書くと双変になり安全性が低くなるため
+   * Function members written in method notation become bivariant, reducing type
+   * safety
    * https://github.com/Microsoft/TypeScript/wiki/FAQ#why-are-function-parameters-bivariant
    */
   '@typescript-eslint/method-signature-style': 'error',
@@ -116,7 +116,7 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-for-in-array': 'error',
   '@typescript-eslint/no-implied-eval': 'error',
 
-  /** 型を明示的に書きたい場合もあるためオフに */
+  /** Off to allow explicit type annotations when desired */
   '@typescript-eslint/no-inferrable-types': 'off', // disabled
 
   '@typescript-eslint/no-invalid-this': 'error',
@@ -128,7 +128,7 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-misused-promises': [
     'error',
     {
-      checksConditionals: false, // strict-boolean-expression で十分
+      checksConditionals: false, // strict-boolean-expression is sufficient
     },
   ],
   '@typescript-eslint/no-namespace': 'off', // disabled
@@ -287,7 +287,10 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/prefer-string-starts-ends-with': 'error',
   '@typescript-eslint/promise-function-async': 'off', // disabled
 
-  /** `sort` はデフォルトで文字列としての比較を行うため、数値のソートを行おうとしたときに比較関数を忘れることを防ぐため使用。 */
+  /**
+   * Prevent forgetting compare function when sorting numbers, as `sort`
+   * defaults to string comparison.
+   */
   '@typescript-eslint/require-array-sort-compare': [
     'error',
     { ignoreStringArrays: true },
@@ -295,9 +298,10 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/require-await': 'error',
 
   /**
-   * `+` の曖昧性回避のため使用。 restrict-plus-operands で bigint, number, string
-   * 同士にしか使用できないように制限し、 prefer-template で文字列の連結に `+` を使うことも禁止する。 修正方法： template
-   * literal を使うか、文字列の配列を `join("")` で結合する。
+   * Used to avoid ambiguity with `+` operator. restrict-plus-operands limits
+   * usage to only bigint, number, string types, and prefer-template prohibits
+   * using `+` for string concatenation. Fix: Use template literals or join
+   * string arrays with `join("")`.
    *
    * - A + b -> `${a}${b}`
    * - S_1 + s_2 + ... + s_n -> [s_1, ..., s_n].join("")
@@ -328,15 +332,15 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/return-await': 'error',
 
   /**
-   * Boolean への暗黙のキャストを回避するために使用。 数値 `0`, `NaN` や 文字列 `""` が条件部に来たときに false
-   * として扱われるのを 見落とさないようにするため。
+   * Used to avoid implicit casting to Boolean. Prevents overlooking that
+   * numbers `0`, `NaN` and string `""` are treated as false in conditionals.
    */
   '@typescript-eslint/strict-boolean-expressions': [
     'error',
     { allowString: false, allowNumber: false, allowNullableObject: false },
   ],
 
-  /** Switch の case 漏れを防ぐ（型情報を使用） */
+  /** Prevent missing switch cases (using type information) */
   '@typescript-eslint/switch-exhaustiveness-check': [
     'error',
     {
@@ -389,14 +393,14 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-unnecessary-parameter-property-assignment': 'error',
   '@typescript-eslint/no-unnecessary-template-expression': 'error',
 
-  // 再帰型で無限ループが発生して落ちるバグがあるため一旦オフ
+  // Off temporarily due to bug causing infinite loop with recursive types
   '@typescript-eslint/no-unnecessary-type-parameters': 'off',
 
   '@typescript-eslint/no-unsafe-function-type': 'error',
   '@typescript-eslint/no-wrapper-object-types': 'error',
   '@typescript-eslint/no-deprecated': 'error',
 
-  // total-functions/no-unsafe-type-assertion の方が厳格なチェックができるようなのでこちらはオフ
+  // Off as total-functions/no-unsafe-type-assertion provides stricter checking
   '@typescript-eslint/no-unsafe-type-assertion': 'off',
 
   '@typescript-eslint/related-getter-setter-pairs': 'error',

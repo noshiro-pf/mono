@@ -70,17 +70,17 @@ export const restrictedGlobals = [
 export const restrictedGlobalsForFrontend = [
   ...restrictedGlobals,
   {
-    // react-router の location との曖昧性回避のため
+    // Avoid ambiguity with react-router's location
     name: 'location',
     message: "use 'window.location' instead.",
   },
   {
-    // react-router の history との曖昧性回避のため
+    // Avoid ambiguity with react-router's history
     name: 'history',
     message: "use 'window.history' instead.",
   },
   {
-    // react-router の navigator との曖昧性回避のため
+    // Avoid ambiguity with react-router's navigator
     name: 'navigator',
     message: "use 'window.navigator' instead.",
   },
@@ -180,7 +180,7 @@ export const eslintRules: EslintRules = {
       generators: 'never',
     },
   ],
-  'func-style': 'off', // 関数オーバーロードで偽陽性が出る
+  'func-style': 'off', // False positives with function overloads
   'grouped-accessor-pairs': 'error',
   'guard-for-in': 'error',
   'id-denylist': 'error',
@@ -224,7 +224,7 @@ export const eslintRules: EslintRules = {
   'no-empty-pattern': 'error',
   'no-empty-static-block': 'error',
   'no-empty': 'error',
-  'no-eq-null': 'off', // eqeqeqでnull許容するならoff
+  'no-eq-null': 'off', // off since eqeqeq allows null
   'no-eval': 'error',
   'no-ex-assign': 'error',
   'no-extend-native': 'error',
@@ -273,7 +273,10 @@ export const eslintRules: EslintRules = {
   'no-octal': 'error',
   'no-param-reassign': 'error',
 
-  /** `++x` や `x++` という式の値を使用しているコードは可読性が落ちやすいため警告を出す */
+  /**
+   * Warn against using the value of expressions like `++x` or `x++` as they
+   * reduce readability
+   */
   'no-plusplus': [
     'error',
     {
@@ -290,7 +293,8 @@ export const eslintRules: EslintRules = {
   'no-restricted-properties': 'error',
 
   /**
-   * 他ルールで実現しづらい禁止したい構文をここに書く。 以下のAST checker を用いて selector をどう書くべきか調べることができる。
+   * Write restricted syntax here that is difficult to achieve with other rules.
+   * Use the following AST checker to determine how to write selectors:
    *
    * AST checker:
    * https://typescript-eslint.io/play/#ts=4.7.2&sourceType=module&showAST=es
@@ -340,9 +344,10 @@ export const eslintRules: EslintRules = {
   'prefer-regex-literals': 'error',
 
   /**
-   * `+` の曖昧性回避のため使用。 restrict-plus-operands で bigint, number, string
-   * 同士にしか使用できないように制限し、 prefer-template で文字列の連結に `+` を使うことも禁止する。 修正方法： template
-   * literal を使うか、文字列の配列を `join("")` で結合する。
+   * Used to avoid ambiguity with `+` operator. restrict-plus-operands limits
+   * usage to only bigint, number, string types, and prefer-template prohibits
+   * using `+` for string concatenation. Fix: Use template literals or join
+   * string arrays with `join("")`.
    *
    *     - a + b -> `${a}${b}`
    *     - s_1 + s_2 + ... + s_n -> [s_1, ..., s_n].join("")

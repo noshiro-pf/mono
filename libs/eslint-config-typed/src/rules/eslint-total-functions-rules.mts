@@ -3,10 +3,10 @@ import { type EslintTotalFunctionsRules } from '../types/index.mjs';
 export const eslintTotalFunctionsRules: EslintTotalFunctionsRules = {
   'total-functions/require-strict-mode': 'error',
 
-  // @typescript-eslint/no-unsafe-type-assertion より厳しくチェックできることが分かったのでこちらを優先
+  // Prioritize this as it can check more strictly than @typescript-eslint/no-unsafe-type-assertion
   'total-functions/no-unsafe-type-assertion': 'error',
 
-  // 動作が重いのと偽陽性があるためオフ
+  // Off due to performance issues and false positives
   'total-functions/no-unsafe-readonly-mutable-assignment': 'off',
 
   'total-functions/no-unsafe-mutable-readonly-assignment': 'off',

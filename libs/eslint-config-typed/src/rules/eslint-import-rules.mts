@@ -1,7 +1,7 @@
 import { type EslintImportsRules } from '../types/index.mjs';
 
 export const eslintImportsRules: EslintImportsRules = {
-  // TypeScript を使っている場合このチェックは必要ない。
+  // Not needed when using TypeScript.
   'import/no-unresolved': 'off',
 
   'import/named': 'off',
@@ -110,7 +110,10 @@ export const eslintImportsRules: EslintImportsRules = {
   ],
   'import/no-named-default': 'off',
 
-  /** Default export は定義側のリネームが import する側に反映されないので禁止 */
+  /**
+   * Prohibit default exports as renaming on the definition side is not
+   * reflected on the import side
+   */
   'import/no-default-export': 'error',
 
   'import/no-named-export': 'off',
@@ -118,7 +121,7 @@ export const eslintImportsRules: EslintImportsRules = {
   'import/group-exports': 'off',
   'import/dynamic-import-chunkname': 'error',
   'import/no-empty-named-blocks': 'error',
-  'import/enforce-node-protocol-usage': 'error',
+  'import/enforce-node-protocol-usage': ['error', 'always'],
 
   // deprecated rules
   'import/imports-first': 0,

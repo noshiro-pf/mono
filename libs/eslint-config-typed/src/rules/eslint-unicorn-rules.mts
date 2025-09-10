@@ -13,7 +13,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/better-regex': 'error',
   'unicorn/catch-error-name': 'error',
 
-  /** Props を展開して使うかどうかを統一する。 */
+  /** Enforce consistent usage of destructuring. */
   'unicorn/consistent-destructuring': 'error',
 
   'unicorn/consistent-function-scoping': 'error',
@@ -23,7 +23,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/expiring-todo-comments': 'error',
   'unicorn/explicit-length-check': 'off',
 
-  /** ファイル名の統一 */
+  /** Enforce consistent file naming */
   'unicorn/filename-case': [
     'error',
     {
