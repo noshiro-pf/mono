@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.1.1...v1.1.2) (2025-09-10)
+
+### Bug Fixes
+
+- bump eslint-plugin-cypress from 4.1.0 to 5.1.1 ([#24](https://github.com/noshiro-pf/eslint-config-typed/issues/24)) ([ee84e82](https://github.com/noshiro-pf/eslint-config-typed/commit/ee84e82214c24627f8c8880d9dd4df376e257b52))
+
 ## [1.1.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.1.0...v1.1.1) (2025-09-10)
 
 ### Bug Fixes
