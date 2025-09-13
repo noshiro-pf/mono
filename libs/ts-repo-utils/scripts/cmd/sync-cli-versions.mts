@@ -32,7 +32,6 @@ const syncCliVersions = async (): Promise<void> => {
     const relativePath = path.relative(projectRootPath, filePath);
 
     try {
-      // eslint-disable-next-line no-await-in-loop
       const content = await fs.readFile(filePath, 'utf8');
 
       // Match version pattern in cmd.command definition
@@ -52,7 +51,6 @@ const syncCliVersions = async (): Promise<void> => {
       );
 
       if (mut_hasUpdates) {
-        // eslint-disable-next-line no-await-in-loop
         await fs.writeFile(filePath, updatedContent, 'utf8');
         mut_updatedCount += 1;
       } else {

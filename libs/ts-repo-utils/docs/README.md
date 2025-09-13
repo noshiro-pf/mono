@@ -563,10 +563,7 @@ await genIndex({
 
 ```typescript
 type GenIndexConfig = Readonly<{
-    /**
-     * Target directories to generate index files for (string or array of
-     * strings)
-     */
+    /** Target directories to generate index files for (string or array of strings) */
     targetDirectory: string | readonly string[];
 
     /**

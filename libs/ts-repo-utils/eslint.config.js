@@ -1312,6 +1312,7 @@ export default tseslint.config(
       'unicorn/no-process-exit': 'off',
       'import/no-unassigned-import': 'off',
       'import/no-extraneous-dependencies': 'off',
+      'no-await-in-loop': 'off',
     },
   },
   {
@@ -1326,7 +1327,14 @@ export default tseslint.config(
   },
   {
     files: ['samples/**/*'],
-    rules: { 'import/no-extraneous-dependencies': 'off' },
+    rules: {
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      'unicorn/no-process-exit': 'off',
+      'import/no-unassigned-import': 'off',
+      'import/no-extraneous-dependencies': 'off',
+      'no-await-in-loop': 'off',
+      '@typescript-eslint/consistent-type-imports': 'off',
+    },
   },
   {
     files: ['**/*.d.mts'],
