@@ -1,3 +1,9 @@
+# [7.4.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.3.1...v7.4.0) (2025-09-13)
+
+### Features
+
+- change checkShouldRunTypeChecks function to return a boolean value ([#148](https://github.com/noshiro-pf/ts-repo-utils/issues/148)) ([15121e6](https://github.com/noshiro-pf/ts-repo-utils/commit/15121e69b2e7e32ed674366eb55dde4df39480f8))
+
 ## [7.3.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.3.0...v7.3.1) (2025-09-13)
 
 ### Bug Fixes
