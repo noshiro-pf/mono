@@ -134,6 +134,12 @@ Re-exports [getWorkspacePackages](functions/workspace-utils/get-workspace-packag
 
 ***
 
+### isDirectlyExecuted
+
+Re-exports [isDirectlyExecuted](functions/is-directly-executed.md#isdirectlyexecuted)
+
+***
+
 ### Package
 
 Re-exports [Package](functions/workspace-utils/types.md#package)

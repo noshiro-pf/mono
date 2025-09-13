@@ -761,6 +761,7 @@ Apache-2.0
 - [functions/exec-async](functions/exec-async.md)
 - [functions/format](functions/format.md)
 - [functions/gen-index](functions/gen-index.md)
+- [functions/is-directly-executed](functions/is-directly-executed.md)
 - [functions/should-run](functions/should-run.md)
 - [functions/workspace-utils](functions/workspace-utils.md)
 - [functions/workspace-utils/execute-parallel](functions/workspace-utils/execute-parallel.md)
