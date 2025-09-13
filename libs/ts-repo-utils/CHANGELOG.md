@@ -1,3 +1,9 @@
+# [7.3.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.2.0...v7.3.0) (2025-09-13)
+
+### Features
+
+- add isDirectlyExecuted ([#146](https://github.com/noshiro-pf/ts-repo-utils/issues/146)) ([7dce66d](https://github.com/noshiro-pf/ts-repo-utils/commit/7dce66d151a45e5097caba9b2f1287fb10e6e407))
+
 # [7.2.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.1.1...v7.2.0) (2025-09-08)
 
 ### Features
