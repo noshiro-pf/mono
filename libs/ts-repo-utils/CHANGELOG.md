@@ -1,3 +1,9 @@
+# [7.5.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.4.0...v7.5.0) (2025-09-13)
+
+### Features
+
+- define Result as a global variable ([#149](https://github.com/noshiro-pf/ts-repo-utils/issues/149)) ([a75a06a](https://github.com/noshiro-pf/ts-repo-utils/commit/a75a06a2de992ac37644f32bd0baf7004dc7fac5))
+
 # [7.4.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.3.1...v7.4.0) (2025-09-13)
 
 ### Features
