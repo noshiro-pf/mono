@@ -7,7 +7,6 @@ export default defineConfig({
   test: {
     globals: true,
     dir: projectRootPath,
-    include: ['src/**/*.mts', 'test/**/*.mts', 'samples/**/*.mts'],
     includeSource: [path.resolve(projectRootPath, './src/**/*.mts')],
     typecheck: {
       tsconfig: path.resolve(projectRootPath, './configs/tsconfig.test.json'),
