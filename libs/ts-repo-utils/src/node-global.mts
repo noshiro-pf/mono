@@ -25,5 +25,5 @@ declare global {
   const path: typeof path_;
   const fs: typeof fs_;
   const glob: typeof glob_;
-  // const isDirectlyExecuted: typeof isDirectlyExecuted_;
+  const isDirectlyExecuted: typeof isDirectlyExecuted_;
 }

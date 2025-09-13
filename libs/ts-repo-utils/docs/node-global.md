@@ -40,6 +40,14 @@ Defined in: [src/node-global.mts:27](https://github.com/noshiro-pf/ts-repo-utils
 
 ***
 
+### isDirectlyExecuted
+
+> `const` **isDirectlyExecuted**: *typeof* [`isDirectlyExecuted`](functions/is-directly-executed.md#isdirectlyexecuted)
+
+Defined in: [src/node-global.mts:28](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L28)
+
+***
+
 ### path
 
 > `const` **path**: *typeof* `path_`

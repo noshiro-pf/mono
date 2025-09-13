@@ -236,6 +236,39 @@ type Ret = Promise<
 
 ### Script Execution Utilities
 
+#### `isDirectlyExecuted(fileUrl: string): boolean`
+
+Determines whether a script is being executed directly via CLI or imported as a module. This is useful for creating scripts that can both be imported as libraries and executed directly.
+
+```typescript
+import { isDirectlyExecuted } from 'ts-repo-utils';
+
+// or
+// import "ts-repo-utils"; // isDirectlyExecuted is globally defined in ts-repo-utils
+
+// calculator.mjs
+export const add = (a: number, b: number): number => a + b;
+export const multiply = (a: number, b: number): number => a * b;
+
+// Only run main logic when executed directly: node calculator.mjs (or tsx calculator.mts)
+// When imported elsewhere, only the functions are available
+if (isDirectlyExecuted(import.meta.url)) {
+    console.log('Calculator CLI');
+    console.log('2 + 3 =', add(2, 3));
+    console.log('4 × 5 =', multiply(4, 5));
+}
+```
+
+When executed directly (`node calculator.mjs`), it runs the main function and prints the results. When imported (`import { add } from './calculator.mjs'`), it only provides the functions without executing the main logic.
+
+NOTE: If you use [tsx](https://www.npmjs.com/package/tsx) or [ts-node](https://www.npmjs.com/package/ts-node), run your scripts with the extension `.(m)ts` instead of `.(m)js` so that `isDirectlyExecuted` can correctly determine if the script is executed directly.
+
+**Use Cases:**
+
+- Creating CLI tools that can also be used as libraries
+- Preventing automatic execution when a file is imported
+- Running initialization code only during direct execution
+
 ### Path and File System Utilities
 
 #### `pathExists(filePath: string): Promise<boolean>`
@@ -668,6 +701,10 @@ const configJson: string = await fs.readFile('./config.json', {
 });
 
 const files: readonly string[] = await glob('**/*.ts');
+
+if (isDirectlyExecuted(import.meta.url)) {
+    echo('Running as CLI');
+}
 ```
 
 - `$` - The command execution utility described above.
@@ -675,6 +712,7 @@ const files: readonly string[] = await glob('**/*.ts');
 - `path` - `node:path`
 - `fs` - `node:fs/promises`
 - `glob` - `fast-glob`
+- `isDirectlyExecuted` - The script execution utility described above.
 
 ## Common Patterns
 
