@@ -1,4 +1,3 @@
-import { Result } from 'ts-data-forge';
 import { assertPathExists } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -127,7 +126,7 @@ const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
 };
 
 const runStep = async (
-  promise: Promise<Result.Base>,
+  promise: Promise<Result<unknown, unknown>>,
   errorMsg: string,
 ): Promise<void> => {
   const result = await promise;

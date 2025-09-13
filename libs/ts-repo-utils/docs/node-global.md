@@ -6,13 +6,31 @@
 
 # node-global
 
+## Type Aliases
+
+### Result\<S, E\>
+
+> **Result**\<`S`, `E`\> = `Result_`\<`S`, `E`\>
+
+Defined in: [src/node-global.mts:31](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L31)
+
+#### Type Parameters
+
+##### S
+
+`S`
+
+##### E
+
+`E`
+
 ## Variables
 
 ### $
 
 > `const` **$**: *typeof* [`$`](functions/exec-async.md#)
 
-Defined in: [src/node-global.mts:22](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L22)
+Defined in: [src/node-global.mts:24](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L24)
 
 ***
 
@@ -20,7 +38,7 @@ Defined in: [src/node-global.mts:22](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **echo**: *typeof* `console.log`
 
-Defined in: [src/node-global.mts:23](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L23)
+Defined in: [src/node-global.mts:25](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L25)
 
 ***
 
@@ -28,7 +46,7 @@ Defined in: [src/node-global.mts:23](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **fs**: *typeof* `fs_`
 
-Defined in: [src/node-global.mts:26](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L26)
+Defined in: [src/node-global.mts:28](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L28)
 
 ***
 
@@ -36,7 +54,7 @@ Defined in: [src/node-global.mts:26](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **glob**: *typeof* `glob_`
 
-Defined in: [src/node-global.mts:27](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L27)
+Defined in: [src/node-global.mts:29](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L29)
 
 ***
 
@@ -44,7 +62,7 @@ Defined in: [src/node-global.mts:27](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **isDirectlyExecuted**: *typeof* [`isDirectlyExecuted`](functions/is-directly-executed.md#isdirectlyexecuted)
 
-Defined in: [src/node-global.mts:28](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L28)
+Defined in: [src/node-global.mts:30](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L30)
 
 ***
 
@@ -52,4 +70,12 @@ Defined in: [src/node-global.mts:28](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **path**: *typeof* `path_`
 
-Defined in: [src/node-global.mts:25](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L25)
+Defined in: [src/node-global.mts:27](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L27)
+
+***
+
+### Result
+
+> `const` **Result**: *typeof* `Result_`
+
+Defined in: [src/node-global.mts:31](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L31)

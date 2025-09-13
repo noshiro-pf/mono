@@ -727,7 +727,10 @@ import 'ts-repo-utils';
 
 // Now these functions are globally available
 
-await $('npm test');
+const result = await $('npm test');
+if (Result.isErr(result)) {
+    console.error(result.value);
+}
 
 echo('Building project...');
 
@@ -745,6 +748,7 @@ if (isDirectlyExecuted(import.meta.url)) {
 ```
 
 - `$` - The command execution utility described above.
+- `Result` - A utility for Result pattern (from [ts-data-forge](https://github.com/noshiro-pf/ts-data-forge#readme))
 - `echo` - Equivalent to `console.log`
 - `path` - `node:path`
 - `fs` - `node:fs/promises`

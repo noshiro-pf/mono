@@ -2,6 +2,7 @@
 import { default as glob_ } from 'fast-glob';
 import * as fs_ from 'node:fs/promises';
 import * as path_ from 'node:path';
+import { Result as Result_ } from 'ts-data-forge';
 import { $ as $_ } from './functions/exec-async.mjs';
 import { isDirectlyExecuted as isDirectlyExecuted_ } from './functions/is-directly-executed.mjs';
 
@@ -13,6 +14,7 @@ const globalsDef = {
   fs: fs_,
   glob: glob_,
   isDirectlyExecuted: isDirectlyExecuted_,
+  Result: Result_,
 } as const;
 
 // eslint-disable-next-line functional/immutable-data
@@ -26,4 +28,6 @@ declare global {
   const fs: typeof fs_;
   const glob: typeof glob_;
   const isDirectlyExecuted: typeof isDirectlyExecuted_;
+  const Result: typeof Result_;
+  type Result<S, E> = Result_<S, E>;
 }
