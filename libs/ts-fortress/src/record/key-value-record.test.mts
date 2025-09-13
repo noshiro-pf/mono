@@ -8,7 +8,7 @@ import {
 import { keyValueRecord } from './key-value-record.mjs';
 
 describe('keyValueRecord', () => {
-  const strNumRecord = keyValueRecord(string(''), number(0));
+  const strNumRecord = keyValueRecord(string(), number());
 
   type StrNumRecord = TypeOf<typeof strNumRecord>;
 

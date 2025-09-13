@@ -6,23 +6,23 @@ import { record } from './record.mjs';
 describe('record allowExcessProperties option', () => {
   const strictRecord = record(
     {
-      name: number(0),
-      age: number(0),
+      name: number(),
+      age: number(),
     },
     { allowExcessProperties: false },
   );
 
   const permissiveRecord = record(
     {
-      name: number(0),
-      age: number(0),
+      name: number(),
+      age: number(),
     },
     { allowExcessProperties: true },
   );
 
   const defaultRecord = record({
-    name: number(0),
-    age: number(0),
+    name: number(),
+    age: number(),
   });
 
   test('allowExcessProperties: false - rejects excess properties', () => {

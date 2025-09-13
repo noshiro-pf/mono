@@ -6,7 +6,7 @@ import { type TypeOf } from '../type.mjs';
 import { SetType } from './set.mjs';
 
 test('SetType with string elements', () => {
-  const StringSet = SetType(string(''));
+  const StringSet = SetType(string());
   type StringSet = TypeOf<typeof StringSet>;
 
   // Type test
@@ -32,7 +32,7 @@ test('SetType with string elements', () => {
 });
 
 test('SetType with number elements', () => {
-  const NumberSet = SetType(number(0));
+  const NumberSet = SetType(number());
   type NumberSet = TypeOf<typeof NumberSet>;
 
   // Type test
@@ -52,7 +52,7 @@ test('SetType with number elements', () => {
 });
 
 test('SetType with invalid element types', () => {
-  const StringSet = SetType(string(''));
+  const StringSet = SetType(string());
 
   const invalidSet = new Set<unknown>(['valid', 123, 'another', true]);
 
@@ -69,7 +69,7 @@ test('SetType with invalid element types', () => {
 });
 
 test('SetType fill() method', () => {
-  const NumberSet = SetType(number(0));
+  const NumberSet = SetType(number());
 
   // Valid set - should preserve all elements
   const validSet = new Set([1, 2, 3]);
@@ -94,7 +94,7 @@ test('SetType fill() method', () => {
 });
 
 test('SetType cast() method', () => {
-  const StringSet = SetType(string(''));
+  const StringSet = SetType(string());
 
   // Valid set
   const validSet = new Set(['hello', 'world']);
@@ -111,7 +111,7 @@ test('SetType cast() method', () => {
 });
 
 test('SetType assertIs() method', () => {
-  const NumberSet = SetType(number(0));
+  const NumberSet = SetType(number());
 
   const assertIsNumberSet: (a: unknown) => asserts a is ReadonlySet<number> =
     NumberSet.assertIs;
@@ -132,7 +132,7 @@ test('SetType assertIs() method', () => {
 });
 
 test('SetType with custom typeName', () => {
-  const CustomSet = SetType(string(''), {
+  const CustomSet = SetType(string(), {
     typeName: 'CustomStringSet',
   });
 
@@ -148,8 +148,8 @@ test('SetType with custom typeName', () => {
 
 test('SetType with complex element types', () => {
   const UserType = record({
-    id: number(0),
-    name: string(''),
+    id: number(),
+    name: string(),
   });
 
   const UserSet = SetType(UserType);
@@ -179,14 +179,14 @@ test('SetType with complex element types', () => {
 });
 
 test('SetType defaultValue', () => {
-  const StringSet = SetType(string(''));
+  const StringSet = SetType(string());
 
   expect(StringSet.defaultValue).toStrictEqual(new Set());
   expect(StringSet.defaultValue.size).toBe(0);
 });
 
 test('SetType ensures uniqueness', () => {
-  const NumberSet = SetType(number(0));
+  const NumberSet = SetType(number());
 
   // Set with duplicate values (Set automatically handles uniqueness)
   const setWithDuplicates = new Set([1, 2, 2, 3, 3, 3]);

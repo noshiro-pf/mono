@@ -15,7 +15,7 @@ describe('string', () => {
     });
   });
 
-  const str = string('');
+  const str = string();
   type Str = TypeOf<typeof str>;
 
   expectType<Str, string>('=');

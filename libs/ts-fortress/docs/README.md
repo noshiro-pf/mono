@@ -94,13 +94,13 @@ import * as t from 'ts-fortress';
 // Every type requires a default value
 const UserProfile = t.record({
     name: t.string('Anonymous'), // Default: 'Anonymous'
-    age: t.number(0), // Default: 0
-    email: t.optional(t.string('')), // Optional field with default ''
+    age: t.number(), // Default: 0
+    email: t.optional(t.string()), // Optional field with default ''
     preferences: t.record({
         theme: t.string('light'), // Default: 'light'
         notifications: t.boolean(true), // Default: true
     }),
-    tags: t.array(t.string('')), // Default: empty array []
+    tags: t.array(t.string()), // Default: empty array []
 });
 
 // The fill() function automatically provides missing values
@@ -250,7 +250,7 @@ export const SomeObject = t.record({
 // ✅ Correct ts-fortress usage - enforced by TypeScript
 export const SomeObject = t.record({
     key1: t.literal(1), // or t.number(1) with default
-    key2: t.string(''),
+    key2: t.string(),
 });
 ```
 
@@ -269,12 +269,12 @@ export const SomeObject = t.record({
 import * as t from 'ts-fortress';
 
 const UserType = t.record({
-    name: t.string(''),
+    name: t.string(),
     address: t.record({
-        street: t.string(''),
-        city: t.string(''),
+        street: t.string(),
+        city: t.string(),
     }),
-    tags: t.array(t.string('')),
+    tags: t.array(t.string()),
 });
 
 type User = t.TypeOf<typeof UserType>;
@@ -384,7 +384,7 @@ import * as tf from 'ts-fortress';
 const TsFortressNestedType = tf.record({
     user: tf.record({
         profile: tf.record({
-            age: tf.number(0),
+            age: tf.number(),
         }),
     }),
 });
@@ -560,16 +560,16 @@ import * as t from 'ts-fortress';
 
 // ✅ Complex union types work reliably without unexpected behavior
 const A = t.record({
-    A: t.union([t.number(0), t.undefinedType, t.nullType]),
+    A: t.union([t.number(), t.undefinedType, t.nullType]),
 });
 
 const B = t.record({
-    B: t.union([t.number(0), t.undefinedType, t.nullType]),
+    B: t.union([t.number(), t.undefinedType, t.nullType]),
 });
 
 const C = t.partial(
     t.record({
-        C: t.union([t.number(0), t.nullType]),
+        C: t.union([t.number(), t.nullType]),
     }),
 );
 
@@ -620,9 +620,9 @@ type User = t.TypeOf<typeof UserCodec>;
 import * as t from 'ts-fortress';
 
 const UserType = t.record({
-    id: t.string(''),
-    name: t.string(''),
-    age: t.number(0),
+    id: t.string(),
+    name: t.string(),
+    age: t.number(),
 });
 
 type User = t.TypeOf<typeof UserType>;
@@ -663,8 +663,8 @@ The `validate` method performs comprehensive validation and returns a `Result` t
 import * as t from 'ts-fortress';
 
 const User = t.record({
-    name: t.string(''),
-    age: t.number(0),
+    name: t.string(),
+    age: t.number(),
 });
 
 // Success case - returns the same object reference
@@ -700,7 +700,7 @@ When using `assertIs`, you must assign it to a typed variable with an explicit t
 ```typescript
 import * as t from 'ts-fortress';
 
-const numberType = t.number(0);
+const numberType = t.number();
 
 // ✅ Correct usage - explicit type annotation required
 const assertIsNumber: (a: unknown) => asserts a is number = numberType.assertIs;
@@ -720,8 +720,8 @@ try {
 
 // Example with complex types
 const User = t.record({
-    id: t.string(''),
-    name: t.string(''),
+    id: t.string(),
+    name: t.string(),
 });
 
 type User = t.TypeOf<typeof User>;
@@ -768,9 +768,9 @@ Every type has a `defaultValue` property that can be used for initialization:
 import * as t from 'ts-fortress';
 
 const User = t.record({
-    id: t.string(''),
+    id: t.string(),
     name: t.string('Guest'),
-    score: t.number(0),
+    score: t.number(),
 });
 
 type User = t.TypeOf<typeof User>;
@@ -794,7 +794,7 @@ import * as t from 'ts-fortress';
 
 // Basic primitives
 const stringType = t.string('default');
-const numberType = t.number(0);
+const numberType = t.number();
 const booleanType = t.boolean(false);
 const nullType = t.nullType;
 const undefinedType = t.undefinedType;
@@ -804,11 +804,11 @@ const statusType = t.literal('active');
 const versionType = t.literal(1);
 
 // Arrays
-const stringArrayType = t.array(t.string(''));
-const nonEmptyArrayType = t.nonEmptyArray(t.number(0));
+const stringArrayType = t.array(t.string());
+const nonEmptyArrayType = t.nonEmptyArray(t.number());
 
 // Tuples
-const coordinateType = t.tuple([t.number(0), t.number(0)]);
+const coordinateType = t.tuple([t.number(), t.number()]);
 ```
 
 ### Record Types
@@ -818,13 +818,13 @@ import * as t from 'ts-fortress';
 
 // Define object schemas
 const PersonType = t.record({
-    firstName: t.string(''),
-    lastName: t.string(''),
-    age: t.number(0),
+    firstName: t.string(),
+    lastName: t.string(),
+    age: t.number(),
     address: t.record({
-        street: t.string(''),
-        city: t.string(''),
-        zipCode: t.string(''),
+        street: t.string(),
+        city: t.string(),
+        zipCode: t.string(),
     }),
 });
 
@@ -832,8 +832,8 @@ type Person = t.TypeOf<typeof PersonType>;
 
 // Optional fields
 const UserProfileType = t.record({
-    username: t.string(''),
-    bio: t.optional(t.string('')), // Optional field
+    username: t.string(),
+    bio: t.optional(t.string()), // Optional field
     settings: t.partial(
         t.record({
             // Partial record (all fields optional)
@@ -846,8 +846,8 @@ const UserProfileType = t.record({
 // Strict validation (disallow excess properties)
 const StrictUserType = t.record(
     {
-        id: t.string(''),
-        name: t.string(''),
+        id: t.string(),
+        name: t.string(),
     },
     {
         allowExcessProperties: false, // Reject any properties not defined in schema
@@ -856,15 +856,15 @@ const StrictUserType = t.record(
 
 // Alternatively, use the strictRecord alias for cleaner syntax
 const StrictUserTypeAlias = t.strictRecord({
-    id: t.string(''),
-    name: t.string(''),
+    id: t.string(),
+    name: t.string(),
 });
 
 // Permissive validation (allow excess properties) - this is the default
 const PermissiveUserType = t.record(
     {
-        id: t.string(''),
-        name: t.string(''),
+        id: t.string(),
+        name: t.string(),
     },
     {
         allowExcessProperties: true, // Allow additional properties (default behavior)
@@ -881,9 +881,9 @@ console.log(PermissiveUserType.is(permissiveData)); // true - 'extra' property i
 
 // strictRecord provides cleaner syntax for strict validation
 const UserSchema = t.strictRecord({
-    name: t.string(''),
-    email: t.string(''),
-    age: t.number(0),
+    name: t.string(),
+    email: t.string(),
+    age: t.number(),
 });
 
 // Validation examples
@@ -928,11 +928,11 @@ if (t.Result.isOk(userIdResult)) {
 import * as t from 'ts-fortress';
 
 // Union types
-const IdType = t.union([t.string(''), t.number(0)]);
+const IdType = t.union([t.string(), t.number()]);
 
 // Intersection types
 const TimestampedType = t.intersection([
-    t.record({ data: t.string('') }),
+    t.record({ data: t.string() }),
     t.record({
         createdAt: t.number(Date.now()),
         updatedAt: t.number(Date.now()),
@@ -943,8 +943,8 @@ const TimestampedType = t.intersection([
 const ExtendedUserType = t.mergeRecords([
     PersonType,
     t.record({
-        id: t.string(''),
-        email: t.string(''),
+        id: t.string(),
+        email: t.string(),
     }),
 ]);
 ```
@@ -975,8 +975,8 @@ ts-fortress uses `Result<T, readonly ValidationError[]>` for structured error ha
 import * as t from 'ts-fortress';
 
 const UserType = t.record({
-    name: t.string(''),
-    age: t.number(0),
+    name: t.string(),
+    age: t.number(),
 });
 
 const invalidData = { name: 123, age: 'not a number' };
@@ -1007,8 +1007,8 @@ try {
 // Excess property validation example
 const StrictType = t.record(
     {
-        name: t.string(''),
-        age: t.number(0),
+        name: t.string(),
+        age: t.number(),
     },
     {
         allowExcessProperties: false,

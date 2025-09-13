@@ -11,7 +11,7 @@ import { union } from './union.mjs';
 
 describe('union', () => {
   const targetType = union(
-    [record({ x: number(0), y: number(0) }), literal(3), literal('2')],
+    [record({ x: number(), y: number() }), literal(3), literal('2')],
     {
       defaultType: literal(3),
     },

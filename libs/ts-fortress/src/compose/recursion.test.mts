@@ -171,7 +171,7 @@ describe('recursive', () => {
       'LinkedList<number>',
       () =>
         record({
-          value: number(0),
+          value: number(),
           next: union([nullType, LinkedListNumber]),
         }),
       { defaultValue: { value: 0, next: null } },

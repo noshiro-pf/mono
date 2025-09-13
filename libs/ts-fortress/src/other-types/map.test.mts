@@ -4,7 +4,7 @@ import { type TypeOf } from '../type.mjs';
 import { MapType } from './map.mjs';
 
 test('MapType with string keys and number values', () => {
-  const StringNumberMap = MapType(string(''), number(0));
+  const StringNumberMap = MapType(string(), number());
   type StringNumberMap = TypeOf<typeof StringNumberMap>;
 
   // Type test
@@ -34,7 +34,7 @@ test('MapType with string keys and number values', () => {
 });
 
 test('MapType with invalid key types', () => {
-  const StringNumberMap = MapType(string(''), number(0));
+  const StringNumberMap = MapType(string(), number());
 
   const invalidMap = new Map<unknown, unknown>([
     ['valid', 1],
@@ -55,7 +55,7 @@ test('MapType with invalid key types', () => {
 });
 
 test('MapType with invalid value types', () => {
-  const StringNumberMap = MapType(string(''), number(0));
+  const StringNumberMap = MapType(string(), number());
 
   const invalidMap = new Map<unknown, unknown>([
     ['a', 1],
@@ -76,7 +76,7 @@ test('MapType with invalid value types', () => {
 });
 
 test('MapType fill() method', () => {
-  const StringNumberMap = MapType(string(''), number(0));
+  const StringNumberMap = MapType(string(), number());
 
   // Valid map - should preserve valid entries
   const validMap = new Map([
@@ -107,7 +107,7 @@ test('MapType fill() method', () => {
 });
 
 test('MapType cast() method', () => {
-  const StringNumberMap = MapType(string(''), number(0));
+  const StringNumberMap = MapType(string(), number());
 
   // Valid map
   const validMap = new Map([['key', 42]]);
@@ -121,7 +121,7 @@ test('MapType cast() method', () => {
 });
 
 test('MapType assertIs() method', () => {
-  const StringNumberMap = MapType(string(''), number(0));
+  const StringNumberMap = MapType(string(), number());
 
   const assertIsStringNumberMap: (
     a: unknown,
@@ -140,7 +140,7 @@ test('MapType assertIs() method', () => {
 });
 
 test('MapType with custom typeName', () => {
-  const CustomMap = MapType(string(''), number(0), {
+  const CustomMap = MapType(string(), number(), {
     typeName: 'CustomStringNumberMap',
   });
 
@@ -155,7 +155,7 @@ test('MapType with custom typeName', () => {
 });
 
 test('MapType with number keys and string values', () => {
-  const NumberStringMap = MapType(number(0), string(''));
+  const NumberStringMap = MapType(number(), string());
   type NumberStringMap = TypeOf<typeof NumberStringMap>;
 
   // Type test
@@ -174,7 +174,7 @@ test('MapType with number keys and string values', () => {
 });
 
 test('MapType defaultValue', () => {
-  const StringNumberMap = MapType(string(''), number(0));
+  const StringNumberMap = MapType(string(), number());
 
   expect(StringNumberMap.defaultValue).toStrictEqual(new Map());
   expect(StringNumberMap.defaultValue.size).toBe(0);

@@ -10,10 +10,10 @@ describe('record strict composition tests', () => {
   // Base strict record type
   const strictBaseRecord = record(
     {
-      id: string(''),
-      name: string(''),
-      age: number(0),
-      email: string(''),
+      id: string(),
+      name: string(),
+      age: number(),
+      email: string(),
     },
     { allowExcessProperties: false },
   );
@@ -277,16 +277,16 @@ describe('record strict composition tests', () => {
   describe('mergeRecords with strict records', () => {
     const strictRecord1 = record(
       {
-        id: string(''),
-        name: string(''),
+        id: string(),
+        name: string(),
       },
       { allowExcessProperties: false },
     );
 
     const strictRecord2 = record(
       {
-        age: number(0),
-        email: string(''),
+        age: number(),
+        email: string(),
       },
       { allowExcessProperties: false },
     );
@@ -359,8 +359,8 @@ describe('record strict composition tests', () => {
 
     test('mixed strict and permissive records', () => {
       const permissiveRecord = record({
-        status: string(''),
-        metadata: string(''),
+        status: string(),
+        metadata: string(),
       }); // allowExcessProperties defaults to true
 
       const mixedMergedType = mergeRecords([strictRecord1, permissiveRecord]);

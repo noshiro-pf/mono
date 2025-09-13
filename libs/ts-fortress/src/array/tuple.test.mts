@@ -27,7 +27,7 @@ describe('tuple', () => {
   });
 
   const targetType = tuple([
-    record({ x: number(0), y: number(0) }),
+    record({ x: number(), y: number() }),
     literal(3),
     literal('2'),
   ]);

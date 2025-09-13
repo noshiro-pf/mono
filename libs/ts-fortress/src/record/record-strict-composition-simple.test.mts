@@ -9,9 +9,9 @@ describe('record strict composition - simple tests', () => {
   // Base strict record type
   const strictRecord = record(
     {
-      id: string(''),
-      name: string(''),
-      age: number(0),
+      id: string(),
+      name: string(),
+      age: number(),
     },
     { allowExcessProperties: false },
   );
@@ -106,9 +106,9 @@ describe('record strict composition - simple tests', () => {
 
   describe('behavior comparison: strict vs permissive', () => {
     const permissiveRecord = record({
-      id: string(''),
-      name: string(''),
-      age: number(0),
+      id: string(),
+      name: string(),
+      age: number(),
     }); // allowExcessProperties defaults to true
 
     test('strict record rejects excess properties', () => {

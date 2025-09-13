@@ -6,8 +6,8 @@ import { record, strictRecord } from './record.mjs';
 
 describe('strictRecord', () => {
   const userType = strictRecord({
-    name: string(''),
-    age: number(0),
+    name: string(),
+    age: number(),
   });
 
   type User = TypeOf<typeof userType>;
@@ -121,8 +121,8 @@ describe('strictRecord', () => {
 
   describe('comparison with regular record', () => {
     const regularRecord = record({
-      name: string(''),
-      age: number(0),
+      name: string(),
+      age: number(),
     });
 
     test('regular record allows excess properties', () => {
@@ -130,7 +130,7 @@ describe('strictRecord', () => {
 
       expect(regularRecord.is(dataWithExtra)).toBe(true);
       expect(
-        strictRecord({ name: string(''), age: number(0) }).is(dataWithExtra),
+        strictRecord({ name: string(), age: number() }).is(dataWithExtra),
       ).toBe(false);
     });
 
@@ -139,7 +139,7 @@ describe('strictRecord', () => {
 
       expect(regularRecord.is(invalidData)).toBe(false);
       expect(
-        strictRecord({ name: string(''), age: number(0) }).is(invalidData),
+        strictRecord({ name: string(), age: number() }).is(invalidData),
       ).toBe(false);
     });
   });
@@ -148,8 +148,8 @@ describe('strictRecord', () => {
     test('uses custom typeName in errors', () => {
       const customUserType = strictRecord(
         {
-          name: string(''),
-          age: number(0),
+          name: string(),
+          age: number(),
         },
         { typeName: 'User' },
       );

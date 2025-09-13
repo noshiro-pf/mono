@@ -15,7 +15,7 @@ describe('array', () => {
 
     test('with explicit default value', () => {
       expect(
-        array(number(0), {
+        array(number(), {
           typeName: 'xs',
           defaultValue: [],
         }).defaultValue,
@@ -23,7 +23,7 @@ describe('array', () => {
     });
   });
 
-  const xs = array(number(0), {
+  const xs = array(number(), {
     typeName: 'xs',
     defaultValue: [],
   });

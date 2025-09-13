@@ -54,8 +54,8 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
 
     // ts-fortress equivalent
     const TsFortressSimpleType = tf.record({
-      name: tf.string(''),
-      age: tf.number(0),
+      name: tf.string(),
+      age: tf.number(),
     });
 
     type TsFortressSimpleType = tf.TypeOf<typeof TsFortressSimpleType>;
@@ -139,7 +139,7 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
     const TsFortressNestedType = tf.record({
       user: tf.record({
         profile: tf.record({
-          age: tf.number(0),
+          age: tf.number(),
         }),
       }),
     });
@@ -231,10 +231,10 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
     // ts-fortress equivalent structure
     const TsFortressComplexType = tf.record({
       user: tf.record({
-        id: tf.number(0),
+        id: tf.number(),
         profile: tf.record({
-          age: tf.number(0),
-          score: tf.number(0),
+          age: tf.number(),
+          score: tf.number(),
         }),
       }),
     });

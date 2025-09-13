@@ -15,7 +15,7 @@ describe('number', () => {
     });
   });
 
-  const num = number(0);
+  const num = number();
   type Num = TypeOf<typeof num>;
 
   expectType<Num, number>('=');

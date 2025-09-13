@@ -19,7 +19,7 @@ describe('arrayOfLength', () => {
 
     test('with explicit default value, case 2', () => {
       expect(
-        arrayOfLength(4, number(0), {
+        arrayOfLength(4, number(), {
           typeName: 'xs',
           defaultValue: [1, 2, 3, 4],
         }).defaultValue,
@@ -27,7 +27,7 @@ describe('arrayOfLength', () => {
     });
   });
 
-  const xs = arrayOfLength(4, number(0), {
+  const xs = arrayOfLength(4, number(), {
     typeName: 'xs',
     defaultValue: [1, 2, 3, 4],
   });

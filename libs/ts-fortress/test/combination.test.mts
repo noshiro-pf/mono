@@ -390,16 +390,16 @@ describe('io-ts bug examples - correct behavior in ts-fortress', () => {
   describe('union validation consistency (io-ts issue #677)', () => {
     test('union validation produces predictable results without unexpected fields', () => {
       const A = record({
-        A: union([number(0), undefinedType, nullType]),
+        A: union([number(), undefinedType, nullType]),
       });
 
       const B = record({
-        B: union([number(0), undefinedType, nullType]),
+        B: union([number(), undefinedType, nullType]),
       });
 
       const C = partial(
         record({
-          C: union([number(0), nullType]),
+          C: union([number(), nullType]),
         }),
       );
 
@@ -444,14 +444,14 @@ describe('io-ts bug examples - correct behavior in ts-fortress', () => {
 
     test('union validation handles partial types correctly', () => {
       const FullRecord = record({
-        name: number(0),
-        value: number(0),
+        name: number(),
+        value: number(),
       });
 
       const PartialRecord = partial(
         record({
-          name: number(0),
-          optional: number(0),
+          name: number(),
+          optional: number(),
         }),
       );
 
@@ -488,14 +488,14 @@ describe('io-ts bug examples - correct behavior in ts-fortress', () => {
       const TypeA = record({
         type: union([undefinedType]), // Only accepts undefined
         data: record({
-          valueA: number(0),
+          valueA: number(),
         }),
       });
 
       const TypeB = record({
         type: nullType, // Only accepts null
         data: record({
-          valueB: number(0),
+          valueB: number(),
         }),
       });
 

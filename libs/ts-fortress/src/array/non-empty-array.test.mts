@@ -19,7 +19,7 @@ describe('nonEmptyArray', () => {
 
     test('with explicit default value, case 2', () => {
       expect(
-        nonEmptyArray(number(0), {
+        nonEmptyArray(number(), {
           typeName: 'xs',
           defaultValue: [2],
         }).defaultValue,
@@ -27,7 +27,7 @@ describe('nonEmptyArray', () => {
     });
   });
 
-  const xs = nonEmptyArray(number(0), {
+  const xs = nonEmptyArray(number(), {
     defaultValue: [1],
     typeName: 'xs',
   });
