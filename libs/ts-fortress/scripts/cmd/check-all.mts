@@ -1,4 +1,3 @@
-import { Result } from 'ts-data-forge';
 import 'ts-repo-utils';
 
 /**
@@ -50,8 +49,8 @@ const checkAll = async (): Promise<void> => {
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
   if (Result.isErr(result)) {
-    echo(`${errorMsg}: ${result.value.message}`);
-    echo('❌ Check failed');
+    console.error(`${errorMsg}: ${result.value.message}`);
+    console.error('❌ Check failed');
     process.exit(1);
   }
 };
