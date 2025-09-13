@@ -35,6 +35,7 @@
     "check:ext": "tsx ./scripts/cmd/check-ext.mts",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
+    "doc:embed": "tsx ./scripts/cmd/embed-samples.mts",
     "fmt": "format-diff-from origin/main",
     "fmt:full": "prettier --write .",
     "gi": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --fmt 'npm run fmt'",

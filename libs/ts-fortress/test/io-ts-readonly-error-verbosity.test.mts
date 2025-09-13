@@ -22,7 +22,7 @@
 
 import * as ioTs from 'io-ts';
 import { expectType } from 'ts-data-forge';
-import { z } from 'zod';
+import * as z from 'zod';
 
 // eslint-disable-next-line import/no-internal-modules
 import { PathReporter } from 'io-ts/PathReporter';

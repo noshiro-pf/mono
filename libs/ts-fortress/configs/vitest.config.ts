@@ -7,7 +7,7 @@ export default defineConfig({
   test: {
     globals: true,
     dir: projectRootPath,
-    include: ['src/**/*.mts', 'test/**/*.mts'],
+    include: ['src/**/*.mts', 'test/**/*.mts', 'samples/**/*.mts'],
     includeSource: [path.resolve(projectRootPath, './src/**/*.mts')],
     typecheck: {
       tsconfig: path.resolve(projectRootPath, './configs/tsconfig.test.json'),
@@ -15,6 +15,9 @@ export default defineConfig({
     passWithNoTests: true,
     restoreMocks: true,
     hideSkippedTests: true,
+    alias: {
+      'ts-fortress': path.resolve(projectRootPath, './src/entry-point.mts'),
+    },
     coverage: {
       provider: 'v8',
       reporter: ['html', 'lcov', 'text'],

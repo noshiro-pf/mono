@@ -40,6 +40,7 @@ pnpm add ts-fortress
 ## Quick Start
 
 ```typescript
+import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 
 // Define a schema
@@ -47,19 +48,23 @@ const User = t.record({
     id: t.string(),
     name: t.string(),
     age: t.number(),
-    email: t.string(),
+    email: t.optional(t.string()),
     isActive: t.boolean(),
 });
 
 // Infer TypeScript type
 type User = t.TypeOf<typeof User>;
-// ↑ Readonly<{
-//     id: string;
-//     name: string;
-//     age: number;
-//     email: string;
-//     isActive: boolean
-//   }>
+
+expectType<
+    User,
+    Readonly<{
+        id: string;
+        name: string;
+        age: number;
+        email?: string;
+        isActive: boolean;
+    }>
+>('=');
 
 // Validate data
 const userData = {
@@ -68,19 +73,29 @@ const userData = {
     age: 30,
     email: 'john@example.com',
     isActive: true,
-};
+} as const;
+
+assert(User.is(userData));
 
 if (User.is(userData)) {
     // userData is now typed as User
-    console.log(`User: ${userData.name}, Age: ${userData.age}`);
+    userData satisfies User;
+
+    assert.equal(
+        `User: ${userData.name}, Age: ${userData.age}`,
+        'User: John Doe, Age: 30',
+    );
 }
 
 // Get validation result with error details
 const result = User.validate(userData);
 if (t.Result.isOk(result)) {
-    const user = result.value; // typed as User
+    result.value satisfies User; // typed as User
 } else {
-    console.error('Validation errors:', result.value); // readonly ValidationError[] showing error information
+    console.error(
+        'Validation errors:',
+        result.value satisfies readonly t.ValidationError[],
+    );
 }
 ```
 
@@ -114,29 +129,39 @@ const partialData = {
 };
 
 const filledData = UserProfile.fill(partialData);
-console.log(filledData);
-// Output: {
-//   name: 'John Doe',
-//   age: 0,                    // ← Filled with default
-//   email: '',                 // ← Filled with default
-//   preferences: {
-//     theme: 'dark',
-//     notifications: true,     // ← Filled with default
-//   },
-//   tags: [],                  // ← Filled with default
-// }
+
+assert.deepStrictEqual(filledData, {
+    name: 'John Doe',
+    age: 0, // ← Filled with default
+    email: '', // ← Filled with default
+    preferences: {
+        theme: 'dark',
+        notifications: true, // ← Filled with default
+    },
+    tags: [], // ← Filled with default
+});
 
 // fill() is type-safe and always returns a complete object
 type UserProfile = t.TypeOf<typeof UserProfile>;
-const completeUser: UserProfile = UserProfile.fill(anyPartialData);
 
 // Important: Default value filling only occurs when fill() is called
 // The is() and validate() functions can still detect missing keys
-console.log(UserProfile.is(partialData)); // false - missing required keys
+assert(!UserProfile.is(partialData)); // missing required keys
+
 const result = UserProfile.validate(partialData);
-if (t.Result.isErr(result)) {
-    console.log(result.value); // ValidationError[] showing missing keys
-}
+
+assert(t.Result.isErr(result));
+
+assert.deepStrictEqual(
+    t.validationErrorsToMessages(
+        result.value satisfies readonly t.ValidationError[],
+    ),
+    [
+        `Missing required key "age" at age`,
+        `Missing required key "notifications" at preferences.notifications`,
+        `Missing required key "tags" at tags`,
+    ],
+);
 ```
 
 ### Benefits of Default Values
@@ -153,6 +178,8 @@ if (t.Result.isErr(result)) {
 Most ts-fortress types provide sensible defaults automatically, so you rarely need to specify explicit default values:
 
 ```typescript
+import * as t from 'ts-fortress';
+
 // Most common types have built-in defaults
 const Schema = t.record({
     name: t.string(), // defaults to ""
@@ -160,7 +187,7 @@ const Schema = t.record({
     active: t.boolean(), // defaults to false
     tags: t.array(t.string()), // defaults to []
     config: t.record({
-        debug: t.boolean(), // defaults to false
+        debug: t.nullable(t.boolean()), // defaults to false
     }), // defaults to { debug: false }
 });
 ```
@@ -168,6 +195,8 @@ const Schema = t.record({
 You only need to specify explicit default values in two cases: when you want custom values, or when using `intersection` types:
 
 ```typescript
+import * as t from 'ts-fortress';
+
 // Custom default values
 const ServerConfig = t.record({
     port: t.number(3000), // custom default: 3000
@@ -175,22 +204,32 @@ const ServerConfig = t.record({
     retries: t.number(5), // custom default: 5
 });
 
-const JobStatus = t.enumType(['started', 'scheduled', 'succeeded', 'failed']);
+assert.deepStrictEqual(ServerConfig.defaultValue, {
+    port: 3000,
+    host: 'localhost',
+    retries: 5,
+} satisfies t.TypeOf<typeof ServerConfig>);
 
-const JobFulfilledStatus = t.enumType(['succeeded', 'failed', 'cancelled']);
+// Enum types have built-in defaults
+
+const JobStatus = t.enumType(['started', 'scheduled', 'succeeded', 'failed']); // default: "started"
+
+const JobFulfilledStatus = t.enumType(['succeeded', 'failed', 'cancelled']); // default: "succeeded"
 
 // Intersection types require explicit defaults
 const ReportStatus = t.intersection(
     [JobStatus, JobFulfilledStatus],
-    t.enumType(['success', 'failed']), // must provide combined default
+    t.enumType(['succeeded', 'failed']), // must provide combined default
 );
 ```
 
 This is because intersection types can be created from arbitrary types, making it impossible to automatically determine appropriate default values. However, when all constituent types are record types, you can use the `mergeRecords` function to avoid specifying defaults:
 
 ```typescript
+import * as t from 'ts-fortress';
+
 // Using mergeRecords for record-only intersections
-const UserWithMetadata = t.mergeRecords(
+const UserWithMetadata = t.mergeRecords([
     t.record({
         id: t.string(),
         name: t.string(),
@@ -199,406 +238,22 @@ const UserWithMetadata = t.mergeRecords(
         createdAt: t.number(),
         updatedAt: t.number(),
     }),
-);
-// No explicit default needed - automatically combines defaults from both records
-// Default: { id: '', name: '', createdAt: 0, updatedAt: 0 }
+    // No explicit default needed - automatically combines defaults from both records
+]);
+
+assert.deepStrictEqual(UserWithMetadata.defaultValue, {
+    id: '',
+    name: '',
+    createdAt: 0,
+    updatedAt: 0,
+} satisfies t.TypeOf<typeof UserWithMetadata>);
 ```
 
 ## Why ts-fortress over Zod and io-ts?
 
 While ts-fortress, [Zod](https://github.com/colinhacks/zod), and [io-ts](https://github.com/gcanti/io-ts) are all excellent TypeScript validation libraries, ts-fortress offers more readable and informative error messages than both, a more type-safe way of building validators than Zod, and addresses some critical runtime consistency issues found in io-ts.
 
-### Type Safety when Building Schemas
-
-**Problem with Zod**: The following code compiles without errors but creates an invalid schema:
-
-```typescript
-import * as z from 'zod';
-
-// ❌ This compiles but is incorrect!
-export const SomeObject = z.object({
-    key1: 1, // Should be z.literal(1)
-    key2: 'string', // Should be z.string()
-});
-
-export type SomeObject = z.infer<typeof SomeObject>; // inferred as { key1: unknown, key2: unknown }
-```
-
-The above Zod schema will fail at runtime because raw values (`1`, `'string'`) are not valid Zod validators.
-
-**Correct Zod usage** requires remembering to wrap all values:
-
-```typescript
-// ✅ Correct Zod usage
-export const SomeObject = z.object({
-    key1: z.literal(1),
-    key2: z.string(),
-});
-```
-
-**ts-fortress prevents this error at compile time**:
-
-```typescript
-import * as t from 'ts-fortress';
-
-// ❌ TypeScript error - this won't compile!
-export const SomeObject = t.record({
-    key1: 1, // Error: number is not assignable to Type<unknown>
-    key2: 'string', // Error: string is not assignable to Type<unknown>
-});
-
-// ✅ Correct ts-fortress usage - enforced by TypeScript
-export const SomeObject = t.record({
-    key1: t.literal(1), // or t.number(1) with default
-    key2: t.string(),
-});
-```
-
-### Benefits
-
-- **Compile-time safety**: TypeScript catches invalid schema definitions immediately
-- **IDE support**: Better autocomplete and error highlighting during development
-- **Reduced runtime errors**: Impossible to create invalid schemas that fail at runtime
-- **Self-documenting**: The type system guides you toward correct usage
-
-### Deep Readonly Types by Default
-
-**ts-fortress generates deeply readonly types**, promoting immutability and preventing accidental mutations:
-
-```typescript
-import * as t from 'ts-fortress';
-
-const UserType = t.record({
-    name: t.string(),
-    address: t.record({
-        street: t.string(),
-        city: t.string(),
-    }),
-    tags: t.array(t.string()),
-});
-
-type User = t.TypeOf<typeof UserType>;
-// ↑ Readonly<{
-//     name: string;
-//     address: Readonly<{
-//       street: string;
-//       city: string;
-//     }>;
-//     tags: readonly string[];
-//   }>
-
-const user: User = UserType.cast(someData);
-
-// ❌ All of these produce TypeScript errors:
-user.name = 'new name'; // Cannot assign to 'name' because it is read-only
-user.address.street = 'new street'; // Cannot assign to 'street' because it is read-only
-user.tags.push('new tag'); // Property 'push' does not exist on readonly array
-user.tags[0] = 'modified'; // Index signature in type 'readonly string[]' only permits reading
-```
-
-**In contrast, Zod types are mutable by default**:
-
-```typescript
-import * as z from 'zod';
-
-const UserSchema = z.object({
-    name: z.string(),
-    address: z.object({
-        street: z.string(),
-        city: z.string(),
-    }),
-    tags: z.array(z.string()),
-});
-
-type User = z.infer<typeof UserSchema>;
-// ↑ {
-//     name: string;
-//     address: {
-//       street: string;
-//       city: string;
-//     };
-//     tags: string[];
-//   }
-
-const user: User = UserSchema.parse(someData);
-
-// ✅ These all work in Zod (but may not be desirable):
-user.name = 'new name'; // No error
-user.address.street = 'new street'; // No error
-user.tags.push('new tag'); // No error
-user.tags[0] = 'modified'; // No error
-```
-
-**In io-ts, Readonly types will generate verbose error messages**:
-
-```typescript
-import * as ioTs from 'io-ts';
-import { PathReporter } from 'io-ts/PathReporter';
-
-// io-ts nested readonly version with multiple Readonly wrappers
-const IoTsNestedReadonly = ioTs.readonly(
-    ioTs.type({
-        user: ioTs.readonly(
-            ioTs.type({
-                profile: ioTs.readonly(
-                    ioTs.type({
-                        age: ioTs.number,
-                    }),
-                ),
-            }),
-        ),
-    }),
-);
-
-const invalidData = {
-    user: {
-        profile: {
-            age: 'not-a-number', // should be number
-        },
-    },
-};
-
-// Get io-ts error messages
-const ioTsResult = IoTsNestedReadonly.decode(invalidData);
-const ioTsErrorMessages = PathReporter.report(ioTsResult);
-
-console.log(ioTsErrorMessages[0]);
-// Output: Invalid value "not-a-number" supplied to : Readonly<{ user: Readonly<{ profile: Readonly<{ age: number }> }> }>/user: Readonly<{ profile: Readonly<{ age: number }> }>/profile: Readonly<{ age: number }>/age: number
-```
-
-**The error message contains excessive `Readonly<...>` wrapper noise:**
-
-- Root level: `Readonly<{ user: Readonly<{ profile: Readonly<{ age: number }> }> }>`
-- User level: `Readonly<{ profile: Readonly<{ age: number }> }>`
-- Profile level: `Readonly<{ age: number }>`
-- Each nested readonly creates exponentially verbose error messages with redundant type information
-
-This verbosity makes error messages extremely difficult to read and debug in production environments.
-
-**ts-fortress addresses this issue** by generating clean, actionable error messages without verbose type wrapper details:
-
-```typescript
-import * as tf from 'ts-fortress';
-
-// ts-fortress equivalent clean structure
-const TsFortressNestedType = tf.record({
-    user: tf.record({
-        profile: tf.record({
-            age: tf.number(),
-        }),
-    }),
-});
-
-// Get ts-fortress error messages
-const tsFortressResult = TsFortressNestedType.validate(invalidData);
-const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
-    ? tf.validationErrorsToMessages(tsFortressResult.value)
-    : [];
-
-console.log(tsFortressErrorMessages[0]);
-// Clean output: Expected <number> at user.profile.age, got <string> type value "not-a-number".
-```
-
-**ts-fortress vs Zod comparison:**
-
-```typescript
-import { z } from 'zod';
-
-// Zod nested readonly equivalent
-const ZodNestedType = z
-    .object({
-        user: z
-            .object({
-                profile: z
-                    .object({
-                        age: z.number(),
-                    })
-                    .readonly(),
-            })
-            .readonly(),
-    })
-    .readonly();
-
-// Get Zod error messages using prettifyError
-const zodResult = ZodNestedType.safeParse(invalidData);
-const zodErrorMessages = zodResult.success
-    ? ''
-    : z.prettifyError(zodResult.error);
-
-console.log(zodErrorMessages);
-// Clean output: "✖ Invalid input: expected number, received string\n  → at user.profile.age"
-```
-
-**Error message comparison:**
-
-- **io-ts**: 148 characters of verbose type information mixed with the actual error
-- **Zod**: 62 characters with visual formatting but missing the actual invalid value
-- **ts-fortress**: 74 characters focused purely on what went wrong and where, including the actual invalid value
-
-While Zod produces cleaner error messages than io-ts and includes helpful visual formatting, **ts-fortress provides superior debugging experience** by including the actual invalid value (`"not-a-number"`) in the error message, making it easier to understand what data caused the validation failure.
-
-### Benefits of Deep Readonly
-
-- **Immutability by default**: Prevents accidental mutations that can lead to bugs
-- **Functional programming support**: Encourages functional programming patterns
-- **Predictable data flow**: Ensures data integrity throughout your application
-- **Thread safety**: Immutable data is inherently safe to share between contexts
-
-### Runtime-Type Consistency Issues in io-ts
-
-**io-ts has several long-standing bugs** where runtime behavior doesn't match TypeScript types, which have remained unfixed for years:
-
-#### 1. Keyof Type Mismatch ([Issue #697](https://github.com/gcanti/io-ts/issues/697))
-
-```typescript
-import * as t from 'io-ts';
-
-const T = t.keyof({
-    0: undefined,
-    1: undefined,
-    2: undefined,
-    3: undefined,
-    4: undefined,
-});
-
-// ❌ Runtime behavior is inconsistent with TypeScript types!
-console.log(T.decode(0)); // Left (fails) - number 0 is rejected
-console.log(T.decode('0')); // Right (succeeds) - string "0" is accepted
-
-type T = t.TypeOf<typeof T>;
-// ↑ TypeScript infers: 0 | 1 | 2 | 3 | 4 (number literals)
-// But should be: "0" | "1" | "2" | "3" | "4" (string literals)
-
-// The runtime validator only accepts strings, but TypeScript thinks it accepts numbers!
-```
-
-For this reason, the [io-ts documentation](https://github.com/gcanti/io-ts/blob/master/index.md#implemented-types--combinators) states that `t.keyof` only supports string keys (although this is somewhat dangerous, as the TypeScript type definition does not prevent the use of keys other than string).
-
-#### 2. Union + Undefined Decode Issues ([Issue #677](https://github.com/gcanti/io-ts/issues/677))
-
-```typescript
-import * as t from 'io-ts';
-import { isRight } from 'fp-ts/Either';
-
-const A = t.type({
-    A: t.union([t.number, t.undefined, t.null]),
-});
-
-const B = t.type({
-    B: t.union([t.number, t.undefined, t.null]),
-});
-
-const C = t.partial({
-    C: t.union([t.number, t.null]),
-});
-
-// ❌ Case 1: Union decode adds unexpected fields
-{
-    const UnionBA = t.union([B, A]);
-    const res = UnionBA.decode({ A: 1 });
-
-    if (isRight(res)) {
-        console.log(res.right); // { A: 1, B: undefined } <- NG (expected: { A: 1 })
-        console.log(A.is(res.right)); // true  <- ok
-        console.log(B.is(res.right)); // true  <- NG (expected: false)
-    }
-}
-
-// ❌ Case 2: Union decode produces inconsistent results
-{
-    const UnionCA = t.union([C, A]);
-    const res = UnionCA.decode({ A: 1 });
-
-    if (isRight(res)) {
-        console.log(res.right); // { A: 1 } <- NG (expected: {})
-        console.log(A.is(res.right)); // true  <- ok
-        console.log(C.is(res.right)); // true  <- ok
-    }
-}
-```
-
-**ts-fortress eliminates these problems** by ensuring strict runtime-type consistency:
-
-Keyof Type Mismatch:
-
-```typescript
-import * as t from 'ts-fortress';
-
-// ✅ ts-fortress: Runtime and types always match
-const T = t.keyof(
-    t.record({
-        0: t.undefinedType,
-        1: t.undefinedType,
-        2: t.undefinedType,
-        3: t.undefinedType,
-        4: t.undefinedType,
-    }),
-);
-
-type T = t.TypeOf<typeof T>;
-// ↑ TypeScript correctly infers: "0" | "1" | "2" | "3" | "4" (string literals)
-
-// ✅ Runtime behavior matches TypeScript types exactly
-console.log(T.validate(0)); // ❌ Fails correctly - number 0 is rejected
-console.log(T.validate('0')); // ✅ Success - string "0" is accepted
-
-// For this use case, if you want to define a union type of numeric literals, you can use `uintRange` from ts-fortress:
-
-const U = t.uintRange({ start: 0, end: 5 });
-
-type U = t.TypeOf<typeof U>;
-// ↑ TypeScript correctly infers: 0 | 1 | 2 | 3 | 4 (number literals)
-
-console.log(U.validate('0')); // ❌ Fails - string "0" is rejected
-console.log(U.validate(0)); // ✅ Success - number 0 is accepted
-```
-
-Union + Undefined Decode Issues:
-
-```ts
-import * as t from 'ts-fortress';
-
-// ✅ Complex union types work reliably without unexpected behavior
-const A = t.record({
-    A: t.union([t.number(), t.undefinedType, t.nullType]),
-});
-
-const B = t.record({
-    B: t.union([t.number(), t.undefinedType, t.nullType]),
-});
-
-const C = t.partial(
-    t.record({
-        C: t.union([t.number(), t.nullType]),
-    }),
-);
-
-// ✅ Case 1: Union validation is predictable and correct
-{
-    const UnionBA = t.union([B, A]);
-    const result = UnionBA.validate({ A: 1 });
-
-    if (t.Result.isOk(result)) {
-        console.log(result.value); // { A: 1 } <- ✅ Correct! No unexpected fields
-        console.log(A.is(result.value)); // true  <- ✅ Correct
-        console.log(B.is(result.value)); // false <- ✅ Correct! B requires field B
-    }
-}
-
-// ✅ Case 2: Consistent validation behavior
-{
-    const UnionCA = t.union([C, A]);
-    const result = UnionCA.validate({ A: 1 });
-
-    if (t.Result.isOk(result)) {
-        console.log(result.value); // { A: 1 } <- ✅ Correct and consistent
-        console.log(A.is(result.value)); // true  <- ✅ Correct
-        console.log(C.is(result.value)); // true  <- ✅ Consistent! ts-fortress partial types allow extra fields
-    }
-}
-```
-
-This makes ts-fortress especially valuable in large codebases where schema correctness is critical and runtime failures need to be minimized.
+For more information, please see [this documentation](_media/why-ts-fortress-over-zod-and-io-ts.md).
 
 ### Migration from io-ts
 
@@ -608,32 +263,33 @@ If you're coming from io-ts, here's how common patterns translate:
 // io-ts style
 import * as t from 'io-ts';
 
-const UserCodec = t.type({
+const User = t.type({
     id: t.string,
     name: t.string,
     age: t.number,
 });
 
-type User = t.TypeOf<typeof UserCodec>;
+type User = t.TypeOf<typeof User>;
+```
 
+```typescript
 // ts-fortress style
 import * as t from 'ts-fortress';
 
-const UserType = t.record({
+const User = t.record({
     id: t.string(),
     name: t.string(),
-    age: t.number(),
+    age: t.number(20),
 });
 
-type User = t.TypeOf<typeof UserType>;
+type User = t.TypeOf<typeof User>;
 ```
 
 Key differences:
 
-- **Default values**: ts-fortress requires explicit default values for better type safety
+- **Default values**: ts-fortress types are functions to allow for explicit default values ​​etc.
 - **Naming**: `record` instead of `type`, more explicit function names
 - **Error handling**: `Result` type instead of `Either`
-- **Branded types**: Rich collection of pre-built branded number types
 
 ## Core Concepts
 
@@ -668,29 +324,33 @@ const User = t.record({
 });
 
 // Success case - returns the same object reference
-const validData = { name: 'Alice', age: 30 };
+const validData = { name: 'Alice', age: 30 } as const;
 const result = User.validate(validData);
 
-if (t.Result.isOk(result)) {
-    console.log(result.value === validData); // true - same reference!
-    console.log(result.value); // { name: 'Alice', age: 30 }
-}
+assert(t.Result.isOk(result));
+assert(result.value === validData); // true - same reference!
+
+assert.deepStrictEqual(result.value, { name: 'Alice', age: 30 });
 
 // Error case - provides detailed error information
-const invalidData = { name: 'Bob', age: 'thirty' };
+const invalidData = { name: 'Bob', age: 'thirty' } as const;
 const errorResult = User.validate(invalidData);
 
-if (t.Result.isErr(errorResult)) {
-    console.log(errorResult.value);
-    // [
-    //   {
-    //     path: ['age'],
-    //     actualValue: 'thirty',
-    //     expectedType: 'number',
-    //     typeName: 'number'
-    //   }
-    // ]
-}
+assert(t.Result.isErr(errorResult));
+
+assert.deepStrictEqual(errorResult.value, [
+    {
+        path: ['age'],
+        actualValue: 'thirty',
+        expectedType: 'number',
+        typeName: 'number',
+        message: undefined,
+    },
+]);
+
+assert.deepStrictEqual(t.validationErrorsToMessages(errorResult.value), [
+    'Expected <number> at age, got <string> type value "thirty".',
+]);
 ```
 
 ##### `assertIs` - Type assertion with runtime checking
@@ -705,17 +365,23 @@ const numberType = t.number();
 // ✅ Correct usage - explicit type annotation required
 const assertIsNumber: (a: unknown) => asserts a is number = numberType.assertIs;
 
-function processValue(value: unknown) {
-    // After assertion, TypeScript knows value is a number
+const processValue = (value: unknown): void => {
     assertIsNumber(value);
-    console.log(value.toFixed(2)); // TypeScript knows this is safe
-}
+
+    // After assertion, TypeScript knows value is a number
+    assertType<number>(value);
+};
 
 try {
     processValue(42); // Works
     processValue('not a number'); // Throws error
 } catch (error) {
-    console.error('Assertion failed:', error);
+    assert.deepStrictEqual(
+        error,
+        new Error(
+            `\nExpected <number>, got <string> type value "not a number".`,
+        ),
+    );
 }
 
 // Example with complex types
@@ -729,11 +395,12 @@ type User = t.TypeOf<typeof User>;
 // Explicit type annotation for the assertion function
 const assertIsUser: (a: unknown) => asserts a is User = User.assertIs;
 
-function processUser(data: unknown) {
+const processUser = (data: unknown): void => {
     assertIsUser(data);
+
     // TypeScript now knows data is User type
-    console.log(`User ${data.name} has ID ${data.id}`);
-}
+    assertType<User>(data);
+};
 ```
 
 ##### `cast` - Type casting with validation
@@ -745,18 +412,21 @@ import * as t from 'ts-fortress';
 
 const Port = t.number(8080);
 
-console.log(Port.cast(3000)); // 3000 - valid number
+assert(Port.cast(3000) === 3000); // 3000 is a valid number
 
 try {
-    console.log(Port.cast('invalid')); // Throws Error!
+    Port.cast('invalid'); // Throws Error!
 } catch (error) {
-    console.error(error.message); // "Expected number, got string"
+    assert.deepStrictEqual(
+        error,
+        new Error('Expected <number>, got <string> type value "invalid".'),
+    );
 }
 ```
 
 ##### `fill` - Intelligent default value filling
 
-The `fill` method attempts to preserve valid parts of the input while filling in missing or invalid values with defaults:
+The `fill` method attempts to preserve valid parts of the input while filling in missing or invalid values with defaults.
 
 See [Default Values and Data Filling](#default-values-and-data-filling)
 
@@ -777,14 +447,17 @@ type User = t.TypeOf<typeof User>;
 
 // Use defaultValue for initialization
 const newUser: User = { ...User.defaultValue, id: 'user-123' };
-console.log(newUser);
-// { id: 'user-123', name: 'Guest', score: 0 }
+// This default value filling process can also be written as follows:
+const newUser2: User = User.fill({ id: 'user-456' });
+
+assert.deepStrictEqual(newUser, { id: 'user-123', name: 'Guest', score: 0 });
+assert.deepStrictEqual(newUser2, { id: 'user-456', name: 'Guest', score: 0 });
 
 // Useful for React state initialization
-function UserForm() {
+const UserForm = () => {
     const [formData, setFormData] = useState<User>(User.defaultValue);
     // ...
-}
+};
 ```
 
 ### Primitive Types
@@ -817,7 +490,7 @@ const coordinateType = t.tuple([t.number(), t.number()]);
 import * as t from 'ts-fortress';
 
 // Define object schemas
-const PersonType = t.record({
+const Person = t.record({
     firstName: t.string(),
     lastName: t.string(),
     age: t.number(),
@@ -828,10 +501,10 @@ const PersonType = t.record({
     }),
 });
 
-type Person = t.TypeOf<typeof PersonType>;
+type Person = t.TypeOf<typeof Person>;
 
 // Optional fields
-const UserProfileType = t.record({
+const UserProfile = t.record({
     username: t.string(),
     bio: t.optional(t.string()), // Optional field
     settings: t.partial(
@@ -873,11 +546,11 @@ const PermissiveUserType = t.record(
 
 // Example usage - both StrictUserType and StrictUserTypeAlias behave identically
 const strictData = { id: '123', name: 'John', extra: 'not allowed' };
-console.log(StrictUserType.is(strictData)); // false - 'extra' property causes rejection
-console.log(StrictUserTypeAlias.is(strictData)); // false - same as above
+assert(!StrictUserType.is(strictData)); // 'extra' property causes rejection
+assert(!StrictUserTypeAlias.is(strictData)); // same as above
 
 const permissiveData = { id: '123', name: 'John', extra: 'allowed' };
-console.log(PermissiveUserType.is(permissiveData)); // true - 'extra' property is allowed
+assert(PermissiveUserType.is(permissiveData)); // 'extra' property is allowed
 
 // strictRecord provides cleaner syntax for strict validation
 const UserSchema = t.strictRecord({
@@ -896,6 +569,149 @@ UserSchema.is({
 }); // ❌ false - excess property
 ```
 
+### Refined Types
+
+ts-fortress provides the `refine` function to create refined types with custom validation logic while leveraging existing base types:
+
+```typescript
+import * as t from 'ts-fortress';
+
+// Create refined types
+const Uuid = t.refine({
+    baseType: t.string(),
+    // Define custom validation logic
+    is: (value: string): value is string =>
+        /^[\da-f]{8}-[\da-f]{4}-[0-5][\da-f]{3}-[089ab][\da-f]{3}-[\da-f]{12}$/iu.test(
+            value,
+        ),
+    defaultValue: '00000000-1111-2222-3333-444444444444',
+    typeName: 'Uuid',
+});
+
+type Uuid = t.TypeOf<typeof Uuid>; // string (with runtime validation)
+
+const PositiveNumber = t.refine({
+    baseType: t.number(1),
+    is: (value: number): value is number => value > 0,
+    defaultValue: 1,
+    typeName: 'PositiveNumber',
+});
+
+type PositiveNumber = t.TypeOf<typeof PositiveNumber>; // number (with runtime validation)
+
+const EvenNumber = t.refine({
+    baseType: t.number(),
+    is: (value: number): value is number => value % 2 === 0,
+    defaultValue: 0,
+    typeName: 'EvenNumber',
+});
+
+// Usage in validation
+const uuidResult = Uuid.validate('6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b');
+
+assert(t.Result.isOk(uuidResult));
+
+if (t.Result.isOk(uuidResult)) {
+    const validUuid = uuidResult.value; // string, guaranteed to be valid Uuid format
+}
+
+const positiveResult = PositiveNumber.validate(42);
+
+assert(t.Result.isOk(positiveResult));
+
+if (t.Result.isOk(positiveResult)) {
+    const positiveNum = positiveResult.value; // number, guaranteed to be > 0
+}
+
+// Invalid cases
+assert(!Uuid.is('invalid-uuid'));
+assert(!PositiveNumber.is(-5));
+assert(!EvenNumber.is(7));
+
+// Use in record schemas
+const UserProfile = t.record({
+    id: Uuid, // refined uuid validation
+    score: PositiveNumber, // must be positive
+    level: EvenNumber, // must be even
+});
+
+type UserProfile = t.TypeOf<typeof UserProfile>;
+
+// The refined types maintain their validation in composite types
+const userData = {
+    id: '6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b', // ✅ valid uuid format
+    score: 85, // ✅ positive number
+    level: 4, // ✅ even number
+} as const satisfies UserProfile;
+
+assert(UserProfile.is(userData));
+
+const invalidData = {
+    id: 'user123', // ❌ invalid uuid format
+    score: -10, // ❌ negative number
+    level: 3, // ❌ odd number
+} as const;
+
+const result = UserProfile.validate(invalidData);
+
+assert(t.Result.isErr(result));
+
+assert.deepStrictEqual(
+    t.validationErrorsToMessages(
+        result.value satisfies readonly t.ValidationError[],
+    ),
+    [
+        'Expected <Uuid> at id, got <string> type value "user123".',
+        'Expected <PositiveNumber> at score, got <number> type value `-10`.',
+        'Expected <EvenNumber> at level, got <number> type value `3`.',
+    ],
+);
+```
+
+#### Key Benefits of Refined Types
+
+- **Composable validation**: Build on existing base types while adding custom constraints
+- **Type safety**: TypeScript types reflect the refined constraints at compile time
+- **Clear error messages**: Validation errors clearly indicate which refinement failed
+- **Reusable logic**: Define validation logic once and reuse across multiple schemas
+- **Performance**: Leverages base type validation before applying custom refinements
+
+#### Common Use Cases
+
+```typescript
+import * as t from 'ts-fortress';
+
+// Domain-specific string types
+const PhoneNumber = t.refine({
+    baseType: t.string(),
+    is: (s): s is string => /^\+?[\d\s()-]+$/u.test(s),
+    defaultValue: '+1234567890',
+    typeName: 'PhoneNumber',
+});
+
+const ZipCode = t.refine({
+    baseType: t.string(),
+    is: (s): s is string => /^\d{5}(-\d{4})?$/u.test(s),
+    defaultValue: '12345',
+    typeName: 'ZipCode',
+});
+
+// Constrained numeric types
+const Percentage = t.refine({
+    baseType: t.number(),
+    is: (n): n is number => 0 <= n && n <= 100,
+    defaultValue: 0,
+    typeName: 'Percentage',
+});
+
+const Port = t.refine({
+    baseType: t.number(3000),
+    is: (n): n is number => Number.isInteger(n) && 1 <= n && n <= 65535,
+    defaultValue: 3000,
+    typeName: 'Port',
+});
+```
+
 ### Branded Types
 
 ts-fortress provides extensive support for branded types to create domain-specific validation:
@@ -911,12 +727,15 @@ type UserId = t.TypeOf<typeof UserId>; // Brand<string, 'UserId'>
 type Weight = t.TypeOf<typeof Weight>; // Brand<number, 'Weight'>
 
 // Rich number validation types
-const PositiveInt = t.positiveInt(1);
-const SafeInt = t.safeInt(0);
-const UInt16 = t.uint16(0);
+const PositiveInt = t.positiveInt(t.asPositiveInt(1));
+const SafeInt = t.safeInt(t.asSafeInt(0));
+const UInt16 = t.uint16(t.asUint16(0));
 
 // Usage
 const userIdResult = UserId.validate('user_123');
+
+assert(t.Result.isOk(userIdResult));
+
 if (t.Result.isOk(userIdResult)) {
     const id: UserId = userIdResult.value;
 }
@@ -931,13 +750,20 @@ import * as t from 'ts-fortress';
 const IdType = t.union([t.string(), t.number()]);
 
 // Intersection types
-const TimestampedType = t.intersection([
-    t.record({ data: t.string() }),
+const TimestampedType = t.intersection(
+    [
+        t.record({ data: t.string() }),
+        t.record({
+            createdAt: t.number(Date.now()),
+            updatedAt: t.number(Date.now()),
+        }),
+    ],
     t.record({
+        data: t.string(),
         createdAt: t.number(Date.now()),
         updatedAt: t.number(Date.now()),
     }),
-]);
+);
 
 // Merge records (similar to intersection but more specific)
 const ExtendedUserType = t.mergeRecords([
@@ -956,6 +782,7 @@ import * as t from 'ts-fortress';
 
 // String enums
 const ColorEnum = t.enumType(['red', 'green', 'blue']);
+
 type Color = t.TypeOf<typeof ColorEnum>; // 'red' | 'green' | 'blue'
 
 // Numeric ranges
@@ -964,8 +791,11 @@ const DiceRoll = t.uintRange({
     end: 7,
     defaultValue: 1,
 }); // integers from 1 to 6
+
 type DiceRoll = t.TypeOf<typeof DiceRoll>; // 1 | 2 | 3 | 4 | 5 | 6
 ```
+
+Tips: It is often better to use `uintRange` instead of `enumType` when possible, because `enumType` stores a Set of the sizes of its members as data, while `uintRange` only stores the range, resulting in smaller memory usage.
 
 ## Error Handling
 
@@ -974,34 +804,57 @@ ts-fortress uses `Result<T, readonly ValidationError[]>` for structured error ha
 ```typescript
 import * as t from 'ts-fortress';
 
-const UserType = t.record({
+const User = t.record({
     name: t.string(),
     age: t.number(),
 });
 
+type User = t.TypeOf<typeof User>;
+
 const invalidData = { name: 123, age: 'not a number' };
 
-const result = UserType.validate(invalidData);
-if (t.Result.isErr(result)) {
-    // result.value is an array of ValidationError objects
-    for (const error of result.value) {
-        console.log('Path:', error.path); // ['name'] or ['age']
-        console.log('Expected:', error.expectedType); // 'string' or 'number'
-        console.log('Actual:', error.actualValue); // 123 or 'not a number'
-        console.log('Type:', error.typeName); // type being validated
-    }
+const result = User.validate(invalidData);
 
-    // Convert to string messages
-    const messages = t.validationErrorsToMessages(result.value);
-    console.log(messages);
-    // ['Expected string at name, got number', 'Expected number at age, got string']
-}
+assert(t.Result.isErr(result));
+
+// result.value is an array of ValidationError objects
+assert.deepStrictEqual(result.value, [
+    {
+        actualValue: 123,
+        expectedType: 'string',
+        message: undefined,
+        path: ['name'],
+        typeName: 'string',
+    },
+    {
+        actualValue: 'not a number',
+        expectedType: 'number',
+        message: undefined,
+        path: ['age'],
+        typeName: 'number',
+    },
+] satisfies t.ValidationError[]);
+
+// Convert to string messages
+const messages = t.validationErrorsToMessages(result.value);
+
+assert.deepStrictEqual(messages, [
+    'Expected <string> at name, got <number> type value `123`.',
+    'Expected <number> at age, got <string> type value "not a number".',
+]);
+
+const assertIsUser: (a: unknown) => asserts a is User = User.assertIs;
 
 // Using assertions (throws on invalid data)
 try {
-    UserType.assertIs(invalidData);
+    assertIsUser(invalidData);
 } catch (error) {
-    console.error('Validation failed:', error.message);
+    assert.deepStrictEqual(
+        error,
+        new Error(
+            '\nExpected <string> at name, got <number> type value `123`.,\nExpected <number> at age, got <string> type value "not a number".',
+        ),
+    );
 }
 
 // Excess property validation example
@@ -1018,16 +871,17 @@ const StrictType = t.record(
 const dataWithExcess = { name: 'John', age: 30, extra: 'not allowed' };
 const strictResult = StrictType.validate(dataWithExcess);
 
-if (t.Result.isErr(strictResult)) {
-    console.log(strictResult.value);
-    // [{
-    //   path: ['extra'],
-    //   actualValue: 'not allowed',
-    //   expectedType: '{ name: string, age: number }',
-    //   message: 'Excess property "extra" is not allowed',
-    //   typeName: '{ name: string, age: number }'
-    // }]
-}
+assert(t.Result.isErr(strictResult));
+
+assert.deepStrictEqual(strictResult.value, [
+    {
+        path: ['extra'],
+        actualValue: 'not allowed',
+        expectedType: '{ name: string, age: number }',
+        message: 'Excess property "extra" is not allowed',
+        typeName: '{ name: string, age: number }',
+    },
+]);
 ```
 
 ### ValidationError Structure
