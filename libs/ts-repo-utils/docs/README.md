@@ -16,47 +16,24 @@ A comprehensive toolkit for managing TypeScript projects with strict ESM support
 ## Installation
 
 ```bash
-npm install ts-repo-utils
+npm add --save-dev ts-repo-utils
+```
+
+```bash
+yarn add --dev ts-repo-utils
+```
+
+```bash
+pnpm add --save-dev ts-repo-utils
 ```
 
 ## CLI Commands
 
 `ts-repo-utils` provides several CLI commands that can be used directly or through npm scripts.
 
-### `gen-index-ts`
-
-Generates index.ts files recursively in target directories with automatic barrel exports.
-
-```bash
-# Basic usage with required options
-npm exec -- gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs
-
-# With formatting command
-npm exec -- gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs --fmt 'npm run fmt'
-
-# Multiple target extensions
-npm exec -- gen-index-ts ./src --target-ext .mts --target-ext .tsx --index-ext .mts --export-ext .mjs
-
-# With exclude patterns
-npm exec -- gen-index-ts ./src --target-ext .ts --index-ext .ts --export-ext .js --exclude '*.test.ts' --exclude '*.spec.ts'
-
-# Example in npm scripts
-"gi": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'"
-```
-
-**Options:**
-
-- `<target-directory>` - Directory where the index file will be generated (comma-separated list can be used)
-- `--target-ext` - File extensions to include in the index file (required, can be specified multiple times)
-- `--index-ext` - Extension of the index file to be generated (required)
-- `--export-ext` - Extension of the export statements in the index file (required, or 'none')
-- `--exclude` - Glob patterns of files to exclude (optional, can be specified multiple times)
-- `--fmt` - Command to format after generating the index file (optional)
-- `--silent` - Suppress output messages (optional)
-
 ### `assert-repo-is-clean`
 
-Checks if repository is clean and exits with code 1 if it has uncommitted changes.
+Checks if the repository is clean (i.e., there are no uncommitted changes, untracked files, or staged files) and exits with code 1 if any are present.
 
 ```bash
 # Basic usage
@@ -68,6 +45,8 @@ npm exec -- assert-repo-is-clean --silent
 
 ```yaml
 # Example in GitHub Actions
+- name: Format check
+  run: npm run fmt
 - name: Check if there is no file diff
   run: npm exec -- assert-repo-is-clean
 ```
@@ -112,9 +91,16 @@ npm exec -- format-diff-from main --exclude-untracked
 
 # Silent mode
 npm exec -- format-diff-from main --silent
+```
 
-# Example in npm scripts
-"fmt": "format-diff-from origin/main"
+Example in npm scripts:
+
+```json
+{
+    "scripts": {
+        "fmt": "npm exec -- format-diff-from origin/main"
+    }
+}
 ```
 
 **Options:**
@@ -126,9 +112,53 @@ npm exec -- format-diff-from main --silent
 - `--silent` - Suppress output messages (default: false)
 - `--ignore-unknown` - Skip files without a Prettier parser instead of erroring (default: true)
 
+### `gen-index-ts`
+
+Generates index.ts files recursively in target directories with automatic barrel exports.
+
+```bash
+# Basic usage with required options
+npm exec -- gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs
+
+# With formatting command
+npm exec -- gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs --fmt 'npm run fmt'
+
+# Multiple target extensions
+npm exec -- gen-index-ts ./src --target-ext .mts --target-ext .tsx --index-ext .mts --export-ext .mjs
+
+# With exclude patterns
+npm exec -- gen-index-ts ./src --target-ext .ts --index-ext .ts --export-ext .js --exclude '*.test.ts' --exclude '*.spec.ts'
+
+# Example in npm scripts
+"gi": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'"
+```
+
+**Features:**
+
+- Creates barrel exports for all subdirectories
+- Supports complex glob exclusion patterns (using micromatch)
+- Automatically formats generated files using the project's Prettier config
+- Works with both single directories and directory arrays
+- Respects source and export extension configuration
+
+**Benefits:**
+
+- Prevents forgetting to export modules
+- TypeScript can detect duplicate variables, type names, etc.
+
+**Options:**
+
+- `<target-directory>` - Directory where the index file will be generated (comma-separated list can be used)
+- `--target-ext` - File extensions to include in the index file (required, can be specified multiple times)
+- `--index-ext` - Extension of the index file to be generated (required)
+- `--export-ext` - Extension of the export statements in the index file (required, or 'none')
+- `--exclude` - Glob patterns of files to exclude (optional, can be specified multiple times)
+- `--fmt` - Command to format after generating the index file (optional)
+- `--silent` - Suppress output messages (optional)
+
 ### `check-should-run-type-checks`
 
-Checks if TypeScript type checks should run based on the diff from a base branch. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files are changed.
+Checks whether TypeScript type checks should run based on file changes from the base branch. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files have changed. The determination of "non-TypeScript files" is based on configurable ignore patterns, which can be specified using the `--paths-ignore` option.
 
 ```bash
 # Basic usage (compares against origin/main)
@@ -169,39 +199,46 @@ npm exec -- check-should-run-type-checks \
 
 When running in GitHub Actions, the command sets the `GITHUB_OUTPUT` environment variable with `should_run=true` or `should_run=false`, which can be used in subsequent steps.
 
-### Usage in npm scripts
+## API Reference
 
-The CLI commands are commonly used in npm scripts for automation:
+### Command Execution
 
-```json
-{
-    "scripts": {
-        "fmt": "format-diff-from origin/main",
-        "gi": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'",
-        "check:clean": "assert-repo-is-clean"
-    }
+#### `$(command: string, options?: ExecOptions): Promise<ExecResult>`
+
+Executes a shell command asynchronously with type-safe results.
+
+```typescript
+import { $, Result } from 'ts-repo-utils';
+
+// or
+// import "ts-repo-utils"; // $ and Result are globally defined in ts-repo-utils
+
+const result = await $('npm test');
+
+if (Result.isOk(result)) {
+    console.log('Tests passed:', result.value.stdout);
+} else {
+    console.error('Tests failed:', result.value.message);
 }
 ```
 
-### Usage in CI/CD
+**Options:**
 
-These commands are particularly useful in CI/CD pipelines:
+- `silent?: boolean` - Don't log command/output (default: false)
+- `'node:child_process'` `exec` function options
 
-```yaml
-# GitHub Actions example
-- name: Format check
-  run: |
-      npm run fmt
-      npm exec -- assert-repo-is-clean
+**Return Type:**
 
-# Check for uncommitted changes after build
-- name: Build
-  run: npm run build
-- name: Check if there is no file diff
-  run: npm exec -- assert-repo-is-clean
+```typescript
+type Ret = Promise<
+    Result<
+        Readonly<{ stdout: string | Buffer; stderr: string | Buffer }>,
+        import('node:child_process').ExecException
+    >
+>;
 ```
 
-## API Reference
+### Script Execution Utilities
 
 ### Path and File System Utilities
 
@@ -213,7 +250,7 @@ Checks if a file or directory exists at the specified path.
 import { pathExists } from 'ts-repo-utils';
 
 const exists = await pathExists('./src/index.ts');
-console.log(exists); // true or false
+console.log(exists satisfies boolean); // true or false
 ```
 
 #### `assertPathExists(filePath: string, description?: string): Promise<void>`
@@ -226,8 +263,6 @@ import { assertPathExists } from 'ts-repo-utils';
 // If the file doesn't exist, this will exit the process with code 1
 await assertPathExists('./src/index.ts', 'Entry point file');
 ```
-
-### File Extension Validation
 
 #### `assertExt(config: CheckExtConfig): Promise<void>`
 
@@ -254,12 +289,12 @@ await assertExt({
 **Configuration Type:**
 
 ```typescript
-type CheckExtConfig = DeepReadonly<{
-    directories: {
+type CheckExtConfig = Readonly<{
+    directories: readonly Readonly<{
         path: string; // Directory path to check
         extension: string; // Expected file extension (including the dot)
-        ignorePatterns?: string[]; // Optional glob patterns to ignore
-    }[];
+        ignorePatterns?: readonly string[]; // Optional glob patterns to ignore
+    }>[];
 }>;
 ```
 
@@ -280,7 +315,8 @@ if (isDirty) {
 
 #### `assertRepoIsClean(): Promise<void>`
 
-Checks if repository is clean and exits with code 1 if it has uncommitted changes (shows changes and diff).
+Checks if the repository is clean and exits with code 1 if it has uncommitted changes (shows changes and diff).
+(Function version of the `assert-repo-is-clean` command)
 
 ```typescript
 import { assertRepoIsClean } from 'ts-repo-utils';
@@ -297,22 +333,22 @@ await assertRepoIsClean();
 
 ##### `getUntrackedFiles(options?)`
 
-Get untracked files from the working tree (files not added to git).  
+Gets untracked files from the working tree (files not added to git).  
 Runs `git ls-files --others --exclude-standard [--deleted]`
 
 ##### `getModifiedFiles(options?)`
 
-Get modified files from the working tree (files that have been changed but not staged).  
+Gets modified files from the working tree (files that have been changed but not staged).  
 Runs `git diff --name-only [--diff-filter=d]`
 
 ##### `getStagedFiles(options?)`
 
-Get files that are staged for commit (files added with git add).  
+Gets files that are staged for commit (files added with git add).  
 Runs `git diff --staged --name-only [--diff-filter=d]`
 
 ##### `getDiffFrom(base: string, options?)`
 
-Get files that differ from the specified base branch or commit.  
+Gets files that differ from the specified base branch or commit.  
 Runs `git diff --name-only <base> [--diff-filter=d]`
 
 **Common options:**
@@ -325,87 +361,7 @@ Runs `git diff --name-only <base> [--diff-filter=d]`
 ```typescript
 type Ret = Result<
     readonly string[],
-    ExecException | Readonly<{ message: string }>
->;
-```
-
-### Build Optimization Utilities
-
-#### `checkShouldRunTypeChecks(options?): Promise<boolean>`
-
-Checks if TypeScript type checks should run based on the diff from a base branch. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files are changed.
-
-```typescript
-import { checkShouldRunTypeChecks } from 'ts-repo-utils';
-
-// Use default settings (compare against origin/main)
-const shouldRun = await checkShouldRunTypeChecks();
-
-if (shouldRun) {
-    await $('npm run type-check');
-}
-
-// Custom ignore patterns and base branch
-const shouldRun = await checkShouldRunTypeChecks({
-    pathsIgnore: ['.eslintrc.json', 'docs/', '**.md', 'scripts/'],
-    baseBranch: 'origin/develop',
-});
-```
-
-**Options:**
-
-- `pathsIgnore?` - Patterns to ignore when checking if type checks should run:
-    - Exact file matches: `.cspell.json`
-    - Directory prefixes: `docs/` (matches any file in docs directory)
-    - File extensions: `**.md` (matches any markdown file)
-    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
-- `baseBranch?` - Base branch to compare against (default: `origin/main`)
-
-**GitHub Actions Integration:**
-
-When running in GitHub Actions, sets `GITHUB_OUTPUT` with `should_run=true/false`:
-
-```yaml
-- name: Check if type checks should run
-  id: check_diff
-  run: npx check-should-run-type-checks
-
-- name: Run type checks
-  if: steps.check_diff.outputs.should_run == 'true'
-  run: npm run type-check
-```
-
-### Command Execution
-
-#### `$(command: string, options?: ExecOptions): Promise<ExecResult>`
-
-Executes a shell command asynchronously with timeout support and type-safe results.
-
-```typescript
-import { $ } from 'ts-repo-utils';
-
-const result = await $('npm test', { timeout: 60000 });
-
-if (result.type === 'ok') {
-    console.log('Tests passed:', result.stdout);
-} else {
-    console.error('Tests failed:', result.exception.message);
-}
-```
-
-**Options:**
-
-- `silent?: boolean` - Don't log command/output (default: false)
-- `'node:child_process'` `exec` function options
-
-**Return Type:**
-
-```typescript
-type Ret = Promise<
-    Result<
-        Readonly<{ stdout: string | Buffer; stderr: string | Buffer }>,
-        import('node:child_process').ExecException
-    >
+    import('node:child_process').ExecException | Readonly<{ message: string }>
 >;
 ```
 
@@ -413,7 +369,7 @@ type Ret = Promise<
 
 #### `formatFilesGlob(pathGlob: string, options?): Promise<Result<undefined, unknown>>`
 
-Format files matching a glob pattern using Prettier.
+Formats files matching a glob pattern using Prettier.
 
 ```typescript
 import { formatFilesGlob } from 'ts-repo-utils';
@@ -439,7 +395,8 @@ await formatFilesGlob('src/**/*.ts', {
 
 #### `formatUncommittedFiles(options?): Promise<Result>`
 
-Format only files that have been changed according to git status.
+Formats only files that have been changed according to git status.
+(Function version of the `format-uncommitted` command)
 
 ```typescript
 import { formatUncommittedFiles } from 'ts-repo-utils';
@@ -469,14 +426,17 @@ await formatUncommittedFiles({
 type Ret = Promise<
     Result<
         undefined,
-        ExecException | Readonly<{ message: string }> | readonly unknown[]
+        | import('node:child_process').ExecException
+        | Readonly<{ message: string }>
+        | readonly unknown[]
     >
 >;
 ```
 
 #### `formatDiffFrom(base: string, options?): Promise<Result>`
 
-Format only files that differ from the specified base branch or commit.
+Formats only files that differ from the specified base branch or commit.
+(Function version of the `format-diff-from` command)
 
 ```typescript
 import { formatDiffFrom } from 'ts-repo-utils';
@@ -510,26 +470,102 @@ await formatDiffFrom('main', {
 type Ret = Promise<
     Result<
         undefined,
-        ExecException | Readonly<{ message: string }> | readonly unknown[]
+        | import('node:child_process').ExecException
+        | Readonly<{ message: string }>
+        | readonly unknown[]
     >
 >;
 ```
 
-### Workspace Management Utilities
+### Index File Generation
+
+#### `genIndex(config: GenIndexConfig): Promise<Result<undefined, unknown>>`
+
+Generates index files recursively in target directories with automatic barrel exports.
+(Function version of the `gen-index-ts` command)
+
+```typescript
+import { genIndex } from 'ts-repo-utils';
+
+await genIndex({
+    targetDirectory: './src',
+    exclude: ['*.test.ts', '*.spec.ts'],
+});
+```
+
+**Configuration Type:**
+
+```typescript
+type GenIndexConfig = Readonly<{
+    /**
+     * Target directories to generate index files for (string or array of
+     * strings)
+     */
+    targetDirectory: string | readonly string[];
+
+    /**
+     * Glob patterns for files or predicate function to exclude from exports
+     * (default: excludes `'**\/*.{test,spec}.?(c|m)[jt]s?(x)'` and
+     * `'**\/*.d.?(c|m)ts'`)
+     */
+    exclude?:
+        | readonly string[]
+        | ((
+              args: Readonly<{
+                  absolutePath: string;
+                  relativePath: string;
+                  fileName: string;
+              }>,
+          ) => boolean);
+
+    /**
+     * File extensions of source files to include in exports (default: ['.ts',
+     * '.tsx'])
+     */
+    targetExtensions?: readonly `.${string}`[];
+
+    /** File extension of index files to generate (default: '.ts') */
+    indexFileExtension?: `.${string}`;
+
+    /** File extension to use in export statements (default: '.js') */
+    exportStatementExtension?: `.${string}` | 'none';
+
+    /** Command to run for formatting generated files (optional) */
+    formatCommand?: string;
+
+    /** Whether to suppress output during execution (default: false) */
+    silent?: boolean;
+}>;
+```
+
+**Features:**
+
+- Creates barrel exports for all subdirectories
+- Supports complex glob exclusion patterns (using micromatch)
+- Automatically formats generated files using the project's Prettier config
+- Works with both single directories and directory arrays
+- Respects source and export extension configuration
+
+**Benefits:**
+
+- Prevents forgetting to export modules
+- TypeScript can detect duplicate variables, type names, etc.
+
+### Monorepo Workspace Management Utilities
 
 #### `runCmdInStagesAcrossWorkspaces(options): Promise<void>`
 
-Executes a npm script command across all workspace packages in dependency order stages. Packages are grouped into stages where each stage contains packages whose dependencies have been completed in previous stages. Uses fail-fast behavior.
+Executes an npm script command across all workspace packages in dependency order stages. Packages are grouped into stages where each stage contains packages whose dependencies have been completed in previous stages. Uses fail-fast behavior.
 
 ```typescript
 import { runCmdInStagesAcrossWorkspaces } from 'ts-repo-utils';
 
 // Run build in dependency order
 await runCmdInStagesAcrossWorkspaces({
-    rootPackageJsonDir: '.',
+    rootPackageJsonDir: '../',
     cmd: 'build',
     concurrency: 3,
-    filterWorkspacePattern: (name) => !name.includes('deprecated'),
+    filterWorkspacePattern: (name) => !name.includes('experimental'),
 });
 ```
 
@@ -542,16 +578,17 @@ await runCmdInStagesAcrossWorkspaces({
 
 #### `runCmdInParallelAcrossWorkspaces(options): Promise<void>`
 
-Executes a npm script command across all workspace packages in parallel. Uses fail-fast behavior - stops execution immediately when any package fails.
+Executes an npm script command across all workspace packages in parallel. Uses fail-fast behavior - stops execution immediately when any package fails.
 
 ```typescript
 import { runCmdInParallelAcrossWorkspaces } from 'ts-repo-utils';
 
 // Run tests in parallel across all packages
 await runCmdInParallelAcrossWorkspaces({
-    rootPackageJsonDir: '.',
+    rootPackageJsonDir: '../',
     cmd: 'test',
     concurrency: 5,
+    filterWorkspacePattern: (name) => !name.includes('experimental'),
 });
 ```
 
@@ -577,17 +614,17 @@ console.log(packages.map((pkg) => pkg.name));
 **Return Type:**
 
 ```typescript
-type Package = {
+type Package = Readonly<{
     name: string;
     path: string;
     packageJson: JsonValue;
-    dependencies: Record<string, string>;
-};
+    dependencies: Readonly<Record<string, string>>;
+}>;
 ```
 
 #### `executeParallel(packages, scriptName, concurrency?): Promise<readonly Result[]>`
 
-Executes a npm script across multiple packages in parallel with a concurrency limit. Lower-level function used by `runCmdInParallelAcrossWorkspaces`.
+Executes an npm script across multiple packages in parallel with a concurrency limit. Lower-level function used by `runCmdInParallelAcrossWorkspaces`.
 
 ```typescript
 import { executeParallel, getWorkspacePackages } from 'ts-repo-utils';
@@ -598,7 +635,7 @@ await executeParallel(packages, 'lint', 4);
 
 #### `executeStages(packages, scriptName, concurrency?): Promise<void>`
 
-Executes a npm script across packages in dependency order stages. Lower-level function used by `runCmdInStagesAcrossWorkspaces`.
+Executes an npm script across packages in dependency order stages. Lower-level function used by `runCmdInStagesAcrossWorkspaces`.
 
 ```typescript
 import { executeStages, getWorkspacePackages } from 'ts-repo-utils';
@@ -615,93 +652,44 @@ await executeStages(packages, 'build', 3);
 - Fail-fast behavior on errors
 - Circular dependency detection
 
-### Index File Generation
+### Globals
 
-#### `genIndex(config: GenIndexConfig): Promise<Result<undefined, unknown>>`
-
-Generates index files recursively in target directories with automatic barrel exports.
+When you import `ts-repo-utils` without destructuring, several utilities become globally available. This is useful for scripts where you want quick access to common functions without explicit imports.
 
 ```typescript
-import { genIndex } from 'ts-repo-utils';
+import 'ts-repo-utils';
 
-await genIndex({
-    targetDirectory: './src',
-    exclude: ['*.test.ts', '*.spec.ts'],
+// Now these functions are globally available
+
+await $('npm test');
+
+echo('Building project...');
+
+const filePath: string = path.join('src', 'index.ts');
+
+const configJson: string = await fs.readFile('./config.json', {
+    encoding: 'utf8',
 });
+
+const files: readonly string[] = await glob('**/*.ts');
 ```
 
-**Configuration Type:**
-
-```typescript
-type GenIndexConfig = DeepReadonly<{
-    /**
-     * Target directories to generate index files for (string or array of
-     * strings)
-     */
-    targetDirectory: string | readonly string[];
-
-    /**
-     * Glob patterns of files or predicate function to exclude from exports
-     * (default: excludes `'**\/*.{test,spec}.?(c|m)[jt]s?(x)'` and
-     * `'**\/*.d.?(c|m)ts'`)
-     */
-    exclude?:
-        | readonly string[]
-        | ((
-              args: Readonly<{
-                  absolutePath: string;
-                  relativePath: string;
-                  fileName: string;
-              }>,
-          ) => boolean);
-
-    /** File extensions of source files to export (default: ['.ts', '.tsx']) */
-    targetExtensions?: readonly `.${string}`[];
-
-    /** File extension of index files to generate (default: '.ts') */
-    indexFileExtension?: `.${string}`;
-
-    /** File extension to use in export statements (default: '.js') */
-    exportStatementExtension?: `.${string}` | 'none';
-
-    /** Command to run for formatting generated files (optional) */
-    formatCommand?: string;
-
-    /** Whether to suppress output during execution (default: false) */
-    silent?: boolean;
-}>;
-```
-
-**Features:**
-
-- Creates barrel exports for all subdirectories
-- Supports complex glob exclusion patterns (using micromatch)
-- Automatically formats generated files using project's prettier config
-- Works with both single directories and directory arrays
-- Respects source and export extension configuration
-
-**Benefits:**
-
-- Prevents forgetting to export libraries
-- tsc can detect duplicate variables, type names, etc.
-
-## Key Features
-
-- **Type Safety**: All functions use strict TypeScript types with readonly parameters
-- **Error Handling**: Comprehensive error handling with descriptive messages
-- **Git Integration**: Built-in git status and diff utilities
-- **Formatting**: Prettier integration with configuration resolution
-- **ESM Support**: Designed for ES modules with .mts/.mjs extension handling
-- **Concurrent Processing**: Uses Promise.all for performance optimization
-- **Configurable**: Flexible configuration options with sensible defaults
-- **Console Feedback**: Informative logging throughout operations
+- `$` - The command execution utility described above.
+- `echo` - Equivalent to `console.log`
+- `path` - `node:path`
+- `fs` - `node:fs/promises`
+- `glob` - `fast-glob`
 
 ## Common Patterns
 
 ### Pre-commit Hook
 
 ```typescript
-import { formatUntracked, assertExt, assertRepoIsClean } from 'ts-repo-utils';
+import {
+    assertExt,
+    assertRepoIsClean,
+    formatUncommittedFiles,
+} from 'ts-repo-utils';
 
 // Validate file extensions
 await assertExt({
@@ -718,15 +706,7 @@ await assertRepoIsClean();
 ### Build Pipeline
 
 ```typescript
-import { assertExt, genIndex, $, formatFilesGlob } from 'ts-repo-utils';
-
-// Validate extensions
-await assertExt({
-    directories: [
-        { path: './src', extension: '.ts' },
-        { path: './scripts', extension: '.mjs' },
-    ],
-});
+import { formatFilesGlob, genIndex } from 'ts-repo-utils';
 
 // Generate barrel exports
 await genIndex({ targetDirectory: './src' });
@@ -744,11 +724,19 @@ await formatFilesGlob('dist/**/*.js');
 ### Project Validation
 
 ```typescript
-import { pathExists, assertPathExists, assertRepoIsClean } from 'ts-repo-utils';
+import { assertExt, assertPathExists, assertRepoIsClean } from 'ts-repo-utils';
 
 // Check required files exist (exits with code 1 if files don't exist)
 await assertPathExists('./package.json', 'Package manifest');
 await assertPathExists('./tsconfig.json', 'TypeScript config');
+
+// Validate extensions
+await assertExt({
+    directories: [
+        { path: './src', extension: '.ts' },
+        { path: './scripts', extension: '.mjs' },
+    ],
+});
 
 // Verify clean repository state (exits with code 1 if repo is dirty)
 await assertRepoIsClean();
