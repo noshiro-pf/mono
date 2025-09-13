@@ -10,7 +10,7 @@
 
 ### checkShouldRunTypeChecks()
 
-> **checkShouldRunTypeChecks**(`options?`): `Promise`\<`void`\>
+> **checkShouldRunTypeChecks**(`options?`): `Promise`\<`boolean`\>
 
 Defined in: [src/functions/should-run.mts:59](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/should-run.mts#L59)
 
@@ -32,7 +32,7 @@ Configuration options
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\<`boolean`\>
 
 A promise that resolves when the check is complete. The function
   will set the GITHUB_OUTPUT environment variable with `should_run=true` or

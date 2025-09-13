@@ -394,6 +394,39 @@ type Ret = Result<
 >;
 ```
 
+#### Build Optimization Utilities
+
+##### `checkShouldRunTypeChecks(options?): Promise<boolean>`
+
+Checks whether TypeScript type checks should run based on file changes from the base branch. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files have changed.
+(Function version of the `check-should-run-type-checks` command)
+
+```typescript
+import { checkShouldRunTypeChecks } from 'ts-repo-utils';
+
+// Use default settings (compare against origin/main)
+const shouldRun = await checkShouldRunTypeChecks();
+
+if (shouldRun) {
+    await $('npm run type-check');
+}
+
+// Custom ignore patterns and base branch
+const shouldRun2 = await checkShouldRunTypeChecks({
+    pathsIgnore: ['.eslintrc.json', 'docs/', '**.md', 'scripts/'],
+    baseBranch: 'origin/develop',
+});
+```
+
+**Options:**
+
+- `pathsIgnore?` - Patterns to ignore when checking if type checks should run:
+    - Exact file matches: `.cspell.json`
+    - Directory prefixes: `docs/` (matches any file in docs directory)
+    - File extensions: `**.md` (matches any markdown file)
+    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
+- `baseBranch?` - Base branch to compare against (default: `origin/main`)
+
 ### Code Formatting Utilities
 
 #### `formatFilesGlob(pathGlob: string, options?): Promise<Result<undefined, unknown>>`

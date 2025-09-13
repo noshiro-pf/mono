@@ -61,7 +61,7 @@ export const checkShouldRunTypeChecks = async (
     pathsIgnore?: readonly string[];
     baseBranch?: string;
   }>,
-): Promise<void> => {
+): Promise<boolean> => {
   const pathsIgnore = options?.pathsIgnore ?? [
     'LICENSE',
     '.editorconfig',
@@ -112,4 +112,6 @@ export const checkShouldRunTypeChecks = async (
   if (GITHUB_OUTPUT !== undefined) {
     await fs.appendFile(GITHUB_OUTPUT, `should_run=${shouldRunTsChecks}\n`);
   }
+
+  return shouldRunTsChecks;
 };
