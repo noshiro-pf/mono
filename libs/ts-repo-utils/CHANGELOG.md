@@ -1,3 +1,9 @@
+## [7.3.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.3.0...v7.3.1) (2025-09-13)
+
+### Bug Fixes
+
+- fix isDirectlyExecuted global definition and docs ([#147](https://github.com/noshiro-pf/ts-repo-utils/issues/147)) ([3a131b4](https://github.com/noshiro-pf/ts-repo-utils/commit/3a131b4368cab39d52d67cd9b5b2655299004ef8))
+
 # [7.3.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.2.0...v7.3.0) (2025-09-13)
 
 ### Features
