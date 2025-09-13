@@ -29,7 +29,7 @@ jobs:
       matrix:
         command:
           - test:cov
-          - lint
+          - lint:fix
           - build
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -54,11 +54,14 @@ jobs:
       # skip each step instead of skipping the entire workflow with paths-ignore.
       - name: Check diff
         id: check_diff_type
-        run: npm exec -- check-should-run-type-checks
+        run: npm exec check-should-run-type-checks
 
       - name: Run "${{ matrix.command }}"
         if: steps.check_diff_type.outputs.should_run == 'true'
         run: npm run ${{ matrix.command }}
+
+      - name: Check if there is no file diff
+        run: npm exec assert-repo-is-clean
 
       - name: Upload coverage reports to Codecov
         if: steps.check_diff_type.outputs.should_run == 'true'
