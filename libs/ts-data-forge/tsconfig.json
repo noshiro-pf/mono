@@ -4,12 +4,15 @@
     "./configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    "jsx": "react-jsx",
     "paths": {
-      "ts-data-forge": ["./src/index.mts"]
+      "ts-data-forge": ["./src/entry-point.mts"]
     }
   },
   "include": [
     "./src",
+    "./samples",
+    "./test",
     "./scripts",
     "./configs",
     "./release.config.js",

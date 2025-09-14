@@ -1,4 +1,3 @@
-import { Result } from 'ts-data-forge';
 import 'ts-repo-utils';
 
 /**
@@ -29,7 +28,7 @@ const checkAll = async (): Promise<void> => {
 
   // Step 5: Lint and check repo status
   echo('5. Running lint fixes...');
-  await runCmdStep('npm run lint', 'Linting failed');
+  await runCmdStep('npm run lint:fix', 'Linting failed');
   echo('✓ Lint fixes applied\n');
 
   // Step 6: Build and check repo status
@@ -40,23 +39,8 @@ const checkAll = async (): Promise<void> => {
   echo('7. Generating documentation...');
   await runCmdStep('npm run doc', 'Documentation generation failed');
 
-  // Step 8: Type check samples
-  echo('8. Type checking samples...');
-  await runCmdStep('npm run type-check:samples', 'Sample type checking failed');
-  echo('✓ Sample type checking passed\n');
-
-  // Step 9: Run tests on samples
-  echo('9. Running tests on samples...');
-  await runCmdStep('npm run test:samples', 'Sample tests failed');
-  echo('✓ Sample tests passed\n');
-
-  // Step 10: Lint samples
-  echo('10. Running lint fixes on samples...');
-  await runCmdStep('npm run lint:samples', 'Linting samples failed');
-  echo('✓ Sample lint fixes applied\n');
-
-  // Step 11: Format and check repo status
-  echo('11. Formatting code...');
+  // Step 8: Format and check repo status
+  echo('8. Formatting code...');
   await runCmdStep('npm run fmt', 'Formatting failed');
 
   echo('✅ All checks completed successfully!\n');
@@ -65,8 +49,8 @@ const checkAll = async (): Promise<void> => {
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
   if (Result.isErr(result)) {
-    echo(`${errorMsg}: ${result.value.message}`);
-    echo('❌ Check failed');
+    console.error(`${errorMsg}: ${result.value.message}`);
+    console.error('❌ Check failed');
     process.exit(1);
   }
 };

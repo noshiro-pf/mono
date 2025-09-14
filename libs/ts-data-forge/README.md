@@ -132,7 +132,7 @@ Here are some examples of how to use utilities from `ts-data-forge`:
 
 The `expectType` utility allows you to make assertions about types at compile time. This is useful for ensuring type correctness in complex type manipulations or when refactoring.
 
-```typescript
+```tsx
 import { expectType } from 'ts-data-forge';
 
 type User = { id: number; name: string };
@@ -158,7 +158,7 @@ expectType<User, any>('!='); // Error: Comparisons with `any` are also strictly 
 
 Handle nullable values and error-prone operations safely.
 
-```typescript
+```tsx
 import { match, Optional, pipe, Result } from 'ts-data-forge';
 
 // Optional for nullable values
@@ -212,7 +212,7 @@ assert(processResult(Result.err('Failed')) === 'Error: Failed');
 
 The `Num` object provides safe and convenient functions for numerical operations.
 
-```typescript
+```tsx
 import { Num } from 'ts-data-forge';
 
 // Basic conversions
@@ -252,7 +252,7 @@ if (Num.isNonZero(value)) {
 
 `ts-data-forge` provides branded number types that enforce specific constraints at the type level.
 
-```typescript
+```tsx
 import {
     asFiniteNumber,
     asInt,
@@ -314,7 +314,7 @@ assert(randomInt16 <= 32767);
 
 The `Arr` object provides a rich set of functions for array manipulation.
 
-```typescript
+```tsx
 import { Arr, expectType, Optional } from 'ts-data-forge';
 
 const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3];
@@ -369,7 +369,7 @@ if (Optional.isSome(oldestPerson)) {
 
 Type-safe, immutable data structures.
 
-```typescript
+```tsx
 import { Arr, IMap, ISet, Optional } from 'ts-data-forge';
 
 // IMap usage - immutable operations
@@ -415,7 +415,7 @@ assert(setWithItems.size === 2);
 
 Safe type narrowing with comprehensive type guards.
 
-```typescript
+```tsx
 import { hasKey, isNonNullObject, isRecord } from 'ts-data-forge';
 
 const processData = (data: unknown): string | undefined => {
@@ -448,7 +448,7 @@ assert(processData('not an object') === undefined);
 
 Generate ranges for iteration and array creation.
 
-```typescript
+```tsx
 import { range } from 'ts-data-forge';
 
 // Traditional for loop using range

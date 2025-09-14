@@ -1,4 +1,3 @@
-import { Result } from 'ts-data-forge';
 import { assertPathExists } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -11,8 +10,11 @@ const build = async (): Promise<void> => {
   echo('Starting build process...\n');
 
   // Step 1: Validate file extensions
-  echo('1. Checking file extensions...');
-  await $('npm run check:ext');
+  {
+    echo('1. Checking file extensions...');
+    await runCmdStep('npm run check:ext', 'Checking file extensions failed');
+    echo('✓ File extensions validated\n');
+  }
 
   // Step 2: Clean previous build
   {
@@ -83,7 +85,7 @@ const build = async (): Promise<void> => {
     echo('7. Generating dist/types.d.mts...');
     const content = [
       "import './globals.d.mts';",
-      "export * from './index.mjs';",
+      "export * from './entry-point.mjs';",
     ].join('\n');
 
     const typesFile = path.resolve(distDir, 'types.d.mts');
@@ -112,20 +114,20 @@ const build = async (): Promise<void> => {
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
   if (Result.isErr(result)) {
-    echo(`${errorMsg}: ${result.value.message}`);
-    echo('❌ Build failed');
+    console.error(`${errorMsg}: ${result.value.message}`);
+    console.error('❌ Build failed');
     process.exit(1);
   }
 };
 
 const runStep = async (
-  promise: Promise<Result.Base>,
+  promise: Promise<Result<unknown, unknown>>,
   errorMsg: string,
 ): Promise<void> => {
   const result = await promise;
   if (Result.isErr(result)) {
-    echo(`${errorMsg}: ${String(result.value)}`);
-    echo('❌ Build failed');
+    console.error(`${errorMsg}: ${String(result.value)}`);
+    console.error('❌ Build failed');
     process.exit(1);
   }
 };

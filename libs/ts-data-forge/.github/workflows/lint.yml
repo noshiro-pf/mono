@@ -1,4 +1,4 @@
-name: Style Check
+name: Lint and Build
 
 # Controls when the action will run.
 on:
@@ -9,13 +9,17 @@ on:
       - 'develop*'
     paths-ignore:
       - '.gitignore'
+      # - '.cspell.json'
+      # - '**.md'
+      # - '**.txt'
+      # - 'docs/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  style-check:
+  lint-and-build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -24,11 +28,8 @@ jobs:
       fail-fast: true
       matrix:
         command:
-          - fmt
-          - cspell
-          - doc
-          - check:ext
-          - md
+          - lint:fix
+          - build
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -46,9 +47,16 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm install --engine-strict
+        run: npm ci --engine-strict
+
+      # NOTE: To include this workflow in the branch protection rule status check,
+      # skip each step instead of skipping the entire workflow with paths-ignore.
+      - name: Check diff
+        id: check_diff_type
+        run: npm exec check-should-run-type-checks
 
       - name: Run "${{ matrix.command }}"
+        if: steps.check_diff_type.outputs.should_run == 'true'
         run: npm run ${{ matrix.command }}
 
       - name: Check if there is no file diff

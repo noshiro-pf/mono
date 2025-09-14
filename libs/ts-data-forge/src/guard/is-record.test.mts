@@ -22,7 +22,6 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     expectType<typeof obj, {}>('=');
     expectType<typeof res, boolean>('=');
 
