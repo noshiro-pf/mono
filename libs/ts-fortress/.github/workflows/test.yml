@@ -1,4 +1,4 @@
-name: Type Check
+name: Test and Upload Coverage to Codecov
 
 # Controls when the action will run.
 on:
