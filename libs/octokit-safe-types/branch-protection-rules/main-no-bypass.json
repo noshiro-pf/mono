@@ -1,0 +1,26 @@
+{
+  "id": 6233322,
+  "name": "main-no-bypass",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "noshiro-pf/typescript-template",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [],
+      "include": ["~DEFAULT_BRANCH", "refs/heads/main"]
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "required_linear_history"
+    },
+    {
+      "type": "creation"
+    }
+  ],
+  "bypass_actors": []
+}

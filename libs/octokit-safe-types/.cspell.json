@@ -1,0 +1,15 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "allowCompoundWords": true,
+  "caseSensitive": false,
+  "ignoreRandomStrings": true,
+  "words": ["noshiro", "testw", "tscw"],
+  "flagWords": [],
+  "ignorePaths": [
+    "eslint.config.js",
+    "./package-lock.json",
+    "docs/**",
+    "BREAKING_CHANGE_GUIDE.md"
+  ]
+}
