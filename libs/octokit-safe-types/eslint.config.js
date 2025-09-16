@@ -1305,6 +1305,7 @@ export default tseslint.config(
       'unicorn/no-process-exit': 'off',
       'import/no-unassigned-import': 'off',
       'import/no-extraneous-dependencies': 'off',
+      'no-await-in-loop': 'off',
     },
   },
   {

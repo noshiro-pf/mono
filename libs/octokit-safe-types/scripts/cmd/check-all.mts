@@ -35,12 +35,8 @@ const checkAll = async (): Promise<void> => {
   echo('6. Building project...');
   await runCmdStep('npm run build', 'Build failed');
 
-  // Step 7: Generate docs and check repo status
-  echo('7. Generating documentation...');
-  await runCmdStep('npm run doc', 'Documentation generation failed');
-
-  // Step 8: Format and check repo status
-  echo('8. Formatting code...');
+  // Step 7: Format and check repo status
+  echo('7. Formatting code...');
   await runCmdStep('npm run fmt', 'Formatting failed');
 
   echo('✅ All checks completed successfully!\n');

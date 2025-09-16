@@ -10,6 +10,7 @@
     "eslint.config.js",
     "./package-lock.json",
     "docs/**",
-    "BREAKING_CHANGE_GUIDE.md"
+    "BREAKING_CHANGE_GUIDE.md",
+    "github/**"
   ]
 }

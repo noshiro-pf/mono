@@ -1,13 +1,17 @@
 {
-  "name": "typescript-template",
+  "name": "octokit-safe-types",
   "version": "0.1.0",
   "private": false,
+  "description": "A library of readonly versions of Octokit types and their corresponding validators",
   "keywords": [
-    "typescript"
+    "typescript",
+    "octokit",
+    "ts-fortress",
+    "validation"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/noshiro-pf/typescript-template.git"
+    "url": "git+https://github.com/noshiro-pf/octokit-safe-types.git"
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
@@ -17,11 +21,11 @@
     ".": {
       "import": {
         "types": "./dist/types.d.mts",
-        "default": "./dist/index.mjs"
+        "default": "./dist/entry-point.mjs"
       }
     }
   },
-  "module": "./dist/index.mjs",
+  "module": "./dist/entry-point.mjs",
   "types": "./dist/types.d.mts",
   "files": [
     "src",
@@ -34,10 +38,17 @@
     "check-all": "tsx ./scripts/cmd/check-all.mjs",
     "check:ext": "tsx ./scripts/cmd/check-ext.mjs",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
-    "doc": "tsx ./scripts/cmd/gen-docs.mjs",
     "fmt": "format-diff-from origin/main",
     "fmt:full": "prettier --write .",
-    "gi": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'",
+    "gh:apply-all": "run-s gh:apply-variables gh:apply-rulesets gh:apply-repository-settings",
+    "gh:apply-repository-settings": "tsx --env-file=.env scripts/github/repository/apply.mts",
+    "gh:apply-rulesets": "tsx --env-file=.env scripts/github/ruleset/apply.mts",
+    "gh:apply-variables": "tsx --env-file=.env scripts/github/variables/apply.mts",
+    "gh:backup-repository-settings": "tsx --env-file=.env scripts/github/repository/backup.mts",
+    "gh:backup-rulesets": "tsx --env-file=.env scripts/github/repository/backup.mts",
+    "gi": "run-s gi:scripts gi:src fmt",
+    "gi:scripts": "gen-index-ts ./scripts/github --index-ext .mts --export-ext .mjs --target-ext .mts --exclude cmd --exclude apply.mts --exclude octokit.mts",
+    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",
@@ -51,6 +62,11 @@
     "type-check": "tsc --noEmit",
     "update-packages": "npx npm-check-updates -u --install always",
     "z:vitest": "vitest --config ./configs/vitest.config.ts"
+  },
+  "dependencies": {
+    "@octokit/core": "^7.0.3",
+    "ts-data-forge": "^3.2.0",
+    "ts-fortress": "^4.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
@@ -81,18 +97,16 @@
     "eslint-plugin-vitest": "0.5.4",
     "fast-glob": "^3.3.3",
     "markdownlint-cli2": "^0.18.1",
+    "npm-run-all2": "^8.0.4",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.2.0",
     "prettier-plugin-packagejson": "^2.5.19",
     "rollup": "^4.50.1",
     "semantic-release": "^24.2.7",
-    "ts-data-forge": "^3.2.0",
     "ts-repo-utils": "^7.5.0",
     "ts-type-forge": "^2.2.0",
     "tslib": "^2.8.1",
     "tsx": "^4.20.5",
-    "typedoc": "^0.28.11",
-    "typedoc-plugin-markdown": "^4.8.1",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.40.0",
     "vitest": "^3.2.4"

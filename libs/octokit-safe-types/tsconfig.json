@@ -3,6 +3,11 @@
     "./configs/tsconfig/tsconfig.type-check.json",
     "./configs/tsconfig/tsconfig.vite.json"
   ],
+  "compilerOptions": {
+    "paths": {
+      "octokit-safe-types": ["./src/entry-point.mts"]
+    }
+  },
   "include": [
     "./src",
     "./test",
