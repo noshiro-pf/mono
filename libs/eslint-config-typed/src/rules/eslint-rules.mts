@@ -369,6 +369,7 @@ export const eslintRules: EslintRules = {
 
   'no-useless-assignment': 'error',
   'no-unassigned-vars': 'error',
+  'preserve-caught-error': ['error', { requireCatchParameter: false }],
 
   // deprecated
   'lines-around-comment': 0,

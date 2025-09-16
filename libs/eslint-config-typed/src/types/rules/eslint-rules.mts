@@ -6029,11 +6029,12 @@ namespace NoEmptyCharacterClass {
  * @link https://eslint.org/docs/latest/rules/no-empty-function
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | deprecated  | false      |
- *  | recommended | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace NoEmptyFunction {
@@ -6143,11 +6144,12 @@ namespace NoEmptyPattern {
  * @link https://eslint.org/docs/latest/rules/no-empty-static-block
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | deprecated  | false      |
- *  | recommended | true       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  *  ```
  */
 namespace NoEmptyStaticBlock {
@@ -11854,6 +11856,53 @@ namespace PreferTemplate {
 }
 
 /**
+ * Disallow losing originally caught error when re-throwing custom errors
+ *
+ * @link https://eslint.org/docs/latest/rules/preserve-caught-error
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
+ *  ```
+ */
+namespace PreserveCaughtError {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "requireCatchParameter": {
+   *         "type": "boolean",
+   *         "default": false,
+   *         "description": "Requires the catch blocks to always have the caught error parameter so it is not discarded."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    /**
+     * Requires the catch blocks to always have the caught error parameter so it
+     * is not discarded.
+     */
+    readonly requireCatchParameter?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.StringSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+}
+
+/**
  * Require quotes around object literal property names
  *
  * @link https://eslint.org/docs/latest/rules/quote-props
@@ -13488,6 +13537,7 @@ export type EslintRules = {
   readonly 'prefer-rest-params': PreferRestParams.RuleEntry;
   readonly 'prefer-spread': PreferSpread.RuleEntry;
   readonly 'prefer-template': PreferTemplate.RuleEntry;
+  readonly 'preserve-caught-error': PreserveCaughtError.RuleEntry;
   readonly radix: Radix.RuleEntry;
   readonly 'require-atomic-updates': RequireAtomicUpdates.RuleEntry;
   readonly 'require-await': RequireAwait.RuleEntry;
@@ -13708,6 +13758,7 @@ export type EslintRulesOption = {
   ];
   readonly 'prefer-promise-reject-errors': PreferPromiseRejectErrors.Options;
   readonly 'prefer-regex-literals': PreferRegexLiterals.Options;
+  readonly 'preserve-caught-error': PreserveCaughtError.Options;
   readonly radix: Radix.Options;
   readonly 'require-atomic-updates': RequireAtomicUpdates.Options;
   readonly 'require-unicode-regexp': RequireUnicodeRegexp.Options;

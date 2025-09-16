@@ -4526,11 +4526,12 @@ namespace NoDynamicDelete {
  * @link https://typescript-eslint.io/rules/no-empty-function
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | deprecated  | false      |
- *  | recommended | stylistic  |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | stylistic  |
  *  ```
  */
 namespace NoEmptyFunction {
