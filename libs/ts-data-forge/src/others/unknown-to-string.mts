@@ -151,8 +151,10 @@ export const unknownToString = (
     case 'string':
       return value;
 
-    case 'number':
     case 'bigint':
+      return `${value.toString()}n`;
+
+    case 'number':
     case 'boolean':
     case 'symbol':
     case 'function':
