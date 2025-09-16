@@ -61,6 +61,7 @@ export const eslintFlatConfigForTypeScript = ({
   {
     files: ['**/*.d.ts', '**/*.d.mts', '**/*.d.cts'],
     rules: {
+      '@typescript-eslint/triple-slash-reference': 'off',
       'import/unambiguous': 'off',
     },
   } satisfies FlatConfig,
