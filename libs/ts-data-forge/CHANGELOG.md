@@ -1,3 +1,9 @@
+# [3.3.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.2.0...v3.3.0) (2025-09-16)
+
+### Features
+
+- unknownToString now outputs BigInt values ​​as "123n" instead of "123" ([#149](https://github.com/noshiro-pf/ts-data-forge/issues/149)) ([1da1397](https://github.com/noshiro-pf/ts-data-forge/commit/1da139769e75fc68544531af3befa5b509688d2b))
+
 # [3.2.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.1.0...v3.2.0) (2025-08-28)
 
 ### Features
