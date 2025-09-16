@@ -83,7 +83,7 @@ All operations automatically clamp results to the valid NonNegativeInt32 range [
 This ensures that all arithmetic maintains the 32-bit non-negative integer constraint,
 with negative results clamped to 0 and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 

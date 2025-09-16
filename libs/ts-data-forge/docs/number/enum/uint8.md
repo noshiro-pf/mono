@@ -136,7 +136,7 @@ All operations automatically clamp results to the valid Uint8 range [0, 255].
 This ensures that all arithmetic maintains the 8-bit unsigned integer constraint,
 with negative results clamped to 0 and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 

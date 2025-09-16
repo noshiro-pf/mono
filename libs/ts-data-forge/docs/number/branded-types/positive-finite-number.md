@@ -84,7 +84,7 @@ while ensuring results remain finite (excluding NaN and Infinity). This type is 
 for representing quantities that must always be positive, such as probabilities, magnitudes,
 and physical measurements.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 

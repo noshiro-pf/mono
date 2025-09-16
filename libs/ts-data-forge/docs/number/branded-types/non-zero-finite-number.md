@@ -83,7 +83,7 @@ All operations maintain the non-zero constraint while ensuring results remain fi
 (excluding NaN and Infinity). This type is useful for values that must never be zero,
 such as denominators, scaling factors, and ratios.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 

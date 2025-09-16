@@ -83,7 +83,7 @@ All operations maintain the non-negative constraint by clamping negative results
 while ensuring results remain finite (excluding NaN and Infinity). This type is useful
 for representing measurements, distances, weights, and other inherently non-negative values.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 

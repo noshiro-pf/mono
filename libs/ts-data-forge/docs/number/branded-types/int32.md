@@ -60,7 +60,7 @@ Namespace providing type-safe arithmetic operations for 32-bit signed integers.
 All operations automatically clamp results to the valid Int32 range [-2147483648, 2147483647].
 This ensures that all arithmetic maintains the 32-bit signed integer constraint, preventing overflow.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 

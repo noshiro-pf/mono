@@ -82,7 +82,7 @@ Namespace providing type-safe arithmetic operations for unsigned integers.
 All operations maintain the non-negative constraint by clamping negative results to 0.
 This ensures that all arithmetic preserves the unsigned integer property.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 

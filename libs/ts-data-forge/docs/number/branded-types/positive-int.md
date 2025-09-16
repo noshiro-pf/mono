@@ -114,7 +114,7 @@ This type is essential for:
 - Loop counters and iteration counts
 - Database primary keys and IDs
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 

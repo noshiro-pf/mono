@@ -83,7 +83,7 @@ All operations automatically clamp results to the safe unsigned integer range [0
 This ensures that all arithmetic maintains both the non-negative constraint and IEEE 754 precision guarantees,
 preventing precision loss while ensuring results are never negative.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 

@@ -82,7 +82,7 @@ Namespace providing type-safe arithmetic operations for non-zero integers.
 All operations maintain the non-zero constraint, ensuring that results are always valid NonZeroInt values.
 Division operations return floor division results, and all arithmetic maintains integer precision.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 

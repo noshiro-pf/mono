@@ -113,7 +113,7 @@ ideal for:
 - Array indices and sizes
 - Any integer arithmetic requiring precision guarantees
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 

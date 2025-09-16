@@ -83,7 +83,7 @@ All operations automatically clamp results to the valid Uint16 range [0, 65535].
 This ensures that all arithmetic maintains the 16-bit unsigned integer constraint,
 with negative results clamped to 0 and overflow results clamped to MAX_VALUE.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 

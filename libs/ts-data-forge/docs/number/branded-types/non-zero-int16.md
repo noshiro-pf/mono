@@ -83,7 +83,7 @@ All operations automatically clamp results to the valid NonZeroInt16 range [-327
 excluding 0. This ensures that all arithmetic maintains the 16-bit non-zero signed integer
 constraint, preventing zero results and overflow.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 

@@ -83,7 +83,7 @@ All operations automatically clamp results to the positive safe integer range [1
 This ensures that all arithmetic maintains both the positive constraint and IEEE 754 precision guarantees,
 preventing precision loss and ensuring results are always positive.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 

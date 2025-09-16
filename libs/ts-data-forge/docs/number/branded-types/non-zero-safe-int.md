@@ -83,7 +83,7 @@ All operations automatically clamp results to the non-zero safe integer range, e
 This ensures that all arithmetic maintains both the non-zero constraint and IEEE 754 precision guarantees,
 preventing precision loss while ensuring results are never zero.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 

@@ -73,7 +73,7 @@ Unlike SafeInt, Int allows values outside the safe integer range
 (±2^53 - 1), but be aware that very large integers may lose precision
 in JavaScript's number type.
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 

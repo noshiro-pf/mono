@@ -88,7 +88,7 @@ This type is useful for:
 - Memory-efficient integer storage
 - Image processing (signed pixel offsets)
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 

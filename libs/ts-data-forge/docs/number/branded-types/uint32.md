@@ -81,7 +81,7 @@ Utility functions for working with Uint32 (32-bit unsigned integer) branded type
 Provides type-safe operations that ensure results remain within the valid range [0, 2^32).
 All arithmetic operations are clamped to maintain the Uint32 constraint.
 
-#### Type declaration
+#### Type Declaration
 
 ##### add()
 

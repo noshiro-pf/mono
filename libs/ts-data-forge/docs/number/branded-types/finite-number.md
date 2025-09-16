@@ -76,7 +76,7 @@ This type is essential for:
 - Preventing NaN/Infinity propagation in calculations
 - Ensuring numeric stability in algorithms
 
-#### Type declaration
+#### Type Declaration
 
 ##### abs()
 
