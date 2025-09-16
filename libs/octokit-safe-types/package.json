@@ -45,7 +45,7 @@
     "gh:apply-rulesets": "tsx --env-file=.env scripts/github/ruleset/apply.mts",
     "gh:apply-variables": "tsx --env-file=.env scripts/github/variables/apply.mts",
     "gh:backup-repository-settings": "tsx --env-file=.env scripts/github/repository/backup.mts",
-    "gh:backup-rulesets": "tsx --env-file=.env scripts/github/repository/backup.mts",
+    "gh:backup-rulesets": "tsx --env-file=.env scripts/github/ruleset/backup.mts",
     "gi": "run-s gi:scripts gi:src fmt",
     "gi:scripts": "gen-index-ts ./scripts/github --index-ext .mts --export-ext .mjs --target-ext .mts --exclude cmd --exclude apply.mts --exclude octokit.mts",
     "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
