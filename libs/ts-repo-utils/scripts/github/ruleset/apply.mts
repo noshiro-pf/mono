@@ -59,9 +59,17 @@ for (const ruleset of rulesetsToCreate) {
   for (const rule of rulesetsResult) {
     const content = await getRuleset(rule.id);
 
+    const str = JSON.stringify(
+      Obj.pick(content, rulesetKeysToPick),
+      undefined,
+      2,
+    );
+
+    await fs.writeFile(path.resolve(rulesetsDir, `${rule.name}.json`), str);
+
     await fs.writeFile(
-      path.resolve(rulesetsDir, `${rule.name}.json`),
-      JSON.stringify(Obj.pick(content, rulesetKeysToPick), undefined, 2),
+      path.resolve(rulesetsDir, `./bk/${rule.name}.json`),
+      str,
     );
   }
 

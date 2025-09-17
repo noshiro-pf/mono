@@ -2,45 +2,40 @@
 
 ## Project Structure & Module Organization
 
-- `src/` — Library source in strict ESM (`.mts`). CLI entry points in `src/cmd/`. Tests are co‑located as `*.test.mts`.
-- `scripts/` — Build/validation and GitHub automation scripts.
-- `configs/` — Rollup/Vitest/TS configs; build emits to `dist/`.
-- `docs/` — Generated API docs; `samples/` — usage examples.
-- `dist/` — Compiled output (generated). Do not edit.
+- `src/` contains strict ESM TypeScript (`.mts`) modules; CLI entry points live under `src/cmd/`.
+- Co-locate tests next to sources as `*.test.mts`; keep fixtures lightweight.
+- Build and release automation resides in `scripts/`; configuration in `configs/`; generated outputs appear only in `dist/` and must not be edited.
+- Usage samples live in `samples/`; API docs are regenerated into `docs/`.
 
 ## Build, Test, and Development Commands
 
-- `npm run build` — Full build: validate, generate indexes, type‑check, rollup bundle.
-- `npm test` / `npm run testw` — Run tests once / in watch mode.
-- `npm run test:cov` — Run tests with coverage; `npm run test:cov:ui` to preview HTML.
-- `npm run tsc` — Type‑check only. `npm run lint` / `lint:fix` — ESLint check/fix.
-- `npm run fmt` — Format changed files; `fmt:diff` from `origin/main`; `fmt:full` formats all.
-- `npm run doc` — Generate TypeDoc. `npm run check-all` — End‑to‑end validate (lint, test, build, docs, backups).
+- `npm run build` performs the full pipeline: lint, type-check, index generation, and Rollup bundling.
+- `npm test` runs the Vitest suite once; append a path (`npm test -- src/foo/bar.test.mts`) to focus on a file.
+- `npm run tsc` runs a standalone type-check; `npm run lint` and `npm run lint:fix` enforce ESLint rules.
+- `npm run fmt` formats staged files; use `fmt:diff` before PRs to align with main.
+- `npm run check-all` is the pre-PR gate covering lint, tests, build, docs, and backups.
 
 ## Coding Style & Naming Conventions
 
-- TypeScript ESM only; use `.mts` (exports compiled to `.mjs`).
-- Indent 2 spaces; LF endings; single quotes; semicolons (see `.editorconfig`, `.prettierrc`).
-- Prefer named exports and arrow functions. Avoid `any` and unsafe casts.
-- Tools: Prettier (with organize‑imports), ESLint (eslint-config-typed), Markdownlint.
+- Use TypeScript with named exports, arrow functions, and no `any` unless justified.
+- Formatting: 2-space indent, LF endings, single quotes, and semicolons, enforced by Prettier with organize-imports.
+- Keep module names descriptive (e.g., `src/functions/resolve-path.mts`); align CLI commands with file names in `src/cmd/`.
 
 ## Testing Guidelines
 
-- Framework: Vitest (globals enabled); type‑checking via Vitest + TS config.
-- File naming: co‑locate tests as `*.test.mts` next to sources.
-- Conventions: use `test(...)` not `it(...)`, and `toStrictEqual(...)` for deep equality.
-- Run: `npm test` or a single file `npm test -- src/functions/foo.test.mts`.
+- Tests use Vitest globals; import utilities explicitly when outside the project scope.
+- Prefer `test(...)` and `expect(...).toStrictEqual(...)` for deterministic comparisons.
+- Aim for coverage parity with existing modules; run `npm run test:cov` for enforcement and `npm run test:cov:ui` to inspect reports.
 
 ## Commit & Pull Request Guidelines
 
-- Conventional Commits drive releases (semantic‑release). Examples:
-    - `feat: add workspace stage runner`
-    - `fix(exec): handle non‑zero exit codes`
-    - Include `BREAKING CHANGE: ...` in body for majors (see `BREAKING_CHANGE_GUIDE.md`).
-- Before opening a PR: run `npm run check-all` and ensure no `git` diff (`npm run fmt` + `npm exec -- assert-repo-is-clean`).
-- PRs should include: clear description, linked issues, and for CLI changes, an example command/output.
+- Follow Conventional Commits (`feat: add workspace stage runner`, `fix(exec): handle non-zero exit codes`).
+- Document breaking changes with `BREAKING CHANGE:` in the commit body.
+- Before opening a PR, run `npm run check-all`, `npm run fmt`, and `npm exec -- assert-repo-is-clean` to ensure no drift from `origin/main`.
+- PR descriptions should reference related issues and include CLI examples when behavior changes.
 
 ## Security & Configuration Tips
 
-- GitHub automation requires `.env` with `PERSONAL_ACCESS_TOKEN` (see `.env.example`). Never commit secrets.
-- Do not edit generated artifacts in `dist/` or `docs/`; change sources and rebuild.
+- GitHub automation rely on `.env` with `PERSONAL_ACCESS_TOKEN`; copy from `.env.example` and never commit secrets.
+- Keep credentials out of tests and samples; scrub logs before sharing.
+- Treat `dist/` and `docs/` as generated artifacts—modify sources, then rebuild.
