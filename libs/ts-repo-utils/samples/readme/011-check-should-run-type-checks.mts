@@ -13,5 +13,5 @@ const shouldRun2 = await checkShouldRunTypeChecks({
   baseBranch: 'origin/develop',
 });
 
-// embed-sample-code-ignore
+// embed-sample-code-ignore-below
 export { shouldRun2 };

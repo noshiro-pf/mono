@@ -7,33 +7,35 @@ const TYPEDOC_CONFIG = path.resolve(
   './configs/typedoc.config.mjs',
 );
 
-/** Generates documentation using TypeDoc and formats the output. */
-const genDocs = async (): Promise<void> => {
+/**
+ * Generates documentation using TypeDoc and formats the output.
+ */
+export const genDocs = async (): Promise<void> => {
   echo('Starting documentation generation...\n');
 
   // Verify TypeDoc config exists
   await assertPathExists(TYPEDOC_CONFIG, 'TypeDoc config');
 
-  // Step 1: Embed sample code into README
-  echo('1. Embedding sample code into README...');
+  // Step 0: Embed sample code into README
+  echo('0. Embedding sample code into README...');
   await runStep(embedSamples(), 'Sample embedding failed');
   echo('✓ Sample code embedded into README\n');
 
-  // Step 2: Generate docs with TypeDoc
-  echo('2. Generating documentation with TypeDoc...');
+  // Step 1: Generate docs with TypeDoc
+  echo('1. Generating documentation with TypeDoc...');
   await runCmdStep(
     `typedoc --options "${TYPEDOC_CONFIG}"`,
     'TypeDoc generation failed',
   );
   echo('✓ TypeDoc generation completed\n');
 
-  // Step 3: Format generated files
-  echo('3. Formatting generated files...');
+  // Step 2: Format generated files
+  echo('2. Formatting generated files...');
   await runCmdStep('npm run fmt', 'Formatting failed');
   echo('✓ Formatting completed\n');
 
-  // Step 4: Lint markdown files
-  echo('4. Linting markdown files...');
+  // Step 3: Lint markdown files
+  echo('3. Linting markdown files...');
   await runCmdStep('npm run md', 'Markdown linting failed');
   echo('✓ Markdown linting completed\n');
 
@@ -61,4 +63,6 @@ const runStep = async (
   }
 };
 
-await genDocs();
+if (isDirectlyExecuted(import.meta.url)) {
+  await genDocs();
+}

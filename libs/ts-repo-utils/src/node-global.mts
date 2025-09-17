@@ -1,5 +1,5 @@
 /* eslint-disable import/no-internal-modules */
-import { default as glob_ } from 'fast-glob';
+import glob_ from 'fast-glob';
 import * as fs_ from 'node:fs/promises';
 import * as path_ from 'node:path';
 import { Result as Result_ } from 'ts-data-forge';
@@ -10,7 +10,9 @@ const globalsDef = {
   $: $_,
   echo: console.log,
 
+  // eslint-disable-next-line tree-shakable/import-star
   path: path_,
+  // eslint-disable-next-line tree-shakable/import-star
   fs: fs_,
   glob: glob_,
   isDirectlyExecuted: isDirectlyExecuted_,

@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../README.md)
 
-***
+---
 
 [ts-repo-utils](../README.md) / functions/format
 
@@ -10,7 +10,7 @@
 
 ### formatDiffFrom()
 
-> **formatDiffFrom**(`base`, `options?`): `Promise`\<`Result`\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+> **formatDiffFrom**(`base`, `options?`): `Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
 Defined in: [src/functions/format.mts:309](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L309)
 
@@ -23,7 +23,7 @@ Format only files that differ from the specified base branch or commit
 `string`
 
 Base branch name or commit hash to compare against (defaults to
-  'main')
+'main')
 
 ##### options?
 
@@ -33,13 +33,13 @@ Options for formatting
 
 #### Returns
 
-`Promise`\<`Result`\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+`Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-***
+---
 
 ### formatFiles()
 
-> **formatFiles**(`files`, `options?`): `Promise`\<`Result`\<`undefined`, readonly `unknown`[]\>\>
+> **formatFiles**(`files`, `options?`): `Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, readonly `unknown`[]\>\>
 
 Defined in: [src/functions/format.mts:17](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L17)
 
@@ -59,13 +59,13 @@ Array of file paths to format
 
 #### Returns
 
-`Promise`\<`Result`\<`undefined`, readonly `unknown`[]\>\>
+`Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, readonly `unknown`[]\>\>
 
-***
+---
 
 ### formatFilesGlob()
 
-> **formatFilesGlob**(`pathGlob`, `options?`): `Promise`\<`Result`\<`undefined`, `unknown`\>\>
+> **formatFilesGlob**(`pathGlob`, `options?`): `Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, `unknown`\>\>
 
 Defined in: [src/functions/format.mts:181](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L181)
 
@@ -85,13 +85,13 @@ Glob pattern to match files
 
 #### Returns
 
-`Promise`\<`Result`\<`undefined`, `unknown`\>\>
+`Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, `unknown`\>\>
 
-***
+---
 
 ### formatUncommittedFiles()
 
-> **formatUncommittedFiles**(`options?`): `Promise`\<`Result`\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+> **formatUncommittedFiles**(`options?`): `Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
 Defined in: [src/functions/format.mts:221](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L221)
 
@@ -107,4 +107,4 @@ Options for formatting
 
 #### Returns
 
-`Promise`\<`Result`\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+`Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>

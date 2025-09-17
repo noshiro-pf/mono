@@ -248,6 +248,7 @@ const generateIndexFileForDir = async (
   } catch (error) {
     throw new Error(
       `Failed to generate index for directory ${dirPath}: ${String(error)}`,
+      { cause: error },
     );
   }
 };

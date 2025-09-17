@@ -1,11 +1,13 @@
+import { type ExecException } from 'node:child_process';
+
 type Ret = Promise<
   Result<
     undefined,
-    | import('node:child_process').ExecException
+    | ExecException
     | Readonly<{ message: string }>
     | readonly unknown[]
   >
 >;
 
-// embed-sample-code-ignore
+// embed-sample-code-ignore-below
 export type { Ret };

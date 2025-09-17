@@ -36,5 +36,5 @@ type GenIndexConfig = Readonly<{
   silent?: boolean;
 }>;
 
-// embed-sample-code-ignore
+// embed-sample-code-ignore-below
 export type { GenIndexConfig };

@@ -1,3 +1,4 @@
+/* eslint-disable vitest/no-conditional-expect */
 import { tmpdir } from 'node:os';
 import { Result } from 'ts-data-forge';
 import '../node-global.mjs';

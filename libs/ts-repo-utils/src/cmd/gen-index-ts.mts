@@ -14,7 +14,8 @@ const extensionType = cmd.extendType(cmd.string, {
     if (!s.startsWith('.')) {
       throw new Error(`ext should start with '.'`);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return Promise.resolve(s as Ext);
   },
 });
@@ -31,7 +32,8 @@ const nonEmptyArray = <T extends cmd.Type<any, any>>(
           `No value provided for --${commandName}. At least one value is required.`,
         );
       }
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return Promise.resolve(arr as unknown as NonEmptyArray<OutputOf<T>>);
     },
   });

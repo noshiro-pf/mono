@@ -1,9 +1,11 @@
+import { type ExecException } from 'node:child_process';
+
 type Ret = Promise<
   Result<
     Readonly<{ stdout: string | Buffer; stderr: string | Buffer }>,
-    import('node:child_process').ExecException
+    ExecException
   >
 >;
 
-// embed-sample-code-ignore
+// embed-sample-code-ignore-below
 export type { Ret };

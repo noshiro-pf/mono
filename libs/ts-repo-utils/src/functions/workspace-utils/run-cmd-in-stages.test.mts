@@ -29,10 +29,12 @@ describe('runCmdInStagesAcrossWorkspaces', () => {
     const consoleErrorSpy = vi
       .spyOn(console, 'error')
       .mockImplementation((): void => {});
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     const processExitSpy = vi
       .spyOn(process, 'exit')
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       .mockImplementation((): never => undefined as never) as ReturnType<
       typeof vi.spyOn
     >;

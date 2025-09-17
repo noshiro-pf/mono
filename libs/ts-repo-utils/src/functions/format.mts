@@ -114,7 +114,7 @@ export const formatFiles = async (
   } else {
     const errors: readonly unknown[] = results
       .filter((r) => r.status === 'rejected')
-      .map((r) => r.reason as unknown);
+      .map((r): unknown => r.reason);
 
     return Result.err(errors);
   }

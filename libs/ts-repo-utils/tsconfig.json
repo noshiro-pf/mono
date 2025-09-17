@@ -5,11 +5,12 @@
   ],
   "compilerOptions": {
     "paths": {
-      "ts-repo-utils": ["./src/index.mts"]
+      "ts-repo-utils": ["./src/entry-point.mts"]
     }
   },
   "include": [
     "./src",
+    "./test",
     "./samples",
     "./scripts",
     "./configs",

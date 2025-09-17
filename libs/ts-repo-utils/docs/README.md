@@ -1,6 +1,6 @@
 **ts-repo-utils**
 
-***
+---
 
 # ts-repo-utils
 
@@ -207,7 +207,7 @@ When running in GitHub Actions, the command sets the `GITHUB_OUTPUT` environment
 
 Executes a shell command asynchronously with type-safe results.
 
-```typescript
+```tsx
 import { $, Result } from 'ts-repo-utils';
 
 // or
@@ -229,11 +229,13 @@ if (Result.isOk(result)) {
 
 **Return Type:**
 
-```typescript
+```tsx
+import { type ExecException } from 'node:child_process';
+
 type Ret = Promise<
     Result<
         Readonly<{ stdout: string | Buffer; stderr: string | Buffer }>,
-        import('node:child_process').ExecException
+        ExecException
     >
 >;
 ```
@@ -244,7 +246,7 @@ type Ret = Promise<
 
 Determines whether a script is being executed directly via CLI or imported as a module. This is useful for creating scripts that can both be imported as libraries and executed directly.
 
-```typescript
+```tsx
 import { isDirectlyExecuted } from 'ts-repo-utils';
 
 // or
@@ -279,7 +281,7 @@ NOTE: If you use [tsx](https://www.npmjs.com/package/tsx) or [ts-node](https://w
 
 Checks if a file or directory exists at the specified path.
 
-```typescript
+```tsx
 import { pathExists } from 'ts-repo-utils';
 
 const exists = await pathExists('./src/index.ts');
@@ -290,7 +292,7 @@ console.log(exists satisfies boolean); // true or false
 
 Validates that a path exists and exits with code 1 if it doesn't.
 
-```typescript
+```tsx
 import { assertPathExists } from 'ts-repo-utils';
 
 // If the file doesn't exist, this will exit the process with code 1
@@ -301,7 +303,7 @@ await assertPathExists('./src/index.ts', 'Entry point file');
 
 Validates that all files in specified directories have the correct extensions. Exits with code 1 if any files have incorrect extensions.
 
-```typescript
+```tsx
 import { assertExt } from 'ts-repo-utils';
 
 await assertExt({
@@ -321,7 +323,7 @@ await assertExt({
 
 **Configuration Type:**
 
-```typescript
+```tsx
 type CheckExtConfig = Readonly<{
     directories: readonly Readonly<{
         path: string; // Directory path to check
@@ -337,7 +339,7 @@ type CheckExtConfig = Readonly<{
 
 Checks if the repository has uncommitted changes.
 
-```typescript
+```tsx
 import { repoIsDirty } from 'ts-repo-utils';
 
 const isDirty = await repoIsDirty();
@@ -351,7 +353,7 @@ if (isDirty) {
 Checks if the repository is clean and exits with code 1 if it has uncommitted changes (shows changes and diff).
 (Function version of the `assert-repo-is-clean` command)
 
-```typescript
+```tsx
 import { assertRepoIsClean } from 'ts-repo-utils';
 
 // Use in CI/build scripts to ensure clean state
@@ -391,10 +393,12 @@ Runs `git diff --name-only <base> [--diff-filter=d]`
 
 **Common Return Type:**
 
-```typescript
+```tsx
+import { type ExecException } from 'node:child_process';
+
 type Ret = Result<
     readonly string[],
-    import('node:child_process').ExecException | Readonly<{ message: string }>
+    ExecException | Readonly<{ message: string }>
 >;
 ```
 
@@ -405,7 +409,7 @@ type Ret = Result<
 Checks whether TypeScript type checks should run based on file changes from the base branch. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files have changed.
 (Function version of the `check-should-run-type-checks` command)
 
-```typescript
+```tsx
 import { checkShouldRunTypeChecks } from 'ts-repo-utils';
 
 // Use default settings (compare against origin/main)
@@ -437,7 +441,7 @@ const shouldRun2 = await checkShouldRunTypeChecks({
 
 Formats files matching a glob pattern using Prettier.
 
-```typescript
+```tsx
 import { formatFilesGlob } from 'ts-repo-utils';
 
 // Format all TypeScript files in src
@@ -464,7 +468,7 @@ await formatFilesGlob('src/**/*.ts', {
 Formats only files that have been changed according to git status.
 (Function version of the `format-uncommitted` command)
 
-```typescript
+```tsx
 import { formatUncommittedFiles } from 'ts-repo-utils';
 
 // Format only modified files
@@ -488,13 +492,13 @@ await formatUncommittedFiles({
 
 **Return Type:**
 
-```typescript
+```tsx
+import { type ExecException } from 'node:child_process';
+
 type Ret = Promise<
     Result<
         undefined,
-        | import('node:child_process').ExecException
-        | Readonly<{ message: string }>
-        | readonly unknown[]
+        ExecException | Readonly<{ message: string }> | readonly unknown[]
     >
 >;
 ```
@@ -504,7 +508,7 @@ type Ret = Promise<
 Formats only files that differ from the specified base branch or commit.
 (Function version of the `format-diff-from` command)
 
-```typescript
+```tsx
 import { formatDiffFrom } from 'ts-repo-utils';
 
 // Format files different from main branch
@@ -532,13 +536,13 @@ await formatDiffFrom('main', {
 
 **Return Type:**
 
-```typescript
+```tsx
+import { type ExecException } from 'node:child_process';
+
 type Ret = Promise<
     Result<
         undefined,
-        | import('node:child_process').ExecException
-        | Readonly<{ message: string }>
-        | readonly unknown[]
+        ExecException | Readonly<{ message: string }> | readonly unknown[]
     >
 >;
 ```
@@ -550,7 +554,7 @@ type Ret = Promise<
 Generates index files recursively in target directories with automatic barrel exports.
 (Function version of the `gen-index-ts` command)
 
-```typescript
+```tsx
 import { genIndex } from 'ts-repo-utils';
 
 await genIndex({
@@ -561,7 +565,7 @@ await genIndex({
 
 **Configuration Type:**
 
-```typescript
+```tsx
 type GenIndexConfig = Readonly<{
     /** Target directories to generate index files for (string or array of strings) */
     targetDirectory: string | readonly string[];
@@ -620,7 +624,7 @@ type GenIndexConfig = Readonly<{
 
 Executes an npm script command across all workspace packages in dependency order stages. Packages are grouped into stages where each stage contains packages whose dependencies have been completed in previous stages. Uses fail-fast behavior.
 
-```typescript
+```tsx
 import { runCmdInStagesAcrossWorkspaces } from 'ts-repo-utils';
 
 // Run build in dependency order
@@ -643,7 +647,7 @@ await runCmdInStagesAcrossWorkspaces({
 
 Executes an npm script command across all workspace packages in parallel. Uses fail-fast behavior - stops execution immediately when any package fails.
 
-```typescript
+```tsx
 import { runCmdInParallelAcrossWorkspaces } from 'ts-repo-utils';
 
 // Run tests in parallel across all packages
@@ -666,7 +670,7 @@ await runCmdInParallelAcrossWorkspaces({
 
 Retrieves all workspace packages from a monorepo based on the workspace patterns defined in the root package.json file.
 
-```typescript
+```tsx
 import { getWorkspacePackages } from 'ts-repo-utils';
 
 const packages = await getWorkspacePackages('.');
@@ -676,7 +680,7 @@ console.log(packages.map((pkg) => pkg.name));
 
 **Return Type:**
 
-```typescript
+```tsx
 type Package = Readonly<{
     name: string;
     path: string;
@@ -689,7 +693,7 @@ type Package = Readonly<{
 
 Executes an npm script across multiple packages in parallel with a concurrency limit. Lower-level function used by `runCmdInParallelAcrossWorkspaces`.
 
-```typescript
+```tsx
 import { executeParallel, getWorkspacePackages } from 'ts-repo-utils';
 
 const packages = await getWorkspacePackages('.');
@@ -700,7 +704,7 @@ await executeParallel(packages, 'lint', 4);
 
 Executes an npm script across packages in dependency order stages. Lower-level function used by `runCmdInStagesAcrossWorkspaces`.
 
-```typescript
+```tsx
 import { executeStages, getWorkspacePackages } from 'ts-repo-utils';
 
 const packages = await getWorkspacePackages('.');
@@ -719,7 +723,7 @@ await executeStages(packages, 'build', 3);
 
 When you import `ts-repo-utils` without destructuring, several utilities become globally available. This is useful for scripts where you want quick access to common functions without explicit imports.
 
-```typescript
+```tsx
 import 'ts-repo-utils';
 
 // Now these functions are globally available
@@ -756,7 +760,7 @@ if (isDirectlyExecuted(import.meta.url)) {
 
 ### Pre-commit Hook
 
-```typescript
+```tsx
 import {
     assertExt,
     assertRepoIsClean,
@@ -777,7 +781,7 @@ await assertRepoIsClean();
 
 ### Build Pipeline
 
-```typescript
+```tsx
 import { formatFilesGlob, genIndex } from 'ts-repo-utils';
 
 // Generate barrel exports
@@ -795,7 +799,7 @@ await formatFilesGlob('dist/**/*.js');
 
 ### Project Validation
 
-```typescript
+```tsx
 import { assertExt, assertPathExists, assertRepoIsClean } from 'ts-repo-utils';
 
 // Check required files exist (exits with code 1 if files don't exist)
@@ -825,6 +829,7 @@ Apache-2.0
 - [cmd/format-diff-from](cmd/format-diff-from.md)
 - [cmd/format-uncommitted](cmd/format-uncommitted.md)
 - [cmd/gen-index-ts](cmd/gen-index-ts.md)
+- [entry-point](entry-point/README.md)
 - [functions](functions.md)
 - [functions/assert-ext](functions/assert-ext.md)
 - [functions/assert-path-exists](functions/assert-path-exists.md)

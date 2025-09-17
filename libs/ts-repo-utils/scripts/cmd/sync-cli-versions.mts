@@ -9,7 +9,8 @@ const syncCliVersions = async (): Promise<void> => {
   const packageJsonPath = path.resolve(projectRootPath, './package.json');
 
   const packageJsonContent = await fs.readFile(packageJsonPath, 'utf8');
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   const packageJson = JSON.parse(packageJsonContent) as { version: string };
   const targetVersion = packageJson.version;
 

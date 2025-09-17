@@ -1,7 +1,9 @@
+import { type ExecException } from 'node:child_process';
+
 type Ret = Result<
   readonly string[],
-  import('node:child_process').ExecException | Readonly<{ message: string }>
+  ExecException | Readonly<{ message: string }>
 >;
 
-// embed-sample-code-ignore
+// embed-sample-code-ignore-below
 export type { Ret };

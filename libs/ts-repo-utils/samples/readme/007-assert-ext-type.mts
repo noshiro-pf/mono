@@ -6,5 +6,5 @@ type CheckExtConfig = Readonly<{
   }>[];
 }>;
 
-// embed-sample-code-ignore
+// embed-sample-code-ignore-below
 export type { CheckExtConfig };

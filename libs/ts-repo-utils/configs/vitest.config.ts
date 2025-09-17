@@ -6,17 +6,17 @@ import { projectRootPath } from '../scripts/project-root-path.mjs';
 export default defineConfig({
   test: {
     globals: true,
-    dir: path.resolve(projectRootPath, './src'),
-    includeSource: [
-      path.resolve(projectRootPath, './src/**/*.mts'),
-      path.resolve(projectRootPath, './samples/**/*.mts'),
-    ],
+    dir: projectRootPath,
+    includeSource: [path.resolve(projectRootPath, './src/**/*.mts')],
     typecheck: {
       tsconfig: path.resolve(projectRootPath, './configs/tsconfig.test.json'),
     },
     passWithNoTests: true,
     restoreMocks: true,
     hideSkippedTests: true,
+    alias: {
+      'ts-repo-utils': path.resolve(projectRootPath, './src/entry-point.mts'),
+    },
     coverage: {
       provider: 'v8',
       reporter: ['html', 'lcov', 'text'],

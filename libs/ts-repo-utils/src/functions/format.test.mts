@@ -1,3 +1,4 @@
+/* eslint-disable vitest/no-conditional-expect */
 import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import '../node-global.mjs';
@@ -517,10 +518,12 @@ describe('formatUncommittedFiles', () => {
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
-      await formatUncommittedFiles({ silent: false });
+      const result1 = await formatUncommittedFiles({ silent: false });
+      expect(Result.isOk(result1)).toBe(true);
       // With silent: false, console output may occur
 
-      await formatUncommittedFiles({ silent: true });
+      const result2 = await formatUncommittedFiles({ silent: true });
+      expect(Result.isOk(result2)).toBe(true);
       // With silent: true, console output should be suppressed
 
       vi.unstubAllGlobals();

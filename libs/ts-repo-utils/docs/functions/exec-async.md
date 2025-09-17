@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../README.md)
 
-***
+---
 
 [ts-repo-utils](../README.md) / functions/exec-async
 
@@ -14,11 +14,11 @@
 
 Defined in: [src/functions/exec-async.mts:8](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L8)
 
-***
+---
 
 ### ExecResult\<T\>
 
-> **ExecResult**\<`T`\> = `Result`\<`Readonly`\<\{ `stderr`: `T`; `stdout`: `T`; \}\>, `childProcess.ExecException`\>
+> **ExecResult**\<`T`\> = [`Result`](../entry-point/README.md#result)\<`Readonly`\<\{ `stderr`: `T`; `stdout`: `T`; \}\>, `childProcess.ExecException`\>
 
 Defined in: [src/functions/exec-async.mts:10](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L10)
 
@@ -26,7 +26,7 @@ Defined in: [src/functions/exec-async.mts:10](https://github.com/noshiro-pf/ts-r
 
 ##### T
 
-`T` *extends* `string` \| `Buffer`
+`T` _extends_ `string` \| `Buffer`
 
 ## Functions
 

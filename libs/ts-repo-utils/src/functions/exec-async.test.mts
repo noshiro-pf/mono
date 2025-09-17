@@ -1,3 +1,5 @@
+/* eslint-disable vitest/expect-expect */
+/* eslint-disable vitest/no-conditional-expect */
 import { exec, type ExecException } from 'node:child_process';
 import { expectType, Result } from 'ts-data-forge';
 import '../node-global.mjs';
@@ -6,16 +8,16 @@ import { $ } from './exec-async.mjs';
 describe('exec-async', () => {
   // Helper to suppress echo output during tests
   const withSilentEcho = async <T,>(fn: () => Promise<T>): Promise<T> => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const originalEcho = (globalThis as any).echo;
-    // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-unsafe-member-access
     (globalThis as any).echo = () => {
       // Silent implementation - no output
     };
     try {
       return await fn();
     } finally {
-      // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+      // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       (globalThis as any).echo = originalEcho;
     }
   };
@@ -479,9 +481,11 @@ describe('exec-async', () => {
           ): ExecCallbackParams<T> => {
             const emptyParams: ExecCallbackParams<T> = {
               error: null,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+
+              // eslint-disable-next-line total-functions/no-unsafe-type-assertion
               stdout: undefined as unknown as T,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+
+              // eslint-disable-next-line total-functions/no-unsafe-type-assertion
               stderr: undefined as unknown as T,
             };
             return emptyParams;

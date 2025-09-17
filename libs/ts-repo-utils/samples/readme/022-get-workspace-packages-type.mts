@@ -5,5 +5,5 @@ type Package = Readonly<{
   dependencies: Readonly<Record<string, string>>;
 }>;
 
-// embed-sample-code-ignore
+// embed-sample-code-ignore-below
 export type { Package };

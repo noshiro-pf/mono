@@ -21,5 +21,5 @@ if (isDirectlyExecuted(import.meta.url)) {
   echo('Running as CLI');
 }
 
-// embed-sample-code-ignore
+// embed-sample-code-ignore-below
 export { configJson, filePath, files };
