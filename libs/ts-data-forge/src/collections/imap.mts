@@ -447,14 +447,14 @@ class IMapClass<K extends MapSetKeyType, V>
 
   /** @inheritdoc */
   has(key: K | (WidenLiteral<K> & {})): boolean {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return this.#map.has(key as K);
   }
 
   /** @inheritdoc */
   get(key: K | (WidenLiteral<K> & {})): Optional<V> {
     if (!this.has(key)) return Optional.none;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-non-null-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-non-null-assertion
     return Optional.some(this.#map.get(key as K)!);
   }
 

@@ -32,7 +32,7 @@ import { Result } from '../functional/index.mjs';
 export const createPromise = <S, E>(
   executor: (resolve: (value: S) => void, reject: (reason?: E) => void) => void,
 ): Promise<Result<S, E>> =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   Result.fromPromise(new Promise<S>(executor)) satisfies Promise<
     Result<S, unknown>
   > as Promise<Result<S, E>>;

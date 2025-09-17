@@ -174,7 +174,7 @@ clampToPercent(150); // 100
 
 > **decrement**\<`N`\>(`n`): `Decrement`\<`N`\>
 
-Defined in: [src/number/num.mts:510](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L510)
+Defined in: [src/number/num.mts:516](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L516)
 
 Type-safe decrement operation for positive SmallInt values.
 
@@ -268,7 +268,7 @@ const result3 = Num.div(20, nonZero); // 4
 
 > **divInt**(`a`, `b`): `number`
 
-Defined in: [src/number/num.mts:373](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L373)
+Defined in: [src/number/num.mts:374](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L374)
 
 Performs integer division using floor division.
 
@@ -311,7 +311,7 @@ Num.divInt(10, -3); // -4 (floor division)
 
 > **increment**\<`N`\>(`n`): `Increment`\<`N`\>
 
-Defined in: [src/number/num.mts:489](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L489)
+Defined in: [src/number/num.mts:495](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L495)
 
 Type-safe increment operation for SmallUint values.
 
@@ -755,7 +755,7 @@ if (isValidScore(score)) {
 
 > **mapNaN2Undefined**\<`N`\>(`num`): `undefined` \| `RelaxedExclude`\<`N`, `NaNType`\>
 
-Defined in: [src/number/num.mts:464](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L464)
+Defined in: [src/number/num.mts:470](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L470)
 
 Converts NaN values to undefined while preserving all other numbers.
 
@@ -798,7 +798,7 @@ Num.mapNaN2Undefined(NaN); // undefined
 
 > **round**(`digit`): (`num`) => `number`
 
-Defined in: [src/number/num.mts:439](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L439)
+Defined in: [src/number/num.mts:443](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L443)
 
 Creates a reusable rounding function with a fixed precision.
 
@@ -844,7 +844,7 @@ roundTo2(2.71828); // 2.72
 
 > **roundAt**(`num`, `precision`): `number`
 
-Defined in: [src/number/num.mts:394](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L394)
+Defined in: [src/number/num.mts:397](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L397)
 
 Rounds a number to a specified number of decimal places.
 
@@ -884,7 +884,7 @@ Num.roundAt(10.5, 0); // 11
 
 > **roundToInt**(`num`): `Int`
 
-Defined in: [src/number/num.mts:420](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L420)
+Defined in: [src/number/num.mts:424](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/number/num.mts#L424)
 
 Rounds a number to the nearest integer using bitwise operations.
 

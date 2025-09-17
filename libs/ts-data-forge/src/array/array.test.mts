@@ -32,7 +32,7 @@ describe('Array.some', () => {
 
 describe('Array.flat', () => {
   const xs = [1, 2, [3, 4, [5, 6, [7, 8]]]] as const;
-  const result = xs.flat(1);
+  const result = xs.flat();
 
   expectType<
     typeof result,

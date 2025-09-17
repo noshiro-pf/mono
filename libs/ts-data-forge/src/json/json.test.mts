@@ -216,11 +216,10 @@ describe('stringify', () => {
     expect(Json.stringify(Symbol('test'))).toStrictEqual(Result.ok(undefined));
     expect(Json.stringify(() => {})).toStrictEqual(Result.ok(undefined));
     // BigInt should cause an error
-    expect(Result.isErr(Json.stringify(BigInt(123)))).toBe(true);
+    expect(Result.isErr(Json.stringify(123n))).toBe(true);
   });
 
   test('should handle circular references', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mut_obj: any = { a: 1 };
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     mut_obj.circular = mut_obj;
@@ -242,7 +241,6 @@ describe('stringify', () => {
   });
 
   test('should not throw errors', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mut_circularArray: any[] = [];
     mut_circularArray.push(mut_circularArray);
 

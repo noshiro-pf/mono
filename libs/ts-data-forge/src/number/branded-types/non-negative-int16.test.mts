@@ -13,18 +13,18 @@ describe('NonNegativeInt16', () => {
       expect(() => asNonNegativeInt16(0)).not.toThrow();
       expect(() => asNonNegativeInt16(1)).not.toThrow();
       expect(() => asNonNegativeInt16(1000)).not.toThrow();
-      expect(() => asNonNegativeInt16(32767)).not.toThrow(); // 2^15 - 1
+      expect(() => asNonNegativeInt16(32_767)).not.toThrow(); // 2^15 - 1
     });
 
     test('rejects negative integers', () => {
       expect(() => asNonNegativeInt16(-1)).toThrow(TypeError);
       expect(() => asNonNegativeInt16(-42)).toThrow(TypeError);
-      expect(() => asNonNegativeInt16(-32768)).toThrow(TypeError);
+      expect(() => asNonNegativeInt16(-32_768)).toThrow(TypeError);
     });
 
     test('rejects values outside int16 range', () => {
-      expect(() => asNonNegativeInt16(32768)).toThrow(TypeError); // 2^15
-      expect(() => asNonNegativeInt16(65536)).toThrow(TypeError);
+      expect(() => asNonNegativeInt16(32_768)).toThrow(TypeError); // 2^15
+      expect(() => asNonNegativeInt16(65_536)).toThrow(TypeError);
     });
 
     test('rejects non-integers', () => {
@@ -42,7 +42,7 @@ describe('NonNegativeInt16', () => {
     test('returns the same value for valid inputs', () => {
       expect(asNonNegativeInt16(0)).toBe(0);
       expect(asNonNegativeInt16(5)).toBe(5);
-      expect(asNonNegativeInt16(32767)).toBe(32767);
+      expect(asNonNegativeInt16(32_767)).toBe(32_767);
     });
 
     test.each([
@@ -52,7 +52,7 @@ describe('NonNegativeInt16', () => {
       { name: '1.2', value: 1.2 },
       { name: '-3.4', value: -3.4 },
       { name: '-1', value: -1 },
-      { name: '32768', value: 32768 },
+      { name: '32768', value: 32_768 },
     ] as const)(
       `asNonNegativeInt16($name) should throw a TypeError`,
       ({ value }) => {
@@ -70,18 +70,18 @@ describe('NonNegativeInt16', () => {
       expect(isNonNegativeInt16(0)).toBe(true);
       expect(isNonNegativeInt16(1)).toBe(true);
       expect(isNonNegativeInt16(1000)).toBe(true);
-      expect(isNonNegativeInt16(32767)).toBe(true);
+      expect(isNonNegativeInt16(32_767)).toBe(true);
     });
 
     test('correctly identifies negative integers', () => {
       expect(isNonNegativeInt16(-1)).toBe(false);
       expect(isNonNegativeInt16(-42)).toBe(false);
-      expect(isNonNegativeInt16(-32768)).toBe(false);
+      expect(isNonNegativeInt16(-32_768)).toBe(false);
     });
 
     test('correctly identifies values outside int16 range', () => {
-      expect(isNonNegativeInt16(32768)).toBe(false);
-      expect(isNonNegativeInt16(65536)).toBe(false);
+      expect(isNonNegativeInt16(32_768)).toBe(false);
+      expect(isNonNegativeInt16(65_536)).toBe(false);
     });
 
     test('correctly identifies non-integers', () => {
@@ -104,7 +104,7 @@ describe('NonNegativeInt16', () => {
   describe('constants', () => {
     test('MIN_VALUE and MAX_VALUE', () => {
       expect(NonNegativeInt16.MIN_VALUE).toBe(0);
-      expect(NonNegativeInt16.MAX_VALUE).toBe(32767);
+      expect(NonNegativeInt16.MAX_VALUE).toBe(32_767);
     });
   });
 
@@ -122,10 +122,10 @@ describe('NonNegativeInt16', () => {
 
     test('add (with clamping to non-negative int16 range)', () => {
       const result = NonNegativeInt16.add(
-        asNonNegativeInt16(32000),
+        asNonNegativeInt16(32_000),
         asNonNegativeInt16(1000),
       );
-      expect(result).toBe(32767); // clamped to max
+      expect(result).toBe(32_767); // clamped to max
       expect(NonNegativeInt16.add(a, b)).toBe(150);
     });
 
@@ -140,7 +140,7 @@ describe('NonNegativeInt16', () => {
         asNonNegativeInt16(1000),
         asNonNegativeInt16(100),
       );
-      expect(result).toBe(32767); // clamped to max
+      expect(result).toBe(32_767); // clamped to max
       expect(
         NonNegativeInt16.mul(asNonNegativeInt16(10), asNonNegativeInt16(5)),
       ).toBe(50);
@@ -161,7 +161,7 @@ describe('NonNegativeInt16', () => {
         asNonNegativeInt16(200),
         asNonNegativeInt16(3),
       );
-      expect(result).toBe(32767); // clamped to max
+      expect(result).toBe(32_767); // clamped to max
       expect(
         NonNegativeInt16.pow(asNonNegativeInt16(2), asNonNegativeInt16(3)),
       ).toBe(8);
@@ -187,7 +187,7 @@ describe('NonNegativeInt16', () => {
       for (const _ of range(10)) {
         const result = NonNegativeInt16.random(0, 30);
         expect(result).toBeGreaterThanOrEqual(0);
-        expect(result).toBeLessThanOrEqual(32767);
+        expect(result).toBeLessThanOrEqual(32_767);
       }
     });
   });

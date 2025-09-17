@@ -67,7 +67,7 @@ export namespace Json {
       return Result.ok(
         JSON.parse(
           text,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           reviver as (this: unknown, key: string, value: unknown) => unknown,
         ),
       );

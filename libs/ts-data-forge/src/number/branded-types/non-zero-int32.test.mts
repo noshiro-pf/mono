@@ -11,8 +11,8 @@ describe('NonZeroInt32', () => {
     test('accepts valid non-zero int32 values', () => {
       expect(() => asNonZeroInt32(1)).not.toThrow();
       expect(() => asNonZeroInt32(-1)).not.toThrow();
-      expect(() => asNonZeroInt32(2147483647)).not.toThrow(); // 2^31 - 1
-      expect(() => asNonZeroInt32(-2147483648)).not.toThrow(); // -2^31
+      expect(() => asNonZeroInt32(2_147_483_647)).not.toThrow(); // 2^31 - 1
+      expect(() => asNonZeroInt32(-2_147_483_648)).not.toThrow(); // -2^31
     });
 
     test('rejects zero', () => {
@@ -20,10 +20,10 @@ describe('NonZeroInt32', () => {
     });
 
     test('rejects values outside int32 range', () => {
-      expect(() => asNonZeroInt32(2147483648)).toThrow(TypeError); // 2^31
-      expect(() => asNonZeroInt32(-2147483649)).toThrow(TypeError); // -2^31 - 1
-      expect(() => asNonZeroInt32(4294967296)).toThrow(TypeError);
-      expect(() => asNonZeroInt32(-4294967296)).toThrow(TypeError);
+      expect(() => asNonZeroInt32(2_147_483_648)).toThrow(TypeError); // 2^31
+      expect(() => asNonZeroInt32(-2_147_483_649)).toThrow(TypeError); // -2^31 - 1
+      expect(() => asNonZeroInt32(4_294_967_296)).toThrow(TypeError);
+      expect(() => asNonZeroInt32(-4_294_967_296)).toThrow(TypeError);
     });
 
     test('rejects non-integers', () => {
@@ -37,8 +37,8 @@ describe('NonZeroInt32', () => {
     test('returns the same value for valid inputs', () => {
       expect(asNonZeroInt32(5)).toBe(5);
       expect(asNonZeroInt32(-10)).toBe(-10);
-      expect(asNonZeroInt32(2147483647)).toBe(2147483647);
-      expect(asNonZeroInt32(-2147483648)).toBe(-2147483648);
+      expect(asNonZeroInt32(2_147_483_647)).toBe(2_147_483_647);
+      expect(asNonZeroInt32(-2_147_483_648)).toBe(-2_147_483_648);
     });
 
     test.each([
@@ -48,8 +48,8 @@ describe('NonZeroInt32', () => {
       { name: '1.2', value: 1.2 },
       { name: '-3.4', value: -3.4 },
       { name: '0', value: 0 },
-      { name: '2147483648', value: 2147483648 },
-      { name: '-2147483649', value: -2147483649 },
+      { name: '2147483648', value: 2_147_483_648 },
+      { name: '-2147483649', value: -2_147_483_649 },
     ] as const)(
       `asNonZeroInt32($name) should throw a TypeError`,
       ({ value }) => {
@@ -66,8 +66,8 @@ describe('NonZeroInt32', () => {
     test('correctly identifies non-zero int32 values', () => {
       expect(isNonZeroInt32(1)).toBe(true);
       expect(isNonZeroInt32(-1)).toBe(true);
-      expect(isNonZeroInt32(2147483647)).toBe(true);
-      expect(isNonZeroInt32(-2147483648)).toBe(true);
+      expect(isNonZeroInt32(2_147_483_647)).toBe(true);
+      expect(isNonZeroInt32(-2_147_483_648)).toBe(true);
     });
 
     test('correctly identifies zero', () => {
@@ -75,10 +75,10 @@ describe('NonZeroInt32', () => {
     });
 
     test('correctly identifies values outside int32 range', () => {
-      expect(isNonZeroInt32(2147483648)).toBe(false);
-      expect(isNonZeroInt32(-2147483649)).toBe(false);
-      expect(isNonZeroInt32(4294967296)).toBe(false);
-      expect(isNonZeroInt32(-4294967296)).toBe(false);
+      expect(isNonZeroInt32(2_147_483_648)).toBe(false);
+      expect(isNonZeroInt32(-2_147_483_649)).toBe(false);
+      expect(isNonZeroInt32(4_294_967_296)).toBe(false);
+      expect(isNonZeroInt32(-4_294_967_296)).toBe(false);
     });
 
     test('correctly identifies non-integers', () => {
@@ -100,66 +100,69 @@ describe('NonZeroInt32', () => {
 
   describe('constants', () => {
     test('MIN_VALUE and MAX_VALUE', () => {
-      expect(NonZeroInt32.MIN_VALUE).toBe(-2147483648);
-      expect(NonZeroInt32.MAX_VALUE).toBe(2147483647);
+      expect(NonZeroInt32.MIN_VALUE).toBe(-2_147_483_648);
+      expect(NonZeroInt32.MAX_VALUE).toBe(2_147_483_647);
     });
   });
 
   describe('mathematical operations', () => {
-    const a = asNonZeroInt32(1000000);
-    const b = asNonZeroInt32(500000);
-    const c = asNonZeroInt32(-300000);
+    const a = asNonZeroInt32(1_000_000);
+    const b = asNonZeroInt32(500_000);
+    const c = asNonZeroInt32(-300_000);
 
     test('abs', () => {
-      expect(NonZeroInt32.abs(a)).toBe(1000000);
-      expect(NonZeroInt32.abs(c)).toBe(300000);
+      expect(NonZeroInt32.abs(a)).toBe(1_000_000);
+      expect(NonZeroInt32.abs(c)).toBe(300_000);
     });
 
     test('min and max', () => {
-      expect(NonZeroInt32.min(a, b)).toBe(500000);
-      expect(NonZeroInt32.max(a, b)).toBe(1000000);
-      expect(NonZeroInt32.min(a, c)).toBe(-300000);
-      expect(NonZeroInt32.max(a, c)).toBe(1000000);
+      expect(NonZeroInt32.min(a, b)).toBe(500_000);
+      expect(NonZeroInt32.max(a, b)).toBe(1_000_000);
+      expect(NonZeroInt32.min(a, c)).toBe(-300_000);
+      expect(NonZeroInt32.max(a, c)).toBe(1_000_000);
     });
 
     test('add (with clamping)', () => {
       const result = NonZeroInt32.add(
-        asNonZeroInt32(2147483000),
+        asNonZeroInt32(2_147_483_000),
         asNonZeroInt32(1000),
       );
-      expect(result).toBe(2147483647); // clamped to max
-      expect(NonZeroInt32.add(a, b)).toBe(1500000);
+      expect(result).toBe(2_147_483_647); // clamped to max
+      expect(NonZeroInt32.add(a, b)).toBe(1_500_000);
     });
 
     test('sub (with clamping)', () => {
       const result = NonZeroInt32.sub(
-        asNonZeroInt32(-2147483000),
+        asNonZeroInt32(-2_147_483_000),
         asNonZeroInt32(1000),
       );
-      expect(result).toBe(-2147483648); // clamped to min
-      expect(NonZeroInt32.sub(a, b)).toBe(500000);
+      expect(result).toBe(-2_147_483_648); // clamped to min
+      expect(NonZeroInt32.sub(a, b)).toBe(500_000);
     });
 
     test('mul (with clamping)', () => {
       const result = NonZeroInt32.mul(
-        asNonZeroInt32(100000),
-        asNonZeroInt32(100000),
+        asNonZeroInt32(100_000),
+        asNonZeroInt32(100_000),
       );
-      expect(result).toBe(2147483647); // clamped to max
+      expect(result).toBe(2_147_483_647); // clamped to max
       expect(NonZeroInt32.mul(asNonZeroInt32(1000), asNonZeroInt32(5))).toBe(
         5000,
       );
     });
 
     test('div (floor division with clamping)', () => {
-      expect(NonZeroInt32.div(a, asNonZeroInt32(500000))).toBe(2);
+      expect(NonZeroInt32.div(a, asNonZeroInt32(500_000))).toBe(2);
       expect(NonZeroInt32.div(asNonZeroInt32(7), asNonZeroInt32(3))).toBe(2);
       expect(NonZeroInt32.div(asNonZeroInt32(-7), asNonZeroInt32(3))).toBe(-3);
     });
 
     test('pow (with clamping)', () => {
-      const result = NonZeroInt32.pow(asNonZeroInt32(10000), asNonZeroInt32(3));
-      expect(result).toBe(2147483647); // clamped to max
+      const result = NonZeroInt32.pow(
+        asNonZeroInt32(10_000),
+        asNonZeroInt32(3),
+      );
+      expect(result).toBe(2_147_483_647); // clamped to max
       expect(NonZeroInt32.pow(asNonZeroInt32(2), asNonZeroInt32(3))).toBe(8);
     });
   });
@@ -182,8 +185,8 @@ describe('NonZeroInt32', () => {
     test('generates values within NonZeroInt32 range', () => {
       for (const _ of range(10)) {
         const result = NonZeroInt32.random(-20, 20);
-        expect(result).toBeGreaterThanOrEqual(-2147483648);
-        expect(result).toBeLessThanOrEqual(2147483647);
+        expect(result).toBeGreaterThanOrEqual(-2_147_483_648);
+        expect(result).toBeLessThanOrEqual(2_147_483_647);
       }
     });
   });
@@ -192,7 +195,7 @@ describe('NonZeroInt32', () => {
     test('type relationships', () => {
       expectType<NonZeroInt32, number>('<=');
 
-      expectTypeOf(asNonZeroInt32(1000000)).toExtend<NonZeroInt32>();
+      expectTypeOf(asNonZeroInt32(1_000_000)).toExtend<NonZeroInt32>();
     });
   });
 });

@@ -34,7 +34,7 @@ describe('isPrimitive', () => {
   });
 
   test('should return true for bigint primitives', () => {
-    expect(isPrimitive(BigInt(123))).toBe(true);
+    expect(isPrimitive(123n)).toBe(true);
     expect(isPrimitive(0n)).toBe(true);
     expect(isPrimitive(-123n)).toBe(true);
   });

@@ -26,9 +26,9 @@ const {
   SafeUint
 >({
   integerOrSafeInteger: 'SafeInteger',
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   MIN_VALUE: Number.MIN_SAFE_INTEGER as SafeInt,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   MAX_VALUE: Number.MAX_SAFE_INTEGER as SafeUint,
   typeNameInMessage,
 } as const);

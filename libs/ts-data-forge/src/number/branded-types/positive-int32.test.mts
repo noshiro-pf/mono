@@ -11,7 +11,7 @@ describe('PositiveInt32', () => {
     test('accepts valid positive int32 values', () => {
       expect(() => asPositiveInt32(1)).not.toThrow();
       expect(() => asPositiveInt32(1000)).not.toThrow();
-      expect(() => asPositiveInt32(2147483647)).not.toThrow(); // 2^31 - 1
+      expect(() => asPositiveInt32(2_147_483_647)).not.toThrow(); // 2^31 - 1
     });
 
     test('rejects zero', () => {
@@ -19,8 +19,8 @@ describe('PositiveInt32', () => {
     });
 
     test('rejects values outside int32 range', () => {
-      expect(() => asPositiveInt32(2147483648)).toThrow(TypeError); // 2^31
-      expect(() => asPositiveInt32(4294967296)).toThrow(TypeError);
+      expect(() => asPositiveInt32(2_147_483_648)).toThrow(TypeError); // 2^31
+      expect(() => asPositiveInt32(4_294_967_296)).toThrow(TypeError);
     });
 
     test('rejects negative integers', () => {
@@ -43,7 +43,7 @@ describe('PositiveInt32', () => {
     test('returns the same value for valid inputs', () => {
       expect(asPositiveInt32(5)).toBe(5);
       expect(asPositiveInt32(1)).toBe(1);
-      expect(asPositiveInt32(2147483647)).toBe(2147483647);
+      expect(asPositiveInt32(2_147_483_647)).toBe(2_147_483_647);
     });
 
     test.each([
@@ -54,7 +54,7 @@ describe('PositiveInt32', () => {
       { name: '-3.4', value: -3.4 },
       { name: '0', value: 0 },
       { name: '-1', value: -1 },
-      { name: '2147483648', value: 2147483648 },
+      { name: '2147483648', value: 2_147_483_648 },
     ] as const)(
       `asPositiveInt32($name) should throw a TypeError`,
       ({ value }) => {
@@ -71,7 +71,7 @@ describe('PositiveInt32', () => {
     test('correctly identifies positive int32 values', () => {
       expect(isPositiveInt32(1)).toBe(true);
       expect(isPositiveInt32(1000)).toBe(true);
-      expect(isPositiveInt32(2147483647)).toBe(true);
+      expect(isPositiveInt32(2_147_483_647)).toBe(true);
     });
 
     test('correctly identifies zero', () => {
@@ -79,8 +79,8 @@ describe('PositiveInt32', () => {
     });
 
     test('correctly identifies values outside int32 range', () => {
-      expect(isPositiveInt32(2147483648)).toBe(false);
-      expect(isPositiveInt32(4294967296)).toBe(false);
+      expect(isPositiveInt32(2_147_483_648)).toBe(false);
+      expect(isPositiveInt32(4_294_967_296)).toBe(false);
     });
 
     test('correctly identifies negative integers', () => {
@@ -108,58 +108,58 @@ describe('PositiveInt32', () => {
   describe('constants', () => {
     test('MIN_VALUE and MAX_VALUE', () => {
       expect(PositiveInt32.MIN_VALUE).toBe(1);
-      expect(PositiveInt32.MAX_VALUE).toBe(2147483647);
+      expect(PositiveInt32.MAX_VALUE).toBe(2_147_483_647);
     });
   });
 
   describe('mathematical operations', () => {
-    const a = asPositiveInt32(1000000);
-    const b = asPositiveInt32(500000);
+    const a = asPositiveInt32(1_000_000);
+    const b = asPositiveInt32(500_000);
 
     test('min and max', () => {
-      expect(PositiveInt32.min(a, b)).toBe(500000);
-      expect(PositiveInt32.max(a, b)).toBe(1000000);
+      expect(PositiveInt32.min(a, b)).toBe(500_000);
+      expect(PositiveInt32.max(a, b)).toBe(1_000_000);
     });
 
     test('add (with clamping to positive int32 range)', () => {
       const result = PositiveInt32.add(
-        asPositiveInt32(2147483000),
+        asPositiveInt32(2_147_483_000),
         asPositiveInt32(1000),
       );
-      expect(result).toBe(2147483647); // clamped to max
-      expect(PositiveInt32.add(a, b)).toBe(1500000);
+      expect(result).toBe(2_147_483_647); // clamped to max
+      expect(PositiveInt32.add(a, b)).toBe(1_500_000);
     });
 
     test('sub (never goes below 1)', () => {
-      expect(PositiveInt32.sub(a, b)).toBe(500000);
+      expect(PositiveInt32.sub(a, b)).toBe(500_000);
       expect(PositiveInt32.sub(b, a)).toBe(1); // clamped to 1
     });
 
     test('mul (with clamping to positive int32 range)', () => {
       const result = PositiveInt32.mul(
-        asPositiveInt32(100000),
-        asPositiveInt32(100000),
+        asPositiveInt32(100_000),
+        asPositiveInt32(100_000),
       );
-      expect(result).toBe(2147483647); // clamped to max
+      expect(result).toBe(2_147_483_647); // clamped to max
       expect(PositiveInt32.mul(asPositiveInt32(1000), asPositiveInt32(5))).toBe(
         5000,
       );
     });
 
     test('div (floor division, never goes below 1)', () => {
-      expect(PositiveInt32.div(a, asPositiveInt32(500000))).toBe(2);
+      expect(PositiveInt32.div(a, asPositiveInt32(500_000))).toBe(2);
       expect(PositiveInt32.div(asPositiveInt32(7), asPositiveInt32(3))).toBe(2);
       expect(
-        PositiveInt32.div(asPositiveInt32(500000), asPositiveInt32(1000000)),
+        PositiveInt32.div(asPositiveInt32(500_000), asPositiveInt32(1_000_000)),
       ).toBe(1); // floor(500000/1000000) = 0, clamped to 1
     });
 
     test('pow (with clamping to positive int32 range)', () => {
       const result = PositiveInt32.pow(
-        asPositiveInt32(10000),
+        asPositiveInt32(10_000),
         asPositiveInt32(3),
       );
-      expect(result).toBe(2147483647); // clamped to max
+      expect(result).toBe(2_147_483_647); // clamped to max
       expect(PositiveInt32.pow(asPositiveInt32(2), asPositiveInt32(3))).toBe(8);
     });
   });
@@ -183,7 +183,7 @@ describe('PositiveInt32', () => {
       for (const _ of range(10)) {
         const result = PositiveInt32.random(1, 30);
         expect(result).toBeGreaterThanOrEqual(1);
-        expect(result).toBeLessThanOrEqual(2147483647);
+        expect(result).toBeLessThanOrEqual(2_147_483_647);
       }
     });
   });
@@ -192,7 +192,7 @@ describe('PositiveInt32', () => {
     test('type relationships', () => {
       expectType<PositiveInt32, number>('<=');
 
-      expectTypeOf(asPositiveInt32(1000000)).toExtend<PositiveInt32>();
+      expectTypeOf(asPositiveInt32(1_000_000)).toExtend<PositiveInt32>();
     });
   });
 });

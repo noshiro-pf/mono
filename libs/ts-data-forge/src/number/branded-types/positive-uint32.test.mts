@@ -11,8 +11,8 @@ describe('PositiveUint32', () => {
     test('accepts valid positive uint32 values', () => {
       expect(() => asPositiveUint32(1)).not.toThrow();
       expect(() => asPositiveUint32(1000)).not.toThrow();
-      expect(() => asPositiveUint32(4294967295)).not.toThrow(); // 2^32 - 1
-      expect(() => asPositiveUint32(2147483648)).not.toThrow(); // 2^31
+      expect(() => asPositiveUint32(4_294_967_295)).not.toThrow(); // 2^32 - 1
+      expect(() => asPositiveUint32(2_147_483_648)).not.toThrow(); // 2^31
     });
 
     test('rejects zero', () => {
@@ -20,8 +20,8 @@ describe('PositiveUint32', () => {
     });
 
     test('rejects values outside uint32 range', () => {
-      expect(() => asPositiveUint32(4294967296)).toThrow(TypeError); // 2^32
-      expect(() => asPositiveUint32(10000000000)).toThrow(TypeError);
+      expect(() => asPositiveUint32(4_294_967_296)).toThrow(TypeError); // 2^32
+      expect(() => asPositiveUint32(10_000_000_000)).toThrow(TypeError);
     });
 
     test('rejects negative integers', () => {
@@ -44,7 +44,7 @@ describe('PositiveUint32', () => {
     test('returns the same value for valid inputs', () => {
       expect(asPositiveUint32(5)).toBe(5);
       expect(asPositiveUint32(1)).toBe(1);
-      expect(asPositiveUint32(4294967295)).toBe(4294967295);
+      expect(asPositiveUint32(4_294_967_295)).toBe(4_294_967_295);
     });
 
     test.each([
@@ -55,7 +55,7 @@ describe('PositiveUint32', () => {
       { name: '-3.4', value: -3.4 },
       { name: '0', value: 0 },
       { name: '-1', value: -1 },
-      { name: '4294967296', value: 4294967296 },
+      { name: '4294967296', value: 4_294_967_296 },
     ] as const)(
       `asPositiveUint32($name) should throw a TypeError`,
       ({ value }) => {
@@ -72,8 +72,8 @@ describe('PositiveUint32', () => {
     test('correctly identifies positive uint32 values', () => {
       expect(isPositiveUint32(1)).toBe(true);
       expect(isPositiveUint32(1000)).toBe(true);
-      expect(isPositiveUint32(4294967295)).toBe(true);
-      expect(isPositiveUint32(2147483648)).toBe(true);
+      expect(isPositiveUint32(4_294_967_295)).toBe(true);
+      expect(isPositiveUint32(2_147_483_648)).toBe(true);
     });
 
     test('correctly identifies zero', () => {
@@ -81,8 +81,8 @@ describe('PositiveUint32', () => {
     });
 
     test('correctly identifies values outside uint32 range', () => {
-      expect(isPositiveUint32(4294967296)).toBe(false);
-      expect(isPositiveUint32(10000000000)).toBe(false);
+      expect(isPositiveUint32(4_294_967_296)).toBe(false);
+      expect(isPositiveUint32(10_000_000_000)).toBe(false);
     });
 
     test('correctly identifies negative integers', () => {
@@ -110,60 +110,63 @@ describe('PositiveUint32', () => {
   describe('constants', () => {
     test('MIN_VALUE and MAX_VALUE', () => {
       expect(PositiveUint32.MIN_VALUE).toBe(1);
-      expect(PositiveUint32.MAX_VALUE).toBe(4294967295);
+      expect(PositiveUint32.MAX_VALUE).toBe(4_294_967_295);
     });
   });
 
   describe('mathematical operations', () => {
-    const a = asPositiveUint32(1000000);
-    const b = asPositiveUint32(500000);
+    const a = asPositiveUint32(1_000_000);
+    const b = asPositiveUint32(500_000);
 
     test('min and max', () => {
-      expect(PositiveUint32.min(a, b)).toBe(500000);
-      expect(PositiveUint32.max(a, b)).toBe(1000000);
+      expect(PositiveUint32.min(a, b)).toBe(500_000);
+      expect(PositiveUint32.max(a, b)).toBe(1_000_000);
     });
 
     test('add (with clamping to positive uint32 range)', () => {
       const result = PositiveUint32.add(
-        asPositiveUint32(4294967000),
+        asPositiveUint32(4_294_967_000),
         asPositiveUint32(1000),
       );
-      expect(result).toBe(4294967295); // clamped to max
-      expect(PositiveUint32.add(a, b)).toBe(1500000);
+      expect(result).toBe(4_294_967_295); // clamped to max
+      expect(PositiveUint32.add(a, b)).toBe(1_500_000);
     });
 
     test('sub (never goes below 1)', () => {
-      expect(PositiveUint32.sub(a, b)).toBe(500000);
+      expect(PositiveUint32.sub(a, b)).toBe(500_000);
       expect(PositiveUint32.sub(b, a)).toBe(1); // clamped to 1
     });
 
     test('mul (with clamping to positive uint32 range)', () => {
       const result = PositiveUint32.mul(
-        asPositiveUint32(100000),
-        asPositiveUint32(100000),
+        asPositiveUint32(100_000),
+        asPositiveUint32(100_000),
       );
-      expect(result).toBe(4294967295); // clamped to max
+      expect(result).toBe(4_294_967_295); // clamped to max
       expect(
         PositiveUint32.mul(asPositiveUint32(1000), asPositiveUint32(5)),
       ).toBe(5000);
     });
 
     test('div (floor division, never goes below 1)', () => {
-      expect(PositiveUint32.div(a, asPositiveUint32(500000))).toBe(2);
+      expect(PositiveUint32.div(a, asPositiveUint32(500_000))).toBe(2);
       expect(PositiveUint32.div(asPositiveUint32(7), asPositiveUint32(3))).toBe(
         2,
       );
       expect(
-        PositiveUint32.div(asPositiveUint32(500000), asPositiveUint32(1000000)),
+        PositiveUint32.div(
+          asPositiveUint32(500_000),
+          asPositiveUint32(1_000_000),
+        ),
       ).toBe(1); // floor(500000/1000000) = 0, clamped to 1
     });
 
     test('pow (with clamping to positive uint32 range)', () => {
       const result = PositiveUint32.pow(
-        asPositiveUint32(10000),
+        asPositiveUint32(10_000),
         asPositiveUint32(3),
       );
-      expect(result).toBe(4294967295); // clamped to max
+      expect(result).toBe(4_294_967_295); // clamped to max
       expect(PositiveUint32.pow(asPositiveUint32(2), asPositiveUint32(3))).toBe(
         8,
       );
@@ -189,7 +192,7 @@ describe('PositiveUint32', () => {
       for (const _ of range(10)) {
         const result = PositiveUint32.random(1, 30);
         expect(result).toBeGreaterThanOrEqual(1);
-        expect(result).toBeLessThanOrEqual(4294967295);
+        expect(result).toBeLessThanOrEqual(4_294_967_295);
       }
     });
   });
@@ -198,7 +201,7 @@ describe('PositiveUint32', () => {
     test('type relationships', () => {
       expectType<PositiveUint32, number>('<=');
 
-      expectTypeOf(asPositiveUint32(1000000)).toExtend<PositiveUint32>();
+      expectTypeOf(asPositiveUint32(1_000_000)).toExtend<PositiveUint32>();
     });
   });
 });

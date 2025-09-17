@@ -112,7 +112,7 @@ export namespace Arr {
   ): Ar extends NonEmptyArray<unknown>
     ? IntersectBrand<PositiveNumber, SizeType.Arr>
     : SizeType.Arr =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     array.length as never;
 
   // type guard
@@ -421,7 +421,7 @@ export namespace Arr {
     : N extends SizeType.ArgArrPositive
       ? NonEmptyArray<0>
       : readonly 0[] =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Array.from<0>({ length: len }).fill(0) as never;
 
   /**
@@ -472,7 +472,7 @@ export namespace Arr {
     : N extends SizeType.ArgArrPositive
       ? NonEmptyArray<SizeType.Arr>
       : readonly SizeType.Arr[] =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Array.from({ length: len }, (_, i) => i) as never;
 
   /**
@@ -531,7 +531,7 @@ export namespace Arr {
     : N extends SizeType.ArgArrPositive
       ? NonEmptyArray<V>
       : readonly V[] =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Array.from({ length: Math.max(0, len) }, () => init) as never;
 
   /**
@@ -658,7 +658,7 @@ export namespace Arr {
    *   The underlying implementation uses `slice()` for efficient shallow copying
    */
   export const copy = <Ar extends readonly unknown[]>(array: Ar): Ar =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     array.slice() as unknown as Ar;
 
   /**
@@ -1046,7 +1046,7 @@ export namespace Arr {
       : Ar extends NonEmptyArray<infer E>
         ? Optional.Some<E>
         : Optional<Ar[number]> =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (array.length === 0 ? Optional.none : Optional.some(array.at(0))) as never;
 
   /**
@@ -1138,7 +1138,7 @@ export namespace Arr {
       : Ar extends NonEmptyArray<infer E>
         ? Optional.Some<E>
         : Optional<Ar[number]> =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (array.length === 0 ? Optional.none : Optional.some(array.at(-1))) as never;
 
   // slicing
@@ -1276,7 +1276,7 @@ export namespace Arr {
   export const tail = <Ar extends readonly unknown[]>(
     array: Ar,
   ): List.Tail<Ar> =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     array.slice(1) as unknown as List.Tail<Ar>;
 
   /**
@@ -1294,7 +1294,7 @@ export namespace Arr {
   export const butLast = <Ar extends readonly unknown[]>(
     array: Ar,
   ): List.ButLast<Ar> =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (isEmpty(array) ? [] : array.slice(0, -1)) as unknown as List.ButLast<Ar>;
 
   /**
@@ -1609,7 +1609,7 @@ export namespace Arr {
     switch (args.length) {
       case 3: {
         const [array, index, newValue] = args;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         return (array as (E | V)[]).with(index, newValue);
       }
       case 2: {
@@ -1810,7 +1810,7 @@ export namespace Arr {
     switch (args.length) {
       case 3: {
         const [array, index, updater] = args;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, total-functions/no-unsafe-type-assertion
         return (array as (E | V)[]).with(index, updater(array[index]!));
       }
       case 2: {
@@ -1872,7 +1872,7 @@ export namespace Arr {
     switch (args.length) {
       case 3: {
         const [array, index, newValue] = args;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         return (array as readonly (E | V)[]).toSpliced(
           index,
           0,
@@ -1965,7 +1965,7 @@ export namespace Arr {
     switch (args.length) {
       case 2: {
         const [array, newValue] = args;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         return array.toSpliced(
           array.length,
           0,
@@ -2012,7 +2012,7 @@ export namespace Arr {
     switch (args.length) {
       case 2: {
         const [array, newValue] = args;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         return array.toSpliced(0, 0, newValue) as unknown as readonly [
           V,
           ...Ar,
@@ -2255,7 +2255,7 @@ export namespace Arr {
       case 2: {
         const [array, predicate] = args;
         const foundIndex = array.findIndex(
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           predicate as () => boolean,
         );
 
@@ -2350,7 +2350,7 @@ export namespace Arr {
       case 2: {
         const [array, predicate] = args;
         const foundIndex = array.findLastIndex(
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           predicate as () => boolean,
         );
 
@@ -2519,7 +2519,7 @@ export namespace Arr {
         const [array, predicate] = args;
         return pipe(
           array.findIndex(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             predicate as (value: E, index: number) => boolean,
           ),
         ).map((idx) => (idx >= 0 ? asUint32(idx) : -1)).value;
@@ -2653,7 +2653,7 @@ export namespace Arr {
         const [array, predicate] = args;
         return pipe(
           array.findLastIndex(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             predicate as (value: E, index: number) => boolean,
           ),
         ).map((idx) => (idx >= 0 ? asUint32(idx) : -1)).value;
@@ -3496,7 +3496,7 @@ export namespace Arr {
       return Result.ok(result);
     } catch (error) {
       return Result.err(
-        error instanceof Error ? error : new Error(unknownToString(error)),
+        Error.isError(error) ? error : new Error(unknownToString(error)),
       );
     }
   };
@@ -3526,7 +3526,7 @@ export namespace Arr {
     array1: Ar1,
     array2: Ar2,
   ): List.Zip<Ar1, Ar2> =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     seq(Uint32.min(size(array1), size(array2))).map((i) =>
       // Non-null assertion is safe here because `i` is always within bounds of both arrays up to the length of the shorter one.
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -3580,7 +3580,7 @@ export namespace Arr {
     switch (args.length) {
       case 2: {
         const [array, mapFn] = args;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         return array.map(mapFn as never);
       }
       case 1: {
@@ -3773,7 +3773,7 @@ export namespace Arr {
           return (array) => flat(array, 1);
         } else {
           expectType<typeof arrayOrDepth, readonly E[]>('=');
-          return arrayOrDepth.flat(1);
+          return arrayOrDepth.flat();
         }
       }
 
@@ -3900,7 +3900,8 @@ export namespace Arr {
         const [array, chunkSize] = args;
         return chunkSize < 2
           ? []
-          : seq(asUint32(Math.ceil(array.length / chunkSize))).map((i) =>
+          : // eslint-disable-next-line total-functions/no-partial-division
+            seq(asUint32(Math.ceil(array.length / chunkSize))).map((i) =>
               array.slice(chunkSize * i, chunkSize * (i + 1)),
             );
       }
@@ -3943,7 +3944,7 @@ export namespace Arr {
   export const toReversed = <const Ar extends readonly unknown[]>(
     array: Ar,
   ): List.Reverse<Ar> =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     array.toReversed() as never;
 
   /**
@@ -3978,11 +3979,11 @@ export namespace Arr {
     : Ar extends NonEmptyArray<unknown>
       ? NonEmptyArray<Ar[number]>
       : readonly Ar[number][] =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     array.toSorted(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       (comparator as ((x: unknown, y: unknown) => number) | undefined) ??
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         ((x, y) => (x as number) - (y as number)),
     ) as never;
 
@@ -4032,9 +4033,9 @@ export namespace Arr {
       comparator === undefined
         ? // This branch assumes V is number if comparator is undefined.
           // The overloads should handle this, but explicit cast might be needed if V is not number.
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           (comparatorValueMapper(x) as number) -
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           (comparatorValueMapper(y) as number)
         : comparator(comparatorValueMapper(x), comparatorValueMapper(y)),
     );
@@ -4463,7 +4464,7 @@ export namespace Arr {
   ): Ar extends NonEmptyArray<unknown>
     ? NonEmptyArray<Ar[number]>
     : readonly Ar[number][] =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Array.from(new Set(array)) as never;
 
   /**
@@ -4495,7 +4496,7 @@ export namespace Arr {
     : readonly Ar[number][] => {
     const mut_mappedValues = new Set<P>();
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return array.filter((val) => {
       const mappedValue = mapFn(val);
 
@@ -4561,7 +4562,7 @@ export namespace Arr {
     array2: readonly E2[],
   ): boolean =>
     array1.every((a) =>
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       array2.includes(a as E1 & E2),
     );
 
@@ -4609,7 +4610,7 @@ export namespace Arr {
     array1: readonly E1[],
     array2: readonly E2[],
   ): readonly (E1 & E2)[] =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     array1.filter((e) => array2.includes(e as E1 & E2)) as (E1 & E2)[];
 
   /**

@@ -16,7 +16,7 @@
 
 > **MapSetKeyType** = `Primitive`
 
-Defined in: [src/globals.d.mts:10](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/globals.d.mts#L10)
+Defined in: [src/globals.d.mts:8](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/globals.d.mts#L8)
 
 Represents the type of keys that can be used in a standard JavaScript Map.
 
@@ -26,4 +26,4 @@ Represents the type of keys that can be used in a standard JavaScript Map.
 
 > **SmallPositiveInt** = `WithSmallInt`\<`PositiveInt`\>
 
-Defined in: [src/globals.d.mts:5](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/globals.d.mts#L5)
+Defined in: [src/globals.d.mts:3](https://github.com/noshiro-pf/ts-data-forge/blob/main/src/globals.d.mts#L3)

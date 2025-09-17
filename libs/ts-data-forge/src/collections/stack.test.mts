@@ -45,7 +45,9 @@ describe('Stack', () => {
     const stack = createStack<string>();
 
     stack.push('first');
+    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('second');
+    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('third');
 
     expect(stack.size).toBe(3);
@@ -98,10 +100,12 @@ describe('Stack', () => {
     const stack = createStack<string>();
 
     stack.push('a');
+    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('b');
     expect(Optional.unwrap(stack.pop())).toBe('b');
 
     stack.push('c');
+    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('d');
     expect(Optional.unwrap(stack.pop())).toBe('d');
     expect(Optional.unwrap(stack.pop())).toBe('c');
@@ -118,6 +122,7 @@ describe('Stack', () => {
     const item2: Item = { id: 2, name: 'second' };
 
     stack.push(item1);
+    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push(item2);
 
     expect(Optional.unwrap(stack.pop())).toStrictEqual(item2);
@@ -127,7 +132,7 @@ describe('Stack', () => {
 
   test('should handle large number of operations efficiently', () => {
     const stack = createStack<number>();
-    const n = asPositiveSafeInt(10000);
+    const n = asPositiveSafeInt(10_000);
 
     // Push many elements
     for (const i of range(n)) {
@@ -167,8 +172,11 @@ describe('Stack', () => {
     const stack = createStack<string | null | undefined>();
 
     stack.push('value');
+    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push(null);
+    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push(undefined);
+    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('another');
 
     expect(Optional.unwrap(stack.pop())).toBe('another');

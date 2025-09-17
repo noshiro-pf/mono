@@ -344,7 +344,10 @@ describe('Optional', () => {
       const divideBy =
         (divisor: number) =>
         (n: number): Optional<number> =>
-          divisor === 0 ? Optional.none : Optional.some(n / divisor);
+          divisor === 0
+            ? Optional.none
+            : // eslint-disable-next-line total-functions/no-partial-division
+              Optional.some(n / divisor);
 
       const intermediate = Optional.flatMap(Optional.some('100'), parseNumber);
       const result = Optional.flatMap(intermediate, divideBy(2));

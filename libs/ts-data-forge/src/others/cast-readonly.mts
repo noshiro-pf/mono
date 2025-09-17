@@ -188,5 +188,5 @@ export const castReadonly = <T,>(mutable: T): Readonly<T> =>
  * @see castDeepMutable - For the opposite operation (use with extreme caution)
  */
 export const castDeepReadonly = <T,>(mutable: T): DeepReadonly<T> =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   mutable as DeepReadonly<T>;

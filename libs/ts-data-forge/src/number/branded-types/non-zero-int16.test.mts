@@ -11,8 +11,8 @@ describe('NonZeroInt16', () => {
     test('accepts valid non-zero int16 values', () => {
       expect(() => asNonZeroInt16(1)).not.toThrow();
       expect(() => asNonZeroInt16(-1)).not.toThrow();
-      expect(() => asNonZeroInt16(32767)).not.toThrow(); // 2^15 - 1
-      expect(() => asNonZeroInt16(-32768)).not.toThrow(); // -2^15
+      expect(() => asNonZeroInt16(32_767)).not.toThrow(); // 2^15 - 1
+      expect(() => asNonZeroInt16(-32_768)).not.toThrow(); // -2^15
     });
 
     test('rejects zero', () => {
@@ -20,10 +20,10 @@ describe('NonZeroInt16', () => {
     });
 
     test('rejects values outside int16 range', () => {
-      expect(() => asNonZeroInt16(32768)).toThrow(TypeError); // 2^15
-      expect(() => asNonZeroInt16(-32769)).toThrow(TypeError); // -2^15 - 1
-      expect(() => asNonZeroInt16(65536)).toThrow(TypeError);
-      expect(() => asNonZeroInt16(-65536)).toThrow(TypeError);
+      expect(() => asNonZeroInt16(32_768)).toThrow(TypeError); // 2^15
+      expect(() => asNonZeroInt16(-32_769)).toThrow(TypeError); // -2^15 - 1
+      expect(() => asNonZeroInt16(65_536)).toThrow(TypeError);
+      expect(() => asNonZeroInt16(-65_536)).toThrow(TypeError);
     });
 
     test('rejects non-integers', () => {
@@ -37,8 +37,8 @@ describe('NonZeroInt16', () => {
     test('returns the same value for valid inputs', () => {
       expect(asNonZeroInt16(5)).toBe(5);
       expect(asNonZeroInt16(-10)).toBe(-10);
-      expect(asNonZeroInt16(32767)).toBe(32767);
-      expect(asNonZeroInt16(-32768)).toBe(-32768);
+      expect(asNonZeroInt16(32_767)).toBe(32_767);
+      expect(asNonZeroInt16(-32_768)).toBe(-32_768);
     });
 
     test.each([
@@ -48,8 +48,8 @@ describe('NonZeroInt16', () => {
       { name: '1.2', value: 1.2 },
       { name: '-3.4', value: -3.4 },
       { name: '0', value: 0 },
-      { name: '32768', value: 32768 },
-      { name: '-32769', value: -32769 },
+      { name: '32768', value: 32_768 },
+      { name: '-32769', value: -32_769 },
     ] as const)(
       `asNonZeroInt16($name) should throw a TypeError`,
       ({ value }) => {
@@ -66,8 +66,8 @@ describe('NonZeroInt16', () => {
     test('correctly identifies non-zero int16 values', () => {
       expect(isNonZeroInt16(1)).toBe(true);
       expect(isNonZeroInt16(-1)).toBe(true);
-      expect(isNonZeroInt16(32767)).toBe(true);
-      expect(isNonZeroInt16(-32768)).toBe(true);
+      expect(isNonZeroInt16(32_767)).toBe(true);
+      expect(isNonZeroInt16(-32_768)).toBe(true);
     });
 
     test('correctly identifies zero', () => {
@@ -75,10 +75,10 @@ describe('NonZeroInt16', () => {
     });
 
     test('correctly identifies values outside int16 range', () => {
-      expect(isNonZeroInt16(32768)).toBe(false);
-      expect(isNonZeroInt16(-32769)).toBe(false);
-      expect(isNonZeroInt16(65536)).toBe(false);
-      expect(isNonZeroInt16(-65536)).toBe(false);
+      expect(isNonZeroInt16(32_768)).toBe(false);
+      expect(isNonZeroInt16(-32_769)).toBe(false);
+      expect(isNonZeroInt16(65_536)).toBe(false);
+      expect(isNonZeroInt16(-65_536)).toBe(false);
     });
 
     test('correctly identifies non-integers', () => {
@@ -100,8 +100,8 @@ describe('NonZeroInt16', () => {
 
   describe('constants', () => {
     test('MIN_VALUE and MAX_VALUE', () => {
-      expect(NonZeroInt16.MIN_VALUE).toBe(-32768);
-      expect(NonZeroInt16.MAX_VALUE).toBe(32767);
+      expect(NonZeroInt16.MIN_VALUE).toBe(-32_768);
+      expect(NonZeroInt16.MAX_VALUE).toBe(32_767);
     });
   });
 
@@ -124,19 +124,19 @@ describe('NonZeroInt16', () => {
 
     test('add (with clamping)', () => {
       const result = NonZeroInt16.add(
-        asNonZeroInt16(32000),
+        asNonZeroInt16(32_000),
         asNonZeroInt16(1000),
       );
-      expect(result).toBe(32767); // clamped to max
+      expect(result).toBe(32_767); // clamped to max
       expect(NonZeroInt16.add(a, b)).toBe(150);
     });
 
     test('sub (with clamping)', () => {
       const result = NonZeroInt16.sub(
-        asNonZeroInt16(-32000),
+        asNonZeroInt16(-32_000),
         asNonZeroInt16(1000),
       );
-      expect(result).toBe(-32768); // clamped to min
+      expect(result).toBe(-32_768); // clamped to min
       expect(NonZeroInt16.sub(a, b)).toBe(50);
     });
 
@@ -145,7 +145,7 @@ describe('NonZeroInt16', () => {
         asNonZeroInt16(1000),
         asNonZeroInt16(100),
       );
-      expect(result).toBe(32767); // clamped to max
+      expect(result).toBe(32_767); // clamped to max
       expect(NonZeroInt16.mul(asNonZeroInt16(10), asNonZeroInt16(5))).toBe(50);
     });
 
@@ -157,7 +157,7 @@ describe('NonZeroInt16', () => {
 
     test('pow (with clamping)', () => {
       const result = NonZeroInt16.pow(asNonZeroInt16(200), asNonZeroInt16(3));
-      expect(result).toBe(32767); // clamped to max
+      expect(result).toBe(32_767); // clamped to max
       expect(NonZeroInt16.pow(asNonZeroInt16(2), asNonZeroInt16(3))).toBe(8);
     });
   });
@@ -180,8 +180,8 @@ describe('NonZeroInt16', () => {
     test('generates values within NonZeroInt16 range', () => {
       for (const _ of range(10)) {
         const result = NonZeroInt16.random(-20, 20);
-        expect(result).toBeGreaterThanOrEqual(-32768);
-        expect(result).toBeLessThanOrEqual(32767);
+        expect(result).toBeGreaterThanOrEqual(-32_768);
+        expect(result).toBeLessThanOrEqual(32_767);
       }
     });
   });

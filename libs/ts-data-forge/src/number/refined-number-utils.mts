@@ -335,7 +335,7 @@ export namespace TsDataForgeInternals {
       const clampOrCastFn: (a: number) => ElementType = clamp ?? castType;
 
       const abs = (x: ElementTypeWithSmallInt): ToNonNegative<ElementType> =>
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Math.abs(clampOrCastFn(x)) as ToNonNegative<ElementType>;
 
       const min_ = (
@@ -369,7 +369,13 @@ export namespace TsDataForgeInternals {
       const div = (
         x: ElementTypeWithSmallInt,
         y: ToNonZeroIntWithSmallInt<ElementType>,
-      ): ElementType => clampOrCastFn(Math.floor(x / y));
+      ): ElementType =>
+        clampOrCastFn(
+          Math.floor(
+            // eslint-disable-next-line total-functions/no-partial-division
+            x / y,
+          ),
+        );
 
       const randomImpl = (
         min: number = MIN_VALUE,
@@ -410,7 +416,7 @@ export namespace TsDataForgeInternals {
         castType,
 
         clamp:
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           clamp as TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
             ? undefined
             : (x: number) => ElementType,
@@ -503,7 +509,7 @@ export namespace TsDataForgeInternals {
       const clampOrCastFn: (a: number) => ElementType = clamp ?? castType;
 
       const abs = (x: ElementType): ToNonNegative<ElementType> =>
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Math.abs(x) as ToNonNegative<ElementType>;
 
       const min_ = (...values: readonly ElementType[]): ElementType =>
@@ -525,6 +531,7 @@ export namespace TsDataForgeInternals {
         clampOrCastFn(x * y);
 
       const div = (x: ElementType, y: ToNonZero<ElementType>): ElementType =>
+        // eslint-disable-next-line total-functions/no-partial-division
         clampOrCastFn(x / y);
 
       const randomImpl = (
@@ -561,7 +568,7 @@ export namespace TsDataForgeInternals {
         randomNonZero,
         castType,
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         clamp: clamp as TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
           ? undefined
           : (x: number) => ElementType,

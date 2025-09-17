@@ -8,7 +8,13 @@ const codeBlockEnd = '```';
 const ignoreAboveKeyword = '// embed-sample-code-ignore-above';
 const ignoreBelowKeyword = '// embed-sample-code-ignore-below';
 
-const documents = [
+const documents: DeepReadonly<
+  {
+    mdPath: string;
+    samplesDir: string;
+    sampleCodeFiles: string[];
+  }[]
+> = [
   {
     mdPath: path.resolve(projectRootPath, 'README.md'),
     samplesDir: path.resolve(projectRootPath, 'samples/readme'),
@@ -24,11 +30,7 @@ const documents = [
       'mutability-utilities.tsx',
     ],
   },
-] as const satisfies {
-  mdPath: string;
-  samplesDir: string;
-  sampleCodeFiles: string[];
-}[];
+] as const;
 
 /** Embeds sample code from ./samples/readme directory into README.md */
 export const embedSamples = async (): Promise<Result<undefined, unknown>> => {

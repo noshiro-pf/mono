@@ -171,7 +171,7 @@ export const unknownToString = (
             : JSON.stringify(value);
         return stringified;
       } catch (error) {
-        return error instanceof Error
+        return Error.isError(error)
           ? error.message
           : '[Circular or Non-serializable]';
       }

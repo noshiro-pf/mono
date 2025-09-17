@@ -63,7 +63,7 @@ const is = (x: number): x is Uint8 => isImpl(x);
  * ```
  */
 const castType = (x: number): Uint8 =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   castTypeImpl(x) as Uint8;
 
 /**

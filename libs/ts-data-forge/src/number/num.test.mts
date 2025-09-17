@@ -183,8 +183,8 @@ describe('Num', () => {
 
   describe('roundAt', () => {
     test('rounds to specified decimal places', () => {
-      expect(Num.roundAt(3.14159, 2)).toBe(3.14);
-      expect(Num.roundAt(3.14159, 3)).toBe(3.142);
+      expect(Num.roundAt(3.141_59, 2)).toBe(3.14);
+      expect(Num.roundAt(3.141_59, 3)).toBe(3.142);
       expect(Num.roundAt(2.555, 2)).toBe(2.56);
       expect(Num.roundAt(123.456, 1)).toBe(123.5);
     });
@@ -203,11 +203,11 @@ describe('Num', () => {
   describe('round', () => {
     test('creates rounding function with specified precision', () => {
       const round2 = Num.round(2);
-      expect(round2(3.14159)).toBe(3.14);
+      expect(round2(3.141_59)).toBe(3.14);
       expect(round2(2.556)).toBe(2.56);
 
       const round1 = Num.round(1);
-      expect(round1(3.14159)).toBe(3.1);
+      expect(round1(3.141_59)).toBe(3.1);
       expect(round1(2.56)).toBe(2.6);
 
       const round3 = Num.round(3);

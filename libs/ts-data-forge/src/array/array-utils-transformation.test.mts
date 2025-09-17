@@ -1072,7 +1072,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with curried version', () => {
-      const flattenOnce = Arr.flat(1);
+      const flattenOnce = Arr.flat();
       const result = flattenOnce([
         [1, 2],
         [3, 4],

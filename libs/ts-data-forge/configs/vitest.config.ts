@@ -6,7 +6,7 @@ import { projectRootPath } from '../scripts/project-root-path.mjs';
 export default defineConfig({
   test: {
     globals: true,
-    dir: path.resolve(projectRootPath, './src'),
+    dir: projectRootPath,
     includeSource: [path.resolve(projectRootPath, './src/**/*.mts')],
     typecheck: {
       tsconfig: path.resolve(projectRootPath, './configs/tsconfig.test.json'),
@@ -14,6 +14,9 @@ export default defineConfig({
     passWithNoTests: true,
     restoreMocks: true,
     hideSkippedTests: true,
+    alias: {
+      'ts-data-forge': path.resolve(projectRootPath, './src/entry-point.mts'),
+    },
     coverage: {
       provider: 'v8',
       reporter: ['html', 'lcov', 'text'],

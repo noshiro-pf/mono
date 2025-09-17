@@ -109,5 +109,5 @@ export const castMutable = <T,>(readonlyValue: T): Mutable<T> =>
  * @see structuredClone - Recommended for creating safe copies before mutation
  */
 export const castDeepMutable = <T,>(readonlyValue: T): DeepMutable<T> =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   readonlyValue as DeepMutable<T>;

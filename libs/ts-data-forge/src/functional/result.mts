@@ -316,11 +316,11 @@ export namespace Result {
     toStr: (e: UnwrapErr<R>) => string = toStr_,
   ): UnwrapOk<R> => {
     if (isErr(result)) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       throw new Error(toStr(result.value as UnwrapErr<R>));
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return result.value as UnwrapOk<R>;
   };
 
@@ -366,7 +366,7 @@ export namespace Result {
   export function unwrapOk<R extends Base>(result: R): UnwrapOk<R> | undefined {
     return isErr(result)
       ? undefined
-      : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (result.value as UnwrapOk<R>);
   }
 
@@ -404,7 +404,7 @@ export namespace Result {
       case 2: {
         // Direct version: first argument is result
         const [result, defaultValue] = args;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         return isErr(result) ? defaultValue : (result.value as UnwrapOk<R>);
       }
 
@@ -449,12 +449,12 @@ export namespace Result {
   ): UnwrapErr<R> => {
     if (isOk(result)) {
       throw new Error(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         `Expected Err but got Ok: ${toStr(result.value as UnwrapOk<R>)}`,
       );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return result.value as UnwrapErr<R>;
   };
 
@@ -480,7 +480,7 @@ export namespace Result {
   export const unwrapErr = <R extends Base>(
     result: R,
   ): UnwrapErr<R> | undefined =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     isErr(result) ? (result.value as UnwrapErr<R>) : undefined;
 
   /**
@@ -517,7 +517,7 @@ export namespace Result {
       case 2: {
         // Direct version: first argument is result
         const [result, defaultValue] = args;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         return isErr(result) ? (result.value as UnwrapErr<R>) : defaultValue;
       }
 
@@ -570,9 +570,9 @@ export namespace Result {
       case 2: {
         const [result, mapFn] = args;
         return isErr(result)
-          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             (result as Err<UnwrapErr<R>>)
-          : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             ok(mapFn(result.value as UnwrapOk<R>));
       }
 
@@ -618,9 +618,9 @@ export namespace Result {
       case 2: {
         const [result, mapFn] = args;
         return isOk(result)
-          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             (result as Ok<UnwrapOk<R>>)
-          : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             err(mapFn(result.value as UnwrapErr<R>));
       }
 
@@ -678,9 +678,9 @@ export namespace Result {
       case 3: {
         const [result, mapFn, mapErrFn] = args;
         return isOk(result)
-          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             ok(mapFn(result.value as UnwrapOk<R>))
-          : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             err(mapErrFn(result.value as UnwrapErr<R>));
       }
 
@@ -732,9 +732,9 @@ export namespace Result {
       case 2: {
         const [result, flatMapFn] = args;
         return isErr(result)
-          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             (result as Err<UnwrapErr<R>>)
-          : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             flatMapFn(result.value as UnwrapOk<R>);
       }
 
@@ -815,7 +815,7 @@ export namespace Result {
   export const fromPromise = <P extends Promise<unknown>>(
     promise: P,
   ): Promise<Result<UnwrapPromise<P>, unknown>> =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     promise.then((v) => ok(v) as Ok<UnwrapPromise<P>>).catch(err);
 
   /**
@@ -848,7 +848,7 @@ export namespace Result {
     try {
       return ok(fn());
     } catch (error) {
-      if (error instanceof Error) {
+      if (Error.isError(error)) {
         return err(error);
       }
       const msg = unknownToString(error);
@@ -872,7 +872,7 @@ export namespace Result {
   export const swap = <R extends Base>(
     result: R,
   ): Result<UnwrapErr<R>, UnwrapOk<R>> =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     isOk(result) ? err(unwrapOk(result)) : ok(result.value as UnwrapErr<R>);
 
   /**

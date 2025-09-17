@@ -246,17 +246,17 @@ describe('mapNullable', () => {
     });
 
     test('should work with form data processing', () => {
-      type FormData = Readonly<{
+      type FormDataType = Readonly<{
         email?: string;
         age?: string;
       }>;
 
-      const formData: FormData = {
+      const formData: FormDataType = {
         email: 'test@example.com',
         age: '25',
       };
 
-      const extractAge = mapNullable((data: FormData) => data.age);
+      const extractAge = mapNullable((data: FormDataType) => data.age);
       const parseAge = mapNullable((ageStr: string) =>
         Number.parseInt(ageStr, 10),
       );
@@ -272,17 +272,17 @@ describe('mapNullable', () => {
     });
 
     test('should handle missing data gracefully', () => {
-      type FormData = Readonly<{
+      type FormDataType = Readonly<{
         email?: string;
         age?: string;
       }>;
 
-      const incompleteFormData: FormData = {
+      const incompleteFormData: FormDataType = {
         email: 'test@example.com',
         // age is missing
       };
 
-      const extractAge = mapNullable((data: FormData) => data.age);
+      const extractAge = mapNullable((data: FormDataType) => data.age);
       const parseAge = mapNullable((ageStr: string) =>
         Number.parseInt(ageStr, 10),
       );

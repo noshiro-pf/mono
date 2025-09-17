@@ -371,7 +371,10 @@ describe('Result', () => {
   describe('flatMap', () => {
     test('should chain operations that return Result', () => {
       const divide = (a: number, b: number): Result<number, string> =>
-        b === 0 ? Result.err('Division by zero') : Result.ok(a / b);
+        b === 0
+          ? Result.err('Division by zero')
+          : // eslint-disable-next-line total-functions/no-partial-division
+            Result.ok(a / b);
 
       const result = Result.flatMap(Result.ok(10), (x) => divide(x, 2));
       expect(Result.unwrapOk(result)).toBe(5);
@@ -394,6 +397,7 @@ describe('Result', () => {
       };
 
       const divide = (a: number, b: number): Result<number, string> =>
+        // eslint-disable-next-line total-functions/no-partial-division
         b === 0 ? Result.err('Division by zero') : Result.ok(a / b);
 
       const result = Result.flatMap(
@@ -405,7 +409,10 @@ describe('Result', () => {
 
     test('should support curried form', () => {
       const divide = (a: number, b: number): Result<number, string> =>
-        b === 0 ? Result.err('Division by zero') : Result.ok(a / b);
+        b === 0
+          ? Result.err('Division by zero')
+          : // eslint-disable-next-line total-functions/no-partial-division
+            Result.ok(a / b);
 
       const divideBy2 = Result.flatMap((x: number) => divide(x, 2));
 

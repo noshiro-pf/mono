@@ -35,7 +35,7 @@ const is = (x: number): x is Int8 => isImpl(x);
  * @throws TypeError if x is not a valid Int8
  */
 const castType = (x: number): Int8 =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   castTypeImpl(x) as Int8;
 
 /**
@@ -51,7 +51,7 @@ const clamp = (a: number): Int8 => castType(clampImpl(a));
  * @returns The absolute value
  */
 const abs = <N extends Int8>(x: N): AbsoluteValue<N> =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   Math.abs(x) as unknown as AbsoluteValue<N>;
 
 /**

@@ -520,7 +520,7 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
 
   /** @inheritdoc */
   has(key: K | (WidenLiteral<K> & {})): boolean {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return this.#set.has(key as K);
   }
 
@@ -621,13 +621,13 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
 
   /** @inheritdoc */
   isSubsetOf(set: ISet<WidenLiteral<K>>): boolean {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return this.every((k) => set.has(k as WidenLiteral<K>));
   }
 
   /** @inheritdoc */
   isSupersetOf(set: ISet<WidenLiteral<K>>): boolean {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return set.every((k) => this.has(k as K));
   }
 

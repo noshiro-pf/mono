@@ -11,7 +11,7 @@ describe('PositiveInt16', () => {
     test('accepts valid positive int16 values', () => {
       expect(() => asPositiveInt16(1)).not.toThrow();
       expect(() => asPositiveInt16(1000)).not.toThrow();
-      expect(() => asPositiveInt16(32767)).not.toThrow(); // 2^15 - 1
+      expect(() => asPositiveInt16(32_767)).not.toThrow(); // 2^15 - 1
     });
 
     test('rejects zero', () => {
@@ -19,8 +19,8 @@ describe('PositiveInt16', () => {
     });
 
     test('rejects values outside int16 range', () => {
-      expect(() => asPositiveInt16(32768)).toThrow(TypeError); // 2^15
-      expect(() => asPositiveInt16(65536)).toThrow(TypeError);
+      expect(() => asPositiveInt16(32_768)).toThrow(TypeError); // 2^15
+      expect(() => asPositiveInt16(65_536)).toThrow(TypeError);
     });
 
     test('rejects negative integers', () => {
@@ -43,7 +43,7 @@ describe('PositiveInt16', () => {
     test('returns the same value for valid inputs', () => {
       expect(asPositiveInt16(5)).toBe(5);
       expect(asPositiveInt16(1)).toBe(1);
-      expect(asPositiveInt16(32767)).toBe(32767);
+      expect(asPositiveInt16(32_767)).toBe(32_767);
     });
 
     test.each([
@@ -54,7 +54,7 @@ describe('PositiveInt16', () => {
       { name: '-3.4', value: -3.4 },
       { name: '0', value: 0 },
       { name: '-1', value: -1 },
-      { name: '32768', value: 32768 },
+      { name: '32768', value: 32_768 },
     ] as const)(
       `asPositiveInt16($name) should throw a TypeError`,
       ({ value }) => {
@@ -71,7 +71,7 @@ describe('PositiveInt16', () => {
     test('correctly identifies positive int16 values', () => {
       expect(isPositiveInt16(1)).toBe(true);
       expect(isPositiveInt16(1000)).toBe(true);
-      expect(isPositiveInt16(32767)).toBe(true);
+      expect(isPositiveInt16(32_767)).toBe(true);
     });
 
     test('correctly identifies zero', () => {
@@ -79,8 +79,8 @@ describe('PositiveInt16', () => {
     });
 
     test('correctly identifies values outside int16 range', () => {
-      expect(isPositiveInt16(32768)).toBe(false);
-      expect(isPositiveInt16(65536)).toBe(false);
+      expect(isPositiveInt16(32_768)).toBe(false);
+      expect(isPositiveInt16(65_536)).toBe(false);
     });
 
     test('correctly identifies negative integers', () => {
@@ -108,7 +108,7 @@ describe('PositiveInt16', () => {
   describe('constants', () => {
     test('MIN_VALUE and MAX_VALUE', () => {
       expect(PositiveInt16.MIN_VALUE).toBe(1);
-      expect(PositiveInt16.MAX_VALUE).toBe(32767);
+      expect(PositiveInt16.MAX_VALUE).toBe(32_767);
     });
   });
 
@@ -123,10 +123,10 @@ describe('PositiveInt16', () => {
 
     test('add (with clamping to positive int16 range)', () => {
       const result = PositiveInt16.add(
-        asPositiveInt16(32000),
+        asPositiveInt16(32_000),
         asPositiveInt16(1000),
       );
-      expect(result).toBe(32767); // clamped to max
+      expect(result).toBe(32_767); // clamped to max
       expect(PositiveInt16.add(a, b)).toBe(150);
     });
 
@@ -140,7 +140,7 @@ describe('PositiveInt16', () => {
         asPositiveInt16(1000),
         asPositiveInt16(100),
       );
-      expect(result).toBe(32767); // clamped to max
+      expect(result).toBe(32_767); // clamped to max
       expect(PositiveInt16.mul(asPositiveInt16(10), asPositiveInt16(5))).toBe(
         50,
       );
@@ -159,7 +159,7 @@ describe('PositiveInt16', () => {
         asPositiveInt16(200),
         asPositiveInt16(3),
       );
-      expect(result).toBe(32767); // clamped to max
+      expect(result).toBe(32_767); // clamped to max
       expect(PositiveInt16.pow(asPositiveInt16(2), asPositiveInt16(3))).toBe(8);
     });
   });
@@ -183,7 +183,7 @@ describe('PositiveInt16', () => {
       for (const _ of range(10)) {
         const result = PositiveInt16.random(1, 30);
         expect(result).toBeGreaterThanOrEqual(1);
-        expect(result).toBeLessThanOrEqual(32767);
+        expect(result).toBeLessThanOrEqual(32_767);
       }
     });
   });

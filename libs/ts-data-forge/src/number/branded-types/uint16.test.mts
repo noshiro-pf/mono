@@ -8,13 +8,13 @@ describe('Uint16', () => {
     test('accepts valid uint16 values', () => {
       expect(() => asUint16(0)).not.toThrow();
       expect(() => asUint16(1)).not.toThrow();
-      expect(() => asUint16(65535)).not.toThrow(); // 2^16 - 1
-      expect(() => asUint16(32768)).not.toThrow(); // 2^15
+      expect(() => asUint16(65_535)).not.toThrow(); // 2^16 - 1
+      expect(() => asUint16(32_768)).not.toThrow(); // 2^15
     });
 
     test('rejects values outside uint16 range', () => {
-      expect(() => asUint16(65536)).toThrow(TypeError); // 2^16
-      expect(() => asUint16(100000)).toThrow(TypeError);
+      expect(() => asUint16(65_536)).toThrow(TypeError); // 2^16
+      expect(() => asUint16(100_000)).toThrow(TypeError);
     });
 
     test('rejects negative integers', () => {
@@ -33,7 +33,7 @@ describe('Uint16', () => {
     test('returns the same value for valid inputs', () => {
       expect(asUint16(5)).toBe(5);
       expect(asUint16(0)).toBe(0);
-      expect(asUint16(65535)).toBe(65535);
+      expect(asUint16(65_535)).toBe(65_535);
     });
 
     test.each([
@@ -56,13 +56,13 @@ describe('Uint16', () => {
     test('correctly identifies uint16 values', () => {
       expect(isUint16(0)).toBe(true);
       expect(isUint16(1)).toBe(true);
-      expect(isUint16(65535)).toBe(true);
-      expect(isUint16(32768)).toBe(true);
+      expect(isUint16(65_535)).toBe(true);
+      expect(isUint16(32_768)).toBe(true);
     });
 
     test('correctly identifies values outside uint16 range', () => {
-      expect(isUint16(65536)).toBe(false);
-      expect(isUint16(100000)).toBe(false);
+      expect(isUint16(65_536)).toBe(false);
+      expect(isUint16(100_000)).toBe(false);
     });
 
     test('correctly identifies negative integers', () => {
@@ -82,7 +82,7 @@ describe('Uint16', () => {
   describe('Uint16.is', () => {
     test('same as isUint16 function', () => {
       expect(Uint16.is(5)).toBe(isUint16(5));
-      expect(Uint16.is(65536)).toBe(isUint16(65536));
+      expect(Uint16.is(65_536)).toBe(isUint16(65_536));
       expect(Uint16.is(-1)).toBe(isUint16(-1));
     });
   });
@@ -90,7 +90,7 @@ describe('Uint16', () => {
   describe('constants', () => {
     test('MIN_VALUE and MAX_VALUE', () => {
       expect(Uint16.MIN_VALUE).toBe(0);
-      expect(Uint16.MAX_VALUE).toBe(65535);
+      expect(Uint16.MAX_VALUE).toBe(65_535);
     });
   });
 
@@ -107,8 +107,8 @@ describe('Uint16', () => {
     });
 
     test('add (with clamping to uint16 range)', () => {
-      const result = Uint16.add(asUint16(65000), asUint16(1000));
-      expect(result).toBe(65535); // clamped to max
+      const result = Uint16.add(asUint16(65_000), asUint16(1000));
+      expect(result).toBe(65_535); // clamped to max
       expect(Uint16.add(a, b)).toBe(150);
     });
 
@@ -120,7 +120,7 @@ describe('Uint16', () => {
 
     test('mul (with clamping to uint16 range)', () => {
       const result = Uint16.mul(asUint16(1000), asUint16(100));
-      expect(result).toBe(65535); // clamped to max
+      expect(result).toBe(65_535); // clamped to max
       expect(Uint16.mul(asUint16(10), asUint16(5))).toBe(50);
     });
 
@@ -132,7 +132,7 @@ describe('Uint16', () => {
 
     test('pow (with clamping to uint16 range)', () => {
       const result = Uint16.pow(asUint16(256), asUint16(3));
-      expect(result).toBe(65535); // clamped to max
+      expect(result).toBe(65_535); // clamped to max
       expect(Uint16.pow(asUint16(2), asUint16(3))).toBe(8);
     });
   });
@@ -156,7 +156,7 @@ describe('Uint16', () => {
       for (const _ of range(10)) {
         const result = Uint16.random(0, 30);
         expect(result).toBeGreaterThanOrEqual(0);
-        expect(result).toBeLessThanOrEqual(65535);
+        expect(result).toBeLessThanOrEqual(65_535);
       }
     });
   });

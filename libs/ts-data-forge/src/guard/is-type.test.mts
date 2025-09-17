@@ -139,7 +139,7 @@ describe('isNumber', () => {
     expect(isNumber('123')).toBe(false);
     expect(isNumber(true)).toBe(false);
     expect(isNumber(null)).toBe(false);
-    expect(isNumber(BigInt(123))).toBe(false);
+    expect(isNumber(123n)).toBe(false);
     // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
     expect(isNumber(new Number(42))).toBe(false);
   });
@@ -155,7 +155,7 @@ describe('isNumber', () => {
 
 describe('isBigint', () => {
   test('should return true for bigints', () => {
-    expect(isBigint(BigInt(0))).toBe(true);
+    expect(isBigint(0n)).toBe(true);
     expect(isBigint(123n)).toBe(true);
     expect(isBigint(-456n)).toBe(true);
   });
@@ -265,7 +265,7 @@ describe('isNotNumber', () => {
     expect(isNotNumber(false)).toBe(true);
     expect(isNotNumber(null)).toBe(true);
     expect(isNotNumber(undefined)).toBe(true);
-    expect(isNotNumber(BigInt(123))).toBe(true);
+    expect(isNotNumber(123n)).toBe(true);
     expect(isNotNumber({})).toBe(true);
     expect(isNotNumber([])).toBe(true);
     expect(isNotNumber(Symbol('test'))).toBe(true);
@@ -284,7 +284,7 @@ describe('isNotNumber', () => {
 
 describe('isNotBigint', () => {
   test('should return false for bigint values', () => {
-    expect(isNotBigint(BigInt(0))).toBe(false);
+    expect(isNotBigint(0n)).toBe(false);
     expect(isNotBigint(123n)).toBe(false);
     expect(isNotBigint(-456n)).toBe(false);
   });
@@ -326,7 +326,7 @@ describe('isNotString', () => {
     expect(isNotString({})).toBe(true);
     expect(isNotString([])).toBe(true);
     expect(isNotString(Symbol('test'))).toBe(true);
-    expect(isNotString(BigInt(123))).toBe(true);
+    expect(isNotString(123n)).toBe(true);
   });
 
   test('should act as a type guard', () => {
@@ -356,7 +356,7 @@ describe('isNotSymbol', () => {
     expect(isNotSymbol(undefined)).toBe(true);
     expect(isNotSymbol({})).toBe(true);
     expect(isNotSymbol([])).toBe(true);
-    expect(isNotSymbol(BigInt(123))).toBe(true);
+    expect(isNotSymbol(123n)).toBe(true);
   });
 
   test('should act as a type guard', () => {
@@ -417,7 +417,7 @@ describe('isNonNullish', () => {
     expect(isNonNullish([])).toBe(true);
     expect(isNonNullish(Number.NaN)).toBe(true);
     expect(isNonNullish(Symbol('test'))).toBe(true);
-    expect(isNonNullish(BigInt(123))).toBe(true);
+    expect(isNonNullish(123n)).toBe(true);
   });
 
   test('should act as a type guard', () => {

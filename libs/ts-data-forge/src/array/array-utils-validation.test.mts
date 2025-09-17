@@ -80,9 +80,7 @@ describe('Arr validations', () => {
           | boolean
           | readonly number[]
           | Readonly<{ a: number }>
-          // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
           | unknown
-          // eslint-disable-next-line @typescript-eslint/no-restricted-types
           | object,
       ): number => {
         if (Arr.isArray(value)) {
@@ -93,13 +91,7 @@ describe('Arr validations', () => {
         // Non-array types
         expectType<
           typeof value,
-          | string
-          | boolean
-          | Readonly<{ a: number }>
-          // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-          | unknown
-          // eslint-disable-next-line @typescript-eslint/no-restricted-types
-          | object
+          string | boolean | Readonly<{ a: number }> | unknown | object
         >('=');
         return -1;
       };
@@ -148,7 +140,6 @@ describe('Arr validations', () => {
       });
 
       test('should handle any type', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const value: any = [1, 2, 3];
         if (Arr.isArray(value)) {
           expectType<typeof value, readonly unknown[]>('=');
@@ -200,7 +191,7 @@ describe('Arr validations', () => {
       });
 
       test('should handle never type correctly', () => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         const neverValue = undefined as never;
         if (Arr.isArray(neverValue)) {
           expectType<typeof neverValue, never>('=');
@@ -211,10 +202,10 @@ describe('Arr validations', () => {
         type ArrayOrValue<T> = T extends readonly unknown[] ? T : readonly T[];
         const makeArray = <T,>(value: T): ArrayOrValue<T> => {
           if (Arr.isArray(value)) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             return value as ArrayOrValue<T>;
           }
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           return [value] as ArrayOrValue<T>;
         };
         expect(makeArray([1, 2, 3])).toStrictEqual([1, 2, 3]);
@@ -232,7 +223,7 @@ describe('Arr validations', () => {
 
       test('should work with branded types', () => {
         type BrandedArray = readonly number[] & Readonly<{ __brand: unknown }>;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         const branded = [1, 2, 3] as unknown as BrandedArray;
         if (Arr.isArray(branded)) {
           expectType<typeof branded, BrandedArray>('=');

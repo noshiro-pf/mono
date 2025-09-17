@@ -239,8 +239,8 @@ assert(clamp(-10) === 0);
 // Rounding utilities
 const round2 = Num.round(2);
 
-assert(round2(3.14159) === 3.14);
-assert(Num.roundAt(3.14159, 3) === 3.142);
+assert(round2(3.141_59) === 3.14);
+assert(Num.roundAt(3.141_59, 3) === 3.142);
 assert(Num.roundToInt(3.7) === 4);
 
 // Type guards
@@ -288,9 +288,9 @@ assert.throw(() => {
 
 // Range-constrained types (16-bit, 32-bit)
 const int16 = asInt16(1000); // Int16: [-32768, 32767]
-const uint32 = asUint32(3000000000); // Uint32: [0, 4294967295]
+const uint32 = asUint32(3_000_000_000); // Uint32: [0, 4294967295]
 assert(int16 === 1000);
-assert(uint32 === 3000000000);
+assert(uint32 === 3_000_000_000);
 
 // Non-zero and positive variants
 const nonZeroInt = asNonZeroInt(5); // NonZeroInt - excludes zero
@@ -300,9 +300,9 @@ assert(positiveInt === 10);
 
 // Type-safe arithmetic with automatic clamping
 const sum = Int16.add(int16, asInt16(2000)); // Int16 (3000)
-const clamped = Int16.clamp(100000); // Int16 (32767 - clamped to MAX_VALUE)
+const clamped = Int16.clamp(100_000); // Int16 (32767 - clamped to MAX_VALUE)
 assert(sum === 3000);
-assert(clamped === 32767);
+assert(clamped === 32_767);
 
 // Safe division with non-zero types
 const ratio = NonZeroInt.div(asNonZeroInt(10), nonZeroInt); // No division by zero risk
@@ -310,8 +310,8 @@ assert(ratio === 2);
 
 // Random generation within type constraints
 const randomInt16 = Int16.random(); // Int16 (random value in valid range)
-assert(-32768 <= randomInt16);
-assert(randomInt16 <= 32767);
+assert(-32_768 <= randomInt16);
+assert(randomInt16 <= 32_767);
 ```
 
 ### 4. Array Utilities with `Arr`
@@ -489,6 +489,9 @@ import { castMutable } from 'ts-data-forge';
 // Example: Material-UI Autocomplete
 import { Autocomplete, TextField } from '@mui/material';
 
+// Immer.js example
+import { produce } from 'immer';
+
 export const SomeComponent: React.FC = () => (
     <Autocomplete
         options={castMutable(readonlyOptions)}
@@ -499,9 +502,6 @@ export const SomeComponent: React.FC = () => (
 );
 
 const readonlyOptions: readonly string[] = ['Option 1', 'Option 2', 'Option 3'];
-
-// Immer.js example
-import { produce } from 'immer';
 
 type State = Readonly<{
     items: readonly string[];

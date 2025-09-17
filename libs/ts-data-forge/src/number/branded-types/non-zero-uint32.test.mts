@@ -11,8 +11,8 @@ describe('NonZeroUint32', () => {
     test('accepts valid non-zero uint32 values', () => {
       expect(() => asNonZeroUint32(1)).not.toThrow();
       expect(() => asNonZeroUint32(1000)).not.toThrow();
-      expect(() => asNonZeroUint32(4294967295)).not.toThrow(); // 2^32 - 1
-      expect(() => asNonZeroUint32(2147483648)).not.toThrow(); // 2^31
+      expect(() => asNonZeroUint32(4_294_967_295)).not.toThrow(); // 2^32 - 1
+      expect(() => asNonZeroUint32(2_147_483_648)).not.toThrow(); // 2^31
     });
 
     test('rejects zero', () => {
@@ -20,8 +20,8 @@ describe('NonZeroUint32', () => {
     });
 
     test('rejects values outside uint32 range', () => {
-      expect(() => asNonZeroUint32(4294967296)).toThrow(TypeError); // 2^32
-      expect(() => asNonZeroUint32(10000000000)).toThrow(TypeError);
+      expect(() => asNonZeroUint32(4_294_967_296)).toThrow(TypeError); // 2^32
+      expect(() => asNonZeroUint32(10_000_000_000)).toThrow(TypeError);
     });
 
     test('rejects negative integers', () => {
@@ -44,7 +44,7 @@ describe('NonZeroUint32', () => {
     test('returns the same value for valid inputs', () => {
       expect(asNonZeroUint32(5)).toBe(5);
       expect(asNonZeroUint32(1)).toBe(1);
-      expect(asNonZeroUint32(4294967295)).toBe(4294967295);
+      expect(asNonZeroUint32(4_294_967_295)).toBe(4_294_967_295);
     });
 
     test.each([
@@ -55,7 +55,7 @@ describe('NonZeroUint32', () => {
       { name: '-3.4', value: -3.4 },
       { name: '0', value: 0 },
       { name: '-1', value: -1 },
-      { name: '4294967296', value: 4294967296 },
+      { name: '4294967296', value: 4_294_967_296 },
     ] as const)(
       `asNonZeroUint32($name) should throw a TypeError`,
       ({ value }) => {
@@ -72,8 +72,8 @@ describe('NonZeroUint32', () => {
     test('correctly identifies non-zero uint32 values', () => {
       expect(isNonZeroUint32(1)).toBe(true);
       expect(isNonZeroUint32(1000)).toBe(true);
-      expect(isNonZeroUint32(4294967295)).toBe(true);
-      expect(isNonZeroUint32(2147483648)).toBe(true);
+      expect(isNonZeroUint32(4_294_967_295)).toBe(true);
+      expect(isNonZeroUint32(2_147_483_648)).toBe(true);
     });
 
     test('correctly identifies zero', () => {
@@ -81,8 +81,8 @@ describe('NonZeroUint32', () => {
     });
 
     test('correctly identifies values outside uint32 range', () => {
-      expect(isNonZeroUint32(4294967296)).toBe(false);
-      expect(isNonZeroUint32(10000000000)).toBe(false);
+      expect(isNonZeroUint32(4_294_967_296)).toBe(false);
+      expect(isNonZeroUint32(10_000_000_000)).toBe(false);
     });
 
     test('correctly identifies negative integers', () => {
@@ -110,58 +110,58 @@ describe('NonZeroUint32', () => {
   describe('constants', () => {
     test('MIN_VALUE and MAX_VALUE', () => {
       expect(NonZeroUint32.MIN_VALUE).toBe(1);
-      expect(NonZeroUint32.MAX_VALUE).toBe(4294967295);
+      expect(NonZeroUint32.MAX_VALUE).toBe(4_294_967_295);
     });
   });
 
   describe('mathematical operations', () => {
-    const a = asNonZeroUint32(1000000);
-    const b = asNonZeroUint32(500000);
+    const a = asNonZeroUint32(1_000_000);
+    const b = asNonZeroUint32(500_000);
 
     test('min and max', () => {
-      expect(NonZeroUint32.min(a, b)).toBe(500000);
-      expect(NonZeroUint32.max(a, b)).toBe(1000000);
+      expect(NonZeroUint32.min(a, b)).toBe(500_000);
+      expect(NonZeroUint32.max(a, b)).toBe(1_000_000);
     });
 
     test('add (with clamping to non-zero uint32 range)', () => {
       const result = NonZeroUint32.add(
-        asNonZeroUint32(4294967000),
+        asNonZeroUint32(4_294_967_000),
         asNonZeroUint32(1000),
       );
-      expect(result).toBe(4294967295); // clamped to max
-      expect(NonZeroUint32.add(a, b)).toBe(1500000);
+      expect(result).toBe(4_294_967_295); // clamped to max
+      expect(NonZeroUint32.add(a, b)).toBe(1_500_000);
     });
 
     test('sub (never goes below 1)', () => {
-      expect(NonZeroUint32.sub(a, b)).toBe(500000);
+      expect(NonZeroUint32.sub(a, b)).toBe(500_000);
       expect(NonZeroUint32.sub(b, a)).toBe(1); // clamped to 1
     });
 
     test('mul (with clamping to non-zero uint32 range)', () => {
       const result = NonZeroUint32.mul(
-        asNonZeroUint32(100000),
-        asNonZeroUint32(100000),
+        asNonZeroUint32(100_000),
+        asNonZeroUint32(100_000),
       );
-      expect(result).toBe(4294967295); // clamped to max
+      expect(result).toBe(4_294_967_295); // clamped to max
       expect(NonZeroUint32.mul(asNonZeroUint32(1000), asNonZeroUint32(5))).toBe(
         5000,
       );
     });
 
     test('div (floor division, never goes below 1)', () => {
-      expect(NonZeroUint32.div(a, asNonZeroUint32(500000))).toBe(2);
+      expect(NonZeroUint32.div(a, asNonZeroUint32(500_000))).toBe(2);
       expect(NonZeroUint32.div(asNonZeroUint32(7), asNonZeroUint32(3))).toBe(2);
       expect(
-        NonZeroUint32.div(asNonZeroUint32(500000), asNonZeroUint32(1000000)),
+        NonZeroUint32.div(asNonZeroUint32(500_000), asNonZeroUint32(1_000_000)),
       ).toBe(1); // floor(500000/1000000) = 0, clamped to 1
     });
 
     test('pow (with clamping to non-zero uint32 range)', () => {
       const result = NonZeroUint32.pow(
-        asNonZeroUint32(10000),
+        asNonZeroUint32(10_000),
         asNonZeroUint32(3),
       );
-      expect(result).toBe(4294967295); // clamped to max
+      expect(result).toBe(4_294_967_295); // clamped to max
       expect(NonZeroUint32.pow(asNonZeroUint32(2), asNonZeroUint32(3))).toBe(8);
     });
   });
@@ -185,7 +185,7 @@ describe('NonZeroUint32', () => {
       for (const _ of range(10)) {
         const result = NonZeroUint32.random(1, 30);
         expect(result).toBeGreaterThanOrEqual(1);
-        expect(result).toBeLessThanOrEqual(4294967295);
+        expect(result).toBeLessThanOrEqual(4_294_967_295);
       }
     });
   });
@@ -194,7 +194,7 @@ describe('NonZeroUint32', () => {
     test('type relationships', () => {
       expectType<NonZeroUint32, number>('<=');
 
-      expectTypeOf(asNonZeroUint32(1000000)).toExtend<NonZeroUint32>();
+      expectTypeOf(asNonZeroUint32(1_000_000)).toExtend<NonZeroUint32>();
     });
   });
 });

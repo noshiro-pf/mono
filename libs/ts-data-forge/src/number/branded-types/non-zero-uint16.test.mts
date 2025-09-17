@@ -11,8 +11,8 @@ describe('NonZeroUint16', () => {
     test('accepts valid non-zero uint16 values', () => {
       expect(() => asNonZeroUint16(1)).not.toThrow();
       expect(() => asNonZeroUint16(1000)).not.toThrow();
-      expect(() => asNonZeroUint16(65535)).not.toThrow(); // 2^16 - 1
-      expect(() => asNonZeroUint16(32768)).not.toThrow(); // 2^15
+      expect(() => asNonZeroUint16(65_535)).not.toThrow(); // 2^16 - 1
+      expect(() => asNonZeroUint16(32_768)).not.toThrow(); // 2^15
     });
 
     test('rejects zero', () => {
@@ -20,8 +20,8 @@ describe('NonZeroUint16', () => {
     });
 
     test('rejects values outside uint16 range', () => {
-      expect(() => asNonZeroUint16(65536)).toThrow(TypeError); // 2^16
-      expect(() => asNonZeroUint16(100000)).toThrow(TypeError);
+      expect(() => asNonZeroUint16(65_536)).toThrow(TypeError); // 2^16
+      expect(() => asNonZeroUint16(100_000)).toThrow(TypeError);
     });
 
     test('rejects negative integers', () => {
@@ -44,7 +44,7 @@ describe('NonZeroUint16', () => {
     test('returns the same value for valid inputs', () => {
       expect(asNonZeroUint16(5)).toBe(5);
       expect(asNonZeroUint16(1)).toBe(1);
-      expect(asNonZeroUint16(65535)).toBe(65535);
+      expect(asNonZeroUint16(65_535)).toBe(65_535);
     });
 
     test.each([
@@ -55,7 +55,7 @@ describe('NonZeroUint16', () => {
       { name: '-3.4', value: -3.4 },
       { name: '0', value: 0 },
       { name: '-1', value: -1 },
-      { name: '65536', value: 65536 },
+      { name: '65536', value: 65_536 },
     ] as const)(
       `asNonZeroUint16($name) should throw a TypeError`,
       ({ value }) => {
@@ -72,8 +72,8 @@ describe('NonZeroUint16', () => {
     test('correctly identifies non-zero uint16 values', () => {
       expect(isNonZeroUint16(1)).toBe(true);
       expect(isNonZeroUint16(1000)).toBe(true);
-      expect(isNonZeroUint16(65535)).toBe(true);
-      expect(isNonZeroUint16(32768)).toBe(true);
+      expect(isNonZeroUint16(65_535)).toBe(true);
+      expect(isNonZeroUint16(32_768)).toBe(true);
     });
 
     test('correctly identifies zero', () => {
@@ -81,8 +81,8 @@ describe('NonZeroUint16', () => {
     });
 
     test('correctly identifies values outside uint16 range', () => {
-      expect(isNonZeroUint16(65536)).toBe(false);
-      expect(isNonZeroUint16(100000)).toBe(false);
+      expect(isNonZeroUint16(65_536)).toBe(false);
+      expect(isNonZeroUint16(100_000)).toBe(false);
     });
 
     test('correctly identifies negative integers', () => {
@@ -110,7 +110,7 @@ describe('NonZeroUint16', () => {
   describe('constants', () => {
     test('MIN_VALUE and MAX_VALUE', () => {
       expect(NonZeroUint16.MIN_VALUE).toBe(1);
-      expect(NonZeroUint16.MAX_VALUE).toBe(65535);
+      expect(NonZeroUint16.MAX_VALUE).toBe(65_535);
     });
   });
 
@@ -125,10 +125,10 @@ describe('NonZeroUint16', () => {
 
     test('add (with clamping to non-zero uint16 range)', () => {
       const result = NonZeroUint16.add(
-        asNonZeroUint16(65000),
+        asNonZeroUint16(65_000),
         asNonZeroUint16(1000),
       );
-      expect(result).toBe(65535); // clamped to max
+      expect(result).toBe(65_535); // clamped to max
       expect(NonZeroUint16.add(a, b)).toBe(150);
     });
 
@@ -142,7 +142,7 @@ describe('NonZeroUint16', () => {
         asNonZeroUint16(1000),
         asNonZeroUint16(100),
       );
-      expect(result).toBe(65535); // clamped to max
+      expect(result).toBe(65_535); // clamped to max
       expect(NonZeroUint16.mul(asNonZeroUint16(10), asNonZeroUint16(5))).toBe(
         50,
       );
@@ -161,7 +161,7 @@ describe('NonZeroUint16', () => {
         asNonZeroUint16(256),
         asNonZeroUint16(3),
       );
-      expect(result).toBe(65535); // clamped to max
+      expect(result).toBe(65_535); // clamped to max
       expect(NonZeroUint16.pow(asNonZeroUint16(2), asNonZeroUint16(3))).toBe(8);
     });
   });
@@ -185,7 +185,7 @@ describe('NonZeroUint16', () => {
       for (const _ of range(10)) {
         const result = NonZeroUint16.random(1, 30);
         expect(result).toBeGreaterThanOrEqual(1);
-        expect(result).toBeLessThanOrEqual(65535);
+        expect(result).toBeLessThanOrEqual(65_535);
       }
     });
   });

@@ -76,7 +76,7 @@ describe('unknownToString', () => {
   });
 
   test('BigInt value', () => {
-    const result = unknownToString(BigInt(123));
+    const result = unknownToString(123n);
     expect(result).toBe('123n');
   });
 });

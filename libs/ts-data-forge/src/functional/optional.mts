@@ -174,7 +174,7 @@ export namespace Optional {
    */
   export const unwrapThrow = <O extends Base>(optional: O): Unwrap<O> => {
     if (isSome(optional)) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return optional.value as Unwrap<O>;
     }
 
@@ -207,7 +207,7 @@ export namespace Optional {
 
   export function unwrap<O extends Base>(optional: O): Unwrap<O> | undefined {
     return isSome(optional)
-      ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (optional.value as Unwrap<O>)
       : undefined;
   }
@@ -259,7 +259,7 @@ export namespace Optional {
       case 2: {
         const [optional, defaultValue] = args;
         return isSome(optional)
-          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             (optional.value as Unwrap<O>)
           : defaultValue;
       }

@@ -349,6 +349,7 @@ export namespace Num {
    * ```
    */
   export const div = (a: number, b: NonZeroNumber | SmallInt<'!=0'>): number =>
+    // eslint-disable-next-line total-functions/no-partial-division
     a / b;
 
   /**
@@ -373,7 +374,9 @@ export namespace Num {
   export const divInt = (
     a: number,
     b: NonZeroNumber | SmallInt<'!=0'>,
-  ): number => Math.floor(Math.floor(a) / Math.floor(b));
+  ): number =>
+    // eslint-disable-next-line total-functions/no-partial-division
+    Math.floor(Math.floor(a) / Math.floor(b));
 
   /**
    * Rounds a number to a specified number of decimal places.
@@ -397,6 +400,7 @@ export namespace Num {
   ): number => {
     const digit = 10 ** precision;
 
+    // eslint-disable-next-line total-functions/no-partial-division
     return Math.round(num * digit) / digit;
   };
 
@@ -416,7 +420,7 @@ export namespace Num {
    * Num.roundToInt(3.5);   // 4
    * ```
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   export const roundToInt = (num: number): Int => (0 | (num + 0.5)) as Int;
 
   /**
@@ -441,7 +445,9 @@ export namespace Num {
   ): ((num: number) => number) => {
     const powAmount = 10 ** digit;
 
-    return (target: number) => roundToInt(powAmount * target) / powAmount;
+    return (target: number) =>
+      // eslint-disable-next-line total-functions/no-partial-division
+      roundToInt(powAmount * target) / powAmount;
   };
 
   /**
@@ -466,7 +472,7 @@ export namespace Num {
   ): RelaxedExclude<N, NaNType> | undefined =>
     Number.isNaN(num)
       ? undefined
-      : // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (num as RelaxedExclude<N, NaNType>);
 
   /**
@@ -487,7 +493,7 @@ export namespace Num {
    * ```
    */
   export const increment = <N extends SmallUint>(n: N): Increment<N> =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (n + 1) as Increment<N>;
 
   /**
@@ -508,6 +514,6 @@ export namespace Num {
    * ```
    */
   export const decrement = <N extends SmallPositiveInt>(n: N): Decrement<N> =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (n - 1) as Decrement<N>;
 }

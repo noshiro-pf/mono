@@ -50,7 +50,7 @@ describe('isNonNullObject', () => {
     expect(isNonNullObject(true)).toBe(false);
     expect(isNonNullObject(false)).toBe(false);
     expect(isNonNullObject(Symbol('test'))).toBe(false);
-    expect(isNonNullObject(BigInt(123))).toBe(false);
+    expect(isNonNullObject(123n)).toBe(false);
   });
 
   test('should act as a type guard', () => {

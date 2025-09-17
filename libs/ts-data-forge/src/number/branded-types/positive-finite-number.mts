@@ -33,7 +33,7 @@ const floor = (
 ): TsDataForgeInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
   TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>
 > =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   Math.floor(
     x,
   ) as TsDataForgeInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
@@ -43,7 +43,7 @@ const floor = (
 const ceil = (
   x: ElementType,
 ): TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType> =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   Math.ceil(x) as TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>;
 
 const round = (
@@ -51,7 +51,7 @@ const round = (
 ): TsDataForgeInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<
   TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>
 > =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   Math.round(
     x,
   ) as TsDataForgeInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<

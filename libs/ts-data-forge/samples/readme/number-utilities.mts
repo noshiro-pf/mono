@@ -20,8 +20,8 @@ assert(clamp(-10) === 0);
 // Rounding utilities
 const round2 = Num.round(2);
 
-assert(round2(3.14159) === 3.14);
-assert(Num.roundAt(3.14159, 3) === 3.142);
+assert(round2(3.141_59) === 3.14);
+assert(Num.roundAt(3.141_59, 3) === 3.142);
 assert(Num.roundToInt(3.7) === 4);
 
 // Type guards

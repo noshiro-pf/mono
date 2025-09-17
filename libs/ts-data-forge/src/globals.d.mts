@@ -1,5 +1,3 @@
-/* eslint-disable import/unambiguous */
-
 /// <reference types="ts-type-forge" />
 
 type SmallPositiveInt = WithSmallInt<PositiveInt>;

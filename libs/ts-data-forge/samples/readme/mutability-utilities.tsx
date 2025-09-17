@@ -3,6 +3,9 @@ import { castMutable } from 'ts-data-forge';
 // Example: Material-UI Autocomplete
 import { Autocomplete, TextField } from '@mui/material';
 
+// Immer.js example
+import { produce } from 'immer';
+
 export const SomeComponent: React.FC = () => (
   <Autocomplete
     options={castMutable(readonlyOptions)}
@@ -13,9 +16,6 @@ export const SomeComponent: React.FC = () => (
 );
 
 const readonlyOptions: readonly string[] = ['Option 1', 'Option 2', 'Option 3'];
-
-// Immer.js example
-import { produce } from 'immer';
 
 type State = Readonly<{
   items: readonly string[];

@@ -139,7 +139,7 @@ export namespace Obj {
         const keysSet = new Set<keyof R>(keys);
 
         return (
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           Object.fromEntries(
             Object.entries(record).filter(([k, _v]) => keysSet.has(k)),
           ) as never
@@ -252,7 +252,7 @@ export namespace Obj {
         const keysSet = new Set<keyof R>(keys);
 
         return (
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           Object.fromEntries(
             Object.entries(record).filter(([k, _v]) => !keysSet.has(k)),
           ) as never
@@ -262,7 +262,7 @@ export namespace Obj {
       case 1: {
         const [keys] = args;
         return <R2 extends UnknownRecord>(record: R2) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           const result = omit(record, keys as readonly (keyof R2)[]) as Omit<
             R2,
             ArrayElement<Keys>
@@ -366,7 +366,7 @@ export namespace Obj {
           TsDataForgeInternals.ValuesOfEntries<Entries>
         >
       > =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Object.fromEntries(entries) as never;
 
   /**
