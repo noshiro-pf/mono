@@ -1,3 +1,9 @@
+# [7.6.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.5.0...v7.6.0) (2025-09-17)
+
+### Features
+
+- add makeEmptyDir ([#155](https://github.com/noshiro-pf/ts-repo-utils/issues/155)) ([37795c8](https://github.com/noshiro-pf/ts-repo-utils/commit/37795c8a963fb0a6fc4e288eebbfb7fd13c75609))
+
 # [7.5.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.4.0...v7.5.0) (2025-09-13)
 
 ### Features
