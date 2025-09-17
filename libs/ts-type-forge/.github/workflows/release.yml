@@ -39,9 +39,6 @@ jobs:
         run: npm ci
 
       - name: Run type check
-        run: npm run test
-
-      - name: Build
         run: npm run type-check
 
       - name: Run semantic-release

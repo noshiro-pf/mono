@@ -2,45 +2,40 @@
 
 ## Project Structure & Module Organization
 
-- `src/` — TypeScript type utilities organized by domain (e.g., `record/`, `tuple-and-list/`). Public entry is `src/index.d.mts` (auto‑generated; do not edit).
-- `test/` — Compile‑time type tests using `expectType` helpers. Mirror the `src/` structure when adding tests.
-- `docs/` — Handwritten docs and examples. Keep docs in sync with public APIs.
-- `scripts/` — Build, validation, docs, and GitHub maintenance scripts (`.mts`/`.mjs`).
-- `configs/` — Shared tsconfig and tool configs. Project settings live in `tsconfig.json`.
+- `src/` holds type utilities grouped by domain (`record/`, `tuple-and-list/`, etc.). Export surface is auto-generated to `src/index.d.mts`; never edit it directly.
+- `test/` mirrors the `src/` tree. Add compile-time tests beside the matching module (e.g., `src/tuple-and-list/...` -> `test/tuple-and-list/...`).
+- `docs/` contains hand-written guides and examples. Update docs when public APIs change.
+- Support folders: `scripts/` for maintenance scripts, `configs/` for shared tsconfigs and linters, and root configs (`package.json`, `tsconfig.json`) for project settings.
 
 ## Build, Test, and Development Commands
 
-- `npm run check-all` — End‑to‑end validation: install, spell check, ext check, lint:fix, build, docs, format.
-- `npm run build` — Generate `src/index.d.mts`, create index files, and run type checking.
-- `npm run tsc` / `npm run tscw` — Type check once / in watch mode.
-- `npm run lint` / `npm run lint:fix` — Lint code and auto‑fix issues.
-- `npm run fmt` / `npm run fmt:full` — Format changed files / entire repo with Prettier.
-- `npm run doc` — Regenerate markdown docs. `npm run doc:embed` embeds code samples.
-- `npm run md` / `npm run cspell` — Markdown and spell checks.
+- `npm run build` regenerates declaration bundles and verifies types.
+- `npm run tsc` performs a one-off type check; use `npm run tscw` for watch mode.
+- `npm run lint` and `npm run lint:fix` enforce ESLint rules; `npm run fmt` formats staged files.
+- `npm run check-all` runs the full CI parity pipeline (install, lint:fix, build, docs, format, spelling). Use before opening a PR.
+- `npm run doc` refreshes Markdown docs; pair with `npm run doc:embed` to sync code snippets.
 
 ## Coding Style & Naming Conventions
 
-- Language: TypeScript ESM with `.mts`; declaration files use `.d.mts`.
-- Exports: Prefer named exports in `src/` (no default exports per ESLint rules).
-- Formatting: 2‑space indent, LF line endings, single quotes, semicolons (see `.editorconfig`, `.prettierrc`).
-- Files/dirs: kebab‑case (e.g., `type-level-integer`, `utils-for-test.mts`).
+- TypeScript ESM (`.mts`) and declaration files (`.d.mts`) only; no default exports.
+- Follow 2-space indents, LF endings, single quotes, and semicolons (`.editorconfig`, `.prettierrc`).
+- Prefer kebab-case for files and directories (`type-level-integer`, `utils-for-test.mts`).
+- Run `npm run fmt:full` after bulk edits to normalize formatting.
 
 ## Testing Guidelines
 
-- Use compile‑time assertions via `test/expect-type.mts` (e.g., `expectType<A, B>('=')`).
-- Place tests under `test/<area>/...` matching the corresponding `src/` path.
-- Run tests by type checking: `npm run tsc` or `npm run check-all`.
-- Runtime tests are not configured; favor type‑level coverage and clear examples in `docs/`.
+- Use compile-time assertions from `test/expect-type.mts`: `expectType<A, B>('=')`.
+- Structure test files to mirror module paths and cover edge cases (empty tuples, deep nesting, etc.).
+- `npm run tsc` doubles as the test runner; ensure it passes before commits.
 
 ## Commit & Pull Request Guidelines
 
-- Conventional Commits are required (semantic‑release). Examples:
-    - `feat(record): add DeepRequired`
-    - `fix(tuple-and-list): handle empty tuple`
-    - `refactor!: simplify conditional types` with footer `BREAKING CHANGE: ...`
-- PRs: include a clear description, link issues, update docs/tests, and ensure `npm run check-all` passes. Commit generated updates (e.g., `src/index.d.mts`, docs) when relevant.
+- Follow Conventional Commits (`feat(record): add DeepRequired`, `fix(tuple-and-list): handle empty tuple`). Mark breaking changes with `refactor!` and a `BREAKING CHANGE` footer.
+- PRs should describe intent, link related issues, list manual validation, and include regenerated artifacts (`src/index.d.mts`, docs) when applicable.
+- Verify `npm run check-all` locally and attach any relevant screenshots or code snippets to clarify behavior changes.
 
-## Security & Configuration
+## Security & Configuration Tips
 
-- GitHub maintenance scripts read `.env` (see `.env.example`). Keep tokens local and uncommitted. Example: `npm run gh:apply-all` uses `--env-file=.env`.
-- Do not store secrets in source files or docs. Prefer environment variables and local config.
+- Scripts may load `.env` (see `.env.example`). Keep real tokens local and out of source control.
+- Avoid embedding secrets in docs or comments; reference environment variables instead.
+- When using `npm run gh:*` scripts, pass `--env-file=.env` to limit token exposure.
