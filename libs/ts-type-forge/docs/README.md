@@ -151,7 +151,7 @@ For a comprehensive list of all available types and their detailed documentation
 
 The type utilities allow you to perform complex type checking and assertions at compile time.
 
-```ts
+```tsx
 // No import needed if using triple-slash directive
 // import type { TypeEq, TypeExtends } from 'ts-type-forge'; // if importing explicitly
 
@@ -182,10 +182,7 @@ type UserType = GetUserType<User>; // 'user'
 
 Transform nested object types with precise control over mutability and optionality.
 
-```ts
-// No import needed if using triple-slash directive
-// import type { DeepReadonly, DeepPartial } from 'ts-type-forge'; // if importing explicitly
-
+```tsx
 type Config = {
     port: number;
     database: {
@@ -215,9 +212,12 @@ const config: ReadonlyConfig = {
     features: ['featureA', 'featureB'],
 };
 
-// config.port = 8081; // Error: Cannot assign to 'port' because it is a read-only property
-// config.database.host = 'remote'; // Error: Cannot assign to 'host' because it is a read-only property
-// config.features.push('featureC'); // Error: Property 'push' does not exist on type 'readonly string[]'
+// @ts-expect-error Cannot assign to 'port' because it is a read-only property
+config.port = 8081;
+// @ts-expect-error Cannot assign to 'host' because it is a read-only property
+config.database.host = 'remote';
+// @ts-expect-error Property 'push' does not exist on type 'readonly string[]'
+config.features.push('featureC');
 
 // Create a type where all properties are optional (useful for partial updates)
 type PartialConfig = DeepPartial<Config>;
@@ -235,10 +235,7 @@ const partialUpdate: PartialConfig = {
 
 Enhanced versions of built-in `Omit` utility that provide compile-time key validation.
 
-```ts
-// No import needed if using triple-slash directive
-// import type { StrictOmit } from 'ts-type-forge'; // if importing explicitly
-
+```tsx
 type UserProfile = Readonly<{
     id: string;
     username: string;
@@ -249,12 +246,16 @@ type UserProfile = Readonly<{
 
 // StrictOmit ensures keys actually exist in the source type
 type UserCreationData = StrictOmit<UserProfile, 'id' | 'lastLogin'>;
-// Result:
-// type UserCreationData = Readonly<{
-//     username: string;
-//     email: string;
-//     bio?: string | undefined;
-// }>;
+
+expectType<
+    UserCreationData,
+    // Result:
+    Readonly<{
+        username: string;
+        email: string;
+        bio?: string | undefined;
+    }>
+>('=');
 
 const newUser: UserCreationData = {
     username: 'jane_doe',
@@ -262,18 +263,15 @@ const newUser: UserCreationData = {
     bio: 'Software Developer', // Optional
 };
 
-// The following would cause a compile-time error because 'nonExistentKey' doesn't exist:
-// type InvalidOmit = StrictOmit<UserProfile, 'id' | 'nonExistentKey'>; // Error
+// @ts-expect-error 'nonExistentKey' doesn't exist:
+type InvalidOmit = StrictOmit<UserProfile, 'id' | 'nonExistentKey'>;
 ```
 
 ### 4. Array Type Safety with `NonEmptyArray` and `List` Operations
 
 Guarantee array constraints and perform type-safe operations on collections.
 
-```ts
-// No import needed if using triple-slash directive
-// import type { NonEmptyArray, List } from 'ts-type-forge'; // if importing explicitly
-
+```tsx
 type Post = Readonly<{
     title: string;
     content: string;
@@ -295,10 +293,11 @@ const myBlog: Blog = {
 };
 
 // This would cause a type error:
-// const emptyBlog: Blog = {
-//     name: 'Empty Thoughts',
-//     posts: [], // Error: Source has 0 element(s) but target requires 1
-// };
+const emptyBlog: Blog = {
+    name: 'Empty Thoughts',
+    // @ts-expect-error Source has 0 element(s) but target requires 1
+    posts: [],
+};
 
 const getFirstPostTitle = (posts: NonEmptyArray<Post>): string =>
     posts[0].title; // Safe to access posts[0] - guaranteed to exist
@@ -309,21 +308,18 @@ type NumberList = readonly [1, 2, 3, 4, 5];
 type FirstElement = List.Head<NumberList>; // 1
 type LastElement = List.Last<NumberList>; // 5
 type WithoutFirst = List.Tail<NumberList>; // readonly [2, 3, 4, 5]
-type FirstThree = List.Take<NumberList, 3>; // readonly [1, 2, 3]
+type FirstThree = List.Take<3, NumberList>; // readonly [1, 2, 3]
 type Reversed = List.Reverse<NumberList>; // readonly [5, 4, 3, 2, 1]
 
 // Combine operations
-type LastThreeReversed = List.Reverse<List.TakeLast<NumberList, 3>>; // readonly [5, 4, 3]
+type LastThreeReversed = List.Reverse<List.TakeLast<3, NumberList>>; // readonly [5, 4, 3]
 ```
 
 ### 5. Type-Safe JSON Handling with `JsonValue`
 
 Safely represent and work with JSON data structures.
 
-```ts
-// No import needed if using triple-slash directive
-// import type { JsonValue, JsonObject } from 'ts-type-forge'; // if importing explicitly
-
+```tsx
 const jsonString =
     '{"name": "Alice", "age": 30, "isAdmin": false, "tags": ["user", "active"], "metadata": null}';
 
@@ -347,36 +343,36 @@ try {
         }
 
         if (Array.isArray(jsonObj['tags'])) {
-            jsonObj['tags'].forEach((tag) => {
+            for (const tag of jsonObj['tags']) {
                 if (typeof tag === 'string') {
                     console.log(`Tag: ${tag}`);
                 }
-            });
+            }
         }
     } else if (Array.isArray(parsedData)) {
         // parsedData is a JSON array
-        parsedData.forEach((item) => console.log(item));
+        for (const item of parsedData) {
+            console.log(item);
+        }
     }
 } catch (error) {
     console.error('Failed to parse JSON:', error);
 }
 
 // Define API response types using JsonValue
-type ApiResponse = JsonObject & {
-    readonly status: 'success' | 'error';
-    readonly data?: JsonValue;
-    readonly message?: string;
-};
+type ApiResponse = JsonObject &
+    Readonly<{
+        status: 'success' | 'error';
+        data?: JsonValue;
+        message?: string;
+    }>;
 ```
 
 ### 6. Precise Numeric Ranges with `UintRange` and Branded Types
 
 Define exact numeric constraints and enhance type safety with branded number types.
 
-```ts
-// No import needed if using triple-slash directive
-// import type { UintRange, UintRangeInclusive, Int, Uint } from 'ts-type-forge'; // if importing explicitly
-
+```tsx
 /**
  * Parse integer with constrained radix parameter
  * @param str A string to convert into a number
@@ -398,8 +394,10 @@ parseInteger('255', 16); // Hexadecimal
 parseInteger('123', 36); // Maximum base
 
 // Invalid usages (TypeScript will error):
-// parseInteger('10', 1); // Error: Argument of type '1' is not assignable to parameter of type 'UintRange<2, 37> | undefined'
-// parseInteger('10', 37); // Error: Argument of type '37' is not assignable to parameter of type 'UintRange<2, 37> | undefined'
+// @ts-expect-error Argument of type '1' is not assignable to parameter of type 'UintRange<2, 37> | undefined'
+parseInteger('10', 1);
+// @ts-expect-error Argument of type '37' is not assignable to parameter of type 'UintRange<2, 37> | undefined'
+parseInteger('10', 37);
 
 // Branded types for additional safety
 type UserId = Brand<number, 'UserId'>;
@@ -410,14 +408,17 @@ declare const userId: UserId;
 declare const productId: ProductId;
 
 // Type-safe functions that can't mix up IDs
-function getUserById(id: UserId): User | null {
+function getUserById(id: UserId): User | undefined {
     /* ... */
+    return undefined;
 }
-function getProductById(id: ProductId): Product | null {
+function getProductById(id: ProductId): Product | undefined {
     /* ... */
+    return undefined;
 }
 
-// getUserById(productId); // Error: Argument of type 'ProductId' is not assignable to parameter of type 'UserId'
+// @ts-expect-error Argument of type 'ProductId' is not assignable to parameter of type 'UserId'
+getUserById(productId);
 ```
 
 ## Modules Overview

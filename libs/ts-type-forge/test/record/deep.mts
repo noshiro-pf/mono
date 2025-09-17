@@ -1,4 +1,4 @@
-import { type ExecOptions } from 'child_process';
+import { type ExecOptions } from 'node:child_process';
 import { expectType } from '../expect-type.mjs';
 
 // Base types for testing
