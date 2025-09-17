@@ -168,6 +168,12 @@ Re-exports [isDirectlyExecuted](../functions/is-directly-executed.md#isdirectlye
 
 ---
 
+### makeEmptyDir
+
+Re-exports [makeEmptyDir](../functions/make-empty-dir.md#makeemptydir)
+
+---
+
 ### Package
 
 Re-exports [Package](../functions/workspace-utils/types.md#package)

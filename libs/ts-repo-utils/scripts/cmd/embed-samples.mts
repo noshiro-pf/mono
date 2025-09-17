@@ -26,6 +26,7 @@ const documents: DeepReadonly<
       '005-assert-path-exists.mts',
       '006-assert-ext.mts',
       '007-assert-ext-type.mts',
+      '007-make-empty-dir.mts',
       '008-repo-is-dirty.mts',
       '009-assert-repo-is-clean.mts',
       '010-get-diff-from-type.mts',

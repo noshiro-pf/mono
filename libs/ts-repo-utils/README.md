@@ -329,6 +329,19 @@ type CheckExtConfig = Readonly<{
 }>;
 ```
 
+#### `makeEmptyDir(dir: string): Promise<void>`
+
+Removes any existing directory at `dir` and recreates it, ensuring a clean target for generated assets or build output.
+
+```tsx
+import { makeEmptyDir } from 'ts-repo-utils';
+
+// Reset ./tmp/build before writing artifacts
+await makeEmptyDir('./tmp/build');
+```
+
+This helper uses `fs.rm` with `recursive` cleanup before calling `fs.mkdir`, so prefer it over manual `rimraf` + `mkdir` sequences when scripting workflows.
+
 ### Git Repository Utilities
 
 #### `repoIsDirty(): Promise<boolean>`

@@ -6,5 +6,6 @@ export * from './exec-async.mjs';
 export * from './format.mjs';
 export * from './gen-index.mjs';
 export * from './is-directly-executed.mjs';
+export * from './make-empty-dir.mjs';
 export * from './should-run.mjs';
 export * from './workspace-utils/index.mjs';
