@@ -1,3 +1,4 @@
+import { expectType } from '../expect-type.mjs';
 import { pipe } from '../functional/index.mjs';
 import { Obj } from './object.mjs';
 
@@ -120,5 +121,33 @@ describe('omit', () => {
       name: string;
     };
     expect(result).toStrictEqual({ id: 1, name: 'Alice' });
+  });
+});
+
+describe('fromEntries', () => {
+  test('should build readonly object from fixed entries', () => {
+    const entries = [
+      ['name', 'Alice'] as const,
+      ['age', 30 as const],
+      ['active', true as const],
+    ] as const;
+
+    const result = Obj.fromEntries(entries);
+
+    expectType<
+      typeof result,
+      Readonly<{ name: 'Alice'; age: 30; active: true }>
+    >('=');
+    expect(result).toStrictEqual({ name: 'Alice', age: 30, active: true });
+  });
+
+  test('should produce partial record when keys are unions', () => {
+    const dynamicEntries: ['name' | 'email', string][] = [['name', 'Alice']];
+
+    const result = Obj.fromEntries(dynamicEntries) satisfies Partial<
+      Readonly<Record<'name' | 'email', string>>
+    >;
+
+    expect(result).toStrictEqual({ name: 'Alice' });
   });
 });

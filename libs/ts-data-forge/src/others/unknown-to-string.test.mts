@@ -79,4 +79,16 @@ describe('unknownToString', () => {
     const result = unknownToString(123n);
     expect(result).toBe('123n');
   });
+
+  test('non-Error thrown during serialization returns fallback text', () => {
+    const value = {
+      toJSON: () => {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error
+        throw 'custom failure';
+      },
+    };
+
+    const result = unknownToString(value);
+    expect(result).toBe('[Circular or Non-serializable]');
+  });
 });
