@@ -85,7 +85,7 @@ const build = async (): Promise<void> => {
     echo('7. Generating dist/types.d.mts...');
     const content = [
       "import './globals.d.mts';",
-      "export * from './index.mjs';",
+      "export * from './entry-point.mjs';",
     ].join('\n');
 
     const typesFile = path.resolve(distDir, 'types.d.mts');
@@ -114,8 +114,8 @@ const build = async (): Promise<void> => {
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
   if (Result.isErr(result)) {
-    echo(`${errorMsg}: ${result.value.message}`);
-    echo('❌ Build failed');
+    console.error(`${errorMsg}: ${result.value.message}`);
+    console.error('❌ Build failed');
     process.exit(1);
   }
 };
@@ -126,8 +126,8 @@ const runStep = async (
 ): Promise<void> => {
   const result = await promise;
   if (Result.isErr(result)) {
-    echo(`${errorMsg}: ${String(result.value)}`);
-    echo('❌ Build failed');
+    console.error(`${errorMsg}: ${String(result.value)}`);
+    console.error('❌ Build failed');
     process.exit(1);
   }
 };

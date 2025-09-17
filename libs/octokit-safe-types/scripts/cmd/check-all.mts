@@ -39,14 +39,21 @@ const checkAll = async (): Promise<void> => {
   echo('7. Formatting code...');
   await runCmdStep('npm run fmt', 'Formatting failed');
 
+  // Step 8: Backup repository settings
+  echo('8. Backing up repository settings...');
+  await runCmdStep(
+    'npm run gh:backup-all',
+    'Backing up repository settings failed',
+  );
+
   echo('✅ All checks completed successfully!\n');
 };
 
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
   if (Result.isErr(result)) {
-    echo(`${errorMsg}: ${result.value.message}`);
-    echo('❌ Check failed');
+    console.error(`${errorMsg}: ${result.value.message}`);
+    console.error('❌ Check failed');
     process.exit(1);
   }
 };

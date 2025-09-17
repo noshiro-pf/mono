@@ -1,7 +1,9 @@
+import { Obj } from 'ts-data-forge';
 import 'ts-repo-utils';
 import { mkdirClean } from '../../utils.mjs';
 import { rulesetsDir } from '../constants.mjs';
 import { getAllRulesets, getRuleset } from './api/index.mjs';
+import { rulesetKeysToPick } from './constants.mjs';
 
 const backupDir = path.resolve(rulesetsDir, './bk');
 
@@ -15,7 +17,7 @@ export const backupRulesets = async (fmt: boolean = true) => {
 
     await fs.writeFile(
       path.resolve(backupDir, `${rule.name}.json`),
-      JSON.stringify(content, undefined, 2),
+      JSON.stringify(Obj.pick(content, rulesetKeysToPick), undefined, 2),
     );
   }
 

@@ -11,6 +11,7 @@
   "include": [
     "./src",
     "./test",
+    "./samples",
     "./scripts",
     "./configs",
     "./release.config.js",

@@ -1,20 +1,17 @@
 import { type Dirent } from 'node:fs';
-import { RepositoryRuleset } from 'octokit-safe-types';
 import * as t from 'ts-fortress';
 import 'ts-repo-utils';
 import { rulesetsDir } from '../constants.mjs';
+import { RulesetPicked } from './constants.mjs';
 
-export const readRulesetFiles = async (): Promise<
-  readonly RepositoryRuleset[]
-> => readFilesIn(rulesetsDir);
+export const readRulesetFiles = async (): Promise<readonly RulesetPicked[]> =>
+  readFilesIn(rulesetsDir);
 
 export const readRulesetBackupFiles = async (): Promise<
-  readonly RepositoryRuleset[]
+  readonly RulesetPicked[]
 > => readFilesIn(path.resolve(rulesetsDir, './bk'));
 
-const readFilesIn = async (
-  dir: string,
-): Promise<readonly RepositoryRuleset[]> => {
+const readFilesIn = async (dir: string): Promise<readonly RulesetPicked[]> => {
   const files: readonly Dirent<string>[] = await fs.readdir(dir, {
     withFileTypes: true,
   });
@@ -30,7 +27,7 @@ const readFilesIn = async (
   );
 
   const validationResults = rulesetFileContents.map((rule) =>
-    RepositoryRuleset.validate(JSON.parse(rule)),
+    RulesetPicked.validate(JSON.parse(rule)),
   );
 
   if (validationResults.every(Result.isOk)) {

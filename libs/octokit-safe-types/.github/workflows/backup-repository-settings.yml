@@ -1,4 +1,4 @@
-name: Style Check
+name: Backup Repository Settings
 
 # Controls when the action will run.
 on:
@@ -7,27 +7,16 @@ on:
     branches-ignore:
       - 'develop'
       - 'develop*'
-    paths-ignore:
-      - '.gitignore'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  style-check:
+  backup-repository-settings:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
-    strategy:
-      fail-fast: true
-      matrix:
-        command:
-          - fmt
-          - cspell
-          - check:ext
-          - md
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -43,10 +32,14 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm install --engine-strict
+        run: npm ci --engine-strict
 
-      - name: Run "${{ matrix.command }}"
-        run: npm run ${{ matrix.command }}
+      - name: Back up
+        run: |
+          npm exec -- tsx scripts/github/repository/backup.mts
+          npm exec -- tsx scripts/github/ruleset/backup.mts
+        env:
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Check if there is no file diff
         run: npm exec assert-repo-is-clean

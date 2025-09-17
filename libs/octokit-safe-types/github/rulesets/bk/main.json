@@ -2,8 +2,6 @@
   "id": 8141335,
   "name": "main",
   "target": "branch",
-  "source_type": "Repository",
-  "source": "noshiro-pf/octokit-safe-types",
   "enforcement": "active",
   "bypass_actors": [
     {
@@ -17,16 +15,6 @@
       "bypass_mode": "always"
     }
   ],
-  "current_user_can_bypass": "always",
-  "node_id": "RRS_lACqUmVwb3NpdG9yec4_BPSQzgB8Ohc",
-  "_links": {
-    "self": {
-      "href": "https://api.github.com/repos/noshiro-pf/octokit-safe-types/rulesets/8141335"
-    },
-    "html": {
-      "href": "https://github.com/noshiro-pf/octokit-safe-types/rules/8141335"
-    }
-  },
   "conditions": {
     "ref_name": {
       "exclude": [],
@@ -70,10 +58,6 @@
             "integration_id": 15368
           },
           {
-            "context": "style-check (doc)",
-            "integration_id": 15368
-          },
-          {
             "context": "style-check (fmt)",
             "integration_id": 15368
           },
@@ -96,7 +80,5 @@
         ]
       }
     }
-  ],
-  "created_at": "2025-09-16T02:47:44.852+09:00",
-  "updated_at": "2025-09-16T02:47:45.034+09:00"
+  ]
 }

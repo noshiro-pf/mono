@@ -1,3 +1,4 @@
+import { Obj } from 'ts-data-forge';
 import 'ts-repo-utils';
 import { rulesetsDir } from '../constants.mjs';
 import {
@@ -7,6 +8,7 @@ import {
   updateRuleset,
 } from './api/index.mjs';
 import { backupRulesets } from './backup.mjs';
+import { rulesetKeysToPick } from './constants.mjs';
 import {
   readRulesetBackupFiles,
   readRulesetFiles,
@@ -57,9 +59,17 @@ for (const ruleset of rulesetsToCreate) {
   for (const rule of rulesetsResult) {
     const content = await getRuleset(rule.id);
 
+    const str = JSON.stringify(
+      Obj.pick(content, rulesetKeysToPick),
+      undefined,
+      2,
+    );
+
+    await fs.writeFile(path.resolve(rulesetsDir, `${rule.name}.json`), str);
+
     await fs.writeFile(
-      path.resolve(rulesetsDir, `${rule.name}.json`),
-      JSON.stringify(content, undefined, 2),
+      path.resolve(rulesetsDir, `./bk/${rule.name}.json`),
+      str,
     );
   }
 
