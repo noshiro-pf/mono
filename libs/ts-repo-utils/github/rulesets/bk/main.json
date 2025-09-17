@@ -70,11 +70,7 @@
             "integration_id": 15368
           },
           {
-            "context": "lint-and-build (build)",
-            "integration_id": 15368
-          },
-          {
-            "context": "lint-and-build (lint:fix)",
+            "context": "lint-and-build",
             "integration_id": 15368
           },
           {
