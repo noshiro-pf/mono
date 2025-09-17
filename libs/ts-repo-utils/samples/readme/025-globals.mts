@@ -15,6 +15,8 @@ const configJson: string = await fs.readFile('./config.json', {
   encoding: 'utf8',
 });
 
+const home = os.homedir();
+
 const files: readonly string[] = await glob('**/*.ts');
 
 if (isDirectlyExecuted(import.meta.url)) {
@@ -22,4 +24,4 @@ if (isDirectlyExecuted(import.meta.url)) {
 }
 
 // embed-sample-code-ignore-below
-export { configJson, filePath, files };
+export { configJson, filePath, files, home };

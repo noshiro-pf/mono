@@ -754,6 +754,8 @@ const configJson: string = await fs.readFile('./config.json', {
     encoding: 'utf8',
 });
 
+const home = os.homedir();
+
 const files: readonly string[] = await glob('**/*.ts');
 
 if (isDirectlyExecuted(import.meta.url)) {
@@ -766,6 +768,7 @@ if (isDirectlyExecuted(import.meta.url)) {
 - `echo` - Equivalent to `console.log`
 - `path` - `node:path`
 - `fs` - `node:fs/promises`
+- `os` - `node:os`
 - `glob` - `fast-glob`
 - `isDirectlyExecuted` - The script execution utility described above.
 
