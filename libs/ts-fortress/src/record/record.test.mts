@@ -76,14 +76,13 @@ describe('record', () => {
       const result = ymd.validate(x);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expectType<typeof result.value, Ymd>('=');
-        expect(result.value).toStrictEqual({
-          year: 2000,
-          month: 12,
-          date: 25,
-        });
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expectType<typeof resultValue, Ymd>('=');
+      expect(resultValue).toStrictEqual({
+        year: 2000,
+        month: 12,
+        date: 25,
+      });
     });
 
     test('falsy case 1', () => {
@@ -96,28 +95,27 @@ describe('record', () => {
       const result = ymd.validate(x);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: ['month'],
-            actualValue: 'ab',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-          {
-            path: ['date'],
-            actualValue: 'cd',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <number> at month, got <string> type value "ab".',
-          'Expected <number> at date, got <string> type value "cd".',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: ['month'],
+          actualValue: 'ab',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+        {
+          path: ['date'],
+          actualValue: 'cd',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <number> at month, got <string> type value "ab".',
+        'Expected <number> at date, got <string> type value "cd".',
+      ]);
     });
 
     test('falsy case 2', () => {
@@ -128,28 +126,27 @@ describe('record', () => {
       const result = ymd.validate(x);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: ['month'],
-            actualValue: { year: 2000 },
-            typeName: '{ year: number, month: number, date: number }',
-            expectedType: '{ year: number, month: number, date: number }',
-            message: 'Missing required key "month"',
-          },
-          {
-            path: ['date'],
-            actualValue: { year: 2000 },
-            typeName: '{ year: number, month: number, date: number }',
-            expectedType: '{ year: number, month: number, date: number }',
-            message: 'Missing required key "date"',
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Missing required key "month" at month',
-          'Missing required key "date" at date',
-        ]);
-      }
+      const resultError1 = Result.unwrapErrThrow(result);
+      expect(resultError1).toStrictEqual([
+        {
+          path: ['month'],
+          actualValue: { year: 2000 },
+          typeName: '{ year: number, month: number, date: number }',
+          expectedType: '{ year: number, month: number, date: number }',
+          message: 'Missing required key "month"',
+        },
+        {
+          path: ['date'],
+          actualValue: { year: 2000 },
+          typeName: '{ year: number, month: number, date: number }',
+          expectedType: '{ year: number, month: number, date: number }',
+          message: 'Missing required key "date"',
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+        'Missing required key "month" at month',
+        'Missing required key "date" at date',
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
@@ -160,9 +157,8 @@ describe('record', () => {
       };
       const result = ymd.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
 
@@ -290,13 +286,12 @@ describe('partial record', () => {
       const result = ymd.validate(x);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expectType<typeof result.value, Ymd>('=');
-        expect(result.value).toStrictEqual({
-          year: 2000,
-          month: 12,
-        });
-      }
+      const resultValue2 = Result.unwrapThrow(result);
+      expectType<typeof resultValue2, Ymd>('=');
+      expect(resultValue2).toStrictEqual({
+        year: 2000,
+        month: 12,
+      });
     });
 
     test('falsy case', () => {
@@ -309,28 +304,27 @@ describe('partial record', () => {
       const result = ymd.validate(x);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: ['month'],
-            actualValue: 'ab',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-          {
-            path: ['date'],
-            actualValue: 'cd',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <number> at month, got <string> type value "ab".',
-          'Expected <number> at date, got <string> type value "cd".',
-        ]);
-      }
+      const resultError2 = Result.unwrapErrThrow(result);
+      expect(resultError2).toStrictEqual([
+        {
+          path: ['month'],
+          actualValue: 'ab',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+        {
+          path: ['date'],
+          actualValue: 'cd',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError2)).toStrictEqual([
+        'Expected <number> at month, got <string> type value "ab".',
+        'Expected <number> at date, got <string> type value "cd".',
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
@@ -340,9 +334,8 @@ describe('partial record', () => {
       };
       const result = ymd.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue3 = Result.unwrapThrow(result);
+      expect(resultValue3).toBe(input); // ✅ same reference
     });
   });
 

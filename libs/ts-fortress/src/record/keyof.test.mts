@@ -55,19 +55,17 @@ describe('keyof', () => {
       const result = ymdKey.validate(x);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expectType<typeof result.value, Ymd>('=');
-        expect(result.value).toBe('year');
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expectType<typeof resultValue, Ymd>('=');
+      expect(resultValue).toBe('year');
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 'year';
       const result = ymdKey.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case', () => {
@@ -76,21 +74,20 @@ describe('keyof', () => {
       const result = ymdKey.validate(x);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 'minutes',
-            expectedType: 'keyof { year: number, month: number, date: number }',
-            typeName: 'keyof { year: number, month: number, date: number }',
-            message:
-              'The value is expected to be one of the elements contained in { year, month, date }',
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value is expected to be one of the elements contained in { year, month, date }',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: 'minutes',
+          expectedType: 'keyof { year: number, month: number, date: number }',
+          typeName: 'keyof { year: number, month: number, date: number }',
+          message:
+            'The value is expected to be one of the elements contained in { year, month, date }',
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'The value is expected to be one of the elements contained in { year, month, date }',
+      ]);
     });
   });
 

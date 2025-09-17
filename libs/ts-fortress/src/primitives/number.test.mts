@@ -154,9 +154,8 @@ describe('number', () => {
       const result = num.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(42);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(42);
     });
 
     test('invalid value', () => {
@@ -164,26 +163,24 @@ describe('number', () => {
       const result = num.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 'not a number',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: 'not a number',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 123.456;
       const result = num.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
 });

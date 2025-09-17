@@ -12,7 +12,7 @@
 
 > **MapType**\<`K`, `V`\>(`keyType`, `valueType`, `options?`): [`Type`](../type/README.md#type)\<`MapResultType`\<`K`, `V`\>\>
 
-Defined in: [src/other-types/map.mts:18](https://github.com/noshiro-pf/ts-fortress/blob/main/src/other-types/map.mts#L18)
+Defined in: [src/other-types/map.mts:21](https://github.com/noshiro-pf/ts-fortress/blob/main/src/other-types/map.mts#L21)
 
 #### Type Parameters
 

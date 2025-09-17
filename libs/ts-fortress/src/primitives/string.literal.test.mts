@@ -14,11 +14,10 @@ describe('stringLiteral', () => {
     expect(Result.isOk(hello.validate('hello'))).toBe(true);
     const res = hello.validate(1);
     expect(Result.isErr(res)).toBe(true);
-    if (Result.isErr(res)) {
-      expect(validationErrorsToMessages(res.value)).toStrictEqual([
-        'Expected <stringLiteral("hello")>, got <number> type value `1`.',
-      ]);
-    }
+    const resError = Result.unwrapErrThrow(res);
+    expect(validationErrorsToMessages(resError)).toStrictEqual([
+      'Expected <stringLiteral("hello")>, got <number> type value `1`.',
+    ]);
     expect(hello.fill('world')).toBe('hello');
   });
 });

@@ -15,10 +15,14 @@ const config = {
     'line-length': false, // prefer Prettier's setting
     'list-indent': false, // prefer Prettier's setting
     'code-block-style': false, // prefer Prettier's setting
-    MD041: false,
-    MD024: false, // no-duplicate-heading
+    'first-line-h1': false,
+    'first-line-heading': false,
+    'ol-prefix': false,
     indentation: false, // prefer Prettier's setting
     'ul-indent': false, // prefer Prettier's setting
+    'ol-indent': false, // prefer Prettier's setting
+    'list-marker-space': false, // prefer Prettier's setting
+    'no-duplicate-heading': { siblings_only: true },
   },
 };
 

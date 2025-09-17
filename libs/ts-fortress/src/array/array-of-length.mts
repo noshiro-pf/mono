@@ -22,7 +22,7 @@ export const arrayOfLength = <A, N extends SmallUint>(
 
   const {
     typeName = `ArrayOfLength<${size}, ${elementType.typeName}>`,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     defaultValue = Arr.create(size, elementType.defaultValue) as T,
   } = options ?? {};
 
@@ -62,14 +62,14 @@ export const arrayOfLength = <A, N extends SmallUint>(
       return Result.err(errors);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return Result.ok(a as unknown as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>
     Arr.isArray(a)
       ? // TODO: remove as
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (Arr.map(Arr.seq(size), (i) => elementType.fill(a[i]) satisfies A) as T)
       : defaultValue;
 

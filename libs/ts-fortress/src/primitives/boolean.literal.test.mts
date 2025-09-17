@@ -14,11 +14,10 @@ describe('booleanLiteral', () => {
     expect(Result.isOk(T.validate(true))).toBe(true);
     const res = T.validate(0);
     expect(Result.isErr(res)).toBe(true);
-    if (Result.isErr(res)) {
-      expect(validationErrorsToMessages(res.value)).toStrictEqual([
-        'Expected <booleanLiteral(true)>, got <number> type value `0`.',
-      ]);
-    }
+    const resError = Result.unwrapErrThrow(res);
+    expect(validationErrorsToMessages(resError)).toStrictEqual([
+      'Expected <booleanLiteral(true)>, got <number> type value `0`.',
+    ]);
     expect(T.fill(false)).toBe(true);
   });
 });

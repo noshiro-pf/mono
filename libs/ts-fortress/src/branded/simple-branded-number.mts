@@ -15,7 +15,7 @@ export const simpleBrandedNumber = <K extends string>({
     baseType: number(defaultValue),
 
     defaultValue:
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       defaultValue as Brand<number, K>,
 
     is,

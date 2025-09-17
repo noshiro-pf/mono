@@ -1,4 +1,4 @@
-import { asInt16, expectType, isInt16, Result } from 'ts-data-forge';
+import { asInt16, expectType, isInt16, isNumber, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../type.mjs';
 import { validationErrorsToMessages } from '../../utils/index.mjs';
 import { int16 } from './int16.mjs';
@@ -16,30 +16,35 @@ describe('int16', () => {
     test('truthy case', () => {
       const x: unknown = 1000;
 
-      if (targetType.is(x)) {
+      const isTarget = targetType.is(x);
+
+      if (isTarget) {
         expectType<typeof x, TargetType>('=');
-        expect(isInt16(x)).toBe(true);
       } else {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(true);
+      expect(isTarget).toBe(true);
+      assert(isNumber(x));
+      expect(isInt16(x)).toBe(true);
     });
 
     test('falsy case - too large', () => {
-      const x: unknown = 40000;
+      const x: unknown = 40_000;
 
-      if (targetType.is(x)) {
+      const isTarget = targetType.is(x);
+
+      if (isTarget) {
         expectType<typeof x, TargetType>('=');
       } else {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(false);
+      expect(isTarget).toBe(false);
     });
 
     test('falsy case - too small', () => {
-      const x: unknown = -40000;
+      const x: unknown = -40_000;
 
       expect(targetType.is(x)).toBe(false);
     });
@@ -56,47 +61,44 @@ describe('int16', () => {
       const result = targetType.validate(-1000);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(-1000);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(-1000);
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = 15000;
+      const input = 15_000;
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - out of range', () => {
-      const result = targetType.validate(50000);
+      const result = targetType.validate(50_000);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 50000,
-            expectedType: 'Int16',
-            typeName:
-              '"Finite" & "Int" & "SafeInt" & "> -2^32" & ">= -2^31" & "< 2^32" & "< 2^31" & "< 2^15" & "< 2^16" & "> -2^16" & ">= -2^15" & not("NaNValue")',
-            message: undefined,
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <Int16>, got <number> type value `50000`.',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: 50_000,
+          expectedType: 'Int16',
+          typeName:
+            '"Finite" & "Int" & "SafeInt" & "> -2^32" & ">= -2^31" & "< 2^32" & "< 2^31" & "< 2^15" & "< 2^16" & "> -2^16" & ">= -2^15" & not("NaNValue")',
+          message: undefined,
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <Int16>, got <number> type value `50000`.',
+      ]);
     });
   });
 
   describe('cast', () => {
     test('truthy case', () => {
-      const x: unknown = 15000;
+      const x: unknown = 15_000;
 
-      expect(targetType.cast(x)).toBe(15000);
+      expect(targetType.cast(x)).toBe(15_000);
     });
 
     test('falsy case', () => {

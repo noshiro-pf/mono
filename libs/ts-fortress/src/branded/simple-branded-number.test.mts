@@ -43,38 +43,35 @@ describe('simpleBrandedNumber', () => {
         const input = 42;
         const result = userIdType.validate(input);
         expect(Result.isOk(result)).toBe(true);
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(input); // ✅ same reference
-        }
+        const resultValue = Result.unwrapThrow(result);
+        expect(resultValue).toBe(input); // ✅ same reference
       });
 
       test('succeeds for valid numbers', () => {
         const result = userIdType.validate(42);
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(42);
-        }
+        const resultValue1 = Result.unwrapThrow(result);
+        expect(resultValue1).toBe(42);
       });
 
       test('fails for non-numbers', () => {
         const result = userIdType.validate('not a number');
         expect(Result.isErr(result)).toBe(true);
 
-        if (Result.isErr(result)) {
-          expect(result.value).toStrictEqual([
-            {
-              path: [],
-              actualValue: 'not a number',
-              expectedType: 'number',
-              typeName: 'number',
-              message: undefined,
-            },
-          ]);
-          expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected <number>, got <string> type value "not a number".',
-          ]);
-        }
+        const resultError = Result.unwrapErrThrow(result);
+        expect(resultError).toStrictEqual([
+          {
+            path: [],
+            actualValue: 'not a number',
+            expectedType: 'number',
+            typeName: 'number',
+            message: undefined,
+          },
+        ]);
+        expect(validationErrorsToMessages(resultError)).toStrictEqual([
+          'Expected <number>, got <string> type value "not a number".',
+        ]);
       });
     });
 
@@ -119,38 +116,35 @@ describe('simpleBrandedNumber', () => {
         const input = 85;
         const result = scoreType.validate(input);
         expect(Result.isOk(result)).toBe(true);
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(input); // ✅ same reference
-        }
+        const resultValue2 = Result.unwrapThrow(result);
+        expect(resultValue2).toBe(input); // ✅ same reference
       });
 
       test('succeeds for valid numbers', () => {
         const result = scoreType.validate(85);
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(85);
-        }
+        const resultValue3 = Result.unwrapThrow(result);
+        expect(resultValue3).toBe(85);
       });
 
       test('fails for non-numbers', () => {
         const result = scoreType.validate('invalid');
         expect(Result.isErr(result)).toBe(true);
 
-        if (Result.isErr(result)) {
-          expect(result.value).toStrictEqual([
-            {
-              path: [],
-              actualValue: 'invalid',
-              expectedType: 'number',
-              typeName: 'number',
-              message: undefined,
-            },
-          ]);
-          expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected <number>, got <string> type value "invalid".',
-          ]);
-        }
+        const resultError1 = Result.unwrapErrThrow(result);
+        expect(resultError1).toStrictEqual([
+          {
+            path: [],
+            actualValue: 'invalid',
+            expectedType: 'number',
+            typeName: 'number',
+            message: undefined,
+          },
+        ]);
+        expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+          'Expected <number>, got <string> type value "invalid".',
+        ]);
       });
     });
 
@@ -174,14 +168,16 @@ describe('simpleBrandedNumber', () => {
     test('type narrowing works correctly', () => {
       const x: unknown = 29.99;
 
-      if (priceType.is(x)) {
+      const isPrice = priceType.is(x);
+
+      if (isPrice) {
         expectType<typeof x, Brand<number, 'Price'>>('=');
-        expect(x).toBe(29.99);
       } else {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(priceType.is(x)).toBe(true);
+      expect(isPrice).toBe(true);
+      expect(x).toBe(29.99);
     });
   });
 });

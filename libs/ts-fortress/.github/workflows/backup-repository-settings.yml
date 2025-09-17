@@ -1,0 +1,45 @@
+name: Backup Repository Settings
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches-ignore:
+      - 'develop'
+      - 'develop*'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  backup-repository-settings:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5.0.0
+
+      - name: Set up Node.js 24.x
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        id: setup_node_id
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --engine-strict
+
+      - name: Back up
+        run: |
+          npm exec -- tsx scripts/github/repository/backup.mts
+          npm exec -- tsx scripts/github/ruleset/backup.mts
+        env:
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Check if there is no file diff
+        run: npm exec assert-repo-is-clean

@@ -157,9 +157,8 @@ describe('string', () => {
       const result = str.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe('hello');
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe('hello');
     });
 
     test('empty string is valid', () => {
@@ -167,9 +166,8 @@ describe('string', () => {
       const result = str.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe('');
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe('');
     });
 
     test('invalid value', () => {
@@ -177,26 +175,24 @@ describe('string', () => {
       const result = str.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 42,
-            expectedType: 'string',
-            typeName: 'string',
-            message: undefined,
-          },
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: 42,
+          expectedType: 'string',
+          typeName: 'string',
+          message: undefined,
+        },
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 'hello world';
       const result = str.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue2 = Result.unwrapThrow(result);
+      expect(resultValue2).toBe(input); // ✅ same reference
     });
   });
 });

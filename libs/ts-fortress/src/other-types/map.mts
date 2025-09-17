@@ -10,6 +10,9 @@ import {
   type ValidationErrorWithMessage,
 } from '../utils/index.mjs';
 
+const isMap = (value: unknown): value is ReadonlyMap<unknown, unknown> =>
+  Object.prototype.toString.call(value) === '[object Map]';
+
 type MapResultType<
   K extends Type<unknown>,
   V extends Type<unknown>,
@@ -29,7 +32,7 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
   const defaultValue: M = new Map();
 
   const validate: Type<M>['validate'] = (a) => {
-    if (!(a instanceof Map)) {
+    if (!isMap(a)) {
       return Result.err([
         createPrimitiveValidationError({
           actualValue: a,
@@ -40,7 +43,7 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
     }
 
     const errors: readonly ValidationError[] = Arr.generate(function* () {
-      for (const [k, v] of (a as ReadonlyMap<unknown, unknown>).entries()) {
+      for (const [k, v] of a.entries()) {
         {
           const res = keyType.validate(k);
 
@@ -81,7 +84,7 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
   };
 
   const fill: Type<M>['fill'] = (a) =>
-    a instanceof Map
+    isMap(a)
       ? (new Map(
           Array.from(a.entries()).filter(
             ([k, v]) => keyType.is(k) && valueType.is(v),

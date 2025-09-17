@@ -39,9 +39,12 @@ const checkAll = async (): Promise<void> => {
   echo('7. Generating documentation...');
   await runCmdStep('npm run doc', 'Documentation generation failed');
 
-  // Step 8: Format and check repo status
-  echo('8. Formatting code...');
-  await runCmdStep('npm run fmt', 'Formatting failed');
+  // Step 8: Backup repository settings
+  echo('8. Backing up repository settings...');
+  await runCmdStep(
+    'npm run gh:backup-all',
+    'Backing up repository settings failed',
+  );
 
   echo('✅ All checks completed successfully!\n');
 };

@@ -45,39 +45,36 @@ describe('symbol', () => {
       const result = targetType.validate(testSym);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(testSym);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(testSym);
     });
 
     test('falsy case', () => {
       const result = targetType.validate('not a symbol');
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 'not a symbol',
-            expectedType: 'symbol',
-            typeName: 'symbol',
-            message: undefined,
-          },
-        ]);
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: 'not a symbol',
+          expectedType: 'symbol',
+          typeName: 'symbol',
+          message: undefined,
+        },
+      ]);
 
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <symbol>, got <string> type value "not a symbol".',
-        ]);
-      }
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <symbol>, got <string> type value "not a symbol".',
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = Symbol('my-symbol');
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
 

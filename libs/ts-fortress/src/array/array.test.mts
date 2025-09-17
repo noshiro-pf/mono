@@ -68,9 +68,8 @@ describe('array', () => {
       expectType<typeof result, Result<Xs, readonly ValidationError[]>>('=');
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toStrictEqual([1, 2, 3]);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toStrictEqual([1, 2, 3]);
     });
 
     test('falsy case', () => {
@@ -80,40 +79,38 @@ describe('array', () => {
       const result = xs.validate(ys);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        // Test that we have structured ValidationError objects
-        expect(result.value).toStrictEqual([
-          {
-            path: ['0'],
-            actualValue: '1',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-          {
-            path: ['1'],
-            actualValue: '',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-        ]);
+      const resultError = Result.unwrapErrThrow(result);
+      // Test that we have structured ValidationError objects
+      expect(resultError).toStrictEqual([
+        {
+          path: ['0'],
+          actualValue: '1',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+        {
+          path: ['1'],
+          actualValue: '',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+      ]);
 
-        // Test that we can convert to legacy string format for backward compatibility
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <number> at 0, got <string> type value "1".',
-          'Expected <number> at 1, got <string> type value "".',
-        ]);
-      }
+      // Test that we can convert to legacy string format for backward compatibility
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <number> at 0, got <string> type value "1".',
+        'Expected <number> at 1, got <string> type value "".',
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = [10, 20, 30];
       const result = xs.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
 

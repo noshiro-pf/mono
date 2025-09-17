@@ -14,11 +14,10 @@ describe('numberLiteral', () => {
     expect(Result.isOk(five.validate(5))).toBe(true);
     const res = five.validate('5');
     expect(Result.isErr(res)).toBe(true);
-    if (Result.isErr(res)) {
-      expect(validationErrorsToMessages(res.value)).toStrictEqual([
-        'Expected <numberLiteral(5)>, got <string> type value "5".',
-      ]);
-    }
+    const resError = Result.unwrapErrThrow(res);
+    expect(validationErrorsToMessages(resError)).toStrictEqual([
+      'Expected <numberLiteral(5)>, got <string> type value "5".',
+    ]);
     expect(five.fill(6)).toBe(5);
   });
 });

@@ -52,36 +52,33 @@ describe('uintRange', () => {
       expectType<typeof result, Result<Month, readonly ValidationError[]>>('=');
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(5);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(5);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 5;
       const result = month.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case', () => {
       const result = month.validate(13);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value[0]).toStrictEqual({
-          path: [],
-          actualValue: 13,
-          expectedType: 'month',
-          typeName: 'month',
-          message: 'The value is expected to be an integer between 1 and 12',
-        });
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value is expected to be an integer between 1 and 12',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError[0]).toStrictEqual({
+        path: [],
+        actualValue: 13,
+        expectedType: 'month',
+        typeName: 'month',
+        message: 'The value is expected to be an integer between 1 and 12',
+      });
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'The value is expected to be an integer between 1 and 12',
+      ]);
     });
   });
 

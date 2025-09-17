@@ -28,9 +28,8 @@ test('MapType with string keys and number values', () => {
   // validate() test
   const result = StringNumberMap.validate(validMap);
   expect(Result.isOk(result)).toBe(true);
-  if (Result.isOk(result)) {
-    expect(result.value).toBe(validMap); // Same reference
-  }
+  const resultValue = Result.unwrapThrow(result);
+  expect(resultValue).toBe(validMap); // Same reference
 });
 
 test('MapType with invalid key types', () => {
@@ -48,10 +47,9 @@ test('MapType with invalid key types', () => {
   // validate() test
   const result = StringNumberMap.validate(invalidMap);
   expect(Result.isErr(result)).toBe(true);
-  if (Result.isErr(result)) {
-    expect(result.value.length).toBeGreaterThan(0);
-    expect(result.value[0]?.message).toContain('key of the Map');
-  }
+  const resultError = Result.unwrapErrThrow(result);
+  expect(resultError.length).toBeGreaterThan(0);
+  expect(resultError[0]?.message).toContain('key of the Map');
 });
 
 test('MapType with invalid value types', () => {
@@ -69,10 +67,9 @@ test('MapType with invalid value types', () => {
   // validate() test
   const result = StringNumberMap.validate(invalidMap);
   expect(Result.isErr(result)).toBe(true);
-  if (Result.isErr(result)) {
-    expect(result.value.length).toBeGreaterThan(0);
-    expect(result.value[0]?.message).toContain('value of the Map');
-  }
+  const resultError1 = Result.unwrapErrThrow(result);
+  expect(resultError1.length).toBeGreaterThan(0);
+  expect(resultError1[0]?.message).toContain('value of the Map');
 });
 
 test('MapType fill() method', () => {
@@ -149,9 +146,8 @@ test('MapType with custom typeName', () => {
   // Error message should include custom type name
   const result = CustomMap.validate('not a map');
   expect(Result.isErr(result)).toBe(true);
-  if (Result.isErr(result)) {
-    expect(result.value[0]?.typeName).toBe('CustomStringNumberMap');
-  }
+  const resultError2 = Result.unwrapErrThrow(result);
+  expect(resultError2[0]?.typeName).toBe('CustomStringNumberMap');
 });
 
 test('MapType with number keys and string values', () => {

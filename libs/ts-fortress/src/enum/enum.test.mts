@@ -51,37 +51,34 @@ describe('enumType', () => {
       );
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(3);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(3);
     });
 
     test('falsy case', () => {
       const result = targetType.validate(5);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value[0]).toStrictEqual({
-          path: [],
-          actualValue: 5,
-          expectedType: 'enum',
-          typeName: 'enum',
-          message:
-            'The value is expected to be one of the elements contained in { 3, 2, a }',
-        });
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError[0]).toStrictEqual({
+        path: [],
+        actualValue: 5,
+        expectedType: 'enum',
+        typeName: 'enum',
+        message:
           'The value is expected to be one of the elements contained in { 3, 2, a }',
-        ]);
-      }
+      });
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'The value is expected to be one of the elements contained in { 3, 2, a }',
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 'a';
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
 

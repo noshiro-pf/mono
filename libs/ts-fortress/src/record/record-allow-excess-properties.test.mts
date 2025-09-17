@@ -37,21 +37,20 @@ describe('record allowExcessProperties option', () => {
     const result = strictRecord.validate(dataWithExcess);
     expect(Result.isErr(result)).toBe(true);
 
-    if (Result.isErr(result)) {
-      expect(result.value).toStrictEqual([
-        {
-          path: ['extra'],
-          actualValue: 'not allowed',
-          typeName: '{ name: number, age: number }',
-          expectedType: '{ name: number, age: number }',
-          message: 'Excess property "extra" is not allowed',
-        },
-      ]);
+    const resultError = Result.unwrapErrThrow(result);
+    expect(resultError).toStrictEqual([
+      {
+        path: ['extra'],
+        actualValue: 'not allowed',
+        typeName: '{ name: number, age: number }',
+        expectedType: '{ name: number, age: number }',
+        message: 'Excess property "extra" is not allowed',
+      },
+    ]);
 
-      expect(validationErrorsToMessages(result.value)).toStrictEqual([
-        'Excess property "extra" is not allowed at extra',
-      ]);
-    }
+    expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      'Excess property "extra" is not allowed at extra',
+    ]);
   });
 
   test('allowExcessProperties: false - accepts valid data without excess properties', () => {
@@ -65,21 +64,19 @@ describe('record allowExcessProperties option', () => {
     const result = strictRecord.validate(validData);
     expect(Result.isOk(result)).toBe(true);
 
-    if (Result.isOk(result)) {
-      expect(result.value).toStrictEqual({
-        name: 42,
-        age: 25,
-      });
-    }
+    const resultValue = Result.unwrapThrow(result);
+    expect(resultValue).toStrictEqual({
+      name: 42,
+      age: 25,
+    });
   });
 
   test('strictRecord validate returns input as-is for OK cases', () => {
     const input = { name: 42, age: 25 };
     const result = strictRecord.validate(input);
     expect(Result.isOk(result)).toBe(true);
-    if (Result.isOk(result)) {
-      expect(result.value).toBe(input); // ✅ same reference
-    }
+    const resultValue1 = Result.unwrapThrow(result);
+    expect(resultValue1).toBe(input); // ✅ same reference
   });
 
   test('allowExcessProperties: true - accepts excess properties', () => {
@@ -94,22 +91,20 @@ describe('record allowExcessProperties option', () => {
     const result = permissiveRecord.validate(dataWithExcess);
     expect(Result.isOk(result)).toBe(true);
 
-    if (Result.isOk(result)) {
-      expect(result.value).toStrictEqual({
-        name: 42,
-        age: 25,
-        extra: 'allowed',
-      });
-    }
+    const resultValue2 = Result.unwrapThrow(result);
+    expect(resultValue2).toStrictEqual({
+      name: 42,
+      age: 25,
+      extra: 'allowed',
+    });
   });
 
   test('permissiveRecord validate returns input as-is for OK cases', () => {
     const input = { name: 42, age: 25, extra: 'allowed' };
     const result = permissiveRecord.validate(input);
     expect(Result.isOk(result)).toBe(true);
-    if (Result.isOk(result)) {
-      expect(result.value).toBe(input); // ✅ same reference
-    }
+    const resultValue3 = Result.unwrapThrow(result);
+    expect(resultValue3).toBe(input); // ✅ same reference
   });
 
   test('default behavior - allows excess properties (allowExcessProperties defaults to true)', () => {
@@ -124,22 +119,20 @@ describe('record allowExcessProperties option', () => {
     const result = defaultRecord.validate(dataWithExcess);
     expect(Result.isOk(result)).toBe(true);
 
-    if (Result.isOk(result)) {
-      expect(result.value).toStrictEqual({
-        name: 42,
-        age: 25,
-        extra: 'allowed by default',
-      });
-    }
+    const resultValue4 = Result.unwrapThrow(result);
+    expect(resultValue4).toStrictEqual({
+      name: 42,
+      age: 25,
+      extra: 'allowed by default',
+    });
   });
 
   test('defaultRecord validate returns input as-is for OK cases', () => {
     const input = { name: 42, age: 25, extra: 'allowed by default' };
     const result = defaultRecord.validate(input);
     expect(Result.isOk(result)).toBe(true);
-    if (Result.isOk(result)) {
-      expect(result.value).toBe(input); // ✅ same reference
-    }
+    const resultValue5 = Result.unwrapThrow(result);
+    expect(resultValue5).toBe(input); // ✅ same reference
   });
 
   test('allowExcessProperties: false - multiple excess properties', () => {
@@ -153,25 +146,24 @@ describe('record allowExcessProperties option', () => {
     const result = strictRecord.validate(dataWithMultipleExcess);
     expect(Result.isErr(result)).toBe(true);
 
-    if (Result.isErr(result)) {
-      expect(result.value).toHaveLength(2);
-      expect(result.value).toStrictEqual([
-        {
-          path: ['extra1'],
-          actualValue: 'not allowed 1',
-          typeName: '{ name: number, age: number }',
-          expectedType: '{ name: number, age: number }',
-          message: 'Excess property "extra1" is not allowed',
-        },
-        {
-          path: ['extra2'],
-          actualValue: 'not allowed 2',
-          typeName: '{ name: number, age: number }',
-          expectedType: '{ name: number, age: number }',
-          message: 'Excess property "extra2" is not allowed',
-        },
-      ]);
-    }
+    const resultError1 = Result.unwrapErrThrow(result);
+    expect(resultError1).toHaveLength(2);
+    expect(resultError1).toStrictEqual([
+      {
+        path: ['extra1'],
+        actualValue: 'not allowed 1',
+        typeName: '{ name: number, age: number }',
+        expectedType: '{ name: number, age: number }',
+        message: 'Excess property "extra1" is not allowed',
+      },
+      {
+        path: ['extra2'],
+        actualValue: 'not allowed 2',
+        typeName: '{ name: number, age: number }',
+        expectedType: '{ name: number, age: number }',
+        message: 'Excess property "extra2" is not allowed',
+      },
+    ]);
   });
 
   test('allowExcessProperties: false - combines with other validation errors', () => {
@@ -184,24 +176,23 @@ describe('record allowExcessProperties option', () => {
     const result = strictRecord.validate(invalidData);
     expect(Result.isErr(result)).toBe(true);
 
-    if (Result.isErr(result)) {
-      expect(result.value).toHaveLength(2);
-      // First error: invalid type for 'name'
-      expect(result.value[0]).toStrictEqual({
-        path: ['name'],
-        actualValue: 'invalid',
-        expectedType: 'number',
-        typeName: 'number',
-        message: undefined,
-      });
-      // Second error: excess property
-      expect(result.value[1]).toStrictEqual({
-        path: ['extra'],
-        actualValue: 'not allowed',
-        typeName: '{ name: number, age: number }',
-        expectedType: '{ name: number, age: number }',
-        message: 'Excess property "extra" is not allowed',
-      });
-    }
+    const resultError2 = Result.unwrapErrThrow(result);
+    expect(resultError2).toHaveLength(2);
+    // First error: invalid type for 'name'
+    expect(resultError2[0]).toStrictEqual({
+      path: ['name'],
+      actualValue: 'invalid',
+      expectedType: 'number',
+      typeName: 'number',
+      message: undefined,
+    });
+    // Second error: excess property
+    expect(resultError2[1]).toStrictEqual({
+      path: ['extra'],
+      actualValue: 'not allowed',
+      typeName: '{ name: number, age: number }',
+      expectedType: '{ name: number, age: number }',
+      message: 'Excess property "extra" is not allowed',
+    });
   });
 });

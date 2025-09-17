@@ -12,7 +12,7 @@
 
 > **SetType**\<`T`\>(`elementType`, `options?`): [`Type`](../type/README.md#type)\<`SetResultType`\<`T`\>\>
 
-Defined in: [src/other-types/set.mts:14](https://github.com/noshiro-pf/ts-fortress/blob/main/src/other-types/set.mts#L14)
+Defined in: [src/other-types/set.mts:17](https://github.com/noshiro-pf/ts-fortress/blob/main/src/other-types/set.mts#L17)
 
 #### Type Parameters
 

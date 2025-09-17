@@ -55,39 +55,36 @@ describe('safeInt', () => {
       const result = targetType.validate(-42);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(-42);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(-42);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 123;
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - unsafe integer', () => {
       const result = targetType.validate(Number.MAX_SAFE_INTEGER + 1);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: Number.MAX_SAFE_INTEGER + 1,
-            expectedType: 'SafeInt',
-            typeName: '"Finite" & "Int" & "SafeInt" & not("NaNValue")',
-            message: undefined,
-          },
-        ]);
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: Number.MAX_SAFE_INTEGER + 1,
+          expectedType: 'SafeInt',
+          typeName: '"Finite" & "Int" & "SafeInt" & not("NaNValue")',
+          message: undefined,
+        },
+      ]);
 
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <SafeInt>, got <number> type value `9007199254740992`.',
-        ]);
-      }
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <SafeInt>, got <number> type value `9007199254740992`.',
+      ]);
     });
   });
 

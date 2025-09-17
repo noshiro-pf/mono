@@ -12,14 +12,14 @@ export const valueof = <const R extends ReadonlyRecord<string, Type<unknown>>>(
   const types = Object.values(recordType.shape);
 
   if (Arr.isArrayAtLeastLength(types, 2)) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return union(types, {
       typeName: options?.typeName ?? `ValueOf<${recordType.typeName}>`,
     }) satisfies ValueofTypeSub<R> as ValueOfType<R>;
   }
 
   if (Arr.isNonEmpty(types)) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return types[0] satisfies ValueofTypeSub<R> as ValueOfType<R>;
   }
 

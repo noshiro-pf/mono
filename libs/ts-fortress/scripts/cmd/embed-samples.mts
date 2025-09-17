@@ -2,13 +2,19 @@ import { pipe } from 'ts-data-forge';
 import { formatFiles } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
-const codeBlockStart = '```typescript';
+const codeBlockStart = '```tsx';
 const codeBlockEnd = '```';
 
 const ignoreAboveKeyword = '// embed-sample-code-ignore-above';
 const ignoreBelowKeyword = '// embed-sample-code-ignore-below';
 
-const documents = [
+const documents: DeepReadonly<
+  {
+    mdPath: string;
+    samplesDir: string;
+    sampleCodeFiles: string[];
+  }[]
+> = [
   {
     mdPath: path.resolve(projectRootPath, 'README.md'),
     samplesDir: path.resolve(projectRootPath, 'samples/readme'),
@@ -65,11 +71,7 @@ const documents = [
       'runtime-type-consistency-issues-in-io-ts/union-undefined-decode-issues/02.ts-fortress.test.mts',
     ],
   },
-] as const satisfies {
-  mdPath: string;
-  samplesDir: string;
-  sampleCodeFiles: string[];
-}[];
+] as const;
 
 /** Embeds sample code from ./samples/readme directory into README.md */
 export const embedSamples = async (): Promise<Result<undefined, unknown>> => {

@@ -36,7 +36,7 @@ export const required = <
   );
 
   const requiredShape =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Object.fromEntries(
       Object.entries(recordType.shape).map(
         ([k, v]) => [k, keysToBeRequired.has(k) ? makeRequired(v) : v] as const,
@@ -60,7 +60,7 @@ const makeRequired = <T extends Type<unknown>>(
   t: T,
 ): RequiredPropertyType<T> =>
   isOptionalProperty(t)
-    ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       (Obj.omit(t, ['optional']) as RequiredPropertyType<T>)
     : t;
 

@@ -55,60 +55,56 @@ describe('int', () => {
       const result = targetType.validate(42);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(42);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(42);
     });
 
     test('falsy case - float', () => {
       const result = targetType.validate(42.5);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 42.5,
-            expectedType: 'Int',
-            typeName: '"Finite" & "Int" & not("NaNValue")',
-            message: undefined,
-          },
-        ]);
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: 42.5,
+          expectedType: 'Int',
+          typeName: '"Finite" & "Int" & not("NaNValue")',
+          message: undefined,
+        },
+      ]);
 
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <Int>, got <number> type value `42.5`.',
-        ]);
-      }
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <Int>, got <number> type value `42.5`.',
+      ]);
     });
 
     test('falsy case - string', () => {
       const result = targetType.validate('not a number');
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 'not a number',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-        ]);
+      const resultError1 = Result.unwrapErrThrow(result);
+      expect(resultError1).toStrictEqual([
+        {
+          path: [],
+          actualValue: 'not a number',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+      ]);
 
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <number>, got <string> type value "not a number".',
-        ]);
-      }
+      expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+        'Expected <number>, got <string> type value "not a number".',
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 123;
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
 

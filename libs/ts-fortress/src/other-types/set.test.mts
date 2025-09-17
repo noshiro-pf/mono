@@ -26,9 +26,8 @@ test('SetType with string elements', () => {
   // validate() test
   const result = StringSet.validate(validSet);
   expect(Result.isOk(result)).toBe(true);
-  if (Result.isOk(result)) {
-    expect(result.value).toBe(validSet); // Same reference
-  }
+  const resultValue = Result.unwrapThrow(result);
+  expect(resultValue).toBe(validSet); // Same reference
 });
 
 test('SetType with number elements', () => {
@@ -46,9 +45,8 @@ test('SetType with number elements', () => {
   // validate() test
   const result = NumberSet.validate(validSet);
   expect(Result.isOk(result)).toBe(true);
-  if (Result.isOk(result)) {
-    expect(result.value).toBe(validSet);
-  }
+  const resultValue1 = Result.unwrapThrow(result);
+  expect(resultValue1).toBe(validSet);
 });
 
 test('SetType with invalid element types', () => {
@@ -62,10 +60,9 @@ test('SetType with invalid element types', () => {
   // validate() test
   const result = StringSet.validate(invalidSet);
   expect(Result.isErr(result)).toBe(true);
-  if (Result.isErr(result)) {
-    expect(result.value.length).toBeGreaterThan(0);
-    expect(result.value[0]?.message).toContain('element of the Set');
-  }
+  const resultError = Result.unwrapErrThrow(result);
+  expect(resultError.length).toBeGreaterThan(0);
+  expect(resultError[0]?.message).toContain('element of the Set');
 });
 
 test('SetType fill() method', () => {
@@ -141,9 +138,8 @@ test('SetType with custom typeName', () => {
   // Error message should include custom type name
   const result = CustomSet.validate('not a set');
   expect(Result.isErr(result)).toBe(true);
-  if (Result.isErr(result)) {
-    expect(result.value[0]?.typeName).toBe('CustomStringSet');
-  }
+  const resultError1 = Result.unwrapErrThrow(result);
+  expect(resultError1[0]?.typeName).toBe('CustomStringSet');
 });
 
 test('SetType with complex element types', () => {

@@ -135,9 +135,8 @@ describe('undefinedType', () => {
       const result = undefinedType.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBeUndefined();
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBeUndefined();
     });
 
     test('null is invalid', () => {
@@ -145,17 +144,16 @@ describe('undefinedType', () => {
       const result = undefinedType.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: null,
-            expectedType: 'undefined',
-            typeName: 'undefined',
-            message: undefined,
-          },
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: null,
+          expectedType: 'undefined',
+          typeName: 'undefined',
+          message: undefined,
+        },
+      ]);
     });
 
     test('other values are invalid', () => {
@@ -163,26 +161,24 @@ describe('undefinedType', () => {
       const result = undefinedType.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 0,
-            expectedType: 'undefined',
-            typeName: 'undefined',
-            message: undefined,
-          },
-        ]);
-      }
+      const resultError1 = Result.unwrapErrThrow(result);
+      expect(resultError1).toStrictEqual([
+        {
+          path: [],
+          actualValue: 0,
+          expectedType: 'undefined',
+          typeName: 'undefined',
+          message: undefined,
+        },
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = undefined;
       const result = undefinedType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
 });

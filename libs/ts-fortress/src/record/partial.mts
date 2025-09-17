@@ -32,7 +32,7 @@ export const partial = <
   );
 
   const partialShape =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Object.fromEntries(
       Object.entries(recordType.shape).map(
         ([k, v]) => [k, keysToBeOptional.has(k) ? optional(v) : v] as const,

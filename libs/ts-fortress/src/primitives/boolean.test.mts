@@ -43,39 +43,36 @@ describe('boolean', () => {
       const result = targetType.validate(true);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(true);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(true);
     });
 
     test('falsy case', () => {
       const result = targetType.validate('not a boolean');
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 'not a boolean',
-            expectedType: 'boolean',
-            typeName: 'boolean',
-            message: undefined,
-          },
-        ]);
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: 'not a boolean',
+          expectedType: 'boolean',
+          typeName: 'boolean',
+          message: undefined,
+        },
+      ]);
 
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <boolean>, got <string> type value "not a boolean".',
-        ]);
-      }
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <boolean>, got <string> type value "not a boolean".',
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = false;
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
 

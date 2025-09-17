@@ -26,15 +26,13 @@ describe('record strict composition - simple tests', () => {
       const result = pickedType.validate(dataWithExcess);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        const excessError = result.value.find(
-          (error) =>
-            error.message?.includes(
-              'Excess property "extra" is not allowed',
-            ) === true,
-        );
-        expect(excessError).toBeDefined();
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      const excessError = resultError.find(
+        (error) =>
+          error.message?.includes('Excess property "extra" is not allowed') ===
+          true,
+      );
+      expect(excessError).toBeDefined();
     });
 
     test('pick accepts valid data and fills missing fields', () => {
@@ -44,9 +42,8 @@ describe('record strict composition - simple tests', () => {
       const result = pickedType.validate(validData);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toStrictEqual({ id: '123', name: 'John' });
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toStrictEqual({ id: '123', name: 'John' });
     });
 
     test('pickedType validate returns input as-is for OK cases', () => {
@@ -54,9 +51,8 @@ describe('record strict composition - simple tests', () => {
       const input = { id: '123', name: 'John' };
       const result = pickedType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
 
@@ -70,15 +66,13 @@ describe('record strict composition - simple tests', () => {
       const result = omittedType.validate(dataWithExcess);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        const excessError = result.value.find(
-          (error) =>
-            error.message?.includes(
-              'Excess property "extra" is not allowed',
-            ) === true,
-        );
-        expect(excessError).toBeDefined();
-      }
+      const resultError1 = Result.unwrapErrThrow(result);
+      const excessError = resultError1.find(
+        (error) =>
+          error.message?.includes('Excess property "extra" is not allowed') ===
+          true,
+      );
+      expect(excessError).toBeDefined();
     });
   });
 
@@ -92,15 +86,13 @@ describe('record strict composition - simple tests', () => {
       const result = partialType.validate(dataWithExcess);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        const excessError = result.value.find(
-          (error) =>
-            error.message?.includes(
-              'Excess property "extra" is not allowed',
-            ) === true,
-        );
-        expect(excessError).toBeDefined();
-      }
+      const resultError2 = Result.unwrapErrThrow(result);
+      const excessError = resultError2.find(
+        (error) =>
+          error.message?.includes('Excess property "extra" is not allowed') ===
+          true,
+      );
+      expect(excessError).toBeDefined();
     });
   });
 
@@ -122,9 +114,8 @@ describe('record strict composition - simple tests', () => {
       const input = { id: '123', name: 'John', age: 25 };
       const result = strictRecord.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue2 = Result.unwrapThrow(result);
+      expect(resultValue2).toBe(input); // ✅ same reference
     });
 
     test('permissive record accepts excess properties', () => {
@@ -138,9 +129,8 @@ describe('record strict composition - simple tests', () => {
       const input = { id: '123', name: 'John', age: 25, extra: 'allowed' };
       const result = permissiveRecord.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue3 = Result.unwrapThrow(result);
+      expect(resultValue3).toBe(input); // ✅ same reference
     });
 
     test('pick from strict record rejects excess properties', () => {
@@ -164,9 +154,8 @@ describe('record strict composition - simple tests', () => {
       const input = { id: '123', name: 'John', extra: 'allowed' };
       const result = permissivePicked.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue4 = Result.unwrapThrow(result);
+      expect(resultValue4).toBe(input); // ✅ same reference
     });
   });
 });

@@ -2,6 +2,7 @@ import {
   asNonNegativeFiniteNumber,
   expectType,
   isNonNegativeFiniteNumber,
+  isNumber,
   Result,
 } from 'ts-data-forge';
 import { type TypeOf } from '../../type.mjs';
@@ -21,14 +22,17 @@ describe('nonNegativeFiniteNumber', () => {
     test('truthy case - positive', () => {
       const x: unknown = 123.456;
 
-      if (targetType.is(x)) {
+      const isTarget = targetType.is(x);
+
+      if (isTarget) {
         expectType<typeof x, TargetType>('=');
-        expect(isNonNegativeFiniteNumber(x)).toBe(true);
       } else {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(true);
+      expect(isTarget).toBe(true);
+      assert(isNumber(x));
+      expect(isNonNegativeFiniteNumber(x)).toBe(true);
     });
 
     test('truthy case - zero', () => {
@@ -40,13 +44,15 @@ describe('nonNegativeFiniteNumber', () => {
     test('falsy case - negative', () => {
       const x: unknown = -5.5;
 
-      if (targetType.is(x)) {
+      const isTarget = targetType.is(x);
+
+      if (isTarget) {
         expectType<typeof x, TargetType>('=');
       } else {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(false);
+      expect(isTarget).toBe(false);
     });
 
     test('falsy case - infinity', () => {
@@ -67,39 +73,36 @@ describe('nonNegativeFiniteNumber', () => {
       const result = targetType.validate(789.012);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(789.012);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(789.012);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 123.456;
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - negative', () => {
       const result = targetType.validate(-5.5);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: -5.5,
-            expectedType: 'NonNegativeFiniteNumber',
-            typeName:
-              '">=0" & "> -2^16" & "> -2^32" & ">= -2^15" & ">= -2^31" & "Finite" & not("NaNValue")',
-            message: undefined,
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <NonNegativeFiniteNumber>, got <number> type value `-5.5`.',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: -5.5,
+          expectedType: 'NonNegativeFiniteNumber',
+          typeName:
+            '">=0" & "> -2^16" & "> -2^32" & ">= -2^15" & ">= -2^31" & "Finite" & not("NaNValue")',
+          message: undefined,
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <NonNegativeFiniteNumber>, got <number> type value `-5.5`.',
+      ]);
     });
   });
 

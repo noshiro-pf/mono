@@ -26,7 +26,7 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
 
   const typeName = options?.typeName ?? 'key-value-record';
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/consistent-type-assertions
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/consistent-type-assertions
   const defaultValue = {} as T;
 
   const validate: Type<T>['validate'] = (a) => {
@@ -78,13 +78,13 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
       return Result.err(errors);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>
     isRecord(a)
-      ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (Object.fromEntries(
           Object.entries(a).filter(
             ([k, v]) => keyType.is(k) && valueType.is(v),

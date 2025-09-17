@@ -43,39 +43,36 @@ describe('bigint', () => {
       const result = targetType.validate(456n);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(456n);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(456n);
     });
 
     test('falsy case', () => {
       const result = targetType.validate(123);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 123,
-            expectedType: 'bigint',
-            typeName: 'bigint',
-            message: undefined,
-          },
-        ]);
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: 123,
+          expectedType: 'bigint',
+          typeName: 'bigint',
+          message: undefined,
+        },
+      ]);
 
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <bigint>, got <number> type value `123`.',
-        ]);
-      }
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <bigint>, got <number> type value `123`.',
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 999n;
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
 

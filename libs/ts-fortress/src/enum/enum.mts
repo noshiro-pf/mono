@@ -22,13 +22,13 @@ export const enumType = <const Values extends NonEmptyArray<Primitive>>(
 
   const defaultValue =
     options?.defaultValue ??
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (values[0] as ArrayElement<Values>);
 
   const validate: Type<T>['validate'] = (a) =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     valueSet.has(a as Primitive)
-      ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Result.ok(a as T)
       : Result.err([
           {

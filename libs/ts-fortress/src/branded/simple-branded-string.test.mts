@@ -44,38 +44,35 @@ describe('simpleBrandedString', () => {
         const input = 'john_doe';
         const result = userNameType.validate(input);
         expect(Result.isOk(result)).toBe(true);
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(input); // ✅ same reference
-        }
+        const resultValue = Result.unwrapThrow(result);
+        expect(resultValue).toBe(input); // ✅ same reference
       });
 
       test('succeeds for valid strings', () => {
         const result = userNameType.validate('john_doe');
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          expect(result.value).toBe('john_doe');
-        }
+        const resultValue1 = Result.unwrapThrow(result);
+        expect(resultValue1).toBe('john_doe');
       });
 
       test('fails for non-strings', () => {
         const result = userNameType.validate(42);
         expect(Result.isErr(result)).toBe(true);
 
-        if (Result.isErr(result)) {
-          expect(result.value).toStrictEqual([
-            {
-              path: [],
-              actualValue: 42,
-              expectedType: 'string',
-              typeName: 'string',
-              message: undefined,
-            },
-          ]);
-          expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected <string>, got <number> type value `42`.',
-          ]);
-        }
+        const resultError = Result.unwrapErrThrow(result);
+        expect(resultError).toStrictEqual([
+          {
+            path: [],
+            actualValue: 42,
+            expectedType: 'string',
+            typeName: 'string',
+            message: undefined,
+          },
+        ]);
+        expect(validationErrorsToMessages(resultError)).toStrictEqual([
+          'Expected <string>, got <number> type value `42`.',
+        ]);
       });
     });
 
@@ -120,38 +117,35 @@ describe('simpleBrandedString', () => {
         const input = 'technology';
         const result = categoryType.validate(input);
         expect(Result.isOk(result)).toBe(true);
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(input); // ✅ same reference
-        }
+        const resultValue2 = Result.unwrapThrow(result);
+        expect(resultValue2).toBe(input); // ✅ same reference
       });
 
       test('succeeds for valid strings', () => {
         const result = categoryType.validate('technology');
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          expect(result.value).toBe('technology');
-        }
+        const resultValue3 = Result.unwrapThrow(result);
+        expect(resultValue3).toBe('technology');
       });
 
       test('fails for non-strings', () => {
         const result = categoryType.validate(null);
         expect(Result.isErr(result)).toBe(true);
 
-        if (Result.isErr(result)) {
-          expect(result.value).toStrictEqual([
-            {
-              path: [],
-              actualValue: null,
-              expectedType: 'string',
-              typeName: 'string',
-              message: undefined,
-            },
-          ]);
-          expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected <string>, got <object> type value `null`.',
-          ]);
-        }
+        const resultError1 = Result.unwrapErrThrow(result);
+        expect(resultError1).toStrictEqual([
+          {
+            path: [],
+            actualValue: null,
+            expectedType: 'string',
+            typeName: 'string',
+            message: undefined,
+          },
+        ]);
+        expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+          'Expected <string>, got <object> type value `null`.',
+        ]);
       });
     });
 
@@ -175,14 +169,16 @@ describe('simpleBrandedString', () => {
     test('type narrowing works correctly', () => {
       const x: unknown = 'user@example.com';
 
-      if (emailType.is(x)) {
+      const isEmail = emailType.is(x);
+
+      if (isEmail) {
         expectType<typeof x, Brand<string, 'Email'>>('=');
-        expect(x).toBe('user@example.com');
       } else {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(emailType.is(x)).toBe(true);
+      expect(isEmail).toBe(true);
+      expect(x).toBe('user@example.com');
     });
   });
 

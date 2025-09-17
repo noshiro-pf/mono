@@ -23,7 +23,7 @@ export const intRange = <Start extends Int8 | -128, End extends Int8 | 128>({
 
   const defaultValue: T =
     options.defaultValue ??
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (start as T);
 
   const validate: Type<T>['validate'] = (a) => {
@@ -39,7 +39,7 @@ export const intRange = <Start extends Int8 | -128, End extends Int8 | 128>({
       ]);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return Result.ok(a as T);
   };
 

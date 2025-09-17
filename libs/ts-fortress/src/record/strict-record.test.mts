@@ -40,22 +40,20 @@ describe('strictRecord', () => {
       const result = userType.validate(validUser);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expectType<typeof result.value, User>('=');
-        expect(result.value).toStrictEqual({
-          name: 'John',
-          age: 30,
-        });
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expectType<typeof resultValue, User>('=');
+      expect(resultValue).toStrictEqual({
+        name: 'John',
+        age: 30,
+      });
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = { name: 'John', age: 30 };
       const result = userType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - excess properties', () => {
@@ -64,20 +62,19 @@ describe('strictRecord', () => {
       const result = userType.validate(userWithExtra);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: ['extra'],
-            actualValue: 'not allowed',
-            expectedType: '{ name: string, age: number }',
-            typeName: '{ name: string, age: number }',
-            message: 'Excess property "extra" is not allowed',
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Excess property "extra" is not allowed at extra',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: ['extra'],
+          actualValue: 'not allowed',
+          expectedType: '{ name: string, age: number }',
+          typeName: '{ name: string, age: number }',
+          message: 'Excess property "extra" is not allowed',
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Excess property "extra" is not allowed at extra',
+      ]);
     });
 
     test('falsy case - invalid property type', () => {
@@ -86,17 +83,16 @@ describe('strictRecord', () => {
       const result = userType.validate(invalidUser);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: ['age'],
-            actualValue: 'thirty',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-        ]);
-      }
+      const resultError1 = Result.unwrapErrThrow(result);
+      expect(resultError1).toStrictEqual([
+        {
+          path: ['age'],
+          actualValue: 'thirty',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+      ]);
     });
 
     test('falsy case - missing required property', () => {
@@ -105,17 +101,16 @@ describe('strictRecord', () => {
       const result = userType.validate(incompleteUser);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: ['age'],
-            actualValue: incompleteUser,
-            expectedType: '{ name: string, age: number }',
-            typeName: '{ name: string, age: number }',
-            message: 'Missing required key "age"',
-          },
-        ]);
-      }
+      const resultError2 = Result.unwrapErrThrow(result);
+      expect(resultError2).toStrictEqual([
+        {
+          path: ['age'],
+          actualValue: incompleteUser,
+          expectedType: '{ name: string, age: number }',
+          typeName: '{ name: string, age: number }',
+          message: 'Missing required key "age"',
+        },
+      ]);
     });
   });
 
@@ -161,10 +156,9 @@ describe('strictRecord', () => {
       });
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value[0]?.expectedType).toBe('User');
-        expect(result.value[0]?.typeName).toBe('User');
-      }
+      const resultError3 = Result.unwrapErrThrow(result);
+      expect(resultError3[0]?.expectedType).toBe('User');
+      expect(resultError3[0]?.typeName).toBe('User');
     });
   });
 

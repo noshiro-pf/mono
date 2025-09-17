@@ -31,7 +31,7 @@ describe('validation-error formatting details', () => {
   });
 
   test('non-string actual value omitted when too long for unknownToString', () => {
-    const bigNumber = 123456789012345678901; // length > 10 as string
+    const bigNumber = 123_456_789_012_345_678_901; // length > 10 as string
     const msg = validationErrorToMessage(
       {
         path: ['p'],

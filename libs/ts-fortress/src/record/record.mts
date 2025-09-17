@@ -36,7 +36,7 @@ export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
   const allowExcessProperties = options?.allowExcessProperties ?? true;
 
   const defaultValue: Type<T>['defaultValue'] =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Object.fromEntries(
       Object.entries(shape).map(([key, value]) => tp(key, value.defaultValue)),
     ) as T;
@@ -102,13 +102,13 @@ export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
       return Result.err(defaultErrors);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>
     isRecord(a)
-      ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (Object.fromEntries(
           Object.entries(shape).map(([k, v]) =>
             tp(k, Object.hasOwn(a, k) ? v.fill(a[k]) : v.defaultValue),

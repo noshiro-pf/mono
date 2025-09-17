@@ -10,8 +10,8 @@
   },
   "include": [
     "./src",
-    "./samples",
     "./test",
+    "./samples",
     "./scripts",
     "./configs",
     "./release.config.js",

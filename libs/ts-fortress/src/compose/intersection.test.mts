@@ -85,56 +85,53 @@ describe('intersection', () => {
         >('=');
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          expect(result.value).toStrictEqual({ x: 0, y: 1, z: 2, w: 3 });
-        }
+        const resultValue = Result.unwrapThrow(result);
+        expect(resultValue).toStrictEqual({ x: 0, y: 1, z: 2, w: 3 });
       });
 
       test('validate returns input as-is for OK cases', () => {
         const input = { x: 0, y: 1, z: 2, w: 3 };
         const result = targetType.validate(input);
         expect(Result.isOk(result)).toBe(true);
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(input); // ✅ same reference
-        }
+        const resultValue1 = Result.unwrapThrow(result);
+        expect(resultValue1).toBe(input); // ✅ same reference
       });
 
       test('falsy case', () => {
         const result = targetType.validate({ x: 0, y: 1 });
         expect(Result.isErr(result)).toBe(true);
 
-        if (Result.isErr(result)) {
-          expect(result.value).toStrictEqual([
-            {
-              path: [],
-              actualValue: { x: 0, y: 1 },
-              expectedType:
-                '({ x: number, y: number } & { z: number, w: number })',
-              typeName: '({ x: number, y: number } & { z: number, w: number })',
-              message:
-                'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
-            },
-            {
-              path: ['z'],
-              actualValue: { x: 0, y: 1 },
-              expectedType: '{ z: number, w: number }',
-              typeName: '{ z: number, w: number }',
-              message: 'Missing required key "z"',
-            },
-            {
-              path: ['w'],
-              actualValue: { x: 0, y: 1 },
-              expectedType: '{ z: number, w: number }',
-              typeName: '{ z: number, w: number }',
-              message: 'Missing required key "w"',
-            },
-          ]);
-          expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
-            'Missing required key "z" at z',
-            'Missing required key "w" at w',
-          ]);
-        }
+        const resultError = Result.unwrapErrThrow(result);
+        expect(resultError).toStrictEqual([
+          {
+            path: [],
+            actualValue: { x: 0, y: 1 },
+            expectedType:
+              '({ x: number, y: number } & { z: number, w: number })',
+            typeName: '({ x: number, y: number } & { z: number, w: number })',
+            message:
+              'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
+          },
+          {
+            path: ['z'],
+            actualValue: { x: 0, y: 1 },
+            expectedType: '{ z: number, w: number }',
+            typeName: '{ z: number, w: number }',
+            message: 'Missing required key "z"',
+          },
+          {
+            path: ['w'],
+            actualValue: { x: 0, y: 1 },
+            expectedType: '{ z: number, w: number }',
+            typeName: '{ z: number, w: number }',
+            message: 'Missing required key "w"',
+          },
+        ]);
+        expect(validationErrorsToMessages(resultError)).toStrictEqual([
+          'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
+          'Missing required key "z" at z',
+          'Missing required key "w" at w',
+        ]);
       });
     });
 
@@ -197,64 +194,61 @@ describe('intersection', () => {
         >('=');
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(0);
-        }
+        const resultValue2 = Result.unwrapThrow(result);
+        expect(resultValue2).toBe(0);
       });
 
       test('validate returns input as-is for OK cases', () => {
         const input = 0;
         const result = targetType.validate(input);
         expect(Result.isOk(result)).toBe(true);
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(input); // ✅ same reference
-        }
+        const resultValue3 = Result.unwrapThrow(result);
+        expect(resultValue3).toBe(input); // ✅ same reference
       });
 
       test('falsy case', () => {
         const result = targetType.validate('aaa');
         expect(Result.isErr(result)).toBe(true);
 
-        if (Result.isErr(result)) {
-          expect(result.value).toStrictEqual([
-            {
-              path: [],
-              actualValue: 'aaa',
-              expectedType: '(number & number)',
-              message:
-                'The type of value is expected to match all types of { number, number }',
-              typeName: '(number & number)',
-            },
-            {
-              path: [],
-              actualValue: 'aaa',
-              expectedType: 'number',
-              typeName: 'number',
-              message: undefined,
-            },
-            {
-              path: [],
-              actualValue: 'aaa',
-              expectedType: '(number & number)',
-              message:
-                'The type of value is expected to match all types of { number, number }',
-              typeName: '(number & number)',
-            },
-            {
-              path: [],
-              actualValue: 'aaa',
-              expectedType: 'number',
-              typeName: 'number',
-              message: undefined,
-            },
-          ]);
-          expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'The type of value is expected to match all types of { number, number }',
-            'Expected <number>, got <string> type value "aaa".',
-            'The type of value is expected to match all types of { number, number }',
-            'Expected <number>, got <string> type value "aaa".',
-          ]);
-        }
+        const resultError1 = Result.unwrapErrThrow(result);
+        expect(resultError1).toStrictEqual([
+          {
+            path: [],
+            actualValue: 'aaa',
+            expectedType: '(number & number)',
+            message:
+              'The type of value is expected to match all types of { number, number }',
+            typeName: '(number & number)',
+          },
+          {
+            path: [],
+            actualValue: 'aaa',
+            expectedType: 'number',
+            typeName: 'number',
+            message: undefined,
+          },
+          {
+            path: [],
+            actualValue: 'aaa',
+            expectedType: '(number & number)',
+            message:
+              'The type of value is expected to match all types of { number, number }',
+            typeName: '(number & number)',
+          },
+          {
+            path: [],
+            actualValue: 'aaa',
+            expectedType: 'number',
+            typeName: 'number',
+            message: undefined,
+          },
+        ]);
+        expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+          'The type of value is expected to match all types of { number, number }',
+          'Expected <number>, got <string> type value "aaa".',
+          'The type of value is expected to match all types of { number, number }',
+          'Expected <number>, got <string> type value "aaa".',
+        ]);
       });
     });
 
@@ -332,65 +326,62 @@ describe('intersection', () => {
         >('=');
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(3);
-        }
+        const resultValue4 = Result.unwrapThrow(result);
+        expect(resultValue4).toBe(3);
       });
 
       test('validate returns input as-is for OK cases', () => {
         const input = 3;
         const result = targetType.validate(input);
         expect(Result.isOk(result)).toBe(true);
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(input); // ✅ same reference
-        }
+        const resultValue5 = Result.unwrapThrow(result);
+        expect(resultValue5).toBe(input); // ✅ same reference
       });
 
       test('falsy case', () => {
         const result = targetType.validate(7);
         expect(Result.isErr(result)).toBe(true);
 
-        if (Result.isErr(result)) {
-          expect(result.value).toStrictEqual([
-            {
-              path: [],
-              actualValue: 7,
-              expectedType: '(uintRange(0, 5) & uintRange(1, 7))',
-              message:
-                'The type of value is expected to match all types of { uintRange(0, 5), uintRange(1, 7) }',
-              typeName: '(uintRange(0, 5) & uintRange(1, 7))',
-            },
-            {
-              path: [],
-              actualValue: 7,
-              expectedType: 'uintRange(0, 5)',
-              message: 'The value is expected to be an integer between 0 and 4',
-              typeName: 'uintRange(0, 5)',
-            },
-            {
-              path: [],
-              actualValue: 7,
-              expectedType: '(uintRange(0, 5) & uintRange(1, 7))',
-              message:
-                'The type of value is expected to match all types of { uintRange(0, 5), uintRange(1, 7) }',
-              typeName: '(uintRange(0, 5) & uintRange(1, 7))',
-            },
-            {
-              path: [],
-              actualValue: 7,
-              expectedType: 'uintRange(1, 7)',
-              message: 'The value is expected to be an integer between 1 and 6',
-              typeName: 'uintRange(1, 7)',
-            },
-          ]);
+        const resultError2 = Result.unwrapErrThrow(result);
+        expect(resultError2).toStrictEqual([
+          {
+            path: [],
+            actualValue: 7,
+            expectedType: '(uintRange(0, 5) & uintRange(1, 7))',
+            message:
+              'The type of value is expected to match all types of { uintRange(0, 5), uintRange(1, 7) }',
+            typeName: '(uintRange(0, 5) & uintRange(1, 7))',
+          },
+          {
+            path: [],
+            actualValue: 7,
+            expectedType: 'uintRange(0, 5)',
+            message: 'The value is expected to be an integer between 0 and 4',
+            typeName: 'uintRange(0, 5)',
+          },
+          {
+            path: [],
+            actualValue: 7,
+            expectedType: '(uintRange(0, 5) & uintRange(1, 7))',
+            message:
+              'The type of value is expected to match all types of { uintRange(0, 5), uintRange(1, 7) }',
+            typeName: '(uintRange(0, 5) & uintRange(1, 7))',
+          },
+          {
+            path: [],
+            actualValue: 7,
+            expectedType: 'uintRange(1, 7)',
+            message: 'The value is expected to be an integer between 1 and 6',
+            typeName: 'uintRange(1, 7)',
+          },
+        ]);
 
-          expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'The type of value is expected to match all types of { uintRange(0, 5), uintRange(1, 7) }',
-            'The value is expected to be an integer between 0 and 4',
-            'The type of value is expected to match all types of { uintRange(0, 5), uintRange(1, 7) }',
-            'The value is expected to be an integer between 1 and 6',
-          ]);
-        }
+        expect(validationErrorsToMessages(resultError2)).toStrictEqual([
+          'The type of value is expected to match all types of { uintRange(0, 5), uintRange(1, 7) }',
+          'The value is expected to be an integer between 0 and 4',
+          'The type of value is expected to match all types of { uintRange(0, 5), uintRange(1, 7) }',
+          'The value is expected to be an integer between 1 and 6',
+        ]);
       });
     });
 

@@ -9,7 +9,7 @@ export const keyof = <const R extends ReadonlyRecord<string, Type<unknown>>>(
     typeName: string;
   }>,
 ): KeyofType<R> =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   pipe(getKeys(recordType)).map((keys) =>
     Arr.isNonEmpty(keys)
       ? (enumType(keys, {
@@ -21,7 +21,7 @@ export const keyof = <const R extends ReadonlyRecord<string, Type<unknown>>>(
 const getKeys = <const R extends ReadonlyRecord<string, Type<unknown>>>(
   recordType: RecordType<R>,
 ): readonly ToString<keyof R>[] =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   Object.keys(recordType.shape) satisfies string[] as ToString<keyof R>[];
 
 type KeyofTypeSub<R extends ReadonlyRecord<string, Type<unknown>>> = Type<

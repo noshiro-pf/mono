@@ -71,13 +71,12 @@ describe('omit', () => {
       const result = ym.validate(x);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expectType<typeof result.value, Ym>('=');
-        expect(result.value).toStrictEqual({
-          year: 2000,
-          month: 12,
-        });
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expectType<typeof resultValue, Ym>('=');
+      expect(resultValue).toStrictEqual({
+        year: 2000,
+        month: 12,
+      });
     });
 
     test('validate returns input as-is for OK cases', () => {
@@ -87,9 +86,8 @@ describe('omit', () => {
       };
       const result = ym.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('truthy case with additional keys', () => {
@@ -102,14 +100,13 @@ describe('omit', () => {
       const result = ym.validate(x);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expectType<typeof result.value, Ym>('=');
-        expect(result.value).toStrictEqual({
-          year: 2000,
-          month: 12,
-          aaa: 999,
-        });
-      }
+      const resultValue2 = Result.unwrapThrow(result);
+      expectType<typeof resultValue2, Ym>('=');
+      expect(resultValue2).toStrictEqual({
+        year: 2000,
+        month: 12,
+        aaa: 999,
+      });
     });
 
     test('validate returns input as-is for OK cases with additional keys', () => {
@@ -120,9 +117,8 @@ describe('omit', () => {
       };
       const result = ym.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue3 = Result.unwrapThrow(result);
+      expect(resultValue3).toBe(input); // ✅ same reference
     });
 
     test('falsy case', () => {
@@ -134,20 +130,19 @@ describe('omit', () => {
       const result = ym.validate(x);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: ['month'],
-            actualValue: 'ab',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <number> at month, got <string> type value "ab".',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: ['month'],
+          actualValue: 'ab',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <number> at month, got <string> type value "ab".',
+      ]);
     });
   });
 

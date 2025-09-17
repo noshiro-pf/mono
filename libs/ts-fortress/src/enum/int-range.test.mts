@@ -36,26 +36,24 @@ describe('intRange', () => {
     test('ok', () => {
       const result = rng.validate(1);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(1);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(1);
     });
 
     test('error shape and message', () => {
       const result = rng.validate(3);
       expect(Result.isErr(result)).toBe(true);
-      if (Result.isErr(result)) {
-        expect(result.value[0]).toStrictEqual<ValidationError>({
-          path: [],
-          actualValue: 3,
-          expectedType: 'rng',
-          message: 'The value is expected to be an integer between -2 and 2',
-          typeName: 'rng',
-        });
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value is expected to be an integer between -2 and 2',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError[0]).toStrictEqual<ValidationError>({
+        path: [],
+        actualValue: 3,
+        expectedType: 'rng',
+        message: 'The value is expected to be an integer between -2 and 2',
+        typeName: 'rng',
+      });
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'The value is expected to be an integer between -2 and 2',
+      ]);
     });
   });
 

@@ -1,10 +1,10 @@
-import { expectType, isNonZeroSafeInt, Result } from 'ts-data-forge';
+import { expectType, isNonZeroSafeInt, isNumber, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../type.mjs';
 import { validationErrorsToMessages } from '../../utils/index.mjs';
 import { nonZeroSafeInt } from './non-zero-safe-int.mjs';
 
 describe('nonZeroSafeInt', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   const targetType = nonZeroSafeInt(1 as NonZeroSafeInt);
 
   type TargetType = TypeOf<typeof targetType>;
@@ -15,16 +15,19 @@ describe('nonZeroSafeInt', () => {
 
   describe('is', () => {
     test('truthy case - positive', () => {
-      const x: unknown = 123456;
+      const x: unknown = 123_456;
 
-      if (targetType.is(x)) {
+      const isTarget = targetType.is(x);
+
+      if (isTarget) {
         expectType<typeof x, TargetType>('=');
-        expect(isNonZeroSafeInt(x)).toBe(true);
       } else {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(true);
+      expect(isTarget).toBe(true);
+      assert(isNumber(x));
+      expect(isNonZeroSafeInt(x)).toBe(true);
     });
 
     test('truthy case - negative', () => {
@@ -36,13 +39,15 @@ describe('nonZeroSafeInt', () => {
     test('falsy case - zero', () => {
       const x: unknown = 0;
 
-      if (targetType.is(x)) {
+      const isTarget = targetType.is(x);
+
+      if (isTarget) {
         expectType<typeof x, TargetType>('=');
       } else {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(false);
+      expect(isTarget).toBe(false);
     });
 
     test('falsy case - unsafe integer', () => {
@@ -60,49 +65,46 @@ describe('nonZeroSafeInt', () => {
 
   describe('validate', () => {
     test('truthy case', () => {
-      const result = targetType.validate(-789012);
+      const result = targetType.validate(-789_012);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(-789012);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(-789_012);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 123;
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - zero', () => {
       const result = targetType.validate(0);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 0,
-            expectedType: 'NonZeroSafeInt',
-            typeName: '"Finite" & "Int" & "SafeInt" & "!=0" & not("NaNValue")',
-            message: undefined,
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <NonZeroSafeInt>, got <number> type value `0`.',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: 0,
+          expectedType: 'NonZeroSafeInt',
+          typeName: '"Finite" & "Int" & "SafeInt" & "!=0" & not("NaNValue")',
+          message: undefined,
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <NonZeroSafeInt>, got <number> type value `0`.',
+      ]);
     });
   });
 
   describe('cast', () => {
     test('truthy case', () => {
-      const x: unknown = -100000;
+      const x: unknown = -100_000;
 
-      expect(targetType.cast(x)).toBe(-100000);
+      expect(targetType.cast(x)).toBe(-100_000);
     });
 
     test('falsy case', () => {
@@ -114,9 +116,9 @@ describe('nonZeroSafeInt', () => {
 
   describe('fill', () => {
     test('noop', () => {
-      const x: unknown = 456789;
+      const x: unknown = 456_789;
 
-      expect(targetType.fill(x)).toBe(456789);
+      expect(targetType.fill(x)).toBe(456_789);
     });
 
     test('fill with the default value', () => {

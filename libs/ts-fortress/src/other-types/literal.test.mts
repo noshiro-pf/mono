@@ -94,9 +94,8 @@ describe('literal', () => {
         const result = hello.validate(value);
 
         expect(Result.isOk(result)).toBe(true);
-        if (Result.isOk(result)) {
-          expect(result.value).toBe('hello');
-        }
+        const resultValue = Result.unwrapThrow(result);
+        expect(resultValue).toBe('hello');
       });
 
       test('different value', () => {
@@ -104,26 +103,24 @@ describe('literal', () => {
         const result = hello.validate(value);
 
         expect(Result.isErr(result)).toBe(true);
-        if (Result.isErr(result)) {
-          expect(result.value).toStrictEqual([
-            {
-              path: [],
-              actualValue: 'world',
-              expectedType: 'literal("hello")',
-              typeName: 'literal("hello")',
-              message: undefined,
-            },
-          ]);
-        }
+        const resultError = Result.unwrapErrThrow(result);
+        expect(resultError).toStrictEqual([
+          {
+            path: [],
+            actualValue: 'world',
+            expectedType: 'literal("hello")',
+            typeName: 'literal("hello")',
+            message: undefined,
+          },
+        ]);
       });
 
       test('validate returns input as-is for OK cases', () => {
         const input = 'hello';
         const result = hello.validate(input);
         expect(Result.isOk(result)).toBe(true);
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(input); // ✅ same reference
-        }
+        const resultValue1 = Result.unwrapThrow(result);
+        expect(resultValue1).toBe(input); // ✅ same reference
       });
     });
 
@@ -244,9 +241,8 @@ describe('literal', () => {
         const result = literal42.validate(value);
 
         expect(Result.isOk(result)).toBe(true);
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(42);
-        }
+        const resultValue2 = Result.unwrapThrow(result);
+        expect(resultValue2).toBe(42);
       });
 
       test('different value', () => {
@@ -254,26 +250,24 @@ describe('literal', () => {
         const result = literal42.validate(value);
 
         expect(Result.isErr(result)).toBe(true);
-        if (Result.isErr(result)) {
-          expect(result.value).toStrictEqual([
-            {
-              path: [],
-              actualValue: 43,
-              expectedType: 'literal(42)',
-              typeName: 'literal(42)',
-              message: undefined,
-            },
-          ]);
-        }
+        const resultError1 = Result.unwrapErrThrow(result);
+        expect(resultError1).toStrictEqual([
+          {
+            path: [],
+            actualValue: 43,
+            expectedType: 'literal(42)',
+            typeName: 'literal(42)',
+            message: undefined,
+          },
+        ]);
       });
 
       test('validate returns input as-is for OK cases', () => {
         const input = 42;
         const result = literal42.validate(input);
         expect(Result.isOk(result)).toBe(true);
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(input); // ✅ same reference
-        }
+        const resultValue3 = Result.unwrapThrow(result);
+        expect(resultValue3).toBe(input); // ✅ same reference
       });
     });
   });
@@ -328,60 +322,56 @@ describe('literal', () => {
         const result = targetType.validate(42n);
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(42n);
-        }
+        const resultValue4 = Result.unwrapThrow(result);
+        expect(resultValue4).toBe(42n);
       });
 
       test('falsy case - different bigint', () => {
         const result = targetType.validate(99n);
         expect(Result.isErr(result)).toBe(true);
 
-        if (Result.isErr(result)) {
-          expect(result.value).toStrictEqual([
-            {
-              path: [],
-              actualValue: 99n,
-              expectedType: 'literal(42n)',
-              typeName: 'literal(42n)',
-              message: undefined,
-            },
-          ]);
+        const resultError2 = Result.unwrapErrThrow(result);
+        expect(resultError2).toStrictEqual([
+          {
+            path: [],
+            actualValue: 99n,
+            expectedType: 'literal(42n)',
+            typeName: 'literal(42n)',
+            message: undefined,
+          },
+        ]);
 
-          expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected <literal(42n)>, got <bigint> type value `99`.',
-          ]);
-        }
+        expect(validationErrorsToMessages(resultError2)).toStrictEqual([
+          'Expected <literal(42n)>, got <bigint> type value `99`.',
+        ]);
       });
 
       test('falsy case - non-bigint', () => {
         const result = targetType.validate('not a bigint');
         expect(Result.isErr(result)).toBe(true);
 
-        if (Result.isErr(result)) {
-          expect(result.value).toStrictEqual([
-            {
-              path: [],
-              actualValue: 'not a bigint',
-              expectedType: 'literal(42n)',
-              typeName: 'literal(42n)',
-              message: undefined,
-            },
-          ]);
+        const resultError3 = Result.unwrapErrThrow(result);
+        expect(resultError3).toStrictEqual([
+          {
+            path: [],
+            actualValue: 'not a bigint',
+            expectedType: 'literal(42n)',
+            typeName: 'literal(42n)',
+            message: undefined,
+          },
+        ]);
 
-          expect(validationErrorsToMessages(result.value)).toStrictEqual([
-            'Expected <literal(42n)>, got <string> type value "not a bigint".',
-          ]);
-        }
+        expect(validationErrorsToMessages(resultError3)).toStrictEqual([
+          'Expected <literal(42n)>, got <string> type value "not a bigint".',
+        ]);
       });
 
       test('validate returns input as-is for OK cases', () => {
         const input = 42n;
         const result = targetType.validate(input);
         expect(Result.isOk(result)).toBe(true);
-        if (Result.isOk(result)) {
-          expect(result.value).toBe(input); // ✅ same reference
-        }
+        const resultValue5 = Result.unwrapThrow(result);
+        expect(resultValue5).toBe(input); // ✅ same reference
       });
     });
 
@@ -465,60 +455,56 @@ describe('literal', () => {
           const result = targetType.validate(true);
           expect(Result.isOk(result)).toBe(true);
 
-          if (Result.isOk(result)) {
-            expect(result.value).toBe(true);
-          }
+          const resultValue6 = Result.unwrapThrow(result);
+          expect(resultValue6).toBe(true);
         });
 
         test('falsy case - different boolean', () => {
           const result = targetType.validate(false);
           expect(Result.isErr(result)).toBe(true);
 
-          if (Result.isErr(result)) {
-            expect(result.value).toStrictEqual([
-              {
-                path: [],
-                actualValue: false,
-                expectedType: 'literal(true)',
-                typeName: 'literal(true)',
-                message: undefined,
-              },
-            ]);
+          const resultError4 = Result.unwrapErrThrow(result);
+          expect(resultError4).toStrictEqual([
+            {
+              path: [],
+              actualValue: false,
+              expectedType: 'literal(true)',
+              typeName: 'literal(true)',
+              message: undefined,
+            },
+          ]);
 
-            expect(validationErrorsToMessages(result.value)).toStrictEqual([
-              'Expected <literal(true)>, got <boolean> type value `false`.',
-            ]);
-          }
+          expect(validationErrorsToMessages(resultError4)).toStrictEqual([
+            'Expected <literal(true)>, got <boolean> type value `false`.',
+          ]);
         });
 
         test('falsy case - non-boolean', () => {
           const result = targetType.validate('not a boolean');
           expect(Result.isErr(result)).toBe(true);
 
-          if (Result.isErr(result)) {
-            expect(result.value).toStrictEqual([
-              {
-                path: [],
-                actualValue: 'not a boolean',
-                expectedType: 'literal(true)',
-                typeName: 'literal(true)',
-                message: undefined,
-              },
-            ]);
+          const resultError5 = Result.unwrapErrThrow(result);
+          expect(resultError5).toStrictEqual([
+            {
+              path: [],
+              actualValue: 'not a boolean',
+              expectedType: 'literal(true)',
+              typeName: 'literal(true)',
+              message: undefined,
+            },
+          ]);
 
-            expect(validationErrorsToMessages(result.value)).toStrictEqual([
-              'Expected <literal(true)>, got <string> type value "not a boolean".',
-            ]);
-          }
+          expect(validationErrorsToMessages(resultError5)).toStrictEqual([
+            'Expected <literal(true)>, got <string> type value "not a boolean".',
+          ]);
         });
 
         test('validate returns input as-is for OK cases', () => {
           const input = true;
           const result = targetType.validate(input);
           expect(Result.isOk(result)).toBe(true);
-          if (Result.isOk(result)) {
-            expect(result.value).toBe(input); // ✅ same reference
-          }
+          const resultValue7 = Result.unwrapThrow(result);
+          expect(resultValue7).toBe(input); // ✅ same reference
         });
       });
 
@@ -581,39 +567,36 @@ describe('literal', () => {
           const result = targetType.validate(false);
           expect(Result.isOk(result)).toBe(true);
 
-          if (Result.isOk(result)) {
-            expect(result.value).toBe(false);
-          }
+          const resultValue8 = Result.unwrapThrow(result);
+          expect(resultValue8).toBe(false);
         });
 
         test('falsy case - different boolean', () => {
           const result = targetType.validate(true);
           expect(Result.isErr(result)).toBe(true);
 
-          if (Result.isErr(result)) {
-            expect(result.value).toStrictEqual([
-              {
-                path: [],
-                actualValue: true,
-                expectedType: 'literal(false)',
-                typeName: 'literal(false)',
-                message: undefined,
-              },
-            ]);
+          const resultError6 = Result.unwrapErrThrow(result);
+          expect(resultError6).toStrictEqual([
+            {
+              path: [],
+              actualValue: true,
+              expectedType: 'literal(false)',
+              typeName: 'literal(false)',
+              message: undefined,
+            },
+          ]);
 
-            expect(validationErrorsToMessages(result.value)).toStrictEqual([
-              'Expected <literal(false)>, got <boolean> type value `true`.',
-            ]);
-          }
+          expect(validationErrorsToMessages(resultError6)).toStrictEqual([
+            'Expected <literal(false)>, got <boolean> type value `true`.',
+          ]);
         });
 
         test('validate returns input as-is for OK cases', () => {
           const input = false;
           const result = targetType.validate(input);
           expect(Result.isOk(result)).toBe(true);
-          if (Result.isOk(result)) {
-            expect(result.value).toBe(input); // ✅ same reference
-          }
+          const resultValue9 = Result.unwrapThrow(result);
+          expect(resultValue9).toBe(input); // ✅ same reference
         });
       });
 

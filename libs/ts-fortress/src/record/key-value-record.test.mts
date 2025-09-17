@@ -65,13 +65,12 @@ describe('keyValueRecord', () => {
       >('=');
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toStrictEqual({
-          year: 2000,
-          month: 12,
-          date: 25,
-        });
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toStrictEqual({
+        year: 2000,
+        month: 12,
+        date: 25,
+      });
     });
 
     test('validate returns input as-is for OK cases', () => {
@@ -82,9 +81,8 @@ describe('keyValueRecord', () => {
       };
       const result = strNumRecord.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case', () => {
@@ -97,44 +95,43 @@ describe('keyValueRecord', () => {
       const result = strNumRecord.validate(x);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 'ab',
-            expectedType: 'key-value-record',
-            typeName: 'key-value-record',
-            message: 'The value of the record is expected to be <number>',
-          },
-          {
-            path: ['month'],
-            actualValue: 'ab',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-          {
-            path: [],
-            actualValue: 'cd',
-            expectedType: 'key-value-record',
-            typeName: 'key-value-record',
-            message: 'The value of the record is expected to be <number>',
-          },
-          {
-            path: ['date'],
-            actualValue: 'cd',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'The value of the record is expected to be <number>',
-          'Expected <number> at month, got <string> type value "ab".',
-          'The value of the record is expected to be <number>',
-          'Expected <number> at date, got <string> type value "cd".',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: 'ab',
+          expectedType: 'key-value-record',
+          typeName: 'key-value-record',
+          message: 'The value of the record is expected to be <number>',
+        },
+        {
+          path: ['month'],
+          actualValue: 'ab',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+        {
+          path: [],
+          actualValue: 'cd',
+          expectedType: 'key-value-record',
+          typeName: 'key-value-record',
+          message: 'The value of the record is expected to be <number>',
+        },
+        {
+          path: ['date'],
+          actualValue: 'cd',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'The value of the record is expected to be <number>',
+        'Expected <number> at month, got <string> type value "ab".',
+        'The value of the record is expected to be <number>',
+        'Expected <number> at date, got <string> type value "cd".',
+      ]);
     });
   });
 

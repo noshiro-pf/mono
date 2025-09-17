@@ -84,9 +84,8 @@ describe('tuple', () => {
       );
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toStrictEqual([{ x: 1, y: 2 }, 3, '2']);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toStrictEqual([{ x: 1, y: 2 }, 3, '2']);
     });
 
     test('falsy case - not array', () => {
@@ -95,17 +94,16 @@ describe('tuple', () => {
       const result = targetType.validate(x);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 'not an array',
-            expectedType: 'array',
-            typeName: 'tuple',
-            message: undefined,
-          },
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: 'not an array',
+          expectedType: 'array',
+          typeName: 'tuple',
+          message: undefined,
+        },
+      ]);
     });
 
     test('falsy case - wrong length', () => {
@@ -114,18 +112,17 @@ describe('tuple', () => {
       const result = targetType.validate(x);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: x,
-            expectedType: 'tuple',
-            typeName: 'tuple',
-            message:
-              'The length of tuple is expected to be 3, but it is actually 1',
-          },
-        ]);
-      }
+      const resultError1 = Result.unwrapErrThrow(result);
+      expect(resultError1).toStrictEqual([
+        {
+          path: [],
+          actualValue: x,
+          expectedType: 'tuple',
+          typeName: 'tuple',
+          message:
+            'The length of tuple is expected to be 3, but it is actually 1',
+        },
+      ]);
     });
 
     test('falsy case - element validation errors', () => {
@@ -134,42 +131,40 @@ describe('tuple', () => {
       const result = targetType.validate(x);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: ['0', 'x'],
-            actualValue: 'str',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-          {
-            path: ['0', 'y'],
-            actualValue: 'str',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-        ]);
+      const resultError2 = Result.unwrapErrThrow(result);
+      expect(resultError2).toStrictEqual([
+        {
+          path: ['0', 'x'],
+          actualValue: 'str',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+        {
+          path: ['0', 'y'],
+          actualValue: 'str',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+      ]);
 
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <number> at 0.x, got <string> type value "str".',
-          'Expected <number> at 0.y, got <string> type value "str".',
-        ]);
-      }
+      expect(validationErrorsToMessages(resultError2)).toStrictEqual([
+        'Expected <number> at 0.x, got <string> type value "str".',
+        'Expected <number> at 0.y, got <string> type value "str".',
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = [{ x: 5, y: 10 }, 3, '2'];
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        // Note: tuple validation may create new arrays for type safety
-        // so we check for structural equality rather than reference equality
-        expect(result.value).toStrictEqual(input);
-        // For tuples, the inner objects should maintain reference equality
-        expect(result.value[0]).toBe(input[0]); // ✅ same reference for nested objects
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      // Note: tuple validation may create new arrays for type safety
+      // so we check for structural equality rather than reference equality
+      expect(resultValue1).toStrictEqual(input);
+      // For tuples, the inner objects should maintain reference equality
+      expect(resultValue1[0]).toBe(input[0]); // ✅ same reference for nested objects
     });
   });
 

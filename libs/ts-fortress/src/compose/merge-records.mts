@@ -48,7 +48,7 @@ export const mergeRecords = <
       return Result.err(errors);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return Result.ok(a as T);
   };
 
@@ -222,5 +222,5 @@ expectType<
 const mergeRecordValues = <Rs extends readonly UnknownRecord[]>(
   recs: Rs,
 ): Intersection<Rs> =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   recs.reduce((acc, curr) => ({ ...acc, ...curr }), {}) as Intersection<Rs>;

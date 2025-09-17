@@ -14,11 +14,10 @@ describe('bigintLiteral', () => {
     expect(Result.isOk(ten.validate(10n))).toBe(true);
     const res = ten.validate('10');
     expect(Result.isErr(res)).toBe(true);
-    if (Result.isErr(res)) {
-      expect(validationErrorsToMessages(res.value)).toStrictEqual([
-        'Expected <bigintLiteral(10)>, got <string> type value "10".',
-      ]);
-    }
+    const resError = Result.unwrapErrThrow(res);
+    expect(validationErrorsToMessages(resError)).toStrictEqual([
+      'Expected <bigintLiteral(10)>, got <string> type value "10".',
+    ]);
     expect(ten.fill(11n)).toBe(10n);
   });
 });

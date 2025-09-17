@@ -9,6 +9,9 @@ import {
   type ValidationErrorWithMessage,
 } from '../utils/index.mjs';
 
+const isSet = (value: unknown): value is ReadonlySet<unknown> =>
+  Object.prototype.toString.call(value) === '[object Set]';
+
 type SetResultType<T extends Type<unknown>> = ReadonlySet<TypeOf<T>>;
 
 export const SetType = <T extends Type<unknown>>(
@@ -24,7 +27,7 @@ export const SetType = <T extends Type<unknown>>(
   const defaultValue: S = new Set();
 
   const validate: Type<S>['validate'] = (a) => {
-    if (!(a instanceof Set)) {
+    if (!isSet(a)) {
       return Result.err([
         createPrimitiveValidationError({
           actualValue: a,
@@ -35,7 +38,7 @@ export const SetType = <T extends Type<unknown>>(
     }
 
     const errors: readonly ValidationError[] = Arr.generate(function* () {
-      for (const element of (a as ReadonlySet<unknown>).values()) {
+      for (const element of a.values()) {
         const res = elementType.validate(element);
 
         if (Result.isErr(res)) {
@@ -60,7 +63,7 @@ export const SetType = <T extends Type<unknown>>(
   };
 
   const fill: Type<S>['fill'] = (a) =>
-    a instanceof Set
+    isSet(a)
       ? (new Set(Array.from(a.values()).filter((v) => elementType.is(v))) as S)
       : defaultValue;
 

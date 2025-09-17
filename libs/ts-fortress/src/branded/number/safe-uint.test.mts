@@ -1,4 +1,10 @@
-import { asSafeUint, expectType, isSafeUint, Result } from 'ts-data-forge';
+import {
+  asSafeUint,
+  expectType,
+  isNumber,
+  isSafeUint,
+  Result,
+} from 'ts-data-forge';
 import { type TypeOf } from '../../type.mjs';
 import { validationErrorsToMessages } from '../../utils/index.mjs';
 import { safeUint } from './safe-uint.mjs';
@@ -14,16 +20,19 @@ describe('safeUint', () => {
 
   describe('is', () => {
     test('truthy case', () => {
-      const x: unknown = 123456;
+      const x: unknown = 123_456;
 
-      if (targetType.is(x)) {
+      const isTarget = targetType.is(x);
+
+      if (isTarget) {
         expectType<typeof x, TargetType>('=');
-        expect(isSafeUint(x)).toBe(true);
       } else {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(true);
+      expect(isTarget).toBe(true);
+      assert(isNumber(x));
+      expect(isSafeUint(x)).toBe(true);
     });
 
     test('truthy case - zero', () => {
@@ -35,13 +44,15 @@ describe('safeUint', () => {
     test('falsy case - negative', () => {
       const x: unknown = -1;
 
-      if (targetType.is(x)) {
+      const isTarget = targetType.is(x);
+
+      if (isTarget) {
         expectType<typeof x, TargetType>('=');
       } else {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(false);
+      expect(isTarget).toBe(false);
     });
 
     test('falsy case - unsafe integer', () => {
@@ -59,50 +70,47 @@ describe('safeUint', () => {
 
   describe('validate', () => {
     test('truthy case', () => {
-      const result = targetType.validate(789012);
+      const result = targetType.validate(789_012);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(789012);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(789_012);
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = 123456;
+      const input = 123_456;
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - negative', () => {
       const result = targetType.validate(-5);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: -5,
-            expectedType: 'SafeUint',
-            typeName:
-              '"Finite" & "Int" & "SafeInt" & "> -2^16" & "> -2^32" & ">= -2^15" & ">= -2^31" & ">=0" & not("NaNValue")',
-            message: undefined,
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <SafeUint>, got <number> type value `-5`.',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: -5,
+          expectedType: 'SafeUint',
+          typeName:
+            '"Finite" & "Int" & "SafeInt" & "> -2^16" & "> -2^32" & ">= -2^15" & ">= -2^31" & ">=0" & not("NaNValue")',
+          message: undefined,
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <SafeUint>, got <number> type value `-5`.',
+      ]);
     });
   });
 
   describe('cast', () => {
     test('truthy case', () => {
-      const x: unknown = 100000;
+      const x: unknown = 100_000;
 
-      expect(targetType.cast(x)).toBe(100000);
+      expect(targetType.cast(x)).toBe(100_000);
     });
 
     test('falsy case', () => {
@@ -114,9 +122,9 @@ describe('safeUint', () => {
 
   describe('fill', () => {
     test('noop', () => {
-      const x: unknown = 456789;
+      const x: unknown = 456_789;
 
-      expect(targetType.fill(x)).toBe(456789);
+      expect(targetType.fill(x)).toBe(456_789);
     });
 
     test('fill with the default value', () => {

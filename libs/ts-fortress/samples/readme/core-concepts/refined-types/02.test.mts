@@ -27,7 +27,7 @@ const Percentage = t.refine({
 
 const Port = t.refine({
   baseType: t.number(3000),
-  is: (n): n is number => Number.isInteger(n) && 1 <= n && n <= 65535,
+  is: (n): n is number => Number.isInteger(n) && 1 <= n && n <= 65_535,
   defaultValue: 3000,
   typeName: 'Port',
 });

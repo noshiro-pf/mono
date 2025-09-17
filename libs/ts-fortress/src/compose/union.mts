@@ -17,7 +17,7 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
 ): UnionType<Types> => {
   type T = UnionTypeValue<Types>;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   const defaultType = options?.defaultType ?? (types[0] as UnionType<Types>);
 
   const typeNameFilled: string =
@@ -25,7 +25,7 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
 
   const validate: Type<T>['validate'] = (a) =>
     types.some((t) => t.is(a))
-      ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Result.ok(a as T)
       : Result.err([
           {

@@ -6,7 +6,7 @@ While ts-fortress, [Zod](https://github.com/colinhacks/zod), and [io-ts](https:/
 
 **Problem with Zod**: The following code compiles without errors but creates an invalid schema:
 
-```typescript
+```tsx
 import * as z from 'zod';
 
 // ❌ This compiles but is incorrect!
@@ -22,7 +22,7 @@ The above Zod schema will fail at runtime because raw values (`1`, `'string'`) a
 
 **Correct Zod usage** requires remembering to wrap all values:
 
-```typescript
+```tsx
 // ✅ Correct Zod usage
 const SomeObject = z.object({
     key1: z.literal(1),
@@ -32,7 +32,7 @@ const SomeObject = z.object({
 
 **ts-fortress prevents this error at compile time**:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // ❌ TypeScript error - this won't compile!
@@ -59,7 +59,7 @@ const SomeObject = t.record({
 
 **ts-fortress generates deeply readonly types**, promoting immutability and preventing accidental mutations:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 const UserType = t.record({
@@ -96,7 +96,7 @@ user.tags[0] = 'modified';
 
 **In contrast, Zod types are mutable by default**:
 
-```typescript
+```tsx
 import * as z from 'zod';
 
 const UserSchema = z.object({
@@ -129,7 +129,7 @@ user.tags[0] = 'modified';
 
 **In io-ts, Readonly types will generate verbose error messages**:
 
-```typescript
+```tsx
 import * as ioTs from 'io-ts';
 import { PathReporter } from 'io-ts/PathReporter';
 
@@ -177,7 +177,7 @@ This verbosity makes error messages extremely difficult to read and debug in pro
 
 **ts-fortress addresses this issue** by generating clean, actionable error messages without verbose type wrapper details:
 
-```typescript
+```tsx
 import * as tf from 'ts-fortress';
 
 // ts-fortress equivalent clean structure
@@ -203,7 +203,7 @@ assert.equal(
 
 **ts-fortress vs Zod comparison:**
 
-```typescript
+```tsx
 import * as z from 'zod';
 
 // Zod nested readonly equivalent
@@ -254,7 +254,7 @@ While Zod produces cleaner error messages than io-ts and includes helpful visual
 
 #### 1. Keyof Type Mismatch ([Issue #697](https://github.com/gcanti/io-ts/issues/697))
 
-```typescript
+```tsx
 import { isRight } from 'fp-ts/Either';
 import * as t from 'io-ts';
 
@@ -281,7 +281,7 @@ For this reason, the [io-ts documentation](https://github.com/gcanti/io-ts/blob/
 
 **ts-fortress eliminates these problems** by ensuring strict runtime-type consistency:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // ✅ ts-fortress: Runtime and types always match
@@ -315,7 +315,7 @@ assert(t.Result.isOk(U.validate(0))); // ✅ Success - number 0 is accepted
 
 #### 2. Union + Undefined Decode Issues ([Issue #677](https://github.com/gcanti/io-ts/issues/677))
 
-```typescript
+```tsx
 import { isRight } from 'fp-ts/Either';
 import * as t from 'io-ts';
 
@@ -368,7 +368,7 @@ const C = t.partial({
 
 **ts-fortress eliminates these problems** by ensuring strict runtime-type consistency:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // ✅ Complex union types work reliably without unexpected behavior

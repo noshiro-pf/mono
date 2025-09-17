@@ -111,44 +111,43 @@ describe('nested record', () => {
       const result = nestedRecord.validate(x);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: ['xs', '1'],
-            actualValue: 2.2,
-            expectedType: 'Int',
-            typeName: '"Finite" & "Int" & not("NaNValue")',
-            message: undefined,
-          },
-          {
-            path: ['xs', '2'],
-            actualValue: 3.3,
-            expectedType: 'Int',
-            typeName: '"Finite" & "Int" & not("NaNValue")',
-            message: undefined,
-          },
-          {
-            path: ['rec', 'a'],
-            actualValue: 123,
-            expectedType: 'uintRange(0, 11)',
-            typeName: 'uintRange(0, 11)',
-            message: 'The value is expected to be an integer between 0 and 10',
-          },
-          {
-            path: ['rec', 'b'],
-            actualValue: 234,
-            expectedType: 'uintRange(0, 11)',
-            typeName: 'uintRange(0, 11)',
-            message: 'The value is expected to be an integer between 0 and 10',
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <Int> at xs.1, got <number> type value `2.2`.',
-          'Expected <Int> at xs.2, got <number> type value `3.3`.',
-          'The value is expected to be an integer between 0 and 10 at rec.a',
-          'The value is expected to be an integer between 0 and 10 at rec.b',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: ['xs', '1'],
+          actualValue: 2.2,
+          expectedType: 'Int',
+          typeName: '"Finite" & "Int" & not("NaNValue")',
+          message: undefined,
+        },
+        {
+          path: ['xs', '2'],
+          actualValue: 3.3,
+          expectedType: 'Int',
+          typeName: '"Finite" & "Int" & not("NaNValue")',
+          message: undefined,
+        },
+        {
+          path: ['rec', 'a'],
+          actualValue: 123,
+          expectedType: 'uintRange(0, 11)',
+          typeName: 'uintRange(0, 11)',
+          message: 'The value is expected to be an integer between 0 and 10',
+        },
+        {
+          path: ['rec', 'b'],
+          actualValue: 234,
+          expectedType: 'uintRange(0, 11)',
+          typeName: 'uintRange(0, 11)',
+          message: 'The value is expected to be an integer between 0 and 10',
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <Int> at xs.1, got <number> type value `2.2`.',
+        'Expected <Int> at xs.2, got <number> type value `3.3`.',
+        'The value is expected to be an integer between 0 and 10 at rec.a',
+        'The value is expected to be an integer between 0 and 10 at rec.b',
+      ]);
     });
   });
 
@@ -298,28 +297,27 @@ describe('ymd', () => {
 
     expect(Result.isErr(result)).toBe(true);
 
-    if (Result.isErr(result)) {
-      expect(result.value).toStrictEqual([
-        {
-          path: ['month'],
-          actualValue: x,
-          expectedType: '{ year: number, month: number, date: number }',
-          typeName: '{ year: number, month: number, date: number }',
-          message: 'Missing required key "month"',
-        },
-        {
-          path: ['date'],
-          actualValue: x,
-          expectedType: '{ year: number, month: number, date: number }',
-          typeName: '{ year: number, month: number, date: number }',
-          message: 'Missing required key "date"',
-        },
-      ]);
-      expect(validationErrorsToMessages(result.value)).toStrictEqual([
-        'Missing required key "month" at month',
-        'Missing required key "date" at date',
-      ]);
-    }
+    const resultError1 = Result.unwrapErrThrow(result);
+    expect(resultError1).toStrictEqual([
+      {
+        path: ['month'],
+        actualValue: x,
+        expectedType: '{ year: number, month: number, date: number }',
+        typeName: '{ year: number, month: number, date: number }',
+        message: 'Missing required key "month"',
+      },
+      {
+        path: ['date'],
+        actualValue: x,
+        expectedType: '{ year: number, month: number, date: number }',
+        typeName: '{ year: number, month: number, date: number }',
+        message: 'Missing required key "date"',
+      },
+    ]);
+    expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+      'Missing required key "month" at month',
+      'Missing required key "date" at date',
+    ]);
   });
 });
 
@@ -410,14 +408,13 @@ describe('io-ts bug examples - correct behavior in ts-fortress', () => {
 
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          // No unexpected fields added
-          expect(result.value).toStrictEqual({ A: 1 });
+        const resultValue = Result.unwrapThrow(result);
+        // No unexpected fields added
+        expect(resultValue).toStrictEqual({ A: 1 });
 
-          // Type guards behave correctly
-          expect(A.is(result.value)).toBe(true); // Correct
-          expect(B.is(result.value)).toBe(false); // Correct! B requires field B
-        }
+        // Type guards behave correctly
+        expect(A.is(resultValue)).toBe(true); // Correct
+        expect(B.is(resultValue)).toBe(false); // Correct! B requires field B
       }
 
       // Case 2: Consistent validation behavior
@@ -427,18 +424,17 @@ describe('io-ts bug examples - correct behavior in ts-fortress', () => {
 
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          // Correct and consistent result
-          expect(result.value).toStrictEqual({ A: 1 });
+        const resultValue1 = Result.unwrapThrow(result);
+        // Correct and consistent result
+        expect(resultValue1).toStrictEqual({ A: 1 });
 
-          // Type guards work as expected
-          expect(A.is(result.value)).toBe(true); // Correct
-          // Note: In ts-fortress, partial types are more permissive and can accept
-          // objects with additional fields, so C.is() returns true here.
-          // This is different from io-ts behavior and shows ts-fortress's
-          // consistent approach to partial type validation.
-          expect(C.is(result.value)).toBe(true); // ts-fortress allows extra fields in partial
-        }
+        // Type guards work as expected
+        expect(A.is(resultValue1)).toBe(true); // Correct
+        // Note: In ts-fortress, partial types are more permissive and can accept
+        // objects with additional fields, so C.is() returns true here.
+        // This is different from io-ts behavior and shows ts-fortress's
+        // consistent approach to partial type validation.
+        expect(C.is(resultValue1)).toBe(true); // ts-fortress allows extra fields in partial
       }
     });
 
@@ -462,13 +458,12 @@ describe('io-ts bug examples - correct behavior in ts-fortress', () => {
         const result = UnionType.validate({ name: 42, value: 100 });
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          expect(result.value).toStrictEqual({ name: 42, value: 100 });
-          expect(FullRecord.is(result.value)).toBe(true);
-          // Note: In ts-fortress, partial types accept objects with extra fields
-          // so PartialRecord.is() returns true even with the 'value' field
-          expect(PartialRecord.is(result.value)).toBe(true); // ts-fortress partial allows extra fields
-        }
+        const resultValue2 = Result.unwrapThrow(result);
+        expect(resultValue2).toStrictEqual({ name: 42, value: 100 });
+        expect(FullRecord.is(resultValue2)).toBe(true);
+        // Note: In ts-fortress, partial types accept objects with extra fields
+        // so PartialRecord.is() returns true even with the 'value' field
+        expect(PartialRecord.is(resultValue2)).toBe(true); // ts-fortress partial allows extra fields
       }
 
       // Test with data that matches PartialRecord
@@ -476,11 +471,10 @@ describe('io-ts bug examples - correct behavior in ts-fortress', () => {
         const result = UnionType.validate({ name: 42 });
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          expect(result.value).toStrictEqual({ name: 42 });
-          expect(FullRecord.is(result.value)).toBe(false); // Missing 'value' field
-          expect(PartialRecord.is(result.value)).toBe(true);
-        }
+        const resultValue3 = Result.unwrapThrow(result);
+        expect(resultValue3).toStrictEqual({ name: 42 });
+        expect(FullRecord.is(resultValue3)).toBe(false); // Missing 'value' field
+        expect(PartialRecord.is(resultValue3)).toBe(true);
       }
     });
 
@@ -511,11 +505,10 @@ describe('io-ts bug examples - correct behavior in ts-fortress', () => {
         const result = UnionAB.validate(input);
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          expect(result.value).toStrictEqual(input);
-          expect(TypeA.is(result.value)).toBe(true);
-          expect(TypeB.is(result.value)).toBe(false);
-        }
+        const resultValue4 = Result.unwrapThrow(result);
+        expect(resultValue4).toStrictEqual(input);
+        expect(TypeA.is(resultValue4)).toBe(true);
+        expect(TypeB.is(resultValue4)).toBe(false);
       }
 
       // Test TypeB validation
@@ -528,11 +521,10 @@ describe('io-ts bug examples - correct behavior in ts-fortress', () => {
         const result = UnionAB.validate(input);
         expect(Result.isOk(result)).toBe(true);
 
-        if (Result.isOk(result)) {
-          expect(result.value).toStrictEqual(input);
-          expect(TypeA.is(result.value)).toBe(false);
-          expect(TypeB.is(result.value)).toBe(true);
-        }
+        const resultValue5 = Result.unwrapThrow(result);
+        expect(resultValue5).toStrictEqual(input);
+        expect(TypeA.is(resultValue5)).toBe(false);
+        expect(TypeB.is(resultValue5)).toBe(true);
       }
 
       // Test invalid data

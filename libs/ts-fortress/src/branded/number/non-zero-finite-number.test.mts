@@ -1,10 +1,15 @@
-import { expectType, isNonZeroFiniteNumber, Result } from 'ts-data-forge';
+import {
+  expectType,
+  isNonZeroFiniteNumber,
+  isNumber,
+  Result,
+} from 'ts-data-forge';
 import { type TypeOf } from '../../type.mjs';
 import { validationErrorsToMessages } from '../../utils/index.mjs';
 import { nonZeroFiniteNumber } from './non-zero-finite-number.mjs';
 
 describe('nonZeroFiniteNumber', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   const targetType = nonZeroFiniteNumber(1.5 as NonZeroFiniteNumber);
 
   type TargetType = TypeOf<typeof targetType>;
@@ -17,14 +22,17 @@ describe('nonZeroFiniteNumber', () => {
     test('truthy case - positive', () => {
       const x: unknown = 123.456;
 
-      if (targetType.is(x)) {
+      const isTarget = targetType.is(x);
+
+      if (isTarget) {
         expectType<typeof x, TargetType>('=');
-        expect(isNonZeroFiniteNumber(x)).toBe(true);
       } else {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(true);
+      expect(isTarget).toBe(true);
+      assert(isNumber(x));
+      expect(isNonZeroFiniteNumber(x)).toBe(true);
     });
 
     test('truthy case - negative', () => {
@@ -36,13 +44,15 @@ describe('nonZeroFiniteNumber', () => {
     test('falsy case - zero', () => {
       const x: unknown = 0;
 
-      if (targetType.is(x)) {
+      const isTarget = targetType.is(x);
+
+      if (isTarget) {
         expectType<typeof x, TargetType>('=');
       } else {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(false);
+      expect(isTarget).toBe(false);
     });
 
     test('falsy case - infinity', () => {
@@ -63,38 +73,35 @@ describe('nonZeroFiniteNumber', () => {
       const result = targetType.validate(-789.012);
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(-789.012);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(-789.012);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 123.456;
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - zero', () => {
       const result = targetType.validate(0);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: 0,
-            expectedType: 'NonZeroFiniteNumber',
-            typeName: '"!=0" & "Finite" & not("NaNValue")',
-            message: undefined,
-          },
-        ]);
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <NonZeroFiniteNumber>, got <number> type value `0`.',
-        ]);
-      }
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: 0,
+          expectedType: 'NonZeroFiniteNumber',
+          typeName: '"!=0" & "Finite" & not("NaNValue")',
+          message: undefined,
+        },
+      ]);
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected <NonZeroFiniteNumber>, got <number> type value `0`.',
+      ]);
     });
   });
 

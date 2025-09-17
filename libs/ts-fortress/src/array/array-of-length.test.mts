@@ -84,18 +84,16 @@ describe('arrayOfLength', () => {
       expectType<typeof result, Result<Xs, readonly ValidationError[]>>('=');
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toStrictEqual([5, 6, 7, 8]);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toStrictEqual([5, 6, 7, 8]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = [5, 6, 7, 8];
       const result = xs.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case 1', () => {
@@ -104,21 +102,20 @@ describe('arrayOfLength', () => {
       const result = xs.validate(ys);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: [],
-            actualValue: ys,
-            expectedType: 'xs',
-            typeName: 'xs',
-            message: 'Expected array of length 4, got length 0',
-          },
-        ]);
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError).toStrictEqual([
+        {
+          path: [],
+          actualValue: ys,
+          expectedType: 'xs',
+          typeName: 'xs',
+          message: 'Expected array of length 4, got length 0',
+        },
+      ]);
 
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected array of length 4, got length 0',
-        ]);
-      }
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'Expected array of length 4, got length 0',
+      ]);
     });
 
     test('falsy case 2', () => {
@@ -127,29 +124,28 @@ describe('arrayOfLength', () => {
       const result = xs.validate(ys);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual([
-          {
-            path: ['1'],
-            actualValue: '1',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-          {
-            path: ['2'],
-            actualValue: '',
-            expectedType: 'number',
-            typeName: 'number',
-            message: undefined,
-          },
-        ]);
+      const resultError1 = Result.unwrapErrThrow(result);
+      expect(resultError1).toStrictEqual([
+        {
+          path: ['1'],
+          actualValue: '1',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+        {
+          path: ['2'],
+          actualValue: '',
+          expectedType: 'number',
+          typeName: 'number',
+          message: undefined,
+        },
+      ]);
 
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
-          'Expected <number> at 1, got <string> type value "1".',
-          'Expected <number> at 2, got <string> type value "".',
-        ]);
-      }
+      expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+        'Expected <number> at 1, got <string> type value "1".',
+        'Expected <number> at 2, got <string> type value "".',
+      ]);
     });
   });
 

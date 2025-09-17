@@ -39,7 +39,7 @@ pnpm add ts-fortress
 
 ## Quick Start
 
-```typescript
+```tsx
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 
@@ -103,7 +103,7 @@ if (t.Result.isOk(result)) {
 
 One of the key design decisions in ts-fortress is that **all schema types have explicit default values**, which allows for powerful data entry capabilities:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // Every type requires a default value
@@ -177,7 +177,7 @@ assert.deepStrictEqual(
 
 Most ts-fortress types provide sensible defaults automatically, so you rarely need to specify explicit default values:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // Most common types have built-in defaults
@@ -194,7 +194,7 @@ const Schema = t.record({
 
 You only need to specify explicit default values in two cases: when you want custom values, or when using `intersection` types:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // Custom default values
@@ -225,7 +225,7 @@ const ReportStatus = t.intersection(
 
 This is because intersection types can be created from arbitrary types, making it impossible to automatically determine appropriate default values. However, when all constituent types are record types, you can use the `mergeRecords` function to avoid specifying defaults:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // Using mergeRecords for record-only intersections
@@ -259,7 +259,7 @@ For more information, please see [this documentation](_media/why-ts-fortress-ove
 
 If you're coming from io-ts, here's how common patterns translate:
 
-```typescript
+```tsx
 // io-ts style
 import * as t from 'io-ts';
 
@@ -272,7 +272,7 @@ const User = t.type({
 type User = t.TypeOf<typeof User>;
 ```
 
-```typescript
+```tsx
 // ts-fortress style
 import * as t from 'ts-fortress';
 
@@ -297,7 +297,7 @@ Key differences:
 
 Every validator in ts-fortress implements the `Type<A>` interface:
 
-```typescript
+```tsx
 type Type<A> = Readonly<{
     typeName: string; // Human-readable type name
     defaultValue: A; // Default value for this type
@@ -315,7 +315,7 @@ type Type<A> = Readonly<{
 
 The `validate` method performs comprehensive validation and returns a `Result` type. **When validation succeeds, it returns the original input object (same reference)**, preserving object identity:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 const User = t.record({
@@ -357,7 +357,7 @@ assert.deepStrictEqual(t.validationErrorsToMessages(errorResult.value), [
 
 When using `assertIs`, you must assign it to a typed variable with an explicit type annotation due to TypeScript's limitations with assertion functions:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 const numberType = t.number();
@@ -407,7 +407,7 @@ const processUser = (data: unknown): void => {
 
 The `cast` method validates the input and returns it if valid, otherwise **throws an Error** with validation details:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 const Port = t.number(8080);
@@ -434,7 +434,7 @@ See [Default Values and Data Filling](#default-values-and-data-filling)
 
 Every type has a `defaultValue` property that can be used for initialization:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 const User = t.record({
@@ -462,7 +462,7 @@ const UserForm = () => {
 
 ### Primitive Types
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // Basic primitives
@@ -486,7 +486,7 @@ const coordinateType = t.tuple([t.number(), t.number()]);
 
 ### Record Types
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // Define object schemas
@@ -573,7 +573,7 @@ UserSchema.is({
 
 ts-fortress provides the `refine` function to create refined types with custom validation logic while leveraging existing base types:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // Create refined types
@@ -678,7 +678,7 @@ assert.deepStrictEqual(
 
 #### Common Use Cases
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // Domain-specific string types
@@ -706,7 +706,7 @@ const Percentage = t.refine({
 
 const Port = t.refine({
     baseType: t.number(3000),
-    is: (n): n is number => Number.isInteger(n) && 1 <= n && n <= 65535,
+    is: (n): n is number => Number.isInteger(n) && 1 <= n && n <= 65_535,
     defaultValue: 3000,
     typeName: 'Port',
 });
@@ -716,7 +716,7 @@ const Port = t.refine({
 
 ts-fortress provides extensive support for branded types to create domain-specific validation:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // Simple branded types
@@ -743,7 +743,7 @@ if (t.Result.isOk(userIdResult)) {
 
 ### Union and Intersection Types
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // Union types
@@ -777,7 +777,7 @@ const ExtendedUserType = t.mergeRecords([
 
 ### Enums
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 // String enums
@@ -801,7 +801,7 @@ Tips: It is often better to use `uintRange` instead of `enumType` when possible,
 
 ts-fortress uses `Result<T, readonly ValidationError[]>` for structured error handling with detailed error information:
 
-```typescript
+```tsx
 import * as t from 'ts-fortress';
 
 const User = t.record({
@@ -888,7 +888,7 @@ assert.deepStrictEqual(strictResult.value, [
 
 Each validation error provides detailed information:
 
-```typescript
+```tsx
 type ValidationError = Readonly<{
     path: readonly string[];
     actualValue: unknown; // The actual value that failed validation

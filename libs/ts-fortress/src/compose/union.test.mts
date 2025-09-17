@@ -77,38 +77,34 @@ describe('union', () => {
       );
       expect(Result.isOk(result)).toBe(true);
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(3);
-      }
+      const resultValue = Result.unwrapThrow(result);
+      expect(resultValue).toBe(3);
     });
 
     test('falsy case', () => {
       const result = targetType.validate(5);
       expect(Result.isErr(result)).toBe(true);
 
-      if (Result.isErr(result)) {
-        expect(result.value[0]).toStrictEqual({
-          path: [],
-          actualValue: 5,
-          expectedType:
-            '({ x: number, y: number } | literal(3) | literal("2"))',
-          typeName: '({ x: number, y: number } | literal(3) | literal("2"))',
-          message:
-            'The type of value is expected to be one of the elements contained in { { x: number, y: number }, literal(3), literal("2") }',
-        });
-        expect(validationErrorsToMessages(result.value)).toStrictEqual([
+      const resultError = Result.unwrapErrThrow(result);
+      expect(resultError[0]).toStrictEqual({
+        path: [],
+        actualValue: 5,
+        expectedType: '({ x: number, y: number } | literal(3) | literal("2"))',
+        typeName: '({ x: number, y: number } | literal(3) | literal("2"))',
+        message:
           'The type of value is expected to be one of the elements contained in { { x: number, y: number }, literal(3), literal("2") }',
-        ]);
-      }
+      });
+      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        'The type of value is expected to be one of the elements contained in { { x: number, y: number }, literal(3), literal("2") }',
+      ]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = { x: 10, y: 20 };
       const result = targetType.validate(input);
       expect(Result.isOk(result)).toBe(true);
-      if (Result.isOk(result)) {
-        expect(result.value).toBe(input); // ✅ same reference
-      }
+      const resultValue1 = Result.unwrapThrow(result);
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
 
