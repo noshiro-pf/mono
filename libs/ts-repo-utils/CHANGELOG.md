@@ -1,3 +1,9 @@
+# [7.7.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.6.0...v7.7.0) (2025-09-17)
+
+### Features
+
+- define os globally ([#156](https://github.com/noshiro-pf/ts-repo-utils/issues/156)) ([a147b07](https://github.com/noshiro-pf/ts-repo-utils/commit/a147b07ffc2ebb1e30efd2742d2377e36fed68d5))
+
 # [7.6.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.5.0...v7.6.0) (2025-09-17)
 
 ### Features
