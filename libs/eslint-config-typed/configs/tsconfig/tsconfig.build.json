@@ -2,13 +2,13 @@
   "extends": "./tsconfig.type-check.json",
   "compilerOptions": {
     // Emit
+    "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
     "importHelpers": true,
     "importsNotUsedAsValues": "remove",
     "newLine": "lf",
     "noEmit": false,
     "noEmitOnError": true,
-    "allowSyntheticDefaultImports": true,
 
     // Projects
     "incremental": false

@@ -42,7 +42,7 @@ Defined in: [src/rules/eslint-rules.mts:70](https://github.com/noshiro-pf/eslint
 
 Defined in: [src/rules/eslint-rules.mts:3](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-rules.mts#L3)
 
-#### Type declaration
+#### Type Declaration
 
 ##### message
 

@@ -1,4 +1,4 @@
-/** @typedef {import('../src/types/flat-config.mjs').FlatConfig} FlatConfig */
+/** @typedef {import('../../src/types/flat-config.mjs').FlatConfig} FlatConfig */
 
 import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin';
 import typescriptEslintParser from '@typescript-eslint/parser';

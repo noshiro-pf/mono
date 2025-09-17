@@ -2,9 +2,9 @@
 
 import { Result } from 'ts-data-forge';
 import 'ts-repo-utils';
-import { eslintPlugins } from './eslint-plugins.mjs';
-import { generateRulesTypeCore } from './generate-rules-type-core.mjs';
-import { replaceRulesType } from './replace.mjs';
+import { eslintPlugins } from './constants/eslint-plugins.mjs';
+import { generateRulesTypeCore } from './functions/generate-rules-type-core.mjs';
+import { replaceRulesType } from './functions/replace-rules-type.mjs';
 
 const thisDir = import.meta.dirname;
 

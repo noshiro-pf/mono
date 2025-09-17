@@ -1,7 +1,8 @@
-import { Result } from 'ts-data-forge';
 import 'ts-repo-utils';
 
-/** Runs all validation and build steps for the project. */
+/**
+ * Runs all validation and build steps for the project.
+ */
 const checkAll = async (): Promise<void> => {
   echo('Starting full project validation and build...\n');
 
@@ -42,14 +43,21 @@ const checkAll = async (): Promise<void> => {
   echo('8. Generating documentation...');
   await runCmdStep('npm run doc', 'Documentation generation failed');
 
+  // Step 8: Backup repository settings
+  echo('8. Backing up repository settings...');
+  await runCmdStep(
+    'npm run gh:backup-all',
+    'Backing up repository settings failed',
+  );
+
   echo('✅ All checks completed successfully!\n');
 };
 
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
   if (Result.isErr(result)) {
-    echo(`${errorMsg}: ${result.value.message}`);
-    echo('❌ Check failed');
+    console.error(`${errorMsg}: ${result.value.message}`);
+    console.error('❌ Check failed');
     process.exit(1);
   }
 };

@@ -27,11 +27,11 @@ jobs:
           fetch-depth: 0 # To allow semantic-release to parse the entire commit history
           persist-credentials: false
 
-      - name: Set up Node.js 20.x
+      - name: Set up Node.js 24.x
         uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         id: setup_node_id
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
           cache-dependency-path: package-lock.json
 

@@ -9,15 +9,15 @@ import {
   treeShakableRules,
   type Rule,
   type Rules,
-} from '../src/index.mjs';
-import { eslintPlugins } from './eslint-plugins.mjs';
+} from '../../../src/index.mjs';
+import { eslintPlugins } from '../constants/eslint-plugins.mjs';
 import {
   deepCopy,
   deepReplace,
   falseToUndefined,
   toCapitalCase,
   toStr,
-} from './utils/index.mjs';
+} from '../utils/index.mjs';
 
 const isDeprecated = (
   deprecated: boolean | DeepReadonly<DeprecatedInfo> | undefined,

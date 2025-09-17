@@ -14,7 +14,7 @@
 
 Defined in: [src/plugins/tree-shakable/rules/rules.mts:4](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/tree-shakable/rules/rules.mts#L4)
 
-#### Type declaration
+#### Type Declaration
 
 ##### import-star
 

@@ -88,7 +88,7 @@ An object specifying additional objects that should be added to the global scope
 
 An object containing a `parse()` method or a `parseForESLint()` method.
 
-###### Type declaration
+###### Type Declaration
 
 \{ `meta?`: \{ `name?`: `string`; `version?`: `string`; \}; `parseForESLint`: \{ `ast`: `unknown`; `scopeManager?`: `unknown`; `services?`: `unknown`; `visitorKeys?`: `unknown`; \}; \}
 
@@ -204,7 +204,7 @@ The available options are parser-dependent.
 
 > `readonly` `optional` **projectService**: `boolean` \| \{ `allowDefaultProject?`: readonly `string`[]; `defaultProject?`: `string`; `loadTypeScriptPlugins?`: `boolean`; `maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING?`: `number`; \}
 
-###### Type declaration
+###### Type Declaration
 
 `boolean`
 
@@ -312,7 +312,7 @@ Either an object containing `preprocess()` and `postprocess()` methods or
 a string indicating the name of a processor inside of a plugin
 (i.e., `"pluginName/processorName"`).
 
-###### Type declaration
+###### Type Declaration
 
 `string`
 

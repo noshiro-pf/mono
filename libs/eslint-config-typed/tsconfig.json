@@ -5,11 +5,13 @@
   ],
   "compilerOptions": {
     "paths": {
-      "eslint-config-typed": ["./dist/index.mjs"]
+      "eslint-config-typed": ["./src/entry-point.mts"]
     }
   },
   "include": [
     "./src",
+    "./test",
+    "./samples",
     "./scripts",
     "./configs",
     "./release.config.js",

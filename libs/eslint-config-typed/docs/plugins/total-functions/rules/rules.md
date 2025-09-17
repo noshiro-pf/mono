@@ -14,7 +14,7 @@
 
 Defined in: [src/plugins/total-functions/rules/rules.mts:15](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/total-functions/rules/rules.mts#L15)
 
-#### Type declaration
+#### Type Declaration
 
 ##### no-enums
 

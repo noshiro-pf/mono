@@ -527,6 +527,7 @@ This project is licensed under the [Apache License 2.0](_media/LICENSE).
 - [custom-rules](custom-rules.md)
 - [custom-rules/custom](custom-rules/custom.md)
 - [custom-rules/no-restricted-syntax2](custom-rules/no-restricted-syntax2.md)
+- [entry-point](entry-point.md)
 - [globals](globals.md)
 - [plugins](plugins.md)
 - [plugins/total-functions](plugins/total-functions.md)

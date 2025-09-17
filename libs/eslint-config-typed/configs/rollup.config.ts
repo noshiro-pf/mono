@@ -15,7 +15,7 @@ const input = await glob(path.resolve(srcDir, './**/*.mts'), {
   ignore: ['**/*.test.mts', './**/*.d.mts'],
 });
 
-const config = {
+export default {
   input,
   output: {
     format: 'es',
@@ -48,5 +48,3 @@ const config = {
     }),
   ],
 };
-
-export default config;

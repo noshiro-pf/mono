@@ -1,11 +1,11 @@
 import { pipe } from 'ts-data-forge';
-import { eslintPlugins } from './eslint-plugins.mjs';
+import { eslintPlugins } from '../constants/eslint-plugins.mjs';
 import {
   closeBraceRegexp,
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
   replaceWithNoMatchCheckBetweenRegexp,
-} from './utils/index.mjs';
+} from '../utils/index.mjs';
 
 export const replaceRulesType = (src: string, typeName: string): string =>
   pipe(src)
