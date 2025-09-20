@@ -71,7 +71,7 @@
     "@typescript-eslint/parser": "8.43.0",
     "@typescript-eslint/type-utils": "8.43.0",
     "@typescript-eslint/utils": "8.43.0",
-    "eslint": "9.35.0",
+    "eslint": "9.36.0",
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-array-func": "5.0.2",
     "eslint-plugin-cypress": "5.1.1",
