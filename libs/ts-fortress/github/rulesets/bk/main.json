@@ -80,6 +80,10 @@
           {
             "context": "test",
             "integration_id": 15368
+          },
+          {
+            "context": "backup-repository-settings",
+            "integration_id": 15368
           }
         ]
       }
