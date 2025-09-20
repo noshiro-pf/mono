@@ -76,6 +76,10 @@
           {
             "context": "lint-and-build (lint:fix)",
             "integration_id": 15368
+          },
+          {
+            "context": "backup-repository-settings",
+            "integration_id": 15368
           }
         ]
       }
