@@ -20,12 +20,6 @@ Re-exports [mergeRecords](compose/merge-records.md#mergerecords)
 
 ---
 
-### recursion
-
-Re-exports [recursion](compose/recursion.md#recursion)
-
----
-
 ### union
 
 Re-exports [union](compose/union.md#union)

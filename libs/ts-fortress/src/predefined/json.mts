@@ -1,6 +1,7 @@
 import { expectType } from 'ts-data-forge';
 import { array } from '../array/index.mjs';
-import { recursion, union } from '../compose/index.mjs';
+import { union } from '../compose/index.mjs';
+import { recursion } from '../other-types/index.mjs';
 import { boolean, nullType, number, string } from '../primitives/index.mjs';
 import { keyValueRecord } from '../record/index.mjs';
 import { type Type, type TypeOf } from '../type.mjs';

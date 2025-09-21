@@ -20,6 +20,12 @@ Re-exports [MapType](other-types/map.md#maptype)
 
 ---
 
+### recursion
+
+Re-exports [recursion](other-types/recursion.md#recursion)
+
+---
+
 ### refine
 
 Re-exports [refine](other-types/refine.md#refine)

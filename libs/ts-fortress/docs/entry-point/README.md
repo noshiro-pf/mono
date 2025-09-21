@@ -9952,7 +9952,7 @@ Re-exports [booleanLiteral](../primitives/boolean.md#booleanliteral)
 
 ### brand
 
-Re-exports [brand](../branded/brand.md#brand)
+Re-exports [brand](../brand/brand.md#brand)
 
 ---
 
@@ -10000,25 +10000,25 @@ Re-exports [enumType](../enum/enum.md#enumtype)
 
 ### finiteNumber
 
-Re-exports [finiteNumber](../branded/number/finite-number.md#finitenumber)
+Re-exports [finiteNumber](../predefined/brand/number/finite-number.md#finitenumber)
 
 ---
 
 ### int
 
-Re-exports [int](../branded/number/int.md#int)
+Re-exports [int](../predefined/brand/number/int.md#int)
 
 ---
 
 ### int16
 
-Re-exports [int16](../branded/number/int16.md#int16)
+Re-exports [int16](../predefined/brand/number/int16.md#int16)
 
 ---
 
 ### int32
 
-Re-exports [int32](../branded/number/int32.md#int32)
+Re-exports [int32](../predefined/brand/number/int32.md#int32)
 
 ---
 
@@ -10102,25 +10102,25 @@ Re-exports [nonEmptyArray](../array/non-empty-array.md#nonemptyarray)
 
 ### nonNegativeFiniteNumber
 
-Re-exports [nonNegativeFiniteNumber](../branded/number/non-negative-finite-number.md#nonnegativefinitenumber)
+Re-exports [nonNegativeFiniteNumber](../predefined/brand/number/non-negative-finite-number.md#nonnegativefinitenumber)
 
 ---
 
 ### nonZeroFiniteNumber
 
-Re-exports [nonZeroFiniteNumber](../branded/number/non-zero-finite-number.md#nonzerofinitenumber)
+Re-exports [nonZeroFiniteNumber](../predefined/brand/number/non-zero-finite-number.md#nonzerofinitenumber)
 
 ---
 
 ### nonZeroInt
 
-Re-exports [nonZeroInt](../branded/number/non-zero-int.md#nonzeroint)
+Re-exports [nonZeroInt](../predefined/brand/number/non-zero-int.md#nonzeroint)
 
 ---
 
 ### nonZeroSafeInt
 
-Re-exports [nonZeroSafeInt](../branded/number/non-zero-safe-int.md#nonzerosafeint)
+Re-exports [nonZeroSafeInt](../predefined/brand/number/non-zero-safe-int.md#nonzerosafeint)
 
 ---
 
@@ -10204,19 +10204,19 @@ Re-exports [PickedType](../record/pick.md#pickedtype)
 
 ### positiveFiniteNumber
 
-Re-exports [positiveFiniteNumber](../branded/number/positive-finite-number.md#positivefinitenumber)
+Re-exports [positiveFiniteNumber](../predefined/brand/number/positive-finite-number.md#positivefinitenumber)
 
 ---
 
 ### positiveInt
 
-Re-exports [positiveInt](../branded/number/positive-int.md#positiveint)
+Re-exports [positiveInt](../predefined/brand/number/positive-int.md#positiveint)
 
 ---
 
 ### positiveSafeInt
 
-Re-exports [positiveSafeInt](../branded/number/positive-safe-int.md#positivesafeint)
+Re-exports [positiveSafeInt](../predefined/brand/number/positive-safe-int.md#positivesafeint)
 
 ---
 
@@ -10246,7 +10246,7 @@ Re-exports [RecordType](../type/README.md#recordtype)
 
 ### recursion
 
-Re-exports [recursion](../compose/recursion.md#recursion)
+Re-exports [recursion](../other-types/recursion.md#recursion)
 
 ---
 
@@ -10276,13 +10276,13 @@ Re-exports [RequiredType](../record/required.md#requiredtype)
 
 ### safeInt
 
-Re-exports [safeInt](../branded/number/safe-int.md#safeint)
+Re-exports [safeInt](../predefined/brand/number/safe-int.md#safeint)
 
 ---
 
 ### safeUint
 
-Re-exports [safeUint](../branded/number/safe-uint.md#safeuint)
+Re-exports [safeUint](../predefined/brand/number/safe-uint.md#safeuint)
 
 ---
 
@@ -10294,13 +10294,13 @@ Re-exports [SetType](../other-types/set.md#settype)
 
 ### simpleBrandedNumber
 
-Re-exports [simpleBrandedNumber](../branded/simple-branded-number.md#simplebrandednumber)
+Re-exports [simpleBrandedNumber](../brand/simple-branded-number.md#simplebrandednumber)
 
 ---
 
 ### simpleBrandedString
 
-Re-exports [simpleBrandedString](../branded/simple-branded-string.md#simplebrandedstring)
+Re-exports [simpleBrandedString](../brand/simple-branded-string.md#simplebrandedstring)
 
 ---
 
@@ -10372,19 +10372,19 @@ Re-exports [TypeOf](../type/README.md#typeof)
 
 ### uint
 
-Re-exports [uint](../branded/number/uint.md#uint)
+Re-exports [uint](../predefined/brand/number/uint.md#uint)
 
 ---
 
 ### uint16
 
-Re-exports [uint16](../branded/number/uint16.md#uint16)
+Re-exports [uint16](../predefined/brand/number/uint16.md#uint16)
 
 ---
 
 ### uint32
 
-Re-exports [uint32](../branded/number/uint32.md#uint32)
+Re-exports [uint32](../predefined/brand/number/uint32.md#uint32)
 
 ---
 

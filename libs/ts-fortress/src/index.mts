@@ -1,5 +1,5 @@
 export * from './array/index.mjs';
-export * from './branded/index.mjs';
+export * from './brand/index.mjs';
 export * from './compose/index.mjs';
 export * from './enum/index.mjs';
 export * from './other-types/index.mjs';
