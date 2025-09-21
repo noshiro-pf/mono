@@ -75,7 +75,7 @@
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-array-func": "5.0.2",
     "eslint-plugin-cypress": "5.1.1",
-    "eslint-plugin-eslint-plugin": "6.4.0",
+    "eslint-plugin-eslint-plugin": "7.0.0",
     "eslint-plugin-functional": "7.1.0",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-jest": "28.11.0",

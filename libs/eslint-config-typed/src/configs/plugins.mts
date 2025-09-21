@@ -44,7 +44,6 @@ import eslintPluginReactPerf from 'eslint-plugin-react-perf';
 // @ts-expect-error no type definition
 import eslintPluginJsxA11y from 'eslint-plugin-jsx-a11y';
 
-// @ts-expect-error no type definition
 import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
 
 // import eslintPluginTotalFunctions from 'eslint-plugin-total-functions';
@@ -115,7 +114,7 @@ export const plugins: Record<
   'total-functions': eslintPluginTotalFunctions,
   unicorn: eslintPluginUnicorn,
   'tree-shakable': eslintPluginTreeShakable,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
   'eslint-plugin': eslintPluginEslintPlugin,
   custom: eslintPluginCustom,
 } as const satisfies FlatConfig['plugins'];
