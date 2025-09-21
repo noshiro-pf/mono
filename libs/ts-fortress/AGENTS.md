@@ -2,35 +2,36 @@
 
 ## Project Structure & Module Organization
 
-- `src/` holds modular `.mts` sources; keep utilities small and re-export via `src/index.mts`. After adding modules, run `npm run gi` to refresh barrels.
-- `test/` contains integration and exploratory specs; co-locate focused unit tests as `*.test.mts` beside implementations. Keep names descriptive and mirror the source folder layout.
-- Generated assets live in `dist/`, `docs/`, `coverage/`, `samples/`, and `documents/`; never edit build outputs by hand. Shared tooling lives in `configs/`, while reusable scripts belong in `scripts/`.
-- Use the repository root `README.md` and `documents/` for longer guides; update both when developer workflows change.
+- Keep all TypeScript sources in `src/` using focused `.mts` modules; re-export shared helpers through `src/index.mts` and rerun `npm run gi` after adding modules.
+- Place integration and exploratory specs in `test/`; co-locate tight unit specs as `*.test.mts` beside their implementations and mirror folder names.
+- Treat `dist/`, `docs/`, `coverage/`, `samples/`, and `documents/` as generated outputs; never hand-edit build artifacts.
+- Centralize shared tooling in `configs/` and reusable automation in `scripts/` to keep the project root tidy.
 
 ## Build, Test, and Development Commands
 
-- `npm run build` compiles the ESM bundles into `dist/`.
-- `npm test`, `npm run testw`, and `npm run test:ui` run Vitest once, in watch mode, or through the UI runner.
-- `npm run lint`, `npm run lint:fix`, `npm run type-check`, and `npm run fmt` enforce style, static analysis, and formatting.
-- `npm run check-all` executes the full local CI pipeline. Use `npm run doc` and `npm run doc:embed` when updating reference docs or samples.
+- `npm run build` compiles the ESM bundles into `dist/` for publishing and docs.
+- `npm test`, `npm run testw`, and `npm run test:ui` execute Vitest once, in watch mode, or via the UI runner.
+- `npm run lint`, `npm run lint:fix`, `npm run type-check`, and `npm run fmt` enforce linting, typing, and formatting standards.
+- `npm run check-all` runs the local CI chain; use `npm run doc` and `npm run doc:embed` when refreshing documentation assets.
 
 ## Coding Style & Naming Conventions
 
-- TypeScript-only, ESM modules; prefer named exports, arrow functions, and hyphenated lowercase file names. Import extensions intentionally include `.mjs`.
-- Adhere to two-space indentation, destructured imports, and the repository ESLint + Prettier rules. Avoid `as any`, `@ts-ignore`, or file-scope disable comments.
-- Favor readonly parameter types for complex objects, and keep comments concise and purpose-driven.
+- Write modern TypeScript ESM with named exports, arrow functions, and kebab-case filenames ending in `.mjs` for imports.
+- Apply two-space indentation, prefer destructured imports, and keep comments short and focused.
+- Avoid `as any`, `@ts-ignore`, or blanket disable directives; rely on the configured ESLint and Prettier rules.
 
 ## Testing Guidelines
 
-- Vitest is the primary framework; use `test()` blocks with `.toStrictEqual()` assertions. Reach for `expectType<A, B>('=')` to verify compile-time contracts.
-- Mirror source structure in test filenames, cover both happy paths and guard rails, and run `npm run test:cov` followed by `npm run test:cov:ui` to inspect coverage.
+- Standardize on Vitest with `test()` blocks and `.toStrictEqual()` assertions to lock behavior.
+- Maintain test names that describe intent, cover both success paths and guard rails, and mirror source layout.
+- For coverage reviews, run `npm run test:cov` followed by `npm run test:cov:ui`.
 
 ## Commit & Pull Request Guidelines
 
-- Follow Conventional Commits (e.g., `feat(parser): add combinator`, `fix(record): handle excess properties`). Mark breaking changes via `BREAKING CHANGE:` footers or the `scope: breaking` pattern.
-- PRs must summarize rationale, link related issues, attach relevant screenshots, and confirm `npm run check-all` success. Do not bump versions; releases are automated.
+- Follow Conventional Commits (e.g., `feat(parser): add combinator`, `fix(record): handle excess properties`) and flag breaking changes with a `BREAKING CHANGE:` footer or `scope: breaking` tag.
+- PRs should explain rationale, link issues, attach relevant screenshots, and confirm `npm run check-all` passed; never bump versions manually.
 
-## Workflow Tips
+## Workflow & Tooling Tips
 
-- Keep work on focused feature branches, rebase before opening a PR, and avoid touching `~/.ssh` or other sensitive paths.
-- Network access is restricted; cache dependencies locally and surface any tooling gaps early so they can be addressed.
+- Branch per feature, rebase before opening a PR, and avoid modifying user-level config like `~/.ssh`.
+- Network access is restricted; surface dependency or tooling gaps early so maintainers can assist.
