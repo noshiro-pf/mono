@@ -720,8 +720,8 @@ ts-fortress provides extensive support for branded types to create domain-specif
 import * as t from 'ts-fortress';
 
 // Simple branded types
-const UserId = t.simpleBrandedString({ typeName: 'UserId', defaultValue: '' });
-const Weight = t.simpleBrandedNumber({ typeName: 'Weight', defaultValue: 0 });
+const UserId = t.brandedString({ typeName: 'UserId', defaultValue: '' });
+const Weight = t.brandedNumber({ typeName: 'Weight', defaultValue: 0 });
 
 type UserId = t.TypeOf<typeof UserId>; // Brand<string, 'UserId'>
 type Weight = t.TypeOf<typeof Weight>; // Brand<number, 'Weight'>
@@ -972,8 +972,8 @@ This project is licensed under the Apache-2.0 License - see the [LICENSE](_media
 - [array/tuple](array/tuple.md)
 - [brand](brand.md)
 - [brand/brand](brand/brand.md)
-- [brand/simple-branded-number](brand/simple-branded-number.md)
-- [brand/simple-branded-string](brand/simple-branded-string.md)
+- [brand/branded-number](brand/branded-number.md)
+- [brand/branded-string](brand/branded-string.md)
 - [compose](compose.md)
 - [compose/intersection](compose/intersection.md)
 - [compose/merge-records](compose/merge-records.md)

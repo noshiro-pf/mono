@@ -4,8 +4,8 @@ const IGNORE_EMBEDDING = (..._args: readonly unknown[]): void => {};
 import * as t from 'ts-fortress';
 
 // Simple branded types
-const UserId = t.simpleBrandedString({ typeName: 'UserId', defaultValue: '' });
-const Weight = t.simpleBrandedNumber({ typeName: 'Weight', defaultValue: 0 });
+const UserId = t.brandedString({ typeName: 'UserId', defaultValue: '' });
+const Weight = t.brandedNumber({ typeName: 'Weight', defaultValue: 0 });
 
 type UserId = t.TypeOf<typeof UserId>; // Brand<string, 'UserId'>
 type Weight = t.TypeOf<typeof Weight>; // Brand<number, 'Weight'>

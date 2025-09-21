@@ -1,3 +1,3 @@
 export * from './brand.mjs';
-export * from './simple-branded-number.mjs';
-export * from './simple-branded-string.mjs';
+export * from './branded-number.mjs';
+export * from './branded-string.mjs';

@@ -1,11 +1,11 @@
 import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
-import { simpleBrandedString } from './simple-branded-string.mjs';
+import { brandedString } from './branded-string.mjs';
 
 describe('simpleBrandedString', () => {
   describe('with default value', () => {
-    const userNameType = simpleBrandedString({
+    const userNameType = brandedString({
       typeName: 'UserName',
       defaultValue: '',
     });
@@ -98,7 +98,7 @@ describe('simpleBrandedString', () => {
   });
 
   describe('with custom default value', () => {
-    const categoryType = simpleBrandedString({
+    const categoryType = brandedString({
       typeName: 'Category',
       defaultValue: 'general',
     });
@@ -161,7 +161,7 @@ describe('simpleBrandedString', () => {
   });
 
   describe('type assertions and narrowing', () => {
-    const emailType = simpleBrandedString({
+    const emailType = brandedString({
       typeName: 'Email',
       defaultValue: '',
     });
@@ -183,11 +183,11 @@ describe('simpleBrandedString', () => {
   });
 
   describe('different brand types', () => {
-    const firstNameType = simpleBrandedString({
+    const firstNameType = brandedString({
       typeName: 'FirstName',
       defaultValue: '',
     });
-    const lastNameType = simpleBrandedString({
+    const lastNameType = brandedString({
       typeName: 'LastName',
       defaultValue: '',
     });

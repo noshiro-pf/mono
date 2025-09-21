@@ -1,11 +1,11 @@
 import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
-import { simpleBrandedNumber } from './simple-branded-number.mjs';
+import { brandedNumber } from './branded-number.mjs';
 
 describe('simpleBrandedNumber', () => {
   describe('with default value', () => {
-    const userIdType = simpleBrandedNumber({
+    const userIdType = brandedNumber({
       typeName: 'UserId',
       defaultValue: 0,
     });
@@ -97,7 +97,7 @@ describe('simpleBrandedNumber', () => {
   });
 
   describe('with custom default value', () => {
-    const scoreType = simpleBrandedNumber({
+    const scoreType = brandedNumber({
       typeName: 'Score',
       defaultValue: 100,
     });
@@ -160,7 +160,7 @@ describe('simpleBrandedNumber', () => {
   });
 
   describe('type assertions and narrowing', () => {
-    const priceType = simpleBrandedNumber({
+    const priceType = brandedNumber({
       typeName: 'Price',
       defaultValue: 0,
     });

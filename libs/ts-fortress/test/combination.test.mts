@@ -2,6 +2,7 @@ import { asInt, expectType, Result } from 'ts-data-forge';
 import {
   array,
   arrayOfLength,
+  brandedString,
   enumType,
   int,
   intersection,
@@ -20,7 +21,6 @@ import {
   record,
   recursion,
   refine,
-  simpleBrandedString,
   tuple,
   uintRange,
   undefinedType,
@@ -251,7 +251,7 @@ describe('nested record', () => {
 });
 
 describe('advanced type', () => {
-  const Identifier = simpleBrandedString({
+  const Identifier = brandedString({
     typeName: 'Identifier',
     defaultValue: 'id:0000',
   });
@@ -286,12 +286,12 @@ describe('advanced type', () => {
   const Metrics = keyValueRecord(MetricKeys, EvenRange);
   const NullableMetrics = nullable(Metrics);
 
-  const Tag = simpleBrandedString({
+  const Tag = brandedString({
     typeName: 'Tag',
     defaultValue: 'tag:0',
   });
 
-  const SettingKey = simpleBrandedString({
+  const SettingKey = brandedString({
     typeName: 'SettingKey',
     defaultValue: 'setting:0',
   });

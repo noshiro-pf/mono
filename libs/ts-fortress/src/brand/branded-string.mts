@@ -2,7 +2,7 @@ import { string } from '../primitives/index.mjs';
 import { type Type } from '../type.mjs';
 import { brand } from './brand.mjs';
 
-export const simpleBrandedString = <K extends string>({
+export const brandedString = <K extends string>({
   typeName,
   defaultValue,
   is = (_u): _u is Brand<string, K> => true,
@@ -21,3 +21,6 @@ export const simpleBrandedString = <K extends string>({
     is,
     brandKeys: [typeName],
   });
+
+/** Same as brandedString */
+export const simpleBrandedString = brandedString;

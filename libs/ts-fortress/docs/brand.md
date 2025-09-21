@@ -14,12 +14,24 @@ Re-exports [brand](brand/brand.md#brand)
 
 ---
 
+### brandedNumber
+
+Re-exports [brandedNumber](brand/branded-number.md#brandednumber)
+
+---
+
+### brandedString
+
+Re-exports [brandedString](brand/branded-string.md#brandedstring)
+
+---
+
 ### simpleBrandedNumber
 
-Re-exports [simpleBrandedNumber](brand/simple-branded-number.md#simplebrandednumber)
+Re-exports [simpleBrandedNumber](brand/branded-number.md#simplebrandednumber)
 
 ---
 
 ### simpleBrandedString
 
-Re-exports [simpleBrandedString](brand/simple-branded-string.md#simplebrandedstring)
+Re-exports [simpleBrandedString](brand/branded-string.md#simplebrandedstring)
