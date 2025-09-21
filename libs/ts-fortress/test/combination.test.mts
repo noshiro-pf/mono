@@ -131,14 +131,14 @@ describe('nested record', () => {
           path: ['xs', '1'],
           actualValue: 2.2,
           expectedType: 'Int',
-          typeName: '"Finite" & "Int" & not("NaNValue")',
+          typeName: 'Int',
           message: undefined,
         },
         {
           path: ['xs', '2'],
           actualValue: 3.3,
           expectedType: 'Int',
-          typeName: '"Finite" & "Int" & not("NaNValue")',
+          typeName: 'Int',
           message: undefined,
         },
         {

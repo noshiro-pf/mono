@@ -77,7 +77,7 @@ describe('safeInt', () => {
           path: [],
           actualValue: Number.MAX_SAFE_INTEGER + 1,
           expectedType: 'SafeInt',
-          typeName: '"Finite" & "Int" & "SafeInt" & not("NaNValue")',
+          typeName: 'SafeInt',
           message: undefined,
         },
       ]);

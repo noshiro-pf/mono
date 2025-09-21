@@ -69,7 +69,7 @@ describe('int', () => {
           path: [],
           actualValue: 42.5,
           expectedType: 'Int',
-          typeName: '"Finite" & "Int" & not("NaNValue")',
+          typeName: 'Int',
           message: undefined,
         },
       ]);

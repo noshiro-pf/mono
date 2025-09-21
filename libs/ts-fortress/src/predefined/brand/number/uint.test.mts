@@ -99,8 +99,7 @@ describe('uint', () => {
           path: [],
           actualValue: -5,
           expectedType: 'Uint',
-          typeName:
-            '"Finite" & "Int" & "> -2^32" & ">= -2^31" & "> -2^16" & ">= -2^15" & ">=0" & not("NaNValue")',
+          typeName: 'Uint',
           message: undefined,
         },
       ]);

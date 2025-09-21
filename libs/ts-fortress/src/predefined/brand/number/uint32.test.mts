@@ -95,8 +95,7 @@ describe('uint32', () => {
           path: [],
           actualValue: -5,
           expectedType: 'Uint32',
-          typeName:
-            '"Finite" & "Int" & "SafeInt" & "> -2^16" & "> -2^32" & ">= -2^15" & ">= -2^31" & ">=0" & "< 2^32" & not("NaNValue")',
+          typeName: 'Uint32',
           message: undefined,
         },
       ]);

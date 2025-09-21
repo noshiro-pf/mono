@@ -12,7 +12,7 @@
 
 > `const` **simpleBrandedNumber**: \<`K`\>(`__namedParameters`) => [`Type`](../type/README.md#type)\<`Brand`\<`number`, `K`\>\> = `brandedNumber`
 
-Defined in: [src/brand/branded-number.mts:26](https://github.com/noshiro-pf/ts-fortress/blob/main/src/brand/branded-number.mts#L26)
+Defined in: [src/brand/branded-number.mts:27](https://github.com/noshiro-pf/ts-fortress/blob/main/src/brand/branded-number.mts#L27)
 
 Same as brandedNumber
 

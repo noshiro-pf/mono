@@ -12,7 +12,7 @@
 
 > `const` **simpleBrandedString**: \<`K`\>(`__namedParameters`) => [`Type`](../type/README.md#type)\<`Brand`\<`string`, `K`\>\> = `brandedString`
 
-Defined in: [src/brand/branded-string.mts:26](https://github.com/noshiro-pf/ts-fortress/blob/main/src/brand/branded-string.mts#L26)
+Defined in: [src/brand/branded-string.mts:27](https://github.com/noshiro-pf/ts-fortress/blob/main/src/brand/branded-string.mts#L27)
 
 Same as brandedString
 

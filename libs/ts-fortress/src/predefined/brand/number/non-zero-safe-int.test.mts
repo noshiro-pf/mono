@@ -90,7 +90,7 @@ describe('nonZeroSafeInt', () => {
           path: [],
           actualValue: 0,
           expectedType: 'NonZeroSafeInt',
-          typeName: '"Finite" & "Int" & "SafeInt" & "!=0" & not("NaNValue")',
+          typeName: 'NonZeroSafeInt',
           message: undefined,
         },
       ]);

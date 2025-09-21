@@ -20,6 +20,7 @@ export const brandedNumber = <K extends string>({
 
     is,
     brandKeys: [typeName],
+    typeName,
   });
 
 /** Same as brandedNumber */

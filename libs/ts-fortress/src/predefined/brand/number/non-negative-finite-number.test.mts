@@ -95,8 +95,7 @@ describe('nonNegativeFiniteNumber', () => {
           path: [],
           actualValue: -5.5,
           expectedType: 'NonNegativeFiniteNumber',
-          typeName:
-            '">=0" & "> -2^16" & "> -2^32" & ">= -2^15" & ">= -2^31" & "Finite" & not("NaNValue")',
+          typeName: 'NonNegativeFiniteNumber',
           message: undefined,
         },
       ]);

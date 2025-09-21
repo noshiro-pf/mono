@@ -77,8 +77,7 @@ describe('int32', () => {
           path: [],
           actualValue: 3_000_000_000,
           expectedType: 'Int32',
-          typeName:
-            '"Finite" & "Int" & "SafeInt" & "> -2^32" & ">= -2^31" & "< 2^32" & "< 2^31" & not("NaNValue")',
+          typeName: 'Int32',
           message: undefined,
         },
       ]);

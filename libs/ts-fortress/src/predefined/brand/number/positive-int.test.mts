@@ -105,8 +105,7 @@ describe('positiveInt', () => {
           path: [],
           actualValue: -5,
           expectedType: 'PositiveInt',
-          typeName:
-            '"Finite" & "Int" & "> -2^32" & ">= -2^31" & "> -2^16" & ">= -2^15" & ">=0" & "!=0" & not("NaNValue")',
+          typeName: 'PositiveInt',
           message: undefined,
         },
       ]);

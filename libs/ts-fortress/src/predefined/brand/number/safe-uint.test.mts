@@ -95,8 +95,7 @@ describe('safeUint', () => {
           path: [],
           actualValue: -5,
           expectedType: 'SafeUint',
-          typeName:
-            '"Finite" & "Int" & "SafeInt" & "> -2^16" & "> -2^32" & ">= -2^15" & ">= -2^31" & ">=0" & not("NaNValue")',
+          typeName: 'SafeUint',
           message: undefined,
         },
       ]);

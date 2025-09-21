@@ -56,7 +56,7 @@ export const brand = <
                     path: [],
                     actualValue: res.value,
                     expectedType: typeNameFilled,
-                    typeName: brandKeysStr,
+                    typeName: typeNameFilled,
                     message:
                       typeName === undefined
                         ? `The value must satisfy the constraint corresponding to the brand keys: <${brandKeysStr}>`

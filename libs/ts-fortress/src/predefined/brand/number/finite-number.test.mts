@@ -89,7 +89,7 @@ describe('finiteNumber', () => {
           path: [],
           actualValue: Number.POSITIVE_INFINITY,
           expectedType: 'FiniteNumber',
-          typeName: '"Finite" & not("NaNValue")',
+          typeName: 'FiniteNumber',
           message: undefined,
         },
       ]);

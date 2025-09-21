@@ -95,7 +95,7 @@ describe('nonZeroFiniteNumber', () => {
           path: [],
           actualValue: 0,
           expectedType: 'NonZeroFiniteNumber',
-          typeName: '"!=0" & "Finite" & not("NaNValue")',
+          typeName: 'NonZeroFiniteNumber',
           message: undefined,
         },
       ]);

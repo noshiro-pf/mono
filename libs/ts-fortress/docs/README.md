@@ -936,8 +936,9 @@ type ValidationError = Readonly<{
 ### Refinement
 
 - `t.refine({ baseType, is, defaultValue })` - Refine `baseType` by `is` function
-- `t.simpleBrandedString({ typeName, defaultValue, is? })` - Simple string branding
-- `t.simpleBrandedNumber({ typeName, defaultValue, is? })` - Simple number branding
+- `t.brand({ baseType, is, defaultValue, brandKeys, brandFalseKeys?, typeName? })` - Refine `baseType` by `is` function with brand typing
+- `t.brandedString({ typeName, defaultValue, is? })` - String branding
+- `t.brandedNumber({ typeName, defaultValue, is? })` - Number branding
 - Number types: `t.int()`, `t.safeInt()`, `t.positiveInt()`, `t.uint16()`, etc.
 
 ### Utilities
