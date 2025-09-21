@@ -12,7 +12,7 @@
 
 ## Type Aliases
 
-### IMapMapped\<K, V, KM\>
+### IMapMapped
 
 > **IMapMapped**\<`K`, `V`, `KM`\> = `Iterable`\<readonly \[`K`, `V`\]\> & `IMapMappedInterface`\<`K`, `V`, `KM`\>
 

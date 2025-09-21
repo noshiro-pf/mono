@@ -22,7 +22,7 @@ Represents an [Optional](../README.md#optional) with an unknown value type.
 
 ---
 
-### NarrowToNone\<O\>
+### NarrowToNone
 
 > **NarrowToNone**\<`O`\> = `O` _extends_ [`None`](#none) ? `O` : `never`
 
@@ -41,7 +41,7 @@ The [Optional.Base](#base) type to narrow.
 
 ---
 
-### NarrowToSome\<O\>
+### NarrowToSome
 
 > **NarrowToSome**\<`O`\> = `O` _extends_ [`None`](#none) ? `never` : `O`
 
@@ -70,7 +70,7 @@ Represents an [Optional](../README.md#optional) that does not contain a value (i
 
 ---
 
-### Some\<S\>
+### Some
 
 > **Some**\<`S`\> = `Some_`\<`S`\>
 
@@ -88,7 +88,7 @@ The type of the contained value.
 
 ---
 
-### Unwrap\<O\>
+### Unwrap
 
 > **Unwrap**\<`O`\> = `O` _extends_ [`Some`](#some)\<infer S\> ? `S` : `never`
 

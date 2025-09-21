@@ -12,7 +12,7 @@
 
 ## Type Aliases
 
-### ISet\<K\>
+### ISet
 
 > **ISet**\<`K`\> = `Iterable`\<`K`\> & `ISetInterface`\<`K`\>
 

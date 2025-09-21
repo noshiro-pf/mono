@@ -12,7 +12,7 @@
 
 ## Type Aliases
 
-### Optional\<S\>
+### Optional
 
 > **Optional**\<`S`\> = `None_` \| `Some_`\<`S`\>
 

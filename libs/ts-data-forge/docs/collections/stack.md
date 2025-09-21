@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### Stack\<T\>
+### Stack
 
 > **Stack**\<`T`\> = `Readonly`\<\{ `isEmpty`: `boolean`; `pop`: () => [`Optional`](../functional/optional/README.md#optional)\<`T`\>; `push`: (`value`) => `void`; `size`: [`Arr`](../globals/namespaces/SizeType.md#arr); \}\>
 

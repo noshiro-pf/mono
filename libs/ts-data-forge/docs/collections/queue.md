@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### Queue\<T\>
+### Queue
 
 > **Queue**\<`T`\> = `Readonly`\<\{ `dequeue`: () => [`Optional`](../functional/optional/README.md#optional)\<`T`\>; `enqueue`: (`value`) => `void`; `isEmpty`: `boolean`; `size`: [`Arr`](../globals/namespaces/SizeType.md#arr); \}\>
 

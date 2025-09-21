@@ -12,7 +12,7 @@
 
 ## Type Aliases
 
-### ISetMapped\<K, KM\>
+### ISetMapped
 
 > **ISetMapped**\<`K`, `KM`\> = `Iterable`\<`K`\> & `Readonly`\<`ISetMappedInterface`\<`K`, `KM`\>\>
 
