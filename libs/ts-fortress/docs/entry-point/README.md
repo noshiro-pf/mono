@@ -10004,6 +10004,12 @@ Re-exports [createType](../utils/create-type.md#createtype)
 
 ---
 
+### email
+
+Re-exports [email](../predefined/brand/string/email.md#email)
+
+---
+
 ### enumType
 
 Re-exports [enumType](../enum/enum.md#enumtype)
@@ -10052,6 +10058,12 @@ Re-exports [intRange](../enum/int-range.md#intrange)
 
 ---
 
+### iso8601
+
+Re-exports [iso8601](../predefined/brand/string/iso-8601.md#iso8601)
+
+---
+
 ### isOptionalProperty
 
 Re-exports [isOptionalProperty](../record/optional.md#isoptionalproperty)
@@ -10067,6 +10079,12 @@ Re-exports [JsonObject](../predefined/json.md#jsonobject)
 ### JsonPrimitive
 
 Re-exports [JsonPrimitive](../predefined/json.md#jsonprimitive)
+
+---
+
+### jsonString
+
+Re-exports [jsonString](../predefined/brand/string/json-string.md#jsonstring)
 
 ---
 
@@ -10427,6 +10445,30 @@ Re-exports [union](../compose/union.md#union)
 ### unknown
 
 Re-exports [unknown](../other-types/unknown.md#unknown)
+
+---
+
+### uuid
+
+Re-exports [uuid](../predefined/brand/string/uuid.md#uuid)
+
+---
+
+### uuidV4
+
+Re-exports [uuidV4](../predefined/brand/string/uuid.md#uuidv4)
+
+---
+
+### uuidV6
+
+Re-exports [uuidV6](../predefined/brand/string/uuid.md#uuidv6)
+
+---
+
+### uuidV7
+
+Re-exports [uuidV7](../predefined/brand/string/uuid.md#uuidv7)
 
 ---
 

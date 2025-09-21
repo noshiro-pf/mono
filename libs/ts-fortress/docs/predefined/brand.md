@@ -8,6 +8,12 @@
 
 ## References
 
+### email
+
+Re-exports [email](brand/string/email.md#email)
+
+---
+
 ### finiteNumber
 
 Re-exports [finiteNumber](brand/number/finite-number.md#finitenumber)
@@ -29,6 +35,18 @@ Re-exports [int16](brand/number/int16.md#int16)
 ### int32
 
 Re-exports [int32](brand/number/int32.md#int32)
+
+---
+
+### iso8601
+
+Re-exports [iso8601](brand/string/iso-8601.md#iso8601)
+
+---
+
+### jsonString
+
+Re-exports [jsonString](brand/string/json-string.md#jsonstring)
 
 ---
 
@@ -101,3 +119,27 @@ Re-exports [uint16](brand/number/uint16.md#uint16)
 ### uint32
 
 Re-exports [uint32](brand/number/uint32.md#uint32)
+
+---
+
+### uuid
+
+Re-exports [uuid](brand/string/uuid.md#uuid)
+
+---
+
+### uuidV4
+
+Re-exports [uuidV4](brand/string/uuid.md#uuidv4)
+
+---
+
+### uuidV6
+
+Re-exports [uuidV6](brand/string/uuid.md#uuidv6)
+
+---
+
+### uuidV7
+
+Re-exports [uuidV7](brand/string/uuid.md#uuidv7)

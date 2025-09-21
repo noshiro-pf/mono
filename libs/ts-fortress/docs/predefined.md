@@ -8,6 +8,12 @@
 
 ## References
 
+### email
+
+Re-exports [email](predefined/brand/string/email.md#email)
+
+---
+
 ### finiteNumber
 
 Re-exports [finiteNumber](predefined/brand/number/finite-number.md#finitenumber)
@@ -38,6 +44,12 @@ Re-exports [int8](predefined/int8.md#int8)
 
 ---
 
+### iso8601
+
+Re-exports [iso8601](predefined/brand/string/iso-8601.md#iso8601)
+
+---
+
 ### JsonObject
 
 Re-exports [JsonObject](predefined/json.md#jsonobject)
@@ -47,6 +59,12 @@ Re-exports [JsonObject](predefined/json.md#jsonobject)
 ### JsonPrimitive
 
 Re-exports [JsonPrimitive](predefined/json.md#jsonprimitive)
+
+---
+
+### jsonString
+
+Re-exports [jsonString](predefined/brand/string/json-string.md#jsonstring)
 
 ---
 
@@ -137,3 +155,27 @@ Re-exports [uint32](predefined/brand/number/uint32.md#uint32)
 ### uint8
 
 Re-exports [uint8](predefined/uint8.md#uint8)
+
+---
+
+### uuid
+
+Re-exports [uuid](predefined/brand/string/uuid.md#uuid)
+
+---
+
+### uuidV4
+
+Re-exports [uuidV4](predefined/brand/string/uuid.md#uuidv4)
+
+---
+
+### uuidV6
+
+Re-exports [uuidV6](predefined/brand/string/uuid.md#uuidv6)
+
+---
+
+### uuidV7
+
+Re-exports [uuidV7](predefined/brand/string/uuid.md#uuidv7)

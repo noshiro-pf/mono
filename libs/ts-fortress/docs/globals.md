@@ -8,14 +8,92 @@
 
 ## Type Aliases
 
+### Email
+
+> **Email** = `Brand`\<`string`, `"Email"`\>
+
+Defined in: [src/globals.d.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L7)
+
+---
+
+### Iso8601
+
+> **Iso8601** = `Brand`\<`string`, `"Iso8601"`\>
+
+Defined in: [src/globals.d.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L5)
+
+---
+
+### JsonString
+
+> **JsonString** = `Brand`\<`string`, `"JsonString"`\>
+
+Defined in: [src/globals.d.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L9)
+
+---
+
 ### PartialReadonly\<T\>
 
 > **PartialReadonly**\<`T`\> = `Partial`\<`Readonly`\<`T`\>\>
 
-Defined in: [src/globals.d.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L5)
+Defined in: [src/globals.d.mts:3](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L3)
 
 #### Type Parameters
 
 ##### T
 
 `T`
+
+---
+
+### Uuid
+
+> **Uuid** = `Brand`\<[`UuidBaseString`](#uuidbasestring), `"Uuid"`\>
+
+Defined in: [src/globals.d.mts:16](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L16)
+
+---
+
+### Uuid4
+
+> **Uuid4** = `Brand`\<[`UuidBaseString`](#uuidbasestring)\<`4`\>, `"Uuid"`\>
+
+Defined in: [src/globals.d.mts:18](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L18)
+
+---
+
+### Uuid6
+
+> **Uuid6** = `Brand`\<[`UuidBaseString`](#uuidbasestring)\<`6`\>, `"Uuid"`\>
+
+Defined in: [src/globals.d.mts:20](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L20)
+
+---
+
+### Uuid7
+
+> **Uuid7** = `Brand`\<[`UuidBaseString`](#uuidbasestring)\<`7`\>, `"Uuid"`\>
+
+Defined in: [src/globals.d.mts:22](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L22)
+
+---
+
+### UuidBaseString\<V\>
+
+> **UuidBaseString**\<`V`\> = `` `${string}-${string}-${V}${string}-${string}-${string}` ``
+
+Defined in: [src/globals.d.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L13)
+
+#### Type Parameters
+
+##### V
+
+`V` _extends_ [`UuidVersion`](#uuidversion) = [`UuidVersion`](#uuidversion)
+
+---
+
+### UuidVersion
+
+> **UuidVersion** = `UintRangeInclusive`\<`1`, `8`\>
+
+Defined in: [src/globals.d.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L11)
