@@ -1,3 +1,9 @@
+## [4.3.1](https://github.com/noshiro-pf/ts-fortress/compare/v4.3.0...v4.3.1) (2025-09-21)
+
+### Bug Fixes
+
+- fix the implementation of brandedString ([#103](https://github.com/noshiro-pf/ts-fortress/issues/103)) ([215749f](https://github.com/noshiro-pf/ts-fortress/commit/215749fdafbb8a7fd621c978add9e794f562253a))
+
 # [4.3.0](https://github.com/noshiro-pf/ts-fortress/compare/v4.2.1...v4.3.0) (2025-09-09)
 
 ### Features
