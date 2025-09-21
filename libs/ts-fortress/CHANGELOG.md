@@ -1,3 +1,9 @@
+# [4.4.0](https://github.com/noshiro-pf/ts-fortress/compare/v4.3.1...v4.4.0) (2025-09-21)
+
+### Features
+
+- add predefined branded strings ([#104](https://github.com/noshiro-pf/ts-fortress/issues/104)) ([95c348e](https://github.com/noshiro-pf/ts-fortress/commit/95c348e7b7c1820a559ae00015d4b15d5e552eea))
+
 ## [4.3.1](https://github.com/noshiro-pf/ts-fortress/compare/v4.3.0...v4.3.1) (2025-09-21)
 
 ### Bug Fixes
