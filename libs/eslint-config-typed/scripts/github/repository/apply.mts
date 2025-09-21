@@ -72,13 +72,20 @@ await updateRepository({
 {
   const repositorySettings = await getRepositorySettings();
 
+  const str = JSON.stringify(
+    Obj.pick(repositorySettings, repositoryKeysToPick),
+    undefined,
+    2,
+  );
+
   await fs.writeFile(
     path.resolve(repositorySettingsDir, repositorySettingsJsonName),
-    JSON.stringify(
-      Obj.pick(repositorySettings, repositoryKeysToPick),
-      undefined,
-      2,
-    ),
+    str,
+  );
+
+  await fs.writeFile(
+    path.resolve(repositorySettingsDir, 'bk', repositorySettingsJsonName),
+    str,
   );
 
   await $('npm run fmt');

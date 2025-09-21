@@ -22,7 +22,7 @@
       "status": "enabled"
     },
     "dependabot_security_updates": {
-      "status": "disabled"
+      "status": "enabled"
     },
     "secret_scanning_non_provider_patterns": {
       "status": "disabled"

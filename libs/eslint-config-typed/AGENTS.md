@@ -2,43 +2,24 @@
 
 ## Project Structure & Module Organization
 
-- `src/` Type-safe ESLint config source: `configs/`, `plugins/`, `rules/`, `types/`, `custom-rules/` (TypeScript ESM, `.mts`).
-- `configs/` Build/test configs: `rollup.config.ts`, `vitest.config.ts`, `tsconfig/*`, `typedoc.config.mjs`.
-- `scripts/` Utilities and CLI tasks under `cmd/` plus GitHub automation.
-- `docs/` Package docs (generated and hand-written). `dist/` is build output (do not edit).
+The ESLint config source sits in `src/`, organized by responsibility: `configs/` for build and test presets, `plugins/` and `rules/` for exported rule collections, `types/` for shared TypeScript declarations, and `custom-rules/` for repository-only rules. Utility scripts live in `scripts/`, with CLI helpers under `scripts/cmd/`. Configuration inputs (Rollup, Vitest, Typedoc, tsconfig variants) are in `configs/`. Generated artifacts land in `dist/`—never edit that directory directly.
 
 ## Build, Test, and Development Commands
 
-- `npm run build` Full build via Rollup; cleans `dist/`, type-checks, generates indexes.
-- `npm run test` Run Vitest (type-check enabled). `testw` watch, `test:ui` UI, `test:cov` coverage.
-- `npm run lint` / `lint:fix` Lint repo using this package’s flat config.
-- `npm run fmt` Format changed files; `fmt:full` formats all.
-- `npm run check-all` End-to-end: install, spellcheck, tests, lint, build, docs, format.
-- `npm run doc` Generate docs; `doc:embed` embeds sample snippets.
+Run `npm run build` for the full pipeline: cleans `dist/`, type-checks, bundles, and regenerates indexes. Use `npm run test` for Vitest with type-checking; switch to `npm run testw` for watch mode or `npm run test:cov` for coverage plus `npm run test:cov:ui` to inspect reports. `npm run lint` (or `npm run lint:fix`) validates the flat config. Formatting goes through `npm run fmt`; `npm run fmt:full` touches the entire tree. For comprehensive pre-release validation, execute `npm run check-all`.
 
 ## Coding Style & Naming Conventions
 
-- Language: TypeScript ESM. Use `.mts` for source; compiled files are `.mjs`.
-- Indentation: 2 spaces (Markdown uses 4) via `.editorconfig`.
-- Formatting: Prettier (+ organize-imports, package.json plugin). Do not hand-format.
-- Exports: Prefer named exports; default exports are generally forbidden (`import/no-default-export`). Allowed in `scripts/**` and `configs/**` only.
-- Imports: Extensions are usually omitted except `*.mjs`/`*.json` (see `import/extensions`).
-- Index files are generated (`npm run gi`); don’t edit generated indexes by hand.
+All sources are TypeScript ESM using the `.mts` extension; compiled output is `.mjs`. Modules favor named exports; defaults are reserved for `configs/**` and `scripts/**`. Imports omit extensions unless targeting `.mjs` or `.json`. Follow the repository’s Prettier setup with organize-imports and package.json plugins—avoid manual formatting. Indentation is two spaces for code (Markdown uses four).
 
 ## Testing Guidelines
 
-- Framework: Vitest with type-checking (`configs/vitest.config.ts`).
-- Location: co-locate as `**/*.test.mts` or under `test/**`.
-- Run: `npm run test`; coverage: `npm run test:cov` and preview HTML via `npm run test:cov:ui`.
+Vitest powers the suite with strict type-checking. Co-locate tests as `*.test.mts` alongside the code or under `test/**`. Guard new rules with scenario-driven tests and include regression cases replicating reported bugs. Run `npm run test` locally before pushing; capture coverage deltas with `npm run test:cov` when altering critical rule logic.
 
 ## Commit & Pull Request Guidelines
 
-- Use Conventional Commits (`feat`, `fix`, `chore`, `docs`, `refactor`, etc.). For majors, follow BREAKING CHANGE footer rules (see `BREAKING_CHANGE_GUIDE.md`).
-- PR titles must be conventional; CI validates titles.
-- PRs should include: purpose, highlights of changes, linked issues, and any screenshots for docs.
-- Ensure `lint`, `test`, and `build` pass before requesting review.
+Commits use Conventional Commit prefixes (`feat`, `fix`, `chore`, `docs`, `refactor`, etc.); declare breaking changes with the standard footer. Pull requests should describe purpose, highlight notable updates, link issues, and attach screenshots for docs changes. Ensure `npm run lint`, `npm run test`, and `npm run build` succeed before requesting review.
 
 ## Security & Configuration Tips
 
-- Node 18+ (CI uses Node 20). Use `npm ci` for reproducible installs.
-- Never commit secrets. GitHub automation reads variables from `.env` (see `.env.example`).
+Develop against Node.js 18 or later (CI runs Node 20). Use `npm ci` for deterministic installs and store local secrets in `.env`, mirroring `.env.example`. Never commit generated credentials or tokens. Review GitHub automation scripts under `scripts/` before modifying workflow-sensitive tasks.
